@@ -1,13 +1,31 @@
+# wichtig fuer release #####################################
 
-- RTreeDatabase: fileName hashCode anhängen für Partition
+- ersetze verbose durch progress wo eine progress-Nachricht ausgegeben werden soll
 
-- RealVector abstract und neu: DoubleVector, IntegerVector, BitVector
-(Arthur) (done: DoubleVector, BitVector)
+- ersetze alle deutschen Sonderzeichen -> ae,oe,ue,ss (oder im Kommentar als html-Kodierung)
 
 - I/O-Access fuer jede DB am Ende eines Algorithmus ausgeben
 
 - ExceptionHandling (user-friendly messages)
 (Elke: ParameterException...)
+
+- Parameterizable hat setVerbose(boolean), setTime(boolean), ein Objekt, das verbose oder time gesetzt hat, setzt dies auch bei jedem Parameterizable, das es verwendet
+
+- OptionHandler in AbstractParameterizable wird private
+
+- option setzen: ueber die Methode in AbstractParameterizable
+
+- RealVector<N extends Number> bei allen Klassen setzen, die RealVector benutzen
+
+- database: epsilon in range query: von String nach D (extends Distance) aendern
+
+
+# laengerfristig: ##########################################
+
+- RTreeDatabase: fileName hashCode anhängen für Partition
+
+- RealVector abstract und neu: DoubleVector, IntegerVector, BitVector
+(Arthur) (done: DoubleVector, BitVector)
 
 - AttributeSettings: ueberall einfuegen (wo benoetigt, evtl. im Parametrizable Interface)
   und im AbstractResult im Constructor übergeben (dann aus writeHeader(...) rausnehmen)
@@ -19,23 +37,14 @@
   das sollte System.out.prints ueberfluessig machen (ebenso System.err.prints)
 (Arthur)
 
-- ersetze alle deutschen Sonderzeichen -> ae,oe,ue,ss
 
 - Database kann als .arff-file geschrieben werden, falls die enthaltenen Objekte das ermoeglichen (.arff kompatibel: Interface)?
   --> converter
 (Arthur)
-
-- Parameterizable hat setVerbose(boolean), setTime(boolean), ein Objekt, das verbose oder time gesetzt hat, setzt dies auch bei jedem Parameterizable, das es verwendet
-
-- OptionHandler in AbstractParameterizable wird private
-
-- option setzen: ueber die Methode in AbstractParameterizable
-
-- RealVector<N extends Number> bei allen Klassen setzen, die RealVector benutzen
 
 - DistanceFunction ist DatabaseListener -> DatabaseChangedEvent: Update, Insert, Delete - Partitioning???
 (Elke)
 
 - ClassLabel als ConstantObject/Singleton, ClassLabelFactory?
 
-- database: epsilon in range query: von String nach D (extends Distance) aendern
+
