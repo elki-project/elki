@@ -38,9 +38,7 @@ public class PClustering<V extends RealVector<V, Double>> extends
 
 	/**
 	 * Parameter to indicate the minimum columnsize of the resulting biclusters
-	 * <p>
-	 * Key: {@code nc}
-	 * </p>
+	 * <p>Key: {@code -nc}</p>
 	 */
 	public static final IntParameter NUMBER_COLS = new IntParameter("nc",
 			"indicates the minimum columnsize of the resulting biclusters",
@@ -48,9 +46,7 @@ public class PClustering<V extends RealVector<V, Double>> extends
 
 	/**
 	 * Parameter to indicate the minimum rowsize of the resulting biclusters
-	 * <p>
-	 * Key: {@code nr}
-	 * </p>
+	 * <p> Key: {@code -nr} </p>
 	 */
 	public static final IntParameter NUMBER_ROWS = new IntParameter("nr",
 			"indicates the minimum rowsize of the resulting biclusters",
@@ -58,9 +54,7 @@ public class PClustering<V extends RealVector<V, Double>> extends
 
 	/**
 	 * threshold value to determine the maximal acceptable score of a bicluster
-	 * <p>
-	 * Key: {@code sigma}
-	 * </p>
+	 * <p> Key: {@code -sigma} </p>
 	 */
 	public static final DoubleParameter SIGMA_PARAM = new DoubleParameter(
 			"sigma",
@@ -420,18 +414,11 @@ public class PClustering<V extends RealVector<V, Double>> extends
 	}
 
 	/**
-	 * Matches every column/row of a key appearing in
-	 * 
-	 * @param mds
-	 *            to the total number of occurrences of that column/row in
-	 * @param mds,
-	 *            setting pairOccurances Matches every column/row appearing in
-	 * @param mds
-	 *            to the total number of occurrences of that column/row in
-	 * @param mds,
-	 *            setting clusterOccurances
-	 * @param mds
-	 *            rowMDS or colMDS
+	 * Matches every column/row of a key appearing in @param mds to the total number 
+	 * of occurrences of that column/row in @param mds, setting pairOccurances. Matches 
+	 * every column/row appearing in @param mds   to the total number of occurrences 
+	 * of that column/row in @param mds, setting clusterOccurances.
+	 * @param mds rowMDS or colMDS
 	 */
 	private void countOccurances(Map<IntegerTriple, BitSet> mds) {
 		clusterOccurances = new HashMap<Integer, Integer>();
@@ -509,15 +496,19 @@ public class PClustering<V extends RealVector<V, Double>> extends
 	 * Matches an array of three values with the corresponding columns/rows,
 	 * forming a rowMDS/columnMDS. All columns/rows belonging to a MDS are
 	 * sorted in ascending order. The difference between the greatest and the
-	 * smallest value of such a MDS is less then
-	 * 
-	 * @param sigma.
+	 * smallest value of such a MDS is less then @param sigma.
+	 * @param x first row/column forming an row/column mds;
+	 * @param y second row/column forming an row/column mds;
+	 * @param t columns/rows containing potential candidates for the row/column mds
+	 * @param min minimum number of columns/rows a mds must contain
+	 * @param rows true if the mds is a rowMDS, false otherwise
+	 * @return List of row- or columnMDSs.
 	 */
-	private ArrayList<BitSet> pairCluster(int x, int y, BitSet t, int anzahl,
-			boolean cols) {
+	private ArrayList<BitSet> pairCluster(int x, int y, BitSet t, int min,
+			boolean rows) {
 		ArrayList<BitSet> resultSet = new ArrayList<BitSet>();
 		BitSet result = null;
-		diffArray = fillDiffArray(x, y, t, cols);
+		diffArray = fillDiffArray(x, y, t, rows);
 		resetEnumeration(t);
 		enumeration = sortArray(diffArray, enumeration);
 		int start = 0;
@@ -530,7 +521,7 @@ public class PClustering<V extends RealVector<V, Double>> extends
 				end++;
 				neu = true;
 			} else {
-				if (end - start >= anzahl && neu) {
+				if (end - start >= min && neu) {
 					result = setBitSet(start, end);
 					resultSet.add(result);
 				}
@@ -538,7 +529,7 @@ public class PClustering<V extends RealVector<V, Double>> extends
 				neu = false;
 			}
 		}
-		if (end - start >= anzahl && neu) {
+		if (end - start >= min && neu) {
 			result = setBitSet(start, end);
 			resultSet.add(result);
 		}

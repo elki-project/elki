@@ -1,7 +1,9 @@
 package de.lmu.ifi.dbs.algorithm.clustering.biclustering;
 
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -35,34 +37,48 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	 * its value is 0 (default) a weighted random order is performed, abetting
 	 * actions with greater gain, if its value is 1 a random order is performed
 	 * else, for values greater then 1 the normal order of actions (1..rowDim
-	 * +colDim) is performed 
-	 * <p>Default value: 0</p>
-	 * <p>Key: {@code actionOrder}</p>
+	 * +colDim) is performed
+	 * <p>
+	 * Default value: 0
+	 * </p>
+	 * <p>
+	 * Key: {@code -actionOrder}
+	 * </p>
 	 */
 	public static final IntParameter ACTION_ORDER_PARAM = new IntParameter(
 			"actionOrder", "specifies the order of actions",
 			new GreaterEqualConstraint(0));
 
 	/**
-	 * seed for creating initial clusters 
-	 * <p>Default value: 1</p>
-	 * <p>Key: {@code seed}</p>
+	 * seed for creating initial clusters
+	 * <p>
+	 * Default value: 1
+	 * </p>
+	 * <p>
+	 * Key: {@code -seed}
+	 * </p>
 	 */
 	public static final IntParameter SEED_PARAM = new IntParameter("seed",
 			"seed for initial clusters", new GreaterEqualConstraint(1));
 
 	/**
-	 * Parameter which indicates how many biclusters should be found 
-	 * <p>Default value: 1</p>
-	 * <p>Key: {@code k}</p>
+	 * Parameter which indicates how many biclusters should be found
+	 * <p>
+	 * Default value: 1
+	 * </p>
+	 * <p>
+	 * Key: {@code -k}
+	 * </p>
 	 */
 	public static final IntParameter K_PARAM = new IntParameter("k",
 			"indicates how many biclusters should be found",
 			new GreaterEqualConstraint(1));
 
 	/**
-	 * Parameter to approximate the rowDimension of an initial bicluster 
-	 * <p>Key: {@code initialRowDim}</p>
+	 * Parameter to approximate the rowDimension of an initial bicluster
+	 * <p>
+	 * Key: {@code -initialRowDim}
+	 * </p>
 	 */
 	public static final DoubleParameter INITIAL_ROW_DIM_PARAM = new DoubleParameter(
 			"initialRowDim",
@@ -70,8 +86,10 @@ public class FLOC<V extends RealVector<V, Double>> extends
 			new LessEqualConstraint(1.0));
 
 	/**
-	 * Parameter to approximate the columnDimension of an initial bicluster 
-	 * <p>Key: {@code initialColDim}</p>
+	 * Parameter to approximate the columnDimension of an initial bicluster
+	 * <p>
+	 * Key: {@code -initialColDim}
+	 * </p>
 	 */
 	public static final DoubleParameter INITIAL_COL_DIM_PARAM = new DoubleParameter(
 			"initialColDim",
@@ -79,8 +97,10 @@ public class FLOC<V extends RealVector<V, Double>> extends
 			new LessEqualConstraint(1.0));
 
 	/**
-	 * Keeps the value which marks a missing entry within the database 
-	 * <p>Key: {@code missing}</p>
+	 * Keeps the value which marks a missing entry within the database
+	 * <p>
+	 * Key: {@code -missing}
+	 * </p>
 	 */
 	public static final DoubleParameter MISSING_PARAM = new DoubleParameter(
 			"missing",
@@ -242,12 +262,17 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	/**
 	 * keeps the columnMeans of the currently processed bicluster
 	 */
-	private Map<Integer, Double> columnMeans;
+	private List<Double> colMeans;
 
 	/**
 	 * keeps the rowMeans of the currently processed bicluster
 	 */
-	private Map<Integer, Double> rowMeans;
+	private List<Double> rowMeans;
+
+	private List<Double>[] rowClusterMeans;
+	private List<Double>[] colClusterMeans;
+	private double[] biclusterMeans;
+	private double[] valueHClusters;
 
 	/**
 	 * keeps the biclusterMeans of the currently processed bicluster
@@ -306,8 +331,7 @@ public class FLOC<V extends RealVector<V, Double>> extends
 		currCols = new BitSet();
 		rowClusters = new BitSet[k];
 		colClusters = new BitSet[k];
-		rowMeans = new HashMap<Integer, Double>();
-		columnMeans = new HashMap<Integer, Double>();
+
 		rowActionPerformed = new BitSet();
 		colActionPerformed = new BitSet();
 		// rows = new BitSet();
@@ -317,7 +341,6 @@ public class FLOC<V extends RealVector<V, Double>> extends
 		// eraseMissingValues();
 		createRandomCluster();
 		// resetValues(rows, cols);
-		bestClustering = calculateAverageResidue();
 		performBestAction();
 	}
 
@@ -425,19 +448,19 @@ public class FLOC<V extends RealVector<V, Double>> extends
 		return sum / vol;
 	}
 
-	/**
-	 * resets the values for the next processed cluster
-	 * 
-	 * @param rows
-	 *            rows belonging to the currently processed bicluster
-	 * @param cols
-	 *            columns belonging to the currently processed bicluster
-	 */
-	private void resetValues(BitSet rows, BitSet cols) {
-		initiateRowMeans(rows, cols);
-		initiateColMeans(rows, cols);
-		biclusterMean = meanOfBicluster(rows, cols);
-	}
+	// /**
+	// * resets the values for the next processed cluster
+	// *
+	// * @param rows
+	// * rows belonging to the currently processed bicluster
+	// * @param cols
+	// * columns belonging to the currently processed bicluster
+	// */
+	// private void resetValues(BitSet rows, BitSet cols) {
+	// initiateRowMeans(rows, cols);
+	// initiateColMeans(rows, cols);
+	// biclusterMean = meanOfBicluster(rows, cols);
+	// }
 
 	/**
 	 * calculates the score of the current bicluster, according to the rows and
@@ -453,16 +476,21 @@ public class FLOC<V extends RealVector<V, Double>> extends
 		double h = 0;
 		double value = 0;
 		int volume = rows.cardinality() * cols.cardinality();
-		for (int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
-			for (int j = cols.nextSetBit(0); j >= 0; j = cols.nextSetBit(j + 1)) {
+		int rM = -1;
+		int cM = -1;
+		for (int i = rows.nextSetBit(0); i>=0; i=rows.nextSetBit(i+1)) {
+			rM++;
+			cM = -1;
+			for (int j = cols.nextSetBit(0); j>=0; j = cols.nextSetBit(j+1)) {
+				cM++;
 				double wert = valueAt(i, j);
 				double residue;
 				if (MISSING_PARAM.isSet() && wert == missing) {
 					residue = 0;
 					volume--;
 				} else {
-					double rowMean = rowMeans.get(i);
-					double columnMean = columnMeans.get(j);
+					double rowMean = rowMeans.get(rM);
+					double columnMean = colMeans.get(cM);
 					double biclusterM = biclusterMean;
 					residue = mod(wert - rowMean - columnMean + biclusterM);
 				}
@@ -482,14 +510,15 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	 * @param currCols
 	 *            columns belonging to the currently processed bicluster
 	 */
-	protected void initiateRowMeans(BitSet currRows, BitSet currCols) {
+	protected List<Double> initiateRowMeans(BitSet currRows, BitSet currCols) {
 		int z = 0;
-		rowMeans.clear();
+		rowMeans = new ArrayList<Double>();
 		for (int i = currRows.nextSetBit(0); i >= 0; i = currRows
 				.nextSetBit(i + 1)) {
-			rowMeans.put(i, meanOfRow(i, currCols));
+			rowMeans.add(meanOfRow(i, currCols));
 			z++;
 		}
+		return rowMeans;
 	}
 
 	/**
@@ -500,14 +529,15 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	 * @param currCols
 	 *            columns belonging to the currently processed bicluster
 	 */
-	protected void initiateColMeans(BitSet currRows, BitSet currCols) {
+	protected List<Double> initiateColMeans(BitSet currRows, BitSet currCols) {
 		int z = 0;
-		columnMeans.clear();
+		colMeans = new ArrayList<Double>();
 		for (int j = currCols.nextSetBit(0); j >= 0; j = currCols
 				.nextSetBit(j + 1)) {
-			columnMeans.put(j, meanOfCol(currRows, j));
+			colMeans.add(meanOfCol(currRows, j));
 			z++;
 		}
+		return colMeans;
 	}
 
 	// private void eraseMissingValues() {
@@ -567,12 +597,49 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	 * @return the gain of
 	 * @param row
 	 */
-	private double rowGain(int row) {
-		double oldHValue = getValueH(currRows, currCols);
+	private double rowGain(int cluster, int row) {
+		currRows = (BitSet) rowClusters[cluster].clone();
+		currCols = (BitSet) colClusters[cluster].clone();
+		double oldHValue = valueHClusters[cluster];
+		rowMeans = rowClusterMeans[cluster];
+		colMeans = colClusterMeans[cluster];
+		biclusterMean = biclusterMeans[cluster];
+		if(currCols.cardinality()!=colMeans.size()){
+			System.out.println();
+		}
+		// currRows.flip(row);
+		// adjust rowMeans
+		int zaehler = 0;
+		for (int i = currRows.nextSetBit(0);; i = currRows.nextSetBit(i + 1)) {
+			if (i < 0) {
+				rowMeans.add(meanOfRow(row, currCols));
+				break;
+			}
+			if (row < i) {
+				rowMeans.add(zaehler, meanOfRow(row, currCols));
+				break;
+			}
+			zaehler++;
+		}
+
+		// adjust columnMeans
+		for (int i = 0; i < currCols.cardinality(); i++) {
+			double newColMean = (colMeans.get(i) * currRows.cardinality() + valueAt(
+					row, i))
+					/ (currRows.cardinality() + 1);
+			colMeans.set(i, newColMean);
+		}
+
+		// adjust biclusterMean
+		biclusterMean = biclusterMean
+				* (currRows.cardinality() * currCols.cardinality());
+		for (int i = currCols.nextSetBit(0); i >= 0; i = currCols
+				.nextSetBit(i + 1)) {
+			biclusterMean = biclusterMean + valueAt(row, i);
+		}
+		biclusterMean = biclusterMean
+				/ ((currRows.cardinality() + 1) * currCols.cardinality());
 		currRows.flip(row);
-		rowMeans.put(row, meanOfRow(row, currCols));
-		initiateColMeans(currRows, currCols);
-		biclusterMean = meanOfBicluster(currRows, currCols);
 		double newHValue = getValueH(currRows, currCols);
 		currRows.flip(row);
 		return oldHValue - newHValue;
@@ -588,14 +655,47 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	 * @return the gain of
 	 * @param col
 	 */
-	private double colGain(int col) {
-		double oldHValue = getValueH(currRows, currCols);
-		currCols.flip(col);
-		columnMeans.put(col, meanOfCol(currRows, col));
-		initiateRowMeans(currRows, currCols);
-		biclusterMean = meanOfBicluster(currRows, currCols);
+	private double colGain(int cluster, int col) {
+		double oldHValue = valueHClusters[cluster];
+		// currCols.flip(col);
+		rowMeans = rowClusterMeans[cluster];
+		colMeans = colClusterMeans[cluster];
+		biclusterMean = biclusterMeans[cluster];
+		// adjust colMeans
+		int zaehler = 0;
+		for (int i = currCols.nextSetBit(0); ; i = currCols
+				.nextSetBit(i + 1)) {
+			if(i<0){
+				colMeans.add(meanOfCol(currRows, col));
+				break;
+			}
+			if (col < i) {
+				colMeans.add(zaehler, meanOfCol(currRows, col));
+				break;
+			}
+			zaehler++;
+		}
+
+		// adjust rowMeans
+		for (int i = 0; i < currRows.cardinality(); i++) {
+			double newRowMean = (rowMeans.get(i) * currCols.cardinality() + valueAt(
+					i, col))
+					/ (currCols.cardinality() + 1);
+			rowMeans.set(i, newRowMean);
+		}
+
+		// adjust biclusterMean
+		biclusterMean = biclusterMean
+				* (currRows.cardinality() * currCols.cardinality());
+		for (int i = currRows.nextSetBit(0); i >= 0; i = currRows
+				.nextSetBit(i + 1)) {
+			biclusterMean = biclusterMean + valueAt(i, col);
+		}
+		biclusterMean = biclusterMean
+				/ (currRows.cardinality() * (currCols.cardinality() + 1));
+		currRows.flip(col);
 		double newHValue = getValueH(currRows, currCols);
-		currCols.flip(col);
+		currRows.flip(col);
 		return oldHValue - newHValue;
 	}
 
@@ -612,10 +712,7 @@ public class FLOC<V extends RealVector<V, Double>> extends
 		double initGain = -99999;
 		int bestCluster = -1;
 		for (int i = 0; i < rowClusters.length; i++) {
-			currRows = (BitSet) rowClusters[i].clone();
-			currCols = (BitSet) colClusters[i].clone();
-			resetValues(currRows, currCols);
-			double gain = rowGain(row);
+			double gain = rowGain(i, row);
 			createGainMap(row, gain);
 			if (gain > initGain) {
 				initGain = gain;
@@ -640,8 +737,7 @@ public class FLOC<V extends RealVector<V, Double>> extends
 		for (int j = 0; j < colClusters.length; j++) {
 			currRows = (BitSet) rowClusters[j].clone();
 			currCols = (BitSet) colClusters[j].clone();
-			resetValues(currRows, currCols);
-			double gain = colGain(col);
+			double gain = colGain(j, col);
 			createGainMap(col + rowDim, gain);
 			if (gain > initGain) {
 				initGain = gain;
@@ -680,6 +776,7 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	 * cluster with the greatest gain for row i)
 	 */
 	private void bestActions() {
+		bestClustering = calculateAverageResidue();
 		bestClusterForRow = new int[rowDim];
 		bestClusterForCol = new int[colDim];
 		for (int i = 0; i < rowDim; i++) {
@@ -775,7 +872,7 @@ public class FLOC<V extends RealVector<V, Double>> extends
 				minGain = 99999;
 				gainMap.clear();
 			}
-			 verbose(iterations+". average residue: " +bestClustering);
+			verbose(iterations + ". average residue: " + bestClustering);
 			iterations++;
 			performBestAction();
 
@@ -843,10 +940,10 @@ public class FLOC<V extends RealVector<V, Double>> extends
 				r2 = c;
 			}
 			double p = 0.5 + (gainMap.get(r2) - gainMap.get(r1)) / (2 * R);
-//			BitSet probabilitySet = new BitSet(100);
-//			probabilitySet.set(0, (int) Math.round(p * 100));
-//			if (probabilitySet.get(r.nextInt(100))) {
-			if(r.nextDouble()<= p){
+			// BitSet probabilitySet = new BitSet(100);
+			// probabilitySet.set(0, (int) Math.round(p * 100));
+			// if (probabilitySet.get(r.nextInt(100))) {
+			if (r.nextDouble() <= p) {
 				randomOrder[r1] = r2;
 				randomOrder[r2] = r1;
 				g--;
@@ -863,13 +960,21 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	 * @return the new average residue of the clustering
 	 */
 	private double calculateAverageResidue() {
+		rowClusterMeans = new List[k];
+		colClusterMeans = new List[k];
+		biclusterMeans = new double[k];
+		valueHClusters = new double[k];
 		double averageResidue = 0;
 		for (int i = 0; i < k; i++) {
-			BitSet currRowCluster = rowClusters[i];
-			BitSet currColCluster = colClusters[i];
-			resetValues(currRowCluster, currColCluster);
-			averageResidue = averageResidue
-					+ getValueH(currRowCluster, currColCluster);
+			BitSet currRows = rowClusters[i];
+			BitSet currCols = colClusters[i];
+
+			rowClusterMeans[i] = initiateRowMeans(currRows, currCols);
+			colClusterMeans[i] = initiateColMeans(currRows, currCols);
+			biclusterMeans[i] = meanOfBicluster(currRows, currCols);
+			biclusterMean = biclusterMeans[i];
+			valueHClusters[i] = getValueH(currRows, currCols);
+			averageResidue = averageResidue + valueHClusters[i];
 		}
 		return averageResidue / k;
 	}

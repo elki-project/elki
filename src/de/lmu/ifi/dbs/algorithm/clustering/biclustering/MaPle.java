@@ -36,9 +36,7 @@ public class MaPle<V extends RealVector<V, Double>> extends
 
 	/**
 	 * Parameter to indicate the minimum columnsize of the resulting biclusters
-	 * <p>
-	 * Key: {@code nc}
-	 * </p>
+	 * <p> Key: {@code -nc} </p>
 	 */
 	public static final IntParameter NUMBER_COLS = new IntParameter("nc",
 			"indicates the minimum columnsize of the resulting biclusters",
@@ -46,9 +44,7 @@ public class MaPle<V extends RealVector<V, Double>> extends
 
 	/**
 	 * Parameter to indicate the minimum rowsize of the resulting biclusters
-	 * <p>
-	 * Key: {@code nr}
-	 * </p>
+	 * <p> Key: {@code -nr}</p>
 	 */
 	public static final IntParameter NUMBER_ROWS = new IntParameter("nr",
 			"indicates the minimum rowsize of the resulting biclusters",
@@ -56,9 +52,7 @@ public class MaPle<V extends RealVector<V, Double>> extends
 
 	/**
 	 * threshold value to determine the maximal acceptable score of a bicluster
-	 * <p>
-	 * Key: {@code sigma}
-	 * </p>
+	 * <p>Key: {@code -sigma} </p>
 	 */
 	public static final DoubleParameter SIGMA_PARAM = new DoubleParameter(
 			"sigma",
@@ -145,6 +139,8 @@ public class MaPle<V extends RealVector<V, Double>> extends
 	 * Will be sorted within the pairCluster-Method.
 	 */
 	private double[] diffArray;
+	
+	private int zaehler = 0;
 	
 	/**
 	 * Keeps track of the row and column order after sorting
@@ -233,6 +229,9 @@ public class MaPle<V extends RealVector<V, Double>> extends
 				for (int i = 0; i < size; i++) {
 					IntegerTriple cols = new IntegerTriple(a, b, i);
 					colMDS.put(cols, mds.get(i));
+					if(mds.get(i).get(188)){
+						this.zaehler++;
+					}
 					// }
 				}
 			}
@@ -394,7 +393,8 @@ public class MaPle<V extends RealVector<V, Double>> extends
 	 */
 	private void mainAlgorithm() {
 		setColMDS();
-		firstPrune();
+		System.out.println(this.zaehler);
+//		firstPrune();
 		setRowMDS();
 		prune();
 		makeAL();
@@ -640,6 +640,7 @@ public class MaPle<V extends RealVector<V, Double>> extends
 	 */
 	private void firstPrune() {
 		countOccurances(colMDS);
+		System.out.println(clusterOccurances.get(188));
 		ArrayList<IntegerTriple> toremove = new ArrayList<IntegerTriple>();
 		for (int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
 			Integer occurance = clusterOccurances.get(i);
@@ -779,8 +780,13 @@ public class MaPle<V extends RealVector<V, Double>> extends
 	 * Matches an array of three values with the corresponding columns/rows,
 	 * forming a rowMDS/columnMDS. All columns/rows belonging to a MDS are
 	 * sorted in ascending order. The difference between the greatest and the
-	 * smallest value of such a MDS is less then 
-	 * @param sigma.
+	 * smallest value of such a MDS is less then @param sigma.
+	 * @param x first row/column forming an row/column mds;
+	 * @param y second row/column forming an row/column mds;
+	 * @param t columns/rows containing potential candidates for the row/column mds
+	 * @param min minimum number of columns/rows a mds must contain
+	 * @param rows true if the mds is a rowMDS, false otherwise
+	 * @return List of row- or columnMDSs.
 	 */
 	private ArrayList<BitSet> pairCluster(int x, int y, BitSet t, int anzahl,
 			boolean cols) {

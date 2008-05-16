@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.algorithm.clustering.biclustering;
 
-
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.result.clustering.biclustering.Bicluster;
 import de.lmu.ifi.dbs.data.RealVector;
@@ -8,7 +7,9 @@ import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.LongParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
 
 import java.util.BitSet;
@@ -33,14 +34,40 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 		AbstractBiclustering<V> {
 
 	/**
-	 * seed for initializing random list for the masking values - key: {@code maskingSeed}
+	 * seed for initializing random list for the masking values - key:
+	 * {@code maskingSeed}
+	 * <p>
+	 * Default value: 1
+	 * </p>
+	 * <p>
+	 * Key: {@code -maskingSeed}
+	 * </p>
 	 */
 	public static final LongParameter SEED_PARAM = new LongParameter(
 			"maskingSeed",
 			"seed for initializing random list for the masking values");
 
 	/**
+	 * Parameter to indicate how many times the algorithm to add Nodes should be
+	 * performed for each iteration. A greater value will result in a more
+	 * accurate result but will require more time.
+	 * <p>
+	 * Default value: 1
+	 * </p>
+	 * <p>
+	 * Key: {@code -multipleAddition}
+	 * </p>
+	 */
+	public static final IntParameter MULTIPLE_ADDITION_PARAM = new IntParameter(
+			"multipleAddition",
+			"indicates how many times the algorithm to add Nodes should be performed",
+			new GreaterEqualConstraint(1));
+
+	/**
 	 * treshhold value to determine the maximal acceptable score of a bicluster
+	 * <p>
+	 * Key: {@code -sigma}
+	 * </p>
 	 */
 	public static final DoubleParameter SIGMA_PARAM = new DoubleParameter(
 			"sigma",
@@ -48,7 +75,10 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 			new GreaterEqualConstraint(0.0));
 
 	/**
-	 * parameter for multiple node deletion to accelerate the algorithm 
+	 * parameter for multiple node deletion to accelerate the algorithm
+	 * <p>
+	 * Key: {@code -alpha}
+	 * </p>
 	 */
 	public static final DoubleParameter ALPHA_PARAM = new DoubleParameter(
 			"alpha",
@@ -56,36 +86,54 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 			new GreaterEqualConstraint(1.0));
 
 	/**
-	 * number of biclusters to be found 
+	 * number of biclusters to be found
+	 * <p>
+	 * Default value: 1
+	 * </p>
+	 * <p>
+	 * Key: {@code -n}
+	 * </p>
 	 */
 	public static final IntParameter N_PARAM = new IntParameter("n",
 			"number of biclusters to be found ", new GreaterEqualConstraint(1));
 
 	/**
 	 * lower limit for maskingValues
+	 * <p>
+	 * Key: {@code -begin}
+	 * </p>
 	 */
 	public static final IntParameter BEGIN_PARAM = new IntParameter("begin",
 			"lower limit for maskingValues");
 
 	/**
 	 * upper limit for maskingValues
+	 * <p>
+	 * Key: {@code -end}
+	 * </p>
 	 */
 	public static final IntParameter END_PARAM = new IntParameter("end",
 			"upper limit for maskingValues");
 
 	/**
 	 * missing Value in database to be raplaced with maskingValues
+	 * <p>
+	 * Key: {@code -missing}
+	 * </p>
 	 */
 	public static final IntParameter MISSING_PARAM = new IntParameter(
 			"missing",
 			"missing Value in database to be raplaced with maskingValues");
 
 	/**
-	 * sets the options for the ParameterValues maskingSeed, sigma, alpha, n, missing, begin and end
+	 * sets the options for the ParameterValues maskingSeed, sigma, alpha, n,
+	 * missing, begin and end
 	 */
 	static {
 		SEED_PARAM.setDefaultValue(1L);
 		SEED_PARAM.setOptional(true);
+		MULTIPLE_ADDITION_PARAM.setOptional(true);
+		MULTIPLE_ADDITION_PARAM.setDefaultValue(1);
 		SIGMA_PARAM.setOptional(false);
 		ALPHA_PARAM.setOptional(false);
 		N_PARAM.setDefaultValue(1);
@@ -118,8 +166,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	 * Keeps the position of the rows belonging to the current bicluster
 	 */
 	private BitSet rows;
-	
-	
+
 	/**
 	 * marks the rows and columns to be masked. Is updated after each iteration
 	 */
@@ -218,10 +265,17 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	private boolean inNodeAddition;
 
 	/**
+	 * Parameter to indicate how many times the algorithm to add Nodes should be
+	 * performed for each iteration.
+	 */
+	private int multipleAddition;
+
+	/**
 	 * adds the parameterValues
 	 */
 	public ChengAndChurch() {
 		this.addOption(SEED_PARAM);
+		this.addOption(MULTIPLE_ADDITION_PARAM);
 		this.addOption(SIGMA_PARAM);
 		this.addOption(ALPHA_PARAM);
 		this.addOption(N_PARAM);
@@ -246,9 +300,12 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 		alpha = this.getParameterValue(ALPHA_PARAM);
 		n = this.getParameterValue(N_PARAM);
 		begin = this.getParameterValue(BEGIN_PARAM);
-		end = this.getParameterValue(END_PARAM)-begin;
+		end = this.getParameterValue(END_PARAM) - begin;
 		if (MISSING_PARAM.isSet()) {
 			missing = this.getParameterValue(MISSING_PARAM);
+		}
+		if (MULTIPLE_ADDITION_PARAM.isSet()) {
+			multipleAddition = this.getParameterValue(MULTIPLE_ADDITION_PARAM);
 		}
 		return remainingParameters;
 	}
@@ -344,8 +401,8 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	protected double valueAt(int row, int col) {
 		if (missingRowsToMask.get(row) && missingColsToMask.get(col)) {
 			return maskedValueAt(row, col);
-		} 
-			return super.valueAt(row, col);
+		}
+		return super.valueAt(row, col);
 	}
 
 	/**
@@ -471,8 +528,8 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	protected double maskedValueAt(int row, int col) {
 		if (maskedVals.containsKey(factor * row + col)) {
 			return maskedVals.get(factor * row + col);
-		} 
-			return super.valueAt(row, col);
+		}
+		return super.valueAt(row, col);
 	}
 
 	public Description getDescription() {
@@ -544,21 +601,20 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	 * Keeps all rows and columns previously belonging to some bicluster for
 	 * masking them
 	 */
-//	private void maskMatrix() {
-//		newRowsToMask.clear();
-//		newColsToMask.clear();
-//		for (int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
-//			rowsToMask.set(i);
-//			newRowsToMask.set(i);
-//		}
-//		for (int j = cols.nextSetBit(0); j >= 0; j = cols.nextSetBit(j + 1)) {
-//			colsToMask.set(j);
-//			newColsToMask.set(j);
-//		}
-//	}
-	
+	// private void maskMatrix() {
+	// newRowsToMask.clear();
+	// newColsToMask.clear();
+	// for (int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
+	// rowsToMask.set(i);
+	// newRowsToMask.set(i);
+	// }
+	// for (int j = cols.nextSetBit(0); j >= 0; j = cols.nextSetBit(j + 1)) {
+	// colsToMask.set(j);
+	// newColsToMask.set(j);
+	// }
+	// }
 	private void maskMatrix() {
-//		toMask.clear();
+		// toMask.clear();
 		for (int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
 			for (int j = cols.nextSetBit(0); j >= 0; j = cols.nextSetBit(j + 1)) {
 				toMask.set(factor * i + j);
@@ -571,9 +627,9 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	 * corresponding row and column
 	 */
 	private void createMaskingValues() {
-		for (int i = toMask.nextSetBit(0); i >= 0; i = toMask.nextSetBit(i+1)){
-				maskedVals.put(i, (double) r.nextInt(end) + begin);
-			}
+		for (int i = toMask.nextSetBit(0); i >= 0; i = toMask.nextSetBit(i + 1)) {
+			maskedVals.put(i, (double) r.nextInt(end) + begin);
+		}
 	}
 
 	/**
@@ -590,12 +646,12 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 				verbose("Score of bicluster" + (i + 1) + ": " + valueH);
 				verbose("number of rows: " + rows.cardinality());
 				verbose("number of columns: " + cols.cardinality());
-				verbose("total number of masked values: " + maskedVals.size() + "\n");
+				verbose("total number of masked values: " + maskedVals.size()
+						+ "\n");
 			}
-			if(i == 5)
-			{
-				System.out.println("ready");
-			}
+//			if (i == 5) {
+//				System.out.println("ready");
+//			}
 			maskMatrix();
 			createMaskingValues();
 			Bicluster<V> bicluster = defineBicluster(rows, cols);
@@ -604,12 +660,11 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 			reset();
 		}
 	}
-	
+
 	/**
 	 * resets the values for the next iteration;
 	 */
-	private void reset()
-	{
+	private void reset() {
 		rowMeans.clear();
 		columnMeans.clear();
 		biclusterMean = 0;
@@ -666,7 +721,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 				}
 			}
 			recomputeValues();
-			
+
 			if (removed) {
 				chooseMaxRAlgorithm2();
 			}
@@ -727,9 +782,9 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 				}
 			}
 			return max;
-		} 
-			throw new IllegalArgumentException(
-					"the HashMap must contain at least one Element");
+		}
+		throw new IllegalArgumentException(
+				"the HashMap must contain at least one Element");
 	}
 
 	/**
@@ -796,10 +851,23 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 		}
 		recomputeValues();
 		inNodeAddition = false;
-		// if(added)
-		// {
-		// chooseMinAdditions();
-		// }
+		if (multipleAddition > 1 && added) {
+			multipleAddition--;
+			chooseMinAdditions();
+		} else {
+			if (MULTIPLE_ADDITION_PARAM.isSet()) {
+				try {
+					multipleAddition = getParameterValue(MULTIPLE_ADDITION_PARAM);
+				} catch (UnusedParameterException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (NoParameterValueException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+		}
 	}
 
 	/**
@@ -838,7 +906,8 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	/**
 	 * calculates the scores for the rows not belonging to the current bicluster
 	 * as potential candidates to be added
-	 * @return list of scores mapped to their rows 
+	 * 
+	 * @return list of scores mapped to their rows
 	 */
 	protected Map<Integer, Double> additionValuesRows() {
 		Map<Integer, Double> ergRows = new LinkedHashMap<Integer, Double>();
@@ -858,9 +927,10 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	}
 
 	/**
-	 * calculates the scores for the columns not belonging to the current bicluster
-	 * as potential candidates to be added
-	 * @return list of scores mapped to their columns 
+	 * calculates the scores for the columns not belonging to the current
+	 * bicluster as potential candidates to be added
+	 * 
+	 * @return list of scores mapped to their columns
 	 */
 	protected Map<Integer, Double> additionValuesCols() {
 		Map<Integer, Double> ergCols = new LinkedHashMap<Integer, Double>();
@@ -880,9 +950,10 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	}
 
 	/**
-	 * calculates the scores for the inverted rows not belonging to the current bicluster
-	 * as potential candidates to be added
-	 * @return list of scores mapped to their rows 
+	 * calculates the scores for the inverted rows not belonging to the current
+	 * bicluster as potential candidates to be added
+	 * 
+	 * @return list of scores mapped to their rows
 	 */
 	protected Map<Integer, Double> ReductionValuesRowsInv() {
 		Map<Integer, Double> ergRows = new LinkedHashMap<Integer, Double>();
