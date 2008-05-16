@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
 
 <project name="ELKI" default="complete" basedir=".">
+	<property name="RELEASE" value="1.0"/>
+
 	<target name="complete"></target>
 </project>
