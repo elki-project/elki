@@ -9,7 +9,7 @@ public class AbortException extends RuntimeException
 {
 
     /**
-     * 
+     * Generated serial version UID.
      */
     private static final long serialVersionUID = -2248437536321126746L;
 
