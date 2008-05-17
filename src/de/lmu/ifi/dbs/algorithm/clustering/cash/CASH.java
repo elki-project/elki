@@ -339,8 +339,6 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
         if (adjust) {
           ids = new HashSet<Integer>();
           basis_dim_minus_1 = runDerivator(database, dim, interval, ids);
-//          System.out.println("ids " + ids.size());
-//          System.out.println("basis (fuer dim " + (dim - 1) + ") " + basis_dim_minus_1);
         }
         else {
           ids = interval.getIDs();
@@ -537,15 +535,6 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
     if (debug) {
       debugFine("\ndb fuer dim " + (dim - 1) + ": " + result.size());
     }
-
-//    if (dim - 1 == 2 || dim -1 == 3) {
-//      System.out.println("#################################################################");
-//      for (Iterator<Integer> it = result.iterator(); it.hasNext();) {
-//        Integer id = it.next();
-//        System.out.print("" + Format.format(result.get(id).getPointCoordinates(), " "));
-//        System.out.println(" " + database.getAssociation(AssociationID.LABEL, id));
-//      }
-//    }
 
     return result;
   }
@@ -753,12 +742,13 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
     params.add(Integer.toString(dim - 1));
     derivator.setParameters(params.toArray(new String[params.size()]));
 
-    //noinspection unchecked
+      //noinspection unchecked
     derivator.run(derivatorDB);
     CorrelationAnalysisSolution model = derivator.getResult();
 
     Matrix weightMatrix = model.getSimilarityMatrix();
     RealVector centroid = new DoubleVector(model.getCentroid());
+      //noinspection unchecked
     DistanceFunction<RealVector, DoubleDistance> df = new WeightedDistanceFunction(weightMatrix);
     DoubleDistance eps = df.valueOf("0.25");
 
