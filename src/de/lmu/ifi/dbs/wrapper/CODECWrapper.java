@@ -30,8 +30,8 @@ public class CODECWrapper extends NormalizationWrapper {
 
   /**
    * Parameter to specify the maximum radius of the neighborhood to be considered,
-   * must be suitable to LocallyWeightedDistanceFunction.
-   * <p>Key: (@code -epsilon) </p>
+   * must be suitable to {@link LocallyWeightedDistanceFunction LocallyWeightedDistanceFunction}.
+   * <p>Key: {@code -epsilon} </p>
    */
   public static final PatternParameter EPSILON_PARAM = new PatternParameter("epsilon",
                                                                             "the maximum radius of the neighborhood " +

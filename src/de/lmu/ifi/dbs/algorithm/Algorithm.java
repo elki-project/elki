@@ -49,20 +49,4 @@ public interface Algorithm<O extends DatabaseObject> extends Parameterizable
      * @return a description of the algorithm
      */
     Description getDescription();
-
-    /**
-     * Sets whether the time should be assessed.
-     * 
-     * @param time whether the time should be assessed
-     */
-    void setTime(boolean time);
-
-    /**
-     * Sets whether verbose messages should be printed while executing the
-     * algorithm.
-     * 
-     * @param verbose whether verbose messages should be printed while executing
-     *        the algorithm
-     */
-    void setVerbose(boolean verbose);
 }

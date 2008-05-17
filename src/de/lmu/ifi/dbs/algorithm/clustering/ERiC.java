@@ -155,9 +155,15 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
 
         // copac algorithm
         copacAlgorithm = new COPAC<V>();
-        remainingParameters = copacAlgorithm.setParameters(remainingParameters);
-        copacAlgorithm.setTime(isTime());
-        copacAlgorithm.setVerbose(isVerbose());
+        String[] copacAlgorithmParameters = new String[remainingParameters.length];
+        System.arraycopy(remainingParameters, 0, copacAlgorithmParameters, 0, remainingParameters.length);
+        if (isVerbose()) {
+            copacAlgorithmParameters = Util.addFlag(copacAlgorithmParameters, AbstractAlgorithm.VERBOSE_FLAG);
+        }
+        if (isTime()) {
+            copacAlgorithmParameters = Util.addFlag(copacAlgorithmParameters, AbstractAlgorithm.TIME_FLAG);
+        }
+        remainingParameters = copacAlgorithm.setParameters(copacAlgorithmParameters);
         setParameters(args, remainingParameters);
 
         return remainingParameters;
@@ -173,30 +179,6 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         List<AttributeSettings> attributeSettings = super.getAttributeSettings();
         attributeSettings.addAll(copacAlgorithm.getAttributeSettings());
         return attributeSettings;
-    }
-
-    /**
-     * Sets whether the time should be assessed.
-     *
-     * @param time whether the time should be assessed
-     */
-    @Override
-    public void setTime(boolean time) {
-        super.setTime(time);
-        copacAlgorithm.setTime(time);
-    }
-
-    /**
-     * Sets whether verbose messages should be printed while executing the
-     * algorithm.
-     *
-     * @param verbose whether verbose messages should be printed while executing the
-     *                algorithm
-     */
-    @Override
-    public void setVerbose(boolean verbose) {
-        super.setVerbose(verbose);
-        copacAlgorithm.setVerbose(verbose);
     }
 
     /**

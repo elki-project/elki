@@ -34,8 +34,8 @@ import java.util.List;
 public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<V> implements Clustering<V> {
     /**
      * Parameter to specify the maximum radius of the neighborhood to be considered,
-     * must be suitable to AbstractDimensionsSelectingDoubleDistanceFunction.
-     * <p>Key: (@code -epsilon) </p>
+     * must be suitable to {@link AbstractDimensionsSelectingDoubleDistanceFunction AbstractDimensionsSelectingDoubleDistanceFunction}.
+     * <p>Key: {@code -epsilon} </p>
      */
     public static final PatternParameter EPSILON_PARAM = new PatternParameter("epsilon",
                                                                               "the maximum radius of the neighborhood " +
@@ -45,7 +45,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
     /**
      * Parameter to specify the threshold for minimum number of points in the
      * epsilon-neighborhood of a point, must be greater than 0.
-     * <p>Key: (@code -minpts) </p>
+     * <p>Key: {@code -minpts} </p>
      */
     public static final IntParameter MINPTS_PARAM = new IntParameter("minpts",
                                                                      "threshold for minimum number of points in the " +
@@ -61,7 +61,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
     /**
      * The distance function to determine the distance between database objects.
      * <p>Default value: DimensionsSelectingEuklideanDistanceFunction </p>
-     * <p>Key: (@code -distancefunction) </p>
+     * <p>Key: {@code -distancefunction} </p>
      */
     public static ClassParameter<AbstractDimensionsSelectingDoubleDistanceFunction> DISTANCEFUNCTION_PARAM = new ClassParameter("distancefunction",
                                                                                                                                 "the distance function to determine the distance between database objects "

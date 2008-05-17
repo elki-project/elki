@@ -19,8 +19,8 @@ public class OPTICSWrapper extends NormalizationWrapper {
 
   /**
    * Parameter to specify the maximum radius of the neighborhood to be considered,
-   * must be suitable to EuklideanDistanceFunction.
-   * <p>Key: (@code -epsilon) </p>
+   * must be suitable to {@link EuklideanDistanceFunction EuklideanDistanceFunction}.
+   * <p>Key: {@code -epsilon} </p>
    */
   public static final PatternParameter EPSILON_PARAM = new PatternParameter(OPTICS.EPSILON_PARAM.getName(),
                                                                             "the maximum radius of the neighborhood " +
