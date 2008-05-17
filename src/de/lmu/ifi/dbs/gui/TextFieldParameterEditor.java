@@ -15,6 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 
+// todo steffi comment all
 public abstract class TextFieldParameterEditor extends ParameterEditor {
 
 	protected JTextField textField;
@@ -142,7 +143,6 @@ public abstract class TextFieldParameterEditor extends ParameterEditor {
 	}
 
 	public void addPropertyChangeListener(String option, PropertyChangeListener l) {
-		System.out.println("added propListenere to textField");
 		this.textField.addPropertyChangeListener(option, l);
 	}
 

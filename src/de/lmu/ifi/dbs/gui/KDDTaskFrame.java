@@ -8,11 +8,11 @@ import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.properties.PropertyName;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import javax.swing.*;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
+import javax.swing.border.EtchedBorder;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -23,521 +23,503 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Calendar;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.JTextPane;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.Border;
-import javax.swing.border.EtchedBorder;
-
+// todo steffi comment all
 public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 7530155806655934877L;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 7530155806655934877L;
 
-	public static final boolean CENTERED_LOCATION = true;
-	
-	public static final int WIDTH = 600;
-	
-	public static final int HEIGHT = 380;
+    public static final boolean CENTERED_LOCATION = true;
 
-	private KDDTask<? extends DatabaseObject> task;
+    public static final int WIDTH = 600;
 
-	private String[] dbConnection;
+    public static final int HEIGHT = 380;
 
-	private String[] algorithm;
+    private KDDTask<? extends DatabaseObject> task;
 
-	private String[] completeParameters;
+    private String[] dbConnection;
 
-	private SelectionPanel dbConnectionPanel;
+    private String[] algorithm;
 
-	private SelectionPanel algorithmPanel;
+    private String[] completeParameters;
 
-	private JButton runButton;
+    private SelectionPanel dbConnectionPanel;
 
-	private JTextPane parameterField;
+    private SelectionPanel algorithmPanel;
 
-	private JScrollPane scroller;
+    private JButton runButton;
 
-	private JPanel runPanel;
+    private JTextPane parameterField;
 
-	private JButton saveButton;
+    private JScrollPane scroller;
 
-	private JTextField nameField;
+    private JPanel runPanel;
 
-	// borders
-	private Border loweredEtched = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
+    private JButton saveButton;
 
-	private Border raisedEtched = BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
+    private JTextField nameField;
 
-	private Border loweredBevel = BorderFactory.createBevelBorder(BevelBorder.LOWERED);
+    // borders
+    private Border loweredEtched = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
 
-	private Border raisedBevel = BorderFactory.createBevelBorder(BevelBorder.RAISED);
+    private Border raisedEtched = BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
 
-	public KDDTaskFrame() {
-		setTitle("KDD Task");
+    private Border loweredBevel = BorderFactory.createBevelBorder(BevelBorder.LOWERED);
 
-		JPanel mainPanel = new JPanel(new GridBagLayout());
+    private Border raisedBevel = BorderFactory.createBevelBorder(BevelBorder.RAISED);
 
-		GridBagConstraints gbc = new GridBagConstraints();
-		// task name
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.gridwidth = 4;
-		// gbc.ipadx = 10;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.insets = new Insets(5, 5, 5, 5);
-		gbc.anchor = GridBagConstraints.LINE_START;
-		mainPanel.add(taskNamePanel(), gbc);
+    public KDDTaskFrame() {
+        setTitle("KDD Task");
 
-		// database connection and algorithm panel
-		gbc.gridy = 1;
-		gbc.gridwidth = 4;
-		gbc.gridx = 0;
-		gbc.anchor = GridBagConstraints.CENTER;
-		gbc.fill = GridBagConstraints.NONE;
-		gbc.insets = new Insets(5, 5, 5, 5);
+        JPanel mainPanel = new JPanel(new GridBagLayout());
 
-		mainPanel.add(createDBAlgPanel(), gbc);
+        GridBagConstraints gbc = new GridBagConstraints();
+        // task name
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 4;
+        // gbc.ipadx = 10;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.LINE_START;
+        mainPanel.add(taskNamePanel(), gbc);
 
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        // database connection and algorithm panel
+        gbc.gridy = 1;
+        gbc.gridwidth = 4;
+        gbc.gridx = 0;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.insets = new Insets(5, 5, 5, 5);
 
-		add(mainPanel);
-		setMinimumSize(new Dimension(WIDTH, HEIGHT));
-		
-		pack();
-		dbConnectionPanel.select.requestFocusInWindow();
-		setLocationRelativeTo(null);
-		setVisible(true);
-	}
+        mainPanel.add(createDBAlgPanel(), gbc);
 
-	// task name panel
-	private JComponent taskNamePanel() {
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		JPanel taskName = new JPanel();
-		taskName.setLayout(new GridBagLayout());
-		GridBagConstraints gbc = new GridBagConstraints();
-		// label
-		gbc.gridwidth = 2;
-		gbc.gridy = 0;
-		gbc.gridx = 0;
-		gbc.anchor = GridBagConstraints.FIRST_LINE_START;
-		gbc.insets = new Insets(0, 10, 0, 15);
-		taskName.add(new JLabel("Task Name"), gbc);
+        add(mainPanel);
+        setMinimumSize(new Dimension(WIDTH, HEIGHT));
 
-		// textField
-		gbc.gridwidth = 3;
-		gbc.gridx = 2;
-		// gbc.anchor = GridBagConstraints.FIRST_LINE_END;
-		gbc.insets = new Insets(0, 10, 0, 0);
-		nameField = new JTextField();
-		// default name ist date_time
-		nameField.setColumns(15);
+        pack();
+        dbConnectionPanel.select.requestFocusInWindow();
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
 
-		Calendar cal = Calendar.getInstance();
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss.S");
-		// System.out.println( formater.format(cal.getTime()) );
-		nameField.setText(formatter.format(cal.getTime()));
-		nameField.setCaretPosition(0);
+    // task name panel
+    private JComponent taskNamePanel() {
 
-		taskName.add(nameField, gbc);
+        JPanel taskName = new JPanel();
+        taskName.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        // label
+        gbc.gridwidth = 2;
+        gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.anchor = GridBagConstraints.FIRST_LINE_START;
+        gbc.insets = new Insets(0, 10, 0, 15);
+        taskName.add(new JLabel("Task Name"), gbc);
 
-		taskName.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.gray), BorderFactory.createEmptyBorder(20, 10, 20, 20)));
+        // textField
+        gbc.gridwidth = 3;
+        gbc.gridx = 2;
+        // gbc.anchor = GridBagConstraints.FIRST_LINE_END;
+        gbc.insets = new Insets(0, 10, 0, 0);
+        nameField = new JTextField();
+        // default name ist date_time
+        nameField.setColumns(15);
 
-		return taskName;
-	}
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss.S");
+        nameField.setText(formatter.format(cal.getTime()));
+        nameField.setCaretPosition(0);
 
-	private String[] getPropertyFileInfo(Class<?> type) {
+        taskName.add(nameField, gbc);
 
-		// check if we got a property file
-		if (Properties.KDD_FRAMEWORK_PROPERTIES != null) {
+        taskName.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.gray), BorderFactory.createEmptyBorder(20, 10, 20, 20)));
 
-			return Properties.KDD_FRAMEWORK_PROPERTIES.getProperty(PropertyName.getOrCreatePropertyName(type));
-		}
-		return new String[] {};
+        return taskName;
+    }
 
-	}
+    private String[] getPropertyFileInfo(Class<?> type) {
 
-	public void propertyChange(PropertyChangeEvent evt) {
+        // check if we got a property file
+        if (Properties.KDD_FRAMEWORK_PROPERTIES != null) {
 
-		if (evt.getPropertyName().equals(KDDTask.DATABASE_CONNECTION_P)) {
-			if(evt.getSource() instanceof CustomizerPanel){
-				dbConnection = ((CustomizerPanel)evt.getSource()).parameterValuesToArray();
-			}
-			else{
-				System.out.println(evt.getSource());
-				KDDDialog.showMessage(this, "Error while fetching parameters for KDD TaskFrame, exit.");
-			}
+            return Properties.KDD_FRAMEWORK_PROPERTIES.getProperty(PropertyName.getOrCreatePropertyName(type));
+        }
+        return new String[]{};
+
+    }
+
+    public void propertyChange(PropertyChangeEvent evt) {
+
+        if (evt.getPropertyName().equals(KDDTask.DATABASE_CONNECTION_P)) {
+            if (evt.getSource() instanceof CustomizerPanel) {
+                dbConnection = ((CustomizerPanel) evt.getSource()).parameterValuesToArray();
+            }
+            else {
+                KDDDialog.showMessage(this, "Error while fetching parameters for KDD TaskFrame, exit.");
+            }
 //			dbConnection = ((String) evt.getNewValue()).split(" ");
-			algorithmPanel.setEnabled(true);
-			 System.out.println(Arrays.toString(dbConnection));
+            algorithmPanel.setEnabled(true);
 
-		} else if (evt.getPropertyName().equals(KDDTask.ALGORITHM_P)) {
-			algorithm = ((String) evt.getNewValue()).split(" ");
-			 System.out.println(Arrays.toString(algorithm));
-			completeParameters = new String[dbConnection.length + algorithm.length];
-			System.arraycopy(algorithm, 0, completeParameters, 0, algorithm.length);
-			System.arraycopy(dbConnection, 0, completeParameters, algorithm.length, dbConnection.length);
-			updateParameterField();
-		}
+        }
+        else if (evt.getPropertyName().equals(KDDTask.ALGORITHM_P)) {
+            algorithm = ((String) evt.getNewValue()).split(" ");
+            completeParameters = new String[dbConnection.length + algorithm.length];
+            System.arraycopy(algorithm, 0, completeParameters, 0, algorithm.length);
+            System.arraycopy(dbConnection, 0, completeParameters, algorithm.length, dbConnection.length);
+            updateParameterField();
+        }
 
-	}
+    }
 
-	private void runKDDTask(String[] args) {
-		// System.out.println("try to run KDD task: " + Arrays.toString(args));
-		task = new KDDTask();
-		try {
-			task.setParameters(args);
-			task.run();
-		} catch (ParameterException e) {
-			KDDDialog.showParameterMessage(this, e.getMessage(), e);
-			e.printStackTrace();
-		} catch (Exception e) {
-			KDDDialog.showErrorMessage(this, e.getMessage(), e);
-			e.printStackTrace();
-		}
-	}
+    private void runKDDTask(String[] args) {
+        task = new KDDTask();
+        try {
+            task.setParameters(args);
+            task.run();
+        }
+        catch (ParameterException e) {
+            KDDDialog.showParameterMessage(this, e.getMessage(), e);
+        }
+        catch (Exception e) {
+            KDDDialog.showErrorMessage(this, e.getMessage(), e);
+        }
+    }
 
-	private JComponent createDBAlgPanel() {
-		JPanel base = new JPanel(new GridBagLayout());
-		GridBagConstraints gbc = new GridBagConstraints();
+    private JComponent createDBAlgPanel() {
+        JPanel base = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
 
-		// database connection panel
-		dbConnectionPanel = new SelectionPanel("Select a database connection", "Database Connection", FileBasedDatabaseConnection.class.getName(), DatabaseConnection.class);
-		dbConnectionPanel.select.setEnabled(true);
-		dbConnectionPanel.addPropertyChangeListener(this);
-		dbConnectionPanel.propName = KDDTask.DATABASE_CONNECTION_P;
+        // database connection panel
+        dbConnectionPanel = new SelectionPanel("Select a database connection", "Database Connection", FileBasedDatabaseConnection.class.getName(), DatabaseConnection.class);
+        dbConnectionPanel.select.setEnabled(true);
+        dbConnectionPanel.addPropertyChangeListener(this);
+        dbConnectionPanel.propName = KDDTask.DATABASE_CONNECTION_P;
 
-		// algorithm panel
-		algorithmPanel = new SelectionPanel("Select an algorithm", "Algorithm", "", Algorithm.class);
-		algorithmPanel.addPropertyChangeListener(this);
-		algorithmPanel.propName = KDDTask.ALGORITHM_P;
-		algorithmPanel.setEnabled(false);
+        // algorithm panel
+        algorithmPanel = new SelectionPanel("Select an algorithm", "Algorithm", "", Algorithm.class);
+        algorithmPanel.addPropertyChangeListener(this);
+        algorithmPanel.propName = KDDTask.ALGORITHM_P;
+        algorithmPanel.setEnabled(false);
 
-		gbc.insets = new Insets(0, 10, 10, 10);
-		gbc.anchor = GridBagConstraints.LINE_START;
-		gbc.gridwidth = 2;
-		base.add(dbConnectionPanel, gbc);
-		gbc.gridx = 2;
-		gbc.insets = new Insets(0, 10, 10, 10);
-		gbc.anchor = GridBagConstraints.LINE_END;
-		base.add(algorithmPanel, gbc);
+        gbc.insets = new Insets(0, 10, 10, 10);
+        gbc.anchor = GridBagConstraints.LINE_START;
+        gbc.gridwidth = 2;
+        base.add(dbConnectionPanel, gbc);
+        gbc.gridx = 2;
+        gbc.insets = new Insets(0, 10, 10, 10);
+        gbc.anchor = GridBagConstraints.LINE_END;
+        base.add(algorithmPanel, gbc);
 
-		// text field displaying the complete parameters selected
-		gbc.gridy = 1;
-		gbc.gridx = 0;
-		gbc.gridwidth = 4;
-		gbc.anchor = GridBagConstraints.CENTER;
-		gbc.insets = new Insets(10, 0, 10, 0);
-		base.add(runPanel(), gbc);
+        // text field displaying the complete parameters selected
+        gbc.gridy = 1;
+        gbc.gridx = 0;
+        gbc.gridwidth = 4;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.insets = new Insets(10, 0, 10, 0);
+        base.add(runPanel(), gbc);
 
-		// run button
-		runButton = new JButton("Run Task");
-		runButton.setEnabled(false);
-		runButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				runKDDTask(completeParameters);
-			}
-		});
-		gbc.gridy = 2;
-		gbc.gridx = 1;
-		gbc.gridwidth = 1;
-		gbc.insets = new Insets(5, 5, 5, 5);
-		gbc.anchor = GridBagConstraints.LINE_END;
-		base.add(runButton, gbc);
+        // run button
+        runButton = new JButton("Run Task");
+        runButton.setEnabled(false);
+        runButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                runKDDTask(completeParameters);
+            }
+        });
+        gbc.gridy = 2;
+        gbc.gridx = 1;
+        gbc.gridwidth = 1;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.LINE_END;
+        base.add(runButton, gbc);
 
-		saveButton = new JButton("Save Settings");
-		saveButton.setEnabled(false);
-		saveButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				// KDDDialog.showSaveSettingsDialog(KDDTaskFrame.this);
-				KDDFileChooser chooser = new KDDFileChooser(System.getProperty("java.class.path"));
-				if(chooser.showSaveDialog(KDDTaskFrame.this)==JFileChooser.APPROVE_OPTION){
-					saveSettings(chooser.getFileName(), chooser.getFileType());
-				}
-				
+        saveButton = new JButton("Save Settings");
+        saveButton.setEnabled(false);
+        saveButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // KDDDialog.showSaveSettingsDialog(KDDTaskFrame.this);
+                KDDFileChooser chooser = new KDDFileChooser(System.getProperty("java.class.path"));
+                if (chooser.showSaveDialog(KDDTaskFrame.this) == JFileChooser.APPROVE_OPTION) {
+                    saveSettings(chooser.getFileName(), chooser.getFileType());
+                }
+
 //				JFileChooser cheesy = new JFileChooser(System.getProperty("java.class.path"));
 //				if (cheesy.showSaveDialog(KDDTaskFrame.this) == JFileChooser.APPROVE_OPTION) {
 //					saveSettings(cheesy.getSelectedFile().getPath());
 //				}
-			}
-		});
-		gbc.gridx = 2;
-		gbc.anchor = GridBagConstraints.LINE_START;
-		base.add(saveButton, gbc);
+            }
+        });
+        gbc.gridx = 2;
+        gbc.anchor = GridBagConstraints.LINE_START;
+        base.add(saveButton, gbc);
 
-		base.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY), BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+        base.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY), BorderFactory.createEmptyBorder(10, 10, 10, 10)));
 
-		return base;
-	}
+        return base;
+    }
 
-	private JPanel createKDDTaskParameterPanel(){
-		
-		JPanel parameterPanel = new JPanel(new GridBagLayout());
-		
-		return parameterPanel;
-	}
-	
-	private JComponent runPanel() {
+    private JPanel createKDDTaskParameterPanel() {
 
-		runPanel = new JPanel();
-		parameterField = new JTextPane() {
+        JPanel parameterPanel = new JPanel(new GridBagLayout());
 
-			public Dimension getPreferredScrollableViewportSize() {
-				Dimension dim = getPreferredSize();
-				dim.width = 500;
+        return parameterPanel;
+    }
 
-				return dim;
-			}
+    private JComponent runPanel() {
 
-			public void setSize(Dimension d) {
+        runPanel = new JPanel();
+        parameterField = new JTextPane() {
 
-				if (d.width < getParent().getSize().width) {
-					d.width = getParent().getSize().width;
+            public Dimension getPreferredScrollableViewportSize() {
+                Dimension dim = getPreferredSize();
+                dim.width = 500;
 
-				}
+                return dim;
+            }
 
-				super.setSize(d);
-			}
+            public void setSize(Dimension d) {
 
-			public boolean getScrollableTracksViewportWidth() {
+                if (d.width < getParent().getSize().width) {
+                    d.width = getParent().getSize().width;
 
-				return false;
-			}
-		};
+                }
 
-		this.parameterField.setEditable(false);
-		// set the right color
-		this.parameterField.setBackground(Color.white);
-		scroller = new JScrollPane(parameterField);
-		this.scroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		this.scroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-		runPanel.add(scroller);
+                super.setSize(d);
+            }
 
-		Dimension dim = runPanel.getPreferredSize();
-		dim.height = 50;
-		runPanel.setPreferredSize(dim);
+            public boolean getScrollableTracksViewportWidth() {
 
-		return runPanel;
-	}
+                return false;
+            }
+        };
 
-	private void updateParameterField() {
-		parameterField.setText(null);
-		parameterField.setText(printArray(completeParameters));
-		parameterField.setCaretPosition(0);
-		runPanel.revalidate();
+        this.parameterField.setEditable(false);
+        // set the right color
+        this.parameterField.setBackground(Color.white);
+        scroller = new JScrollPane(parameterField);
+        this.scroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        this.scroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        runPanel.add(scroller);
 
-		runButton.setEnabled(true);
-		saveButton.setEnabled(true);
-	}
+        Dimension dim = runPanel.getPreferredSize();
+        dim.height = 50;
+        runPanel.setPreferredSize(dim);
 
-	private String printArray(String[] args) {
-		StringBuilder bob = new StringBuilder();
-		int i = 0;
-		for (String s : completeParameters) {
-			bob.append(s);
-			if (i != completeParameters.length - 1) {
-				bob.append(" ");
-			}
-		}
+        return runPanel;
+    }
 
-		return bob.toString();
-	}
+    private void updateParameterField() {
+        parameterField.setText(null);
+        parameterField.setText(printArray(completeParameters));
+        parameterField.setCaretPosition(0);
+        runPanel.revalidate();
 
-	private void saveSettings(String path, String type) {
+        runButton.setEnabled(true);
+        saveButton.setEnabled(true);
+    }
 
-		if(type.equals(KDDFileChooser.TEXT_FORMAT)){
-			try {
-				BufferedWriter writer = new BufferedWriter(new FileWriter(path));
-				// task name
-				writer.write(nameField.getText());
-				writer.write("\n");
-				writer.write(printArray(completeParameters));
-				writer.flush();
-				writer.close();
-			} catch (IOException e) {
-				KDDDialog.showErrorMessage(KDDTaskFrame.this, "Could not save settings to file '"+path+"', reason: " + e.getMessage(), e);
-			}
-		}
-		else if(type.equals(KDDFileChooser.XML_FORMAT)){
-			//TODO
-		}
-		else{
-			//TODO 
-		}
-		
-		
-		
+    private String printArray(String[] args) {
+        StringBuilder bob = new StringBuilder();
+        int i = 0;
+        for (String s : completeParameters) {
+            bob.append(s);
+            if (i != completeParameters.length - 1) {
+                bob.append(" ");
+            }
+        }
 
-	}
+        return bob.toString();
+    }
 
-	private class SelectionPanel extends JPanel implements PopUpTreeListener,
-			EditObjectChangeListener {
+    private void saveSettings(String path, String type) {
+
+        if (type.equals(KDDFileChooser.TEXT_FORMAT)) {
+            try {
+                BufferedWriter writer = new BufferedWriter(new FileWriter(path));
+                // task name
+                writer.write(nameField.getText());
+                writer.write("\n");
+                writer.write(printArray(completeParameters));
+                writer.flush();
+                writer.close();
+            }
+            catch (IOException e) {
+                KDDDialog.showErrorMessage(KDDTaskFrame.this, "Could not save settings to file '" + path + "', reason: " + e.getMessage(), e);
+            }
+        }
+        else if (type.equals(KDDFileChooser.XML_FORMAT)) {
+            //TODO
+        }
+        else {
+            //TODO
+        }
 
 
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 7161605147411986066L;
+    }
 
-		/**
-		 * the popup menu of this panel
-		 */
-		private PopUpTree menu;
+    private class SelectionPanel extends JPanel implements PopUpTreeListener,
+        EditObjectChangeListener {
 
-		/**
-		 * the select button
-		 */
-		private JButton select;
 
-		/**
-		 * the name label
-		 */
-		private JLabel nameLabel;
+        /**
+         *
+         */
+        private static final long serialVersionUID = 7161605147411986066L;
 
-		/**
-		 * the text field
-		 */
-		private JTextField textField;
+        /**
+         * the popup menu of this panel
+         */
+        private PopUpTree menu;
 
-		/**
-		 * the panel to customize the edit object
-		 */
-		private CustomizerPanel editObjectCustomizer;
+        /**
+         * the select button
+         */
+        private JButton select;
 
-		private String propName;
+        /**
+         * the name label
+         */
+        private JLabel nameLabel;
 
-		public SelectionPanel(String buttonToolTip, String labelToolTip, String defaultClassName, Class<?> parentClass) {
+        /**
+         * the text field
+         */
+        private JTextField textField;
 
-			menu = new PopUpTree(getPropertyFileInfo(parentClass), defaultClassName);
-			// don't forget to register as listener
-			menu.addPopUpTreeListener(this);
+        /**
+         * the panel to customize the edit object
+         */
+        private CustomizerPanel editObjectCustomizer;
 
-			editObjectCustomizer = new CustomizerPanel(KDDTaskFrame.this, parentClass);
-			editObjectCustomizer.addEditObjectChangeListener(this);
+        private String propName;
 
-			layoutPanel(buttonToolTip, labelToolTip);
-		}
+        public SelectionPanel(String buttonToolTip, String labelToolTip, String defaultClassName, Class<?> parentClass) {
 
-		private void layoutPanel(final String buttonToolTip, final String labelToolTip) {
+            menu = new PopUpTree(getPropertyFileInfo(parentClass), defaultClassName);
+            // don't forget to register as listener
+            menu.addPopUpTreeListener(this);
 
-			// gridbaylayout
-			setLayout(new GridBagLayout());
-			GridBagConstraints gbc = new GridBagConstraints();
+            editObjectCustomizer = new CustomizerPanel(KDDTaskFrame.this, parentClass);
+            editObjectCustomizer.addEditObjectChangeListener(this);
 
-			// name label
-			nameLabel = new JLabel(labelToolTip);
-			gbc.gridx = 0;
-			gbc.gridwidth = 2;
-			gbc.insets = new Insets(10, 10, 10, 10);
-			// gbc.anchor = GridBagConstraints.LINE_START;
-			add(nameLabel, gbc);
+            layoutPanel(buttonToolTip, labelToolTip);
+        }
 
-			// select button
-			createSelectButton(buttonToolTip);
-			gbc.gridx = 2;
-			gbc.gridwidth = 2;
-			gbc.anchor = GridBagConstraints.LINE_END;
-			add(select, gbc);
+        private void layoutPanel(final String buttonToolTip, final String labelToolTip) {
 
-			// text field
-			createTextField(buttonToolTip);
-			gbc.gridy = 2;
-			gbc.gridwidth = 4;
-			gbc.gridx = 0;
-			gbc.insets = new Insets(5, 10, 10, 10);
-			gbc.anchor = GridBagConstraints.CENTER;
-			add(textField, gbc);
+            // gridbaylayout
+            setLayout(new GridBagLayout());
+            GridBagConstraints gbc = new GridBagConstraints();
 
-			setBorder(loweredEtched);
-			// setBorder(BorderFactory.createCompoundBorder(raisedBevel,
-			// loweredBevel));
-		}
+            // name label
+            nameLabel = new JLabel(labelToolTip);
+            gbc.gridx = 0;
+            gbc.gridwidth = 2;
+            gbc.insets = new Insets(10, 10, 10, 10);
+            // gbc.anchor = GridBagConstraints.LINE_START;
+            add(nameLabel, gbc);
 
-		private void createSelectButton(String toolTipText) {
-			select = new JButton("Select");
+            // select button
+            createSelectButton(buttonToolTip);
+            gbc.gridx = 2;
+            gbc.gridwidth = 2;
+            gbc.anchor = GridBagConstraints.LINE_END;
+            add(select, gbc);
 
-			select.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					menu.show(select, nameLabel.getLocation().x, select.getLocation().y);
-				}
-			});
+            // text field
+            createTextField(buttonToolTip);
+            gbc.gridy = 2;
+            gbc.gridwidth = 4;
+            gbc.gridx = 0;
+            gbc.insets = new Insets(5, 10, 10, 10);
+            gbc.anchor = GridBagConstraints.CENTER;
+            add(textField, gbc);
 
-			select.setEnabled(false);
-			select.setToolTipText(toolTipText);
-		}
+            setBorder(loweredEtched);
+            // setBorder(BorderFactory.createCompoundBorder(raisedBevel,
+            // loweredBevel));
+        }
 
-		private void createTextField(final String toolTipText) {
+        private void createSelectButton(String toolTipText) {
+            select = new JButton("Select");
 
-			textField = new JTextField(20) {
+            select.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    menu.show(select, nameLabel.getLocation().x, select.getLocation().y);
+                }
+            });
 
-				public void setText(String text) {
-					if (text != null || !(text.equals(""))) {
-						super.setText(text);
-						this.setToolTipText("Click for details");
-						this.setCaretPosition(0);
-					} else {
-						super.setText("");
+            select.setEnabled(false);
+            select.setToolTipText(toolTipText);
+        }
 
-						setToolTipText(toolTipText);
-					}
-				}
-			};
-			textField.setEditable(false);
-			textField.setBackground(Color.white);
-			textField.addMouseListener(new MouseAdapter() {
+        private void createTextField(final String toolTipText) {
 
-				public void mouseClicked(MouseEvent e) {
-					if (editObjectCustomizer != null && editObjectCustomizer.getSelectedClass() != null && !textField.getText().equals("")) {
-						editObjectCustomizer.setVisible(true, nameLabel.getLocationOnScreen());
-					}
-				}
+            textField = new JTextField(20) {
 
-				public void mousePressed(MouseEvent e) {
-					if (editObjectCustomizer != null && editObjectCustomizer.getSelectedClass() != null && !textField.getText().equals("")) {
-						editObjectCustomizer.setVisible(true, nameLabel.getLocationOnScreen());
-					}
-				}
-			});
-		}
+                public void setText(String text) {
+                    if (text != null || !(text.equals(""))) {
+                        super.setText(text);
+                        this.setToolTipText("Click for details");
+                        this.setCaretPosition(0);
+                    }
+                    else {
+                        super.setText("");
 
-		public void selectedClassChanged(String selectedClass) {
-			editObjectCustomizer.setEditObjectClass(selectedClass, nameLabel.getLocationOnScreen());
-		}
+                        setToolTipText(toolTipText);
+                    }
+                }
+            };
+            textField.setEditable(false);
+            textField.setBackground(Color.white);
+            textField.addMouseListener(new MouseAdapter() {
 
-		public void editObjectChanged(String editObjectName, String parameters) {
+                public void mouseClicked(MouseEvent e) {
+                    if (editObjectCustomizer != null && editObjectCustomizer.getSelectedClass() != null && !textField.getText().equals("")) {
+                        editObjectCustomizer.setVisible(true, nameLabel.getLocationOnScreen());
+                    }
+                }
 
-			// update textField
-			textField.setText(editObjectName);
-			textField.setCaretPosition(editObjectName.length());
+                public void mousePressed(MouseEvent e) {
+                    if (editObjectCustomizer != null && editObjectCustomizer.getSelectedClass() != null && !textField.getText().equals("")) {
+                        editObjectCustomizer.setVisible(true, nameLabel.getLocationOnScreen());
+                    }
+                }
+            });
+        }
 
-			// update TaskFrame
-			String[] customizerParameters = this.editObjectCustomizer.parameterValuesToArray();
+        public void selectedClassChanged(String selectedClass) {
+            editObjectCustomizer.setEditObjectClass(selectedClass, nameLabel.getLocationOnScreen());
+        }
+
+        public void editObjectChanged(String editObjectName, String parameters) {
+
+            // update textField
+            textField.setText(editObjectName);
+            textField.setCaretPosition(editObjectName.length());
+
+            // update TaskFrame
+            String[] customizerParameters = this.editObjectCustomizer.parameterValuesToArray();
 //			String[]
 //			completeParams[0] = "-" + propName;
 //			completeParams[1] = editObjectName;
 //			System.arraycopy(parameters, 0, completeParams, 2, parameters.length);
-			
-			String completeParams = "-"+propName +" "+editObjectName + " "+parameters;
-			firePropertyChange(propName, "", completeParams);
-		}
 
-		public void setEnabled(boolean e) {
-			this.nameLabel.setEnabled(e);
-			this.textField.setEnabled(e);
-			this.select.setEnabled(e);
-		}
-	}
+            String completeParams = "-" + propName + " " + editObjectName + " " + parameters;
+            firePropertyChange(propName, "", completeParams);
+        }
+
+        public void setEnabled(boolean e) {
+            this.nameLabel.setEnabled(e);
+            this.textField.setEnabled(e);
+            this.select.setEnabled(e);
+        }
+    }
 }

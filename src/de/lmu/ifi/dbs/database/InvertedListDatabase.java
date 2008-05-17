@@ -100,19 +100,12 @@ public <D extends Distance<D>>List<QueryResult<D>> rangeQuery(Integer id, String
       double from = value - eps;
       double to = value + eps + Double.MIN_VALUE;
 
-//      System.out.println("o    "+value);
-//      System.out.println("eps  "+eps);
-//      System.out.println("from "+from);
-//      System.out.println("to   "+to);
-
       SortedMap<Double, List<Integer>> epsMap = invertedList.subMap(from, to);
-//      System.out.println("epsMap "+epsMap);
       for (Double key : epsMap.keySet()) {
         List<Integer> ids = epsMap.get(key);
         for (Integer currentID : ids) {
-          D currentDistance = (D) df.distance(currentID, id);
-//          DoubleDistance currentDistance = new DoubleDistance(Math.abs(value - key));
-//          System.out.println("  d "+currentDistance);
+            // noinspection unchecked
+            D currentDistance = (D) df.distance(currentID, id);
           result.add(new QueryResult<D>(currentID, currentDistance));
         }
       }

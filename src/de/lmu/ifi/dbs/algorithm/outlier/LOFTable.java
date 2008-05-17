@@ -63,6 +63,7 @@ public class LOFTable extends AbstractLoggable {
 	 * @param minpts
 	 *            number of nearest neighbors of an object to be considered for
 	 *            computing its LOF
+     * @throws java.io.IOException if an I/O Exception occurs during reading the file
 	 */
 	public LOFTable(String fileName, int pageSize, int cacheSize, int minpts)
 			throws IOException {
@@ -78,7 +79,6 @@ public class LOFTable extends AbstractLoggable {
 							.restoreObject(line);
 					lof.insert(data);
 				} catch (Exception e) {
-					e.printStackTrace();
 					throw new RuntimeException("Error while parsing line "
 							+ lineNumber, e);
 				}
@@ -138,21 +138,24 @@ public class LOFTable extends AbstractLoggable {
 
 	/**
 	 * Returns the physical read access of this table.
-	 */
+     * @return the physical read access of this table
+     */
 	public long getPhysicalReadAccess() {
 		return lof.getPhysicalReadAccess();
 	}
 
 	/**
 	 * Returns the physical write access of this table.
-	 */
+     * @return the physical write access of this table
+     */
 	public long getPhysicalWriteAccess() {
 		return lof.getPhysicalWriteAccess();
 	}
 
 	/**
 	 * Returns the logical read access of this table.
-	 */
+     * @return the logical read access of this table
+     */
 	public long getLogicalPageAccess() {
 		return lof.getLogicalPageAccess();
 	}
@@ -224,12 +227,6 @@ public class LOFTable extends AbstractLoggable {
 	 *         argument; <code>false</code> otherwise.
 	 */
 	public boolean equals(Object obj) {
-		if (!(obj instanceof LOFTable))
-			return false;
-
-		LOFTable other = (LOFTable) obj;
-
-		return super.equals(obj); // To change body of overridden methods use
-									// File | Settings | File Templates.
+        return obj instanceof LOFTable && super.equals(obj);
 	}
 }

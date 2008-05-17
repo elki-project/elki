@@ -43,10 +43,10 @@ public class PartiallySimilarVoxelObjectsCreator extends AbstractParameterizable
 
   public static void main(String[] args) {
     try {
-      PartiallySimilarVoxelObjectsCreator creator = new PartiallySimilarVoxelObjectsCreator(args);
-      System.out.println(creator.usage(""));
+      new PartiallySimilarVoxelObjectsCreator(args);
     }
     catch (ParameterException e) {
+        // todo exception werfen
       e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
     }    
   }

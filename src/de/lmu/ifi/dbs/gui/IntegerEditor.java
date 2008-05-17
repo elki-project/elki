@@ -2,20 +2,19 @@ package de.lmu.ifi.dbs.gui;
 
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 
-import javax.swing.JFrame;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+import javax.swing.*;
 
+// todo steffi comment all
 public class IntegerEditor extends TextFieldParameterEditor {
 
-	
-	public static final int COLUMN_NUMBER = 7;
-	
-	public IntegerEditor(IntParameter option, JFrame owner, ParameterChangeListener l) {
-		super(option, owner,l);
+
+    public static final int COLUMN_NUMBER = 7;
+
+    public IntegerEditor(IntParameter option, JFrame owner, ParameterChangeListener l) {
+        super(option, owner, l);
 //		this.textField.getDocument().addDocumentListener(new MyDocumentListener());
-		
-	}
+
+    }
 
 //	@Override
 //	protected void createInputField() {
@@ -69,27 +68,8 @@ public class IntegerEditor extends TextFieldParameterEditor {
 //		inputField.add(helpLabel);
 //	}
 
-	@Override
-	protected int getColumnNumber() {
-		return COLUMN_NUMBER;
-	}
-	private class MyDocumentListener implements DocumentListener {
-	    String newline = "\n";
-	 
-	    public void insertUpdate(DocumentEvent e) {
-	    	System.out.println(e.getDocument().toString());
-	    	System.out.println(e.getType().toString());
-	    	System.out.println(e.toString());
-	    }
-	    public void removeUpdate(DocumentEvent e) {
-	    	System.out.println(e.getType().toString());
-	        System.out.println(e.toString());
-	    }
-	    public void changedUpdate(DocumentEvent e) {
-	    	System.out.println(e.getType().toString());
-	       System.out.println(e.toString());
-	    }
-
-	   
-	}
+    @Override
+    protected int getColumnNumber() {
+        return COLUMN_NUMBER;
+    }
 }

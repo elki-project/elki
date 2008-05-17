@@ -3,88 +3,81 @@ package de.lmu.ifi.dbs.gui;
 import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.InputVerifier;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
+// todo steffi comment all
 public class ClassEditor extends ParameterEditor {
 
-	private JComboBox comboField;
+    private JComboBox comboField;
 
-	private JTextField textField;
-	
-	public ClassEditor(ClassParameter<?> option, JFrame owner, ParameterChangeListener l) {
-		super(option, owner,l);
+    private JTextField textField;
+
+    public ClassEditor(ClassParameter<?> option, JFrame owner, ParameterChangeListener l) {
+        super(option, owner, l);
 //		createInputField();
-	}
+    }
 
-	
-	public boolean isOptional(){
-		return ((ClassParameter<?>)this.option).isOptional();
-	}
-	
-	@Override
-	protected void createInputField() {
 
-		inputField = new JPanel();
-		// System.out.println(Arrays.toString(((ClassParameter)option).getRestrictionClasses()));
-		// System.out.println(((ClassParameter)option).getRestrictionClass().toString());
-		String[] restrClasses = ((ClassParameter<?>) option).getRestrictionClasses();
-		if (restrClasses.length == 0) {
-			textField = new JTextField(20);
-			inputField.add(textField);
-		} else { // use combo field
-			comboField = new JComboBox();
-			comboField.setModel(new DefaultComboBoxModel(restrClasses));
+    public boolean isOptional() {
+        return ((ClassParameter<?>) this.option).isOptional();
+    }
 
-			if (((ClassParameter<?>) option).hasDefaultValue()) {
-				comboField.setSelectedItem(((ClassParameter<?>) option).getDefaultValue());
-			}
-			setValue((String) comboField.getSelectedItem());
-			comboField.addActionListener(new ActionListener() {
+    @Override
+    protected void createInputField() {
 
-				public void actionPerformed(ActionEvent e) {
-					setValue((String) comboField.getSelectedItem());
-				}
+        inputField = new JPanel();
+        String[] restrClasses = ((ClassParameter<?>) option).getRestrictionClasses();
+        if (restrClasses.length == 0) {
+            textField = new JTextField(20);
+            inputField.add(textField);
+        }
+        else { // use combo field
+            comboField = new JComboBox();
+            comboField.setModel(new DefaultComboBoxModel(restrClasses));
 
-			});
-			inputField.add(comboField);
-		}
-		
+            if (((ClassParameter<?>) option).hasDefaultValue()) {
+                comboField.setSelectedItem(((ClassParameter<?>) option).getDefaultValue());
+            }
+            setValue((String) comboField.getSelectedItem());
+            comboField.addActionListener(new ActionListener() {
 
-		// }
-		inputField.add(helpLabel);
-		inputField.setInputVerifier(new InputVerifier() {
+                public void actionPerformed(ActionEvent e) {
+                    setValue((String) comboField.getSelectedItem());
+                }
 
-			public boolean verify(JComponent input) {
+            });
+            inputField.add(comboField);
+        }
 
-				return checkInput();
-			}
+        // }
+        inputField.add(helpLabel);
+        inputField.setInputVerifier(new InputVerifier() {
 
-			public boolean shouldYieldFocus(JComponent input) {
-				return verify(input);
-			}
+            public boolean verify(JComponent input) {
 
-			private boolean checkInput() {
+                return checkInput();
+            }
 
-				try {
-					((ClassParameter<?>) option).isValid(getValue());
-				} catch (ParameterException e) {
+            public boolean shouldYieldFocus(JComponent input) {
+                return verify(input);
+            }
 
-					KDDDialog.showParameterMessage(owner, e.getMessage(), e);
-					return false;
-				}
-				return true;
-			}
-		});
-	}
+            private boolean checkInput() {
+
+                try {
+                    option.isValid(getValue());
+                }
+                catch (ParameterException e) {
+
+                    KDDDialog.showParameterMessage(owner, e.getMessage(), e);
+                    return false;
+                }
+                return true;
+            }
+        });
+    }
 
 //	@Override
 //	public boolean isValid() {

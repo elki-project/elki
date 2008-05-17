@@ -12,7 +12,7 @@ import java.util.Arrays;
  * Represents a description of a jpg image including color histogram, color moments and
  * 13 Haralick texture features, Roughness and Facet-Orientation.
  *
- * @author Elke Achtert 
+ * @author Elke Achtert
  */
 class ImageDescriptor extends AbstractLoggable {
 
@@ -419,74 +419,7 @@ class ImageDescriptor extends AbstractLoggable {
 
     // calculate histograms and cooccurrence matrices
     notEmpty = calculateValues(image, width, height);
-/*
-    if (true) {
-      // image debugging
-      try {
-      // convert back to BufferedImage
-      BufferedImage bufferimage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-      for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-          int pos = width * y + x;
-          int rgb = image.getRGB(x, y);
-          int r = ((rgb >> RED_SHIFT) & 0xff);
-          int g = (rgb >> GREEN_SHIFT) & 0xff;
-          int b = (rgb >> BLUE_SHIFT) & 0xff;
-          float v = (float)((( 2097152*r - 1756152*g -  341000*b) / 255) + 2097152) / (float)4194304;	// normalize
-          
-          if (v <= 0.2) {
-         	 rgb = ((0 << RED_SHIFT) | (0 << GREEN_SHIFT) | (0 << BLUE_SHIFT));
-          }
-          else if (hsvValues[pos][1] < 0.1 && v > 0.2) {
-         	 rgb = (((int)(hsvValues[pos][2]*255) << RED_SHIFT) | ((int)(hsvValues[pos][2]*255) << GREEN_SHIFT) | ((int)(hsvValues[pos][2]*255) << BLUE_SHIFT));
-          }
-          else {
-             rgb = hsv2rgb(hsvValues[pos][0], 1.0, 1.0);         	 
-          }
-//          rgb = (((int)(hsvValues[pos][0]*255) << RED_SHIFT) | ((int)(hsvValues[pos][0]*255) << GREEN_SHIFT) | ((int)(hsvValues[pos][0]*255) << BLUE_SHIFT));
-//          rgb = (((int)(hsvValues[pos][1]*255) << RED_SHIFT) | ((int)(hsvValues[pos][1]*255) << GREEN_SHIFT) | ((int)(hsvValues[pos][1]*255) << BLUE_SHIFT));
-//          rgb = (((int)(hsvValues[pos][2]*255) << RED_SHIFT) | ((int)(hsvValues[pos][2]*255) << GREEN_SHIFT) | ((int)(hsvValues[pos][2]*255) << BLUE_SHIFT));
-//          rgb = hsv2rgb(hsvValues[pos][0], hsvValues[pos][1], 1.0);
-          bufferimage.setRGB(x, y, rgb);
-        }
-      }
-        ImageIO.write(bufferimage, "bmp", new File("c:\\debug_pic.bmp"));
-		} catch (IOException e) {
-        e.printStackTrace();
-		}
-    }
-*/
 
-/*    if (false) {
-      // co-occurence debugging
-      try {
-        for (int d = 0; d < DISTANCES.length; d++) {
-          BufferedWriter cooccurrenceWriter = new BufferedWriter(new FileWriter("cooccurrence_" + DISTANCES[d] + ".txt"));
-          for (int y = 0; y < NUM_GRAY_VALUES; y++) {
-            for (int x = 0; x < NUM_GRAY_VALUES; x++) {
-              double value = cooccurrenceMatrices[d].get(x, y);
-
-//              if (value > 0)
-//            	  value = Math.log(value);
-//              else
-//            	  value = 0;
-
-              cooccurrenceWriter.write(Double.toString(value));
-              if ((x + 1) < NUM_GRAY_VALUES) {
-                cooccurrenceWriter.write(", ");
-              }
-            }
-            cooccurrenceWriter.write("\n");
-          }
-          cooccurrenceWriter.flush();
-          cooccurrenceWriter.close();
-        }
-      }
-      catch (IOException e) {
-        e.printStackTrace();
-      }
-    }
-*/
     // if image is not empty: calculate moments and statistics
     if (notEmpty) {
       calculateHistograms(width, height);
@@ -1370,28 +1303,6 @@ class ImageDescriptor extends AbstractLoggable {
     else {
       pixels2 = pixels;
     }
-/*
-    if (true) {
-       // image debugging
-       try {
-       // convert back to BufferedImage
-       BufferedImage bufferimage = new BufferedImage(ww, hh, BufferedImage.TYPE_INT_RGB);
-       for (int y = 0; y < hh; y++) {
-         for (int x = 0; x < ww; x++) {
-           int pos = ww * y + x;
-           int gray = (int)(pixels2[pos] * 255.0);
-           if (gray < 0) gray = 0;
-           else if (gray > 255) gray = 255;
-           int rgb = ((gray << RED_SHIFT) | (gray << GREEN_SHIFT) | (gray << BLUE_SHIFT));
-           bufferimage.setRGB(x, y, rgb);
-         }
-       }
-         ImageIO.write(bufferimage, "bmp", new File("c:\\debug_pic-level-"+levelSurf+".bmp"));
- 		} catch (IOException e) {
-         e.printStackTrace();
- 		}
-     }
-*/
 
     if (filterSurf) {
       if (filterType == 0) {
@@ -1404,28 +1315,6 @@ class ImageDescriptor extends AbstractLoggable {
         throw new RuntimeException("Illegal argument!");
       }
     }
-/*
-    if (true) {
-       // image debugging
-       try {
-       // convert back to BufferedImage
-       BufferedImage bufferimage = new BufferedImage(ww, hh, BufferedImage.TYPE_INT_RGB);
-       for (int y = 0; y < hh; y++) {
-         for (int x = 0; x < ww; x++) {
-           int pos = ww * y + x;
-           int gray = (int)(pixels2[pos] * 255.0);
-           if (gray < 0) gray = 0;
-           else if (gray > 255) gray = 255;
-           int rgb = ((gray << RED_SHIFT) | (gray << GREEN_SHIFT) | (gray << BLUE_SHIFT));
-           bufferimage.setRGB(x, y, rgb);
-         }
-       }
-         ImageIO.write(bufferimage, "bmp", new File("c:\\debug_pic-gauss-"+filterSurf+"-"+filterType+".bmp"));
- 		} catch (IOException e) {
-         e.printStackTrace();
- 		}
-     }
-*/
     int N = ww * hh;
     double zMin = Double.MAX_VALUE;
     double zMax = -Double.MAX_VALUE;

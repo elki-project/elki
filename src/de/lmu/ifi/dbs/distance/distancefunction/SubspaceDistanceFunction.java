@@ -17,166 +17,158 @@ import java.util.regex.Pattern;
  * spanned by the strong eigenvectors of the two points and the affine distance
  * between the two subspaces.
  *
- * @author Elke Achtert 
+ * @author Elke Achtert
  */
-public class SubspaceDistanceFunction<O extends RealVector<O,?>,P extends Preprocessor<O>,D extends SubspaceDistance<D>>
+public class SubspaceDistanceFunction<O extends RealVector<O, ?>, P extends Preprocessor<O>, D extends SubspaceDistance<D>>
     extends AbstractPreprocessorBasedDistanceFunction<O, P, D> {
 
-  /**
-   * The Assocoiation ID for the association to be set by the preprocessor.
-   */
-  public static final AssociationID ASSOCIATION_ID = AssociationID.LOCAL_PCA;
+    /**
+     * The Assocoiation ID for the association to be set by the preprocessor.
+     */
+    public static final AssociationID ASSOCIATION_ID = AssociationID.LOCAL_PCA;
 
-  /**
-   * The super class for the preprocessor.
-   */
-  public static final Class<Preprocessor> PREPROCESSOR_SUPER_CLASS = Preprocessor.class;
+    /**
+     * The super class for the preprocessor.
+     */
+    public static final Class<Preprocessor> PREPROCESSOR_SUPER_CLASS = Preprocessor.class;
 
-  /**
-   * The default preprocessor class name.
-   */
-  public static final String DEFAULT_PREPROCESSOR_CLASS = KnnQueryBasedHiCOPreprocessor.class.getName();
+    /**
+     * The default preprocessor class name.
+     */
+    public static final String DEFAULT_PREPROCESSOR_CLASS = KnnQueryBasedHiCOPreprocessor.class.getName();
 
-  /**
-   * Description for parameter preprocessor.
-   */
-  public static final String PREPROCESSOR_CLASS_D = "the preprocessor to determine the correlation dimensions of the objects " +
-                                                    Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Preprocessor.class) +
-                                                    ". Default: " + SubspaceDistanceFunction.DEFAULT_PREPROCESSOR_CLASS;
+    /**
+     * Description for parameter preprocessor.
+     */
+    public static final String PREPROCESSOR_CLASS_D = "the preprocessor to determine the correlation dimensions of the objects " +
+        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Preprocessor.class) +
+        ". Default: " + SubspaceDistanceFunction.DEFAULT_PREPROCESSOR_CLASS;
 
-  /**
-   * Provides a distance function to determine distances
-   * between subspaces of equal dimensionality.
-   */
-  public SubspaceDistanceFunction() {
-    super(Pattern.compile("\\d+(\\.\\d+)?([eE][-]?\\d+)?" +
-                          AbstractCorrelationDistanceFunction.SEPARATOR.pattern() +
-                          "\\d+(\\.\\d+)?([eE][-]?\\d+)?"));
-  }
-
-  /**
-   * Returns the name of the default preprocessor.
-   */
-  String getDefaultPreprocessorClassName() {
-    return DEFAULT_PREPROCESSOR_CLASS;
-  }
-
-  /**
-   * Returns the description for parameter preprocessor.
-   */
-  String getPreprocessorClassDescription() {
-    return PREPROCESSOR_CLASS_D;
-  }
-
-  /**
-   * Returns the super class for the preprocessor.
-   */
-  Class<Preprocessor> getPreprocessorSuperClassName() {
-    return PREPROCESSOR_SUPER_CLASS;
-  }
-
-  /**
-   * Returns the assocoiation ID for the association to be set by the preprocessor.
-   */
-  AssociationID getAssociationID() {
-    return ASSOCIATION_ID;
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.distance.MeasurementFunction#valueOf(String)
-   */
-  public D valueOf(String pattern) throws IllegalArgumentException {
-    if (pattern.equals(INFINITY_PATTERN)) {
-      return infiniteDistance();
-    }
-    if (matches(pattern)) {
-      String[] values = AbstractCorrelationDistanceFunction.SEPARATOR.split(pattern);
-      return (D)new SubspaceDistance<D>(Double.parseDouble(values[0]), Double.parseDouble(values[1]));
-    }
-    else {
-      throw new IllegalArgumentException("Given pattern \"" +
-                                         pattern +
-                                         "\" does not match required pattern \"" +
-                                         requiredInputPattern() + "\"");
-    }
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.distance.MeasurementFunction#infiniteDistance()
-   */
-  public D infiniteDistance() {
-    return (D) new SubspaceDistance<D>(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.distance.MeasurementFunction#nullDistance()
-   */
-  public D nullDistance() {
-    return (D) new SubspaceDistance<D>(0, 0);
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.distance.MeasurementFunction#undefinedDistance()
-   */
-  public D undefinedDistance() {
-    return (D) new SubspaceDistance<D>(Double.NaN, Double.NaN);
-  }
-
-  /**
-   * Note, that the pca of o1 must have equal ore more strong
-   * eigenvectors than the pca of o2.
-   *
-   * @see de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction#distance(de.lmu.ifi.dbs.data.DatabaseObject, de.lmu.ifi.dbs.data.DatabaseObject)
-   */
-  public D distance(O o1, O o2) {
-    LocalPCA<O> pca1 = (LocalPCA<O>) getDatabase().getAssociation(AssociationID.LOCAL_PCA, o1.getID());
-    LocalPCA<O> pca2 = (LocalPCA<O>) getDatabase().getAssociation(AssociationID.LOCAL_PCA, o2.getID());
-    return distance(o1, o2, pca1, pca2);
-  }
-
-  /**
-   * Computes the distance between two given DatabaseObjects according to this
-   * distance function. Note, that the first pca must have an equal number of strong
-   * eigenvectors than the second pca.
-   *
-   * @param o1   first DatabaseObject
-   * @param o2   second DatabaseObject
-   * @param pca1 first PCA
-   * @param pca2 second PCA
-   * @return the distance between two given DatabaseObjects according to this
-   *         distance function
-   */
-  public D distance(O o1, O o2, LocalPCA<O> pca1, LocalPCA<O> pca2) {
-    if (pca1.getCorrelationDimension() != pca2.getCorrelationDimension()) {
-      throw new IllegalStateException("pca1.getCorrelationDimension() != pca2.getCorrelationDimension()");
+    /**
+     * Provides a distance function to determine distances
+     * between subspaces of equal dimensionality.
+     */
+    public SubspaceDistanceFunction() {
+        super(Pattern.compile("\\d+(\\.\\d+)?([eE][-]?\\d+)?" +
+            AbstractCorrelationDistanceFunction.SEPARATOR.pattern() +
+            "\\d+(\\.\\d+)?([eE][-]?\\d+)?"));
     }
 
-    Matrix strong_ev1 = pca1.getStrongEigenvectors();
-    Matrix weak_ev2 = pca2.getWeakEigenvectors();
+    /**
+     * Returns the name of the default preprocessor.
+     */
+    String getDefaultPreprocessorClassName() {
+        return DEFAULT_PREPROCESSOR_CLASS;
+    }
 
-//    Matrix weak_ev1 = pca1.getWeakEigenvectors();
-//    Matrix strong_ev2 = pca2.getStrongEigenvectors();
+    /**
+     * Returns the description for parameter preprocessor.
+     */
+    String getPreprocessorClassDescription() {
+        return PREPROCESSOR_CLASS_D;
+    }
 
-    Matrix m1 = weak_ev2.getColumnDimensionality() == 0 ? strong_ev1.transpose() : strong_ev1.transpose().times(weak_ev2);
-//    Matrix m2 = weak_ev1.getColumnDimensionality() == 0 ? strong_ev2.transpose() : strong_ev2.transpose().times(weak_ev1);
+    /**
+     * Returns the super class for the preprocessor.
+     */
+    Class<Preprocessor> getPreprocessorSuperClassName() {
+        return PREPROCESSOR_SUPER_CLASS;
+    }
 
-    double d1 = m1.norm2();
-//    double d2 = m2.norm2();
+    /**
+     * Returns the assocoiation ID for the association to be set by the preprocessor.
+     */
+    AssociationID getAssociationID() {
+        return ASSOCIATION_ID;
+    }
 
-//    System.out.println("");
-//    System.out.println(getDatabase().getAssociation(AssociationID.LABEL, o1.getID()) + " - " +
-//                       getDatabase().getAssociation(AssociationID.LABEL, o2.getID()));
-//    System.out.println(pca1.getCorrelationDimension()+ "- " +pca2.getCorrelationDimension());
-//    System.out.println("d1 " + d1);
-//    System.out.println("d2 " + d2);
+    /**
+     * @see de.lmu.ifi.dbs.distance.MeasurementFunction#valueOf(String)
+     */
+    public D valueOf(String pattern) throws IllegalArgumentException {
+        if (pattern.equals(INFINITY_PATTERN)) {
+            return infiniteDistance();
+        }
+        if (matches(pattern)) {
+            String[] values = AbstractCorrelationDistanceFunction.SEPARATOR.split(pattern);
+            // noinspection unchecked
+            return (D) new SubspaceDistance<D>(Double.parseDouble(values[0]), Double.parseDouble(values[1]));
+        }
+        else {
+            throw new IllegalArgumentException("Given pattern \"" +
+                pattern +
+                "\" does not match required pattern \"" +
+                requiredInputPattern() + "\"");
+        }
+    }
 
+    /**
+     * @see de.lmu.ifi.dbs.distance.MeasurementFunction#infiniteDistance()
+     */
+    public D infiniteDistance() {
+        // noinspection unchecked
+        return (D) new SubspaceDistance<D>(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+    }
 
-    WeightedDistanceFunction<O> df1 = new WeightedDistanceFunction<O>(pca1.similarityMatrix());
-    WeightedDistanceFunction<O> df2 = new WeightedDistanceFunction<O>(pca2.similarityMatrix());
+    /**
+     * @see de.lmu.ifi.dbs.distance.MeasurementFunction#nullDistance()
+     */
+    public D nullDistance() {
+        // noinspection unchecked
+        return (D) new SubspaceDistance<D>(0, 0);
+    }
 
-    double affineDistance = Math.max(df1.distance(o1, o2).getDoubleValue(),
-                                     df2.distance(o1, o2).getDoubleValue());
+    /**
+     * @see de.lmu.ifi.dbs.distance.MeasurementFunction#undefinedDistance()
+     */
+    public D undefinedDistance() {
+        // noinspection unchecked
+        return (D) new SubspaceDistance<D>(Double.NaN, Double.NaN);
+    }
 
-    return (D) new SubspaceDistance<D>(d1, affineDistance);
-  }
+    /**
+     * Note, that the pca of o1 must have equal ore more strong
+     * eigenvectors than the pca of o2.
+     *
+     * @see de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction#distance(de.lmu.ifi.dbs.data.DatabaseObject,de.lmu.ifi.dbs.data.DatabaseObject)
+     */
+    public D distance(O o1, O o2) {
+        // noinspection unchecked
+        LocalPCA<O> pca1 = (LocalPCA<O>) getDatabase().getAssociation(AssociationID.LOCAL_PCA, o1.getID());
+        // noinspection unchecked
+        LocalPCA<O> pca2 = (LocalPCA<O>) getDatabase().getAssociation(AssociationID.LOCAL_PCA, o2.getID());
+        return distance(o1, o2, pca1, pca2);
+    }
+
+    /**
+     * Computes the distance between two given DatabaseObjects according to this
+     * distance function. Note, that the first pca must have an equal number of strong
+     * eigenvectors than the second pca.
+     *
+     * @param o1   first DatabaseObject
+     * @param o2   second DatabaseObject
+     * @param pca1 first PCA
+     * @param pca2 second PCA
+     * @return the distance between two given DatabaseObjects according to this
+     *         distance function
+     */
+    public D distance(O o1, O o2, LocalPCA<O> pca1, LocalPCA<O> pca2) {
+        if (pca1.getCorrelationDimension() != pca2.getCorrelationDimension()) {
+            throw new IllegalStateException("pca1.getCorrelationDimension() != pca2.getCorrelationDimension()");
+        }
+
+        Matrix strong_ev1 = pca1.getStrongEigenvectors();
+        Matrix weak_ev2 = pca2.getWeakEigenvectors();
+        Matrix m1 = weak_ev2.getColumnDimensionality() == 0 ? strong_ev1.transpose() : strong_ev1.transpose().times(weak_ev2);
+        double d1 = m1.norm2();
+
+        WeightedDistanceFunction<O> df1 = new WeightedDistanceFunction<O>(pca1.similarityMatrix());
+        WeightedDistanceFunction<O> df2 = new WeightedDistanceFunction<O>(pca2.similarityMatrix());
+
+        double affineDistance = Math.max(df1.distance(o1, o2).getDoubleValue(),
+            df2.distance(o1, o2).getDoubleValue());
+
+        // noinspection unchecked
+        return (D) new SubspaceDistance<D>(d1, affineDistance);
+    }
 }

@@ -183,7 +183,8 @@ public class FeatureExtractor extends StandAloneInputWrapper {
 
     }
     catch (IOException e) {
-      e.printStackTrace();
+        // todo exception handling
+        e.printStackTrace();
     }
     if (isVerbose()) {
       verbose("");
@@ -195,6 +196,7 @@ public class FeatureExtractor extends StandAloneInputWrapper {
    * mapping of the image name to the class id.
    *
    * @return a mapping of the image name to the class id
+   * @throws java.io.IOException if an I/O exception occurs during reading
    */
   private Map<String, Integer> readClassFile() throws IOException {
     Map<String, Integer> res = new HashMap<String, Integer>();

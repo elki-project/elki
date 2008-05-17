@@ -345,8 +345,6 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
     List<Integer> ids = new ArrayList<Integer>();
     leafEntryIDs(node, ids);
     PolynomialApproximation approx = approximateKnnDistances(getMeanKNNList(ids, knnLists));
-//    System.out.println("\napprox1 " + approx1);
-//    System.out.println("approx2 " + approx);
     entry.setKnnDistanceApproximation(approx);
   }
 
@@ -414,7 +412,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
     PolynomialApproximation approximation = new PolynomialApproximation(regression.getEstimatedCoefficients().getColumnPackedCopy());
 
     if (debug) {
-      msg.append("\napproximation " + approximation);
+        msg.append("\napproximation ").append(approximation);
     }
 
     if (debug) {
@@ -452,8 +450,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
    * @param parentDistance the distance from the object to the routing object of the parent node
    */
   protected MkAppEntry<D> createNewLeafEntry(O object, D parentDistance) {
-    MkAppLeafEntry<D> leafEntry = new MkAppLeafEntry<D>(object.getID(), parentDistance, null);
-    return leafEntry;
+      return new MkAppLeafEntry<D>(object.getID(), parentDistance, null);
   }
 
   /**
