@@ -63,7 +63,6 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
      * <p>Default value: DimensionsSelectingEuklideanDistanceFunction </p>
      * <p>Key: (@code -distancefunction) </p>
      */
-    // noinspection unchecked
     public static ClassParameter<AbstractDimensionsSelectingDoubleDistanceFunction> DISTANCEFUNCTION_PARAM = new ClassParameter("distancefunction",
                                                                                                                                 "the distance function to determine the distance between database objects "
                                                                                                                                 + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(AbstractDimensionsSelectingDoubleDistanceFunction.class)

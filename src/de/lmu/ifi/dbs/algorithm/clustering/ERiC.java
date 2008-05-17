@@ -302,7 +302,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         List<String> parameters = new ArrayList<String>();
 
         // eigenpair filter
-        parameters.add(OptionHandler.OPTION_PREFIX + GlobalPCA.EIGENPAIR_FILTER_P);
+        parameters.add(OptionHandler.OPTION_PREFIX + GlobalPCA.EIGENPAIR_FILTER_PARAM.getName());
         parameters.add(FirstNEigenPairFilter.class.getName());
 
         // n
