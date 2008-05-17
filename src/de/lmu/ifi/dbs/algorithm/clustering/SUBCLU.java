@@ -130,6 +130,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
             }
         }
         catch (ParameterException e) {
+            // todo wieder weg
             e.printStackTrace();
             throw new IllegalStateException(e);
         }
@@ -202,7 +203,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
 
         // distance function
         parameters.add(OptionHandler.OPTION_PREFIX + DISTANCEFUNCTION_PARAM.getName());
-        parameters.add(distanceFunction.getClass().toString());
+        parameters.add(distanceFunction.getClass().getName());
 
         // selected dimensions for distance function
         parameters.add(OptionHandler.OPTION_PREFIX + AbstractDimensionsSelectingDoubleDistanceFunction.DIMS_P);
