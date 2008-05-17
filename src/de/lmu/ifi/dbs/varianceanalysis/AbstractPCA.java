@@ -22,7 +22,7 @@ public abstract class AbstractPCA extends AbstractParameterizable implements PCA
 
     /**
      * Parameter to specify the filter for determination of the strong and weak eigenvectors,
-     * must be a subclass of #EigenPairFilter.
+     * must be a subclass of <link>EigenPairFilter</link>.
      * <p>Default value: #PercentageEigenPairFilter </p>
      * <p>Key: (@code -filter) </p>
      */
