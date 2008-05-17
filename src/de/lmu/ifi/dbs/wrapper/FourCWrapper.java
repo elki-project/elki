@@ -22,97 +22,95 @@ import java.util.Vector;
  */
 public class FourCWrapper extends NormalizationWrapper {
 
-  /**
-   * Parameter minpts.
-   */
-  private IntParameter minpts;
+    /**
+     * Parameter minpts.
+     */
+    private IntParameter minpts;
 
-  /**
-   * Parameter lambda.
-   */
-  private IntParameter lambda;
+    /**
+     * Parameter lambda.
+     */
+    private IntParameter lambda;
 
-  /**
-   * Parameter delta.
-   */
-  private DoubleParameter delta;
+    /**
+     * Parameter delta.
+     */
+    private DoubleParameter delta;
 
-  /**
-   * Absolute flag.
-   */
-  private Flag absolute;
+    /**
+     * Absolute flag.
+     */
+    private Flag absolute;
 
-  /**
-   * Main method to run this wrapper.
-   *
-   * @param args the arguments to run this wrapper
-   */
-  public static void main(String[] args) {
-    FourCWrapper wrapper = new FourCWrapper();
-    try {
-      wrapper.setParameters(args);
-      wrapper.run();
+    /**
+     * Main method to run this wrapper.
+     *
+     * @param args the arguments to run this wrapper
+     */
+    public static void main(String[] args) {
+        FourCWrapper wrapper = new FourCWrapper();
+        try {
+            wrapper.setParameters(args);
+            wrapper.run();
+        }
+        catch (ParameterException e) {
+            Throwable cause = e.getCause() != null ? e.getCause() : e;
+            wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
+        }
+        catch (AbortException e) {
+            wrapper.verbose(e.getMessage());
+        }
+        catch (Exception e) {
+            wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
+        }
     }
-    catch (ParameterException e) {
-      e.printStackTrace();
-      Throwable cause = e.getCause() != null ? e.getCause() : e;
-      wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
+
+    /**
+     * Provides a wrapper for the 4C algorithm.
+     */
+    public FourCWrapper() {
+        super();
+        // epsilon
+        optionHandler.put(FourC.EPSILON_PARAM);
+
+        // minpts
+        minpts = new IntParameter(FourC.MINPTS_P, FourC.MINPTS_D, new GreaterConstraint(0));
+        optionHandler.put(minpts);
+
+        // lambda
+        lambda = new IntParameter(FourC.LAMBDA_P, FourC.LAMBDA_D, new GreaterConstraint(0));
+        optionHandler.put(lambda);
+
+        // absolute flag
+        absolute = new Flag(FourCPreprocessor.ABSOLUTE_F, FourCPreprocessor.ABSOLUTE_D);
+        optionHandler.put(absolute);
+
+        // delta
+        List<ParameterConstraint<Number>> cons = new Vector<ParameterConstraint<Number>>();
+        cons.add(new GreaterEqualConstraint(0));
+        cons.add(new LessEqualConstraint(1));
+        delta = new DoubleParameter(FourCPreprocessor.DELTA_P, FourCPreprocessor.DELTA_D, cons);
+        delta.setDefaultValue(LimitEigenPairFilter.DEFAULT_DELTA);
+        optionHandler.put(delta);
     }
-    catch (AbortException e) {
-      wrapper.verbose(e.getMessage());
+
+    /**
+     * @see KDDTaskWrapper#getKDDTaskParameters()
+     */
+    public List<String> getKDDTaskParameters() throws UnusedParameterException {
+        List<String> parameters = super.getKDDTaskParameters();
+
+        // 4C algorithm
+        parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
+        parameters.add(FourC.class.getName());
+
+        put(parameters, FourC.EPSILON_PARAM);
+        put(parameters, minpts);
+        put(parameters, lambda);
+        put(parameters, delta);
+        if (optionHandler.isSet(absolute))
+            put(parameters, absolute);
+
+        return parameters;
     }
-    catch (Exception e) {
-      e.printStackTrace();
-      wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
-    }
-  }
-
-  /**
-   * Provides a wrapper for the 4C algorithm.
-   */
-  public FourCWrapper() {
-    super();
-    // epsilon
-    optionHandler.put(FourC.EPSILON_PARAM);
-
-    // minpts
-    minpts = new IntParameter(FourC.MINPTS_P, FourC.MINPTS_D, new GreaterConstraint(0));
-    optionHandler.put(minpts);
-
-    // lambda
-    lambda = new IntParameter(FourC.LAMBDA_P, FourC.LAMBDA_D, new GreaterConstraint(0));
-    optionHandler.put(lambda);
-
-    // absolute flag
-    absolute = new Flag(FourCPreprocessor.ABSOLUTE_F, FourCPreprocessor.ABSOLUTE_D);
-    optionHandler.put(absolute);
-
-    // delta
-    List<ParameterConstraint<Number>> cons = new Vector<ParameterConstraint<Number>>();
-    cons.add(new GreaterEqualConstraint(0));
-    cons.add(new LessEqualConstraint(1));
-    delta = new DoubleParameter(FourCPreprocessor.DELTA_P, FourCPreprocessor.DELTA_D, cons);
-    delta.setDefaultValue(LimitEigenPairFilter.DEFAULT_DELTA);
-    optionHandler.put(delta);
-  }
-
-  /**
-   * @see KDDTaskWrapper#getKDDTaskParameters()
-   */
-  public List<String> getKDDTaskParameters() throws UnusedParameterException {
-    List<String> parameters = super.getKDDTaskParameters();
-
-    // 4C algorithm
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-    parameters.add(FourC.class.getName());
-
-    put(parameters, FourC.EPSILON_PARAM);
-    put(parameters, minpts);
-    put(parameters, lambda);
-    put(parameters, delta);
-    if (optionHandler.isSet(absolute))
-      put(parameters, absolute);
-
-    return parameters;
-  }
 }

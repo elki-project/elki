@@ -4,11 +4,7 @@ import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.outlier.OnlineLOF;
 import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.utilities.optionhandling.FileParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.io.File;
@@ -18,128 +14,125 @@ import java.util.List;
  * Wrapper class for LOF algorithm. Performs an attribute wise normalization
  * on the database objects.
  *
- * @author Elke Achtert 
+ * @author Elke Achtert
  */
 public class OnlineLOFWrapper extends FileBasedDatabaseConnectionWrapper {
 
-  /**
-   * The value of the minpts parameter.
-   */
-  private int minpts;
+    /**
+     * The value of the minpts parameter.
+     */
+    private int minpts;
 
-  /**
-   * The value of the insertions parameter.
-   */
-  private File insertions;
+    /**
+     * The value of the insertions parameter.
+     */
+    private File insertions;
 
-  /**
-   * The value of the lof parameter.
-   */
-  private File lof;
+    /**
+     * The value of the lof parameter.
+     */
+    private File lof;
 
-  /**
-   * The value of the nn parameter.
-   */
-  private File nn;
+    /**
+     * The value of the nn parameter.
+     */
+    private File nn;
 
-  /**
-   * Main method to run this wrapper.
-   *
-   * @param args the arguments to run this wrapper
-   */
-  public static void main(String[] args) {
-    OnlineLOFWrapper wrapper = new OnlineLOFWrapper();
-    try {
-      wrapper.setParameters(args);
-      wrapper.run();
+    /**
+     * Main method to run this wrapper.
+     *
+     * @param args the arguments to run this wrapper
+     */
+    public static void main(String[] args) {
+        OnlineLOFWrapper wrapper = new OnlineLOFWrapper();
+        try {
+            wrapper.setParameters(args);
+            wrapper.run();
+        }
+        catch (ParameterException e) {
+            Throwable cause = e.getCause() != null ? e.getCause() : e;
+            wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
+        }
+        catch (AbortException e) {
+            wrapper.verbose(e.getMessage());
+        }
+        catch (Exception e) {
+            wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
+        }
     }
-    catch (ParameterException e) {
-      Throwable cause = e.getCause() != null ? e.getCause() : e;
-      wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
+
+    /**
+     * Sets the parameters epsilon and minpts in the parameter map additionally
+     * to the parameters provided by super-classes.
+     */
+    public OnlineLOFWrapper() {
+        super();
+        // parameter min points
+        optionHandler.put(new IntParameter(OnlineLOF.MINPTS_P, OnlineLOF.MINPTS_D, new GreaterConstraint(0)));
+
+        // parameter insertions
+        optionHandler.put(new FileParameter(OnlineLOF.INSERTIONS_P, OnlineLOF.INSERTIONS_D, FileParameter.FILE_IN));
+
+        // parameter LOF
+        optionHandler.put(new FileParameter(OnlineLOF.LOF_P, OnlineLOF.LOF_D, FileParameter.FILE_IN));
+
+        //parameter nn
+        optionHandler.put(new FileParameter(OnlineLOF.NN_P, OnlineLOF.NN_D, FileParameter.FILE_IN));
     }
-    catch (AbortException e) {
-      wrapper.verbose(e.getMessage());
-    }
-    catch (Exception e) {
-      Throwable cause = e.getCause() != null ? e.getCause() : e;
-      cause.printStackTrace();
-      e.printStackTrace();
-      wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
-    }
-  }
 
-  /**
-   * Sets the parameters epsilon and minpts in the parameter map additionally
-   * to the parameters provided by super-classes.
-   */
-  public OnlineLOFWrapper() {
-    super();
-    // parameter min points
-    optionHandler.put(new IntParameter(OnlineLOF.MINPTS_P, OnlineLOF.MINPTS_D, new GreaterConstraint(0)));
+    /**
+     * @see KDDTaskWrapper#getKDDTaskParameters()
+     */
+    public List<String> getKDDTaskParameters() throws UnusedParameterException {
+        List<String> parameters = super.getKDDTaskParameters();
 
-    // parameter insertions
-    optionHandler.put(new FileParameter(OnlineLOF.INSERTIONS_P, OnlineLOF.INSERTIONS_D, FileParameter.FILE_IN));
+        // algorithm OnlineLOF
+        parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
+        parameters.add(OnlineLOF.class.getName());
 
-    // parameter LOF
-    optionHandler.put(new FileParameter(OnlineLOF.LOF_P, OnlineLOF.LOF_D, FileParameter.FILE_IN));
+        // minpts
+        parameters.add(OptionHandler.OPTION_PREFIX + OnlineLOF.MINPTS_P);
+        parameters.add(Integer.toString(minpts));
 
-    //parameter nn
-    optionHandler.put(new FileParameter(OnlineLOF.NN_P, OnlineLOF.NN_D, FileParameter.FILE_IN));
-  }
+        // insertions
+        parameters.add(OptionHandler.OPTION_PREFIX + OnlineLOF.INSERTIONS_P);
+        parameters.add(insertions.getPath());
 
-  /**
-   * @see KDDTaskWrapper#getKDDTaskParameters()
-   */
-  public List<String> getKDDTaskParameters() throws UnusedParameterException {
-    List<String> parameters = super.getKDDTaskParameters();
+        // lof
+        parameters.add(OptionHandler.OPTION_PREFIX + OnlineLOF.LOF_P);
+        parameters.add(lof.getPath());
 
-    // algorithm OnlineLOF
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-    parameters.add(OnlineLOF.class.getName());
+        // nn
+        parameters.add(OptionHandler.OPTION_PREFIX + OnlineLOF.NN_P);
+        parameters.add(nn.getPath());
 
-    // minpts
-    parameters.add(OptionHandler.OPTION_PREFIX + OnlineLOF.MINPTS_P);
-    parameters.add(Integer.toString(minpts));
+        // distance function
+        parameters.add(OptionHandler.OPTION_PREFIX + OnlineLOF.DISTANCE_FUNCTION_P);
+        parameters.add(EuklideanDistanceFunction.class.getName());
 
-    // insertions
-    parameters.add(OptionHandler.OPTION_PREFIX + OnlineLOF.INSERTIONS_P);
-    parameters.add(insertions.getPath());
-
-    // lof
-    parameters.add(OptionHandler.OPTION_PREFIX + OnlineLOF.LOF_P);
-    parameters.add(lof.getPath());
-
-    // nn
-    parameters.add(OptionHandler.OPTION_PREFIX + OnlineLOF.NN_P);
-    parameters.add(nn.getPath());
-
-    // distance function
-    parameters.add(OptionHandler.OPTION_PREFIX + OnlineLOF.DISTANCE_FUNCTION_P);
-    parameters.add(EuklideanDistanceFunction.class.getName());
-
-    // page size
+        // page size
 //    parameters.add(OptionHandler.OPTION_PREFIX + LOF.PAGE_SIZE_P);
 //    parameters.add("8000");
 
-    // cache size
+        // cache size
 //    parameters.add(OptionHandler.OPTION_PREFIX + LOF.CACHE_SIZE_P);
 //    parameters.add("" + 8000 * 10);
 
 
-    return parameters;
-  }
+        return parameters;
+    }
 
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+    /**
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+     */
+    public String[] setParameters(String[] args) throws ParameterException {
+        String[] remainingParameters = super.setParameters(args);
 
-    minpts = (Integer) optionHandler.getOptionValue(OnlineLOF.MINPTS_P);
-    insertions = (File) optionHandler.getOptionValue(OnlineLOF.INSERTIONS_P);
-    lof = (File) optionHandler.getOptionValue(OnlineLOF.LOF_P);
-    nn = (File) optionHandler.getOptionValue(OnlineLOF.NN_P);
+        minpts = (Integer) optionHandler.getOptionValue(OnlineLOF.MINPTS_P);
+        insertions = (File) optionHandler.getOptionValue(OnlineLOF.INSERTIONS_P);
+        lof = (File) optionHandler.getOptionValue(OnlineLOF.LOF_P);
+        nn = (File) optionHandler.getOptionValue(OnlineLOF.NN_P);
 
-    return remainingParameters;
-  }
+        return remainingParameters;
+    }
 }

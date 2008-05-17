@@ -148,6 +148,7 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
    * @return a copy of the vector holding this heap
    */
   public Vector<HeapNode<K,V>> copy() {
+      // noinspection unchecked
     return (Vector<HeapNode<K,V>>) heap.clone();
   }
 
@@ -192,8 +193,8 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
   /**
    * Swaps the nodes at the indices i1 and i2 in the array.
    *
-   * @param i1
-   * @param i2
+   * @param i1 the first index
+   * @param i2 the second index
    */
   protected final void swap(final int i1, final int i2) {
     // get both elements
@@ -213,7 +214,7 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
    * Heapifies the subtree located at i. Precondition: i's both childtrees are
    * heapordered
    *
-   * @param i
+   * @param i the idex of the subtree to be heapified
    */
   protected final void heapify(int i) {
     // move the key down the tree till we're done.
@@ -356,21 +357,4 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
   public String toString() {
     return heap.toString();
   }
-
-  public static void main(String[] args) {
-    /*
-    * DefaultHeap<Integer, Integer> heap = new DefaultHeap<Integer,
-    * Integer>();
-    *
-    * heap.addNode(new DefaultHeapNode<Integer, Integer>(2, 2));
-    * heap.addNode(new DefaultHeapNode<Integer, Integer>(4, 4));
-    * heap.addNode(new DefaultHeapNode<Integer, Integer>(4, 4));
-    * heap.addNode(new DefaultHeapNode<Integer, Integer>(6, 6));
-    * heap.addNode(new DefaultHeapNode<Integer, Integer>(1, 1));
-    * heap.addNode(new DefaultHeapNode<Integer, Integer>(3, 3));
-    *
-    * while (! heap.isEmpty()) { System.out.println(heap.getMinNode()); }
-    */
-  }
-
 }

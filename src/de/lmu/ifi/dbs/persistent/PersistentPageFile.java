@@ -105,8 +105,6 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
       }
     }
     catch (IOException e) {
-      e.printStackTrace();
-      e.fillInStackTrace();
       throw new RuntimeException("IOException occured: \n " + e);
     }
   }
@@ -243,10 +241,12 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
         throw new IllegalArgumentException("Unknown type: " + type);
     }
     catch (IOException e) {
+        // todo exception handling
       e.printStackTrace();
       return null;
     }
     catch (ClassNotFoundException e) {
+        // todo exception handling
       e.printStackTrace();
       return null;
     }

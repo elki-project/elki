@@ -19,8 +19,6 @@ import java.io.Externalizable;
 import java.io.PrintStream;
 import java.util.Arrays;
 
-// ELKITODO : place in package index?
-
 /**
  * Implementation of a B-Tree.
  * <p/>
@@ -58,11 +56,11 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
 
     if (this.debug) {
       StringBuffer msg = new StringBuffer();
-      msg.append("\nkeysize   " + keySize);
-      msg.append("\nvalueSize " + valueSize);
-      msg.append("\npageSize  " + pageSize);
-      msg.append("\ncacheSize " + cacheSize);
-      msg.append("\nm         " + m);
+        msg.append("\nkeysize   ").append(keySize);
+        msg.append("\nvalueSize ").append(valueSize);
+        msg.append("\npageSize  ").append(pageSize);
+        msg.append("\ncacheSize ").append(cacheSize);
+        msg.append("\nm         ").append(m);
       debugFine(msg.toString());
     }
 
@@ -540,52 +538,6 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
       return "Node: " + node + ", keyIndex: " + keyIndex;
     }
   }
-
-  public static void main(String[] args) {
-    int m = 1;
-//    BTree<Integer, Integer> tree = new BTree<Integer, Integer>(m, 300, 300, "elkilein");      // Typ (2,h) B-Baum
-    BTree<DefaultKey, DefaultKey> tree = new BTree<DefaultKey, DefaultKey>(4, 4, 60, 80000);      // Typ (2,h) B-Baum
-//    BTree<Integer, String> tree = new BTree<Integer, String>(m, 50, 5000, null);      // Typ (2,h) B-Baum
-    int[] values = {104, 56, 222, 12, 58, 180, 301,
-        1, 93, 121, 254, 420, 63, 5, 72,
-        245, 81, 113, 4, 72, 83, 60, 271, 567, 234, 7438, 2, 9, 53, 54, 55, 67, 32, 33, 45, 101, 102,
-        103, 104, 105, 789, 234, 235, 278}; // Werte, mit denen der
-    // Baum erzeugt wird
-
-    // Erzeuge Baum
-    System.out.println("Erzeuge B-Baum der Klasse (" + m + ",h) ...");
-    for (int i = 0; i < values.length; i++) {
-      System.out.println("\nXXXXXXXX insert " + values[i]);
-      tree.insert(new DefaultKey(values[i]), new DefaultKey(i));
-//      tree.insert(values[i], "Elki " + i);
-//      System.out.println(tree.toString());
-      System.out.println(tree.printStructure());
-    }
-    System.out.println(tree.printStructure());
-
-//    tree.close();
-//    if (true) return;
-
-//    for (int i = 0; i < values.length; i++) {
-//      System.out.println("\n DELETE " + values[i]);
-//      tree.delete(values[i]);
-//      System.out.println(tree.toString());
-//      System.out.println("\n YYYYYYYYYYYY DELETE " + values[i]);
-//      System.out.println(tree.printStructure());
-//    }
-
-    // Ausgabe eines Durchlaufs in symmetrischer Ordnung
-    System.out.println("\n\nBaumdurchlauf in symmetrischer Ordnung nach einfuegen: ");
-    System.out.println(tree);
-
-    // Ausgabe der Baumstruktur
-    System.out.println("\nBaumstruktur: ");
-    System.out.println(tree.printStructure());
-
-    tree.close();
-
-  }
-
 
   /**
    * Determines and returns the order of this B-Tree.

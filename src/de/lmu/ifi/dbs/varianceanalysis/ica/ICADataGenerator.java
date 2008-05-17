@@ -38,6 +38,7 @@ public class ICADataGenerator {
       generator.synthetic1();
     }
     catch (Exception e) {
+        // todo exception handling
       e.printStackTrace();
       System.exit(1);
     }
