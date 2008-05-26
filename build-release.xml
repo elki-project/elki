@@ -3,5 +3,27 @@
 <project name="ELKI" default="complete" basedir=".">
 	<property name="RELEASE" value="1.0"/>
 
+	<!-- exclude:
+	algorithm.APRIORI,
+	algorithm.ICA,
+	algorithm.classifier,
+	algorithm.outlier,
+	algorithm.clustering.FractalDimensionTest,
+	algorithm.clustering.KernelFourC,
+	algorithm.clustering.SubspaceAggregation,
+	algorithm.clustering.SubspaceEM,
+	algorithm.result.AprioriResult,
+	algorithm.result.GeneralizedLOFResult,
+	algorithm.result.LOFResult,
+	algorithm.result.clustering.FractalDimensionTestResult,
+	algorithm.result.clustering.HierarchicalFractalDimensionCluster,
+	converter,
+	evaluation,
+	featureextraction,
+	gui,
+	math.analysis,
+	math.spacefillingcurves,
+	wrapper
+	-->
 	<target name="complete"></target>
 </project>
