@@ -56,6 +56,7 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends Abstra
     }
 
     /**
+     * 
      * Grabs the options from the option handler. Any extending class should
      * call this method first and return the returned array without further
      * changes, but after setting further required parameters. An example for
@@ -67,9 +68,10 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends Abstra
      *   String[] remainingParameters = super.setParameters(args);
      *   // set parameters for your class eventually using optionHandler
      *   // for example like this:
+     *   TODO: still correct?!?
      *   if(optionHandler.isSet(MY_PARAM_VALUE_PARAM)
      *   {
-     *      myParamValue = optionHandler.getOptionValue(MY_PARAM_VALUE_PARAM);
+     *      myParamValue = getParameterValue(MY_PARAM_VALUE_PARAM);
      *   }
      *   else
      *   {

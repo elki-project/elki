@@ -2,8 +2,8 @@ package de.lmu.ifi.dbs.algorithm.outlier;
 
 import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.algorithm.result.GeneralizedLOFResult;
 import de.lmu.ifi.dbs.algorithm.result.Result;
+import de.lmu.ifi.dbs.algorithm.result.outlier.GeneralizedLOFResult;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;

@@ -20,7 +20,7 @@ import java.util.List;
  * Preprocessor for PreDeCon local dimensionality and locally weighted matrix
  * assignment to objects of a certain database.
  *
- * @author Arthur Zimek
+ * @author Peer Kr&ouml;ger
  */
 public class PreDeConPreprocessor<D extends Distance<D>, V extends RealVector<V,?>> extends ProjectedDBSCANPreprocessor<D,V> {
   /**
@@ -50,7 +50,7 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends RealVector<V,
   private final int kappa = 50;
 
   /**
-   * Provides a new Preprocessor that computes the clocal dimensionality and locally weighted matrix
+   * Provides a new Preprocessor that computes the local dimensionality and locally weighted matrix
    * of objects of a certain database.
    */
   public PreDeConPreprocessor() {
@@ -66,6 +66,8 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends RealVector<V,
   }
 
   /**
+   * TODO provide correct commentary
+   * 
    * This method implements the type of variance analysis to be computed for a given point.
    * <p/>
    * Example1: for 4C, this method should implement a PCA for the given point.

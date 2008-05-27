@@ -19,11 +19,13 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
     /**
      * The Assocoiation ID for the association to be set by the preprocessor.
      */
+    @SuppressWarnings("unchecked")
     public static final AssociationID<SortedSet> ASSOCIATION_ID = AssociationID.SHARED_NEAREST_NEIGHBORS_SET;
 
     /**
      * The super class for the preprocessor.
      */
+    @SuppressWarnings("unchecked")
     public static final Class<SharedNearestNeighborsPreprocessor> PREPROCESSOR_SUPER_CLASS = SharedNearestNeighborsPreprocessor.class;
 
     /**
@@ -36,7 +38,7 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
      */
     public static final String PREPROCESSOR_CLASS_D = "the preprocessor to determine the neighbors of the objects";
     
-    private SharedNearestNeighborsPreprocessor<O,D> preprocessor = new SharedNearestNeighborsPreprocessor<O,D>();
+    //private SharedNearestNeighborsPreprocessor<O,D> preprocessor = new SharedNearestNeighborsPreprocessor<O,D>();
     
     
     public SharedNearestNeighborSimilarityFunction()

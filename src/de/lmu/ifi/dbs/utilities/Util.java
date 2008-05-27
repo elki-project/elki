@@ -14,11 +14,11 @@ import de.lmu.ifi.dbs.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
-import sun.misc.Launcher;
+//import sun.misc.Launcher;
 
-import java.io.File;
+//import java.io.File;
 import java.io.PrintStream;
-import java.net.URL;
+//import java.net.URL;
 import java.text.NumberFormat;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -1143,157 +1143,158 @@ public final class Util extends AbstractLoggable {
         return result.toArray(resultArray);
     }
 
-    /**
-     * Provides a string describing the restriction to implement or extend
-     * the specified class.
-     * <p/>
-     * The message has a structure like follows:
-     * <pre>
-     * (implementing typeName -- available classes:
-     * -->class1.name
-     * -->class2.name
-     * )
-     * </pre>
-     *
-     * @param type the type restricting the possible classes
-     * @return a description listing all available classes
-     *         restricted by the specified class
-     */
-    public static <T> String restrictionString(Class<T> type) {
-        StringBuilder msg = new StringBuilder();
-        msg.append('(');
-        if (type.isInterface()) {
-            msg.append("implementing ");
-        }
-        else {
-            msg.append("extending ");
-        }
-        msg.append(type.getName());
-        Class<? extends T>[] classes = implementingClasses(type);
-        if (logger.debug()) {
-            logger.debugFinest("Classes for " + type.getName() + ": " + Arrays.asList(classes).toString());
-        }
-        if (classes.length > 0) {
-            msg.append(" -- available classes:\n");
-            for (Class<? extends T> c : classes) {
-                msg.append("-->");
-                msg.append(c.getName());
-                msg.append('\n');
-            }
-        }
-        msg.append(')');
-        return msg.toString();
-    }
+//    /**
+//     * Provides a string describing the restriction to implement or extend
+//     * the specified class.
+//     * <p/>
+//     * The message has a structure like follows:
+//     * <pre>
+//     * (implementing typeName -- available classes:
+//     * -->class1.name
+//     * -->class2.name
+//     * )
+//     * </pre>
+//     *
+//     * @param type the type restricting the possible classes
+//     * @return a description listing all available classes
+//     *         restricted by the specified class
+//     */
+//    public static <T> String restrictionString(Class<T> type) {
+//        StringBuilder msg = new StringBuilder();
+//        msg.append('(');
+//        if (type.isInterface()) {
+//            msg.append("implementing ");
+//        }
+//        else {
+//            msg.append("extending ");
+//        }
+//        msg.append(type.getName());
+//        Class<? extends T>[] classes = implementingClasses(type);
+//        if (logger.debug()) {
+//            logger.debugFinest("Classes for " + type.getName() + ": " + Arrays.asList(classes).toString());
+//        }
+//        if (classes.length > 0) {
+//            msg.append(" -- available classes:\n");
+//            for (Class<? extends T> c : classes) {
+//                msg.append("-->");
+//                msg.append(c.getName());
+//                msg.append('\n');
+//            }
+//        }
+//        msg.append(')');
+//        return msg.toString();
+//    }
 
-    /**
-     * Provides all classes currently known by the Launcher
-     * that are instance of the specified type
-     * and that are instantiable by the default constructor.
-     *
-     * @param type the common superclass or interface
-     *             of the required classes
-     * @return all classes currently known by the Launcher
-     *         that are instance of the specified type
-     *         and that are instantiable by the default constructor
-     */
-    public static <T> Class<? extends T>[] implementingClasses(Class<T> type) {
-        List<Class<? extends T>> classes = new ArrayList<Class<? extends T>>();
-        Package[] packages = Package.getPackages();
-        if (logger.debug()) {
-            logger.debugFinest("found packages: " + Arrays.asList(packages).toString());
-        }
-        for (Package p : packages) {
-            if (logger.debug()) {
-                logger.debugFinest(p.getName());
-            }
-            Class<?>[] classesInPackage = classesInPackage(p);
-            int added = 0;
-            for (Class<?> c : classesInPackage) {
-                if (type.isAssignableFrom(c)) {
-                    if (logger.debug()) {
-                        logger.debugFinest(type.getName() + " is assignable from " + c.getName());
-                    }
-                    // noinspection unchecked
-                    classes.add((Class<? extends T>) c);
-                    added++;
-                }
-            }
-            if (logger.debug()) {
-                if (added != classesInPackage.length) {
-                    for (Class<?> c : classesInPackage) {
-                        //noinspection SuspiciousMethodCalls
-                        if (!classes.contains(c)) {
-                            logger.debugFinest(type.getName() + " assignable from " + c.getName() + ": " + type.isAssignableFrom(c));
-                        }
-                    }
-                }
-            }
-        }
-        // noinspection unchecked
-        Class<? extends T>[] result = new Class[classes.size()];
-        return classes.toArray(result);
-    }
+//    /**
+//     * Provides all classes currently known by the Launcher
+//     * that are instance of the specified type
+//     * and that are instantiable by the default constructor.
+//     *
+//     * @param type the common superclass or interface
+//     *             of the required classes
+//     * @return all classes currently known by the Launcher
+//     *         that are instance of the specified type
+//     *         and that are instantiable by the default constructor
+//     */
+//    public static <T> Class<? extends T>[] implementingClasses(Class<T> type) {
+//        List<Class<? extends T>> classes = new ArrayList<Class<? extends T>>();
+//        Package[] packages = Package.getPackages();
+//        if (logger.debug()) {
+//            logger.debugFinest("found packages: " + Arrays.asList(packages).toString());
+//        }
+//        for (Package p : packages) {
+//            if (logger.debug()) {
+//                logger.debugFinest(p.getName());
+//            }
+//            Class<?>[] classesInPackage = classesInPackage(p);
+//            int added = 0;
+//            for (Class<?> c : classesInPackage) {
+//                if (type.isAssignableFrom(c)) {
+//                    if (logger.debug()) {
+//                        logger.debugFinest(type.getName() + " is assignable from " + c.getName());
+//                    }
+//                    // noinspection unchecked
+//                    classes.add((Class<? extends T>) c);
+//                    added++;
+//                }
+//            }
+//            if (logger.debug()) {
+//                if (added != classesInPackage.length) {
+//                    for (Class<?> c : classesInPackage) {
+//                        //noinspection SuspiciousMethodCalls
+//                        if (!classes.contains(c)) {
+//                            logger.debugFinest(type.getName() + " assignable from " + c.getName() + ": " + type.isAssignableFrom(c));
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        // noinspection unchecked
+//        Class<? extends T>[] result = new Class[classes.size()];
+//        return classes.toArray(result);
+//    }
 
-    /**
-     * Provides all classes in the specified package
-     * as currently present in the Launcher.
-     * Only those classes are included
-     * that can be instantiated per default constructor.
-     *
-     * @param p the package to retrieve classes for
-     * @return all classes in the specified package
-     */
-    public static Class<?>[] classesInPackage(Package p) {
-        List<Class<?>> classes = new ArrayList<Class<?>>();
-        final String CLASS_SUFFIX = ".class";
-        String pname = p.getName();
-        URL url = Launcher.class.getResource(pname);
-        if (url == null) {
-            pname = pname.replace('.', '/');
-            if (!pname.startsWith("/")) {
-                pname = "/" + pname;
-            }
-            url = Launcher.class.getResource(pname);
-        }
-        if (url != null) {
-            File dir = new File(url.getFile());
-            if (dir.exists()) {
-                String[] files = dir.list();
-                for (String f : files) {
-                    if (f.endsWith(CLASS_SUFFIX)) {
-                        // remove the .class extension
-                        String classname = f.substring(0, f.length() - 6);
-                        try {
-                            if (logger.debug()) {
-                                logger.debugFinest("classname: " + classname);
-                            }
-                            Class<?> c = Class.forName(p.getName() + "." + classname);
-                            if (logger.debug()) {
-                                logger.debugFinest("class: " + c.getName());
-                            }
-                            Object o = c.newInstance();
-                            if (logger.debug()) {
-                                logger.debugFinest("object class: " + o.getClass().getName());
-                            }
-                            classes.add(c);
-                        }
-                        catch (Exception e) {
-                            if (logger.debug()) {
-                                logger.debugFinest(e.getMessage() + "\n");
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        else {
-            if (logger.debug()) {
-                logger.debugFinest("No resource available for name: \"" + pname + "\"\n");
-            }
-        }
-        Class<?>[] result = new Class[classes.size()];
-        return classes.toArray(result);
-    }
+    
+//    /**
+//     * Provides all classes in the specified package
+//     * as currently present in the Launcher.
+//     * Only those classes are included
+//     * that can be instantiated per default constructor.
+//     *
+//     * @param p the package to retrieve classes for
+//     * @return all classes in the specified package
+//     */
+//    public static Class<?>[] classesInPackage(Package p) {
+//        List<Class<?>> classes = new ArrayList<Class<?>>();
+//        final String CLASS_SUFFIX = ".class";
+//        String pname = p.getName();
+//        URL url = Launcher.class.getResource(pname);
+//        if (url == null) {
+//            pname = pname.replace('.', '/');
+//            if (!pname.startsWith("/")) {
+//                pname = "/" + pname;
+//            }
+//            url = Launcher.class.getResource(pname);
+//        }
+//        if (url != null) {
+//            File dir = new File(url.getFile());
+//            if (dir.exists()) {
+//                String[] files = dir.list();
+//                for (String f : files) {
+//                    if (f.endsWith(CLASS_SUFFIX)) {
+//                        // remove the .class extension
+//                        String classname = f.substring(0, f.length() - 6);
+//                        try {
+//                            if (logger.debug()) {
+//                                logger.debugFinest("classname: " + classname);
+//                            }
+//                            Class<?> c = Class.forName(p.getName() + "." + classname);
+//                            if (logger.debug()) {
+//                                logger.debugFinest("class: " + c.getName());
+//                            }
+//                            Object o = c.newInstance();
+//                            if (logger.debug()) {
+//                                logger.debugFinest("object class: " + o.getClass().getName());
+//                            }
+//                            classes.add(c);
+//                        }
+//                        catch (Exception e) {
+//                            if (logger.debug()) {
+//                                logger.debugFinest(e.getMessage() + "\n");
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        else {
+//            if (logger.debug()) {
+//                logger.debugFinest("No resource available for name: \"" + pname + "\"\n");
+//            }
+//        }
+//        Class<?>[] result = new Class[classes.size()];
+//        return classes.toArray(result);
+//    }
 
     /**
      * Returns a string representation of the specified bit set.

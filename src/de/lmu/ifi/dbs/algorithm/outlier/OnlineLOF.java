@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.algorithm.outlier;
 
-import de.lmu.ifi.dbs.algorithm.result.LOFResult;
+import de.lmu.ifi.dbs.algorithm.result.outlier.LOFResult;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Associations;

@@ -69,6 +69,7 @@
                     de.lmu.ifi.dbs.algorithm.result,
                     de.lmu.ifi.dbs.algorithm.result.clustering,
                     de.lmu.ifi.dbs.algorithm.result.clustering.biclustering,
+                    de.lmu.ifi.dbs.algorithm.result.clustering.outlier,
 			        de.lmu.ifi.dbs.converter,
                     de.lmu.ifi.dbs.data,
                     de.lmu.ifi.dbs.data.synthetic,

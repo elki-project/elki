@@ -19,7 +19,10 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 import java.util.*;
 
 /**
- * Shared nearest neighbor clustering.
+ * <p>Shared nearest neighbor clustering.</p>
+ * 
+ * <p>This class implements the algorithm proposed in
+ * L. Ert&ouml;z, M. Steinbach, V. Kumar: Finding Clusters of Different Sizes, Shapes, and Densities in Noisy, High Dimensional Data. In: Proc. of SIAM Data Mining (SDM), 2003.</p>
  *
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObject the algorithm is applied on

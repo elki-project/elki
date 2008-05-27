@@ -24,31 +24,59 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
+ * A preprocessor for annotation of the ids of nearest neighbors to each database object.
+ * 
+ * The k nearest neighbors are assigned based on an arbitrary distance function.
+ * 
+ * The association is annotated using the association id {@link AssociationID#SHARED_NEAREST_NEIGHBORS_SET}. 
+ * 
+ * @param <O> the type of database objects the preprocessor can be applied to
+ * @param <D> the type of distance the used distance function will return
+ * 
  * @author Arthur Zimek
  */
 public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D extends Distance<D>> extends AbstractParameterizable implements Preprocessor<O>
 {
-    public static final String NUMBER_OF_NEIGHBORS_P = "sharedNearestNeighbors";
-    
-    public static final String NUMBER_OF_NEIGHBORS_D = "number of nearest neighbors to consider (at least 1)";
-    
-    private static final IntParameter NUMBER_OF_NEIGHBORS_PARAM = new IntParameter(NUMBER_OF_NEIGHBORS_P,NUMBER_OF_NEIGHBORS_D,new GreaterEqualConstraint(1));
+
+    /**
+     * Parameter to indicate the number of neighbors to be taken into account for the shared-nearest-neighbor similarity.
+     * 
+     * <p>Default value: 1</p>
+     * <p>Key: {@code sharedNearestNeighbors}</p>
+     */
+    public static final IntParameter NUMBER_OF_NEIGHBORS_PARAM = new IntParameter("sharedNearestNeighbors","number of nearest neighbors to consider (at least 1)",new GreaterEqualConstraint(1));
     static
     {
         NUMBER_OF_NEIGHBORS_PARAM.setDefaultValue(1);
     }
     
+    /**
+     * Parameter to indicate the distance function to be used to ascertain the nearest neighbors.
+     * 
+     * <p>Default value: {@link EuklideanDistanceFunction}</p>
+     * <p>Key: {@code SNNDistanceFunction}</p>
+     */
+    @SuppressWarnings("unchecked")
     public static final ClassParameter<DistanceFunction> DISTANCE_FUNCTION_PARAM = new ClassParameter("SNNDistanceFunction", "the distance function to asses the nearest neighbors", DistanceFunction.class);
     static
     {
         DISTANCE_FUNCTION_PARAM.setDefaultValue(EuklideanDistanceFunction.class.getName());
     }
     
+    /**
+     * Holds the number of nearest neighbors to be used.
+     */
     private int numberOfNeighbors;
     
+    /**
+     * Hold the distance funciton to be used.
+     */
     private DistanceFunction<O,D> distanceFunction;
     
-    
+    /**
+     * Provides a SharedNearestNeighborPreprocessor.
+     *
+     */
     public SharedNearestNeighborsPreprocessor()
     {
         super();
@@ -57,6 +85,8 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
     }
     
     /**
+     * Annotates the nearest neighbors based on the values of {@link #numberOfNeighbors}
+     * and {@link #distanceFunction} to each database object.
      * 
      * @see de.lmu.ifi.dbs.preprocessing.Preprocessor#run(de.lmu.ifi.dbs.database.Database, boolean, boolean)
      */
@@ -92,6 +122,16 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
         }
     }
 
+    /**
+     * Sets the parameter values of
+     * {@link #NUMBER_OF_NEIGHBORS_PARAM}
+     * and {@link #DISTANCE_FUNCTION_PARAM}
+     * to {@link #numberOfNeighbors} and
+     * {@link #distanceFunction}, respectively.
+     * 
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable#setParameters(java.lang.String[])
+     */
+    @SuppressWarnings("unchecked")
     @Override
     public String[] setParameters(String[] args) throws ParameterException
     {
@@ -111,11 +151,23 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
         return remainingParameters;
     }
     
+    /**
+     * Provides the association id used for annotation of the nearest neighbors.
+     * 
+     * 
+     * @return the association id used for annotation of the nearest neighbors ({@link AssociationID#SHARED_NEAREST_NEIGHBORS_SET})
+     */
+    @SuppressWarnings("unchecked")
     public AssociationID<SortedSet> getAssociationID()
     {
         return AssociationID.SHARED_NEAREST_NEIGHBORS_SET;
     }
 
+    /**
+     * Provides a short description of the purpose of this class.
+     * 
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable#description()
+     */
     @Override
     public String description()
     {

@@ -1,7 +1,8 @@
-package de.lmu.ifi.dbs.algorithm.result;
+package de.lmu.ifi.dbs.algorithm.result.outlier;
 
 import de.lmu.ifi.dbs.algorithm.outlier.LOFTable;
 import de.lmu.ifi.dbs.algorithm.outlier.NNTable;
+import de.lmu.ifi.dbs.algorithm.result.AbstractResult;
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.AssociationID;

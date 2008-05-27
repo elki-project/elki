@@ -78,7 +78,7 @@ public class KNNList<D extends Distance<D>> extends AbstractLoggable {
 
             return false;
         }
-        catch (Exception e) { // more specialized??
+        catch (Exception e) { // TODO more specialized??
             this.exception("k " + k, e);
             this.exception("list " + list, e);
             throw new RuntimeException(e);
