@@ -35,7 +35,7 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
   /**
    * The dimensions to be considered for distance computation.
    */
-  BitSet dimensions;
+  private BitSet dimensions = new BitSet();
 
   /**
    * Provides a distance function that computes the distance
@@ -56,7 +56,7 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
     String[] remainingParameters = super.setParameters(args);
 
     // dim
-    dimensions = new BitSet();
+    //dimensions = new BitSet();
     if (optionHandler.isSet(DIMS_P)) {
       List<Integer> dimensionList = optionHandler.getOptionValue(DIMS_P);
       for (int d : dimensionList) {
@@ -73,6 +73,21 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
    * @return a bit set representing the selected dimensions
    */
   public BitSet getSelectedDimensions() {
+    BitSet dimensions = new BitSet(this.dimensions.size());
+    dimensions.or(this.dimensions);
     return dimensions;
   }
+
+  /**
+   * Sets the selected dimensions according to the set bits in the given BitSet.
+   * 
+   * 
+   * @param dimensions a BitSet designating the new selected dimensions
+   */
+  public void setSelectedDimensions(BitSet dimensions) {
+    this.dimensions.clear();
+    this.dimensions.or(dimensions);
+  }
+  
+  
 }

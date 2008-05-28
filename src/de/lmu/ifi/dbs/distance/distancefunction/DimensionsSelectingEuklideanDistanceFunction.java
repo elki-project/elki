@@ -40,19 +40,19 @@ public class DimensionsSelectingEuklideanDistanceFunction<V extends NumberVector
                                          "second argument: " + v2);
     }
 
-    if (v1.getDimensionality() < dimensions.size()) {
+    if (v1.getDimensionality() < getSelectedDimensions().size()) {
       throw new IllegalArgumentException("The dimensionality of the feature space " +
                                          "is not consistent with the specified dimensions " +
                                          "to be considered for distance computation.\n  " +
                                          "dimensionality of the feature space: " + v1.getDimensionality() + "\n  " +
-                                         "specified dimensions: " + dimensions);
+                                         "specified dimensions: " + getSelectedDimensions());
     }
 
     double sqrDist = 0;
-    for (int d = 1; d <= v1.getDimensionality(); d++) {
-      if (!dimensions.get(d - 1)) continue;
-
-      double manhattanI = v1.getValue(d).doubleValue() - v2.getValue(d).doubleValue();
+    // schneller wenn man nur die set Bits durchgeht und direkt die Dimension anspringt
+    // TODO unten entsprechend
+    for (int d = getSelectedDimensions().nextSetBit(0); d >= 0; d = getSelectedDimensions().nextSetBit(d + 1)){ 
+      double manhattanI = v1.getValue(d+1).doubleValue() - v2.getValue(d+1).doubleValue();
       sqrDist += manhattanI * manhattanI;
     }
     return new DoubleDistance(Math.sqrt(sqrDist));
@@ -83,17 +83,17 @@ public class DimensionsSelectingEuklideanDistanceFunction<V extends NumberVector
     if (mbr.getDimensionality() != o.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + o.toString());
     }
-    if (o.getDimensionality() < dimensions.size()) {
+    if (o.getDimensionality() < getSelectedDimensions().size()) {
       throw new IllegalArgumentException("The dimensionality of the feature space " +
                                          "is not consistent with the specified dimensions " +
                                          "to be considered for distance computation.\n  " +
                                          "dimensionality of the feature space: " + o.getDimensionality() + "\n  " +
-                                         "specified dimensions: " + dimensions);
+                                         "specified dimensions: " + getSelectedDimensions());
     }
 
     double sqrDist = 0;
     for (int d = 1; d <= o.getDimensionality(); d++) {
-      if (!dimensions.get(d - 1)) continue;
+      if (!getSelectedDimensions().get(d - 1)) continue;
 
       double value = o.getValue(d).doubleValue();
       double r;
@@ -137,17 +137,17 @@ public class DimensionsSelectingEuklideanDistanceFunction<V extends NumberVector
     if (mbr1.getDimensionality() != mbr2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
     }
-    if (mbr1.getDimensionality() < dimensions.size()) {
+    if (mbr1.getDimensionality() < getSelectedDimensions().size()) {
       throw new IllegalArgumentException("The dimensionality of the feature space " +
                                          "is not consistent with the specified dimensions " +
                                          "to be considered for distance computation.\n  " +
                                          "dimensionality of the feature space: " + mbr1.getDimensionality() + "\n  " +
-                                         "specified dimensions: " + dimensions);
+                                         "specified dimensions: " + getSelectedDimensions());
     }
 
     double sqrDist = 0;
     for (int d = 1; d <= mbr1.getDimensionality(); d++) {
-      if (!dimensions.get(d - 1)) continue;
+      if (!getSelectedDimensions().get(d - 1)) continue;
 
       double m1, m2;
       if (mbr1.getMax(d) < mbr2.getMin(d)) {
@@ -182,17 +182,17 @@ public class DimensionsSelectingEuklideanDistanceFunction<V extends NumberVector
     if (mbr1.getDimensionality() != mbr2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
     }
-    if (mbr1.getDimensionality() < dimensions.size()) {
+    if (mbr1.getDimensionality() < getSelectedDimensions().size()) {
       throw new IllegalArgumentException("The dimensionality of the feature space " +
                                          "is not consistent with the specified dimensions " +
                                          "to be considered for distance computation.\n  " +
                                          "dimensionality of the feature space: " + mbr1.getDimensionality() + "\n  " +
-                                         "specified dimensions: " + dimensions);
+                                         "specified dimensions: " + getSelectedDimensions());
     }
 
     double sqrDist = 0;
     for (int d = 1; d <= mbr1.getDimensionality(); d++) {
-      if (!dimensions.get(d - 1)) continue;
+      if (!getSelectedDimensions().get(d - 1)) continue;
 
       double c1 = (mbr1.getMin(d) + mbr1.getMax(d)) / 2;
       double c2 = (mbr2.getMin(d) + mbr2.getMax(d)) / 2;

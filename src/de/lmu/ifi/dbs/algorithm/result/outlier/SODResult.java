@@ -19,28 +19,28 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Provides the result of the LOF algorithm.
+ * Provides the result of the SOD algorithm.
  *
  * @author Arthur Zimek
  */
 
-public class GeneralizedLOFResult<O extends DatabaseObject> extends AbstractResult<O>
+public class SODResult<O extends DatabaseObject> extends AbstractResult<O>
 {
 
     /**
      * Marker for a file name containing lofs.
      */
-    public static final String LOF_MARKER = "lof";
+    public static final String SOD_MARKER = "sod";
 
     /**
-     * A new LOFResult set for a database.
+     * A new SODResult set for a database.
      * 
-     * The database needs to contain associations for the computed lofs
-     * with <code>AssociationID</code> {@link de.lmu.ifi.dbs.database.AssociationID#LOF LOF}.
+     * The database needs to contain associations for the computed SODs
+     * with <code>AssociationID</code> {@link de.lmu.ifi.dbs.database.AssociationID#SOD_MODEL SOD_MODEL}.
      *
-     * @param db       the database containing the LOFs as association
+     * @param db       the database containing the SODs as association
      */
-    public GeneralizedLOFResult(Database<O> db)
+    public SODResult(Database<O> db)
     {
         super(db);
         this.db = db;
@@ -55,11 +55,11 @@ public class GeneralizedLOFResult<O extends DatabaseObject> extends AbstractResu
         PrintStream outStream;
         try
         {
-            File lofFile = new File(out.getAbsolutePath() + File.separator + LOF_MARKER + FILE_EXTENSION);
-            lofFile.getParentFile().mkdirs();
-            PrintStream lofOut = new PrintStream(new FileOutputStream(lofFile));
-            outputLOF(lofOut, normalization, settings);
-            lofOut.flush();
+            File sodFile = new File(out.getAbsolutePath() + File.separator + SOD_MARKER + FILE_EXTENSION);
+            sodFile.getParentFile().mkdirs();
+            PrintStream sodOut = new PrintStream(new FileOutputStream(sodFile));
+            outputSOD(sodOut, normalization, settings);
+            sodOut.flush();
 
         }
         catch(Exception e)
@@ -75,7 +75,7 @@ public class GeneralizedLOFResult<O extends DatabaseObject> extends AbstractResu
     public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException
     {
 
-        outputLOF(outStream, normalization, settings);
+        outputSOD(outStream, normalization, settings);
         outStream.flush();
     }
 
@@ -88,7 +88,7 @@ public class GeneralizedLOFResult<O extends DatabaseObject> extends AbstractResu
      * @param settings      the settings to be written into the header, if this parameter is <code>null</code>,
      *                      no header will be written
      */
-    private void outputLOF(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException
+    private void outputSOD(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException
     {
 
         writeHeader(outStream, settings, null);
@@ -131,7 +131,8 @@ public class GeneralizedLOFResult<O extends DatabaseObject> extends AbstractResu
                     outStream.print(" ");
                 }
 
-                outStream.println(db.getAssociation(AssociationID.LOF, id));
+                SODModel<?> sodModel = db.getAssociation(AssociationID.SOD_MODEL, id); 
+                outStream.println();
             }
         }
         catch(NonNumericFeaturesException e)
