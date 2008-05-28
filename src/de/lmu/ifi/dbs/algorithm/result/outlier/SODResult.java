@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.algorithm.result.outlier;
 
 import de.lmu.ifi.dbs.algorithm.result.AbstractResult;
 import de.lmu.ifi.dbs.data.ClassLabel;
-import de.lmu.ifi.dbs.data.DatabaseObject;
+import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
@@ -24,7 +24,7 @@ import java.util.List;
  * @author Arthur Zimek
  */
 
-public class SODResult<O extends DatabaseObject> extends AbstractResult<O>
+public class SODResult<O extends RealVector<O,Double>> extends AbstractResult<O>
 {
 
     /**
@@ -102,6 +102,7 @@ public class SODResult<O extends DatabaseObject> extends AbstractResult<O>
             {
                 Integer id = it.next();
 
+                outStream.print("ID=");
                 outStream.print(id);
                 outStream.print(" ");
 
@@ -131,8 +132,9 @@ public class SODResult<O extends DatabaseObject> extends AbstractResult<O>
                     outStream.print(" ");
                 }
 
-                SODModel<?> sodModel = db.getAssociation(AssociationID.SOD_MODEL, id); 
-                outStream.println();
+                SODModel<O> sodModel = db.getAssociation(AssociationID.SOD_MODEL, id);
+                outStream.println();sodModel.output(outStream, normalization, settings);
+                //outStream.println("SOD="+sodModel.getSod());
             }
         }
         catch(NonNumericFeaturesException e)

@@ -90,4 +90,8 @@ public class SODModel<O extends RealVector<O,Double>> extends AbstractResult<O> 
     outStream.flush();
   }
 
+  public double getSod() {
+    return this.sod;
+  }
+
 }

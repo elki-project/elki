@@ -40,13 +40,15 @@ public class DimensionsSelectingEuklideanDistanceFunction<V extends NumberVector
                                          "second argument: " + v2);
     }
 
+    /* TODO: was soll hier wirklich getestet werden? Size ist wohl nicht das richtige
     if (v1.getDimensionality() < getSelectedDimensions().size()) {
       throw new IllegalArgumentException("The dimensionality of the feature space " +
                                          "is not consistent with the specified dimensions " +
                                          "to be considered for distance computation.\n  " +
                                          "dimensionality of the feature space: " + v1.getDimensionality() + "\n  " +
-                                         "specified dimensions: " + getSelectedDimensions());
+                                         "specified dimensions: " + getSelectedDimensions() + "(Size of dimension-set: "+getSelectedDimensions().size()+")");
     }
+    */
 
     double sqrDist = 0;
     // schneller wenn man nur die set Bits durchgeht und direkt die Dimension anspringt
