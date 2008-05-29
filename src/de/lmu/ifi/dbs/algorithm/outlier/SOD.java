@@ -109,13 +109,24 @@ public class SOD<O extends RealVector<O,Double>, D extends Distance<D>> extends 
     sodResult = new SODResult<O>(database);
   }
   
+  /**
+   * Provides the k nearest neighbors in terms of the shared nearest neighbor distance.
+   * 
+   * The query object is excluded from the knn list.
+   * 
+   * @param database
+   * @param queryObject
+   * @return the k nearest neighbors in terms of the shared nearest neighbor distance without the query object
+   */
   private KNNList<DoubleDistance> getKNN(Database<O> database, Integer queryObject){
     similarityFunction.getPreprocessor().getParameters();
     KNNList<DoubleDistance> kNearestNeighbors = new KNNList<DoubleDistance>(knn,new DoubleDistance(Double.POSITIVE_INFINITY));
     for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
       Integer id = iter.next();
-      DoubleDistance distance = new DoubleDistance(1.0 / similarityFunction.similarity(queryObject, id).getDoubleValue());
-      kNearestNeighbors.add(new QueryResult<DoubleDistance>(id,distance));
+      if(!id.equals(queryObject)){
+        DoubleDistance distance = new DoubleDistance(1.0 / similarityFunction.similarity(queryObject, id).getDoubleValue());
+        kNearestNeighbors.add(new QueryResult<DoubleDistance>(id,distance));
+      }
     }
     return kNearestNeighbors;
   }
