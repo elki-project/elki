@@ -34,7 +34,7 @@ public abstract class FileBasedDatabaseConnectionWrapper extends KDDTaskWrapper 
   /**
    * @see KDDTaskWrapper#getKDDTaskParameters()
    */
-  public List<String> getKDDTaskParameters() throws UnusedParameterException {
+  public List<String> getKDDTaskParameters() {
     List<String> result = super.getKDDTaskParameters();
     // input
     result.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.INPUT_P);

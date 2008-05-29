@@ -69,7 +69,7 @@ public class SUBCLUWrapper extends NormalizationWrapper {
     /**
      * @see KDDTaskWrapper#getKDDTaskParameters()
      */
-    public List<String> getKDDTaskParameters() throws UnusedParameterException {
+    public List<String> getKDDTaskParameters() {
         List<String> parameters = super.getKDDTaskParameters();
 
         // algorithm SUBCLU
@@ -94,7 +94,7 @@ public class SUBCLUWrapper extends NormalizationWrapper {
         String[] remainingParameters = super.setParameters(args);
 
         // epsilon, minpts
-        epsilon = optionHandler.getParameterValue(SUBCLU.EPSILON_PARAM);
+        epsilon = getParameterValue(SUBCLU.EPSILON_PARAM);
         minpts = (Integer) optionHandler.getOptionValue(DBSCAN.MINPTS_P);
 
         return remainingParameters;

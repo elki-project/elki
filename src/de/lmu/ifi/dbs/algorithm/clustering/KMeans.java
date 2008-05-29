@@ -33,7 +33,7 @@ public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends D
    */
   public static final String K_D = "k - the number of clusters to find (positive integer)";
 
-  public static final IntParameter K_PARAM = new IntParameter(K_P, K_D, new GreaterConstraint(0));
+  public final IntParameter K_PARAM = new IntParameter(K_P, K_D, new GreaterConstraint(0));
 
   /**
    * Keeps k - the number of clusters to find.

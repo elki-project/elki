@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.*;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter;
 
 import java.util.ArrayList;
@@ -116,7 +117,7 @@ public class HiCOWrapper extends NormalizationWrapper {
     /**
      * @see KDDTaskWrapper#getKDDTaskParameters()
      */
-    public List<String> getKDDTaskParameters() throws UnusedParameterException {
+    public List<String> getKDDTaskParameters() {
         List<String> parameters = super.getKDDTaskParameters();
 
         // OPTICS algorithm
@@ -136,7 +137,7 @@ public class HiCOWrapper extends NormalizationWrapper {
 
         // minpts
         parameters.add(OptionHandler.OPTION_PREFIX + minpts.getName());
-        parameters.add(Integer.toString(minpts.getValue()));
+        parameters.add(Integer.toString(getParameterValue(minpts)));
 
         // preprocessor
         parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.PREPROCESSOR_CLASS_P);
@@ -144,15 +145,15 @@ public class HiCOWrapper extends NormalizationWrapper {
 
         // k for preprocessor
         parameters.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedHiCOPreprocessor.K_P);
-        parameters.add(Integer.toString(k.getValue()));
+        parameters.add(Integer.toString(getParameterValue(k)));
 
         // alpha
         parameters.add(OptionHandler.OPTION_PREFIX + alpha.getName());
-        parameters.add(Double.toString(alpha.getValue()));
+        parameters.add(Double.toString(getParameterValue(alpha)));
 
         // delta
         parameters.add(OptionHandler.OPTION_PREFIX + delta.getName());
-        parameters.add(Double.toString(delta.getValue()));
+        parameters.add(Double.toString(getParameterValue(delta)));
 
         return parameters;
     }

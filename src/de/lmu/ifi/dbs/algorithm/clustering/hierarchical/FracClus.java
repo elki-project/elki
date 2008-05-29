@@ -19,66 +19,54 @@ import java.util.List;
 /**
  * @author Arthur Zimek
  */
-public class FracClus<V extends RealVector<V,?>> extends AbstractAlgorithm<V>
-{
+public class FracClus<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
     public static final String NUMBER_OF_SUPPORTERS_P = "supporters";
-    
-    public static final String NUMBER_OF_SUPPORTERS_D = "number of supporters (at least 2)";
-    
-    private int k;
-    
-    private IntParameter kParameter = new IntParameter(NUMBER_OF_SUPPORTERS_P,NUMBER_OF_SUPPORTERS_D,new GreaterEqualConstraint(2));
-    
-    private HierarchicalClusters<HierarchicalFractalDimensionCluster<V>,V> result;
 
-    public FracClus()
-    {
-        super();        
+    public static final String NUMBER_OF_SUPPORTERS_D = "number of supporters (at least 2)";
+
+    private int k;
+
+    private IntParameter kParameter = new IntParameter(NUMBER_OF_SUPPORTERS_P, NUMBER_OF_SUPPORTERS_D, new GreaterEqualConstraint(2));
+
+    private HierarchicalClusters<HierarchicalFractalDimensionCluster<V>, V> result;
+
+    public FracClus() {
+        super();
         optionHandler.put(kParameter);
     }
 
-    public HierarchicalClusters<HierarchicalFractalDimensionCluster<V>,V> getResult()
-    {
+    public HierarchicalClusters<HierarchicalFractalDimensionCluster<V>, V> getResult() {
         return result;
     }
 
 
-
     @Override
-    protected void runInTime(Database<V> database) throws IllegalStateException
-    {
+    protected void runInTime(Database<V> database) throws IllegalStateException {
         List<HierarchicalFractalDimensionCluster<V>> clusters = new ArrayList<HierarchicalFractalDimensionCluster<V>>();
-        if(this.isVerbose())
-        {
+        if (this.isVerbose()) {
             verbose("assigning database objects to base clusters");
         }
-        for(Iterator<Integer> iter = database.iterator(); iter.hasNext();)
-        {
+        for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
             Integer id = iter.next();
             HierarchicalFractalDimensionCluster<V> point = new HierarchicalFractalDimensionCluster<V>(id, database, k);
             point.setLevel(0);
-            point.setLabel("Level="+0+"_ID="+id+"_"+point.getLabel());
+            point.setLabel("Level=" + 0 + "_ID=" + id + "_" + point.getLabel());
             clusters.add(point);
         }
-        if(this.isVerbose())
-        {
+        if (this.isVerbose()) {
             verbose("agglomerating");
         }
-        Progress agglomeration = new Progress("agglomerating",database.size()-1);
-        for(int level = 1; level < database.size(); level++)
-        {
+        Progress agglomeration = new Progress("agglomerating", database.size() - 1);
+        for (int level = 1; level < database.size(); level++) {
             int indexI = 0;
             int indexJ = 1;
             double minimum = Double.MAX_VALUE;
             HierarchicalFractalDimensionCluster<V> cluster = null;
-            for(int i = 0; i < clusters.size()-1; i++)
-            {
-                for(int j = i+1; j < clusters.size(); j++)
-                {
-                    HierarchicalFractalDimensionCluster<V> currentCluster = new HierarchicalFractalDimensionCluster<V>(clusters.get(i),clusters.get(j),database,k); 
+            for (int i = 0; i < clusters.size() - 1; i++) {
+                for (int j = i + 1; j < clusters.size(); j++) {
+                    HierarchicalFractalDimensionCluster<V> currentCluster = new HierarchicalFractalDimensionCluster<V>(clusters.get(i), clusters.get(j), database, k);
                     double fractalDimension = currentCluster.getFractalDimension();
-                    if(fractalDimension < minimum)
-                    {
+                    if (fractalDimension < minimum) {
                         minimum = fractalDimension;
                         indexI = i;
                         indexJ = j;
@@ -89,32 +77,27 @@ public class FracClus<V extends RealVector<V,?>> extends AbstractAlgorithm<V>
             clusters.remove(indexJ);
             clusters.remove(indexI);
             cluster.setLevel(level);
-            cluster.setLabel("Level="+level+"_"+cluster.getLabel());
-            for(HierarchicalFractalDimensionCluster<V> child : cluster.getChildren())
-            {
+            cluster.setLabel("Level=" + level + "_" + cluster.getLabel());
+            for (HierarchicalFractalDimensionCluster<V> child : cluster.getChildren()) {
                 child.getParents().add(cluster);
             }
-            
+
             clusters.add(cluster);
             cluster = null;
-            if(this.isVerbose())
-            {
+            if (this.isVerbose()) {
                 agglomeration.setProcessed(level);
                 progress(agglomeration);
             }
         }
-        if(this.isVerbose())
-        {
+        if (this.isVerbose()) {
             verbose();
         }
         result = new HierarchicalClusters<HierarchicalFractalDimensionCluster<V>, V>(clusters, database);
     }
-    
-    
+
 
     @Override
-    public List<AttributeSettings> getAttributeSettings()
-    {
+    public List<AttributeSettings> getAttributeSettings() {
         List<AttributeSettings> attributeSettings = super.getAttributeSettings();
         AttributeSettings myAttributeSettings = new AttributeSettings(this);
         myAttributeSettings.addSetting(NUMBER_OF_SUPPORTERS_P, Integer.toString(k));
@@ -123,17 +106,15 @@ public class FracClus<V extends RealVector<V,?>> extends AbstractAlgorithm<V>
     }
 
     @Override
-    public String[] setParameters(String[] args) throws ParameterException
-    {
+    public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
-        k = optionHandler.getParameterValue(kParameter);
+        k = getParameterValue(kParameter);
         return remainingParameters;
     }
 
-    public Description getDescription()
-    {
+    public Description getDescription() {
         // TODO Auto-generated method stub
-        return new Description("FracClus","Fractal Dimension based Clustering", "", "unpublished");
+        return new Description("FracClus", "Fractal Dimension based Clustering", "", "unpublished");
     }
 
 }

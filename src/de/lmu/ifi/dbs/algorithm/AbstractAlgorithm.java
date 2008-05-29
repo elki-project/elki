@@ -6,7 +6,6 @@ import de.lmu.ifi.dbs.database.IndexDatabase;
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 
 /**
  * <p>AbstractAlgorithm sets the values for flags verbose and time.</p>
@@ -26,17 +25,27 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends Abstra
      * <p>Key: {@code -verbose} </p>
      */
     public static final Flag VERBOSE_FLAG = new Flag("verbose",
-        "flag to allow verbose messages while performing the algorithm");
+                                                     "flag to allow verbose messages while performing the algorithm");
 
     /**
      * Flag to request output of performance time.
      * <p>Key: {@code -time} </p>
      */
     public static final Flag TIME_FLAG = new Flag("time",
-        "flag to request output of performance time");
+                                                  "flag to request output of performance time");
 
     /**
-     * Sets the flags for verbose and time in the parameter map. Any extending
+     * Property whether verbose messages should be allowed.
+     */
+    private boolean verbose;
+
+    /**
+     * Property whether runtime should be assessed.
+     */
+    private boolean time;
+
+    /**
+     * Adds the flags for verbose and time to the option handler. Any extending
      * class should call this constructor, then add further parameters.
      * Subclasses can add further parameters using {@link #addOption(de.lmu.ifi.dbs.utilities.optionhandling.Option)}
      */
@@ -56,7 +65,6 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends Abstra
     }
 
     /**
-     * 
      * Grabs the options from the option handler. Any extending class should
      * call this method first and return the returned array without further
      * changes, but after setting further required parameters. An example for
@@ -66,10 +74,10 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends Abstra
      * <pre>
      * {
      *   String[] remainingParameters = super.setParameters(args);
-     *   // set parameters for your class eventually using optionHandler
+     *   // set parameters for your class
      *   // for example like this:
      *   TODO: still correct?!?
-     *   if(optionHandler.isSet(MY_PARAM_VALUE_PARAM)
+     *   if(isSet(MY_PARAM_VALUE_PARAM)
      *   {
      *      myParamValue = getParameterValue(MY_PARAM_VALUE_PARAM);
      *   }
@@ -91,6 +99,8 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends Abstra
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = optionHandler.grabOptions(args);
+        verbose = isSet(VERBOSE_FLAG);
+        time = isSet(TIME_FLAG);
         setParameters(args, remainingParameters);
         return remainingParameters;
     }
@@ -101,12 +111,7 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends Abstra
      * @return whether the time should be assessed
      */
     public boolean isTime() {
-        try {
-            return TIME_FLAG.getValue();
-        }
-        catch (UnusedParameterException e) {
-            return false;
-        }
+        return time;
     }
 
     /**
@@ -117,12 +122,7 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends Abstra
      *         algorithm
      */
     public boolean isVerbose() {
-        try {
-            return VERBOSE_FLAG.getValue();
-        }
-        catch (UnusedParameterException e) {
-            return false;
-        }
+        return verbose;
     }
 
     /**

@@ -32,7 +32,23 @@ public class IntParameter extends NumberParameter<Integer> {
 		addConstraint(constraint);
 	}
 
-	/**
+    /**
+	 * Constructs an integer parameter with the given name, description, parameter constraint,
+     * and defualt value.
+	 *
+	 * @param name the parameter name
+	 * @param description the parameter description
+	 * @param constraint the constraint for this integer parameter
+     * @param defaultValue the default value
+	 */
+	public IntParameter(String name, String description,
+                        ParameterConstraint<Number> constraint, Integer defaultValue) {
+		this(name, description);
+		addConstraint(constraint);
+        setDefaultValue(defaultValue);
+    }
+
+    /**
 	 * Constructs an integer parameter with the given name, description, and list of parameter constraints.
 	 * 
 	 * @param name the parameter name
@@ -44,7 +60,7 @@ public class IntParameter extends NumberParameter<Integer> {
 		addConstraintList(constraints);
 	}
 
-	@Override
+    @Override
 	public void setValue(String value) throws ParameterException {
 
 		if (isValid(value)) {

@@ -51,7 +51,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
      * Parameter for k.
      * Constraint greater 0.
      */
-    private static final IntParameter K_PARAM = new IntParameter(K_P, K_D, new GreaterConstraint(0));
+    private final IntParameter K_PARAM = new IntParameter(K_P, K_D, new GreaterConstraint(0));
 
     /**
      * Keeps k - the number of clusters to find.
@@ -73,11 +73,10 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
      * GreaterEqual 0.0.
      * (Default: 0.0).
      */
-    private static final DoubleParameter DELTA_PARAM = new DoubleParameter(DELTA_P, DELTA_D, new GreaterEqualConstraint(0.0));
-
-    static {
-        DELTA_PARAM.setDefaultValue(0.0);
-    }
+    private final DoubleParameter DELTA_PARAM = new DoubleParameter(DELTA_P,
+                                                                    DELTA_D,
+                                                                    new GreaterEqualConstraint(0.0),
+                                                                    0.0);
 
     /**
      * Keeps delta - a small value as termination criterion in expectation maximization
@@ -500,8 +499,8 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
         // k and delta
-        k = optionHandler.getParameterValue(K_PARAM);
-        delta = optionHandler.getParameterValue(DELTA_PARAM);
+        k = getParameterValue(K_PARAM);
+        delta = getParameterValue(DELTA_PARAM);
 
         return remainingParameters;
     }

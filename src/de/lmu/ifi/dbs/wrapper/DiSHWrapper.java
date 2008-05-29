@@ -5,7 +5,11 @@ import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.DiSH;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.StringParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.util.List;
@@ -65,8 +69,8 @@ public class DiSHWrapper extends NormalizationWrapper {
         super();
         // parameter min points
         optionHandler.put(new IntParameter(DiSHPreprocessor.MINPTS_P,
-            DiSHPreprocessor.MINPTS_D,
-            new GreaterConstraint(0)));
+                                           DiSHPreprocessor.MINPTS_D,
+                                           new GreaterConstraint(0)));
 
         //parameter epsilon
         DoubleParameter eps = new DoubleParameter(DiSH.EPSILON_P, DiSH.EPSILON_D);
@@ -83,7 +87,7 @@ public class DiSHWrapper extends NormalizationWrapper {
     /**
      * @see de.lmu.ifi.dbs.wrapper.KDDTaskWrapper#getKDDTaskParameters()
      */
-    public List<String> getKDDTaskParameters() throws UnusedParameterException {
+    public List<String> getKDDTaskParameters() {
         List<String> parameters = super.getKDDTaskParameters();
 
         // DiSH algorithm

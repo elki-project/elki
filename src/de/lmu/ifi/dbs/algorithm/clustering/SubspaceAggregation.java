@@ -43,7 +43,7 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
      * Parameter for k.
      * Constraint greater 0.
      */
-    private static final IntParameter K_PARAM = new IntParameter(K_P, K_D, new GreaterConstraint(0));
+    private final IntParameter K_PARAM = new IntParameter(K_P, K_D, new GreaterConstraint(0));
 
     /**
      * Keeps k - the number of clusters to find.
@@ -309,7 +309,7 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
-        k = optionHandler.getParameterValue(K_PARAM);
+        k = getParameterValue(K_PARAM);
 
         return remainingParameters;
     }

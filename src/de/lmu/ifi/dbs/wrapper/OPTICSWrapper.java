@@ -4,7 +4,11 @@ import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.util.List;
@@ -17,119 +21,119 @@ import java.util.List;
  */
 public class OPTICSWrapper extends NormalizationWrapper {
 
-  /**
-   * Parameter to specify the maximum radius of the neighborhood to be considered,
-   * must be suitable to {@link EuklideanDistanceFunction EuklideanDistanceFunction}.
-   * <p>Key: {@code -epsilon} </p>
-   */
-  public static final PatternParameter EPSILON_PARAM = new PatternParameter(OPTICS.EPSILON_PARAM.getName(),
-                                                                            "the maximum radius of the neighborhood " +
-                                                                            "to be considered, must be suitable to " +
-                                                                            EuklideanDistanceFunction.class.getName());
+    /**
+     * Parameter to specify the maximum radius of the neighborhood to be considered,
+     * must be suitable to {@link EuklideanDistanceFunction EuklideanDistanceFunction}.
+     * <p>Key: {@code -epsilon} </p>
+     */
+    public static final PatternParameter EPSILON_PARAM = new PatternParameter(OPTICS.EPSILON_PARAM.getName(),
+                                                                              "the maximum radius of the neighborhood " +
+                                                                              "to be considered, must be suitable to " +
+                                                                              EuklideanDistanceFunction.class.getName());
 
-  /**
-   * The value of the epsilon parameter.
-   */
-  private String epsilon;
+    /**
+     * The value of the epsilon parameter.
+     */
+    private String epsilon;
 
-  /**
-   * The value of the minpts parameter.
-   */
-  private int minpts;
+    /**
+     * The value of the minpts parameter.
+     */
+    private int minpts;
 
-  /**
-   * Main method to run this wrapper.
-   *
-   * @param args the arguments to run this wrapper
-   */
-  public static void main(String[] args) {
-    OPTICSWrapper wrapper = new OPTICSWrapper();
-    try {
-      wrapper.setParameters(args);
-      wrapper.run();
+    /**
+     * Main method to run this wrapper.
+     *
+     * @param args the arguments to run this wrapper
+     */
+    public static void main(String[] args) {
+        OPTICSWrapper wrapper = new OPTICSWrapper();
+        try {
+            wrapper.setParameters(args);
+            wrapper.run();
+        }
+        catch (ParameterException e) {
+            Throwable cause = e.getCause() != null ? e.getCause() : e;
+            wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
+        }
+        catch (AbortException e) {
+            wrapper.verbose(e.getMessage());
+        }
+        catch (Exception e) {
+            wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
+        }
     }
-    catch (ParameterException e) {
-      Throwable cause = e.getCause() != null ? e.getCause() : e;
-      wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
+
+    /**
+     * Sets the parameters epsilon and minpts in the parameter map additionally
+     * to the parameters provided by super-classes.
+     */
+    public OPTICSWrapper() {
+        super();
+        // parameter epsilon
+        optionHandler.put(EPSILON_PARAM);
+
+        //parameter min points
+        optionHandler.put(new IntParameter(OPTICS.MINPTS_P, OPTICS.MINPTS_D, new GreaterConstraint(0)));
     }
-    catch (AbortException e) {
-      wrapper.verbose(e.getMessage());
+
+    /**
+     * @see KDDTaskWrapper#getKDDTaskParameters()
+     */
+    public List<String> getKDDTaskParameters() {
+        List<String> parameters = super.getKDDTaskParameters();
+
+        // algorithm OPTICS
+        parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
+        parameters.add(OPTICS.class.getName());
+
+        // epsilon
+        parameters.add(OptionHandler.OPTION_PREFIX + EPSILON_PARAM.getName());
+        parameters.add(epsilon);
+
+        // minpts
+        parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.MINPTS_P);
+        parameters.add(Integer.toString(minpts));
+
+        // distance function
+        parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
+        parameters.add(EuklideanDistanceFunction.class.getName());
+
+        // database
+        // params.add(OptionHandler.OPTION_PREFIX +
+        // AbstractDatabaseConnection.DATABASE_CLASS_P);
+        // params.add(RTreeDatabase.class.getName());
+
+        // distance cache
+        // params.add(OptionHandler.OPTION_PREFIX + AbstractDatabase.CACHE_F);
+
+        // bulk load
+        // params.add(OptionHandler.OPTION_PREFIX +
+        // SpatialIndexDatabase.BULK_LOAD_F);
+
+        // page size
+        // params.add(OptionHandler.OPTION_PREFIX +
+        // SpatialIndexDatabase.PAGE_SIZE_P);
+        // params.add("4000");
+
+        // cache size
+        // params.add(OptionHandler.OPTION_PREFIX +
+        // SpatialIndexDatabase.CACHE_SIZE_P);
+        // params.add("120000");
+
+        return parameters;
     }
-    catch (Exception e) {
-      wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
+
+    /**
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+     */
+    public String[] setParameters(String[] args) throws ParameterException {
+        String[] remainingParameters = super.setParameters(args);
+
+        // epsilon, minpts
+        epsilon = getParameterValue(OPTICS.EPSILON_PARAM);
+        minpts = (Integer) optionHandler.getOptionValue(OPTICS.MINPTS_P);
+
+        return remainingParameters;
     }
-  }
-
-  /**
-   * Sets the parameters epsilon and minpts in the parameter map additionally
-   * to the parameters provided by super-classes.
-   */
-  public OPTICSWrapper() {
-    super();
-    // parameter epsilon
-    optionHandler.put(EPSILON_PARAM);
-
-    //parameter min points
-    optionHandler.put(new IntParameter(OPTICS.MINPTS_P, OPTICS.MINPTS_D, new GreaterConstraint(0)));
-  }
-
-  /**
-   * @see KDDTaskWrapper#getKDDTaskParameters()
-   */
-  public List<String> getKDDTaskParameters() throws UnusedParameterException {
-    List<String> parameters = super.getKDDTaskParameters();
-
-    // algorithm OPTICS
-    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-    parameters.add(OPTICS.class.getName());
-
-    // epsilon
-    parameters.add(OptionHandler.OPTION_PREFIX + EPSILON_PARAM.getName());
-    parameters.add(epsilon);
-
-    // minpts
-    parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.MINPTS_P);
-    parameters.add(Integer.toString(minpts));
-
-    // distance function
-    parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
-    parameters.add(EuklideanDistanceFunction.class.getName());
-
-    // database
-    // params.add(OptionHandler.OPTION_PREFIX +
-    // AbstractDatabaseConnection.DATABASE_CLASS_P);
-    // params.add(RTreeDatabase.class.getName());
-
-    // distance cache
-    // params.add(OptionHandler.OPTION_PREFIX + AbstractDatabase.CACHE_F);
-
-    // bulk load
-    // params.add(OptionHandler.OPTION_PREFIX +
-    // SpatialIndexDatabase.BULK_LOAD_F);
-
-    // page size
-    // params.add(OptionHandler.OPTION_PREFIX +
-    // SpatialIndexDatabase.PAGE_SIZE_P);
-    // params.add("4000");
-
-    // cache size
-    // params.add(OptionHandler.OPTION_PREFIX +
-    // SpatialIndexDatabase.CACHE_SIZE_P);
-    // params.add("120000");
-
-    return parameters;
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
-
-    // epsilon, minpts
-    epsilon = optionHandler.getParameterValue(OPTICS.EPSILON_PARAM);
-    minpts = (Integer) optionHandler.getOptionValue(OPTICS.MINPTS_P);
-
-    return remainingParameters;
-  }
 }

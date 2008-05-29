@@ -8,12 +8,20 @@ import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.utilities.*;
+import de.lmu.ifi.dbs.utilities.Description;
+import de.lmu.ifi.dbs.utilities.Identifiable;
+import de.lmu.ifi.dbs.utilities.Progress;
+import de.lmu.ifi.dbs.utilities.QueryResult;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.utilities.heap.Heap;
 import de.lmu.ifi.dbs.utilities.heap.HeapNode;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
@@ -32,16 +40,15 @@ import java.util.Set;
  * @param <D> the type of Distance used to discern objects
  */
 public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D> {
-
     /**
      * Parameter to specify the maximum radius of the neighborhood to be considered,
      * must be suitable to the distance function specified.
      * <p>Key: {@code -epsilon} </p>
      */
     public static final PatternParameter EPSILON_PARAM = new PatternParameter("epsilon",
-        "the maximum radius of the neighborhood " +
-            "to be considered, must be suitable to " +
-            "the distance function specified");
+                                                                       "the maximum radius of the neighborhood " +
+                                                                       "to be considered, must be suitable to " +
+                                                                       "the distance function specified");
 
 
     /**
@@ -94,13 +101,13 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
         // global constraint epsilon <-> distance function
         try {
             GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint<DistanceFunction<?, ?>>(EPSILON_PARAM,
-                (ClassParameter<DistanceFunction<?, ?>>) optionHandler.getOption(DISTANCE_FUNCTION_P));
+                                                                                                                (ClassParameter<DistanceFunction<?, ?>>) optionHandler.getOption(DISTANCE_FUNCTION_P));
             optionHandler.setGlobalParameterConstraint(gpc);
         }
         catch (UnusedParameterException e) {
             verbose("Could not instantiate global parameter constraint concerning parameter " + EPSILON_PARAM.getName() +
-                " and " + DISTANCE_FUNCTION_P
-                + " because parameter " + DISTANCE_FUNCTION_P + " is not specified! " + e.getMessage());
+                    " and " + DISTANCE_FUNCTION_P
+                    + " because parameter " + DISTANCE_FUNCTION_P + " is not specified! " + e.getMessage());
         }
     }
 
@@ -205,7 +212,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
         String[] remainingParameters = super.setParameters(args);
 
         // epsilon
-        epsilon = optionHandler.getParameterValue(EPSILON_PARAM);
+        epsilon = getParameterValue(EPSILON_PARAM);
 
         // minpts
         minpts = (Integer) optionHandler.getOptionValue(MINPTS_P);

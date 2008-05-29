@@ -18,7 +18,7 @@ public abstract class NormalizationWrapper extends FileBasedDatabaseConnectionWr
   /**
    * @see de.lmu.ifi.dbs.wrapper.KDDTaskWrapper#getKDDTaskParameters()
    */
-  public List<String> getKDDTaskParameters() throws UnusedParameterException {
+  public List<String> getKDDTaskParameters() {
     List<String> parameters = super.getKDDTaskParameters();
 
     // normalization

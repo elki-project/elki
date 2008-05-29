@@ -191,7 +191,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
 
         // knn join
         List<String> params = new ArrayList<String>(Arrays.asList(remainingParameters));
-        Util.addParameter(params, KNNJoin.K_PARAM, Integer.toString(minpts));
+        Util.addParameter(params, knnJoin.K_PARAM, Integer.toString(minpts));
         remainingParameters = knnJoin.setParameters(params.toArray(new String[params.size()]));
         setParameters(args, remainingParameters);
 

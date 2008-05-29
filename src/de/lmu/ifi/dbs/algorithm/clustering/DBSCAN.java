@@ -10,12 +10,20 @@ import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * DBSCAN provides the DBSCAN algorithm.
@@ -31,9 +39,9 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
      * <p>Key: {@code -epsilon} </p>
      */
     public static final PatternParameter EPSILON_PARAM = new PatternParameter("epsilon",
-                                                                              "the maximum radius of the neighborhood " +
-                                                                              "to be considered, must be suitable to " +
-                                                                              "the distance function specified");
+                                                                       "the maximum radius of the neighborhood " +
+                                                                       "to be considered, must be suitable to " +
+                                                                       "the distance function specified");
 
     /**
      * Parameter minimum points.
@@ -43,7 +51,14 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
     /**
      * Description for parameter minimum points.
      */
-    public static final String MINPTS_D = "threshold for minimum number of points in the epsilon-neighborhood of a point";
+    public static final String MINPTS_D = "threshold for minimum number of points in " +
+                                          "the epsilon-neighborhood of a point";
+
+
+    /**
+     * The maximum radius of the neighborhood to be considered.
+     */
+    private String epsilon;
 
     /**
      * Minimum points.
@@ -71,7 +86,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
     protected Set<Integer> processedIDs;
 
     /**
-     * Sets epsilon and minimum points to the optionhandler additionally to the
+     * Adds epsilon and minimum points to the optionhandler additionally to the
      * parameters provided by super-classes.
      */
     @SuppressWarnings("unchecked")
@@ -99,55 +114,50 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
      */
     @Override
     protected void runInTime(Database<O> database) throws IllegalStateException {
-        try {
-            Progress progress = new Progress("Clustering", database.size());
-            resultList = new ArrayList<List<Integer>>();
-            noise = new HashSet<Integer>();
-            processedIDs = new HashSet<Integer>(database.size());
-            getDistanceFunction().setDatabase(database, isVerbose(), isTime());
-            if (isVerbose()) {
-                verbose("Clustering:");
-            }
-            if (database.size() >= minpts) {
-                for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
-                    Integer id = iter.next();
-                    if (!processedIDs.contains(id)) {
-                        expandCluster(database, id, progress);
-                        if (processedIDs.size() == database.size() && noise.size() == 0) {
-                            break;
-                        }
-                    }
-                    if (isVerbose()) {
-                        progress.setProcessed(processedIDs.size());
-                        progress(progress, resultList.size());
+        Progress progress = new Progress("Clustering", database.size());
+        resultList = new ArrayList<List<Integer>>();
+        noise = new HashSet<Integer>();
+        processedIDs = new HashSet<Integer>(database.size());
+        getDistanceFunction().setDatabase(database, isVerbose(), isTime());
+        if (isVerbose()) {
+            verbose("Clustering:");
+        }
+        if (database.size() >= minpts) {
+            for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
+                Integer id = iter.next();
+                if (!processedIDs.contains(id)) {
+                    expandCluster(database, id, progress);
+                    if (processedIDs.size() == database.size() && noise.size() == 0) {
+                        break;
                     }
                 }
-            }
-            else {
-                for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
-                    Integer id = iter.next();
-                    noise.add(id);
-                    if (isVerbose()) {
-                        progress.setProcessed(noise.size());
-                        progress(progress, resultList.size());
-                    }
+                if (isVerbose()) {
+                    progress.setProcessed(processedIDs.size());
+                    progress(progress, resultList.size());
                 }
-            }
-
-            Integer[][] resultArray = new Integer[resultList.size() + 1][];
-            int i = 0;
-            for (Iterator<List<Integer>> resultListIter = resultList.iterator(); resultListIter.hasNext(); i++) {
-                resultArray[i] = resultListIter.next().toArray(new Integer[0]);
-            }
-
-            resultArray[resultArray.length - 1] = noise.toArray(new Integer[0]);
-            result = new ClustersPlusNoise<O>(resultArray, database);
-            if (isVerbose()) {
-                verbose("");
             }
         }
-        catch (UnusedParameterException e) {
-            throw new IllegalStateException("This should never happen: " + e.getMessage());
+        else {
+            for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
+                Integer id = iter.next();
+                noise.add(id);
+                if (isVerbose()) {
+                    progress.setProcessed(noise.size());
+                    progress(progress, resultList.size());
+                }
+            }
+        }
+
+        Integer[][] resultArray = new Integer[resultList.size() + 1][];
+        int i = 0;
+        for (Iterator<List<Integer>> resultListIter = resultList.iterator(); resultListIter.hasNext(); i++) {
+            resultArray[i] = resultListIter.next().toArray(new Integer[0]);
+        }
+
+        resultArray[resultArray.length - 1] = noise.toArray(new Integer[0]);
+        result = new ClustersPlusNoise<O>(resultArray, database);
+        if (isVerbose()) {
+            verbose("");
         }
     }
 
@@ -158,11 +168,9 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
      * @param database      the database on which the algorithm is run
      * @param startObjectID potential seed of a new potential cluster
      * @param progress      the progress object for logging the current status
-     * @throws de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException
-     *          if the parameter setting of parameter epsilon has failed
      */
-    protected void expandCluster(Database<O> database, Integer startObjectID, Progress progress) throws UnusedParameterException {
-        List<QueryResult<D>> seeds = database.rangeQuery(startObjectID, EPSILON_PARAM.getValue(), getDistanceFunction());
+    protected void expandCluster(Database<O> database, Integer startObjectID, Progress progress) {
+        List<QueryResult<D>> seeds = database.rangeQuery(startObjectID, epsilon, getDistanceFunction());
 
         // startObject is no core-object
         if (seeds.size() < minpts) {
@@ -192,7 +200,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
 
         while (seeds.size() > 0) {
             Integer o = seeds.remove(0).getID();
-            List<QueryResult<D>> neighborhood = database.rangeQuery(o, EPSILON_PARAM.getValue(), getDistanceFunction());
+            List<QueryResult<D>> neighborhood = database.rangeQuery(o, epsilon, getDistanceFunction());
 
             if (neighborhood.size() >= minpts) {
                 for (QueryResult<D> neighbor : neighborhood) {
@@ -253,6 +261,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
         String[] remainingParameters = super.setParameters(args);
 
         // minpts
+        epsilon = getParameterValue(EPSILON_PARAM);
         minpts = (Integer) optionHandler.getOptionValue(MINPTS_P);
 
         return remainingParameters;
@@ -263,9 +272,5 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
      */
     public ClustersPlusNoise<O> getResult() {
         return result;
-    }
-
-    public Option<?>[] getOptions() {
-        return optionHandler.getOptions();
     }
 }

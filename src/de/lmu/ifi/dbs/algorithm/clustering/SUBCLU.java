@@ -44,34 +44,37 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
 
     /**
      * Parameter to specify the threshold for minimum number of points in the
-     * epsilon-neighborhood of a point, must be greater than 0.
+     * epsilon-neighborhood of a point, must be an integer greater than 0.
      * <p>Key: {@code -minpts} </p>
      */
-    public static final IntParameter MINPTS_PARAM = new IntParameter("minpts",
-                                                                     "threshold for minimum number of points in the " +
-                                                                     "epsilon-neighborhood of a point",
+    public final IntParameter MINPTS_PARAM = new IntParameter("minpts",
+                                                                     "<int>threshold for minimum number of points in the " +
+                                                                     "epsilon-neighborhood of a point, must be greater than 0",
                                                                      new GreaterConstraint(0));
 
 
-    /**
-     * The default distance function.
-     */
-    public static final Class DEFAULT_DISTANCE_FUNCTION = DimensionsSelectingEuklideanDistanceFunction.class;
 
     /**
      * The distance function to determine the distance between database objects.
      * <p>Default value: {@link DimensionsSelectingEuklideanDistanceFunction DimensionsSelectingEuklideanDistanceFunction} </p>
      * <p>Key: {@code -distancefunction} </p>
      */
-    public static ClassParameter<AbstractDimensionsSelectingDoubleDistanceFunction> DISTANCEFUNCTION_PARAM = new ClassParameter("distancefunction",
+    public final ClassParameter<AbstractDimensionsSelectingDoubleDistanceFunction> DISTANCEFUNCTION_PARAM = new ClassParameter("distancefunction",
                                                                                                                                 "the distance function to determine the distance between database objects "
                                                                                                                                 + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(AbstractDimensionsSelectingDoubleDistanceFunction.class)
-                                                                                                                                + ". Default: " + DEFAULT_DISTANCE_FUNCTION.getName(),
-                                                                                                                                AbstractDimensionsSelectingDoubleDistanceFunction.class);
+                                                                                                                                + ". Default: " + DimensionsSelectingEuklideanDistanceFunction.class.getName(),
+                                                                                                                                AbstractDimensionsSelectingDoubleDistanceFunction.class,
+                                                                                                                                DimensionsSelectingEuklideanDistanceFunction.class.getName());
+    /**
+     * The maximum radius of the neighborhood to be considered.
+     */
+    private String epsilon;
 
-    static {
-        DISTANCEFUNCTION_PARAM.setDefaultValue(DEFAULT_DISTANCE_FUNCTION.getName());
-    }
+    /**
+     * The threshold for minimum number of points in the
+     * epsilon-neighborhood of a point.
+     */
+    private int minpts;
 
     /**
      * The distance function.
@@ -172,14 +175,21 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
+        // epsilon
+        epsilon = getParameterValue(EPSILON_PARAM);
+        // minpts
+        minpts = getParameterValue(MINPTS_PARAM);
+
         // distance function
+        String distanceFunctionClass = getParameterValue(DISTANCEFUNCTION_PARAM);
         try {
             // noinspection unchecked
-            distanceFunction = Util.instantiate(AbstractDimensionsSelectingDoubleDistanceFunction.class, DISTANCEFUNCTION_PARAM.getValue());
+            distanceFunction = Util.instantiate(AbstractDimensionsSelectingDoubleDistanceFunction.class,
+                                                distanceFunctionClass);
         }
         catch (UnableToComplyException e) {
             throw new WrongParameterValueException(DISTANCEFUNCTION_PARAM.getName(),
-                                                   DISTANCEFUNCTION_PARAM.getValue(),
+                                                   distanceFunctionClass,
                                                    DISTANCEFUNCTION_PARAM.getDescription(),
                                                    e);
         }
@@ -215,12 +225,10 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
         }
 
         // epsilon
-        parameters.add(OptionHandler.OPTION_PREFIX + EPSILON_PARAM.getName());
-        parameters.add(EPSILON_PARAM.getValue());
+        Util.addParameter(parameters, EPSILON_PARAM, epsilon);
 
         // minpts
-        parameters.add(OptionHandler.OPTION_PREFIX + MINPTS_PARAM.getName());
-        parameters.add(MINPTS_PARAM.getValue().toString());
+        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(minpts));
 
         dbscan.setParameters(parameters.toArray(new String[parameters.size()]));
         return dbscan;

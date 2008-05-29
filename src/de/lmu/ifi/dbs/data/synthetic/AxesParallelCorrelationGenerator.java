@@ -414,15 +414,15 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
         String[] remainingParameters = super.setParameters(args);
 
         // dataDim
-        dataDim = optionHandler.getParameterValue(dimParameter);
+        dataDim = getParameterValue(dimParameter);
 
         // corrDim
-        corrDim = optionHandler.getParameterValue(corrDimParameter);
+        corrDim = getParameterValue(corrDimParameter);
 
         // minima
         min = new double[dataDim];
         if (optionHandler.isSet(MIN_P)) {
-            List<Double> min_list = optionHandler.getParameterValue(minParameter);
+            List<Double> min_list = getParameterValue(minParameter);
             for (int i = 0; i < dataDim; i++) {
                 min[i] = (min_list.get(i));
             }
@@ -434,7 +434,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
         // maxima
         max = new double[dataDim];
         if (optionHandler.isSet(MAX_P)) {
-            List<Double> max_list = optionHandler.getParameterValue(maxParameter);
+            List<Double> max_list = getParameterValue(maxParameter);
             for (int i = 0; i < dataDim; i++) {
                 max[i] = max_list.get(i);
             }
@@ -452,7 +452,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
 
         // dependent values
         if (optionHandler.isSet(depParameter)) {
-            List<Double> dep_list = optionHandler.getParameterValue(depParameter);
+            List<Double> dep_list = getParameterValue(depParameter);
 
             double[] dv = new double[dataDim];
             int c = 0;

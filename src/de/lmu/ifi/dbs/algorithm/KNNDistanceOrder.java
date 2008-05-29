@@ -9,12 +9,15 @@ import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Provides an order of the kNN-distances for all objects within the database.
@@ -26,20 +29,19 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
 
     /**
      * Parameter to specify the distance of the k-distant object to be assessed,
-     * must be greater than 0.
+     * must be an integer greater than 0.
      * <p>Default value: {@code 1} </p>
      * <p>Key: {@code -k} </p>
      */
-    public static final IntParameter K_PARAM = new IntParameter("k",
-        "<int>the distance of the k-distant object is assessed. k >= 1 (default: 1)",
-        new GreaterConstraint(0));
-
-    //public static final DoubleParameter per = new DoubleParameter(PERCENTAGE_P, PERCENTAGE_D, percentageCons);
+    public final IntParameter K_PARAM = new IntParameter("k",
+                                                         "<int>the distance of the k-distant object is assessed. k >= 1 (default: 1)",
+                                                         new GreaterConstraint(0),
+                                                         1);
 
     /**
      * Parameter percentage.
      */
-    public static final String PERCENTAGE_P = "percentage";
+    public final String PERCENTAGE_P = "percentage";
 
     /**
      * Default value for percentage.
@@ -50,7 +52,12 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
      * Description for parameter percentage.
      */
     public static final String PERCENTAGE_D = "average percentage p, 0 < p <= 1, of distances randomly choosen to be provided in the result (default: "
-        + DEFAULT_PERCENTAGE + ")";
+                                              + DEFAULT_PERCENTAGE + ")";
+
+    /**
+     * Holds the parameter k.
+     */
+    private int k;
 
     /**
      * Holds the parameter percentage.
@@ -83,17 +90,8 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
     /**
      * @see AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.database.Database)
      */
-    protected
     @Override
-    void runInTime(Database<O> database) throws IllegalStateException {
-        int k;
-        try {
-            k = K_PARAM.getValue();
-        }
-        catch (UnusedParameterException e) {
-            throw new IllegalStateException(e);
-        }
-
+    protected void runInTime(Database<O> database) throws IllegalStateException {
         Random random = new Random();
         List<D> knnDistances = new ArrayList<D>();
         for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
@@ -124,7 +122,8 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
-        //parameter percentage
+        //k and percentage
+        k = getParameterValue(K_PARAM);
         percentage = (Double) optionHandler.getOptionValue(PERCENTAGE_P);
 
         return remainingParameters;

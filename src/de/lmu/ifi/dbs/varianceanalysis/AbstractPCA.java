@@ -204,7 +204,7 @@ public abstract class AbstractPCA extends AbstractParameterizable implements PCA
         String[] remainingParameters = super.setParameters(args);
 
         // eigenpair filter
-        String className = optionHandler.getParameterValue(EIGENPAIR_FILTER_PARAM);
+        String className = getParameterValue(EIGENPAIR_FILTER_PARAM);
         try {
             eigenPairFilter = Util.instantiate(EigenPairFilter.class, className);
         }

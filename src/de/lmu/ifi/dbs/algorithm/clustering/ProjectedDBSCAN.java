@@ -16,12 +16,22 @@ import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Provides an abstract algorithm requiring a VarianceAnalysisPreprocessor.
@@ -37,9 +47,9 @@ public abstract class ProjectedDBSCAN<O extends RealVector<O, ?>> extends Abstra
      * <p>Key: {@code -epsilon} </p>
      */
     public static final PatternParameter EPSILON_PARAM = new PatternParameter("epsilon",
-        "the maximum radius of the neighborhood " +
-            "to be considered, must be suitable to " +
-            LocallyWeightedDistanceFunction.class.getName());
+                                                                       "the maximum radius of the neighborhood " +
+                                                                       "to be considered, must be suitable to " +
+                                                                       LocallyWeightedDistanceFunction.class.getName());
 
     /**
      * Parameter minimum points.
@@ -65,8 +75,8 @@ public abstract class ProjectedDBSCAN<O extends RealVector<O, ?>> extends Abstra
      * Description for parameter distance function.
      */
     public static final String DISTANCE_FUNCTION_D = "the distance function to determine the distance between database objects "
-        + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(AbstractLocallyWeightedDistanceFunction.class) + ". Default: "
-        + DEFAULT_DISTANCE_FUNCTION;
+                                                     + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(AbstractLocallyWeightedDistanceFunction.class) + ". Default: "
+                                                     + DEFAULT_DISTANCE_FUNCTION;
 
     /**
      * Epsilon.
@@ -135,8 +145,8 @@ public abstract class ProjectedDBSCAN<O extends RealVector<O, ?>> extends Abstra
         // parameter distance function
         // noinspection unchecked
         ClassParameter<AbstractLocallyWeightedDistanceFunction<O, ?>> distance = new ClassParameter(DISTANCE_FUNCTION_P,
-            DISTANCE_FUNCTION_D,
-            AbstractLocallyWeightedDistanceFunction.class);
+                                                                                                    DISTANCE_FUNCTION_D,
+                                                                                                    AbstractLocallyWeightedDistanceFunction.class);
         distance.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
         optionHandler.put(distance);
 
@@ -349,7 +359,7 @@ public abstract class ProjectedDBSCAN<O extends RealVector<O, ?>> extends Abstra
         }
 
         // epsilon
-        epsilon = optionHandler.getParameterValue(EPSILON_PARAM);
+        epsilon = getParameterValue(EPSILON_PARAM);
 
         // minpts
         minpts = (Integer) optionHandler.getOptionValue(MINPTS_P);

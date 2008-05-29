@@ -81,7 +81,7 @@ public abstract class AbstractParameterizable extends AbstractLoggable
     public final String[] getParameters() {
         String[] param = new String[currentParameterArray.length];
         System.arraycopy(currentParameterArray, 0, param, 0,
-            currentParameterArray.length);
+                         currentParameterArray.length);
         return param;
     }
 
@@ -108,25 +108,64 @@ public abstract class AbstractParameterizable extends AbstractLoggable
         return optionHandler.usage("");
     }
 
+    /**
+     * @see Parameterizable#inlineDescription()
+     */
     public String inlineDescription() {
         return optionHandler.usage("", false);
     }
 
+    /**
+     * Returns an usage-String by calling
+     * {@link de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler#usage(String)}.
+     *
+     * @param message some error-message, if needed (may be null or empty String)
+     * @return an usage-String
+     */
     protected String description(String message) {
         return this.optionHandler.usage(message);
     }
 
+    /**
+     * Returns an usage-String by calling
+     * {@link de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler#usage(String,boolean)}.
+     *
+     * @param message    some error-message, if needed (may be null or empty String)
+     * @param standalone whether the class using the OptionHandler provides a main
+     *                   method
+     * @return an usage-String
+     */
     protected String description(String message, boolean standalone) {
         return this.optionHandler.usage(message, standalone);
     }
 
+    /**
+     * Returns true if the value of the given option is set, false otherwise.
+     *
+     * @param option The option should be asked for without leading &quot;-&quot;
+     *               or closing &quot;:&quot;.
+     * @return boolean true if the value of the given option is set, false
+     *         otherwise
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler#isSet(Option)
+     */
     protected boolean isSet(Option<?> option) {
         return this.optionHandler.isSet(option);
     }
 
+    /**
+     * Returns the value of the given parameter by calling
+     * {@link Parameter#getValue()}.
+     *
+     * @param parameter the parameter to get the value of
+     * @return the value of given parameter
+     * @throws IllegalStateException if this Parameterizable object has not been initialized
+     *                               properly (e.g. the setParameters(String[]) method has been failed
+     *                               to be called).
+     * @see Parameter#getValue()
+     */
     protected <T> T getParameterValue(Parameter<T, ?> parameter) throws IllegalStateException {
         try {
-            return this.optionHandler.getParameterValue(parameter);
+            return parameter.getValue();
         }
         catch (UnusedParameterException e) {
             throw new IllegalStateException(e);

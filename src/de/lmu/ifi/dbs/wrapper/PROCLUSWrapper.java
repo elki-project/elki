@@ -75,7 +75,7 @@ public class PROCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
   /**
    * @see de.lmu.ifi.dbs.wrapper.KDDTaskWrapper#getKDDTaskParameters()
    */
-  public List<String> getKDDTaskParameters() throws UnusedParameterException {
+  public List<String> getKDDTaskParameters() {
     List<String> parameters = super.getKDDTaskParameters();
 
     // PROCLUS algorithm

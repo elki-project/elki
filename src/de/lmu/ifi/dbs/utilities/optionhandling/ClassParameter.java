@@ -28,6 +28,20 @@ public class ClassParameter<C> extends Parameter<String, String> {
         this.restrictionClass = restrictionClass;
     }
 
+    /**
+     * Constructs a class parameter with the given name, description,
+     * restriction class, and default value.
+     *
+     * @param name             the parameter name
+     * @param description      the parameter description
+     * @param restrictionClass the restriction class of this class parameter
+     * @param defaultValue     the default value of this class parameter
+     */
+    public ClassParameter(String name, String description, Class<C> restrictionClass, String defaultValue) {
+        this(name, description, restrictionClass);
+        setDefaultValue(defaultValue);
+    }
+
     @Override
     public void setValue(String value) throws ParameterException {
 
@@ -104,6 +118,6 @@ public class ClassParameter<C> extends Parameter<String, String> {
 
         catch (ClassNotFoundException e) {
             throw new WrongParameterValueException(this.name, value, "subclass of " + restrictionClass.getName());
-		}
-	}
+        }
+    }
 }

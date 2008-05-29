@@ -83,7 +83,7 @@ public class OnlineLOFWrapper extends FileBasedDatabaseConnectionWrapper {
     /**
      * @see KDDTaskWrapper#getKDDTaskParameters()
      */
-    public List<String> getKDDTaskParameters() throws UnusedParameterException {
+    public List<String> getKDDTaskParameters() {
         List<String> parameters = super.getKDDTaskParameters();
 
         // algorithm OnlineLOF

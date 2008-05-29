@@ -97,7 +97,7 @@ public class FourCWrapper extends NormalizationWrapper {
     /**
      * @see KDDTaskWrapper#getKDDTaskParameters()
      */
-    public List<String> getKDDTaskParameters() throws UnusedParameterException {
+    public List<String> getKDDTaskParameters() {
         List<String> parameters = super.getKDDTaskParameters();
 
         // 4C algorithm

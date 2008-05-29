@@ -11,9 +11,13 @@ import de.lmu.ifi.dbs.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.index.tree.spatial.SpatialNode;
 import de.lmu.ifi.dbs.logging.LogLevel;
 import de.lmu.ifi.dbs.logging.ProgressLogRecord;
-import de.lmu.ifi.dbs.utilities.*;
+import de.lmu.ifi.dbs.utilities.Description;
+import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
+import de.lmu.ifi.dbs.utilities.KNNList;
+import de.lmu.ifi.dbs.utilities.Progress;
+import de.lmu.ifi.dbs.utilities.QueryResult;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.util.ArrayList;
@@ -31,13 +35,16 @@ public class KNNJoin<O extends NumberVector<O, ?>, D extends Distance<D>, N exte
     extends DistanceBasedAlgorithm<O, D> {
 
     /**
-     * Parameter that specifies the k-nearest neighbors to be assigned, must be greater than 1.
+     * Parameter that specifies the k-nearest neighbors to be assigned,
+     * must be an integer greater than 0.
+     * <p>Default value: {@code 1} </p>
      * <p>Key: {@code -k} </p>
      */
-    public static final IntParameter K_PARAM =
+    public final IntParameter K_PARAM =
         new IntParameter("k",
-            "<int>specifies the k-nearest neighbors to be assigned, must be greater than 1",
-            new GreaterConstraint(1));
+                         "<int>specifies the k-nearest neighbors to be assigned, must be greater than 0",
+                         new GreaterConstraint(0),
+                         1);
 
     /**
      * The knn lists for each object.
@@ -45,7 +52,7 @@ public class KNNJoin<O extends NumberVector<O, ?>, D extends Distance<D>, N exte
     private KNNJoinResult<O, D> result;
 
     /**
-     * Creates a new KNNJoin algorithm. Sets parameter k to the optionhandler
+     * Adds parameter k to the optionhandler
      * additionally to the parameters provided by super-classes.
      */
     public KNNJoin() {
@@ -61,24 +68,17 @@ public class KNNJoin<O extends NumberVector<O, ?>, D extends Distance<D>, N exte
      *                               setParameters(String[]) method has been failed to be called).
      */
     protected void runInTime(Database<O> database) throws IllegalStateException {
-        int k;
-        try {
-            k = K_PARAM.getValue();
-        }
-        catch (UnusedParameterException e) {
-            throw new IllegalStateException(e);
-        }
-
         if (!(database instanceof SpatialIndexDatabase)) {
             throw new IllegalStateException(
                 "Database must be an instance of "
-                    + SpatialIndexDatabase.class.getName());
+                + SpatialIndexDatabase.class.getName());
         }
         if (!(getDistanceFunction() instanceof SpatialDistanceFunction)) {
             throw new IllegalStateException(
                 "Distance Function must be an instance of "
-                    + SpatialDistanceFunction.class.getName());
+                + SpatialDistanceFunction.class.getName());
         }
+        int k = getParameterValue(K_PARAM);
         SpatialIndexDatabase<O, N, E> db = (SpatialIndexDatabase<O, N, E>) database;
         SpatialDistanceFunction<O, D> distFunction = (SpatialDistanceFunction<O, D>) getDistanceFunction();
         distFunction.setDatabase(db, isVerbose(), isTime());
@@ -121,7 +121,7 @@ public class KNNJoin<O extends NumberVector<O, ?>, D extends Distance<D>, N exte
                         if (distance.compareTo(pr_knn_distance) <= 0) {
                             N ps = db.getIndex().getNode(ps_entry);
                             pr_knn_distance = processDataPages(pr, ps,
-                                knnLists, pr_knn_distance);
+                                                               knnLists, pr_knn_distance);
                         }
                     }
                     up = false;
@@ -136,7 +136,7 @@ public class KNNJoin<O extends NumberVector<O, ?>, D extends Distance<D>, N exte
                         if (distance.compareTo(pr_knn_distance) <= 0) {
                             N ps = db.getIndex().getNode(ps_entry);
                             pr_knn_distance = processDataPages(pr, ps,
-                                knnLists, pr_knn_distance);
+                                                               knnLists, pr_knn_distance);
                         }
                     }
                     up = true;
@@ -147,9 +147,9 @@ public class KNNJoin<O extends NumberVector<O, ?>, D extends Distance<D>, N exte
                 if (isVerbose()) {
                     progress.setProcessed(processed);
                     progress(new ProgressLogRecord(LogLevel.PROGRESS, "\r" + progress.toString()
-                        + " Number of processed data pages: "
-                        + processedPages++,
-                        progress.getTask(), progress.status()));
+                                                                      + " Number of processed data pages: "
+                                                                      + processedPages++,
+                                                   progress.getTask(), progress.status()));
                 }
             }
             result = new KNNJoinResult<O, D>(knnLists);
@@ -192,7 +192,7 @@ public class KNNJoin<O extends NumberVector<O, ?>, D extends Distance<D>, N exte
                         pr_knn_distance = knnList.getMaximumDistance();
                     }
                     pr_knn_distance = Util.max(knnList.getMaximumDistance(),
-                        pr_knn_distance);
+                                               pr_knn_distance);
                 }
             }
         }
@@ -220,5 +220,4 @@ public class KNNJoin<O extends NumberVector<O, ?>, D extends Distance<D>, N exte
             "Algorithm to find the k-nearest neighbors of each object in a spatial database.",
             "");
     }
-
 }

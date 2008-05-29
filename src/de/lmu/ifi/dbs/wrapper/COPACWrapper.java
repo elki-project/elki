@@ -102,7 +102,7 @@ public class COPACWrapper extends NormalizationWrapper {
     /**
      * @see KDDTaskWrapper#getKDDTaskParameters()
      */
-    public List<String> getKDDTaskParameters() throws UnusedParameterException {
+    public List<String> getKDDTaskParameters() {
         List<String> parameters = super.getKDDTaskParameters();
 
         // algorithm COPAC
@@ -149,7 +149,7 @@ public class COPACWrapper extends NormalizationWrapper {
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
         // epsilon, minpts
-        epsilon = optionHandler.getParameterValue(EPSILON_PARAM);
+        epsilon = getParameterValue(EPSILON_PARAM);
         minpts = (Integer) optionHandler.getOptionValue(DBSCAN.MINPTS_P);
 
         // k

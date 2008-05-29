@@ -4,10 +4,17 @@ import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.result.clustering.biclustering.Bicluster;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.utilities.Description;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.LongParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
 
-import java.util.*;
+import java.util.BitSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * Provides a BiclusteringAlgorithm which deletes or inserts rows/columns
@@ -85,7 +92,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
      * </p>
      */
     public static final IntParameter N_PARAM = new IntParameter("n",
-        "number of biclusters to be found ", new GreaterEqualConstraint(1));
+                                                                "number of biclusters to be found ", new GreaterEqualConstraint(1));
 
     /**
      * lower limit for maskingValues
@@ -94,7 +101,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
      * </p>
      */
     public static final IntParameter BEGIN_PARAM = new IntParameter("begin",
-        "lower limit for maskingValues");
+                                                                    "lower limit for maskingValues");
 
     /**
      * upper limit for maskingValues
@@ -103,7 +110,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
      * </p>
      */
     public static final IntParameter END_PARAM = new IntParameter("end",
-        "upper limit for maskingValues");
+                                                                  "upper limit for maskingValues");
 
     /**
      * missing Value in database to be raplaced with maskingValues
@@ -527,9 +534,9 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
             "a biclustering method on row- and columnScoreBases",
             "finding correlated values in a subset of rows and a subset of columns",
             "Yizong Cheng and George M. Church "
-                + "Department of Genetics, Harvard Medical School, Boston, MA 02115 "
-                + "Department of ECECS, University of Cincinnati, Cinncinati, OH 45221"
-                + "yizong.cheng@uc.edu, church@salt2.med.harvard.edu");
+            + "Department of Genetics, Harvard Medical School, Boston, MA 02115 "
+            + "Department of ECECS, University of Cincinnati, Cinncinati, OH 45221"
+            + "yizong.cheng@uc.edu, church@salt2.med.harvard.edu");
         return abs;
     }
 
@@ -636,7 +643,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
                 verbose("number of rows: " + rows.cardinality());
                 verbose("number of columns: " + cols.cardinality());
                 verbose("total number of masked values: " + maskedVals.size()
-                    + "\n");
+                        + "\n");
             }
 //			if (i == 5) {
 //				System.out.println("ready");
@@ -955,7 +962,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
                 double biclusterM = biclusterMean;
 
                 temp = temp
-                    + Math.pow(wert - rowMean - columnMean + biclusterM, 2);
+                       + Math.pow(wert - rowMean - columnMean + biclusterM, 2);
             }
             ergRows.put(i, temp / cols.cardinality());
         }

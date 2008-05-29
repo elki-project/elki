@@ -6,7 +6,11 @@ import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.FileParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 import java.io.File;
 import java.util.List;
@@ -115,7 +119,7 @@ public abstract class KDDTaskWrapper<O extends DatabaseObject> extends AbstractW
 
         // output
         if (optionHandler.isSet(outputParameter)) {
-            output = (File) optionHandler.getParameterValue(outputParameter);
+            output = getParameterValue(outputParameter);
         }
 
         // time
@@ -130,7 +134,7 @@ public abstract class KDDTaskWrapper<O extends DatabaseObject> extends AbstractW
      * @return the array containing the parametr setting that is necessary to
      *         run the kdd task correctly
      */
-    public List<String> getKDDTaskParameters() throws UnusedParameterException {
+    public List<String> getKDDTaskParameters() {
         List<String> parameters = getRemainingParameters();
 
         // verbose
@@ -157,11 +161,10 @@ public abstract class KDDTaskWrapper<O extends DatabaseObject> extends AbstractW
      *
      * @param parameters the list of parameters
      * @param parameter  the parameter to be added
-     * @throws UnusedParameterException
      */
-    public void put(List<String> parameters, Parameter parameter) throws UnusedParameterException {
+    public void put(List<String> parameters, Parameter<?, ?> parameter) {
         parameters.add(OptionHandler.OPTION_PREFIX + parameter.getName());
-        parameters.add(parameter.getValue().toString());
+        parameters.add(getParameterValue(parameter).toString());
     }
 
     /**
@@ -169,9 +172,8 @@ public abstract class KDDTaskWrapper<O extends DatabaseObject> extends AbstractW
      *
      * @param parameters the list of parameters
      * @param flag       the parameter to be added
-     * @throws UnusedParameterException
      */
-    public void put(List<String> parameters, Flag flag) throws UnusedParameterException {
+    public void put(List<String> parameters, Flag flag) {
         parameters.add(OptionHandler.OPTION_PREFIX + flag.getName());
     }
 }

@@ -97,7 +97,7 @@ public class ArffFileParser<O extends DatabaseObject & WekaObject<W>, W extends 
         String[] params = super.setParameters(args);
         if(optionHandler.isSet(BASE_PARSER_PARAM))
         {
-            String parserClass = optionHandler.getParameterValue(BASE_PARSER_PARAM);
+            String parserClass = getParameterValue(BASE_PARSER_PARAM);
             try
             {
                 this.parser = Util.instantiate(Parser.class,parserClass);

@@ -213,22 +213,23 @@ public class OptionHandler extends AbstractLoggable {
         }
     }
 
-    /**
-     * Returns the value of the given parameter, if there is one.
-     *
-     * @param parameter parameter to get value of
-     * @return value of given parameter
-     * @throws UnusedParameterException if the given parameter is not used
-     */
-    @SuppressWarnings("unchecked")
-    public <T> T getParameterValue(Parameter<T, ?> parameter) throws UnusedParameterException {
-        if (parameters.containsKey(parameter.getName())) {
-            return (T) parameters.get(parameter.getName()).getValue();
-        }
-        else {
-            throw new UnusedParameterException("Parameter " + parameter + " is not assigned to the option handler.");
-        }
-    }
+//    /**
+//     * Returns the value of the given parameter, if there is one.
+//     *
+//     * @param parameter parameter to get value of
+//     * @return value of given parameter
+//     * @throws UnusedParameterException if the given parameter is not used
+//     * todo entfernen, falls nicht gebraucht
+//     */
+//    @SuppressWarnings("unchecked")
+//    public <T> T getParameterValue(Parameter<T, ?> parameter) throws UnusedParameterException {
+//        if (parameters.containsKey(parameter.getName())) {
+//            return (T) parameters.get(parameter.getName()).getValue();
+//        }
+//        else {
+//            throw new UnusedParameterException("Parameter " + parameter + " is not assigned to the option handler.");
+//        }
+//    }
 
     public Option<?> getOption(String name) throws UnusedParameterException {
         if (parameters.containsKey(name)) {
@@ -269,7 +270,7 @@ public class OptionHandler extends AbstractLoggable {
      * constructor. Same as <code>usage(message,true)</code>.
      *
      * @param message some error-message, if needed (may be null or empty String)
-     * @return String an usage-String according to the descriptions given in the
+     * @return an usage-String according to the descriptions given in the
      *         constructor.
      */
     public String usage(String message) {
@@ -283,7 +284,7 @@ public class OptionHandler extends AbstractLoggable {
      * @param message    some error-message, if needed (may be null or empty String)
      * @param standalone whether the class using this OptionHandler provides a main
      *                   method
-     * @return String an usage-String according to the descriptions given in the
+     * @return an usage-String according to the descriptions given in the
      *         constructor.
      */
     public String usage(String message, boolean standalone) {
