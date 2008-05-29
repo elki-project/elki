@@ -8,6 +8,7 @@
 	algorithm.ICA,
 	algorithm.classifier,
 	algorithm.outlier,
+	algorithm.clustering.FIRES,
 	algorithm.clustering.FractalDimensionTest,
 	algorithm.clustering.KernelFourC,
 	algorithm.clustering.SubspaceAggregation,
