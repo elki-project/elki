@@ -22,6 +22,7 @@ import java.util.List;
  * on a specified parameter minpts.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @param <O> the type of DatabaseObjects handled by this Algorithm
  */
 public class OnlineBasicLOF<O extends DatabaseObject> extends
     DistanceBasedAlgorithm<O, DoubleDistance> {

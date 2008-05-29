@@ -37,6 +37,7 @@ import java.util.Map;
  * outlier factors in a database after insertion or deletion of new objects.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @param <O> the type of DatabaseObjects handled by this Algorithm
  */
 public class OnlineLOF<O extends DatabaseObject> extends OnlineBasicLOF<O> {
 

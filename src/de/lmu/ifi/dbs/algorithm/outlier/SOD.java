@@ -26,8 +26,10 @@ import java.util.List;
  * todo arthur comment
  *
  * @author Arthur Zimek
+ * @param <<V> the type of RealVector handled by this Algorithm
+ * @param <D> the type of Distance used by this Algorithm
  */
-public class SOD<O extends RealVector<O, Double>, D extends Distance<D>> extends AbstractAlgorithm<O> {
+public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends AbstractAlgorithm<V> {
 
     /**
      * Parameter to indicate the number of shared nearest neighbors to be considered for learning the subspace properties.
@@ -53,14 +55,14 @@ public class SOD<O extends RealVector<O, Double>, D extends Distance<D>> extends
      */
     private int knn;
 
-    private SharedNearestNeighborSimilarityFunction<O, D> similarityFunction = new SharedNearestNeighborSimilarityFunction<O, D>();
+    private SharedNearestNeighborSimilarityFunction<V, D> similarityFunction = new SharedNearestNeighborSimilarityFunction<V, D>();
 
     /**
      * Hold the alpha-value for discerning small from large variances.
      */
     private double alpha;
 
-    private SODResult<O> sodResult;
+    private SODResult<V> sodResult;
 
     public SOD() {
         super();
@@ -82,7 +84,7 @@ public class SOD<O extends RealVector<O, Double>, D extends Distance<D>> extends
     }
 
     @Override
-    protected void runInTime(Database<O> database) throws IllegalStateException {
+    protected void runInTime(Database<V> database) throws IllegalStateException {
         Progress progress = new Progress("assigning SOD", database.size());
         int processed = 0;
         similarityFunction.setDatabase(database, isVerbose(), isTime());
@@ -97,13 +99,13 @@ public class SOD<O extends RealVector<O, Double>, D extends Distance<D>> extends
                 progress(progress);
             }
             List<Integer> knnList = getKNN(database, queryObject).idsToList();
-            SODModel<O> model = new SODModel<O>(database, knnList, alpha, database.get(queryObject));
+            SODModel<V> model = new SODModel<V>(database, knnList, alpha, database.get(queryObject));
             database.associate(AssociationID.SOD_MODEL, queryObject, model);
         }
         if (isVerbose()) {
             verbose("");
         }
-        sodResult = new SODResult<O>(database);
+        sodResult = new SODResult<V>(database);
     }
 
     /**
@@ -115,7 +117,7 @@ public class SOD<O extends RealVector<O, Double>, D extends Distance<D>> extends
      * @param queryObject
      * @return the k nearest neighbors in terms of the shared nearest neighbor distance without the query object
      */
-    private KNNList<DoubleDistance> getKNN(Database<O> database, Integer queryObject) {
+    private KNNList<DoubleDistance> getKNN(Database<V> database, Integer queryObject) {
         similarityFunction.getPreprocessor().getParameters();
         KNNList<DoubleDistance> kNearestNeighbors = new KNNList<DoubleDistance>(knn, new DoubleDistance(Double.POSITIVE_INFINITY));
         for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
@@ -142,7 +144,7 @@ public class SOD<O extends RealVector<O, Double>, D extends Distance<D>> extends
         return new Description("SOD", "Subspace outlier degree", "", "");
     }
 
-    public SODResult<O> getResult() {
+    public SODResult<V> getResult() {
         return sodResult;
     }
 
