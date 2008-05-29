@@ -76,8 +76,12 @@ public class SOD<O extends RealVector<O,Double>, D extends Distance<D>> extends 
   
   @Override
   public String description() {
-    // TODO
-    return super.description();
+    StringBuilder description = new StringBuilder(); 
+    description.append(super.description());
+    description.append(Description.NEWLINE);
+    description.append(similarityFunction.inlineDescription());
+    description.append(Description.NEWLINE);
+    return description.toString();
   }
 
   @Override

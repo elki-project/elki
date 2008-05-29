@@ -108,6 +108,10 @@ public abstract class AbstractParameterizable extends AbstractLoggable
   public String description() {
     return optionHandler.usage("");
   }
+  
+  public String inlineDescription(){
+    return optionHandler.usage("",false);
+  }
 
   protected String description(String message) {
     return this.optionHandler.usage(message);

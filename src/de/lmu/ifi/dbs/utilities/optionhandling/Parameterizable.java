@@ -12,11 +12,22 @@ public interface Parameterizable {
   /**
    * Returns a description of the class and the required parameters.
    * <p/>
-   * This description should be suitable for a usage description.
+   * This description should be suitable for a usage description as for a standalone application.
    *
    * @return String a description of the class and the required parameters
    */
   String description();
+  
+  /**
+   * Returns a description of the class and the required parameters.
+   * <p/>
+   * This description should be suitable for a usage description as for an inline application,
+   * i.e. the usage of a Parameterizable within another Parameterizable
+   * where this Parameterizable is not a parameter itself but is used and expects parameters.
+   *
+   * @return String a description of the class and the required parameters
+   */
+  String inlineDescription();
 
   /**
    * Sets the attributes of the class accordingly to the given parameters.

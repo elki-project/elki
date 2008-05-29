@@ -276,6 +276,18 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
   public IntegerDistance getEpsilon() {
     return epsilon;
   }
+  
+  
+
+  @Override
+  public String description() {
+    StringBuilder description = new StringBuilder(); 
+    description.append(super.description());
+    description.append(Description.NEWLINE);
+    description.append(similarityFunction.inlineDescription());
+    description.append(Description.NEWLINE);
+    return description.toString();
+  }
 
   @Override
   public List<AttributeSettings> getAttributeSettings() {
