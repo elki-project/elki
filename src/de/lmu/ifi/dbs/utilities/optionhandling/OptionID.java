@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
+import de.lmu.ifi.dbs.algorithm.Algorithm;
+import de.lmu.ifi.dbs.algorithm.clustering.Clustering;
 import de.lmu.ifi.dbs.preprocessing.HiCOPreprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.ConstantObject;
@@ -17,9 +19,25 @@ public class OptionID extends ConstantObject {
      * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.COPAA#PREPROCESSOR_PARAM}
      */
     public static final OptionID COPAA_PREPROCESSOR = new OptionID("copaa.preprocessor",
-                                                                   "preprocessor to derive partition criterion " +
-                                                                       Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(HiCOPreprocessor.class) +
-                                                                       ".");
+        "preprocessor to derive partition criterion " +
+            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(HiCOPreprocessor.class) +
+            ".");
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.COPAA#PARTITION_ALGORITHM_PARAM}
+     */
+    public static final OptionID COPAA_PARTITION_ALGORITHM = new OptionID("copaa.partitionAlgorithm",
+        "algorithm to apply to each partition " +
+            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Algorithm.class) +
+            ".");
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.COPAC#PARTITION_ALGORITHM_PARAM}
+     */
+    public static final OptionID COPAC_PARTITION_ALGORITHM = new OptionID("copac.partitionAlgorithm",
+        "algorithm to apply to each partition " +
+            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Clustering.class) +
+            ".");
 
 
     /**
@@ -48,5 +66,14 @@ public class OptionID extends ConstantObject {
      */
     public String getDescription() {
         return description;
+    }
+
+    /**
+     * Sets the description of this OptionID.
+     *
+     * @param description the description to be set
+     */
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

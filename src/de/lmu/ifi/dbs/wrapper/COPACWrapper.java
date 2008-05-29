@@ -30,9 +30,9 @@ public class COPACWrapper extends NormalizationWrapper {
      * <p>Key: {@code -epsilon} </p>
      */
     public static final PatternParameter EPSILON_PARAM = new PatternParameter("epsilon",
-                                                                              "the maximum radius of the neighborhood " +
-                                                                                  "to be considered, must be suitable to " +
-                                                                                  LocallyWeightedDistanceFunction.class.getName());
+        "the maximum radius of the neighborhood " +
+            "to be considered, must be suitable to " +
+            LocallyWeightedDistanceFunction.class.getName());
 
     /**
      * Description for parameter k.
@@ -110,8 +110,7 @@ public class COPACWrapper extends NormalizationWrapper {
         parameters.add(COPAC.class.getName());
 
         // partition algorithm DBSCAN
-        parameters.add(OptionHandler.OPTION_PREFIX + COPAC.PARTITION_ALGORITHM_P);
-        parameters.add(DBSCAN.class.getName());
+        Util.addParameter(parameters, OptionID.COPAA_PARTITION_ALGORITHM, DBSCAN.class.getName());
 
         // epsilon
         parameters.add(OptionHandler.OPTION_PREFIX + EPSILON_PARAM.getName());

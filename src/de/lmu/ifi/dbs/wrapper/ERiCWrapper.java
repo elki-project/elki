@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
-import de.lmu.ifi.dbs.algorithm.clustering.COPAC;
 import de.lmu.ifi.dbs.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.algorithm.clustering.ERiC;
 import de.lmu.ifi.dbs.distance.distancefunction.ERiCDistanceFunction;
@@ -85,8 +84,8 @@ public class ERiCWrapper extends NormalizationWrapper {
 
         // parameter delta
         DoubleParameter deltaPam = new DoubleParameter(ERiCDistanceFunction.DELTA_P,
-                                                       ERiCDistanceFunction.DELTA_D,
-                                                       new GreaterConstraint(0));
+            ERiCDistanceFunction.DELTA_D,
+            new GreaterConstraint(0));
         deltaPam.setDefaultValue(ERiCDistanceFunction.DEFAULT_DELTA);
         optionHandler.put(deltaPam);
     }
@@ -102,8 +101,7 @@ public class ERiCWrapper extends NormalizationWrapper {
         parameters.add(ERiC.class.getName());
 
         // partition algorithm DBSCAN
-        parameters.add(OptionHandler.OPTION_PREFIX + COPAC.PARTITION_ALGORITHM_P);
-        parameters.add(DBSCAN.class.getName());
+        Util.addParameter(parameters, OptionID.COPAA_PARTITION_ALGORITHM, DBSCAN.class.getName());
 
         // epsilon
         parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.EPSILON_PARAM.getName());

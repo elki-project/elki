@@ -34,16 +34,14 @@ public class COPAA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         new ClassParameter<HiCOPreprocessor>(OptionID.COPAA_PREPROCESSOR, HiCOPreprocessor.class);
 
     /**
-     * Parameter for partition algorithm.
+     * Parameter to specify the algorithm to apply to each partition,
+     * must extend {@link de.lmu.ifi.dbs.algorithm.Algorithm}.
+     * <p>Key: {@code -copaa.partitionAlgorithm} </p>
      */
-    public static final String PARTITION_ALGORITHM_P = "partAlg";
+    protected final ClassParameter PARTITION_ALGORITHM_PARAM =
+        new ClassParameter(OptionID.COPAA_PARTITION_ALGORITHM, Algorithm.class);
 
-    /**
-     * Description for parameter partition algorithm
-     */
-    public static final String PARTITION_ALGORITHM_D = "algorithm to apply to each partition" +
-        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Algorithm.class) +
-        ".";
+//    private final ClassParameter<Database<>
 
     /**
      * Parameter for class of partition database.
@@ -88,14 +86,10 @@ public class COPAA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
      */
     public COPAA() {
         super();
-
         //parameter preprocessor
         optionHandler.put(PREPROCESSOR_PARAM);
-
         // parameter partition algorithm
-        // noinspection unchecked
-        ClassParameter<Algorithm<V>> partAlg = new ClassParameter(PARTITION_ALGORITHM_P, PARTITION_ALGORITHM_D, Algorithm.class);
-        optionHandler.put(partAlg);
+        optionHandler.put(PARTITION_ALGORITHM_PARAM);
 
         // parameter partition database class
         // noinspection unchecked
@@ -164,9 +158,9 @@ public class COPAA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
      */
     public Description getDescription() {
         return new Description("COPAA",
-                               "COrrelation PArtitioning Algorithm",
-                               "Partitions a database according to the correlation dimension of its objects and performs an arbitrary algorithm over the partitions.",
-                               "unpublished");
+            "COrrelation PArtitioning Algorithm",
+            "Partitions a database according to the correlation dimension of its objects and performs an arbitrary algorithm over the partitions.",
+            "unpublished");
     }
 
     /**
@@ -203,13 +197,15 @@ public class COPAA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         String[] remainingParameters = super.setParameters(args);
 
         // partition algorithm
-        String partAlgString = (String) optionHandler.getOptionValue(PARTITION_ALGORITHM_P);
+        // noinspection unchecked
+        String partitionAlgoritmClass = (String) getParameterValue(PARTITION_ALGORITHM_PARAM);
         try {
             // noinspection unchecked
-            partitionAlgorithm = Util.instantiate(Algorithm.class, partAlgString);
+            partitionAlgorithm = Util.instantiate(Algorithm.class, partitionAlgoritmClass);
         }
         catch (UnableToComplyException e) {
-            throw new WrongParameterValueException(PARTITION_ALGORITHM_P, partAlgString, PARTITION_ALGORITHM_D);
+            throw new WrongParameterValueException(PARTITION_ALGORITHM_PARAM.getName(),
+                partitionAlgoritmClass, PARTITION_ALGORITHM_PARAM.getDescription(), e);
         }
 
         // partition db
@@ -235,9 +231,9 @@ public class COPAA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         }
         catch (UnableToComplyException e) {
             throw new WrongParameterValueException(PREPROCESSOR_PARAM.getName(),
-                                                   preprocessorClass,
-                                                   PREPROCESSOR_PARAM.getDescription(),
-                                                   e);
+                preprocessorClass,
+                PREPROCESSOR_PARAM.getDescription(),
+                e);
         }
         remainingParameters = preprocessor.setParameters(remainingParameters);
 

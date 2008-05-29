@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.properties.PropertyName;
 public class ClassParameter<C> extends Parameter<String, String> {
 
     /**
-     * the restriction class for this class parameter.
+     * The restriction class for this class parameter.
      */
     private Class<C> restrictionClass;
 
@@ -19,7 +19,7 @@ public class ClassParameter<C> extends Parameter<String, String> {
      * Constructs a class parameter with the given optionID, and
      * restriction class.
      *
-     * @param optionID the unique id of the option
+     * @param optionID         the unique id of the option
      * @param restrictionClass the restriction class of this class parameter
      */
     public ClassParameter(OptionID optionID, Class<C> restrictionClass) {
@@ -34,6 +34,7 @@ public class ClassParameter<C> extends Parameter<String, String> {
      * @param name             the parameter name
      * @param description      the parameter description
      * @param restrictionClass the restriction class of this class parameter
+     * @deprecated
      */
     public ClassParameter(String name, String description, Class<C> restrictionClass) {
         super(name, description);
@@ -48,6 +49,7 @@ public class ClassParameter<C> extends Parameter<String, String> {
      * @param description      the parameter description
      * @param restrictionClass the restriction class of this class parameter
      * @param defaultValue     the default value of this class parameter
+     * @deprecated
      */
     public ClassParameter(String name, String description, Class<C> restrictionClass, String defaultValue) {
         this(name, description, restrictionClass);
@@ -56,7 +58,6 @@ public class ClassParameter<C> extends Parameter<String, String> {
 
     @Override
     public void setValue(String value) throws ParameterException {
-
         if (isValid(value)) {
             setCorrectValue(value);
         }
@@ -113,6 +114,23 @@ public class ClassParameter<C> extends Parameter<String, String> {
         return restrictionClass;
     }
 
+    /**
+     * Sets the restriction class of
+     * this class parameter.
+     *
+     * @param restrictionClass the restriction class to be set
+     */
+    public void setRestrictionClass(Class<C> restrictionClass) {
+        this.restrictionClass = restrictionClass;
+    }
+
+    /**
+     * Tries to set the correct value for this class parameter.
+     *
+     * @param value the value to be set
+     * @throws ParameterException if the specified value is not correct (e.g., it is
+     *                            not conform with the restriction class)
+     */
     private void setCorrectValue(String value) throws ParameterException {
         try {
             try {
@@ -122,12 +140,10 @@ public class ClassParameter<C> extends Parameter<String, String> {
             }
 
             catch (ClassNotFoundException e) {
-
                 restrictionClass.isAssignableFrom(Class.forName(restrictionClass.getPackage().getName() + "." + value));
                 this.value = restrictionClass.getPackage().getName() + "." + value;
             }
         }
-
         catch (ClassNotFoundException e) {
             throw new WrongParameterValueException(this.name, value, "subclass of " + restrictionClass.getName());
         }

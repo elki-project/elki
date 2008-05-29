@@ -118,8 +118,7 @@ public class CODECWrapper extends NormalizationWrapper {
         parameters.add(COPAC.class.getName());
 
         // partition algorithm
-        parameters.add(OptionHandler.OPTION_PREFIX + COPAC.PARTITION_ALGORITHM_P);
-        parameters.add(DBSCAN.class.getName());
+        Util.addParameter(parameters, OptionID.COPAA_PARTITION_ALGORITHM, DBSCAN.class.getName());        
 
         // epsilon
         parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_PARAM.getName());
