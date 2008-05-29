@@ -18,7 +18,17 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 
 import java.io.PrintStream;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.StringTokenizer;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 /**
@@ -1067,7 +1077,9 @@ public final class Util extends AbstractLoggable {
      */
     public static String[] parameterDifference(String[] complete, String[] part) throws IllegalArgumentException {
         if (complete.length < part.length) {
-            throw new IllegalArgumentException("first array must be at least as long as second array.");
+            throw new IllegalArgumentException("First array must be at least as long as second array.\n" +
+                                               "First array:  " + Arrays.asList(complete) + "\n" +
+                                               "Second array: " + Arrays.asList(part));
         }
 
         if (complete.length == 0) {
@@ -1344,7 +1356,7 @@ public final class Util extends AbstractLoggable {
         }
         catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("The specified String does not represent a bit set " +
-                "containing only 0 and 1 values: " + s);
+                                               "containing only 0 and 1 values: " + s);
         }
     }
 
@@ -1363,7 +1375,7 @@ public final class Util extends AbstractLoggable {
             }
             else if (s[i] != '0') {
                 throw new IllegalArgumentException("The specified String does not represent a bit set " +
-                    "containing only 0 and 1 values: " + s);
+                                                   "containing only 0 and 1 values: " + s);
             }
         }
         return result;
