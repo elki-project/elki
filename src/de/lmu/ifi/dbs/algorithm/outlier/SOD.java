@@ -34,11 +34,7 @@ public class SOD<O extends RealVector<O,Double>, D extends Distance<D>> extends 
    * 
    * <p>Key: {@code -knn}</p>
    */
-  public static final IntParameter KNN_PARAM = new IntParameter("knn", "the number of shared nearest neighbors to be considered for learning the subspace properties", new GreaterConstraint(0));
-  
-  static{
-    KNN_PARAM.setDefaultValue(1);
-  }
+  public final IntParameter KNN_PARAM = new IntParameter("knn", "the number of shared nearest neighbors to be considered for learning the subspace properties", new GreaterConstraint(0));
   
   /**
    * Parameter to indicate the multiplier for the discriminance value for discerning small from large variances.
@@ -47,12 +43,8 @@ public class SOD<O extends RealVector<O,Double>, D extends Distance<D>> extends 
    * 
    * <p>Key: {@code -alpha}</p>
    */
-  public static final DoubleParameter ALPHA_PARAM = new DoubleParameter("alpha","multiplier for the discriminance value for discerning small from large variances", new GreaterConstraint(0));
+  public final DoubleParameter ALPHA_PARAM = new DoubleParameter("alpha","multiplier for the discriminance value for discerning small from large variances", new GreaterConstraint(0));
   
-  static{
-    ALPHA_PARAM.setDefaultValue(1.1);
-    ALPHA_PARAM.setOptional(true);
-  }
   
   /**
    * Holds the number of shared nearest neighbors to be considered for learning the subspace properties.
@@ -70,6 +62,9 @@ public class SOD<O extends RealVector<O,Double>, D extends Distance<D>> extends 
   
   public SOD(){
     super();
+    KNN_PARAM.setDefaultValue(1);
+    ALPHA_PARAM.setDefaultValue(1.1);
+    ALPHA_PARAM.setOptional(true);
     addOption(KNN_PARAM);
     addOption(ALPHA_PARAM);
   }
