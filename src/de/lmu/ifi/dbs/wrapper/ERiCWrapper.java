@@ -104,8 +104,7 @@ public class ERiCWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, OptionID.COPAA_PARTITION_ALGORITHM, DBSCAN.class.getName());
 
         // epsilon
-        parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.EPSILON_PARAM.getName());
-        parameters.add("0");
+        Util.addParameter(parameters, OptionID.DBSCAN_EPSILON, "0");
 
         // minpts
         parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.MINPTS_P);

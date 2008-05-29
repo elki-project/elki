@@ -41,6 +41,15 @@ public class OptionID extends ConstantObject {
             "the same class as the original database."
     );
 
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.DBSCAN#EPSILON_PARAM}
+     */
+    public static final OptionID DBSCAN_EPSILON = new OptionID("dbscan.epsilon",
+        "the maximum radius of the neighborhood " +
+            "to be considered, must be suitable to " +
+            "the distance function specified"
+    );
+
 
     /**
      * The description of the OptionID.

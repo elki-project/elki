@@ -10,11 +10,7 @@ import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
@@ -36,12 +32,9 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
     /**
      * Parameter to specify the maximum radius of the neighborhood to be considered,
      * must be suitable to the distance function specified.
-     * <p>Key: {@code -epsilon} </p>
+     * <p>Key: {@code -dbscan.epsilon} </p>
      */
-    public static final PatternParameter EPSILON_PARAM = new PatternParameter("epsilon",
-                                                                       "the maximum radius of the neighborhood " +
-                                                                       "to be considered, must be suitable to " +
-                                                                       "the distance function specified");
+    public final PatternParameter EPSILON_PARAM = new PatternParameter(OptionID.DBSCAN_EPSILON);
 
     /**
      * Parameter minimum points.
@@ -103,7 +96,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
         catch (UnusedParameterException e) {
             verbose("Could not instantiate global parameter constraint concerning parameter " + EPSILON_PARAM.getName() + " and " + DISTANCE_FUNCTION_P + " because parameter " + DISTANCE_FUNCTION_P + " is not specified! " + e.getMessage());
         }
-
+        // parameter minpts
         optionHandler.put(new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
     }
 
@@ -260,7 +253,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
-        // minpts
+        // epsilon, minpts
         epsilon = getParameterValue(EPSILON_PARAM);
         minpts = (Integer) optionHandler.getOptionValue(MINPTS_P);
 
