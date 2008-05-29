@@ -31,8 +31,10 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
      * <p>Key: {@code -k} </p>
      */
     public static final IntParameter K_PARAM = new IntParameter("k",
-        "the distance of the k-distant object is assessed. k >= 1 (default: 1)",
+        "<int>the distance of the k-distant object is assessed. k >= 1 (default: 1)",
         new GreaterConstraint(0));
+
+    //public static final DoubleParameter per = new DoubleParameter(PERCENTAGE_P, PERCENTAGE_D, percentageCons);
 
     /**
      * Parameter percentage.
