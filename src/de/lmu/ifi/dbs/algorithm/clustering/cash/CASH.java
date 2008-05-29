@@ -25,19 +25,29 @@ import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.utilities.heap.HeapNode;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.varianceanalysis.AbstractPCA;
 import de.lmu.ifi.dbs.varianceanalysis.FirstNEigenPairFilter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.Vector;
 
 /**
  * Subspace clustering algorithm based on the hough transform.
  * todo hierarchy
  *
- * @author Elke Achtert
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
     /**
@@ -69,7 +79,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
      * Description for parameter mindim.
      */
     public static final String MINDIM_D = "the minimum dimensionality of the subspaces to be found, " +
-        "default:" + DEFAULT_MINDIM + ".";
+                                          "default:" + DEFAULT_MINDIM + ".";
 
     /**
      * Parameter mindim.
@@ -90,9 +100,9 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
      * Description for flag adjust
      */
     public static final String ADJUSTMENT_D = "flag indicating that an adjustment of the" +
-        "applied heuristic for choosing an interval " +
-        "is performed after an interval is selected, " +
-        "default: no adjustment";
+                                              "applied heuristic for choosing an interval " +
+                                              "is performed after an interval is selected, " +
+                                              "default: no adjustment";
 
     /**
      * Flag adjust.
@@ -239,11 +249,11 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
      */
     public Description getDescription() {
         return new Description("CASH",
-            "Robust clustering in arbitrarily oriented subspaces",
-            "Subspace clustering algorithm based on the hough transform.",
-            "E. Achtert, C. Boehm, J. David, P. Kroeger, A. Zimek: " +
-                "Robust clustering in arbitraily oriented subspaces. " +
-                "In Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008");
+                               "Robust clustering in arbitrarily oriented subspaces",
+                               "Subspace clustering algorithm based on the hough transform.",
+                               "E. Achtert, C. Boehm, J. David, P. Kroeger, A. Zimek: " +
+                               "Robust clustering in arbitraily oriented subspaces. " +
+                               "In Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008");
     }
 
     /**

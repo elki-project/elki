@@ -23,6 +23,8 @@ import java.util.Random;
  * Provides an order of the kNN-distances for all objects within the database.
  *
  * @author Arthur Zimek
+ * @param <O> the type of DatabaseObjects handled by this Algorithm
+ * @param <D> the type of Distance used by this Algorithm
  */
 public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
     extends DistanceBasedAlgorithm<O, D> {

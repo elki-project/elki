@@ -9,75 +9,76 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.varianceanalysis.ica.FastICA;
 
 /**
- * TODO: comment
+ * TODO: elki comment
  *
- * @author Elke Achtert 
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @param <V> the type of RealVector handled by this Algorithm
  */
-public class ICA<V extends RealVector<V,?>> extends AbstractAlgorithm<V> {
-  /**
-   * The result.
-   */
-  private ICAResult<V> result;
+public class ICA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
+    /**
+     * The result.
+     */
+    private ICAResult<V> result;
 
-  /**
-   * The independent component analysis.
-   */
-  private FastICA<V> ica;
+    /**
+     * The independent component analysis.
+     */
+    private FastICA<V> ica;
 
-  /**
-   * todo
-   */
-  public ICA() {
-    super();
-    this.debug = true;
-  }
-
-  /**
-   * The run method encapsulated in measure of runtime. An extending class
-   * needs not to take care of runtime itself.
-   *
-   * @param database the database to run the algorithm on
-   * @throws IllegalStateException if the algorithm has not been initialized properly (e.g. the
-   *                               setParameters(String[]) method has been failed to be called).
-   */
-  protected void runInTime(Database<V> database) throws IllegalStateException {
-    ica.run(database, isVerbose());
-    result = new ICAResult<V>(database, ica);
-    if (debug) {
-      debugFine(result.toString());
+    /**
+     * todo
+     */
+    public ICA() {
+        super();
+        this.debug = true;
     }
-  }
 
-  /**
-   * Returns the result of the algorithm.
-   *
-   * @return the result of the algorithm
-   */
-  public Result<V> getResult() {
-    return result;
-  }
+    /**
+     * The run method encapsulated in measure of runtime. An extending class
+     * needs not to take care of runtime itself.
+     *
+     * @param database the database to run the algorithm on
+     * @throws IllegalStateException if the algorithm has not been initialized properly (e.g. the
+     *                               setParameters(String[]) method has been failed to be called).
+     */
+    protected void runInTime(Database<V> database) throws IllegalStateException {
+        ica.run(database, isVerbose());
+        result = new ICAResult<V>(database, ica);
+        if (debug) {
+            debugFine(result.toString());
+        }
+    }
 
-  /**
-   * Returns a description of the algorithm.
-   *
-   * @return a description of the algorithm
-   *         todo
-   */
-  public Description getDescription() {
-    return new Description("todo", "todo", "todo", "todo");
-  }
+    /**
+     * Returns the result of the algorithm.
+     *
+     * @return the result of the algorithm
+     */
+    public Result<V> getResult() {
+        return result;
+    }
 
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+    /**
+     * Returns a description of the algorithm.
+     *
+     * @return a description of the algorithm
+     *         todo
+     */
+    public Description getDescription() {
+        return new Description("todo", "todo", "todo", "todo");
+    }
 
-    // ica
-    ica = new FastICA<V>();
-    remainingParameters = ica.setParameters(remainingParameters);
-    setParameters(args, remainingParameters);
+    /**
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+     */
+    public String[] setParameters(String[] args) throws ParameterException {
+        String[] remainingParameters = super.setParameters(args);
 
-    return remainingParameters;
-  }
+        // ica
+        ica = new FastICA<V>();
+        remainingParameters = ica.setParameters(remainingParameters);
+        setParameters(args, remainingParameters);
+
+        return remainingParameters;
+    }
 }

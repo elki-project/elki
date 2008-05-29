@@ -27,11 +27,11 @@ import java.util.Set;
 /**
  * Dependency derivator computes quantitativly linear dependencies among
  * attributes of a given dataset based on a linear correlation PCA.
- * 
+ *
  * @author Arthur Zimek
+ * @param <V> the type of RealVector handled by this Algorithm
  */
-public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<D>> extends DistanceBasedAlgorithm<V, D>
-{
+public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<D>> extends DistanceBasedAlgorithm<V, D> {
 
     /**
      * Parameter for output accuracy (number of fraction digits).
@@ -92,8 +92,7 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
      * Provides a dependency derivator, setting parameters alpha and output
      * accuracy additionally to parameters of super class.
      */
-    public DependencyDerivator()
-    {
+    public DependencyDerivator() {
         super();
 
         // parameter output accuracy
@@ -112,54 +111,44 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
     /**
      * @see Algorithm#getDescription()
      */
-    public Description getDescription()
-    {
+    public Description getDescription() {
         return new Description("DependencyDerivator", "Deriving numerical inter-dependencies on data", "Derives an equality-system describing dependencies between attributes in a correlation-cluster", "E. Achtert, C. Boehm, H.-P. Kriegel, P. Kroeger, A. Zimek: " + "Deriving Quantitative Dependencies for Correlation Clusters. " + "In Proc. 12th Int. Conf. on Knowledge Discovery and Data Mining (KDD '06), Philadelphia, PA 2006.");
     }
 
     /**
      * Runs the pca.
-     * 
+     *
      * @param db the database
      * @see AbstractAlgorithm#runInTime(Database)
      */
     @Override
-    public void runInTime(Database<V> db) throws IllegalStateException
-    {
-        if(isVerbose())
-        {
+    public void runInTime(Database<V> db) throws IllegalStateException {
+        if (isVerbose()) {
             verbose("retrieving database objects...");
         }
         Set<Integer> dbIDs = new HashSet<Integer>();
-        for(Iterator<Integer> idIter = db.iterator(); idIter.hasNext();)
-        {
+        for (Iterator<Integer> idIter = db.iterator(); idIter.hasNext();) {
             dbIDs.add(idIter.next());
         }
         V centroidDV = Util.centroid(db, dbIDs);
         Set<Integer> ids;
-        if(this.sampleSize != null)
-        {
-            if(optionHandler.isSet(RANDOM_SAMPLE_F))
-            {
+        if (this.sampleSize != null) {
+            if (optionHandler.isSet(RANDOM_SAMPLE_F)) {
                 ids = db.randomSample(this.sampleSize, 1);
             }
-            else
-            {
+            else {
                 List<QueryResult<D>> queryResults = db.kNNQueryForObject(centroidDV, this.sampleSize, this.getDistanceFunction());
                 ids = new HashSet<Integer>(this.sampleSize);
-                for(QueryResult<D> qr : queryResults)
-                {
+                for (QueryResult<D> qr : queryResults) {
                     ids.add(qr.getID());
                 }
             }
         }
-        else
-        {
+        else {
             ids = dbIDs;
         }
-        
-        if(isVerbose())
-        {
+
+        if (isVerbose()) {
             verbose("PCA...");
         }
 
@@ -167,8 +156,7 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
         Matrix weakEigenvectors = pca.getEigenvectors().times(pca.selectionMatrixOfWeakEigenvectors());
 
         Matrix transposedWeakEigenvectors = weakEigenvectors.transpose();
-        if(this.debug)
-        {
+        if (this.debug) {
             StringBuilder log = new StringBuilder();
             log.append("strong Eigenvectors:\n");
             log.append(pca.getEigenvectors().times(pca.selectionMatrixOfStrongEigenvectors()).toString(NF));
@@ -183,8 +171,7 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
         }
         Vector centroid = centroidDV.getColumnVector();
         Matrix B = transposedWeakEigenvectors.times(centroid);
-        if(this.debug)
-        {
+        if (this.debug) {
             StringBuilder log = new StringBuilder();
             log.append("Centroid:\n");
             log.append(centroid);
@@ -199,8 +186,7 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
         gaussJordan.setMatrix(0, transposedWeakEigenvectors.getRowDimensionality() - 1, 0, transposedWeakEigenvectors.getColumnDimensionality() - 1, transposedWeakEigenvectors);
         gaussJordan.setMatrix(0, gaussJordan.getRowDimensionality() - 1, transposedWeakEigenvectors.getColumnDimensionality(), gaussJordan.getColumnDimensionality() - 1, B);
 
-        if(isVerbose())
-        {
+        if (isVerbose()) {
             verbose("Gauss-Jordan-Elimination of " + gaussJordan.toString(NF));
         }
 
@@ -215,8 +201,7 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
         Matrix strongEigenvectors = pca.getEigenvectors().times(pca.selectionMatrixOfStrongEigenvectors());
         this.solution = new CorrelationAnalysisSolution<V>(lq, db, strongEigenvectors, pca.getWeakEigenvectors(), pca.similarityMatrix(), centroid, NF);
 
-        if(isVerbose())
-        {
+        if (isVerbose()) {
             StringBuilder log = new StringBuilder();
             log.append("Solution:");
             log.append('\n');
@@ -231,8 +216,7 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
     /**
      * @see Algorithm#getResult()
      */
-    public CorrelationAnalysisSolution<V> getResult()
-    {
+    public CorrelationAnalysisSolution<V> getResult() {
         return solution;
     }
 
@@ -240,8 +224,7 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
      * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
-    public String[] setParameters(String[] args) throws ParameterException
-    {
+    public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
         // accuracy
@@ -251,8 +234,7 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
         NF.setMinimumFractionDigits(accuracy);
 
         // sample size
-        if(optionHandler.isSet(SAMPLE_SIZE_P))
-        {
+        if (optionHandler.isSet(SAMPLE_SIZE_P)) {
             sampleSize = (Integer) optionHandler.getOptionValue(SAMPLE_SIZE_P);
         }
 
@@ -265,17 +247,15 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
 
     /**
      * Returns the parameter setting of this algorithm.
-     * 
+     *
      * @return the parameter setting of this algorithm
      */
     @Override
-    public List<AttributeSettings> getAttributeSettings()
-    {
+    public List<AttributeSettings> getAttributeSettings() {
         List<AttributeSettings> attributeSettings = super.getAttributeSettings();
         AttributeSettings mySettings = attributeSettings.get(0);
 
-        if(optionHandler.isSet(SAMPLE_SIZE_P))
-        {
+        if (optionHandler.isSet(SAMPLE_SIZE_P)) {
             mySettings.addSetting(SAMPLE_SIZE_P, Integer.toString(sampleSize));
         }
         attributeSettings.addAll(pca.getAttributeSettings());

@@ -17,7 +17,9 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * todo arthur comment all
  * @author Arthur Zimek
+ * @param <V> the type of RealVector handled by this Algorithm
  */
 public class FracClus<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
     public static final String NUMBER_OF_SUPPORTERS_P = "supporters";

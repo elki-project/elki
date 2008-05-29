@@ -30,9 +30,11 @@ import java.util.List;
  * structure.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @param <V> the type of NumberVector handled by this Algorithm
+ * @param <D> the type of Distance used by this Algorithm
  */
-public class KNNJoin<O extends NumberVector<O, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry>
-    extends DistanceBasedAlgorithm<O, D> {
+public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry>
+    extends DistanceBasedAlgorithm<V, D> {
 
     /**
      * Parameter that specifies the k-nearest neighbors to be assigned,
@@ -49,7 +51,7 @@ public class KNNJoin<O extends NumberVector<O, ?>, D extends Distance<D>, N exte
     /**
      * The knn lists for each object.
      */
-    private KNNJoinResult<O, D> result;
+    private KNNJoinResult<V, D> result;
 
     /**
      * Adds parameter k to the optionhandler
@@ -67,7 +69,7 @@ public class KNNJoin<O extends NumberVector<O, ?>, D extends Distance<D>, N exte
      * @throws IllegalStateException if the algorithm has not been initialized properly (e.g. the
      *                               setParameters(String[]) method has been failed to be called).
      */
-    protected void runInTime(Database<O> database) throws IllegalStateException {
+    protected void runInTime(Database<V> database) throws IllegalStateException {
         if (!(database instanceof SpatialIndexDatabase)) {
             throw new IllegalStateException(
                 "Database must be an instance of "
@@ -79,8 +81,8 @@ public class KNNJoin<O extends NumberVector<O, ?>, D extends Distance<D>, N exte
                 + SpatialDistanceFunction.class.getName());
         }
         int k = getParameterValue(K_PARAM);
-        SpatialIndexDatabase<O, N, E> db = (SpatialIndexDatabase<O, N, E>) database;
-        SpatialDistanceFunction<O, D> distFunction = (SpatialDistanceFunction<O, D>) getDistanceFunction();
+        SpatialIndexDatabase<V, N, E> db = (SpatialIndexDatabase<V, N, E>) database;
+        SpatialDistanceFunction<V, D> distFunction = (SpatialDistanceFunction<V, D>) getDistanceFunction();
         distFunction.setDatabase(db, isVerbose(), isTime());
 
         HashMap<Integer, KNNList<D>> knnLists = new HashMap<Integer, KNNList<D>>();
@@ -152,7 +154,7 @@ public class KNNJoin<O extends NumberVector<O, ?>, D extends Distance<D>, N exte
                                                    progress.getTask(), progress.status()));
                 }
             }
-            result = new KNNJoinResult<O, D>(knnLists);
+            result = new KNNJoinResult<V, D>(knnLists);
         }
 
         catch (Exception e) {
@@ -204,7 +206,7 @@ public class KNNJoin<O extends NumberVector<O, ?>, D extends Distance<D>, N exte
      *
      * @return the result of the algorithm
      */
-    public Result<O> getResult() {
+    public Result<V> getResult() {
         return result;
     }
 

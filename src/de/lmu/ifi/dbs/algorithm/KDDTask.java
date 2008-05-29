@@ -9,7 +9,15 @@ import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.FileParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.io.File;
 import java.util.List;
@@ -21,6 +29,7 @@ import java.util.logging.Logger;
  * {@link de.lmu.ifi.dbs.database.connection.DatabaseConnection DatabaseConnection}.
  *
  * @author Arthur Zimek
+ * @param <O> the type of DatabaseObjects handled by this Algorithm
  */
 public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
 
@@ -44,8 +53,8 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
      * Description for parameter algorithm.
      */
     public static final String ALGORITHM_D = "classname of an algorithm "
-        + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Algorithm.class)
-        + ". Either full name to identify classpath or only classname, if its package is " + Algorithm.class.getPackage().getName();
+                                             + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Algorithm.class)
+                                             + ". Either full name to identify classpath or only classname, if its package is " + Algorithm.class.getPackage().getName();
 
     /**
      * Help flag.
@@ -71,7 +80,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
      * Description for description parameter.
      */
     public static final String DESCRIPTION_D = "name of a class to obtain a description - for classes that implement "
-        + Parameterizable.class.getName() + " -- no further processing will be performed.";
+                                               + Parameterizable.class.getName() + " -- no further processing will be performed.";
 
     /**
      * The default database connection.
@@ -87,9 +96,9 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
      * Description for parameter database connection.
      */
     public static final String DATABASE_CONNECTION_D = "classname of a class "
-        + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DatabaseConnection.class)
-        + ". Either full name to identify classpath or only classname, if its package is "
-        + DatabaseConnection.class.getPackage().getName() + ". Default: " + DEFAULT_DATABASE_CONNECTION;
+                                                       + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DatabaseConnection.class)
+                                                       + ". Either full name to identify classpath or only classname, if its package is "
+                                                       + DatabaseConnection.class.getPackage().getName() + ". Default: " + DEFAULT_DATABASE_CONNECTION;
 
     /**
      * Parameter output.
@@ -110,7 +119,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
      * Description for parameter normalization.
      */
     public static final String NORMALIZATION_D = "a normalization to use a database with normalized values "
-        + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Normalization.class);
+                                                 + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Normalization.class);
 
     /**
      * Flag normalization undo.
@@ -320,7 +329,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
         }
         else if (optionHandler.isSet(NORMALIZATION_UNDO_F)) {
             throw new WrongParameterValueException("Illegal parameter setting: Flag " + NORMALIZATION_UNDO_F
-                + " is set, but no normalization is specified.");
+                                                   + " is set, but no normalization is specified.");
         }
 
         remainingParameters = algorithm.setParameters(remainingParameters);
