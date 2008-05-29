@@ -28,6 +28,19 @@ public class ClassParameter<C> extends Parameter<String, String> {
     }
 
     /**
+     * Constructs a class parameter with the given optionID,
+     * restriction class, and optional flag.
+     *
+     * @param optionID         the unique id of the option
+     * @param restrictionClass the restriction class of this class parameter
+     * @param optional         specifies if this parameter is an optional parameter
+     */
+    public ClassParameter(OptionID optionID, Class<C> restrictionClass, boolean optional) {
+        this(optionID, restrictionClass);
+        setOptional(optional);
+    }
+
+    /**
      * Constructs a class parameter with the given name, description, and
      * restriction class.
      *

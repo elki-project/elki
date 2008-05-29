@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
 import de.lmu.ifi.dbs.algorithm.Algorithm;
-import de.lmu.ifi.dbs.algorithm.clustering.Clustering;
+import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.preprocessing.HiCOPreprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.ConstantObject;
@@ -32,12 +32,14 @@ public class OptionID extends ConstantObject {
             ".");
 
     /**
-     * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.COPAC#PARTITION_ALGORITHM_PARAM}
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.COPAC#PARTITION_DB_PARAM}
      */
-    public static final OptionID COPAC_PARTITION_ALGORITHM = new OptionID("copac.partitionAlgorithm",
-        "algorithm to apply to each partition " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Clustering.class) +
-            ".");
+    public static final OptionID COPAA_PARTITION_DATABASE = new OptionID("copaa.partitionDB",
+        "database class for each partition " +
+            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Database.class) +
+            ". If this parameter is not set, the databases of the partitions have " +
+            "the same class as the original database."
+    );
 
 
     /**

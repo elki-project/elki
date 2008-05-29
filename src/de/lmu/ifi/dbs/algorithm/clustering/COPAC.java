@@ -22,7 +22,7 @@ import java.util.Map;
  * its objects and to then perform an arbitrary clustering algorithm over the partitions.
  *
  * @author Arthur Zimek
- * @param <V> the type of Realvector handled by this Algorithm
+ * @param <V> the type of RealVector handled by this Algorithm
  */
 public class COPAC<V extends RealVector<V, ?>> extends COPAA<V> implements Clustering<V> {
     /**

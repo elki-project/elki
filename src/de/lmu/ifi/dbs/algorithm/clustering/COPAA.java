@@ -8,7 +8,6 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.preprocessing.HiCOPreprocessor;
-import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
@@ -41,19 +40,13 @@ public class COPAA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
     protected final ClassParameter PARTITION_ALGORITHM_PARAM =
         new ClassParameter(OptionID.COPAA_PARTITION_ALGORITHM, Algorithm.class);
 
-//    private final ClassParameter<Database<>
-
     /**
-     * Parameter for class of partition database.
+     * Parameter to specify the database class for each partition,
+     * must extend {@link de.lmu.ifi.dbs.database.Database}.
+     * <p>Key: {@code -copaa.partitionDB} </p>
      */
-    public static final String PARTITION_DATABASE_CLASS_P = "partDB";
-
-    /**
-     * Description for parameter partition database.
-     */
-    public static final String PARTITION_DATABASE_CLASS_D = "database class for each partition " +
-        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Database.class) +
-        ". If this parameter is not set, the databases of the partitions have the same class as the original database.";
+    private final ClassParameter<Database> PARTITION_DB_PARAM =
+        new ClassParameter<Database>(OptionID.COPAA_PARTITION_DATABASE, Database.class, true);
 
     /**
      * Holds the preprocessor.
@@ -90,12 +83,8 @@ public class COPAA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         optionHandler.put(PREPROCESSOR_PARAM);
         // parameter partition algorithm
         optionHandler.put(PARTITION_ALGORITHM_PARAM);
-
         // parameter partition database class
-        // noinspection unchecked
-        ClassParameter<Database<V>> pdc = new ClassParameter(PARTITION_DATABASE_CLASS_P, PARTITION_DATABASE_CLASS_D, Database.class);
-        pdc.setOptional(true);
-        optionHandler.put(pdc);
+        optionHandler.put(PARTITION_DB_PARAM);
     }
 
     /**
@@ -209,17 +198,20 @@ public class COPAA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         }
 
         // partition db
-        if (optionHandler.isSet(PARTITION_DATABASE_CLASS_P)) {
-            String partDBString = (String) optionHandler.getOptionValue(PARTITION_DATABASE_CLASS_P);
+        if (optionHandler.isSet(PARTITION_DB_PARAM)) {
+            String partitionDB_Class = getParameterValue(PARTITION_DB_PARAM);
             try {
-                Database<V> tmpDB = Util.instantiate(Database.class, partDBString);
+                Database tmpDB = Util.instantiate(Database.class, partitionDB_Class);
                 remainingParameters = tmpDB.setParameters(remainingParameters);
                 partitionDatabaseParameters = tmpDB.getParameters();
                 // noinspection unchecked
                 partitionDatabase = (Class<Database<V>>) tmpDB.getClass();
             }
             catch (UnableToComplyException e) {
-                throw new WrongParameterValueException(PARTITION_DATABASE_CLASS_P, partDBString, PARTITION_DATABASE_CLASS_D, e);
+                throw new WrongParameterValueException(PARTITION_DB_PARAM.getName(),
+                    partitionDB_Class,
+                    PARTITION_DB_PARAM.getDescription(),
+                    e);
             }
         }
 
@@ -263,7 +255,7 @@ public class COPAA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
 
         result.addAll(preprocessor.getAttributeSettings());
         result.addAll(partitionAlgorithm.getAttributeSettings());
-        if (optionHandler.isSet(PARTITION_DATABASE_CLASS_P)) {
+        if (optionHandler.isSet(PARTITION_DB_PARAM)) {
             try {
                 // noinspection unchecked
                 Database<V> tmpDB = (Database<V>) Util.instantiate(Database.class, partitionDatabase.getName());
@@ -271,7 +263,7 @@ public class COPAA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
             }
             catch (UnableToComplyException e) {
                 // tested before
-                throw new RuntimeException("This should never happen!");
+                throw new RuntimeException("This should never happen!", e);
             }
         }
 
