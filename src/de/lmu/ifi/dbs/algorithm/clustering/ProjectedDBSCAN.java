@@ -37,9 +37,9 @@ import java.util.Set;
  * Provides an abstract algorithm requiring a VarianceAnalysisPreprocessor.
  *
  * @author Arthur Zimek
- * @param <O> the type of database object the algorithm is to apply on
+ * @param <V> the type of Realvector handled by this Algorithm
  */
-public abstract class ProjectedDBSCAN<O extends RealVector<O, ?>> extends AbstractAlgorithm<O> implements Clustering<O> {
+public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> implements Clustering<V> {
 
     /**
      * Parameter to specify the maximum radius of the neighborhood to be considered,
@@ -47,9 +47,9 @@ public abstract class ProjectedDBSCAN<O extends RealVector<O, ?>> extends Abstra
      * <p>Key: {@code -epsilon} </p>
      */
     public static final PatternParameter EPSILON_PARAM = new PatternParameter("epsilon",
-                                                                       "the maximum radius of the neighborhood " +
-                                                                       "to be considered, must be suitable to " +
-                                                                       LocallyWeightedDistanceFunction.class.getName());
+                                                                              "the maximum radius of the neighborhood " +
+                                                                              "to be considered, must be suitable to " +
+                                                                              LocallyWeightedDistanceFunction.class.getName());
 
     /**
      * Parameter minimum points.
@@ -111,7 +111,7 @@ public abstract class ProjectedDBSCAN<O extends RealVector<O, ?>> extends Abstra
     /**
      * Provides the result of the algorithm.
      */
-    private ClustersPlusNoise<O> result;
+    private ClustersPlusNoise<V> result;
 
     /**
      * Holds a set of noise.
@@ -126,7 +126,7 @@ public abstract class ProjectedDBSCAN<O extends RealVector<O, ?>> extends Abstra
     /**
      * The distance function.
      */
-    private AbstractLocallyWeightedDistanceFunction<O, ?> distanceFunction;
+    private AbstractLocallyWeightedDistanceFunction<V, ?> distanceFunction;
 
     /**
      * Provides the abstract algorithm for variance analysis based DBSCAN.
@@ -144,14 +144,14 @@ public abstract class ProjectedDBSCAN<O extends RealVector<O, ?>> extends Abstra
 
         // parameter distance function
         // noinspection unchecked
-        ClassParameter<AbstractLocallyWeightedDistanceFunction<O, ?>> distance = new ClassParameter(DISTANCE_FUNCTION_P,
+        ClassParameter<AbstractLocallyWeightedDistanceFunction<V, ?>> distance = new ClassParameter(DISTANCE_FUNCTION_P,
                                                                                                     DISTANCE_FUNCTION_D,
                                                                                                     AbstractLocallyWeightedDistanceFunction.class);
         distance.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
         optionHandler.put(distance);
 
         //global parameter constraint epsilon <-> distance function
-        GlobalParameterConstraint con = new GlobalDistanceFunctionPatternConstraint<AbstractLocallyWeightedDistanceFunction<O, ?>>(EPSILON_PARAM, distance);
+        GlobalParameterConstraint con = new GlobalDistanceFunctionPatternConstraint<AbstractLocallyWeightedDistanceFunction<V, ?>>(EPSILON_PARAM, distance);
         optionHandler.setGlobalParameterConstraint(con);
     }
 
@@ -159,7 +159,7 @@ public abstract class ProjectedDBSCAN<O extends RealVector<O, ?>> extends Abstra
      * @see AbstractAlgorithm#runInTime(Database)
      */
     @Override
-    protected void runInTime(Database<O> database) throws IllegalStateException {
+    protected void runInTime(Database<V> database) throws IllegalStateException {
         if (isVerbose()) {
             verbose("");
         }
@@ -210,7 +210,7 @@ public abstract class ProjectedDBSCAN<O extends RealVector<O, ?>> extends Abstra
             }
 
             resultArray[resultArray.length - 1] = noise.toArray(new Integer[0]);
-            result = new ClustersPlusNoise<O>(resultArray, database);
+            result = new ClustersPlusNoise<V>(resultArray, database);
             if (isVerbose()) {
                 progress.setProcessed(processedIDs.size());
                 progress(progress, resultList.size());
@@ -228,7 +228,7 @@ public abstract class ProjectedDBSCAN<O extends RealVector<O, ?>> extends Abstra
      * @param startObjectID the object id of the database object to start the expansion with
      * @param progress      the progress object for logging the current status
      */
-    protected void expandCluster(Database<O> database, Integer startObjectID, Progress progress) {
+    protected void expandCluster(Database<V> database, Integer startObjectID, Progress progress) {
         String label = database.getAssociation(AssociationID.LABEL, startObjectID);
         Integer corrDim = database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, startObjectID);
 
@@ -412,7 +412,7 @@ public abstract class ProjectedDBSCAN<O extends RealVector<O, ?>> extends Abstra
     /**
      * @see de.lmu.ifi.dbs.algorithm.Algorithm#getResult()
      */
-    public ClustersPlusNoise<O> getResult() {
+    public ClustersPlusNoise<V> getResult() {
         return result;
     }
 }

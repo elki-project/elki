@@ -17,10 +17,15 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 
 /**
  * @author Arthur Zimek
+ * @param <V> the type of Realvector handled by this Algorithm
  */
 public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> implements Clustering<V> {
     /**

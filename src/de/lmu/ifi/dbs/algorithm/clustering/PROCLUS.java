@@ -4,17 +4,30 @@ import de.lmu.ifi.dbs.algorithm.result.clustering.Clusters;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.DoubleDistance;
-import de.lmu.ifi.dbs.utilities.*;
+import de.lmu.ifi.dbs.utilities.Description;
+import de.lmu.ifi.dbs.utilities.IDDoublePair;
+import de.lmu.ifi.dbs.utilities.IDIDDoubleTriple;
+import de.lmu.ifi.dbs.utilities.QueryResult;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * PROCLUS provides the PROCLUS algorithm.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @param <V> the type of Realvector handled by this Algorithm
  */
 
 public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
@@ -33,7 +46,7 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
      * Description for parameter m_i.
      */
     public static final String M_I_D = "positive integer value to specify the multiplier for "
-        + "the initial number of medoids, default: " + M_I_DEFAULT;
+                                       + "the initial number of medoids, default: " + M_I_DEFAULT;
 
     /**
      * Holds m_i.
@@ -67,7 +80,7 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
 
             if (database.dimensionality() < dim)
                 throw new IllegalStateException("Dimensionality of data < parameter l! " +
-                    "(" + database.dimensionality() + " < " + dim + ")");
+                                                "(" + database.dimensionality() + " < " + dim + ")");
 
             // initialization phase
             int sampleSize = Math.min(database.size(), k_i * k);
@@ -141,8 +154,8 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
             "PROjected CLUStering",
             "Algorithm to find subspace clusters in high dimensional spaces.",
             "C. C. Aggrawal, C. Procopiuc, J. L. Wolf, P. S. Yu, J. S. Park: "
-                + "Fast Algorithms for Projected Clustering "
-                + "In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)");
+            + "Fast Algorithms for Projected Clustering "
+            + "In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)");
     }
 
     /**

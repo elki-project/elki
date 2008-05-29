@@ -17,7 +17,9 @@ import java.util.List;
 
 /**
  * todo Arthur comment all
+ *
  * @author Arthur Zimek
+ * @param <V> the type of Realvector handled by this Algorithm
  */
 public class FractalDimensionTest<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
 
@@ -77,7 +79,7 @@ public class FractalDimensionTest<V extends RealVector<V, ?>> extends AbstractAl
 
         remainingParameters = distanceFunction.setParameters(remainingParameters);
         setParameters(args, remainingParameters);
-        
+
         return remainingParameters;
     }
 

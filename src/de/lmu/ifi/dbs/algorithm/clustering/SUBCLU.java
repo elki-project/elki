@@ -12,7 +12,12 @@ import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
@@ -30,6 +35,8 @@ import java.util.List;
  * subspace seperately.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @param <V> the type of NumberVector handled by this Algorithm
+ * @param <D> the type of Distance used
  */
 public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<V> implements Clustering<V> {
     /**
@@ -48,10 +55,9 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
      * <p>Key: {@code -minpts} </p>
      */
     public final IntParameter MINPTS_PARAM = new IntParameter("minpts",
-                                                                     "<int>threshold for minimum number of points in the " +
-                                                                     "epsilon-neighborhood of a point, must be greater than 0",
-                                                                     new GreaterConstraint(0));
-
+                                                              "<int>threshold for minimum number of points in the " +
+                                                              "epsilon-neighborhood of a point, must be greater than 0",
+                                                              new GreaterConstraint(0));
 
 
     /**
@@ -60,11 +66,11 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
      * <p>Key: {@code -distancefunction} </p>
      */
     public final ClassParameter<AbstractDimensionsSelectingDoubleDistanceFunction> DISTANCEFUNCTION_PARAM = new ClassParameter("distancefunction",
-                                                                                                                                "the distance function to determine the distance between database objects "
-                                                                                                                                + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(AbstractDimensionsSelectingDoubleDistanceFunction.class)
-                                                                                                                                + ". Default: " + DimensionsSelectingEuklideanDistanceFunction.class.getName(),
-                                                                                                                                AbstractDimensionsSelectingDoubleDistanceFunction.class,
-                                                                                                                                DimensionsSelectingEuklideanDistanceFunction.class.getName());
+                                                                                                                               "the distance function to determine the distance between database objects "
+                                                                                                                               + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(AbstractDimensionsSelectingDoubleDistanceFunction.class)
+                                                                                                                               + ". Default: " + DimensionsSelectingEuklideanDistanceFunction.class.getName(),
+                                                                                                                               AbstractDimensionsSelectingDoubleDistanceFunction.class,
+                                                                                                                               DimensionsSelectingEuklideanDistanceFunction.class.getName());
     /**
      * The maximum radius of the neighborhood to be considered.
      */

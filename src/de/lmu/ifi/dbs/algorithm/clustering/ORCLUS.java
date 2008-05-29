@@ -19,13 +19,19 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.LogRecord;
 
 /**
  * ORCLUS provides the ORCLUS algorithm.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @param <V> the type of Realvector handled by this Algorithm
  */
 
 public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
@@ -45,7 +51,7 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
      * current clusters in each iteration
      */
     public static final String ALPHA_D = "factor for reducing the number of current clusters in each " + "iteration (0..1) - default: "
-        + ALPHA_DEFAULT;
+                                         + ALPHA_DEFAULT;
 
     /**
      * Holds alpha.
@@ -79,7 +85,7 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
 
             if (database.dimensionality() < dim)
                 throw new IllegalStateException("Dimensionality of data < parameter l! " + "(" + database.dimensionality() + " < " + dim
-                    + ")");
+                                                + ")");
 
             // current number of seeds
             int k_c = Math.min(database.size(), k_i * k);
@@ -137,9 +143,9 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
      */
     public Description getDescription() {
         return new Description("ORCLUS", "Arbitrarily ORiented projected CLUSter generation",
-            "Algorithm to find clusters in high dimensional spaces.", "C. C. Aggrawal, P. S. Yu: "
-            + "Finding Generalized Projected Clusters in High Dimensional Spaces "
-            + "In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00)");
+                               "Algorithm to find clusters in high dimensional spaces.", "C. C. Aggrawal, P. S. Yu: "
+                                                                                         + "Finding Generalized Projected Clusters in High Dimensional Spaces "
+                                                                                         + "In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00)");
     }
 
     /**

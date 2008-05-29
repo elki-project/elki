@@ -13,37 +13,38 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
  * The algorithm is based on a combination of kernel PCA and density-based clustering (DBSCAN).
  *
  * @author Simon Paradies
+ * @param <V> the type of Realvector handled by this Algorithm
  */
-public class KernelFourC<O extends RealVector<O, ?>> extends ProjectedDBSCAN<O> {
+public class KernelFourC<V extends RealVector<V, ?>> extends ProjectedDBSCAN<V> {
 
-  /**
-   * @see Algorithm#getDescription()
-   */
-  public Description getDescription() {
-    return new Description("Kernel4C", "Computing Correlation Connected Clusters using Kernels",
-                           "(work in progress, stay tuned...)",
-                           "n/a");
-  }
-
-
-  @Override
-  public Class<KernelFourCPreprocessor> preprocessorClass() {
-    return KernelFourCPreprocessor.class;
-  }
+    /**
+     * @see Algorithm#getDescription()
+     */
+    public Description getDescription() {
+        return new Description("Kernel4C", "Computing Correlation Connected Clusters using Kernels",
+                               "(work in progress, stay tuned...)",
+                               "n/a");
+    }
 
 
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
-  public String[] setParameters(String[] args) throws ParameterException {
-    // locally weighted distance function
-    String[] locallyWeightedDistanceFunctionParameters = new String[args.length + 2];
-    System.arraycopy(args, 0, locallyWeightedDistanceFunctionParameters, 2,
-                     args.length);
-    locallyWeightedDistanceFunctionParameters[0] = OptionHandler.OPTION_PREFIX + ProjectedDBSCAN.DISTANCE_FUNCTION_P;
-    locallyWeightedDistanceFunctionParameters[1] = KernelBasedLocallyWeightedDistanceFunction.class.getName();
+    @Override
+    public Class<KernelFourCPreprocessor> preprocessorClass() {
+        return KernelFourCPreprocessor.class;
+    }
 
-    String[] remainingParameters = super.setParameters(locallyWeightedDistanceFunctionParameters);
-    return remainingParameters;
-  }
+
+    /**
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+     */
+    public String[] setParameters(String[] args) throws ParameterException {
+        // locally weighted distance function
+        String[] locallyWeightedDistanceFunctionParameters = new String[args.length + 2];
+        System.arraycopy(args, 0, locallyWeightedDistanceFunctionParameters, 2,
+                         args.length);
+        locallyWeightedDistanceFunctionParameters[0] = OptionHandler.OPTION_PREFIX + ProjectedDBSCAN.DISTANCE_FUNCTION_P;
+        locallyWeightedDistanceFunctionParameters[1] = KernelBasedLocallyWeightedDistanceFunction.class.getName();
+
+        String[] remainingParameters = super.setParameters(locallyWeightedDistanceFunctionParameters);
+        return remainingParameters;
+    }
 }

@@ -30,12 +30,18 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * DeLiClu provides the DeLiClu algorithm.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @param <O> the type of NumberVector handled by this Algorithm
+ * @param <D> the type of Distance used
  */
 public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extends
     DistanceBasedAlgorithm<O, D> {
@@ -86,20 +92,20 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
         if (!(database instanceof SpatialIndexDatabase)) {
             throw new IllegalArgumentException(
                 "Database must be an instance of "
-                    + SpatialIndexDatabase.class.getName());
+                + SpatialIndexDatabase.class.getName());
         }
         SpatialIndexDatabase<O, DeLiCluNode, DeLiCluEntry> db = (SpatialIndexDatabase<O, DeLiCluNode, DeLiCluEntry>) database;
 
         if (!(db.getIndex() instanceof DeLiCluTree)) {
             throw new IllegalArgumentException("Index must be an instance of "
-                + DeLiCluTree.class.getName());
+                                               + DeLiCluTree.class.getName());
         }
         DeLiCluTree<O> index = (DeLiCluTree<O>) db.getIndex();
 
         if (!(getDistanceFunction() instanceof SpatialDistanceFunction)) {
             throw new IllegalArgumentException(
                 "Distance Function must be an instance of "
-                    + SpatialDistanceFunction.class.getName());
+                + SpatialDistanceFunction.class.getName());
         }
         SpatialDistanceFunction<O, D> distFunction = (SpatialDistanceFunction<O, D>) getDistanceFunction();
 
@@ -129,7 +135,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
         index.setHandled(db.get(startID));
         SpatialEntry rootEntry = db.getRootEntry();
         SpatialObjectPair spatialObjectPair = new SpatialObjectPair(rootEntry,
-            rootEntry, true);
+                                                                    rootEntry, true);
         updateHeap(distFunction.nullDistance(), spatialObjectPair);
 
         while (numHandled != size) {
@@ -148,7 +154,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
                     .setHandled(db.get(dataPair.entry1.getID()));
                 if (path == null)
                     throw new RuntimeException("snh: parent("
-                        + dataPair.entry1.getID() + ") = null!!!");
+                                               + dataPair.entry1.getID() + ") = null!!!");
                 // add to cluster order
                 clusterOrder.add(dataPair.entry1.getID(), dataPair.entry2
                     .getID(), pqNode.getKey());
@@ -172,12 +178,12 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
             "DeliClu",
             "Density-Based Hierarchical Clustering",
             "Algorithm to find density-connected sets in a database based on the parameter "
-                + MINPTS_P,
+            + MINPTS_P,
             "Elke Achtert, Christian B\u00f6hm, Peer Kr\u00f6ger: DeLiClu: Boosting "
-                + "Robustness, Completeness, Usability, and Efficiency of Hierarchical Clustering "
-                + "by a Closest Pair Ranking, "
-                + "In Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD 2006), "
-                + "Singapore, 2006, pp. 119-128.");
+            + "Robustness, Completeness, Usability, and Efficiency of Hierarchical Clustering "
+            + "by a Closest Pair Ranking, "
+            + "In Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD 2006), "
+            + "Singapore, 2006, pp. 119-128.");
     }
 
     /**
@@ -323,7 +329,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
                     .getMBR());
 
                 SpatialObjectPair nodePair = new SpatialObjectPair(entry1,
-                    entry2, true);
+                                                                   entry2, true);
                 updateHeap(distance, nodePair);
             }
         }
@@ -361,7 +367,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
                 D reach = Util.max(distance, knns
                     .getKNNDistance(entry2.getID()));
                 SpatialObjectPair dataPair = new SpatialObjectPair(entry1,
-                    entry2, false);
+                                                                   entry2, false);
                 updateHeap(reach, dataPair);
             }
         }
@@ -402,7 +408,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
                 D reach = Util.max(distance, knns
                     .getKNNDistance(entry2.getID()));
                 SpatialObjectPair dataPair = new SpatialObjectPair(entry1,
-                    entry2, false);
+                                                                   entry2, false);
                 updateHeap(reach, dataPair);
             }
         }
@@ -415,7 +421,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
                 // not yet expanded
                 if (!expanded.contains(entry1.getID())) {
                     SpatialObjectPair nodePair = new SpatialObjectPair(entry1,
-                        entry2, true);
+                                                                       entry2, true);
                     D distance = distFunction.distance(entry1.getMBR(), entry2
                         .getMBR());
                     updateHeap(distance, nodePair);
@@ -424,7 +430,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
                 // already expanded
                 else {
                     reinsertExpanded(distFunction, index, path, pos + 1,
-                        entry1, knns);
+                                     entry1, knns);
                 }
             }
         }
@@ -481,13 +487,13 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
                 return -1;
             }
             if (this.entry1.getID() > other.entry1.getID()) {
-                return +1;
+                return 1;
             }
             if (this.entry2.getID() < other.entry2.getID()) {
                 return -1;
             }
             if (this.entry2.getID() > other.entry2.getID()) {
-                return +1;
+                return 1;
             }
             return 0;
         }
