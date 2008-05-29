@@ -2,13 +2,13 @@ package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
-import de.lmu.ifi.dbs.algorithm.clustering.COPAA;
 import de.lmu.ifi.dbs.algorithm.clustering.COPAC;
 import de.lmu.ifi.dbs.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.algorithm.clustering.ERiC;
 import de.lmu.ifi.dbs.distance.distancefunction.ERiCDistanceFunction;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.PreprocessorHandler;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
@@ -85,8 +85,8 @@ public class ERiCWrapper extends NormalizationWrapper {
 
         // parameter delta
         DoubleParameter deltaPam = new DoubleParameter(ERiCDistanceFunction.DELTA_P,
-            ERiCDistanceFunction.DELTA_D,
-            new GreaterConstraint(0));
+                                                       ERiCDistanceFunction.DELTA_D,
+                                                       new GreaterConstraint(0));
         deltaPam.setDefaultValue(ERiCDistanceFunction.DEFAULT_DELTA);
         optionHandler.put(deltaPam);
     }
@@ -121,8 +121,7 @@ public class ERiCWrapper extends NormalizationWrapper {
         parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F);
 
         // preprocessor for correlation dimension
-        parameters.add(OptionHandler.OPTION_PREFIX + COPAA.PREPROCESSOR_P);
-        parameters.add(KnnQueryBasedHiCOPreprocessor.class.getName());
+        Util.addParameter(parameters, OptionID.COPAA_PREPROCESSOR, KnnQueryBasedHiCOPreprocessor.class.getName());
 
         // k
         parameters.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedHiCOPreprocessor.K_P);

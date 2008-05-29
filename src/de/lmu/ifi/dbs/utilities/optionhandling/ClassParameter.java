@@ -16,6 +16,18 @@ public class ClassParameter<C> extends Parameter<String, String> {
     private Class<C> restrictionClass;
 
     /**
+     * Constructs a class parameter with the given optionID, and
+     * restriction class.
+     *
+     * @param optionID the unique id of the option
+     * @param restrictionClass the restriction class of this class parameter
+     */
+    public ClassParameter(OptionID optionID, Class<C> restrictionClass) {
+        super(optionID);
+        this.restrictionClass = restrictionClass;
+    }
+
+    /**
      * Constructs a class parameter with the given name, description, and
      * restriction class.
      *

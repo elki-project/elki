@@ -13,12 +13,10 @@ import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
-//import sun.misc.Launcher;
 
-//import java.io.File;
 import java.io.PrintStream;
-//import java.net.URL;
 import java.text.NumberFormat;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -1234,7 +1232,6 @@ public final class Util extends AbstractLoggable {
 //        return classes.toArray(result);
 //    }
 
-    
 //    /**
 //     * Provides all classes in the specified package
 //     * as currently present in the Launcher.
@@ -1493,6 +1490,18 @@ public final class Util extends AbstractLoggable {
      */
     public static void addFlag(List<String> parameters, Flag flag) {
         parameters.add(OptionHandler.OPTION_PREFIX + flag.getName());
+    }
+
+    /**
+     * Adds the specified optionID and its value to the end of the given parameter list.
+     *
+     * @param parameters the list of parameters
+     * @param optionID   the optionID of the parameter to be added
+     * @param value      the value of the parameter to be added
+     */
+    public static void addParameter(List<String> parameters, OptionID optionID, String value) {
+        parameters.add(OptionHandler.OPTION_PREFIX + optionID.getName());
+        parameters.add(value);
     }
 
     /**

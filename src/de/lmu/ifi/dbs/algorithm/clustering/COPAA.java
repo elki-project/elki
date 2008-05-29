@@ -13,16 +13,9 @@ import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Algorithm to partition a database according to the correlation dimension of
@@ -33,16 +26,12 @@ import java.util.Map;
  */
 public class COPAA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
     /**
-     * Parameter for preprocessor.
+     * Parameter to specify the preprocessor to derive partition criterion,
+     * must extend {@link HiCOPreprocessor}.
+     * <p>Key: {@code -copaa.preprocessor} </p>
      */
-    public static final String PREPROCESSOR_P = "preprocessor";
-
-    /**
-     * Description for parameter preprocessor.
-     */
-    public static final String PREPROCESSOR_D = "preprocessor to derive partition criterion " +
-                                                Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(HiCOPreprocessor.class) +
-                                                ".";
+    private final ClassParameter<HiCOPreprocessor> PREPROCESSOR_PARAM =
+        new ClassParameter<HiCOPreprocessor>(OptionID.COPAA_PREPROCESSOR, HiCOPreprocessor.class);
 
     /**
      * Parameter for partition algorithm.
@@ -53,8 +42,8 @@ public class COPAA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
      * Description for parameter partition algorithm
      */
     public static final String PARTITION_ALGORITHM_D = "algorithm to apply to each partition" +
-                                                       Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Algorithm.class) +
-                                                       ".";
+        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Algorithm.class) +
+        ".";
 
     /**
      * Parameter for class of partition database.
@@ -65,8 +54,8 @@ public class COPAA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
      * Description for parameter partition database.
      */
     public static final String PARTITION_DATABASE_CLASS_D = "database class for each partition " +
-                                                            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Database.class) +
-                                                            ". If this parameter is not set, the databases of the partitions have the same class as the original database.";
+        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Database.class) +
+        ". If this parameter is not set, the databases of the partitions have the same class as the original database.";
 
     /**
      * Holds the preprocessor.
@@ -101,9 +90,7 @@ public class COPAA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         super();
 
         //parameter preprocessor
-        // noinspection unchecked
-        ClassParameter<HiCOPreprocessor<V>> preprocessor = new ClassParameter(PREPROCESSOR_P, PREPROCESSOR_D, HiCOPreprocessor.class);
-        optionHandler.put(preprocessor);
+        optionHandler.put(PREPROCESSOR_PARAM);
 
         // parameter partition algorithm
         // noinspection unchecked
@@ -241,13 +228,16 @@ public class COPAA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         }
 
         // preprocessor
-        String preprocessorString = (String) optionHandler.getOptionValue(PREPROCESSOR_P);
+        String preprocessorClass = getParameterValue(PREPROCESSOR_PARAM);
         try {
             // noinspection unchecked
-            preprocessor = Util.instantiate(HiCOPreprocessor.class, preprocessorString);
+            preprocessor = Util.instantiate(HiCOPreprocessor.class, preprocessorClass);
         }
         catch (UnableToComplyException e) {
-            throw new WrongParameterValueException(PREPROCESSOR_P, preprocessorString, PREPROCESSOR_D, e);
+            throw new WrongParameterValueException(PREPROCESSOR_PARAM.getName(),
+                                                   preprocessorClass,
+                                                   PREPROCESSOR_PARAM.getDescription(),
+                                                   e);
         }
         remainingParameters = preprocessor.setParameters(remainingParameters);
 
@@ -279,6 +269,7 @@ public class COPAA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         result.addAll(partitionAlgorithm.getAttributeSettings());
         if (optionHandler.isSet(PARTITION_DATABASE_CLASS_P)) {
             try {
+                // noinspection unchecked
                 Database<V> tmpDB = (Database<V>) Util.instantiate(Database.class, partitionDatabase.getName());
                 result.addAll(tmpDB.getAttributeSettings());
             }
@@ -305,7 +296,7 @@ public class COPAA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
             for (Integer partitionID : databasePartitions.keySet()) {
                 if (isVerbose()) {
                     verbose("\nRunning " + partitionAlgorithm.getDescription().getShortTitle() +
-                            " on partition " + partitionID);
+                        " on partition " + partitionID);
                 }
                 partitionAlgorithm.run(databasePartitions.get(partitionID));
                 results.put(partitionID, partitionAlgorithm.getResult());

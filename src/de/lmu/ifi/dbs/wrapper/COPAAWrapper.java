@@ -7,11 +7,8 @@ import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.PreprocessorHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.DefaultValueGlobalConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
@@ -34,15 +31,15 @@ public class COPAAWrapper extends NormalizationWrapper {
      */
     public static final PatternParameter EPSILON_PARAM = new PatternParameter(OPTICS.EPSILON_PARAM.getName(),
                                                                               "the maximum radius of the neighborhood " +
-                                                                              "to be considerd, must be suitable to " +
-                                                                              LocallyWeightedDistanceFunction.class.getName());
+                                                                                  "to be considerd, must be suitable to " +
+                                                                                  LocallyWeightedDistanceFunction.class.getName());
 
     /**
      * Description for parameter k.
      */
     public static final String K_D = "a positive integer specifying the number of " +
-                                     "nearest neighbors considered in the PCA. " +
-                                     "If this value is not defined, k ist set to minpts";
+        "nearest neighbors considered in the PCA. " +
+        "If this value is not defined, k ist set to minpts";
 
     /**
      * The value of the epsilon parameter.
@@ -137,8 +134,7 @@ public class COPAAWrapper extends NormalizationWrapper {
         parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F);
 
         // preprocessor for correlation dimension
-        parameters.add(OptionHandler.OPTION_PREFIX + COPAA.PREPROCESSOR_P);
-        parameters.add(KnnQueryBasedHiCOPreprocessor.class.getName());
+        Util.addParameter(parameters, OptionID.COPAA_PREPROCESSOR, KnnQueryBasedHiCOPreprocessor.class.getName());
 
         // k
         parameters.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedHiCOPreprocessor.K_P);
