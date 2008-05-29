@@ -37,21 +37,29 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
 
   /**
    * Parameter for epsilon.
+   * 
+   * Needs to be greater than 0.
+   * 
+   * <p>Key: {@code -epsilon}</p>
    */
-  public static final IntParameter EPSILON_PARAM = new IntParameter("epsilon", "the minimum SNN density", new GreaterConstraint(0));
+  public final IntParameter EPSILON_PARAM = new IntParameter("epsilon", "the minimum SNN density", new GreaterConstraint(0));
 
   /**
-   * Parameter minimum points.
+   * Parameter to indicate the minimally required set of points.
+   * 
+   * Needs to be greater than 0.
+   * 
+   * <p>Key: {@code -minpts}</p>
    */
-  public static final IntParameter MINPTS_PARAM = new IntParameter("minpts", "threshold for minimum number of points in the epsilon-SNN-neighborhood of a point", new GreaterConstraint(0));
+  public final IntParameter MINPTS_PARAM = new IntParameter("minpts", "threshold for minimum number of points in the epsilon-SNN-neighborhood of a point", new GreaterConstraint(0));
 
   /**
-   * Epsilon.
+   * Holds the Epsilon value.
    */
   private IntegerDistance epsilon;
 
   /**
-   * Minimum points.
+   * Holds the minimum points value.
    */
   private int minpts;
 
@@ -75,6 +83,9 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
    */
   protected Set<Integer> processedIDs;
 
+  /**
+   * The similarity function for the shared nearest neighbor similarity.
+   */
   private SharedNearestNeighborSimilarityFunction<O, D> similarityFunction = new SharedNearestNeighborSimilarityFunction<O, D>();
 
   /**
@@ -269,9 +280,16 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
     return result;
   }
 
+  /*
+   * 
+   * 
+   * 
+   * @return
+   *
   public Option<?>[] getOptions() {
     return this.getOptions();
   }
+  */
 
   public IntegerDistance getEpsilon() {
     return epsilon;
