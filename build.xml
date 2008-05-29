@@ -82,8 +82,6 @@
                     de.lmu.ifi.dbs.evaluation,
                     de.lmu.ifi.dbs.evaluation.holdout,
                     de.lmu.ifi.dbs.evaluation.procedure,
-                    de.lmu.ifi.dbs.featureextraction,
-                    de.lmu.ifi.dbs.featureextraction.image,
                     de.lmu.ifi.dbs.index,
 	                de.lmu.ifi.dbs.index.tree,
                     de.lmu.ifi.dbs.index.tree.metrical,
