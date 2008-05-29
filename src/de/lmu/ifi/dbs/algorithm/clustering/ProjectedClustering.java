@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * Abstract superclass for PROCLUS and ORCLUS.
  * 
- * @author Elke Achtert 
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 
 public abstract class ProjectedClustering<V extends RealVector<V,?>>

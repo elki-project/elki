@@ -25,7 +25,7 @@ import java.util.logging.LogRecord;
 /**
  * ORCLUS provides the ORCLUS algorithm.
  *
- * @author Elke Achtert
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 
 public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {

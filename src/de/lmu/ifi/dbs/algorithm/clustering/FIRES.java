@@ -18,6 +18,7 @@ import java.util.BitSet;
 import java.util.Map;
 
 /**
+ * todo arthur comment
  * @author Arthur Zimek
  */
 public class FIRES<V extends RealVector<V, Double>> extends AbstractAlgorithm<V> implements Clustering<V>

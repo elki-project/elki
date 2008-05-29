@@ -14,7 +14,7 @@ import java.util.*;
 /**
  * PROCLUS provides the PROCLUS algorithm.
  *
- * @author Elke Achtert
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 
 public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
