@@ -217,8 +217,8 @@ public class OptionHandler extends AbstractLoggable {
      * Returns the value of the given parameter, if there is one.
      *
      * @param parameter parameter to get value of
-     * @return value of given option
-     * @throws UnusedParameterException if the given option is not used
+     * @return value of given parameter
+     * @throws UnusedParameterException if the given parameter is not used
      */
     @SuppressWarnings("unchecked")
     public <T> T getParameterValue(Parameter<T, ?> parameter) throws UnusedParameterException {
