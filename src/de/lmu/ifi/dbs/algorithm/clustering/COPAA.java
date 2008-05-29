@@ -17,15 +17,18 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Algorithm to partition a database according to the correlation dimension of
  * its objects and to then perform an arbitrary algorithm over the partitions.
  *
- * @author Elke Achtert
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  * @param <V> the type of RealVector handled by this Algorithm
  */
 public class COPAA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
@@ -38,8 +41,8 @@ public class COPAA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
      * Description for parameter preprocessor.
      */
     public static final String PREPROCESSOR_D = "preprocessor to derive partition criterion " +
-        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(HiCOPreprocessor.class) +
-        ".";
+                                                Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(HiCOPreprocessor.class) +
+                                                ".";
 
     /**
      * Parameter for partition algorithm.
@@ -50,8 +53,8 @@ public class COPAA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
      * Description for parameter partition algorithm
      */
     public static final String PARTITION_ALGORITHM_D = "algorithm to apply to each partition" +
-        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Algorithm.class) +
-        ".";
+                                                       Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Algorithm.class) +
+                                                       ".";
 
     /**
      * Parameter for class of partition database.
@@ -62,8 +65,8 @@ public class COPAA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
      * Description for parameter partition database.
      */
     public static final String PARTITION_DATABASE_CLASS_D = "database class for each partition " +
-        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Database.class) +
-        ". If this parameter is not set, the databases of the partitions have the same class as the original database.";
+                                                            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Database.class) +
+                                                            ". If this parameter is not set, the databases of the partitions have the same class as the original database.";
 
     /**
      * Holds the preprocessor.
@@ -135,7 +138,7 @@ public class COPAA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
 
         for (Iterator<Integer> dbiter = database.iterator(); dbiter.hasNext();) {
             Integer id = dbiter.next();
-            Integer corrdim = ((LocalPCA) database.getAssociation(AssociationID.LOCAL_PCA, id)).getCorrelationDimension();
+            Integer corrdim = (database.getAssociation(AssociationID.LOCAL_PCA, id)).getCorrelationDimension();
 
             if (!partitionMap.containsKey(corrdim)) {
                 partitionMap.put(corrdim, new ArrayList<Integer>());
@@ -174,9 +177,9 @@ public class COPAA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
      */
     public Description getDescription() {
         return new Description("COPAA",
-            "COrrelation PArtitioning Algorithm",
-            "Partitions a database according to the correlation dimension of its objects and performs an arbitrary algorithm over the partitions.",
-            "unpublished");
+                               "COrrelation PArtitioning Algorithm",
+                               "Partitions a database according to the correlation dimension of its objects and performs an arbitrary algorithm over the partitions.",
+                               "unpublished");
     }
 
     /**
@@ -293,6 +296,7 @@ public class COPAA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
      *
      * @param database     the database to run this algorithm on
      * @param partitionMap the map of partition IDs to object ids
+     * @return the result of the partition algorithm
      */
     protected PartitionResults<V> runPartitionAlgorithm(Database<V> database, Map<Integer, List<Integer>> partitionMap) {
         try {
@@ -300,7 +304,8 @@ public class COPAA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
             Map<Integer, Result<V>> results = new Hashtable<Integer, Result<V>>();
             for (Integer partitionID : databasePartitions.keySet()) {
                 if (isVerbose()) {
-                    verbose("\nRunning " + partitionAlgorithm.getDescription().getShortTitle() + " on partition " + partitionID);
+                    verbose("\nRunning " + partitionAlgorithm.getDescription().getShortTitle() +
+                            " on partition " + partitionID);
                 }
                 partitionAlgorithm.run(databasePartitions.get(partitionID));
                 results.put(partitionID, partitionAlgorithm.getResult());
