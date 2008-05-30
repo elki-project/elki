@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.normalization.Normalization;
+import de.lmu.ifi.dbs.utilities.IDDoublePair;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 
@@ -15,6 +16,8 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -95,13 +98,19 @@ public class GeneralizedLOFResult<O extends DatabaseObject> extends AbstractResu
 
         try
         {
-            
+          List<IDDoublePair> lofs = new ArrayList<IDDoublePair>(db.size());
+          for(Iterator<Integer> it = db.iterator(); it.hasNext();)
+          {
+            Integer id = it.next();
+              lofs.add(new IDDoublePair(id,db.getAssociation(AssociationID.LOF, id)));
+          }
+          Collections.sort(lofs);
 
             // write lofs
-            for(Iterator<Integer> it = db.iterator(); it.hasNext();)
-            {
-                Integer id = it.next();
+            for(IDDoublePair pair : lofs){
+              Integer id = pair.getID();
 
+              outStream.print("ID=");
                 outStream.print(id);
                 outStream.print(" ");
 
@@ -131,7 +140,8 @@ public class GeneralizedLOFResult<O extends DatabaseObject> extends AbstractResu
                     outStream.print(" ");
                 }
 
-                outStream.println(db.getAssociation(AssociationID.LOF, id));
+                outStream.print("LOF=");
+                outStream.println(pair.getValue());
             }
         }
         catch(NonNumericFeaturesException e)
