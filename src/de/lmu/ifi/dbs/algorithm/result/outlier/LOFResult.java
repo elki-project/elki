@@ -150,6 +150,7 @@ public class LOFResult<O extends DatabaseObject> extends AbstractResult<O> {
         double lof = idDoublePair.getValue();
         int objectID = idDoublePair.getID();
 
+        outStream.print("ID=");
         outStream.print(objectID);
         outStream.print(" ");
 
@@ -180,7 +181,7 @@ public class LOFResult<O extends DatabaseObject> extends AbstractResult<O> {
           outStream.print(externalID);
           outStream.print(" ");
         }
-
+        outStream.print("LOF=");
         outStream.println(lof);
       }
     }
