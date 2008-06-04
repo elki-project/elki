@@ -10,7 +10,7 @@ import java.util.logging.Level;
  *
  * @author Arthur Zimek
  */
-public final class PropertyName extends ConstantObject {
+public final class PropertyName extends ConstantObject<PropertyName> {
 
   /**
    * Property debug level.
@@ -139,6 +139,6 @@ public final class PropertyName extends ConstantObject {
    * @return the PropertyName for the given name
    */
   public static PropertyName getPropertyName(final String name) {
-    return (PropertyName) PropertyName.lookup(PropertyName.class, name);
+    return PropertyName.lookup(PropertyName.class, name);
   }
 }

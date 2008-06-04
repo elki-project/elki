@@ -25,7 +25,7 @@ import java.util.SortedSet;
  * 
  * @author Arthur Zimek
  */
-public class AssociationID<C> extends ConstantObject {
+public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
   /**
    * The standard association id to associate a label to an object.
    */

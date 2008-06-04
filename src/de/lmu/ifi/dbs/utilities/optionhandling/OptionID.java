@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.algorithm.Algorithm;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.preprocessing.HiCOPreprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
+import de.lmu.ifi.dbs.properties.PropertyName;
 import de.lmu.ifi.dbs.utilities.ConstantObject;
 
 /**
@@ -14,7 +15,7 @@ import de.lmu.ifi.dbs.utilities.ConstantObject;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
-public class OptionID extends ConstantObject {
+public class OptionID extends ConstantObject<OptionID> {
     /**
      * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.COPAA#PREPROCESSOR_PARAM}
      */
@@ -86,5 +87,39 @@ public class OptionID extends ConstantObject {
      */
     public void setDescription(String description) {
         this.description = description;
+    }
+    
+    /**
+     * Gets the OptionID for the given class
+     * named as the classes name if it exists, creates and returns
+     * it otherwise.
+     *
+     * @param type a class as type and the class' name (lowercase) as name-prefix
+     * @param givenName the name as suffix of the complete name
+     * @param description the description is set if the named OptionID does exist already
+     * @return the OptionID for the given class
+     *         named as the lowercase class' name dot {@code givenName}
+     */
+    public static OptionID getOrCreateOptionID(final Class<?> type, final String givenName, final String description) {
+      String nameprefix = type.getName().toLowerCase();
+      OptionID optionID = getOptionID(nameprefix+"."+givenName);
+      if (optionID == null) {
+        optionID = new OptionID(nameprefix+"."+givenName, description);
+      }
+      else{
+        optionID.setDescription(description);
+      }
+      return optionID;
+    }
+
+    /**
+     * Returns the OptionID for the given name
+     * if it exists, null otherwise.
+     *
+     * @param name name of the desired PropertyName
+     * @return the PropertyName for the given name
+     */
+    public static OptionID getOptionID(final String name) {
+      return OptionID.lookup(OptionID.class, name);
     }
 }
