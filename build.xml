@@ -175,7 +175,8 @@
 			<dirset dir="${source}" />
 		</path>
 
-		<javac destdir="${classpath}" deprecation="true" debug="true" optimize="true" source="1.6">
+		<javac destdir="${classpath}" deprecation="true" debug="true" optimize="true" source="1.6" debuglevel="">
+			<compilerarg value="-Xlint:all"/>
 			<classpath refid="compileClasspath" />
 			<exclude name="*.xml" />
 			<exclude name="*.html" />
