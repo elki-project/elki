@@ -1,33 +1,78 @@
 package de.lmu.ifi.dbs.utilities;
 
+/**
+ * Provides a key of three integers. Two IntegerTriple-Objects are equal, if
+ * they consist of the same three integers defined in the same order.
+ * 
+ * @author Noemi Andor
+ */
 public class IntegerTriple implements Comparable<IntegerTriple> {
 
+	/**
+	 * First integer.
+	 */
 	private Integer first;
+
+	/**
+	 * Second integer.
+	 */
 	private Integer second;
+
+	/**
+	 * Third integer.
+	 */
 	private Integer last;
 
+	/**
+	 * @return the first integer-value of the IntegerTriple-Object.
+	 */
 	public int getFirst() {
 		return this.first;
 	}
 
+	/**
+	 * @return the second integer-value of the IntegerTriple-Object.
+	 */
 	public int getSecond() {
 		return this.second;
 	}
 
+	/**
+	 * @return the third integer-value of the IntegerTriple-Object.
+	 */
 	public int getLast() {
 		return this.last;
 	}
 
+	/**
+	 * Constructor which initiates an IntegerTriple Object with three integers.
+	 * 
+	 * @param first
+	 *            first integer-value
+	 * @param second
+	 *            second integer-value
+	 * @param last
+	 *            third integer-value
+	 */
 	public IntegerTriple(int first, int second, int last) {
 		this.first = first;
 		this.second = second;
 		this.last = last;
 	}
-	
-	public IntegerTriple(){
-		
+
+	/**
+	 * Empty constructor creating an IntegerTriple-Object.
+	 */
+	public IntegerTriple() {
+
 	}
 
+	/**
+	 * Compares this IntegerTriple with an IntegerTriple o. If this Object is
+	 * greater than the other object, then 1 is returned, else if the two
+	 * Objects are equal, 0 is returned. If IntegerTriple o is greater then this
+	 * IntegerTriple, then -1 is returned.
+	 */
 	public int compareTo(IntegerTriple o) {
 		if (this.getFirst() > o.getFirst()) {
 			return 1;
@@ -50,6 +95,10 @@ public class IntegerTriple implements Comparable<IntegerTriple> {
 		}
 	}
 
+	/**
+	 * Creates the hashCode dependent on the three integers this Object consist.
+	 * @return the hashCode of this Object
+	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -60,6 +109,11 @@ public class IntegerTriple implements Comparable<IntegerTriple> {
 		return result;
 	}
 
+	/**
+	 * Verifies if this Object is equals to Object obj.
+	 * @param obj   object to be compared with this object
+	 * @return true  if this Object is equals to Object obj, false otherwise
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -87,14 +141,26 @@ public class IntegerTriple implements Comparable<IntegerTriple> {
 		return true;
 	}
 
+	/**
+	 * Sets the first Argument of this Object.
+	 * @param first
+	 */
 	public void setFirst(int first) {
 		this.first = first;
 	}
 
+	/**
+	 * Sets the second Argument of this Object.
+	 * @param second
+	 */
 	public void setSecond(int second) {
 		this.second = second;
 	}
 
+	/**
+	 * Sets the third Argument of this Object.
+	 * @param third
+	 */
 	public void setLast(int last) {
 		this.last = last;
 	}

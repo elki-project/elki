@@ -33,11 +33,11 @@ public class FLOC<V extends RealVector<V, Double>> extends
 		AbstractBiclustering<V> {
 
 	/**
-	 * parameter which indicates in which order actions should be performed if
+	 * Parameter which indicates in which order actions should be performed. If
 	 * its value is 0 (default) a weighted random order is performed, abetting
 	 * actions with greater gain, if its value is 1 a random order is performed
 	 * else, for values greater then 1 the normal order of actions (1..rowDim
-	 * +colDim) is performed
+	 * +colDim) is performed.
 	 * <p>
 	 * Default value: 0
 	 * </p>
@@ -50,7 +50,7 @@ public class FLOC<V extends RealVector<V, Double>> extends
 			new GreaterEqualConstraint(0));
 
 	/**
-	 * seed for creating initial clusters
+	 * Seed for creating initial clusters.
 	 * <p>
 	 * Default value: 1
 	 * </p>
@@ -62,7 +62,7 @@ public class FLOC<V extends RealVector<V, Double>> extends
 			"seed for initial clusters", new GreaterEqualConstraint(1));
 
 	/**
-	 * Parameter which indicates how many biclusters should be found
+	 * Parameter which indicates how many biclusters should be found.
 	 * <p>
 	 * Default value: 1
 	 * </p>
@@ -75,7 +75,7 @@ public class FLOC<V extends RealVector<V, Double>> extends
 			new GreaterEqualConstraint(1));
 
 	/**
-	 * Parameter to approximate the rowDimension of an initial bicluster
+	 * Parameter to approximate the rowDimension of an initial bicluster.
 	 * <p>
 	 * Key: {@code -initialRowDim}
 	 * </p>
@@ -86,7 +86,7 @@ public class FLOC<V extends RealVector<V, Double>> extends
 			new LessEqualConstraint(1.0));
 
 	/**
-	 * Parameter to approximate the columnDimension of an initial bicluster
+	 * Parameter to approximate the columnDimension of an initial bicluster.
 	 * <p>
 	 * Key: {@code -initialColDim}
 	 * </p>
@@ -97,7 +97,7 @@ public class FLOC<V extends RealVector<V, Double>> extends
 			new LessEqualConstraint(1.0));
 
 	/**
-	 * Keeps the value which marks a missing entry within the database
+	 * Keeps the value which marks a missing entry within the database.
 	 * <p>
 	 * Key: {@code -missing}
 	 * </p>
@@ -108,7 +108,7 @@ public class FLOC<V extends RealVector<V, Double>> extends
 
 	/**
 	 * Sets the options for the ParameterValues k, initialRowDim, initialColDim,
-	 * seed, missing, and actionOrder
+	 * seed, missing, and actionOrder.
 	 */
 	static {
 		K_PARAM.setDefaultValue(1);
@@ -122,165 +122,168 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	}
 
 	/**
-	 * a generator for creating the initial k clusters, used as well to define
-	 * the order of actions to be performed
+	 * A generator for creating the initial k clusters, used as well to define
+	 * the order of actions to be performed.
 	 */
 	private Random r;
 
-	// /**
-	// * the rows belonging to the database are set true. If a row contains a
-	// * missing value, the row in the BitSet is set to false
-	// */
-	// private BitSet rows;
-
-	// /**
-	// * the columns belonging to the database are set true. if a column
-	// contains
-	// * a missing value, the row in the BitSet is set to false
-	// */
-	// private BitSet cols;
-
 	/**
-	 * the rowCluster currently worked at (by deleting or inserting a row)
+	 * The rowCluster currently worked at (by deleting or inserting a row).
 	 */
 	private BitSet currRows;
 
 	/**
-	 * the columnCluster currently worked at (by deleting or inserting a column)
+	 * The columnCluster currently worked at (by deleting or inserting a
+	 * column).
 	 */
 	private BitSet currCols;
 
 	/**
-	 * keeps the current set of rowClusters. Is changed by every iteration
+	 * Keeps the current set of rowClusters. Is changed by every iteration.
 	 */
 	private BitSet[] rowClusters;
 
 	/**
-	 * keeps the current set of columnClusters. Is changed by every iteration
+	 * Keeps the current set of columnClusters. Is changed by every iteration.
 	 */
 	private BitSet[] colClusters;
 
 	/**
-	 * every position i, keeps the cluster, in which a deletion/insertion of the
-	 * row i would result in a maximal scoreReduction (best gain)
+	 * Every position i, keeps the cluster, in which a deletion/insertion of the
+	 * row i would result in a maximal scoreReduction (best gain).
 	 */
 	private int[] bestClusterForRow;
 
 	/**
-	 * every position j, keeps the cluster, in which a deletion/insertion of the
-	 * column j would result in a maximal scoreReduction (best gain)
+	 * Every position j, keeps the cluster, in which a deletion/insertion of the
+	 * column j would result in a maximal scoreReduction (best gain).
 	 */
 	private int[] bestClusterForCol;
 
 	/**
-	 * keeps the value of the average Residue of the currently best cluster
-	 * alignment
+	 * Keeps the value of the average residue of the currently best cluster
+	 * alignment.
 	 */
 	private double bestClustering;
 
 	/**
-	 * is set to false if the action with regard to the specified row hasn't
-	 * been performed
+	 * Is set to false if the action with regard to the specified row hasn't
+	 * been performed.
 	 */
 	private BitSet rowActionPerformed;
 
 	/**
-	 * is set to false if the action with regard to the specified column hasn't
-	 * been performed
+	 * Is set to false if the action with regard to the specified column hasn't
+	 * been performed.
 	 */
 	private BitSet colActionPerformed;
 
 	/**
-	 * keeps the number of rows in the database
+	 * Keeps the number of rows in the database.
 	 */
 	private int rowDim;
 
 	/**
-	 * keeps the number of columns in the database
+	 * Keeps the number of columns in the database.
 	 */
 	private int colDim;
 
 	/**
-	 * parameter which indicates in which order actions should be performed if
+	 * Parameter which indicates in which order actions should be performed if
 	 * its value is 0 (default) a weighted random order is performed, abetting
 	 * actions with greater gain, if its value is 1 a random order is performed
 	 * else, for values greater then 1 the normal order of actions (1..rowDim
-	 * +colDim) is performed
+	 * +colDim) is performed.
 	 */
 	private int actionOrder;
 
 	/**
-	 * keeps the gain for each row and column
+	 * Keeps the gain for each row and column.
 	 */
 	private Map<Integer, Double> gainMap;
 
 	/**
-	 * the maximal gain in the current iteration. Necessary only if a weighted
-	 * order of actions is performed
+	 * The maximal gain in the current iteration. Necessary only if a weighted
+	 * order of actions is performed.
 	 */
 	private double maxGain;
 
 	/**
-	 * the minimal gain in the current iteration. Necessary only if a weighted
-	 * order of actions is performed
+	 * The minimal gain in the current iteration. Necessary only if a weighted
+	 * order of actions is performed.
 	 */
 	private double minGain;
 
 	/**
-	 * value indicating a missing entry within the database
+	 * Value indicating a missing entry within the database.
 	 */
 	private double missing;
 
 	/**
-	 * keeps the number of iterations
+	 * Keeps the number of iterations.
 	 */
-	private int iterations = 1;
+	private int iterations;
 
 	/**
-	 * the number of biclusters to be found
+	 * The number of biclusters to be found.
 	 */
 	private int k;
 
 	/**
-	 * value within 0 and 1 indicating the percentage of the rowDimension of the
+	 * Value within 0 and 1 indicating the percentage of the rowDimension of the
 	 * database as dimension for the initial clusters. A small difference
 	 * between the initial Dimension and the dimension of the resultBiclusters,
 	 * contributes to a small number of iterations, and so to a better
-	 * efficiency of the algorithm
+	 * efficiency of the algorithm.
 	 */
 	private double initialRowDim;
 
 	/**
-	 * value within 0 and 1 indicating the percentage of the columnDimension of
+	 * Value within 0 and 1 indicating the percentage of the columnDimension of
 	 * the database as dimension for the initial clusters. A small difference
 	 * between the initial Dimension and the dimension of the resultBiclusters,
 	 * contributes to a small number of iterations, and so to a better
-	 * efficiency of the algorithm
+	 * efficiency of the algorithm.
 	 */
 	private double initialColDim;
 
 	/**
-	 * keeps the columnMeans of the currently processed bicluster
+	 * Keeps the columnMeans of the currently processed bicluster.
 	 */
 	private List<Double> colMeans;
 
 	/**
-	 * keeps the rowMeans of the currently processed bicluster
+	 * Keeps the rowMeans of the currently processed bicluster.
 	 */
 	private List<Double> rowMeans;
 
+	/**
+	 * Keeps the row means of each row of every cluster.
+	 */
 	private List<Double>[] rowClusterMeans;
+
+	/**
+	 * Keeps the column means of each column of every cluster.
+	 */
 	private List<Double>[] colClusterMeans;
+
+	/**
+	 * Keeps the bicluster means of every cluster.
+	 */
 	private double[] biclusterMeans;
+
+	/**
+	 * Keeps the HValue of every cluster.
+	 */
 	private double[] valueHClusters;
 
 	/**
-	 * keeps the biclusterMeans of the currently processed bicluster
+	 * Keeps the biclusterMean of the currently processed bicluster.
 	 */
 	private double biclusterMean;
 
 	/**
-	 * adds the parameter values
+	 * Adds the parameter values.
 	 */
 	public FLOC() {
 		this.addOption(SEED_PARAM);
@@ -322,9 +325,10 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	}
 
 	/**
-	 * initiates the necessary structures for the following algorithm
+	 * Initiates the necessary structures for the following algorithm.
 	 */
-	private void initaiteFLOC() {
+	private void initiateFLOC() {
+		iterations = 1;
 		rowDim = super.getRowDim();
 		colDim = super.getColDim();
 		currRows = new BitSet();
@@ -345,8 +349,8 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	}
 
 	/**
-	 * adjusts the rowMean to the different requests of the FLOC_Algorithm;
-	 * excluding missing entries from the computation
+	 * Adjusts the rowMean to the different requests of the FLOC_Algorithm;
+	 * excluding missing entries from the computation.
 	 * 
 	 * @param row
 	 *            the row to compute the mean value w.r.t. the given set of
@@ -381,8 +385,8 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	}
 
 	/**
-	 * adjusts the columnMean to the different requests of the FLOC_Algorithm
-	 * excludes missing entries from the computation
+	 * Adjusts the columnMean to the different requests of the FLOC_Algorithm
+	 * excludes missing entries from the computation.
 	 * 
 	 * @param rows
 	 *            the set of rows to include in the computation of the mean of
@@ -416,8 +420,8 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	}
 
 	/**
-	 * adjusts the biclusterMean to the different requests of the FLOC_Algorithm
-	 * excludes missing entries from the computation
+	 * Adjusts the biclusterMean to the different requests of the FLOC_Algorithm
+	 * excludes missing entries from the computation.
 	 * 
 	 * @param rows
 	 *            the set of rows to include in the computation of the
@@ -463,8 +467,8 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	// }
 
 	/**
-	 * calculates the score of the current bicluster, according to the rows and
-	 * columns set to true
+	 * Calculates the score of the current bicluster, according to the rows and
+	 * columns set to true.
 	 * 
 	 * @param rows
 	 *            rows belonging to the currently processed bicluster
@@ -473,37 +477,37 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	 * @return score of the bicluster
 	 */
 	public double getValueH(BitSet rows, BitSet cols) {
-		double h = 0;
-		double value = 0;
+		double hValue = 0;
 		int volume = rows.cardinality() * cols.cardinality();
 		int rM = -1;
 		int cM = -1;
-		for (int i = rows.nextSetBit(0); i>=0; i=rows.nextSetBit(i+1)) {
+		for (int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
 			rM++;
 			cM = -1;
-			for (int j = cols.nextSetBit(0); j>=0; j = cols.nextSetBit(j+1)) {
+			for (int j = cols.nextSetBit(0); j >= 0; j = cols.nextSetBit(j + 1)) {
 				cM++;
-				double wert = valueAt(i, j);
+				double value = valueAt(i, j);
 				double residue;
-				if (MISSING_PARAM.isSet() && wert == missing) {
+				if (MISSING_PARAM.isSet() && value == missing) {
 					residue = 0;
 					volume--;
 				} else {
 					double rowMean = rowMeans.get(rM);
 					double columnMean = colMeans.get(cM);
 					double biclusterM = biclusterMean;
-					residue = mod(wert - rowMean - columnMean + biclusterM);
+					residue = Math.abs(value - rowMean - columnMean
+							+ biclusterM);
 				}
-				value = value + residue;
+				hValue = hValue + residue;
 			}
 		}
-		h = value / (volume);
-		return h;
+		hValue = hValue / (volume);
+		return hValue;
 
 	}
 
 	/**
-	 * reinitiates the rowMeans
+	 * Recalculates the rowMeans.
 	 * 
 	 * @param currRows
 	 *            rows belonging to the currently processed bicluster
@@ -522,7 +526,7 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	}
 
 	/**
-	 * reinitiates the columnMeans
+	 * Recalculates the columnMeans.
 	 * 
 	 * @param currRows
 	 *            rows belonging to the currently processed bicluster
@@ -558,27 +562,27 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	// }
 
 	/**
-	 * creates the initial k biclusters at the beginning of the algorithm
+	 * Creates the initial k biclusters at the beginning of the algorithm.
 	 */
 	private void createRandomCluster() {
 		for (int z = 0; z < k; z++) {
 			currRows.clear();
 			currCols.clear();
-			int zaehler = 0;
+			int counter = 0;
 
-			for (int i = r.nextInt(rowDim); zaehler < Math.ceil(initialRowDim
+			for (int i = r.nextInt(rowDim); counter < Math.ceil(initialRowDim
 					* rowDim); i = r.nextInt(rowDim)) {
 				if (!currRows.get(i)) {
-					zaehler++;
+					counter++;
 				}
 				currRows.set(i);
 			}
 
-			zaehler = 0;
-			for (int j = r.nextInt(colDim); zaehler < Math.ceil(initialColDim
+			counter = 0;
+			for (int j = r.nextInt(colDim); counter < Math.ceil(initialColDim
 					* colDim); j = r.nextInt(colDim)) {
 				if (!currCols.get(j)) {
-					zaehler++;
+					counter++;
 				}
 				currCols.set(j);
 			}
@@ -588,14 +592,12 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	}
 
 	/**
-	 * calculates the gain obtained by removing/ inserting
+	 * Calculates the gain obtained by removing/ inserting a row in the
+	 * currently processed rowCluster.
 	 * 
 	 * @param row
-	 *            in the currently processed rowCluster
-	 * @param row
-	 *            row to which the gain corresponds
-	 * @return the gain of
-	 * @param row
+	 *            row responsible for the change of residue
+	 * @return the gain obtained by removing/inserting parameter row
 	 */
 	private double rowGain(int cluster, int row) {
 		currRows = (BitSet) rowClusters[cluster].clone();
@@ -604,22 +606,19 @@ public class FLOC<V extends RealVector<V, Double>> extends
 		rowMeans = rowClusterMeans[cluster];
 		colMeans = colClusterMeans[cluster];
 		biclusterMean = biclusterMeans[cluster];
-		if(currCols.cardinality()!=colMeans.size()){
-			System.out.println();
-		}
-		// currRows.flip(row);
+
 		// adjust rowMeans
-		int zaehler = 0;
+		int counter = 0;
 		for (int i = currRows.nextSetBit(0);; i = currRows.nextSetBit(i + 1)) {
 			if (i < 0) {
 				rowMeans.add(meanOfRow(row, currCols));
 				break;
 			}
 			if (row < i) {
-				rowMeans.add(zaehler, meanOfRow(row, currCols));
+				rowMeans.add(counter, meanOfRow(row, currCols));
 				break;
 			}
-			zaehler++;
+			counter++;
 		}
 
 		// adjust columnMeans
@@ -646,34 +645,31 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	}
 
 	/**
-	 * calculates the gain obtained by removing/ inserting
+	 * Calculates the gain obtained by removing/ inserting a column in the
+	 * currently processed columnCluster.
 	 * 
 	 * @param col
-	 *            in the currently processed columnCluster
-	 * @param col
-	 *            column to which the gain corresponds
-	 * @return the gain of
-	 * @param col
+	 *            column responsible for the change of residue
+	 * @return the gain obtained by removing/inserting parameter row
 	 */
 	private double colGain(int cluster, int col) {
 		double oldHValue = valueHClusters[cluster];
-		// currCols.flip(col);
 		rowMeans = rowClusterMeans[cluster];
 		colMeans = colClusterMeans[cluster];
 		biclusterMean = biclusterMeans[cluster];
+
 		// adjust colMeans
-		int zaehler = 0;
-		for (int i = currCols.nextSetBit(0); ; i = currCols
-				.nextSetBit(i + 1)) {
-			if(i<0){
+		int counter = 0;
+		for (int i = currCols.nextSetBit(0);; i = currCols.nextSetBit(i + 1)) {
+			if (i < 0) {
 				colMeans.add(meanOfCol(currRows, col));
 				break;
 			}
 			if (col < i) {
-				colMeans.add(zaehler, meanOfCol(currRows, col));
+				colMeans.add(counter, meanOfCol(currRows, col));
 				break;
 			}
-			zaehler++;
+			counter++;
 		}
 
 		// adjust rowMeans
@@ -700,13 +696,12 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	}
 
 	/**
-	 * identifies the cluster for the greatest gain
+	 * Identifies the cluster for the greatest gain.
 	 * 
 	 * @param row
 	 *            row to be removed/inserted in a cluster
-	 * @return the position of the cluster in which a deletion/insertion of
-	 * @param row
-	 *            results in the greatest gain
+	 * @return the position of the cluster in which a deletion/insertion of row
+	 *         results in the greatest gain
 	 */
 	private int bestRowGain(int row) {
 		double initGain = -99999;
@@ -723,13 +718,12 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	}
 
 	/**
-	 * identifies the cluster for the greatest gain
+	 * Identifies the cluster for the greatest gain
 	 * 
 	 * @param col
 	 *            column to be removed/inserted in a cluster
-	 * @return the position of the cluster in which a deletion/insertion of
-	 * @param col
-	 *            results in the greatest gain
+	 * @return the position of the cluster in which a deletion/insertion of col
+	 *         results in the greatest gain
 	 */
 	private int bestColGain(int col) {
 		double initGain = -99999;
@@ -748,8 +742,8 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	}
 
 	/**
-	 * maps the gains to their rows/ columns in the bicluster. Necessary only if
-	 * a weighted order of action is selected
+	 * Maps the gains to their rows/ columns in the bicluster. Necessary only if
+	 * a weighted order of action is selected.
 	 * 
 	 * @param pos
 	 *            the row/column with the specified gain
@@ -771,9 +765,9 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	}
 
 	/**
-	 * fills the array bestClusterForRow and bestClusterForCols with the
-	 * clusterPosisions on every rowPosition (bestClusterForRow[i] indicates the
-	 * cluster with the greatest gain for row i)
+	 * Fills the array bestClusterForRow and bestClusterForCols with the
+	 * clusterPositions on every rowPosition (bestClusterForRow[i] indicates the
+	 * cluster with the greatest gain for row i).
 	 */
 	private void bestActions() {
 		bestClustering = calculateAverageResidue();
@@ -788,11 +782,11 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	}
 
 	/**
-	 * performs all actions returned by bestActions() in the order specified by
+	 * Performs all actions returned by bestActions() in the order specified by
 	 * actionOrder. Keeps the clustering with the lowest averageResidue as
 	 * initial clustering for the next iteration. If the averageResidue could
 	 * not been reduced due to any action, the algorithm is finished and the
-	 * clustering with the best average residue is returned
+	 * clustering with the best average residue is returned.
 	 */
 	private void performBestAction() {
 		bestActions();
@@ -886,7 +880,7 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	}
 
 	/**
-	 * allows a sequential order of actions only necessary if a normal order of
+	 * Allows a sequential order of actions only necessary if a normal order of
 	 * actions is selected (actionOrder >1)
 	 * 
 	 * @return an array of row and columnIndices: [0,..., rowDim + colDim - 1]
@@ -900,7 +894,7 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	}
 
 	/**
-	 * allows a random order of actions only necessary if a random order of
+	 * Allows a random order of actions only necessary if a random order of
 	 * actions is selected (actionOrder == 1)
 	 * 
 	 * @return an array of row and columnIndices in random order
@@ -920,9 +914,9 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	}
 
 	/**
-	 * allows a weighted order of actions, abetting the actions with greater
+	 * Allows a weighted order of actions, abetting the actions with greater
 	 * gain. Only necessary if a weighted random order of actions is selected
-	 * (actionOrder == 0)
+	 * (actionOrder == 0).
 	 * 
 	 * @return an array of row and columnIndices
 	 */
@@ -940,9 +934,6 @@ public class FLOC<V extends RealVector<V, Double>> extends
 				r2 = c;
 			}
 			double p = 0.5 + (gainMap.get(r2) - gainMap.get(r1)) / (2 * R);
-			// BitSet probabilitySet = new BitSet(100);
-			// probabilitySet.set(0, (int) Math.round(p * 100));
-			// if (probabilitySet.get(r.nextInt(100))) {
 			if (r.nextDouble() <= p) {
 				randomOrder[r1] = r2;
 				randomOrder[r2] = r1;
@@ -953,9 +944,9 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	}
 
 	/**
-	 * calculates the average residue of all current clusters, after an action
+	 * Calculates the average residue of all current clusters, after an action
 	 * (row/column- deletion/insertion) has been performed on one of the
-	 * clusters
+	 * clusters.
 	 * 
 	 * @return the new average residue of the clustering
 	 */
@@ -980,7 +971,7 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	}
 
 	/**
-	 * adds the embedded biclusters to the final result of this algorithm
+	 * Adds the embedded biclusters to the final result of this algorithm.
 	 */
 	private void returnBiclusters() {
 		for (int i = 0; i < k; i++) {
@@ -991,15 +982,17 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	}
 
 	/**
-	 * initiates this Algorithm
+	 * Initiates this Algorithm.
 	 */
 	@Override
 	protected void biclustering() throws IllegalStateException {
-		initaiteFLOC();
+		long t = System.currentTimeMillis();
+		initiateFLOC();
+		System.out.println(System.currentTimeMillis() - t);
 	}
 
 	/**
-	 * the description of this Algorithm
+	 * The description of this Algorithm.
 	 */
 	public Description getDescription() {
 		Description abs = new Description(
@@ -1009,21 +1002,6 @@ public class FLOC<V extends RealVector<V, Double>> extends
 				"finding correlated values in a subset of rows and a subset of columns",
 				"");
 		return abs;
-	}
-
-	/**
-	 * returns the modulo of a double value
-	 * 
-	 * @param x
-	 *            value whose modulo will be returned
-	 * @return modulo of
-	 * @param x
-	 */
-	private static double mod(double x) {
-		if (x < 0) {
-			return -x;
-		}
-		return x;
 	}
 
 }
