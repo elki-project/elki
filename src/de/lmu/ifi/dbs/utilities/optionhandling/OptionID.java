@@ -92,19 +92,16 @@ public class OptionID extends ConstantObject<OptionID> {
     
     /**
      * Gets or creates the OptionID for the given class and given name.
-     * The OptionID will be named as the classes name (lowercase) as name-prefix
+     * The OptionID usually is named as the classes name (lowercase) as name-prefix
      * and the given name as suffix of the complete name, separated by a dot. 
      * For example, the parameter {@code epsilon} for the class {@link DBSCAN}
      * will be named {@code dbscan.epsilon}.
      *
-     * @param type a class as type and the class' name (lowercase) as name-prefix
-     * @param givenName the name as suffix of the complete name
+     * @param name the name
      * @param description the description is also set if the named OptionID does exist already
-     * @return the OptionID for the given class
-     *         named as the lowercase class' name dot {@code givenName}
+     * @return the OptionID for the given name
      */
-    public static OptionID getOrCreateOptionID(final Class<?> type, final String givenName, final String description) {
-      String name = type.getName().toLowerCase()+"."+givenName;
+    public static OptionID getOrCreateOptionID(final String name, final String description) {
       OptionID optionID = getOptionID(name);
       if (optionID == null) {
         optionID = new OptionID(name, description);
