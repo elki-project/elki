@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
 import de.lmu.ifi.dbs.algorithm.Algorithm;
+import de.lmu.ifi.dbs.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.preprocessing.HiCOPreprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
@@ -90,21 +91,23 @@ public class OptionID extends ConstantObject<OptionID> {
     }
     
     /**
-     * Gets the OptionID for the given class
-     * named as the classes name if it exists, creates and returns
-     * it otherwise.
+     * Gets or creates the OptionID for the given class and given name.
+     * The OptionID will be named as the classes name (lowercase) as name-prefix
+     * and the given name as suffix of the complete name, separated by a dot. 
+     * For example, the parameter {@code epsilon} for the class {@link DBSCAN}
+     * will be named {@code dbscan.epsilon}.
      *
      * @param type a class as type and the class' name (lowercase) as name-prefix
      * @param givenName the name as suffix of the complete name
-     * @param description the description is set if the named OptionID does exist already
+     * @param description the description is also set if the named OptionID does exist already
      * @return the OptionID for the given class
      *         named as the lowercase class' name dot {@code givenName}
      */
     public static OptionID getOrCreateOptionID(final Class<?> type, final String givenName, final String description) {
-      String nameprefix = type.getName().toLowerCase();
-      OptionID optionID = getOptionID(nameprefix+"."+givenName);
+      String name = type.getName().toLowerCase()+"."+givenName;
+      OptionID optionID = getOptionID(name);
       if (optionID == null) {
-        optionID = new OptionID(nameprefix+"."+givenName, description);
+        optionID = new OptionID(name, description);
       }
       else{
         optionID.setDescription(description);
@@ -116,8 +119,8 @@ public class OptionID extends ConstantObject<OptionID> {
      * Returns the OptionID for the given name
      * if it exists, null otherwise.
      *
-     * @param name name of the desired PropertyName
-     * @return the PropertyName for the given name
+     * @param name name of the desired OptionID
+     * @return the OptionID for the given name
      */
     public static OptionID getOptionID(final String name) {
       return OptionID.lookup(OptionID.class, name);
