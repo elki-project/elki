@@ -20,6 +20,8 @@
 	algorithm.result.clustering.FractalDimensionTestResult,
 	algorithm.result.clustering.HierarchicalFractalDimensionCluster,
 	converter,
+	data.???,
+	data.synthetic,
 	distance.???,
 	evaluation,
 	featureextraction,
