@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
@@ -37,6 +38,7 @@ import java.util.List;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  * @param <V> the type of NumberVector handled by this Algorithm
  * @param <D> the type of Distance used
+ * todo parameter, implementation
  */
 public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<V> implements Clustering<V> {
     /**
@@ -50,15 +52,13 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
                                                                               AbstractDimensionsSelectingDoubleDistanceFunction.class.getName());
 
     /**
-     * Parameter to specify the threshold for minimum number of points in the
-     * epsilon-neighborhood of a point, must be an integer greater than 0.
-     * <p>Key: {@code -minpts} </p>
+     * Parameter to specify the threshold for minimum number of points in
+     * the epsilon-neighborhood of a point,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -subclu.minpts} </p>
      */
-    public final IntParameter MINPTS_PARAM = new IntParameter("minpts",
-                                                              "<int>threshold for minimum number of points in the " +
-                                                              "epsilon-neighborhood of a point, must be greater than 0",
-                                                              new GreaterConstraint(0));
-
+    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.SUBCLU_MINPTS,
+        new GreaterConstraint(0));
 
     /**
      * The distance function to determine the distance between database objects.
@@ -96,13 +96,13 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
         this.debug = true;
 
         // parameter epsilon
-        optionHandler.put(EPSILON_PARAM);
+        addOption(EPSILON_PARAM);
 
         // parameter minpts
-        optionHandler.put(MINPTS_PARAM);
+        addOption(MINPTS_PARAM);
 
         // distance function
-        optionHandler.put(DISTANCEFUNCTION_PARAM);
+        addOption(DISTANCEFUNCTION_PARAM);
 
         // global constraint epsilon <-> distance function
         // noinspection unchecked

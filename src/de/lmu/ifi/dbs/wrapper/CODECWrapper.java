@@ -23,40 +23,35 @@ import java.util.List;
  * the partitions and then determines the correlation dependencies in each
  * cluster of each partition.
  *
- * @author Elke Achtert
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class CODECWrapper extends NormalizationWrapper {
 
     /**
      * Parameter to specify the maximum radius of the neighborhood to be considered,
      * must be suitable to {@link LocallyWeightedDistanceFunction LocallyWeightedDistanceFunction}.
-     * <p>Key: {@code -epsilon} </p>
+     * <p>Key: {@code -dbscan.epsilon} </p>
      */
-    public static final PatternParameter EPSILON_PARAM = new PatternParameter("epsilon",
-        "the maximum radius of the neighborhood " +
-            "to be considerd, must be suitable to " +
-            LocallyWeightedDistanceFunction.class.getName());
-
-    /**
-     * Description for parameter k.
-     */
-    public static final String K_D = "a positive integer specifying the number of " +
-        "nearest neighbors considered in the PCA. " +
-        "If this value is not defined, k ist set to minpts";
+    private final PatternParameter EPSILON_PARAM = new PatternParameter(OptionID.DBSCAN_EPSILON);
 
     /**
      * Parameter to specify the threshold for minimum number of points in
      * the epsilon-neighborhood of a point,
      * must be an integer greater than 0.
-     * <p>Key: {@code -optics.minpts} </p>
+     * <p>Key: {@code -dbscan.minpts} </p>
      */
-    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.OPTICS_MINPTS,
+    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.DBSCAN_MINPTS,
         new GreaterConstraint(0));
 
     /**
-     * The k parameter.
+     * Optional parameter to specify the number of nearest neighbors considered in the PCA,
+     * must be an integer greater than 0. If this parameter is not set, k ist set to the
+     * value of {@link CODECWrapper#MINPTS_PARAM}.
+     * <p>Key: {@code -hicopreprocessor.k} </p>
+     * <p>Default value: {@link CODECWrapper#MINPTS_PARAM} </p>
      */
-    private IntParameter k;
+    private final IntParameter K_PARAM = new IntParameter(OptionID.KNN_HICO_PREPROCESSOR_K,
+        new GreaterConstraint(0), true);
 
     /**
      * Main method to run this wrapper.
@@ -88,20 +83,23 @@ public class CODECWrapper extends NormalizationWrapper {
     public CODECWrapper() {
         super();
         // parameter epsilon
+        EPSILON_PARAM.setDescription("<pattern>The maximum radius of the neighborhood " +
+                                     "to be considerd, must be suitable to " +
+                                     LocallyWeightedDistanceFunction.class.getName());
         addOption(EPSILON_PARAM);
 
-        // parameter min points
+        // parameter minpts
         addOption(MINPTS_PARAM);
 
-        // paramter k
-        k = new IntParameter(KnnQueryBasedHiCOPreprocessor.K_P, K_D, new GreaterConstraint(0));
-        k.setOptional(true);
-        optionHandler.put(k);
+        // parameter k
+        K_PARAM.setDescription("<int>The number of nearest neighbors considered in the PCA. " +
+                               "If this parameter is not set, k ist set to the value of " +
+                               MINPTS_PARAM.getName());
+        addOption(K_PARAM);
 
-        // global constraint minpts <-> k
-        // todo noetig???
+        // global constraint k <-> minpts
         // noinspection unchecked
-        GlobalParameterConstraint gpc = new DefaultValueGlobalConstraint(k, MINPTS_PARAM);
+        GlobalParameterConstraint gpc = new DefaultValueGlobalConstraint(K_PARAM, MINPTS_PARAM);
         optionHandler.setGlobalParameterConstraint(gpc);
     }
 
@@ -139,8 +137,7 @@ public class CODECWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, OptionID.COPAA_PREPROCESSOR, KnnQueryBasedHiCOPreprocessor.class.getName());
 
         // k
-        parameters.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedHiCOPreprocessor.K_P);
-        parameters.add(Integer.toString(getParameterValue(k)));
+        Util.addParameter(parameters, K_PARAM, Integer.toString(getParameterValue(K_PARAM)));
 
         return parameters;
     }

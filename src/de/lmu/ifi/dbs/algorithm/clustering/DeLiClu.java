@@ -48,14 +48,13 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
     DistanceBasedAlgorithm<O, D> {
 
     /**
-     * Parameter minimum points.
+     * Parameter to specify the threshold for minimum number of points in
+     * the epsilon-neighborhood of a point,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -optics.minpts} </p>
      */
-    public static final String MINPTS_P = OptionID.OPTICS_MINPTS.getName();
-
-    /**
-     * Description for parameter minimum points.
-     */
-    public static final String MINPTS_D = OPTICS.MINPTS_D;
+    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.DELICLU_MINPTS,
+        new GreaterConstraint(0));
 
     /**
      * Provides the result of the algorithm.
@@ -83,7 +82,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
      */
     public DeLiClu() {
         super();
-        optionHandler.put(new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
+        optionHandler.put(MINPTS_PARAM);
     }
 
     /**
@@ -179,7 +178,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
             "DeliClu",
             "Density-Based Hierarchical Clustering",
             "Algorithm to find density-connected sets in a database based on the parameter "
-            + MINPTS_P,
+            + MINPTS_PARAM.getName(),
             "Elke Achtert, Christian B\u00f6hm, Peer Kr\u00f6ger: DeLiClu: Boosting "
             + "Robustness, Completeness, Usability, and Efficiency of Hierarchical Clustering "
             + "by a Closest Pair Ranking, "
@@ -194,7 +193,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
         String[] remainingParameters = super.setParameters(args);
 
         // minpts
-        int minpts = (Integer) optionHandler.getOptionValue(MINPTS_P);
+        int minpts = getParameterValue(MINPTS_PARAM);
 
         // knn join
         List<String> params = new ArrayList<String>(Arrays.asList(remainingParameters));

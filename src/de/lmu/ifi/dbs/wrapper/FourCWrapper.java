@@ -1,15 +1,18 @@
 package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.AbortException;
-import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.FourC;
 import de.lmu.ifi.dbs.preprocessing.FourCPreprocessor;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
-import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.varianceanalysis.LimitEigenPairFilter;
 
 import java.util.List;
@@ -20,13 +23,18 @@ import java.util.Vector;
  * the database objects.
  *
  * @author Arthur Zimek
+ *         todo parameter
  */
 public class FourCWrapper extends NormalizationWrapper {
 
     /**
-     * Parameter minpts.
+     * Parameter to specify the threshold for minimum number of points in
+     * the epsilon-neighborhood of a point,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -projdbscan.minpts} </p>
      */
-    private IntParameter minpts;
+    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.PROJECTED_DBSCAN_MINPTS,
+        new GreaterConstraint(0));
 
     /**
      * Parameter lambda.
@@ -72,11 +80,10 @@ public class FourCWrapper extends NormalizationWrapper {
     public FourCWrapper() {
         super();
         // epsilon
-        optionHandler.put(FourC.EPSILON_PARAM);
+        addOption(FourC.EPSILON_PARAM);
 
         // minpts
-        minpts = new IntParameter(FourC.MINPTS_P, FourC.MINPTS_D, new GreaterConstraint(0));
-        optionHandler.put(minpts);
+        addOption(MINPTS_PARAM);
 
         // lambda
         lambda = new IntParameter(FourC.LAMBDA_P, FourC.LAMBDA_D, new GreaterConstraint(0));
@@ -108,7 +115,7 @@ public class FourCWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, FourC.EPSILON_PARAM, getParameterValue(FourC.EPSILON_PARAM));
 
         // minpts
-        Util.addParameter(parameters, minpts, getParameterValue(minpts).toString());
+        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(getParameterValue(MINPTS_PARAM)));
 
         // lambda
         Util.addParameter(parameters, lambda, getParameterValue(lambda).toString());

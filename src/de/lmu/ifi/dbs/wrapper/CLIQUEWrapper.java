@@ -14,7 +14,8 @@ import java.util.List;
 /**
  * Wrapper class for CLIQUE algorithm.
  *
- * @author Elke Achtert
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * todo parameter
  */
 public class CLIQUEWrapper extends FileBasedDatabaseConnectionWrapper {
 

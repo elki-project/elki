@@ -7,7 +7,11 @@ import de.lmu.ifi.dbs.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.DefaultValueGlobalConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
@@ -19,16 +23,16 @@ import java.util.List;
  * the database objects, partitions the database according to the correlation dimension of
  * its objects and then performs the algorithm OPTICS over the partitions.
  *
- * @author Elke Achtert
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class COPAAWrapper extends NormalizationWrapper {
 
     /**
      * Parameter to specify the maximum radius of the neighborhood to be considered,
      * must be suitable to {@link LocallyWeightedDistanceFunction LocallyWeightedDistanceFunction}.
-     * <p>Key: {@code -epsilon} </p>
+     * <p>Key: {@code -optics.epsilon} </p>
      */
-    public final PatternParameter EPSILON_PARAM;
+    private final PatternParameter EPSILON_PARAM = new PatternParameter(OptionID.OPTICS_EPSILON);
 
     /**
      * Parameter to specify the threshold for minimum number of points in
@@ -40,26 +44,14 @@ public class COPAAWrapper extends NormalizationWrapper {
         new GreaterConstraint(0));
 
     /**
-     * Description for parameter k.
+     * Optional parameter to specify the number of nearest neighbors considered in the PCA,
+     * must be an integer greater than 0. If this parameter is not set, k ist set to the
+     * value of {@link COPAAWrapper#MINPTS_PARAM}.
+     * <p>Key: {@code -hicopreprocessor.k} </p>
+     * <p>Default value: {@link COPAAWrapper#MINPTS_PARAM} </p>
      */
-    public static final String K_D = "a positive integer specifying the number of " +
-        "nearest neighbors considered in the PCA. " +
-        "If this value is not defined, k ist set to minpts";
-
-    /**
-     * Hold the value of the epsilon parameter.
-     */
-    private String epsilon;
-
-    /**
-     * Holds the value of the minpts parameter.
-     */
-    private int minpts;
-
-    /**
-     * Holds the value of the k parameter.
-     */
-    private int k;
+    private final IntParameter K_PARAM = new IntParameter(OptionID.KNN_HICO_PREPROCESSOR_K,
+        new GreaterConstraint(0), true);
 
     /**
      * Main method to run this wrapper.
@@ -91,23 +83,23 @@ public class COPAAWrapper extends NormalizationWrapper {
     public COPAAWrapper() {
         super();
         // parameter epsilon
-        EPSILON_PARAM = new PatternParameter(OptionID.OPTICS_EPSILON);
         EPSILON_PARAM.setDescription("<pattern>The maximum radius of the neighborhood " +
-            "to be considerd, must be suitable to " +
-            LocallyWeightedDistanceFunction.class.getName());
-        optionHandler.put(EPSILON_PARAM);
+                                     "to be considerd, must be suitable to " +
+                                     LocallyWeightedDistanceFunction.class.getName());
+        addOption(EPSILON_PARAM);
 
         // parameter minpts
-        optionHandler.put(MINPTS_PARAM);
+        addOption(MINPTS_PARAM);
 
         // parameter k
-        IntParameter kPam = new IntParameter(KnnQueryBasedHiCOPreprocessor.K_P, K_D, new GreaterConstraint(0));
-        kPam.setOptional(true);
-        optionHandler.put(kPam);
+        K_PARAM.setDescription("<int>The number of nearest neighbors considered in the PCA. " +
+                               "If this parameter is not set, k ist set to the value of " +
+                               MINPTS_PARAM.getName());
+        addOption(K_PARAM);
 
         // global constraint k <-> minpts
         // noinspection unchecked
-        GlobalParameterConstraint gpc = new DefaultValueGlobalConstraint(kPam, MINPTS_PARAM);
+        GlobalParameterConstraint gpc = new DefaultValueGlobalConstraint(K_PARAM, MINPTS_PARAM);
         optionHandler.setGlobalParameterConstraint(gpc);
     }
 
@@ -124,11 +116,10 @@ public class COPAAWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, OptionID.COPAA_PARTITION_ALGORITHM, OPTICS.class.getName());
 
         // epsilon
-        parameters.add(OptionHandler.OPTION_PREFIX + EPSILON_PARAM.getName());
-        parameters.add(epsilon);
+        Util.addParameter(parameters, EPSILON_PARAM, getParameterValue(EPSILON_PARAM));
 
         // minpts
-        Util.addParameter(parameters, OptionID.OPTICS_MINPTS, Integer.toString(minpts));
+        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(getParameterValue(MINPTS_PARAM)));
 
         // distance function
         parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
@@ -141,21 +132,8 @@ public class COPAAWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, OptionID.COPAA_PREPROCESSOR, KnnQueryBasedHiCOPreprocessor.class.getName());
 
         // k
-        parameters.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedHiCOPreprocessor.K_P);
-        parameters.add(Integer.toString(k));
+        Util.addParameter(parameters, K_PARAM, Integer.toString(getParameterValue(K_PARAM)));
 
         return parameters;
-    }
-
-    /**
-     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
-        epsilon = getParameterValue(EPSILON_PARAM);
-        minpts = getParameterValue(MINPTS_PARAM);
-        k = (Integer) optionHandler.getOptionValue(KnnQueryBasedHiCOPreprocessor.K_P);
-
-        return remainingParameters;
     }
 }

@@ -6,8 +6,17 @@ import de.lmu.ifi.dbs.distance.distancefunction.PCABasedCorrelationDistanceFunct
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.DefaultValueGlobalConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
 import de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter;
 
 import java.util.ArrayList;
@@ -17,15 +26,10 @@ import java.util.List;
  * Wrapper class for HiCO algorithm. Performs an attribute wise normalization on
  * the database objects.
  *
- * @author Elke Achtert
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ *         todo parameter
  */
 public class HiCOWrapper extends NormalizationWrapper {
-
-    /**
-     * Description for parameter k.
-     */
-    public static final String K_D = "a positive integer specifying the number of nearest neighbors considered in the PCA. "
-        + "If this value is not defined, k ist set to minpts";
 
     /**
      * Parameter to specify the threshold for minimum number of points in
@@ -37,9 +41,14 @@ public class HiCOWrapper extends NormalizationWrapper {
         new GreaterConstraint(0));
 
     /**
-     * The k parameter.
+     * Optional parameter to specify the number of nearest neighbors considered in the PCA,
+     * must be an integer greater than 0. If this parameter is not set, k ist set to the
+     * value of {@link HiCOWrapper#MINPTS_PARAM}.
+     * <p>Key: {@code -hicopreprocessor.k} </p>
+     * <p>Default value: {@link HiCOWrapper#MINPTS_PARAM} </p>
      */
-    private IntParameter k;
+    private final IntParameter K_PARAM = new IntParameter(OptionID.KNN_HICO_PREPROCESSOR_K,
+        new GreaterConstraint(0), true);
 
     /**
      * The alpha parameter.
@@ -80,15 +89,20 @@ public class HiCOWrapper extends NormalizationWrapper {
      */
     public HiCOWrapper() {
         super();
+
         // parameter minpts
         optionHandler.put(MINPTS_PARAM);
 
         // parameter k
-        k = new IntParameter(KnnQueryBasedHiCOPreprocessor.K_P,
-            K_D,
-            new GreaterConstraint(0));
-        k.setOptional(true);
-        optionHandler.put(k);
+        K_PARAM.setDescription("<int>The number of nearest neighbors considered in the PCA. " +
+                               "If this parameter is not set, k ist set to the value of " +
+                               MINPTS_PARAM.getName());
+        optionHandler.put(K_PARAM);
+
+        // global constraint k <-> minpts
+        // noinspection unchecked
+        GlobalParameterConstraint gpc = new DefaultValueGlobalConstraint(K_PARAM, MINPTS_PARAM);
+        optionHandler.setGlobalParameterConstraint(gpc);
 
         // parameter delta
         delta = new DoubleParameter(PCABasedCorrelationDistanceFunction.DELTA_P,
@@ -106,12 +120,6 @@ public class HiCOWrapper extends NormalizationWrapper {
             alphaConstraints);
         alpha.setDefaultValue(PercentageEigenPairFilter.DEFAULT_ALPHA);
         optionHandler.put(alpha);
-
-        // global constraint for minpts <-> k
-        // noetig ???
-        // noinspection unchecked
-        GlobalParameterConstraint gpc = new DefaultValueGlobalConstraint(k, MINPTS_PARAM);
-        optionHandler.setGlobalParameterConstraint(gpc);
     }
 
     /**
@@ -141,8 +149,7 @@ public class HiCOWrapper extends NormalizationWrapper {
         parameters.add(KnnQueryBasedHiCOPreprocessor.class.getName());
 
         // k for preprocessor
-        parameters.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedHiCOPreprocessor.K_P);
-        parameters.add(Integer.toString(getParameterValue(k)));
+        Util.addParameter(parameters, K_PARAM, Integer.toString(getParameterValue(K_PARAM)));
 
         // alpha
         parameters.add(OptionHandler.OPTION_PREFIX + alpha.getName());

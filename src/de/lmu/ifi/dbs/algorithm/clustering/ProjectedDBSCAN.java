@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
@@ -38,6 +39,7 @@ import java.util.Set;
  *
  * @author Arthur Zimek
  * @param <V> the type of Realvector handled by this Algorithm
+ * todo parameter
  */
 public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> implements Clustering<V> {
 
@@ -47,19 +49,18 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
      * <p>Key: {@code -epsilon} </p>
      */
     public static final PatternParameter EPSILON_PARAM = new PatternParameter("epsilon",
-                                                                              "the maximum radius of the neighborhood " +
-                                                                              "to be considered, must be suitable to " +
-                                                                              LocallyWeightedDistanceFunction.class.getName());
+        "the maximum radius of the neighborhood " +
+        "to be considered, must be suitable to " +
+        LocallyWeightedDistanceFunction.class.getName());
 
     /**
-     * Parameter minimum points.
+     * Parameter to specify the threshold for minimum number of points in
+     * the epsilon-neighborhood of a point,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -projdbscan.minpts} </p>
      */
-    public static final String MINPTS_P = DBSCAN.MINPTS_P;
-
-    /**
-     * Description for parameter minimum points.
-     */
-    public static final String MINPTS_D = DBSCAN.MINPTS_D;
+    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.PROJECTED_DBSCAN_MINPTS,
+        new GreaterConstraint(0));
 
     /**
      * The default distance function.
@@ -135,18 +136,19 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
         super();
 
         // parameter epsilon
-        optionHandler.put(EPSILON_PARAM);
+        addOption(EPSILON_PARAM);
 
         // minpts
-        optionHandler.put(new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
+        addOption(MINPTS_PARAM);
+
         // lambda
-        optionHandler.put(new IntParameter(LAMBDA_P, LAMBDA_D, new GreaterConstraint(0)));
+        addOption(new IntParameter(LAMBDA_P, LAMBDA_D, new GreaterConstraint(0)));
 
         // parameter distance function
         // noinspection unchecked
         ClassParameter<AbstractLocallyWeightedDistanceFunction<V, ?>> distance = new ClassParameter(DISTANCE_FUNCTION_P,
-                                                                                                    DISTANCE_FUNCTION_D,
-                                                                                                    AbstractLocallyWeightedDistanceFunction.class);
+            DISTANCE_FUNCTION_D,
+            AbstractLocallyWeightedDistanceFunction.class);
         distance.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
         optionHandler.put(distance);
 
@@ -362,14 +364,14 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
         epsilon = getParameterValue(EPSILON_PARAM);
 
         // minpts
-        minpts = (Integer) optionHandler.getOptionValue(MINPTS_P);
+        minpts = getParameterValue(MINPTS_PARAM);
 
         // lambda
         lambda = (Integer) optionHandler.getOptionValue(LAMBDA_P);
 
         // parameters for the distance function
-        String[] distanceFunctionParameters = new String[remainingParameters.length + 7];
-        System.arraycopy(remainingParameters, 0, distanceFunctionParameters, 7, remainingParameters.length);
+        String[] distanceFunctionParameters = new String[remainingParameters.length + 5];
+        System.arraycopy(remainingParameters, 0, distanceFunctionParameters, 5, remainingParameters.length);
 
         // omit preprocessing flag
         distanceFunctionParameters[0] = OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F;
@@ -380,8 +382,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
         distanceFunctionParameters[3] = OptionHandler.OPTION_PREFIX + ProjectedDBSCANPreprocessor.EPSILON_PARAM.getName();
         distanceFunctionParameters[4] = epsilon;
         // preprocessor minpts
-        distanceFunctionParameters[5] = OptionHandler.OPTION_PREFIX + ProjectedDBSCANPreprocessor.MINPTS_P;
-        distanceFunctionParameters[6] = Integer.toString(minpts);
+        Util.addParameter(distanceFunctionParameters, MINPTS_PARAM, Integer.toString(minpts));
 
         distanceFunction.setParameters(distanceFunctionParameters);
 

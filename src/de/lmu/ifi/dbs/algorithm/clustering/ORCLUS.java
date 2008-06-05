@@ -32,6 +32,7 @@ import java.util.logging.LogRecord;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  * @param <V> the type of Realvector handled by this Algorithm
+ * todo parameter
  */
 
 public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {

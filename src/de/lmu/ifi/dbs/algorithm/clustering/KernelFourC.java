@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
- * kernel 4C identifies local subgroups of data objects sharing a possible nonlinear correlation.
+ * Kernel 4C identifies local subgroups of data objects sharing a possible nonlinear correlation.
  * The algorithm is based on a combination of kernel PCA and density-based clustering (DBSCAN).
  *
  * @author Simon Paradies

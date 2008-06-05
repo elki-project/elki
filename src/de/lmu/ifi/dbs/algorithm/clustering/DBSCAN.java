@@ -10,7 +10,12 @@ import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
@@ -27,6 +32,7 @@ import java.util.Set;
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObject the algorithm is applied on
  * @param <D> the type of Distance used
+ * todo parameter
  */
 public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D> implements Clustering<O> {
     /**
@@ -37,16 +43,13 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
     public final PatternParameter EPSILON_PARAM = new PatternParameter(OptionID.DBSCAN_EPSILON);
 
     /**
-     * Parameter minimum points.
+     * Parameter to specify the threshold for minimum number of points in
+     * the epsilon-neighborhood of a point,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -dbscan.minpts} </p>
      */
-    public static final String MINPTS_P = "minpts";
-
-    /**
-     * Description for parameter minimum points.
-     */
-    public static final String MINPTS_D = "threshold for minimum number of points in " +
-                                          "the epsilon-neighborhood of a point";
-
+    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.DBSCAN_MINPTS,
+        new GreaterConstraint(0));
 
     /**
      * The maximum radius of the neighborhood to be considered.
@@ -86,7 +89,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
     public DBSCAN() {
         super();
         // parameter epsilon
-        optionHandler.put(EPSILON_PARAM);
+        addOption(EPSILON_PARAM);
         // global constraint
         try {
             // noinspection unchecked
@@ -96,8 +99,9 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
         catch (UnusedParameterException e) {
             verbose("Could not instantiate global parameter constraint concerning parameter " + EPSILON_PARAM.getName() + " and " + DISTANCE_FUNCTION_P + " because parameter " + DISTANCE_FUNCTION_P + " is not specified! " + e.getMessage());
         }
+
         // parameter minpts
-        optionHandler.put(new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
+        addOption(MINPTS_PARAM);
     }
 
     /**
@@ -239,7 +243,13 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
      * @see Algorithm#getDescription()
      */
     public Description getDescription() {
-        return new Description("DBSCAN", "Density-Based Clustering of Applications with Noise", "Algorithm to find density-connected sets in a database based on the parameters " + MINPTS_P + " and " + EPSILON_PARAM.getName() + " (specifying a volume). " + "These two parameters determine a density threshold for clustering.", "M. Ester, H.-P. Kriegel, J. Sander, and X. Xu: " + "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise. " + "In Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996.");
+        return new Description("DBSCAN", "Density-Based Clustering of Applications with Noise",
+            "Algorithm to find density-connected sets in a database based on the parameters " +
+            MINPTS_PARAM.getName() + " and " + EPSILON_PARAM.getName() + " (specifying a volume). " +
+            "These two parameters determine a density threshold for clustering.",
+            "M. Ester, H.-P. Kriegel, J. Sander, and X. Xu: " +
+            "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise. " +
+            "In Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996.");
     }
 
     /**
@@ -255,7 +265,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
 
         // epsilon, minpts
         epsilon = getParameterValue(EPSILON_PARAM);
-        minpts = (Integer) optionHandler.getOptionValue(MINPTS_P);
+        minpts = getParameterValue(MINPTS_PARAM);
 
         return remainingParameters;
     }

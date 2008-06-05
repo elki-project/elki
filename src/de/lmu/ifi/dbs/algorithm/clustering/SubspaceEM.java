@@ -34,6 +34,7 @@ import java.util.Random;
  *
  * @author Arthur Zimek
  * @param <V> the type of Realvector handled by this Algorithm
+ * todo parameter
  */
 public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> implements Clustering<V> {
     /**

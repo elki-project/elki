@@ -25,6 +25,7 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  * @param <V> the type of Realvector handled by this Algorithm
+ * todo parameter
  */
 
 public abstract class ProjectedClustering<V extends RealVector<V, ?>>

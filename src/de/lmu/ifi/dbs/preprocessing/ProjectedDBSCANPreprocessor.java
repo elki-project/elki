@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.preprocessing;
 
-import de.lmu.ifi.dbs.algorithm.clustering.ProjectedDBSCAN;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
@@ -12,7 +11,14 @@ import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
@@ -26,6 +32,7 @@ import java.util.List;
  * the ProjectedDBSCAN alghorithm.
  *
  * @author Arthur Zimek
+ *         todo parameter
  */
 public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>> extends AbstractParameterizable implements Preprocessor<V> {
 
@@ -36,19 +43,18 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
      */
     public static final PatternParameter EPSILON_PARAM = new PatternParameter("epsilon",
         "the maximum radius of the neighborhood " +
-            "to be considered, must be suitable to " +
-            LocallyWeightedDistanceFunction.class.getName());
+        "to be considered, must be suitable to " +
+        LocallyWeightedDistanceFunction.class.getName());
 
 
     /**
-     * Parameter minimum points.
+     * Parameter to specify the threshold for minimum number of points in
+     * the epsilon-neighborhood of a point,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -projdbscan.minpts} </p>
      */
-    public static final String MINPTS_P = ProjectedDBSCAN.MINPTS_P;
-
-    /**
-     * Description for parameter minimum points.
-     */
-    public static final String MINPTS_D = ProjectedDBSCAN.MINPTS_D;
+    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.PROJECTED_DBSCAN_MINPTS,
+        new GreaterConstraint(0));
 
     /**
      * The default range query distance function.
@@ -64,9 +70,9 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
      * Description for parameter range query distance function.
      */
     public static final String DISTANCE_FUNCTION_D = "the distance function to determine the neighbors for variance analysis "
-        + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class)
-        + ". Default: "
-        + DEFAULT_DISTANCE_FUNCTION;
+                                                     + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class)
+                                                     + ". Default: "
+                                                     + DEFAULT_DISTANCE_FUNCTION;
 
     /**
      * Contains the value of parameter epsilon;
@@ -74,14 +80,14 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
     private String epsilon;
 
     /**
-     * Contains the value of parameter minpts;
-     */
-    private int minpts;
-
-    /**
      * The distance function for the variance analysis.
      */
     protected DistanceFunction<V, D> rangeQueryDistanceFunction;
+
+    /**
+     * Holds the value of parameter minpts.
+     */
+    private int minpts;
 
     /**
      * Provides a new Preprocessor that computes the correlation dimension of
@@ -90,10 +96,10 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
     protected ProjectedDBSCANPreprocessor() {
         super();
         //parameter epsilon
-        optionHandler.put(EPSILON_PARAM);
+        addOption(EPSILON_PARAM);
 
         //parameter minpts
-        optionHandler.put(new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
+        addOption(MINPTS_PARAM);
 
         // parameter range query distance function
         // noinspection unchecked
@@ -150,7 +156,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
         if (time) {
             long elapsedTime = end - start;
             verbose(this.getClass().getName() + " runtime: "
-                + elapsedTime + " milliseconds.");
+                    + elapsedTime + " milliseconds.");
         }
     }
 
@@ -189,7 +195,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
         epsilon = getParameterValue(EPSILON_PARAM);
 
         // minpts
-        minpts = (Integer) optionHandler.getOptionValue(MINPTS_P);
+        minpts = getParameterValue(MINPTS_PARAM);
 
         return remainingParameters;
     }

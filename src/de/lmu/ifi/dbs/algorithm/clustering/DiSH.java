@@ -28,6 +28,7 @@ import java.util.*;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  * @param <V> the type of Realvector handled by this Algorithm
+ * todo parameter
  */
 public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
     /**

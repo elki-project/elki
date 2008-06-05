@@ -15,7 +15,8 @@ import java.util.List;
 /**
  * Wrapper to run another wrapper for all files in the directory given as input.
  *
- * @author Arthur Zimek 
+ * @author Arthur Zimek
+ * todo parameter
  */
 public class DirectoryTask extends StandAloneInputWrapper {
 

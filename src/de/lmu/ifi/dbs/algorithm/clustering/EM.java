@@ -34,6 +34,7 @@ import java.util.Random;
  *
  * @author Arthur Zimek
  * @param <V> a type of {@link RealVector RealVector} as a suitable datatype for this algorithm
+ * todo parameter
  */
 public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> implements Clustering<V> {
     /**

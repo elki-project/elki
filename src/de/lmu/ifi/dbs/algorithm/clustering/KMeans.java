@@ -20,6 +20,7 @@ import java.util.*;
  * @author Arthur Zimek
  * @param <D> a type of {@link Distance Distance} as returned by the used distance function
  * @param <V> a type of {@link RealVector RealVector} as a suitable datatype for this algorithm
+ * todo parameter
  */
 public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, D> implements Clustering<V> {
 

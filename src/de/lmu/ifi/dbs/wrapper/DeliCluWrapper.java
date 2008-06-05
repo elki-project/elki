@@ -1,32 +1,38 @@
 package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.AbortException;
-import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.DeLiClu;
-import de.lmu.ifi.dbs.algorithm.clustering.SUBCLU;
 import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.index.tree.TreeIndex;
 import de.lmu.ifi.dbs.index.tree.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.deliclu.DeLiCluTree;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.utilities.Util;
 
 import java.util.List;
 
 /**
  * Wrapper class for the DeliClu algorithm.
  *
- * @author Elke Achtert
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ *         todo parameter
  */
 public class DeliCluWrapper extends NormalizationWrapper {
 
     /**
-     * The value of the minpts parameter.
+     * Parameter to specify the threshold for minimum number of points in
+     * the epsilon-neighborhood of a point,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -optics.minpts} </p>
      */
-    private int minpts;
+    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.DELICLU_MINPTS,
+        new GreaterConstraint(0));
 
     /**
      * The value of the pageSize parameter.
@@ -67,8 +73,9 @@ public class DeliCluWrapper extends NormalizationWrapper {
      */
     public DeliCluWrapper() {
         super();
-        // parameter min points
-        optionHandler.put(new IntParameter(DeLiClu.MINPTS_P, DeLiClu.MINPTS_D, new GreaterConstraint(0)));
+        // parameter minpts
+        optionHandler.put(MINPTS_PARAM);
+
         // parameter page size
         IntParameter pageSize = new IntParameter(TreeIndex.PAGE_SIZE_P, TreeIndex.PAGE_SIZE_D, new GreaterConstraint(0));
         pageSize.setDefaultValue(TreeIndex.DEFAULT_PAGE_SIZE);
@@ -90,8 +97,7 @@ public class DeliCluWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, OptionID.ALGORITHM, DeLiClu.class.getName());
 
         // minpts
-        parameters.add(OptionHandler.OPTION_PREFIX + DeLiClu.MINPTS_P);
-        parameters.add(Integer.toString(minpts));
+        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(getParameterValue(MINPTS_PARAM)));
 
         // database
         parameters.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.DATABASE_CLASS_P);
@@ -120,8 +126,6 @@ public class DeliCluWrapper extends NormalizationWrapper {
      */
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
-        // minpts
-        minpts = (Integer) optionHandler.getOptionValue(DeLiClu.MINPTS_P);
 
         // pagesize
         pageSize = (Integer) optionHandler.getOptionValue(TreeIndex.PAGE_SIZE_P);

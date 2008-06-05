@@ -103,7 +103,7 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends
             verbose("");
         }
         result = new PointerRepresentation<O, D>(piClone, lambdaClone,
-                                                 getDistanceFunction(), database);
+            getDistanceFunction(), database);
     }
 
     /**
@@ -147,8 +147,9 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends
      * Second step: Determine the pairwise distances from all objects in the
      * pointer representation to the new object with the specified id.
      *
-     * @param newID the id of the object to be inserted into the pointer
-     *              representation
+     * @param newID        the id of the object to be inserted into the pointer
+     *                     representation
+     * @param processedIDs the already processed ids
      */
     private void step2(int newID, ArrayList<Integer> processedIDs) {
         // M(i) = dist(i, n+1)
@@ -162,8 +163,9 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends
     /**
      * Third step: Determine the values for P and L
      *
-     * @param newID the id of the object to be inserted into the pointer
-     *              representation
+     * @param newID        the id of the object to be inserted into the pointer
+     *                     representation
+     * @param processedIDs the already processed ids
      */
     private void step3(int newID, ArrayList<Integer> processedIDs) {
         // for i = 1..n
@@ -197,7 +199,8 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends
     /**
      * Fourth step: Actualize the clusters if necessary
      *
-     * @param newID
+     * @param newID        the id of the current object
+     * @param processedIDs the already processed ids
      */
     private void step4(int newID, ArrayList<Integer> processedIDs) {
         // for i = 1..n
@@ -267,13 +270,13 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends
                 return -1;
 
             if (this.id1 > (o.id1))
-                return +1;
+                return 1;
 
             if (this.id2 < (o.id2))
                 return -1;
 
             if (this.id2 > (o.id2))
-                return +1;
+                return 1;
 
             return 0;
         }

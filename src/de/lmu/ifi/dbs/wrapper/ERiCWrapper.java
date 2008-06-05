@@ -7,7 +7,13 @@ import de.lmu.ifi.dbs.distance.distancefunction.ERiCDistanceFunction;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.DefaultValueGlobalConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.util.List;
@@ -16,26 +22,29 @@ import java.util.List;
  * Wrapper class for hierarchical COPAC algorithm. Performs an attribute wise normalization on
  * the database objects.
  *
- * @author Elke Achtert
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ *         todo parameter
  */
 public class ERiCWrapper extends NormalizationWrapper {
 
     /**
-     * Description for parameter k.
+     * Parameter to specify the threshold for minimum number of points in
+     * the epsilon-neighborhood of a point,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -dbscan.minpts} </p>
      */
-    public static final String K_D = "a positive integer specifying the number of " +
-        "nearest neighbors considered in the PCA. " +
-        "If this value is not defined, k ist set to minpts";
+    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.DBSCAN_MINPTS,
+        new GreaterConstraint(0));
 
     /**
-     * The value of the minpts parameter.
+     * Optional parameter to specify the number of nearest neighbors considered in the PCA,
+     * must be an integer greater than 0. If this parameter is not set, k ist set to the
+     * value of {@link ERiCWrapper#MINPTS_PARAM}.
+     * <p>Key: {@code -hicopreprocessor.k} </p>
+     * <p>Default value: {@link ERiCWrapper#MINPTS_PARAM} </p>
      */
-    private int minpts;
-
-    /**
-     * The value of the k parameter.
-     */
-    private int k;
+    private final IntParameter K_PARAM = new IntParameter(OptionID.KNN_HICO_PREPROCESSOR_K,
+        new GreaterConstraint(0), true);
 
     /**
      * The value of the delta parameter.
@@ -72,14 +81,19 @@ public class ERiCWrapper extends NormalizationWrapper {
     public ERiCWrapper() {
         super();
 
-        // parameter min points
-        IntParameter minPam = new IntParameter(DBSCAN.MINPTS_P, DBSCAN.MINPTS_D, new GreaterConstraint(0));
-        optionHandler.put(minPam);
+        // parameter minpts
+        optionHandler.put(MINPTS_PARAM);
 
         // parameter k
-        IntParameter kPam = new IntParameter(KnnQueryBasedHiCOPreprocessor.K_P, ERiCWrapper.K_D, new GreaterConstraint(0));
-        kPam.setOptional(true);
-        optionHandler.put(kPam);
+        K_PARAM.setDescription("<int>The number of nearest neighbors considered in the PCA. " +
+                               "If this parameter is not set, k ist set to the value of " +
+                               MINPTS_PARAM.getName());
+        optionHandler.put(K_PARAM);
+
+        // global constraint k <-> minpts
+        // noinspection unchecked
+        GlobalParameterConstraint gpc = new DefaultValueGlobalConstraint(K_PARAM, MINPTS_PARAM);
+        optionHandler.setGlobalParameterConstraint(gpc);
 
         // parameter delta
         DoubleParameter deltaPam = new DoubleParameter(ERiCDistanceFunction.DELTA_P,
@@ -105,8 +119,7 @@ public class ERiCWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, OptionID.DBSCAN_EPSILON, "0");
 
         // minpts
-        parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.MINPTS_P);
-        parameters.add(Integer.toString(minpts));
+        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(getParameterValue(MINPTS_PARAM)));
 
         // distance function
         parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.DISTANCE_FUNCTION_P);
@@ -119,8 +132,7 @@ public class ERiCWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, OptionID.COPAA_PREPROCESSOR, KnnQueryBasedHiCOPreprocessor.class.getName());
 
         // k
-        parameters.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedHiCOPreprocessor.K_P);
-        parameters.add(Integer.toString(k));
+        Util.addParameter(parameters, K_PARAM, Integer.toString(getParameterValue(K_PARAM)));
 
         // delta
         parameters.add(OptionHandler.OPTION_PREFIX + ERiCDistanceFunction.DELTA_P);
@@ -138,16 +150,6 @@ public class ERiCWrapper extends NormalizationWrapper {
      */
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
-        // minpts
-        minpts = (Integer) optionHandler.getOptionValue(DBSCAN.MINPTS_P);
-
-        // k
-        if (optionHandler.isSet(KnnQueryBasedHiCOPreprocessor.K_P)) {
-            k = (Integer) optionHandler.getOptionValue(KnnQueryBasedHiCOPreprocessor.K_P);
-        }
-        else {
-            k = minpts;
-        }
 
         // delta
         delta = (Double) optionHandler.getOptionValue(ERiCDistanceFunction.DELTA_P);

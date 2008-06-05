@@ -28,6 +28,7 @@ import java.util.Set;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  * @param <V> the type of Realvector handled by this Algorithm
+ * todo parameter
  */
 
 public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {

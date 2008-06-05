@@ -31,6 +31,7 @@ import java.util.Set;
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObject the algorithm is applied on
  * @param <D> the type of Distance used for the preprocessing of the shared nearest neighbors neighborhood lists
+ * todo parameter
  */
 public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> extends AbstractAlgorithm<O> implements Clustering<O> {
 

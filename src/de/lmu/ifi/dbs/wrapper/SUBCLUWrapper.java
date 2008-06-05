@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.AbortException;
-import de.lmu.ifi.dbs.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.algorithm.clustering.SUBCLU;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
@@ -16,7 +15,8 @@ import java.util.List;
  * Wrapper class for SUBCLU algorithm. Performs an attribute wise normalization on
  * the database objects.
  *
- * @author Elke Achtert
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ *         todo parameter
  */
 public class SUBCLUWrapper extends NormalizationWrapper {
 
@@ -26,9 +26,13 @@ public class SUBCLUWrapper extends NormalizationWrapper {
     private String epsilon;
 
     /**
-     * The value of the minpts parameter.
+     * Parameter to specify the threshold for minimum number of points in
+     * the epsilon-neighborhood of a point,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -subclu.minpts} </p>
      */
-    private int minpts;
+    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.SUBCLU_MINPTS,
+        new GreaterConstraint(0));
 
     /**
      * Main method to run this wrapper.
@@ -60,10 +64,10 @@ public class SUBCLUWrapper extends NormalizationWrapper {
     public SUBCLUWrapper() {
         super();
         //  parameter epsilon
-        optionHandler.put(SUBCLU.EPSILON_PARAM);
+        addOption(SUBCLU.EPSILON_PARAM);
 
         // parameter min points
-        optionHandler.put(new IntParameter(DBSCAN.MINPTS_P, DBSCAN.MINPTS_D, new GreaterConstraint(0)));
+        addOption(MINPTS_PARAM);
     }
 
     /**
@@ -80,8 +84,7 @@ public class SUBCLUWrapper extends NormalizationWrapper {
         parameters.add(epsilon);
 
         // minpts
-        parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.MINPTS_P);
-        parameters.add(Integer.toString(minpts));
+        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(getParameterValue(MINPTS_PARAM)));
 
         return parameters;
     }
@@ -94,7 +97,6 @@ public class SUBCLUWrapper extends NormalizationWrapper {
 
         // epsilon, minpts
         epsilon = getParameterValue(SUBCLU.EPSILON_PARAM);
-        minpts = (Integer) optionHandler.getOptionValue(DBSCAN.MINPTS_P);
 
         return remainingParameters;
     }

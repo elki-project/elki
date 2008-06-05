@@ -49,11 +49,6 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
         new GreaterConstraint(0));
 
     /**
-     * Description for parameter minimum points.
-     */
-    public static final String MINPTS_D = DBSCAN.MINPTS_D;
-
-    /**
      * Hold the value of the epsilon parameter.
      */
     private String epsilon;

@@ -12,7 +12,8 @@ import java.io.File;
  * make correct use of parameter settings via optionHandler as commented with
  * constructor and methods.
  *
- * @author Elke Achtert 
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * todo parameter
  */
 public abstract class StandAloneInputWrapper extends StandAloneWrapper {
 

@@ -4,7 +4,10 @@ import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.util.List;
@@ -13,29 +16,25 @@ import java.util.List;
  * Wrapper class for DBSCAN algorithm. Performs an attribute wise normalization on
  * the database objects.
  *
- * @author Elke Achtert
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class DBSCANWrapper extends NormalizationWrapper {
 
     /**
      * Parameter to specify the maximum radius of the neighborhood to be considered,
-     * must be suitable to {@link EuklideanDistanceFunction EuklideanDistanceFunction}.
-     * <p>Key: {@code -epsilon} </p>
+     * must be suitable to {@link de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction}.
+     * <p>Key: {@code -dbscan.epsilon} </p>
      */
-    public static final PatternParameter EPSILON_PARAM = new PatternParameter("epsilon",
-        "the maximum radius of the neighborhood " +
-            "to be considered, must be suitable to " +
-            EuklideanDistanceFunction.class.getName());
+    private final PatternParameter EPSILON_PARAM = new PatternParameter(OptionID.DBSCAN_EPSILON);
 
     /**
-     * The value of the epsilon parameter.
+     * Parameter to specify the threshold for minimum number of points in
+     * the epsilon-neighborhood of a point,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -dbscan.minpts} </p>
      */
-    private String epsilon;
-
-    /**
-     * The value of the minpts parameter.
-     */
-    private int minpts;
+    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.OPTICS_MINPTS,
+        new GreaterConstraint(0));
 
 
     /**
@@ -67,11 +66,14 @@ public class DBSCANWrapper extends NormalizationWrapper {
      */
     public DBSCANWrapper() {
         super();
-        //  parameter epsilon
-        optionHandler.put(EPSILON_PARAM);
+
+        // parameter epsilon
+        EPSILON_PARAM.setDescription("<pattern>The maximum radius of the neighborhood " +
+                                     "to be considerd, must be suitable to " +
+                                     EuklideanDistanceFunction.class.getName());
 
         // parameter min points
-        optionHandler.put(new IntParameter(DBSCAN.MINPTS_P, DBSCAN.MINPTS_D, new GreaterConstraint(0)));
+        addOption(MINPTS_PARAM);
     }
 
     /**
@@ -84,12 +86,10 @@ public class DBSCANWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, OptionID.ALGORITHM, DBSCAN.class.getName());
 
         // epsilon
-        parameters.add(OptionHandler.OPTION_PREFIX + EPSILON_PARAM.getName());
-        parameters.add(epsilon);
+        Util.addParameter(parameters, EPSILON_PARAM, getParameterValue(EPSILON_PARAM));
 
         // minpts
-        parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.MINPTS_P);
-        parameters.add(Integer.toString(minpts));
+        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(getParameterValue(MINPTS_PARAM)));
 
         // database
 //    params.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.DATABASE_CLASS_P);
@@ -110,18 +110,5 @@ public class DBSCANWrapper extends NormalizationWrapper {
 //    params.add("120000");
 
         return parameters;
-    }
-
-    /**
-     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
-
-        // epsilon, minpts
-        epsilon = getParameterValue(EPSILON_PARAM);
-        minpts = (Integer) optionHandler.getOptionValue(DBSCAN.MINPTS_P);
-
-        return remainingParameters;
     }
 }

@@ -3,13 +3,18 @@ package de.lmu.ifi.dbs.wrapper;
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.clustering.COPAC;
 import de.lmu.ifi.dbs.algorithm.clustering.DBSCAN;
-import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.distance.distancefunction.ERiCDistanceFunction;
 import de.lmu.ifi.dbs.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.DefaultValueGlobalConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.util.List;
@@ -19,41 +24,35 @@ import java.util.List;
  * the database objects, partitions the database according to the correlation dimension of
  * its objects and then performs the algorithm DBSCAN over the partitions.
  *
- * @author Elke Achtert
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class COPACWrapper extends NormalizationWrapper {
 
     /**
      * Parameter to specify the maximum radius of the neighborhood to be considered,
      * must be suitable to {@link LocallyWeightedDistanceFunction LocallyWeightedDistanceFunction}.
-     * <p>Key: {@code -epsilon} </p>
+     * <p>Key: {@code -dbscan.epsilon} </p>
      */
-    public static final PatternParameter EPSILON_PARAM = new PatternParameter("epsilon",
-        "the maximum radius of the neighborhood " +
-            "to be considered, must be suitable to " +
-            LocallyWeightedDistanceFunction.class.getName());
+    private final PatternParameter EPSILON_PARAM = new PatternParameter(OptionID.DBSCAN_EPSILON);
 
     /**
-     * Description for parameter k.
+     * Parameter to specify the threshold for minimum number of points in
+     * the epsilon-neighborhood of a point,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -dbscan.minpts} </p>
      */
-    public static final String K_D = "a positive integer specifying the number of " +
-        "nearest neighbors considered in the PCA. " +
-        "If this value is not defined, k ist set to minpts";
+    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.DBSCAN_MINPTS,
+        new GreaterConstraint(0));
 
     /**
-     * The value of the epsilon parameter.
+     * Optional parameter to specify the number of nearest neighbors considered in the PCA,
+     * must be an integer greater than 0. If this parameter is not set, k ist set to the
+     * value of {@link COPACWrapper#MINPTS_PARAM}.
+     * <p>Key: {@code -hicopreprocessor.k} </p>
+     * <p>Default value: {@link COPACWrapper#MINPTS_PARAM} </p>
      */
-    private String epsilon;
-
-    /**
-     * The value of the minpts parameter.
-     */
-    private int minpts;
-
-    /**
-     * The value of the k parameter.
-     */
-    private int k;
+    private final IntParameter K_PARAM = new IntParameter(OptionID.KNN_HICO_PREPROCESSOR_K,
+        new GreaterConstraint(0), true);
 
     /**
      * Main method to run this wrapper.
@@ -74,6 +73,7 @@ public class COPACWrapper extends NormalizationWrapper {
             wrapper.verbose(e.getMessage());
         }
         catch (Exception e) {
+            e.printStackTrace();
             wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
         }
     }
@@ -86,16 +86,24 @@ public class COPACWrapper extends NormalizationWrapper {
         super();
 
         // parameter epsilon
-        optionHandler.put(EPSILON_PARAM);
+        EPSILON_PARAM.setDescription("<pattern>The maximum radius of the neighborhood " +
+                                     "to be considerd, must be suitable to " +
+                                     LocallyWeightedDistanceFunction.class.getName());
+        addOption(EPSILON_PARAM);
 
-        // parameter min points
-        IntParameter minPam = new IntParameter(DBSCAN.MINPTS_P, OPTICS.MINPTS_D, new GreaterConstraint(0));
-        optionHandler.put(minPam);
+        // parameter minpts
+        addOption(MINPTS_PARAM);
 
         // parameter k
-        IntParameter kPam = new IntParameter(KnnQueryBasedHiCOPreprocessor.K_P, K_D, new GreaterConstraint(0));
-        kPam.setOptional(true);
-        optionHandler.put(kPam);
+        K_PARAM.setDescription("<int>The number of nearest neighbors considered in the PCA. " +
+                               "If this parameter is not set, k ist set to the value of " +
+                               MINPTS_PARAM.getName());
+        addOption(K_PARAM);
+
+        // global constraint k <-> minpts
+        // noinspection unchecked
+        GlobalParameterConstraint gpc = new DefaultValueGlobalConstraint(K_PARAM, MINPTS_PARAM);
+        optionHandler.setGlobalParameterConstraint(gpc);
     }
 
     /**
@@ -111,12 +119,10 @@ public class COPACWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, OptionID.COPAA_PARTITION_ALGORITHM, DBSCAN.class.getName());
 
         // epsilon
-        parameters.add(OptionHandler.OPTION_PREFIX + EPSILON_PARAM.getName());
-        parameters.add(epsilon);
+        Util.addParameter(parameters, EPSILON_PARAM, getParameterValue(EPSILON_PARAM));
 
         // minpts
-        parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.MINPTS_P);
-        parameters.add(Integer.toString(minpts));
+        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(getParameterValue(MINPTS_PARAM)));
 
         // distance function
         parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.DISTANCE_FUNCTION_P);
@@ -130,32 +136,8 @@ public class COPACWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, OptionID.COPAA_PREPROCESSOR, KnnQueryBasedHiCOPreprocessor.class.getName());
 
         // k
-        parameters.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedHiCOPreprocessor.K_P);
-        parameters.add(Integer.toString(k));
-        // k
-        parameters.add(OptionHandler.OPTION_PREFIX + KnnQueryBasedHiCOPreprocessor.K_P);
-        parameters.add(Integer.toString(k));
+        Util.addParameter(parameters, K_PARAM, Integer.toString(getParameterValue(K_PARAM)));
 
         return parameters;
-    }
-
-    /**
-     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
-        // epsilon, minpts
-        epsilon = getParameterValue(EPSILON_PARAM);
-        minpts = (Integer) optionHandler.getOptionValue(DBSCAN.MINPTS_P);
-
-        // k
-        if (optionHandler.isSet(KnnQueryBasedHiCOPreprocessor.K_P)) {
-            k = (Integer) optionHandler.getOptionValue(KnnQueryBasedHiCOPreprocessor.K_P);
-        }
-        else {
-            k = minpts;
-        }
-
-        return remainingParameters;
     }
 }

@@ -30,6 +30,18 @@ public class IntParameter extends NumberParameter<Integer> {
     }
 
     /**
+     * Constructs an integer parameter with the given optionID, and parameter constraint.
+     *
+     * @param optionID   optionID the unique id of the option
+     * @param constraint the constraint for this integer parameter
+     * @param optional   specifies if this parameter is an optional parameter
+     */
+    public IntParameter(OptionID optionID, ParameterConstraint<Number> constraint, boolean optional) {
+        this(optionID, constraint);
+        setOptional(optional);
+    }
+
+    /**
      * Constructs an integer parameter with the given name and description.
      *
      * @param name        the parameter name

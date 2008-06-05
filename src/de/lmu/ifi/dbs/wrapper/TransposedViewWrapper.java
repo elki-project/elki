@@ -22,7 +22,8 @@ import java.util.List;
  * data file to the specified output. Additionmally a script file for gnuplot is
  * written.
  *
- * @author Elke Achtert
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * todo parameter
  */
 public class TransposedViewWrapper<V extends RealVector<V, ?>> extends StandAloneInputWrapper {
 

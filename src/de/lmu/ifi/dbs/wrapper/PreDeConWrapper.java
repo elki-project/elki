@@ -15,7 +15,8 @@ import java.util.List;
  * A wrapper for the PreDeCon algorithm. Performs an attribute wise normalization on
  * the database objects.
  *
- * @author Elke Achtert
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ *         todo parameter
  */
 public class PreDeConWrapper extends NormalizationWrapper {
 
@@ -25,9 +26,13 @@ public class PreDeConWrapper extends NormalizationWrapper {
     private String epsilon;
 
     /**
-     * The value of the minpts parameter.
+     * Parameter to specify the threshold for minimum number of points in
+     * the epsilon-neighborhood of a point,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -projdbscan.minpts} </p>
      */
-    private int minpts;
+    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.PROJECTED_DBSCAN_MINPTS,
+        new GreaterConstraint(0));
 
     /**
      * The value of the lambda parameter.
@@ -63,13 +68,13 @@ public class PreDeConWrapper extends NormalizationWrapper {
     public PreDeConWrapper() {
         super();
         // parameter epsilon
-        optionHandler.put(PreDeCon.EPSILON_PARAM);
+        addOption(PreDeCon.EPSILON_PARAM);
 
         // parameter min points
-        optionHandler.put(new IntParameter(PreDeCon.MINPTS_P, PreDeCon.MINPTS_D, new GreaterConstraint(0)));
+        addOption(MINPTS_PARAM);
 
         // parameter lambda
-        optionHandler.put(new IntParameter(PreDeCon.LAMBDA_P, PreDeCon.LAMBDA_D, new GreaterConstraint(0)));
+        addOption(new IntParameter(PreDeCon.LAMBDA_P, PreDeCon.LAMBDA_D, new GreaterConstraint(0)));
     }
 
     /**
@@ -86,8 +91,7 @@ public class PreDeConWrapper extends NormalizationWrapper {
         parameters.add(epsilon);
 
         // minpts for PreDeCon
-        parameters.add(OptionHandler.OPTION_PREFIX + PreDeCon.MINPTS_P);
-        parameters.add(Integer.toString(minpts));
+        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(getParameterValue(MINPTS_PARAM)));
 
         // lambda for PreDeCon
         parameters.add(OptionHandler.OPTION_PREFIX + PreDeCon.LAMBDA_P);
@@ -104,7 +108,6 @@ public class PreDeConWrapper extends NormalizationWrapper {
 
         // epsilon, minpts, lambda
         epsilon = getParameterValue(PreDeCon.EPSILON_PARAM);
-        minpts = (Integer) optionHandler.getOptionValue(PreDeCon.MINPTS_P);
         lambda = (Integer) optionHandler.getOptionValue(PreDeCon.LAMBDA_P);
 
         return remainingParameters;
