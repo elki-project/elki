@@ -36,8 +36,7 @@ public class KNNDistanceOrderResult<O extends DatabaseObject, D extends Distance
     }
 
     /**
-     * @see Result#output(java.io.File,
-     *de.lmu.ifi.dbs.normalization.Normalization,java.util.List)
+     * @see Result#output(java.io.File,de.lmu.ifi.dbs.normalization.Normalization,java.util.List)
      */
     public void output(final File out, final Normalization<O> normalization,
                        final List<AttributeSettings> settings)

@@ -18,13 +18,19 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Provides a result of a clustering-algorithm that computes several clusters
- * and remaining noise. <p/>
+ * and remaining noise.
  *
  * @author Arthur Zimek
+ * @param <O> the type of DatabaseObjects handled by this Result
  */
 public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<O> implements ClusteringResult<O> {
     /**

@@ -14,12 +14,16 @@ import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.varianceanalysis.AbstractPCA;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.varianceanalysis.FirstNEigenPairFilter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Encapsulates a mapping of subspace dimensionalities to a list of set of ids forming a cluster
@@ -63,7 +67,7 @@ public class SubspaceClusterMap {
      * @param ids            the ids forming the cluster
      * @param database       the database holding the objects
      */
-    public void add(Integer dimensionality, Set<Integer> ids, Database<ParameterizationFunction> database) throws ParameterException, UnableToComplyException, NonNumericFeaturesException {
+    public void add(Integer dimensionality, Set<Integer> ids, Database<ParameterizationFunction> database) {
         List<Set<Integer>> clusterList = clusters.get(dimensionality);
         if (clusterList == null) {
             clusterList = new ArrayList<Set<Integer>>();
@@ -114,6 +118,7 @@ public class SubspaceClusterMap {
      * Returns the list of clusters to which this map maps the specified subspaceDimension.
      *
      * @param subspaceDimension subspace dimension whose associated clusters are to be returned
+     * @return the list of clusters to which this map maps the specified subspaceDimension
      */
     public List<Set<Integer>> getCluster(Integer subspaceDimension) {
         return clusters.get(subspaceDimension);
@@ -123,6 +128,7 @@ public class SubspaceClusterMap {
      * Returns the list of dependencies to which this map maps the specified subspaceDimension.
      *
      * @param subspaceDimension subspace dimension whose associated dependencies are to be returned
+     * @return the list of dependencies to which this map maps the specified subspaceDimension
      */
     public List<LinearEquationSystem> getDependencies(Integer subspaceDimension) {
         return dependencies.get(subspaceDimension);
@@ -148,34 +154,42 @@ public class SubspaceClusterMap {
      * having a distance less then the standard deviation of the derivator model
      * to the model to this model.
      *
-     * @param database the database containing the parametrization functions
-     * @param ids      the ids to build the model
+     * @param database       the database containing the parametrization functions
+     * @param ids            the ids to build the model
+     * @param dimensionality the dimensionality of the subspace
      * @return a basis of the found subspace
-     * @throws de.lmu.ifi.dbs.utilities.UnableToComplyException
-     *
-     * @throws de.lmu.ifi.dbs.utilities.optionhandling.ParameterException
-     *
      */
     private LinearEquationSystem runDerivator(Database<ParameterizationFunction> database,
-                                              int dim,
-                                              Set<Integer> ids) throws UnableToComplyException, ParameterException, NonNumericFeaturesException {
-        // build database for derivator
-        Database<RealVector> derivatorDB = buildDerivatorDB(database, ids);
+                                              int dimensionality,
+                                              Set<Integer> ids) {
+        try {
+            // build database for derivator
+            Database<RealVector> derivatorDB = buildDerivatorDB(database, ids);
 
-        DependencyDerivator derivator = new DependencyDerivator();
+            DependencyDerivator derivator = new DependencyDerivator();
 
-        List<String> parameters = new ArrayList<String>();
-        Util.addParameter(parameters, OptionID.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
-        parameters.add(OptionHandler.OPTION_PREFIX + FirstNEigenPairFilter.N_P);
-        parameters.add(Integer.toString(dim));
-        derivator.setParameters(parameters.toArray(new String[parameters.size()]));
+            List<String> parameters = new ArrayList<String>();
+            Util.addParameter(parameters, OptionID.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
+            parameters.add(OptionHandler.OPTION_PREFIX + FirstNEigenPairFilter.N_P);
+            parameters.add(Integer.toString(dimensionality));
+            derivator.setParameters(parameters.toArray(new String[parameters.size()]));
 
-        //noinspection unchecked
-        derivator.run(derivatorDB);
-        CorrelationAnalysisSolution model = derivator.getResult();
-
-        LinearEquationSystem les = model.getNormalizedLinearEquationSystem(null);
-        return les;
+            //noinspection unchecked
+            derivator.run(derivatorDB);
+            CorrelationAnalysisSolution model = derivator.getResult();
+            // noinspection unchecked
+            LinearEquationSystem les = model.getNormalizedLinearEquationSystem(null);
+            return les;
+        }
+        catch (ParameterException e) {
+            throw new IllegalStateException("Wrong parameter-setting for the derivator: " + e);
+        }
+        catch (UnableToComplyException e) {
+            throw new IllegalStateException("Initialization of the database for the derivator failed: " + e);
+        }
+        catch (NonNumericFeaturesException e) {
+            throw new IllegalStateException("Error during normalization" + e);
+        }
     }
 
     /**
@@ -186,7 +200,7 @@ public class SubspaceClusterMap {
      * @param ids      the ids to build the database from
      * @return a database for the derivator consisting of the ids
      *         in the specified interval
-     * @throws UnableToComplyException
+     * @throws UnableToComplyException if initialization of the database is not possible
      */
     private Database<RealVector> buildDerivatorDB(Database<ParameterizationFunction> database,
                                                   Set<Integer> ids) throws UnableToComplyException {

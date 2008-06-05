@@ -11,7 +11,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.varianceanalysis.LimitEigenPairFilter;
-import de.lmu.ifi.dbs.zelki.hough.old.HoughOLD4;
 
 import java.util.List;
 import java.util.Vector;
