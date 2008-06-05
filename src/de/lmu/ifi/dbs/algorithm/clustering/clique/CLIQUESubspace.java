@@ -26,7 +26,7 @@ public class CLIQUESubspace<V extends RealVector<V, ?>> extends Subspace<V> impl
     /**
      * The dense units belonging to this subspace.
      */
-    private List<Unit<V>> denseUnits;
+    private List<CLIQUEUnit<V>> denseUnits;
 
     /**
      * The coverage of this subspace, which is the number of all feature vectors that fall inside
@@ -41,7 +41,7 @@ public class CLIQUESubspace<V extends RealVector<V, ?>> extends Subspace<V> impl
      */
     public CLIQUESubspace(int dimension) {
         super(dimension);
-        denseUnits = new ArrayList<Unit<V>>();
+        denseUnits = new ArrayList<CLIQUEUnit<V>>();
         coverage = 0;
     }
 
@@ -52,7 +52,7 @@ public class CLIQUESubspace<V extends RealVector<V, ?>> extends Subspace<V> impl
      */
     public CLIQUESubspace(SortedSet<Integer> dimensions) {
         super(dimensions);
-        denseUnits = new ArrayList<Unit<V>>();
+        denseUnits = new ArrayList<CLIQUEUnit<V>>();
         coverage = 0;
     }
 
@@ -61,7 +61,7 @@ public class CLIQUESubspace<V extends RealVector<V, ?>> extends Subspace<V> impl
      *
      * @param unit the unit to be added.
      */
-    public void addDenseUnit(Unit<V> unit) {
+    public void addDenseUnit(CLIQUEUnit<V> unit) {
         Collection<Interval> intervals = unit.getIntervals();
         for (Interval interval : intervals) {
             if (!getDimensions().contains(interval.getDimension())) {
@@ -114,7 +114,7 @@ public class CLIQUESubspace<V extends RealVector<V, ?>> extends Subspace<V> impl
     public Map<CLIQUEModel<V>, Set<Integer>> determineClusters(Database<V> database) {
         Map<CLIQUEModel<V>, Set<Integer>> clusters = new HashMap<CLIQUEModel<V>, Set<Integer>>();
 
-        for (Unit<V> unit : denseUnits) {
+        for (CLIQUEUnit<V> unit : denseUnits) {
             if (!unit.isAssigned()) {
                 Set<Integer> cluster = new HashSet<Integer>();
                 CLIQUEModel<V> model = new CLIQUEModel<V>(database, this);
@@ -134,16 +134,16 @@ public class CLIQUESubspace<V extends RealVector<V, ?>> extends Subspace<V> impl
      * @param unit    the unit
      * @param cluster the ids of the feature vectors of the current cluster
      */
-    public void dfs(Unit<V> unit, Set<Integer> cluster) {
+    public void dfs(CLIQUEUnit<V> unit, Set<Integer> cluster) {
         cluster.addAll(unit.getIds());
         unit.markAsAssigned();
 
         for (Integer dim : getDimensions()) {
-            Unit<V> left = leftNeighbour(unit, dim);
+            CLIQUEUnit<V> left = leftNeighbour(unit, dim);
             if (left != null && !left.isAssigned())
                 dfs(left, cluster);
 
-            Unit<V> right = rightNeighbour(unit, dim);
+            CLIQUEUnit<V> right = rightNeighbour(unit, dim);
             if (right != null && !right.isAssigned())
                 dfs(right, cluster);
         }
@@ -156,10 +156,10 @@ public class CLIQUESubspace<V extends RealVector<V, ?>> extends Subspace<V> impl
      * @param dim  the dimension
      * @return the left neighbor of the given unit in the specified dimension
      */
-    public Unit<V> leftNeighbour(Unit unit, Integer dim) {
+    public CLIQUEUnit<V> leftNeighbour(CLIQUEUnit unit, Integer dim) {
         Interval i = unit.getInterval(dim);
 
-        for (Unit<V> u : denseUnits) {
+        for (CLIQUEUnit<V> u : denseUnits) {
             if (u.containsLeftNeighbor(i))
                 return u;
         }
@@ -173,10 +173,10 @@ public class CLIQUESubspace<V extends RealVector<V, ?>> extends Subspace<V> impl
      * @param dim  the dimension
      * @return the right neighbor of the given unit in the specified dimension
      */
-    public Unit<V> rightNeighbour(Unit unit, Integer dim) {
+    public CLIQUEUnit<V> rightNeighbour(CLIQUEUnit unit, Integer dim) {
         Interval i = unit.getInterval(dim);
 
-        for (Unit<V> u : denseUnits) {
+        for (CLIQUEUnit<V> u : denseUnits) {
             if (u.containsRightNeighbor(i))
                 return u;
         }
@@ -213,9 +213,9 @@ public class CLIQUESubspace<V extends RealVector<V, ?>> extends Subspace<V> impl
 
         CLIQUESubspace<V> s = new CLIQUESubspace<V>(dimensions);
         for (int i = 0; i < this.denseUnits.size(); i++) {
-            Unit<V> u1 = this.denseUnits.get(i);
-            for (Unit<V> u2 : other.denseUnits) {
-                Unit<V> u = u1.join(u2, all, tau);
+            CLIQUEUnit<V> u1 = this.denseUnits.get(i);
+            for (CLIQUEUnit<V> u2 : other.denseUnits) {
+                CLIQUEUnit<V> u = u1.join(u2, all, tau);
                 if (u != null) {
                     s.addDenseUnit(u);
                 }
@@ -238,7 +238,7 @@ public class CLIQUESubspace<V extends RealVector<V, ?>> extends Subspace<V> impl
         result.append(super.toString(pre));
         result.append(pre).append("Coverage: ").append(coverage).append("\n");
         result.append(pre).append("Units: " + "\n");
-        for (Unit<V> denseUnit : denseUnits) {
+        for (CLIQUEUnit<V> denseUnit : denseUnits) {
             result.append(pre).append("   ").append(denseUnit.toString()).append("   ")
                 .append(denseUnit.getIds().size()).append(" objects\n");
         }

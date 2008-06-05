@@ -18,14 +18,22 @@ import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.distance.distancefunction.WeightedDistanceFunction;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
-import de.lmu.ifi.dbs.utilities.*;
+import de.lmu.ifi.dbs.utilities.Description;
+import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
+import de.lmu.ifi.dbs.utilities.Progress;
+import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.utilities.heap.HeapNode;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.varianceanalysis.AbstractPCA;
 import de.lmu.ifi.dbs.varianceanalysis.FirstNEigenPairFilter;
 
 import java.util.ArrayList;
@@ -39,6 +47,7 @@ import java.util.Vector;
 /**
  * Subspace clustering algorithm based on the hough transform.
  * todo hierarchy
+ * todo parameter
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
@@ -242,11 +251,11 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
      */
     public Description getDescription() {
         return new Description("CASH",
-                               "Robust clustering in arbitrarily oriented subspaces",
-                               "Subspace clustering algorithm based on the hough transform.",
-                               "E. Achtert, C. Boehm, J. David, P. Kroeger, A. Zimek: " +
-                               "Robust clustering in arbitraily oriented subspaces. " +
-                               "In Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008");
+            "Robust clustering in arbitrarily oriented subspaces",
+            "Subspace clustering algorithm based on the hough transform.",
+            "E. Achtert, C. Boehm, J. David, P. Kroeger, A. Zimek: " +
+            "Robust clustering in arbitraily oriented subspaces. " +
+            "In Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008");
     }
 
     /**
@@ -558,7 +567,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
         double[] nn = new double[alpha.length + 1];
         for (int i = 0; i < nn.length; i++) {
             double alpha_i = i == alpha.length ? 0 : alpha[i];
-            nn[i] = sinusProduct(0, i, alpha) * Math.cos(alpha_i);
+            nn[i] = sinusProduct(0, i, alpha) * StrictMath.cos(alpha_i);
         }
         Matrix n = new Matrix(nn, alpha.length + 1);
         return n.completeToOrthonormalBasis();
@@ -577,7 +586,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
     private double sinusProduct(int start, int end, double[] alpha) {
         double result = 1;
         for (int j = start; j < end; j++) {
-            result *= Math.sin(alpha[j]);
+            result *= StrictMath.sin(alpha[j]);
         }
         return result;
     }

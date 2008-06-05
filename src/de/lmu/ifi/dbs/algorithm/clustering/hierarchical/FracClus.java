@@ -18,6 +18,7 @@ import java.util.List;
 
 /**
  * todo arthur comment all
+ * todo parameter
  * @author Arthur Zimek
  * @param <V> the type of RealVector handled by this Algorithm
  */
@@ -85,7 +86,7 @@ public class FracClus<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
             }
 
             clusters.add(cluster);
-            cluster = null;
+           //cluster = null;
             if (this.isVerbose()) {
                 agglomeration.setProcessed(level);
                 progress(agglomeration);
@@ -115,7 +116,6 @@ public class FracClus<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
     }
 
     public Description getDescription() {
-        // TODO Auto-generated method stub
         return new Description("FracClus", "Fractal Dimension based Clustering", "", "unpublished");
     }
 

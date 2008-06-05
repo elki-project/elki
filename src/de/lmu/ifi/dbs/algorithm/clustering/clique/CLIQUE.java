@@ -48,6 +48,7 @@ import java.util.TreeSet;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  * @param <V> the type of RealVector handled by this Algorithm
+ * todo parameter
  */
 public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> implements Clustering<V> {
 
@@ -139,11 +140,11 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
      */
     public Description getDescription() {
         return new Description("CLIQUE",
-                               "Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications",
-                               "Grid-based algorithm to identify dense clusters in subspaces of maximum dimensionality. ",
-                               "R. Agrawal, J. Gehrke, D. Gunopulos, P. Raghavan: " +
-                               "Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications. " +
-                               "In Proc. SIGMOD Conference, Seattle, WA, 1998.");
+            "Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications",
+            "Grid-based algorithm to identify dense clusters in subspaces of maximum dimensionality. ",
+            "R. Agrawal, J. Gehrke, D. Gunopulos, P. Raghavan: " +
+            "Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications. " +
+            "In Proc. SIGMOD Conference, Seattle, WA, 1998.");
     }
 
     /**
@@ -275,7 +276,7 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
      */
     private SortedSet<CLIQUESubspace<V>> findDenseSubspaces(Database<V> database, SortedSet<CLIQUESubspace<V>> denseSubspaces) {
         SortedSet<CLIQUESubspace<V>> denseSubspaceCandidates = findDenseSubspaceCandidates(database,
-                                                                                           denseSubspaces);
+            denseSubspaces);
 
         if (prune)
             return pruneDenseSubspaces(denseSubspaceCandidates);
@@ -289,7 +290,7 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
      * @param database the database to run the algorithm on
      * @return the created one dimensional units
      */
-    private Collection<Unit<V>> initOneDimensionalUnits(Database<V> database) {
+    private Collection<CLIQUEUnit<V>> initOneDimensionalUnits(Database<V> database) {
         int dimensionality = database.dimensionality();
         // initialize minima and maxima
         double[] minima = new double[dimensionality];
@@ -338,10 +339,10 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
         }
 
         // build the 1 dimensional units
-        List<Unit<V>> units = new ArrayList<Unit<V>>((xsi * dimensionality));
+        List<CLIQUEUnit<V>> units = new ArrayList<CLIQUEUnit<V>>((xsi * dimensionality));
         for (int x = 0; x < xsi; x++) {
             for (int d = 0; d < dimensionality; d++) {
-                units.add(new Unit<V>(new Interval(d, unit_bounds[x][d], unit_bounds[x + 1][d])));
+                units.add(new CLIQUEUnit<V>(new Interval(d, unit_bounds[x][d], unit_bounds[x + 1][d])));
             }
         }
 
@@ -382,15 +383,15 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
      * @return the one-dimensional dense subspace candidates
      */
     private SortedSet<CLIQUESubspace<V>> findOneDimensionalDenseSubspaceCandidates(Database<V> database) {
-        Collection<Unit<V>> units = initOneDimensionalUnits(database);
-        Collection<Unit<V>> denseUnits = new ArrayList<Unit<V>>();
+        Collection<CLIQUEUnit<V>> units = initOneDimensionalUnits(database);
+        Collection<CLIQUEUnit<V>> denseUnits = new ArrayList<CLIQUEUnit<V>>();
         Map<Integer, CLIQUESubspace<V>> denseSubspaces = new HashMap<Integer, CLIQUESubspace<V>>();
 
         // identify dense units
         double total = database.size();
         for (Iterator<Integer> it = database.iterator(); it.hasNext();) {
             V featureVector = database.get(it.next());
-            for (Unit<V> unit : units) {
+            for (CLIQUEUnit<V> unit : units) {
                 unit.addFeatureVector(featureVector);
                 // unit is a dense unit
                 if (!it.hasNext() && unit.selectivity(total) >= tau) {
