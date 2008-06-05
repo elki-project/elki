@@ -32,6 +32,9 @@ import java.util.List;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  * @param <V> the type of NumberVector handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
+ * @param <N> the type of node used in the spatial index structure
+ * @param <E> the type of entry used in the spatial node
+ * todo parameter
  */
 public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry>
     extends DistanceBasedAlgorithm<V, D> {
@@ -59,7 +62,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
      */
     public KNNJoin() {
         super();
-        optionHandler.put(K_PARAM);
+        addOption(K_PARAM);
     }
 
     /**

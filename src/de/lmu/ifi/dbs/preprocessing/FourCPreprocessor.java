@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.database.AssociationID;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.utilities.QueryResult;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.*;
 import de.lmu.ifi.dbs.varianceanalysis.LimitEigenPairFilter;
@@ -163,8 +164,7 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
         // save parameters for pca
         List<String> tmpPCAParameters = new ArrayList<String>();
         // eigen pair filter
-        tmpPCAParameters.add(OptionHandler.OPTION_PREFIX + LinearLocalPCA.EIGENPAIR_FILTER_PARAM.getName());
-        tmpPCAParameters.add(LimitEigenPairFilter.class.getName());
+        Util.addParameter(tmpPCAParameters, OptionID.PCA_EIGENPAIR_FILTER, LimitEigenPairFilter.class.getName());
         // abs
         if (absolute) {
             tmpPCAParameters.add(OptionHandler.OPTION_PREFIX + LimitEigenPairFilter.ABSOLUTE_F);
@@ -217,7 +217,7 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
         description.append(" computes the local dimensionality and locally weighted matrix of objects of a certain database according to the 4C algorithm.\n");
         description.append("The PCA is based on epsilon range queries.\n");
         description.append(optionHandler.usage("", false));
-		return description.toString();
-	}
+        return description.toString();
+    }
 
 }

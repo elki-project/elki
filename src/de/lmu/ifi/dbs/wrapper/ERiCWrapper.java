@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.AbortException;
-import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.algorithm.clustering.ERiC;
 import de.lmu.ifi.dbs.distance.distancefunction.ERiCDistanceFunction;
@@ -97,8 +96,7 @@ public class ERiCWrapper extends NormalizationWrapper {
         List<String> parameters = super.getKDDTaskParameters();
 
         // algorithm ERiC
-        parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-        parameters.add(ERiC.class.getName());
+        Util.addParameter(parameters, OptionID.ALGORITHM, ERiC.class.getName());
 
         // partition algorithm DBSCAN
         Util.addParameter(parameters, OptionID.COPAA_PARTITION_ALGORITHM, DBSCAN.class.getName());

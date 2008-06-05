@@ -6,18 +6,9 @@ import de.lmu.ifi.dbs.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.normalization.Normalization;
-import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.FileParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.io.File;
 import java.util.List;
@@ -32,7 +23,6 @@ import java.util.logging.Logger;
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  */
 public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
-
     /**
      * The String for calling this class' main routine on command line
      * interface.
@@ -42,107 +32,80 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
     /**
      * The newline string according to system.
      */
-    public static final String NEWLINE = System.getProperty("line.separator");
+    private static final String NEWLINE = System.getProperty("line.separator");
 
     /**
-     * The parameter algorithm.
+     * Flag to obtain help-message.
+     * <p>Key: {@code -h} </p>
      */
-    public static final String ALGORITHM_P = "algorithm";
+    private final Flag HELP_FLAG = new Flag(OptionID.HELP);
 
     /**
-     * Description for parameter algorithm.
+     * Flag to obtain help-message.
+     * <p>Key: {@code -help} </p>
      */
-    public static final String ALGORITHM_D = "classname of an algorithm "
-                                             + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Algorithm.class)
-                                             + ". Either full name to identify classpath or only classname, if its package is " + Algorithm.class.getPackage().getName();
+    private final Flag HELP_LONG_FLAG = new Flag(OptionID.HELP_LONG);
 
     /**
-     * Help flag.
+     * Parameter to specify the algorithm to be applied,
+     * must extend {@link de.lmu.ifi.dbs.algorithm.Algorithm}.
+     * <p>Key: {@code -algorithm} </p>
      */
-    public static final String HELP_F = "h";
+    private final ClassParameter<Algorithm> ALGORITHM_PARAM =
+        new ClassParameter<Algorithm>(OptionID.ALGORITHM, Algorithm.class);
 
     /**
-     * Long help flag.
+     * Optional Parameter to specify a class to obtain a description for,
+     * must extend {@link de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable}.
+     * <p>Key: {@code -description} </p>
      */
-    public static final String HELPLONG_F = "help";
+    private final ClassParameter<Parameterizable> DESCRIPTION_PARAM =
+        new ClassParameter<Parameterizable>(OptionID.DESCRIPTION, Parameterizable.class, true);
 
     /**
-     * Description for help flag.
+     * Parameter to specify the database connection to be used,
+     * must extend {@link de.lmu.ifi.dbs.database.connection.DatabaseConnection}.
+     * <p>Key: {@code -dbc} </p>
+     * <p>Default value: {@link FileBasedDatabaseConnection} </p>
      */
-    public static final String HELP_D = "flag to obtain help-message, either for the main-routine or for any specified algorithm. Causes immediate stop of the program.";
+    private final ClassParameter<DatabaseConnection> DATABASE_CONNECTION_PARAM =
+        new ClassParameter<DatabaseConnection>(OptionID.DATABASE_CONNECTION,
+            DatabaseConnection.class, FileBasedDatabaseConnection.class.getName());
 
     /**
-     * Description flag.
+     * Optional Parameter to specify the file to write the obtained results in.
+     * If this parameter is omitted, per default the output will sequentially be given to STDOUT.
+     * <p>Key: {@code -out} </p>
      */
-    public static final String DESCRIPTION_P = "description";
+    private final FileParameter OUTPUT_PARAM = new FileParameter(OptionID.OUTPUT,
+        FileParameter.FILE_OUT, true);
 
     /**
-     * Description for description parameter.
+     * Optional Parameter to specify a normalization in order to use a database with normalized values.
+     * <p>Key: {@code -norm} </p>
      */
-    public static final String DESCRIPTION_D = "name of a class to obtain a description - for classes that implement "
-                                               + Parameterizable.class.getName() + " -- no further processing will be performed.";
+    private final ClassParameter<Normalization> NORMALIZATION_PARAM =
+        new ClassParameter<Normalization>(OptionID.NORMALIZATION, Normalization.class, true);
 
     /**
-     * The default database connection.
+     * Flag to revert result to original values -
+     * invalid option if no normalization has been performed..
+     * <p>Key: {@code -normUndo} </p>
      */
-    private static final String DEFAULT_DATABASE_CONNECTION = FileBasedDatabaseConnection.class.getName();
+    private final Flag NORMALIZATION_UNDO_FLAG = new Flag(OptionID.NORMALIZATION_UNDO);
 
     /**
-     * Parameter for database connection.
-     */
-    public static final String DATABASE_CONNECTION_P = "dbc";
-
-    /**
-     * Description for parameter database connection.
-     */
-    public static final String DATABASE_CONNECTION_D = "classname of a class "
-                                                       + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DatabaseConnection.class)
-                                                       + ". Either full name to identify classpath or only classname, if its package is "
-                                                       + DatabaseConnection.class.getPackage().getName() + ". Default: " + DEFAULT_DATABASE_CONNECTION;
-
-    /**
-     * Parameter output.
-     */
-    public static final String OUTPUT_P = "out";
-
-    /**
-     * Description for parameter output.
-     */
-    public static final String OUTPUT_D = "file to write the obtained results in. If an algorithm requires several outputfiles, the given filename will be used as prefix followed by automatically created markers. If this parameter is omitted, per default the output will sequentially be given to STDOUT.";
-
-    /**
-     * Parameter normalization.
-     */
-    public static final String NORMALIZATION_P = "norm";
-
-    /**
-     * Description for parameter normalization.
-     */
-    public static final String NORMALIZATION_D = "a normalization to use a database with normalized values "
-                                                 + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Normalization.class);
-
-    /**
-     * Flag normalization undo.
-     */
-    public static final String NORMALIZATION_UNDO_F = "normUndo";
-
-    /**
-     * Description for flag normalization undo.
-     */
-    public static final String NORMALIZATION_UNDO_D = "flag to revert result to original values - invalid option if no normalization has been performed.";
-
-    /**
-     * The algorithm to run.
+     * Holds the algorithm to run.
      */
     private Algorithm<O> algorithm;
 
     /**
-     * The database connection to have the algorithm run with.
+     * Holds the database connection to have the algorithm run with.
      */
     private DatabaseConnection<O> databaseConnection;
 
     /**
-     * The file to print results to.
+     * Holds the file to print results to.
      */
     private File out;
 
@@ -168,40 +131,26 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
     public KDDTask() {
 
         // parameter algorithm
-        // noinspection unchecked
-        ClassParameter<Algorithm<O>> algParam = new ClassParameter(ALGORITHM_P, ALGORITHM_D, Algorithm.class);
-        optionHandler.put(algParam);
+        addOption(ALGORITHM_PARAM);
 
         // help flag
-        optionHandler.put(new Flag(HELP_F, HELP_D));
-
-        // help flag
-        optionHandler.put(new Flag(HELPLONG_F, HELP_D));
+        addOption(HELP_FLAG);
+        addOption(HELP_LONG_FLAG);
 
         // decription parameter
-        ClassParameter<Parameterizable> desc = new ClassParameter<Parameterizable>(DESCRIPTION_P, DESCRIPTION_D, Parameterizable.class);
-        desc.setOptional(true);
-        optionHandler.put(desc);
+        addOption(DESCRIPTION_PARAM);
 
         // parameter database connection
-        // noinspection unchecked
-        ClassParameter<DatabaseConnection<O>> dbCon = new ClassParameter(DATABASE_CONNECTION_P, DATABASE_CONNECTION_D, DatabaseConnection.class);
-        dbCon.setDefaultValue(DEFAULT_DATABASE_CONNECTION);
-        optionHandler.put(dbCon);
+        addOption(DATABASE_CONNECTION_PARAM);
 
         // parameter output file
-        FileParameter outputFile = new FileParameter(OUTPUT_P, OUTPUT_D, FileParameter.FILE_OUT);
-        outputFile.setOptional(true);
-        optionHandler.put(outputFile);
+        addOption(OUTPUT_PARAM);
 
         // parameter normalization
-        // noinspection unchecked
-        ClassParameter<Normalization<O>> norm = new ClassParameter(NORMALIZATION_P, NORMALIZATION_D, Normalization.class);
-        norm.setOptional(true);
-        optionHandler.put(norm);
+        addOption(NORMALIZATION_PARAM);
 
         // normalization-undo flag
-        optionHandler.put(new Flag(NORMALIZATION_UNDO_F, NORMALIZATION_UNDO_D));
+        addOption(NORMALIZATION_UNDO_FLAG);
 
         optionHandler.setProgrammCall(CALL);
         if (this.debug) {
@@ -235,7 +184,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
         usage.append(NEWLINE);
         if (algorithm != null) {
             usage.append(OptionHandler.OPTION_PREFIX);
-            usage.append(ALGORITHM_P);
+            usage.append(ALGORITHM_PARAM.getName());
             usage.append(" ");
             usage.append(algorithm.description());
             usage.append(NEWLINE);
@@ -255,25 +204,26 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
         String[] remainingParameters = optionHandler.grabOptions(args);
 
         // help
-        if (optionHandler.isSet(HELP_F) || optionHandler.isSet(HELPLONG_F)) {
+        if (isSet(HELP_FLAG) || isSet(HELP_LONG_FLAG)) {
             throw new AbortException(description());
         }
 
         // description
-        if (optionHandler.isSet(DESCRIPTION_P)) {
-            String parameterizableName = optionHandler.getOptionValue(DESCRIPTION_P);
+        if (isSet(DESCRIPTION_PARAM)) {
+            String descriptionClass = getParameterValue(DESCRIPTION_PARAM);
             Parameterizable p;
             try {
                 try {
-                    p = Util.instantiate(Algorithm.class, parameterizableName);
+                    p = Util.instantiate(Algorithm.class, descriptionClass);
                 }
                 catch (UnableToComplyException e) {
-                    p = Util.instantiate(Parameterizable.class, parameterizableName);
+                    p = Util.instantiate(Parameterizable.class, descriptionClass);
                 }
             }
             catch (UnableToComplyException e) {
                 exception(e.getMessage(), e);
-                throw new WrongParameterValueException(DESCRIPTION_P, parameterizableName, DESCRIPTION_D, e);
+                throw new WrongParameterValueException(DESCRIPTION_PARAM.getName(),
+                    descriptionClass, DESCRIPTION_PARAM.getDescription(), e);
             }
             if (p instanceof Algorithm) {
                 Algorithm<?> a = (Algorithm<?>) p;
@@ -285,51 +235,56 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
         }
 
         // algorithm
-        String algorithmName = (String) optionHandler.getOptionValue(ALGORITHM_P);
+        String algorithmClass = getParameterValue(ALGORITHM_PARAM);
         try {
             // noinspection unchecked
-            algorithm = Util.instantiate(Algorithm.class, algorithmName);
+            algorithm = Util.instantiate(Algorithm.class, algorithmClass);
         }
         catch (UnableToComplyException e) {
             exception(e.getMessage(), e);
-            throw new WrongParameterValueException(ALGORITHM_P, algorithmName, ALGORITHM_D, e);
+            throw new WrongParameterValueException(ALGORITHM_PARAM.getName(),
+                algorithmClass,
+                ALGORITHM_PARAM.getDescription(),
+                e);
         }
 
         // database connection
-        String databaseConnectionName = (String) optionHandler.getOptionValue(DATABASE_CONNECTION_P);
+        String databaseConnectionClass = getParameterValue(DATABASE_CONNECTION_PARAM);
 
         try {
             // noinspection unchecked
-            databaseConnection = Util.instantiate(DatabaseConnection.class, databaseConnectionName);
+            databaseConnection = Util.instantiate(DatabaseConnection.class, databaseConnectionClass);
         }
         catch (UnableToComplyException e) {
             exception(e.getMessage(), e);
-            throw new WrongParameterValueException(DATABASE_CONNECTION_P, databaseConnectionName, DATABASE_CONNECTION_D, e);
+            throw new WrongParameterValueException(DATABASE_CONNECTION_PARAM.getName(),
+                databaseConnectionClass, DATABASE_CONNECTION_PARAM.getDescription(), e);
         }
 
         // output
-        if (optionHandler.isSet(OUTPUT_P)) {
-            out = (File) optionHandler.getOptionValue(OUTPUT_P);
+        if (isSet(OUTPUT_PARAM)) {
+            out = getParameterValue(OUTPUT_PARAM);
         }
 
         // normalization
-        if (optionHandler.isSet(NORMALIZATION_P)) {
-
-            String normalizationName = (String) optionHandler.getOptionValue(NORMALIZATION_P);
+        if (isSet(NORMALIZATION_PARAM)) {
+            String normalizationClass = getParameterValue(NORMALIZATION_PARAM);
             try {
                 // noinspection unchecked
-                normalization = Util.instantiate(Normalization.class, normalizationName);
+                normalization = Util.instantiate(Normalization.class, normalizationClass);
             }
             catch (UnableToComplyException e) {
                 exception(e.getMessage(), e);
-                throw new WrongParameterValueException(NORMALIZATION_P, normalizationName, NORMALIZATION_D, e);
+                throw new WrongParameterValueException(NORMALIZATION_PARAM.getName(),
+                    normalizationClass, NORMALIZATION_PARAM.getDescription(), e);
             }
-            normalizationUndo = optionHandler.isSet(NORMALIZATION_UNDO_F);
+            normalizationUndo = isSet(NORMALIZATION_UNDO_FLAG);
             remainingParameters = normalization.setParameters(remainingParameters);
         }
-        else if (optionHandler.isSet(NORMALIZATION_UNDO_F)) {
-            throw new WrongParameterValueException("Illegal parameter setting: Flag " + NORMALIZATION_UNDO_F
-                                                   + " is set, but no normalization is specified.");
+        else if (isSet(NORMALIZATION_UNDO_FLAG)) {
+            throw new WrongParameterValueException("Illegal parameter setting: Flag " +
+                NORMALIZATION_UNDO_FLAG +
+                " is set, but no normalization is specified.");
         }
 
         remainingParameters = algorithm.setParameters(remainingParameters);

@@ -22,11 +22,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +34,7 @@ import java.util.Map;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  * @param <O> the type of DatabaseObjects handled by this Algorithm
+ * todo parameter
  */
 public class OnlineLOF<O extends DatabaseObject> extends OnlineBasicLOF<O> {
 
@@ -85,8 +82,8 @@ public class OnlineLOF<O extends DatabaseObject> extends OnlineBasicLOF<O> {
      * Description of parameter parser.
      */
     public final static String PARSER_D = "a parser to parse the insertion and/or deletion files " +
-                                          Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Parser.class) +
-                                          ". Default: " + DEFAULT_PARSER;
+        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Parser.class) +
+        ". Default: " + DEFAULT_PARSER;
 
     /**
      * The objects to be inserted.
@@ -154,9 +151,9 @@ public class OnlineLOF<O extends DatabaseObject> extends OnlineBasicLOF<O> {
      */
     public Description getDescription() {
         return new Description("OnlineLOF", "Online Local Outlier Factor",
-                               "Algorithm to efficiently update density-based local outlier factors in a database " +
-                               "after insertion or deletion of new objects. ",
-                               "unpublished.");
+            "Algorithm to efficiently update density-based local outlier factors in a database " +
+                "after insertion or deletion of new objects. ",
+            "unpublished.");
     }
 
     /**
@@ -223,8 +220,8 @@ public class OnlineLOF<O extends DatabaseObject> extends OnlineBasicLOF<O> {
 
         if (this.debug) {
             StringBuffer msg = new StringBuffer();
-            msg.append("\nkNNs[" + o + "] " + neighbors);
-            msg.append("\nrNNs[" + o + "]" + reverseNeighbors);
+            msg.append("\nkNNs[").append(o).append("] ").append(neighbors);
+            msg.append("\nrNNs[").append(o).append("]").append(reverseNeighbors);
             debugFine(msg.toString());
         }
 
@@ -264,15 +261,15 @@ public class OnlineLOF<O extends DatabaseObject> extends OnlineBasicLOF<O> {
 
             if (this.debug) {
                 debugFine("\nold neighbor [" + p + "] " + neighbor_p_old +
-                          "\nnew neighbor [" + p + "] " + neighbor_p_new +
-                          "\nnew kNNs[" + p + "] " + nnTable.getNeighbors(p));
+                    "\nnew neighbor [" + p + "] " + neighbor_p_new +
+                    "\nnew kNNs[" + p + "] " + nnTable.getNeighbors(p));
             }
 
             // 1.3.1 update sum1 of lof(p)
             LOFEntry lof_p = lofTable.getLOFEntryForUpdate(p);
             double sum1_p = lof_p.getSum1()
-                            - neighbor_p_old.getReachabilityDistance()
-                            + neighbor_p_new.getReachabilityDistance();
+                - neighbor_p_old.getReachabilityDistance()
+                + neighbor_p_new.getReachabilityDistance();
             lof_p.setSum1(sum1_p);
 
             // 1.3.2 update sum2 of lof(p)
@@ -288,8 +285,8 @@ public class OnlineLOF<O extends DatabaseObject> extends OnlineBasicLOF<O> {
                 LOFEntry lof_q = lofTable.getLOFEntryForUpdate(q.getObjectID());
                 double sum2_q_old = lof_q.getSum2(q.getIndex());
                 double sum2_q = sum2_q_old
-                                - neighbor_p_old.getReachabilityDistance()
-                                + neighbor_p_new.getReachabilityDistance();
+                    - neighbor_p_old.getReachabilityDistance()
+                    + neighbor_p_new.getReachabilityDistance();
                 lof_q.setSum2(q.getIndex(), sum2_q);
             }
         }
@@ -314,8 +311,8 @@ public class OnlineLOF<O extends DatabaseObject> extends OnlineBasicLOF<O> {
                     // 2.2 update sum1 of lof(q)
                     LOFEntry lof_q = lofTable.getLOFEntryForUpdate(q.getObjectID());
                     double sum1_q = lof_q.getSum1()
-                                    - reachDist_qp_old
-                                    + reachDist_qp_new;
+                        - reachDist_qp_old
+                        + reachDist_qp_new;
                     lof_q.setSum1(sum1_q);
 
                     // 2.3 for all r in rnn(q): update sum2 of lof(r)
@@ -326,8 +323,8 @@ public class OnlineLOF<O extends DatabaseObject> extends OnlineBasicLOF<O> {
                     for (Neighbor r : rnns_q) {
                         LOFEntry lof_r = lofTable.getLOFEntryForUpdate(r.getObjectID());
                         double sum2_r = lof_r.getSum2(r.getIndex())
-                                        - reachDist_qp_old
-                                        + reachDist_qp_new;
+                            - reachDist_qp_old
+                            + reachDist_qp_new;
                         lof_r.setSum2(r.getIndex(), sum2_r);
                     }
                 }

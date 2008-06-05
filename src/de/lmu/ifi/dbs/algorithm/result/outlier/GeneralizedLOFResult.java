@@ -25,10 +25,10 @@ import java.util.List;
  * Provides the result of the LOF algorithm.
  *
  * @author Arthur Zimek
+ * @param <O> the type of DatabaseObjects handled by this Result
  */
 
-public class GeneralizedLOFResult<O extends DatabaseObject> extends AbstractResult<O>
-{
+public class GeneralizedLOFResult<O extends DatabaseObject> extends AbstractResult<O> {
 
     /**
      * Marker for a file name containing lofs.
@@ -37,27 +37,24 @@ public class GeneralizedLOFResult<O extends DatabaseObject> extends AbstractResu
 
     /**
      * A new LOFResult set for a database.
-     * 
+     * <p/>
      * The database needs to contain associations for the computed lofs
      * with <code>AssociationID</code> {@link de.lmu.ifi.dbs.database.AssociationID#LOF LOF}.
      *
-     * @param db       the database containing the LOFs as association
+     * @param db the database containing the LOFs as association
      */
-    public GeneralizedLOFResult(Database<O> db)
-    {
+    public GeneralizedLOFResult(Database<O> db) {
         super(db);
         this.db = db;
     }
 
     /**
-     * @see AbstractResult#output(java.io.File, de.lmu.ifi.dbs.normalization.Normalization, java.util.List)
+     * @see AbstractResult#output(java.io.File,de.lmu.ifi.dbs.normalization.Normalization,java.util.List)
      */
     @Override
-    public void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException
-    {
+    public void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         PrintStream outStream;
-        try
-        {
+        try {
             File lofFile = new File(out.getAbsolutePath() + File.separator + LOF_MARKER + FILE_EXTENSION);
             lofFile.getParentFile().mkdirs();
             PrintStream lofOut = new PrintStream(new FileOutputStream(lofFile));
@@ -65,18 +62,16 @@ public class GeneralizedLOFResult<O extends DatabaseObject> extends AbstractResu
             lofOut.flush();
 
         }
-        catch(Exception e)
-        {
+        catch (Exception e) {
             outStream = new PrintStream(new FileOutputStream(FileDescriptor.out));
             output(outStream, normalization, settings);
         }
     }
 
     /**
-     * @see AbstractResult#output(java.io.PrintStream, de.lmu.ifi.dbs.normalization.Normalization, java.util.List)
+     * @see AbstractResult#output(java.io.PrintStream,de.lmu.ifi.dbs.normalization.Normalization,java.util.List)
      */
-    public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException
-    {
+    public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
 
         outputLOF(outStream, normalization, settings);
         outStream.flush();
@@ -90,52 +85,46 @@ public class GeneralizedLOFResult<O extends DatabaseObject> extends AbstractResu
      *                      - may remain null.
      * @param settings      the settings to be written into the header, if this parameter is <code>null</code>,
      *                      no header will be written
+     * @throws de.lmu.ifi.dbs.utilities.UnableToComplyException if an eror during normalization occurs
      */
-    private void outputLOF(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException
-    {
+    private void outputLOF(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
 
         writeHeader(outStream, settings, null);
 
-        try
-        {
-          List<IDDoublePair> lofs = new ArrayList<IDDoublePair>(db.size());
-          for(Iterator<Integer> it = db.iterator(); it.hasNext();)
-          {
-            Integer id = it.next();
-              lofs.add(new IDDoublePair(id,db.getAssociation(AssociationID.LOF, id)));
-          }
-          Collections.sort(lofs);
+        try {
+            List<IDDoublePair> lofs = new ArrayList<IDDoublePair>(db.size());
+            for (Iterator<Integer> it = db.iterator(); it.hasNext();) {
+                Integer id = it.next();
+                lofs.add(new IDDoublePair(id, db.getAssociation(AssociationID.LOF, id)));
+            }
+            Collections.sort(lofs);
 
             // write lofs
-            for(IDDoublePair pair : lofs){
-              Integer id = pair.getID();
+            for (IDDoublePair pair : lofs) {
+                Integer id = pair.getID();
 
-              outStream.print("ID=");
+                outStream.print("ID=");
                 outStream.print(id);
                 outStream.print(" ");
 
                 O object = db.get(id);
-                if(normalization != null)
-                {
+                if (normalization != null) {
                     O restored = normalization.restore(object);
                     outStream.print(restored.toString());
                 }
-                else
-                {
+                else {
                     outStream.print(object.toString());
                 }
                 outStream.print(" ");
 
                 String label = db.getAssociation(AssociationID.LABEL, id);
-                if(label != null)
-                {
+                if (label != null) {
                     outStream.print(label);
                     outStream.print(" ");
                 }
 
                 ClassLabel<?> classLabel = db.getAssociation(AssociationID.CLASS, id);
-                if(classLabel != null)
-                {
+                if (classLabel != null) {
                     outStream.print(classLabel);
                     outStream.print(" ");
                 }
@@ -144,8 +133,7 @@ public class GeneralizedLOFResult<O extends DatabaseObject> extends AbstractResu
                 outStream.println(pair.getValue());
             }
         }
-        catch(NonNumericFeaturesException e)
-        {
+        catch (NonNumericFeaturesException e) {
             throw new UnableToComplyException(e);
         }
 

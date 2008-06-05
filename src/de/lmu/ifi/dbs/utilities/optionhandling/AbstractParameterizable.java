@@ -149,7 +149,7 @@ public abstract class AbstractParameterizable extends AbstractLoggable
      * @see de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler#isSet(Option)
      */
     protected boolean isSet(Option<?> option) {
-        return this.optionHandler.isSet(option);
+        return option.isSet();
     }
 
     /**

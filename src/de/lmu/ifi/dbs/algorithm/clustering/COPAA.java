@@ -37,6 +37,7 @@ public class COPAA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
      * must extend {@link de.lmu.ifi.dbs.algorithm.Algorithm}.
      * <p>Key: {@code -copaa.partitionAlgorithm} </p>
      */
+    @SuppressWarnings("unchecked")
     protected final ClassParameter PARTITION_ALGORITHM_PARAM =
         new ClassParameter(OptionID.COPAA_PARTITION_ALGORITHM, Algorithm.class);
 
@@ -80,11 +81,11 @@ public class COPAA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
     public COPAA() {
         super();
         //parameter preprocessor
-        optionHandler.put(PREPROCESSOR_PARAM);
+        addOption(PREPROCESSOR_PARAM);
         // parameter partition algorithm
-        optionHandler.put(PARTITION_ALGORITHM_PARAM);
+        addOption(PARTITION_ALGORITHM_PARAM);
         // parameter partition database class
-        optionHandler.put(PARTITION_DB_PARAM);
+        addOption(PARTITION_DB_PARAM);
     }
 
     /**
@@ -232,12 +233,8 @@ public class COPAA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         // partition algorithm
         String[] partitiongAlgorithmParameters = new String[remainingParameters.length];
         System.arraycopy(remainingParameters, 0, partitiongAlgorithmParameters, 0, remainingParameters.length);
-        if (isTime()) {
-            partitiongAlgorithmParameters = Util.addFlag(partitiongAlgorithmParameters, TIME_FLAG);
-        }
-        if (isVerbose()) {
-            partitiongAlgorithmParameters = Util.addFlag(partitiongAlgorithmParameters, VERBOSE_FLAG);
-        }
+        partitionAlgorithm.setTime(isTime());
+        partitionAlgorithm.setVerbose(isVerbose());
         remainingParameters = partitionAlgorithm.setParameters(partitiongAlgorithmParameters);
 
         setParameters(args, remainingParameters);

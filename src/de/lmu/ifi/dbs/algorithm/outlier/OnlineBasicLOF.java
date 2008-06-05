@@ -23,6 +23,7 @@ import java.util.List;
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  * @param <O> the type of DatabaseObjects handled by this Algorithm
+ * todo parameter
  */
 public class OnlineBasicLOF<O extends DatabaseObject> extends
     DistanceBasedAlgorithm<O, DoubleDistance> {
@@ -41,7 +42,7 @@ public class OnlineBasicLOF<O extends DatabaseObject> extends
      * Description for parameter filename.
      */
     public static final String PAGE_SIZE_D = "a positive integer value specifying the size of a page in bytes, "
-                                             + "default is " + DEFAULT_PAGE_SIZE + " Byte.";
+        + "default is " + DEFAULT_PAGE_SIZE + " Byte.";
 
     /**
      * The default cachesize.
@@ -57,7 +58,7 @@ public class OnlineBasicLOF<O extends DatabaseObject> extends
      * Description for parameter cachesize.
      */
     public static final String CACHE_SIZE_D = "a positive integer value specifying the size of the cache in bytes, "
-                                              + "default is Integer.MAX_VALUE Byte.";
+        + "default is Integer.MAX_VALUE Byte.";
 
     /**
      * Parameter minimum points.
@@ -175,7 +176,7 @@ public class OnlineBasicLOF<O extends DatabaseObject> extends
             lofTable = new LOFTable(pageSize, cacheSize, minpts);
             {
                 Progress progressLOFs = new Progress("LOF: LOF for objects",
-                                                     database.size());
+                    database.size());
                 int counter = 0;
                 for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
                     Integer id = iter.next();
@@ -193,22 +194,22 @@ public class OnlineBasicLOF<O extends DatabaseObject> extends
 
             if (isTime()) {
                 verbose("\nPhysical read Access LOF-Table: "
-                        + lofTable.getPhysicalReadAccess());
+                    + lofTable.getPhysicalReadAccess());
 
                 verbose("Physical write Access LOF-Table: "
-                        + lofTable.getPhysicalWriteAccess());
+                    + lofTable.getPhysicalWriteAccess());
 
                 verbose("Logical page Access LOF-Table:  "
-                        + lofTable.getLogicalPageAccess());
+                    + lofTable.getLogicalPageAccess());
 
                 verbose("Physical read Access NN-Table:  "
-                        + nnTable.getPhysicalReadAccess());
+                    + nnTable.getPhysicalReadAccess());
 
                 verbose("Physical write Access NN-Table:  "
-                        + nnTable.getPhysicalWriteAccess());
+                    + nnTable.getPhysicalWriteAccess());
 
                 verbose("Logical page Access NN-Table:   "
-                        + nnTable.getLogicalPageAccess());
+                    + nnTable.getLogicalPageAccess());
             }
         }
     }
@@ -270,11 +271,11 @@ public class OnlineBasicLOF<O extends DatabaseObject> extends
             "LOF",
             "Local Outlier Factor",
             "Algorithm to compute density-based local outlier factors in a database based on the parameter "
-            + MINPTS_P,
+                + MINPTS_P,
             "M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander: "
-            + " LOF: Identifying Density-Based Local Outliers. "
-            + "In: Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00), "
-            + "Dallas, TX, 2000.");
+                + " LOF: Identifying Density-Based Local Outliers. "
+                + "In: Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00), "
+                + "Dallas, TX, 2000.");
     }
 
     /**

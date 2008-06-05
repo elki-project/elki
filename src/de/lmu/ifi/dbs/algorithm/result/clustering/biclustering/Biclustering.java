@@ -23,11 +23,11 @@ import java.util.List;
 
 /**
  * A Biclustering result holds a set of biclusters.
- * 
+ *
  * @author Arthur Zimek
+ * @param <V> the type of RealVector handled by this Result
  */
-public class Biclustering<V extends RealVector<V, Double>> extends AbstractResult<V>
-{
+public class Biclustering<V extends RealVector<V, Double>> extends AbstractResult<V> {
     /**
      * Marker for a file name of a cluster.
      */
@@ -40,55 +40,46 @@ public class Biclustering<V extends RealVector<V, Double>> extends AbstractResul
 
     /**
      * Provides a Result.
-     * 
+     *
      * @param database the database where this result is defined on
      */
-    public Biclustering(Database<V> database)
-    {
+    public Biclustering(Database<V> database) {
         super(database);
         biclusters = new ArrayList<Bicluster<V>>();
     }
-    
+
     /**
      * Appends the given bicluster to this result.
-     * 
-     * 
+     *
      * @param bicluster the bicluster to be appended
      */
-    public void appendBicluster(Bicluster<V> bicluster)
-    {
+    public void appendBicluster(Bicluster<V> bicluster) {
         biclusters.add(bicluster);
     }
-    
+
     /**
      * Returns the bicluster with a given index in the result.
-     *  
+     *
      * @param clusterIndex the index of the cluster in the result - cluster appended first has index 0.
      * @return the bicluster appended as {@code clusterIndex+1}<sup>th</sup> to this result
      */
-    public Bicluster<V> getBicluster(int clusterIndex)
-    {
+    public Bicluster<V> getBicluster(int clusterIndex) {
         return biclusters.get(clusterIndex);
     }
-    
+
     /**
-     * 
-     * @see de.lmu.ifi.dbs.algorithm.result.Result#output(java.io.PrintStream, de.lmu.ifi.dbs.normalization.Normalization, java.util.List)
+     * @see de.lmu.ifi.dbs.algorithm.result.Result#output(java.io.PrintStream,de.lmu.ifi.dbs.normalization.Normalization,java.util.List)
      */
-    public void output(PrintStream outStream, Normalization<V> normalization, List<AttributeSettings> settings) throws UnableToComplyException
-    {
+    public void output(PrintStream outStream, Normalization<V> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         int c = 0;
-        for(Bicluster<V> bicluster : biclusters)
-        {
+        for (Bicluster<V> bicluster : biclusters) {
             c++;
             String marker = CLUSTER_MARKER + Format.format(c, biclusters.size()) + FILE_EXTENSION;
             outStream.println(marker + ":");
-            try
-            {
+            try {
                 write(bicluster, outStream, normalization, settings);
             }
-            catch(NonNumericFeaturesException e)
-            {
+            catch (NonNumericFeaturesException e) {
                 throw new UnableToComplyException(e);
             }
             outStream.flush();
@@ -97,73 +88,59 @@ public class Biclustering<V extends RealVector<V, Double>> extends AbstractResul
     }
 
     /**
-     * @see de.lmu.ifi.dbs.algorithm.result.Result#output(File, Normalization, List)
+     * @see de.lmu.ifi.dbs.algorithm.result.Result#output(File,Normalization,List)
      */
     @Override
-    public void output(File out, Normalization<V> normalization, List<AttributeSettings> settings) throws UnableToComplyException
-    {
+    public void output(File out, Normalization<V> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         int c = 0;
-        for(Bicluster<V> bicluster : biclusters)
-        {
+        for (Bicluster<V> bicluster : biclusters) {
             c++;
             String marker = CLUSTER_MARKER + Format.format(c, biclusters.size()) + FILE_EXTENSION;
             PrintStream markedOut;
-            try
-            {
+            try {
                 File markedFile = new File(out.getAbsolutePath() + File.separator + marker);
                 markedFile.getParentFile().mkdirs();
                 markedOut = new PrintStream(new FileOutputStream(markedFile));
             }
-            catch(Exception e)
-            {
+            catch (Exception e) {
                 markedOut = new PrintStream(new FileOutputStream(FileDescriptor.out));
                 markedOut.println(marker + ":");
             }
-            try
-            {
+            try {
                 write(bicluster, markedOut, normalization, settings);
             }
-            catch(NonNumericFeaturesException e)
-            {
+            catch (NonNumericFeaturesException e) {
                 throw new UnableToComplyException(e);
             }
             markedOut.flush();
         }
     }
-    
-    private void write(Bicluster<V> bicluster, PrintStream out, Normalization<V> normalization, List<AttributeSettings> settings) throws NonNumericFeaturesException
-    {
+
+    private void write(Bicluster<V> bicluster, PrintStream out, Normalization<V> normalization, List<AttributeSettings> settings) throws NonNumericFeaturesException {
         bicluster.sortIDs();
         writeHeader(out, settings, bicluster.headerInformation());
 
         Result<V> model = bicluster.model();
-        if(model != null)
-        {
-            try
-            {
+        if (model != null) {
+            try {
                 model.output(out, normalization, null);
             }
-            catch(UnableToComplyException e)
-            {
+            catch (UnableToComplyException e) {
                 exception(e.getMessage(), e);
             }
         }
 
-        for(Iterator<V> rows = bicluster.rowIterator(); rows.hasNext();)
-        {
+        for (Iterator<V> rows = bicluster.rowIterator(); rows.hasNext();) {
             V mo = rows.next();
-            if(normalization != null)
-            {
+            if (normalization != null) {
                 mo = normalization.restore(mo);
             }
             out.print(mo.toString());
             Associations associations = db.getAssociations(mo.getID());
             List<AssociationID> keys = new ArrayList<AssociationID>(associations.keySet());
             Collections.sort(keys);
-            for(AssociationID<?> id : keys)
-            {
-                if(id == AssociationID.CLASS || id == AssociationID.LABEL || id == AssociationID.LOCAL_DIMENSIONALITY)
-                {
+            for (AssociationID<?> id : keys) {
+                if (id == AssociationID.CLASS || id == AssociationID.LABEL || id == AssociationID.LOCAL_DIMENSIONALITY) {
                     out.print(SEPARATOR);
                     out.print(id.getName());
                     out.print("=");
@@ -174,5 +151,5 @@ public class Biclustering<V extends RealVector<V, Double>> extends AbstractResul
         }
         out.flush();
     }
-    
+
 }

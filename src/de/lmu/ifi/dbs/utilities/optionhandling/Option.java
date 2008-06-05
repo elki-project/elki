@@ -14,7 +14,7 @@ public abstract class Option<T> extends AbstractLoggable {
     /**
      * The option name.
      */
-    protected String name;
+    protected final String name;
 
     /**
      * The option description.
@@ -27,15 +27,15 @@ public abstract class Option<T> extends AbstractLoggable {
     protected T value;
 
     /**
-     * Sets the unique id of this option.
+     * Creates an option which is guaranteed
+     * to be have an unique name.
      *
      * @param optionID the unique id of the option
-     * todo name und description nach optionid aendern!
      */
     public Option(OptionID optionID) {
         super(LoggingConfiguration.DEBUG);
         this.name = optionID.getName();
-        this.description = optionID.getName();
+        this.description = optionID.getDescription();
     }
 
     /**
@@ -43,7 +43,7 @@ public abstract class Option<T> extends AbstractLoggable {
      *
      * @param name        The name of the option.
      * @param description The description of the option.
-     * @deprecated  use Option(optionID) instead
+     * @deprecated use Option(optionID) instead
      */
     public Option(String name, String description) {
         super(LoggingConfiguration.DEBUG);
@@ -67,6 +67,14 @@ public abstract class Option<T> extends AbstractLoggable {
      */
     public String getDescription() {
         return description;
+    }
+
+    /**
+     * Sets the description of the option.
+     * @param description the description to be set
+     */
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     /**

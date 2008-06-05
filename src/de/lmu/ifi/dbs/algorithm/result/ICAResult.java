@@ -14,59 +14,63 @@ import java.util.List;
 /**
  * TODO: comment
  *
- * @author Elke Achtert
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @param <V> the type of RealVector handled by this Result
  */
-public class ICAResult<V extends RealVector<V,?>> extends AbstractResult<V> {
-  /**
-   * The independent component analysis.
-   */
-  private FastICA<V> ica;
+public class ICAResult<V extends RealVector<V, ?>> extends AbstractResult<V> {
+    /**
+     * The independent component analysis.
+     */
+    private FastICA<V> ica;
 
-  /**
-   * todo
-   * @param db
-   */
-  public ICAResult(Database<V> db, FastICA<V> ica) {
-    super(db);
-    this.ica = ica;
-  }
+    /**
+     * todo
+     *
+     * @param db
+     * @param ica
+     */
+    public ICAResult(Database<V> db, FastICA<V> ica) {
+        super(db);
+        this.ica = ica;
+    }
 
-  /**
-   * Writes the clustering result to the given stream.
-   * todo
-   *
-   * @param outStream     the stream to write to
-   * @param normalization Normalization to restore original values according to, if this action is supported
-   *                      - may remain null.
-   * @param settings      the settings to be written into the header, if this parameter is <code>null</code>,
-   *                      no header will be written
-   * @throws de.lmu.ifi.dbs.utilities.UnableToComplyException
-   *          if any feature vector is not compatible with values initialized during normalization
-   */
-  public void output(PrintStream outStream, Normalization<V> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
-    //To change body of implemented methods use File | Settings | File Templates.
-  }
+    /**
+     * Writes the clustering result to the given stream.
+     * todo
+     *
+     * @param outStream     the stream to write to
+     * @param normalization Normalization to restore original values according to, if this action is supported
+     *                      - may remain null.
+     * @param settings      the settings to be written into the header, if this parameter is <code>null</code>,
+     *                      no header will be written
+     * @throws de.lmu.ifi.dbs.utilities.UnableToComplyException
+     *          if any feature vector is not compatible with values initialized during normalization
+     */
+    public void output(PrintStream outStream, Normalization<V> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
 
-  /**
-   * Returns a string representation of the object.
-   * @return a string representation of the object.
-   */
-  public String toString() {
-    StringBuffer msg = new StringBuffer();
+    /**
+     * Returns a string representation of the object.
+     *
+     * @return a string representation of the object.
+     */
+    public String toString() {
+        StringBuffer msg = new StringBuffer();
 
-    Matrix mix = ica.getMixingMatrix().copy();
-    mix.normalizeColumns();
+        Matrix mix = ica.getMixingMatrix().copy();
+        mix.normalizeColumns();
 
-     Matrix sep = ica.getSeparatingMatrix().copy();
-    sep.normalizeColumns();
+        Matrix sep = ica.getSeparatingMatrix().copy();
+        sep.normalizeColumns();
 
 
-    msg.append("\nMixing matrix\n" +  ica.getMixingMatrix());
-    msg.append("\nSeparating matrix\n" + ica.getSeparatingMatrix());
-    msg.append("\nWeight matrix\n" + ica.getWeightMatrix());
-     msg.append("\nNormalo Mixing matrix\n" + mix);
-     msg.append("\nNormalo Sep matrix\n" + sep);
+        msg.append("\nMixing matrix\n").append(ica.getMixingMatrix());
+        msg.append("\nSeparating matrix\n").append(ica.getSeparatingMatrix());
+        msg.append("\nWeight matrix\n").append(ica.getWeightMatrix());
+        msg.append("\nNormalo Mixing matrix\n").append(mix);
+        msg.append("\nNormalo Sep matrix\n").append(sep);
 
-    return msg.toString();
-  }
+        return msg.toString();
+    }
 }

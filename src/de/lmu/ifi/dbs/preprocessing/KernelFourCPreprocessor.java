@@ -7,23 +7,10 @@ import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.similarityfunction.kernel.ArbitraryKernelFunctionWrapper;
 import de.lmu.ifi.dbs.distance.similarityfunction.kernel.LinearKernelFunction;
 import de.lmu.ifi.dbs.utilities.QueryResult;
-import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessEqualConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterFlagGlobalConstraint;
-import de.lmu.ifi.dbs.varianceanalysis.AbstractPCA;
-import de.lmu.ifi.dbs.varianceanalysis.CompositeEigenPairFilter;
-import de.lmu.ifi.dbs.varianceanalysis.LimitEigenPairFilter;
-import de.lmu.ifi.dbs.varianceanalysis.LocalKernelPCA;
-import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
-import de.lmu.ifi.dbs.varianceanalysis.NormalizingEigenPairFilter;
+import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.*;
+import de.lmu.ifi.dbs.varianceanalysis.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -181,8 +168,7 @@ public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector
         // save parameters for pca
         final List<String> tmpPCAParameters = new ArrayList<String>();
         // eigen pair filter
-        tmpPCAParameters.add(OptionHandler.OPTION_PREFIX + AbstractPCA.EIGENPAIR_FILTER_PARAM.getName());
-        tmpPCAParameters.add(CompositeEigenPairFilter.class.getName());
+        Util.addParameter(tmpPCAParameters, OptionID.PCA_EIGENPAIR_FILTER, CompositeEigenPairFilter.class.getName());
         tmpPCAParameters.add(OptionHandler.OPTION_PREFIX + CompositeEigenPairFilter.FILTERS_P);
         tmpPCAParameters.add(LimitEigenPairFilter.class.getName() + CompositeEigenPairFilter.COMMA_SPLIT
             + NormalizingEigenPairFilter.class.getName() + CompositeEigenPairFilter.COMMA_SPLIT + LimitEigenPairFilter.class.getName());
@@ -226,7 +212,7 @@ public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector
             .append(" computes the local dimensionality and locally weighted matrix of objects of a certain database according to the 4C algorithm.\n");
         description.append("The PCA is based on epsilon range queries.\n");
         description.append(optionHandler.usage("", false));
-		return description.toString();
-	}
+        return description.toString();
+    }
 
 }

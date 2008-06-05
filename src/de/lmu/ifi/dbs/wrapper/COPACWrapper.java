@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.AbortException;
-import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.COPAC;
 import de.lmu.ifi.dbs.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
@@ -106,8 +105,7 @@ public class COPACWrapper extends NormalizationWrapper {
         List<String> parameters = super.getKDDTaskParameters();
 
         // algorithm COPAC
-        parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-        parameters.add(COPAC.class.getName());
+        Util.addParameter(parameters, OptionID.ALGORITHM, COPAC.class.getName());
 
         // partition algorithm DBSCAN
         Util.addParameter(parameters, OptionID.COPAA_PARTITION_ALGORITHM, DBSCAN.class.getName());

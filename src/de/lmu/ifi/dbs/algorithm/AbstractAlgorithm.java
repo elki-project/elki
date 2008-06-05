@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.database.IndexDatabase;
 import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
 
 /**
  * <p>AbstractAlgorithm sets the values for flags verbose and time.</p>
@@ -24,15 +25,13 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends Abstra
      * Flag to allow verbose messages while performing the algorithm.
      * <p>Key: {@code -verbose} </p>
      */
-    public static final Flag VERBOSE_FLAG = new Flag("verbose",
-                                                     "flag to allow verbose messages while performing the algorithm");
+    private final Flag VERBOSE_FLAG = new Flag(OptionID.ALGORITHM_VERBOSE);
 
     /**
      * Flag to request output of performance time.
      * <p>Key: {@code -time} </p>
      */
-    public static final Flag TIME_FLAG = new Flag("time",
-                                                  "flag to request output of performance time");
+    private final Flag TIME_FLAG = new Flag(OptionID.ALGORITHM_TIME);
 
     /**
      * Property whether verbose messages should be allowed.
@@ -123,6 +122,22 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends Abstra
      */
     public boolean isVerbose() {
         return verbose;
+    }
+
+    /**
+     * @see de.lmu.ifi.dbs.algorithm.Algorithm#setVerbose(boolean)
+     */
+    public void setVerbose(boolean verbose) {
+        this.verbose = verbose;
+        VERBOSE_FLAG.setValue(verbose);
+    }
+
+    /**
+     * @see de.lmu.ifi.dbs.algorithm.Algorithm#setTime(boolean)
+     */
+    public void setTime(boolean time) {
+        this.time = time;
+        TIME_FLAG.setValue(time);
     }
 
     /**

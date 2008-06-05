@@ -4,7 +4,6 @@ import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
@@ -22,21 +21,15 @@ public abstract class AbstractPCA extends AbstractParameterizable implements PCA
 
     /**
      * Parameter to specify the filter for determination of the strong and weak eigenvectors,
-     * must be a subclass of {@link EigenPairFilter EigenPairFilter}.
-     * <p>Default value: {@link PercentageEigenPairFilter PercentageEigenPairFilter}</p>
-     * <p>Key: {@code -filter} </p>
+     * must be a subclass of {@link EigenPairFilter}.
+     * <p>Default value: {@link PercentageEigenPairFilter}</p>
+     * <p>Key: {@code -pca.filter} </p>
      */
-    public static ClassParameter<EigenPairFilter> EIGENPAIR_FILTER_PARAM =
+    private ClassParameter<EigenPairFilter> EIGENPAIR_FILTER_PARAM =
         new ClassParameter<EigenPairFilter>(
-            "filter",
-            "<class>the filter to determine the strong and weak eigenvectors " +
-                Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(EigenPairFilter.class) +
-                ". Default: " + PercentageEigenPairFilter.class.getName(),
-            EigenPairFilter.class);
-
-    static {
-        EIGENPAIR_FILTER_PARAM.setDefaultValue(PercentageEigenPairFilter.class.getName());
-    }
+            OptionID.PCA_EIGENPAIR_FILTER,
+            EigenPairFilter.class,
+            PercentageEigenPairFilter.class.getName());
 
     /**
      * The eigenpair filter to determine the strong and weak eigenvectors.
@@ -204,14 +197,14 @@ public abstract class AbstractPCA extends AbstractParameterizable implements PCA
         String[] remainingParameters = super.setParameters(args);
 
         // eigenpair filter
-        String className = getParameterValue(EIGENPAIR_FILTER_PARAM);
+        String eigenpairFilterClass = getParameterValue(EIGENPAIR_FILTER_PARAM);
         try {
-            eigenPairFilter = Util.instantiate(EigenPairFilter.class, className);
+            eigenPairFilter = Util.instantiate(EigenPairFilter.class, eigenpairFilterClass);
         }
         catch (UnableToComplyException e) {
             throw new WrongParameterValueException(
                 EIGENPAIR_FILTER_PARAM.getName(),
-                className,
+                eigenpairFilterClass,
                 EIGENPAIR_FILTER_PARAM.getDescription(),
                 e);
         }

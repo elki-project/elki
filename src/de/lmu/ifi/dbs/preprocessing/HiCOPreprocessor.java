@@ -178,12 +178,10 @@ public abstract class HiCOPreprocessor<V extends RealVector<V, ?>> extends Abstr
         }
 
         // save parameters for pca
-        String[] tmpPCAParameters = new String[remainingParameters.length + 2];
-        System.arraycopy(remainingParameters, 0, tmpPCAParameters, 2, remainingParameters.length);
+        String[] tmpPCAParameters = new String[remainingParameters.length];
+        System.arraycopy(remainingParameters, 0, tmpPCAParameters, 0, remainingParameters.length);
         // eigen pair filter
-        tmpPCAParameters[0] = OptionHandler.OPTION_PREFIX + LinearLocalPCA.EIGENPAIR_FILTER_PARAM.getName();
-        tmpPCAParameters[1] = PercentageEigenPairFilter.class.getName();
-
+        Util.addParameter(tmpPCAParameters, OptionID.PCA_EIGENPAIR_FILTER, PercentageEigenPairFilter.class.getName());
         remainingParameters = tmpPCA.setParameters(tmpPCAParameters);
         pcaParameters = tmpPCA.getParameters();
         setParameters(args, remainingParameters);

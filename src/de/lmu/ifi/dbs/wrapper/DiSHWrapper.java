@@ -1,15 +1,10 @@
 package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.AbortException;
-import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.DiSH;
-import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor;
-import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.StringParameter;
+import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.util.List;
@@ -69,8 +64,8 @@ public class DiSHWrapper extends NormalizationWrapper {
         super();
         // parameter min points
         optionHandler.put(new IntParameter(DiSHPreprocessor.MINPTS_P,
-                                           DiSHPreprocessor.MINPTS_D,
-                                           new GreaterConstraint(0)));
+            DiSHPreprocessor.MINPTS_D,
+            new GreaterConstraint(0)));
 
         //parameter epsilon
         DoubleParameter eps = new DoubleParameter(DiSH.EPSILON_P, DiSH.EPSILON_D);
@@ -91,8 +86,7 @@ public class DiSHWrapper extends NormalizationWrapper {
         List<String> parameters = super.getKDDTaskParameters();
 
         // DiSH algorithm
-        parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-        parameters.add(DiSH.class.getName());
+        Util.addParameter(parameters, OptionID.ALGORITHM, DiSH.class.getName());
 
         // epsilon
         if (epsilon != null) {
@@ -101,8 +95,7 @@ public class DiSHWrapper extends NormalizationWrapper {
         }
 
         // minpts for OPTICS
-        parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.MINPTS_P);
-        parameters.add(Integer.toString(minpts));
+        Util.addParameter(parameters, OptionID.OPTICS_MINPTS, Integer.toString(minpts));
 
         // minpts for preprocessor
         parameters.add(OptionHandler.OPTION_PREFIX + DiSHPreprocessor.MINPTS_P);

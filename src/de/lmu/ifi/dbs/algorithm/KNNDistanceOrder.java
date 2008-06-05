@@ -25,6 +25,7 @@ import java.util.Random;
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
+ * todo parameter
  */
 public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
     extends DistanceBasedAlgorithm<O, D> {
@@ -78,7 +79,7 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
     public KNNDistanceOrder() {
         super();
         // parameter k
-        optionHandler.put(K_PARAM);
+        addOption(K_PARAM);
 
         //parameter percentage
         ArrayList<ParameterConstraint<Number>> percentageCons = new ArrayList<ParameterConstraint<Number>>();
@@ -86,7 +87,7 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
         percentageCons.add(new LessEqualConstraint(1));
         DoubleParameter per = new DoubleParameter(PERCENTAGE_P, PERCENTAGE_D, percentageCons);
         per.setDefaultValue(DEFAULT_PERCENTAGE);
-        optionHandler.put(per);
+        addOption(per);
     }
 
     /**

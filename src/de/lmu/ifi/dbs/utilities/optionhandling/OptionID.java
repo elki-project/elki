@@ -1,11 +1,15 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
 import de.lmu.ifi.dbs.algorithm.Algorithm;
-import de.lmu.ifi.dbs.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.database.Database;
+import de.lmu.ifi.dbs.database.connection.DatabaseConnection;
+import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.preprocessing.HiCOPreprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.ConstantObject;
+import de.lmu.ifi.dbs.varianceanalysis.EigenPairFilter;
+import de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter;
 
 /**
  * An OptionID is used by option handlers as a unique identifier for specific
@@ -16,11 +20,95 @@ import de.lmu.ifi.dbs.utilities.ConstantObject;
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public class OptionID extends ConstantObject<OptionID> {
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.KDDTask#HELP_FLAG}
+     */
+    public static final OptionID HELP = new OptionID("h",
+        "Flag to obtain help-message, either for the main-routine or for any specified algorithm. " +
+            "Causes immediate stop of the program.");
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.KDDTask#HELP_LONG_FLAG}
+     */
+    public static final OptionID HELP_LONG = new OptionID("help",
+        "Flag to obtain help-message, either for the main-routine or for any specified algorithm. " +
+            "Causes immediate stop of the program.");
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.KDDTask#ALGORITHM_PARAM}
+     */
+    public static final OptionID ALGORITHM = new OptionID("algorithm",
+        "<class>Classname of an algorithm " +
+            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Algorithm.class) +
+            ". Either full name to identify classpath or only classname, if its package is " +
+            Algorithm.class.getPackage().getName() + "."
+    );
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.KDDTask#DESCRIPTION_PARAM}
+     */
+    public static final OptionID DESCRIPTION = new OptionID("description",
+        "<class>Name of a class to obtain a description - for classes that implement " +
+            Parameterizable.class.getName() +
+            " -- no further processing will be performed."
+    );
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.KDDTask#DATABASE_CONNECTION_PARAM}
+     */
+    public static final OptionID DATABASE_CONNECTION = new OptionID("dbc",
+        "<class>Classname of a database connection " +
+            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DatabaseConnection.class) +
+            ". Either full name to identify classpath or only classname, if its package is " +
+            DatabaseConnection.class.getPackage().getName() +
+            ". Default: " + FileBasedDatabaseConnection.class.getName()
+    );
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.KDDTask#OUTPUT_PARAM}
+     * todo richtige beschreibung? oder sind es directories?
+     */
+    public static final OptionID OUTPUT = new OptionID("out",
+        "<file>Name of the file to write the obtained results in. " +
+            "If an algorithm requires several outputfiles, the given filename will be used " +
+            "as prefix followed by automatically created markers. " +
+            "If this parameter is omitted, per default the output will sequentially be given to STDOUT."
+    );
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.KDDTask#NORMALIZATION_PARAM}
+     */
+    public static final OptionID NORMALIZATION = new OptionID("norm",
+        "<class>Classname of a normalization in order to use a database with normalized values " +
+            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Normalization.class) +
+            ". "
+    );
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.KDDTask#NORMALIZATION_PARAM}
+     */
+    public static final OptionID NORMALIZATION_UNDO = new OptionID("normUndo",
+        "Flag to revert result to original values - " +
+            "invalid option if no normalization has been performed.");
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.AbstractAlgorithm#VERBOSE_FLAG}
+     */
+    public static final OptionID ALGORITHM_VERBOSE = new OptionID("verbose",
+        "Flag to allow verbose messages while performing the algorithm.");
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.AbstractAlgorithm#TIME_FLAG}
+     */
+    public static final OptionID ALGORITHM_TIME = new OptionID("time",
+        "Flag to request output of performance time.");
+
     /**
      * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.COPAA#PREPROCESSOR_PARAM}
      */
     public static final OptionID COPAA_PREPROCESSOR = new OptionID("copaa.preprocessor",
-        "preprocessor to derive partition criterion " +
+        "<class>Classname of the preprocessor to derive partition criterion " +
             Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(HiCOPreprocessor.class) +
             ".");
 
@@ -28,7 +116,7 @@ public class OptionID extends ConstantObject<OptionID> {
      * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.COPAA#PARTITION_ALGORITHM_PARAM}
      */
     public static final OptionID COPAA_PARTITION_ALGORITHM = new OptionID("copaa.partitionAlgorithm",
-        "algorithm to apply to each partition " +
+        "<class>Classname of the algorithm to apply to each partition " +
             Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Algorithm.class) +
             ".");
 
@@ -36,7 +124,7 @@ public class OptionID extends ConstantObject<OptionID> {
      * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.COPAC#PARTITION_DB_PARAM}
      */
     public static final OptionID COPAA_PARTITION_DATABASE = new OptionID("copaa.partitionDB",
-        "database class for each partition " +
+        "<class>Classname of the database for each partition " +
             Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Database.class) +
             ". If this parameter is not set, the databases of the partitions have " +
             "the same class as the original database."
@@ -46,9 +134,36 @@ public class OptionID extends ConstantObject<OptionID> {
      * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.DBSCAN#EPSILON_PARAM}
      */
     public static final OptionID DBSCAN_EPSILON = new OptionID("dbscan.epsilon",
-        "the maximum radius of the neighborhood " +
+        "<pattern>The maximum radius of the neighborhood " +
             "to be considered, must be suitable to " +
             "the distance function specified"
+    );
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.OPTICS#EPSILON_PARAM}
+     */
+    public static final OptionID OPTICS_EPSILON = new OptionID("optics.epsilon",
+        "<pattern>The maximum radius of the neighborhood " +
+            "to be considered, must be suitable to " +
+            "the distance function specified."
+    );
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.OPTICS#MINPTS_PARAM}
+     */
+    public static final OptionID OPTICS_MINPTS = new OptionID("optics.minpts",
+        "<int>Threshold for minimum number of points in " +
+            "the epsilon-neighborhood of a point, " +
+            "must be greater than 0."
+    );
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.varianceanalysis.AbstractPCA#EIGENPAIR_FILTER_PARAM}
+     */
+    public static final OptionID PCA_EIGENPAIR_FILTER = new OptionID("pca.filter",
+        "<class>Classname of the filter to determine the strong and weak eigenvectors " +
+            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(EigenPairFilter.class) +
+            ". Default: " + PercentageEigenPairFilter.class.getName()
     );
 
 
@@ -88,27 +203,27 @@ public class OptionID extends ConstantObject<OptionID> {
     public void setDescription(String description) {
         this.description = description;
     }
-    
+
     /**
      * Gets or creates the OptionID for the given class and given name.
      * The OptionID usually is named as the classes name (lowercase) as name-prefix
-     * and the given name as suffix of the complete name, separated by a dot. 
-     * For example, the parameter {@code epsilon} for the class {@link DBSCAN}
+     * and the given name as suffix of the complete name, separated by a dot.
+     * For example, the parameter {@code epsilon} for the class {@link de.lmu.ifi.dbs.algorithm.clustering.DBSCAN}
      * will be named {@code dbscan.epsilon}.
      *
-     * @param name the name
+     * @param name        the name
      * @param description the description is also set if the named OptionID does exist already
      * @return the OptionID for the given name
      */
     public static OptionID getOrCreateOptionID(final String name, final String description) {
-      OptionID optionID = getOptionID(name);
-      if (optionID == null) {
-        optionID = new OptionID(name, description);
-      }
-      else{
-        optionID.setDescription(description);
-      }
-      return optionID;
+        OptionID optionID = getOptionID(name);
+        if (optionID == null) {
+            optionID = new OptionID(name, description);
+        }
+        else {
+            optionID.setDescription(description);
+        }
+        return optionID;
     }
 
     /**
@@ -119,6 +234,6 @@ public class OptionID extends ConstantObject<OptionID> {
      * @return the OptionID for the given name
      */
     public static OptionID getOptionID(final String name) {
-      return OptionID.lookup(OptionID.class, name);
+        return OptionID.lookup(OptionID.class, name);
     }
 }

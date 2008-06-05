@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.varianceanalysis.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.varianceanalysis.GlobalPCA;
 import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
@@ -157,12 +158,8 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         copacAlgorithm = new COPAC<V>();
         String[] copacAlgorithmParameters = new String[remainingParameters.length];
         System.arraycopy(remainingParameters, 0, copacAlgorithmParameters, 0, remainingParameters.length);
-        if (isVerbose()) {
-            copacAlgorithmParameters = Util.addFlag(copacAlgorithmParameters, AbstractAlgorithm.VERBOSE_FLAG);
-        }
-        if (isTime()) {
-            copacAlgorithmParameters = Util.addFlag(copacAlgorithmParameters, AbstractAlgorithm.TIME_FLAG);
-        }
+        copacAlgorithm.setVerbose(isVerbose());
+        copacAlgorithm.setTime(isTime());
         remainingParameters = copacAlgorithm.setParameters(copacAlgorithmParameters);
         setParameters(args, remainingParameters);
 
@@ -284,8 +281,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         List<String> parameters = new ArrayList<String>();
 
         // eigenpair filter
-        parameters.add(OptionHandler.OPTION_PREFIX + GlobalPCA.EIGENPAIR_FILTER_PARAM.getName());
-        parameters.add(FirstNEigenPairFilter.class.getName());
+        Util.addParameter(parameters, OptionID.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
 
         // n
         parameters.add(OptionHandler.OPTION_PREFIX + FirstNEigenPairFilter.N_P);

@@ -4,11 +4,9 @@ import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.cash.CASH;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.parser.ParameterizationFunctionLabelParser;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.Util;
 
 import java.util.List;
 
@@ -65,8 +63,7 @@ public class CASHWrapper extends FileBasedDatabaseConnectionWrapper {
         List<String> parameters = super.getKDDTaskParameters();
 
         // algorithm CASH
-        parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-        parameters.add(CASH.class.getName());
+        Util.addParameter(parameters, OptionID.ALGORITHM, CASH.class.getName());
 
         // parser
         parameters.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.PARSER_P);

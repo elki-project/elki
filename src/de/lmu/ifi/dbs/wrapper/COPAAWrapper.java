@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.AbortException;
-import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.COPAA;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.distance.distancefunction.LocallyWeightedDistanceFunction;
@@ -29,10 +28,16 @@ public class COPAAWrapper extends NormalizationWrapper {
      * must be suitable to {@link LocallyWeightedDistanceFunction LocallyWeightedDistanceFunction}.
      * <p>Key: {@code -epsilon} </p>
      */
-    public static final PatternParameter EPSILON_PARAM = new PatternParameter(OPTICS.EPSILON_PARAM.getName(),
-        "the maximum radius of the neighborhood " +
-            "to be considerd, must be suitable to " +
-            LocallyWeightedDistanceFunction.class.getName());
+    public final PatternParameter EPSILON_PARAM;
+
+    /**
+     * Parameter to specify the threshold for minimum number of points in
+     * the epsilon-neighborhood of a point,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -optics.minpts} </p>
+     */
+    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.OPTICS_MINPTS,
+        new GreaterConstraint(0));
 
     /**
      * Description for parameter k.
@@ -42,17 +47,17 @@ public class COPAAWrapper extends NormalizationWrapper {
         "If this value is not defined, k ist set to minpts";
 
     /**
-     * The value of the epsilon parameter.
+     * Hold the value of the epsilon parameter.
      */
     private String epsilon;
 
     /**
-     * The value of the minpts parameter.
+     * Holds the value of the minpts parameter.
      */
     private int minpts;
 
     /**
-     * The value of the k parameter.
+     * Holds the value of the k parameter.
      */
     private int k;
 
@@ -86,11 +91,14 @@ public class COPAAWrapper extends NormalizationWrapper {
     public COPAAWrapper() {
         super();
         // parameter epsilon
+        EPSILON_PARAM = new PatternParameter(OptionID.OPTICS_EPSILON);
+        EPSILON_PARAM.setDescription("<pattern>The maximum radius of the neighborhood " +
+            "to be considerd, must be suitable to " +
+            LocallyWeightedDistanceFunction.class.getName());
         optionHandler.put(EPSILON_PARAM);
 
-        // parameter min points
-        IntParameter minPam = new IntParameter(OPTICS.MINPTS_P, OPTICS.MINPTS_D, new GreaterConstraint(0));
-        optionHandler.put(minPam);
+        // parameter minpts
+        optionHandler.put(MINPTS_PARAM);
 
         // parameter k
         IntParameter kPam = new IntParameter(KnnQueryBasedHiCOPreprocessor.K_P, K_D, new GreaterConstraint(0));
@@ -98,9 +106,8 @@ public class COPAAWrapper extends NormalizationWrapper {
         optionHandler.put(kPam);
 
         // global constraint k <-> minpts
-        // todo noetig???
         // noinspection unchecked
-        GlobalParameterConstraint gpc = new DefaultValueGlobalConstraint(kPam, minPam);
+        GlobalParameterConstraint gpc = new DefaultValueGlobalConstraint(kPam, MINPTS_PARAM);
         optionHandler.setGlobalParameterConstraint(gpc);
     }
 
@@ -111,8 +118,7 @@ public class COPAAWrapper extends NormalizationWrapper {
         List<String> parameters = super.getKDDTaskParameters();
 
         // algorithm COPAA
-        parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-        parameters.add(COPAA.class.getName());
+        Util.addParameter(parameters, OptionID.ALGORITHM, COPAA.class.getName());
 
         // partition algorithm
         Util.addParameter(parameters, OptionID.COPAA_PARTITION_ALGORITHM, OPTICS.class.getName());
@@ -122,8 +128,7 @@ public class COPAAWrapper extends NormalizationWrapper {
         parameters.add(epsilon);
 
         // minpts
-        parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.MINPTS_P);
-        parameters.add(Integer.toString(minpts));
+        Util.addParameter(parameters, OptionID.OPTICS_MINPTS, Integer.toString(minpts));
 
         // distance function
         parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
@@ -148,7 +153,7 @@ public class COPAAWrapper extends NormalizationWrapper {
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
         epsilon = getParameterValue(EPSILON_PARAM);
-        minpts = (Integer) optionHandler.getOptionValue(OPTICS.MINPTS_P);
+        minpts = getParameterValue(MINPTS_PARAM);
         k = (Integer) optionHandler.getOptionValue(KnnQueryBasedHiCOPreprocessor.K_P);
 
         return remainingParameters;

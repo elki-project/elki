@@ -8,12 +8,7 @@ import de.lmu.ifi.dbs.tree.btree.BTreeData;
 import de.lmu.ifi.dbs.tree.btree.DefaultKey;
 import de.lmu.ifi.dbs.utilities.output.ObjectPrinter;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
+import java.io.*;
 import java.util.regex.Pattern;
 
 /**
@@ -59,9 +54,9 @@ public class NNTable extends AbstractLoggable {
         int valueSize = minpts * neighborSize;
 
         this.nn = new BTree<DefaultKey, NeighborList>(keySize, valueSize,
-                                                      pageSize, cacheSize);
+            pageSize, cacheSize);
         this.rnn = new BTree<DefaultKey, NeighborList>(keySize, valueSize,
-                                                       pageSize, cacheSize);
+            pageSize, cacheSize);
         this.minpts = minpts;
     }
 
@@ -73,6 +68,7 @@ public class NNTable extends AbstractLoggable {
      * @param cacheSize the size of the cache in Bytes
      * @param minpts    number of nearest neighbors of an object to be considered for
      *                  computing its LOF
+     * @throws java.io.IOException if an I/O-Exception occurs during reading the file
      */
     public NNTable(String fileName, int pageSize, int cacheSize, int minpts)
         throws IOException {
@@ -197,7 +193,7 @@ public class NNTable extends AbstractLoggable {
                 Neighbor rnn_old = reverseNeighbors_old.get(j);
                 if (rnn_old.getObjectID().equals(nn_new.getObjectID())) {
                     Neighbor rnn_new = new Neighbor(rnn_old.getObjectID(), i,
-                                                    rnn_old.getNeighborID(), rnn_old
+                        rnn_old.getNeighborID(), rnn_old
                         .getReachabilityDistance(), rnn_old
                         .getDistance());
                     reverseNeighbors_old.remove(j);
@@ -250,8 +246,8 @@ public class NNTable extends AbstractLoggable {
                 Neighbor rnn_old = reverseNeighbors.get(j);
                 if (rnn_old.getObjectID().equals(nn_old.getObjectID())) {
                     Neighbor rnn_new = new Neighbor(rnn_old.getObjectID(),
-                                                    rnn_old.getIndex(), rnn_old.getNeighborID(),
-                                                    reachabilityDistance, rnn_old.getDistance());
+                        rnn_old.getIndex(), rnn_old.getNeighborID(),
+                        reachabilityDistance, rnn_old.getDistance());
                     reverseNeighbors.remove(j);
                     reverseNeighbors.add(j, rnn_new);
                     break;
@@ -274,7 +270,7 @@ public class NNTable extends AbstractLoggable {
         NeighborList neighbors = nn.searchForUpdate(nn_id);
         Neighbor nn_new = new Neighbor(neighbor.getObjectID(), neighbor
             .getIndex(), neighbor.getNeighborID(), reachabilityDistance,
-                         neighbor.getDistance());
+            neighbor.getDistance());
         neighbors.remove(neighbor.getIndex());
         neighbors.add(nn_new.getIndex(), nn_new);
 
@@ -286,7 +282,7 @@ public class NNTable extends AbstractLoggable {
             if (rnn_old.getObjectID().equals(neighbor.getObjectID())) {
                 Neighbor rnn_new = new Neighbor(rnn_old.getObjectID(), rnn_old
                     .getIndex(), rnn_old.getNeighborID(),
-                                 reachabilityDistance, rnn_old.getDistance());
+                    reachabilityDistance, rnn_old.getDistance());
                 reverseNeighbors.remove(j);
                 reverseNeighbors.add(j, rnn_new);
                 break;
@@ -354,6 +350,8 @@ public class NNTable extends AbstractLoggable {
 
     /**
      * Returns the physical read access of this table.
+     *
+     * @return the physical read access of this table
      */
     public long getPhysicalReadAccess() {
         return nn.getPhysicalReadAccess() + rnn.getPhysicalReadAccess();
@@ -361,6 +359,8 @@ public class NNTable extends AbstractLoggable {
 
     /**
      * Returns the physical write access of this table.
+     *
+     * @return the physical write access of this table
      */
     public long getPhysicalWriteAccess() {
         return nn.getPhysicalWriteAccess() + rnn.getPhysicalWriteAccess();
@@ -368,6 +368,8 @@ public class NNTable extends AbstractLoggable {
 
     /**
      * Returns the logical page access of this table.
+     *
+     * @return the logical page access of this table
      */
     public long getLogicalPageAccess() {
         return nn.getLogicalPageAccess() + rnn.getLogicalPageAccess();
@@ -451,22 +453,22 @@ public class NNTable extends AbstractLoggable {
             double reachabilityDistance = Double.parseDouble(parameters[3]);
             double distance = Double.parseDouble(parameters[4]);
             return new Neighbor(objectID, index, neighborID,
-                                reachabilityDistance, distance);
+                reachabilityDistance, distance);
         }
     }
 
     public boolean testNN_and_RNN(int id) {
         NeighborList neighbors = nn.search(new DefaultKey(id));
-		for (Neighbor neighbor : neighbors) {
-			NeighborList reverseNeighbors = rnn.search(new DefaultKey(neighbor
-					.getNeighborID()));
-			for (Neighbor reverseNeighbor : reverseNeighbors) {
-				if (!reverseNeighbor.equals(neighbor)) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
+        for (Neighbor neighbor : neighbors) {
+            NeighborList reverseNeighbors = rnn.search(new DefaultKey(neighbor
+                .getNeighborID()));
+            for (Neighbor reverseNeighbor : reverseNeighbors) {
+                if (!reverseNeighbor.equals(neighbor)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 
 }

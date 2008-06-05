@@ -41,6 +41,19 @@ public class ClassParameter<C> extends Parameter<String, String> {
     }
 
     /**
+     * Constructs a class parameter with the given optionID,
+     * restriction class, and default value.
+     *
+     * @param optionID         the unique id of the option
+     * @param restrictionClass the restriction class of this class parameter
+     * @param defaultValue     the default value of this class parameter
+     */
+    public ClassParameter(OptionID optionID, Class<C> restrictionClass, String defaultValue) {
+        this(optionID, restrictionClass);
+        setDefaultValue(defaultValue);
+    }
+
+    /**
      * Constructs a class parameter with the given name, description, and
      * restriction class.
      *

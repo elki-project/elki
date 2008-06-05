@@ -22,11 +22,11 @@ import java.util.Locale;
 /**
  * A solution of correlation analysis is a matrix of equations describing the
  * dependencies.
- * 
+ *
  * @author Arthur Zimek
+ * @param <V> the type of RealVector handled by this Result
  */
-public class CorrelationAnalysisSolution<V extends RealVector<V, ?>> extends AbstractResult<V>
-{
+public class CorrelationAnalysisSolution<V extends RealVector<V, ?>> extends AbstractResult<V> {
     /**
      * Stores the solution equations.
      */
@@ -71,41 +71,39 @@ public class CorrelationAnalysisSolution<V extends RealVector<V, ?>> extends Abs
     /**
      * Provides a new CorrelationAnalysisSolution holding the specified matrix.
      * <p/>
-     * 
-     * @param solution the linear equation system describing the solution
-     *        equations
-     * @param db the database containing the objects
+     *
+     * @param solution           the linear equation system describing the solution
+     *                           equations
+     * @param db                 the database containing the objects
      * @param strongEigenvectors the strong eigenvectors of the hyperplane
-     *        induced by the correlation
-     * @param weakEigenvectors the weak eigenvectors of the hyperplane
-     *        induced by the correlation
-     * @param similarityMatrix the similarity matrix of the underlying distance computations
-     * @param centroid the centroid if the objects belonging to the hyperplane
-     *        induced by the correlation
+     *                           induced by the correlation
+     * @param weakEigenvectors   the weak eigenvectors of the hyperplane
+     *                           induced by the correlation
+     * @param similarityMatrix   the similarity matrix of the underlying distance computations
+     * @param centroid           the centroid if the objects belonging to the hyperplane
+     *                           induced by the correlation
      */
-    public CorrelationAnalysisSolution(LinearEquationSystem solution, Database<V> db, Matrix strongEigenvectors, Matrix weakEigenvectors, Matrix similarityMatrix, Vector centroid)
-    {
+    public CorrelationAnalysisSolution(LinearEquationSystem solution, Database<V> db, Matrix strongEigenvectors, Matrix weakEigenvectors, Matrix similarityMatrix, Vector centroid) {
         this(solution, db, strongEigenvectors, weakEigenvectors, similarityMatrix, centroid, NumberFormat.getInstance(Locale.US));
     }
 
     /**
      * Provides a new CorrelationAnalysisSolution holding the specified matrix
      * and number format.
-     * 
-     * @param solution the linear equation system describing the solution
-     *        equations
-     * @param db the database containing the objects
+     *
+     * @param solution           the linear equation system describing the solution
+     *                           equations
+     * @param db                 the database containing the objects
      * @param strongEigenvectors the strong eigenvectors of the hyperplane
-     *        induced by the correlation
-     * @param weakEigenvectors the weak eigenvectors of the hyperplane
-     *        induced by the correlation
-     * @param similarityMatrix the similarity matrix of the underlying distance computations
-     * @param centroid the centroid if the objects belonging to the hyperplane
-     *        induced by the correlation
-     * @param nf the number format for output accuracy
+     *                           induced by the correlation
+     * @param weakEigenvectors   the weak eigenvectors of the hyperplane
+     *                           induced by the correlation
+     * @param similarityMatrix   the similarity matrix of the underlying distance computations
+     * @param centroid           the centroid if the objects belonging to the hyperplane
+     *                           induced by the correlation
+     * @param nf                 the number format for output accuracy
      */
-    public CorrelationAnalysisSolution(LinearEquationSystem solution, Database<V> db, Matrix strongEigenvectors, Matrix weakEigenvectors, Matrix similarityMatrix, Vector centroid, NumberFormat nf)
-    {
+    public CorrelationAnalysisSolution(LinearEquationSystem solution, Database<V> db, Matrix strongEigenvectors, Matrix weakEigenvectors, Matrix similarityMatrix, Vector centroid, NumberFormat nf) {
         super(db);
 
         this.linearEquationSystem = solution;
@@ -119,8 +117,7 @@ public class CorrelationAnalysisSolution<V extends RealVector<V, ?>> extends Abs
         // determine standard deviation
         double variance = 0;
         Iterator<Integer> it = db.iterator();
-        while(it.hasNext())
-        {
+        while (it.hasNext()) {
             Integer id = it.next();
             double distance = distance(db.get(id).getColumnVector());
             variance += distance * distance;
@@ -129,18 +126,15 @@ public class CorrelationAnalysisSolution<V extends RealVector<V, ?>> extends Abs
     }
 
     /**
-     * @see Result#output(File, Normalization, List)
+     * @see Result#output(File,Normalization,List)
      */
     @Override
-    public void output(File out, Normalization<V> normalization, List<AttributeSettings> settings) throws UnableToComplyException
-    {
+    public void output(File out, Normalization<V> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         PrintStream outStream;
-        try
-        {
+        try {
             outStream = new PrintStream(new FileOutputStream(out));
         }
-        catch(Exception e)
-        {
+        catch (Exception e) {
             outStream = new PrintStream(new FileOutputStream(FileDescriptor.out));
         }
         output(outStream, normalization, settings);
@@ -148,21 +142,20 @@ public class CorrelationAnalysisSolution<V extends RealVector<V, ?>> extends Abs
 
     /**
      * Writes the clustering result to the given stream.
-     * 
-     * @param outStream the stream to write to
+     *
+     * @param outStream     the stream to write to
      * @param normalization Normalization to restore original values according
-     *        to, if this action is supported - may remain null.
-     * @param settings the settings to be written into the header
-     * @throws de.lmu.ifi.dbs.utilities.UnableToComplyException if any feature
-     *         vector is not compatible with values initialized during
-     *         normalization
+     *                      to, if this action is supported - may remain null.
+     * @param settings      the settings to be written into the header
+     * @throws de.lmu.ifi.dbs.utilities.UnableToComplyException
+     *          if any feature
+     *          vector is not compatible with values initialized during
+     *          normalization
      */
-    public void output(PrintStream outStream, Normalization<V> normalization, List<AttributeSettings> settings) throws UnableToComplyException
-    {
+    public void output(PrintStream outStream, Normalization<V> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         writeHeader(outStream, settings, null);
 
-        try
-        {
+        try {
             LinearEquationSystem printSolution = getNormalizedLinearEquationSystem(normalization);
             outStream.println("### " + this.getClass().getSimpleName() + ":");
             outStream.println("### standardDeviation = " + standardDeviation);
@@ -171,8 +164,7 @@ public class CorrelationAnalysisSolution<V extends RealVector<V, ?>> extends Abs
             outStream.println("################################################################################");
             outStream.flush();
         }
-        catch(NonNumericFeaturesException e)
-        {
+        catch (NonNumericFeaturesException e) {
             throw new UnableToComplyException(e);
         }
     }
@@ -182,56 +174,51 @@ public class CorrelationAnalysisSolution<V extends RealVector<V, ?>> extends Abs
      * normalization is null the linear equation system is returned, otherwise
      * the linear equation system will be transformed according to the
      * normalization.
-     * 
+     *
      * @param normalization the normalization, can be null
      * @return the linear equation system for printing purposes
-     * @throws NonNumericFeaturesException
+     * @throws NonNumericFeaturesException if the linear equation system is not compatible
+     *                                     with values initialized during normalization
      */
-    public LinearEquationSystem getNormalizedLinearEquationSystem(Normalization<V> normalization) throws NonNumericFeaturesException
-    {
-        if(normalization != null)
-        {
+    public LinearEquationSystem getNormalizedLinearEquationSystem(Normalization<V> normalization) throws NonNumericFeaturesException {
+        if (normalization != null) {
             LinearEquationSystem lq = normalization.transform(linearEquationSystem);
             lq.solveByTotalPivotSearch();
             return lq;
         }
-        else
-        {
+        else {
             return linearEquationSystem;
         }
     }
 
     /**
      * Return the correlation dimensionality.
-     * 
+     *
      * @return the correlation dimensionality
      */
-    public int getCorrelationDimensionality()
-    {
+    public int getCorrelationDimensionality() {
         return correlationDimensionality;
     }
 
     /**
      * Returns the distance of RealVector p from the hyperplane underlying this
      * solution.
-     * 
+     *
      * @param p a vector in the space underlying this solution
      * @return the distance of p from the hyperplane underlying this solution
      */
-    public double distance(V p)
-    {
+    public double distance(V p) {
         return distance(p.getColumnVector());
     }
 
     /**
      * Returns the distance of Matrix p from the hyperplane underlying this
      * solution.
-     * 
+     *
      * @param p a vector in the space underlying this solution
      * @return the distance of p from the hyperplane underlying this solution
      */
-    private double distance(Matrix p)
-    {
+    private double distance(Matrix p) {
         // V_affin = V + a
         // dist(p, V_affin) = d(p-a, V) = ||p - a - proj_V(p-a) ||
         Matrix p_minus_a = p.minus(centroid);
@@ -242,51 +229,46 @@ public class CorrelationAnalysisSolution<V extends RealVector<V, ?>> extends Abs
     /**
      * Returns the standard deviation of the distances of the objects belonging
      * to the hyperplane underlying this solution.
-     * 
+     *
      * @return the standard deviation of this solution
      */
-    public double getStandardDeviation()
-    {
+    public double getStandardDeviation() {
         return standardDeviation;
     }
 
     /**
      * Returns a copy of the strong eigenvectors.
-     * 
+     *
      * @return a copy of the strong eigenvectors
      */
-    public Matrix getStrongEigenvectors()
-    {
+    public Matrix getStrongEigenvectors() {
         return strongEigenvectors.copy();
     }
 
     /**
      * Returns a copy of the weak eigenvectors.
-     * 
+     *
      * @return a copy of the weak eigenvectors
      */
-    public Matrix getWeakEigenvectors()
-    {
+    public Matrix getWeakEigenvectors() {
         return weakEigenvectors.copy();
     }
 
     /**
      * Returns the similarity matrix of the pca.
-     * 
+     *
      * @return the similarity matrix of the pca
      */
-    public Matrix getSimilarityMatrix()
-    {
+    public Matrix getSimilarityMatrix() {
         return similarityMatrix;
     }
 
     /**
      * Returns the centroid of this model.
-     * 
+     *
      * @return the centroid of this model
      */
-    public Vector getCentroid()
-    {
+    public Vector getCentroid() {
         return centroid;
     }
 }

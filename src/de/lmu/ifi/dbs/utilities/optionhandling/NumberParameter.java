@@ -11,14 +11,24 @@ public abstract class NumberParameter<T extends Number> extends Parameter<T,Numb
 	/**
 	 * Constructs a number parameter with the given name and description.
 	 * 
+	 * @param optionID the unique id of the option
+	 */
+	public NumberParameter(OptionID optionID){
+		super(optionID);
+	}
+
+    /**
+	 * Constructs a number parameter with the given name and description.
+	 *
 	 * @param name the parameter name
 	 * @param description the parameter description
+     * @deprecated
 	 */
 	public NumberParameter(String name,String description){
 		super(name,description);
 	}
-	
-	/**
+
+    /**
 	 * Returns the number value of the parameter.
 	 * 
 	 * @return number value of the parameter.

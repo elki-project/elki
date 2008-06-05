@@ -9,11 +9,12 @@ import de.lmu.ifi.dbs.database.Database;
 import java.util.Map;
 
 /**
- * TODO comment
+ * TODO arthur comment
  *
  * @author Arthur Zimek
+ * @param <O> the type of DatabaseObjects handled by this Result
  */
-public interface ClusteringResult<D extends DatabaseObject> extends Result<D> {
+public interface ClusteringResult<O extends DatabaseObject> extends Result<O> {
     
     /**
      * Returns the clusters as array of arrays of object ids.
@@ -22,7 +23,7 @@ public interface ClusteringResult<D extends DatabaseObject> extends Result<D> {
      * 
      * @return the clusters as defined in this result
      */
-    Cluster<D>[] getClusters();
+    Cluster<O>[] getClusters();
     
   /**
    * Returns a Map of ClassLabel to Database,
@@ -35,7 +36,7 @@ public interface ClusteringResult<D extends DatabaseObject> extends Result<D> {
    *         comprising a separate database for each cluster
    *         without noise.
    */
-  public <L extends ClassLabel<L>> Map<L, Database<D>> clustering(Class<L> classLabel);
+  public <L extends ClassLabel<L>> Map<L, Database<O>> clustering(Class<L> classLabel);
 
   /**
    * Returns a new Database containing only
@@ -45,7 +46,7 @@ public interface ClusteringResult<D extends DatabaseObject> extends Result<D> {
    * @param classLabel the class to be used as ClassLabel
    * @return a new Database of only non-noise objects
    */
-  public <L extends ClassLabel<L>> Database<D> associate(Class<L> classLabel);
+  public <L extends ClassLabel<L>> Database<O> associate(Class<L> classLabel);
 
   /**
    * todo comment
@@ -53,7 +54,7 @@ public interface ClusteringResult<D extends DatabaseObject> extends Result<D> {
    * @param clusterID
    * @param model
    */
-  public <L extends ClassLabel<L>> void appendModel(L clusterID, Result<D> model);
+  public <L extends ClassLabel<L>> void appendModel(L clusterID, Result<O> model);
   
 
   /**
@@ -61,5 +62,5 @@ public interface ClusteringResult<D extends DatabaseObject> extends Result<D> {
    *
    * @return a database containing only noise objects
    */
-  public Database<D> noise();
+  public Database<O> noise();
 }

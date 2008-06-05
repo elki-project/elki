@@ -8,7 +8,6 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
@@ -20,8 +19,12 @@ import java.util.*;
  * TODO comment
  *
  * @author Arthur Zimek
+ * @param <V> the type of RealVector handled by this Algorithm
+ * @param <D> the type of Distance used by this Algorithm
+ * @param <L> the type of the ClassLabel the Classifier is assigning
  */
-public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Distance<D>, L extends ClassLabel<L>> extends AbstractClassifier<V, L> {
+public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Distance<D>,
+    L extends ClassLabel<L>> extends AbstractClassifier<V, L> {
 
     /**
      * Generated serial version UID.
@@ -165,12 +168,8 @@ public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Di
         // dependency derivator
         String[] dependencyDerivatorParameters = new String[remainingParameters.length];
         System.arraycopy(remainingParameters, 0, dependencyDerivatorParameters, 0, remainingParameters.length);
-        if (isVerbose()) {
-            Util.addFlag(dependencyDerivatorParameters, VERBOSE_FLAG);
-        }
-        if (isTime()) {
-            Util.addFlag(dependencyDerivatorParameters, TIME_FLAG);
-        }
+        dependencyDerivator.setVerbose(isVerbose());
+        dependencyDerivator.setTime(isTime());
         remainingParameters = dependencyDerivator.setParameters(dependencyDerivatorParameters);
 
         setParameters(args, remainingParameters);

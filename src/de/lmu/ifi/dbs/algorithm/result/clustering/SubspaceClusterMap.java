@@ -12,8 +12,10 @@ import de.lmu.ifi.dbs.database.SequentialDatabase;
 import de.lmu.ifi.dbs.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.varianceanalysis.AbstractPCA;
 import de.lmu.ifi.dbs.varianceanalysis.FirstNEigenPairFilter;
 
@@ -162,12 +164,11 @@ public class SubspaceClusterMap {
 
         DependencyDerivator derivator = new DependencyDerivator();
 
-        List<String> params = new ArrayList<String>();
-        params.add(OptionHandler.OPTION_PREFIX + AbstractPCA.EIGENPAIR_FILTER_PARAM.getName());
-        params.add(FirstNEigenPairFilter.class.getName());
-        params.add(OptionHandler.OPTION_PREFIX + FirstNEigenPairFilter.N_P);
-        params.add(Integer.toString(dim));
-        derivator.setParameters(params.toArray(new String[params.size()]));
+        List<String> parameters = new ArrayList<String>();
+        Util.addParameter(parameters, OptionID.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
+        parameters.add(OptionHandler.OPTION_PREFIX + FirstNEigenPairFilter.N_P);
+        parameters.add(Integer.toString(dim));
+        derivator.setParameters(parameters.toArray(new String[parameters.size()]));
 
         //noinspection unchecked
         derivator.run(derivatorDB);

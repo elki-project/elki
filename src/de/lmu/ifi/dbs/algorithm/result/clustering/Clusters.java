@@ -26,6 +26,7 @@ import java.util.*;
  * certain cluster.
  *
  * @author Arthur Zimek
+ * @param <O> the type of DatabaseObjects handled by this Result
  */
 public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implements ClusteringResult<O> {
 

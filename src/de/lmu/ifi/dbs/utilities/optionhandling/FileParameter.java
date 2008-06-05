@@ -9,64 +9,89 @@ import java.io.File;
  */
 public class FileParameter extends Parameter<File, Object> {
 
-  /**
-   * Constant indicating an input file
-   */
-  public static final int FILE_IN = 1;
+    /**
+     * Constant indicating an input file
+     */
+    public static final int FILE_IN = 1;
 
-  /**
-   * Constant indication an output file
-   */
-  public static final int FILE_OUT = 2;
+    /**
+     * Constant indication an output file
+     */
+    public static final int FILE_OUT = 2;
 
-  /**
-   * The file type of this file parameter. Specifies if the file is an input of output file.
-   */
-  private int fileType;
+    /**
+     * The file type of this file parameter. Specifies if the file is an input of output file.
+     */
+    private int fileType;
 
-  /**
-   * Constructs a file parameter with the given name, description, and file type.
-   *
-   * @param name        the parameter name
-   * @param description the parameter description
-   * @param fileType    the fily type of this file parameter
-   */
-  public FileParameter(String name, String description, int fileType) {
-    super(name, description);
-    this.fileType = fileType;
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#setValue(java.lang.String)
-   */
-  public void setValue(String value) throws ParameterException {
-    if (isValid(value)) {
-      this.value = new File(value);
-    }
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#isValid(java.lang.String)
-   */
-  public boolean isValid(String value) throws ParameterException {
-    if (value == null) {
-      throw new WrongParameterValueException("Parameter \"" + getName()
-                                             + "\": No filename given!\nParameter description: " + getDescription());
+    /**
+     * Constructs a file parameter with the given optionID, and file type.
+     *
+     * @param optionID optionID the unique id of the option
+     * @param fileType the file type of this file parameter
+     */
+    public FileParameter(OptionID optionID, int fileType) {
+        super(optionID);
+        this.fileType = fileType;
     }
 
-    if (fileType == FILE_IN) {
-      File file = new File(value);
-      try {
-        if (!file.exists()) {
-          throw new WrongParameterValueException("Given file " + file.getPath()
-                                                 + " for parameter \"" + getName() + "\" does not exist!\n");
+    /**
+     * Constructs a file parameter with the given optionID, file type,
+     * and optional value.
+     *
+     * @param optionID optionID the unique id of the option
+     * @param fileType the file type of this file parameter
+     * @param optional specifies if this parameter is an optional parameter
+     */
+    public FileParameter(OptionID optionID, int fileType, boolean optional) {
+        this(optionID, fileType);
+        setOptional(optional);
+    }
+
+    /**
+     * Constructs a file parameter with the given name, description, and file type.
+     *
+     * @param name        the parameter name
+     * @param description the parameter description
+     * @param fileType    the file type of this file parameter
+     * @deprecated
+     */
+    public FileParameter(String name, String description, int fileType) {
+        super(name, description);
+        this.fileType = fileType;
+    }
+
+    /**
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#setValue(java.lang.String)
+     */
+    public void setValue(String value) throws ParameterException {
+        if (isValid(value)) {
+            this.value = new File(value);
         }
-      }
-      catch (SecurityException e) {
-        throw new WrongParameterValueException("Given file \"" + file.getPath()
-                                               + "\" cannot be read, access denied!\n" + e.getMessage());
-      }
     }
-    return true;
-	}
+
+    /**
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#isValid(java.lang.String)
+     */
+    public boolean isValid(String value) throws ParameterException {
+        if (value == null) {
+            throw new WrongParameterValueException("Parameter \"" + getName()
+                + "\": No filename given!\nParameter description: " + getDescription());
+        }
+
+        if (fileType == FILE_IN) {
+            File file = new File(value);
+            try {
+                if (!file.exists()) {
+                    throw new WrongParameterValueException("Given file " + file.getPath()
+                        + " for parameter \"" + getName() + "\" does not exist!\n");
+                }
+            }
+            catch (SecurityException e) {
+                throw new WrongParameterValueException("Given file \"" + file.getPath()
+                    + "\" cannot be read, access denied!\n" + e.getMessage());
+            }
+        }
+        return true;
+    }
 }

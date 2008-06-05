@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.CoDeC;
-import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.COPAC;
 import de.lmu.ifi.dbs.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
@@ -34,9 +33,9 @@ public class CODECWrapper extends NormalizationWrapper {
      * <p>Key: {@code -epsilon} </p>
      */
     public static final PatternParameter EPSILON_PARAM = new PatternParameter("epsilon",
-                                                                              "the maximum radius of the neighborhood " +
-                                                                                  "to be considerd, must be suitable to " +
-                                                                                  LocallyWeightedDistanceFunction.class.getName());
+        "the maximum radius of the neighborhood " +
+            "to be considerd, must be suitable to " +
+            LocallyWeightedDistanceFunction.class.getName());
 
     /**
      * Description for parameter k.
@@ -46,9 +45,13 @@ public class CODECWrapper extends NormalizationWrapper {
         "If this value is not defined, k ist set to minpts";
 
     /**
-     * The minpts parameter.
+     * Parameter to specify the threshold for minimum number of points in
+     * the epsilon-neighborhood of a point,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -optics.minpts} </p>
      */
-    private IntParameter minpts;
+    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.OPTICS_MINPTS,
+        new GreaterConstraint(0));
 
     /**
      * The k parameter.
@@ -85,11 +88,10 @@ public class CODECWrapper extends NormalizationWrapper {
     public CODECWrapper() {
         super();
         // parameter epsilon
-        optionHandler.put(EPSILON_PARAM);
+        addOption(EPSILON_PARAM);
 
         // parameter min points
-        minpts = new IntParameter(DBSCAN.MINPTS_P, OPTICS.MINPTS_D, new GreaterConstraint(0));
-        optionHandler.put(minpts);
+        addOption(MINPTS_PARAM);
 
         // paramter k
         k = new IntParameter(KnnQueryBasedHiCOPreprocessor.K_P, K_D, new GreaterConstraint(0));
@@ -99,7 +101,7 @@ public class CODECWrapper extends NormalizationWrapper {
         // global constraint minpts <-> k
         // todo noetig???
         // noinspection unchecked
-        GlobalParameterConstraint gpc = new DefaultValueGlobalConstraint(k, minpts);
+        GlobalParameterConstraint gpc = new DefaultValueGlobalConstraint(k, MINPTS_PARAM);
         optionHandler.setGlobalParameterConstraint(gpc);
     }
 
@@ -110,23 +112,21 @@ public class CODECWrapper extends NormalizationWrapper {
         List<String> parameters = super.getKDDTaskParameters();
 
         // algorithm CoDeC
-        parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-        parameters.add(CoDeC.class.getName());
+        Util.addParameter(parameters, OptionID.ALGORITHM, CoDeC.class.getName());
 
         // clustering algorithm COPAC
         parameters.add(OptionHandler.OPTION_PREFIX + CoDeC.CLUSTERING_ALGORITHM_P);
         parameters.add(COPAC.class.getName());
 
         // partition algorithm
-        Util.addParameter(parameters, OptionID.COPAA_PARTITION_ALGORITHM, DBSCAN.class.getName());        
+        Util.addParameter(parameters, OptionID.COPAA_PARTITION_ALGORITHM, DBSCAN.class.getName());
 
         // epsilon
-        parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_PARAM.getName());
-        parameters.add(getParameterValue(EPSILON_PARAM));
+        Util.addParameter(parameters, OptionID.OPTICS_EPSILON, getParameterValue(EPSILON_PARAM));
 
         // minpts
-        parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.MINPTS_P);
-        parameters.add(Integer.toString(getParameterValue(minpts)));
+        Util.addParameter(parameters, OptionID.OPTICS_MINPTS,
+            Integer.toString(getParameterValue(MINPTS_PARAM)));
 
         // distance function
         parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);

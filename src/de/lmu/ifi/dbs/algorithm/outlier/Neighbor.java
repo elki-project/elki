@@ -70,7 +70,7 @@ public class Neighbor implements Externalizable, Comparable<Neighbor> {
      */
     public String toString() {
         return "(" + objectID + ", " + index + ", " + neighborID +
-               ", " + reachabilityDistance + ", " + distance + ")";
+            ", " + reachabilityDistance + ", " + distance + ")";
 
     }
 
@@ -157,13 +157,15 @@ public class Neighbor implements Externalizable, Comparable<Neighbor> {
 
     /**
      * Creates and returns a copy of this object.
+     *
+     * @return a copy of this object.
      */
     public Neighbor copy() {
         return new Neighbor(objectID,
-                            index,
-                            neighborID,
-                            reachabilityDistance,
-                            distance);
+            index,
+            neighborID,
+            reachabilityDistance,
+            distance);
     }
 
     /**

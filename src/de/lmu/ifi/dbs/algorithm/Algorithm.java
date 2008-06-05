@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 /**
  * <p>Specifies the requirements for any algorithm that is to be executable by the
@@ -49,4 +50,20 @@ public interface Algorithm<O extends DatabaseObject> extends Parameterizable
      * @return a description of the algorithm
      */
     Description getDescription();
+
+    /**
+     * Sets whether verbose messages should be printed while executing the
+     * algorithm.
+     *
+     * @param verbose the flag to allow verbose messages while performing the algorithm
+     */
+    public void setVerbose(boolean verbose);
+
+    /**
+     * Sets whether whether the time should be assessed while executing the
+     * algorithm.
+     *
+     * @param time the flag to request output of performance time
+     */
+    public void setTime(boolean time);
 }

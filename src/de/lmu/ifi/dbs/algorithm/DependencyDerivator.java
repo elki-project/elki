@@ -30,6 +30,8 @@ import java.util.Set;
  *
  * @author Arthur Zimek
  * @param <V> the type of RealVector handled by this Algorithm
+ * @param <D> the type of Distance used by this Algorithm
+ * todo parameter
  */
 public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<D>> extends DistanceBasedAlgorithm<V, D> {
 
@@ -98,14 +100,14 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
         // parameter output accuracy
         IntParameter outputACC = new IntParameter(OUTPUT_ACCURACY_P, OUTPUT_ACCURACY_D, new GreaterEqualConstraint(0));
         outputACC.setDefaultValue(OUTPUT_ACCURACY_DEFAULT);
-        optionHandler.put(outputACC);
+        addOption(outputACC);
 
         // parameter sample size
         IntParameter sampleSize = new IntParameter(SAMPLE_SIZE_P, SAMPLE_SIZE_D, new GreaterEqualConstraint(0));
         sampleSize.setOptional(true);
-        optionHandler.put(sampleSize);
+        addOption(sampleSize);
 
-        optionHandler.put(new Flag(RANDOM_SAMPLE_F, RANDOM_SAMPLE_D));
+        addOption(new Flag(RANDOM_SAMPLE_F, RANDOM_SAMPLE_D));
     }
 
     /**

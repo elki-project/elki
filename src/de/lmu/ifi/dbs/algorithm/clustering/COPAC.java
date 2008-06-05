@@ -10,7 +10,6 @@ import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -33,7 +32,7 @@ public class COPAC<V extends RealVector<V, ?>> extends COPAA<V> implements Clust
         super();
 
         // change description and restriction class of PARTITION_ALGORITHM_PARAM
-        OptionID.COPAA_PARTITION_ALGORITHM.setDescription("algorithm to apply to each partition " +
+        PARTITION_ALGORITHM_PARAM.setDescription("algorithm to apply to each partition " +
             Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Clustering.class) +
             ".");
         // noinspection unchecked
@@ -63,7 +62,7 @@ public class COPAC<V extends RealVector<V, ?>> extends COPAA<V> implements Clust
     }
 
     /**
-     * @see COPAA#runPartitionAlgorithm(de.lmu.ifi.dbs.database.Database, java.util.Map)
+     * @see COPAA#runPartitionAlgorithm(de.lmu.ifi.dbs.database.Database,java.util.Map)
      */
     @Override
     protected PartitionResults<V> runPartitionAlgorithm(Database<V> database,

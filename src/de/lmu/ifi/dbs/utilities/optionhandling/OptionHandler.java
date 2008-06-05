@@ -418,8 +418,9 @@ public class OptionHandler extends AbstractLoggable {
         Option<?> put = this.parameters.put(option.getName(), option);
         if (put != null) {
             try {
-                warning("Parameter " + option.getName() + " has been already set before, overwrite old value. (old value: " + put.getValue().toString() +
-                    ", new value: " + option.getValue().toString());
+                warning("Parameter " + option.getName() + " has been already set before, overwrite old value. " +
+                    "(old value: " + put.getValue().toString() +
+                    ", new value: " + option.getValue().toString()+")");
             }
             catch (UnusedParameterException e) {
                 this.exception(e.getMessage(), e);

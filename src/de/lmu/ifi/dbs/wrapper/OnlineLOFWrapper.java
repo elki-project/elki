@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.AbortException;
-import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.outlier.OnlineLOF;
 import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
@@ -87,8 +87,7 @@ public class OnlineLOFWrapper extends FileBasedDatabaseConnectionWrapper {
         List<String> parameters = super.getKDDTaskParameters();
 
         // algorithm OnlineLOF
-        parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-        parameters.add(OnlineLOF.class.getName());
+        Util.addParameter(parameters, OptionID.ALGORITHM, OnlineLOF.class.getName());
 
         // minpts
         parameters.add(OptionHandler.OPTION_PREFIX + OnlineLOF.MINPTS_P);

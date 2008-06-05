@@ -16,12 +16,11 @@ import java.util.Map;
 /**
  * A result for a partitioning algorithm providing a single result for a single
  * partition.
- * 
- * @author Elke Achtert
+ *
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @param <O> the type of DatabaseObjects handled by this Result
  */
-public class PartitionResults<O extends DatabaseObject> extends
-        AbstractResult<O>
-{
+public class PartitionResults<O extends DatabaseObject> extends AbstractResult<O> {
     /**
      * A prefix for the partition-based class label.
      */
@@ -40,39 +39,33 @@ public class PartitionResults<O extends DatabaseObject> extends
     /**
      * A result for a partitioning algorithm providing a single result for a
      * single partition.
-     * 
-     * @param db
-     *            the database
-     * @param resultMap
-     *            a map of partition IDs to results
+     *
+     * @param db        the database
+     * @param resultMap a map of partition IDs to results
      */
-    public PartitionResults(Database<O> db, Map<Integer, Result<O>> resultMap)
-    {
+    public PartitionResults(Database<O> db, Map<Integer, Result<O>> resultMap) {
         super(db);
         this.partitionResults = resultMap;
     }
 
     /**
      * @see de.lmu.ifi.dbs.algorithm.result.Result#output(java.io.File,
-     *      de.lmu.ifi.dbs.normalization.Normalization, java.util.List)
+     *de.lmu.ifi.dbs.normalization.Normalization,java.util.List)
      */
     @Override
     public void output(File out, Normalization<O> normalization,
-            List<AttributeSettings> settings) throws UnableToComplyException
-    {
-        for (Integer resultID : partitionResults.keySet())
-        {
+                       List<AttributeSettings> settings) throws UnableToComplyException {
+        for (Integer resultID : partitionResults.keySet()) {
             Result<O> result = partitionResults.get(resultID);
             String marker = File.separator + PartitionResults.PARTITION_MARKER
-                    + resultID + FILE_EXTENSION;
-            if (out == null)
-            {
+                + resultID + FILE_EXTENSION;
+            if (out == null) {
                 PrintStream pout = new PrintStream(new FileOutputStream(
-                        FileDescriptor.out));
+                    FileDescriptor.out));
                 pout.println(marker);
                 result.output(pout, normalization, settings);
-            } else
-            {
+            }
+            else {
                 File markedOut = new File(out.getAbsolutePath() + marker);
                 markedOut.getParentFile().mkdirs();
                 result.output(markedOut, normalization, settings);
@@ -82,16 +75,14 @@ public class PartitionResults<O extends DatabaseObject> extends
 
     /**
      * @see Result#output(java.io.PrintStream,
-     *      de.lmu.ifi.dbs.normalization.Normalization, java.util.List)
+     *de.lmu.ifi.dbs.normalization.Normalization,java.util.List)
      */
     public void output(PrintStream outStream, Normalization<O> normalization,
-            List<AttributeSettings> settings) throws UnableToComplyException
-    {
-        for (Integer resultID : partitionResults.keySet())
-        {
+                       List<AttributeSettings> settings) throws UnableToComplyException {
+        for (Integer resultID : partitionResults.keySet()) {
             Result<O> result = partitionResults.get(resultID);
             String marker = File.separator + PartitionResults.PARTITION_MARKER
-                    + resultID;
+                + resultID;
             outStream.println(marker);
             result.output(outStream, normalization, settings);
         }

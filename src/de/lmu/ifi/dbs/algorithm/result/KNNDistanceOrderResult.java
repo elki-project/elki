@@ -15,38 +15,39 @@ import java.io.PrintStream;
 import java.util.List;
 
 /**
- * @author Arthur Zimek 
+ * @author Arthur Zimek
+ * @param <O> the type of DatabaseObjects handled by this Result
+ * @param <D> the type of Distance used by this Result
+ * todo arthur comment
  */
 public class KNNDistanceOrderResult<O extends DatabaseObject, D extends Distance<D>>
-        extends AbstractResult<O>
-{
+    extends AbstractResult<O> {
+
     private final List<D> knnDistances;
 
     /**
      * @param db
+     * @param knnDistances
      */
     public KNNDistanceOrderResult(final Database<O> db,
-            final List<D> knnDistances)
-    {
+                                  final List<D> knnDistances) {
         super(db);
         this.knnDistances = knnDistances;
     }
 
     /**
      * @see Result#output(java.io.File,
-     *      de.lmu.ifi.dbs.normalization.Normalization, java.util.List)
+     *de.lmu.ifi.dbs.normalization.Normalization,java.util.List)
      */
     public void output(final File out, final Normalization<O> normalization,
-            final List<AttributeSettings> settings)
-            throws UnableToComplyException
-    {
+                       final List<AttributeSettings> settings)
+        throws UnableToComplyException {
         PrintStream output;
-        try
-        {
+        try {
             out.getParentFile().mkdirs();
             output = new PrintStream(new FileOutputStream(out));
-        } catch (Exception e)
-        {
+        }
+        catch (Exception e) {
             output = new PrintStream(new FileOutputStream(FileDescriptor.out));
         }
         output(output, normalization, settings);
@@ -54,11 +55,10 @@ public class KNNDistanceOrderResult<O extends DatabaseObject, D extends Distance
     }
 
     public void output(PrintStream outStream, Normalization<O> normalization,
-            List<AttributeSettings> settings) throws UnableToComplyException
-    {
+                       List<AttributeSettings> settings) throws UnableToComplyException {
         writeHeader(outStream, settings, null);
         Util.print(knnDistances, System.getProperty("line.separator"),
-                outStream);
+            outStream);
         outStream.println();
 
     }

@@ -26,7 +26,8 @@ import java.util.Map;
 /**
  * Provides the apriori algorithm.
  * 
- * TODO Doku
+ * TODO parameter
+ * todo arthur documentation
  * 
  * @author Arthur Zimek 
  */
@@ -92,12 +93,12 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
 		DoubleParameter minFreq = new DoubleParameter(MINIMUM_FREQUENCY_P,MINIMUM_FREQUENCY_D,minFreqConstraints);
 		// optional parameter 
 		minFreq.setOptional(true);
-		optionHandler.put(minFreq);
+		addOption(minFreq);
 		
 		// minimum support parameter
 		IntParameter minSupp = new IntParameter(MINIMUM_SUPPORT_P,MINIMUM_SUPPORT_D,new GreaterEqualConstraint(0));
 		minSupp.setOptional(true);
-		optionHandler.put(minSupp);
+		addOption(minSupp);
 		
 		// global parameter constraints
 		ArrayList<Parameter<?,?>> globalConstraints = new ArrayList<Parameter<?,?>>();

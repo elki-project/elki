@@ -9,7 +9,9 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.varianceanalysis.LimitEigenPairFilter;
+import de.lmu.ifi.dbs.zelki.hough.old.HoughOLD4;
 
 import java.util.List;
 import java.util.Vector;
@@ -101,15 +103,23 @@ public class FourCWrapper extends NormalizationWrapper {
         List<String> parameters = super.getKDDTaskParameters();
 
         // 4C algorithm
-        parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-        parameters.add(FourC.class.getName());
+        Util.addParameter(parameters, OptionID.ALGORITHM, FourC.class.getName());
 
-        put(parameters, FourC.EPSILON_PARAM);
-        put(parameters, minpts);
-        put(parameters, lambda);
-        put(parameters, delta);
+        // epsilon
+        Util.addParameter(parameters, FourC.EPSILON_PARAM, getParameterValue(FourC.EPSILON_PARAM));
+
+        // minpts
+        Util.addParameter(parameters, minpts, getParameterValue(minpts).toString());
+
+        // lambda
+        Util.addParameter(parameters, lambda, getParameterValue(lambda).toString());
+
+        // delta
+        Util.addParameter(parameters, delta, getParameterValue(delta).toString());
+
+        // absolute flag
         if (optionHandler.isSet(absolute))
-            put(parameters, absolute);
+            Util.addFlag(parameters, absolute);
 
         return parameters;
     }

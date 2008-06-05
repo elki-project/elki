@@ -1,14 +1,10 @@
 package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.AbortException;
-import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.util.List;
@@ -24,20 +20,26 @@ public class OPTICSWrapper extends NormalizationWrapper {
     /**
      * Parameter to specify the maximum radius of the neighborhood to be considered,
      * must be suitable to {@link EuklideanDistanceFunction EuklideanDistanceFunction}.
-     * <p>Key: {@code -epsilon} </p>
+     * <p>Key: {@code -optics.epsilon} </p>
      */
-    public static final PatternParameter EPSILON_PARAM = new PatternParameter(OPTICS.EPSILON_PARAM.getName(),
-                                                                              "the maximum radius of the neighborhood " +
-                                                                              "to be considered, must be suitable to " +
-                                                                              EuklideanDistanceFunction.class.getName());
+    private final PatternParameter EPSILON_PARAM;
 
     /**
-     * The value of the epsilon parameter.
+     * Parameter to specify the threshold for minimum number of points in
+     * the epsilon-neighborhood of a point,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -optics.minpts} </p>
+     */
+    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.OPTICS_MINPTS,
+        new GreaterConstraint(0));
+
+    /**
+     * Holds the value of the epsilon parameter.
      */
     private String epsilon;
 
     /**
-     * The value of the minpts parameter.
+     * THolds the value of the minpts parameter.
      */
     private int minpts;
 
@@ -71,10 +73,14 @@ public class OPTICSWrapper extends NormalizationWrapper {
     public OPTICSWrapper() {
         super();
         // parameter epsilon
+        EPSILON_PARAM = new PatternParameter(OptionID.OPTICS_EPSILON);
+        EPSILON_PARAM.setDescription("<pattern>The maximum radius of the neighborhood " +
+            "to be considered, must be suitable to " +
+            EuklideanDistanceFunction.class.getName());
         optionHandler.put(EPSILON_PARAM);
 
         //parameter min points
-        optionHandler.put(new IntParameter(OPTICS.MINPTS_P, OPTICS.MINPTS_D, new GreaterConstraint(0)));
+        optionHandler.put(MINPTS_PARAM);
     }
 
     /**
@@ -84,16 +90,13 @@ public class OPTICSWrapper extends NormalizationWrapper {
         List<String> parameters = super.getKDDTaskParameters();
 
         // algorithm OPTICS
-        parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-        parameters.add(OPTICS.class.getName());
+        Util.addParameter(parameters, OptionID.ALGORITHM, OPTICS.class.getName());
 
         // epsilon
-        parameters.add(OptionHandler.OPTION_PREFIX + EPSILON_PARAM.getName());
-        parameters.add(epsilon);
+        Util.addParameter(parameters, EPSILON_PARAM, epsilon);
 
         // minpts
-        parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.MINPTS_P);
-        parameters.add(Integer.toString(minpts));
+        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(minpts));
 
         // distance function
         parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
@@ -131,8 +134,8 @@ public class OPTICSWrapper extends NormalizationWrapper {
         String[] remainingParameters = super.setParameters(args);
 
         // epsilon, minpts
-        epsilon = getParameterValue(OPTICS.EPSILON_PARAM);
-        minpts = (Integer) optionHandler.getOptionValue(OPTICS.MINPTS_P);
+        epsilon = getParameterValue(EPSILON_PARAM);
+        minpts = getParameterValue(MINPTS_PARAM);
 
         return remainingParameters;
     }

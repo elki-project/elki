@@ -1,10 +1,11 @@
 package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.AbortException;
-import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.PreDeCon;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
@@ -78,8 +79,7 @@ public class PreDeConWrapper extends NormalizationWrapper {
         List<String> parameters = super.getKDDTaskParameters();
 
         // PreDeCon algorithm
-        parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-        parameters.add(PreDeCon.class.getName());
+        Util.addParameter(parameters, OptionID.ALGORITHM, PreDeCon.class.getName());
 
         // epsilon for PreDeCon
         parameters.add(OptionHandler.OPTION_PREFIX + PreDeCon.EPSILON_PARAM.getName());

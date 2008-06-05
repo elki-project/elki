@@ -8,12 +8,7 @@ import de.lmu.ifi.dbs.tree.btree.BTreeData;
 import de.lmu.ifi.dbs.tree.btree.DefaultKey;
 import de.lmu.ifi.dbs.utilities.output.ObjectPrinter;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
+import java.io.*;
 import java.util.regex.Pattern;
 
 /**
@@ -45,7 +40,7 @@ public class LOFTable extends AbstractLoggable {
         int keySize = 4;
         int valueSize = 8 + minpts * 8;
         this.lof = new BTree<DefaultKey, LOFEntry>(keySize, valueSize,
-                                                   pageSize, cacheSize);
+            pageSize, cacheSize);
     }
 
     /**
@@ -74,7 +69,7 @@ public class LOFTable extends AbstractLoggable {
                 }
                 catch (Exception e) {
                     throw new RuntimeException("Error while parsing line "
-                                               + lineNumber, e);
+                        + lineNumber, e);
                 }
             }
         }
@@ -215,7 +210,7 @@ public class LOFTable extends AbstractLoggable {
      * @return <code>true</code> if this object is the same as the obj
      *         argument; <code>false</code> otherwise.
      */
-	public boolean equals(Object obj) {
+    public boolean equals(Object obj) {
         return obj instanceof LOFTable && super.equals(obj);
 	}
 }

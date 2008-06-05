@@ -13,20 +13,16 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * Provides the result of the single link algorithm SLINK.
  *
- * @author Elke Achtert
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @param <O> the type of DatabaseObjects handled by this Result
+ * @param <D> the type of Distance used by this Result 
  */
-public class PointerRepresentation<O extends DatabaseObject, D extends Distance<D>> extends AbstractResult<O>
-{
+public class PointerRepresentation<O extends DatabaseObject, D extends Distance<D>> extends AbstractResult<O> {
 
     /**
      * The values of the function Pi of the pointer representation.
@@ -46,19 +42,14 @@ public class PointerRepresentation<O extends DatabaseObject, D extends Distance<
     /**
      * Creates a new pointer representation.
      *
-     * @param pi
-     *            the values of the function Pi of the pointer representation
-     * @param lambda
-     *            the values of the function Lambda of the pointer
-     *            representation
-     * @param distanceFunction
-     *            the distance function this pointer representation was computed
-     *            with
-     * @param database
-     *            the database containing the objects
+     * @param pi               the values of the function Pi of the pointer representation
+     * @param lambda           the values of the function Lambda of the pointer
+     *                         representation
+     * @param distanceFunction the distance function this pointer representation was computed
+     *                         with
+     * @param database         the database containing the objects
      */
-    public PointerRepresentation(HashMap<Integer, Integer> pi, HashMap<Integer, SLINK<O, D>.SLinkDistance> lambda, DistanceFunction<O, D> distanceFunction, Database<O> database)
-    {
+    public PointerRepresentation(HashMap<Integer, Integer> pi, HashMap<Integer, SLINK<O, D>.SLinkDistance> lambda, DistanceFunction<O, D> distanceFunction, Database<O> database) {
         super(database);
         this.pi = pi;
         this.lambda = lambda;
@@ -66,25 +57,21 @@ public class PointerRepresentation<O extends DatabaseObject, D extends Distance<
     }
 
     /**
-     * @see Result#output(File, Normalization, List)
+     * @see Result#output(File,Normalization,List)
      */
-    public void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException
-    {
+    public void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         PrintStream outStream;
-        try
-        {
+        try {
             outStream = new PrintStream(new FileOutputStream(out));
         }
-        catch(Exception e)
-        {
+        catch (Exception e) {
             outStream = new PrintStream(new FileOutputStream(FileDescriptor.out));
         }
 
-        output(outStream, normalization,settings);
+        output(outStream, normalization, settings);
     }
 
-    public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException
-    {
+    public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         writeHeader(outStream, settings, null);
 
         outStream.println(this.toString());
@@ -96,13 +83,11 @@ public class PointerRepresentation<O extends DatabaseObject, D extends Distance<
      *
      * @return a string representation of this pointer representation
      */
-    public String toString()
-    {
+    public String toString() {
         StringBuffer result = new StringBuffer();
 
         SortedSet<Integer> keys = new TreeSet<Integer>(pi.keySet());
-        for(Integer id : keys)
-        {
+        for (Integer id : keys) {
             result.append("P(");
             result.append(id);
             result.append(") = ");
@@ -119,27 +104,22 @@ public class PointerRepresentation<O extends DatabaseObject, D extends Distance<
     /**
      * Returns the clustering result for a given distance threshold.
      *
-     * @param distancePattern
-     *            the pattern of the threshold
+     * @param distancePattern the pattern of the threshold
      * @return the clustering result: each element of the returned collection is
      *         a list of ids representing one cluster
      */
-    public Collection<List<Integer>> getClusters(String distancePattern)
-    {
+    public Collection<List<Integer>> getClusters(String distancePattern) {
         D distance = distanceFunction.valueOf(distancePattern);
 
         HashMap<Integer, List<Integer>> partitions = new HashMap<Integer, List<Integer>>();
-        for(Integer id : pi.keySet())
-        {
+        for (Integer id : pi.keySet()) {
             Integer partitionID = id;
-            while(lambda.get(partitionID).getDistance().compareTo(distance) <= 0)
-            {
+            while (lambda.get(partitionID).getDistance().compareTo(distance) <= 0) {
                 partitionID = pi.get(partitionID);
             }
 
             List<Integer> partition = partitions.get(partitionID);
-            if(partition == null)
-            {
+            if (partition == null) {
                 partition = new ArrayList<Integer>();
                 partitions.put(partitionID, partition);
             }

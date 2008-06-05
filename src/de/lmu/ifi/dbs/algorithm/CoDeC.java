@@ -16,11 +16,7 @@ import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,9 +24,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * todo parameter
  * TODO Arthur comment
  *
  * @author Arthur Zimek
+ * @param <V> the type of RealVector handled by this Algorithm
+ * @param <D> the type of Distance used by this Algorithm
  */
 public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends ClassLabel<L>> extends AbstractAlgorithm<V> {
 
@@ -43,12 +42,12 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
     public static final String DEFAULT_CLASS_LABEL_CLASS = HierarchicalClassLabel.class.toString();
 
     public static final String CLASS_LABEL_D = "use the designated classLabel class "
-                                               + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(ClassLabel.class) + ". Default: " + DEFAULT_CLASS_LABEL_CLASS;
+        + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(ClassLabel.class) + ". Default: " + DEFAULT_CLASS_LABEL_CLASS;
 
     public static final String CLUSTERING_ALGORITHM_P = "clusteringAlgorithm";
 
     public static final String CLUSTERING_ALGORITHM_D = "the clustering algorithm to use to derive cluster "
-                                                        + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Clustering.class) + ". Default: " + COPAC.class.getName();
+        + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Clustering.class) + ". Default: " + COPAC.class.getName();
 
     private boolean evaluateAsClassifier = false;
 
@@ -68,17 +67,17 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
     @SuppressWarnings("unchecked")
     public CoDeC() {
         super();
-        optionHandler.put(new Flag(EVALUATE_AS_CLASSIFIER_F, EVALUATE_AS_CLASSIFIER_D));
+        addOption(new Flag(EVALUATE_AS_CLASSIFIER_F, EVALUATE_AS_CLASSIFIER_D));
 
         // parameter class label
         ClassParameter<L> classLabel = new ClassParameter(CLASS_LABEL_P, CLASS_LABEL_D, ClassLabel.class);
         classLabel.setDefaultValue(HierarchicalClassLabel.class.toString());
-        optionHandler.put(classLabel);
+        addOption(classLabel);
 
         // parameter clustering algorithm
         ClassParameter<Clustering<V>> clAlg = new ClassParameter(CLUSTERING_ALGORITHM_P, CLUSTERING_ALGORITHM_D, Clustering.class);
         clAlg.setDefaultValue(COPAC.class.getName());
-        optionHandler.put(clAlg);
+        addOption(clAlg);
     }
 
     /**
@@ -182,28 +181,22 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
         }
         String[] clusteringAlgorithmParameters = new String[remainingParameters.length];
         System.arraycopy(remainingParameters, 0, clusteringAlgorithmParameters, 0, remainingParameters.length);
-        if (isTime()) {
-            clusteringAlgorithmParameters = Util.addFlag(clusteringAlgorithmParameters, AbstractAlgorithm.TIME_FLAG);
-        }
-        if (isVerbose()) {
-            clusteringAlgorithmParameters = Util.addFlag(clusteringAlgorithmParameters, AbstractAlgorithm.VERBOSE_FLAG);
-        }
+        clusteringAlgorithm.setTime(isTime());
+        clusteringAlgorithm.setVerbose(isVerbose());
         remainingParameters = clusteringAlgorithm.setParameters(clusteringAlgorithmParameters);
 
         // evaluation
         String[] evaluationParmeters = new String[remainingParameters.length];
         System.arraycopy(remainingParameters, 0, evaluationParmeters, 0, remainingParameters.length);
 
-        if (isTime()) {
-            evaluationParmeters = Util.addFlag(evaluationParmeters, AbstractAlgorithm.TIME_FLAG);
-        }
-        if (isVerbose()) {
-            evaluationParmeters = Util.addFlag(evaluationParmeters, AbstractAlgorithm.VERBOSE_FLAG);
-        }
         if (evaluateAsClassifier) {
+            classifier.setTime(isTime());
+            classifier.setVerbose(isVerbose());
             remainingParameters = classifier.setParameters(evaluationParmeters);
         }
         else {
+            dependencyDerivator.setTime(isTime());
+            dependencyDerivator.setVerbose(isVerbose());
             remainingParameters = dependencyDerivator.setParameters(evaluationParmeters);
         }
         setParameters(args, remainingParameters);

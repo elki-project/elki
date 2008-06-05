@@ -121,7 +121,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
 
     /**
      * @see de.lmu.ifi.dbs.algorithm.Algorithm#getDescription()
-     * todo publication
+     *      todo publication
      */
     public Description getDescription() {
         return new Description(
@@ -146,11 +146,9 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         // parameters for optics
         List<String> opticsParameters = new ArrayList<String>();
         // epsilon for OPTICS
-        opticsParameters.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_PARAM.getName());
-        opticsParameters.add(DiSHDistanceFunction.INFINITY_PATTERN);
+        Util.addParameter(opticsParameters, OptionID.OPTICS_EPSILON, DiSHDistanceFunction.INFINITY_PATTERN);
         // minpts for OPTICS
-        opticsParameters.add(OptionHandler.OPTION_PREFIX + OPTICS.MINPTS_P);
-        opticsParameters.add(Integer.toString(minpts));
+        Util.addParameter(opticsParameters, OptionID.OPTICS_MINPTS, Integer.toString(minpts));
         // distance function
         opticsParameters.add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
         opticsParameters.add(DiSHDistanceFunction.class.getName());
@@ -166,13 +164,8 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         opticsParameters.add(OptionHandler.OPTION_PREFIX + DiSHPreprocessor.EPSILON_P);
         opticsParameters.add(Double.toString(epsilon));
         // verbose
-        if (isVerbose()) {
-            Util.addFlag(opticsParameters, OPTICS.VERBOSE_FLAG);
-        }
-        // time
-        if (isTime()) {
-            Util.addFlag(opticsParameters, OPTICS.TIME_FLAG);
-        }
+        optics.setVerbose(isVerbose());
+        optics.setTime(isTime());
         // optics
         for (String parameter : remainingParameters) {
             opticsParameters.add(parameter);

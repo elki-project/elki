@@ -1,16 +1,11 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.FileParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.io.File;
 import java.util.List;
@@ -19,19 +14,22 @@ import java.util.List;
  * KDDTaskWrapper is an abstract super class for all wrapper classes running
  * algorithms in a kdd task.
  *
- * @author Elke Achtert
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  */
 public abstract class KDDTaskWrapper<O extends DatabaseObject> extends AbstractWrapper {
 
     /**
-     * The result of the kdd task.
+     * Flag to request output of performance time.
      */
-    private Result<O> result;
+    private final Flag TIME_FLAG = new Flag(OptionID.ALGORITHM_TIME);
 
     /**
-     * The parameter output.
+     * Optional Parameter to specify the file to write the obtained results in.
+     * If this parameter is omitted, per default the output will sequentially be given to STDOUT.
+     * <p>Key: {@code -out} </p>
      */
-    private FileParameter outputParameter;
+    private final FileParameter OUTPUT_PARAM = new FileParameter(OptionID.OUTPUT,
+        FileParameter.FILE_OUT, true);
 
     /**
      * The output file.
@@ -39,9 +37,9 @@ public abstract class KDDTaskWrapper<O extends DatabaseObject> extends AbstractW
     private File output;
 
     /**
-     * The time flag.
+     * The result of the kdd task.
      */
-    private Flag timeFlag;
+    private Result<O> result;
 
     /**
      * The value of the time flag.
@@ -56,14 +54,11 @@ public abstract class KDDTaskWrapper<O extends DatabaseObject> extends AbstractW
     protected KDDTaskWrapper() {
         super();
 
-        // file
-        outputParameter = new FileParameter(KDDTask.OUTPUT_P, KDDTask.OUTPUT_D, FileParameter.FILE_OUT);
-        outputParameter.setOptional(true);
-        optionHandler.put(outputParameter);
+        // outpout
+        optionHandler.put(OUTPUT_PARAM);
 
         // time
-        timeFlag = new Flag(AbstractAlgorithm.TIME_FLAG.getName(), AbstractAlgorithm.TIME_FLAG.getDescription());
-        optionHandler.put(timeFlag);
+        optionHandler.put(TIME_FLAG);
     }
 
     /**
@@ -118,12 +113,12 @@ public abstract class KDDTaskWrapper<O extends DatabaseObject> extends AbstractW
         String[] remainingParameters = super.setParameters(args);
 
         // output
-        if (optionHandler.isSet(outputParameter)) {
-            output = getParameterValue(outputParameter);
+        if (optionHandler.isSet(OUTPUT_PARAM)) {
+            output = getParameterValue(OUTPUT_PARAM);
         }
 
         // time
-        time = optionHandler.isSet(timeFlag);
+        time = optionHandler.isSet(TIME_FLAG);
 
         return remainingParameters;
     }
@@ -139,41 +134,19 @@ public abstract class KDDTaskWrapper<O extends DatabaseObject> extends AbstractW
 
         // verbose
         if (isVerbose()) {
-            Util.addFlag(parameters, AbstractAlgorithm.VERBOSE_FLAG);
+            Util.addFlag(parameters, OptionID.ALGORITHM_VERBOSE);
         }
 
         // time
         if (isTime()) {
-            Util.addFlag(parameters, AbstractAlgorithm.TIME_FLAG);
+            Util.addFlag(parameters, OptionID.ALGORITHM_TIME);
         }
 
         // output
         if (getOutput() != null) {
-            parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.OUTPUT_P);
-            parameters.add(getOutput().getPath());
+            Util.addParameter(parameters, OUTPUT_PARAM, getOutput().getPath());
         }
 
         return parameters;
-    }
-
-    /**
-     * Puts the value of the specified parameter to the specified parameter list.
-     *
-     * @param parameters the list of parameters
-     * @param parameter  the parameter to be added
-     */
-    public void put(List<String> parameters, Parameter<?, ?> parameter) {
-        parameters.add(OptionHandler.OPTION_PREFIX + parameter.getName());
-        parameters.add(getParameterValue(parameter).toString());
-    }
-
-    /**
-     * Puts the specified flag to the specified parameter list.
-     *
-     * @param parameters the list of parameters
-     * @param flag       the parameter to be added
-     */
-    public void put(List<String> parameters, Flag flag) {
-        parameters.add(OptionHandler.OPTION_PREFIX + flag.getName());
     }
 }

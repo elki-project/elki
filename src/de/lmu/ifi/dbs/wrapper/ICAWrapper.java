@@ -1,9 +1,10 @@
 package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.ICA;
-import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter;
 import de.lmu.ifi.dbs.varianceanalysis.ica.FastICA;
 import de.lmu.ifi.dbs.varianceanalysis.ica.KurtosisBasedContrastFunction;
@@ -20,8 +21,8 @@ public class ICAWrapper extends FileBasedDatabaseConnectionWrapper {
      * Description for parameter epsilon.
      */
     public static final String EPSILON_D = "the maximum radius of the neighborhood to" +
-                                           "be considerd, must be suitable to " +
-                                           EuklideanDistanceFunction.class.getName();
+        "be considerd, must be suitable to " +
+        EuklideanDistanceFunction.class.getName();
 
 
     /**
@@ -62,8 +63,7 @@ public class ICAWrapper extends FileBasedDatabaseConnectionWrapper {
         List<String> parameters = super.getKDDTaskParameters();
 
         // algorithm ICA
-        parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-        parameters.add(ICA.class.getName());
+        Util.addParameter(parameters, OptionID.ALGORITHM, ICA.class.getName());
 
         // parser
 //    parameters.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.PARSER_P);

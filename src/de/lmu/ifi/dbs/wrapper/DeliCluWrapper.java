@@ -3,17 +3,16 @@ package de.lmu.ifi.dbs.wrapper;
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.DeLiClu;
+import de.lmu.ifi.dbs.algorithm.clustering.SUBCLU;
 import de.lmu.ifi.dbs.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.database.connection.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.index.tree.TreeIndex;
 import de.lmu.ifi.dbs.index.tree.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.deliclu.DeLiCluTree;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.utilities.Util;
 
 import java.util.List;
 
@@ -88,8 +87,7 @@ public class DeliCluWrapper extends NormalizationWrapper {
         List<String> parameters = super.getKDDTaskParameters();
 
         // deliclu algorithm
-        parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-        parameters.add(DeLiClu.class.getName());
+        Util.addParameter(parameters, OptionID.ALGORITHM, DeLiClu.class.getName());
 
         // minpts
         parameters.add(OptionHandler.OPTION_PREFIX + DeLiClu.MINPTS_P);

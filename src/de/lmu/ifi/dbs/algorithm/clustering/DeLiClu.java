@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.utilities.heap.HeapNode;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.io.Serializable;
@@ -49,7 +50,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
     /**
      * Parameter minimum points.
      */
-    public static final String MINPTS_P = OPTICS.MINPTS_P;
+    public static final String MINPTS_P = OptionID.OPTICS_MINPTS.getName();
 
     /**
      * Description for parameter minimum points.

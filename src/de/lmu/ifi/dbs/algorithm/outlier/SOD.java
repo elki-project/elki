@@ -28,6 +28,7 @@ import java.util.List;
  * @author Arthur Zimek
  * @param <<V> the type of RealVector handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
+ * todo parameter
  */
 public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends AbstractAlgorithm<V> {
 
@@ -113,8 +114,8 @@ public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends
      * <p/>
      * The query object is excluded from the knn list.
      *
-     * @param database
-     * @param queryObject
+     * @param database    the database holding the objects
+     * @param queryObject the query object for which the kNNs should be determined
      * @return the k nearest neighbors in terms of the shared nearest neighbor distance without the query object
      */
     private KNNList<DoubleDistance> getKNN(Database<V> database, Integer queryObject) {

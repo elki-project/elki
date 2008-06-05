@@ -18,17 +18,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 
 import java.io.PrintStream;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.StringTokenizer;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -1078,8 +1068,8 @@ public final class Util extends AbstractLoggable {
     public static String[] parameterDifference(String[] complete, String[] part) throws IllegalArgumentException {
         if (complete.length < part.length) {
             throw new IllegalArgumentException("First array must be at least as long as second array.\n" +
-                                               "First array:  " + Arrays.asList(complete) + "\n" +
-                                               "Second array: " + Arrays.asList(part));
+                "First array:  " + Arrays.asList(complete) + "\n" +
+                "Second array: " + Arrays.asList(part));
         }
 
         if (complete.length == 0) {
@@ -1138,7 +1128,10 @@ public final class Util extends AbstractLoggable {
             }
         }
         if (second < partArray.size()) {
-            throw new IllegalArgumentException("second array contains entries that are not contained by the first array.");
+            throw new IllegalArgumentException("second array contains entries that are not " +
+                "contained in the first array.\n" +
+                "First array:  " + Arrays.asList(complete) + "\n" +
+                "Second array: " + Arrays.asList(part));
         }
         while (first < completeArray.size()) {
             String[] params = pattern.split(completeArray.get(first));
@@ -1356,7 +1349,7 @@ public final class Util extends AbstractLoggable {
         }
         catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("The specified String does not represent a bit set " +
-                                               "containing only 0 and 1 values: " + s);
+                "containing only 0 and 1 values: " + s);
         }
     }
 
@@ -1375,7 +1368,7 @@ public final class Util extends AbstractLoggable {
             }
             else if (s[i] != '0') {
                 throw new IllegalArgumentException("The specified String does not represent a bit set " +
-                                                   "containing only 0 and 1 values: " + s);
+                    "containing only 0 and 1 values: " + s);
             }
         }
         return result;
@@ -1463,7 +1456,7 @@ public final class Util extends AbstractLoggable {
     }
 
     /**
-     * Adds the specified flag to the end of the given parameter array.
+     * Adds the specified flag to the beginning of the given parameter array.
      *
      * @param parameters the array of parameters
      * @param flag       the flag to be added
@@ -1472,13 +1465,13 @@ public final class Util extends AbstractLoggable {
      */
     public static String[] addFlag(String[] parameters, Flag flag) {
         String[] newParameters = new String[parameters.length + 1];
-        System.arraycopy(parameters, 0, newParameters, 0, parameters.length);
-        newParameters[parameters.length] = OptionHandler.OPTION_PREFIX + flag.getName();
+        System.arraycopy(parameters, 0, newParameters, 1, parameters.length);
+        newParameters[0] = OptionHandler.OPTION_PREFIX + flag.getName();
         return newParameters;
     }
 
     /**
-     * Adds the specified parameter and its value to the end of the given parameter array.
+     * Adds the specified parameter and its value to the beginning of the given parameter array.
      *
      * @param parameters the array of parameters
      * @param parameter  the parameter to be added
@@ -1488,43 +1481,70 @@ public final class Util extends AbstractLoggable {
      */
     public static String[] addParameter(String[] parameters, Parameter parameter, String value) {
         String[] newParameters = new String[parameters.length + 2];
-        System.arraycopy(parameters, 0, newParameters, 0, parameters.length);
-        newParameters[parameters.length] = OptionHandler.OPTION_PREFIX + parameter.getName();
-        newParameters[parameters.length + 1] = value;
+        System.arraycopy(parameters, 0, newParameters, 2, parameters.length);
+        newParameters[0] = OptionHandler.OPTION_PREFIX + parameter.getName();
+        newParameters[1] = value;
         return newParameters;
     }
 
     /**
-     * Adds the specified flag to the end of the given parameter list.
+     * Adds the specified optionID and its value to the beginning of the given parameter array.
+     *
+     * @param parameters the array of parameters
+     * @param optionID   the optionID to be added
+     * @param value      the value of the optionID to be added
+     * @return a new parameter array containing the values of <code>parameters</code> and
+     *         the specified <code>optionID</code> and its <code>value</code>.
+     */
+    public static String[] addParameter(String[] parameters, OptionID optionID, String value) {
+        String[] newParameters = new String[parameters.length + 2];
+        System.arraycopy(parameters, 0, newParameters, 2, parameters.length);
+        newParameters[0] = OptionHandler.OPTION_PREFIX + optionID.getName();
+        newParameters[1] = value;
+        return newParameters;
+    }
+
+    /**
+     * Adds the specified flag to the beginning of the given parameter list.
      *
      * @param parameters the list of parameters
      * @param flag       the flag to be added
      */
     public static void addFlag(List<String> parameters, Flag flag) {
-        parameters.add(OptionHandler.OPTION_PREFIX + flag.getName());
+        parameters.add(0, OptionHandler.OPTION_PREFIX + flag.getName());
     }
 
     /**
-     * Adds the specified optionID and its value to the end of the given parameter list.
+     * Adds the specified optionID of a flag to the beginning of the given parameter list.
+     *
+     * @param parameters the list of parameters
+     * @param optionID       the optionID to be added
+     */
+    public static void addFlag(List<String> parameters, OptionID optionID) {
+        parameters.add(0, OptionHandler.OPTION_PREFIX + optionID.getName());
+    }
+
+    /**
+     * Adds the specified optionID and its value to the beginning of the given parameter list.
      *
      * @param parameters the list of parameters
      * @param optionID   the optionID of the parameter to be added
      * @param value      the value of the parameter to be added
      */
     public static void addParameter(List<String> parameters, OptionID optionID, String value) {
-        parameters.add(OptionHandler.OPTION_PREFIX + optionID.getName());
-        parameters.add(value);
+        parameters.add(0, OptionHandler.OPTION_PREFIX + optionID.getName());
+        parameters.add(1, value);
     }
 
     /**
-     * Adds the specified parameter and its value to the end of the given parameter list.
+     * Adds the specified parameter and its value to the beginning of the given parameter list.
      *
      * @param parameters the list of parameters
      * @param parameter  the parameter to be added
      * @param value      the value of the parameter to be added
      */
     public static void addParameter(List<String> parameters, Parameter parameter, String value) {
-        parameters.add(OptionHandler.OPTION_PREFIX + parameter.getName());
-        parameters.add(value);
+        parameters.add(0, OptionHandler.OPTION_PREFIX + parameter.getName());
+        parameters.add(1, value);
     }
 }

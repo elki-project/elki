@@ -17,7 +17,9 @@ import java.util.List;
 /**
  * Provides the result of a kNN-Join.
  *
- * @author Elke Achtert 
+ * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @param <O> the type of DatabaseObjects handled by this Result
+ * @param <D> the type of Distance used by this Result 
  */
 public class KNNJoinResult<O extends DatabaseObject, D extends Distance<D>> implements Result<O> {
   /**

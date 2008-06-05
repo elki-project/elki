@@ -18,18 +18,11 @@ import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.distance.distancefunction.WeightedDistanceFunction;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
-import de.lmu.ifi.dbs.utilities.Description;
-import de.lmu.ifi.dbs.utilities.HyperBoundingBox;
-import de.lmu.ifi.dbs.utilities.Progress;
-import de.lmu.ifi.dbs.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.utilities.*;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.utilities.heap.HeapNode;
-import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.varianceanalysis.AbstractPCA;
@@ -733,13 +726,12 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
         Database<RealVector> derivatorDB = buildDerivatorDB(database, interval);
 
         DependencyDerivator derivator = new DependencyDerivator();
-
-        List<String> params = new ArrayList<String>();
-        params.add(OptionHandler.OPTION_PREFIX + AbstractPCA.EIGENPAIR_FILTER_PARAM.getName());
-        params.add(FirstNEigenPairFilter.class.getName());
-        params.add(OptionHandler.OPTION_PREFIX + FirstNEigenPairFilter.N_P);
-        params.add(Integer.toString(dim - 1));
-        derivator.setParameters(params.toArray(new String[params.size()]));
+        // set the parameters
+        List<String> parameters = new ArrayList<String>();
+        Util.addParameter(parameters, OptionID.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
+        parameters.add(OptionHandler.OPTION_PREFIX + FirstNEigenPairFilter.N_P);
+        parameters.add(Integer.toString(dim - 1));
+        derivator.setParameters(parameters.toArray(new String[parameters.size()]));
 
         //noinspection unchecked
         derivator.run(derivatorDB);

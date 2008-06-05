@@ -31,7 +31,7 @@ public class NeighborList implements Externalizable, Iterable<Neighbor> {
     /**
      * Provides a neighbor list with the specified initial size.
      *
-     * @param size
+     * @param size the initial size of the list.
      */
     public NeighborList(int size) {
         neighbors = new ArrayList<Neighbor>(size);

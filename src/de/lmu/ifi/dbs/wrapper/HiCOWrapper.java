@@ -1,14 +1,13 @@
 package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.AbortException;
-import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.distance.distancefunction.PCABasedCorrelationDistanceFunction;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.PreprocessorHandler;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.*;
-import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter;
 
 import java.util.ArrayList;
@@ -29,9 +28,13 @@ public class HiCOWrapper extends NormalizationWrapper {
         + "If this value is not defined, k ist set to minpts";
 
     /**
-     * The minpts parameter.
+     * Parameter to specify the threshold for minimum number of points in
+     * the epsilon-neighborhood of a point,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -optics.minpts} </p>
      */
-    private IntParameter minpts;
+    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.OPTICS_MINPTS,
+        new GreaterConstraint(0));
 
     /**
      * The k parameter.
@@ -78,10 +81,7 @@ public class HiCOWrapper extends NormalizationWrapper {
     public HiCOWrapper() {
         super();
         // parameter minpts
-        minpts = new IntParameter(OPTICS.MINPTS_P,
-            OPTICS.MINPTS_D,
-            new GreaterConstraint(0));
-        optionHandler.put(minpts);
+        optionHandler.put(MINPTS_PARAM);
 
         // parameter k
         k = new IntParameter(KnnQueryBasedHiCOPreprocessor.K_P,
@@ -110,7 +110,7 @@ public class HiCOWrapper extends NormalizationWrapper {
         // global constraint for minpts <-> k
         // noetig ???
         // noinspection unchecked
-        GlobalParameterConstraint gpc = new DefaultValueGlobalConstraint(k, minpts);
+        GlobalParameterConstraint gpc = new DefaultValueGlobalConstraint(k, MINPTS_PARAM);
         optionHandler.setGlobalParameterConstraint(gpc);
     }
 
@@ -121,8 +121,7 @@ public class HiCOWrapper extends NormalizationWrapper {
         List<String> parameters = super.getKDDTaskParameters();
 
         // OPTICS algorithm
-        parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-        parameters.add(OPTICS.class.getName());
+        Util.addParameter(parameters, OptionID.ALGORITHM, OPTICS.class.getName());
 
         // distance function
         parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
@@ -132,12 +131,10 @@ public class HiCOWrapper extends NormalizationWrapper {
         parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F);
 
         // epsilon
-        parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.EPSILON_PARAM.getName());
-        parameters.add(PCABasedCorrelationDistanceFunction.INFINITY_PATTERN);
+        Util.addParameter(parameters, OptionID.OPTICS_EPSILON, PCABasedCorrelationDistanceFunction.INFINITY_PATTERN);
 
         // minpts
-        parameters.add(OptionHandler.OPTION_PREFIX + minpts.getName());
-        parameters.add(Integer.toString(getParameterValue(minpts)));
+        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(getParameterValue(MINPTS_PARAM)));
 
         // preprocessor
         parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.PREPROCESSOR_CLASS_P);

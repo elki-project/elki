@@ -16,6 +16,7 @@ import java.util.List;
  * of the subspace of the cluster.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @param <V> the type of RealVector handled by this Result  
  */
 public class CLIQUEModel<V extends RealVector<V, ?>> extends AbstractResult<V> {
   /**

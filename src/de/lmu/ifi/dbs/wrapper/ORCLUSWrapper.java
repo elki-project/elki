@@ -1,12 +1,12 @@
 package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.AbortException;
-import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.ORCLUS;
+import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.util.List;
@@ -79,8 +79,7 @@ public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
         List<String> parameters = super.getKDDTaskParameters();
 
         // ORCLUS algorithm
-        parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.ALGORITHM_P);
-        parameters.add(ORCLUS.class.getName());
+        Util.addParameter(parameters, OptionID.ALGORITHM, ORCLUS.class.getName());
 
         // dim
         parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.L_P);
@@ -108,5 +107,5 @@ public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
         k_i = (Integer) optionHandler.getOptionValue(ORCLUS.K_I_P);
 
         return remainingParameters;
-	}
+    }
 }
