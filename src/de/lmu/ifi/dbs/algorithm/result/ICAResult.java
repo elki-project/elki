@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * TODO: comment
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  * @param <V> the type of RealVector handled by this Result
  */
 public class ICAResult<V extends RealVector<V, ?>> extends AbstractResult<V> {

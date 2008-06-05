@@ -49,7 +49,7 @@ import java.util.Vector;
  * todo hierarchy
  * todo parameter
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
     /**

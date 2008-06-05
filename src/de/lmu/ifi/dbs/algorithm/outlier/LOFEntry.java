@@ -8,7 +8,7 @@ import java.io.ObjectOutput;
 /**
  * Represents an entry in a LOF-Table.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class LOFEntry implements Externalizable {
     /**

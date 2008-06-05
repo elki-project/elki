@@ -12,7 +12,7 @@ import java.util.Map;
  * If the cache is full and another object is added, the LRU (least recently used)
  * object is dropped.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class LRUCache<P extends Page<P>> implements Cache<P> {
   /**

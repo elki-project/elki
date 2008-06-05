@@ -12,7 +12,7 @@ import java.util.Set;
  * that holds the interval of angles, the ids of the objects
  * belonging to this cluster and the children and parents of this cluster.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class HierarchicalCASHCluster extends HierarchicalCluster<HierarchicalCASHCluster> {
     /**

@@ -35,7 +35,7 @@ import java.util.List;
  * DBSCAN would have found, when applied to this
  * subspace seperately.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  * @param <V> the type of NumberVector handled by this Algorithm
  * @param <D> the type of Distance used
  * todo parameter, implementation

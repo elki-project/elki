@@ -22,7 +22,7 @@ import java.util.List;
  * Wrapper class for hierarchical COPAC algorithm. Performs an attribute wise normalization on
  * the database objects.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  *         todo parameter
  */
 public class ERiCWrapper extends NormalizationWrapper {

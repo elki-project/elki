@@ -16,7 +16,7 @@ import java.util.List;
  * Wrapper class for DBSCAN algorithm. Performs an attribute wise normalization on
  * the database objects.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class DBSCANWrapper extends NormalizationWrapper {
 
@@ -33,7 +33,7 @@ public class DBSCANWrapper extends NormalizationWrapper {
      * must be an integer greater than 0.
      * <p>Key: {@code -dbscan.minpts} </p>
      */
-    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.OPTICS_MINPTS,
+    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.DBSCAN_MINPTS,
         new GreaterConstraint(0));
 
 

@@ -23,7 +23,7 @@ import java.util.List;
  * the partitions and then determines the correlation dependencies in each
  * cluster of each partition.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class CODECWrapper extends NormalizationWrapper {
 

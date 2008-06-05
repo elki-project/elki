@@ -23,7 +23,7 @@ import java.util.List;
  * Provides a result of a clustering-algorithm that computes several clusters
  * and remaining noise and a correlation analysis for each cluster.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  * @param <V> the type of RealVector handled by this Result
  */
 public class ClustersPlusNoisePlusCorrelationAnalysis<V extends RealVector<V, ?>> extends ClustersPlusNoise<V> {

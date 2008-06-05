@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Encapsulates the current settings of the attributes of an object.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class AttributeSettings {
   /**

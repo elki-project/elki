@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.database;
 /**
  * Defines the interface for an object that listens to changes in a Database.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public interface DatabaseListener {
   /**

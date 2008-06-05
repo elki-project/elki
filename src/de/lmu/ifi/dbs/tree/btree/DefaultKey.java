@@ -8,7 +8,7 @@ import java.io.ObjectOutput;
 /**
  * Default class for an object representing a key in a B-Tree.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class DefaultKey implements Comparable<DefaultKey>, Externalizable {
   /**

@@ -18,7 +18,7 @@ import java.util.TreeMap;
 /**
  * Database implemented by inverted lists that supports range queries on a specific dimension.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class InvertedListDatabase<N extends Number, O extends FeatureVector<O,N>> extends SequentialDatabase<O> {
   /**

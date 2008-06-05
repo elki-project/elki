@@ -15,7 +15,7 @@ import java.util.List;
  * Represents a cluster model for a cluster in the CLIQUE algorithm. Provides information
  * of the subspace of the cluster.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  * @param <V> the type of RealVector handled by this Result  
  */
 public class CLIQUEModel<V extends RealVector<V, ?>> extends AbstractResult<V> {

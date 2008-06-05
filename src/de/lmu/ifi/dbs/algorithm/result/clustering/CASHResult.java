@@ -24,7 +24,7 @@ import java.util.Set;
 /**
  * TODO: comment
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class CASHResult extends AbstractResult<ParameterizationFunction> {
   /**

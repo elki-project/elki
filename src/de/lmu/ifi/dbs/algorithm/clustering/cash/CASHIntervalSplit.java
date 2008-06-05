@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * Supports the splitting of CASH intervals.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class CASHIntervalSplit extends AbstractLoggable {
     /**

@@ -9,7 +9,7 @@ import java.util.TreeSet;
 /**
  * Represents a subspace of the original dataspace.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class Subspace<V extends RealVector<V, ?>> {
   /**

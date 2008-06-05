@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.utilities;
 /**
  * Represents an interval in a certain dimension of the data space.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class Interval implements Comparable<Interval> {
   /**

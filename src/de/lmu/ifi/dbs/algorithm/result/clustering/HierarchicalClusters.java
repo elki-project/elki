@@ -22,7 +22,7 @@ import java.util.Map;
  * Provides a result of a clustering algorithm that computes hierarchical
  * clusters.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  * @param <O> the type of DatabaseObjects handled by this Result
  * @param <C> the type of HierarchicalCluster used by this Result
  */

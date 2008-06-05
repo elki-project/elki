@@ -17,7 +17,7 @@ import java.util.List;
  * Provides a result of a clustering algorithm that computes hierarchical
  * axes parallel correlation clusters from a cluster order.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  * @param <V> the type of RealVector handled by this Result
  * @param <D> the type of Distance used by this Result
  */

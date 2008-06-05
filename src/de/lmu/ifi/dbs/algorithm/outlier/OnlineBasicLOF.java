@@ -21,7 +21,7 @@ import java.util.List;
  * Algorithm to compute density-based local outlier factors in a database based
  * on a specified parameter minpts.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * todo parameter
  */

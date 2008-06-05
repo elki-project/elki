@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter;
  * There is no option possible without a specific OptionID defined
  * within this class.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class OptionID extends ConstantObject<OptionID> {
 

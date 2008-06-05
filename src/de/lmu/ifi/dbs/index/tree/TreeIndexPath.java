@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Represents a path to a node in an Index Structure.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class TreeIndexPath<E extends Entry> {
   /**

@@ -18,7 +18,7 @@ import java.util.List;
  * Abstract super class for a result object. Encapsulates methods common for
  * many result objects.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  * @param <O> the type of DatabaseObjects handled by this Result
  */
 public abstract class AbstractResult<O extends DatabaseObject> extends AbstractLoggable implements Result<O> {

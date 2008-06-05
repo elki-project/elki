@@ -27,7 +27,7 @@ import java.util.Set;
 /**
  * OPTICS provides the OPTICS algorithm.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  * @param <O> the type of DatabaseObjects handled by the algorithm
  * @param <D> the type of Distance used to discern objects
  */

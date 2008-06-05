@@ -11,7 +11,7 @@ import java.util.Set;
  * an interval of the correspinding distance,
  * and a set of objects ids associated with this interval.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class CASHInterval extends HyperBoundingBox implements Identifiable<CASHInterval> {
     /**

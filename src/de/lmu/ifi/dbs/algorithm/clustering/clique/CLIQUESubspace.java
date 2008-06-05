@@ -19,7 +19,7 @@ import java.util.SortedSet;
 /**
  * Represents a subspace of the original dataspace in the CLIQUE algorithm.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  * @param <V> the type of RealVector handled by this Algorithm
  */
 public class CLIQUESubspace<V extends RealVector<V, ?>> extends Subspace<V> implements Comparable<CLIQUESubspace<V>> {

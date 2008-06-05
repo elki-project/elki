@@ -12,7 +12,7 @@ import java.util.Set;
  * that holds the PCA, the ids of the objects
  * belonging to this cluster and the children and parents of this cluster.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  * @param <V> the type of RealVector handled by this Result
  */
 public class HierarchicalCorrelationCluster<V extends RealVector<V, ?>>

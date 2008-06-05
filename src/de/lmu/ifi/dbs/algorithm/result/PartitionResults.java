@@ -17,7 +17,7 @@ import java.util.Map;
  * A result for a partitioning algorithm providing a single result for a single
  * partition.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  * @param <O> the type of DatabaseObjects handled by this Result
  */
 public class PartitionResults<O extends DatabaseObject> extends AbstractResult<O> {

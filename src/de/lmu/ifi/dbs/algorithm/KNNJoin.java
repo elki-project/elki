@@ -29,7 +29,7 @@ import java.util.List;
  * This algorithm only supports spatial databases based on a spatial index
  * structure.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  * @param <V> the type of NumberVector handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  * @param <N> the type of node used in the spatial index structure
@@ -47,9 +47,9 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
      */
     public final IntParameter K_PARAM =
         new IntParameter("k",
-                         "<int>specifies the k-nearest neighbors to be assigned, must be greater than 0",
-                         new GreaterConstraint(0),
-                         1);
+            "<int>specifies the k-nearest neighbors to be assigned, must be greater than 0",
+            new GreaterConstraint(0),
+            1);
 
     /**
      * The knn lists for each object.
@@ -126,7 +126,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
                         if (distance.compareTo(pr_knn_distance) <= 0) {
                             N ps = db.getIndex().getNode(ps_entry);
                             pr_knn_distance = processDataPages(pr, ps,
-                                                               knnLists, pr_knn_distance);
+                                knnLists, pr_knn_distance);
                         }
                     }
                     up = false;
@@ -141,7 +141,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
                         if (distance.compareTo(pr_knn_distance) <= 0) {
                             N ps = db.getIndex().getNode(ps_entry);
                             pr_knn_distance = processDataPages(pr, ps,
-                                                               knnLists, pr_knn_distance);
+                                knnLists, pr_knn_distance);
                         }
                     }
                     up = true;
@@ -154,7 +154,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
                     progress(new ProgressLogRecord(LogLevel.PROGRESS, "\r" + progress.toString()
                                                                       + " Number of processed data pages: "
                                                                       + processedPages++,
-                                                   progress.getTask(), progress.status()));
+                        progress.getTask(), progress.status()));
                 }
             }
             result = new KNNJoinResult<V, D>(knnLists);
@@ -197,7 +197,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
                         pr_knn_distance = knnList.getMaximumDistance();
                     }
                     pr_knn_distance = Util.max(knnList.getMaximumDistance(),
-                                               pr_knn_distance);
+                        pr_knn_distance);
                 }
             }
         }

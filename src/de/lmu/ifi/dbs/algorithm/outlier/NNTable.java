@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
  * Allows efficient access to nearest and reverse nearest neighbors of an
  * object.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class NNTable extends AbstractLoggable {
     /**

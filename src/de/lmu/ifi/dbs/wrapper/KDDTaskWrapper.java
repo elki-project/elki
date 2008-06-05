@@ -14,7 +14,7 @@ import java.util.List;
  * KDDTaskWrapper is an abstract super class for all wrapper classes running
  * algorithms in a kdd task.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public abstract class KDDTaskWrapper<O extends DatabaseObject> extends AbstractWrapper {
 

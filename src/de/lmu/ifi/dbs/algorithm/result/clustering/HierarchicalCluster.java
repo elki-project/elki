@@ -15,7 +15,7 @@ import java.util.Set;
  * belonging to this cluster and the children and parents of this cluster.
  * Hierarchical clusters allow multiple inheritance and can be visualized in a graph.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  * @param <C> the type of HierarchicalCluster used by this Result
  */
 public class HierarchicalCluster<C extends HierarchicalCluster<C>> extends AbstractLoggable implements Comparable<C>, Enumeratable<C> {

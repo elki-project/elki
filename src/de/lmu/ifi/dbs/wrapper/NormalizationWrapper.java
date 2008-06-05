@@ -10,7 +10,7 @@ import java.util.List;
  * NormalizationWrapper is an abstract super class for all
  * file based database connection wrappers that need to normalize the input data.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public abstract class NormalizationWrapper extends FileBasedDatabaseConnectionWrapper {
 

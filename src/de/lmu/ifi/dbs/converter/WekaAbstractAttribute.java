@@ -5,8 +5,7 @@ import java.util.Arrays;
 /**
  * WekaAbstractAttribute handles the type of the attribute.
  * 
- * @author Arthur Zimek (<a
- *         href="mailto:zimek@dbs.ifi.lmu.de">zimek@dbs.ifi.lmu.de</a>)
+ * @author Arthur Zimek
  */
 public abstract class WekaAbstractAttribute<W extends WekaAbstractAttribute<W>>
         implements WekaAttribute<W>

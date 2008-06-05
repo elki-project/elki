@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 /**
  * Holds the lof values of the lof algorithm in a B-Tree structure.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class LOFTable extends AbstractLoggable {
     /**

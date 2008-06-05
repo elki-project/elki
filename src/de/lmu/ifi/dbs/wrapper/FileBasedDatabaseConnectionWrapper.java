@@ -13,7 +13,7 @@ import java.util.List;
  * FileBasedDatabaseConnectionWrapper is an abstract super class for all wrapper
  * classes running algorithms in a kdd task using a file based database connection.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  * todo parameter
  */
 public abstract class FileBasedDatabaseConnectionWrapper extends KDDTaskWrapper {

@@ -17,7 +17,7 @@ import java.util.Iterator;
 /**
  * Efficient implementation of the Single-Link Algorithm SLINK of R. Sibson.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  * @param <O> the type of DatabaseObject the algorithm is applied on
  * @param <D> the type of Distance used
  */

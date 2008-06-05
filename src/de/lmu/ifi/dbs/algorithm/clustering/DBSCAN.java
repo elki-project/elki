@@ -32,7 +32,6 @@ import java.util.Set;
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObject the algorithm is applied on
  * @param <D> the type of Distance used
- * todo parameter
  */
 public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D> implements Clustering<O> {
     /**
@@ -40,7 +39,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
      * must be suitable to the distance function specified.
      * <p>Key: {@code -dbscan.epsilon} </p>
      */
-    public final PatternParameter EPSILON_PARAM = new PatternParameter(OptionID.DBSCAN_EPSILON);
+    private final PatternParameter EPSILON_PARAM = new PatternParameter(OptionID.DBSCAN_EPSILON);
 
     /**
      * Parameter to specify the threshold for minimum number of points in

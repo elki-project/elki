@@ -18,7 +18,7 @@ import java.util.*;
 /**
  * Provides the result of the single link algorithm SLINK.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  * @param <O> the type of DatabaseObjects handled by this Result
  * @param <D> the type of Distance used by this Result 
  */

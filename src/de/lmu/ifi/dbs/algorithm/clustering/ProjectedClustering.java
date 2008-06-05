@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * Abstract superclass for PROCLUS and ORCLUS.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  * @param <V> the type of Realvector handled by this Algorithm
  * todo parameter
  */

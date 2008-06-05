@@ -26,7 +26,7 @@ import java.util.Set;
 /**
  * PROCLUS provides the PROCLUS algorithm.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  * @param <V> the type of Realvector handled by this Algorithm
  * todo parameter
  */

@@ -13,7 +13,7 @@ import java.util.List;
  * Provides a result of the CASH clustering algorithm that computes hierarchical
  * correlation clusters in arbitrary subspaces.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class HierarchicalCASHClusters extends HierarchicalClusters<HierarchicalCASHCluster, ParameterizationFunction> {
     /**

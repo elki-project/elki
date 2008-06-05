@@ -46,7 +46,7 @@ import java.util.TreeSet;
  * The third step of the original algorithm (Generation of minimal description
  * for the clusters) is not (yet) implemented.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  * @param <V> the type of RealVector handled by this Algorithm
  * todo parameter
  */

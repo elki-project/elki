@@ -32,7 +32,7 @@ import java.util.Map;
  * Online algorithm to efficiently update density-based local
  * outlier factors in a database after insertion or deletion of new objects.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * todo parameter
  */

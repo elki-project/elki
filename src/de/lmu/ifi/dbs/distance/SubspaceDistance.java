@@ -12,8 +12,7 @@ import java.util.regex.Pattern;
  * spanned by the strong eigenvectors of the two points and the affine distance
  * between the two subspaces.
  *
- * @author Elke Achtert (<a
- *         href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class SubspaceDistance<D extends SubspaceDistance<D>> extends AbstractDistance<D> {
   /**

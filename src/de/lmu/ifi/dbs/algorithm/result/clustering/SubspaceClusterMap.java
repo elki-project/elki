@@ -29,7 +29,7 @@ import java.util.Set;
  * Encapsulates a mapping of subspace dimensionalities to a list of set of ids forming a cluster
  * in a specific subspace dimension.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  */
 public class SubspaceClusterMap {
     /**
