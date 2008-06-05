@@ -62,12 +62,29 @@ public class IntParameter extends NumberParameter<Integer> {
      * @param description  the parameter description
      * @param constraint   the constraint for this integer parameter
      * @param defaultValue the default value
+     * @deprecated
      */
     public IntParameter(String name, String description,
                         ParameterConstraint<Number> constraint, Integer defaultValue) {
-        this(name, description);
-        addConstraint(constraint);
+        this(name, description, constraint);
         setDefaultValue(defaultValue);
+    }
+
+    /**
+     * Constructs an integer parameter with the given name, description, parameter constraint,
+     * and defualt value.
+     *
+     * @param name         the parameter name
+     * @param description  the parameter description
+     * @param constraint   the constraint for this integer parameter
+     * @param defaultValue the default value
+     * @param optional     specifies if this parameter is an optional parameter
+     * @deprecated
+     */
+    public IntParameter(String name, String description,
+                        ParameterConstraint<Number> constraint, Integer defaultValue, boolean optional) {
+        this(name, description, constraint, defaultValue);
+        setOptional(optional);
     }
 
     /**
@@ -101,7 +118,7 @@ public class IntParameter extends NumberParameter<Integer> {
         }
         catch (NumberFormatException e) {
             throw new WrongParameterValueException("Wrong parameter format. Parameter \""
-                + getName() + "\" requires an integer value. (given value: " + value + ")\n");
+                                                   + getName() + "\" requires an integer value. (given value: " + value + ")\n");
         }
 
         try {
@@ -111,9 +128,9 @@ public class IntParameter extends NumberParameter<Integer> {
         }
         catch (ParameterException ex) {
             throw new WrongParameterValueException("Specified parameter value for parameter \""
-					+ getName() + "\" breaches parameter constraint.\n" + ex.getMessage());
-		}
-		return true;
-	}
+                                                   + getName() + "\" breaches parameter constraint.\n" + ex.getMessage());
+        }
+        return true;
+    }
 
 }

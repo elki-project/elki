@@ -16,10 +16,24 @@ public class DoubleParameter extends NumberParameter<Double> {
      *
      * @param name        the parameter name
      * @param description the parameter description
+     * @deprecated
      */
     public DoubleParameter(String name, String description) {
         super(name, description);
 
+    }
+
+    /**
+     * Constructs a double parameter with the given name and description
+     *
+     * @param name        the parameter name
+     * @param description the parameter description
+     * @param optional    specifies if this parameter is an optional parameter
+     * @deprecated
+     */
+    public DoubleParameter(String name, String description, boolean optional) {
+        this(name, description);
+        setOptional(optional);
     }
 
     /**
@@ -28,6 +42,7 @@ public class DoubleParameter extends NumberParameter<Double> {
      * @param name        the parameter name
      * @param description the parameter description
      * @param cons        the constraint for this double parameter
+     * @deprecated      
      */
     public DoubleParameter(String name, String description, ParameterConstraint<Number> cons) {
         this(name, description);
