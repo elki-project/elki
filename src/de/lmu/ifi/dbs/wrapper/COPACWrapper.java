@@ -73,7 +73,6 @@ public class COPACWrapper extends NormalizationWrapper {
             wrapper.verbose(e.getMessage());
         }
         catch (Exception e) {
-            e.printStackTrace();
             wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
         }
     }
@@ -126,8 +125,8 @@ public class COPACWrapper extends NormalizationWrapper {
 
         // distance function
         parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.DISTANCE_FUNCTION_P);
-//    parameters.add(LocallyWeightedDistanceFunction.class.getName());
-        parameters.add(ERiCDistanceFunction.class.getName());
+    parameters.add(LocallyWeightedDistanceFunction.class.getName());
+//        parameters.add(ERiCDistanceFunction.class.getName());
 
         // omit preprocessing
         parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F);
