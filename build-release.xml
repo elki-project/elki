@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <project name="ELKI" default="complete" basedir=".">
-	<property name="RELEASE" value="1.0"/>
+	<property name="RELEASE" value="0.1"/>
 
 	<!-- exclude:
 	algorithm.APRIORI,
