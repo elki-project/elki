@@ -24,12 +24,12 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstrain
  * random values. The Algorithm finds biclusters with correlated values. It
  * finds more bicluster at one time, which may overlap.
  * 
- * @param <V> a certain subtype of RealVector - the data matrix is supposed to
+ * @param <V>
+ *            a certain subtype of RealVector - the data matrix is supposed to
  *            consist of rows where each row relates to an object of type V and
  *            the columns relate to the attribute values of these objects
  * 
  * @author Noemi Andor
- * todo parameter
  */
 public class MaPle<V extends RealVector<V, Double>> extends
 		AbstractBiclustering<V> {
@@ -40,7 +40,7 @@ public class MaPle<V extends RealVector<V, Double>> extends
 	 * Key: {@code -nc}
 	 * </p>
 	 */
-	private final IntParameter NUMBER_COLS = new IntParameter("nc",
+	public final IntParameter NUMBER_COLS = new IntParameter("nc",
 			"indicates the minimum columnsize of the resulting biclusters",
 			new GreaterEqualConstraint(1));
 
@@ -50,7 +50,7 @@ public class MaPle<V extends RealVector<V, Double>> extends
 	 * Key: {@code -nr}
 	 * </p>
 	 */
-	private final IntParameter NUMBER_ROWS = new IntParameter("nr",
+	public final IntParameter NUMBER_ROWS = new IntParameter("nr",
 			"indicates the minimum rowsize of the resulting biclusters",
 			new GreaterEqualConstraint(1));
 
@@ -60,7 +60,7 @@ public class MaPle<V extends RealVector<V, Double>> extends
 	 * Key: {@code -sigma}
 	 * </p>
 	 */
-	private final DoubleParameter SIGMA_PARAM = new DoubleParameter(
+	public final DoubleParameter SIGMA_PARAM = new DoubleParameter(
 			"sigma",
 			"treshhold value to determine the maximal acceptable score of a bicluster",
 			new GreaterEqualConstraint(0.0));
@@ -415,10 +415,11 @@ public class MaPle<V extends RealVector<V, Double>> extends
 				cols.set(attributeList[i]);
 				cols.set(attributeList[j]);
 				currMaxCluster = findRowMaxCluster(null, cols, -1);
-                for (BitSet rows : currMaxCluster) {
-                    search(rows, (BitSet) cols.clone(), attributeList[j]);
-                }
-            }
+				for (int key = 0; key < currMaxCluster.size(); key++) {
+					BitSet rows = currMaxCluster.get(key);
+					search(rows, (BitSet) cols.clone(), attributeList[j]);
+				}
+			}
 		}
 	}
 

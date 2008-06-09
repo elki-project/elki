@@ -159,7 +159,7 @@ public class IntegerTriple implements Comparable<IntegerTriple> {
 
 	/**
 	 * Sets the third Argument of this Object.
-	 * @param third
+	 * @param last
 	 */
 	public void setLast(int last) {
 		this.last = last;

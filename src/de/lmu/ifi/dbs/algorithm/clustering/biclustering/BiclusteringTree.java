@@ -1,9 +1,20 @@
-package de.lmu.ifi.dbs.utilities;
+package de.lmu.ifi.dbs.algorithm.clustering.biclustering;
 
 import java.util.ArrayList;
 import java.util.BitSet;
 
-public class RootTree {
+/**
+ * Provides a treeStructure with BitSets as nodes and Integers as edges. Every
+ * node of the tree has a path to the root, defined trough the edges
+ * leading from the node to the root. This class is used by PClustering as a
+ * clusterTree, the edges representing columns and the nodes representing rows.
+ * Every path from the root to some node of predefined depth, forms a bicluster 
+ * with that node.
+ * 
+ * @author Noemi Andor
+ * 
+ */
+public class BiclusteringTree {
 
 	/**
 	 * Specifies the position in which a child should be added.
@@ -26,25 +37,28 @@ public class RootTree {
 	private BitSet rootEdges;
 
 	/**
-	 * The edges of this RootTree.
+	 * The edges of this node.
 	 */
 	private ArrayList<Integer> edges;
 
 	/**
 	 * The children of this node.
 	 */
-	private ArrayList<RootTree> children;
+	private ArrayList<BiclusteringTree> children;
 
-	private RootTree parent;
+	/**
+	 * The parent node of this node.
+	 */
+	private BiclusteringTree parent;
 
 	/**
 	 * Constructor creating a new RootTree-Object.
 	 */
-	public RootTree() {
+	public BiclusteringTree() {
 		node = new BitSet();
 		rootEdge = -1;
 		edges = new ArrayList<Integer>();
-		children = new ArrayList<RootTree>();
+		children = new ArrayList<BiclusteringTree>();
 		rootEdges = new BitSet();
 		placeToAdd = 0;
 		parent = this;
@@ -53,9 +67,9 @@ public class RootTree {
 	/**
 	 * Getter for the children of this Object.
 	 * 
-	 * @return the childrentrees of this
+	 * @return the childrenTrees of this object.
 	 */
-	public ArrayList<RootTree> getChildren() {
+	public ArrayList<BiclusteringTree> getChildren() {
 		return this.children;
 	}
 
@@ -140,10 +154,10 @@ public class RootTree {
 	 * @param root
 	 *            edge which may lead to the rootNode of some child of this
 	 *            tree.
-	 * @return the child with the rootnode which has the parameter root as
+	 * @return the child with the rootNode which has the parameter root as
 	 *         origin.
 	 */
-	private RootTree getChild(int root) {
+	private BiclusteringTree getChild(int root) {
 		for (int i = 0; i < children.size(); i++) {
 			if (children.get(i).rootEdge == root) {
 				return children.get(i);
@@ -156,7 +170,7 @@ public class RootTree {
 	 * 
 	 * @return the parent of this tree.
 	 */
-	public RootTree getParent() {
+	public BiclusteringTree getParent() {
 		return this.parent;
 	}
 
@@ -174,7 +188,7 @@ public class RootTree {
 	 */
 	public void insertTree(BitSet edge, BitSet node, int initialEdge) {
 		for (int i = edge.nextSetBit(0); i >= 0; i = edge.nextSetBit(i + 1)) {
-			RootTree child = this.getChild(i);
+			BiclusteringTree child = this.getChild(i);
 			if (child != null) {
 				if ((child.rootEdges.cardinality() >= initialEdge)) {
 					child.setNode(node);
@@ -184,7 +198,7 @@ public class RootTree {
 				return;
 
 			}
-			RootTree newTree = new RootTree();
+			BiclusteringTree newTree = new BiclusteringTree();
 			newTree.setRootEdge(i);
 			this.addEdge(i);
 			this.children.add(placeToAdd, newTree);
