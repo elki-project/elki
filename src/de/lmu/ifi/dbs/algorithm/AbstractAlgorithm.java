@@ -46,7 +46,8 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends Abstra
     /**
      * Adds the flags for verbose and time to the option handler. Any extending
      * class should call this constructor, then add further parameters.
-     * Subclasses can add further parameters using {@link #addOption(de.lmu.ifi.dbs.utilities.optionhandling.Option)}
+     * Subclasses can add further parameters using
+     * {@link #addOption(de.lmu.ifi.dbs.utilities.optionhandling.Option)}
      */
     protected AbstractAlgorithm() {
         super();

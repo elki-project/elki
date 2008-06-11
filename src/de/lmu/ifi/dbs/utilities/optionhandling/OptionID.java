@@ -109,7 +109,7 @@ public class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID APRIORI_MINFREQ = new OptionID("apriori.minfreq",
         "<double> Threshold for minimum frequency (as percentage, " +
-        "i.e.: 0 <= apriori.minfreq <= 1) (alternatively to parameter apriori.minsupp)."
+            "i.e.: 0 <= apriori.minfreq <= 1) (alternatively to parameter apriori.minsupp)."
     );
 
     /**
@@ -174,6 +174,29 @@ public class OptionID extends ConstantObject<OptionID> {
         "<int> Threshold for minimum number of points in " +
             "the epsilon-neighborhood of a point, " +
             "must be greater than 0."
+    );
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.DependencyDerivator#OUTPUT_ACCURACY_PARAM}
+     */
+    public static final OptionID DEPENDENCY_DERIVATOR_ACCURACY = new OptionID("derivator.accuracy",
+        "<int> Threshold for output accuracy fraction digits (>0), " +
+            "must be equal to or greater than 0. Default value is 4."
+    );
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.DependencyDerivator#SAMPLE_SIZE_PARAM}
+     */
+    public static final OptionID DEPENDENCY_DERIVATOR_SAMPLE_SIZE = new OptionID("derivator.sampleSize",
+        "<int> Threshold for the size of the random sample to use, " +
+            "must be greater than 0. Default value is soze of the complete dataset."
+    );
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.DependencyDerivator#RANDOM_SAMPLE_FLAG}
+     */
+    public static final OptionID DEPENDENCY_DERIVATOR_RANDOM_SAMPLE = new OptionID("derivator.randomSample",
+        "Flag to use random sample (use knn query around centroid, if flag is not set)."
     );
 
     /**

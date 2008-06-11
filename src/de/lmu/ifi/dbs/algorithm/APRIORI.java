@@ -69,7 +69,10 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
     private Map<BitSet, Integer> support;
 
     /**
-     * Provides the apriori algorithm.
+     * Provides the apriori algorithm,
+     * setting parameters {@link de.lmu.ifi.dbs.algorithm.APRIORI#MINFREQ_PARAM} and
+     * {@link APRIORI#MINSUPP_PARAM}
+     * additionally to parameters of super class.
      */
     public APRIORI() {
         super();

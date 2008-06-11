@@ -10,19 +10,13 @@ import de.lmu.ifi.dbs.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
 
 import java.text.NumberFormat;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Dependency derivator computes quantitativly linear dependencies among
@@ -31,44 +25,33 @@ import java.util.Set;
  * @author Arthur Zimek
  * @param <V> the type of RealVector handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
- * todo parameter
  */
 public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<D>> extends DistanceBasedAlgorithm<V, D> {
 
     /**
-     * Parameter for output accuracy (number of fraction digits).
+     * Optional parameter to specify the threshold for output accuracy fraction digits,
+     * must be an integer equal to or greater than 0.
+     * <p>Default value: {@code 4} </p>
+     * <p>Key: {@code -derivator.accuracy} </p>
      */
-    public static final String OUTPUT_ACCURACY_P = "accuracy";
+    private final IntParameter OUTPUT_ACCURACY_PARAM = new IntParameter(
+        OptionID.DEPENDENCY_DERIVATOR_ACCURACY,
+        new GreaterEqualConstraint(0), 4);
 
     /**
-     * Default value for output accuracy (number of fraction digits).
+     * Optional parameter to specify the treshold for the size of the random sample to use,
+     * must be an integer greater than 0.
+     * <p>Default value: the size of the complete dataset </p>
+     * <p>Key: {@code -derivator.sampleSize} </p>
      */
-    public static final int OUTPUT_ACCURACY_DEFAULT = 4;
+    private final IntParameter SAMPLE_SIZE_PARAM = new IntParameter(
+        OptionID.DEPENDENCY_DERIVATOR_SAMPLE_SIZE, new GreaterConstraint(0), true);
 
     /**
-     * Description for parameter output accuracy (number of fraction digits).
+     * Flag to use random sample (use knn query around centroid, if flag is not set).
+     * <p>Key: {@code -derivator.randomSample} </p>
      */
-    public static final String OUTPUT_ACCURACY_D = "output accuracy fraction digits (>0) (default: " + OUTPUT_ACCURACY_DEFAULT + ").";
-
-    /**
-     * Parameter for size of random sample.
-     */
-    public static final String SAMPLE_SIZE_P = "sampleSize";
-
-    /**
-     * Description for parameter for size of random sample.
-     */
-    public static final String SAMPLE_SIZE_D = "size (> 0) of random sample to use (default: use of complete dataset).";
-
-    /**
-     * Flag for use of random sample.
-     */
-    public static final String RANDOM_SAMPLE_F = "randomSample";
-
-    /**
-     * Description for flag for use of random sample.
-     */
-    public static final String RANDOM_SAMPLE_D = "flag to use random sample (use knn query around centroid, if flag is not set). Flag is ignored if no sample size is specified.";
+    private final Flag RANDOM_SAMPLE_FLAG = new Flag(OptionID.DEPENDENCY_DERIVATOR_RANDOM_SAMPLE);
 
     /**
      * Holds size of sample.
@@ -91,23 +74,23 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
     public final NumberFormat NF = NumberFormat.getInstance(Locale.US);
 
     /**
-     * Provides a dependency derivator, setting parameters alpha and output
-     * accuracy additionally to parameters of super class.
+     * Provides a dependency derivator,
+     * setting parameters {@link DependencyDerivator#OUTPUT_ACCURACY_PARAM},
+     * {@link de.lmu.ifi.dbs.algorithm.DependencyDerivator#SAMPLE_SIZE_PARAM}, and
+     * flag {@link de.lmu.ifi.dbs.algorithm.DependencyDerivator#RANDOM_SAMPLE_FLAG}
+     * additionally to parameters of super class.
      */
     public DependencyDerivator() {
         super();
 
         // parameter output accuracy
-        IntParameter outputACC = new IntParameter(OUTPUT_ACCURACY_P, OUTPUT_ACCURACY_D, new GreaterEqualConstraint(0));
-        outputACC.setDefaultValue(OUTPUT_ACCURACY_DEFAULT);
-        addOption(outputACC);
+        addOption(OUTPUT_ACCURACY_PARAM);
 
         // parameter sample size
-        IntParameter sampleSize = new IntParameter(SAMPLE_SIZE_P, SAMPLE_SIZE_D, new GreaterEqualConstraint(0));
-        sampleSize.setOptional(true);
-        addOption(sampleSize);
+        addOption(SAMPLE_SIZE_PARAM);
 
-        addOption(new Flag(RANDOM_SAMPLE_F, RANDOM_SAMPLE_D));
+        // random sample
+        addOption(RANDOM_SAMPLE_FLAG);
     }
 
     /**
@@ -135,7 +118,7 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
         V centroidDV = Util.centroid(db, dbIDs);
         Set<Integer> ids;
         if (this.sampleSize != null) {
-            if (optionHandler.isSet(RANDOM_SAMPLE_F)) {
+            if (isSet(RANDOM_SAMPLE_FLAG)) {
                 ids = db.randomSample(this.sampleSize, 1);
             }
             else {
@@ -207,7 +190,7 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
             StringBuilder log = new StringBuilder();
             log.append("Solution:");
             log.append('\n');
-            log.append("Standard deviation " + this.solution.getStandardDeviation());
+            log.append("Standard deviation ").append(this.solution.getStandardDeviation());
             log.append('\n');
             log.append(lq.equationsToString(NF.getMaximumFractionDigits()));
             log.append('\n');
@@ -230,14 +213,13 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
         String[] remainingParameters = super.setParameters(args);
 
         // accuracy
-        int accuracy = (Integer) optionHandler.getOptionValue(OUTPUT_ACCURACY_P);
-
+        int accuracy = getParameterValue(OUTPUT_ACCURACY_PARAM);
         NF.setMaximumFractionDigits(accuracy);
         NF.setMinimumFractionDigits(accuracy);
 
         // sample size
-        if (optionHandler.isSet(SAMPLE_SIZE_P)) {
-            sampleSize = (Integer) optionHandler.getOptionValue(SAMPLE_SIZE_P);
+        if (isSet(SAMPLE_SIZE_PARAM)) {
+            sampleSize = getParameterValue(SAMPLE_SIZE_PARAM);
         }
 
         // pca
@@ -248,18 +230,11 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
     }
 
     /**
-     * Returns the parameter setting of this algorithm.
-     *
-     * @return the parameter setting of this algorithm
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
      */
     @Override
     public List<AttributeSettings> getAttributeSettings() {
         List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-        AttributeSettings mySettings = attributeSettings.get(0);
-
-        if (optionHandler.isSet(SAMPLE_SIZE_P)) {
-            mySettings.addSetting(SAMPLE_SIZE_P, Integer.toString(sampleSize));
-        }
         attributeSettings.addAll(pca.getAttributeSettings());
         return attributeSettings;
     }

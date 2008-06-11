@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.varianceanalysis.ica.FastICA;
 
 /**
- * TODO: elki comment
+ * Provides an ICA algorithm.
  *
  * @author Elke Achtert
  * @param <V> the type of RealVector handled by this Algorithm
@@ -26,20 +26,15 @@ public class ICA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
     private FastICA<V> ica;
 
     /**
-     * todo
+     * Provides an ICA algorithm.
      */
     public ICA() {
         super();
-        this.debug = true;
+        //this.debug = true;
     }
 
     /**
-     * The run method encapsulated in measure of runtime. An extending class
-     * needs not to take care of runtime itself.
-     *
-     * @param database the database to run the algorithm on
-     * @throws IllegalStateException if the algorithm has not been initialized properly (e.g. the
-     *                               setParameters(String[]) method has been failed to be called).
+     * @see AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.database.Database)
      */
     protected void runInTime(Database<V> database) throws IllegalStateException {
         ica.run(database, isVerbose());
@@ -50,22 +45,18 @@ public class ICA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
     }
 
     /**
-     * Returns the result of the algorithm.
-     *
-     * @return the result of the algorithm
+     * @see Algorithm#getResult()
      */
     public Result<V> getResult() {
         return result;
     }
 
     /**
-     * Returns a description of the algorithm.
-     *
-     * @return a description of the algorithm
-     *         todo
+     * @see de.lmu.ifi.dbs.algorithm.Algorithm#getDescription()
+     * todo elki reference
      */
     public Description getDescription() {
-        return new Description("todo", "todo", "todo", "todo");
+        return new Description("ICA", "Independent Component Analysis", "todo", "todo");
     }
 
     /**
