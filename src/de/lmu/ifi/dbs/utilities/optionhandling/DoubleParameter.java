@@ -11,61 +11,73 @@ import java.util.List;
  */
 public class DoubleParameter extends NumberParameter<Double> {
 
-  /**
-   * Constructs a double parameter with the given OptionID
-   *
-   * @param optionID the unique optionID
-   */
-  public DoubleParameter(OptionID optionID) {
-      super(optionID);
+    /**
+     * Constructs a double parameter with the given OptionID
+     *
+     * @param optionID the unique optionID
+     */
+    public DoubleParameter(OptionID optionID) {
+        super(optionID);
 
-  }
-  
-  /**
-   * Constructs a double parameter with the given OptionID
-   *
-   * @param optionID the unique optionID
-   * @param optional    specifies whether this parameter is an optional parameter
-   */
-  public DoubleParameter(OptionID optionID, boolean optional) {
-      this(optionID);
-      setOptional(optional);
-  }
-  
-  /**
-   * Constructs a double parameter with the given OptionID
-   *
-   * @param optionID the unique optionID
-   * @param cons        the constraint for this double parameter
-   */
-  public DoubleParameter(OptionID optionID, ParameterConstraint<Number> cons) {
-      this(optionID);
-      addConstraint(cons);
-  }
-  
-  /**
-   * Constructs a double parameter with the given OptionID
-   *
-   * @param optionID the unique optionID
-   * @param cons        the constraint for this double parameter
-   * @param defaultValue the default value for this double parameter
-   */
-  public DoubleParameter(OptionID optionID, ParameterConstraint<Number> cons, Double defaultValue) {
-      this(optionID,cons);
-      setDefaultValue(defaultValue);
-  }
-  
-  /**
-   * Constructs a double parameter with the given OptionID
-   *
-   * @param optionID the unique optionID
-   * @param cons        a list of parameter constraints for this double parameter
-   */
-  public DoubleParameter(OptionID optionID, List<ParameterConstraint<Number>> cons) {
-      this(optionID);
-      addConstraintList(cons);
-  }
-  
+    }
+
+    /**
+     * Constructs a double parameter with the given OptionID
+     *
+     * @param optionID the unique optionID
+     * @param optional specifies whether this parameter is an optional parameter
+     */
+    public DoubleParameter(OptionID optionID, boolean optional) {
+        this(optionID);
+        setOptional(optional);
+    }
+
+    /**
+     * Constructs a double parameter with the given OptionID
+     *
+     * @param optionID the unique optionID
+     * @param cons     the constraint for this double parameter
+     */
+    public DoubleParameter(OptionID optionID, ParameterConstraint<Number> cons) {
+        this(optionID);
+        addConstraint(cons);
+    }
+
+    /**
+     * Constructs a double parameter with the given OptionID
+     *
+     * @param optionID     the unique optionID
+     * @param cons         the constraint for this double parameter
+     * @param defaultValue the default value for this double parameter
+     */
+    public DoubleParameter(OptionID optionID, ParameterConstraint<Number> cons, Double defaultValue) {
+        this(optionID, cons);
+        setDefaultValue(defaultValue);
+    }
+
+    /**
+     * Constructs a double parameter with the given OptionID
+     *
+     * @param optionID the unique optionID
+     * @param cons     a list of parameter constraints for this double parameter
+     */
+    public DoubleParameter(OptionID optionID, List<ParameterConstraint<Number>> cons) {
+        this(optionID);
+        addConstraintList(cons);
+    }
+
+    /**
+     * Constructs a double parameter with the given OptionID
+     *
+     * @param optionID the unique optionID
+     * @param cons     a list of parameter constraints for this double parameter
+     * @param optional specifies whether this parameter is an optional parameter
+     */
+    public DoubleParameter(OptionID optionID, List<ParameterConstraint<Number>> cons, boolean optional) {
+        this(optionID, cons);
+        setOptional(optional);
+    }
+
     /**
      * Constructs a double parameter with the given name and description
      *
@@ -99,7 +111,7 @@ public class DoubleParameter extends NumberParameter<Double> {
      * @param name        the parameter name
      * @param description the parameter description
      * @param cons        the constraint for this double parameter
-     * @deprecated      
+     * @deprecated
      */
     @Deprecated
     public DoubleParameter(String name, String description, ParameterConstraint<Number> cons) {
@@ -159,7 +171,7 @@ public class DoubleParameter extends NumberParameter<Double> {
 
         catch (NumberFormatException e) {
             throw new WrongParameterValueException("Wrong parameter format! Parameter \""
-                                                   + getName() + "\" requires a double value, read: " + value + "!\n");
+                + getName() + "\" requires a double value, read: " + value + "!\n");
         }
 
         try {
@@ -170,7 +182,7 @@ public class DoubleParameter extends NumberParameter<Double> {
         }
         catch (ParameterException ex) {
             throw new WrongParameterValueException("Specified parameter value for parameter \""
-                                                   + getName() + "\" breaches parameter constraint!\n" + ex.getMessage());
+                + getName() + "\" breaches parameter constraint!\n" + ex.getMessage());
         }
 
         return true;
