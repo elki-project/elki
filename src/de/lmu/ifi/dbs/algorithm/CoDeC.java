@@ -25,7 +25,7 @@ import java.util.Map;
 
 /**
  * todo parameter
- * TODO Arthur comment
+ * TODO Arthur comment class, parameters and constructor
  *
  * @author Arthur Zimek
  * @param <V> the type of RealVector handled by this Algorithm
