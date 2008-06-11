@@ -194,10 +194,10 @@ public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implem
     }
 
     /**
-     * // todo comment
+     * Decides whether a given associationID is regarded as required.
      *
-     * @param id
-     * @return
+     * @param id an associationID to decide whether or not it is required
+     * @return true if the associationID is {@link AssociationID#CLASS} or {@link AssociationID#LABEL}, false otherwise
      */
     public boolean isRequiredAssociation(AssociationID<?> id) {
         return id == AssociationID.CLASS || id == AssociationID.LABEL;
