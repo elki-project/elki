@@ -11,6 +11,61 @@ import java.util.List;
  */
 public class DoubleParameter extends NumberParameter<Double> {
 
+  /**
+   * Constructs a double parameter with the given OptionID
+   *
+   * @param optionID the unique optionID
+   */
+  public DoubleParameter(OptionID optionID) {
+      super(optionID);
+
+  }
+  
+  /**
+   * Constructs a double parameter with the given OptionID
+   *
+   * @param optionID the unique optionID
+   * @param optional    specifies whether this parameter is an optional parameter
+   */
+  public DoubleParameter(OptionID optionID, boolean optional) {
+      this(optionID);
+      setOptional(optional);
+  }
+  
+  /**
+   * Constructs a double parameter with the given OptionID
+   *
+   * @param optionID the unique optionID
+   * @param cons        the constraint for this double parameter
+   */
+  public DoubleParameter(OptionID optionID, ParameterConstraint<Number> cons) {
+      this(optionID);
+      addConstraint(cons);
+  }
+  
+  /**
+   * Constructs a double parameter with the given OptionID
+   *
+   * @param optionID the unique optionID
+   * @param cons        the constraint for this double parameter
+   * @param defaultValue the default value for this double parameter
+   */
+  public DoubleParameter(OptionID optionID, ParameterConstraint<Number> cons, Double defaultValue) {
+      this(optionID,cons);
+      setDefaultValue(defaultValue);
+  }
+  
+  /**
+   * Constructs a double parameter with the given OptionID
+   *
+   * @param optionID the unique optionID
+   * @param cons        a list of parameter constraints for this double parameter
+   */
+  public DoubleParameter(OptionID optionID, List<ParameterConstraint<Number>> cons) {
+      this(optionID);
+      addConstraintList(cons);
+  }
+  
     /**
      * Constructs a double parameter with the given name and description
      *
@@ -18,6 +73,7 @@ public class DoubleParameter extends NumberParameter<Double> {
      * @param description the parameter description
      * @deprecated
      */
+    @Deprecated
     public DoubleParameter(String name, String description) {
         super(name, description);
 
@@ -31,6 +87,7 @@ public class DoubleParameter extends NumberParameter<Double> {
      * @param optional    specifies if this parameter is an optional parameter
      * @deprecated
      */
+    @Deprecated
     public DoubleParameter(String name, String description, boolean optional) {
         this(name, description);
         setOptional(optional);
@@ -44,6 +101,7 @@ public class DoubleParameter extends NumberParameter<Double> {
      * @param cons        the constraint for this double parameter
      * @deprecated      
      */
+    @Deprecated
     public DoubleParameter(String name, String description, ParameterConstraint<Number> cons) {
         this(name, description);
         addConstraint(cons);
@@ -57,7 +115,9 @@ public class DoubleParameter extends NumberParameter<Double> {
      * @param description  the parameter description
      * @param cons         the constraint for this double parameter
      * @param defaultValue the default value for this double parameter
+     * @deprecated
      */
+    @Deprecated
     public DoubleParameter(String name, String description,
                            ParameterConstraint<Number> cons, Double defaultValue) {
         this(name, description, cons);
@@ -70,7 +130,9 @@ public class DoubleParameter extends NumberParameter<Double> {
      * @param name        the parameter name
      * @param description the parameter description
      * @param cons        a list of parameter constraints for this double parameter
+     * @deprecated
      */
+    @Deprecated
     public DoubleParameter(String name, String description, List<ParameterConstraint<Number>> cons) {
         this(name, description);
         addConstraintList(cons);
@@ -79,6 +141,7 @@ public class DoubleParameter extends NumberParameter<Double> {
     /**
      * @see Option#setValue(String)
      */
+    @Override
     public void setValue(String value) throws ParameterException {
         if (isValid(value)) {
             this.value = Double.parseDouble(value);
@@ -88,6 +151,7 @@ public class DoubleParameter extends NumberParameter<Double> {
     /**
      * @see Option#isValid(String)
      */
+    @Override
     public boolean isValid(String value) throws ParameterException {
         try {
             Double.parseDouble(value);
@@ -119,6 +183,7 @@ public class DoubleParameter extends NumberParameter<Double> {
      * @return <code>true</code> if this double parameter has the same
      *         value as the specified object, <code>false</code> otherwise.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
