@@ -14,6 +14,7 @@
 	algorithm.clustering.SubspaceAggregation,
 	algorithm.clustering.SubspaceEM,
 	algorithm.clustering.biclustering.NaivePatternBased,
+	algorithm.clustering.hierarchical,
 	algorithm.result.AprioriResult,
 	algorithm.result.GeneralizedLOFResult,
 	algorithm.result.LOFResult,
