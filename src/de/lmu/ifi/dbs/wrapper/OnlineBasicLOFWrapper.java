@@ -1,13 +1,14 @@
 package de.lmu.ifi.dbs.wrapper;
 
 import de.lmu.ifi.dbs.algorithm.AbortException;
-import de.lmu.ifi.dbs.algorithm.KDDTask;
-import de.lmu.ifi.dbs.algorithm.clustering.DiSH;
 import de.lmu.ifi.dbs.algorithm.outlier.OnlineBasicLOF;
 import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ import java.util.List;
  * on the database objects.
  *
  * @author Elke Achtert
- * todo parameter
+ *         todo parameter
  */
 public class OnlineBasicLOFWrapper extends FileBasedDatabaseConnectionWrapper {
 
@@ -71,8 +72,7 @@ public class OnlineBasicLOFWrapper extends FileBasedDatabaseConnectionWrapper {
         parameters.add(Integer.toString(minpts));
 
         // distance function
-        parameters.add(OptionHandler.OPTION_PREFIX + OnlineBasicLOF.DISTANCE_FUNCTION_P);
-        parameters.add(EuklideanDistanceFunction.class.getName());
+        Util.addParameter(parameters, OptionID.ALGORITHM_DISTANCEFUNCTION, EuklideanDistanceFunction.class.getName());
 
         // normalization
 //    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);

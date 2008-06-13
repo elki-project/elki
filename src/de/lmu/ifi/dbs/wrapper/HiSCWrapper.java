@@ -16,7 +16,7 @@ import java.util.List;
  * the database objects.
  *
  * @author Elke Achtert
- * todo parameter
+ *         todo parameter
  */
 //public class HiSCWrapper extends NormalizationWrapper {
 // todo: richtig?
@@ -82,8 +82,7 @@ public class HiSCWrapper extends FileBasedDatabaseConnectionWrapper {
         Util.addParameter(parameters, OptionID.ALGORITHM, OPTICS.class.getName());
 
         // distance function
-        parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
-        parameters.add(HiSCDistanceFunction.class.getName());
+        Util.addParameter(parameters, OptionID.ALGORITHM_DISTANCEFUNCTION, HiSCDistanceFunction.class.getName());
 
         // omit flag
         parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F);

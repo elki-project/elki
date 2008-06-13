@@ -7,11 +7,7 @@ import de.lmu.ifi.dbs.distance.distancefunction.ERiCDistanceFunction;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.DefaultValueGlobalConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
@@ -86,8 +82,8 @@ public class ERiCWrapper extends NormalizationWrapper {
 
         // parameter k
         K_PARAM.setDescription("<int>The number of nearest neighbors considered in the PCA. " +
-                               "If this parameter is not set, k ist set to the value of " +
-                               MINPTS_PARAM.getName());
+            "If this parameter is not set, k ist set to the value of " +
+            MINPTS_PARAM.getName());
         optionHandler.put(K_PARAM);
 
         // global constraint k <-> minpts
@@ -122,8 +118,7 @@ public class ERiCWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(getParameterValue(MINPTS_PARAM)));
 
         // distance function
-        parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.DISTANCE_FUNCTION_P);
-        parameters.add(ERiCDistanceFunction.class.getName());
+        Util.addParameter(parameters, OptionID.ALGORITHM_DISTANCEFUNCTION, ERiCDistanceFunction.class.getName());
 
         // omit preprocessing
         parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F);

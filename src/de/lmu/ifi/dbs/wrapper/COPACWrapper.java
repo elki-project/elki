@@ -3,16 +3,11 @@ package de.lmu.ifi.dbs.wrapper;
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.clustering.COPAC;
 import de.lmu.ifi.dbs.algorithm.clustering.DBSCAN;
-import de.lmu.ifi.dbs.distance.distancefunction.ERiCDistanceFunction;
 import de.lmu.ifi.dbs.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.PatternParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.DefaultValueGlobalConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
@@ -86,8 +81,8 @@ public class COPACWrapper extends NormalizationWrapper {
 
         // parameter epsilon
         EPSILON_PARAM.setDescription("<pattern>The maximum radius of the neighborhood " +
-                                     "to be considerd, must be suitable to " +
-                                     LocallyWeightedDistanceFunction.class.getName());
+            "to be considerd, must be suitable to " +
+            LocallyWeightedDistanceFunction.class.getName());
         addOption(EPSILON_PARAM);
 
         // parameter minpts
@@ -95,8 +90,8 @@ public class COPACWrapper extends NormalizationWrapper {
 
         // parameter k
         K_PARAM.setDescription("<int>The number of nearest neighbors considered in the PCA. " +
-                               "If this parameter is not set, k ist set to the value of " +
-                               MINPTS_PARAM.getName());
+            "If this parameter is not set, k ist set to the value of " +
+            MINPTS_PARAM.getName());
         addOption(K_PARAM);
 
         // global constraint k <-> minpts
@@ -124,8 +119,7 @@ public class COPACWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(getParameterValue(MINPTS_PARAM)));
 
         // distance function
-        parameters.add(OptionHandler.OPTION_PREFIX + DBSCAN.DISTANCE_FUNCTION_P);
-    parameters.add(LocallyWeightedDistanceFunction.class.getName());
+        Util.addParameter(parameters, OptionID.ALGORITHM_DISTANCEFUNCTION, LocallyWeightedDistanceFunction.class.getName());
 //        parameters.add(ERiCDistanceFunction.class.getName());
 
         // omit preprocessing

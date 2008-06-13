@@ -4,7 +4,6 @@ import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.CoDeC;
 import de.lmu.ifi.dbs.algorithm.clustering.COPAC;
 import de.lmu.ifi.dbs.algorithm.clustering.DBSCAN;
-import de.lmu.ifi.dbs.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.PreprocessorHandler;
@@ -84,8 +83,8 @@ public class CODECWrapper extends NormalizationWrapper {
         super();
         // parameter epsilon
         EPSILON_PARAM.setDescription("<pattern>The maximum radius of the neighborhood " +
-                                     "to be considerd, must be suitable to " +
-                                     LocallyWeightedDistanceFunction.class.getName());
+            "to be considerd, must be suitable to " +
+            LocallyWeightedDistanceFunction.class.getName());
         addOption(EPSILON_PARAM);
 
         // parameter minpts
@@ -93,8 +92,8 @@ public class CODECWrapper extends NormalizationWrapper {
 
         // parameter k
         K_PARAM.setDescription("<int>The number of nearest neighbors considered in the PCA. " +
-                               "If this parameter is not set, k ist set to the value of " +
-                               MINPTS_PARAM.getName());
+            "If this parameter is not set, k ist set to the value of " +
+            MINPTS_PARAM.getName());
         addOption(K_PARAM);
 
         // global constraint k <-> minpts
@@ -127,8 +126,7 @@ public class CODECWrapper extends NormalizationWrapper {
             Integer.toString(getParameterValue(MINPTS_PARAM)));
 
         // distance function
-        parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
-        parameters.add(LocallyWeightedDistanceFunction.class.getName());
+        Util.addParameter(parameters, OptionID.ALGORITHM_DISTANCEFUNCTION, LocallyWeightedDistanceFunction.class.getName());
 
         // omit preprocessing
         parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F);

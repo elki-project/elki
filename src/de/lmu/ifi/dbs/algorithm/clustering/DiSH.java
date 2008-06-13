@@ -151,8 +151,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         // minpts for OPTICS
         Util.addParameter(opticsParameters, OptionID.OPTICS_MINPTS, Integer.toString(minpts));
         // distance function
-        opticsParameters.add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
-        opticsParameters.add(DiSHDistanceFunction.class.getName());
+        Util.addParameter(opticsParameters, OptionID.ALGORITHM_DISTANCEFUNCTION, DiSHDistanceFunction.class.getName());
         // epsilon for distance function
         opticsParameters.add(OptionHandler.OPTION_PREFIX + DiSHDistanceFunction.EPSILON_P);
         opticsParameters.add(Double.toString(epsilon));

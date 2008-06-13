@@ -10,6 +10,8 @@ import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.ConstantObject;
 import de.lmu.ifi.dbs.varianceanalysis.EigenPairFilter;
 import de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter;
+import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
 
 /**
  * An OptionID is used by option handlers as a unique identifier for specific
@@ -91,6 +93,15 @@ public class OptionID extends ConstantObject<OptionID> {
     public static final OptionID NORMALIZATION_UNDO = new OptionID("normUndo",
         "Flag to revert result to original values - " +
             "invalid option if no normalization has been performed.");
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm#DISTANCE_FUNCTION_PARAM}
+     */
+    public static final OptionID ALGORITHM_DISTANCEFUNCTION = new OptionID("algorithm.distancefunction",
+        "<class> Classname of the distance function to determine the distance between database objects " +
+            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) +
+            ". Default: " + EuklideanDistanceFunction.class.getName()
+    );
 
     /**
      * OptionID for {@link de.lmu.ifi.dbs.algorithm.AbstractAlgorithm#VERBOSE_FLAG}

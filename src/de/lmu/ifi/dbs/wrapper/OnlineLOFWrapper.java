@@ -15,7 +15,7 @@ import java.util.List;
  * on the database objects.
  *
  * @author Elke Achtert
- * todo parameter
+ *         todo parameter
  */
 public class OnlineLOFWrapper extends FileBasedDatabaseConnectionWrapper {
 
@@ -107,8 +107,7 @@ public class OnlineLOFWrapper extends FileBasedDatabaseConnectionWrapper {
         parameters.add(nn.getPath());
 
         // distance function
-        parameters.add(OptionHandler.OPTION_PREFIX + OnlineLOF.DISTANCE_FUNCTION_P);
-        parameters.add(EuklideanDistanceFunction.class.getName());
+        Util.addParameter(parameters, OptionID.ALGORITHM_DISTANCEFUNCTION, EuklideanDistanceFunction.class.getName());
 
         // page size
 //    parameters.add(OptionHandler.OPTION_PREFIX + LOF.PAGE_SIZE_P);

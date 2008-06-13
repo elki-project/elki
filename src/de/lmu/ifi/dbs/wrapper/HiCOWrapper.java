@@ -6,17 +6,8 @@ import de.lmu.ifi.dbs.distance.distancefunction.PCABasedCorrelationDistanceFunct
 import de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.DefaultValueGlobalConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GlobalParameterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.*;
 import de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter;
 
 import java.util.ArrayList;
@@ -95,8 +86,8 @@ public class HiCOWrapper extends NormalizationWrapper {
 
         // parameter k
         K_PARAM.setDescription("<int>The number of nearest neighbors considered in the PCA. " +
-                               "If this parameter is not set, k ist set to the value of " +
-                               MINPTS_PARAM.getName());
+            "If this parameter is not set, k ist set to the value of " +
+            MINPTS_PARAM.getName());
         optionHandler.put(K_PARAM);
 
         // global constraint k <-> minpts
@@ -132,8 +123,7 @@ public class HiCOWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, OptionID.ALGORITHM, OPTICS.class.getName());
 
         // distance function
-        parameters.add(OptionHandler.OPTION_PREFIX + OPTICS.DISTANCE_FUNCTION_P);
-        parameters.add(PCABasedCorrelationDistanceFunction.class.getName());
+        Util.addParameter(parameters, OptionID.ALGORITHM_DISTANCEFUNCTION, PCABasedCorrelationDistanceFunction.class.getName());
 
         // omit flag
         parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F);
