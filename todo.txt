@@ -19,6 +19,7 @@
 
 - database: epsilon in range query: von String nach D (extends Distance) aendern
 
+- frueher gab's mal eine Beschwerde (Exception), wenn ein Parameter gesetzt wird, den es gar nicht gibt, ist irgendwie abhandengekommen?!?
 
 # laengerfristig: ##########################################
 
