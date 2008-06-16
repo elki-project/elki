@@ -388,7 +388,7 @@ public final class Util extends AbstractLoggable {
      * @return the prefix of the specidfied fileName
      */
     public static String getFilePrefix(final String fileName) {
-        final int index = fileName.lastIndexOf((int) '.');
+        final int index = fileName.lastIndexOf(Character.getNumericValue('.'));
         if (index < 0) {
             return fileName;
         }
@@ -489,9 +489,9 @@ public final class Util extends AbstractLoggable {
                 centroid[j - 1] += o.getValue(j).doubleValue();
             }
         }
-
+        double size = ids.size();
         for (int i = 0; i < dim; i++) {
-            centroid[i] /= (double) ids.size();
+            centroid[i] /= size;
         }
 
         V o = database.get(ids.iterator().next());
@@ -528,8 +528,9 @@ public final class Util extends AbstractLoggable {
             }
         }
 
+        double size = ids.size();
         for (int i = 0; i < dim; i++) {
-            centroid[i] /= (double) ids.size();
+            centroid[i] /= size;
         }
 
         V o = database.get(ids.iterator().next());
@@ -559,8 +560,9 @@ public final class Util extends AbstractLoggable {
             }
         }
 
+        double size = database.size();
         for (int i = 0; i < dim; i++) {
-            centroid[i] /= (double) database.size();
+            centroid[i] /= size; 
         }
         O o = database.get(database.iterator().next());
         return o.newInstance(centroid);
@@ -574,7 +576,7 @@ public final class Util extends AbstractLoggable {
      */
     public static Vector centroid(Matrix data) {
         int d = data.getRowDimensionality();
-        int n = data.getColumnDimensionality();
+        double n = data.getColumnDimensionality();
         double[] centroid = new double[d];
 
         for (int i = 0; i < n; i++) {
@@ -585,7 +587,7 @@ public final class Util extends AbstractLoggable {
         }
 
         for (int j = 0; j < d; j++) {
-            centroid[j] /= (double) n;
+            centroid[j] /= n;
         }
 
         return new Vector(centroid);
@@ -648,7 +650,7 @@ public final class Util extends AbstractLoggable {
         Matrix centeredMatrix = new Matrix(matrixArray);
         // covariance matrix
         Matrix cov = centeredMatrix.transpose().times(centeredMatrix);
-        cov = cov.times(1.0 / (double) database.size());
+        cov = cov.times(1.0 / database.size());
 
         return cov;
     }
@@ -674,7 +676,7 @@ public final class Util extends AbstractLoggable {
         Matrix centeredMatrix = new Matrix(matrixArray);
         // covariance matrix
         Matrix cov = centeredMatrix.times(centeredMatrix.transpose());
-        cov = cov.times(1.0 / (double) data.getColumnDimensionality());
+        cov = cov.times(1.0 / data.getColumnDimensionality());
 
         return cov;
     }
@@ -700,7 +702,7 @@ public final class Util extends AbstractLoggable {
                 variances[d - 1] += diff * diff;
             }
 
-            variances[d - 1] /= (double) database.size();
+            variances[d - 1] /= database.size();
         }
         return variances;
     }
@@ -739,7 +741,7 @@ public final class Util extends AbstractLoggable {
                 variances[d - 1] += diff * diff;
             }
 
-            variances[d - 1] /= (double) ids.size();
+            variances[d - 1] /= ids.size();
         }
         return variances;
     }
@@ -767,7 +769,7 @@ public final class Util extends AbstractLoggable {
                 variances[d - 1] += diff * diff;
             }
 
-            variances[d - 1] /= (double) ids_d.size();
+            variances[d - 1] /= ids_d.size();
         }
 
         return variances;
@@ -1045,7 +1047,7 @@ public final class Util extends AbstractLoggable {
         SortedSet<ClassLabel<?>> labels = new TreeSet<ClassLabel<?>>();
         for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
             //noinspection unchecked
-            labels.add((ClassLabel<?>) database.getAssociation(AssociationID.CLASS, iter.next()));
+            labels.add(database.getAssociation(AssociationID.CLASS, iter.next()));
         }
         return labels;
     }
@@ -1357,7 +1359,7 @@ public final class Util extends AbstractLoggable {
      * Returns a new <code>BitSet</code> initialized to the values
      * represented by the specified <code>char</code> array only containing '0' and '1' values.
      *
-     * @param s the cahr array to be parsed.
+     * @param s the char array to be parsed.
      * @return a new <code>BitSet</code> represented by s
      */
     public static BitSet parseBitSet(char[] s) {
@@ -1368,7 +1370,7 @@ public final class Util extends AbstractLoggable {
             }
             else if (s[i] != '0') {
                 throw new IllegalArgumentException("The specified String does not represent a bit set " +
-                    "containing only 0 and 1 values: " + s);
+                    "containing only 0 and 1 values: " + String.valueOf(s));
             }
         }
         return result;
@@ -1417,7 +1419,7 @@ public final class Util extends AbstractLoggable {
 
     /**
      * Converts the specified positive integer value into a bit representation,
-     * where bit 0 denotes 2^0, bit 1 denotes 2^1 etc..
+     * where bit 0 denotes 2<sup>0</sup>, bit 1 denotes 2<sup>1</sup> etc.
      *
      * @param n the positive integer value to be converted
      * @return the specified integer value into a bit representation
@@ -1430,7 +1432,6 @@ public final class Util extends AbstractLoggable {
         BitSet result = new BitSet();
         int i = 0;
         while (n > 0) {
-            //noinspection BadOddness
             boolean rest = (n % 2 == 1);
             if (rest) {
                 result.set(i);
@@ -1479,7 +1480,7 @@ public final class Util extends AbstractLoggable {
      * @return a new parameter array containing the values of <code>parameters</code> and
      *         the specified <code>parameter</code> and its <code>value</code>.
      */
-    public static String[] addParameter(String[] parameters, Parameter parameter, String value) {
+    public static String[] addParameter(String[] parameters, Parameter<?,?> parameter, String value) {
         String[] newParameters = new String[parameters.length + 2];
         System.arraycopy(parameters, 0, newParameters, 2, parameters.length);
         newParameters[0] = OptionHandler.OPTION_PREFIX + parameter.getName();
@@ -1543,7 +1544,7 @@ public final class Util extends AbstractLoggable {
      * @param parameter  the parameter to be added
      * @param value      the value of the parameter to be added
      */
-    public static void addParameter(List<String> parameters, Parameter parameter, String value) {
+    public static void addParameter(List<String> parameters, Parameter<?,?> parameter, String value) {
         parameters.add(0, OptionHandler.OPTION_PREFIX + parameter.getName());
         parameters.add(1, value);
     }
