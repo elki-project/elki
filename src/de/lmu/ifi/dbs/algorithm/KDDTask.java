@@ -51,7 +51,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
      * must extend {@link de.lmu.ifi.dbs.algorithm.Algorithm}.
      * <p>Key: {@code -algorithm} </p>
      */
-    private final ClassParameter<Algorithm> ALGORITHM_PARAM =
+    private final ClassParameter<Algorithm> ALGORITHM_PARAM = 
         new ClassParameter<Algorithm>(OptionID.ALGORITHM, Algorithm.class);
 
     /**
@@ -163,6 +163,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
      *
      * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#description()
      */
+    @Override
     public String description() {
         return optionHandler.usage("");
     }
@@ -197,6 +198,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
      *
      * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         if (args.length == 0) {
             throw new AbortException("No options specified. Try flag -h to gain more information.");
@@ -300,6 +302,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
      *
      * @return the parameter setting of the attributes
      */
+    @Override
     public List<AttributeSettings> getAttributeSettings() {
         List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
