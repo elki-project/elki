@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.OneMustBeSetGlobalConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.OnlyOneIsAllowedToBeSetGlobalConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.IntervalConstraint;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,23 +33,14 @@ import java.util.Map;
 public class APRIORI extends AbstractAlgorithm<BitVector> {
 
     /**
-     * Holds the constraints for parameter {@link APRIORI#MINFREQ_PARAM}.
-     */
-    private ArrayList<ParameterConstraint<Number>> MINFREQ_PARAM_CONSTRAINTS = new ArrayList<ParameterConstraint<Number>>();
-
-    {
-        MINFREQ_PARAM_CONSTRAINTS.add(new GreaterEqualConstraint(0));
-        MINFREQ_PARAM_CONSTRAINTS.add(new LessEqualConstraint(1));
-    }
-
-    /**
-     * Parameter to specify the threshold for minimum frequency,
-     * (as percentage, i.e.: 0 <= {@link APRIORI#MINFREQ_PARAM} <= 1).
+     * Optional parameter to specify the threshold for minimum frequency,
+     * must be a double greater than or equal to 0 and less than or equal to 1.
      * Alternatively to parameter {@link APRIORI#MINSUPP_PARAM}).
      * <p>Key: {@code -apriori.minfreq} </p>
      */
     private final DoubleParameter MINFREQ_PARAM = new DoubleParameter(OptionID.APRIORI_MINFREQ,
-        MINFREQ_PARAM_CONSTRAINTS, true);
+        new IntervalConstraint(0, IntervalConstraint.IntervalBoundary.CLOSE, 1, IntervalConstraint.IntervalBoundary.CLOSE),
+        true);
 
     /**
      * Parameter to specify the threshold for

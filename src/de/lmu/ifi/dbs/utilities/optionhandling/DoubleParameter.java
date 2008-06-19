@@ -46,6 +46,18 @@ public class DoubleParameter extends NumberParameter<Double> {
     /**
      * Constructs a double parameter with the given OptionID
      *
+     * @param optionID the unique optionID
+     * @param cons     the constraint for this double parameter
+     * @param optional specifies whether this parameter is an optional parameter
+     */
+    public DoubleParameter(OptionID optionID, ParameterConstraint<Number> cons, boolean optional) {
+        this(optionID, cons);
+        setOptional(optional);
+    }
+
+    /**
+     * Constructs a double parameter with the given OptionID
+     *
      * @param optionID     the unique optionID
      * @param cons         the constraint for this double parameter
      * @param defaultValue the default value for this double parameter

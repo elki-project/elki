@@ -209,6 +209,32 @@ public class OptionID extends ConstantObject<OptionID> {
     );
 
     /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.clique.CLIQUE#PRUNE_FLAG}
+     */
+    public static final OptionID CLIQUE_PRUNE = new OptionID("clique.prune",
+        "Flag to indicate that only subspaces with large coverage " +
+        "(i.e. the fraction of the database that is covered by the dense units) " +
+        "are selected, the rest will be pruned. Default: no pruning."
+    );
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.clique.CLIQUE#TAU_PARAM}
+     */
+    public static final OptionID CLIQUE_TAU = new OptionID("clique.tau",
+        "<double> The density threshold for the selectivity of a unit, where the selectivity is" +
+        "the fraction of total feature vectors contained in this unit, " +
+        "must be greater than 0 and less than 1."
+    );
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.clique.CLIQUE#XSI_PARAM}
+     */
+    public static final OptionID CLIQUE_XSI = new OptionID("clique.xsi",
+        "<int> The number of intervals (units) in each dimension, " +
+        "must be greater than 0."
+    );
+
+    /**
      * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.COPAA#PREPROCESSOR_PARAM}
      */
     public static final OptionID COPAA_PREPROCESSOR = new OptionID("copaa.preprocessor",

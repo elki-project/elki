@@ -3,36 +3,46 @@ package de.lmu.ifi.dbs.wrapper;
 import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.clustering.clique.CLIQUE;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.IntervalConstraint;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Wrapper class for CLIQUE algorithm.
  *
  * @author Elke Achtert
- * todo parameter
  */
 public class CLIQUEWrapper extends FileBasedDatabaseConnectionWrapper {
 
     /**
-     * The value of the xsi parameter.
+     * Parameter to specify the number of intervals (units) in each dimension,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -clique.xsi} </p>
      */
-    private int xsi;
+    private final IntParameter XSI_PARAM = new IntParameter(OptionID.CLIQUE_XSI, new GreaterConstraint(0));
 
     /**
-     * The value of the tau parameter.
+     * Parameter to specify the density threshold for the selectivity of a unit,
+     * where the selectivity is the fraction of total feature vectors contained in this unit,
+     * must be a double greater than 0 and less than 1.
+     * <p>Key: {@code -clique.tau} </p>
      */
-    private double tau;
+    private final DoubleParameter TAU_PARAM = new DoubleParameter(OptionID.CLIQUE_TAU,
+        new IntervalConstraint(0, IntervalConstraint.IntervalBoundary.OPEN, 1, IntervalConstraint.IntervalBoundary.OPEN));
 
     /**
-     * The value of the prune flag.
+     * Flag to indicate that that only subspaces with large coverage
+     * (i.e. the fraction of the database that is covered by the dense units)
+     * are selected, the rest will be pruned.
+     * <p>Key: {@code -clique.prune} </p>
      */
-    private boolean prune;
+    private final Flag PRUNE_FLAG = new Flag(OptionID.CLIQUE_PRUNE);
 
 
     /**
@@ -65,16 +75,13 @@ public class CLIQUEWrapper extends FileBasedDatabaseConnectionWrapper {
     public CLIQUEWrapper() {
         super();
         //parameter xsi
-        optionHandler.put(new IntParameter(CLIQUE.XSI_P, CLIQUE.XSI_D, new GreaterConstraint(0)));
+        addOption(XSI_PARAM);
 
         //parameter tau
-        List<ParameterConstraint<Number>> tauConstraints = new ArrayList<ParameterConstraint<Number>>();
-        tauConstraints.add(new GreaterConstraint(0));
-        tauConstraints.add(new LessConstraint(1));
-        optionHandler.put(new DoubleParameter(CLIQUE.TAU_P, CLIQUE.TAU_D, tauConstraints));
+        addOption(TAU_PARAM);
 
         //flag prune
-        optionHandler.put(new Flag(CLIQUE.PRUNE_F, CLIQUE.PRUNE_D));
+        addOption(PRUNE_FLAG);
     }
 
     /**
@@ -87,32 +94,16 @@ public class CLIQUEWrapper extends FileBasedDatabaseConnectionWrapper {
         Util.addParameter(parameters, OptionID.ALGORITHM, CLIQUE.class.getName());
 
         // xsi
-        parameters.add(OptionHandler.OPTION_PREFIX + CLIQUE.XSI_P);
-        parameters.add(Integer.toString(xsi));
+        Util.addParameter(parameters, XSI_PARAM, Integer.toString(getParameterValue(XSI_PARAM)));
 
         // tau
-        parameters.add(OptionHandler.OPTION_PREFIX + CLIQUE.TAU_P);
-        parameters.add(Double.toString(tau));
+        Util.addParameter(parameters, TAU_PARAM, Double.toString(getParameterValue(TAU_PARAM)));
 
         // prune
-        if (prune) {
-            parameters.add(OptionHandler.OPTION_PREFIX + CLIQUE.PRUNE_F);
+        if (isSet(PRUNE_FLAG)) {
+            Util.addFlag(parameters, PRUNE_FLAG);
         }
 
         return parameters;
-    }
-
-    /**
-     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
-
-        // xsi, tau, prune
-        xsi = (Integer) optionHandler.getOptionValue(CLIQUE.XSI_P);
-        tau = (Double) optionHandler.getOptionValue(CLIQUE.TAU_P);
-        prune = optionHandler.isSet(CLIQUE.PRUNE_F);
-
-        return remainingParameters;
     }
 }

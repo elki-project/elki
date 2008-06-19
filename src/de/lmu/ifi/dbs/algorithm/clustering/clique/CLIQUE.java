@@ -15,10 +15,10 @@ import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.IntervalConstraint;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,43 +48,33 @@ import java.util.TreeSet;
  *
  * @author Elke Achtert
  * @param <V> the type of RealVector handled by this Algorithm
- * todo parameter
  */
 public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> implements Clustering<V> {
 
     /**
-     * Parameter xsi.
+     * Parameter to specify the number of intervals (units) in each dimension,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -clique.xsi} </p>
      */
-    public static final String XSI_P = "xsi";
+    private final IntParameter XSI_PARAM = new IntParameter(OptionID.CLIQUE_XSI,
+        new GreaterConstraint(0));
 
     /**
-     * Description for parameter xsi.
+     * Parameter to specify the density threshold for the selectivity of a unit,
+     * where the selectivity is the fraction of total feature vectors contained in this unit,
+     * must be a double greater than 0 and less than 1.
+     * <p>Key: {@code -clique.tau} </p>
      */
-    public static final String XSI_D = "number of intervals (units) in each dimension";
+    private final DoubleParameter TAU_PARAM = new DoubleParameter(OptionID.CLIQUE_TAU,
+        new IntervalConstraint(0, IntervalConstraint.IntervalBoundary.OPEN, 1, IntervalConstraint.IntervalBoundary.OPEN));
 
     /**
-     * Parameter tau.
+     * Flag to indicate that that only subspaces with large coverage
+     * (i.e. the fraction of the database that is covered by the dense units)
+     * are selected, the rest will be pruned.
+     * <p>Key: {@code -clique.prune} </p>
      */
-    public static final String TAU_P = "tau";
-
-    /**
-     * Description for parameter tau.
-     */
-    public static final String TAU_D = "density threshold for the selectivity of a unit, where the selectivity is" +
-                                       "the fraction of total feature vectors contained in this unit";
-
-    /**
-     * Flag prune.
-     */
-    public static final String PRUNE_F = "prune";
-
-    /**
-     * Description for flag prune.
-     */
-    public static final String PRUNE_D = "flag indicating that only subspaces with large coverage " +
-                                         "(i.e. the fraction of the database that is covered by the dense units) " +
-                                         "are selected, the rest will be pruned, default: no pruning";
-
+    private final Flag PRUNE_FLAG = new Flag(OptionID.CLIQUE_PRUNE);
 
     /**
      * Number of units in each dimension.
@@ -112,16 +102,13 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
 //    this.debug = true;
 
         //parameter xsi
-        optionHandler.put(new IntParameter(XSI_P, XSI_D, new GreaterConstraint(0)));
+        addOption(XSI_PARAM);
 
         //parameter tau
-        List<ParameterConstraint<Number>> tauConstraints = new ArrayList<ParameterConstraint<Number>>();
-        tauConstraints.add(new GreaterConstraint(0));
-        tauConstraints.add(new LessConstraint(1));
-        optionHandler.put(new DoubleParameter(TAU_P, TAU_D, tauConstraints));
+        addOption(TAU_PARAM);
 
         //flag prune
-        optionHandler.put(new Flag(PRUNE_F, PRUNE_D));
+        addOption(PRUNE_FLAG);
     }
 
     /**
@@ -221,9 +208,10 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
-        xsi = (Integer) optionHandler.getOptionValue(XSI_P);
-        tau = (Double) optionHandler.getOptionValue(TAU_P);
-        prune = optionHandler.isSet(PRUNE_F);
+        // parameters xsi, tau and flag prune
+        xsi = getParameterValue(XSI_PARAM);
+        tau = getParameterValue(TAU_PARAM);
+        prune = isSet(PRUNE_FLAG);
 
         return remainingParameters;
     }

@@ -11,8 +11,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessEqualConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.IntervalConstraint;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,22 +39,15 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
         new GreaterConstraint(0), 1);
 
     /**
-     * Holds the constraints for parameter {@link de.lmu.ifi.dbs.algorithm.KNNDistanceOrder#PERCENTAGE_PARAM}.
-     */
-    private final ArrayList<ParameterConstraint<Number>> PERCENTAGE_PARAM_CONSTRAINTS = new ArrayList<ParameterConstraint<Number>>();
-    {
-        PERCENTAGE_PARAM_CONSTRAINTS.add(new GreaterConstraint(0));
-        PERCENTAGE_PARAM_CONSTRAINTS.add(new LessEqualConstraint(1));
-    }
-
-    /**
      * Parameter to specify the average percentage of distances randomly choosen to be provided in the result,
      * must be a double greater than 0 and less than or equal to 1.
      * <p>Default value: {@code 1.0} </p>
      * <p>Key: {@code -knndistanceorder.percentage} </p>
      */
     public final DoubleParameter PERCENTAGE_PARAM =
-        new DoubleParameter(OptionID.KNN_DISTANCE_ORDER_PERCENTAGE, PERCENTAGE_PARAM_CONSTRAINTS, 1.0);
+        new DoubleParameter(OptionID.KNN_DISTANCE_ORDER_PERCENTAGE,
+            new IntervalConstraint(0, IntervalConstraint.IntervalBoundary.OPEN, 1, IntervalConstraint.IntervalBoundary.CLOSE),
+            1.0);
 
     /**
      * Holds the value of parameter k.
