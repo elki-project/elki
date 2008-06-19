@@ -239,6 +239,22 @@ public class OptionID extends ConstantObject<OptionID> {
     );
 
     /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.KNNDistanceOrder#K_PARAM}
+     */
+    public static final OptionID KNN_DISTANCE_ORDER_K = new OptionID("knndistanceorder.k",
+        "<int> Specifies the distance of the k-distant object to be assessed, " +
+        "must be greater than 0 (default: 1)."
+    );
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.KNNDistanceOrder#PERCENTAGE_PARAM}
+     */
+    public static final OptionID KNN_DISTANCE_ORDER_PERCENTAGE = new OptionID("knndistanceorder.percentage",
+        "<double> The average percentage of distances randomly choosen to be provided in the result, " +
+        "must be greater than 0 and less or equal to 1, (default: 1)." 
+    );
+
+    /**
      * OptionID for {@link de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor#K_PARAM}
      */
     public static final OptionID KNN_HICO_PREPROCESSOR_K = new OptionID("hicopreprocessor.k",

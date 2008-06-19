@@ -34,11 +34,11 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
     /**
      * Holds the constraints for parameter {@link APRIORI#MINFREQ_PARAM}.
      */
-    private ArrayList<ParameterConstraint<Number>> minFreqConstraints = new ArrayList<ParameterConstraint<Number>>();
+    private ArrayList<ParameterConstraint<Number>> MINFREQ_PARAM_CONSTRAINTS = new ArrayList<ParameterConstraint<Number>>();
 
     {
-        minFreqConstraints.add(new GreaterEqualConstraint(0));
-        minFreqConstraints.add(new LessEqualConstraint(1));
+        MINFREQ_PARAM_CONSTRAINTS.add(new GreaterEqualConstraint(0));
+        MINFREQ_PARAM_CONSTRAINTS.add(new LessEqualConstraint(1));
     }
 
     /**
@@ -48,7 +48,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
      * <p>Key: {@code -apriori.minfreq} </p>
      */
     private final DoubleParameter MINFREQ_PARAM = new DoubleParameter(OptionID.APRIORI_MINFREQ,
-        minFreqConstraints, true);
+        MINFREQ_PARAM_CONSTRAINTS, true);
 
     /**
      * Parameter to specify the threshold for

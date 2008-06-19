@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessEqualConstraint;
@@ -25,7 +26,6 @@ import java.util.Random;
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
- * todo parameter
  */
 public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
     extends DistanceBasedAlgorithm<O, D> {
@@ -34,36 +34,36 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
      * Parameter to specify the distance of the k-distant object to be assessed,
      * must be an integer greater than 0.
      * <p>Default value: {@code 1} </p>
-     * <p>Key: {@code -k} </p>
+     * <p>Key: {@code -knndistanceorder.k} </p>
      */
-    public final IntParameter K_PARAM = new IntParameter("k",
-                                                         "<int>the distance of the k-distant object is assessed. k >= 1 (default: 1)",
-                                                         new GreaterConstraint(0),
-                                                         1);
+    private final IntParameter K_PARAM = new IntParameter(OptionID.KNN_DISTANCE_ORDER_K,
+        new GreaterConstraint(0), 1);
 
     /**
-     * Parameter percentage.
+     * Holds the constraints for parameter {@link de.lmu.ifi.dbs.algorithm.KNNDistanceOrder#PERCENTAGE_PARAM}.
      */
-    public final String PERCENTAGE_P = "percentage";
+    private final ArrayList<ParameterConstraint<Number>> PERCENTAGE_PARAM_CONSTRAINTS = new ArrayList<ParameterConstraint<Number>>();
+    {
+        PERCENTAGE_PARAM_CONSTRAINTS.add(new GreaterConstraint(0));
+        PERCENTAGE_PARAM_CONSTRAINTS.add(new LessEqualConstraint(1));
+    }
 
     /**
-     * Default value for percentage.
+     * Parameter to specify the average percentage of distances randomly choosen to be provided in the result,
+     * must be a double greater than 0 and less than or equal to 1.
+     * <p>Default value: {@code 1.0} </p>
+     * <p>Key: {@code -knndistanceorder.percentage} </p>
      */
-    public static final double DEFAULT_PERCENTAGE = 1;
+    public final DoubleParameter PERCENTAGE_PARAM =
+        new DoubleParameter(OptionID.KNN_DISTANCE_ORDER_PERCENTAGE, PERCENTAGE_PARAM_CONSTRAINTS, 1.0);
 
     /**
-     * Description for parameter percentage.
-     */
-    public static final String PERCENTAGE_D = "average percentage p, 0 < p <= 1, of distances randomly choosen to be provided in the result (default: "
-                                              + DEFAULT_PERCENTAGE + ")";
-
-    /**
-     * Holds the parameter k.
+     * Holds the value of parameter k.
      */
     private int k;
 
     /**
-     * Holds the parameter percentage.
+     * Holds the value of parameter percentage.
      */
     private double percentage;
 
@@ -82,12 +82,7 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
         addOption(K_PARAM);
 
         //parameter percentage
-        ArrayList<ParameterConstraint<Number>> percentageCons = new ArrayList<ParameterConstraint<Number>>();
-        percentageCons.add(new GreaterConstraint(0));
-        percentageCons.add(new LessEqualConstraint(1));
-        DoubleParameter per = new DoubleParameter(PERCENTAGE_P, PERCENTAGE_D, percentageCons);
-        per.setDefaultValue(DEFAULT_PERCENTAGE);
-        addOption(per);
+        addOption(PERCENTAGE_PARAM);
     }
 
     /**
@@ -127,7 +122,7 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
 
         //k and percentage
         k = getParameterValue(K_PARAM);
-        percentage = (Double) optionHandler.getOptionValue(PERCENTAGE_P);
+        percentage = getParameterValue(PERCENTAGE_PARAM);
 
         return remainingParameters;
     }

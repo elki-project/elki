@@ -79,6 +79,18 @@ public class DoubleParameter extends NumberParameter<Double> {
     }
 
     /**
+     * Constructs a double parameter with the given OptionID
+     *
+     * @param optionID     the unique optionID
+     * @param cons         a list of parameter constraints for this double parameter
+     * @param defaultValue the default value for this double parameter
+     */
+    public DoubleParameter(OptionID optionID, List<ParameterConstraint<Number>> cons, Double defaultValue) {
+        this(optionID, cons);
+        setDefaultValue(defaultValue);
+    }
+
+    /**
      * Constructs a double parameter with the given name and description
      *
      * @param name        the parameter name
@@ -171,7 +183,7 @@ public class DoubleParameter extends NumberParameter<Double> {
 
         catch (NumberFormatException e) {
             throw new WrongParameterValueException("Wrong parameter format! Parameter \""
-                + getName() + "\" requires a double value, read: " + value + "!\n");
+                                                   + getName() + "\" requires a double value, read: " + value + "!\n");
         }
 
         try {
@@ -182,7 +194,7 @@ public class DoubleParameter extends NumberParameter<Double> {
         }
         catch (ParameterException ex) {
             throw new WrongParameterValueException("Specified parameter value for parameter \""
-                + getName() + "\" breaches parameter constraint!\n" + ex.getMessage());
+                                                   + getName() + "\" breaches parameter constraint!\n" + ex.getMessage());
         }
 
         return true;

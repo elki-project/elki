@@ -53,10 +53,12 @@ public class ICA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
 
     /**
      * @see de.lmu.ifi.dbs.algorithm.Algorithm#getDescription()
-     * todo elki reference
      */
     public Description getDescription() {
-        return new Description("ICA", "Independent Component Analysis", "todo", "todo");
+        return new Description("ICA",
+            "Independent Component Analysis",
+            "Implementation of the Fast ICA Algorithm",
+            "A. Hyvaerinen, J. Karhunen, E. Oja: Independent Component Analysis, John Wiley & Sons, 2001");
     }
 
     /**
