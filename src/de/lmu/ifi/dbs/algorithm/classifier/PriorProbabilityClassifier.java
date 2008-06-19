@@ -56,6 +56,7 @@ public class PriorProbabilityClassifier<O extends DatabaseObject, L extends Clas
         distribution = new double[getLabels().length];
         int[] occurences = new int[getLabels().length];
         for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
+            // noinspection unchecked
             String label = (String) database.getAssociation(CLASS, iter.next());
             int index = Arrays.binarySearch(getLabels(), label);
             if (index > -1) {

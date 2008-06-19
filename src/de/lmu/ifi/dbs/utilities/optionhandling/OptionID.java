@@ -270,6 +270,14 @@ public class OptionID extends ConstantObject<OptionID> {
     );
 
     /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.classifier.KNNClassifier#K_PARAM}
+     */
+    public static final OptionID KNN_CLASSIFIER_K = new OptionID("knnclassifier.k",
+        "<int> Specifies the number of neighbors to take into account for classification, " +
+        "must be greater than 0. Default: 1."
+    );
+
+    /**
      * OptionID for {@link de.lmu.ifi.dbs.algorithm.KNNDistanceOrder#K_PARAM}
      */
     public static final OptionID KNN_DISTANCE_ORDER_K = new OptionID("knndistanceorder.k",

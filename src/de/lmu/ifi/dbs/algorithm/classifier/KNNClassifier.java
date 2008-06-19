@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
@@ -21,11 +22,9 @@ import java.util.List;
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  * @param <L> the type of the ClassLabel the Classifier is assigning
- * todo parameter
  */
 public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L extends ClassLabel<L>>
     extends DistanceBasedClassifier<O, D, L> {
-
 
     /**
      * Generated serial version UID.
@@ -33,19 +32,13 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
     private static final long serialVersionUID = 5467968122892109545L;
 
     /**
-     * The parameter k.
+     * Parameter to specify the number of neighbors to take into account for classification,
+     * must be an integer greater than 0.
+     * <p>Default value: {@code 1} </p>
+     * <p>Key: {@code -knnclassifier.k} </p>
      */
-    public static final String K_P = "k";
-
-    /**
-     * Default value for the parameter k.
-     */
-    public static final int K_DEFAULT = 1;
-
-    /**
-     * Description for parameter k.
-     */
-    public static final String K_D = "number of neighbors (>0) to take into account for classification (default=" + K_DEFAULT + ")";
+    private final IntParameter K_PARAM = new IntParameter(OptionID.KNN_CLASSIFIER_K,
+        new GreaterConstraint(0), 1);
 
     /**
      * Holds the database where the classification is to base on.
@@ -62,9 +55,8 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
      */
     public KNNClassifier() {
         super();
-        IntParameter k = new IntParameter(K_P, K_D, new GreaterConstraint(0));
-        k.setDefaultValue(K_DEFAULT);
-        optionHandler.put(k);
+        // parameter k
+        addOption(K_PARAM);
     }
 
     /**
@@ -72,11 +64,9 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
      * labels available n the database. Holds the database to lazily classify
      * new instances later on.
      *
-     * @see Classifier#buildClassifier(de.lmu.ifi.dbs.database.Database,
-     *de.lmu.ifi.dbs.data.ClassLabel[])
+     * @see Classifier#buildClassifier(de.lmu.ifi.dbs.database.Database,de.lmu.ifi.dbs.data.ClassLabel[])
      */
-    public void buildClassifier(Database<O> database, L[] labels)
-        throws IllegalStateException {
+    public void buildClassifier(Database<O> database, L[] labels) throws IllegalStateException {
         this.setLabels(labels);
         this.database = database;
     }
@@ -96,16 +86,16 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
             List<QueryResult<D>> query = database.kNNQueryForObject(instance,
                 k, getDistanceFunction());
             for (QueryResult<D> neighbor : query) {
+                // noinspection unchecked
                 int index = Arrays.binarySearch(getLabels(),
-                    (CLASS.getType().cast(database.getAssociation(CLASS,
-                        neighbor.getID()))));
+                    (CLASS.getType().cast(database.getAssociation(CLASS, neighbor.getID()))));
                 if (index >= 0) {
                     occurences[index]++;
                 }
             }
             for (int i = 0; i < distribution.length; i++) {
                 distribution[i] = ((double) occurences[i])
-                    / (double) query.size();
+                                  / (double) query.size();
             }
             return distribution;
         }
@@ -138,7 +128,7 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
         String[] remainingParameters = super.setParameters(args);
 
         // parameter k
-        k = (Integer) optionHandler.getOptionValue(K_P);
+        k = getParameterValue(K_PARAM);
 
         return remainingParameters;
     }
