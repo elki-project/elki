@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import java.util.List;
 
 /**
- * Provides an abstract algorithm already setting the distance funciton.
+ * Provides an abstract algorithm already setting the distance function.
  *
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObjects handled by this Algorithm

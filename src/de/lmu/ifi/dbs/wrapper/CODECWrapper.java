@@ -112,8 +112,7 @@ public class CODECWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, OptionID.ALGORITHM, CoDeC.class.getName());
 
         // clustering algorithm COPAC
-        parameters.add(OptionHandler.OPTION_PREFIX + CoDeC.CLUSTERING_ALGORITHM_P);
-        parameters.add(COPAC.class.getName());
+        Util.addParameter(parameters, OptionID.CODEC_CLUSTERING_ALGORITHM, COPAC.class.getName());
 
         // partition algorithm
         Util.addParameter(parameters, OptionID.COPAA_PARTITION_ALGORITHM, DBSCAN.class.getName());

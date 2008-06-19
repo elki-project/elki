@@ -12,11 +12,15 @@ import de.lmu.ifi.dbs.data.HierarchicalClassLabel;
 import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
-import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,60 +28,81 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * todo parameter
- * TODO Arthur comment class, parameters and constructor
+ * TODO Arthur comment class and constructor
  *
  * @author Arthur Zimek
  * @param <V> the type of RealVector handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  */
 public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends ClassLabel<L>> extends AbstractAlgorithm<V> {
+    /**
+     * Flag to demand evaluation of the cluster-models as classifier.
+     * <p>Key: {@code -codec.classify} </p>
+     */
+    private final Flag EVALUATE_AS_CLASSIFIER_FLAG = new Flag(OptionID.CODEC_EVALUATE_AS_CLASSIFIER);
 
-    public static final String EVALUATE_AS_CLASSIFIER_F = "classify";
+    /**
+     * Parameter to specify the designated classLabel class,
+     * must extend {@link ClassLabel}.
+     * <p>Key: {@code -codec.classlabel} </p>
+     * <p>Default value: {@link HierarchicalClassLabel} </p>
+     */
+    private final ClassParameter<ClassLabel> CLASSLABEL_PARAM =
+        new ClassParameter<ClassLabel>(OptionID.CODEC_CLASSLABEL,
+            ClassLabel.class, HierarchicalClassLabel.class.getName());
 
-    public static final String EVALUATE_AS_CLASSIFIER_D = "demand evaluation of the cluster-models as classifier";
+    /**
+     * Parameter to specify the clustering algorithm to use to derive cluster,
+     * must extend {@link Clustering}.
+     * <p>Key: {@code -codec.clusteringAlgorithm} </p>
+     * <p>Default value: {@link COPAC} </p>
+     */
+    private final ClassParameter<Clustering> CLUSTERING_ALGORITHM_PARAM =
+        new ClassParameter<Clustering>(OptionID.CODEC_CLUSTERING_ALGORITHM,
+            Clustering.class, COPAC.class.getName());
 
-    public static final String CLASS_LABEL_P = "classlabel";
-
-    public static final String DEFAULT_CLASS_LABEL_CLASS = HierarchicalClassLabel.class.toString();
-
-    public static final String CLASS_LABEL_D = "use the designated classLabel class "
-        + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(ClassLabel.class) + ". Default: " + DEFAULT_CLASS_LABEL_CLASS;
-
-    public static final String CLUSTERING_ALGORITHM_P = "clusteringAlgorithm";
-
-    public static final String CLUSTERING_ALGORITHM_D = "the clustering algorithm to use to derive cluster "
-        + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Clustering.class) + ". Default: " + COPAC.class.getName();
-
+    /**
+     * Holds the value of flag classify.
+     */
     private boolean evaluateAsClassifier = false;
 
+    /**
+     * Holds the value of parameter classlabel.
+     */
     private L classLabel;
 
-    private Result<V> result;
-
+    /**
+     * Holds the value of parameter clusteringAlgorithm.
+     */
     private Clustering<V> clusteringAlgorithm;
+
+    /**
+     * Holds the result of this algorithm.
+     */
+    private Result<V> result;
 
     /**
      * The Dependency Derivator algorithm.
      */
     private DependencyDerivator<V, D> dependencyDerivator = new DependencyDerivator<V, D>();
 
+    /**
+     * The classifier for evaluation.
+     */
     private Classifier<V, L> classifier = new CorrelationBasedClassifier<V, D, L>();
 
     @SuppressWarnings("unchecked")
     public CoDeC() {
         super();
-        addOption(new Flag(EVALUATE_AS_CLASSIFIER_F, EVALUATE_AS_CLASSIFIER_D));
+
+        // flag classify
+        addOption(EVALUATE_AS_CLASSIFIER_FLAG);
 
         // parameter class label
-        ClassParameter<L> classLabel = new ClassParameter(CLASS_LABEL_P, CLASS_LABEL_D, ClassLabel.class);
-        classLabel.setDefaultValue(HierarchicalClassLabel.class.toString());
-        addOption(classLabel);
+        addOption(CLASSLABEL_PARAM);
 
         // parameter clustering algorithm
-        ClassParameter<Clustering<V>> clAlg = new ClassParameter(CLUSTERING_ALGORITHM_P, CLUSTERING_ALGORITHM_D, Clustering.class);
-        clAlg.setDefaultValue(COPAC.class.getName());
-        addOption(clAlg);
+        addOption(CLUSTERING_ALGORITHM_PARAM);
     }
 
     /**
@@ -95,7 +120,7 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
         // demand database with class labels, evaluate
         // CorrelationBasedClassifier
         if (evaluateAsClassifier) {
-            Database<V> annotatedClasses = clusteringAlgorithm.getResult().associate((Class<L>) classLabel.getClass());
+            Database<V> annotatedClasses = clusteringAlgorithm.getResult().associate(classLabel.getClass());
             classifier.run(annotatedClasses);
             result = classifier.getResult();
         }
@@ -158,32 +183,33 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
         String[] remainingParameters = super.setParameters(args);
 
         // evaluateAsClassifier
-        evaluateAsClassifier = optionHandler.isSet(EVALUATE_AS_CLASSIFIER_F);
+        evaluateAsClassifier = isSet(EVALUATE_AS_CLASSIFIER_FLAG);
 
         // classlabel
-        String classLabelString = (String) optionHandler.getOptionValue(CLASS_LABEL_P);
-
+        String classLabelClass = getParameterValue(CLASSLABEL_PARAM);
         try {
-            classLabel = (L) Util.instantiate(ClassLabel.class, classLabelString);
+            classLabel = (L) Util.instantiate(ClassLabel.class, classLabelClass);
         }
         catch (UnableToComplyException e) {
-            throw new WrongParameterValueException(CLASS_LABEL_P, classLabelString, CLASS_LABEL_D, e);
+            throw new WrongParameterValueException(CLASSLABEL_PARAM.getName(),
+                classLabelClass, CLASSLABEL_PARAM.getDescription(), e);
         }
 
-        // clustering algorithm
-        String clusteringAlgorithmString = (String) optionHandler.getOptionValue(CLUSTERING_ALGORITHM_P);
+        // clusteringAlgorithm
+        String clusteringAlgorithmClass = getParameterValue(CLUSTERING_ALGORITHM_PARAM);
         try {
-            // noinspection unchecked
-            clusteringAlgorithm = Util.instantiate(Clustering.class, clusteringAlgorithmString);
+            clusteringAlgorithm = Util.instantiate(Clustering.class, clusteringAlgorithmClass);
         }
         catch (UnableToComplyException e) {
-            throw new WrongParameterValueException(CLUSTERING_ALGORITHM_P, clusteringAlgorithmString, CLUSTERING_ALGORITHM_D, e);
+            throw new WrongParameterValueException(CLUSTERING_ALGORITHM_PARAM.getName(),
+                clusteringAlgorithmClass, CLUSTERING_ALGORITHM_PARAM.getDescription(), e);
         }
         String[] clusteringAlgorithmParameters = new String[remainingParameters.length];
         System.arraycopy(remainingParameters, 0, clusteringAlgorithmParameters, 0, remainingParameters.length);
         clusteringAlgorithm.setTime(isTime());
         clusteringAlgorithm.setVerbose(isVerbose());
         remainingParameters = clusteringAlgorithm.setParameters(clusteringAlgorithmParameters);
+        setParameters(args, remainingParameters);
 
         // evaluation
         String[] evaluationParmeters = new String[remainingParameters.length];

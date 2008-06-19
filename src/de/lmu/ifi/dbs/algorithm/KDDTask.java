@@ -8,7 +8,16 @@ import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.AbstractParameterizable;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.FileParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.io.File;
 import java.util.List;
@@ -51,7 +60,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
      * must extend {@link de.lmu.ifi.dbs.algorithm.Algorithm}.
      * <p>Key: {@code -algorithm} </p>
      */
-    private final ClassParameter<Algorithm> ALGORITHM_PARAM = 
+    private final ClassParameter<Algorithm> ALGORITHM_PARAM =
         new ClassParameter<Algorithm>(OptionID.ALGORITHM, Algorithm.class);
 
     /**
@@ -285,8 +294,8 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
         }
         else if (isSet(NORMALIZATION_UNDO_FLAG)) {
             throw new WrongParameterValueException("Illegal parameter setting: Flag " +
-                NORMALIZATION_UNDO_FLAG +
-                " is set, but no normalization is specified.");
+                                                   NORMALIZATION_UNDO_FLAG +
+                                                   " is set, but no normalization is specified.");
         }
 
         remainingParameters = algorithm.setParameters(remainingParameters);
@@ -371,8 +380,8 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
         catch (ParameterException e) {
             kddTask.warning(kddTask.usage(e.getMessage() + "\n\nUSAGE:\n"));
         }
-        catch (Exception e) // any other exception
-        {
+        // any other exception
+        catch (Exception e) {
             kddTask.exception(e.getMessage(), e);
         }
     }

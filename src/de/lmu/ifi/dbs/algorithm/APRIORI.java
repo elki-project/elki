@@ -63,7 +63,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
         new GreaterEqualConstraint(0), true);
 
     /**
-     * Holds the value of paramater minimum frequency.
+     * Holds the value of parameter minimum frequency.
      */
     private double minfreq = -1;
 

@@ -1,17 +1,21 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
 import de.lmu.ifi.dbs.algorithm.Algorithm;
+import de.lmu.ifi.dbs.algorithm.clustering.Clustering;
+import de.lmu.ifi.dbs.algorithm.clustering.COPAC;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.preprocessing.HiCOPreprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.ConstantObject;
 import de.lmu.ifi.dbs.varianceanalysis.EigenPairFilter;
 import de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter;
-import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.data.ClassLabel;
+import de.lmu.ifi.dbs.data.HierarchicalClassLabel;
 
 /**
  * An OptionID is used by option handlers as a unique identifier for specific
@@ -28,23 +32,23 @@ public class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID HELP = new OptionID("h",
         "Flag to obtain help-message, either for the main-routine or for any specified algorithm. " +
-            "Causes immediate stop of the program.");
+        "Causes immediate stop of the program.");
 
     /**
      * OptionID for {@link de.lmu.ifi.dbs.algorithm.KDDTask#HELP_LONG_FLAG}
      */
     public static final OptionID HELP_LONG = new OptionID("help",
         "Flag to obtain help-message, either for the main-routine or for any specified algorithm. " +
-            "Causes immediate stop of the program.");
+        "Causes immediate stop of the program.");
 
     /**
      * OptionID for {@link de.lmu.ifi.dbs.algorithm.KDDTask#ALGORITHM_PARAM}
      */
     public static final OptionID ALGORITHM = new OptionID("algorithm",
         "<class> Classname of an algorithm " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Algorithm.class) +
-            ". Either full name to identify classpath or only classname, if its package is " +
-            Algorithm.class.getPackage().getName() + "."
+        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Algorithm.class) +
+        ". Either full name to identify classpath or only classname, if its package is " +
+        Algorithm.class.getPackage().getName() + "."
     );
 
     /**
@@ -52,8 +56,8 @@ public class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID DESCRIPTION = new OptionID("description",
         "<class> Name of a class to obtain a description - for classes that implement " +
-            Parameterizable.class.getName() +
-            " -- no further processing will be performed."
+        Parameterizable.class.getName() +
+        " -- no further processing will be performed."
     );
 
     /**
@@ -61,10 +65,10 @@ public class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID DATABASE_CONNECTION = new OptionID("dbc",
         "<class> Classname of a database connection " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DatabaseConnection.class) +
-            ". Either full name to identify classpath or only classname, if its package is " +
-            DatabaseConnection.class.getPackage().getName() +
-            ". Default: " + FileBasedDatabaseConnection.class.getName()
+        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DatabaseConnection.class) +
+        ". Either full name to identify classpath or only classname, if its package is " +
+        DatabaseConnection.class.getPackage().getName() +
+        ". Default: " + FileBasedDatabaseConnection.class.getName()
     );
 
     /**
@@ -73,9 +77,9 @@ public class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID OUTPUT = new OptionID("out",
         "<file> Name of the file to write the obtained results in. " +
-            "If an algorithm requires several outputfiles, the given filename will be used " +
-            "as prefix followed by automatically created markers. " +
-            "If this parameter is omitted, per default the output will sequentially be given to STDOUT."
+        "If an algorithm requires several outputfiles, the given filename will be used " +
+        "as prefix followed by automatically created markers. " +
+        "If this parameter is omitted, per default the output will sequentially be given to STDOUT."
     );
 
     /**
@@ -83,8 +87,8 @@ public class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID NORMALIZATION = new OptionID("norm",
         "<class> Classname of a normalization in order to use a database with normalized values " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Normalization.class) +
-            ". "
+        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Normalization.class) +
+        ". "
     );
 
     /**
@@ -92,15 +96,15 @@ public class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID NORMALIZATION_UNDO = new OptionID("normUndo",
         "Flag to revert result to original values - " +
-            "invalid option if no normalization has been performed.");
+        "invalid option if no normalization has been performed.");
 
     /**
      * OptionID for {@link de.lmu.ifi.dbs.algorithm.DistanceBasedAlgorithm#DISTANCE_FUNCTION_PARAM}
      */
     public static final OptionID ALGORITHM_DISTANCEFUNCTION = new OptionID("algorithm.distancefunction",
         "<class> Classname of the distance function to determine the distance between database objects " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) +
-            ". Default: " + EuklideanDistanceFunction.class.getName()
+        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) +
+        ". Default: " + EuklideanDistanceFunction.class.getName()
     );
 
     /**
@@ -120,7 +124,7 @@ public class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID APRIORI_MINFREQ = new OptionID("apriori.minfreq",
         "<double> Threshold for minimum frequency (as percentage, " +
-            "i.e.: 0 <= apriori.minfreq <= 1) (alternatively to parameter apriori.minsupp)."
+        "i.e.: 0 <= apriori.minfreq <= 1) (alternatively to parameter apriori.minsupp)."
     );
 
     /**
@@ -128,10 +132,10 @@ public class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID APRIORI_MINSUPP = new OptionID("apriori.minsupp",
         "<int> Threshold for minimum support as minimally required number of transactions " +
-            "(alternatively to parameter apriori.minfreq" +
-            " - setting apriori.minsupp is slightly preferable over setting " +
-            "apriori.minfreq in terms of efficiency), " +
-            "must be equal to or greater than 0."
+        "(alternatively to parameter apriori.minfreq" +
+        " - setting apriori.minsupp is slightly preferable over setting " +
+        "apriori.minfreq in terms of efficiency), " +
+        "must be equal to or greater than 0."
     );
 
     /**
@@ -139,34 +143,58 @@ public class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID COPAA_PREPROCESSOR = new OptionID("copaa.preprocessor",
         "<class> Classname of the preprocessor to derive partition criterion " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(HiCOPreprocessor.class) +
-            ".");
+        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(HiCOPreprocessor.class) +
+        ".");
 
     /**
      * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.COPAA#PARTITION_ALGORITHM_PARAM}
      */
     public static final OptionID COPAA_PARTITION_ALGORITHM = new OptionID("copaa.partitionAlgorithm",
         "<class> Classname of the algorithm to apply to each partition " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Algorithm.class) +
-            ".");
+        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Algorithm.class) +
+        ".");
 
     /**
      * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.COPAC#PARTITION_DB_PARAM}
      */
     public static final OptionID COPAA_PARTITION_DATABASE = new OptionID("copaa.partitionDB",
         "<class> Classname of the database for each partition " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Database.class) +
-            ". If this parameter is not set, the databases of the partitions have " +
-            "the same class as the original database."
+        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Database.class) +
+        ". If this parameter is not set, the databases of the partitions have " +
+        "the same class as the original database."
     );
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.CoDeC#CLASSLABEL_PARAM}
+     */
+    public static final OptionID CODEC_CLASSLABEL = new OptionID("codec.classlabel",
+        "<class> Classname of the designated classLabel class " +
+        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(ClassLabel.class) +
+        ". Default: " + HierarchicalClassLabel.class.getName()
+    );
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.CoDeC#CLUSTERING_ALGORITHM_PARAM}
+     */
+    public static final OptionID CODEC_CLUSTERING_ALGORITHM = new OptionID("codec.clusteringAlgorithm",
+        "<class> Classname of the clustering algorithm to use to derive cluster " +
+        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Clustering.class) +
+        ". Default: " + COPAC.class.getName()
+    );
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.CoDeC#EVALUATE_AS_CLASSIFIER_FLAG}
+     */
+    public static final OptionID CODEC_EVALUATE_AS_CLASSIFIER = new OptionID("codec.classify",
+        "Flag to demand evaluation of the cluster-models as classifier.");
 
     /**
      * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.DBSCAN#EPSILON_PARAM}
      */
     public static final OptionID DBSCAN_EPSILON = new OptionID("dbscan.epsilon",
         "<pattern> The maximum radius of the neighborhood " +
-            "to be considered, must be suitable to " +
-            "the distance function specified"
+        "to be considered, must be suitable to " +
+        "the distance function specified"
     );
 
     /**
@@ -174,8 +202,8 @@ public class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID DBSCAN_MINPTS = new OptionID("dbscan.minpts",
         "<int> Threshold for minimum number of points in " +
-            "the epsilon-neighborhood of a point, " +
-            "must be greater than 0."
+        "the epsilon-neighborhood of a point, " +
+        "must be greater than 0."
     );
 
     /**
@@ -183,8 +211,8 @@ public class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID DELICLU_MINPTS = new OptionID("deliclu.minpts",
         "<int> Threshold for minimum number of points in " +
-            "the epsilon-neighborhood of a point, " +
-            "must be greater than 0."
+        "the epsilon-neighborhood of a point, " +
+        "must be greater than 0."
     );
 
     /**
@@ -192,7 +220,7 @@ public class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID DEPENDENCY_DERIVATOR_ACCURACY = new OptionID("derivator.accuracy",
         "<int> Threshold for output accuracy fraction digits (>0), " +
-            "must be equal to or greater than 0. Default value is 4."
+        "must be equal to or greater than 0. Default value is 4."
     );
 
     /**
@@ -200,7 +228,7 @@ public class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID DEPENDENCY_DERIVATOR_SAMPLE_SIZE = new OptionID("derivator.sampleSize",
         "<int> Threshold for the size of the random sample to use, " +
-            "must be greater than 0. Default value is soze of the complete dataset."
+        "must be greater than 0. Default value is soze of the complete dataset."
     );
 
     /**
@@ -215,8 +243,8 @@ public class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID KNN_HICO_PREPROCESSOR_K = new OptionID("hicopreprocessor.k",
         "<int> The number of nearest neighbors considered in the PCA. " +
-            "If this parameter is not set, k ist set to three " +
-            "times of the dimensionality of the database objects."
+        "If this parameter is not set, k ist set to three " +
+        "times of the dimensionality of the database objects."
     );
 
     /**
@@ -224,8 +252,8 @@ public class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID PROJECTED_DBSCAN_MINPTS = new OptionID("projdbscan.minpts",
         "<int> Threshold for minimum number of points in " +
-            "the epsilon-neighborhood of a point, " +
-            "must be greater than 0."
+        "the epsilon-neighborhood of a point, " +
+        "must be greater than 0."
     );
 
     /**
@@ -233,8 +261,8 @@ public class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID OPTICS_EPSILON = new OptionID("optics.epsilon",
         "<pattern> The maximum radius of the neighborhood " +
-            "to be considered, must be suitable to " +
-            "the distance function specified."
+        "to be considered, must be suitable to " +
+        "the distance function specified."
     );
 
     /**
@@ -242,8 +270,8 @@ public class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID OPTICS_MINPTS = new OptionID("optics.minpts",
         "<int> Threshold for minimum number of points in " +
-            "the epsilon-neighborhood of a point, " +
-            "must be greater than 0."
+        "the epsilon-neighborhood of a point, " +
+        "must be greater than 0."
     );
 
     /**
@@ -251,8 +279,8 @@ public class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID PCA_EIGENPAIR_FILTER = new OptionID("pca.filter",
         "<class> Classname of the filter to determine the strong and weak eigenvectors " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(EigenPairFilter.class) +
-            ". Default: " + PercentageEigenPairFilter.class.getName()
+        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(EigenPairFilter.class) +
+        ". Default: " + PercentageEigenPairFilter.class.getName()
     );
 
     /**
@@ -260,8 +288,8 @@ public class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID SUBCLU_MINPTS = new OptionID("subclu.minpts",
         "<int> Threshold for minimum number of points in " +
-            "the epsilon-neighborhood of a point, " +
-            "must be greater than 0."
+        "the epsilon-neighborhood of a point, " +
+        "must be greater than 0."
     );
 
 
