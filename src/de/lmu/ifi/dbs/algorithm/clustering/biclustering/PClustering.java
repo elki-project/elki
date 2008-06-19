@@ -1,5 +1,12 @@
 package de.lmu.ifi.dbs.algorithm.clustering.biclustering;
 
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
 import de.lmu.ifi.dbs.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.algorithm.result.clustering.biclustering.Bicluster;
 import de.lmu.ifi.dbs.data.RealVector;
@@ -7,15 +14,9 @@ import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.IntegerTriple;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
-
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Provides a BiclusteringAlgorithm which finds a bicluster based on all of its
@@ -36,34 +37,50 @@ public class PClustering<V extends RealVector<V, Double>> extends
 		AbstractBiclustering<V> {
 
 	/**
+	 * OptionID for the parameter {@link #NUMBER_COLS_PARAM}.
+	 */
+	public static final OptionID NUMBER_COLS_ID = OptionID.getOrCreateOptionID("PClustering.nc",
+			"indicates the minimum columnsize of the resulting biclusters");
+
+	
+	/**
 	 * Parameter to indicate the minimum columnsize of the resulting biclusters.
 	 * <p>
-	 * Key: {@code -nc}
+	 * Key: {@code -PClustering.nc}
 	 * </p>
 	 */
-	public final IntParameter NUMBER_COLS = new IntParameter("nc",
-			"indicates the minimum columnsize of the resulting biclusters",
+	public final IntParameter NUMBER_COLS_PARAM = new IntParameter(NUMBER_COLS_ID,
 			new GreaterEqualConstraint(1));
+	
+	/**
+	 * OptionID for the parameter {@link #NUMBER_ROWS_PARAM}.
+	 */
+	public static final OptionID NUMBER_ROWS_ID = OptionID.getOrCreateOptionID("PClustering.nr",
+			"indicates the minimum rowsize of the resulting biclusters");
 
 	/**
 	 * Parameter to indicate the minimum rowsize of the resulting biclusters.
 	 * <p>
-	 * Key: {@code -nr}
+	 * Key: {@code -PClustering.nr}
 	 * </p>
 	 */
-	public final IntParameter NUMBER_ROWS = new IntParameter("nr",
-			"indicates the minimum rowsize of the resulting biclusters",
+	public final IntParameter NUMBER_ROWS_PARAM = new IntParameter(NUMBER_ROWS_ID,
 			new GreaterEqualConstraint(1));
+	
+	/**
+	 * OptionID for the parameter {@link #SIGMA_PARAM}.
+	 */
+	public static final OptionID SIGMA_ID = OptionID.getOrCreateOptionID(
+			"PClustering.sigma",
+			"treshhold value to determine the maximal acceptable score of a bicluster");
 
 	/**
 	 * Threshold value to determine the maximal acceptable score of a bicluster.
 	 * <p>
-	 * Key: {@code -sigma}
+	 * Key: {@code -PClustering.sigma}
 	 * </p>
 	 */
-	public final DoubleParameter SIGMA_PARAM = new DoubleParameter(
-			"sigma",
-			"treshhold value to determine the maximal acceptable score of a bicluster",
+	public final DoubleParameter SIGMA_PARAM = new DoubleParameter(SIGMA_ID,
 			new GreaterEqualConstraint(0.0));
 
 	/**
@@ -185,8 +202,8 @@ public class PClustering<V extends RealVector<V, Double>> extends
 	 * Adds the parameter values.
 	 */
 	public PClustering() {
-		this.addOption(NUMBER_COLS);
-		this.addOption(NUMBER_ROWS);
+		this.addOption(NUMBER_COLS_PARAM);
+		this.addOption(NUMBER_ROWS_PARAM);
 		this.addOption(SIGMA_PARAM);
 	}
 
@@ -200,8 +217,8 @@ public class PClustering<V extends RealVector<V, Double>> extends
 	@Override
 	public String[] setParameters(String[] args) throws ParameterException {
 		String[] remainingParameters = super.setParameters(args);
-		nc = this.getParameterValue(NUMBER_COLS);
-		nr = this.getParameterValue(NUMBER_ROWS);
+		nc = this.getParameterValue(NUMBER_COLS_PARAM);
+		nr = this.getParameterValue(NUMBER_ROWS_PARAM);
 		sigma = this.getParameterValue(SIGMA_PARAM);
 		return remainingParameters;
 	}

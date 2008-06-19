@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessEqualConstraint;
@@ -33,6 +34,13 @@ public class FLOC<V extends RealVector<V, Double>> extends
 		AbstractBiclustering<V> {
 
 	/**
+	 * OptionID for the parameter {@link #ACTION_ORDER_PARAM}.
+	 */
+	public static final OptionID ACTION_ORDER_ID = OptionID
+			.getOrCreateOptionID("FLOC.actionOrder",
+					"specifies the order of actions");
+
+	/**
 	 * Parameter which indicates in which order actions should be performed. If
 	 * its value is 0 (default) a weighted random order is performed, abetting
 	 * actions with greater gain, if its value is 1 a random order is performed
@@ -42,12 +50,17 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	 * Default value: 0
 	 * </p>
 	 * <p>
-	 * Key: {@code -actionOrder}
+	 * Key: {@code -FLOC.actionOrder}
 	 * </p>
 	 */
 	public final IntParameter ACTION_ORDER_PARAM = new IntParameter(
-			"actionOrder", "specifies the order of actions",
-			new GreaterEqualConstraint(0));
+			ACTION_ORDER_ID, new GreaterEqualConstraint(0));
+
+	/**
+	 * OptionID for the parameter {@link #SEED_PARAM}.
+	 */
+	public static final OptionID SEED_ID = OptionID.getOrCreateOptionID(
+			"FLOC.seed", "seed for initial clusters");
 
 	/**
 	 * Seed for creating initial clusters.
@@ -55,11 +68,17 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	 * Default value: 1
 	 * </p>
 	 * <p>
-	 * Key: {@code -seed}
+	 * Key: {@code -FLOC.seed}
 	 * </p>
 	 */
-	public final IntParameter SEED_PARAM = new IntParameter("seed",
-			"seed for initial clusters", new GreaterEqualConstraint(1));
+	public final IntParameter SEED_PARAM = new IntParameter(SEED_ID,
+			new GreaterEqualConstraint(1));
+
+	/**
+	 * OptionID for the parameter {@link #K_PARAM}.
+	 */
+	public static final OptionID K_ID = OptionID.getOrCreateOptionID("FLOC.k",
+			"indicates how many biclusters should be found");
 
 	/**
 	 * Parameter which indicates how many biclusters should be found.
@@ -67,59 +86,58 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	 * Default value: 1
 	 * </p>
 	 * <p>
-	 * Key: {@code -k}
+	 * Key: {@code -FLOC.k}
 	 * </p>
 	 */
-	public final IntParameter K_PARAM = new IntParameter("k",
-			"indicates how many biclusters should be found",
+	public final IntParameter K_PARAM = new IntParameter(K_ID,
 			new GreaterEqualConstraint(1));
+
+	/**
+	 * OptionID for the parameter {@link #INITIAL_ROW_DIM_PARAM}.
+	 */
+	public static final OptionID INITIAL_ROW_DIM_ID = OptionID
+			.getOrCreateOptionID("FLOC.initialRowDim",
+					"Parameter to approximate the rowDimension of a initial bicluster");
 
 	/**
 	 * Parameter to approximate the rowDimension of an initial bicluster.
 	 * <p>
-	 * Key: {@code -initialRowDim}
+	 * Key: {@code -FLOC.initialRowDim}
 	 * </p>
 	 */
 	public final DoubleParameter INITIAL_ROW_DIM_PARAM = new DoubleParameter(
-			"initialRowDim",
-			"Parameter to approximate the rowDimension of a initial bicluster",
-			new LessEqualConstraint(1.0));
+			INITIAL_ROW_DIM_ID, new LessEqualConstraint(1.0));
+
+	/**
+	 * OptionID for the parameter {@link #INITIAL_COL_DIM_PARAM}.
+	 */
+	public static final OptionID INITIAL_COL_DIM_ID = OptionID
+			.getOrCreateOptionID("FLOC.initialColDim",
+					"Parameter to approximate the columnDimension of a initial bicluster");
 
 	/**
 	 * Parameter to approximate the columnDimension of an initial bicluster.
 	 * <p>
-	 * Key: {@code -initialColDim}
+	 * Key: {@code -FLOC.initialColDim}
 	 * </p>
 	 */
 	public final DoubleParameter INITIAL_COL_DIM_PARAM = new DoubleParameter(
-			"initialColDim",
-			"Parameter to approximate the columnDimension of a initial bicluster",
-			new LessEqualConstraint(1.0));
+			INITIAL_COL_DIM_ID, new LessEqualConstraint(1.0));
+
+	/**
+	 * OptionID for the parameter {@link #MISSING_PARAM}.
+	 */
+	public static final OptionID MISSING_ID = OptionID.getOrCreateOptionID(
+			"FLOC.missing",
+			"Keeps the value which marks a missing entry within the dataset");
 
 	/**
 	 * Keeps the value which marks a missing entry within the database.
 	 * <p>
-	 * Key: {@code -missing}
+	 * Key: {@code -FLOC.missing}
 	 * </p>
 	 */
-	public final DoubleParameter MISSING_PARAM = new DoubleParameter(
-			"missing",
-			"Keeps the value which marks a missing entry within the dataset");
-
-	/**
-	 * Sets the options for the ParameterValues k, initialRowDim, initialColDim,
-	 * seed, missing, and actionOrder.
-	 */
-	 {
-		K_PARAM.setDefaultValue(1);
-		INITIAL_ROW_DIM_PARAM.setOptional(false);
-		INITIAL_COL_DIM_PARAM.setOptional(false);
-		SEED_PARAM.setDefaultValue(1);
-		SEED_PARAM.setOptional(true);
-		MISSING_PARAM.setOptional(true);
-		ACTION_ORDER_PARAM.setOptional(true);
-		ACTION_ORDER_PARAM.setDefaultValue(0);
-	}
+	public final DoubleParameter MISSING_PARAM = new DoubleParameter(MISSING_ID);
 
 	/**
 	 * A generator for creating the initial k clusters, used as well to define
@@ -283,9 +301,18 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	private double biclusterMean;
 
 	/**
-	 * Adds the parameter values.
+	 * Sets the options for the ParameterValues k, initialRowDim, initialColDim,
+	 * seed, missing, and actionOrder. Adds the parameter values.
 	 */
 	public FLOC() {
+		K_PARAM.setDefaultValue(1);
+		INITIAL_ROW_DIM_PARAM.setOptional(false);
+		INITIAL_COL_DIM_PARAM.setOptional(false);
+		SEED_PARAM.setDefaultValue(1);
+		SEED_PARAM.setOptional(true);
+		MISSING_PARAM.setOptional(true);
+		ACTION_ORDER_PARAM.setOptional(true);
+		ACTION_ORDER_PARAM.setDefaultValue(0);
 		this.addOption(SEED_PARAM);
 		this.addOption(K_PARAM);
 		this.addOption(INITIAL_ROW_DIM_PARAM);

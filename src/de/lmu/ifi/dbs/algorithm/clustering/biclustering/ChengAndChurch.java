@@ -8,9 +8,8 @@ import de.lmu.ifi.dbs.utilities.IntegerIntegerPair;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.LongParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.NoParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
 
 import java.util.BitSet;
@@ -35,17 +34,29 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 		AbstractBiclustering<V> {
 
 	/**
+	 * OptionID for the parameter {@link #SEED_PARAM}.
+	 */
+	public static final OptionID SEED_ID = OptionID.getOrCreateOptionID(
+			"ChengAndChurch.random",
+			"seed for initializing random list for the masking values");
+
+	/**
 	 * Seed for initializing a random list for the masking values.
 	 * <p>
 	 * Default value: 1
 	 * </p>
 	 * <p>
-	 * Key: {@code -maskingSeed}
+	 * Key: {@code -ChengAndChurch.random}
 	 * </p>
 	 */
-	public final LongParameter SEED_PARAM = new LongParameter(
-			"maskingSeed",
-			"seed for initializing random list for the masking values");
+	public final LongParameter SEED_PARAM = new LongParameter(SEED_ID);
+
+	/**
+	 * OptionID for the parameter {@link #MULTIPLE_ADDITION_PARAM}.
+	 */
+	public static final OptionID MULTIPLE_ADDITION_ID = OptionID
+			.getOrCreateOptionID("ChengAndChurch.multipleAddition",
+					"indicates how many times the algorithm to add Nodes should be performed");
 
 	/**
 	 * Parameter to indicate how many times the algorithm to add Nodes should be
@@ -55,35 +66,48 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	 * Default value: 1
 	 * </p>
 	 * <p>
-	 * Key: {@code -multipleAddition}
+	 * Key: {@code -ChengAndChurch.multipleAddition}
 	 * </p>
 	 */
 	public final IntParameter MULTIPLE_ADDITION_PARAM = new IntParameter(
-			"multipleAddition",
-			"indicates how many times the algorithm to add Nodes should be performed",
-			new GreaterEqualConstraint(1));
+			MULTIPLE_ADDITION_ID, new GreaterEqualConstraint(1));
+
+	/**
+	 * OptionID for the parameter {@link #SIGMA_PARAM}.
+	 */
+	public static final OptionID SIGMA_ID = OptionID.getOrCreateOptionID(
+			"ChengAndChurch.sigma",
+			"treshhold value to determine the maximal acceptable score of a bicluster");
 
 	/**
 	 * Treshhold value to determine the maximal acceptable score of a bicluster.
 	 * <p>
-	 * Key: {@code -sigma}
+	 * Key: {@code -ChengAndChurch.sigma}
 	 * </p>
 	 */
-	public final DoubleParameter SIGMA_PARAM = new DoubleParameter(
-			"sigma",
-			"treshhold value to determine the maximal acceptable score of a bicluster",
+	public final DoubleParameter SIGMA_PARAM = new DoubleParameter(SIGMA_ID,
 			new GreaterEqualConstraint(0.0));
+
+	/**
+	 * OptionID for the parameter {@link #ALPHA_PARAM}.
+	 */
+	public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("ChengAndChurch.alpha",
+			"parameter for multiple node deletion to accelerate the algorithm ");
 
 	/**
 	 * Parameter for multiple node deletion to accelerate the algorithm.
 	 * <p>
-	 * Key: {@code -alpha}
+	 * Key: {@code -ChengAndChurch.alpha}
 	 * </p>
 	 */
-	public final DoubleParameter ALPHA_PARAM = new DoubleParameter(
-			"alpha",
-			"parameter for multiple node deletion to accelerate the algorithm ",
+	public final DoubleParameter ALPHA_PARAM = new DoubleParameter(ALPHA_ID,
 			new GreaterEqualConstraint(1.0));
+
+	/**
+	 * OptionID for the parameter {@link #N_PARAM}.
+	 */
+	public static final OptionID N_ID = OptionID.getOrCreateOptionID("ChengAndChurch.n",
+			"number of biclusters to be found ");
 
 	/**
 	 * Number of biclusters to be found.
@@ -91,56 +115,51 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	 * Default value: 1
 	 * </p>
 	 * <p>
-	 * Key: {@code -n}
+	 * Key: {@code -ChengAndChurch.n}
 	 * </p>
 	 */
-	public final IntParameter N_PARAM = new IntParameter("n",
-			"number of biclusters to be found ", new GreaterEqualConstraint(1));
+	public final IntParameter N_PARAM = new IntParameter(N_ID, new GreaterEqualConstraint(1));
+
+	/**
+	 * OptionID for the parameter {@link #BEGIN_PARAM}.
+	 */
+	public static final OptionID BEGIN_ID = OptionID.getOrCreateOptionID(
+			"ChengAndChurch.begin", "lower limit for maskingValues");
 
 	/**
 	 * Lower limit for maskingValues.
 	 * <p>
-	 * Key: {@code -begin}
+	 * Key: {@code -ChengAndChurch.begin}
 	 * </p>
 	 */
-	public final IntParameter BEGIN_PARAM = new IntParameter("begin",
-			"lower limit for maskingValues");
+	public final IntParameter BEGIN_PARAM = new IntParameter(BEGIN_ID);
+
+	/**
+	 * OptionID for the parameter {@link #END_PARAM}.
+	 */
+	public static final OptionID END_ID = OptionID.getOrCreateOptionID("ChengAndChurch.end", "upper limit for maskingValues");
 
 	/**
 	 * Upper limit for maskingValues.
 	 * <p>
-	 * Key: {@code -end}
+	 * Key: {@code -ChengAndChurch.end}
 	 * </p>
 	 */
-	public final IntParameter END_PARAM = new IntParameter("end",
-			"upper limit for maskingValues");
+	public final IntParameter END_PARAM = new IntParameter(END_ID);
 
 	/**
-	 * Missing Value in database to be raplaced with maskingValues.
-	 * <p>
-	 * Key: {@code -missing}
-	 * </p>
+	 * OptionID for the parameter {@link #MISSING_PARAM}.
 	 */
-	public final IntParameter MISSING_PARAM = new IntParameter(
-			"missing",
+	public static final OptionID MISSING_ID = OptionID.getOrCreateOptionID("ChengAndChurch.missing",
 			"missing Value in database to be raplaced with maskingValues");
 
 	/**
-	 * Sets the options for the ParameterValues maskingSeed, sigma, alpha, n,
-	 * missing, begin and end.
+	 * Missing Value in database to be replaced with maskingValues.
+	 * <p>
+	 * Key: {@code -ChengAndChurch.missing}
+	 * </p>
 	 */
-	{
-		SEED_PARAM.setDefaultValue(1L);
-		SEED_PARAM.setOptional(true);
-		MULTIPLE_ADDITION_PARAM.setOptional(true);
-		MULTIPLE_ADDITION_PARAM.setDefaultValue(1);
-		SIGMA_PARAM.setOptional(false);
-		ALPHA_PARAM.setOptional(false);
-		N_PARAM.setDefaultValue(1);
-		MISSING_PARAM.setOptional(true);
-		BEGIN_PARAM.setOptional(false);
-		END_PARAM.setOptional(false);
-	}
+	public final IntParameter MISSING_PARAM = new IntParameter(MISSING_ID);
 
 	/**
 	 * Keeps the number of rows in the dataset.
@@ -221,7 +240,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	 * A generator for masking found or missing rows/columns with random
 	 * numbers.
 	 */
-	private Random r;
+	private Random random;
 
 	/**
 	 * Parameter for multiple node deletion.
@@ -261,9 +280,22 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	private int multipleAddition;
 
 	/**
+	 * 
+	 * Sets the options for the ParameterValues random, sigma, alpha, n,
+	 * missing, begin and end.
 	 * Adds the parameterValues.
 	 */
 	public ChengAndChurch() {
+		SEED_PARAM.setDefaultValue(1L);
+		SEED_PARAM.setOptional(true);
+		MULTIPLE_ADDITION_PARAM.setOptional(true);
+		MULTIPLE_ADDITION_PARAM.setDefaultValue(1);
+		SIGMA_PARAM.setOptional(false);
+		ALPHA_PARAM.setOptional(false);
+		N_PARAM.setDefaultValue(1);
+		MISSING_PARAM.setOptional(true);
+		BEGIN_PARAM.setOptional(false);
+		END_PARAM.setOptional(false);
 		this.addOption(SEED_PARAM);
 		this.addOption(MULTIPLE_ADDITION_PARAM);
 		this.addOption(SIGMA_PARAM);
@@ -277,7 +309,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	/**
 	 * Calls
 	 * {@link AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
-	 * and sets additionally the parameters for r, sigma, alpha, n, begin, end
+	 * and sets additionally the parameters for random, sigma, alpha, n, begin, end
 	 * 
 	 * @see AbstractAlgorithm#setParameters(String[])
 	 */
@@ -285,7 +317,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	public String[] setParameters(String[] args) throws ParameterException {
 		String[] remainingParameters = super.setParameters(args);
 		long seed = this.getParameterValue(SEED_PARAM);
-		r = new Random(seed);
+		random = new Random(seed);
 		sigma = this.getParameterValue(SIGMA_PARAM);
 		alpha = this.getParameterValue(ALPHA_PARAM);
 		n = this.getParameterValue(N_PARAM);
@@ -518,8 +550,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	}
 
 	/**
-	 * Finds the missing values in the dataset if the missingParameter is
-	 * set.
+	 * Finds the missing values in the dataset if the missingParameter is set.
 	 */
 	private void findMissingValues() {
 		if (!MISSING_PARAM.isSet()) {
@@ -531,7 +562,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 					missingRowsToMask.set(i);
 					missingColsToMask.set(j);
 					IntegerIntegerPair key = new IntegerIntegerPair(i, j);
-					maskedVals.put(key, (double) r.nextInt(end) + begin);
+					maskedVals.put(key, (double) random.nextInt(end) + begin);
 				}
 			}
 		}
@@ -544,7 +575,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 		for (int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
 			for (int j = cols.nextSetBit(0); j >= 0; j = cols.nextSetBit(j + 1)) {
 				IntegerIntegerPair key = new IntegerIntegerPair(i, j);
-				maskedVals.put(key, (double) r.nextInt(end) + begin);
+				maskedVals.put(key, (double) random.nextInt(end) + begin);
 			}
 		}
 	}
@@ -640,7 +671,6 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 			}
 		}
 	}
-
 
 	/**
 	 * Performs single node deletion until the score of the resulting bicluster
@@ -763,11 +793,12 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 			chooseMinAdditions();
 		} else {
 			if (MULTIPLE_ADDITION_PARAM.isSet()) {
-					//restores the value of multipleAddition for the next iteration
-				    //if the parameter is not set, the previous if-clause will never be entered and 
-				    // therefore the parameter will remain unchanged.
-					multipleAddition = getParameterValue(MULTIPLE_ADDITION_PARAM);
-          
+				// restores the value of multipleAddition for the next iteration
+				// if the parameter is not set, the previous if-clause will
+				// never be entered and
+				// therefore the parameter will remain unchanged.
+				multipleAddition = getParameterValue(MULTIPLE_ADDITION_PARAM);
+
 			}
 
 		}
@@ -840,13 +871,15 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 				double biclusterM = biclusterMean;
 
 				temp = temp
-						+ Math.pow(value - rowMean - columnMean + biclusterM, 2);
+						+ Math
+								.pow(value - rowMean - columnMean + biclusterM,
+										2);
 			}
 			resultRows.put(i, temp / cols.cardinality());
 		}
 		return resultRows;
 	}
-	
+
 	/**
 	 * The description of this Algorithm.
 	 */
