@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.varianceanalysis.FirstNEigenPairFilter;
 
 import java.util.ArrayList;
@@ -46,71 +45,51 @@ import java.util.Vector;
 
 /**
  * Subspace clustering algorithm based on the hough transform.
- * todo hierarchy
- * todo parameter
+ * todo elke hierarchy (later)
  *
  * @author Elke Achtert
  */
 public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
-    /**
-     * Description for parameter minimum points.
-     */
-    public static final String MINPTS_D = "threshold for minumum number of points in a cluster.";
 
     /**
-     * Parameter minimum points.
+     * Parameter to specify the threshold for minimum number of points in a cluster,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -cash.minpts} </p>
      */
-    public static final String MINPTS_P = "minpts";
+    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.CASH_MINPTS,
+        new GreaterConstraint(0));
 
     /**
-     * Description for parameter maxlevel.
+     * Parameter to specify the maximum level for splitting the hypercube,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -cash.maxlevel} </p>
      */
-    public static final String MAXLEVEL_D = "the maximum level for splitting the hypercube.";
+    private final IntParameter MAXLEVEL_PARAM = new IntParameter(OptionID.CASH_MAXLEVEL,
+        new GreaterConstraint(0));
 
     /**
-     * Parameter maxlevel.
+     * Parameter to specify the minimum dimensionality of the subspaces to be found,
+     * must be an integer greater than 0.
+     * <p>Default value: {@code 1} </p>
+     * <p>Key: {@code -cash.mindim} </p>
      */
-    public static final String MAXLEVEL_P = "maxlevel";
+    private final IntParameter MINDIM_PARAM = new IntParameter(OptionID.CASH_MINDIM,
+        new GreaterConstraint(0), 1);
 
     /**
-     * The default value for mindim parameter.
+     * Parameter to specify the maximum jitter for distance values,
+     * must be a double greater than 0.
+     * <p>Key: {@code -cash.jitter} </p>
      */
-    public static final int DEFAULT_MINDIM = 1;
+    private final DoubleParameter JITTER_PARAM = new DoubleParameter(OptionID.CASH_JITTER,
+        new GreaterConstraint(0));
 
     /**
-     * Description for parameter mindim.
+     * Flag to indicate that an adjustment of the applied heuristic for choosing an interval
+     * is performed after an interval is selected.
+     * <p>Key: {@code -cash.adjust} </p>
      */
-    public static final String MINDIM_D = "the minimum dimensionality of the subspaces to be found, " +
-                                          "default:" + DEFAULT_MINDIM + ".";
-
-    /**
-     * Parameter mindim.
-     */
-    public static final String MINDIM_P = "mindim";
-
-    /**
-     * Description for parameter jitter.
-     */
-    public static final String JITTER_D = "the maximum jitter for distance values.";
-
-    /**
-     * Parameter jitter.
-     */
-    public static final String JITTER_P = "jitter";
-
-    /**
-     * Description for flag adjust
-     */
-    public static final String ADJUSTMENT_D = "flag indicating that an adjustment of the" +
-                                              "applied heuristic for choosing an interval " +
-                                              "is performed after an interval is selected, " +
-                                              "default: no adjustment";
-
-    /**
-     * Flag adjust.
-     */
-    public static final String ADJUSTMENT_F = "adjust";
-
+    private final Flag ADJUST_FLAG = new Flag(OptionID.CASH_ADJUST);
 
     /**
      * The result.
@@ -118,7 +97,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
     private CASHResult result;
 
     /**
-     * Minimum points.
+     * Minimum points in a cluster.
      */
     private int minPts;
 
@@ -154,6 +133,9 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
      */
     private Set<Integer> processedIDs;
 
+    /**
+     * The database holding the objects.
+     */
     private Database<ParameterizationFunction> database;
 
     /**
@@ -163,21 +145,19 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
         super();
 
         //parameter minpts
-        optionHandler.put(new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
+        addOption(MINPTS_PARAM);
 
         //parameter maxLevel
-        optionHandler.put(new IntParameter(MAXLEVEL_P, MAXLEVEL_D, new GreaterConstraint(0)));
+        addOption(MAXLEVEL_PARAM);
 
         //parameter minDim
-        IntParameter minDim = new IntParameter(MINDIM_P, MINDIM_D, new GreaterEqualConstraint(1));
-        minDim.setDefaultValue(DEFAULT_MINDIM);
-        optionHandler.put(minDim);
+        addOption(MINDIM_PARAM);
 
         //parameter jitter
-        optionHandler.put(new DoubleParameter(JITTER_P, JITTER_D, new GreaterConstraint(0)));
+        addOption(JITTER_PARAM);
 
         //flag adjust
-        optionHandler.put(new Flag(ADJUSTMENT_F, ADJUSTMENT_D));
+        addOption(ADJUST_FLAG);
     }
 
     /**
@@ -264,19 +244,19 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
         // minpts
-        minPts = (Integer) optionHandler.getOptionValue(MINPTS_P);
+        minPts = getParameterValue(MINPTS_PARAM);
 
         // maxlevel
-        maxLevel = (Integer) optionHandler.getOptionValue(MAXLEVEL_P);
+        maxLevel = getParameterValue(MAXLEVEL_PARAM);
 
         // mindim
-        minDim = (Integer) optionHandler.getOptionValue(MINDIM_P);
+        minDim = getParameterValue(MINDIM_PARAM);
 
         // jitter
-        jitter = (Double) optionHandler.getOptionValue(JITTER_P);
+        jitter = getParameterValue(JITTER_PARAM);
 
         // adjust
-        adjust = optionHandler.isSet(ADJUSTMENT_F);
+        adjust = isSet(ADJUST_FLAG);
 
         return remainingParameters;
     }
@@ -490,9 +470,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
 
             HyperBoundingBox alphaInterval = new HyperBoundingBox(alphaMin, alphaMax);
             Set<Integer> intervalIDs = split.determineIDs(ids, alphaInterval, d_mins[i], d_maxs[i]);
-            // todo: nur die mit allen punkten?
             if (intervalIDs != null && intervalIDs.size() >= minPts) {
-//      if (intervalIDs != null && intervalIDs.size() >= database.size()) {
                 CASHInterval rootInterval = new CASHInterval(alphaMin, alphaMax, split, intervalIDs, 0, 0, d_mins[i], d_maxs[i]);
                 heap.addNode(new DefaultHeapNode<Integer, CASHInterval>(rootInterval.priority(), rootInterval));
             }

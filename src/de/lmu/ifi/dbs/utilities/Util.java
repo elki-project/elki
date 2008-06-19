@@ -18,7 +18,17 @@ import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
 
 import java.io.PrintStream;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.StringTokenizer;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 /**
@@ -562,7 +572,7 @@ public final class Util extends AbstractLoggable {
 
         double size = database.size();
         for (int i = 0; i < dim; i++) {
-            centroid[i] /= size; 
+            centroid[i] /= size;
         }
         O o = database.get(database.iterator().next());
         return o.newInstance(centroid);
@@ -1070,8 +1080,8 @@ public final class Util extends AbstractLoggable {
     public static String[] parameterDifference(String[] complete, String[] part) throws IllegalArgumentException {
         if (complete.length < part.length) {
             throw new IllegalArgumentException("First array must be at least as long as second array.\n" +
-                "First array:  " + Arrays.asList(complete) + "\n" +
-                "Second array: " + Arrays.asList(part));
+                                               "First array:  " + Arrays.asList(complete) + "\n" +
+                                               "Second array: " + Arrays.asList(part));
         }
 
         if (complete.length == 0) {
@@ -1131,9 +1141,9 @@ public final class Util extends AbstractLoggable {
         }
         if (second < partArray.size()) {
             throw new IllegalArgumentException("second array contains entries that are not " +
-                "contained in the first array.\n" +
-                "First array:  " + Arrays.asList(complete) + "\n" +
-                "Second array: " + Arrays.asList(part));
+                                               "contained in the first array.\n" +
+                                               "First array:  " + Arrays.asList(complete) + "\n" +
+                                               "Second array: " + Arrays.asList(part));
         }
         while (first < completeArray.size()) {
             String[] params = pattern.split(completeArray.get(first));
@@ -1351,7 +1361,7 @@ public final class Util extends AbstractLoggable {
         }
         catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("The specified String does not represent a bit set " +
-                "containing only 0 and 1 values: " + s);
+                                               "containing only 0 and 1 values: " + s);
         }
     }
 
@@ -1370,7 +1380,7 @@ public final class Util extends AbstractLoggable {
             }
             else if (s[i] != '0') {
                 throw new IllegalArgumentException("The specified String does not represent a bit set " +
-                    "containing only 0 and 1 values: " + String.valueOf(s));
+                                                   "containing only 0 and 1 values: " + String.valueOf(s));
             }
         }
         return result;
@@ -1480,7 +1490,7 @@ public final class Util extends AbstractLoggable {
      * @return a new parameter array containing the values of <code>parameters</code> and
      *         the specified <code>parameter</code> and its <code>value</code>.
      */
-    public static String[] addParameter(String[] parameters, Parameter<?,?> parameter, String value) {
+    public static String[] addParameter(String[] parameters, Parameter<?, ?> parameter, String value) {
         String[] newParameters = new String[parameters.length + 2];
         System.arraycopy(parameters, 0, newParameters, 2, parameters.length);
         newParameters[0] = OptionHandler.OPTION_PREFIX + parameter.getName();
@@ -1519,7 +1529,7 @@ public final class Util extends AbstractLoggable {
      * Adds the specified optionID of a flag to the beginning of the given parameter list.
      *
      * @param parameters the list of parameters
-     * @param optionID       the optionID to be added
+     * @param optionID   the optionID to be added
      */
     public static void addFlag(List<String> parameters, OptionID optionID) {
         parameters.add(0, OptionHandler.OPTION_PREFIX + optionID.getName());
@@ -1538,13 +1548,13 @@ public final class Util extends AbstractLoggable {
     }
 
     /**
-     * Adds the specified parameter and its value to the beginning of the given parameter list.
+     * Adds the specified parameter and the specified value to the beginning of the given parameter list.
      *
      * @param parameters the list of parameters
      * @param parameter  the parameter to be added
      * @param value      the value of the parameter to be added
      */
-    public static void addParameter(List<String> parameters, Parameter<?,?> parameter, String value) {
+    public static void addParameter(List<String> parameters, Parameter<?, ?> parameter, String value) {
         parameters.add(0, OptionHandler.OPTION_PREFIX + parameter.getName());
         parameters.add(1, value);
     }

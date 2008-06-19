@@ -1,12 +1,13 @@
 package de.lmu.ifi.dbs.wrapper;
 
-import de.lmu.ifi.dbs.algorithm.KDDTask;
 import de.lmu.ifi.dbs.algorithm.clustering.cash.CASH;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.parser.ParameterizationFunctionLabelParser;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.Util;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.util.List;
 
@@ -14,19 +15,24 @@ import java.util.List;
  * Wrapper class for CASH algorithm.
  *
  * @author Elke Achtert
- * todo parameter
  */
 public class CASHWrapper extends FileBasedDatabaseConnectionWrapper {
 
     /**
-     * Minimum points.
+     * Parameter to specify the threshold for minimum number of points in a cluster,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -cash.minpts} </p>
      */
-    private int minpts;
+    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.CASH_MINPTS,
+        new GreaterConstraint(0));
 
     /**
-     * The maximum level for splitting the hypercube.
+     * Parameter to specify the maximum level for splitting the hypercube,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -cash.maxlevel} </p>
      */
-    private int maxLevel;
+    private final IntParameter MAXLEVEL_PARAM = new IntParameter(OptionID.CASH_MAXLEVEL,
+        new GreaterConstraint(0));
 
     /**
      * Main method to run this wrapper.
@@ -51,10 +57,10 @@ public class CASHWrapper extends FileBasedDatabaseConnectionWrapper {
     public CASHWrapper() {
         super();
         // parameter min points
-        optionHandler.put(new IntParameter(CASH.MINPTS_P, CASH.MINPTS_D, new GreaterConstraint(0)));
+        addOption(MINPTS_PARAM);
 
         // parameter max level
-        optionHandler.put(new IntParameter(CASH.MAXLEVEL_P, CASH.MAXLEVEL_D, new GreaterConstraint(0)));
+        addOption(MAXLEVEL_PARAM);
     }
 
     /**
@@ -71,26 +77,11 @@ public class CASHWrapper extends FileBasedDatabaseConnectionWrapper {
         parameters.add(ParameterizationFunctionLabelParser.class.getName());
 
         // minpts
-        parameters.add(OptionHandler.OPTION_PREFIX + CASH.MINPTS_P);
-        parameters.add(Integer.toString(minpts));
+        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(getParameterValue(MINPTS_PARAM)));
 
         // maxLevel
-        parameters.add(OptionHandler.OPTION_PREFIX + CASH.MAXLEVEL_P);
-        parameters.add(Integer.toString(maxLevel));
+        Util.addParameter(parameters, MAXLEVEL_PARAM, Integer.toString(getParameterValue(MAXLEVEL_PARAM)));
 
         return parameters;
-    }
-
-    /**
-     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
-
-        //  minpts, maxLevel
-        minpts = (Integer) optionHandler.getOptionValue(CASH.MINPTS_P);
-        maxLevel = (Integer) optionHandler.getOptionValue(CASH.MAXLEVEL_P);
-
-        return remainingParameters;
     }
 }

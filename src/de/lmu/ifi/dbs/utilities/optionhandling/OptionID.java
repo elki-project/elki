@@ -1,25 +1,25 @@
 package de.lmu.ifi.dbs.utilities.optionhandling;
 
 import de.lmu.ifi.dbs.algorithm.Algorithm;
-import de.lmu.ifi.dbs.algorithm.clustering.Clustering;
 import de.lmu.ifi.dbs.algorithm.clustering.COPAC;
+import de.lmu.ifi.dbs.algorithm.clustering.Clustering;
+import de.lmu.ifi.dbs.data.ClassLabel;
+import de.lmu.ifi.dbs.data.HierarchicalClassLabel;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.evaluation.holdout.Holdout;
+import de.lmu.ifi.dbs.evaluation.holdout.StratifiedCrossValidation;
+import de.lmu.ifi.dbs.evaluation.procedure.ClassifierEvaluationProcedure;
+import de.lmu.ifi.dbs.evaluation.procedure.EvaluationProcedure;
 import de.lmu.ifi.dbs.normalization.Normalization;
 import de.lmu.ifi.dbs.preprocessing.HiCOPreprocessor;
 import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.ConstantObject;
 import de.lmu.ifi.dbs.varianceanalysis.EigenPairFilter;
 import de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter;
-import de.lmu.ifi.dbs.data.ClassLabel;
-import de.lmu.ifi.dbs.data.HierarchicalClassLabel;
-import de.lmu.ifi.dbs.evaluation.procedure.EvaluationProcedure;
-import de.lmu.ifi.dbs.evaluation.procedure.ClassifierEvaluationProcedure;
-import de.lmu.ifi.dbs.evaluation.holdout.Holdout;
-import de.lmu.ifi.dbs.evaluation.holdout.StratifiedCrossValidation;
 
 /**
  * An OptionID is used by option handlers as a unique identifier for specific
@@ -140,6 +140,45 @@ public class OptionID extends ConstantObject<OptionID> {
         " - setting apriori.minsupp is slightly preferable over setting " +
         "apriori.minfreq in terms of efficiency), " +
         "must be equal to or greater than 0."
+    );
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.cash.CASH#ADJUST_FLAG}
+     */
+    public static final OptionID CASH_ADJUST = new OptionID("cash.adjust",
+        "Flag to indicate that an adjustment of the applied heuristic for choosing an interval " +
+        "is performed after an interval is selected.");
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.cash.CASH#JITTER_PARAM}
+     */
+    public static final OptionID CASH_JITTER = new OptionID("cash.jitter",
+        "<double> The maximum jitter for distance values, " +
+        "must be greater than 0."
+    );
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.cash.CASH#MAXLEVEL_PARAM}
+     */
+    public static final OptionID CASH_MAXLEVEL = new OptionID("cash.maxlevel",
+        "<int> The maximum level for splitting the hypercube, " +
+        "must be greater than 0."
+    );
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.cash.CASH#MINDIM_PARAM}
+     */
+    public static final OptionID CASH_MINDIM = new OptionID("cash.mindim",
+        "<int> The minimum dimensionality of the subspaces to be found, " +
+        "must be greater than 0."
+    );
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.cash.CASH#MINPTS_PARAM}
+     */
+    public static final OptionID CASH_MINPTS = new OptionID("cash.minpts",
+        "<int> Threshold for minimum number of points in a cluster, " +
+        "must be greater than 0."
     );
 
     /**
