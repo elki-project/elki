@@ -81,9 +81,9 @@ public class ERiCWrapper extends NormalizationWrapper {
         optionHandler.put(MINPTS_PARAM);
 
         // parameter k
-        K_PARAM.setDescription("<int>The number of nearest neighbors considered in the PCA. " +
+        K_PARAM.setShortDescription("The number of nearest neighbors considered in the PCA. " +
             "If this parameter is not set, k ist set to the value of " +
-            MINPTS_PARAM.getName());
+            MINPTS_PARAM.getName() + ".");
         optionHandler.put(K_PARAM);
 
         // global constraint k <-> minpts

@@ -32,7 +32,7 @@ public class COPAC<V extends RealVector<V, ?>> extends COPAA<V> implements Clust
         super();
 
         // change description and restriction class of PARTITION_ALGORITHM_PARAM
-        PARTITION_ALGORITHM_PARAM.setDescription("algorithm to apply to each partition " +
+        PARTITION_ALGORITHM_PARAM.setShortDescription("Classname of the algorithm to apply to each partition " +
             Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Clustering.class) +
             ".");
         // noinspection unchecked

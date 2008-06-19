@@ -47,7 +47,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
      * <p>Key: {@code -epsilon} </p>
      */
     public static final PatternParameter EPSILON_PARAM = new PatternParameter("epsilon",
-                                                                              "the maximum radius of the neighborhood " +
+                                                                              "The maximum radius of the neighborhood " +
                                                                               "to be considered, must be suitable to " +
                                                                               AbstractDimensionsSelectingDoubleDistanceFunction.class.getName());
 

@@ -29,7 +29,7 @@ public abstract class KDDTaskWrapper<O extends DatabaseObject> extends AbstractW
      * <p>Key: {@code -out} </p>
      */
     private final FileParameter OUTPUT_PARAM = new FileParameter(OptionID.OUTPUT,
-        FileParameter.FILE_OUT, true);
+        FileParameter.FileType.OUTPUT_FILE, true);
 
     /**
      * The output file.

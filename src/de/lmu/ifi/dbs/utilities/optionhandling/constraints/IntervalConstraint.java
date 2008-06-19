@@ -64,8 +64,8 @@ public class IntervalConstraint extends AbstractLoggable implements ParameterCon
         super(LoggingConfiguration.DEBUG);
 
         if (lowConstraintValue.doubleValue() >= highConstraintValue.doubleValue()) {
-            throw new IllegalArgumentException("Left interval boundary is greater than "+
-            "or equal to right interval boundary!");
+            throw new IllegalArgumentException("Left interval boundary is greater than " +
+                "or equal to right interval boundary!");
         }
 
         this.lowConstraintValue = lowConstraintValue;
@@ -86,19 +86,19 @@ public class IntervalConstraint extends AbstractLoggable implements ParameterCon
         if (lowBoundary.equals(IntervalBoundary.CLOSE)) {
             if (t.doubleValue() < lowConstraintValue.doubleValue()) {
                 throw new WrongParameterValueException("Parameter Constraint Error: \n" +
-                                                       "The parameter value specified has to be " +
-                                                       "equal to or greater than " +
-                                                       lowConstraintValue.toString() +
-                                                       ". (current value: " + t.doubleValue() + ")\n");
+                    "The parameter value specified has to be " +
+                    "equal to or greater than " +
+                    lowConstraintValue.toString() +
+                    ". (current value: " + t.doubleValue() + ")\n");
             }
         }
         else if (lowBoundary.equals(IntervalBoundary.OPEN)) {
             if (t.doubleValue() <= lowConstraintValue.doubleValue()) {
                 throw new WrongParameterValueException("Parameter Constraint Error: \n" +
-                                                       "The parameter value specified has to be " +
-                                                       "greater than " +
-                                                       lowConstraintValue.toString() +
-                                                       ". (current value: " + t.doubleValue() + ")\n");
+                    "The parameter value specified has to be " +
+                    "greater than " +
+                    lowConstraintValue.toString() +
+                    ". (current value: " + t.doubleValue() + ")\n");
             }
         }
 
@@ -106,21 +106,44 @@ public class IntervalConstraint extends AbstractLoggable implements ParameterCon
         if (highBoundary.equals(IntervalBoundary.CLOSE)) {
             if (t.doubleValue() > highConstraintValue.doubleValue()) {
                 throw new WrongParameterValueException("Parameter Constraint Error: \n" +
-                                                       "The parameter value specified has to be " +
-                                                       "equal to or less than " +
-                                                       highConstraintValue.toString() +
-                                                       ". (current value: " + t.doubleValue() + ")\n");
+                    "The parameter value specified has to be " +
+                    "equal to or less than " +
+                    highConstraintValue.toString() +
+                    ". (current value: " + t.doubleValue() + ")\n");
             }
         }
         else if (highBoundary.equals(IntervalBoundary.OPEN)) {
             if (t.doubleValue() >= highConstraintValue.doubleValue()) {
                 throw new WrongParameterValueException("Parameter Constraint Error: \n" +
-                                                       "The parameter value specified has to be " +
-                                                       "less than " +
-                                                       highConstraintValue.toString() +
-                                                       ". (current value: " + t.doubleValue() + ")\n");
+                    "The parameter value specified has to be " +
+                    "less than " +
+                    highConstraintValue.toString() +
+                    ". (current value: " + t.doubleValue() + ")\n");
             }
         }
+    }
+
+    /**
+     * @see ParameterConstraint#getDescription(String)
+     */
+    public String getDescription(String parameterName) {
+        String description = parameterName + " in ";
+        if (lowBoundary.equals(IntervalBoundary.CLOSE)) {
+            description += "[";
+        }
+        else if (lowBoundary.equals(IntervalBoundary.OPEN)) {
+            description += "(";
+        }
+
+        description += lowConstraintValue.toString() + ", " + highConstraintValue;
+
+        if (highBoundary.equals(IntervalBoundary.CLOSE)) {
+            description += "]";
+        }
+        if (highBoundary.equals(IntervalBoundary.OPEN)) {
+            description += ")";
+        }
+        return description;
     }
 
 }

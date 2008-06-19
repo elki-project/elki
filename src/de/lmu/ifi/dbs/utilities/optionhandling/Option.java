@@ -17,9 +17,10 @@ public abstract class Option<T> extends AbstractLoggable {
     protected final String name;
 
     /**
-     * The option description.
+     * The short description of the optionn. An extended description
+     * is provided by the method {@link #getDescription()}
      */
-    protected String description;
+    protected String shortDescription;
 
     /**
      * The value of this option.
@@ -35,7 +36,7 @@ public abstract class Option<T> extends AbstractLoggable {
     public Option(OptionID optionID) {
         super(LoggingConfiguration.DEBUG);
         this.name = optionID.getName();
-        this.description = optionID.getDescription();
+        this.shortDescription = optionID.getDescription();
     }
 
     /**
@@ -45,10 +46,11 @@ public abstract class Option<T> extends AbstractLoggable {
      * @param description The description of the option.
      * @deprecated use Option(optionID) instead
      */
+    @Deprecated
     public Option(String name, String description) {
         super(LoggingConfiguration.DEBUG);
         this.name = name;
-        this.description = description;
+        this.shortDescription = description;
     }
 
     /**
@@ -61,21 +63,30 @@ public abstract class Option<T> extends AbstractLoggable {
     }
 
     /**
-     * Returns the description of the option.
+     * Returns the short description of the option.
      *
-     * @return the option's description.
+     * @return the option's short description.
      */
-    public String getDescription() {
-        return description;
+    protected String getShortDescription() {
+        return shortDescription;
     }
 
     /**
-     * Sets the description of the option.
-     * @param description the description to be set
+     * Sets the short description of the option.
+     * @param description the short description to be set
      */
-    public void setDescription(String description) {
-        this.description = description;
+    public void setShortDescription(String description) {
+        this.shortDescription = description;
     }
+
+    /**
+     * Returns the extended description of the option
+     * which includes the option's type, the short description
+     * and the default value (if specified).
+     *
+     * @return the option's description.
+     */
+    public abstract String getDescription();
 
     /**
      * Returns true if the value of the option is set, false otherwise.

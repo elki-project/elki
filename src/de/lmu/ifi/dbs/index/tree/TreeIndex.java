@@ -121,7 +121,8 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
    */
   public TreeIndex() {
     super();
-    FileParameter fileName = new FileParameter(FILE_NAME_P, FILE_NAME_D, FileParameter.FILE_OUT);
+    FileParameter fileName = new FileParameter(FILE_NAME_P, FILE_NAME_D,
+        FileParameter.FileType.OUTPUT_FILE);
     fileName.setOptional(true);
     optionHandler.put(fileName);
 

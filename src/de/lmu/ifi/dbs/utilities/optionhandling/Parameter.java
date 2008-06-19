@@ -55,6 +55,7 @@ public abstract class Parameter<T, C> extends Option<T> {
      * @param description the parameter description
      * @deprecated
      */
+    @Deprecated
     public Parameter(String name, String description) {
         super(name, description);
         constraints = new Vector<ParameterConstraint<C>>();
@@ -169,4 +170,41 @@ public abstract class Parameter<T, C> extends Option<T> {
     public void reset() {
         this.value = null;
     }
+
+
+    /**
+     * @return the option's description.
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#getDescription()
+     */
+    public final String getDescription() {
+        StringBuffer description = new StringBuffer();
+        description.append(getParameterType()).append(" ");
+        description.append(shortDescription);
+        if (hasDefaultValue()) {
+            description.append(" Default: ").append(getDefaultValue().toString()).append(".");
+        }
+        if (!constraints.isEmpty()) {
+            description.append(" Constraint(s): ");
+            for (int i = 0; i < constraints.size(); i++) {
+                ParameterConstraint<C> constraint = constraints.get(i);
+                if (i > 0) {
+                    description.append(", ");
+                }
+                description.append(constraint.getDescription(getName()));
+                if (i == constraints.size()-1) {
+                    description.append(".");
+                }
+            }
+        }
+        return description.toString();
+    }
+
+    /**
+     * Returns a string representation of the parameter's type
+     * (e.g. an {@link de.lmu.ifi.dbs.utilities.optionhandling.IntParameter} should
+     * return {@code <int>}).
+     *
+     * @return a string representation of the parameter's type
+     */
+    protected abstract String getParameterType();
 }

@@ -83,7 +83,7 @@ public class COPAAWrapper extends NormalizationWrapper {
     public COPAAWrapper() {
         super();
         // parameter epsilon
-        EPSILON_PARAM.setDescription("<pattern>The maximum radius of the neighborhood " +
+        EPSILON_PARAM.setShortDescription("The maximum radius of the neighborhood " +
                                      "to be considerd, must be suitable to " +
                                      LocallyWeightedDistanceFunction.class.getName());
         addOption(EPSILON_PARAM);
@@ -92,7 +92,7 @@ public class COPAAWrapper extends NormalizationWrapper {
         addOption(MINPTS_PARAM);
 
         // parameter k
-        K_PARAM.setDescription("<int>The number of nearest neighbors considered in the PCA. " +
+        K_PARAM.setShortDescription("The number of nearest neighbors considered in the PCA. " +
                                "If this parameter is not set, k ist set to the value of " +
                                MINPTS_PARAM.getName());
         addOption(K_PARAM);

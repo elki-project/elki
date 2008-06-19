@@ -68,7 +68,7 @@ public class DBSCANWrapper extends NormalizationWrapper {
         super();
 
         // parameter epsilon
-        EPSILON_PARAM.setDescription("<pattern>The maximum radius of the neighborhood " +
+        EPSILON_PARAM.setShortDescription("The maximum radius of the neighborhood " +
                                      "to be considerd, must be suitable to " +
                                      EuklideanDistanceFunction.class.getName());
         addOption(EPSILON_PARAM);

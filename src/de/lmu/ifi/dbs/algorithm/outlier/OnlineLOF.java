@@ -97,13 +97,13 @@ public class OnlineLOF<O extends DatabaseObject> extends OnlineBasicLOF<O> {
     public OnlineLOF() {
         super();
         //parameter lof
-        optionHandler.put(new FileParameter(LOF_P, LOF_D, FileParameter.FILE_IN));
+        optionHandler.put(new FileParameter(LOF_P, LOF_D, FileParameter.FileType.INPUT_FILE));
 
         //parameter nn
-        optionHandler.put(new FileParameter(NN_P, NN_D, FileParameter.FILE_IN));
+        optionHandler.put(new FileParameter(NN_P, NN_D, FileParameter.FileType.INPUT_FILE));
 
         //parameter insertions
-        optionHandler.put(new FileParameter(INSERTIONS_P, INSERTIONS_D, FileParameter.FILE_IN));
+        optionHandler.put(new FileParameter(INSERTIONS_P, INSERTIONS_D, FileParameter.FileType.INPUT_FILE));
 
         //parameter parser
         ClassParameter<Parser<O>> parser = new ClassParameter(PARSER_P, PARSER_D, Parser.class);

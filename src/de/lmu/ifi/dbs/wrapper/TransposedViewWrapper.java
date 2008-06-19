@@ -70,7 +70,7 @@ public class TransposedViewWrapper<V extends RealVector<V, ?>> extends StandAlon
      */
     public TransposedViewWrapper() {
         super();
-        optionHandler.put(new FileParameter(GNUPLOT_P, GNUPLOT_D, FileParameter.FILE_OUT));
+        optionHandler.put(new FileParameter(GNUPLOT_P, GNUPLOT_D, FileParameter.FileType.OUTPUT_FILE));
     }
 
     /**

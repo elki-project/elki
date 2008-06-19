@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.properties.PropertyName;
 
 /**
  * Parameter class for a parameter specifying a class name.
+ * todo class zurueckgeben
  *
  * @author Steffi Wanka
  */
@@ -62,6 +63,7 @@ public class ClassParameter<C> extends Parameter<String, String> {
      * @param restrictionClass the restriction class of this class parameter
      * @deprecated
      */
+    @Deprecated
     public ClassParameter(String name, String description, Class<C> restrictionClass) {
         super(name, description);
         this.restrictionClass = restrictionClass;
@@ -77,12 +79,15 @@ public class ClassParameter<C> extends Parameter<String, String> {
      * @param defaultValue     the default value of this class parameter
      * @deprecated
      */
+    @Deprecated
     public ClassParameter(String name, String description, Class<C> restrictionClass, String defaultValue) {
         this(name, description, restrictionClass);
         setDefaultValue(defaultValue);
     }
 
-    @Override
+    /**
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#setValue(String)
+     */
     public void setValue(String value) throws ParameterException {
         if (isValid(value)) {
             setCorrectValue(value);
@@ -105,8 +110,8 @@ public class ClassParameter<C> extends Parameter<String, String> {
     /**
      * Checks if the given parameter value is valid for this ClassParameter. If
      * not a parameter exception is thrown.
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#isValid(String)
      */
-    @Override
     public boolean isValid(String value) throws ParameterException {
         if (value == null) {
             throw new WrongParameterValueException("Parameter Error.\nNo value for parameter \"" + getName() + "\" " + "given.");
@@ -173,5 +178,15 @@ public class ClassParameter<C> extends Parameter<String, String> {
         catch (ClassNotFoundException e) {
             throw new WrongParameterValueException(this.name, value, "subclass of " + restrictionClass.getName());
         }
+    }
+
+    /**
+     * Returns a string representation of the parameter's type which is {@code &lt;class&gt;}.
+     *
+     * @return &lt;class&gt;
+     * @see Parameter#getParameterType()
+     */
+    protected String getParameterType() {
+        return "<class>";
     }
 }

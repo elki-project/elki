@@ -75,7 +75,7 @@ public class OPTICSWrapper extends NormalizationWrapper {
         super();
         // parameter epsilon
         EPSILON_PARAM = new PatternParameter(OptionID.OPTICS_EPSILON);
-        EPSILON_PARAM.setDescription("<pattern>The maximum radius of the neighborhood " +
+        EPSILON_PARAM.setShortDescription("The maximum radius of the neighborhood " +
             "to be considered, must be suitable to " +
             EuklideanDistanceFunction.class.getName());
         optionHandler.put(EPSILON_PARAM);

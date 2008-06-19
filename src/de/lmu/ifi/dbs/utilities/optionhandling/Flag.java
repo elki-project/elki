@@ -39,9 +39,20 @@ public class Flag extends Option<Boolean> {
      * @param description the description of the flag.
      * @deprecated
      */
+    @Deprecated
     public Flag(String name, String description) {
         super(name, description);
         this.value = false;
+    }
+
+    /**
+     * Returns the short description of this flag.
+     *
+     * @return the short description of this flag
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#getDescription()
+     */
+    public String getDescription() {
+        return shortDescription;
     }
 
     /**
@@ -60,15 +71,8 @@ public class Flag extends Option<Boolean> {
      * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#setValue(java.lang.String)
      */
     public void setValue(String value) throws ParameterException {
-
         if (isValid(value)) {
-
-            if (value.equals(SET)) {
-                this.value = true;
-            }
-            else {
-                this.value = false;
-            }
+            this.value = value.equals(SET);
         }
     }
 

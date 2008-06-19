@@ -18,7 +18,6 @@ public class DoubleParameter extends NumberParameter<Double> {
      */
     public DoubleParameter(OptionID optionID) {
         super(optionID);
-
     }
 
     /**
@@ -112,7 +111,6 @@ public class DoubleParameter extends NumberParameter<Double> {
     @Deprecated
     public DoubleParameter(String name, String description) {
         super(name, description);
-
     }
 
     /**
@@ -177,7 +175,6 @@ public class DoubleParameter extends NumberParameter<Double> {
     /**
      * @see Option#setValue(String)
      */
-    @Override
     public void setValue(String value) throws ParameterException {
         if (isValid(value)) {
             this.value = Double.parseDouble(value);
@@ -187,7 +184,6 @@ public class DoubleParameter extends NumberParameter<Double> {
     /**
      * @see Option#isValid(String)
      */
-    @Override
     public boolean isValid(String value) throws ParameterException {
         try {
             Double.parseDouble(value);
@@ -195,18 +191,17 @@ public class DoubleParameter extends NumberParameter<Double> {
 
         catch (NumberFormatException e) {
             throw new WrongParameterValueException("Wrong parameter format! Parameter \""
-                                                   + getName() + "\" requires a double value, read: " + value + "!\n");
+                + getName() + "\" requires a double value, read: " + value + "!\n");
         }
 
         try {
             for (ParameterConstraint<Number> cons : this.constraints) {
-
                 cons.test(Double.parseDouble(value));
             }
         }
         catch (ParameterException ex) {
             throw new WrongParameterValueException("Specified parameter value for parameter \""
-                                                   + getName() + "\" breaches parameter constraint!\n" + ex.getMessage());
+                + getName() + "\" breaches parameter constraint!\n" + ex.getMessage());
         }
 
         return true;
@@ -228,5 +223,15 @@ public class DoubleParameter extends NumberParameter<Double> {
             return false;
         }
         return this.value.equals(((DoubleParameter) obj).value);
+    }
+
+    /**
+     * Returns a string representation of the parameter's type which is {@code &lt;double&gt;}.
+     *
+     * @return &lt;double&gt;
+     * @see Parameter#getParameterType()
+     */
+    protected String getParameterType() {
+        return "<double>";
     }
 }

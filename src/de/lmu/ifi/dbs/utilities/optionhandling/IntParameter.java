@@ -44,8 +44,8 @@ public class IntParameter extends NumberParameter<Integer> {
     /**
      * Constructs an integer parameter with the given optionID, and parameter constraint.
      *
-     * @param optionID   optionID the unique id of the option
-     * @param constraint the constraint for this integer parameter
+     * @param optionID     optionID the unique id of the option
+     * @param constraint   the constraint for this integer parameter
      * @param defaultValue the default value
      */
     public IntParameter(OptionID optionID, ParameterConstraint<Number> constraint, Integer defaultValue) {
@@ -60,9 +60,9 @@ public class IntParameter extends NumberParameter<Integer> {
      * @param description the parameter description
      * @deprecated
      */
+    @Deprecated
     public IntParameter(String name, String description) {
         super(name, description);
-
     }
 
     /**
@@ -73,6 +73,7 @@ public class IntParameter extends NumberParameter<Integer> {
      * @param constraint  the constraint for this integer parameter
      * @deprecated
      */
+    @Deprecated
     public IntParameter(String name, String description, ParameterConstraint<Number> constraint) {
         this(name, description);
         addConstraint(constraint);
@@ -88,6 +89,7 @@ public class IntParameter extends NumberParameter<Integer> {
      * @param defaultValue the default value
      * @deprecated
      */
+    @Deprecated
     public IntParameter(String name, String description,
                         ParameterConstraint<Number> constraint, Integer defaultValue) {
         this(name, description, constraint);
@@ -105,6 +107,7 @@ public class IntParameter extends NumberParameter<Integer> {
      * @param optional     specifies if this parameter is an optional parameter
      * @deprecated
      */
+    @Deprecated
     public IntParameter(String name, String description,
                         ParameterConstraint<Number> constraint, Integer defaultValue, boolean optional) {
         this(name, description, constraint, defaultValue);
@@ -117,32 +120,33 @@ public class IntParameter extends NumberParameter<Integer> {
      * @param name        the parameter name
      * @param description the parameter description
      * @param constraints a list of parameter constraints for this integer parameter
+     * @deprecated
      */
+    @Deprecated
     public IntParameter(String name, String description, List<ParameterConstraint<Number>> constraints) {
         this(name, description);
         addConstraintList(constraints);
     }
 
-    @Override
+    /**
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#setValue(String)
+     */
     public void setValue(String value) throws ParameterException {
-
         if (isValid(value)) {
             this.value = Integer.parseInt(value);
         }
     }
 
-    /* (non-Javadoc)
-      * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#isValid(java.lang.String)
-      */
+    /**
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#isValid(java.lang.String)
+     */
     public boolean isValid(String value) throws ParameterException {
-
         try {
             Integer.parseInt(value);
-
         }
         catch (NumberFormatException e) {
             throw new WrongParameterValueException("Wrong parameter format. Parameter \""
-                                                   + getName() + "\" requires an integer value. (given value: " + value + ")\n");
+                + getName() + "\" requires an integer value. (given value: " + value + ")\n");
         }
 
         try {
@@ -150,11 +154,20 @@ public class IntParameter extends NumberParameter<Integer> {
                 cons.test(Integer.parseInt(value));
             }
         }
-        catch (ParameterException ex) {
+        catch (ParameterException e) {
             throw new WrongParameterValueException("Specified parameter value for parameter \""
-                                                   + getName() + "\" breaches parameter constraint.\n" + ex.getMessage());
+                + getName() + "\" breaches parameter constraint.\n" + e.getMessage());
         }
         return true;
     }
 
+    /**
+     * Returns a string representation of the parameter's type which is {@code &lt;int&gt;}.
+     *
+     * @return &lt;int&gt;
+     * @see Parameter#getParameterType()
+     */
+    protected String getParameterType() {
+        return "<int>";
+    }
 }

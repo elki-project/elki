@@ -13,51 +13,52 @@ import java.io.File;
  * constructor and methods.
  *
  * @author Elke Achtert
- * todo parameter
+ *         todo parameter
  */
 public abstract class StandAloneInputWrapper extends StandAloneWrapper {
 
-  /**
-   * Label for parameter input.
-   */
-  public final static String INPUT_P = "in";
+    /**
+     * Label for parameter input.
+     */
+    public final static String INPUT_P = "in";
 
-  /**
-   * Description for parameter input.
-   */
-  public static String INPUT_D = "input file";
+    /**
+     * Description for parameter input.
+     */
+    public static String INPUT_D = "input file";
 
-  /**
-   * The input file.
-   */
-  private File input;
+    /**
+     * The input file.
+     */
+    private File input;
 
-  /**
-   * Sets additionally to the parameters set by the super class the
-   * parameter in in the parameter map. Any extending
-   * class should call this constructor, then add further parameters. 
-   */
-  protected StandAloneInputWrapper() {
-    super();
-    optionHandler.put(new FileParameter(INPUT_P,INPUT_D,FileParameter.FILE_IN));
-  }
+    /**
+     * Sets additionally to the parameters set by the super class the
+     * parameter in in the parameter map. Any extending
+     * class should call this constructor, then add further parameters.
+     */
+    protected StandAloneInputWrapper() {
+        super();
+        optionHandler.put(new FileParameter(INPUT_P, INPUT_D,
+            FileParameter.FileType.INPUT_FILE));
+    }
 
-  /**
-   * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
-    // input
-    input = (File) optionHandler.getOptionValue(INPUT_P);
-    return remainingParameters;
-  }
+    /**
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+     */
+    public String[] setParameters(String[] args) throws ParameterException {
+        String[] remainingParameters = super.setParameters(args);
+        // input
+        input = (File) optionHandler.getOptionValue(INPUT_P);
+        return remainingParameters;
+    }
 
-  /**
-   * Returns the input string.
-   *
-   * @return the input string
-   */
-  public final File getInput() {
-    return input;
-  }
+    /**
+     * Returns the input string.
+     *
+     * @return the input string
+     */
+    public final File getInput() {
+        return input;
+    }
 }

@@ -18,7 +18,7 @@ public class DistanceFunctionPatternConstraint extends AbstractLoggable implemen
 	/**
 	 * The distance function the pattern is checked for.
 	 */
-	private DistanceFunction<?,?> distFunction;
+	private DistanceFunction<?,?> distanceFunction;
 
 	/**
 	 * Constructs a distance function pattern constraint for testing if a given
@@ -29,7 +29,7 @@ public class DistanceFunctionPatternConstraint extends AbstractLoggable implemen
 	 */
 	public DistanceFunctionPatternConstraint(DistanceFunction<?,?> distFunction) {
         super(LoggingConfiguration.DEBUG);
-		this.distFunction = distFunction;
+		this.distanceFunction = distFunction;
 	}
 
 	/**
@@ -39,15 +39,20 @@ public class DistanceFunctionPatternConstraint extends AbstractLoggable implemen
 	 * @see ParameterConstraint#test(Object)
 	 */
 	public void test(String t) throws ParameterException {
-
 		try {
-			distFunction.valueOf(t);
+			distanceFunction.valueOf(t);
 		} catch (IllegalArgumentException ex) {
 			throw new WrongParameterValueException("The specified pattern " + t + " is not valid " + "for distance function "
-					+ distFunction.getClass().getName() + ".\n" +
+					+ distanceFunction.getClass().getName() + ".\n" +
 							ex.getMessage());
 		}
-
 	}
+
+    /**
+     * @see ParameterConstraint#getDescription(String)
+     */
+    public String getDescription(String parameterName) {
+        return parameterName + " must be suitable to " + distanceFunction;
+    }
 
 }

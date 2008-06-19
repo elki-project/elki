@@ -65,7 +65,8 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
   /**
    * Description for parameter input.
    */
-  public final static String INPUT_D = "<filename_1,...,filename_n>a comma separated list of input files to be parsed.";
+  public final static String INPUT_D = "<filename_1,...,filename_n>a comma separated list of input files " +
+      "to be parsed.";
 
   /**
    * A pattern defining a comma.
@@ -99,7 +100,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
     optionHandler.put(parser);
 
     // parameter file list
-    FileListParameter fileList = new FileListParameter(INPUT_P, INPUT_D, FileParameter.FILE_IN);
+    FileListParameter fileList = new FileListParameter(INPUT_P, INPUT_D, FileListParameter.FilesType.INPUT_FILES);
     optionHandler.put(fileList);
 
     // TODO global constraints: wie setzen, wenn default parser genützt wird???

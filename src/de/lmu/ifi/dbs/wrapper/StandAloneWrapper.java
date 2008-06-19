@@ -13,7 +13,7 @@ import java.io.File;
  * constructor and methods.
  *
  * @author Elke Achtert
- * todo parameter
+ *         todo parameter
  */
 public abstract class StandAloneWrapper extends AbstractWrapper {
     /**
@@ -38,7 +38,8 @@ public abstract class StandAloneWrapper extends AbstractWrapper {
      */
     protected StandAloneWrapper() {
         super();
-        outputParameter = new FileParameter(OUTPUT_P, getOutputDescription(), FileParameter.FILE_OUT);
+        outputParameter = new FileParameter(OUTPUT_P, getOutputDescription(),
+            FileParameter.FileType.OUTPUT_FILE);
         optionHandler.put(outputParameter);
     }
 

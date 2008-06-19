@@ -59,12 +59,12 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
     protected AbstractWrapper() {
         // verbose
         VERBOSE_FLAG = new Flag(OptionID.ALGORITHM_VERBOSE);
-        VERBOSE_FLAG.setDescription("Flag to allow verbose messages while performing the wrapper.");
+        VERBOSE_FLAG.setShortDescription("Flag to allow verbose messages while performing the wrapper.");
         optionHandler.put(VERBOSE_FLAG);
 
         // help
         HELP_FLAG = new Flag(OptionID.HELP);
-        HELP_FLAG.setDescription("Flag to obtain help-message. Causes immediate stop of the program.");
+        HELP_FLAG.setShortDescription("Flag to obtain help-message. Causes immediate stop of the program.");
         optionHandler.put(HELP_FLAG);
     }
 

@@ -8,21 +8,20 @@ import java.io.File;
  * @author Steffi Wanka
  */
 public class FileParameter extends Parameter<File, Object> {
-
     /**
-     * Constant indicating an input file
+     * Available file types:
+     * {@link #INPUT_FILE} denotes an input file,
+     * {@link #OUTPUT_FILE} denotes an output file.
      */
-    public static final int FILE_IN = 1;
-
-    /**
-     * Constant indication an output file
-     */
-    public static final int FILE_OUT = 2;
+    public enum FileType {
+        INPUT_FILE,
+        OUTPUT_FILE
+    }
 
     /**
      * The file type of this file parameter. Specifies if the file is an input of output file.
      */
-    private int fileType;
+    private FileType fileType;
 
     /**
      * Constructs a file parameter with the given optionID, and file type.
@@ -30,7 +29,7 @@ public class FileParameter extends Parameter<File, Object> {
      * @param optionID optionID the unique id of the option
      * @param fileType the file type of this file parameter
      */
-    public FileParameter(OptionID optionID, int fileType) {
+    public FileParameter(OptionID optionID, FileType fileType) {
         super(optionID);
         this.fileType = fileType;
     }
@@ -43,7 +42,7 @@ public class FileParameter extends Parameter<File, Object> {
      * @param fileType the file type of this file parameter
      * @param optional specifies if this parameter is an optional parameter
      */
-    public FileParameter(OptionID optionID, int fileType, boolean optional) {
+    public FileParameter(OptionID optionID, FileType fileType, boolean optional) {
         this(optionID, fileType);
         setOptional(optional);
     }
@@ -56,7 +55,8 @@ public class FileParameter extends Parameter<File, Object> {
      * @param fileType    the file type of this file parameter
      * @deprecated
      */
-    public FileParameter(String name, String description, int fileType) {
+    @Deprecated
+    public FileParameter(String name, String description, FileType fileType) {
         super(name, description);
         this.fileType = fileType;
     }
@@ -79,7 +79,7 @@ public class FileParameter extends Parameter<File, Object> {
                 + "\": No filename given!\nParameter description: " + getDescription());
         }
 
-        if (fileType == FILE_IN) {
+        if (fileType.equals(FileType.INPUT_FILE)) {
             File file = new File(value);
             try {
                 if (!file.exists()) {
@@ -93,5 +93,15 @@ public class FileParameter extends Parameter<File, Object> {
             }
         }
         return true;
+    }
+
+    /**
+     * Returns a string representation of the parameter's type which is {@code &lt;file_&gt;}.
+     *
+     * @return &lt;file_&gt;
+     * @see Parameter#getParameterType()
+     */
+    protected String getParameterType() {
+        return "<file>";
     }
 }

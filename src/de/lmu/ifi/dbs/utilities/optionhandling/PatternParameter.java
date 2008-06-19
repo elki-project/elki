@@ -28,6 +28,7 @@ public class PatternParameter extends Parameter<String, String> {
      * @param description the parameter description
      * @deprecated
      */
+    @Deprecated
     public PatternParameter(String name, String description) {
         super(name, description);
     }
@@ -41,12 +42,15 @@ public class PatternParameter extends Parameter<String, String> {
      * @param con         a parameter constraint for this parameter
      * @deprecated
      */
+    @Deprecated
     public PatternParameter(String name, String description, ParameterConstraint<String> con) {
         this(name, description);
         addConstraint(con);
     }
 
-    @Override
+    /**
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#setValue(String)
+     */
     public void setValue(String value) throws ParameterException {
         if (isValid(value)) {
             this.value = value;
@@ -74,5 +78,15 @@ public class PatternParameter extends Parameter<String, String> {
                 " parameter " + getName() + ": " + ex.getMessage());
         }
         return true;
+    }
+
+    /**
+     * Returns a string representation of the parameter's type which is {@code &lt;pattern&gt;}.
+     *
+     * @return &lt;pattern&gt;
+     * @see Parameter#getParameterType()
+     */
+    protected String getParameterType() {
+        return "<pattern>";
     }
 }
