@@ -110,6 +110,7 @@ public class ClassParameter<C> extends Parameter<String, String> {
     /**
      * Checks if the given parameter value is valid for this ClassParameter. If
      * not a parameter exception is thrown.
+     *
      * @see de.lmu.ifi.dbs.utilities.optionhandling.Option#isValid(String)
      */
     public boolean isValid(String value) throws ParameterException {

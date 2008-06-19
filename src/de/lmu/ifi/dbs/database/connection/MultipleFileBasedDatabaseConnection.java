@@ -95,7 +95,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
     super();
     forceExternalID = true;
     // parameter parser
-    // TODO default parser, liste hat länge der input files!!
+    // TODO default parser, liste hat laenge der input files!!
     ClassListParameter parser = new ClassListParameter(PARSER_P, PARSER_D, Parser.class);
     optionHandler.put(parser);
 
@@ -103,7 +103,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
     FileListParameter fileList = new FileListParameter(INPUT_P, INPUT_D, FileListParameter.FilesType.INPUT_FILES);
     optionHandler.put(fileList);
 
-    // TODO global constraints: wie setzen, wenn default parser genützt wird???
+    // TODO global constraints: wie setzen, wenn default parser genutzt wird???
 
   }
 
