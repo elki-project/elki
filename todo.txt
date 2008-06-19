@@ -1,8 +1,10 @@
 # wichtig fuer release #####################################
+- Parameter Handling ueberarbeiten
 
 - ersetze verbose durch progress wo eine progress-Nachricht ausgegeben werden soll
 
 - ersetze alle deutschen Sonderzeichen -> ae,oe,ue,ss (oder im Kommentar als html-Kodierung)
+  (done: alle Klassen ausser MaPle)
 
 - I/O-Access fuer jede DB am Ende eines Algorithmus ausgeben
 
