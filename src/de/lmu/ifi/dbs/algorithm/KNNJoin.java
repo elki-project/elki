@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.util.ArrayList;
@@ -34,7 +35,6 @@ import java.util.List;
  * @param <D> the type of Distance used by this Algorithm
  * @param <N> the type of node used in the spatial index structure
  * @param <E> the type of entry used in the spatial node
- * todo parameter
  */
 public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry>
     extends DistanceBasedAlgorithm<V, D> {
@@ -46,10 +46,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
      * <p>Key: {@code -k} </p>
      */
     public final IntParameter K_PARAM =
-        new IntParameter("k",
-            "<int>specifies the k-nearest neighbors to be assigned, must be greater than 0",
-            new GreaterConstraint(0),
-            1);
+        new IntParameter(OptionID.KNN_JOIN_K, new GreaterConstraint(0), 1);
 
     /**
      * The knn lists for each object.

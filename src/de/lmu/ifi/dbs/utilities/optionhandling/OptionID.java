@@ -264,6 +264,14 @@ public class OptionID extends ConstantObject<OptionID> {
     );
 
     /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.KNNJoin#K_PARAM}
+     */
+    public static final OptionID KNN_JOIN_K = new OptionID("knnjoin.k",
+        "<int> Specifies the k-nearest neighbors to be assigned, " +
+        "must be greater than 0 (default: 1)."
+    );
+
+    /**
      * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.ProjectedDBSCAN#MINPTS_PARAM}
      */
     public static final OptionID PROJECTED_DBSCAN_MINPTS = new OptionID("projdbscan.minpts",
