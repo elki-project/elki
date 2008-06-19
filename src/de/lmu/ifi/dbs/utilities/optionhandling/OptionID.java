@@ -16,6 +16,10 @@ import de.lmu.ifi.dbs.varianceanalysis.EigenPairFilter;
 import de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter;
 import de.lmu.ifi.dbs.data.ClassLabel;
 import de.lmu.ifi.dbs.data.HierarchicalClassLabel;
+import de.lmu.ifi.dbs.evaluation.procedure.EvaluationProcedure;
+import de.lmu.ifi.dbs.evaluation.procedure.ClassifierEvaluationProcedure;
+import de.lmu.ifi.dbs.evaluation.holdout.Holdout;
+import de.lmu.ifi.dbs.evaluation.holdout.StratifiedCrossValidation;
 
 /**
  * An OptionID is used by option handlers as a unique identifier for specific
@@ -139,6 +143,24 @@ public class OptionID extends ConstantObject<OptionID> {
     );
 
     /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.classifier.AbstractClassifier#EVALUATION_PROCEDURE_PARAM}
+     */
+    public static final OptionID CLASSIFIER_EVALUATION_PROCEDURE = new OptionID("classifier.eval",
+        "<class> Classname of the evaluation-procedure to use for evaluation " +
+        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(EvaluationProcedure.class) +
+        ". Default: " + ClassifierEvaluationProcedure.class.getName()
+    );
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.classifier.AbstractClassifier#HOLDOUT_PARAM}
+     */
+    public static final OptionID CLASSIFIER_HOLDOUT = new OptionID("classifier.holdout",
+        "<class> Classname of the holdout for evaluation  " +
+        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Holdout.class) +
+        ". Default: " + StratifiedCrossValidation.class.getName()
+    );
+
+    /**
      * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.COPAA#PREPROCESSOR_PARAM}
      */
     public static final OptionID COPAA_PREPROCESSOR = new OptionID("copaa.preprocessor",
@@ -220,7 +242,7 @@ public class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID DEPENDENCY_DERIVATOR_ACCURACY = new OptionID("derivator.accuracy",
         "<int> Threshold for output accuracy fraction digits (>0), " +
-        "must be equal to or greater than 0. Default value is 4."
+        "must be equal to or greater than 0. Default: 4."
     );
 
     /**
@@ -228,7 +250,7 @@ public class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID DEPENDENCY_DERIVATOR_SAMPLE_SIZE = new OptionID("derivator.sampleSize",
         "<int> Threshold for the size of the random sample to use, " +
-        "must be greater than 0. Default value is soze of the complete dataset."
+        "must be greater than 0. Default value is size of the complete dataset."
     );
 
     /**
@@ -243,7 +265,7 @@ public class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID KNN_DISTANCE_ORDER_K = new OptionID("knndistanceorder.k",
         "<int> Specifies the distance of the k-distant object to be assessed, " +
-        "must be greater than 0 (default: 1)."
+        "must be greater than 0. Default: 1."
     );
 
     /**
@@ -251,7 +273,7 @@ public class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID KNN_DISTANCE_ORDER_PERCENTAGE = new OptionID("knndistanceorder.percentage",
         "<double> The average percentage of distances randomly choosen to be provided in the result, " +
-        "must be greater than 0 and less or equal to 1, (default: 1)." 
+        "must be greater than 0 and less or equal to 1. Default: 1."
     );
 
     /**
@@ -268,7 +290,7 @@ public class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID KNN_JOIN_K = new OptionID("knnjoin.k",
         "<int> Specifies the k-nearest neighbors to be assigned, " +
-        "must be greater than 0 (default: 1)."
+        "must be greater than 0. Default: 1."
     );
 
     /**

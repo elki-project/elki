@@ -11,11 +11,11 @@ import de.lmu.ifi.dbs.evaluation.holdout.Holdout;
 import de.lmu.ifi.dbs.evaluation.holdout.StratifiedCrossValidation;
 import de.lmu.ifi.dbs.evaluation.procedure.ClassifierEvaluationProcedure;
 import de.lmu.ifi.dbs.evaluation.procedure.EvaluationProcedure;
-import de.lmu.ifi.dbs.properties.Properties;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
@@ -30,57 +30,42 @@ import java.util.List;
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <L> the type of the ClassLabel the Classifier is assigning
- * todo parameter
  */
 public abstract class AbstractClassifier<O extends DatabaseObject, L extends ClassLabel<L>> extends AbstractAlgorithm<O> implements Classifier<O, L> {
-
     /**
      * The association id for the class label.
      */
-    public static final AssociationID CLASS = AssociationID.CLASS;
+    protected static final AssociationID CLASS = AssociationID.CLASS;
 
     /**
-     * The default evaluation procedure.
+     * Parameter to specify the evaluation-procedure to use for evaluation,
+     * must extend {@link EvaluationProcedure}.
+     * <p>Key: {@code -classifier.eval} </p>
+     * <p>Default value: {@link ClassifierEvaluationProcedure} </p>
      */
-    public static final String DEFAULT_EVALUATION_PROCEDURE = ClassifierEvaluationProcedure.class.getName();
+    private final ClassParameter<EvaluationProcedure> EVALUATION_PROCEDURE_PARAM =
+        new ClassParameter<EvaluationProcedure>(OptionID.CLASSIFIER_EVALUATION_PROCEDURE,
+            EvaluationProcedure.class, ClassifierEvaluationProcedure.class.getName());
 
     /**
-     * The evaluation procedure.
+     * Parameter to specify the holdout for evaluation,
+     * must extend {@link de.lmu.ifi.dbs.evaluation.holdout.Holdout}.
+     * <p>Key: {@code -classifier.holdout} </p>
+     * <p>Default value: {@link StratifiedCrossValidation} </p>
+     */
+    private final ClassParameter<Holdout> HOLDOUT_PARAM =
+        new ClassParameter<Holdout>(OptionID.CLASSIFIER_EVALUATION_PROCEDURE,
+            Holdout.class, StratifiedCrossValidation.class.getName());
+
+    /**
+     * Holds the value of parameter evaluation procedure.
      */
     protected EvaluationProcedure<O, Classifier<O, L>, L> evaluationProcedure;
 
     /**
-     * The parameter for the evaluation procedure.
-     */
-    public final String EVALUATION_PROCEDURE_P = "eval";
-
-    /**
-     * The description for parameter evaluation procedure.
-     */
-    public final String EVALUATION_PROCEDURE_D = "the evaluation-procedure to use for evaluation "
-        + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(EvaluationProcedure.class) + ". Default: "
-        + DEFAULT_EVALUATION_PROCEDURE;
-
-    /**
-     * The holdout used for evaluation.
+     * Holds the value of parameter holdout.
      */
     protected Holdout<O, L> holdout;
-
-    /**
-     * The default holdout.
-     */
-    public static final String DEFAULT_HOLDOUT = StratifiedCrossValidation.class.getName();
-
-    /**
-     * The parameter for the holdout.
-     */
-    public static final String HOLDOUT_P = "holdout";
-
-    /**
-     * Description for parameter holdout.
-     */
-    public static final String HOLDOUT_D = "The holdout for evaluation "
-        + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Holdout.class) + ". Default: " + DEFAULT_HOLDOUT;
 
     /**
      * The result.
@@ -91,6 +76,7 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
      * Holds the available labels. Should be set by the training method
      * {@link Classifier#buildClassifier(de.lmu.ifi.dbs.database.Database,de.lmu.ifi.dbs.data.ClassLabel[])}
      */
+    @SuppressWarnings("unchecked")
     private L[] labels = (L[]) new ClassLabel[0];
 
     /**
@@ -99,14 +85,11 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
     protected AbstractClassifier() {
         super();
 
-        ClassParameter<EvaluationProcedure> eval = new ClassParameter<EvaluationProcedure>(EVALUATION_PROCEDURE_P, EVALUATION_PROCEDURE_D, EvaluationProcedure.class);
-        eval.setDefaultValue(DEFAULT_EVALUATION_PROCEDURE);
-        optionHandler.put(eval);
+        // parameter evaluation procedure
+        addOption(EVALUATION_PROCEDURE_PARAM);
 
         // parameter holdout
-        ClassParameter<Holdout> hold = new ClassParameter<Holdout>(HOLDOUT_P, HOLDOUT_D, Holdout.class);
-        hold.setDefaultValue(DEFAULT_HOLDOUT);
-        optionHandler.put(hold);
+        addOption(HOLDOUT_PARAM);
     }
 
     /**
@@ -183,31 +166,33 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
         String[] remainingParameters = super.setParameters(args);
 
         // parameter evaluation procedure
-        String evaluationProcedureClass = (String) optionHandler.getOptionValue(EVALUATION_PROCEDURE_P);
+        String evaluationProcedureClass = getParameterValue(EVALUATION_PROCEDURE_PARAM);
         try {
             // noinspection unchecked
             evaluationProcedure = Util.instantiate(EvaluationProcedure.class, evaluationProcedureClass);
         }
         catch (UnableToComplyException e) {
-            throw new WrongParameterValueException(EVALUATION_PROCEDURE_P, evaluationProcedureClass, EVALUATION_PROCEDURE_D, e);
+            throw new WrongParameterValueException(EVALUATION_PROCEDURE_PARAM.getName(),
+                evaluationProcedureClass, EVALUATION_PROCEDURE_PARAM.getDescription(), e);
         }
+        evaluationProcedure.setTime(isTime());
+        evaluationProcedure.setVerbose(isVerbose());
+        remainingParameters = evaluationProcedure.setParameters(remainingParameters);
+        setParameters(args, remainingParameters);
 
         // parameter holdout
-        String holdoutClass = (String) optionHandler.getOptionValue(HOLDOUT_P);
+        String holdoutClass = getParameterValue(HOLDOUT_PARAM);
         try {
             // noinspection unchecked
             holdout = Util.instantiate(Holdout.class, holdoutClass);
         }
         catch (UnableToComplyException e) {
-            throw new WrongParameterValueException(HOLDOUT_P, holdoutClass, HOLDOUT_D, e);
+            throw new WrongParameterValueException(HOLDOUT_PARAM.getName(),
+                holdoutClass, HOLDOUT_PARAM.getDescription(), e);
         }
-
-        evaluationProcedure.setTime(isTime());
-        evaluationProcedure.setVerbose(isVerbose());
-        remainingParameters = evaluationProcedure.setParameters(remainingParameters);
-
         remainingParameters = holdout.setParameters(remainingParameters);
         setParameters(args, remainingParameters);
+
         return remainingParameters;
     }
 
@@ -239,9 +224,9 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
      *
      * @param labels the labels to use for building the classifier
      */
-	public final void setLabels(L[] labels) {
-		this.labels = labels;
-		Arrays.sort(this.labels);
-	}
+    public final void setLabels(L[] labels) {
+        this.labels = labels;
+        Arrays.sort(this.labels);
+    }
 
 }
