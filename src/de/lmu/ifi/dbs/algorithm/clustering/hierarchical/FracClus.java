@@ -17,7 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * todo arthur comment all
+ * todo arthur comment class
  * todo parameter
  * @author Arthur Zimek
  * @param <V> the type of RealVector handled by this Algorithm
@@ -31,18 +31,29 @@ public class FracClus<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
 
     private IntParameter kParameter = new IntParameter(NUMBER_OF_SUPPORTERS_P, NUMBER_OF_SUPPORTERS_D, new GreaterEqualConstraint(2));
 
+    /**
+     * Holds the result of the algorithm.
+     */
     private HierarchicalClusters<HierarchicalFractalDimensionCluster<V>, V> result;
 
+    /**
+     * todo comment
+     */
     public FracClus() {
         super();
         optionHandler.put(kParameter);
     }
 
+    /**
+     * @see de.lmu.ifi.dbs.algorithm.Algorithm#getResult()
+     */
     public HierarchicalClusters<HierarchicalFractalDimensionCluster<V>, V> getResult() {
         return result;
     }
 
-
+    /**
+     * @see de.lmu.ifi.dbs.algorithm.AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.database.Database)
+     */
     @Override
     protected void runInTime(Database<V> database) throws IllegalStateException {
         List<HierarchicalFractalDimensionCluster<V>> clusters = new ArrayList<HierarchicalFractalDimensionCluster<V>>();
@@ -98,16 +109,9 @@ public class FracClus<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         result = new HierarchicalClusters<HierarchicalFractalDimensionCluster<V>, V>(clusters, database);
     }
 
-
-    @Override
-    public List<AttributeSettings> getAttributeSettings() {
-        List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-        AttributeSettings myAttributeSettings = new AttributeSettings(this);
-        myAttributeSettings.addSetting(NUMBER_OF_SUPPORTERS_P, Integer.toString(k));
-        attributeSettings.add(myAttributeSettings);
-        return attributeSettings;
-    }
-
+    /**
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
+     */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
@@ -115,6 +119,9 @@ public class FracClus<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         return remainingParameters;
     }
 
+    /**
+     * @see de.lmu.ifi.dbs.algorithm.Algorithm#getDescription()
+     */
     public Description getDescription() {
         return new Description("FracClus", "Fractal Dimension based Clustering", "", "unpublished");
     }
