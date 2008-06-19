@@ -16,29 +16,35 @@ import java.io.PrintStream;
 import java.util.*;
 
 /**
- * TODO comment
+ * TODO Arthur comment class
  *
  * @author Arthur Zimek
  * @param <V> the type of RealVector handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  * @param <L> the type of the ClassLabel the Classifier is assigning
  */
-public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Distance<D>,
-    L extends ClassLabel<L>> extends AbstractClassifier<V, L> {
+public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Distance<D>, L extends ClassLabel<L>>
+    extends AbstractClassifier<V, L> {
 
     /**
      * Generated serial version UID.
      */
     private static final long serialVersionUID = -6786297567169490313L;
 
+    /**
+     * todo arthur comment
+     */
     private DependencyDerivator<V, D> dependencyDerivator = new DependencyDerivator<V, D>();
 
+    /**
+     * todo arthur comment
+     */
     private CorrelationAnalysisSolution<V>[] model;
 
     /**
-     * @see Classifier#buildClassifier(de.lmu.ifi.dbs.database.Database,
-     *de.lmu.ifi.dbs.data.ClassLabel[])
+     * @see Classifier#buildClassifier(de.lmu.ifi.dbs.database.Database, de.lmu.ifi.dbs.data.ClassLabel[])
      */
+    @SuppressWarnings("unchecked")
     public void buildClassifier(Database<V> database, L[] classLabels) throws IllegalStateException {
         setLabels(classLabels);
         model = (CorrelationAnalysisSolution<V>[]) new CorrelationAnalysisSolution[classLabels.length];
@@ -59,11 +65,10 @@ public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Di
             Map<Integer, Database<V>> clusters = database.partition(partitions);
             List<Integer> keys = new ArrayList<Integer>(clusters.keySet());
             Collections.sort(keys);
-            for (Iterator<Integer> clusterIterator = keys.iterator(); clusterIterator.hasNext();) {
-                Integer classID = clusterIterator.next();
+            for (Integer classID : keys) {
                 if (isVerbose()) {
                     verbose("Deriving model for class "
-                        + this.getClassLabel(classID).toString());
+                            + this.getClassLabel(classID).toString());
                 }
                 Database<V> cluster = clusters.get(classID);
                 dependencyDerivator.run(cluster);
@@ -86,10 +91,10 @@ public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Di
      * @param sigma    the standard deviation of the underlying distribution
      * @return the density for the given distance and sigma
      */
+    @SuppressWarnings("unchecked")
     protected double density(double distance, double sigma) {
         double distanceDivSigma = distance / sigma;
-        double density = Math.pow(Math.E,
-            (distanceDivSigma * distanceDivSigma * -0.5))
+        double density = StrictMath.pow(Math.E, (distanceDivSigma * distanceDivSigma * -0.5))
             / (sigma * Math.sqrt(2 * Math.PI));
         return density;
     }
@@ -133,9 +138,9 @@ public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Di
 
     /**
      * @see de.lmu.ifi.dbs.algorithm.Algorithm#getDescription()
+     * todo arthur description
      */
     public Description getDescription() {
-        // TODO
         return new Description("CorrelationBasedClassifier",
             "CorrelationBasedClassifier", "...", "unpublished");
     }

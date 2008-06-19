@@ -143,6 +143,15 @@ public class OptionID extends ConstantObject<OptionID> {
     );
 
     /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.classifier.DistanceBasedClassifier#DISTANCE_FUNCTION_PARAM}
+     */
+    public static final OptionID CLASSIFIER_DISTANCEFUNCTION = new OptionID("classifier.distancefunction",
+        "<class> Classname of the distance function to determine the distance between database objects " +
+        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) +
+        ". Default: " + EuklideanDistanceFunction.class.getName()
+    );
+
+    /**
      * OptionID for {@link de.lmu.ifi.dbs.algorithm.classifier.AbstractClassifier#EVALUATION_PROCEDURE_PARAM}
      */
     public static final OptionID CLASSIFIER_EVALUATION_PROCEDURE = new OptionID("classifier.eval",
