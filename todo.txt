@@ -17,6 +17,8 @@
 
 - RealVector<N extends Number> bei allen Klassen setzen, die RealVector benutzen
 
+- ClassParameter kann Instantiieren der Klasse uebernehmen und die Klasse bzw Instanz als Wert zurueckgeben anstelle des Strings ?!?
+
 - database: epsilon in range query: von String nach D (extends Distance) aendern
 
 - frueher gab's mal eine Beschwerde (Exception), wenn ein Parameter gesetzt wird, den es gar nicht gibt, ist irgendwie abhandengekommen?!?
