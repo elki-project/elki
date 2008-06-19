@@ -5,10 +5,24 @@ import de.lmu.ifi.dbs.algorithm.result.Result;
 import de.lmu.ifi.dbs.data.BitVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Description;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessEqualConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.OneMustBeSetGlobalConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.OnlyOneIsAllowedToBeSetGlobalConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Provides the apriori algorithm.
@@ -152,8 +166,8 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
                 .nextSetBit(i + 1)) {
                 bitSet.clear(i);
                 unpruned = (minfreq > -1 && support.get(bitSet).doubleValue()
-                    / size >= minfreq)
-                    || support.get(bitSet) >= minsupp;
+                                            / size >= minfreq)
+                           || support.get(bitSet) >= minsupp;
                 bitSet.set(i);
             }
             if (unpruned) {
@@ -218,7 +232,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
         List<BitSet> frequentItemsets = new ArrayList<BitSet>();
         for (BitSet bitSet : candidates) {
             if ((minfreq > -1 && support.get(bitSet).doubleValue()
-                / database.size() >= minfreq)
+                                 / database.size() >= minfreq)
                 || support.get(bitSet) >= minsupp) {
                 frequentItemsets.add(bitSet);
             }
@@ -237,9 +251,12 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
      * @see Algorithm#getDescription()
      */
     public Description getDescription() {
-        // TODO reference
-        return new Description("APRIORI", "APRIORI",
-            "search for frequent itemsets", "...");
+        return new Description("APRIORI",
+            "Algorithm for Mining Association Rules",
+            "Searches for frequent itemsets",
+            "R. Agrawal, R. Srikant: " +
+            "Fast Algorithms for Mining Association Rules in Large Databases. " +
+            "In Proc. 20th Int. Conf. on Very Large Data Bases (VLDB '94), Santiago de Chile, Chile 1994.");
     }
 
     /**
