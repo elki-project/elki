@@ -157,6 +157,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
 
         try {
             // noinspection unchecked
+            // todo
             parser = Util.instantiate(Parser.class, parserClass);
         }
         catch (UnableToComplyException e) {

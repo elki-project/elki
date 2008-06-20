@@ -186,6 +186,7 @@ implements DistanceParser<ExternalObject, D> {
     String className = (String)optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
     try {
       // noinspection unchecked
+        // todo
       distanceFunction = Util.instantiate(DistanceFunction.class, className);
     }
     catch (UnableToComplyException e) {

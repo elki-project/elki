@@ -182,6 +182,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
         String className = (String) optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
         try {
             // noinspection unchecked
+            // todo
             rangeQueryDistanceFunction = Util.instantiate(DistanceFunction.class, className);
         }
         catch (UnableToComplyException e) {

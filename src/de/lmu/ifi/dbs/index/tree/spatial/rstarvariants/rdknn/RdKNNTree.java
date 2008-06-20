@@ -284,6 +284,7 @@ public class RdKNNTree<O extends NumberVector<O,? >, D extends NumberDistance<D>
     String className = (String) optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
     try {
       // noinspection unchecked
+        // todo
       distanceFunction = Util.instantiate(SpatialDistanceFunction.class, className);
     }
     catch (UnableToComplyException e) {

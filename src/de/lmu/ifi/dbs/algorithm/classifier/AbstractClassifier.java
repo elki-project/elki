@@ -11,13 +11,11 @@ import de.lmu.ifi.dbs.evaluation.holdout.Holdout;
 import de.lmu.ifi.dbs.evaluation.holdout.StratifiedCrossValidation;
 import de.lmu.ifi.dbs.evaluation.procedure.ClassifierEvaluationProcedure;
 import de.lmu.ifi.dbs.evaluation.procedure.EvaluationProcedure;
-import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -166,30 +164,16 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
         String[] remainingParameters = super.setParameters(args);
 
         // parameter evaluation procedure
-        String evaluationProcedureClass = getParameterValue(EVALUATION_PROCEDURE_PARAM);
-        try {
-            // noinspection unchecked
-            evaluationProcedure = Util.instantiate(EvaluationProcedure.class, evaluationProcedureClass);
-        }
-        catch (UnableToComplyException e) {
-            throw new WrongParameterValueException(EVALUATION_PROCEDURE_PARAM.getName(),
-                evaluationProcedureClass, EVALUATION_PROCEDURE_PARAM.getDescription(), e);
-        }
+        // noinspection unchecked
+        evaluationProcedure = EVALUATION_PROCEDURE_PARAM.instantiateClass();
         evaluationProcedure.setTime(isTime());
         evaluationProcedure.setVerbose(isVerbose());
         remainingParameters = evaluationProcedure.setParameters(remainingParameters);
         setParameters(args, remainingParameters);
 
         // parameter holdout
-        String holdoutClass = getParameterValue(HOLDOUT_PARAM);
-        try {
-            // noinspection unchecked
-            holdout = Util.instantiate(Holdout.class, holdoutClass);
-        }
-        catch (UnableToComplyException e) {
-            throw new WrongParameterValueException(HOLDOUT_PARAM.getName(),
-                holdoutClass, HOLDOUT_PARAM.getDescription(), e);
-        }
+        // noinspection unchecked
+        holdout = HOLDOUT_PARAM.instantiateClass();
         remainingParameters = holdout.setParameters(remainingParameters);
         setParameters(args, remainingParameters);
 

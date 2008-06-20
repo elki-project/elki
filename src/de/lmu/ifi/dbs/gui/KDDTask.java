@@ -254,28 +254,32 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
         String algorithmName = (String) optionHandler.getOptionValue(ALGORITHM_P);
         try {
             // noinspection unchecked
+            // todo
             algorithm = Util.instantiate(Algorithm.class, algorithmName);
         }
         catch (UnableToComplyException e) {
             throw new WrongParameterValueException(ALGORITHM_P, algorithmName, ALGORITHM_D, e);
         }
+        remainingParameters = algorithm.setParameters(remainingParameters);
 
         // database connection
         String databaseConnectionName = (String) optionHandler.getOptionValue(DATABASE_CONNECTION_P);
 
         try {
             // noinspection unchecked
+            // todo
             databaseConnection = Util.instantiate(DatabaseConnection.class, databaseConnectionName);
         }
         catch (UnableToComplyException e) {
             throw new WrongParameterValueException(DATABASE_CONNECTION_P, databaseConnectionName, DATABASE_CONNECTION_D, e);
         }
+        remainingParameters = databaseConnection.setParameters(remainingParameters);
 
         // normalization
         if (optionHandler.isSet(NORMALIZATION_P)) {
-
             String normalizationName = (String) optionHandler.getOptionValue(NORMALIZATION_P);
             try {
+                // todo
                 // noinspection unchecked
                 normalization = Util.instantiate(Normalization.class, normalizationName);
             }
@@ -289,9 +293,6 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
             throw new WrongParameterValueException("Illegal parameter setting: Flag " + NORMALIZATION_UNDO_F
                 + " is set, but no normalization is specified.");
         }
-
-        remainingParameters = algorithm.setParameters(remainingParameters);
-        remainingParameters = databaseConnection.setParameters(remainingParameters);
 
         initialized = true;
         setParameters(args, remainingParameters);

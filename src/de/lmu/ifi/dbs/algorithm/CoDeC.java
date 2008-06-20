@@ -13,14 +13,7 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.utilities.Description;
-import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -186,24 +179,10 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
         evaluateAsClassifier = isSet(EVALUATE_AS_CLASSIFIER_FLAG);
 
         // classlabel
-        String classLabelClass = getParameterValue(CLASSLABEL_PARAM);
-        try {
-            classLabel = (L) Util.instantiate(ClassLabel.class, classLabelClass);
-        }
-        catch (UnableToComplyException e) {
-            throw new WrongParameterValueException(CLASSLABEL_PARAM.getName(),
-                classLabelClass, CLASSLABEL_PARAM.getDescription(), e);
-        }
+        classLabel = (L) CLASSLABEL_PARAM.instantiateClass();
 
         // clusteringAlgorithm
-        String clusteringAlgorithmClass = getParameterValue(CLUSTERING_ALGORITHM_PARAM);
-        try {
-            clusteringAlgorithm = Util.instantiate(Clustering.class, clusteringAlgorithmClass);
-        }
-        catch (UnableToComplyException e) {
-            throw new WrongParameterValueException(CLUSTERING_ALGORITHM_PARAM.getName(),
-                clusteringAlgorithmClass, CLUSTERING_ALGORITHM_PARAM.getDescription(), e);
-        }
+        clusteringAlgorithm = CLUSTERING_ALGORITHM_PARAM.instantiateClass();
         String[] clusteringAlgorithmParameters = new String[remainingParameters.length];
         System.arraycopy(remainingParameters, 0, clusteringAlgorithmParameters, 0, remainingParameters.length);
         clusteringAlgorithm.setTime(isTime());

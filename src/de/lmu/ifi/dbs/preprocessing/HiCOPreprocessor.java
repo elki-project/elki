@@ -116,6 +116,7 @@ public abstract class HiCOPreprocessor<V extends RealVector<V, ?>> extends Abstr
                 List<Integer> ids = objectIDsForPCA(id, database, verbose, false);
 
                 //noinspection unchecked
+                // todo???
                 LocalPCA<V> pca = Util.instantiate(LocalPCA.class, pcaClassName);
                 pca.setParameters(pcaParameters);
                 pca.run(ids, database);
@@ -159,6 +160,7 @@ public abstract class HiCOPreprocessor<V extends RealVector<V, ?>> extends Abstr
         String pcaDistanceFunctionClassName = (String) optionHandler.getOptionValue(PCA_DISTANCE_FUNCTION_P);
         try {
             // noinspection unchecked
+            // todo
             pcaDistanceFunction = Util.instantiate(DistanceFunction.class, pcaDistanceFunctionClassName);
         }
         catch (UnableToComplyException e) {
@@ -171,6 +173,7 @@ public abstract class HiCOPreprocessor<V extends RealVector<V, ?>> extends Abstr
         pcaClassName = (String) optionHandler.getOptionValue(PCA_CLASS_P);
         try {
 //    	 noinspection unchecked
+            // todo
             tmpPCA = Util.instantiate(LocalPCA.class, pcaClassName);
         }
         catch (UnableToComplyException e) {
@@ -200,6 +203,7 @@ public abstract class HiCOPreprocessor<V extends RealVector<V, ?>> extends Abstr
 
         try {
 //    	 noinspection unchecked
+            // todo???
             LocalPCA<V> pca = Util.instantiate(LocalPCA.class, pcaClassName);
             pca.setParameters(pcaParameters);
             attributeSettings.addAll(pca.getAttributeSettings());

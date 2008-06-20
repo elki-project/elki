@@ -185,6 +185,7 @@ public class OnlineLOF<O extends DatabaseObject> extends OnlineBasicLOF<O> {
         Parser<O> parser;
         try {
             //noinspection unchecked
+            // todo
             parser = Util.instantiate(Parser.class, parserClass);
         }
         catch (UnableToComplyException e) {

@@ -216,6 +216,7 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
         // reachabilityDistanceFunction
         String reachabilityDistanceFunctionName = (String) optionHandler.getOptionValue(REACHABILITY_DISTANCE_FUNCTION_P);
         try {
+            // todo
             reachabilityDistanceFunction = Util.instantiate(DistanceFunction.class, reachabilityDistanceFunctionName);
         }
         catch (UnableToComplyException e) {

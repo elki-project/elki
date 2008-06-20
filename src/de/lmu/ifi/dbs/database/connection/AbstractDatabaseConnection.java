@@ -148,6 +148,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
 
     try {
       // noinspection unchecked
+        // todo
       database = Util.instantiate(Database.class, dbClass);
     }
     catch (UnableToComplyException e) {

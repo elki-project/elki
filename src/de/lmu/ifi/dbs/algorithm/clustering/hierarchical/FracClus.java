@@ -7,8 +7,8 @@ import de.lmu.ifi.dbs.data.RealVector;
 import de.lmu.ifi.dbs.database.Database;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
-import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
 
@@ -18,18 +18,24 @@ import java.util.List;
 
 /**
  * todo arthur comment class
- * todo parameter
+ *
  * @author Arthur Zimek
  * @param <V> the type of RealVector handled by this Algorithm
  */
 public class FracClus<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
-    public static final String NUMBER_OF_SUPPORTERS_P = "supporters";
 
-    public static final String NUMBER_OF_SUPPORTERS_D = "number of supporters (at least 2)";
+    /**
+     * Parameter to specify the number of supporters,
+     * must be an integer equal to or greater than 2.
+     * <p>Key: {@code -fraclus.supporters} </p>
+     */
+    private final IntParameter NUMBER_OF_SUPPORTERS_PARAM = new IntParameter(OptionID.FRACLUS_NUMBER_OF_SUPPORTERS,
+        new GreaterEqualConstraint(2));
 
+    /**
+     * Holds the value of the number of supporters parameter.
+     */
     private int k;
-
-    private IntParameter kParameter = new IntParameter(NUMBER_OF_SUPPORTERS_P, NUMBER_OF_SUPPORTERS_D, new GreaterEqualConstraint(2));
 
     /**
      * Holds the result of the algorithm.
@@ -41,7 +47,7 @@ public class FracClus<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
      */
     public FracClus() {
         super();
-        optionHandler.put(kParameter);
+        addOption(NUMBER_OF_SUPPORTERS_PARAM);
     }
 
     /**
@@ -54,7 +60,6 @@ public class FracClus<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
     /**
      * @see de.lmu.ifi.dbs.algorithm.AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.database.Database)
      */
-    @Override
     protected void runInTime(Database<V> database) throws IllegalStateException {
         List<HierarchicalFractalDimensionCluster<V>> clusters = new ArrayList<HierarchicalFractalDimensionCluster<V>>();
         if (this.isVerbose()) {
@@ -97,7 +102,7 @@ public class FracClus<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
             }
 
             clusters.add(cluster);
-           //cluster = null;
+            //cluster = null;
             if (this.isVerbose()) {
                 agglomeration.setProcessed(level);
                 progress(agglomeration);
@@ -115,7 +120,7 @@ public class FracClus<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
-        k = getParameterValue(kParameter);
+        k = getParameterValue(NUMBER_OF_SUPPORTERS_PARAM);
         return remainingParameters;
     }
 

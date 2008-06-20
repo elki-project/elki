@@ -200,6 +200,7 @@ public String[] setParameters(String[] args) throws ParameterException {
     String indexClass = (String) optionHandler.getOptionValue(INDEX_P);
     try {
       //noinspection unchecked
+        // todo
       index = Util.instantiate(MetricalIndex.class, indexClass);
     }
     catch (UnableToComplyException e) {

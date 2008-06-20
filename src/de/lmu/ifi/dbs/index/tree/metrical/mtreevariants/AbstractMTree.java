@@ -246,6 +246,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
 
     try {
       // noinspection unchecked
+        // todo
       distanceFunction = Util.instantiate(DistanceFunction.class, className);
     }
     catch (UnableToComplyException e) {

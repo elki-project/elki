@@ -28,38 +28,28 @@ import java.util.*;
  *
  * @author Elke Achtert
  * @param <V> the type of Realvector handled by this Algorithm
- * todo parameter
  */
 public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
+
     /**
-     * The default value for epsilon.
+     * Parameter that specifies the maximum radius of the neighborhood to be
+     * considered in each dimension for determination of the preference vector,
+     * must be a double equal to or greater than 0.
+     * <p>Default value: {@code 0.001} </p>
+     * <p>Key: {@code -dish.epsilon} </p>
      */
-    public static final double DEFAULT_EPSILON = 0.001;
+    private final DoubleParameter EPSILON_PARAM =
+        new DoubleParameter(OptionID.DISH_EPSILON, new GreaterEqualConstraint(0), 0.001);
 
     /**
-     * Option string for parameter epsilon.
+     * Parameter that specifies the a minimum number of points as a smoothing
+     * factor to avoid the single-link-effect,
+     * must be an integer greater than 0.
+     * <p>Default value: {@code 1} </p>
+     * <p>Key: {@code -dish.mu} </p>
      */
-    public static final String EPSILON_P = "epsilon";
-
-    /**
-     * Description for parameter epsilon.
-     */
-    public static String EPSILON_D = "a double specifying the "
-        + "maximum radius of the neighborhood to be "
-        + "considered in each dimension for determination of "
-        + "the preference vector (default is " + DEFAULT_EPSILON
-        + "in each dimension).";
-
-    /**
-     * The parameter for the smoothing factor &#956;
-     * <p>Default value: 1</p>
-     * <p>Key: -mu</p>
-     */ // FIXME: inserting this to OPTICS doesn't help, only wrapper is running, not DiSH-algorithm stand-alone!
-    public static IntParameter MU_P = new IntParameter("mu", "an integer specifying a minimum number \u03BC of points as a smoothing factor to avoid the single-link-effekt", new GreaterConstraint(0));
-
-    static {
-        MU_P.setDefaultValue(1);
-    }
+    private final IntParameter MU_PARAM = new IntParameter(OptionID.DISH_MU,
+        new GreaterConstraint(0), 1);
 
     /**
      * The optics algorithm to determine the cluster order.
@@ -84,10 +74,10 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
 //    debug = true;
 
         // parameter epsilon
-        DoubleParameter eps = new DoubleParameter(EPSILON_P, EPSILON_D, new GreaterEqualConstraint(0));
-        eps.setDefaultValue(DEFAULT_EPSILON);
-        optionHandler.put(eps);
-        addOption(MU_P);
+        addOption(EPSILON_PARAM);
+
+        // parameter mu
+        addOption(MU_PARAM);
     }
 
     /**
@@ -98,7 +88,6 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
      * @throws IllegalStateException if the algorithm has not been initialized properly (e.g. the
      *                               setParameters(String[]) method has been failed to be called).
      */
-    @Override
     protected void runInTime(Database<V> database) throws IllegalStateException {
         if (isVerbose()) {
             verbose("\nRun OPTICS algorithm.");
@@ -140,47 +129,62 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         String[] remainingParameters = super.setParameters(args);
 
         // epsilon
-        epsilon = (Double) optionHandler.getOptionValue(EPSILON_P);
+        epsilon = getParameterValue(EPSILON_PARAM);
 
-        int minpts = getParameterValue(MU_P);
+        // mu
+        int minpts = getParameterValue(MU_PARAM);
+
+        // OPTICS
+        optics = new OPTICS<V, PreferenceVectorBasedCorrelationDistance>();
+
+        // verbose and time
+        optics.setVerbose(isVerbose());
+        optics.setTime(isTime());
 
         // parameters for optics
         List<String> opticsParameters = new ArrayList<String>();
+
         // epsilon for OPTICS
         Util.addParameter(opticsParameters, OptionID.OPTICS_EPSILON, DiSHDistanceFunction.INFINITY_PATTERN);
+
         // minpts for OPTICS
         Util.addParameter(opticsParameters, OptionID.OPTICS_MINPTS, Integer.toString(minpts));
+
         // distance function
         Util.addParameter(opticsParameters, OptionID.ALGORITHM_DISTANCEFUNCTION, DiSHDistanceFunction.class.getName());
+
         // epsilon for distance function
         opticsParameters.add(OptionHandler.OPTION_PREFIX + DiSHDistanceFunction.EPSILON_P);
         opticsParameters.add(Double.toString(epsilon));
+
         // omit flag
         opticsParameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F);
+
         // preprocessor
         opticsParameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.PREPROCESSOR_CLASS_P);
         opticsParameters.add(DiSHPreprocessor.class.getName());
+
         // preprocessor epsilon
         opticsParameters.add(OptionHandler.OPTION_PREFIX + DiSHPreprocessor.EPSILON_P);
         opticsParameters.add(Double.toString(epsilon));
-        // verbose
-        optics.setVerbose(isVerbose());
-        optics.setTime(isTime());
-        // optics
+
+        // preprocessor minpts
+        opticsParameters.add(OptionHandler.OPTION_PREFIX + DiSHPreprocessor.MINPTS_P);
+        opticsParameters.add(Integer.toString(minpts));
+
+        // remaining parameters
         for (String parameter : remainingParameters) {
             opticsParameters.add(parameter);
         }
-        optics = new OPTICS<V, PreferenceVectorBasedCorrelationDistance>();
-        remainingParameters = optics.setParameters(opticsParameters.toArray(new String[opticsParameters.size()]));
 
+        remainingParameters = optics.setParameters(opticsParameters.toArray(new String[opticsParameters.size()]));
         setParameters(args, remainingParameters);
+
         return remainingParameters;
     }
 
     /**
-     * Returns the parameter setting of the attributes.
-     *
-     * @return the parameter setting of the attributes
+     * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#getAttributeSettings()
      */
     @Override
     public List<AttributeSettings> getAttributeSettings() {

@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.io.File;
 import java.util.List;
+import java.util.Arrays;
 
 /**
  * KDDTaskWrapper is an abstract super class for all wrapper classes running
@@ -70,7 +71,12 @@ public abstract class KDDTaskWrapper<O extends DatabaseObject> extends AbstractW
             debugFiner("got KDD Task parametes");
             KDDTask<O> task = new KDDTask<O>();
             debugFiner("KDD task has been instanstiated");
-            task.setParameters(parameters.toArray(new String[parameters.size()]));
+            String[] remainingParameters = task.setParameters(parameters.toArray(new String[parameters.size()]));
+            if (remainingParameters.length != 0) {
+                task.warning(task.usage("Unnecessary parameters specified: "+
+                    Arrays.asList(remainingParameters) + "\n\nUSAGE:\n"));
+                return;
+            }
             debugFiner("set KDD Task parameters, will run kdd Task");
             result = task.run();
         }

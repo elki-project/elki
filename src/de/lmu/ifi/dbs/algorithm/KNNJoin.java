@@ -43,7 +43,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
      * Parameter that specifies the k-nearest neighbors to be assigned,
      * must be an integer greater than 0.
      * <p>Default value: {@code 1} </p>
-     * <p>Key: {@code -k} </p>
+     * <p>Key: {@code -knnjoin.k} </p>
      */
     public final IntParameter K_PARAM =
         new IntParameter(OptionID.KNN_JOIN_K, new GreaterConstraint(0), 1);

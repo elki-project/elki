@@ -270,8 +270,7 @@ public class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID DBSCAN_EPSILON = new OptionID("dbscan.epsilon",
         "The maximum radius of the neighborhood " +
-            "to be considered, must be suitable to " +
-            "the distance function specified"
+            "to be considered."
     );
 
     /**
@@ -313,10 +312,33 @@ public class OptionID extends ConstantObject<OptionID> {
     );
 
     /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.DiSH#EPSILON_PARAM}
+     */
+    public static final OptionID DISH_EPSILON = new OptionID("dish.epsilon",
+        "The maximum radius of the neighborhood " +
+            "to be considered in each dimension for determination of " +
+            "the preference vector."
+    );
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.DiSH#MU_PARAM}
+     */
+    public static final OptionID DISH_MU = new OptionID("dish.mu",
+        "The minimum number of points as a smoothing factor to avoid the single-link-effekt."
+    );
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.hierarchical.FracClus#NUMBER_OF_SUPPORTERS_PARAM}
+     */
+    public static final OptionID FRACLUS_NUMBER_OF_SUPPORTERS = new OptionID("fraclus.supporters",
+        "The number of supporters."
+    );
+
+    /**
      * OptionID for {@link de.lmu.ifi.dbs.algorithm.classifier.KNNClassifier#K_PARAM}
      */
     public static final OptionID KNN_CLASSIFIER_K = new OptionID("knnclassifier.k",
-        "Specifies the number of neighbors to take into account for classification."
+        "The number of neighbors to take into account for classification."
     );
 
     /**
@@ -362,8 +384,7 @@ public class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID OPTICS_EPSILON = new OptionID("optics.epsilon",
         "The maximum radius of the neighborhood " +
-            "to be considered, must be suitable to " +
-            "the distance function specified."
+            "to be considered."
     );
 
     /**

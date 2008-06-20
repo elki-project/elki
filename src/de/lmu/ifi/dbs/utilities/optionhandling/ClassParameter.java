@@ -5,7 +5,6 @@ import de.lmu.ifi.dbs.properties.PropertyName;
 
 /**
  * Parameter class for a parameter specifying a class name.
- * todo class zurueckgeben
  *
  * @author Steffi Wanka
  */
@@ -190,4 +189,40 @@ public class ClassParameter<C> extends Parameter<String, String> {
     protected String getParameterType() {
         return "<class>";
     }
+
+    /**
+     * Returns a new instance for the value (i.e., the class name)
+     * of this class parameter. The instance has the
+     * type of the restriction class of this class parameter.
+     * <p/> If the Class for the class name is not found, the instantiation is tried
+     * using the package of the restriction class as package of the class name.
+     *
+     * @return a new instance for the value of this class parameter
+     * @throws ParameterException if the instantiation cannot be performed successfully
+     *                            or the value of this class parameter is not set
+     */
+    public C instantiateClass() throws ParameterException {
+        if (value == null && !optionalParameter)
+            throw new UnusedParameterException("Value of parameter " + name + " has not been specified.");
+
+        Class<C> type = getRestrictionClass();
+        String className = getValue();
+
+        C instance;
+        try {
+            try {
+                instance = restrictionClass.cast(Class.forName(value).newInstance());
+            }
+            catch (ClassNotFoundException e) {
+                // try package of type
+                instance = restrictionClass.cast(Class.forName(restrictionClass.getPackage().getName() +
+                    "." + value).newInstance());
+            }
+        }
+        catch (Exception e) {
+            throw new WrongParameterValueException(name, value, getDescription(), e);
+        }
+        return instance;
+    }
+
 }

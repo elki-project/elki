@@ -354,6 +354,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
         String className = (String) optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
         try {
             // noinspection unchecked
+            // todo
             distanceFunction = Util.instantiate(AbstractLocallyWeightedDistanceFunction.class, className);
         }
         catch (UnableToComplyException e) {

@@ -100,6 +100,7 @@ public class ArffFileParser<O extends DatabaseObject & WekaObject<W>, W extends 
             String parserClass = getParameterValue(BASE_PARSER_PARAM);
             try
             {
+                // todo
                 this.parser = Util.instantiate(Parser.class,parserClass);
             }
             catch(UnableToComplyException e)
@@ -111,6 +112,7 @@ public class ArffFileParser<O extends DatabaseObject & WekaObject<W>, W extends 
         {
             try
             {
+                // todo
                 this.parser = Util.instantiate(Parser.class,DEFAULT_PARSER.getClass().getCanonicalName());
             }
             catch(UnableToComplyException e)

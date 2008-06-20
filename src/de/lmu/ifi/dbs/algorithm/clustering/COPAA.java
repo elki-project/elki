@@ -12,7 +12,10 @@ import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Progress;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 import java.util.*;
 
@@ -188,46 +191,20 @@ public class COPAA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
 
         // partition algorithm
         // noinspection unchecked
-        String partitionAlgoritmClass = (String) getParameterValue(PARTITION_ALGORITHM_PARAM);
-        try {
-            // noinspection unchecked
-            partitionAlgorithm = Util.instantiate(Algorithm.class, partitionAlgoritmClass);
-        }
-        catch (UnableToComplyException e) {
-            throw new WrongParameterValueException(PARTITION_ALGORITHM_PARAM.getName(),
-                partitionAlgoritmClass, PARTITION_ALGORITHM_PARAM.getDescription(), e);
-        }
+        partitionAlgorithm = (Algorithm) PARTITION_ALGORITHM_PARAM.instantiateClass();
 
         // partition db
         if (optionHandler.isSet(PARTITION_DB_PARAM)) {
-            String partitionDB_Class = getParameterValue(PARTITION_DB_PARAM);
-            try {
-                Database tmpDB = Util.instantiate(Database.class, partitionDB_Class);
-                remainingParameters = tmpDB.setParameters(remainingParameters);
-                partitionDatabaseParameters = tmpDB.getParameters();
-                // noinspection unchecked
-                partitionDatabase = (Class<Database<V>>) tmpDB.getClass();
-            }
-            catch (UnableToComplyException e) {
-                throw new WrongParameterValueException(PARTITION_DB_PARAM.getName(),
-                    partitionDB_Class,
-                    PARTITION_DB_PARAM.getDescription(),
-                    e);
-            }
+            Database tmpDB = PARTITION_DB_PARAM.instantiateClass();
+            remainingParameters = tmpDB.setParameters(remainingParameters);
+            partitionDatabaseParameters = tmpDB.getParameters();
+            // noinspection unchecked
+            partitionDatabase = (Class<Database<V>>) tmpDB.getClass();
         }
 
         // preprocessor
-        String preprocessorClass = getParameterValue(PREPROCESSOR_PARAM);
-        try {
-            // noinspection unchecked
-            preprocessor = Util.instantiate(HiCOPreprocessor.class, preprocessorClass);
-        }
-        catch (UnableToComplyException e) {
-            throw new WrongParameterValueException(PREPROCESSOR_PARAM.getName(),
-                preprocessorClass,
-                PREPROCESSOR_PARAM.getDescription(),
-                e);
-        }
+        // noinspection unchecked
+        preprocessor = PREPROCESSOR_PARAM.instantiateClass();
         remainingParameters = preprocessor.setParameters(remainingParameters);
 
         // partition algorithm

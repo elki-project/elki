@@ -313,6 +313,7 @@ public class FastICA<V extends RealVector<V, ?>> extends AbstractParameterizable
         String className = (String) optionHandler.getOptionValue(G_P);
         try {
             // noinspection unchecked
+            // todo
             contrastFunction = Util.instantiate(ContrastFunction.class, className);
         }
         catch (UnableToComplyException e) {

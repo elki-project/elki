@@ -6,13 +6,11 @@ import de.lmu.ifi.dbs.data.DatabaseObject;
 import de.lmu.ifi.dbs.distance.Distance;
 import de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction;
-import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.List;
 
@@ -103,15 +101,8 @@ public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extend
         String[] remainingParameters = super.setParameters(args);
 
         // distance function
-        String distancefunctionClass = getParameterValue(DISTANCE_FUNCTION_PARAM);
-        try {
-            //noinspection unchecked
-            distanceFunction = Util.instantiate(DistanceFunction.class, distancefunctionClass);
-        }
-        catch (UnableToComplyException e) {
-            throw new WrongParameterValueException(DISTANCE_FUNCTION_PARAM.getName(),
-                distancefunctionClass, DISTANCE_FUNCTION_PARAM.getDescription(), e);
-        }
+        //noinspection unchecked
+        distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
         remainingParameters = distanceFunction.setParameters(remainingParameters);
         setParameters(args, remainingParameters);
 

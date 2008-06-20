@@ -92,6 +92,7 @@ public class CompositeEigenPairFilter extends AbstractParameterizable implements
 
     for (String filterClass : filtersString) {
       try {
+          // todo
         EigenPairFilter f = Util.instantiate(EigenPairFilter.class, filterClass);
         remainingParameters = f.setParameters(remainingParameters);
         filters.add(f);

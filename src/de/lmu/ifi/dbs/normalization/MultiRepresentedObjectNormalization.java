@@ -318,8 +318,7 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
         else {
           try {
             // noinspection unchecked
-            Normalization<O> n = Util.instantiate(
-            Normalization.class, normalizationClass);
+            Normalization<O> n = Util.instantiate(Normalization.class, normalizationClass);
             n.setParameters(args);
             this.normalizations.add(n);
           }

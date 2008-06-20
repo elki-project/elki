@@ -18,6 +18,8 @@ import java.io.PrintStream;
 
 /**
  * Converts an arff file into a whitespace separated txt file.
+ * @author Elke Achtert
+ * todo parameter
  */
 public class Arff2Txt extends StandAloneInputWrapper {
 

@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.io.File;
 import java.util.List;
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 /**
@@ -237,31 +238,14 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
         }
 
         // algorithm
-        String algorithmClass = getParameterValue(ALGORITHM_PARAM);
-        try {
-            // noinspection unchecked
-            algorithm = Util.instantiate(Algorithm.class, algorithmClass);
-        }
-        catch (UnableToComplyException e) {
-            exception(e.getMessage(), e);
-            throw new WrongParameterValueException(ALGORITHM_PARAM.getName(),
-                algorithmClass,
-                ALGORITHM_PARAM.getDescription(),
-                e);
-        }
+        // noinspection unchecked
+        algorithm = ALGORITHM_PARAM.instantiateClass();
+        remainingParameters = algorithm.setParameters(remainingParameters);
 
         // database connection
-        String databaseConnectionClass = getParameterValue(DATABASE_CONNECTION_PARAM);
-
-        try {
-            // noinspection unchecked
-            databaseConnection = Util.instantiate(DatabaseConnection.class, databaseConnectionClass);
-        }
-        catch (UnableToComplyException e) {
-            exception(e.getMessage(), e);
-            throw new WrongParameterValueException(DATABASE_CONNECTION_PARAM.getName(),
-                databaseConnectionClass, DATABASE_CONNECTION_PARAM.getDescription(), e);
-        }
+        // noinspection unchecked
+        databaseConnection = DATABASE_CONNECTION_PARAM.instantiateClass();
+        remainingParameters = databaseConnection.setParameters(remainingParameters);
 
         // output
         if (isSet(OUTPUT_PARAM)) {
@@ -270,16 +254,8 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
 
         // normalization
         if (isSet(NORMALIZATION_PARAM)) {
-            String normalizationClass = getParameterValue(NORMALIZATION_PARAM);
-            try {
-                // noinspection unchecked
-                normalization = Util.instantiate(Normalization.class, normalizationClass);
-            }
-            catch (UnableToComplyException e) {
-                exception(e.getMessage(), e);
-                throw new WrongParameterValueException(NORMALIZATION_PARAM.getName(),
-                    normalizationClass, NORMALIZATION_PARAM.getDescription(), e);
-            }
+            // noinspection unchecked
+            normalization = NORMALIZATION_PARAM.instantiateClass();
             normalizationUndo = isSet(NORMALIZATION_UNDO_FLAG);
             remainingParameters = normalization.setParameters(remainingParameters);
         }
@@ -289,8 +265,6 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
                 " is set, but no normalization is specified.");
         }
 
-        remainingParameters = algorithm.setParameters(remainingParameters);
-        remainingParameters = databaseConnection.setParameters(remainingParameters);
 
         initialized = true;
         setParameters(args, remainingParameters);
@@ -362,7 +336,11 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
         // noinspection unchecked
         KDDTask<? extends DatabaseObject> kddTask = new KDDTask();
         try {
-            kddTask.setParameters(args);
+            String[] remainingParameters = kddTask.setParameters(args);
+            if (remainingParameters.length != 0) {
+                kddTask.warning(kddTask.usage("Unnecessary parameters specified: "+
+                    Arrays.asList(remainingParameters) + "\n\nUSAGE:\n"));                
+            }
             kddTask.run();
         }
         catch (AbortException e) {

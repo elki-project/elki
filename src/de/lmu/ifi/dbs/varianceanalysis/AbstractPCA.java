@@ -4,7 +4,6 @@ import de.lmu.ifi.dbs.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
@@ -197,18 +196,7 @@ public abstract class AbstractPCA extends AbstractParameterizable implements PCA
         String[] remainingParameters = super.setParameters(args);
 
         // eigenpair filter
-        String eigenpairFilterClass = getParameterValue(EIGENPAIR_FILTER_PARAM);
-        try {
-            eigenPairFilter = Util.instantiate(EigenPairFilter.class, eigenpairFilterClass);
-        }
-        catch (UnableToComplyException e) {
-            throw new WrongParameterValueException(
-                EIGENPAIR_FILTER_PARAM.getName(),
-                eigenpairFilterClass,
-                EIGENPAIR_FILTER_PARAM.getDescription(),
-                e);
-        }
-
+        eigenPairFilter = EIGENPAIR_FILTER_PARAM.instantiateClass();
         remainingParameters = eigenPairFilter.setParameters(remainingParameters);
         setParameters(args, remainingParameters);
 

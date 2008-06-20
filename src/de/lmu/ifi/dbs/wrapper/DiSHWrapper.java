@@ -4,15 +4,12 @@ import de.lmu.ifi.dbs.algorithm.AbortException;
 import de.lmu.ifi.dbs.algorithm.clustering.DiSH;
 import de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.utilities.Util;
-import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.StringParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
 
 import java.util.List;
+import java.util.Arrays;
 
 /**
  * todo parameter
@@ -24,14 +21,24 @@ import java.util.List;
 public class DiSHWrapper extends NormalizationWrapper {
 
     /**
-     * The epsilon value in each dimension;
+     * Parameter that specifies the maximum radius of the neighborhood to be
+     * considered in each dimension for determination of the preference vector,
+     * must be a double equal to or greater than 0.
+     * <p>Default value: {@code 0.001} </p>
+     * <p>Key: {@code -dish.epsilon} </p>
      */
-    private Double epsilon;
+    private final DoubleParameter EPSILON_PARAM =
+        new DoubleParameter(OptionID.DISH_EPSILON, new GreaterEqualConstraint(0), 0.001);
 
     /**
-     * The value of the minpts parameter.
+     * Parameter that specifies the a minimum number of points as a smoothing
+     * factor to avoid the single-link-effect,
+     * must be an integer greater than 0.
+     * <p>Default value: {@code 1} </p>
+     * <p>Key: {@code -dish.mu} </p>
      */
-    private int minpts;
+    private final IntParameter MU_PARAM = new IntParameter(OptionID.DISH_MU,
+        new GreaterConstraint(0), 1);
 
     /**
      * The strategy for determination of the preference vector.
@@ -68,17 +75,13 @@ public class DiSHWrapper extends NormalizationWrapper {
      */
     public DiSHWrapper() {
         super();
-        // parameter min points
-        optionHandler.put(new IntParameter(DiSHPreprocessor.MINPTS_P,
-            DiSHPreprocessor.MINPTS_D,
-            new GreaterConstraint(0)));
+
+        // parameter mu
+        addOption(MU_PARAM);
 
         //parameter epsilon
-        DoubleParameter eps = new DoubleParameter(DiSH.EPSILON_P, DiSH.EPSILON_D);
-        eps.setOptional(true);
-        optionHandler.put(eps);
+        addOption(EPSILON_PARAM);
 
-        //strategy
         // parameter strategy
         StringParameter strat = new StringParameter(DiSHPreprocessor.STRATEGY_P, DiSHPreprocessor.STRATEGY_D);
         strat.setOptional(true);
@@ -95,17 +98,10 @@ public class DiSHWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, OptionID.ALGORITHM, DiSH.class.getName());
 
         // epsilon
-        if (epsilon != null) {
-            parameters.add(OptionHandler.OPTION_PREFIX + DiSH.EPSILON_P);
-            parameters.add(Double.toString(epsilon));
-        }
+        Util.addParameter(parameters, OptionID.DISH_EPSILON, Double.toString(getParameterValue(EPSILON_PARAM)));
 
-        // minpts for OPTICS
-        Util.addParameter(parameters, OptionID.OPTICS_MINPTS, Integer.toString(minpts));
-
-        // minpts for preprocessor
-        parameters.add(OptionHandler.OPTION_PREFIX + DiSHPreprocessor.MINPTS_P);
-        parameters.add(Integer.toString(minpts));
+        // minpts
+        Util.addParameter(parameters, OptionID.DISH_MU, Integer.toString(getParameterValue(MU_PARAM)));
 
         // strategy for preprocessor
         if (strategy != null) {
@@ -121,12 +117,6 @@ public class DiSHWrapper extends NormalizationWrapper {
      */
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
-
-        if (optionHandler.isSet(DiSHPreprocessor.EPSILON_P)) {
-            epsilon = (Double) optionHandler.getOptionValue(DiSH.EPSILON_P);
-        }
-
-        minpts = (Integer) optionHandler.getOptionValue(DiSHPreprocessor.MINPTS_P);
 
         if (optionHandler.isSet(DiSHPreprocessor.STRATEGY_P)) {
             strategy = (String) optionHandler.getOptionValue(DiSHPreprocessor.STRATEGY_P);

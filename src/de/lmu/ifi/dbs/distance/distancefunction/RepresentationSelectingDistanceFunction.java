@@ -142,6 +142,7 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
       for (String distanceFunctionClass : distanceFunctions) {
         try {
           //noinspection unchecked
+            // todo
           this.distanceFunctions.add(Util.instantiate(DistanceFunction.class, distanceFunctionClass));
         }
         catch (UnableToComplyException e) {
@@ -158,6 +159,7 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
     else {
       try {
         //noinspection unchecked
+          // todo
         defaultDistanceFunction = Util.instantiate(DistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
       }
       catch (UnableToComplyException e) {
