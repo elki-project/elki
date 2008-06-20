@@ -1,10 +1,13 @@
 # wichtig fuer release #####################################
+- Eigene klasse fuer HiCo
+  (Elke)
+
 - Restriction classes bei der usage Methode werden nicht richtig formatiert ausgegeben: erscheinen
   immer am Zeilenanfang, statt in der 2. Tabellenspalte
   (Arthur)
 
 - Global Parameter Constraints bei der usage Methode richtig formatiert ausgegeben
- (Arthur)
+  (Arthur)
 
 - Parameter Handling ueberarbeiten
 
@@ -16,7 +19,7 @@
 - I/O-Access fuer jede DB am Ende eines Algorithmus ausgeben
 
 - ExceptionHandling (user-friendly messages)
-(Elke: ParameterException...)
+  (Elke: ParameterException...)
 
 - Parameterizable hat setVerbose(boolean), setTime(boolean), ein Objekt, das verbose oder time gesetzt hat, setzt dies auch bei jedem Parameterizable, das es verwendet
 
