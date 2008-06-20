@@ -17,7 +17,6 @@ import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
  */
 public interface GlobalParameterConstraint extends Loggable {
 	
-	
 	/**
 	 * Checks if the respective parameters satisfy the parameter constraint. If not,
 	 * a parameter exception is thrown.
@@ -25,5 +24,12 @@ public interface GlobalParameterConstraint extends Loggable {
 	 * @throws ParameterException if the parameters don't satisfy the parameter constraint.
 	 */
 	public abstract void test() throws ParameterException;
+
+    /**
+     * Returns a description of this global constraint.
+     *
+     * @return a description of this global constraint
+     */
+    public abstract String getDescription();
 	
 }

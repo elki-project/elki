@@ -85,9 +85,9 @@ public class ClassListParameter extends ListParameter<String> {
     }
 
     /**
-     * Returns a string representation of the parameter's type which is {@code &lt;class_1,...,class_n&gt;}.
+     * Returns a string representation of the parameter's type.
      *
-     * @return &lt;class_1,...,class_n&gt;
+     * @return &quot;&lt;class_1,...,class_n&gt;&quot;
      * @see Parameter#getParameterType()
      */
     protected String getParameterType() {

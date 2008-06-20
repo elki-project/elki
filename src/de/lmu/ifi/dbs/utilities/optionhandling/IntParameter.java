@@ -19,7 +19,8 @@ public class IntParameter extends NumberParameter<Integer> {
     }
 
     /**
-     * Constructs an integer parameter with the given optionID, and parameter constraint.
+     * Constructs an integer parameter with the given optionID,
+     * and parameter constraint.
      *
      * @param optionID   optionID the unique id of the option
      * @param constraint the constraint for this integer parameter
@@ -30,7 +31,8 @@ public class IntParameter extends NumberParameter<Integer> {
     }
 
     /**
-     * Constructs an integer parameter with the given optionID, and parameter constraint.
+     * Constructs an integer parameter with the given optionID,
+     * parameter constraint, and optional flag.
      *
      * @param optionID   optionID the unique id of the option
      * @param constraint the constraint for this integer parameter
@@ -42,7 +44,8 @@ public class IntParameter extends NumberParameter<Integer> {
     }
 
     /**
-     * Constructs an integer parameter with the given optionID, and parameter constraint.
+     * Constructs an integer parameter with the given optionID,
+     * parameter constraint, and default value.
      *
      * @param optionID     optionID the unique id of the option
      * @param constraint   the constraint for this integer parameter
@@ -162,9 +165,9 @@ public class IntParameter extends NumberParameter<Integer> {
     }
 
     /**
-     * Returns a string representation of the parameter's type which is {@code &lt;int&gt;}.
+     * Returns a string representation of the parameter's type.
      *
-     * @return &lt;int&gt;
+     * @return &quot;&lt;int&gt;&quot;
      * @see Parameter#getParameterType()
      */
     protected String getParameterType() {

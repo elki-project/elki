@@ -12,7 +12,7 @@ import java.util.List;
 public class LongParameter extends NumberParameter<Long> {
 
     /**
-     * Constructs a long parameter with the given OptionID.
+     * Constructs a long parameter with the given optionID.
      *
      * @param optionID the unique OptionID for this parameter
      */
@@ -21,7 +21,8 @@ public class LongParameter extends NumberParameter<Long> {
     }
 
     /**
-     * Constructs a long parameter with the given OptionID.
+     * Constructs a long parameter with the given optionID,
+     * and parameter constraint.
      *
      * @param optionID the unique OptionID for this parameter
      * @param cons     the parameter constraint for this long parameter
@@ -32,7 +33,8 @@ public class LongParameter extends NumberParameter<Long> {
     }
 
     /**
-     * Constructs a long parameter with the given OptionID.
+     * Constructs a long parameter with the given optionID,
+     * and parameter constraints.
      *
      * @param optionID the unique OptionID for this parameter
      * @param cons     a list of parameter constraints for this long parameter
@@ -117,9 +119,9 @@ public class LongParameter extends NumberParameter<Long> {
     }
 
     /**
-     * Returns a string representation of the parameter's type which is {@code &lt;long&gt;}.
+     * Returns a string representation of the parameter's type.
      *
-     * @return &lt;long&gt;
+     * @return &quot;&lt;long&gt;&quot;
      * @see Parameter#getParameterType()
      */
     protected String getParameterType() {

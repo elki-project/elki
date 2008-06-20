@@ -78,9 +78,9 @@ public class StringParameter extends Parameter<String, String> {
     }
 
     /**
-     * Returns a string representation of the parameter's type which is {@code &lt;string&gt;}.
+     * Returns a string representation of the parameter's type.
      *
-     * @return &lt;string&gt;
+     * @return &quot;&lt;string&gt;&quot;
      * @see Parameter#getParameterType()
      */
     protected String getParameterType() {

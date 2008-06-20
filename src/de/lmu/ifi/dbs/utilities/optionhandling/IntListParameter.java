@@ -94,9 +94,9 @@ public class IntListParameter extends ListParameter<Integer> {
     }
 
     /**
-     * Returns a string representation of the parameter's type which is {@code &lt;int_1,...,int_n&gt;}.
+     * Returns a string representation of the parameter's type.
      *
-     * @return &lt;int_1,...,int_n&gt;
+     * @return &quot;&lt;int_1,...,int_n&gt;&quot;
      * @see Parameter#getParameterType()
      */
     protected String getParameterType() {

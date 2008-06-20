@@ -9,8 +9,8 @@ package de.lmu.ifi.dbs.utilities.optionhandling;
 public abstract class NumberParameter<T extends Number> extends Parameter<T,Number> {
 
 	/**
-	 * Constructs a number parameter with the given name and description.
-	 * 
+	 * Constructs a number parameter with the given optionID.
+	 *
 	 * @param optionID the unique id of the option
 	 */
 	public NumberParameter(OptionID optionID){
@@ -24,7 +24,8 @@ public abstract class NumberParameter<T extends Number> extends Parameter<T,Numb
 	 * @param description the parameter description
      * @deprecated
 	 */
-	public NumberParameter(String name,String description){
+    @Deprecated
+    public NumberParameter(String name,String description){
 		super(name,description);
 	}
 
@@ -36,5 +37,4 @@ public abstract class NumberParameter<T extends Number> extends Parameter<T,Numb
 	public T getNumberValue(){
 		return value;
 	}
-
 }

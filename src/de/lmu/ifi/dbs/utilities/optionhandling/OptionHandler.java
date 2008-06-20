@@ -318,9 +318,6 @@ public class OptionHandler extends AbstractLoggable {
             String longDescription = desc;
 
             if (option.getValue() instanceof Parameter) {
-                // shortDescription = desc.substring(desc.indexOf("<"), desc
-                // .indexOf(">") + 1);
-                // longDescription = desc.substring(desc.indexOf(">") + 1);
                 currentOption = currentOption.substring(0);
             }
             currentOption = OPTION_PREFIX + currentOption;
@@ -379,6 +376,17 @@ public class OptionHandler extends AbstractLoggable {
                 messageBuffer.append(descriptionIndent).append(lines.get(l)).append(NEWLINE);
             }
         }
+
+        // global constraints
+        // todo arthur bitte richtig formatieren mit pretty printer
+        if (! globalParameterConstraints.isEmpty()) {
+            messageBuffer.append(NEWLINE).append("  Global parameter constraints:");
+            for (GlobalParameterConstraint gpc : globalParameterConstraints) {
+                messageBuffer.append(NEWLINE).append("  - ");
+                messageBuffer.append(gpc.getDescription());
+            }
+        }
+
         return messageBuffer.toString();
     }
 
@@ -420,7 +428,7 @@ public class OptionHandler extends AbstractLoggable {
             try {
                 warning("Parameter " + option.getName() + " has been already set before, overwrite old value. " +
                     "(old value: " + put.getValue().toString() +
-                    ", new value: " + option.getValue().toString()+")");
+                    ", new value: " + option.getValue().toString() + ")");
             }
             catch (UnusedParameterException e) {
                 this.exception(e.getMessage(), e);
@@ -529,7 +537,7 @@ public class OptionHandler extends AbstractLoggable {
     protected void checkGlobalParameterConstraints() throws ParameterException {
 
         for (GlobalParameterConstraint gbc : globalParameterConstraints) {
-      gbc.test();
+            gbc.test();
+        }
     }
-  }
 }

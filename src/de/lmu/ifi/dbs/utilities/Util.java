@@ -11,24 +11,11 @@ import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.logging.StaticLogger;
 import de.lmu.ifi.dbs.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.*;
 
 import java.io.PrintStream;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.StringTokenizer;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -1080,8 +1067,8 @@ public final class Util extends AbstractLoggable {
     public static String[] parameterDifference(String[] complete, String[] part) throws IllegalArgumentException {
         if (complete.length < part.length) {
             throw new IllegalArgumentException("First array must be at least as long as second array.\n" +
-                                               "First array:  " + Arrays.asList(complete) + "\n" +
-                                               "Second array: " + Arrays.asList(part));
+                "First array:  " + Arrays.asList(complete) + "\n" +
+                "Second array: " + Arrays.asList(part));
         }
 
         if (complete.length == 0) {
@@ -1141,9 +1128,9 @@ public final class Util extends AbstractLoggable {
         }
         if (second < partArray.size()) {
             throw new IllegalArgumentException("second array contains entries that are not " +
-                                               "contained in the first array.\n" +
-                                               "First array:  " + Arrays.asList(complete) + "\n" +
-                                               "Second array: " + Arrays.asList(part));
+                "contained in the first array.\n" +
+                "First array:  " + Arrays.asList(complete) + "\n" +
+                "Second array: " + Arrays.asList(part));
         }
         while (first < completeArray.size()) {
             String[] params = pattern.split(completeArray.get(first));
@@ -1361,7 +1348,7 @@ public final class Util extends AbstractLoggable {
         }
         catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("The specified String does not represent a bit set " +
-                                               "containing only 0 and 1 values: " + s);
+                "containing only 0 and 1 values: " + s);
         }
     }
 
@@ -1380,7 +1367,7 @@ public final class Util extends AbstractLoggable {
             }
             else if (s[i] != '0') {
                 throw new IllegalArgumentException("The specified String does not represent a bit set " +
-                                                   "containing only 0 and 1 values: " + String.valueOf(s));
+                    "containing only 0 and 1 values: " + String.valueOf(s));
             }
         }
         return result;
@@ -1557,5 +1544,47 @@ public final class Util extends AbstractLoggable {
     public static void addParameter(List<String> parameters, Parameter<?, ?> parameter, String value) {
         parameters.add(0, OptionHandler.OPTION_PREFIX + parameter.getName());
         parameters.add(1, value);
+    }
+
+    /**
+     * Returns a string representation of the specified list of
+     * options containing the names of the options.
+     *
+     * @param options the list of options
+     * @return the names of the options
+     */
+    public static <O extends Option<?>> String optionsNamesToString(List<O> options) {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("[");
+        for (int i = 0; i < options.size(); i++) {
+            buffer.append(options.get(i).getName());
+            if (i != options.size() - 1) {
+                buffer.append(",");
+            }
+        }
+        buffer.append("]");
+        return buffer.toString();
+    }
+
+    /**
+     * Returns a string representation of the list of number
+     * parameters containing the names and the values of the parameters.
+     *
+     * @param parameters the list of number parameters
+     * @return the names and the values of the parameters
+     */
+    public static <N extends NumberParameter<?>> String parameterNamesAndValuesToString(List<N> parameters) {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("[");
+        for (int i = 0; i < parameters.size(); i++) {
+            buffer.append(parameters.get(i).getName());
+            buffer.append(":");
+            buffer.append(parameters.get(i).getNumberValue().doubleValue());
+            if (i != parameters.size() - 1) {
+                buffer.append(", ");
+            }
+        }
+        buffer.append("]");
+        return buffer.toString();
     }
 }

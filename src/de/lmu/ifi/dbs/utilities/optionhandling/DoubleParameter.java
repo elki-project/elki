@@ -12,7 +12,7 @@ import java.util.List;
 public class DoubleParameter extends NumberParameter<Double> {
 
     /**
-     * Constructs a double parameter with the given OptionID
+     * Constructs a double parameter with the given optionID.
      *
      * @param optionID the unique optionID
      */
@@ -21,7 +21,8 @@ public class DoubleParameter extends NumberParameter<Double> {
     }
 
     /**
-     * Constructs a double parameter with the given OptionID
+     * Constructs a double parameter with the given optionID,
+     * and optional flag.
      *
      * @param optionID the unique optionID
      * @param optional specifies whether this parameter is an optional parameter
@@ -32,7 +33,8 @@ public class DoubleParameter extends NumberParameter<Double> {
     }
 
     /**
-     * Constructs a double parameter with the given OptionID
+     * Constructs a double parameter with the given optionID,
+     * and parameter constraint.
      *
      * @param optionID the unique optionID
      * @param cons     the constraint for this double parameter
@@ -43,7 +45,8 @@ public class DoubleParameter extends NumberParameter<Double> {
     }
 
     /**
-     * Constructs a double parameter with the given OptionID
+     * Constructs a double parameter with the given optionID,
+     * parameter constraint, and optional flag.
      *
      * @param optionID the unique optionID
      * @param cons     the constraint for this double parameter
@@ -55,7 +58,8 @@ public class DoubleParameter extends NumberParameter<Double> {
     }
 
     /**
-     * Constructs a double parameter with the given OptionID
+     * Constructs a double parameter with the given optionID,
+     * parameter constraint, and default value.
      *
      * @param optionID     the unique optionID
      * @param cons         the constraint for this double parameter
@@ -67,7 +71,8 @@ public class DoubleParameter extends NumberParameter<Double> {
     }
 
     /**
-     * Constructs a double parameter with the given OptionID
+     * Constructs a double parameter with the given optionID,
+     * and parameter constraints.
      *
      * @param optionID the unique optionID
      * @param cons     a list of parameter constraints for this double parameter
@@ -78,7 +83,8 @@ public class DoubleParameter extends NumberParameter<Double> {
     }
 
     /**
-     * Constructs a double parameter with the given OptionID
+     * Constructs a double parameter with the given optionID,
+     * parameter constraints, and optional flag.
      *
      * @param optionID the unique optionID
      * @param cons     a list of parameter constraints for this double parameter
@@ -90,7 +96,8 @@ public class DoubleParameter extends NumberParameter<Double> {
     }
 
     /**
-     * Constructs a double parameter with the given OptionID
+     * Constructs a double parameter with the given optionID,
+     * parameter constraints, and default value.
      *
      * @param optionID     the unique optionID
      * @param cons         a list of parameter constraints for this double parameter
@@ -226,7 +233,7 @@ public class DoubleParameter extends NumberParameter<Double> {
     }
 
     /**
-     * Returns a string representation of the parameter's type which is {@code <double>;}.
+     * Returns a string representation of the parameter's type.
      *
      * @return &quot;&lt;double&gt;&quot;
      * @see Parameter#getParameterType()

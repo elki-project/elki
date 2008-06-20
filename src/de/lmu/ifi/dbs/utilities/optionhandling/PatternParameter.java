@@ -81,9 +81,9 @@ public class PatternParameter extends Parameter<String, String> {
     }
 
     /**
-     * Returns a string representation of the parameter's type which is {@code &lt;pattern&gt;}.
+     * Returns a string representation of the parameter's type.
      *
-     * @return &lt;pattern&gt;
+     * @return &quot;&lt;pattern&gt;&quot;
      * @see Parameter#getParameterType()
      */
     protected String getParameterType() {

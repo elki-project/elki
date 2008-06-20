@@ -83,9 +83,9 @@ public class FileListParameter extends ListParameter<File> {
     }
 
     /**
-     * Returns a string representation of the parameter's type which is {@code &lt;file_1,...,file_n&gt;}.
+     * Returns a string representation of the parameter's type.
      *
-     * @return &lt;file_1,...,file_n&gt;
+     * @return &quot;&lt;file_1,...,file_n&gt;&quot;
      * @see Parameter#getParameterType()
      */
     protected String getParameterType() {

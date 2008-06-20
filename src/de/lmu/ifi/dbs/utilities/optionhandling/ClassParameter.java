@@ -182,9 +182,9 @@ public class ClassParameter<C> extends Parameter<String, String> {
     }
 
     /**
-     * Returns a string representation of the parameter's type which is {@code &lt;class&gt;}.
+     * Returns a string representation of the parameter's type.
      *
-     * @return &lt;class&gt;
+     * @return &quot;&lt;class&gt;&quot;
      * @see Parameter#getParameterType()
      */
     protected String getParameterType() {

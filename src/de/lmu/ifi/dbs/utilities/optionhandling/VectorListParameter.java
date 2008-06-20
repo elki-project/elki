@@ -136,10 +136,9 @@ public class VectorListParameter extends ListParameter<List<Double>> {
     }
 
     /**
-     * Returns a string representation of the parameter's type which is
-     * {@code &lt;double_11,...,double_1n:...:double_m1,...,double_mn&gt;}.
+     * Returns a string representation of the parameter's type.
      *
-     * @return &lt;double_11,...,double_1n:...:double_m1,...,double_mn&gt;
+     * @return &quot;&lt;double_11,...,double_1n:...:double_m1,...,double_mn&gt;&quot;
      * @see Parameter#getParameterType()
      */
     protected String getParameterType() {

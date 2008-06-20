@@ -96,9 +96,9 @@ public class DoubleListParameter extends ListParameter<Double> {
     }
 
     /**
-     * Returns a string representation of the parameter's type which is {@code &lt;double_1,...,double_n&gt;}.
+     * Returns a string representation of the parameter's type.
      *
-     * @return &lt;double_1,...,double_n&gt;
+     * @return &quot;&lt;double_1,...,double_n&gt;&quot;
      * @see Parameter#getParameterType()
      */
     protected String getParameterType() {

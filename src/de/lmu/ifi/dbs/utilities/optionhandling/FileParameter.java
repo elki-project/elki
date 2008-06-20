@@ -36,7 +36,7 @@ public class FileParameter extends Parameter<File, Object> {
 
     /**
      * Constructs a file parameter with the given optionID, file type,
-     * and optional value.
+     * and optional flag.
      *
      * @param optionID optionID the unique id of the option
      * @param fileType the file type of this file parameter
@@ -96,9 +96,9 @@ public class FileParameter extends Parameter<File, Object> {
     }
 
     /**
-     * Returns a string representation of the parameter's type which is {@code &lt;file_&gt;}.
+     * Returns a string representation of the parameter's type.
      *
-     * @return &lt;file_&gt;
+     * @return &quot;&lt;file_&gt;&quot;
      * @see Parameter#getParameterType()
      */
     protected String getParameterType() {
