@@ -1,4 +1,11 @@
 # wichtig fuer release #####################################
+- Restriction classes bei der usage Methode werden nicht richtig formatiert ausgegeben: erscheinen
+  immer am Zeilenanfang, statt in der 2. Tabellenspalte
+  (Arthur)
+
+- Global Parameter Constraints bei der usage Methode richtig formatiert ausgegeben
+ (Arthur)
+
 - Parameter Handling ueberarbeiten
 
 - ersetze verbose durch progress wo eine progress-Nachricht ausgegeben werden soll
