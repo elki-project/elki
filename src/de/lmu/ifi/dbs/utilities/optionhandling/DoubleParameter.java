@@ -226,9 +226,9 @@ public class DoubleParameter extends NumberParameter<Double> {
     }
 
     /**
-     * Returns a string representation of the parameter's type which is {@code &lt;double&gt;}.
+     * Returns a string representation of the parameter's type which is {@code <double>;}.
      *
-     * @return &lt;double&gt;
+     * @return &quot;&lt;double&gt;&quot;
      * @see Parameter#getParameterType()
      */
     protected String getParameterType() {
