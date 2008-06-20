@@ -269,24 +269,21 @@ public class OptionID extends ConstantObject<OptionID> {
      * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.DBSCAN#EPSILON_PARAM}
      */
     public static final OptionID DBSCAN_EPSILON = new OptionID("dbscan.epsilon",
-        "The maximum radius of the neighborhood " +
-            "to be considered."
+        "The maximum radius of the neighborhood to be considered."
     );
 
     /**
      * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.DBSCAN#MINPTS_PARAM}
      */
     public static final OptionID DBSCAN_MINPTS = new OptionID("dbscan.minpts",
-        " Threshold for minimum number of points in " +
-            "the epsilon-neighborhood of a point."
+        " Threshold for minimum number of points in the epsilon-neighborhood of a point."
     );
 
     /**
      * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.DeLiClu#MINPTS_PARAM}
      */
     public static final OptionID DELICLU_MINPTS = new OptionID("deliclu.minpts",
-        "Threshold for minimum number of points in " +
-            "the epsilon-neighborhood of a point."
+        "Threshold for minimum number of points in the epsilon-neighborhood of a point."
     );
 
     /**
@@ -383,8 +380,7 @@ public class OptionID extends ConstantObject<OptionID> {
      * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.OPTICS#EPSILON_PARAM}
      */
     public static final OptionID OPTICS_EPSILON = new OptionID("optics.epsilon",
-        "The maximum radius of the neighborhood " +
-            "to be considered."
+        "The maximum radius of the neighborhood to be considered."
     );
 
     /**
@@ -408,8 +404,7 @@ public class OptionID extends ConstantObject<OptionID> {
      * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.SUBCLU#MINPTS_PARAM}
      */
     public static final OptionID SUBCLU_MINPTS = new OptionID("subclu.minpts",
-        "Threshold for minimum number of points in " +
-            "the epsilon-neighborhood of a point."
+        "Threshold for minimum number of points in the epsilon-neighborhood of a point."
     );
 
 
