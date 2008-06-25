@@ -325,6 +325,21 @@ public class OptionID extends ConstantObject<OptionID> {
     );
 
     /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.EM#DELTA_PARAM}
+     */
+    public static final OptionID EM_DELTA = new OptionID("em.delta",
+        "The termination criterion for maximization of E(M): " +
+            "E(M) - E(M') < em.delta"
+    );
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.EM#K_PARAM}
+     */
+    public static final OptionID EM_K = new OptionID("em.k",
+        "The number of clusters to find."
+    );
+
+    /**
      * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.hierarchical.FracClus#NUMBER_OF_SUPPORTERS_PARAM}
      */
     public static final OptionID FRACLUS_NUMBER_OF_SUPPORTERS = new OptionID("fraclus.supporters",

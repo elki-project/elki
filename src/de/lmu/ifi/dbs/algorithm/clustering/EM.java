@@ -14,15 +14,12 @@ import de.lmu.ifi.dbs.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterEqualConstraint;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Provides the EM algorithm (clustering by expectation maximization).
@@ -33,8 +30,7 @@ import java.util.Random;
  * and initial zero-covariance and variance=1 in covariance matrices.
  *
  * @author Arthur Zimek
- * @param <V> a type of {@link RealVector RealVector} as a suitable datatype for this algorithm
- * todo parameter
+ * @param <V> a type of {@link RealVector} as a suitable datatype for this algorithm
  */
 public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> implements Clustering<V> {
     /**
@@ -44,45 +40,26 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impleme
     private static final double SINGULARITY_CHEAT = 1E-9;
 
     /**
-     * Parameter k.
+     * Parameter to specify the number of clusters to find,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -em.k} </p>
      */
-    public static final String K_P = "k";
+    private final IntParameter K_PARAM = new IntParameter(OptionID.EM_K, new GreaterConstraint(0));
 
     /**
-     * Description for parameter k.
+     * Parameter to specify the termination criterion for maximization of E(M): E(M) - E(M') < em.delta,
+     * must be a double eqaul to or greater than 0.
+     * <p>Default value: {@code 0.0} </p>
+     * <p>Key: {@code -em.delta} </p>
      */
-    public static final String K_D = "k - the number of clusters to find (positive integer)";
-
-    /**
-     * Parameter for k.
-     * Constraint greater 0.
-     */
-    private final IntParameter K_PARAM = new IntParameter(K_P, K_D, new GreaterConstraint(0));
+    private final DoubleParameter DELTA_PARAM = new DoubleParameter(OptionID.EM_DELTA,
+        new GreaterEqualConstraint(0.0),
+        0.0);
 
     /**
      * Keeps k - the number of clusters to find.
      */
     private int k;
-
-    /**
-     * Parameter delta.
-     */
-    public static final String DELTA_P = "delta";
-
-    /**
-     * Description for parameter delta.
-     */
-    public static final String DELTA_D = "delta - the termination criterion for maximization of E(M): E(M) - E(M') < delta";
-
-    /**
-     * Parameter for delta.
-     * GreaterEqual 0.0.
-     * (Default: 0.0).
-     */
-    private final DoubleParameter DELTA_PARAM = new DoubleParameter(DELTA_P,
-                                                                    DELTA_D,
-                                                                    new GreaterEqualConstraint(0.0),
-                                                                    0.0);
 
     /**
      * Keeps delta - a small value as termination criterion in expectation maximization
@@ -136,12 +113,12 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impleme
             clusterWeights.add(1.0 / k);
             if (this.debug && false) {
                 StringBuffer msg = new StringBuffer();
-                msg.append("\nmodel " + i + ":\n");
-                msg.append(" mean:    " + means.get(i) + "\n");
-                msg.append(" m:\n" + m.toString("        ") + "\n");
-                msg.append(" m.det(): " + m.det() + "\n");
-                msg.append(" cluster weight: " + clusterWeights.get(i) + "\n");
-                msg.append(" normDistFact:   " + normDistrFactor.get(i) + "\n");
+                msg.append("\nmodel ").append(i).append(":\n");
+                msg.append(" mean:    ").append(means.get(i)).append("\n");
+                msg.append(" m:\n").append(m.toString("        ")).append("\n");
+                msg.append(" m.det(): ").append(m.det()).append("\n");
+                msg.append(" cluster weight: ").append(clusterWeights.get(i)).append("\n");
+                msg.append(" normDistFact:   ").append(normDistrFactor.get(i)).append("\n");
                 debugFine(msg.toString());
             }
         }
@@ -280,14 +257,14 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impleme
                 double prob = normDistrFactor.get(i) * Math.exp(-power);
                 if (debug && false) {
                     debugFine("\n" +
-                              " difference vector= ( " + difference.toString() + " )\n" +
-                              " differenceRow:\n" + differenceRow.toString("    ") + "\n" +
-                              " differenceCol:\n" + differenceCol.toString("    ") + "\n" +
-                              " rowTimesCov:\n" + rowTimesCov.toString("    ") + "\n" +
-                              " rowTimesCovTimesCol:\n" + rowTimesCovTimesCol.toString("    ") + "\n" +
-                              " power= " + power + "\n" +
-                              " prob=" + prob + "\n" +
-                              " inv cov matrix: \n" + invCovMatr.get(i).toString("     "));
+                        " difference vector= ( " + difference.toString() + " )\n" +
+                        " differenceRow:\n" + differenceRow.toString("    ") + "\n" +
+                        " differenceCol:\n" + differenceCol.toString("    ") + "\n" +
+                        " rowTimesCov:\n" + rowTimesCov.toString("    ") + "\n" +
+                        " rowTimesCovTimesCol:\n" + rowTimesCovTimesCol.toString("    ") + "\n" +
+                        " power= " + power + "\n" +
+                        " prob=" + prob + "\n" +
+                        " inv cov matrix: \n" + invCovMatr.get(i).toString("     "));
                 }
 
                 probabilities.add(prob);

@@ -12,13 +12,12 @@ import de.lmu.ifi.dbs.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.database.SequentialDatabase;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 import java.util.BitSet;
 import java.util.Map;
 
 /**
- * todo arthur comment
+ * todo arthur comment class, parameters, constructor
  *
  * @author Arthur Zimek
  * @param <V> the type of Realvector handled by this Algorithm
@@ -38,7 +37,6 @@ public class FIRES<V extends RealVector<V, Double>> extends AbstractAlgorithm<V>
     /**
      * @see de.lmu.ifi.dbs.algorithm.AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.database.Database)
      */
-    @Override
     protected void runInTime(Database<V> database) throws IllegalStateException {
         if (database.size() == 0) {
             throw new IllegalArgumentException("database empty: must contain elements");
@@ -88,7 +86,12 @@ public class FIRES<V extends RealVector<V, Double>> extends AbstractAlgorithm<V>
      * @see de.lmu.ifi.dbs.algorithm.Algorithm#getDescription()
      */
     public Description getDescription() {
-        return new Description("FIRES", "FIRES", "Generic Framework for Subspace Clustering", "H.-P. Kriegel, P. Kr\u00F6ger, M. Renz, S. Wurst: A Generic Framework for Efficient Subspace Clustering of High-Dimensional Data, in: Proc. 5th IEEE International Conference on Data Mining (ICDM), Houston, TX, 2005");
+        return new Description("FIRES",
+            "FIRES",
+            "Generic Framework for Subspace Clustering",
+            "H.-P. Kriegel, P. Kr\u00F6ger, M. Renz, S. Wurst: " +
+                "A Generic Framework for Efficient Subspace Clustering of High-Dimensional Data, " +
+                "In: Proc. 5th IEEE International Conference on Data Mining (ICDM), Houston, TX, 2005");
     }
 
     /**
@@ -98,12 +101,4 @@ public class FIRES<V extends RealVector<V, Double>> extends AbstractAlgorithm<V>
         // TODO Auto-generated method stub
         return null;
     }
-
-    @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        // TODO Auto-generated method stub
-        return super.setParameters(args);
-    }
-
-
 }

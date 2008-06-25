@@ -21,14 +21,7 @@ import de.lmu.ifi.dbs.varianceanalysis.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA;
 import de.lmu.ifi.dbs.varianceanalysis.LocalPCA;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Performs correlation clustering on the data
@@ -37,7 +30,6 @@ import java.util.TreeMap;
  *
  * @author Elke Achtert
  * @param <V> the type of Realvector handled by this Algorithm
- * todo parameter
  */
 public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
     /**
@@ -148,7 +140,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
             "ERiC",
             "ERiC",
             "Performs the DBSCAN algorithm on the data using a special distance function and builds " +
-            "a hierarchy that allows multiple inheritance from the clustering result.",
+                "a hierarchy that allows multiple inheritance from the clustering result.",
             "E. Achtert, C. B\u00F6hm, H.-P. Kriegel, P. Kr\u00F6ger, and A. Zimek: On Exploring Complex Relkationships of Correlation Clusters. In Proc. 19th International Conference on Scientific and Statistical Database Management (SSDBM 2007), Banff, Canada, 2007");
     }
 
@@ -330,7 +322,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
                             //noinspection unchecked
                             BitDistance dist = distanceFunction.distance(parent.getCentroid(), child.getCentroid(), parent.getPCA(), child.getPCA());
                             if (!dist.isBit() && (child.getParents().isEmpty() ||
-                                                  !isParent(distanceFunction, parent, child.getParents()))) {
+                                !isParent(distanceFunction, parent, child.getParents()))) {
                                 parent.addChild(child);
                                 child.addParent(parent);
                                 if (debug) {
