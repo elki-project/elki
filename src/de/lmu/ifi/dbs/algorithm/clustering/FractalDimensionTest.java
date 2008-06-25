@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.KNNList;
 import de.lmu.ifi.dbs.utilities.QueryResult;
 import de.lmu.ifi.dbs.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
 
 import java.util.List;
@@ -20,15 +21,24 @@ import java.util.List;
  *
  * @author Arthur Zimek
  * @param <V> the type of Realvector handled by this Algorithm
- * todo parameter
  */
 public class FractalDimensionTest<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
 
+    /**
+     * @todo arthur: constraints, default value, description
+     * Parameter that specifies the first id.
+     * <p>Key: {@code -fractaldimensiontest.id1} </p>
+     */
+    private final IntParameter ID1_PARAM = new IntParameter(OptionID.FRACTAL_DIMENSION_TEST_ID1);
+
+    /**
+     * @todo arthur: constraints, default value, description
+     * Parameter that specifies the second id.
+     * <p>Key: {@code -fractaldimensiontest.id2} </p>
+     */
+    private final IntParameter ID2_PARAM = new IntParameter(OptionID.FRACTAL_DIMENSION_TEST_ID1);
+
     private FractalDimensionTestResult<V> result;
-
-    private IntParameter id1Parameter = new IntParameter("id1", "id 1");
-
-    private IntParameter id2Parameter = new IntParameter("id2", "id 2");
 
     //private IntParameter supporters = new IntParameter("supporters", "number of supporters");
 
@@ -43,8 +53,8 @@ public class FractalDimensionTest<V extends RealVector<V, ?>> extends AbstractAl
 
     public FractalDimensionTest() {
         super();
-        optionHandler.put(id1Parameter);
-        optionHandler.put(id2Parameter);
+        addOption(ID1_PARAM);
+        addOption(ID2_PARAM);
         //optionHandler.put(supporters);
     }
 
@@ -74,8 +84,8 @@ public class FractalDimensionTest<V extends RealVector<V, ?>> extends AbstractAl
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
-        id1 = getParameterValue(id1Parameter);
-        id2 = getParameterValue(id2Parameter);
+        id1 = getParameterValue(ID1_PARAM);
+        id2 = getParameterValue(ID2_PARAM);
         //k = getParameterValue(supporters);
 
         remainingParameters = distanceFunction.setParameters(remainingParameters);
