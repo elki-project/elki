@@ -51,7 +51,7 @@ public class FractalDimensionTest<V extends RealVector<V, ?>> extends AbstractAl
     /**
      * @see de.lmu.ifi.dbs.algorithm.AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.database.Database)
      */
-    @Override
+    @SuppressWarnings("unchecked")
     protected void runInTime(Database<V> database) throws IllegalStateException {
         distanceFunction.setDatabase(database, true, false);
         List<Integer> suppID1 = (List<Integer>) database.getAssociation(AssociationID.NEIGHBORS, id1);

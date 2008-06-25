@@ -347,6 +347,20 @@ public class OptionID extends ConstantObject<OptionID> {
     );
 
     /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.FractalDimensionTest#ID1_PARAM}
+     */
+    public static final OptionID FRACTAL_DIMENSION_TEST_ID1 = new OptionID("fractaldimensiontest.id1",
+        "The first id."
+    );
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.FractalDimensionTest#ID1_PARAM}
+     */
+    public static final OptionID FRACTAL_DIMENSION_TEST_ID2 = new OptionID("fractaldimensiontest.id2",
+        "The second id."
+    );
+
+    /**
      * OptionID for {@link de.lmu.ifi.dbs.algorithm.classifier.KNNClassifier#K_PARAM}
      */
     public static final OptionID KNN_CLASSIFIER_K = new OptionID("knnclassifier.k",
