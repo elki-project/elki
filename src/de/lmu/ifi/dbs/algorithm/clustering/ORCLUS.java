@@ -14,17 +14,11 @@ import de.lmu.ifi.dbs.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.utilities.Description;
 import de.lmu.ifi.dbs.utilities.Util;
 import de.lmu.ifi.dbs.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.LessConstraint;
-import de.lmu.ifi.dbs.utilities.optionhandling.constraints.ParameterConstraint;
+import de.lmu.ifi.dbs.utilities.optionhandling.constraints.IntervalConstraint;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.LogRecord;
 
 /**
@@ -32,27 +26,20 @@ import java.util.logging.LogRecord;
  *
  * @author Elke Achtert
  * @param <V> the type of Realvector handled by this Algorithm
- * todo parameter
  */
 
 public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
-    /**
-     * Parameter name for alpha - factor for reducing the number of current
-     * clusters in each iteration.
-     */
-    public static final String ALPHA_P = "alpha";
 
     /**
-     * Default value for alpha.
+     * Parameter to specify the factor for reducing the number of current clusters in each iteration,
+     * must be an integer greater than 0 and less than 1.
+     * <p>Default value: {@code 0.5} </p>
+     * <p>Key: {@code -orclus.alpha} </p>
      */
-    public static final double ALPHA_DEFAULT = 0.50;
-
-    /**
-     * Description for parameter alpha - factor for reducing the number of
-     * current clusters in each iteration
-     */
-    public static final String ALPHA_D = "factor for reducing the number of current clusters in each " + "iteration (0..1) - default: "
-                                         + ALPHA_DEFAULT;
+    private final DoubleParameter ALPHA_PARAM = new DoubleParameter(OptionID.ORCLUS_ALPHA,
+        new IntervalConstraint(0, IntervalConstraint.IntervalBoundary.OPEN,
+            1, IntervalConstraint.IntervalBoundary.CLOSE),
+        0.5);
 
     /**
      * Holds alpha.
@@ -60,18 +47,13 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
     private double alpha;
 
     /**
-     * Sets the parameter k and l the optionhandler additionally to the
+     * Adds the parameter {@link #ALPHA_PARAM} additionally to the
      * parameters provided by super-classes.
      */
     public ORCLUS() {
         super();
         // parameter alpha
-        ArrayList<ParameterConstraint<Number>> alphaCons = new ArrayList<ParameterConstraint<Number>>();
-        alphaCons.add(new GreaterConstraint(0));
-        alphaCons.add(new LessConstraint(1));
-        DoubleParameter alpha = new DoubleParameter(ALPHA_P, ALPHA_D, alphaCons);
-        alpha.setDefaultValue(ALPHA_DEFAULT);
-        optionHandler.put(alpha);
+        addOption(ALPHA_PARAM);
     }
 
     /**
@@ -86,7 +68,7 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
 
             if (database.dimensionality() < dim)
                 throw new IllegalStateException("Dimensionality of data < parameter l! " + "(" + database.dimensionality() + " < " + dim
-                                                + ")");
+                    + ")");
 
             // current number of seeds
             int k_c = Math.min(database.size(), k_i * k);
@@ -144,23 +126,23 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
      */
     public Description getDescription() {
         return new Description("ORCLUS", "Arbitrarily ORiented projected CLUSter generation",
-                               "Algorithm to find clusters in high dimensional spaces.", "C. C. Aggrawal, P. S. Yu: "
-                                                                                         + "Finding Generalized Projected Clusters in High Dimensional Spaces "
-                                                                                         + "In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00)");
+            "Algorithm to find clusters in high dimensional spaces.", "C. C. Aggrawal, P. S. Yu: "
+            + "Finding Generalized Projected Clusters in High Dimensional Spaces "
+            + "In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00)");
     }
 
     /**
-     * Sets the parameters k and l additionally to the parameters set by the
-     * super-class' method. Both k and l are required parameters.
+     * Sets the parameters {@link #ALPHA_PARAM} additionally to the parameters set by the
+     * super-class' method.
      *
      * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
         // alpha
-
-        alpha = (Double) optionHandler.getOptionValue(ALPHA_P);
+        alpha = getParameterValue(ALPHA_PARAM);
 
         return remainingParameters;
     }
@@ -236,7 +218,7 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
 
     /**
      * Finds the basis of the subspace of dimensionality
-     * <code> for the specified cluster.
+     * <code>dim</code> for the specified cluster.
      *
      * @param database the database to run the algorithm on
      * @param cluster  the cluster
