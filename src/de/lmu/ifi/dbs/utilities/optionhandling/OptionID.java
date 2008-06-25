@@ -361,6 +361,13 @@ public class OptionID extends ConstantObject<OptionID> {
     );
 
     /**
+     * OptionID for {@link de.lmu.ifi.dbs.algorithm.clustering.KMeans#K_PARAM}
+     */
+    public static final OptionID KMEANS_K = new OptionID("kmeans.k",
+        "The number of clusters to find."
+    );
+
+    /**
      * OptionID for {@link de.lmu.ifi.dbs.algorithm.classifier.KNNClassifier#K_PARAM}
      */
     public static final OptionID KNN_CLASSIFIER_K = new OptionID("knnclassifier.k",

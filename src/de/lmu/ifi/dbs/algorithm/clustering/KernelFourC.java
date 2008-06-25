@@ -22,29 +22,28 @@ public class KernelFourC<V extends RealVector<V, ?>> extends ProjectedDBSCAN<V> 
      */
     public Description getDescription() {
         return new Description("Kernel4C", "Computing Correlation Connected Clusters using Kernels",
-                               "(work in progress, stay tuned...)",
-                               "n/a");
+            "(work in progress, stay tuned...)",
+            "n/a");
     }
 
-
-    @Override
+    /**
+     * @see ProjectedDBSCAN#preprocessorClass()
+     */
     public Class<KernelFourCPreprocessor> preprocessorClass() {
         return KernelFourCPreprocessor.class;
     }
 
-
     /**
      * @see de.lmu.ifi.dbs.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         // locally weighted distance function
         String[] locallyWeightedDistanceFunctionParameters = new String[args.length + 2];
-        System.arraycopy(args, 0, locallyWeightedDistanceFunctionParameters, 2,
-                         args.length);
+        System.arraycopy(args, 0, locallyWeightedDistanceFunctionParameters, 2, args.length);
         locallyWeightedDistanceFunctionParameters[0] = OptionHandler.OPTION_PREFIX + ProjectedDBSCAN.DISTANCE_FUNCTION_P;
         locallyWeightedDistanceFunctionParameters[1] = KernelBasedLocallyWeightedDistanceFunction.class.getName();
 
-        String[] remainingParameters = super.setParameters(locallyWeightedDistanceFunctionParameters);
-        return remainingParameters;
+        return super.setParameters(locallyWeightedDistanceFunctionParameters);
     }
 }
