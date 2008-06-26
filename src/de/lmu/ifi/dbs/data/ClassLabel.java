@@ -44,6 +44,7 @@ public abstract class ClassLabel<L extends ClassLabel<L>> extends AbstractLoggab
      * @return true, if <code>this==obj || this.compareTo(o)==0</code>, false
      *         otherwise
      */
+    @SuppressWarnings("unchecked")
     @Override
     public boolean equals(Object obj)
     {

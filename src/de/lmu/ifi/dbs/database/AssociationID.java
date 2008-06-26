@@ -160,6 +160,7 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
   /**
    * The association id to associate a subspace outlier degree.
    */
+  @SuppressWarnings("unchecked")
   public static final AssociationID<SODModel> SOD_MODEL = new AssociationID<SODModel>("SOD",SODModel.class);
   
   /**
@@ -213,8 +214,9 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
    * @param name the name of the desired AssociationID
    * @return the AssociationID for the given name if it exists, null otherwise
    */
+  @SuppressWarnings("unchecked")
   public AssociationID<?> getAssociationID(final String name) {
-    return (AssociationID) AssociationID.lookup(AssociationID.class, name);
+    return AssociationID.lookup(AssociationID.class, name);
   }
 
 }
