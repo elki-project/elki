@@ -37,6 +37,7 @@ public abstract int hashCode();
    *
    * @see Object#equals(Object)
    */
+  @SuppressWarnings("unchecked")
   @Override
 public boolean equals(Object o) {
     try {
