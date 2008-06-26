@@ -89,6 +89,7 @@ public String toString() {
    * @return <code>true</code> if this object is the same as the o
    *         argument; <code>false</code> otherwise.
    */
+  @SuppressWarnings("unchecked")
   @Override
 public boolean equals(Object o) {
     if (this == o)

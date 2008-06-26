@@ -31,14 +31,15 @@ public abstract class NumberVector<V extends NumberVector<V,N>,N extends Number>
   /**
    * @see FeatureVector#newInstance(Number[])
    */
+  @SuppressWarnings("unchecked")
   public V newInstance(N[] values) throws SecurityException,
                                                          NoSuchMethodException, IllegalArgumentException,
                                                          InstantiationException, IllegalAccessException,
                                                          InvocationTargetException {
     Class<?>[] parameterClasses =  {values.getClass()};
     Object[] parameterValues = {values};
-    Constructor<?> c = this.getClass().getConstructor(parameterClasses);
-    return (V) c.newInstance(parameterValues);
+    Constructor<V> c = (Constructor<V>) this.getClass().getConstructor(parameterClasses);
+    return c.newInstance(parameterValues);
   }
 
   /**
@@ -54,6 +55,7 @@ public abstract class NumberVector<V extends NumberVector<V,N>,N extends Number>
    *         dimensions, respectively
    * @see DatabaseObject#equals(Object)
    */
+  @SuppressWarnings("unchecked")
   @Override
 public boolean equals(Object obj) {
     if (this.getClass().isInstance(obj)) {

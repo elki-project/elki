@@ -106,6 +106,7 @@ public abstract class WekaAbstractAttribute<W extends WekaAbstractAttribute<W>>
      * 
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString()
     {
         return getValue();
@@ -117,6 +118,8 @@ public abstract class WekaAbstractAttribute<W extends WekaAbstractAttribute<W>>
      * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
+    @SuppressWarnings("unchecked")
+    @Override
     public boolean equals(Object o)
     {
         try

@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.utilities;
 import de.lmu.ifi.dbs.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.logging.LoggingConfiguration;
 
-import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -70,6 +69,7 @@ public abstract class ConstantObject<D extends ConstantObject<D>> extends Abstra
    * @return the ConstantObject of designated type and name if it exists, null
    *         otherwise
    */
+  @SuppressWarnings("unchecked")
   public static final <D extends ConstantObject<D>> D lookup(final Class<D> type, final String name) {
     return (D) CONSTANT_OBJECTS_INDEX.get(type).get(name);
   }
@@ -81,9 +81,9 @@ public abstract class ConstantObject<D extends ConstantObject<D>> extends Abstra
    * @return the ConstantObject that already exists in the virtual machine
    *         rather than a new instance as created by the serialization
    *         mechanism
-   * @throws ObjectStreamException
    */
-  protected Object readResolve() throws ObjectStreamException {
+  @SuppressWarnings("unchecked")
+  protected Object readResolve(){
     Object result = lookup(getClass(), getName());
     if(result == null) {
       throw new NullPointerException("No constant object of type \"" + getClass().getName() + "\" found for name \"" + getName() + "\".");
@@ -94,6 +94,7 @@ public abstract class ConstantObject<D extends ConstantObject<D>> extends Abstra
   /**
    * @see Object#equals(Object)
    */
+  @SuppressWarnings("unchecked")
   @Override
   public boolean equals(Object o) {
     if(this == o) {
