@@ -1,9 +1,16 @@
 <?xml version="1.0"?>
 
-<project name="ELKI" default="complete" basedir=".">
+<project name="ELKI" default="preliminary" basedir=".">
 	<property name="RELEASE" value="0.1"/>
 	
 	<property name="release.overview" value="release_0_1.html"/>
+	
+	<property name="basepackage" value="de/lmu/ifi/dbs/elki/"/>
+	
+	<property name="ELKI" value="ELKI"/>
+	
+	<property name="ELKI_LONG" value="ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures"/>
+	
 	<tstamp>
 		<format property="now" pattern="yyyy-MM-dd_HHmm" />
 	</tstamp>
@@ -23,42 +30,66 @@
 		</or>
 	</condition>
 
+	<condition property="windows.web.prefix" value="W:">
+		<or>
+			<equals arg1="${user.name}" arg2="achtert" />
+			<equals arg1="${user.name}" arg2="schumm" />
+			<equals arg1="${user.name}" arg2="wanka" />
+			<and>
+				<or>
+					<equals arg1="${user.name}" arg2="kroegerp" />
+					<equals arg1="${user.name}" arg2="zimek" />
+				</or>
+				<equals arg1="${os.name}" arg2="Windows XP" />
+			</and>
+		</or>
+	</condition>
+	
 	<property name="deploy.srcdir" value="${windows.disk.prefix}/nfs/infdbs/WissProj/KDD-Framework/releases/${RELEASE}/${now}/input"/>
 	
-	<property name="deploy.basedir" value="${windows.disk.prefix}/nfs/infdbs/WissProj/KDD-Framework/releases/${RELEASE}/${now}"/>
+	<property name="deploy.basedir" value="${windows.disk.prefix}/nfs/infdbs/WissProj/KDD-Framework/releases/${RELEASE}/${now}/output"/>
+	
+	<property name="deploy.target" value="${windows.web.prefix}/nfs/www/Forschung/KDD/ELKI/release${RELEASE}"/>
 
 	<property name="deploy.javadoc" value="${deploy.basedir}/doc"/>
 
-
-	<!-- exclude:
-	algorithm.APRIORI,
-	algorithm.ICA,
-	algorithm.classifier,
-	algorithm.outlier,
-	algorithm.clustering.FIRES,
-	algorithm.clustering.FractalDimensionTest,
-	algorithm.clustering.KernelFourC,
-	algorithm.clustering.SubspaceAggregation,
-	algorithm.clustering.SubspaceEM,
-	algorithm.clustering.biclustering.NaivePatternBased,
-	algorithm.clustering.hierarchical,
-	algorithm.result.AprioriResult,
-	algorithm.result.GeneralizedLOFResult,
-	algorithm.result.LOFResult,
-	algorithm.result.clustering.FractalDimensionTestResult,
-	algorithm.result.clustering.HierarchicalFractalDimensionCluster,
-	converter,
-	data.???,
-	data.synthetic,
-	distance.???,
-	evaluation,
-	featureextraction,
-	gui,
-	math.analysis,
-	math.spacefillingcurves,
-	wrapper
-	-->
-	<target name="complete"></target>
+	
+	<target name="preliminary" depends="copy4release"/>
+	
+	<target name="copy4release" description="copies selected resources to current release directory">
+		<copy todir="${deploy.srcdir}">
+			<fileset dir="src">
+				<exclude name="${basepackage}algorithm/APRIORI.*"/>
+				<exclude name="${basepackage}algorithm/ICA.*"/>
+				<exclude name="${basepackage}algorithm/classifier/**"/>
+				<exclude name="${basepackage}algorithm/outlier/**"/>
+				<exclude name="${basepackage}algorithm/clustering/subspace/FIRES.*"/>
+				<exclude name="${basepackage}algorithm/clustering/correlation/FractalDimensionTst.*"/>
+				<exclude name="${basepackage}algorithm/clustering/correlation/KernelFourC.*"/>
+				<exclude name="${basepackage}algorithm/clustering/correlation/SubspaceAggregation.*"/>
+				<exclude name="${basepackage}algorithm/clustering/correlation/SubspaceEM.*"/>
+				<exclude name="${basepackage}algorithm/clustering/biclustering/NaivePatternBased.*"/>
+				<exclude name="${basepackage}algorithm/clustering/hierarchical/**"/>
+				<exclude name="${basepackage}algorithm/result/AprioriResult.*"/>
+				<exclude name="${basepackage}algorithm/result/GeneralizedLOFResult.*"/>
+				<exclude name="${basepackage}algorithm/result/LOFResult.*"/>
+				<exclude name="${basepackage}algorithm/result/clustering/FractalDimensionTestResult.*"/>
+				<exclude name="${basepackage}algorithm/result/clustering/HierarchicalFractalDimensionCluster.*"/>
+				<exclude name="${basepackage}converter/**"/>
+		<!--
+			data.???,
+			data.synthetic,
+			distance.???,
+			evaluation,
+			featureextraction,
+			gui,
+			math.analysis,
+			math.spacefillingcurves,
+			wrapper
+			-->
+			</fileset>			
+		</copy>
+	</target>
 	
 	<target name="javadoc">
 			<javadoc destdir="${deploy.javadoc}" access="protected" use="true" notree="false" nonavbar="false" noindex="false" splitindex="true" author="true" version="true" nodeprecatedlist="false" nodeprecated="false" link="http://java.sun.com/javase/6/docs/api/"
