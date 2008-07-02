@@ -63,98 +63,50 @@
 				<exclude name="${basepackage}algorithm/ICA.*"/>
 				<exclude name="${basepackage}algorithm/classifier/**"/>
 				<exclude name="${basepackage}algorithm/outlier/**"/>
-				<exclude name="${basepackage}algorithm/clustering/subspace/FIRES.*"/>
+				<exclude name="${basepackage}algorithm/clustering/biclustering/NaivePatternBased.*"/>
 				<exclude name="${basepackage}algorithm/clustering/correlation/FractalDimensionTst.*"/>
 				<exclude name="${basepackage}algorithm/clustering/correlation/KernelFourC.*"/>
 				<exclude name="${basepackage}algorithm/clustering/correlation/SubspaceAggregation.*"/>
 				<exclude name="${basepackage}algorithm/clustering/correlation/SubspaceEM.*"/>
-				<exclude name="${basepackage}algorithm/clustering/biclustering/NaivePatternBased.*"/>
 				<exclude name="${basepackage}algorithm/clustering/hierarchical/**"/>
+				<exclude name="${basepackage}algorithm/clustering/subspace/FIRES.*"/>
 				<exclude name="${basepackage}algorithm/result/AprioriResult.*"/>
 				<exclude name="${basepackage}algorithm/result/GeneralizedLOFResult.*"/>
 				<exclude name="${basepackage}algorithm/result/LOFResult.*"/>
 				<exclude name="${basepackage}algorithm/result/clustering/FractalDimensionTestResult.*"/>
 				<exclude name="${basepackage}algorithm/result/clustering/HierarchicalFractalDimensionCluster.*"/>
 				<exclude name="${basepackage}converter/**"/>
-		<!--
-			data.???,
-			data.synthetic,
-			distance.???,
-			evaluation,
-			featureextraction,
-			gui,
-			math.analysis,
-			math.spacefillingcurves,
-			wrapper
-			-->
+				<exclude name="${basepackage}data/synthetic/**"/>
+				<exclude name="${basepackage}distance/distancefunction/FractalDimensionBasedDistanceFunction"/>
+				<exclude name="${basepackage}evaluation/**"/>
+				<exclude name="${basepackage}featureextraction/**"/>
+				<exclude name="${basepackage}gui/**"/>
+				<exclude name="${basepackage}math/analysis/**"/>
+				<exclude name="${basepackage}math/spacefillingcurves/**"/>
+				<exclude name="${basepackage}wrapper/**"/>
 			</fileset>			
 		</copy>
 	</target>
 	
-	<target name="javadoc">
-			<javadoc destdir="${deploy.javadoc}" access="protected" use="true" notree="false" nonavbar="false" noindex="false" splitindex="true" author="true" version="true" nodeprecatedlist="false" nodeprecated="false" link="http://java.sun.com/javase/6/docs/api/"
-				packagenames="de.lmu.ifi.dbs.algorithm,
-	                    de.lmu.ifi.dbs.algorithm.classifier,
-	                    de.lmu.ifi.dbs.algorithm.clustering,
-	                    de.lmu.ifi.dbs.algorithm.clustering.biclustering,
-	                    de.lmu.ifi.dbs.algorithm.clustering.hierarchical,
-	                    de.lmu.ifi.dbs.algorithm.clustering.hough,
-	                    de.lmu.ifi.dbs.algorithm.outlier,
-	                    de.lmu.ifi.dbs.algorithm.result,
-	                    de.lmu.ifi.dbs.algorithm.result.clustering,
-	                    de.lmu.ifi.dbs.algorithm.result.clustering.biclustering,
-	                    de.lmu.ifi.dbs.algorithm.result.clustering.outlier,
-				        de.lmu.ifi.dbs.converter,
-	                    de.lmu.ifi.dbs.data,
-	                    de.lmu.ifi.dbs.data.synthetic,
-	                    de.lmu.ifi.dbs.database,
-	                    de.lmu.ifi.dbs.database.connection,
-	                    de.lmu.ifi.dbs.distance,
-	                    de.lmu.ifi.dbs.distance.distancefunction,
-	                    de.lmu.ifi.dbs.distance.similarityfunction,
-	                    de.lmu.ifi.dbs.distance.similarityfunction.kernel,
-	                    de.lmu.ifi.dbs.evaluation,
-	                    de.lmu.ifi.dbs.evaluation.holdout,
-	                    de.lmu.ifi.dbs.evaluation.procedure,
-	                    de.lmu.ifi.dbs.index,
-		                de.lmu.ifi.dbs.index.tree,
-	                    de.lmu.ifi.dbs.index.tree.metrical,
-	                    de.lmu.ifi.dbs.index.tree.metrical.mtreevariants,
-	                    de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.mkapp,
-	                    de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.mkcop,
-	                    de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.mkmax,
-	                    de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.mktab,
-	                    de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.mtree,
-	                    de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.util,
-	                    de.lmu.ifi.dbs.index.tree.spatial,
-	                    de.lmu.ifi.dbs.index.tree.spatial.rstarvariants,
-	                    de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.deliclu,
-	                    de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.flat,
-	                    de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.rdknn,
-	                    de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.rstar,
-	                    de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.util,
-	                    de.lmu.ifi.dbs.logging,
-	                    de.lmu.ifi.dbs.math,
-	                    de.lmu.ifi.dbs.math.analysis,
-	                    de.lmu.ifi.dbs.math.linearalgebra,
-	                    de.lmu.ifi.dbs.math.spacefillingcurves,
-	                    de.lmu.ifi.dbs.math.statistics,
-	                    de.lmu.ifi.dbs.normalization,
-	                    de.lmu.ifi.dbs.parser,
-	                    de.lmu.ifi.dbs.persistent,
-	                    de.lmu.ifi.dbs.preprocessing,
-	                    de.lmu.ifi.dbs.properties,
-	                    de.lmu.ifi.dbs.tree,
-	                    de.lmu.ifi.dbs.tree.btree,
-	                    de.lmu.ifi.dbs.utilities,
-	                    de.lmu.ifi.dbs.utilities.heap,
-	                    de.lmu.ifi.dbs.utilities.optionhandling,
-	                    de.lmu.ifi.dbs.utilities.optionhandling.constraints,
-	                    de.lmu.ifi.dbs.utilities.output,
-	                    de.lmu.ifi.dbs.varianceanalysis,
-	                    de.lmu.ifi.dbs.varianceanalysis.ica,
-	                    de.lmu.ifi.dbs.wrapper"
-				overview="${deploy.srcdir}/src/${release.overview}" sourcepath="${deploy.srcdir}/src" classpath="${deploy.srcdir}/bin" doctitle="ELKI" windowtitle="ELKI">
+	<target name="javadoc" depends="compile">
+			<javadoc
+				destdir="${deploy.javadoc}"
+				access="protected"
+				use="true"
+				notree="false"
+				nonavbar="false"
+				noindex="false"
+				splitindex="true"
+				author="true"
+				version="false"
+				nodeprecatedlist="false"
+				nodeprecated="false"
+				link="http://java.sun.com/javase/6/docs/api/"
+				overview="${deploy.srcdir}/src/${release.overview}"
+				sourcepath="${deploy.srcdir}/src"
+				classpath="${deploy.srcdir}/bin"
+				doctitle="ELKI"
+				windowtitle="ELKI">
 				<footer>
 	                    &lt;table style="font-size:xx-small;"&gt;
 	                    &lt;tr&gt;
@@ -190,10 +142,12 @@
 	                    &lt;/td&gt;
 	                    &lt;/tr&gt;
 	                    &lt;/table&gt;
-	                </footer>
+	            </footer>
 				<header>ELKI</header>
 			</javadoc>
 		</target>
 	
+	<target name="compile">
+	</target>
 
 </project>

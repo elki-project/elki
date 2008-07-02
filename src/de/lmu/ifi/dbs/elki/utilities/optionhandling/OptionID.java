@@ -405,7 +405,7 @@ public class OptionID extends ConstantObject<OptionID> {
     );
 
     /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.ProjectedDBSCAN#MINPTS_PARAM}
+     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.ProjectedDBSCAN#MINPTS_PARAM}
      */
     public static final OptionID PROJECTED_DBSCAN_MINPTS = new OptionID("projdbscan.minpts",
         "Threshold for minimum number of points in " +

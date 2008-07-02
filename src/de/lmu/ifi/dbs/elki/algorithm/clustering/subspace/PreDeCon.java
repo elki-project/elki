@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
 
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.ProjectedDBSCAN;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.preprocessing.PreDeConPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.Description;

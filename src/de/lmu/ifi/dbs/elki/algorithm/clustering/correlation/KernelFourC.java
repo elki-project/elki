@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.ProjectedDBSCAN;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.ProjectedDBSCAN;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.KernelBasedLocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.preprocessing.KernelFourCPreprocessor;

@@ -1,8 +1,7 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
+package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.Clustering;
 import de.lmu.ifi.dbs.elki.algorithm.result.clustering.ClustersPlusNoise;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
