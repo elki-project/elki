@@ -2,6 +2,33 @@
 
 <project name="ELKI" default="complete" basedir=".">
 	<property name="RELEASE" value="0.1"/>
+	
+	<property name="release.overview" value="release_0_1.html"/>
+	<tstamp>
+		<format property="now" pattern="yyyy-MM-dd_HHmm" />
+	</tstamp>
+
+	<condition property="windows.disk.prefix" value="P:">
+		<or>
+			<equals arg1="${user.name}" arg2="achtert" />
+			<equals arg1="${user.name}" arg2="schumm" />
+			<equals arg1="${user.name}" arg2="wanka" />
+			<and>
+				<or>
+					<equals arg1="${user.name}" arg2="kroegerp" />
+					<equals arg1="${user.name}" arg2="zimek" />
+				</or>
+				<equals arg1="${os.name}" arg2="Windows XP" />
+			</and>
+		</or>
+	</condition>
+
+	<property name="deploy.srcdir" value="${windows.disk.prefix}/nfs/infdbs/WissProj/KDD-Framework/releases/${RELEASE}/${now}/input"/>
+	
+	<property name="deploy.basedir" value="${windows.disk.prefix}/nfs/infdbs/WissProj/KDD-Framework/releases/${RELEASE}/${now}"/>
+
+	<property name="deploy.javadoc" value="${deploy.basedir}/doc"/>
+
 
 	<!-- exclude:
 	algorithm.APRIORI,
@@ -32,4 +59,110 @@
 	wrapper
 	-->
 	<target name="complete"></target>
+	
+	<target name="javadoc">
+			<javadoc destdir="${deploy.javadoc}" access="protected" use="true" notree="false" nonavbar="false" noindex="false" splitindex="true" author="true" version="true" nodeprecatedlist="false" nodeprecated="false" link="http://java.sun.com/javase/6/docs/api/"
+				packagenames="de.lmu.ifi.dbs.algorithm,
+	                    de.lmu.ifi.dbs.algorithm.classifier,
+	                    de.lmu.ifi.dbs.algorithm.clustering,
+	                    de.lmu.ifi.dbs.algorithm.clustering.biclustering,
+	                    de.lmu.ifi.dbs.algorithm.clustering.hierarchical,
+	                    de.lmu.ifi.dbs.algorithm.clustering.hough,
+	                    de.lmu.ifi.dbs.algorithm.outlier,
+	                    de.lmu.ifi.dbs.algorithm.result,
+	                    de.lmu.ifi.dbs.algorithm.result.clustering,
+	                    de.lmu.ifi.dbs.algorithm.result.clustering.biclustering,
+	                    de.lmu.ifi.dbs.algorithm.result.clustering.outlier,
+				        de.lmu.ifi.dbs.converter,
+	                    de.lmu.ifi.dbs.data,
+	                    de.lmu.ifi.dbs.data.synthetic,
+	                    de.lmu.ifi.dbs.database,
+	                    de.lmu.ifi.dbs.database.connection,
+	                    de.lmu.ifi.dbs.distance,
+	                    de.lmu.ifi.dbs.distance.distancefunction,
+	                    de.lmu.ifi.dbs.distance.similarityfunction,
+	                    de.lmu.ifi.dbs.distance.similarityfunction.kernel,
+	                    de.lmu.ifi.dbs.evaluation,
+	                    de.lmu.ifi.dbs.evaluation.holdout,
+	                    de.lmu.ifi.dbs.evaluation.procedure,
+	                    de.lmu.ifi.dbs.index,
+		                de.lmu.ifi.dbs.index.tree,
+	                    de.lmu.ifi.dbs.index.tree.metrical,
+	                    de.lmu.ifi.dbs.index.tree.metrical.mtreevariants,
+	                    de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.mkapp,
+	                    de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.mkcop,
+	                    de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.mkmax,
+	                    de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.mktab,
+	                    de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.mtree,
+	                    de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.util,
+	                    de.lmu.ifi.dbs.index.tree.spatial,
+	                    de.lmu.ifi.dbs.index.tree.spatial.rstarvariants,
+	                    de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.deliclu,
+	                    de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.flat,
+	                    de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.rdknn,
+	                    de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.rstar,
+	                    de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.util,
+	                    de.lmu.ifi.dbs.logging,
+	                    de.lmu.ifi.dbs.math,
+	                    de.lmu.ifi.dbs.math.analysis,
+	                    de.lmu.ifi.dbs.math.linearalgebra,
+	                    de.lmu.ifi.dbs.math.spacefillingcurves,
+	                    de.lmu.ifi.dbs.math.statistics,
+	                    de.lmu.ifi.dbs.normalization,
+	                    de.lmu.ifi.dbs.parser,
+	                    de.lmu.ifi.dbs.persistent,
+	                    de.lmu.ifi.dbs.preprocessing,
+	                    de.lmu.ifi.dbs.properties,
+	                    de.lmu.ifi.dbs.tree,
+	                    de.lmu.ifi.dbs.tree.btree,
+	                    de.lmu.ifi.dbs.utilities,
+	                    de.lmu.ifi.dbs.utilities.heap,
+	                    de.lmu.ifi.dbs.utilities.optionhandling,
+	                    de.lmu.ifi.dbs.utilities.optionhandling.constraints,
+	                    de.lmu.ifi.dbs.utilities.output,
+	                    de.lmu.ifi.dbs.varianceanalysis,
+	                    de.lmu.ifi.dbs.varianceanalysis.ica,
+	                    de.lmu.ifi.dbs.wrapper"
+				overview="${deploy.srcdir}/src/${release.overview}" sourcepath="${deploy.srcdir}/src" classpath="${deploy.srcdir}/bin" doctitle="ELKI" windowtitle="ELKI">
+				<footer>
+	                    &lt;table style="font-size:xx-small;"&gt;
+	                    &lt;tr&gt;
+	                    &lt;td colspan="2" align="left"&gt;
+	                    Documentation created
+	                    &lt;/td&gt;
+	                    &lt;/tr&gt;
+
+	                    &lt;tr&gt;
+	                    &lt;td align="left"&gt;
+	                    at
+	                    &lt;/td&gt;
+	                    &lt;td align="right"&gt;
+	                    ${now}
+	                    &lt;/td&gt;
+	                    &lt;/tr&gt;
+
+	                    &lt;tr&gt;
+	                    &lt;td align="left"&gt;
+	                    by
+	                    &lt;/td&gt;
+	                    &lt;td align="right"&gt;
+	                    ${user.name}
+	                    &lt;/td&gt;
+	                    &lt;/tr&gt;
+					
+						&lt;tr&gt;
+	                    &lt;td align="left"&gt;
+	                    for release
+	                    &lt;/td&gt;
+	                    &lt;td align="right"&gt;
+	                    ${RELEASE}
+	                    &lt;/td&gt;
+	                    &lt;/tr&gt;
+	                    &lt;/table&gt;
+	                </footer>
+				<header>ELKI</header>
+			</javadoc>
+		</target>
+	
+
 </project>
