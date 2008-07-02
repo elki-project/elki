@@ -1,12 +1,13 @@
 package de.lmu.ifi.dbs.elki.database;
 
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.HierarchicalFractalDimensionCluster;
+
 import de.lmu.ifi.dbs.elki.algorithm.result.outlier.SODModel;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.ConstantObject;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.varianceanalysis.LocalPCA;
 
 import java.util.BitSet;
@@ -151,11 +152,6 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
    */
   public static final AssociationID<Object> OBJECT = new AssociationID<Object>("object", Object.class);
 
-  /**
-   * The association id to associate a fractal dimension cluster.
-   */
-  @SuppressWarnings("unchecked")
-  public static final AssociationID<HierarchicalFractalDimensionCluster> FRACTAL_DIMENSION_CLUSTER = new AssociationID<HierarchicalFractalDimensionCluster>("fractalDimensionCluster", HierarchicalFractalDimensionCluster.class);
 
   /**
    * The association id to associate a subspace outlier degree.
@@ -215,8 +211,24 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
    * @return the AssociationID for the given name if it exists, null otherwise
    */
   @SuppressWarnings("unchecked")
-  public AssociationID<?> getAssociationID(final String name) {
+  public static AssociationID<?> getAssociationID(final String name) {
     return AssociationID.lookup(AssociationID.class, name);
+  }
+  
+  /**
+   * Gets or creates the AssociationID for the given name and given type.
+   * 
+   *
+   * @param name        the name
+   * @param type the type of the association
+   * @return the AssociationID for the given name
+   */
+  public static <C extends Class<C>> AssociationID<C> getOrCreateAssociationID(final String name, final C type) {
+    AssociationID<C> associationID = (AssociationID<C>) getAssociationID(name); 
+    if (associationID == null) {
+          associationID = new AssociationID(name, type);
+      }
+      return associationID;
   }
 
 }

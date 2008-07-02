@@ -6,8 +6,6 @@ import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.evaluation.holdout.Holdout;
-import de.lmu.ifi.dbs.elki.evaluation.procedure.EvaluationProcedure;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.preprocessing.HiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.properties.Properties;
@@ -175,22 +173,7 @@ public class OptionID extends ConstantObject<OptionID> {
             Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) + "."
     );
 
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.classifier.AbstractClassifier#EVALUATION_PROCEDURE_PARAM}
-     */
-    public static final OptionID CLASSIFIER_EVALUATION_PROCEDURE = new OptionID("classifier.eval",
-        "Classname of the evaluation-procedure to use for evaluation " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(EvaluationProcedure.class) + "."
-    );
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.classifier.AbstractClassifier#HOLDOUT_PARAM}
-     */
-    public static final OptionID CLASSIFIER_HOLDOUT = new OptionID("classifier.holdout",
-        "<Classname of the holdout for evaluation  " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Holdout.class) + "."
-    );
-
+    
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.CLIQUE#PRUNE_FLAG}
      */

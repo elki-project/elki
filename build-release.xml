@@ -54,35 +54,40 @@
 	<property name="deploy.javadoc" value="${deploy.basedir}/doc"/>
 
 	
-	<target name="preliminary" depends="copy4release"/>
+	<target name="preliminary" depends="copy4release,compile,javadoc"/>
 	
 	<target name="copy4release" description="copies selected resources to current release directory">
-		<copy todir="${deploy.srcdir}">
+		<copy todir="${deploy.srcdir}/src">
 			<fileset dir="src">
-				<exclude name="${basepackage}algorithm/APRIORI.*"/>
+				<!-- CoDeC requires classifier -->
+				<exclude name="${basepackage}algorithm/CoDeC.*"/>
 				<exclude name="${basepackage}algorithm/ICA.*"/>
 				<exclude name="${basepackage}algorithm/classifier/**"/>
 				<exclude name="${basepackage}algorithm/outlier/**"/>
 				<exclude name="${basepackage}algorithm/clustering/biclustering/NaivePatternBased.*"/>
-				<exclude name="${basepackage}algorithm/clustering/correlation/FractalDimensionTst.*"/>
+				<exclude name="${basepackage}algorithm/clustering/correlation/FractalDimensionTest.*"/>
 				<exclude name="${basepackage}algorithm/clustering/correlation/KernelFourC.*"/>
 				<exclude name="${basepackage}algorithm/clustering/correlation/SubspaceAggregation.*"/>
 				<exclude name="${basepackage}algorithm/clustering/correlation/SubspaceEM.*"/>
 				<exclude name="${basepackage}algorithm/clustering/hierarchical/**"/>
 				<exclude name="${basepackage}algorithm/clustering/subspace/FIRES.*"/>
-				<exclude name="${basepackage}algorithm/result/AprioriResult.*"/>
 				<exclude name="${basepackage}algorithm/result/GeneralizedLOFResult.*"/>
-				<exclude name="${basepackage}algorithm/result/LOFResult.*"/>
+				<exclude name="${basepackage}algorithm/result/ICAResult.*"/>
 				<exclude name="${basepackage}algorithm/result/clustering/FractalDimensionTestResult.*"/>
 				<exclude name="${basepackage}algorithm/result/clustering/HierarchicalFractalDimensionCluster.*"/>
-				<exclude name="${basepackage}converter/**"/>
+				<exclude name="${basepackage}algorithm/result/outlier/LOFResult.*"/>
+				<exclude name="${basepackage}converter/Arff2Txt.*"/>
+				<exclude name="${basepackage}converter/ArffSparseInstanceToSparseBitVector.*"/>
+				<exclude name="${basepackage}converter/Database2Arff.*"/>
+				<exclude name="${basepackage}converter/Txt2Arff.*"/>
 				<exclude name="${basepackage}data/synthetic/**"/>
 				<exclude name="${basepackage}distance/distancefunction/FractalDimensionBasedDistanceFunction"/>
 				<exclude name="${basepackage}evaluation/**"/>
 				<exclude name="${basepackage}featureextraction/**"/>
 				<exclude name="${basepackage}gui/**"/>
 				<exclude name="${basepackage}math/analysis/**"/>
-				<exclude name="${basepackage}math/spacefillingcurves/**"/>
+				<exclude name="${basepackage}parser/ArffFileParser.**"/>
+				<exclude name="${basepackage}varianceanalysis/ica/**"/>				
 				<exclude name="${basepackage}wrapper/**"/>
 			</fileset>			
 		</copy>
@@ -103,51 +108,45 @@
 				nodeprecated="false"
 				link="http://java.sun.com/javase/6/docs/api/"
 				overview="${deploy.srcdir}/src/${release.overview}"
-				sourcepath="${deploy.srcdir}/src"
 				classpath="${deploy.srcdir}/bin"
 				doctitle="ELKI"
 				windowtitle="ELKI">
+				<packageset dir="${deploy.srcdir}/src"/>
 				<footer>
-	                    &lt;table style="font-size:xx-small;"&gt;
-	                    &lt;tr&gt;
-	                    &lt;td colspan="2" align="left"&gt;
-	                    Documentation created
-	                    &lt;/td&gt;
-	                    &lt;/tr&gt;
-
-	                    &lt;tr&gt;
-	                    &lt;td align="left"&gt;
-	                    at
-	                    &lt;/td&gt;
-	                    &lt;td align="right"&gt;
-	                    ${now}
-	                    &lt;/td&gt;
-	                    &lt;/tr&gt;
-
-	                    &lt;tr&gt;
-	                    &lt;td align="left"&gt;
-	                    by
-	                    &lt;/td&gt;
-	                    &lt;td align="right"&gt;
-	                    ${user.name}
-	                    &lt;/td&gt;
-	                    &lt;/tr&gt;
-					
-						&lt;tr&gt;
-	                    &lt;td align="left"&gt;
-	                    for release
-	                    &lt;/td&gt;
-	                    &lt;td align="right"&gt;
+                   &lt;table style="font-size:xx-small;"&gt;			
+	                 &lt;tr&gt;
+	                   &lt;td align="left"&gt;
+	                    Release
+	                   &lt;/td&gt;
+	                   &lt;td align="center"&gt;
 	                    ${RELEASE}
-	                    &lt;/td&gt;
-	                    &lt;/tr&gt;
-	                    &lt;/table&gt;
+	                   &lt;/td&gt;
+					   &lt;td align="right"&gt;
+	                    (${now})
+	                   &lt;/td&gt;
+	                 &lt;/tr&gt;
+                   &lt;/table&gt;
 	            </footer>
 				<header>ELKI</header>
 			</javadoc>
+		    <!-- GRAPHIKEN -->
 		</target>
 	
-	<target name="compile">
+	<target name="compile" depends="copy4release">
+		<javac destdir="${deploy.srcdir}" deprecation="true" debug="true" optimize="true" source="1.6" debuglevel="">
+			<compilerarg value="-Xlint:all"/>
+			<classpath path="${deploy.srcdir}/src" />
+			<exclude name="*.xml" />
+			<exclude name="*.html" />
+			<exclude name="*.jar" />
+			<exclude name="*.xsd" />
+			<exclude name="*.prp" />
+			<src path="${deploy.srcdir}/src" />
+		</javac>
+		<copy file="${deploy.srcdir}/src/${basepackage}properties/KDDFramework.prp" tofile="${deploy.srcdir}/${basepackage}properties/KDDFramework.prp"/>
+	</target>
+	
+	<target name="jar">
 	</target>
 
 </project>

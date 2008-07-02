@@ -48,10 +48,10 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
    *                 of this node
    * @param isLeaf   indicates wether this node is a leaf node
    */
+  @SuppressWarnings("unchecked")
   public AbstractNode(PageFile<N> file, int capacity, boolean isLeaf) {
     super(file);
     this.numEntries = 0;
-    //noinspection unchecked
     this.entries = (E[]) new Entry[capacity];
     this.isLeaf = isLeaf;
   }

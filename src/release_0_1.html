@@ -1,0 +1,51 @@
+<html>
+<head>
+<title>Documentation for ELKI</title>
+</head>
+<body>
+<p>ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures.</p>
+
+<p>ELKI is a generic framework for a broad range of KDD-applications
+and their development.</p>
+
+<h1>Architecture</h1>
+<!-- // TODO : describe architecture (some diagrams?) -->
+
+<h2>How to make use of this framework</h2>
+
+<h3>Usage</h3>
+<p>To use the KDD-Framework we recommend an executable .jar-file:
+<a href="../kdd.jar">kdd.jar</a>. You get a description of usage by calling
+<code>java -jar kdd.jar -h</code>.</p>
+
+<h3>Development of new applications</h3>
+
+<h4>Extension</h4>
+To provide new applications one is simply to implement the specified interfaces.
+There are interfaces for a broad range of targets of development. Compare the
+<a href="overview-tree.html">tree of interfaces</a> to get an overview
+concerning the provided interfaces.
+
+
+<h4>Where are what parameters used for which purpose?</h4>
+
+<p>The main class {@link de.lmu.ifi.dbs.elki.KDDTask KDDTask} requires specification of an
+{@link de.lmu.ifi.dbs.elki.algorithm.Algorithm Algorithm}
+to use, a {@link de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection DatabaseConnection} to manage the input,
+and a filename where to deploy the output. However, by omitting specification of a filename for
+output, the results will be given to standard output, thus it may be piped directly to another
+application.</p>
+
+<p>Furthermore a normalization can be specified for the input.
+You can additionally require to restore the original values for the output.</p>
+
+<p>Which input is to be provided in what way
+is to be defined via parameters specifically for a certain
+{@link de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection DatabaseConnection}.</p>
+
+<p>The need for other parameters may differ from implementation to implementation. However,
+you need not to specify input nor output if you are going to implement an algorithm.</p>
+
+
+</body>
+</html>
