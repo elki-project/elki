@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
-import de.lmu.ifi.dbs.elki.algorithm.KDDTask;
+import de.lmu.ifi.dbs.elki.KDDTask;
 import de.lmu.ifi.dbs.elki.algorithm.result.Result;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;

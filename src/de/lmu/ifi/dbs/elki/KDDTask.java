@@ -1,5 +1,7 @@
-package de.lmu.ifi.dbs.elki.algorithm;
+package de.lmu.ifi.dbs.elki;
 
+import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.algorithm.result.Result;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;

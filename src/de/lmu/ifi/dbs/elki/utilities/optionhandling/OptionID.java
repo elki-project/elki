@@ -25,21 +25,21 @@ import de.lmu.ifi.dbs.elki.varianceanalysis.EigenPairFilter;
 public class OptionID extends ConstantObject<OptionID> {
 
     /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.KDDTask#HELP_FLAG}
+     * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#HELP_FLAG}
      */
     public static final OptionID HELP = new OptionID("h",
         "Flag to obtain help-message, either for the main-routine or for any specified algorithm. " +
             "Causes immediate stop of the program.");
 
     /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.KDDTask#HELP_LONG_FLAG}
+     * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#HELP_LONG_FLAG}
      */
     public static final OptionID HELP_LONG = new OptionID("help",
         "Flag to obtain help-message, either for the main-routine or for any specified algorithm. " +
             "Causes immediate stop of the program.");
 
     /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.KDDTask#ALGORITHM_PARAM}
+     * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#ALGORITHM_PARAM}
      */
     public static final OptionID ALGORITHM = new OptionID("algorithm",
         "Classname of an algorithm " +
@@ -49,7 +49,7 @@ public class OptionID extends ConstantObject<OptionID> {
     );
 
     /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.KDDTask#DESCRIPTION_PARAM}
+     * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#DESCRIPTION_PARAM}
      */
     public static final OptionID DESCRIPTION = new OptionID("description",
         "Name of a class to obtain a description - for classes that implement " +
@@ -58,7 +58,7 @@ public class OptionID extends ConstantObject<OptionID> {
     );
 
     /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.KDDTask#DATABASE_CONNECTION_PARAM}
+     * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#DATABASE_CONNECTION_PARAM}
      */
     public static final OptionID DATABASE_CONNECTION = new OptionID("dbc",
         "Classname of a database connection " +
@@ -68,7 +68,7 @@ public class OptionID extends ConstantObject<OptionID> {
     );
 
     /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.KDDTask#OUTPUT_PARAM}
+     * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#OUTPUT_PARAM}
      * todo richtige beschreibung? oder sind es directories?
      */
     public static final OptionID OUTPUT = new OptionID("out",
@@ -79,7 +79,7 @@ public class OptionID extends ConstantObject<OptionID> {
     );
 
     /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.KDDTask#NORMALIZATION_PARAM}
+     * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#NORMALIZATION_PARAM}
      */
     public static final OptionID NORMALIZATION = new OptionID("norm",
         "Classname of a normalization in order to use a database with normalized values " +
@@ -88,7 +88,7 @@ public class OptionID extends ConstantObject<OptionID> {
     );
 
     /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.KDDTask#NORMALIZATION_PARAM}
+     * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#NORMALIZATION_PARAM}
      */
     public static final OptionID NORMALIZATION_UNDO = new OptionID("normUndo",
         "Flag to revert result to original values - " +
