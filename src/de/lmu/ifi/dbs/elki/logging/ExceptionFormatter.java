@@ -19,11 +19,7 @@ public class ExceptionFormatter extends Formatter
      * Otherwise, the user gets information
      * w.r.t. cause and stacktrace.
      */
-    private static final boolean DEBUG = true;
-    // XXX note to set this variable accordingly
-    // experimental version: false
-    // release version:
-    // LoggingConfiguration.DEBUG;
+    private static final boolean DEBUG = LoggingConfiguration.DEBUG;
 
     /**
      * Provides an exception formatter
@@ -37,9 +33,9 @@ public class ExceptionFormatter extends Formatter
     
     /**
      * Exception messages are formatted dependent from the
-     * debug mode as assigned by {@link #DEBUG DEBUG}.
+     * debug mode as assigned by DEBUG.
      * <ul>
-     * <li>If debug mode is deactivated (i.e. {@link #DEBUG DEBUG}<code>=false</code>)
+     * <li>If debug mode is deactivated (i.e. <code>DEBUG=false</code>)
      *     the regular user information will be provided:
      *     i.e., the message of the LogEntry only.
      * </li>
@@ -48,7 +44,7 @@ public class ExceptionFormatter extends Formatter
      *     of the causing exception and the stacktrace.
      * </li>
      * </ul>
-     * Current status: {@value #DEBUG}.
+     * 
      * @see java.util.logging.Formatter#format(java.util.logging.LogRecord)
      */
     @Override

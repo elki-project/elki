@@ -1,4 +1,32 @@
 # wichtig fuer release #####################################
+- Verschieben von OptionIDs, um Abhaengigkeiten von Klassen, die nicht zur Release gehoeren, loszubekommen:
+de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:171: warning - Tag @link: reference not found: de.lmu.ifi.dbs.elki.algorithm.classifier.DistanceBasedClassifier#DISTANCE_FUNCTION_PARAM
+de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:230: warning - Tag @link: reference not found: de.lmu.ifi.dbs.elki.algorithm.CoDeC#CLASSLABEL_PARAM
+de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:239: warning - Tag @link: reference not found: de.lmu.ifi.dbs.elki.algorithm.CoDeC#CLUSTERING_ALGORITHM_PARAM
+de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:248: warning - Tag @link: reference not found: de.lmu.ifi.dbs.elki.algorithm.CoDeC#EVALUATE_AS_CLASSIFIER_FLAG
+de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:328: warning - Tag @link: reference not found: de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.FracClus#NUMBER_OF_SUPPORTERS_PARAM
+de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:335: warning - Tag @link: reference not found: de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.FractalDimensionTest#ID1_PARAM
+de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:342: warning - Tag @link: reference not found: de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.FractalDimensionTest#ID1_PARAM
+de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:356: warning - Tag @link: reference not found: de.lmu.ifi.dbs.elki.algorithm.classifier.KNNClassifier#K_PARAM
+de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:171: warning - Tag @link: reference not found: de.lmu.ifi.dbs.elki.algorithm.classifier.DistanceBasedClassifier#DISTANCE_FUNCTION_PARAM
+de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:230: warning - Tag @link: reference not found: de.lmu.ifi.dbs.elki.algorithm.CoDeC#CLASSLABEL_PARAM
+de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:239: warning - Tag @link: reference not found: de.lmu.ifi.dbs.elki.algorithm.CoDeC#CLUSTERING_ALGORITHM_PARAM
+de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:248: warning - Tag @link: reference not found: de.lmu.ifi.dbs.elki.algorithm.CoDeC#EVALUATE_AS_CLASSIFIER_FLAG
+de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:328: warning - Tag @link: reference not found: de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.FracClus#NUMBER_OF_SUPPORTERS_PARAM
+de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:335: warning - Tag @link: reference not found: de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.FractalDimensionTest#ID1_PARAM
+de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:342: warning - Tag @link: reference not found: de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.FractalDimensionTest#ID1_PARAM
+de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:356: warning - Tag @link: reference not found: de.lmu.ifi.dbs.elki.algorithm.classifier.KNNClassifier#K_PARAM
+de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:171: warning - Tag @link: reference not found: de.lmu.ifi.dbs.elki.algorithm.classifier.DistanceBasedClassifier#DISTANCE_FUNCTION_PARAM
+de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:230: warning - Tag @link: reference not found: de.lmu.ifi.dbs.elki.algorithm.CoDeC#CLASSLABEL_PARAM
+de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:239: warning - Tag @link: reference not found: de.lmu.ifi.dbs.elki.algorithm.CoDeC#CLUSTERING_ALGORITHM_PARAM
+de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:248: warning - Tag @link: reference not found: de.lmu.ifi.dbs.elki.algorithm.CoDeC#EVALUATE_AS_CLASSIFIER_FLAG
+de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:328: warning - Tag @link: reference not found: de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.FracClus#NUMBER_OF_SUPPORTERS_PARAM
+de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:335: warning - Tag @link: reference not found: de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.FractalDimensionTest#ID1_PARAM
+de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:342: warning - Tag @link: reference not found: de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.FractalDimensionTest#ID1_PARAM
+de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:356: warning - Tag @link: reference not found: de.lmu.ifi.dbs.elki.algorithm.classifier.KNNClassifier#K_PARAM
+
+
+
 - Eigene klasse fuer HiCo
   (Elke)
 
