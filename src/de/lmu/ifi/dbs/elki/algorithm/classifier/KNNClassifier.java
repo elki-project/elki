@@ -32,12 +32,20 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
     private static final long serialVersionUID = 5467968122892109545L;
 
     /**
+     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.classifier.KNNClassifier#K_PARAM}
+     */
+    public static final OptionID KNN_CLASSIFIER_K = OptionID.getOrCreateOptionID(
+        "knnclassifier.k",
+        "The number of neighbors to take into account for classification."
+    );
+
+    /**
      * Parameter to specify the number of neighbors to take into account for classification,
      * must be an integer greater than 0.
      * <p>Default value: {@code 1} </p>
      * <p>Key: {@code -knnclassifier.k} </p>
      */
-    private final IntParameter K_PARAM = new IntParameter(OptionID.KNN_CLASSIFIER_K,
+    private final IntParameter K_PARAM = new IntParameter(KNN_CLASSIFIER_K,
         new GreaterConstraint(0), 1);
 
     /**
@@ -95,7 +103,7 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
             }
             for (int i = 0; i < distribution.length; i++) {
                 distribution[i] = ((double) occurences[i])
-                                  / (double) query.size();
+                    / (double) query.size();
             }
             return distribution;
         }

@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.Clustering;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
@@ -52,7 +51,7 @@ public class OptionID extends ConstantObject<OptionID> {
     public static final OptionID DESCRIPTION = new OptionID("description",
         "Name of a class to obtain a description " +
 //            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Parameterizable.class) +
-            "- for classes that implement " + Parameterizable.class.getName()+")" + 
+            "- for classes that implement " + Parameterizable.class.getName() + ")" +
             " -- no further processing will be performed."
     );
 
@@ -167,15 +166,6 @@ public class OptionID extends ConstantObject<OptionID> {
     );
 
     /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.classifier.DistanceBasedClassifier#DISTANCE_FUNCTION_PARAM}
-     */
-    public static final OptionID CLASSIFIER_DISTANCEFUNCTION = new OptionID("classifier.distancefunction",
-        "Classname of the distance function to determine the distance between database objects " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) + "."
-    );
-
-    
-    /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.CLIQUE#PRUNE_FLAG}
      */
     public static final OptionID CLIQUE_PRUNE = new OptionID("clique.prune",
@@ -224,30 +214,6 @@ public class OptionID extends ConstantObject<OptionID> {
             ". If this parameter is not set, the databases of the partitions have " +
             "the same class as the original database."
     );
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.CoDeC#CLASSLABEL_PARAM}
-     */
-    public static final OptionID CODEC_CLASSLABEL = new OptionID("codec.classlabel",
-        "Classname of the designated classLabel class " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(ClassLabel.class) +
-            "."
-    );
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.CoDeC#CLUSTERING_ALGORITHM_PARAM}
-     */
-    public static final OptionID CODEC_CLUSTERING_ALGORITHM = new OptionID("codec.clusteringAlgorithm",
-        "Classname of the clustering algorithm to use to derive cluster " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Clustering.class) +
-            "."
-    );
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.CoDeC#EVALUATE_AS_CLASSIFIER_FLAG}
-     */
-    public static final OptionID CODEC_EVALUATE_AS_CLASSIFIER = new OptionID("codec.classify",
-        "Flag to demand evaluation of the cluster-models as classifier.");
 
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN#EPSILON_PARAM}
@@ -324,38 +290,10 @@ public class OptionID extends ConstantObject<OptionID> {
     );
 
     /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.FracClus#NUMBER_OF_SUPPORTERS_PARAM}
-     */
-    public static final OptionID FRACLUS_NUMBER_OF_SUPPORTERS = new OptionID("fraclus.supporters",
-        "The number of supporters."
-    );
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.FractalDimensionTest#ID1_PARAM}
-     */
-    public static final OptionID FRACTAL_DIMENSION_TEST_ID1 = new OptionID("fractaldimensiontest.id1",
-        "The first id."
-    );
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.FractalDimensionTest#ID1_PARAM}
-     */
-    public static final OptionID FRACTAL_DIMENSION_TEST_ID2 = new OptionID("fractaldimensiontest.id2",
-        "The second id."
-    );
-
-    /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.KMeans#K_PARAM}
      */
     public static final OptionID KMEANS_K = new OptionID("kmeans.k",
         "The number of clusters to find."
-    );
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.classifier.KNNClassifier#K_PARAM}
-     */
-    public static final OptionID KNN_CLASSIFIER_K = new OptionID("knnclassifier.k",
-        "The number of neighbors to take into account for classification."
     );
 
     /**

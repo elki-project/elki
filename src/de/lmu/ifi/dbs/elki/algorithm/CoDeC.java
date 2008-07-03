@@ -12,8 +12,13 @@ import de.lmu.ifi.dbs.elki.data.HierarchicalClassLabel;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,10 +34,37 @@ import java.util.Map;
  */
 public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends ClassLabel<L>> extends AbstractAlgorithm<V> {
     /**
+     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.CoDeC#CLASSLABEL_PARAM}
+     */
+    public static final OptionID CODEC_CLASSLABEL = OptionID.getOrCreateOptionID("" +
+        "codec.classlabel",
+        "Classname of the designated classLabel class " +
+            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(ClassLabel.class) +
+            "."
+    );
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.CoDeC#CLUSTERING_ALGORITHM_PARAM}
+     */
+    public static final OptionID CODEC_CLUSTERING_ALGORITHM = OptionID.getOrCreateOptionID(
+        "codec.clusteringAlgorithm",
+        "Classname of the clustering algorithm to use to derive cluster " +
+            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Clustering.class) +
+            "."
+    );
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.CoDeC#EVALUATE_AS_CLASSIFIER_FLAG}
+     */
+    public static final OptionID CODEC_EVALUATE_AS_CLASSIFIER = OptionID.getOrCreateOptionID(
+        "codec.classify",
+        "Flag to demand evaluation of the cluster-models as classifier.");
+
+    /**
      * Flag to demand evaluation of the cluster-models as classifier.
      * <p>Key: {@code -codec.classify} </p>
      */
-    private final Flag EVALUATE_AS_CLASSIFIER_FLAG = new Flag(OptionID.CODEC_EVALUATE_AS_CLASSIFIER);
+    private final Flag EVALUATE_AS_CLASSIFIER_FLAG = new Flag(CODEC_EVALUATE_AS_CLASSIFIER);
 
     /**
      * Parameter to specify the designated classLabel class,
@@ -41,8 +73,10 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
      * <p>Default value: {@link HierarchicalClassLabel} </p>
      */
     private final ClassParameter<ClassLabel> CLASSLABEL_PARAM =
-        new ClassParameter<ClassLabel>(OptionID.CODEC_CLASSLABEL,
-            ClassLabel.class, HierarchicalClassLabel.class.getName());
+        new ClassParameter<ClassLabel>(
+            CODEC_CLASSLABEL,
+            ClassLabel.class,
+            HierarchicalClassLabel.class.getName());
 
     /**
      * Parameter to specify the clustering algorithm to use to derive cluster,
@@ -51,8 +85,10 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
      * <p>Default value: {@link COPAC} </p>
      */
     private final ClassParameter<Clustering> CLUSTERING_ALGORITHM_PARAM =
-        new ClassParameter<Clustering>(OptionID.CODEC_CLUSTERING_ALGORITHM,
-            Clustering.class, COPAC.class.getName());
+        new ClassParameter<Clustering>(
+            CODEC_CLUSTERING_ALGORITHM,
+            Clustering.class,
+            COPAC.class.getName());
 
     /**
      * Holds the value of flag classify.

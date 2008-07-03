@@ -25,11 +25,20 @@ import java.util.List;
 public class FracClus<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
 
     /**
+     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.FracClus#NUMBER_OF_SUPPORTERS_PARAM}
+     */
+    public static final OptionID FRACLUS_NUMBER_OF_SUPPORTERS = OptionID.getOrCreateOptionID(
+        "fraclus.supporters",
+        "The number of supporters."
+    );
+
+    /**
      * Parameter to specify the number of supporters,
      * must be an integer equal to or greater than 2.
      * <p>Key: {@code -fraclus.supporters} </p>
      */
-    private final IntParameter NUMBER_OF_SUPPORTERS_PARAM = new IntParameter(OptionID.FRACLUS_NUMBER_OF_SUPPORTERS,
+    private final IntParameter NUMBER_OF_SUPPORTERS_PARAM = new IntParameter(
+        FRACLUS_NUMBER_OF_SUPPORTERS,
         new GreaterEqualConstraint(2));
 
     /**

@@ -24,8 +24,7 @@ de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:328: warning - Tag @l
 de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:335: warning - Tag @link: reference not found: de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.FractalDimensionTest#ID1_PARAM
 de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:342: warning - Tag @link: reference not found: de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.FractalDimensionTest#ID1_PARAM
 de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:356: warning - Tag @link: reference not found: de.lmu.ifi.dbs.elki.algorithm.classifier.KNNClassifier#K_PARAM
-
-
+ (done: Elke)
 
 - Eigene klasse fuer HiCo
   (Elke)
