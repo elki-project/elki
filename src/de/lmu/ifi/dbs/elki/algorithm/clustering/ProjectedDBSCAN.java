@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.elki.preprocessing.ProjectedDBSCANPreprocessor;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
-import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
@@ -23,7 +22,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -39,19 +37,71 @@ import java.util.Set;
  *
  * @author Arthur Zimek
  * @param <V> the type of Realvector handled by this Algorithm
- * todo parameter
  */
 public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> implements Clustering<V> {
 
     /**
-     * Parameter to specify the maximum radius of the neighborhood to be considered,
-     * must be suitable to {@link LocallyWeightedDistanceFunction LocallyWeightedDistanceFunction}.
-     * <p>Key: {@code -epsilon} </p>
+     * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
      */
-    public static final PatternParameter EPSILON_PARAM = new PatternParameter("epsilon",
-        "the maximum radius of the neighborhood " +
-        "to be considered, must be suitable to " +
-        LocallyWeightedDistanceFunction.class.getName());
+    public static final OptionID PROJECTED_DBSCAN_DISTANCEFUNCTION = OptionID.getOrCreateOptionID(
+        "projdbscan.distancefunction",
+        "Classname of the distance function to determine the distance between database objects " +
+            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(AbstractLocallyWeightedDistanceFunction.class) + "."
+    );
+
+    /**
+     * OptionID for {@link #EPSILON_PARAM}
+     */
+    public static final OptionID PROJECTED_DBSCAN_EPSILON = OptionID.getOrCreateOptionID(
+        "projdbscan.epsilon",
+        "The maximum radius of the neighborhood to be considered."
+    );
+
+    /**
+     * OptionID for {@link #LAMBDA_PARAM}
+     */
+    public static final OptionID PROJECTED_DBSCAN_LAMBDA = OptionID.getOrCreateOptionID(
+        "projdbscan.lambda",
+        "The intrinsic dimensionality of the clusters to find."
+    );
+
+    /**
+     * OptionID for {@link #MINPTS_PARAM}
+     */
+    public static final OptionID PROJECTED_DBSCAN_MINPTS = OptionID.getOrCreateOptionID(
+        "projdbscan.minpts",
+        "Threshold for minimum number of points in " +
+            "the epsilon-neighborhood of a point."
+    );
+
+    /**
+     * Parameter to specify the distance function to determine the distance between database objects,
+     * must extend {@link de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractLocallyWeightedDistanceFunction}.
+     * <p>Key: {@code -projdbscan.distancefunction} </p>
+     * <p>Default value: {@link de.lmu.ifi.dbs.elki.distance.distancefunction.EuklideanDistanceFunction} </p>
+     */
+    protected final ClassParameter<AbstractLocallyWeightedDistanceFunction> DISTANCE_FUNCTION_PARAM =
+        new ClassParameter<AbstractLocallyWeightedDistanceFunction>(
+            PROJECTED_DBSCAN_DISTANCEFUNCTION,
+            AbstractLocallyWeightedDistanceFunction.class,
+            LocallyWeightedDistanceFunction.class.getName());
+
+
+    /**
+     * Parameter to specify the maximum radius of the neighborhood to be considered,
+     * must be suitable to {@link LocallyWeightedDistanceFunction}.
+     * <p>Key: {@code -projdbscan.epsilon} </p>
+     */
+    private final PatternParameter EPSILON_PARAM = new PatternParameter(PROJECTED_DBSCAN_EPSILON);
+
+    /**
+     * Parameter to specify the intrinsic dimensionality of the clusters to find,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -projdbscan.lambda} </p>
+     */
+    private final IntParameter LAMBDA_PARAM = new IntParameter(
+        PROJECTED_DBSCAN_LAMBDA,
+        new GreaterConstraint(0));
 
     /**
      * Parameter to specify the threshold for minimum number of points in
@@ -59,25 +109,9 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
      * must be an integer greater than 0.
      * <p>Key: {@code -projdbscan.minpts} </p>
      */
-    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.PROJECTED_DBSCAN_MINPTS,
+    private final IntParameter MINPTS_PARAM = new IntParameter(
+        PROJECTED_DBSCAN_MINPTS,
         new GreaterConstraint(0));
-
-    /**
-     * The default distance function.
-     */
-    public static final String DEFAULT_DISTANCE_FUNCTION = LocallyWeightedDistanceFunction.class.getName();
-
-    /**
-     * Parameter for distance function.
-     */
-    public static final String DISTANCE_FUNCTION_P = "distancefunction";
-
-    /**
-     * Description for parameter distance function.
-     */
-    public static final String DISTANCE_FUNCTION_D = "the distance function to determine the distance between database objects "
-                                                     + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(AbstractLocallyWeightedDistanceFunction.class) + ". Default: "
-                                                     + DEFAULT_DISTANCE_FUNCTION;
 
     /**
      * Epsilon.
@@ -88,16 +122,6 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
      * Minimum points.
      */
     protected int minpts;
-
-    /**
-     * Parameter lambda.
-     */
-    public static final String LAMBDA_P = "lambda";
-
-    /**
-     * Description for parameter lambda.
-     */
-    public static final String LAMBDA_D = "a positive integer specifiying the intrinsic dimensionality of clusters to be found.";
 
     /**
      * Keeps lambda.
@@ -142,18 +166,14 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
         addOption(MINPTS_PARAM);
 
         // lambda
-        addOption(new IntParameter(LAMBDA_P, LAMBDA_D, new GreaterConstraint(0)));
+        addOption(LAMBDA_PARAM);
 
         // parameter distance function
-        // noinspection unchecked
-        ClassParameter<AbstractLocallyWeightedDistanceFunction<V, ?>> distance = new ClassParameter(DISTANCE_FUNCTION_P,
-            DISTANCE_FUNCTION_D,
-            AbstractLocallyWeightedDistanceFunction.class);
-        distance.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
-        optionHandler.put(distance);
+        addOption(DISTANCE_FUNCTION_PARAM);
 
-        //global parameter constraint epsilon <-> distance function
-        GlobalParameterConstraint con = new GlobalDistanceFunctionPatternConstraint<AbstractLocallyWeightedDistanceFunction<V, ?>>(EPSILON_PARAM, distance);
+        // global parameter constraint epsilon <-> distance function
+        // noinspection unchecked
+        GlobalParameterConstraint con = new GlobalDistanceFunctionPatternConstraint(EPSILON_PARAM, DISTANCE_FUNCTION_PARAM);
         optionHandler.setGlobalParameterConstraint(con);
     }
 
@@ -351,15 +371,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
         String[] remainingParameters = super.setParameters(args);
 
         // distance function
-        String className = (String) optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
-        try {
-            // noinspection unchecked
-            // todo
-            distanceFunction = Util.instantiate(AbstractLocallyWeightedDistanceFunction.class, className);
-        }
-        catch (UnableToComplyException e) {
-            throw new WrongParameterValueException(DISTANCE_FUNCTION_P, className, DISTANCE_FUNCTION_D, e);
-        }
+        distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
 
         // epsilon
         epsilon = getParameterValue(EPSILON_PARAM);
@@ -368,7 +380,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
         minpts = getParameterValue(MINPTS_PARAM);
 
         // lambda
-        lambda = (Integer) optionHandler.getOptionValue(LAMBDA_P);
+        lambda = getParameterValue(LAMBDA_PARAM);
 
         // parameters for the distance function
         String[] distanceFunctionParameters = new String[remainingParameters.length + 5];

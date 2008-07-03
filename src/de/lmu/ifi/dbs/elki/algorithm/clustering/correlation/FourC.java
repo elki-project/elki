@@ -28,7 +28,9 @@ public class FourC<O extends RealVector<O, ?>> extends ProjectedDBSCAN<O> {
   }
 
 
-  @Override
+  /**
+   * @see de.lmu.ifi.dbs.elki.algorithm.clustering.ProjectedDBSCAN#preprocessorClass()
+   */
   public Class<FourCPreprocessor> preprocessorClass() {
     return FourCPreprocessor.class;
   }

@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
@@ -31,27 +32,44 @@ import java.util.Set;
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObject the algorithm is applied on
  * @param <D> the type of Distance used for the preprocessing of the shared nearest neighbors neighborhood lists
- * todo parameter
  */
 public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> extends AbstractAlgorithm<O> implements Clustering<O> {
 
     /**
-     * Parameter for epsilon.
-     * <p/>
-     * Needs to be greater than 0.
-     * <p/>
-     * <p>Key: {@code -epsilon}</p>
+     * OptionID for {@link #EPSILON_PARAM}
      */
-    public final IntParameter EPSILON_PARAM = new IntParameter("epsilon", "the minimum SNN density", new GreaterConstraint(0));
+    public static final OptionID SNN_EPSILON = OptionID.getOrCreateOptionID(
+        "snn.epsilon",
+        "The minimum SNN density."
+    );
 
     /**
-     * Parameter to indicate the minimally required set of points.
-     * <p/>
-     * Needs to be greater than 0.
-     * <p/>
-     * <p>Key: {@code -minpts}</p>
+     * OptionID for {@link #MINPTS_PARAM}
      */
-    public final IntParameter MINPTS_PARAM = new IntParameter("minpts", "threshold for minimum number of points in the epsilon-SNN-neighborhood of a point", new GreaterConstraint(0));
+    public static final OptionID SNN_MINPTS = OptionID.getOrCreateOptionID(
+        "snn.minpts",
+        "Threshold for minimum number of points in " +
+            "the epsilon-SNN-neighborhood of a point."
+    );
+
+    /**
+     * Parameter to specify the minimum SNN density,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -snn.epsilon} </p>
+     */
+    private final IntParameter EPSILON_PARAM = new IntParameter(
+        SNN_EPSILON,
+        new GreaterConstraint(0));
+
+    /**
+     * Parameter to specify the threshold for minimum number of points in
+     * the epsilon-SNN-neighborhood of a point,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -snn.minpts} </p>
+     */
+    private final IntParameter MINPTS_PARAM = new IntParameter(
+        SNN_MINPTS,
+        new GreaterConstraint(0));
 
     /**
      * Holds the Epsilon value.

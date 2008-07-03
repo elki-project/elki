@@ -13,7 +13,12 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionsSelectingEuklidea
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -33,18 +38,41 @@ import java.util.List;
  * @author Elke Achtert
  * @param <V> the type of NumberVector handled by this Algorithm
  * @param <D> the type of Distance used
- * todo parameter, implementation
+ * todo implementation
  */
 public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<V> implements Clustering<V> {
+
+    /**
+     * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
+     */
+    public static final OptionID SUBCLU_DISTANCE_FUNCTION = OptionID.getOrCreateOptionID(
+        "subclu.distancefunction",
+        "Classname of the distance function to determine the distance between database objects " +
+            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(AbstractDimensionsSelectingDoubleDistanceFunction.class) + "."
+    );
+
+    /**
+     * OptionID for {@link #EPSILON_PARAM}
+     */
+    public static final OptionID SUBCLU_EPSILON = OptionID.getOrCreateOptionID(
+        "subclu.epsilon",
+        "The maximum radius of the neighborhood to be considered."
+    );
+
+    /**
+     * OptionID for {@link #MINPTS_PARAM}
+     */
+    public static final OptionID SUBCLU_MINPTS = OptionID.getOrCreateOptionID(
+        "subclu.minpts",
+        "Threshold for minimum number of points in the epsilon-neighborhood of a point."
+    );
+
     /**
      * Parameter to specify the maximum radius of the neighborhood to be considered,
-     * must be suitable to {@link AbstractDimensionsSelectingDoubleDistanceFunction AbstractDimensionsSelectingDoubleDistanceFunction}.
-     * <p>Key: {@code -epsilon} </p>
+     * must be suitable to {@link AbstractDimensionsSelectingDoubleDistanceFunction}.
+     * <p>Key: {@code -subclu.epsilon} </p>
      */
-    public static final PatternParameter EPSILON_PARAM = new PatternParameter("epsilon",
-        "The maximum radius of the neighborhood " +
-            "to be considered, must be suitable to " +
-            AbstractDimensionsSelectingDoubleDistanceFunction.class.getName());
+    private final PatternParameter EPSILON_PARAM = new PatternParameter(SUBCLU_EPSILON);
 
     /**
      * Parameter to specify the threshold for minimum number of points in
@@ -52,20 +80,21 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
      * must be an integer greater than 0.
      * <p>Key: {@code -subclu.minpts} </p>
      */
-    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.SUBCLU_MINPTS,
+    private final IntParameter MINPTS_PARAM = new IntParameter(
+        SUBCLU_MINPTS,
         new GreaterConstraint(0));
 
     /**
      * The distance function to determine the distance between database objects.
-     * <p>Default value: {@link DimensionsSelectingEuklideanDistanceFunction DimensionsSelectingEuklideanDistanceFunction} </p>
-     * <p>Key: {@code -distancefunction} </p>
+     * <p>Default value: {@link DimensionsSelectingEuklideanDistanceFunction} </p>
+     * <p>Key: {@code -subclu.distancefunction} </p>
      */
-    public final ClassParameter<AbstractDimensionsSelectingDoubleDistanceFunction> DISTANCEFUNCTION_PARAM = new ClassParameter("distancefunction",
-        "the distance function to determine the distance between database objects "
-            + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(AbstractDimensionsSelectingDoubleDistanceFunction.class)
-            + ". Default: " + DimensionsSelectingEuklideanDistanceFunction.class.getName(),
-        AbstractDimensionsSelectingDoubleDistanceFunction.class,
-        DimensionsSelectingEuklideanDistanceFunction.class.getName());
+    private final ClassParameter<AbstractDimensionsSelectingDoubleDistanceFunction> DISTANCE_FUNCTION_PARAM =
+        new ClassParameter<AbstractDimensionsSelectingDoubleDistanceFunction>(
+            SUBCLU_DISTANCE_FUNCTION,
+            AbstractDimensionsSelectingDoubleDistanceFunction.class,
+            DimensionsSelectingEuklideanDistanceFunction.class.getName());
+
     /**
      * The maximum radius of the neighborhood to be considered.
      */
@@ -97,11 +126,11 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
         addOption(MINPTS_PARAM);
 
         // distance function
-        addOption(DISTANCEFUNCTION_PARAM);
+        addOption(DISTANCE_FUNCTION_PARAM);
 
         // global constraint epsilon <-> distance function
         // noinspection unchecked
-        GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint(EPSILON_PARAM, DISTANCEFUNCTION_PARAM);
+        GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint(EPSILON_PARAM, DISTANCE_FUNCTION_PARAM);
         optionHandler.setGlobalParameterConstraint(gpc);
     }
 
@@ -133,8 +162,6 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
             }
         }
         catch (ParameterException e) {
-            // todo wieder weg
-            e.printStackTrace();
             throw new IllegalStateException(e);
         }
     }
@@ -183,7 +210,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
 
         // distance function
         // noinspection unchecked
-        distanceFunction = DISTANCEFUNCTION_PARAM.instantiateClass();
+        distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
         remainingParameters = distanceFunction.setParameters(remainingParameters);
         setParameters(args, remainingParameters);
 
@@ -202,8 +229,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
         List<String> parameters = new ArrayList<String>();
 
         // distance function
-        parameters.add(OptionHandler.OPTION_PREFIX + DISTANCEFUNCTION_PARAM.getName());
-        parameters.add(distanceFunction.getClass().getName());
+        Util.addParameter(parameters, DISTANCE_FUNCTION_PARAM, distanceFunction.getClass().getName());
 
         // selected dimensions for distance function
         parameters.add(OptionHandler.OPTION_PREFIX + AbstractDimensionsSelectingDoubleDistanceFunction.DIMS_P);

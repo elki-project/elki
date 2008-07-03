@@ -4,9 +4,9 @@ import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PreDeCon;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.util.List;
@@ -16,14 +16,15 @@ import java.util.List;
  * the database objects.
  *
  * @author Elke Achtert
- *         todo parameter
  */
 public class PreDeConWrapper extends NormalizationWrapper {
 
     /**
-     * The value of the epsilon parameter.
+     * Parameter to specify the maximum radius of the neighborhood to be considered,
+     * must be suitable to {@link de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction}.
+     * <p>Key: {@code -projdbscan.epsilon} </p>
      */
-    private String epsilon;
+    private final PatternParameter EPSILON_PARAM = new PatternParameter(PreDeCon.PROJECTED_DBSCAN_EPSILON);
 
     /**
      * Parameter to specify the threshold for minimum number of points in
@@ -31,13 +32,18 @@ public class PreDeConWrapper extends NormalizationWrapper {
      * must be an integer greater than 0.
      * <p>Key: {@code -projdbscan.minpts} </p>
      */
-    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.PROJECTED_DBSCAN_MINPTS,
+    private final IntParameter MINPTS_PARAM = new IntParameter(
+        PreDeCon.PROJECTED_DBSCAN_MINPTS,
         new GreaterConstraint(0));
 
     /**
-     * The value of the lambda parameter.
+     * Parameter to specify the intrinsic dimensionality of the clusters to find,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -projdbscan.lambda} </p>
      */
-    private int lambda;
+    private final IntParameter LAMBDA_PARAM = new IntParameter(
+        PreDeCon.PROJECTED_DBSCAN_LAMBDA,
+        new GreaterConstraint(0));
 
     /**
      * Main method to run this wrapper.
@@ -68,13 +74,13 @@ public class PreDeConWrapper extends NormalizationWrapper {
     public PreDeConWrapper() {
         super();
         // parameter epsilon
-        addOption(PreDeCon.EPSILON_PARAM);
+        addOption(EPSILON_PARAM);
 
         // parameter min points
         addOption(MINPTS_PARAM);
 
         // parameter lambda
-        addOption(new IntParameter(PreDeCon.LAMBDA_P, PreDeCon.LAMBDA_D, new GreaterConstraint(0)));
+        addOption(LAMBDA_PARAM);
     }
 
     /**
@@ -87,29 +93,14 @@ public class PreDeConWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, OptionID.ALGORITHM, PreDeCon.class.getName());
 
         // epsilon for PreDeCon
-        parameters.add(OptionHandler.OPTION_PREFIX + PreDeCon.EPSILON_PARAM.getName());
-        parameters.add(epsilon);
+        Util.addParameter(parameters, EPSILON_PARAM, getParameterValue(EPSILON_PARAM));
 
         // minpts for PreDeCon
         Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(getParameterValue(MINPTS_PARAM)));
 
         // lambda for PreDeCon
-        parameters.add(OptionHandler.OPTION_PREFIX + PreDeCon.LAMBDA_P);
-        parameters.add(Integer.toString(lambda));
+        Util.addParameter(parameters, LAMBDA_PARAM, Integer.toString(getParameterValue(LAMBDA_PARAM)));
 
         return parameters;
-    }
-
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
-
-        // epsilon, minpts, lambda
-        epsilon = getParameterValue(PreDeCon.EPSILON_PARAM);
-        lambda = (Integer) optionHandler.getOptionValue(PreDeCon.LAMBDA_P);
-
-        return remainingParameters;
     }
 }

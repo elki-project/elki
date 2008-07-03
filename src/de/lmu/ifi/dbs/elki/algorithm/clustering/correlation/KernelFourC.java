@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.KernelBasedLocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.preprocessing.KernelFourCPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
@@ -40,10 +40,11 @@ public class KernelFourC<V extends RealVector<V, ?>> extends ProjectedDBSCAN<V> 
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
         // locally weighted distance function
-        String[] locallyWeightedDistanceFunctionParameters = new String[args.length + 2];
-        System.arraycopy(args, 0, locallyWeightedDistanceFunctionParameters, 2, args.length);
-        locallyWeightedDistanceFunctionParameters[0] = OptionHandler.OPTION_PREFIX + ProjectedDBSCAN.DISTANCE_FUNCTION_P;
-        locallyWeightedDistanceFunctionParameters[1] = KernelBasedLocallyWeightedDistanceFunction.class.getName();
+        String[] locallyWeightedDistanceFunctionParameters = new String[args.length];
+        System.arraycopy(args, 0, locallyWeightedDistanceFunctionParameters, 0, args.length);
+        Util.addParameter(locallyWeightedDistanceFunctionParameters,
+            PROJECTED_DBSCAN_DISTANCEFUNCTION,
+            KernelBasedLocallyWeightedDistanceFunction.class.getName());
 
         return super.setParameters(locallyWeightedDistanceFunctionParameters);
     }

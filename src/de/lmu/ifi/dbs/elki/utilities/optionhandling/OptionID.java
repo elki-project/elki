@@ -327,14 +327,6 @@ public class OptionID extends ConstantObject<OptionID> {
     );
 
     /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.ProjectedDBSCAN#MINPTS_PARAM}
-     */
-    public static final OptionID PROJECTED_DBSCAN_MINPTS = new OptionID("projdbscan.minpts",
-        "Threshold for minimum number of points in " +
-            "the epsilon-neighborhood of a point."
-    );
-
-    /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS#EPSILON_PARAM}
      */
     public static final OptionID OPTICS_EPSILON = new OptionID("optics.epsilon",
@@ -371,14 +363,6 @@ public class OptionID extends ConstantObject<OptionID> {
     public static final OptionID PROCLUS_M_I = new OptionID("proclus.mi",
         "The multiplier for the initial number of medoids."
     );
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.SUBCLU#MINPTS_PARAM}
-     */
-    public static final OptionID SUBCLU_MINPTS = new OptionID("subclu.minpts",
-        "Threshold for minimum number of points in the epsilon-neighborhood of a point."
-    );
-
 
     /**
      * The description of the OptionID.

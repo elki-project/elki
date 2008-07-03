@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -35,9 +36,26 @@ import java.util.Random;
  *
  * @author Arthur Zimek
  * @param <V> the type of Realvector handled by this Algorithm
- * todo parameter
  */
 public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> implements Clustering<V> {
+
+    /**
+     * OptionID for {@link #DELTA_PARAM}
+     */
+    public static final OptionID SUBSPACE_EM_DELTA = OptionID.getOrCreateOptionID(
+        "subspaceem.delta",
+        "The termination criterion for maximization of E(M): " +
+            "E(M) - E(M') < subspaceem.delta"
+    );
+
+    /**
+     * OptionID for {@link #K_PARAM}
+     */
+    public static final OptionID SUBSPACE_EM_K = OptionID.getOrCreateOptionID(
+        "subspaceem.k",
+        "The number of clusters to find."
+    );
+
     /**
      * Small value to increment diagonally of a matrix
      * in order to avoid singularity befor building the inverse.
@@ -45,45 +63,29 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
     private static final double SINGULARITY_CHEAT = 1E-9;
 
     /**
-     * Parameter k.
+     * Parameter to specify the number of clusters to find,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -subspaceem.k} </p>
      */
-    public static final String K_P = "k";
+    private final IntParameter K_PARAM = new IntParameter(
+        SUBSPACE_EM_K,
+        new GreaterConstraint(0));
 
     /**
-     * Description for parameter k.
+     * Parameter to specify the termination criterion for maximization of E(M): E(M) - E(M') < subspaceem.delta,
+     * must be a double equal to or greater than 0.
+     * <p>Default value: {@code 0.0} </p>
+     * <p>Key: {@code -subspaceem.delta} </p>
      */
-    public static final String K_D = "k - the number of clusters to find (positive integer)";
-
-    /**
-     * Parameter for k.
-     * Constraint greater 0.
-     */
-    private final IntParameter K_PARAM = new IntParameter(K_P, K_D, new GreaterConstraint(0));
+    private final DoubleParameter DELTA_PARAM = new DoubleParameter(
+        SUBSPACE_EM_DELTA,
+        new GreaterEqualConstraint(0.0),
+        0.0);
 
     /**
      * Keeps k - the number of clusters to find.
      */
     private int k;
-
-    /**
-     * Parameter delta.
-     */
-    public static final String DELTA_P = "delta";
-
-    /**
-     * Description for parameter delta.
-     */
-    public static final String DELTA_D = "delta - the termination criterion for maximization of E(M): E(M) - E(M') < delta";
-
-    /**
-     * Parameter for delta.
-     * GreaterEqual 0.0.
-     * (Default: 0.0).
-     */
-    private final DoubleParameter DELTA_PARAM = new DoubleParameter(DELTA_P,
-                                                                    DELTA_D,
-                                                                    new GreaterEqualConstraint(0.0),
-                                                                    0.0);
 
     /**
      * Keeps delta - a small value as termination criterion in expectation maximization
@@ -96,7 +98,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
     private Clusters<V> result;
 
     /**
-     *
+     * todo arthur comment
      */
     public SubspaceEM() {
         super();
@@ -296,6 +298,9 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
 
     }
 
+    /**
+     * todo arthur comment
+     */
     protected Integer[][] hardClustering(Database<V> database) {
         List<List<Integer>> hardClusters = new ArrayList<List<Integer>>(k);
         for (int i = 0; i < k; i++) {
@@ -343,6 +348,9 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
         return sum;
     }
 
+    /**
+     * todo arthur comment
+     */
     protected void assignProbabilities(Database<V> database, double[] normDistributionFactor, double[] standardDeviation, double[] clusterWeight, List<V> means, Matrix[] eigensystems, Matrix selectionStrong) {
         for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
             Integer id = iter.next();
@@ -366,6 +374,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
         }
     }
 
+    //todo arthur comment
     protected static <V extends RealVector<V, ?>> double distance(V p, V mean, Matrix strongEigenvectors) {
         Matrix p_minus_a = p.getColumnVector().minus(mean.getColumnVector());
         Matrix proj = p_minus_a.projection(strongEigenvectors);
@@ -422,6 +431,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
         }
     }
 
+    // todo arthur comment
     protected Matrix[] initialEigensystems(int dimensionality) {
         Random random = new Random();
         Matrix[] eigensystems = new Matrix[k];
@@ -446,6 +456,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
         return eigensystems;
     }
 
+    // todo arthur comment
     private void gnuplot(String title, Database<V> db, List<V> means, Matrix[] eigensystems) {
         if (means.size() != eigensystems.length) {
             throw new IllegalArgumentException("number of means: " + means.size() + " -- number of eigensystems: " + eigensystems.length);

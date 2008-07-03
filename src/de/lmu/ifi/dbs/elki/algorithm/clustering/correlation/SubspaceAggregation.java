@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.io.File;
@@ -25,11 +26,19 @@ import java.util.List;
 import java.util.Random;
 
 /**
+ * todo arthur comment class
  * @author Arthur Zimek
  * @param <V> the type of Realvector handled by this Algorithm
- * todo parameter
  */
 public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> implements Clustering<V> {
+    /**
+     * OptionID for {@link #K_PARAM}
+     */
+    public static final OptionID SUBSPACE_AGGREGATION_K = OptionID.getOrCreateOptionID(
+        "subspaceagg.k",
+        "The number of clusters to find."
+    );
+
     /**
      * Small value to increment diagonally of a matrix
      * in order to avoid singularity befor building the inverse.
@@ -37,26 +46,18 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
     private static final double SINGULARITY_CHEAT = 1E-9;
 
     /**
-     * Parameter k.
+     * Parameter to specify the number of clusters to find,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -subspaceagg.k} </p>
      */
-    public static final String K_P = "k";
-
-    /**
-     * Description for parameter k.
-     */
-    public static final String K_D = "k - the number of clusters to find (positive integer)";
-
-    /**
-     * Parameter for k.
-     * Constraint greater 0.
-     */
-    private final IntParameter K_PARAM = new IntParameter(K_P, K_D, new GreaterConstraint(0));
+    private final IntParameter K_PARAM = new IntParameter(
+        SUBSPACE_AGGREGATION_K,
+        new GreaterConstraint(0));
 
     /**
      * Keeps k - the number of clusters to find.
      */
     private int k;
-
 
     /**
      * Stores the result.
@@ -64,7 +65,7 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
     private Clusters<V> result;
 
     /**
-     *
+     *  todo arthur comment
      */
     public SubspaceAggregation() {
         super();
@@ -89,7 +90,6 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
     /**
      * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
-    @Override
     public void runInTime(Database<V> database) throws IllegalStateException {
         if (database.size() == 0) {
             throw new IllegalArgumentException("database empty: must contain elements");
@@ -175,7 +175,9 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
         result = new Clusters<V>(resultClusters, database);
     }
 
-
+    /**
+     * todo arthur comment
+     */
     protected static <V extends RealVector<V, ?>> double projectionDistance(V p, V mean, Matrix strongEigenvectors) {
         Matrix p_minus_a = p.getColumnVector().minus(mean.getColumnVector());
         Matrix proj = p_minus_a.projection(strongEigenvectors);
@@ -232,6 +234,9 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
         }
     }
 
+    /**
+     * todo arthur comment
+     */
     protected Matrix[] initialEigensystems(int dimensionality) {
         Random random = new Random();
         Matrix[] eigensystems = new Matrix[k];
@@ -256,6 +261,9 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
         return eigensystems;
     }
 
+    /**
+     * todo arthur comment
+     */
     private void gnuplot(String title, Database<V> db, List<V> means, Matrix[] eigensystems) {
         if (means.size() != eigensystems.length) {
             throw new IllegalArgumentException("number of means: " + means.size() + " -- number of eigensystems: " + eigensystems.length);

@@ -67,7 +67,7 @@ public class CASHIntervalSplit extends AbstractLoggable {
     public Set<Integer> determineIDs(Set<Integer> superSetIDs, HyperBoundingBox interval, double d_min, double d_max) {
         StringBuffer msg = new StringBuffer();
         if (debug) {
-            msg.append("\ninterval " + interval);
+            msg.append("\ninterval ").append(interval);
         }
 
         Set<Integer> childIDs = new HashSet<Integer>(superSetIDs.size());
@@ -95,10 +95,10 @@ public class CASHIntervalSplit extends AbstractLoggable {
             }
 
             if (debug) {
-                msg.append("\n\nf_min " + f_min);
-                msg.append("\nf_max " + f_max);
-                msg.append("\nd_min " + d_min);
-                msg.append("\nd_max " + d_max);
+                msg.append("\n\nf_min ").append(f_min);
+                msg.append("\nf_max ").append(f_max);
+                msg.append("\nd_min ").append(d_min);
+                msg.append("\nd_max ").append(d_max);
             }
 
             if (f_min - f_max > ParameterizationFunction.DELTA) {
@@ -111,19 +111,19 @@ public class CASHIntervalSplit extends AbstractLoggable {
             if (f_min <= d_max && f_max >= d_min) {
                 childIDs.add(id);
                 if (debug) {
-                    msg.append("\nid " + id + " appended");
+                    msg.append("\nid ").append(id).append(" appended");
                 }
             }
 
             else {
                 if (debug) {
-                    msg.append("\nid " + id + " NOT appended");
+                    msg.append("\nid ").append(id).append(" NOT appended");
                 }
             }
         }
 
         if (debug) {
-            msg.append("\nchildIds " + childIDs.size());
+            msg.append("\nchildIds ").append(childIDs.size());
             debugFine(msg.toString());
         }
 

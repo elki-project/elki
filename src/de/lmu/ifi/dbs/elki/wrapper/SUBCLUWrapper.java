@@ -4,9 +4,9 @@ import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.SUBCLU;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.util.List;
@@ -16,14 +16,15 @@ import java.util.List;
  * the database objects.
  *
  * @author Elke Achtert
- *         todo parameter
  */
 public class SUBCLUWrapper extends NormalizationWrapper {
 
     /**
-     * The value of the epsilon parameter.
+     * Parameter to specify the maximum radius of the neighborhood to be considered,
+     * must be suitable to {@link de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDimensionsSelectingDoubleDistanceFunction}.
+     * <p>Key: {@code -subclu.epsilon} </p>
      */
-    private String epsilon;
+    private final PatternParameter EPSILON_PARAM = new PatternParameter(SUBCLU.SUBCLU_EPSILON);
 
     /**
      * Parameter to specify the threshold for minimum number of points in
@@ -31,7 +32,8 @@ public class SUBCLUWrapper extends NormalizationWrapper {
      * must be an integer greater than 0.
      * <p>Key: {@code -subclu.minpts} </p>
      */
-    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.SUBCLU_MINPTS,
+    private final IntParameter MINPTS_PARAM = new IntParameter(
+        SUBCLU.SUBCLU_MINPTS,
         new GreaterConstraint(0));
 
     /**
@@ -64,7 +66,7 @@ public class SUBCLUWrapper extends NormalizationWrapper {
     public SUBCLUWrapper() {
         super();
         //  parameter epsilon
-        addOption(SUBCLU.EPSILON_PARAM);
+        addOption(EPSILON_PARAM);
 
         // parameter min points
         addOption(MINPTS_PARAM);
@@ -80,24 +82,11 @@ public class SUBCLUWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, OptionID.ALGORITHM, SUBCLU.class.getName());
 
         // epsilon
-        parameters.add(OptionHandler.OPTION_PREFIX + SUBCLU.EPSILON_PARAM.getName());
-        parameters.add(epsilon);
+        Util.addParameter(parameters, EPSILON_PARAM, getParameterValue(EPSILON_PARAM));
 
         // minpts
         Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(getParameterValue(MINPTS_PARAM)));
 
         return parameters;
-    }
-
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
-
-        // epsilon, minpts
-        epsilon = getParameterValue(SUBCLU.EPSILON_PARAM);
-
-        return remainingParameters;
     }
 }

@@ -48,7 +48,7 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impleme
 
     /**
      * Parameter to specify the termination criterion for maximization of E(M): E(M) - E(M') < em.delta,
-     * must be a double eqaul to or greater than 0.
+     * must be a double equal to or greater than 0.
      * <p>Default value: {@code 0.0} </p>
      * <p>Key: {@code -em.delta} </p>
      */

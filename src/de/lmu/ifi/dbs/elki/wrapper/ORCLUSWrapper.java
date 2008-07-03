@@ -1,10 +1,10 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.ProjectedClustering;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.ORCLUS;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -12,28 +12,39 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
 import java.util.List;
 
 /**
- * Wrapper class for COPAC algorithm. Performs an attribute wise normalization
- * on the database objects.
+ * Wrapper class for ORCLUS algorithm.
  *
  * @author Elke Achtert
- * todo parameter
  */
 public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
+    /**
+     * Parameter to specify the number of clusters to find,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -projectedclustering.k} </p>
+     */
+    private final IntParameter K_PARAM = new IntParameter(
+        ProjectedClustering.PROJECTED_CLUSTERING_K,
+        new GreaterConstraint(0));
 
     /**
-     * The value of the k parameter.
+     * Parameter to specify the multiplier for the initial number of seeds,
+     * must be an integer greater than 0.
+     * <p>Default value: {@code 30} </p>
+     * <p>Key: {@code -projectedclustering.k_i} </p>
      */
-    private int k;
+    private final IntParameter K_I_PARAM = new IntParameter(
+        ProjectedClustering.PROJECTED_CLUSTERING_K_I,
+        new GreaterConstraint(0),
+        30);
 
     /**
-     * The value of the k_i parameter.
+     * Parameter to specify the dimensionality of the clusters to find,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -projectedclustering.l} </p>
      */
-    private int k_i;
-
-    /**
-     * The value of the dim parameter.
-     */
-    private int dim;
+    private final IntParameter L_PARAM = new IntParameter(
+        ProjectedClustering.PROJECTED_CLUSTERING_L,
+        new GreaterConstraint(0));
 
     /**
      * Main method to run this wrapper.
@@ -64,13 +75,12 @@ public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
      */
     public ORCLUSWrapper() {
         super();
-        optionHandler.put(new IntParameter(ORCLUS.K_P, ORCLUS.K_D, new GreaterConstraint(0)));
-
-        IntParameter ki = new IntParameter(ORCLUS.K_I_P, ORCLUS.K_I_D, new GreaterConstraint(0));
-        ki.setDefaultValue(ORCLUS.K_I_DEFAULT);
-        optionHandler.put(ki);
-
-        optionHandler.put(new IntParameter(ORCLUS.L_P, ORCLUS.L_D, new GreaterConstraint(0)));
+        // k
+        addOption(K_PARAM);
+        // k_i
+        addOption(K_I_PARAM);
+        // l
+        addOption(L_PARAM);
     }
 
     /**
@@ -82,31 +92,15 @@ public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
         // ORCLUS algorithm
         Util.addParameter(parameters, OptionID.ALGORITHM, ORCLUS.class.getName());
 
-        // dim
-        parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.L_P);
-        parameters.add(Integer.toString(dim));
+        // l
+        Util.addParameter(parameters, L_PARAM, Integer.toString(getParameterValue(L_PARAM)));
 
         // k
-        parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.K_P);
-        parameters.add(Integer.toString(k));
+        Util.addParameter(parameters, K_PARAM, Integer.toString(getParameterValue(K_PARAM)));
 
         // k_i
-        parameters.add(OptionHandler.OPTION_PREFIX + ORCLUS.K_I_P);
-        parameters.add(Integer.toString(k_i));
+        Util.addParameter(parameters, K_I_PARAM, Integer.toString(getParameterValue(K_I_PARAM)));
 
         return parameters;
-    }
-
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
-
-        k = (Integer) optionHandler.getOptionValue(ORCLUS.K_P);
-        dim = (Integer) optionHandler.getOptionValue(ORCLUS.L_P);
-        k_i = (Integer) optionHandler.getOptionValue(ORCLUS.K_I_P);
-
-        return remainingParameters;
     }
 }

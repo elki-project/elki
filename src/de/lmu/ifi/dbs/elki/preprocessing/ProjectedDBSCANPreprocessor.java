@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.preprocessing;
 
+import de.lmu.ifi.dbs.elki.algorithm.clustering.ProjectedDBSCAN;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
@@ -15,7 +16,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -43,8 +43,8 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
      */
     public static final PatternParameter EPSILON_PARAM = new PatternParameter("epsilon",
         "the maximum radius of the neighborhood " +
-        "to be considered, must be suitable to " +
-        LocallyWeightedDistanceFunction.class.getName());
+            "to be considered, must be suitable to " +
+            LocallyWeightedDistanceFunction.class.getName());
 
 
     /**
@@ -53,8 +53,11 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
      * must be an integer greater than 0.
      * <p>Key: {@code -projdbscan.minpts} </p>
      */
-    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.PROJECTED_DBSCAN_MINPTS,
+    private final IntParameter MINPTS_PARAM = new IntParameter(
+        ProjectedDBSCAN.PROJECTED_DBSCAN_MINPTS,
         new GreaterConstraint(0));
+
+    
 
     /**
      * The default range query distance function.
@@ -70,9 +73,9 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
      * Description for parameter range query distance function.
      */
     public static final String DISTANCE_FUNCTION_D = "the distance function to determine the neighbors for variance analysis "
-                                                     + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class)
-                                                     + ". Default: "
-                                                     + DEFAULT_DISTANCE_FUNCTION;
+        + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class)
+        + ". Default: "
+        + DEFAULT_DISTANCE_FUNCTION;
 
     /**
      * Contains the value of parameter epsilon;
@@ -156,7 +159,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
         if (time) {
             long elapsedTime = end - start;
             verbose(this.getClass().getName() + " runtime: "
-                    + elapsedTime + " milliseconds.");
+                + elapsedTime + " milliseconds.");
         }
     }
 
