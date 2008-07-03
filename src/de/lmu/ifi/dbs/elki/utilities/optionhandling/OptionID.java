@@ -50,8 +50,9 @@ public class OptionID extends ConstantObject<OptionID> {
      * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#DESCRIPTION_PARAM}
      */
     public static final OptionID DESCRIPTION = new OptionID("description",
-        "Name of a class to obtain a description - for classes that implement " +
-            Parameterizable.class.getName() +
+        "Name of a class to obtain a description " +
+//            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Parameterizable.class) +
+            "- for classes that implement " + Parameterizable.class.getName()+")" + 
             " -- no further processing will be performed."
     );
 
