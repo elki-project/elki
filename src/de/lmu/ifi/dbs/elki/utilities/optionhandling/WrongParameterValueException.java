@@ -3,9 +3,8 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 /**
  * Thrown by a Parameterizable object in case of wrong parameter format.
  */
-public class WrongParameterValueException extends ParameterException
-{
-    
+public class WrongParameterValueException extends ParameterException {
+
     /**
      * Generated serial version UID.
      */
@@ -18,8 +17,7 @@ public class WrongParameterValueException extends ParameterException
      * @param read      the value of the parameter read by the option handler
      * @param expected  the value that has been expected
      */
-    public WrongParameterValueException(String parameter, String read, String expected)
-    {
+    public WrongParameterValueException(String parameter, String read, String expected) {
         super("Wrong value of parameter " + parameter + ".\nRead " + read + ".\nExpected: " + expected);
     }
 
@@ -31,8 +29,7 @@ public class WrongParameterValueException extends ParameterException
      * @param expected  the value that has been expected
      * @param cause     the cause
      */
-    public WrongParameterValueException(String parameter, String read, String expected, Throwable cause)
-    {
+    public WrongParameterValueException(String parameter, String read, String expected, Throwable cause) {
         super("Wrong value of parameter " + parameter + ".\nRead " + read + ".\nExpected: " + expected, cause);
     }
 
@@ -41,8 +38,7 @@ public class WrongParameterValueException extends ParameterException
      *
      * @param message detail message
      */
-    public WrongParameterValueException(String message)
-    {
+    public WrongParameterValueException(String message) {
         super(message);
     }
 }
