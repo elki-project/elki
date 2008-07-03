@@ -9,10 +9,9 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,209 +24,208 @@ import java.util.List;
  */
 public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<D>, N extends MetricalNode<N, E>, E extends MTreeEntry<D>>
     extends IndexDatabase<O> {
-  /**
-   * Option string for parameter index.
-   */
-  public static final String INDEX_P = "index";
 
-  /**
-   * Description for parameter index.
-   */
-  public static final String INDEX_D = "the metrical index to use " +
-                                       Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(MetricalIndex.class) +
-                                       ".";
+    /**
+     * OptionID for {@link #INDEX_PARAM}
+     */
+    public static final OptionID METRICAL_INDEX_DB_INDEX = OptionID.getOrCreateOptionID(
+        "metricalindexdb.index",
+        "Classname of the metrical index to use " +
+            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(MetricalIndex.class) +
+            ". "
+    );
 
-  /**
-   * The metrical index storing the data.
-   */
-  MetricalIndex<O, D, N, E> index;
+    /**
+     * Parameter to specify the metrical index to use.
+     * <p>Key: {@code -metricalindexdb.index} </p>
+     */
+    private final ClassParameter<MetricalIndex> INDEX_PARAM = new ClassParameter<MetricalIndex>(
+        METRICAL_INDEX_DB_INDEX, MetricalIndex.class);
 
-  public MetricalIndexDatabase() {
-    super();
-    ClassParameter<MetricalIndex<O,D,N,E>> metIndex = new ClassParameter(INDEX_P, INDEX_D, MetricalIndex.class);
-    optionHandler.put(metIndex);
-  }
 
-  /**
-   * Calls the super method and afterwards inserts the specified object into
-   * the underlying index structure.
-   *
-   * @see Database#insert(ObjectAndAssociations)
-   */
-  public Integer insert(ObjectAndAssociations<O> objectAndAssociations) throws UnableToComplyException {
-    Integer id = super.insert(objectAndAssociations);
-    O object = objectAndAssociations.getObject();
-    index.insert(object);
-    return id;
-  }
+    /**
+     * The metrical index storing the data.
+     */
+    MetricalIndex<O, D, N, E> index;
 
-  /**
-   * Calls the super method and afterwards inserts the specified objects into
-   * the underlying index structure. If the option bulk load is enabled and
-   * the index structure is empty, a bulk load will be performed. Otherwise
-   * the objects will be inserted sequentially.
-   *
-   * @see Database#insert(java.util.List)
-   */
-  public void insert(List<ObjectAndAssociations<O>> objectsAndAssociationsList) throws UnableToComplyException {
-    for (ObjectAndAssociations<O> objectAndAssociations : objectsAndAssociationsList) {
-      super.insert(objectAndAssociations);
-    }
-    this.index.insert(getObjects(objectsAndAssociationsList));
-  }
-
-  /**
-   * @see Database#rangeQuery(Integer, String, de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction)
-   */
-  public <T extends Distance<T>> List<QueryResult<T>> rangeQuery(Integer id,
-                                                                 String epsilon,
-                                                                 DistanceFunction<O, T> distanceFunction) {
-    if (!distanceFunction.getClass().equals(index.getDistanceFunction().getClass()))
-      throw new IllegalArgumentException("Parameter distanceFunction must be an instance of " +
-                                         index.getDistanceFunction().getClass());
-
-    List<QueryResult<D>> rangeQuery = index.rangeQuery(get(id), epsilon);
-
-    List<QueryResult<T>> result = new ArrayList<QueryResult<T>>();
-    for (QueryResult<D> qr : rangeQuery) {
-      // noinspection unchecked
-      result.add((QueryResult<T>) qr);
+    public MetricalIndexDatabase() {
+        super();
+        addOption(INDEX_PARAM);
     }
 
-    return result;
-  }
-
-  /**
-   * @see Database#kNNQueryForObject(DatabaseObject, int,de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction)
-   */
-  public <T extends Distance<T>> List<QueryResult<T>> kNNQueryForObject(
-      O queryObject, int k, DistanceFunction<O, T> distanceFunction) {
-    if (!distanceFunction.getClass().equals(index.getDistanceFunction().getClass()))
-      throw new IllegalArgumentException("Parameter distanceFunction must be an instance of "
-                                         + index.getDistanceFunction().getClass());
-
-    List<QueryResult<D>> knnQuery = index.kNNQuery(queryObject, k);
-
-    List<QueryResult<T>> result = new ArrayList<QueryResult<T>>();
-    for (QueryResult<D> qr : knnQuery) {
-      // noinspection unchecked
-      result.add((QueryResult<T>) qr);
+    /**
+     * Calls the super method and afterwards inserts the specified object into
+     * the underlying index structure.
+     *
+     * @see Database#insert(ObjectAndAssociations)
+     */
+    public Integer insert(ObjectAndAssociations<O> objectAndAssociations) throws UnableToComplyException {
+        Integer id = super.insert(objectAndAssociations);
+        O object = objectAndAssociations.getObject();
+        index.insert(object);
+        return id;
     }
 
-    return result;
-  }
-
-  /**
-   * @see Database#kNNQueryForID(Integer, int,
-   *      de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction)
-   */
-  public <T extends Distance<T>> List<QueryResult<T>> kNNQueryForID(Integer id, int k, DistanceFunction<O, T> distanceFunction) {
-
-    if (!distanceFunction.getClass().equals(index.getDistanceFunction().getClass()))
-      throw new IllegalArgumentException("Parameter distanceFunction must be an instance of "
-                                         + index.getDistanceFunction().getClass());
-
-    List<QueryResult<D>> knnQuery = index.kNNQuery(get(id), k);
-
-    List<QueryResult<T>> result = new ArrayList<QueryResult<T>>();
-    for (QueryResult<D> qr : knnQuery) {
-      // noinspection unchecked
-      result.add((QueryResult<T>) qr);
+    /**
+     * Calls the super method and afterwards inserts the specified objects into
+     * the underlying index structure. If the option bulk load is enabled and
+     * the index structure is empty, a bulk load will be performed. Otherwise
+     * the objects will be inserted sequentially.
+     *
+     * @see Database#insert(java.util.List)
+     */
+    public void insert(List<ObjectAndAssociations<O>> objectsAndAssociationsList) throws UnableToComplyException {
+        for (ObjectAndAssociations<O> objectAndAssociations : objectsAndAssociationsList) {
+            super.insert(objectAndAssociations);
+        }
+        this.index.insert(getObjects(objectsAndAssociationsList));
     }
 
-    return result;
-  }
+    /**
+     * @see Database#rangeQuery(Integer,String,de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction)
+     */
+    public <T extends Distance<T>> List<QueryResult<T>> rangeQuery(Integer id,
+                                                                   String epsilon,
+                                                                   DistanceFunction<O, T> distanceFunction) {
+        if (!distanceFunction.getClass().equals(index.getDistanceFunction().getClass()))
+            throw new IllegalArgumentException("Parameter distanceFunction must be an instance of " +
+                index.getDistanceFunction().getClass());
 
-  /**
-   * @see Database#bulkKNNQueryForID(java.util.List, int, de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction)
-   */
-  public <D extends Distance<D>>List<List<QueryResult<D>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
-    throw new UnsupportedOperationException("Not yet supported!");
-  }
+        List<QueryResult<D>> rangeQuery = index.rangeQuery(get(id), epsilon);
 
+        List<QueryResult<T>> result = new ArrayList<QueryResult<T>>();
+        for (QueryResult<D> qr : rangeQuery) {
+            // noinspection unchecked
+            result.add((QueryResult<T>) qr);
+        }
 
-  /**
-   * @see Database#reverseKNNQuery(Integer, int,
-   *      de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction)
-   */
-  public <T extends Distance<T>> List<QueryResult<T>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, T> distanceFunction) {
-
-    if (!distanceFunction.getClass().equals(index.getDistanceFunction().getClass()))
-      throw new IllegalArgumentException("Parameter distanceFunction must be an instance of "
-                                         + index.getDistanceFunction().getClass() +
-                                         ", but is " + distanceFunction.getClass());
-
-    List<QueryResult<D>> rknnQuery = index.reverseKNNQuery(get(id), k);
-
-    List<QueryResult<T>> result = new ArrayList<QueryResult<T>>();
-    for (QueryResult<D> qr : rknnQuery) {
-      // noinspection unchecked
-      result.add((QueryResult<T>) qr);
+        return result;
     }
 
-    return result;
-  }
+    /**
+     * @see Database#kNNQueryForObject(DatabaseObject,int,de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction)
+     */
+    public <T extends Distance<T>> List<QueryResult<T>> kNNQueryForObject(
+        O queryObject, int k, DistanceFunction<O, T> distanceFunction) {
+        if (!distanceFunction.getClass().equals(index.getDistanceFunction().getClass()))
+            throw new IllegalArgumentException("Parameter distanceFunction must be an instance of "
+                + index.getDistanceFunction().getClass());
 
-  /**
-   * Returns a string representation of this database.
-   *
-   * @return a string representation of this database.
-   */
-  @Override
-public String toString() {
-    return index.toString();
-  }
+        List<QueryResult<D>> knnQuery = index.kNNQuery(queryObject, k);
 
-  /**
-   * Returns the index of this database.
-   *
-   * @return the index of this database
-   */
-  public MetricalIndex<O, D, N, E> getIndex() {
-    return index;
-  }
+        List<QueryResult<T>> result = new ArrayList<QueryResult<T>>();
+        for (QueryResult<D> qr : knnQuery) {
+            // noinspection unchecked
+            result.add((QueryResult<T>) qr);
+        }
 
-  /**
-   * Sets the values for the parameter bulk.
-   * If the parameters is not specified the default value is set.
-   *
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
-  @Override
-public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
-
-    String indexClass = (String) optionHandler.getOptionValue(INDEX_P);
-    try {
-      //noinspection unchecked
-        // todo
-      index = Util.instantiate(MetricalIndex.class, indexClass);
-    }
-    catch (UnableToComplyException e) {
-      throw new WrongParameterValueException(INDEX_P, indexClass, INDEX_D, e);
+        return result;
     }
 
-    remainingParameters = index.setParameters(remainingParameters);
-    setParameters(args, remainingParameters);
-    index.setDatabase(this);
+    /**
+     * @see Database#kNNQueryForID(Integer,int,
+     *de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction)
+     */
+    public <T extends Distance<T>> List<QueryResult<T>> kNNQueryForID(Integer id, int k, DistanceFunction<O, T> distanceFunction) {
 
-    return remainingParameters;
-  }
+        if (!distanceFunction.getClass().equals(index.getDistanceFunction().getClass()))
+            throw new IllegalArgumentException("Parameter distanceFunction must be an instance of "
+                + index.getDistanceFunction().getClass());
 
-  /**
-   * Returns a short description of the database.
-   * (Such as: efficiency in space and time, index structure...)
-   *
-   * @return a description of the database
-   */
-  @Override
-public String description() {
-    StringBuffer description = new StringBuffer();
-    description.append(this.getClass().getName());
-    description.append(" holds all the data in a ");
-    description.append("metrical index structure extending "+MetricalIndex.class.getName()+".\n");
+        List<QueryResult<D>> knnQuery = index.kNNQuery(get(id), k);
+
+        List<QueryResult<T>> result = new ArrayList<QueryResult<T>>();
+        for (QueryResult<D> qr : knnQuery) {
+            // noinspection unchecked
+            result.add((QueryResult<T>) qr);
+        }
+
+        return result;
+    }
+
+    /**
+     * @see Database#bulkKNNQueryForID(java.util.List,int,de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction)
+     */
+    public <D extends Distance<D>> List<List<QueryResult<D>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
+        throw new UnsupportedOperationException("Not yet supported!");
+    }
+
+
+    /**
+     * @see Database#reverseKNNQuery(Integer,int,
+     *de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction)
+     */
+    public <T extends Distance<T>> List<QueryResult<T>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, T> distanceFunction) {
+
+        if (!distanceFunction.getClass().equals(index.getDistanceFunction().getClass()))
+            throw new IllegalArgumentException("Parameter distanceFunction must be an instance of "
+                + index.getDistanceFunction().getClass() +
+                ", but is " + distanceFunction.getClass());
+
+        List<QueryResult<D>> rknnQuery = index.reverseKNNQuery(get(id), k);
+
+        List<QueryResult<T>> result = new ArrayList<QueryResult<T>>();
+        for (QueryResult<D> qr : rknnQuery) {
+            // noinspection unchecked
+            result.add((QueryResult<T>) qr);
+        }
+
+        return result;
+    }
+
+    /**
+     * Returns a string representation of this database.
+     *
+     * @return a string representation of this database.
+     */
+    @Override
+    public String toString() {
+        return index.toString();
+    }
+
+    /**
+     * Returns the index of this database.
+     *
+     * @return the index of this database
+     */
+    public MetricalIndex<O, D, N, E> getIndex() {
+        return index;
+    }
+
+    /**
+     * Sets the values for the parameter bulk.
+     * If the parameters is not specified the default value is set.
+     *
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
+     */
+    @Override
+    public String[] setParameters(String[] args) throws ParameterException {
+        String[] remainingParameters = super.setParameters(args);
+
+        //noinspection unchecked
+        index = INDEX_PARAM.instantiateClass();
+
+        remainingParameters = index.setParameters(remainingParameters);
+        setParameters(args, remainingParameters);
+        index.setDatabase(this);
+
+        return remainingParameters;
+    }
+
+    /**
+     * Returns a short description of the database.
+     * (Such as: efficiency in space and time, index structure...)
+     *
+     * @return a description of the database
+     */
+    @Override
+    public String description() {
+        StringBuffer description = new StringBuffer();
+        description.append(this.getClass().getName());
+        description.append(" holds all the data in a ");
+        description.append("metrical index structure extending ").append(MetricalIndex.class.getName()).append(".\n");
 //    description.append(index.getClass().getName()).append(" index structure.\n");
-    description.append(optionHandler.usage("", false));
-    return description.toString();
-  }
+        description.append(optionHandler.usage("", false));
+        return description.toString();
+    }
 }

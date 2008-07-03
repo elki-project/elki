@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * todo arthur comment
+ * todo arthur comment all
  *
  * @author Arthur Zimek
  */
@@ -36,6 +36,7 @@ public class Associations extends AbstractLoggable {
         return this.associations.keySet();
     }
 
+    @SuppressWarnings("unchecked")
     public <T> void putAll(Associations associations) {
         for (AssociationID<T> associationID : associations.keySet()) {
             put(associationID, associations.get(associationID));

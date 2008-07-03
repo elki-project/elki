@@ -166,7 +166,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable {
    * @param id the id for which the associations are to be returned
    * @return all associations for a given ID
    */
-  public <T> Associations getAssociations(final Integer id);
+  public Associations getAssociations(final Integer id);
 
   /**
    * Returns the association specified by the given associationID and related
