@@ -14,27 +14,11 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Interval;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 
 
 /**
@@ -132,8 +116,8 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
             "Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications",
             "Grid-based algorithm to identify dense clusters in subspaces of maximum dimensionality. ",
             "R. Agrawal, J. Gehrke, D. Gunopulos, P. Raghavan: " +
-            "Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications. " +
-            "In Proc. SIGMOD Conference, Seattle, WA, 1998.");
+                "Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications. " +
+                "In Proc. SIGMOD Conference, Seattle, WA, 1998.");
     }
 
     /**
