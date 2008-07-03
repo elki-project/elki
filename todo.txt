@@ -95,4 +95,6 @@ de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:356: warning - Tag @l
 
 - ClassLabel als ConstantObject/Singleton, ClassLabelFactory?
 
+- Implementing classes von Parameterizable im Property-File aufnehmen
+
 
