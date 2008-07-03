@@ -76,14 +76,9 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends Abstra
      *   String[] remainingParameters = super.setParameters(args);
      *   // set parameters for your class
      *   // for example like this:
-     *   TODO: arthur still correct?!?
-     *   if(isSet(MY_PARAM_VALUE_PARAM)
+     *   if(isSet(MY_PARAM_VALUE_PARAM))
      *   {
      *      myParamValue = getParameterValue(MY_PARAM_VALUE_PARAM);
-     *   }
-     *   else
-     *   {
-     *      myParamValue = MY_PARAM_DEFAULT_VALUE;
      *   }
      *   .
      *   .

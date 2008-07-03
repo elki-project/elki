@@ -117,9 +117,9 @@ public class PrettyPrinter extends AbstractLoggable
             {
                 currentLine1 = currentLine.substring(0, columnWidth[column]);
             }
-            if(currentLine1.indexOf(NEWLINE) > -1)
+            if(currentLine1.indexOf('\n') > -1)
             {
-                currentLine1 = currentLine1.substring(0,currentLine1.indexOf(NEWLINE));
+                currentLine1 = currentLine1.substring(0,currentLine1.indexOf('\n'));
             }
             else if(currentLine1.indexOf(' ') > -1)
             {

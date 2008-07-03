@@ -118,7 +118,6 @@ de.lmu.ifi.dbs.elki.parser.Parser=de.lmu.ifi.dbs.elki.parser.BitVectorLabelParse
 de.lmu.ifi.dbs.elki.preprocessing.Preprocessor=de.lmu.ifi.dbs.elki.preprocessing.DiSHPreprocessor,\
 					 de.lmu.ifi.dbs.elki.preprocessing.FourCPreprocessor,\
 					 de.lmu.ifi.dbs.elki.preprocessing.HiSCPreprocessor,\
-#					 de.lmu.ifi.dbs.elki.preprocessing.KernelFourCPreprocessor,\
 					 de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor,\
 					 de.lmu.ifi.dbs.elki.preprocessing.PreDeConPreprocessor,\
 					 de.lmu.ifi.dbs.elki.preprocessing.RangeQueryBasedHiCOPreprocessor
