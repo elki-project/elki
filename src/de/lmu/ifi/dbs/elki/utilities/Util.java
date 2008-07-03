@@ -512,7 +512,7 @@ public final class Util extends AbstractLoggable {
 
     /**
      * Returns the centroid w.r.t. the dimensions specified
-     * by the given bitSet as a RealVector object of the specified objects
+     * by the given BitSet as a RealVector object of the specified objects
      * stored in the given database. The objects belonging to the specified ids
      * must be instance of <code>RealVector</code>.
      *
@@ -556,6 +556,7 @@ public final class Util extends AbstractLoggable {
      * @param database the database storing the objects
      * @return the centroid of the specified objects stored in the given
      *         database
+     * @throws IllegalArgumentException if the database is empty
      */
     public static <O extends RealVector<O, ?>> O centroid(Database<O> database) {
         if (database.size() == 0) {
