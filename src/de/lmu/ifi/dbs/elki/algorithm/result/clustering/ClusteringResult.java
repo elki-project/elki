@@ -9,7 +9,8 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import java.util.Map;
 
 /**
- * TODO arthur comment
+ * A Result that provides a set of disjunct clusters and a mapping from
+ * classlabels (supposedly assigned by the algorithm) to databases. 
  *
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObjects handled by this Result
@@ -49,10 +50,10 @@ public interface ClusteringResult<O extends DatabaseObject> extends Result<O> {
   public <L extends ClassLabel<L>> Database<O> associate(Class<L> classLabel);
 
   /**
-   * todo comment
+   * Appends a model the designated cluster.
    *
-   * @param clusterID
-   * @param model
+   * @param clusterID ClassLabel assigned to the cluster a model should be appended to
+   * @param model the model describing the designated cluster
    */
   public <L extends ClassLabel<L>> void appendModel(L clusterID, Result<O> model);
   

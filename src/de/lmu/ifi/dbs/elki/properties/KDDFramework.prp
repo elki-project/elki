@@ -3,37 +3,40 @@ DEBUG_LEVEL=DEBUG_FINE
 # #######################################################
 # algorithms - default package: de.lmu.ifi.dbs.elki.algorithm
 de.lmu.ifi.dbs.elki.algorithm.Algorithm=de.lmu.ifi.dbs.elki.algorithm.APRIORI,\
-           de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.COPAA,\
-           de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.COPAC,\
-           de.lmu.ifi.dbs.elki.algorithm.CoDeC,\
-           de.lmu.ifi.dbs.elki.algorithm.classifier.CorrelationBasedClassifier,\
            de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN,\
            de.lmu.ifi.dbs.elki.algorithm.clustering.DeLiClu,\
-           de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator,\
-           de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.DiSH,\
-           de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.FourC,\
-           de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.CASH,\
-           de.lmu.ifi.dbs.elki.algorithm.ICA,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.EM,\
            de.lmu.ifi.dbs.elki.algorithm.clustering.KMeans,\
-           de.lmu.ifi.dbs.elki.algorithm.classifier.KNNClassifier,\
-           de.lmu.ifi.dbs.elki.algorithm.KNNDistanceOrder,\
-           de.lmu.ifi.dbs.elki.algorithm.KNNJoin,\
-           de.lmu.ifi.dbs.elki.algorithm.outlier.GeneralizedLOF,\
            de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.SLINK,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.SNNClustering,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering.ChengAndChurch,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering.FLOC,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering.MaPle,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering.PClustering,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.CASH,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.COPAC,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.ERiC,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.FourC,\
            de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.ORCLUS,\
-           de.lmu.ifi.dbs.elki.algorithm.outlier.OnlineLOF,\
-           de.lmu.ifi.dbs.elki.algorithm.outlier.OnlineBasicLOF,\
-           de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PreDeCon,\
-           de.lmu.ifi.dbs.elki.algorithm.classifier.PriorProbabilityClassifier,\
-           de.lmu.ifi.dbs.elki.algorithm.clustering.SLINK
+           de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.CLIQUE,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.DiSH,\
+		   de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PreDeCon,\
+		   de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PROCLUS,\
+		   de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.SUBCLU
 # #######################################################
 # clustering - default package: de.lmu.ifi.dbs.elki.algorithm.clustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.Clustering=de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.COPAC,\
            de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN,\
-           de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.FourC,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.EM,\
            de.lmu.ifi.dbs.elki.algorithm.clustering.KMeans,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.SNNClustering,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.COPAC,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.FourC,\
            de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.ORCLUS,\
-           de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PreDeCon
+           de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.CLIQUE,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PreDeCon,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PROCLUS
 # #######################################################
 # Classlabel - default package: de.lmu.ifi.dbs.elki.data
 de.lmu.ifi.dbs.elki.data.ClassLabel=de.lmu.ifi.dbs.elki.data.SimpleClassLabel,\
@@ -77,14 +80,14 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractLocallyWeightedDistanceFun
 de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDimensionsSelectingDoubleDistanceFunction=de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionsSelectingEuklideanDistanceFunction
 # #######################################################
 # Holdout - default package: de.lmu.ifi.dbs.elki.evaluation.holdout
-de.lmu.ifi.dbs.elki.evaluation.holdout.Holdout=de.lmu.ifi.dbs.elki.evaluation.holdout.LeaveOneOut,\
-           de.lmu.ifi.dbs.elki.evaluation.holdout.ProvidedTestSet,\
-           de.lmu.ifi.dbs.elki.evaluation.holdout.DisjointCrossValidation,\
-           de.lmu.ifi.dbs.elki.evaluation.holdout.RandomizedCrossValidation,\
-           de.lmu.ifi.dbs.elki.evaluation.holdout.StratifiedCrossValidation
+#de.lmu.ifi.dbs.elki.evaluation.holdout.Holdout=de.lmu.ifi.dbs.elki.evaluation.holdout.LeaveOneOut,\
+#           de.lmu.ifi.dbs.elki.evaluation.holdout.ProvidedTestSet,\
+#           de.lmu.ifi.dbs.elki.evaluation.holdout.DisjointCrossValidation,\
+#           de.lmu.ifi.dbs.elki.evaluation.holdout.RandomizedCrossValidation,\
+#           de.lmu.ifi.dbs.elki.evaluation.holdout.StratifiedCrossValidation
 # #######################################################
 # EvaluationProcedure - default package: de.lmu.ifi.dbs.elki.evaluation.procedure
-de.lmu.ifi.dbs.elki.evaluation.procedure.EvaluationProcedure=de.lmu.ifi.dbs.elki.evaluation.procedure.ClassifierEvaluationProcedure
+#de.lmu.ifi.dbs.elki.evaluation.procedure.EvaluationProcedure=de.lmu.ifi.dbs.elki.evaluation.procedure.ClassifierEvaluationProcedure
 # #######################################################
 # MetricalIndex - default package: de.lmu.ifi.dbs.elki.index.tree.metrical
 de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex=de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTree,\
@@ -115,7 +118,7 @@ de.lmu.ifi.dbs.elki.parser.Parser=de.lmu.ifi.dbs.elki.parser.BitVectorLabelParse
 de.lmu.ifi.dbs.elki.preprocessing.Preprocessor=de.lmu.ifi.dbs.elki.preprocessing.DiSHPreprocessor,\
 					 de.lmu.ifi.dbs.elki.preprocessing.FourCPreprocessor,\
 					 de.lmu.ifi.dbs.elki.preprocessing.HiSCPreprocessor,\
-					 de.lmu.ifi.dbs.elki.preprocessing.KernelFourCPreprocessor,\
+#					 de.lmu.ifi.dbs.elki.preprocessing.KernelFourCPreprocessor,\
 					 de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor,\
 					 de.lmu.ifi.dbs.elki.preprocessing.PreDeConPreprocessor,\
 					 de.lmu.ifi.dbs.elki.preprocessing.RangeQueryBasedHiCOPreprocessor
@@ -130,7 +133,7 @@ de.lmu.ifi.dbs.elki.preprocessing.PreferenceVectorPreprocessor=de.lmu.ifi.dbs.el
 # #######################################################
 # ProjectedDBSCANPreprocessor - default package: de.lmu.ifi.dbs.elki.preprocessing
 de.lmu.ifi.dbs.elki.preprocessing.ProjectedDBSCANPreprocessor=de.lmu.ifi.dbs.elki.preprocessing.FourCPreprocessor,\
-           de.lmu.ifi.dbs.elki.preprocessing.KernelFourCPreprocessor,\
+#           de.lmu.ifi.dbs.elki.preprocessing.KernelFourCPreprocessor,\
            de.lmu.ifi.dbs.elki.preprocessing.PreDeConPreprocessor
 # #######################################################
 # EigenPairFilter - default package: de.lmu.ifi.dbs.elki.varianceanalysis
@@ -143,7 +146,7 @@ de.lmu.ifi.dbs.elki.varianceanalysis.EigenPairFilter=de.lmu.ifi.dbs.elki.varianc
 de.lmu.ifi.dbs.elki.varianceanalysis.LocalPCA=de.lmu.ifi.dbs.elki.varianceanalysis.LinearLocalPCA
 # #######################################################
 # ContrastFunction - default package: de.lmu.ifi.dbs.elki.varianceanalysis.ica
-de.lmu.ifi.dbs.elki.varianceanalysis.ica.ContrastFunction=de.lmu.ifi.dbs.elki.varianceanalysis.ica.ExponentialContrastFunction,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.ica.KurtosisBasedContrastFunction,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.ica.TanhContrastFunction
+#de.lmu.ifi.dbs.elki.varianceanalysis.ica.ContrastFunction=de.lmu.ifi.dbs.elki.varianceanalysis.ica.ExponentialContrastFunction,\
+#  de.lmu.ifi.dbs.elki.varianceanalysis.ica.KurtosisBasedContrastFunction,\
+#  de.lmu.ifi.dbs.elki.varianceanalysis.ica.TanhContrastFunction
 # #######################################################
