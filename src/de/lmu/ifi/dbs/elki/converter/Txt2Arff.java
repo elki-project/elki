@@ -41,6 +41,7 @@ public class Txt2Arff<W extends WekaAttribute<W>> extends StandAloneInputWrapper
    *
    * @param args the arguments to run this wrapper
    */
+  @SuppressWarnings("unchecked")
   public static void main(String[] args) {
     Txt2Arff<? extends WekaAttribute> wrapper = new Txt2Arff();
     try {
@@ -66,6 +67,7 @@ public class Txt2Arff<W extends WekaAttribute<W>> extends StandAloneInputWrapper
   /**
    * Runs the wrapper with the specified arguments.
    */
+  @SuppressWarnings("unchecked")
   public void run() throws UnableToComplyException {
     try {
       File inputFile = getInput();
