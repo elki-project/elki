@@ -13,8 +13,8 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
 
 import java.io.File;
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -206,6 +206,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
         if (args.length == 0) {
             throw new AbortException("No options specified. Try flag -h to gain more information.");
         }
+
         String[] remainingParameters = optionHandler.grabOptions(args);
 
         // help
@@ -340,8 +341,8 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
         try {
             String[] remainingParameters = kddTask.setParameters(args);
             if (remainingParameters.length != 0) {
-                kddTask.warning(kddTask.usage("Unnecessary parameters specified: "+
-                    Arrays.asList(remainingParameters) + "\n\nUSAGE:\n"));                
+                kddTask.warning(kddTask.usage("Unnecessary parameters specified: " +
+                    Arrays.asList(remainingParameters) + "\n\nUSAGE:\n"));
             }
             kddTask.run();
         }

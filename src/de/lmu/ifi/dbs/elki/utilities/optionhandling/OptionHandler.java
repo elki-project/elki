@@ -85,7 +85,6 @@ public class OptionHandler extends AbstractLoggable {
      *                                   because the next value is itself some option)
      */
     public String[] grabOptions(String[] currentOptions) throws ParameterException {
-
         List<String> unexpectedParameters = new ArrayList<String>();
         List<String> parameterArray = new ArrayList<String>();
 
