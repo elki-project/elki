@@ -7,6 +7,8 @@
 	
 	<property name="basepackage" value="de/lmu/ifi/dbs/elki/"/>
 	
+	<property name="main-class" value="de.lmu.ifi.dbs.elki.KDDTask" />
+	
 	<property name="ELKI" value="ELKI"/>
 	
 	<property name="ELKI_LONG" value="ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures"/>
@@ -54,7 +56,7 @@
 	<property name="deploy.javadoc" value="${deploy.basedir}/doc"/>
 
 	
-	<target name="preliminary" depends="copy4release,compile,javadoc"/>
+	<target name="preliminary" depends="copy4release,compile,javadoc,jar"/>
 	
 	<target name="copy4release" description="copies selected resources to current release directory">
 		<copy todir="${deploy.srcdir}/src">
@@ -146,7 +148,15 @@
 		<copy file="${deploy.srcdir}/src/${basepackage}properties/KDDFramework.prp" tofile="${deploy.srcdir}/${basepackage}properties/KDDFramework.prp"/>
 	</target>
 	
-	<target name="jar">
+	<target name="jar" depends="compile">
+		<jar basedir="${deploy.srcdir}/" destfile="${deploy.basedir}/elki.jar">
+			<manifest>
+				<attribute name="Manifest-Version" value="${RELEASE}"/>
+				<attribute name="Main-class" value="${main-class}"/>
+				<attribute name="Release-Date" value="${now}"/>
+				<attribute name="Built-By" value="${user.name}"/>
+			</manifest>
+		</jar>
 	</target>
 
 </project>
