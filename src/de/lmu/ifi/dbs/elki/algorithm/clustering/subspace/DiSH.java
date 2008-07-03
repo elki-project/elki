@@ -16,13 +16,22 @@ import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 
-import java.util.*;
-
-//FIXME: minpts is required but is not shown in usage (parameter of OPTICS???)
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Algorithm for detecting subspace hierarchies.
@@ -112,14 +121,16 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
 
     /**
      * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getDescription()
-     *      todo publication
      */
     public Description getDescription() {
         return new Description(
             "DiSH",
-            "Detecting Subspace Clusters",
+            "Detecting Subspace cluster Hierarchies",
             "Algorithm to find hierarchical correlation clusters in subspaces.",
-            "unpublished :-(");
+            "E. Achtert, C. Boehm, H.-P. Kriegel, P. Kröger, I. Mueller-Gorman, A. Zimek: " +
+                "Detection and Visualization of Subspace Cluster Hierarchies. " +
+                "In Proc. DASFAA Conference, Bangkok, Thailand, 2007."
+        );
     }
 
     /**
