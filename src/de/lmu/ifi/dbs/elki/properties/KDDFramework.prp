@@ -1,149 +1,149 @@
 # debug level: one of ALL,DEBUG_FINEST,DEBUG_FINER,DEBUG_FINE or an integer
 DEBUG_LEVEL=DEBUG_FINE
 # #######################################################
-# algorithms - default package: de.lmu.ifi.dbs.algorithm
-de.lmu.ifi.dbs.algorithm.Algorithm=de.lmu.ifi.dbs.algorithm.APRIORI,\
-           de.lmu.ifi.dbs.algorithm.clustering.COPAA,\
-           de.lmu.ifi.dbs.algorithm.clustering.COPAC,\
-           de.lmu.ifi.dbs.algorithm.CoDeC,\
-           de.lmu.ifi.dbs.algorithm.classifier.CorrelationBasedClassifier,\
-           de.lmu.ifi.dbs.algorithm.clustering.DBSCAN,\
-           de.lmu.ifi.dbs.algorithm.clustering.DeLiClu,\
-           de.lmu.ifi.dbs.algorithm.DependencyDerivator,\
-           de.lmu.ifi.dbs.algorithm.clustering.DiSH,\
-           de.lmu.ifi.dbs.algorithm.clustering.FourC,\
-           de.lmu.ifi.dbs.algorithm.clustering.cash.CASH,\
-           de.lmu.ifi.dbs.algorithm.ICA,\
-           de.lmu.ifi.dbs.algorithm.clustering.KMeans,\
-           de.lmu.ifi.dbs.algorithm.classifier.KNNClassifier,\
-           de.lmu.ifi.dbs.algorithm.KNNDistanceOrder,\
-           de.lmu.ifi.dbs.algorithm.KNNJoin,\
-           de.lmu.ifi.dbs.algorithm.outlier.GeneralizedLOF,\
-           de.lmu.ifi.dbs.algorithm.clustering.OPTICS,\
-           de.lmu.ifi.dbs.algorithm.clustering.ORCLUS,\
-           de.lmu.ifi.dbs.algorithm.outlier.OnlineLOF,\
-           de.lmu.ifi.dbs.algorithm.outlier.OnlineBasicLOF,\
-           de.lmu.ifi.dbs.algorithm.clustering.PreDeCon,\
-           de.lmu.ifi.dbs.algorithm.classifier.PriorProbabilityClassifier,\
-           de.lmu.ifi.dbs.algorithm.clustering.SLINK
+# algorithms - default package: de.lmu.ifi.dbs.elki.algorithm
+de.lmu.ifi.dbs.elki.algorithm.Algorithm=de.lmu.ifi.dbs.elki.algorithm.APRIORI,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.COPAA,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.COPAC,\
+           de.lmu.ifi.dbs.elki.algorithm.CoDeC,\
+           de.lmu.ifi.dbs.elki.algorithm.classifier.CorrelationBasedClassifier,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.DeLiClu,\
+           de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.DiSH,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.FourC,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.CASH,\
+           de.lmu.ifi.dbs.elki.algorithm.ICA,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.KMeans,\
+           de.lmu.ifi.dbs.elki.algorithm.classifier.KNNClassifier,\
+           de.lmu.ifi.dbs.elki.algorithm.KNNDistanceOrder,\
+           de.lmu.ifi.dbs.elki.algorithm.KNNJoin,\
+           de.lmu.ifi.dbs.elki.algorithm.outlier.GeneralizedLOF,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.ORCLUS,\
+           de.lmu.ifi.dbs.elki.algorithm.outlier.OnlineLOF,\
+           de.lmu.ifi.dbs.elki.algorithm.outlier.OnlineBasicLOF,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PreDeCon,\
+           de.lmu.ifi.dbs.elki.algorithm.classifier.PriorProbabilityClassifier,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.SLINK
 # #######################################################
-# clustering - default package: de.lmu.ifi.dbs.algorithm.clustering
-de.lmu.ifi.dbs.algorithm.clustering.Clustering=de.lmu.ifi.dbs.algorithm.clustering.COPAC,\
-           de.lmu.ifi.dbs.algorithm.clustering.DBSCAN,\
-           de.lmu.ifi.dbs.algorithm.clustering.FourC,\
-           de.lmu.ifi.dbs.algorithm.clustering.KMeans,\
-           de.lmu.ifi.dbs.algorithm.clustering.ORCLUS,\
-           de.lmu.ifi.dbs.algorithm.clustering.PreDeCon
+# clustering - default package: de.lmu.ifi.dbs.elki.algorithm.clustering
+de.lmu.ifi.dbs.elki.algorithm.clustering.Clustering=de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.COPAC,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.FourC,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.KMeans,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.ORCLUS,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PreDeCon
 # #######################################################
-# Classlabel - default package: de.lmu.ifi.dbs.data
-de.lmu.ifi.dbs.data.ClassLabel=de.lmu.ifi.dbs.data.SimpleClassLabel,\
-           de.lmu.ifi.dbs.data.HierarchicalClassLabel
+# Classlabel - default package: de.lmu.ifi.dbs.elki.data
+de.lmu.ifi.dbs.elki.data.ClassLabel=de.lmu.ifi.dbs.elki.data.SimpleClassLabel,\
+           de.lmu.ifi.dbs.elki.data.HierarchicalClassLabel
 # #######################################################
-# Databases - default package: de.lmu.ifi.dbs.database
-de.lmu.ifi.dbs.database.Database=de.lmu.ifi.dbs.database.MetricalIndexDatabase,\
-           de.lmu.ifi.dbs.database.SequentialDatabase,\
-           de.lmu.ifi.dbs.database.SpatialIndexDatabase
+# Databases - default package: de.lmu.ifi.dbs.elki.database
+de.lmu.ifi.dbs.elki.database.Database=de.lmu.ifi.dbs.elki.database.MetricalIndexDatabase,\
+           de.lmu.ifi.dbs.elki.database.SequentialDatabase,\
+           de.lmu.ifi.dbs.elki.database.SpatialIndexDatabase
 # #######################################################
-# Database connections - default package: de.lmu.ifi.dbs.database.connection
-de.lmu.ifi.dbs.database.connection.DatabaseConnection=de.lmu.ifi.dbs.database.connection.FileBasedDatabaseConnection,\
-           de.lmu.ifi.dbs.database.connection.InputStreamDatabaseConnection,\
-           de.lmu.ifi.dbs.database.connection.MultipleFileBasedDatabaseConnection
+# Database connections - default package: de.lmu.ifi.dbs.elki.database.connection
+de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection=de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection,\
+           de.lmu.ifi.dbs.elki.database.connection.InputStreamDatabaseConnection,\
+           de.lmu.ifi.dbs.elki.database.connection.MultipleFileBasedDatabaseConnection
 # #######################################################
-# distance functions - default package: de.lmu.ifi.dbs.distance.distancefunction
-de.lmu.ifi.dbs.distance.distancefunction.DistanceFunction= de.lmu.ifi.dbs.distance.distancefunction.CosineDistanceFunction,\
-           de.lmu.ifi.dbs.distance.distancefunction.DimensionSelectingDistanceFunction,\
-           de.lmu.ifi.dbs.distance.distancefunction.DimensionsSelectingEuklideanDistanceFunction,\
-           de.lmu.ifi.dbs.distance.distancefunction.DirectSupportDependentItemsetDistanceFunction,\
-           de.lmu.ifi.dbs.distance.distancefunction.EuklideanDistanceFunction,\
-           de.lmu.ifi.dbs.distance.distancefunction.FileBasedDoubleDistanceFunction,\
-           de.lmu.ifi.dbs.distance.distancefunction.FileBasedFloatDistanceFunction,\
-           de.lmu.ifi.dbs.distance.distancefunction.LPNormDistanceFunction,\
-           de.lmu.ifi.dbs.distance.distancefunction.LocallyWeightedDistanceFunction,\
-           de.lmu.ifi.dbs.distance.distancefunction.PCABasedCorrelationDistanceFunction,\
-           de.lmu.ifi.dbs.distance.distancefunction.DiSHDistanceFunction,\
-           de.lmu.ifi.dbs.distance.distancefunction.HiSCDistanceFunction,\
-           de.lmu.ifi.dbs.distance.distancefunction.ReciprocalSupportDependentItemsetDistanceFunction,\
-           de.lmu.ifi.dbs.distance.distancefunction.RepresentationSelectingDistanceFunction,\
-           de.lmu.ifi.dbs.distance.distancefunction.SharedMaximumDistanceFunction,\
-           de.lmu.ifi.dbs.distance.distancefunction.SharedUnitedDistanceFunction,\
-           de.lmu.ifi.dbs.distance.distancefunction.SquareRootSupportLengthDependentItemsetDistanceFunction,\
-           de.lmu.ifi.dbs.distance.distancefunction.SupportLengthDependentItemsetDistanceFunction
+# distance functions - default package: de.lmu.ifi.dbs.elki.distance.distancefunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction= de.lmu.ifi.dbs.elki.distance.distancefunction.CosineDistanceFunction,\
+           de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionSelectingDistanceFunction,\
+           de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionsSelectingEuklideanDistanceFunction,\
+           de.lmu.ifi.dbs.elki.distance.distancefunction.DirectSupportDependentItemsetDistanceFunction,\
+           de.lmu.ifi.dbs.elki.distance.distancefunction.EuklideanDistanceFunction,\
+           de.lmu.ifi.dbs.elki.distance.distancefunction.FileBasedDoubleDistanceFunction,\
+           de.lmu.ifi.dbs.elki.distance.distancefunction.FileBasedFloatDistanceFunction,\
+           de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction,\
+           de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction,\
+           de.lmu.ifi.dbs.elki.distance.distancefunction.PCABasedCorrelationDistanceFunction,\
+           de.lmu.ifi.dbs.elki.distance.distancefunction.DiSHDistanceFunction,\
+           de.lmu.ifi.dbs.elki.distance.distancefunction.HiSCDistanceFunction,\
+           de.lmu.ifi.dbs.elki.distance.distancefunction.ReciprocalSupportDependentItemsetDistanceFunction,\
+           de.lmu.ifi.dbs.elki.distance.distancefunction.RepresentationSelectingDistanceFunction,\
+           de.lmu.ifi.dbs.elki.distance.distancefunction.SharedMaximumDistanceFunction,\
+           de.lmu.ifi.dbs.elki.distance.distancefunction.SharedUnitedDistanceFunction,\
+           de.lmu.ifi.dbs.elki.distance.distancefunction.SquareRootSupportLengthDependentItemsetDistanceFunction,\
+           de.lmu.ifi.dbs.elki.distance.distancefunction.SupportLengthDependentItemsetDistanceFunction
 # #######################################################
-# locally weighted distance functions - default package: de.lmu.ifi.dbs.distance.distancefunction
-de.lmu.ifi.dbs.distance.distancefunction.AbstractLocallyWeightedDistanceFunction=de.lmu.ifi.dbs.distance.distancefunction.KernelBasedLocallyWeightedDistanceFunction,\
-           de.lmu.ifi.dbs.distance.distancefunction.LocallyWeightedDistanceFunction
+# locally weighted distance functions - default package: de.lmu.ifi.dbs.elki.distance.distancefunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractLocallyWeightedDistanceFunction=de.lmu.ifi.dbs.elki.distance.distancefunction.KernelBasedLocallyWeightedDistanceFunction,\
+           de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction
 # #######################################################
-# dimensions selecting distance functions - default package: de.lmu.ifi.dbs.distance.distancefunction
-de.lmu.ifi.dbs.distance.distancefunction.AbstractDimensionsSelectingDoubleDistanceFunction=de.lmu.ifi.dbs.distance.distancefunction.DimensionsSelectingEuklideanDistanceFunction
+# dimensions selecting distance functions - default package: de.lmu.ifi.dbs.elki.distance.distancefunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDimensionsSelectingDoubleDistanceFunction=de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionsSelectingEuklideanDistanceFunction
 # #######################################################
-# Holdout - default package: de.lmu.ifi.dbs.evaluation.holdout
-de.lmu.ifi.dbs.evaluation.holdout.Holdout=de.lmu.ifi.dbs.evaluation.holdout.LeaveOneOut,\
-           de.lmu.ifi.dbs.evaluation.holdout.ProvidedTestSet,\
-           de.lmu.ifi.dbs.evaluation.holdout.DisjointCrossValidation,\
-           de.lmu.ifi.dbs.evaluation.holdout.RandomizedCrossValidation,\
-           de.lmu.ifi.dbs.evaluation.holdout.StratifiedCrossValidation
+# Holdout - default package: de.lmu.ifi.dbs.elki.evaluation.holdout
+de.lmu.ifi.dbs.elki.evaluation.holdout.Holdout=de.lmu.ifi.dbs.elki.evaluation.holdout.LeaveOneOut,\
+           de.lmu.ifi.dbs.elki.evaluation.holdout.ProvidedTestSet,\
+           de.lmu.ifi.dbs.elki.evaluation.holdout.DisjointCrossValidation,\
+           de.lmu.ifi.dbs.elki.evaluation.holdout.RandomizedCrossValidation,\
+           de.lmu.ifi.dbs.elki.evaluation.holdout.StratifiedCrossValidation
 # #######################################################
-# EvaluationProcedure - default package: de.lmu.ifi.dbs.evaluation.procedure
-de.lmu.ifi.dbs.evaluation.procedure.EvaluationProcedure=de.lmu.ifi.dbs.evaluation.procedure.ClassifierEvaluationProcedure
+# EvaluationProcedure - default package: de.lmu.ifi.dbs.elki.evaluation.procedure
+de.lmu.ifi.dbs.elki.evaluation.procedure.EvaluationProcedure=de.lmu.ifi.dbs.elki.evaluation.procedure.ClassifierEvaluationProcedure
 # #######################################################
-# MetricalIndex - default package: de.lmu.ifi.dbs.index.tree.metrical
-de.lmu.ifi.dbs.index.tree.metrical.MetricalIndex=de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.mtree.MTree,\
-           de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.mkcop.MkCoPTree,\
-           de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.mkmax.MkMaxTree,\
-           de.lmu.ifi.dbs.index.tree.metrical.mtreevariants.mktab.MkTabTree
+# MetricalIndex - default package: de.lmu.ifi.dbs.elki.index.tree.metrical
+de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex=de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTree,\
+           de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mkcop.MkCoPTree,\
+           de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mkmax.MkMaxTree,\
+           de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktab.MkTabTree
 # #######################################################
-# SpatialIndex - default package: de.lmu.ifi.dbs.index.tree.spatial
-de.lmu.ifi.dbs.index.tree.spatial.SpatialIndex=de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.deliclu.DeLiCluTree,\
-           de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.flat.FlatRStarTree,\
-           de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.rstar.RStarTree,\
-           de.lmu.ifi.dbs.index.tree.spatial.rstarvariants.rdknn.RdKNNTree
+# SpatialIndex - default package: de.lmu.ifi.dbs.elki.index.tree.spatial
+de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex=de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTree,\
+           de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.flat.FlatRStarTree,\
+           de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTree,\
+           de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rdknn.RdKNNTree
 # #######################################################
-# Normalization - default package: de.lmu.ifi.dbs.normalization
-de.lmu.ifi.dbs.normalization.Normalization=de.lmu.ifi.dbs.normalization.AttributeWiseRealVectorNormalization,\
-           de.lmu.ifi.dbs.normalization.DummyNormalization,\
-           de.lmu.ifi.dbs.normalization.MultiRepresentedObjectNormalization
+# Normalization - default package: de.lmu.ifi.dbs.elki.normalization
+de.lmu.ifi.dbs.elki.normalization.Normalization=de.lmu.ifi.dbs.elki.normalization.AttributeWiseRealVectorNormalization,\
+           de.lmu.ifi.dbs.elki.normalization.DummyNormalization,\
+           de.lmu.ifi.dbs.elki.normalization.MultiRepresentedObjectNormalization
 # #######################################################
-# Parser - default package: de.lmu.ifi.dbs.parser
-de.lmu.ifi.dbs.parser.Parser=de.lmu.ifi.dbs.parser.BitVectorLabelParser,\
-           de.lmu.ifi.dbs.parser.NumberDistanceParser,\
-           de.lmu.ifi.dbs.parser.ParameterizationFunctionLabelParser,\
-           de.lmu.ifi.dbs.parser.RealVectorLabelParser,\
-           de.lmu.ifi.dbs.parser.RealVectorLabelTransposingParser,\
-           de.lmu.ifi.dbs.parser.SparseBitVectorLabelParser
+# Parser - default package: de.lmu.ifi.dbs.elki.parser
+de.lmu.ifi.dbs.elki.parser.Parser=de.lmu.ifi.dbs.elki.parser.BitVectorLabelParser,\
+           de.lmu.ifi.dbs.elki.parser.NumberDistanceParser,\
+           de.lmu.ifi.dbs.elki.parser.ParameterizationFunctionLabelParser,\
+           de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser,\
+           de.lmu.ifi.dbs.elki.parser.RealVectorLabelTransposingParser,\
+           de.lmu.ifi.dbs.elki.parser.SparseBitVectorLabelParser
 # #######################################################
-# Preprocessor - default package: de.lmu.ifi.dbs.preprocessing
-de.lmu.ifi.dbs.preprocessing.Preprocessor=de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor,\
-					 de.lmu.ifi.dbs.preprocessing.FourCPreprocessor,\
-					 de.lmu.ifi.dbs.preprocessing.HiSCPreprocessor,\
-					 de.lmu.ifi.dbs.preprocessing.KernelFourCPreprocessor,\
-					 de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor,\
-					 de.lmu.ifi.dbs.preprocessing.PreDeConPreprocessor,\
-					 de.lmu.ifi.dbs.preprocessing.RangeQueryBasedHiCOPreprocessor
+# Preprocessor - default package: de.lmu.ifi.dbs.elki.preprocessing
+de.lmu.ifi.dbs.elki.preprocessing.Preprocessor=de.lmu.ifi.dbs.elki.preprocessing.DiSHPreprocessor,\
+					 de.lmu.ifi.dbs.elki.preprocessing.FourCPreprocessor,\
+					 de.lmu.ifi.dbs.elki.preprocessing.HiSCPreprocessor,\
+					 de.lmu.ifi.dbs.elki.preprocessing.KernelFourCPreprocessor,\
+					 de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor,\
+					 de.lmu.ifi.dbs.elki.preprocessing.PreDeConPreprocessor,\
+					 de.lmu.ifi.dbs.elki.preprocessing.RangeQueryBasedHiCOPreprocessor
 # #######################################################
-# HiCOPreprocessor - default package: de.lmu.ifi.dbs.preprocessing
-de.lmu.ifi.dbs.preprocessing.HiCOPreprocessor=de.lmu.ifi.dbs.preprocessing.KnnQueryBasedHiCOPreprocessor,\
-           de.lmu.ifi.dbs.preprocessing.RangeQueryBasedHiCOPreprocessor
+# HiCOPreprocessor - default package: de.lmu.ifi.dbs.elki.preprocessing
+de.lmu.ifi.dbs.elki.preprocessing.HiCOPreprocessor=de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor,\
+           de.lmu.ifi.dbs.elki.preprocessing.RangeQueryBasedHiCOPreprocessor
 # #######################################################
-# PreferenceVectorPreprocessor - default package: de.lmu.ifi.dbs.preprocessing
-de.lmu.ifi.dbs.preprocessing.PreferenceVectorPreprocessor=de.lmu.ifi.dbs.preprocessing.DiSHPreprocessor,\
-					 de.lmu.ifi.dbs.preprocessing.HiSCPreprocessor
+# PreferenceVectorPreprocessor - default package: de.lmu.ifi.dbs.elki.preprocessing
+de.lmu.ifi.dbs.elki.preprocessing.PreferenceVectorPreprocessor=de.lmu.ifi.dbs.elki.preprocessing.DiSHPreprocessor,\
+					 de.lmu.ifi.dbs.elki.preprocessing.HiSCPreprocessor
 # #######################################################
-# ProjectedDBSCANPreprocessor - default package: de.lmu.ifi.dbs.preprocessing
-de.lmu.ifi.dbs.preprocessing.ProjectedDBSCANPreprocessor=de.lmu.ifi.dbs.preprocessing.FourCPreprocessor,\
-           de.lmu.ifi.dbs.preprocessing.KernelFourCPreprocessor,\
-           de.lmu.ifi.dbs.preprocessing.PreDeConPreprocessor
+# ProjectedDBSCANPreprocessor - default package: de.lmu.ifi.dbs.elki.preprocessing
+de.lmu.ifi.dbs.elki.preprocessing.ProjectedDBSCANPreprocessor=de.lmu.ifi.dbs.elki.preprocessing.FourCPreprocessor,\
+           de.lmu.ifi.dbs.elki.preprocessing.KernelFourCPreprocessor,\
+           de.lmu.ifi.dbs.elki.preprocessing.PreDeConPreprocessor
 # #######################################################
-# EigenPairFilter - default package: de.lmu.ifi.dbs.varianceanalysis
-de.lmu.ifi.dbs.varianceanalysis.EigenPairFilter=de.lmu.ifi.dbs.varianceanalysis.FirstNEigenPairFilter,\
-  de.lmu.ifi.dbs.varianceanalysis.LimitEigenPairFilter,\
-  de.lmu.ifi.dbs.varianceanalysis.PercentageEigenPairFilter,\
-  de.lmu.ifi.dbs.varianceanalysis.CompositeEigenPairFilter
+# EigenPairFilter - default package: de.lmu.ifi.dbs.elki.varianceanalysis
+de.lmu.ifi.dbs.elki.varianceanalysis.EigenPairFilter=de.lmu.ifi.dbs.elki.varianceanalysis.FirstNEigenPairFilter,\
+  de.lmu.ifi.dbs.elki.varianceanalysis.LimitEigenPairFilter,\
+  de.lmu.ifi.dbs.elki.varianceanalysis.PercentageEigenPairFilter,\
+  de.lmu.ifi.dbs.elki.varianceanalysis.CompositeEigenPairFilter
 # #######################################################
-# LocalPCA - default package: de.lmu.ifi.dbs.varianceanalysis
-de.lmu.ifi.dbs.varianceanalysis.LocalPCA=de.lmu.ifi.dbs.varianceanalysis.LinearLocalPCA
+# LocalPCA - default package: de.lmu.ifi.dbs.elki.varianceanalysis
+de.lmu.ifi.dbs.elki.varianceanalysis.LocalPCA=de.lmu.ifi.dbs.elki.varianceanalysis.LinearLocalPCA
 # #######################################################
-# ContrastFunction - default package: de.lmu.ifi.dbs.varianceanalysis.ica
-de.lmu.ifi.dbs.varianceanalysis.ica.ContrastFunction=de.lmu.ifi.dbs.varianceanalysis.ica.ExponentialContrastFunction,\
-  de.lmu.ifi.dbs.varianceanalysis.ica.KurtosisBasedContrastFunction,\
-  de.lmu.ifi.dbs.varianceanalysis.ica.TanhContrastFunction
+# ContrastFunction - default package: de.lmu.ifi.dbs.elki.varianceanalysis.ica
+de.lmu.ifi.dbs.elki.varianceanalysis.ica.ContrastFunction=de.lmu.ifi.dbs.elki.varianceanalysis.ica.ExponentialContrastFunction,\
+  de.lmu.ifi.dbs.elki.varianceanalysis.ica.KurtosisBasedContrastFunction,\
+  de.lmu.ifi.dbs.elki.varianceanalysis.ica.TanhContrastFunction
 # #######################################################

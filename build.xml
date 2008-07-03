@@ -160,7 +160,7 @@
 		<property name="deploy" value="${windows.disk.prefix}${deploy.archive}version-${now}" />
 		<property name="executable" value="${windows.disk.prefix}${deploy.executable}" />
 		<property name="jarFile" value="kdd.jar" />
-		<property name="main-class" value="de.lmu.ifi.dbs.elki.algorithm.KDDTask" />
+		<property name="main-class" value="de.lmu.ifi.dbs.elki.KDDTask" />
 		<property name="source" value="src" />
 		<mkdir dir="${deploy}" />
 		<delete file="${jarFile}" />
