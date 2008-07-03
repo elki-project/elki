@@ -370,9 +370,11 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
         Map<Integer, Cluster> clusters = new HashMap<Integer, Cluster>();
         for (Integer m_i : dimensions.keySet()) {
             Set<Integer> objectIDs = clusterIDs.get(m_i);
-            Set<Integer> clusterDimensions = dimensions.get(m_i);
-            V centroid = Util.centroid(database, objectIDs);
-            clusters.put(m_i, new Cluster(objectIDs, clusterDimensions, centroid));
+            if (! objectIDs.isEmpty()) {
+                Set<Integer> clusterDimensions = dimensions.get(m_i);
+                V centroid = Util.centroid(database, objectIDs);
+                clusters.put(m_i, new Cluster(objectIDs, clusterDimensions, centroid));
+            }
         }
         return clusters;
     }

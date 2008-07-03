@@ -489,7 +489,7 @@ public final class Util extends AbstractLoggable {
      */
     public static <V extends RealVector<V, ?>> V centroid(Database<V> database, Collection<Integer> ids) {
         if (ids.isEmpty()) {
-            throw new IllegalArgumentException("Empty list of ids!");
+            throw new IllegalArgumentException("Cannot compute a centroid, because of empty list of ids!");
         }
 
         int dim = database.dimensionality();
@@ -525,7 +525,7 @@ public final class Util extends AbstractLoggable {
      */
     public static <V extends RealVector<V, ?>> V centroid(Database<V> database, Collection<Integer> ids, BitSet bitSet) {
         if (ids.isEmpty()) {
-            throw new IllegalArgumentException("Empty list of ids!");
+            throw new IllegalArgumentException("Cannot compute a centroid, because of empty list of ids!");
         }
 
         int dim = database.dimensionality();
