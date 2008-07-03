@@ -114,7 +114,8 @@ public class ClassParameter<C> extends Parameter<String, String> {
      */
     public boolean isValid(String value) throws ParameterException {
         if (value == null) {
-            throw new WrongParameterValueException("Parameter Error.\nNo value for parameter \"" + getName() + "\" " + "given.");
+            throw new WrongParameterValueException("Parameter Error.\n" +
+                "No value for parameter \"" + getName() + "\" " + "given.");
         }
 
         try {
@@ -131,9 +132,11 @@ public class ClassParameter<C> extends Parameter<String, String> {
         }
 
         catch (ClassNotFoundException e) {
-            throw new WrongParameterValueException(this.name, value, "", e);
+            throw new WrongParameterValueException(this.name, value, "subclass / implementing class of "
+                + restrictionClass.getName(), e);
         }
-        throw new WrongParameterValueException(this.name, value, "subclass of " + restrictionClass.getName());
+        throw new WrongParameterValueException(this.name, value, "subclass / implementing class of "
+            + restrictionClass.getName());
     }
 
     /**
@@ -204,9 +207,6 @@ public class ClassParameter<C> extends Parameter<String, String> {
     public C instantiateClass() throws ParameterException {
         if (value == null && !optionalParameter)
             throw new UnusedParameterException("Value of parameter " + name + " has not been specified.");
-
-        Class<C> type = getRestrictionClass();
-        String className = getValue();
 
         C instance;
         try {
