@@ -5,7 +5,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 /**
- * TODO comment
+ * TODO arthur comment
  * @author Arthur Zimek
  */
 public class BitDistance extends NumberDistance<BitDistance> {
@@ -19,16 +19,12 @@ public class BitDistance extends NumberDistance<BitDistance> {
    */
   private boolean bit;
 
-  /**
-   *
-   */
+  // TODO arthur comment
   public BitDistance() {
     super();
   }
 
-  /**
-   *
-   */
+  // TODO arthur comment
   public BitDistance(boolean bit) {
     super();
     this.bit = bit;

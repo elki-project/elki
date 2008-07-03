@@ -4,11 +4,10 @@ import java.util.regex.Pattern;
 
 /**
  * Provides a bit number. The bit is internally represented as boolean.
- * 
- * @author Arthur Zimek 
+ *
+ * @author Arthur Zimek
  */
-public class Bit extends Number
-{
+public class Bit extends Number {
     /**
      * Generated serial version UID.
      */
@@ -21,21 +20,17 @@ public class Bit extends Number
 
     /**
      * Method to construct a Bit for a given String expression.
-     * 
-     * @param bit
-     *            a String expression defining a Bit
+     *
+     * @param bit a String expression defining a Bit
      * @return a Bit as defined by the given String expression
-     * @throws NumberFormatException
-     *             if the given String expression does not fit to the Pattern
-     *             {@link #BIT_PATTERN BIT_PATTERN}
+     * @throws NumberFormatException if the given String expression does not fit to the Pattern
+     *                               {@link #BIT_PATTERN BIT_PATTERN}
      */
-    public static Bit valueOf(String bit) throws NumberFormatException
-    {
-        if (!BIT_PATTERN.matcher(bit).matches())
-        {
+    public static Bit valueOf(String bit) throws NumberFormatException {
+        if (!BIT_PATTERN.matcher(bit).matches()) {
             throw new NumberFormatException("Input \"" + bit
-                    + "\" does not fit required pattern: "
-                    + BIT_PATTERN.pattern());
+                + "\" does not fit required pattern: "
+                + BIT_PATTERN.pattern());
         }
         return new Bit(Integer.parseInt(bit));
     }
@@ -47,97 +42,89 @@ public class Bit extends Number
 
     /**
      * Provides a new bit according to the specified boolean value.
+     *
+     * @param bit the boolean value of this bit
      */
-    public Bit(boolean bit)
-    {
+    public Bit(boolean bit) {
         this.bit = bit;
     }
 
     /**
      * Provides a new bit according to the specified integer value. The bit
      * value is 1 for true and 0 for false.
-     * 
-     * @throws IllegalArgumentException
-     *             if the specified value is neither 0 nor 1.
+     * @param bit 1 for true and 0 for false
+     *
+     * @throws IllegalArgumentException if the specified value is neither 0 nor 1.
      */
-    public Bit(int bit) throws IllegalArgumentException
-    {
-        if (bit != 0 && bit != 1)
-        {
+    public Bit(int bit) throws IllegalArgumentException {
+        if (bit != 0 && bit != 1) {
             throw new IllegalArgumentException("Required: 0 or 1 - found: "
-                    + bit);
+                + bit);
         }
         this.bit = bit == 1;
     }
 
     /**
      * Provides an integer representation of the bit.
-     * 
+     *
      * @return 1 if the bit is set, 0 otherwise
      * @see java.lang.Number#intValue()
      */
     @Override
-    public int intValue()
-    {
+    public int intValue() {
         return bit ? 1 : 0;
     }
 
     /**
      * Provides a long value for the integer representation of this Bit as given
      * by {@link #intValue() intValue()}.
-     * 
+     *
      * @see java.lang.Number#longValue()
      */
     @Override
-    public long longValue()
-    {
+    public long longValue() {
         return intValue();
     }
 
     /**
      * Provides a float value for the integer representation of this Bit as
      * given by {@link #intValue() intValue()}.
-     * 
-     * 
+     *
      * @see java.lang.Number#floatValue()
      */
     @Override
-    public float floatValue()
-    {
+    public float floatValue() {
         return intValue();
     }
 
     /**
      * Provides a double value for the integer representation of this Bit as
      * given by {@link #intValue() intValue()}.
-     * 
+     *
      * @see java.lang.Number#doubleValue()
      */
     @Override
-    public double doubleValue()
-    {
+    public double doubleValue() {
         return intValue();
     }
 
     /**
      * Returns the bit value as a boolean.
-     * 
+     *
      * @return the bit value
      */
-    public boolean bitValue()
-    {
+    public boolean bitValue() {
         return this.bit;
     }
 
     /**
      * Provides the String representation of the integer representation of this
      * Bit as given by {@link #intValue() intValue()}.
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     @Override
-    public String toString()
-    {
+    public String toString() {
         return Integer.toString(intValue());
     }
 }

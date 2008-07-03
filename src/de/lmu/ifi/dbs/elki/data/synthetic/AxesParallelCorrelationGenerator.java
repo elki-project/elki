@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
  * variables can be specified.
  *
  * @author Elke Achtert
+ * todo parameter
  */
 public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
     public final static String LINE_SEPARATOR = System.getProperty("line.separator");

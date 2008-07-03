@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * within different subgroups.
  *
  * @author Arthur Zimek
+ * todo parameter
  */
 public class PartiallySimilarVoxelObjectsCreator extends AbstractParameterizable{
   public static final String CUBE_SIZE_MIN_P = "cubesizemin";

@@ -64,7 +64,9 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends 
 
   /**
    * Inserts the specified object into this MDkNNTree-Tree. This operation is
-   * not supported. todo Provide insertion of single objects
+   * not supported.
+   *
+   * todo Provide insertion of single objects
    *
    * @param object the object to be inserted
    */
