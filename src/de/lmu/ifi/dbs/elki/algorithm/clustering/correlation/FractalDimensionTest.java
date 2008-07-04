@@ -41,14 +41,14 @@ public class FractalDimensionTest<V extends RealVector<V, ?>> extends AbstractAl
     );
 
     /**
-     * @todo arthur: constraints, default value, description
+     * todo arthur: constraints, default value, description
      * Parameter that specifies the first id.
      * <p>Key: {@code -fractaldimensiontest.id1} </p>
      */
     private final IntParameter ID1_PARAM = new IntParameter(FRACTAL_DIMENSION_TEST_ID1);
 
     /**
-     * @todo arthur: constraints, default value, description
+     * todo arthur: constraints, default value, description
      * Parameter that specifies the second id.
      * <p>Key: {@code -fractaldimensiontest.id2} </p>
      */

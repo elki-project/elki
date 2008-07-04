@@ -47,7 +47,7 @@ import java.util.Vector;
 
 /**
  * Subspace clustering algorithm based on the hough transform.
- * @todo elke hierarchy (later)
+ * todo elke hierarchy (later)
  *
  * @author Elke Achtert
  */
