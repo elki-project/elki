@@ -202,6 +202,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
+    @SuppressWarnings("unchecked")
     public String[] setParameters(String[] args) throws ParameterException {
         if (args.length == 0) {
             throw new AbortException("No options specified. Try flag -h to gain more information.");
@@ -241,12 +242,10 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
         }
 
         // algorithm
-        // noinspection unchecked
         algorithm = ALGORITHM_PARAM.instantiateClass();
         remainingParameters = algorithm.setParameters(remainingParameters);
 
         // database connection
-        // noinspection unchecked
         databaseConnection = DATABASE_CONNECTION_PARAM.instantiateClass();
         remainingParameters = databaseConnection.setParameters(remainingParameters);
 
@@ -257,7 +256,6 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
 
         // normalization
         if (isSet(NORMALIZATION_PARAM)) {
-            // noinspection unchecked
             normalization = NORMALIZATION_PARAM.instantiateClass();
             normalizationUndo = isSet(NORMALIZATION_UNDO_FLAG);
             remainingParameters = normalization.setParameters(remainingParameters);
@@ -324,10 +322,6 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
             throw new IllegalStateException("KDD-Task was not properly initialized. Need to set parameters first.");
         }
     }
-
-    // public Logger getLogger() {
-    // return logger;
-    // }
 
     /**
      * Runs a KDD task accordingly to the specified parameters.
