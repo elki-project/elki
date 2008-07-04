@@ -72,6 +72,7 @@ public class Description {
      *
      * @see Object#toString()
      */
+    @Override
     public String toString() {
         StringBuffer result = new StringBuffer();
         result.append(shortTitle);
