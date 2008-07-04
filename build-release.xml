@@ -73,7 +73,7 @@
 				<exclude name="${basepackage}algorithm/clustering/correlation/SubspaceEM.*"/>
 				<exclude name="${basepackage}algorithm/clustering/hierarchical/**"/>
 				<exclude name="${basepackage}algorithm/clustering/subspace/FIRES.*"/>
-                <exclude name="${basepackage}algorithm.clustering.subspace/SUBCLU.*"/>
+                <exclude name="${basepackage}algorithm/clustering/subspace/SUBCLU.*"/>
                 <exclude name="${basepackage}algorithm/result/GeneralizedLOFResult.*"/>
 				<exclude name="${basepackage}algorithm/result/ICAResult.*"/>
 				<exclude name="${basepackage}algorithm/result/clustering/FractalDimensionTestResult.*"/>
@@ -85,14 +85,13 @@
 				<exclude name="${basepackage}converter/Txt2Arff.*"/>
 				<exclude name="${basepackage}data/synthetic/**"/>
 				<exclude name="${basepackage}distance/distancefunction/FractalDimensionBasedDistanceFunction"/>
-                <exclude name="${basepackage}distance.similarityfunction.kernel/**"/>
                 <exclude name="${basepackage}evaluation/**"/>
 				<exclude name="${basepackage}featureextraction/**"/>
 				<exclude name="${basepackage}gui/**"/>
-                <exclude name="${basepackage}index.tree.spatial.rstarvariants.flat/**"/>
+                <exclude name="${basepackage}index/tree/spatial/rstarvariants/flat/**"/>
                 <exclude name="${basepackage}math/analysis/**"/>
 				<exclude name="${basepackage}parser/ArffFileParser.**"/>
-                <exclude name="${basepackage}tree.btree/**"/>
+                <exclude name="${basepackage}tree/btree/**"/>
                 <exclude name="${basepackage}varianceanalysis/ica/**"/>
 				<exclude name="${basepackage}wrapper/**"/>
 			</fileset>			

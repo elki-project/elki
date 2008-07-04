@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.logging.Logger;
 
 /**
@@ -127,12 +128,19 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
      * Whether to undo normalization for result.
      */
     private boolean normalizationUndo = false;
+    
+    private OptionHandler helpOptionHandler;
 
     /**
      * Provides a KDDTask.
      */
     public KDDTask() {
 
+      helpOptionHandler = new OptionHandler(new TreeMap<String, Option<?>>(), this.getClass().getName());
+      helpOptionHandler.put(HELP_FLAG);
+      helpOptionHandler.put(HELP_LONG_FLAG);
+      helpOptionHandler.put(DESCRIPTION_PARAM);
+      
         // parameter algorithm
         addOption(ALGORITHM_PARAM);
 
@@ -207,17 +215,18 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
         if (args.length == 0) {
             throw new AbortException("No options specified. Try flag -h to gain more information.");
         }
+        String[] remainingParameters = helpOptionHandler.grabOptions(args);
 
-        String[] remainingParameters = optionHandler.grabOptions(args);
+        
 
         // help
-        if (isSet(HELP_FLAG) || isSet(HELP_LONG_FLAG)) {
+        if (helpOptionHandler.isSet(HELP_FLAG) || helpOptionHandler.isSet(HELP_LONG_FLAG)) {
             throw new AbortException(description());
         }
 
         // description
-        if (isSet(DESCRIPTION_PARAM)) {
-            String descriptionClass = getParameterValue(DESCRIPTION_PARAM);
+        if (helpOptionHandler.isSet(DESCRIPTION_PARAM)) {
+            String descriptionClass = DESCRIPTION_PARAM.getValue();
             Parameterizable p;
             try {
                 try {
@@ -241,6 +250,8 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
             }
         }
 
+        remainingParameters = super.setParameters(args);
+        
         // algorithm
         algorithm = ALGORITHM_PARAM.instantiateClass();
         remainingParameters = algorithm.setParameters(remainingParameters);

@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
-import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -19,7 +18,7 @@ import de.lmu.ifi.dbs.elki.varianceanalysis.EigenPairFilter;
  *
  * @author Elke Achtert
  */
-public class OptionID extends ConstantObject<OptionID> {
+public final class OptionID extends ConstantObject<OptionID> {
 
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#HELP_FLAG}

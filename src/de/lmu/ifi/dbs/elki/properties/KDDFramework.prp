@@ -22,8 +22,7 @@ de.lmu.ifi.dbs.elki.algorithm.Algorithm=de.lmu.ifi.dbs.elki.algorithm.APRIORI,\
            de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.CLIQUE,\
            de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.DiSH,\
 		   de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PreDeCon,\
-		   de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PROCLUS,\
-		   de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.SUBCLU
+		   de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PROCLUS
 # #######################################################
 # clustering - default package: de.lmu.ifi.dbs.elki.algorithm.clustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.Clustering=de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.COPAC,\
@@ -97,7 +96,6 @@ de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex=de.lmu.ifi.dbs.elki.index.
 # #######################################################
 # SpatialIndex - default package: de.lmu.ifi.dbs.elki.index.tree.spatial
 de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex=de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTree,\
-           de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.flat.FlatRStarTree,\
            de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTree,\
            de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rdknn.RdKNNTree
 # #######################################################
@@ -150,23 +148,23 @@ de.lmu.ifi.dbs.elki.varianceanalysis.LocalPCA=de.lmu.ifi.dbs.elki.varianceanalys
 #  de.lmu.ifi.dbs.elki.varianceanalysis.ica.TanhContrastFunction
 # #######################################################
 # Parameterizable - default package: de.lmu.ifi.dbs.elki.utilities.optionhandling
-de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable=de.lmu.ifi.dbs.elki.KDDTask,\
-  de.lmu.ifi.dbs.elki.algorithm.APRIORI,\
-  de.lmu.ifi.dbs.elki.algorithm.CoDeC,\
-  de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator,\
-  de.lmu.ifi.dbs.elki.algorithm.ICA,\
-  de.lmu.ifi.dbs.elki.algorithm.KNNDistanceOrder,\
-  de.lmu.ifi.dbs.elki.algorithm.KNNJoin,\
-  de.lmu.ifi.dbs.elki.algorithm.classifier.CorrelationBasedClassifier,\
-  de.lmu.ifi.dbs.elki.algorithm.classifier.KNNClassifier,\
-  de.lmu.ifi.dbs.elki.algorithm.classifier.PriorProbabilityClassifier,\
-  de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN,\
-  de.lmu.ifi.dbs.elki.algorithm.clustering.DeLiClu,\
-  de.lmu.ifi.dbs.elki.algorithm.clustering.EM,\
-  de.lmu.ifi.dbs.elki.algorithm.clustering.KMeans,\
-  de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS,\
-  de.lmu.ifi.dbs.elki.algorithm.clustering.SLINK,\
-  de.lmu.ifi.dbs.elki.algorithm.clustering.SNNClustering,\
-  de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.DiSH,\
-  de.lmu.ifi.dbs.elki.data.synthetic.ArbitraryCorrelationGenerator
+#de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable=de.lmu.ifi.dbs.elki.KDDTask,\
+#  de.lmu.ifi.dbs.elki.algorithm.APRIORI,\
+#  de.lmu.ifi.dbs.elki.algorithm.CoDeC,\
+#  de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator,\
+#  de.lmu.ifi.dbs.elki.algorithm.ICA,\
+#  de.lmu.ifi.dbs.elki.algorithm.KNNDistanceOrder,\
+#  de.lmu.ifi.dbs.elki.algorithm.KNNJoin,\
+#  de.lmu.ifi.dbs.elki.algorithm.classifier.CorrelationBasedClassifier,\
+#  de.lmu.ifi.dbs.elki.algorithm.classifier.KNNClassifier,\
+#  de.lmu.ifi.dbs.elki.algorithm.classifier.PriorProbabilityClassifier,\
+#  de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN,\
+#  de.lmu.ifi.dbs.elki.algorithm.clustering.DeLiClu,\
+#  de.lmu.ifi.dbs.elki.algorithm.clustering.EM,\
+#  de.lmu.ifi.dbs.elki.algorithm.clustering.KMeans,\
+#  de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS,\
+#  de.lmu.ifi.dbs.elki.algorithm.clustering.SLINK,\
+#  de.lmu.ifi.dbs.elki.algorithm.clustering.SNNClustering,\
+#  de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.DiSH,\
+#  de.lmu.ifi.dbs.elki.data.synthetic.ArbitraryCorrelationGenerator
 # #######################################################
