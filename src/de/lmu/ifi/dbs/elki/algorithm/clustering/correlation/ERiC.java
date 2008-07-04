@@ -49,6 +49,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
      */
     public ERiC() {
 //    this.debug = true;
+      copacAlgorithm = new COPAC<V>();
     }
 
     /**
@@ -130,6 +131,18 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         return result;
     }
 
+    
+
+    @Override
+    public String description() {
+      StringBuilder description = new StringBuilder();
+      description.append(super.description());
+      description.append('\n');
+      description.append(ERiC.class.getName());
+      description.append(" requires parametrization of underlying partitioning algorithm:\n");
+      description.append(copacAlgorithm.description());
+      return description.toString();
+    }
 
     /**
      * Returns a description of the algorithm.
@@ -155,7 +168,6 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         String[] remainingParameters = super.setParameters(args);
 
         // copac algorithm
-        copacAlgorithm = new COPAC<V>();
         String[] copacAlgorithmParameters = new String[remainingParameters.length];
         System.arraycopy(remainingParameters, 0, copacAlgorithmParameters, 0, remainingParameters.length);
         copacAlgorithm.setVerbose(isVerbose());

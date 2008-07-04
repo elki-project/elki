@@ -91,7 +91,7 @@ public class PrettyPrinter extends AbstractLoggable
         }
         else
         {
-            System.err.println("Wrong number of entries!");
+            warning("Wrong number of entries!");
         }
         return line.toString();
     }
