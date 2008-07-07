@@ -87,6 +87,7 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
   public void setSelectedDimensions(BitSet dimensions) {
     this.dimensions.clear();
     this.dimensions.or(dimensions);
+    // TODO: set value in parameter
   }
   
   

@@ -205,9 +205,9 @@ public class ClassParameter<C> extends Parameter<String, String> {
      *                            or the value of this class parameter is not set
      */
     public C instantiateClass() throws ParameterException {
-        if (value == null && !optionalParameter)
+        if (value == null && !optionalParameter){
             throw new UnusedParameterException("Value of parameter " + name + " has not been specified.");
-
+        }
         C instance;
         try {
             try {
