@@ -109,7 +109,7 @@ public class CholeskyDecomposition implements java.io.Serializable
 
     public Matrix getL()
     {
-        return new Matrix(L, n, n);
+        return new Matrix(L);
     }
 
     /**
@@ -172,6 +172,6 @@ public class CholeskyDecomposition implements java.io.Serializable
                 }
             }
         }
-        return new Matrix(X, n, nx);
+        return new Matrix(X);
     }
 }

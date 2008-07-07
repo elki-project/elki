@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
+import de.lmu.ifi.dbs.elki.math.Mathutil;
+
 /**
  * QR Decomposition.
  * <P>
@@ -69,7 +71,7 @@ public class QRDecomposition implements java.io.Serializable
             double nrm = 0;
             for (int i = k; i < m; i++)
             {
-                nrm = Utils.hypot(nrm, QR[i][k]);
+                nrm = Mathutil.hypotenuse(nrm, QR[i][k]);
             }
 
             if (nrm != 0.0)
@@ -276,6 +278,6 @@ public class QRDecomposition implements java.io.Serializable
                 }
             }
         }
-        return (new Matrix(X, n, nx).getMatrix(0, n - 1, 0, nx - 1));
+        return (new Matrix(X).getMatrix(0, n - 1, 0, nx - 1));
     }
 }
