@@ -51,12 +51,18 @@
 	
 	<property name="deploy.basedir" value="${windows.disk.prefix}/nfs/infdbs/WissProj/KDD-Framework/releases/${RELEASE}/${now}/output"/>
 	
-	<property name="deploy.target" value="${windows.web.prefix}/nfs/www/Forschung/KDD/ELKI/release${RELEASE}"/>
+	<property name="deploy.target" value="${windows.web.prefix}/Forschung/KDD/ELKI/release${RELEASE}"/>
 
 	<property name="deploy.javadoc" value="${deploy.basedir}/doc"/>
 
 	
 	<target name="preliminary" depends="copy4release,compile,javadoc,jar"/>
+	
+	<target name="complete" depends="preliminary">
+		<copy todir="${deploy.target}">
+			<fileset dir="${deploy.basedir}"/>
+		</copy>
+	</target>
 	
 	<target name="copy4release" description="copies selected resources to current release directory">
 		<copy todir="${deploy.srcdir}/src">
