@@ -91,17 +91,17 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
             COPAC.class.getName());
 
     /**
-     * Holds the value of flag classify.
+     * Holds the value of #EVALUATE_AS_CLASSIFIER_FLAG.
      */
     private boolean evaluateAsClassifier = false;
 
     /**
-     * Holds the value of parameter classlabel.
+     * Holds the value of #CLASSLABEL_PARAM.
      */
     private L classLabel;
 
     /**
-     * Holds the value of parameter clusteringAlgorithm.
+     * Holds the value of #CLUSTERING_ALGORITHM_PARAM.
      */
     private Clustering<V> clusteringAlgorithm;
 
