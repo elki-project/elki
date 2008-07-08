@@ -17,11 +17,9 @@ import java.util.Locale;
 
 /**
  * The Matrix Class represents real-valued matrices.
- * 
+ * <p/>
  * For a Matrix {@code M} we have therefore {@code M &isin;$real;<sup>m &times; n</sup>},
  * where {@code m} and {@code n} are the number of rows and columns, respectively.
- * 
- * 
  */
 public class Matrix extends AbstractLoggable implements Cloneable, java.io.Serializable {
 
@@ -50,7 +48,7 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
     /**
      * Basic-constructor for use in complex constructors only.
      * Sets the debug-status for the class
-     * according to the present status of 
+     * according to the present status of
      * {@link LoggingConfiguration#DEBUG}
      */
     private Matrix() {
@@ -63,7 +61,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @param m number of rows
      * @param n number of colums
      */
-
     public Matrix(int m, int n) {
         this();
         this.rowdimension = m;
@@ -78,7 +75,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @param n number of colums
      * @param s A scalar value defining the constant value in the matrix
      */
-
     public Matrix(int m, int n, double s) {
         this();
         this.rowdimension = m;
@@ -97,7 +93,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @param elements an array of arrays of doubles defining the values of the matrix
      * @throws IllegalArgumentException if not all rows conform in the same length
      */
-
     public Matrix(double[][] elements) {
         this();
         rowdimension = elements.length;
@@ -128,7 +123,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
         }
     }
 
-
     /**
      * Construct a matrix from a one-dimensional packed array
      *
@@ -137,7 +131,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @param m      Number of rows.
      * @throws IllegalArgumentException Array length must be a multiple of m.
      */
-
     public Matrix(double values[], int m) {
         this();
         this.rowdimension = m;
@@ -159,7 +152,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @param A Two-dimensional array of doubles.
      * @throws IllegalArgumentException All rows must have the same length
      */
-
     public static Matrix constructWithCopy(double[][] A) {
         int m = A.length;
         int n = A[0].length;
@@ -177,9 +169,9 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
     }
 
     /**
-     * Make a deep copy of a matrix
+     * Make a deep copy of a matrix.
+     * @return a new matrix containing the same values as this matrix
      */
-
     public Matrix copy() {
         Matrix X = new Matrix(rowdimension, columndimension);
         double[][] C = X.getArray();
@@ -192,7 +184,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
     /**
      * Clone the Matrix object.
      */
-
     @Override
     public Object clone() {
         return this.copy();
@@ -203,7 +194,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      *
      * @return Pointer to the two-dimensional array of matrix elements.
      */
-
     public double[][] getArray() {
         return elements;
     }
@@ -213,7 +203,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      *
      * @return Two-dimensional array copy of matrix elements.
      */
-
     public double[][] getArrayCopy() {
         double[][] C = new double[rowdimension][columndimension];
         for (int i = 0; i < rowdimension; i++) {
@@ -229,7 +218,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      *
      * @return Matrix elements packed in a one-dimensional array by columns.
      */
-
     public double[] getColumnPackedCopy() {
         double[] vals = new double[rowdimension * columndimension];
         for (int i = 0; i < rowdimension; i++) {
@@ -245,7 +233,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      *
      * @return Matrix elements packed in a one-dimensional array by rows.
      */
-
     public double[] getRowPackedCopy() {
         double[] vals = new double[rowdimension * columndimension];
         for (int i = 0; i < rowdimension; i++) {
@@ -261,7 +248,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      *
      * @return m, the number of rows.
      */
-
     public int getRowDimensionality() {
         return rowdimension;
     }
@@ -271,7 +257,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      *
      * @return n, the number of columns.
      */
-
     public int getColumnDimensionality() {
         return columndimension;
     }
@@ -284,7 +269,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @return A(i,j)
      * @throws ArrayIndexOutOfBoundsException
      */
-
     public double get(int i, int j) {
         return elements[i][j];
     }
@@ -323,7 +307,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @return A(r(:),c(:))
      * @throws ArrayIndexOutOfBoundsException Submatrix indices
      */
-
     public Matrix getMatrix(int[] r, int[] c) {
         Matrix X = new Matrix(r.length, c.length);
         double[][] B = X.getArray();
@@ -349,7 +332,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @return A(i0:i1,c(:))
      * @throws ArrayIndexOutOfBoundsException Submatrix indices
      */
-
     public Matrix getMatrix(int i0, int i1, int[] c) {
         Matrix X = new Matrix(i1 - i0 + 1, c.length);
         double[][] B = X.getArray();
@@ -375,7 +357,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @return A(r(:),j0:j1)
      * @throws ArrayIndexOutOfBoundsException Submatrix indices
      */
-
     public Matrix getMatrix(int[] r, int j0, int j1) {
         Matrix X = new Matrix(r.length, j1 - j0 + 1);
         double[][] B = X.getArray();
@@ -400,7 +381,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @param s A(i,j).
      * @throws ArrayIndexOutOfBoundsException
      */
-
     public void set(int i, int j, double s) {
         elements[i][j] = s;
     }
@@ -427,7 +407,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @param X  A(i0:i1,j0:j1)
      * @throws ArrayIndexOutOfBoundsException Submatrix indices
      */
-
     public void setMatrix(int i0, int i1, int j0, int j1, Matrix X) {
         try {
             for (int i = i0; i <= i1; i++) {
@@ -449,7 +428,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @param X A(r(:),c(:))
      * @throws ArrayIndexOutOfBoundsException Submatrix indices
      */
-
     public void setMatrix(int[] r, int[] c, Matrix X) {
         try {
             for (int i = 0; i < r.length; i++) {
@@ -472,7 +450,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @param X  A(r(:),j0:j1)
      * @throws ArrayIndexOutOfBoundsException Submatrix indices
      */
-
     public void setMatrix(int[] r, int j0, int j1, Matrix X) {
         try {
             for (int i = 0; i < r.length; i++) {
@@ -495,7 +472,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @param X  A(i0:i1,c(:))
      * @throws ArrayIndexOutOfBoundsException Submatrix indices
      */
-
     public void setMatrix(int i0, int i1, int[] c, Matrix X) {
         try {
             for (int i = i0; i <= i1; i++) {
@@ -575,7 +551,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      *
      * @return A'
      */
-
     public Matrix transpose() {
         Matrix X = new Matrix(columndimension, rowdimension);
         double[][] C = X.getArray();
@@ -609,7 +584,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      *
      * @return maximum singular value.
      */
-
     public double norm2() {
         return (new SingularValueDecomposition(this).norm2());
     }
@@ -619,7 +593,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      *
      * @return maximum row sum.
      */
-
     public double normInf() {
         double f = 0;
         for (int i = 0; i < rowdimension; i++) {
@@ -637,7 +610,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      *
      * @return sqrt of sum of squares of all elements.
      */
-
     public double normF() {
         double f = 0;
         for (int i = 0; i < rowdimension; i++) {
@@ -653,7 +625,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      *
      * @return -A
      */
-
     public Matrix uminus() {
         Matrix X = new Matrix(rowdimension, columndimension);
         double[][] C = X.getArray();
@@ -671,7 +642,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @param B another matrix
      * @return A + B
      */
-
     public Matrix plus(Matrix B) {
         checkMatrixDimensions(B);
         Matrix X = new Matrix(rowdimension, columndimension);
@@ -690,7 +660,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @param B another matrix
      * @return A + B
      */
-
     public Matrix plusEquals(Matrix B) {
         checkMatrixDimensions(B);
         for (int i = 0; i < rowdimension; i++) {
@@ -707,7 +676,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @param B another matrix
      * @return A - B
      */
-
     public Matrix minus(Matrix B) {
         checkMatrixDimensions(B);
         Matrix X = new Matrix(rowdimension, columndimension);
@@ -726,7 +694,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @param B another matrix
      * @return A - B
      */
-
     public Matrix minusEquals(Matrix B) {
         checkMatrixDimensions(B);
         for (int i = 0; i < rowdimension; i++) {
@@ -743,7 +710,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @param B another matrix
      * @return A.*B
      */
-
     public Matrix arrayTimes(Matrix B) {
         checkMatrixDimensions(B);
         Matrix X = new Matrix(rowdimension, columndimension);
@@ -762,7 +728,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @param B another matrix
      * @return A.*B
      */
-
     public Matrix arrayTimesEquals(Matrix B) {
         checkMatrixDimensions(B);
         for (int i = 0; i < rowdimension; i++) {
@@ -779,7 +744,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @param B another matrix
      * @return A./B
      */
-
     public Matrix arrayRightDivide(Matrix B) {
         checkMatrixDimensions(B);
         Matrix X = new Matrix(rowdimension, columndimension);
@@ -798,7 +762,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @param B another matrix
      * @return A./B
      */
-
     public Matrix arrayRightDivideEquals(Matrix B) {
         checkMatrixDimensions(B);
         for (int i = 0; i < rowdimension; i++) {
@@ -815,7 +778,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @param B another matrix
      * @return A.\B
      */
-
     public Matrix arrayLeftDivide(Matrix B) {
         checkMatrixDimensions(B);
         Matrix X = new Matrix(rowdimension, columndimension);
@@ -834,7 +796,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @param B another matrix
      * @return A.\B
      */
-
     public Matrix arrayLeftDivideEquals(Matrix B) {
         checkMatrixDimensions(B);
         for (int i = 0; i < rowdimension; i++) {
@@ -851,7 +812,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @param s scalar
      * @return s*A
      */
-
     public Matrix times(double s) {
         Matrix X = new Matrix(rowdimension, columndimension);
         double[][] C = X.getArray();
@@ -869,7 +829,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @param s scalar
      * @return replace A by s*A
      */
-
     public Matrix timesEquals(double s) {
         for (int i = 0; i < rowdimension; i++) {
             for (int j = 0; j < columndimension; j++) {
@@ -886,7 +845,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @return Matrix product, A * B
      * @throws IllegalArgumentException Matrix inner dimensions must agree.
      */
-
     public Matrix times(Matrix B) {
         if (B.rowdimension != columndimension) {
             throw new IllegalArgumentException("Matrix inner dimensions must agree.");
@@ -916,7 +874,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @return LUDecomposition
      * @see LUDecomposition
      */
-
     public LUDecomposition lu() {
         return new LUDecomposition(this);
     }
@@ -927,7 +884,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @return QRDecomposition
      * @see QRDecomposition
      */
-
     public QRDecomposition qr() {
         return new QRDecomposition(this);
     }
@@ -938,7 +894,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @return CholeskyDecomposition
      * @see CholeskyDecomposition
      */
-
     public CholeskyDecomposition chol() {
         return new CholeskyDecomposition(this);
     }
@@ -949,7 +904,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @return SingularValueDecomposition
      * @see SingularValueDecomposition
      */
-
     public SingularValueDecomposition svd() {
         return new SingularValueDecomposition(this);
     }
@@ -960,7 +914,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @return EigenvalueDecomposition
      * @see EigenvalueDecomposition
      */
-
     public EigenvalueDecomposition eig() {
         return new EigenvalueDecomposition(this);
     }
@@ -971,7 +924,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @param B right hand side
      * @return solution if A is square, least squares solution otherwise
      */
-
     public Matrix solve(Matrix B) {
         return (rowdimension == columndimension ? (new LUDecomposition(this)).solve(B) : (new QRDecomposition(this)).solve(B));
     }
@@ -982,7 +934,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @param B right hand side
      * @return solution if A is square, least squares solution otherwise.
      */
-
     public Matrix solveTranspose(Matrix B) {
         return transpose().solve(B.transpose());
     }
@@ -992,7 +943,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      *
      * @return inverse(A) if A is square, pseudoinverse otherwise.
      */
-
     public Matrix inverse() {
         return solve(identity(rowdimension, rowdimension));
     }
@@ -1002,7 +952,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      *
      * @return determinant
      */
-
     public double det() {
         return new LUDecomposition(this).det();
     }
@@ -1012,7 +961,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      *
      * @return effective numerical rank, obtained from SVD.
      */
-
     public int rank() {
         return new SingularValueDecomposition(this).rank();
     }
@@ -1022,7 +970,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      *
      * @return ratio of largest to smallest singular value.
      */
-
     public double cond() {
         return new SingularValueDecomposition(this).cond();
     }
@@ -1032,7 +979,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      *
      * @return sum of the diagonal elements.
      */
-
     public double trace() {
         double t = 0;
         for (int i = 0; i < Math.min(rowdimension, columndimension); i++) {
@@ -1048,7 +994,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @param n Number of colums.
      * @return An m-by-n matrix with uniformly distributed random elements.
      */
-
     public static Matrix random(int m, int n) {
         Matrix A = new Matrix(m, n);
         double[][] X = A.getArray();
@@ -1067,7 +1012,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @param n Number of colums.
      * @return An m-by-n matrix with ones on the diagonal and zeros elsewhere.
      */
-
     public static Matrix identity(int m, int n) {
         Matrix A = new Matrix(m, n);
         double[][] X = A.getArray();
@@ -1086,7 +1030,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @param w Column width.
      * @param d Number of digits after the decimal.
      */
-
     public void print(int w, int d) {
         print(new PrintWriter(System.out, true), w, d);
     }
@@ -1099,7 +1042,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @param w      Column width.
      * @param d      Number of digits after the decimal.
      */
-
     public void print(PrintWriter output, int w, int d) {
         DecimalFormat format = new DecimalFormat();
         format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
@@ -1120,7 +1062,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @param width  Field width for each column.
      * @see java.text.DecimalFormat#setDecimalFormatSymbols
      */
-
     public void print(NumberFormat format, int width) {
         print(new PrintWriter(System.out, true), format, width);
     }
@@ -1142,7 +1083,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * @param width  Column width.
      * @see java.text.DecimalFormat#setDecimalFormatSymbols
      */
-
     public void print(PrintWriter output, NumberFormat format, int width) {
         output.println(); // start on new line.
         for (int i = 0; i < rowdimension; i++) {
@@ -1167,7 +1107,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      *
      * @param input the input stream.
      */
-
     public static Matrix read(BufferedReader input) throws java.io.IOException {
         StreamTokenizer tokenizer = new StreamTokenizer(input);
 
@@ -1229,7 +1168,6 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
     /**
      * Check if size(A) == size(B) *
      */
-
     private void checkMatrixDimensions(Matrix B) {
         if (B.rowdimension != rowdimension || B.columndimension != columndimension) {
             throw new IllegalArgumentException("Matrix dimensions must agree.");
