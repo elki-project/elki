@@ -28,7 +28,7 @@ public class COPACWrapper extends NormalizationWrapper {
      * must be suitable to {@link LocallyWeightedDistanceFunction LocallyWeightedDistanceFunction}.
      * <p>Key: {@code -dbscan.epsilon} </p>
      */
-    private final PatternParameter EPSILON_PARAM = new PatternParameter(OptionID.DBSCAN_EPSILON);
+    private final PatternParameter EPSILON_PARAM = new PatternParameter(DBSCAN.EPSILON_ID);
 
     /**
      * Parameter to specify the threshold for minimum number of points in
@@ -36,7 +36,7 @@ public class COPACWrapper extends NormalizationWrapper {
      * must be an integer greater than 0.
      * <p>Key: {@code -dbscan.minpts} </p>
      */
-    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.DBSCAN_MINPTS,
+    private final IntParameter MINPTS_PARAM = new IntParameter(DBSCAN.MINPTS_ID,
         new GreaterConstraint(0));
 
     /**

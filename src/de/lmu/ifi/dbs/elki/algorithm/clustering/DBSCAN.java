@@ -20,7 +20,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
 import java.util.*;
 
 /**
- * DBSCAN provides the DBSCAN algorithm.
+ * DBSCAN provides the DBSCAN algorithm,
+ * an algorithm to find density-connected sets in a database.
+ * <p>Reference:
+ * <br>M. Ester, H.-P. Kriegel, J. Sander, and X. Xu:
+ * A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise.
+ * <br>In Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996.
  *
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObject the algorithm is applied on
@@ -28,11 +33,32 @@ import java.util.*;
  */
 public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D> implements Clustering<O> {
     /**
+     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN#EPSILON_PARAM}
+     */
+    public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID(
+        "dbscan.epsilon",
+        "The maximum radius of the neighborhood to be considered."
+    );
+
+    /**
      * Parameter to specify the maximum radius of the neighborhood to be considered,
      * must be suitable to the distance function specified.
      * <p>Key: {@code -dbscan.epsilon} </p>
      */
-    private final PatternParameter EPSILON_PARAM = new PatternParameter(OptionID.DBSCAN_EPSILON);
+    private final PatternParameter EPSILON_PARAM = new PatternParameter(EPSILON_ID);
+
+    /**
+     * Holds the value of {@link #EPSILON_PARAM}.
+     */
+    private String epsilon;
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN#MINPTS_PARAM}
+     */
+    public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID(
+        "dbscan.minpts",
+        " Threshold for minimum number of points in the epsilon-neighborhood of a point."
+    );
 
     /**
      * Parameter to specify the threshold for minimum number of points in
@@ -40,16 +66,11 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
      * must be an integer greater than 0.
      * <p>Key: {@code -dbscan.minpts} </p>
      */
-    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.DBSCAN_MINPTS,
+    private final IntParameter MINPTS_PARAM = new IntParameter(MINPTS_ID,
         new GreaterConstraint(0));
 
     /**
-     * The maximum radius of the neighborhood to be considered.
-     */
-    private String epsilon;
-
-    /**
-     * Minimum points.
+     * Holds the value of {@link #MINPTS_PARAM}.
      */
     protected int minpts;
 
@@ -74,21 +95,24 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
     protected Set<Integer> processedIDs;
 
     /**
-     * Adds epsilon and minimum points to the optionhandler additionally to the
-     * parameters provided by super-classes.
+     * Provides the DBSCAN algorithm,
+     * adding parameters {@link #EPSILON_PARAM} and
+     * {@link #MINPTS_PARAM} to the option handler
+     * additionally to parameters of super class.
      */
     @SuppressWarnings("unchecked")
     public DBSCAN() {
         super();
         // parameter epsilon
         addOption(EPSILON_PARAM);
+
+        // parameter minpts
+        addOption(MINPTS_PARAM);
+
         // global constraint
         // noinspection unchecked
         GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint(EPSILON_PARAM, DISTANCE_FUNCTION_PARAM);
         optionHandler.setGlobalParameterConstraint(gpc);
-
-        // parameter minpts
-        addOption(MINPTS_PARAM);
     }
 
     /**
@@ -240,9 +264,9 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
     }
 
     /**
-     * Sets the parameters epsilon and minpts additionally to the parameters set
-     * by the super-class' method. Both epsilon and minpts are required
-     * parameters.
+     * Calls {@link DistanceBasedAlgorithm#setParameters(String[]) DistanceBasedAlgorithm#setParameters(args)}
+     * and sets additionally the values of the parameters
+     * {@link #EPSILON_PARAM} and {@link #MINPTS_PARAM}.
      *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */

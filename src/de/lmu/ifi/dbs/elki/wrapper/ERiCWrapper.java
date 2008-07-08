@@ -29,7 +29,7 @@ public class ERiCWrapper extends NormalizationWrapper {
      * must be an integer greater than 0.
      * <p>Key: {@code -dbscan.minpts} </p>
      */
-    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.DBSCAN_MINPTS,
+    private final IntParameter MINPTS_PARAM = new IntParameter(DBSCAN.MINPTS_ID,
         new GreaterConstraint(0));
 
     /**
@@ -112,7 +112,7 @@ public class ERiCWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, OptionID.COPAA_PARTITION_ALGORITHM, DBSCAN.class.getName());
 
         // epsilon
-        Util.addParameter(parameters, OptionID.DBSCAN_EPSILON, "0");
+        Util.addParameter(parameters, DBSCAN.EPSILON_ID, "0");
 
         // minpts
         Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(getParameterValue(MINPTS_PARAM)));

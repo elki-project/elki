@@ -206,20 +206,6 @@ public final class OptionID extends ConstantObject<OptionID> {
     );
 
     /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN#EPSILON_PARAM}
-     */
-    public static final OptionID DBSCAN_EPSILON = new OptionID("dbscan.epsilon",
-        "The maximum radius of the neighborhood to be considered."
-    );
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN#MINPTS_PARAM}
-     */
-    public static final OptionID DBSCAN_MINPTS = new OptionID("dbscan.minpts",
-        " Threshold for minimum number of points in the epsilon-neighborhood of a point."
-    );
-
-    /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.DeLiClu#MINPTS_PARAM}
      */
     public static final OptionID DELICLU_MINPTS = new OptionID("deliclu.minpts",
