@@ -72,7 +72,7 @@ public class OnlineBasicLOFWrapper extends FileBasedDatabaseConnectionWrapper {
         parameters.add(Integer.toString(minpts));
 
         // distance function
-        Util.addParameter(parameters, OptionID.ALGORITHM_DISTANCEFUNCTION, EuklideanDistanceFunction.class.getName());
+        Util.addParameter(parameters, OnlineBasicLOF.DISTANCE_FUNCTION_ID, EuklideanDistanceFunction.class.getName());
 
         // normalization
 //    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);

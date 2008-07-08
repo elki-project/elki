@@ -123,7 +123,7 @@ public class HiCOWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, OptionID.ALGORITHM, OPTICS.class.getName());
 
         // distance function
-        Util.addParameter(parameters, OptionID.ALGORITHM_DISTANCEFUNCTION, PCABasedCorrelationDistanceFunction.class.getName());
+        Util.addParameter(parameters, OPTICS.DISTANCE_FUNCTION_ID, PCABasedCorrelationDistanceFunction.class.getName());
 
         // omit flag
         parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F);

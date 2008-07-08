@@ -100,7 +100,7 @@ public class OPTICSWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(minpts));
 
         // distance function
-        Util.addParameter(parameters, OptionID.ALGORITHM_DISTANCEFUNCTION, EuklideanDistanceFunction.class.getName());
+        Util.addParameter(parameters, OPTICS.DISTANCE_FUNCTION_ID, EuklideanDistanceFunction.class.getName());
 
         // database
         // params.add(OptionHandler.OPTION_PREFIX +

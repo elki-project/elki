@@ -82,7 +82,7 @@ public class HiSCWrapper extends FileBasedDatabaseConnectionWrapper {
         Util.addParameter(parameters, OptionID.ALGORITHM, OPTICS.class.getName());
 
         // distance function
-        Util.addParameter(parameters, OptionID.ALGORITHM_DISTANCEFUNCTION, HiSCDistanceFunction.class.getName());
+        Util.addParameter(parameters, OPTICS.DISTANCE_FUNCTION_ID, HiSCDistanceFunction.class.getName());
 
         // omit flag
         parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F);

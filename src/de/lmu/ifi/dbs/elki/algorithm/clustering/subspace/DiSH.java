@@ -153,6 +153,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         optics.setVerbose(isVerbose());
         optics.setTime(isTime());
 
+        // todo provide setter
         // parameters for optics
         List<String> opticsParameters = new ArrayList<String>();
 
@@ -163,7 +164,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         Util.addParameter(opticsParameters, OptionID.OPTICS_MINPTS, Integer.toString(minpts));
 
         // distance function
-        Util.addParameter(opticsParameters, OptionID.ALGORITHM_DISTANCEFUNCTION, DiSHDistanceFunction.class.getName());
+        Util.addParameter(opticsParameters, OPTICS.DISTANCE_FUNCTION_ID, DiSHDistanceFunction.class.getName());
 
         // epsilon for distance function
         opticsParameters.add(OptionHandler.OPTION_PREFIX + DiSHDistanceFunction.EPSILON_P);

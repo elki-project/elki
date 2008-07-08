@@ -92,14 +92,6 @@ public final class OptionID extends ConstantObject<OptionID> {
             "invalid option if no normalization has been performed.");
 
     /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm#DISTANCE_FUNCTION_PARAM}
-     */
-    public static final OptionID ALGORITHM_DISTANCEFUNCTION = new OptionID("algorithm.distancefunction",
-        "Classname of the distance function to determine the distance between database objects " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) + "."
-    );
-
-    /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#VERBOSE_FLAG}
      */
     public static final OptionID ALGORITHM_VERBOSE = new OptionID("verbose",

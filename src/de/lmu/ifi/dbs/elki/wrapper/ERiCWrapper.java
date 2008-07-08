@@ -118,7 +118,7 @@ public class ERiCWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(getParameterValue(MINPTS_PARAM)));
 
         // distance function
-        Util.addParameter(parameters, OptionID.ALGORITHM_DISTANCEFUNCTION, ERiCDistanceFunction.class.getName());
+        Util.addParameter(parameters, DBSCAN.DISTANCE_FUNCTION_ID, ERiCDistanceFunction.class.getName());
 
         // omit preprocessing
         parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F);

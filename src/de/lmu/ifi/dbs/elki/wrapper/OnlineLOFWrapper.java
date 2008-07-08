@@ -110,7 +110,7 @@ public class OnlineLOFWrapper extends FileBasedDatabaseConnectionWrapper {
         parameters.add(nn.getPath());
 
         // distance function
-        Util.addParameter(parameters, OptionID.ALGORITHM_DISTANCEFUNCTION, EuklideanDistanceFunction.class.getName());
+        Util.addParameter(parameters, OnlineLOF.DISTANCE_FUNCTION_ID, EuklideanDistanceFunction.class.getName());
 
         // page size
 //    parameters.add(OptionHandler.OPTION_PREFIX + LOF.PAGE_SIZE_P);

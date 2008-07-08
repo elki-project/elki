@@ -125,7 +125,7 @@ public class CODECWrapper extends NormalizationWrapper {
             Integer.toString(getParameterValue(MINPTS_PARAM)));
 
         // distance function
-        Util.addParameter(parameters, OptionID.ALGORITHM_DISTANCEFUNCTION, LocallyWeightedDistanceFunction.class.getName());
+        Util.addParameter(parameters, DBSCAN.DISTANCE_FUNCTION_ID, LocallyWeightedDistanceFunction.class.getName());
 
         // omit preprocessing
         parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F);

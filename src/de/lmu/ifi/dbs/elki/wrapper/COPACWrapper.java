@@ -119,7 +119,7 @@ public class COPACWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(getParameterValue(MINPTS_PARAM)));
 
         // distance function
-        Util.addParameter(parameters, OptionID.ALGORITHM_DISTANCEFUNCTION, LocallyWeightedDistanceFunction.class.getName());
+        Util.addParameter(parameters, DBSCAN.DISTANCE_FUNCTION_ID, LocallyWeightedDistanceFunction.class.getName());
 //        parameters.add(ERiCDistanceFunction.class.getName());
 
         // omit preprocessing
