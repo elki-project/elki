@@ -28,23 +28,23 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends Abstra
     private final Flag VERBOSE_FLAG = new Flag(OptionID.ALGORITHM_VERBOSE);
 
     /**
+     * Holds the value of {@link #VERBOSE_FLAG}.
+     */
+    private boolean verbose;
+
+    /**
      * Flag to request output of performance time.
      * <p>Key: {@code -time} </p>
      */
     private final Flag TIME_FLAG = new Flag(OptionID.ALGORITHM_TIME);
 
     /**
-     * Holds the value of AbstractAlgorithm#VERBOSE_FLAG.
-     */
-    private boolean verbose;
-
-    /**
-     * Holds the value of AbstractAlgorithm#TIME_FLAG.
+     * Holds the value of {@link #TIME_FLAG}.
      */
     private boolean time;
 
     /**
-     * Adds the flags #VERBOSE_FLAG and #TIME_FLAG to the option handler. Any extending
+     * Adds the flags {@link #VERBOSE_FLAG} and {@link #TIME_FLAG} to the option handler. Any extending
      * class should call this constructor, then add further parameters.
      * Subclasses can add further parameters using
      * {@link #addOption(de.lmu.ifi.dbs.elki.utilities.optionhandling.Option)}

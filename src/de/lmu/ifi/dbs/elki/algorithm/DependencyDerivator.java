@@ -29,6 +29,10 @@ import java.util.Set;
 /**
  * Dependency derivator computes quantitativly linear dependencies among
  * attributes of a given dataset based on a linear correlation PCA.
+ * <p>Reference:
+ * <br>E. Achtert, C. Boehm, H.-P. Kriegel, P. Kroeger, A. Zimek:
+ * Deriving Quantitative Dependencies for Correlation Clusters.
+ * <br>In Proc. 12th Int. Conf. on Knowledge Discovery and Data Mining (KDD '06), Philadelphia, PA 2006.
  *
  * @author Arthur Zimek
  * @param <V> the type of RealVector handled by this Algorithm
@@ -37,14 +41,31 @@ import java.util.Set;
 public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<D>> extends DistanceBasedAlgorithm<V, D> {
 
     /**
-     * Optional parameter to specify the threshold for output accuracy fraction digits,
+     * OptionID for {@link #OUTPUT_ACCURACY_PARAM}
+     */
+    public static final OptionID OUTPUT_ACCURACY_ID = OptionID.getOrCreateOptionID(
+        "derivator.accuracy",
+        "Threshold for output accuracy fraction digits."
+    );
+
+    /**
+     * Parameter to specify the threshold for output accuracy fraction digits,
      * must be an integer equal to or greater than 0.
      * <p>Default value: {@code 4} </p>
      * <p>Key: {@code -derivator.accuracy} </p>
      */
     private final IntParameter OUTPUT_ACCURACY_PARAM = new IntParameter(
-        OptionID.DEPENDENCY_DERIVATOR_ACCURACY,
+        OUTPUT_ACCURACY_ID,
         new GreaterEqualConstraint(0), 4);
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator#SAMPLE_SIZE_PARAM}
+     */
+    public static final OptionID SAMPLE_SIZE_ID = OptionID.getOrCreateOptionID(
+        "derivator.sampleSize",
+        "Threshold for the size of the random sample to use. " +
+            "Default value is size of the complete dataset."
+    );
 
     /**
      * Optional parameter to specify the treshold for the size of the random sample to use,
@@ -53,18 +74,18 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
      * <p>Key: {@code -derivator.sampleSize} </p>
      */
     private final IntParameter SAMPLE_SIZE_PARAM = new IntParameter(
-        OptionID.DEPENDENCY_DERIVATOR_SAMPLE_SIZE, new GreaterConstraint(0), true);
+        SAMPLE_SIZE_ID, new GreaterConstraint(0), true);
+
+    /**
+     * Holds the value of {@link #SAMPLE_SIZE_PARAM}.
+     */
+    private Integer sampleSize;
 
     /**
      * Flag to use random sample (use knn query around centroid, if flag is not set).
      * <p>Key: {@code -derivator.randomSample} </p>
      */
     private final Flag RANDOM_SAMPLE_FLAG = new Flag(OptionID.DEPENDENCY_DERIVATOR_RANDOM_SAMPLE);
-
-    /**
-     * Holds size of sample.
-     */
-    private Integer sampleSize;
 
     /**
      * Holds the object performing the pca.
@@ -83,10 +104,11 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
 
     /**
      * Provides a dependency derivator,
-     * setting parameters {@link DependencyDerivator#OUTPUT_ACCURACY_PARAM},
+     * adding parameters
+     * {@link DependencyDerivator#OUTPUT_ACCURACY_PARAM},
      * {@link de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator#SAMPLE_SIZE_PARAM}, and
      * flag {@link de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator#RANDOM_SAMPLE_FLAG}
-     * additionally to parameters of super class.
+     * to the option handler additionally to parameters of super class.
      */
     public DependencyDerivator() {
         super();

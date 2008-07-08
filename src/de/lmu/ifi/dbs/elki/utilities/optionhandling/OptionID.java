@@ -236,21 +236,6 @@ public final class OptionID extends ConstantObject<OptionID> {
     );
 
     /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator#OUTPUT_ACCURACY_PARAM}
-     */
-    public static final OptionID DEPENDENCY_DERIVATOR_ACCURACY = new OptionID("derivator.accuracy",
-        "Threshold for output accuracy fraction digits."
-    );
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator#SAMPLE_SIZE_PARAM}
-     */
-    public static final OptionID DEPENDENCY_DERIVATOR_SAMPLE_SIZE = new OptionID("derivator.sampleSize",
-        "Threshold for the size of the random sample to use. " +
-            "Default value is size of the complete dataset."
-    );
-
-    /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator#RANDOM_SAMPLE_FLAG}
      */
     public static final OptionID DEPENDENCY_DERIVATOR_RANDOM_SAMPLE = new OptionID("derivator.randomSample",

@@ -26,7 +26,7 @@ import java.util.Map;
 /**
  * Provides the APRIORI algorithm for Mining Association Rules.
  * <p>Reference:
- * <br>Fast Algorithms for Mining Association Rules in Large Databases.
+ * <br>R. Agrawal, R. Srikant: Fast Algorithms for Mining Association Rules in Large Databases.
  * <br>In Proc. 20th Int. Conf. on Very Large Data Bases (VLDB '94), Santiago de Chile, Chile 1994.
  *
  * @author Arthur Zimek
@@ -43,6 +43,21 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
     );
 
     /**
+     * Optional parameter to specify the threshold for minimum frequency,
+     * must be a double greater than or equal to 0 and less than or equal to 1.
+     * Alternatively to parameter {@link APRIORI#MINSUPP_PARAM}).
+     * <p>Key: {@code -apriori.minfreq} </p>
+     */
+    private final DoubleParameter MINFREQ_PARAM = new DoubleParameter(OptionID.APRIORI_MINFREQ,
+        new IntervalConstraint(0, IntervalConstraint.IntervalBoundary.CLOSE, 1, IntervalConstraint.IntervalBoundary.CLOSE),
+        true);
+
+    /**
+     * Holds the value of {@link #MINFREQ_PARAM}.
+     */
+    private double minfreq = -1;
+
+    /**
      * OptionID for {@link #MINSUPP_PARAM}
      */
     public static final OptionID MINSUPP_ID = OptionID.getOrCreateOptionID(
@@ -52,16 +67,6 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
             " - setting apriori.minsupp is slightly preferable over setting " +
             "apriori.minfreq in terms of efficiency)."
     );
-
-    /**
-     * Optional parameter to specify the threshold for minimum frequency,
-     * must be a double greater than or equal to 0 and less than or equal to 1.
-     * Alternatively to parameter {@link APRIORI#MINSUPP_PARAM}).
-     * <p>Key: {@code -apriori.minfreq} </p>
-     */
-    private final DoubleParameter MINFREQ_PARAM = new DoubleParameter(OptionID.APRIORI_MINFREQ,
-        new IntervalConstraint(0, IntervalConstraint.IntervalBoundary.CLOSE, 1, IntervalConstraint.IntervalBoundary.CLOSE),
-        true);
 
     /**
      * Parameter to specify the threshold for
@@ -76,12 +81,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
         new GreaterEqualConstraint(0), true);
 
     /**
-     * Holds the value of #MINFREQ_PARAM.
-     */
-    private double minfreq = -1;
-
-    /**
-     * Holds the value of #MINSUPP_PARAM.
+     * Holds the value of {@link #MINSUPP_PARAM}.
      */
     private int minsupp;
 
@@ -97,8 +97,8 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
 
     /**
      * Provides the apriori algorithm,
-     * setting parameters {@link #MINFREQ_PARAM} and
-     * {@link #MINSUPP_PARAM}
+     * adding parameters {@link #MINFREQ_PARAM} and
+     * {@link #MINSUPP_PARAM} to the option handler
      * additionally to parameters of super class.
      */
     public APRIORI() {
