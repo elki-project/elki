@@ -72,7 +72,11 @@
 				<exclude name="${basepackage}algorithm/ICA.*"/>
 				<exclude name="${basepackage}algorithm/classifier/**"/>
 				<exclude name="${basepackage}algorithm/outlier/**"/>
+				<exclude name="${basepackage}algorithm/clustering/biclustering/ChengAndChurch.*"/>
+				<exclude name="${basepackage}algorithm/clustering/biclustering/FLOC.*"/>
+				<exclude name="${basepackage}algorithm/clustering/biclustering/MaPle.*"/>
 				<exclude name="${basepackage}algorithm/clustering/biclustering/NaivePatternBased.*"/>
+				<exclude name="${basepackage}algorithm/clustering/biclustering/PClustering.*"/>
 				<exclude name="${basepackage}algorithm/clustering/correlation/FractalDimensionTest.*"/>
 				<exclude name="${basepackage}algorithm/clustering/correlation/KernelFourC.*"/>
 				<exclude name="${basepackage}algorithm/clustering/correlation/SubspaceAggregation.*"/>
