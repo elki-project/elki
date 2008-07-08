@@ -47,7 +47,9 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
     private DistanceFunction<O, D> distanceFunction;
 
     /**
-     * Adds parameter for distance function to parameter map.
+     * Adds parameter
+     * {@link #DISTANCE_FUNCTION_PARAM},
+     * to the option handler additionally to parameters of super class.
      */
     protected DistanceBasedAlgorithm() {
         super();
@@ -56,10 +58,10 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
     }
 
     /**
-     * Calls
-     * {@link AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
-     * and sets additionally the distance function, passing remaining parameters
-     * to the set distance function.
+     * Calls {@link AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
+     * and instantiates {@link #distanceFunction} according to the value of parameter
+     * {@link #DISTANCE_FUNCTION_PARAM}.
+     * The remaining parameters are passed to the {@link #distanceFunction}.
      *
      * @see AbstractAlgorithm#setParameters(String[])
      */
@@ -77,6 +79,10 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
     }
 
     /**
+     * Calls {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#getAttributeSettings()}
+     * and adds to the returned attribute settings the attribute settings of
+     * the {@link #distanceFunction}.
+     *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
      */
     @Override

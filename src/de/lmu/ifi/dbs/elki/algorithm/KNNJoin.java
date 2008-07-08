@@ -40,13 +40,21 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
     extends DistanceBasedAlgorithm<V, D> {
 
     /**
+     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.KNNJoin#K_PARAM}
+     */
+    public static final OptionID K_ID = OptionID.getOrCreateOptionID(
+        "knnjoin.k",
+        "Specifies the k-nearest neighbors to be assigned."
+    );
+
+    /**
      * Parameter that specifies the k-nearest neighbors to be assigned,
      * must be an integer greater than 0.
      * <p>Default value: {@code 1} </p>
      * <p>Key: {@code -knnjoin.k} </p>
      */
     public final IntParameter K_PARAM =
-        new IntParameter(OptionID.KNN_JOIN_K, new GreaterConstraint(0), 1);
+        new IntParameter(K_ID, new GreaterConstraint(0), 1);
 
     /**
      * The knn lists for each object.
@@ -54,8 +62,9 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
     private KNNJoinResult<V, D> result;
 
     /**
-     * Adds parameter k to the optionhandler
-     * additionally to the parameters provided by super-classes.
+     * Provides a KNN-Join,
+     * adding parameter {@link #K_PARAM} to the option handler
+     * additionally to parameters of super class.
      */
     public KNNJoin() {
         super();

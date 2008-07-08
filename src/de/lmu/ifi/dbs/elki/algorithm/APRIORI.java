@@ -74,7 +74,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
      * must be an integer equal to or greater than 0.
      * Alternatively to parameter {@link APRIORI#MINFREQ_PARAM}
      * - setting {@link APRIORI#MINSUPP_PARAM} is slightly preferable over setting
-     * {@link APRIORI#MINFREQ_PARAM} in terms of efficiency).
+     * {@link APRIORI#MINFREQ_PARAM} in terms of efficiency.
      * <p>Key: {@code -apriori.minsupp} </p>
      */
     private final IntParameter MINSUPP_PARAM = new IntParameter(OptionID.APRIORI_MINSUPP,
@@ -273,7 +273,11 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
+     * Calls {@link AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
+     * and sets additionally the values of the parameters
+     * {@link #MINFREQ_PARAM} and {@link #MINSUPP_PARAM}.
+     *
+     * @see AbstractAlgorithm#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

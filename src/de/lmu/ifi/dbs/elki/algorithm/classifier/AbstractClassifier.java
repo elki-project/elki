@@ -39,28 +39,35 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.classifier.AbstractClassifier#EVALUATION_PROCEDURE_PARAM}
      */
-    public static final OptionID EVALUATION_PROCEDURE_ID = OptionID.getOrCreateOptionID("classifier.eval",
+    public static final OptionID EVALUATION_PROCEDURE_ID = OptionID.getOrCreateOptionID(
+        "classifier.eval",
         "Classname of the evaluation-procedure to use for evaluation " +
             Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(EvaluationProcedure.class) + "."
     );
 
     /**
+        * Parameter to specify the evaluation-procedure to use for evaluation,
+        * must extend {@link EvaluationProcedure}.
+        * <p>Key: {@code -classifier.eval} </p>
+        * <p>Default value: {@link ClassifierEvaluationProcedure} </p>
+        */
+       private final ClassParameter<EvaluationProcedure> EVALUATION_PROCEDURE_PARAM =
+           new ClassParameter<EvaluationProcedure>(EVALUATION_PROCEDURE_ID,
+               EvaluationProcedure.class, ClassifierEvaluationProcedure.class.getName());
+
+    /**
+     * Holds the value of {@link #EVALUATION_PROCEDURE_PARAM}.
+     */
+    protected EvaluationProcedure<O, Classifier<O, L>, L> evaluationProcedure;
+
+    /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.classifier.AbstractClassifier#HOLDOUT_PARAM}
      */
-    public static final OptionID HOLDOUT_ID = OptionID.getOrCreateOptionID("classifier.holdout",
+    public static final OptionID HOLDOUT_ID = OptionID.getOrCreateOptionID(
+        "classifier.holdout",
         "<Classname of the holdout for evaluation  " +
             Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Holdout.class) + "."
     );
-
-    /**
-     * Parameter to specify the evaluation-procedure to use for evaluation,
-     * must extend {@link EvaluationProcedure}.
-     * <p>Key: {@code -classifier.eval} </p>
-     * <p>Default value: {@link ClassifierEvaluationProcedure} </p>
-     */
-    private final ClassParameter<EvaluationProcedure> EVALUATION_PROCEDURE_PARAM =
-        new ClassParameter<EvaluationProcedure>(EVALUATION_PROCEDURE_ID,
-            EvaluationProcedure.class, ClassifierEvaluationProcedure.class.getName());
 
     /**
      * Parameter to specify the holdout for evaluation,
@@ -73,12 +80,7 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
             Holdout.class, StratifiedCrossValidation.class.getName());
 
     /**
-     * Holds the value of parameter evaluation procedure.
-     */
-    protected EvaluationProcedure<O, Classifier<O, L>, L> evaluationProcedure;
-
-    /**
-     * Holds the value of parameter holdout.
+     * Holds the value of {@link #HOLDOUT_PARAM}.
      */
     protected Holdout<O, L> holdout;
 
@@ -95,7 +97,8 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
     private L[] labels = (L[]) new ClassLabel[0];
 
     /**
-     * Sets parameter settings as AbstractAlgorithm.
+     * Adds parameters {@link #EVALUATION_PROCEDURE_PARAM} and {@link #HOLDOUT_PARAM}
+     * to the option handler additionally to parameters of super class.
      */
     protected AbstractClassifier() {
         super();
@@ -171,10 +174,13 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
     }
 
     /**
-     * Sets the parameters evaluationProcedure and holdout. Passes the remaining
-     * parameters to the set evaluation procedure and, then, to the set holdout.
+     * Calls {@link AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
+     * and instantiates {@link #evaluationProcedure} according to the value of parameter {@link #EVALUATION_PROCEDURE_PARAM}
+     * and {@link #holdout} according to the value of parameter {@link #HOLDOUT_PARAM}.
+     * The remaining parameters are passed to the {@link #evaluationProcedure}
+     * and, then, to the {@link #holdout}.
      *
-     * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#setParameters(String[])
+     * @see AbstractAlgorithm#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
@@ -186,19 +192,22 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
         evaluationProcedure.setTime(isTime());
         evaluationProcedure.setVerbose(isVerbose());
         remainingParameters = evaluationProcedure.setParameters(remainingParameters);
-        setParameters(args, remainingParameters);
 
         // parameter holdout
         // noinspection unchecked
         holdout = HOLDOUT_PARAM.instantiateClass();
         remainingParameters = holdout.setParameters(remainingParameters);
-        setParameters(args, remainingParameters);
 
+        setParameters(args, remainingParameters);
         return remainingParameters;
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#getAttributeSettings()
+     * Calls {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#getAttributeSettings()}
+     * and adds to the returned attribute settings the attribute settings of
+     * {@link #evaluationProcedure} and {@link #holdout}.
+     *
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
      */
     @Override
     public List<AttributeSettings> getAttributeSettings() {

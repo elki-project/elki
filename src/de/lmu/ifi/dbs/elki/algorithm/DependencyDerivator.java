@@ -241,7 +241,12 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
+     * Calls {@link AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
+     * and sets additionally the values of the parameters
+     * {@link #OUTPUT_ACCURACY_PARAM} and {@link #SAMPLE_SIZE_PARAM}.
+     * The remaining parameters are passed to the {@link #pca}.
+     *
+     * @see AbstractAlgorithm#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
@@ -265,6 +270,10 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
     }
 
     /**
+     * Calls {@link DistanceBasedAlgorithm#getAttributeSettings()}
+     * and adds to the returned attribute settings the attribute settings of
+     * the {@link #pca}.
+     *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
      */
     @Override

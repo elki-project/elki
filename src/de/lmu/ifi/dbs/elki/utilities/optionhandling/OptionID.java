@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.preprocessing.HiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.properties.Properties;
@@ -273,33 +272,12 @@ public final class OptionID extends ConstantObject<OptionID> {
     );
 
     /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.KNNDistanceOrder#K_PARAM}
-     */
-    public static final OptionID KNN_DISTANCE_ORDER_K = new OptionID("knndistanceorder.k",
-        "Specifies the distance of the k-distant object to be assessed."
-    );
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.KNNDistanceOrder#PERCENTAGE_PARAM}
-     */
-    public static final OptionID KNN_DISTANCE_ORDER_PERCENTAGE = new OptionID("knndistanceorder.percentage",
-        "The average percentage of distances randomly choosen to be provided in the result."
-    );
-
-    /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor#K_PARAM}
      */
     public static final OptionID KNN_HICO_PREPROCESSOR_K = new OptionID("hicopreprocessor.k",
         "<The number of nearest neighbors considered in the PCA. " +
             "If this parameter is not set, k ist set to three " +
             "times of the dimensionality of the database objects."
-    );
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.KNNJoin#K_PARAM}
-     */
-    public static final OptionID KNN_JOIN_K = new OptionID("knnjoin.k",
-        "Specifies the k-nearest neighbors to be assigned."
     );
 
     /**

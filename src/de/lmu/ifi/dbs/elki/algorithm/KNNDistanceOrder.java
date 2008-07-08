@@ -30,13 +30,34 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
     extends DistanceBasedAlgorithm<O, D> {
 
     /**
+     * OptionID for {@link #K_PARAM}
+     */
+    public static final OptionID K_ID = OptionID.getOrCreateOptionID(
+        "knndistanceorder.k",
+        "Specifies the distance of the k-distant object to be assessed."
+    );
+
+    /**
      * Parameter to specify the distance of the k-distant object to be assessed,
      * must be an integer greater than 0.
      * <p>Default value: {@code 1} </p>
      * <p>Key: {@code -knndistanceorder.k} </p>
      */
-    private final IntParameter K_PARAM = new IntParameter(OptionID.KNN_DISTANCE_ORDER_K,
-        new GreaterConstraint(0), 1);
+    private final IntParameter K_PARAM = new IntParameter(
+        K_ID, new GreaterConstraint(0), 1);
+
+    /**
+     * Holds the value of {@link #K_PARAM}.
+     */
+    private int k;
+
+    /**
+     * OptionID for {@link #PERCENTAGE_PARAM}
+     */
+    public static final OptionID PERCENTAGE_ID = OptionID.getOrCreateOptionID(
+        "knndistanceorder.percentage",
+        "The average percentage of distances randomly choosen to be provided in the result."
+    );
 
     /**
      * Parameter to specify the average percentage of distances randomly choosen to be provided in the result,
@@ -45,17 +66,12 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
      * <p>Key: {@code -knndistanceorder.percentage} </p>
      */
     public final DoubleParameter PERCENTAGE_PARAM =
-        new DoubleParameter(OptionID.KNN_DISTANCE_ORDER_PERCENTAGE,
+        new DoubleParameter(PERCENTAGE_ID,
             new IntervalConstraint(0, IntervalConstraint.IntervalBoundary.OPEN, 1, IntervalConstraint.IntervalBoundary.CLOSE),
             1.0);
 
     /**
-     * Holds the value of parameter k.
-     */
-    private int k;
-
-    /**
-     * Holds the value of parameter percentage.
+     * Holds the value of {@link #PERCENTAGE_PARAM}.
      */
     private double percentage;
 
@@ -66,7 +82,10 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
 
     /**
      * Provides an algorithm to order the kNN-distances for all objects of the
-     * database.
+     * database,
+     * adding parameters {@link #K_PARAM} and
+     * {@link #PERCENTAGE_PARAM} to the option handler
+     * additionally to parameters of super class.
      */
     public KNNDistanceOrder() {
         super();
@@ -102,11 +121,11 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
     }
 
     /**
-     * Sets the parameter value for parameter k, if specified, additionally to
-     * the parameter settings of super classes. Otherwise the default value for
-     * k is used.
+     * Calls {@link AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
+     * and sets additionally the values of the parameters
+     * {@link #K_PARAM} and {@link #PERCENTAGE_PARAM}.
      *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
+     * @see AbstractAlgorithm#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

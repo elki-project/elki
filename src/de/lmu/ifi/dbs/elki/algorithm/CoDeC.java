@@ -121,10 +121,10 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
     private Classifier<V, L> classifier = new CorrelationBasedClassifier<V, D, L>();
 
     /**
-     * Adding flag {@link #EVALUATE_AS_CLASSIFIER_FLAG} and
+     * Adds flag {@link #EVALUATE_AS_CLASSIFIER_FLAG} and
      * parameters {@link #CLASSLABEL_PARAM} and
-     * {@link #CLUSTERING_ALGORITHM_PARAM}
-     * additionally to parameters of super class.
+     * {@link #CLUSTERING_ALGORITHM_PARAM} to the option handler
+     * to the option handler additionally to parameters of super class.
      */
     @SuppressWarnings("unchecked")
     public CoDeC() {
@@ -193,6 +193,11 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
     }
 
     /**
+     * Calls {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#getAttributeSettings()}
+     * and adds to the returned attribute settings the attribute settings of
+     * {@link #classifier} or {@link #dependencyDerivator}
+     * (if {@link #EVALUATE_AS_CLASSIFIER_FLAG} is set or not).
+     *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
      */
     @Override
@@ -210,7 +215,15 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
+     * Calls {@link AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
+     * and sets additionally the value of the flag
+     * {@link #EVALUATE_AS_CLASSIFIER_FLAG}
+     * and instantiates {@link #classLabel} according to the value of parameter {@link #CLASSLABEL_PARAM}
+     * and {@link #clusteringAlgorithm} according to the value of parameter {@link #CLUSTERING_ALGORITHM_PARAM}.
+     * The remaining parameters are passed to the {@link #classifier} or {@link #dependencyDerivator}
+     * dependent on the value of {@link #EVALUATE_AS_CLASSIFIER_FLAG}.
+     *
+     * @see AbstractAlgorithm#setParameters(String[])
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -233,18 +246,15 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
         setParameters(args, remainingParameters);
 
         // evaluation
-        String[] evaluationParmeters = new String[remainingParameters.length];
-        System.arraycopy(remainingParameters, 0, evaluationParmeters, 0, remainingParameters.length);
-
         if (evaluateAsClassifier) {
             classifier.setTime(isTime());
             classifier.setVerbose(isVerbose());
-            remainingParameters = classifier.setParameters(evaluationParmeters);
+            remainingParameters = classifier.setParameters(remainingParameters);
         }
         else {
             dependencyDerivator.setTime(isTime());
             dependencyDerivator.setVerbose(isVerbose());
-            remainingParameters = dependencyDerivator.setParameters(evaluationParmeters);
+            remainingParameters = dependencyDerivator.setParameters(remainingParameters);
         }
         setParameters(args, remainingParameters);
         return remainingParameters;

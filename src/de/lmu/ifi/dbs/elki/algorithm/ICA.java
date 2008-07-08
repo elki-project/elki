@@ -6,10 +6,16 @@ import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.varianceanalysis.ica.FastICA;
 
+import java.util.List;
+
 /**
- * Provides an ICA algorithm.
+ * Provides an Implementation of the Fast ICA Algorithm.
+ * <p>Reference:
+ * <br>A. Hyvaerinen, J. Karhunen, E. Oja:
+ * Independent Component Analysis, John Wiley & Sons, 2001.
  *
  * @author Elke Achtert
  * @param <V> the type of RealVector handled by this Algorithm
@@ -62,7 +68,10 @@ public class ICA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
+     * Calls {@link AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}.
+     * The remaining parameters are passed to the {@link #ica}.
+     *
+     * @see AbstractAlgorithm#setParameters(String[])
      */
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
@@ -73,5 +82,19 @@ public class ICA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         setParameters(args, remainingParameters);
 
         return remainingParameters;
+    }
+
+    /**
+     * Calls {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#getAttributeSettings()}
+     * and adds to the returned attribute settings the attribute settings of
+     * the {@link #ica}.
+     *
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
+     */
+    @Override
+    public List<AttributeSettings> getAttributeSettings() {
+        List<AttributeSettings> attributeSettings = super.getAttributeSettings();
+        attributeSettings.addAll(ica.getAttributeSettings());
+        return attributeSettings;
     }
 }

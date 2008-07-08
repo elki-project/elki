@@ -65,7 +65,9 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends Abstra
     }
 
     /**
-     * Grabs the options from the option handler. Any extending class should
+     * Grabs all specified options from the option handler and sets the
+     * values for the flags {@link #VERBOSE_FLAG} and {@link #TIME_FLAG}.
+     * Any extending class should
      * call this method first and return the returned array without further
      * changes, but after setting further required parameters. An example for
      * overwritting this method taking advantage from the previously (in

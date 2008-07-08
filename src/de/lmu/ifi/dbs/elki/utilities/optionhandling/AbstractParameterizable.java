@@ -81,11 +81,13 @@ public abstract class AbstractParameterizable extends AbstractLoggable
     public final String[] getParameters() {
         String[] param = new String[currentParameterArray.length];
         System.arraycopy(currentParameterArray, 0, param, 0,
-                         currentParameterArray.length);
+            currentParameterArray.length);
         return param;
     }
 
     /**
+     * Returns the settings of all options assigned to the option handler.
+     *
      * @see Parameterizable#getAttributeSettings()
      */
     public List<AttributeSettings> getAttributeSettings() {
@@ -97,7 +99,7 @@ public abstract class AbstractParameterizable extends AbstractLoggable
             return settings;
         }
         catch (UnusedParameterException e) {
-          // TODO avoid these messages
+            // TODO avoid these messages
             throw new RuntimeException("This should never happen! ", e);
         }
     }
