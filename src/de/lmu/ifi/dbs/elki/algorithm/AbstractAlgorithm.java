@@ -34,17 +34,17 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends Abstra
     private final Flag TIME_FLAG = new Flag(OptionID.ALGORITHM_TIME);
 
     /**
-     * Property whether verbose messages should be allowed.
+     * Holds the value of #VERBOSE_FLAG.
      */
     private boolean verbose;
 
     /**
-     * Property whether runtime should be assessed.
+     * Holds the value of #TIME_FLAG.
      */
     private boolean time;
 
     /**
-     * Adds the flags for verbose and time to the option handler. Any extending
+     * Adds the flags #VERBOSE_FLAG and #TIME_FLAG to the option handler. Any extending
      * class should call this constructor, then add further parameters.
      * Subclasses can add further parameters using
      * {@link #addOption(de.lmu.ifi.dbs.elki.utilities.optionhandling.Option)}
@@ -101,9 +101,9 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends Abstra
     }
 
     /**
-     * Returns whether the time should be assessed.
+     * Returns whether the performance time of the algorithm should be assessed.
      *
-     * @return whether the time should be assessed
+     * @return true, if output of performance time is requested, false otherwise
      */
     public boolean isTime() {
         return time;
@@ -113,8 +113,8 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends Abstra
      * Returns whether verbose messages should be printed while executing the
      * algorithm.
      *
-     * @return whether verbose messages should be printed while executing the
-     *         algorithm
+     * @return true, if verbose messages should be printed while executing the
+     *         algorithm, false otherwise
      */
     public boolean isVerbose() {
         return verbose;

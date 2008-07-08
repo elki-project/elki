@@ -12,10 +12,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.OneMustBeSetGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.OnlyOneIsAllowedToBeSetGlobalConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,7 +24,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Provides the apriori algorithm.
+ * Provides the APRIORI algorithm for Mining Association Rules.
+ * <p>Reference:
+ * <br>Fast Algorithms for Mining Association Rules in Large Databases.
+ * <br>In Proc. 20th Int. Conf. on Very Large Data Bases (VLDB '94), Santiago de Chile, Chile 1994.
  *
  * @author Arthur Zimek
  */
@@ -55,12 +56,12 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
         new GreaterEqualConstraint(0), true);
 
     /**
-     * Holds the value of parameter minimum frequency.
+     * Holds the value of #MINFREQ_PARAM.
      */
     private double minfreq = -1;
 
     /**
-     * Holds the value of parameter minimum support.
+     * Holds the value of #MINSUPP_PARAM.
      */
     private int minsupp;
 
@@ -76,8 +77,8 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
 
     /**
      * Provides the apriori algorithm,
-     * setting parameters {@link de.lmu.ifi.dbs.elki.algorithm.APRIORI#MINFREQ_PARAM} and
-     * {@link APRIORI#MINSUPP_PARAM}
+     * setting parameters {@link #MINFREQ_PARAM} and
+     * {@link #MINSUPP_PARAM}
      * additionally to parameters of super class.
      */
     public APRIORI() {
@@ -158,8 +159,8 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
                 .nextSetBit(i + 1)) {
                 bitSet.clear(i);
                 unpruned = (minfreq > -1 && support.get(bitSet).doubleValue()
-                                            / size >= minfreq)
-                           || support.get(bitSet) >= minsupp;
+                    / size >= minfreq)
+                    || support.get(bitSet) >= minsupp;
                 bitSet.set(i);
             }
             if (unpruned) {
@@ -224,7 +225,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
         List<BitSet> frequentItemsets = new ArrayList<BitSet>();
         for (BitSet bitSet : candidates) {
             if ((minfreq > -1 && support.get(bitSet).doubleValue()
-                                 / database.size() >= minfreq)
+                / database.size() >= minfreq)
                 || support.get(bitSet) >= minsupp) {
                 frequentItemsets.add(bitSet);
             }
@@ -247,8 +248,8 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
             "Algorithm for Mining Association Rules",
             "Searches for frequent itemsets",
             "R. Agrawal, R. Srikant: " +
-            "Fast Algorithms for Mining Association Rules in Large Databases. " +
-            "In Proc. 20th Int. Conf. on Very Large Data Bases (VLDB '94), Santiago de Chile, Chile 1994.");
+                "Fast Algorithms for Mining Association Rules in Large Databases. " +
+                "In Proc. 20th Int. Conf. on Very Large Data Bases (VLDB '94), Santiago de Chile, Chile 1994.");
     }
 
     /**
