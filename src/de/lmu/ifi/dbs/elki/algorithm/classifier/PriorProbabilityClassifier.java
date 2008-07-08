@@ -114,5 +114,4 @@ public class PriorProbabilityClassifier<O extends DatabaseObject, L extends Clas
         }
         return output.toString();
     }
-
 }

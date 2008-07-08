@@ -277,7 +277,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
      * and sets additionally the values of the parameters
      * {@link #MINFREQ_PARAM} and {@link #MINSUPP_PARAM}.
      *
-     * @see AbstractAlgorithm#setParameters(String[])
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

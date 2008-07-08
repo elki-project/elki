@@ -31,7 +31,7 @@ public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extend
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.classifier.DistanceBasedClassifier#DISTANCE_FUNCTION_PARAM}
      */
-    public static final OptionID DISTANCEFUNCTION_ID = OptionID.getOrCreateOptionID(
+    public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID(
         "classifier.distancefunction",
         "Classname of the distance function to determine the distance between database objects " +
             Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) + "."
@@ -45,18 +45,20 @@ public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extend
      */
     private final ClassParameter<DistanceFunction> DISTANCE_FUNCTION_PARAM =
         new ClassParameter<DistanceFunction>(
-            DISTANCEFUNCTION_ID,
+            DISTANCE_FUNCTION_ID,
             DistanceFunction.class,
             EuklideanDistanceFunction.class.getName());
 
     /**
-     * The distance function.
+     * Holds the instance of the distance function specified by {@link #DISTANCE_FUNCTION_PARAM}.
      */
     private DistanceFunction<O, D> distanceFunction;
 
 
     /**
-     * Adds parameter for distance function to parameter map.
+     * Adds parameter
+     * {@link #DISTANCE_FUNCTION_PARAM},
+     * to the option handler additionally to parameters of super class.
      */
     protected DistanceBasedClassifier() {
         super();
@@ -84,10 +86,13 @@ public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extend
     }
 
     /**
-     * Returns the parameter setting of the attributes.
+     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.classifier.AbstractClassifier#getAttributeSettings()}
+     * and adds to the returned attribute settings the attribute settings of
+     * the {@link #distanceFunction}.
      *
-     * @return the parameter setting of the attributes
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
      */
+    @Override
     public List<AttributeSettings> getAttributeSettings() {
         List<AttributeSettings> attributeSettings = super.getAttributeSettings();
         attributeSettings.addAll(distanceFunction.getAttributeSettings());
@@ -106,7 +111,12 @@ public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extend
 
 
     /**
-     * @see AbstractClassifier#setParameters(String[])
+     * Calls {@link AbstractClassifier#setParameters(String[]) AbstractClassifier#setParameters(args)}
+     * and instantiates {@link #distanceFunction} according to the value of parameter
+     * {@link #DISTANCE_FUNCTION_PARAM}.
+     * The remaining parameters are passed to the {@link #distanceFunction}.
+     *
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

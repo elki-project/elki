@@ -223,7 +223,7 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
      * The remaining parameters are passed to the {@link #classifier} or {@link #dependencyDerivator}
      * dependent on the value of {@link #EVALUATE_AS_CLASSIFIER_FLAG}.
      *
-     * @see AbstractAlgorithm#setParameters(String[])
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @SuppressWarnings("unchecked")
     @Override

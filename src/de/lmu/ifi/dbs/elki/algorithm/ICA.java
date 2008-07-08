@@ -71,7 +71,7 @@ public class ICA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
      * Calls {@link AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}.
      * The remaining parameters are passed to the {@link #ica}.
      *
-     * @see AbstractAlgorithm#setParameters(String[])
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);

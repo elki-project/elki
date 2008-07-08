@@ -121,11 +121,11 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
     }
 
     /**
-     * Calls {@link AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
+     * Calls {@link DistanceBasedAlgorithm#setParameters(String[]) DistanceBasedAlgorithm#setParameters(args)}
      * and sets additionally the values of the parameters
      * {@link #K_PARAM} and {@link #PERCENTAGE_PARAM}.
      *
-     * @see AbstractAlgorithm#setParameters(String[])
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

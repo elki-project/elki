@@ -49,17 +49,19 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
         new GreaterConstraint(0), 1);
 
     /**
+     * Holds the value of @link #K_PARAM}.
+     */
+    protected int k;
+
+    /**
      * Holds the database where the classification is to base on.
      */
     protected Database<O> database;
 
     /**
-     * Holds the value for k.
-     */
-    protected int k;
-
-    /**
-     * Provides a KNNClassifier.
+     * Provides a KNNClassifier,
+     * adding parameter {@link #K_PARAM} to the option handler
+     * additionally to parameters of super class.
      */
     public KNNClassifier() {
         super();
@@ -121,15 +123,16 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
         return new Description(
             "kNN-classifier",
             "kNN-classifier",
-            "lazy classifier classifies a given instance to the majority class of the k-nearest neighbors",
+            "Lazy classifier classifies a given instance to the majority class of the k-nearest neighbors.",
             "");
     }
 
     /**
-     * Sets the parameter k, if speicified. Otherwise, k will remain at the
-     * default value 1 or the previously specified value, respectively.
+     * Calls {@link DistanceBasedClassifier#setParameters(String[]) DistanceBasedClassifier#setParameters(args)}
+     * and sets additionally the value of the parameter
+     * {@link #K_PARAM}.
      *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
+     * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

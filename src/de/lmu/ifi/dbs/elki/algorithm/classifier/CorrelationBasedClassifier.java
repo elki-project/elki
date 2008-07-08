@@ -146,10 +146,11 @@ public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Di
     }
 
     /**
-     * Returns the AttributeSettings of CorrelationBasedClassifier and of the
-     * inherent DependencyDerivator.
+     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.classifier.AbstractClassifier#getAttributeSettings()}
+     * and adds to the returned attribute settings the attribute settings of
+     * the {@link #dependencyDerivator}.
      *
-     * @see AbstractClassifier#getAttributeSettings()
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
      */
     @Override
     public List<AttributeSettings> getAttributeSettings() {
@@ -159,12 +160,10 @@ public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Di
     }
 
     /**
-     * Sets the parameters required by
-     * {@link CorrelationBasedClassifier CorrelationBasedClassifier} and passes
-     * the remaining parameters to the inherent
-     * {@link DependencyDerivator DependencyDerivator}.
+     * Calls {@link AbstractClassifier#setParameters(String[]) AbstractClassifier#setParameters(args)}
+     * and passes the remaining parameters to {@link #dependencyDerivator}.
      *
-     * @see AbstractClassifier#setParameters(String[])
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

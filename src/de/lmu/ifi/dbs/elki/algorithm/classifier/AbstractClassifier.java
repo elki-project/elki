@@ -180,7 +180,7 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
      * The remaining parameters are passed to the {@link #evaluationProcedure}
      * and, then, to the {@link #holdout}.
      *
-     * @see AbstractAlgorithm#setParameters(String[])
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
