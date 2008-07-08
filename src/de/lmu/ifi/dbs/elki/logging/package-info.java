@@ -97,22 +97,24 @@ catch(SomeException e)
     <li>Exception messages are printed immediately to <code>System.err</code>.
     </li>
 </ul></p>
-<h4>Handling for Graphical User Interface</h4>
-TODO general comment for GUI logging facility
-<p><ul>
-    <li>Debugging - should use a log-file (in simple format?)</li>
-    <li>Verbose messages for regular user information - should be printed on some progress textframe.
-        Perhaps the logging facility can be enhanced to provide progressbars based on the logs?</li>
-    <li>Warning messages for user information - should prompt a warning frame</li>
-    <li>Exception messages - should prompt an error frame
-        <ul>
-            <li>Regular user information - should be displayed on the error frame</li>
-            <li>Detailed information - could possibly be available by a request button
-            	on the error frame.
-            </li>
-        </ul>
-    </li>
-</ul></p>
+<!--
+  <h4>Handling for Graphical User Interface</h4>
+  TODO general comment for GUI logging facility
+  <p><ul>
+      <li>Debugging - should use a log-file (in simple format?)</li>
+      <li>Verbose messages for regular user information - should be printed on some progress textframe.
+          Perhaps the logging facility can be enhanced to provide progressbars based on the logs?</li>
+      <li>Warning messages for user information - should prompt a warning frame</li>
+      <li>Exception messages - should prompt an error frame
+          <ul>
+              <li>Regular user information - should be displayed on the error frame</li>
+              <li>Detailed information - could possibly be available by a request button
+              	on the error frame.
+              </li>
+          </ul>
+      </li>
+  </ul></p>
+-->
 <h3>Efficiency considerations (for development)</h3>
 <p>Coding the logging of debugging messages conditionally by a final boolean variable
     can result in a considerable speedup if the final boolean is false.

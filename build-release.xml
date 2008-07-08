@@ -78,7 +78,7 @@
 				<exclude name="${basepackage}algorithm/result/ICAResult.*"/>
 				<exclude name="${basepackage}algorithm/result/clustering/FractalDimensionTestResult.*"/>
 				<exclude name="${basepackage}algorithm/result/clustering/HierarchicalFractalDimensionCluster.*"/>
-				<exclude name="${basepackage}algorithm/result/outlier/LOFResult.*"/>
+				<exclude name="${basepackage}algorithm/result/outlier/**"/>
 				<exclude name="${basepackage}converter/Arff2Txt.*"/>
 				<exclude name="${basepackage}converter/ArffSparseInstanceToSparseBitVector.*"/>
 				<exclude name="${basepackage}converter/Database2Arff.*"/>
@@ -96,46 +96,14 @@
 				<exclude name="${basepackage}wrapper/**"/>
 			</fileset>			
 		</copy>
+		<copy todir="${deploy.javadoc}/figures">
+			<fileset dir="figures/release${RELEASE}">
+				<include name="*.png"/>
+			</fileset>
+		</copy>
 	</target>
 	
-	<target name="javadoc" depends="compile">
-			<javadoc
-				destdir="${deploy.javadoc}"
-				access="protected"
-				use="true"
-				notree="false"
-				nonavbar="false"
-				noindex="false"
-				splitindex="true"
-				author="true"
-				version="false"
-				nodeprecatedlist="false"
-				nodeprecated="false"
-				link="http://java.sun.com/javase/6/docs/api/"
-				overview="${deploy.srcdir}/src/${release.overview}"
-				classpath="${deploy.srcdir}/bin"
-				doctitle="ELKI"
-				windowtitle="ELKI">
-				<packageset dir="${deploy.srcdir}/src"/>
-				<footer>
-                   &lt;table style="font-size:xx-small;"&gt;			
-	                 &lt;tr&gt;
-	                   &lt;td align="left"&gt;
-	                    Release
-	                   &lt;/td&gt;
-	                   &lt;td align="center"&gt;
-	                    ${RELEASE}
-	                   &lt;/td&gt;
-					   &lt;td align="right"&gt;
-	                    (${now})
-	                   &lt;/td&gt;
-	                 &lt;/tr&gt;
-                   &lt;/table&gt;
-	            </footer>
-				<header>ELKI</header>
-			</javadoc>
-		    <!-- GRAPHIKEN -->
-		</target>
+	
 	
 	<target name="compile" depends="copy4release">
 		<javac destdir="${deploy.srcdir}" deprecation="true" debug="true" optimize="true" source="1.6" debuglevel="">
@@ -160,6 +128,60 @@
 				<attribute name="Built-By" value="${user.name}"/>
 			</manifest>
 		</jar>
+	</target>
+	
+	<target name="javadoc" depends="compile">
+		<javadoc
+			destdir="${deploy.javadoc}"
+			access="protected"
+			use="true"
+			notree="false"
+			nonavbar="false"
+			noindex="false"
+			splitindex="true"
+			author="true"
+			version="false"
+			nodeprecatedlist="false"
+			nodeprecated="false"
+			link="http://java.sun.com/javase/6/docs/api/"
+			overview="${deploy.srcdir}/src/${release.overview}"
+			classpath="${deploy.srcdir}/bin"
+			doctitle="${ELKI}"
+			windowtitle="${ELKI_LONG}">
+			<packageset dir="${deploy.srcdir}/src"/>
+			<footer>
+               &lt;table style=&apos;font-size:small&apos;&gt;			
+                 &lt;tr&gt;
+                   &lt;td align=&apos;left&apos;&gt;
+                    Release
+                   &lt;/td&gt;
+                   &lt;td align=&apos;center&apos;&gt;
+                    ${RELEASE}
+                   &lt;/td&gt;
+				   &lt;td align=&apos;right&apos;&gt;
+                    (${now})
+                   &lt;/td&gt;
+                 &lt;/tr&gt;
+               &lt;/table&gt;
+            </footer>
+			<header>
+				&lt;table cellspacing=&apos;0&apos; cellpadding=&apos;0&apos; style=&apos;font-weight:bold&#59; font-style:normal&#59; font-size:small&apos;&gt; 
+				<!--				&lt;table cellspacing=&apos;0&apos; cellpadding=&apos;0&apos; style=&apos;font-weight:bold&apos;&gt;-->
+				  &lt;tr&gt;
+				    &lt;td align=&apos;right&apos;&gt;&lt;/td&gt;&lt;td align=&apos;center&apos;&gt;&lt;font color=&apos;#ff0000&apos;&gt;E&lt;/font&gt;&lt;/td&gt;&lt;td align=&apos;left&apos;&gt;nvironment for&lt;/td&gt;
+				  &lt;/tr&gt;
+				  &lt;tr&gt;
+				    &lt;td align=&apos;right&apos;&gt;Deve&lt;/td&gt;&lt;td align=&apos;center&apos;&gt;&lt;font color=&apos;#ff0000&apos;&gt;L&lt;/font&gt;&lt;/td&gt;&lt;td align=&apos;left&apos;&gt;oping&lt;/td&gt;
+				  &lt;/tr&gt;
+				  &lt;tr&gt;
+				    &lt;td align=&apos;right&apos;&gt;&lt;/td&gt;&lt;td align=&apos;center&apos;&gt;&lt;font color=&apos;#ff0000&apos;&gt;K&lt;/font&gt;&lt;/td&gt;&lt;td align=&apos;left&apos;&gt;DD-Applications&lt;/td&gt;
+				  &lt;/tr&gt;
+				  &lt;tr&gt;
+				    &lt;td align=&apos;right&apos;&gt;Supported by&#160;&lt;/td&gt;&lt;td align=&apos;center&apos;&gt;&lt;font color=&apos;#ff0000&apos;&gt;I&lt;/font&gt;&lt;/td&gt;&lt;td align=&apos;left&apos;&gt;ndex-Structures&lt;/td&gt;
+				  &lt;/tr&gt;
+				&lt;/table&gt;
+			</header>
+		</javadoc>
 	</target>
 
 </project>

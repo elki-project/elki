@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.algorithm.result.outlier;
 
+import de.lmu.ifi.dbs.elki.algorithm.outlier.SOD;
 import de.lmu.ifi.dbs.elki.algorithm.result.AbstractResult;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.RealVector;
@@ -100,7 +101,7 @@ public class SODResult<O extends RealVector<O, Double>> extends AbstractResult<O
             for (Iterator<Integer> it = db.iterator(); it.hasNext();) {
                 Integer id = it.next();
                 // noinspection unchecked
-                SODModel<O> sodModel = db.getAssociation(AssociationID.SOD_MODEL, id);
+                SODModel<O> sodModel = db.getAssociation(SOD.SOD_MODEL, id);
                 list.add(new IDDoublePair(id, sodModel.getSod()));
             }
             Collections.sort(list);
@@ -136,7 +137,7 @@ public class SODResult<O extends RealVector<O, Double>> extends AbstractResult<O
 
                 outStream.println("SOD=" + iddoublepair.getValue());
                 // noinspection unchecked
-                SODModel<O> sodModel = db.getAssociation(AssociationID.SOD_MODEL, id);
+                SODModel<O> sodModel = db.getAssociation(SOD.SOD_MODEL, id);
                 sodModel.output(outStream, normalization, settings);
 
             }

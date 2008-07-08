@@ -87,6 +87,7 @@ public class ClassParameter<C> extends Parameter<String, String> {
     /**
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Option#setValue(String)
      */
+    @Override
     public void setValue(String value) throws ParameterException {
         if (isValid(value)) {
             setCorrectValue(value);
@@ -112,6 +113,7 @@ public class ClassParameter<C> extends Parameter<String, String> {
      *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Option#isValid(String)
      */
+    @Override
     public boolean isValid(String value) throws ParameterException {
         if (value == null) {
             throw new WrongParameterValueException("Parameter Error.\n" +
@@ -189,6 +191,7 @@ public class ClassParameter<C> extends Parameter<String, String> {
      * @return &quot;&lt;class&gt;&quot;
      * @see Parameter#getParameterType()
      */
+    @Override
     protected String getParameterType() {
         return "<class>";
     }

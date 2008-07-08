@@ -32,6 +32,13 @@ import java.util.List;
  */
 public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends AbstractAlgorithm<V> {
 
+  /**
+   * The association id to associate a subspace outlier degree.
+   */
+  @SuppressWarnings("unchecked")
+  public static final AssociationID<SODModel> SOD_MODEL = AssociationID.getOrCreateAssociationID("SOD", SODModel.class);
+
+  
     /**
      * Parameter to indicate the number of shared nearest neighbors to be considered for learning the subspace properties.
      * <p/>
@@ -101,7 +108,7 @@ public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends
             }
             List<Integer> knnList = getKNN(database, queryObject).idsToList();
             SODModel<V> model = new SODModel<V>(database, knnList, alpha, database.get(queryObject));
-            database.associate(AssociationID.SOD_MODEL, queryObject, model);
+            database.associate(SOD_MODEL, queryObject, model);
         }
         if (isVerbose()) {
             verbose("");

@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.database;
 
 
-import de.lmu.ifi.dbs.elki.algorithm.result.outlier.SODModel;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
@@ -151,11 +150,6 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
     public static final AssociationID<Object> OBJECT = new AssociationID<Object>("object", Object.class);
 
 
-    /**
-     * The association id to associate a subspace outlier degree.
-     */
-    @SuppressWarnings("unchecked")
-    public static final AssociationID<SODModel> SOD_MODEL = new AssociationID<SODModel>("SOD", SODModel.class);
 
     /**
      * The serial version UID.
@@ -220,10 +214,10 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
      * @param type the type of the association
      * @return the AssociationID for the given name
      */
-    public static <C extends Class<C>> AssociationID<C> getOrCreateAssociationID(final String name, final C type) {
+    public static <C> AssociationID<C> getOrCreateAssociationID(final String name, final Class<C> type) {
         AssociationID<C> associationID = (AssociationID<C>) getAssociationID(name);
         if (associationID == null) {
-            associationID = new AssociationID(name, type);
+            associationID = new AssociationID<C>(name, type);
         }
         return associationID;
     }
