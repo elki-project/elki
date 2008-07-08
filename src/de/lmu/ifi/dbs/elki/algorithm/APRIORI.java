@@ -34,6 +34,26 @@ import java.util.Map;
 public class APRIORI extends AbstractAlgorithm<BitVector> {
 
     /**
+     * OptionID for {@link #MINFREQ_PARAM}
+     */
+    public static final OptionID MINFREQ_ID = OptionID.getOrCreateOptionID(
+        "apriori.minfreq",
+        "Threshold for minimum frequency as percentage value " +
+            "(alternatively to parameter apriori.minsupp)."
+    );
+
+    /**
+     * OptionID for {@link #MINSUPP_PARAM}
+     */
+    public static final OptionID MINSUPP_ID = OptionID.getOrCreateOptionID(
+        "apriori.minsupp",
+        "Threshold for minimum support as minimally required number of transactions " +
+            "(alternatively to parameter apriori.minfreq" +
+            " - setting apriori.minsupp is slightly preferable over setting " +
+            "apriori.minfreq in terms of efficiency)."
+    );
+
+    /**
      * Optional parameter to specify the threshold for minimum frequency,
      * must be a double greater than or equal to 0 and less than or equal to 1.
      * Alternatively to parameter {@link APRIORI#MINSUPP_PARAM}).
