@@ -12,6 +12,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * input and provide a file based database or provide an intermediate connection
  * to a database system.
  * 
+ * @param <O> the type of DatabaseObject to be provided by the implementing class as element of the supplied database
+ * 
  * @author Arthur Zimek 
  */
 public interface DatabaseConnection<O extends DatabaseObject> extends
