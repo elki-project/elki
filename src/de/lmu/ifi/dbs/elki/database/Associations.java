@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A helper class to facilitate setting of associations in a database.
+ * A helper class to facilitate setting of global associations in a database.
  *
  * @author Arthur Zimek
  */
