@@ -202,10 +202,10 @@ public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector
         // Big and small are not used in this version of KernelFourC
         // as they implicitly take the values 1 (big) and 0 (small),
         // big value
-        Util.addParameter(tmpPCAParameters, LocalPCA.LOCAL_PCA_BIG, "1");
+        Util.addParameter(tmpPCAParameters, LocalPCA.BIG_ID, "1");
 
         // small value
-        Util.addParameter(tmpPCAParameters, LocalPCA.LOCAL_PCA_SMALL, "0");
+        Util.addParameter(tmpPCAParameters, LocalPCA.SMALL_ID, "0");
 
         pcaParameters = tmpPCAParameters.toArray(new String[tmpPCAParameters.size()]);
         tmpPCA.setParameters(pcaParameters);

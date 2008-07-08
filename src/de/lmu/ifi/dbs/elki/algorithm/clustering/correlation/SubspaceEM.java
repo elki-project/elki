@@ -42,7 +42,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
     /**
      * OptionID for {@link #DELTA_PARAM}
      */
-    public static final OptionID SUBSPACE_EM_DELTA = OptionID.getOrCreateOptionID(
+    public static final OptionID DELTA_ID = OptionID.getOrCreateOptionID(
         "subspaceem.delta",
         "The termination criterion for maximization of E(M): " +
             "E(M) - E(M') < subspaceem.delta"
@@ -51,7 +51,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
     /**
      * OptionID for {@link #K_PARAM}
      */
-    public static final OptionID SUBSPACE_EM_K = OptionID.getOrCreateOptionID(
+    public static final OptionID K_ID = OptionID.getOrCreateOptionID(
         "subspaceem.k",
         "The number of clusters to find."
     );
@@ -68,7 +68,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
      * <p>Key: {@code -subspaceem.k} </p>
      */
     private final IntParameter K_PARAM = new IntParameter(
-        SUBSPACE_EM_K,
+        K_ID,
         new GreaterConstraint(0));
 
     /**
@@ -78,7 +78,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
      * <p>Key: {@code -subspaceem.delta} </p>
      */
     private final DoubleParameter DELTA_PARAM = new DoubleParameter(
-        SUBSPACE_EM_DELTA,
+        DELTA_ID,
         new GreaterEqualConstraint(0.0),
         0.0);
 

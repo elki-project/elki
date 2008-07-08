@@ -34,7 +34,7 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
     /**
      * OptionID for {@link #K_PARAM}
      */
-    public static final OptionID SUBSPACE_AGGREGATION_K = OptionID.getOrCreateOptionID(
+    public static final OptionID K_ID = OptionID.getOrCreateOptionID(
         "subspaceagg.k",
         "The number of clusters to find."
     );
@@ -51,7 +51,7 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
      * <p>Key: {@code -subspaceagg.k} </p>
      */
     private final IntParameter K_PARAM = new IntParameter(
-        SUBSPACE_AGGREGATION_K,
+        K_ID,
         new GreaterConstraint(0));
 
     /**

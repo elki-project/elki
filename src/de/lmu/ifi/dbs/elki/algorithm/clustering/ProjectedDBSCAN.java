@@ -43,7 +43,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
     /**
      * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
      */
-    public static final OptionID PROJECTED_DBSCAN_DISTANCEFUNCTION = OptionID.getOrCreateOptionID(
+    public static final OptionID DISTANCEFUNCTION_ID = OptionID.getOrCreateOptionID(
         "projdbscan.distancefunction",
         "Classname of the distance function to determine the distance between database objects " +
             Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(AbstractLocallyWeightedDistanceFunction.class) + "."
@@ -52,7 +52,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
     /**
      * OptionID for {@link #EPSILON_PARAM}
      */
-    public static final OptionID PROJECTED_DBSCAN_EPSILON = OptionID.getOrCreateOptionID(
+    public static final OptionID DBSCAN_EPSILON_ID = OptionID.getOrCreateOptionID(
         "projdbscan.epsilon",
         "The maximum radius of the neighborhood to be considered."
     );
@@ -60,7 +60,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
     /**
      * OptionID for {@link #LAMBDA_PARAM}
      */
-    public static final OptionID PROJECTED_DBSCAN_LAMBDA = OptionID.getOrCreateOptionID(
+    public static final OptionID LAMBDA_ID = OptionID.getOrCreateOptionID(
         "projdbscan.lambda",
         "The intrinsic dimensionality of the clusters to find."
     );
@@ -68,7 +68,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
     /**
      * OptionID for {@link #MINPTS_PARAM}
      */
-    public static final OptionID PROJECTED_DBSCAN_MINPTS = OptionID.getOrCreateOptionID(
+    public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID(
         "projdbscan.minpts",
         "Threshold for minimum number of points in " +
             "the epsilon-neighborhood of a point."
@@ -82,7 +82,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
      */
     protected final ClassParameter<AbstractLocallyWeightedDistanceFunction> DISTANCE_FUNCTION_PARAM =
         new ClassParameter<AbstractLocallyWeightedDistanceFunction>(
-            PROJECTED_DBSCAN_DISTANCEFUNCTION,
+            DISTANCEFUNCTION_ID,
             AbstractLocallyWeightedDistanceFunction.class,
             LocallyWeightedDistanceFunction.class.getName());
 
@@ -92,7 +92,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
      * must be suitable to {@link LocallyWeightedDistanceFunction}.
      * <p>Key: {@code -projdbscan.epsilon} </p>
      */
-    private final PatternParameter EPSILON_PARAM = new PatternParameter(PROJECTED_DBSCAN_EPSILON);
+    private final PatternParameter EPSILON_PARAM = new PatternParameter(DBSCAN_EPSILON_ID);
 
     /**
      * Parameter to specify the intrinsic dimensionality of the clusters to find,
@@ -100,7 +100,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
      * <p>Key: {@code -projdbscan.lambda} </p>
      */
     private final IntParameter LAMBDA_PARAM = new IntParameter(
-        PROJECTED_DBSCAN_LAMBDA,
+        LAMBDA_ID,
         new GreaterConstraint(0));
 
     /**
@@ -110,7 +110,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
      * <p>Key: {@code -projdbscan.minpts} </p>
      */
     private final IntParameter MINPTS_PARAM = new IntParameter(
-        PROJECTED_DBSCAN_MINPTS,
+        MINPTS_ID,
         new GreaterConstraint(0));
 
     /**

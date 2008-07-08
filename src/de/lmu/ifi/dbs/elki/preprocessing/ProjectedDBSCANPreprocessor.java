@@ -54,7 +54,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
      * <p>Key: {@code -projdbscan.minpts} </p>
      */
     private final IntParameter MINPTS_PARAM = new IntParameter(
-        ProjectedDBSCAN.PROJECTED_DBSCAN_MINPTS,
+        ProjectedDBSCAN.MINPTS_ID,
         new GreaterConstraint(0));
 
     

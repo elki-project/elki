@@ -22,7 +22,7 @@ public abstract class ProjectedClustering<V extends RealVector<V, ?>>
     /**
      * OptionID for {@link #K_PARAM}
      */
-    public static final OptionID PROJECTED_CLUSTERING_K = OptionID.getOrCreateOptionID(
+    public static final OptionID K_ID = OptionID.getOrCreateOptionID(
         "projectedclustering.k",
         "The number of clusters to find."
     );
@@ -30,7 +30,7 @@ public abstract class ProjectedClustering<V extends RealVector<V, ?>>
     /**
      * OptionID for {@link #K_I_PARAM}
      */
-    public static final OptionID PROJECTED_CLUSTERING_K_I = OptionID.getOrCreateOptionID(
+    public static final OptionID K_I_ID = OptionID.getOrCreateOptionID(
         "projectedclustering.k_i",
         "The multiplier for the initial number of seeds."
     );
@@ -38,7 +38,7 @@ public abstract class ProjectedClustering<V extends RealVector<V, ?>>
     /**
      * OptionID for {@link #L_PARAM}
      */
-    public static final OptionID PROJECTED_CLUSTERING_L = OptionID.getOrCreateOptionID(
+    public static final OptionID L_ID = OptionID.getOrCreateOptionID(
         "projectedclustering.l",
         "The dimensionality of the clusters to find."
     );
@@ -49,7 +49,7 @@ public abstract class ProjectedClustering<V extends RealVector<V, ?>>
      * <p>Key: {@code -projectedclustering.k} </p>
      */
     private final IntParameter K_PARAM = new IntParameter(
-        PROJECTED_CLUSTERING_K,
+        K_ID,
         new GreaterConstraint(0));
 
     /**
@@ -59,7 +59,7 @@ public abstract class ProjectedClustering<V extends RealVector<V, ?>>
      * <p>Key: {@code -projectedclustering.k_i} </p>
      */
     private final IntParameter K_I_PARAM = new IntParameter(
-        PROJECTED_CLUSTERING_K_I,
+        K_I_ID,
         new GreaterConstraint(0),
         30);
 
@@ -69,7 +69,7 @@ public abstract class ProjectedClustering<V extends RealVector<V, ?>>
      * <p>Key: {@code -projectedclustering.l} </p>
      */
     private final IntParameter L_PARAM = new IntParameter(
-        PROJECTED_CLUSTERING_L,
+        L_ID,
         new GreaterConstraint(0));
 
     /**

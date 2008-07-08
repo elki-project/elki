@@ -30,7 +30,7 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
     /**
      * OptionID for {@link #INDEX_PARAM}
      */
-    public static final OptionID SPATIAL_INDEX_DB_INDEX = OptionID.getOrCreateOptionID(
+    public static final OptionID INDEX_ID = OptionID.getOrCreateOptionID(
         "spatialindexdb.index",
         "Classname of the spatial index to use " +
             Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(SpatialIndex.class) +
@@ -42,7 +42,7 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
      * <p>Key: {@code -spatialindexdb.index} </p>
      */
     private final ClassParameter<SpatialIndex> INDEX_PARAM = new ClassParameter<SpatialIndex>(
-        SPATIAL_INDEX_DB_INDEX, SpatialIndex.class);
+        INDEX_ID, SpatialIndex.class);
 
     /**
      * The index structure storing the data.

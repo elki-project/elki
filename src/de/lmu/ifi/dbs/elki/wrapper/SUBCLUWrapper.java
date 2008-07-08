@@ -24,7 +24,7 @@ public class SUBCLUWrapper extends NormalizationWrapper {
      * must be suitable to {@link de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDimensionsSelectingDoubleDistanceFunction}.
      * <p>Key: {@code -subclu.epsilon} </p>
      */
-    private final PatternParameter EPSILON_PARAM = new PatternParameter(SUBCLU.SUBCLU_EPSILON);
+    private final PatternParameter EPSILON_PARAM = new PatternParameter(SUBCLU.EPSILON_ID);
 
     /**
      * Parameter to specify the threshold for minimum number of points in
@@ -33,7 +33,7 @@ public class SUBCLUWrapper extends NormalizationWrapper {
      * <p>Key: {@code -subclu.minpts} </p>
      */
     private final IntParameter MINPTS_PARAM = new IntParameter(
-        SUBCLU.SUBCLU_MINPTS,
+        SUBCLU.MINPTS_ID,
         new GreaterConstraint(0));
 
     /**

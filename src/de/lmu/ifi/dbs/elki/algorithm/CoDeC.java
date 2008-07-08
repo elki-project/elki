@@ -36,7 +36,7 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.CoDeC#CLASSLABEL_PARAM}
      */
-    public static final OptionID CODEC_CLASSLABEL = OptionID.getOrCreateOptionID("" +
+    public static final OptionID CLASSLABEL_ID = OptionID.getOrCreateOptionID("" +
         "codec.classlabel",
         "Classname of the designated classLabel class " +
             Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(ClassLabel.class) +
@@ -46,7 +46,7 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.CoDeC#CLUSTERING_ALGORITHM_PARAM}
      */
-    public static final OptionID CODEC_CLUSTERING_ALGORITHM = OptionID.getOrCreateOptionID(
+    public static final OptionID CLUSTERING_ALGORITHM_ID = OptionID.getOrCreateOptionID(
         "codec.clusteringAlgorithm",
         "Classname of the clustering algorithm to use to derive cluster " +
             Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Clustering.class) +
@@ -56,7 +56,7 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.CoDeC#EVALUATE_AS_CLASSIFIER_FLAG}
      */
-    public static final OptionID CODEC_EVALUATE_AS_CLASSIFIER = OptionID.getOrCreateOptionID(
+    public static final OptionID EVALUATE_AS_CLASSIFIER_ID = OptionID.getOrCreateOptionID(
         "codec.classify",
         "Flag to demand evaluation of the cluster-models as classifier.");
 
@@ -64,7 +64,7 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
      * Flag to demand evaluation of the cluster-models as classifier.
      * <p>Key: {@code -codec.classify} </p>
      */
-    private final Flag EVALUATE_AS_CLASSIFIER_FLAG = new Flag(CODEC_EVALUATE_AS_CLASSIFIER);
+    private final Flag EVALUATE_AS_CLASSIFIER_FLAG = new Flag(EVALUATE_AS_CLASSIFIER_ID);
 
     /**
      * Parameter to specify the designated classLabel class,
@@ -74,7 +74,7 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
      */
     private final ClassParameter<ClassLabel> CLASSLABEL_PARAM =
         new ClassParameter<ClassLabel>(
-            CODEC_CLASSLABEL,
+            CLASSLABEL_ID,
             ClassLabel.class,
             HierarchicalClassLabel.class.getName());
 
@@ -86,7 +86,7 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
      */
     private final ClassParameter<Clustering> CLUSTERING_ALGORITHM_PARAM =
         new ClassParameter<Clustering>(
-            CODEC_CLUSTERING_ALGORITHM,
+            CLUSTERING_ALGORITHM_ID,
             Clustering.class,
             COPAC.class.getName());
 

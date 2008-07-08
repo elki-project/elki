@@ -24,7 +24,7 @@ public abstract class LocalPCA<V extends RealVector<V, ?>> extends AbstractPCA {
     /**
      * OptionID for {@link #BIG_PARAM}
      */
-    public static final OptionID LOCAL_PCA_BIG = OptionID.getOrCreateOptionID(
+    public static final OptionID BIG_ID = OptionID.getOrCreateOptionID(
         "localpca.big",
         "A constant big value to reset high eigenvalues."
     );
@@ -32,7 +32,7 @@ public abstract class LocalPCA<V extends RealVector<V, ?>> extends AbstractPCA {
     /**
      * OptionID for {@link #SMALL_PARAM}
      */
-    public static final OptionID LOCAL_PCA_SMALL = OptionID.getOrCreateOptionID(
+    public static final OptionID SMALL_ID = OptionID.getOrCreateOptionID(
         "localpca.small",
         "A constant small value to reset low eigenvalues."
     );
@@ -44,7 +44,7 @@ public abstract class LocalPCA<V extends RealVector<V, ?>> extends AbstractPCA {
      * <p>Key: {@code -localpca.big} </p>
      */
     private final DoubleParameter BIG_PARAM = new DoubleParameter(
-        LOCAL_PCA_BIG,
+        BIG_ID,
         new GreaterConstraint(0),
         1.0);
 
@@ -55,7 +55,7 @@ public abstract class LocalPCA<V extends RealVector<V, ?>> extends AbstractPCA {
      * <p>Key: {@code -localpca.small} </p>
      */
     private final DoubleParameter SMALL_PARAM = new DoubleParameter(
-        LOCAL_PCA_SMALL,
+        SMALL_ID,
         new GreaterConstraint(0),
         0.0);
 

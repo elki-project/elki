@@ -28,7 +28,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
     /**
      * OptionID for {@link #INDEX_PARAM}
      */
-    public static final OptionID METRICAL_INDEX_DB_INDEX = OptionID.getOrCreateOptionID(
+    public static final OptionID INDEX_ID = OptionID.getOrCreateOptionID(
         "metricalindexdb.index",
         "Classname of the metrical index to use " +
             Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(MetricalIndex.class) +
@@ -40,7 +40,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
      * <p>Key: {@code -metricalindexdb.index} </p>
      */
     private final ClassParameter<MetricalIndex> INDEX_PARAM = new ClassParameter<MetricalIndex>(
-        METRICAL_INDEX_DB_INDEX, MetricalIndex.class);
+        INDEX_ID, MetricalIndex.class);
 
 
     /**

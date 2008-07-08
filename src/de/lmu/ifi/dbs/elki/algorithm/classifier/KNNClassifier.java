@@ -34,7 +34,7 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.classifier.KNNClassifier#K_PARAM}
      */
-    public static final OptionID KNN_CLASSIFIER_K = OptionID.getOrCreateOptionID(
+    public static final OptionID K_ID = OptionID.getOrCreateOptionID(
         "knnclassifier.k",
         "The number of neighbors to take into account for classification."
     );
@@ -45,7 +45,7 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
      * <p>Default value: {@code 1} </p>
      * <p>Key: {@code -knnclassifier.k} </p>
      */
-    private final IntParameter K_PARAM = new IntParameter(KNN_CLASSIFIER_K,
+    private final IntParameter K_PARAM = new IntParameter(K_ID,
         new GreaterConstraint(0), 1);
 
     /**

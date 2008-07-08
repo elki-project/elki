@@ -174,10 +174,10 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
         tmpPCAParameters.add(Double.toString(delta));
 
         // big value
-        Util.addParameter(tmpPCAParameters, LinearLocalPCA.LOCAL_PCA_BIG, "50");
+        Util.addParameter(tmpPCAParameters, LinearLocalPCA.BIG_ID, "50");
 
         // small value
-        Util.addParameter(tmpPCAParameters, LinearLocalPCA.LOCAL_PCA_SMALL, "1");
+        Util.addParameter(tmpPCAParameters, LinearLocalPCA.SMALL_ID, "1");
 
         pcaParameters = tmpPCAParameters.toArray(new String[tmpPCAParameters.size()]);
         tmpPCA.setParameters(pcaParameters);

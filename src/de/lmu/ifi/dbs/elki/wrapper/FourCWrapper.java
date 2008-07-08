@@ -34,7 +34,7 @@ public class FourCWrapper extends NormalizationWrapper {
      * must be suitable to {@link de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction}.
      * <p>Key: {@code -projdbscan.epsilon} </p>
      */
-    private final PatternParameter EPSILON_PARAM = new PatternParameter(FourC.PROJECTED_DBSCAN_EPSILON);
+    private final PatternParameter EPSILON_PARAM = new PatternParameter(FourC.DBSCAN_EPSILON_ID);
 
 
     /**
@@ -44,7 +44,7 @@ public class FourCWrapper extends NormalizationWrapper {
      * <p>Key: {@code -projdbscan.minpts} </p>
      */
     private final IntParameter MINPTS_PARAM = new IntParameter(
-        FourC.PROJECTED_DBSCAN_MINPTS,
+        FourC.MINPTS_ID,
         new GreaterConstraint(0));
 
     /**
@@ -53,7 +53,7 @@ public class FourCWrapper extends NormalizationWrapper {
      * <p>Key: {@code -projdbscan.lambda} </p>
      */
     private final IntParameter LAMBDA_PARAM = new IntParameter(
-        PreDeCon.PROJECTED_DBSCAN_LAMBDA,
+        PreDeCon.LAMBDA_ID,
         new GreaterConstraint(0));
 
     /**

@@ -39,7 +39,7 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.classifier.AbstractClassifier#EVALUATION_PROCEDURE_PARAM}
      */
-    public static final OptionID CLASSIFIER_EVALUATION_PROCEDURE_ID = OptionID.getOrCreateOptionID("classifier.eval",
+    public static final OptionID EVALUATION_PROCEDURE_ID = OptionID.getOrCreateOptionID("classifier.eval",
         "Classname of the evaluation-procedure to use for evaluation " +
             Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(EvaluationProcedure.class) + "."
     );
@@ -47,7 +47,7 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.classifier.AbstractClassifier#HOLDOUT_PARAM}
      */
-    public static final OptionID CLASSIFIER_HOLDOUT_ID = OptionID.getOrCreateOptionID("classifier.holdout",
+    public static final OptionID HOLDOUT_ID = OptionID.getOrCreateOptionID("classifier.holdout",
         "<Classname of the holdout for evaluation  " +
             Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Holdout.class) + "."
     );
@@ -59,7 +59,7 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
      * <p>Default value: {@link ClassifierEvaluationProcedure} </p>
      */
     private final ClassParameter<EvaluationProcedure> EVALUATION_PROCEDURE_PARAM =
-        new ClassParameter<EvaluationProcedure>(CLASSIFIER_EVALUATION_PROCEDURE_ID,
+        new ClassParameter<EvaluationProcedure>(EVALUATION_PROCEDURE_ID,
             EvaluationProcedure.class, ClassifierEvaluationProcedure.class.getName());
 
     /**
@@ -69,7 +69,7 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
      * <p>Default value: {@link StratifiedCrossValidation} </p>
      */
     private final ClassParameter<Holdout> HOLDOUT_PARAM =
-        new ClassParameter<Holdout>(CLASSIFIER_EVALUATION_PROCEDURE_ID,
+        new ClassParameter<Holdout>(EVALUATION_PROCEDURE_ID,
             Holdout.class, StratifiedCrossValidation.class.getName());
 
     /**

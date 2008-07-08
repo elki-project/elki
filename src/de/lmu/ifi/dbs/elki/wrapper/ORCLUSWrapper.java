@@ -23,7 +23,7 @@ public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
      * <p>Key: {@code -projectedclustering.k} </p>
      */
     private final IntParameter K_PARAM = new IntParameter(
-        ProjectedClustering.PROJECTED_CLUSTERING_K,
+        ProjectedClustering.K_ID,
         new GreaterConstraint(0));
 
     /**
@@ -33,7 +33,7 @@ public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
      * <p>Key: {@code -projectedclustering.k_i} </p>
      */
     private final IntParameter K_I_PARAM = new IntParameter(
-        ProjectedClustering.PROJECTED_CLUSTERING_K_I,
+        ProjectedClustering.K_I_ID,
         new GreaterConstraint(0),
         30);
 
@@ -43,7 +43,7 @@ public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
      * <p>Key: {@code -projectedclustering.l} </p>
      */
     private final IntParameter L_PARAM = new IntParameter(
-        ProjectedClustering.PROJECTED_CLUSTERING_L,
+        ProjectedClustering.L_ID,
         new GreaterConstraint(0));
 
     /**

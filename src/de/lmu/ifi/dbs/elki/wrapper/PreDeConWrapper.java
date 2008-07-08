@@ -24,7 +24,7 @@ public class PreDeConWrapper extends NormalizationWrapper {
      * must be suitable to {@link de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction}.
      * <p>Key: {@code -projdbscan.epsilon} </p>
      */
-    private final PatternParameter EPSILON_PARAM = new PatternParameter(PreDeCon.PROJECTED_DBSCAN_EPSILON);
+    private final PatternParameter EPSILON_PARAM = new PatternParameter(PreDeCon.DBSCAN_EPSILON_ID);
 
     /**
      * Parameter to specify the threshold for minimum number of points in
@@ -33,7 +33,7 @@ public class PreDeConWrapper extends NormalizationWrapper {
      * <p>Key: {@code -projdbscan.minpts} </p>
      */
     private final IntParameter MINPTS_PARAM = new IntParameter(
-        PreDeCon.PROJECTED_DBSCAN_MINPTS,
+        PreDeCon.MINPTS_ID,
         new GreaterConstraint(0));
 
     /**
@@ -42,7 +42,7 @@ public class PreDeConWrapper extends NormalizationWrapper {
      * <p>Key: {@code -projdbscan.lambda} </p>
      */
     private final IntParameter LAMBDA_PARAM = new IntParameter(
-        PreDeCon.PROJECTED_DBSCAN_LAMBDA,
+        PreDeCon.LAMBDA_ID,
         new GreaterConstraint(0));
 
     /**

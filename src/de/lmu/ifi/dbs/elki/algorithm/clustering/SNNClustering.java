@@ -38,7 +38,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
     /**
      * OptionID for {@link #EPSILON_PARAM}
      */
-    public static final OptionID SNN_EPSILON = OptionID.getOrCreateOptionID(
+    public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID(
         "snn.epsilon",
         "The minimum SNN density."
     );
@@ -46,7 +46,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
     /**
      * OptionID for {@link #MINPTS_PARAM}
      */
-    public static final OptionID SNN_MINPTS = OptionID.getOrCreateOptionID(
+    public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID(
         "snn.minpts",
         "Threshold for minimum number of points in " +
             "the epsilon-SNN-neighborhood of a point."
@@ -58,7 +58,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
      * <p>Key: {@code -snn.epsilon} </p>
      */
     private final IntParameter EPSILON_PARAM = new IntParameter(
-        SNN_EPSILON,
+        EPSILON_ID,
         new GreaterConstraint(0));
 
     /**
@@ -68,7 +68,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
      * <p>Key: {@code -snn.minpts} </p>
      */
     private final IntParameter MINPTS_PARAM = new IntParameter(
-        SNN_MINPTS,
+        MINPTS_ID,
         new GreaterConstraint(0));
 
     /**

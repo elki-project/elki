@@ -41,7 +41,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
     /**
      * OptionID for {@link #DATABASE_PARAM}
      */
-    public static final OptionID DB_CONNECTION_DATABASE = OptionID.getOrCreateOptionID(
+    public static final OptionID DATABASE_ID = OptionID.getOrCreateOptionID(
         "dbconnection.database",
         "Classname specifying the database to be provided by the parse method " +
             Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Database.class) +
@@ -54,7 +54,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
      * <p>Key: {@code -dbconnection.database} </p>
      */
     private final ClassParameter<Database> DATABASE_PARAM = new ClassParameter<Database>(
-        DB_CONNECTION_DATABASE, Database.class, SequentialDatabase.class.getName());
+        DATABASE_ID, Database.class, SequentialDatabase.class.getName());
 
     /**
      * Option string for parameter externalIDIndex.

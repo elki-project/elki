@@ -27,7 +27,7 @@ public class FractalDimensionTest<V extends RealVector<V, ?>> extends AbstractAl
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.FractalDimensionTest#ID1_PARAM}
      */
-    public static final OptionID FRACTAL_DIMENSION_TEST_ID1 = OptionID.getOrCreateOptionID(
+    public static final OptionID ID1_ID = OptionID.getOrCreateOptionID(
         "fractaldimensiontest.id1",
         "The first id."
     );
@@ -35,7 +35,7 @@ public class FractalDimensionTest<V extends RealVector<V, ?>> extends AbstractAl
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.FractalDimensionTest#ID1_PARAM}
      */
-    public static final OptionID FRACTAL_DIMENSION_TEST_ID2 = OptionID.getOrCreateOptionID(
+    public static final OptionID ID2_ID = OptionID.getOrCreateOptionID(
         "fractaldimensiontest.id2",
         "The second id."
     );
@@ -45,14 +45,14 @@ public class FractalDimensionTest<V extends RealVector<V, ?>> extends AbstractAl
      * Parameter that specifies the first id.
      * <p>Key: {@code -fractaldimensiontest.id1} </p>
      */
-    private final IntParameter ID1_PARAM = new IntParameter(FRACTAL_DIMENSION_TEST_ID1);
+    private final IntParameter ID1_PARAM = new IntParameter(ID1_ID);
 
     /**
      * todo arthur: constraints, default value, description
      * Parameter that specifies the second id.
      * <p>Key: {@code -fractaldimensiontest.id2} </p>
      */
-    private final IntParameter ID2_PARAM = new IntParameter(FRACTAL_DIMENSION_TEST_ID1);
+    private final IntParameter ID2_PARAM = new IntParameter(ID1_ID);
 
     private FractalDimensionTestResult<V> result;
 

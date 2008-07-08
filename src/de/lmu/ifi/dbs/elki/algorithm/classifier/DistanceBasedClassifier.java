@@ -31,7 +31,7 @@ public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extend
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.classifier.DistanceBasedClassifier#DISTANCE_FUNCTION_PARAM}
      */
-    public static final OptionID CLASSIFIER_DISTANCEFUNCTION = OptionID.getOrCreateOptionID(
+    public static final OptionID DISTANCEFUNCTION_ID = OptionID.getOrCreateOptionID(
         "classifier.distancefunction",
         "Classname of the distance function to determine the distance between database objects " +
             Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) + "."
@@ -45,7 +45,7 @@ public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extend
      */
     private final ClassParameter<DistanceFunction> DISTANCE_FUNCTION_PARAM =
         new ClassParameter<DistanceFunction>(
-            CLASSIFIER_DISTANCEFUNCTION,
+            DISTANCEFUNCTION_ID,
             DistanceFunction.class,
             EuklideanDistanceFunction.class.getName());
 

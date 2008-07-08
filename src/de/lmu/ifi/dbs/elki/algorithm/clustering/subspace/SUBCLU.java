@@ -45,7 +45,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
     /**
      * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
      */
-    public static final OptionID SUBCLU_DISTANCE_FUNCTION = OptionID.getOrCreateOptionID(
+    public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID(
         "subclu.distancefunction",
         "Classname of the distance function to determine the distance between database objects " +
             Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(AbstractDimensionsSelectingDoubleDistanceFunction.class) + "."
@@ -54,7 +54,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
     /**
      * OptionID for {@link #EPSILON_PARAM}
      */
-    public static final OptionID SUBCLU_EPSILON = OptionID.getOrCreateOptionID(
+    public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID(
         "subclu.epsilon",
         "The maximum radius of the neighborhood to be considered."
     );
@@ -62,7 +62,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
     /**
      * OptionID for {@link #MINPTS_PARAM}
      */
-    public static final OptionID SUBCLU_MINPTS = OptionID.getOrCreateOptionID(
+    public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID(
         "subclu.minpts",
         "Threshold for minimum number of points in the epsilon-neighborhood of a point."
     );
@@ -72,7 +72,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
      * must be suitable to {@link AbstractDimensionsSelectingDoubleDistanceFunction}.
      * <p>Key: {@code -subclu.epsilon} </p>
      */
-    private final PatternParameter EPSILON_PARAM = new PatternParameter(SUBCLU_EPSILON);
+    private final PatternParameter EPSILON_PARAM = new PatternParameter(EPSILON_ID);
 
     /**
      * Parameter to specify the threshold for minimum number of points in
@@ -81,7 +81,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
      * <p>Key: {@code -subclu.minpts} </p>
      */
     private final IntParameter MINPTS_PARAM = new IntParameter(
-        SUBCLU_MINPTS,
+        MINPTS_ID,
         new GreaterConstraint(0));
 
     /**
@@ -91,7 +91,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
      */
     private final ClassParameter<AbstractDimensionsSelectingDoubleDistanceFunction> DISTANCE_FUNCTION_PARAM =
         new ClassParameter<AbstractDimensionsSelectingDoubleDistanceFunction>(
-            SUBCLU_DISTANCE_FUNCTION,
+            DISTANCE_FUNCTION_ID,
             AbstractDimensionsSelectingDoubleDistanceFunction.class,
             DimensionsSelectingEuklideanDistanceFunction.class.getName());
 
