@@ -94,7 +94,7 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
     /**
      * Constructs a matrix from a 2-D array.
      *
-     * @param array of arrays of doubles defining the values of the matrix
+     * @param elements an array of arrays of doubles defining the values of the matrix
      * @throws IllegalArgumentException if not all rows conform in the same length
      */
 
