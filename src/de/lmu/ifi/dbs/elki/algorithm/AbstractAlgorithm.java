@@ -34,12 +34,12 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends Abstra
     private final Flag TIME_FLAG = new Flag(OptionID.ALGORITHM_TIME);
 
     /**
-     * Holds the value of #VERBOSE_FLAG.
+     * Holds the value of AbstractAlgorithm#VERBOSE_FLAG.
      */
     private boolean verbose;
 
     /**
-     * Holds the value of #TIME_FLAG.
+     * Holds the value of AbstractAlgorithm#TIME_FLAG.
      */
     private boolean time;
 
