@@ -313,7 +313,7 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
 
         // parameters for apriori
         List<String> parameters = new ArrayList<String>();
-        Util.addParameter(parameters, OptionID.APRIORI_MINSUPP, Integer.toString(minpts));
+        Util.addParameter(parameters, APRIORI.MINSUPP_ID, Integer.toString(minpts));
         APRIORI apriori = new APRIORI();
         apriori.setParameters(parameters.toArray(new String[parameters.size()]));
 

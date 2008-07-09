@@ -10,10 +10,6 @@ de.lmu.ifi.dbs.elki.algorithm.Algorithm=de.lmu.ifi.dbs.elki.algorithm.APRIORI,\
            de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS,\
            de.lmu.ifi.dbs.elki.algorithm.clustering.SLINK,\
            de.lmu.ifi.dbs.elki.algorithm.clustering.SNNClustering,\
-           de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering.ChengAndChurch,\
-           de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering.FLOC,\
-           de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering.MaPle,\
-           de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering.PClustering,\
            de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.CASH,\
            de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.COPAC,\
            de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.ERiC,\
@@ -23,6 +19,11 @@ de.lmu.ifi.dbs.elki.algorithm.Algorithm=de.lmu.ifi.dbs.elki.algorithm.APRIORI,\
            de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.DiSH,\
 		   de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PreDeCon,\
 		   de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PROCLUS
+#		   
+#           de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering.ChengAndChurch,\
+#           de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering.FLOC,\
+#           de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering.MaPle,\
+#           de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering.PClustering,\
 # #######################################################
 # clustering - default package: de.lmu.ifi.dbs.elki.algorithm.clustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.Clustering=de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.COPAC,\

@@ -102,23 +102,23 @@ public final class OptionID extends ConstantObject<OptionID> {
     public static final OptionID ALGORITHM_TIME = new OptionID("time",
         "Flag to request output of performance time.");
 
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.APRIORI#MINFREQ_PARAM}
-     */
-    public static final OptionID APRIORI_MINFREQ = new OptionID("apriori.minfreq",
-        "Threshold for minimum frequency as percentage value " +
-            "(alternatively to parameter apriori.minsupp)."
-    );
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.APRIORI#MINSUPP_PARAM}
-     */
-    public static final OptionID APRIORI_MINSUPP = new OptionID("apriori.minsupp",
-        "Threshold for minimum support as minimally required number of transactions " +
-            "(alternatively to parameter apriori.minfreq" +
-            " - setting apriori.minsupp is slightly preferable over setting " +
-            "apriori.minfreq in terms of efficiency)."
-    );
+//    /**
+//     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.APRIORI#MINFREQ_PARAM}
+//     */
+//    public static final OptionID APRIORI_MINFREQ = new OptionID("apriori.minfreq",
+//        "Threshold for minimum frequency as percentage value " +
+//            "(alternatively to parameter apriori.minsupp)."
+//    );
+//
+//    /**
+//     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.APRIORI#MINSUPP_PARAM}
+//     */
+//    public static final OptionID APRIORI_MINSUPP = new OptionID("apriori.minsupp",
+//        "Threshold for minimum support as minimally required number of transactions " +
+//            "(alternatively to parameter apriori.minfreq" +
+//            " - setting apriori.minsupp is slightly preferable over setting " +
+//            "apriori.minfreq in terms of efficiency)."
+//    );
 
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.CASH#ADJUST_FLAG}
