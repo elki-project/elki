@@ -178,9 +178,8 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
             for (int i = bitSet.nextSetBit(0); i >= 0 && unpruned; i = bitSet
                 .nextSetBit(i + 1)) {
                 bitSet.clear(i);
-                unpruned = (minfreq > -1 && support.get(bitSet).doubleValue()
-                    / size >= minfreq)
-                    || support.get(bitSet) >= minsupp;
+                unpruned = minfreq > -1 ? support.get(bitSet).doubleValue() / size >= minfreq
+                                        : support.get(bitSet) >= minsupp;
                 bitSet.set(i);
             }
             if (unpruned) {
