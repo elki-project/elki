@@ -175,7 +175,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
         List<BitSet> candidateList = new ArrayList<BitSet>();
         for (BitSet bitSet : candidates) {
             boolean unpruned = true;
-            for (int i = bitSet.nextSetBit(0); i <= 0 && unpruned; i = bitSet
+            for (int i = bitSet.nextSetBit(0); i >= 0 && unpruned; i = bitSet
                 .nextSetBit(i + 1)) {
                 bitSet.clear(i);
                 unpruned = (minfreq > -1 && support.get(bitSet).doubleValue()
@@ -256,7 +256,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
     /**
      * @see Algorithm#getResult()
      */
-    public Result<BitVector> getResult() {
+    public AprioriResult getResult() {
         return result;
     }
 

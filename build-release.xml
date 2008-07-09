@@ -143,7 +143,7 @@
 	<target name="javadoc" depends="compile">
 		<javadoc
 			destdir="${deploy.javadoc}"
-			access="protected"
+			access="private"
 			use="true"
 			notree="false"
 			nonavbar="false"

@@ -344,7 +344,7 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
         apriori.run(apriori_db);
 
         // result of apriori
-        AprioriResult aprioriResult = (AprioriResult) apriori.getResult();
+        AprioriResult aprioriResult = apriori.getResult();
         List<BitSet> frequentItemsets = aprioriResult.getSolution();
         Map<BitSet, Integer> supports = aprioriResult.getSupports();
         if (this.debug) {
