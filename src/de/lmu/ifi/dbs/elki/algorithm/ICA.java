@@ -16,6 +16,7 @@ import java.util.List;
  * <p>Reference:
  * <br>A. Hyvaerinen, J. Karhunen, E. Oja:
  * Independent Component Analysis, John Wiley & Sons, 2001.
+ * </p>
  *
  * @author Elke Achtert
  * @param <V> the type of RealVector handled by this Algorithm

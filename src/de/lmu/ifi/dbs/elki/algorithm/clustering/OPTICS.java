@@ -32,6 +32,11 @@ import java.util.Set;
 
 /**
  * OPTICS provides the OPTICS algorithm.
+ * <p>Reference:
+ * M. Ankerst, M. Breunig, H.-P. Kriegel, and J. Sander:
+ * OPTICS: Ordering Points to Identify the Clustering Structure.
+ * <br>In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99).
+ * </p>
  *
  * @author Elke Achtert
  * @param <O> the type of DatabaseObjects handled by the algorithm
@@ -209,7 +214,9 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
             "OPTICS",
             "Density-Based Hierarchical Clustering",
             "Algorithm to find density-connected sets in a database based on the parameters minimumPoints and epsilon (specifying a volume). These two parameters determine a density threshold for clustering.",
-            "M. Ankerst, M. Breunig, H.-P. Kriegel, and J. Sander: OPTICS: Ordering Points to Identify the Clustering Structure. In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)");
+            "M. Ankerst, M. Breunig, H.-P. Kriegel, and J. Sander: " +
+                "OPTICS: Ordering Points to Identify the Clustering Structure. " +
+                "In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)");
     }
 
     /**

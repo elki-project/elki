@@ -16,6 +16,10 @@ import java.util.Iterator;
 
 /**
  * Efficient implementation of the Single-Link Algorithm SLINK of R. Sibson.
+ * <p>Reference:
+ * R. Sibson: SLINK:  An optimally efficient algorithm for the single-link cluster method.
+ * <br>In: The Computer Journal 16 (1973), No. 1, p. 30-34.
+ * </p>
  *
  * @author Elke Achtert
  * @param <O> the type of DatabaseObject the algorithm is applied on
@@ -238,12 +242,27 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends
      * Encapsulates the distance between two objects and their ids.
      */
     public class SLinkDistance implements Comparable<SLinkDistance> {
+        /**
+         * The distance between the two objects.
+         */
         D distance;
 
+        /**
+         * The id of the first object.
+         */
         Integer id1;
 
+        /**
+         * The id of the second object.
+         */
         Integer id2;
 
+        /**
+         * Provides a new distance between two objects.
+         * @param distance the distance between the two objects
+         * @param id1 the id of the first object
+         * @param id2 the id of the second object
+         */
         public SLinkDistance(D distance, Integer id1, Integer id2) {
             this.distance = distance;
             this.id1 = id1;
@@ -251,10 +270,12 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends
         }
 
         /**
-         * <p>Compares this object with the specified object for order.</p>
-         * <p/>
-         * <p>Returns a negative integer, zero, or a positive integer as this object is less
+         * <p>Compares this object with the specified object for order.
+         * Returns a negative integer, zero, or a positive integer as this object is less
          * than, equal to, or greater than the specified object. </p>
+         * <p>This object is less (or greater) than the specified object if the
+         * distance of this objects is less (or greater) than the distance of the specified object.
+         * If both distance values are the same, the first ids and then the second ids are compared.
          *
          * @param o the Object to be compared.
          * @return a negative integer, zero, or a positive integer as this

@@ -25,9 +25,10 @@ import java.util.Set;
 
 /**
  * <p>Shared nearest neighbor clustering.</p>
- * <p/>
- * <p>This class implements the algorithm proposed in
- * L. Ert&ouml;z, M. Steinbach, V. Kumar: Finding Clusters of Different Sizes, Shapes, and Densities in Noisy, High Dimensional Data. In: Proc. of SIAM Data Mining (SDM), 2003.</p>
+ * <p>Reference:
+ * L. Ert&ouml;z, M. Steinbach, V. Kumar: Finding Clusters of Different Sizes, Shapes, and Densities in Noisy, High Dimensional Data.
+ * <br>In: Proc. of SIAM Data Mining (SDM), 2003.
+ * </p>
  *
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObject the algorithm is applied on
@@ -44,15 +45,6 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
     );
 
     /**
-     * OptionID for {@link #MINPTS_PARAM}
-     */
-    public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID(
-        "snn.minpts",
-        "Threshold for minimum number of points in " +
-            "the epsilon-SNN-neighborhood of a point."
-    );
-
-    /**
      * Parameter to specify the minimum SNN density,
      * must be an integer greater than 0.
      * <p>Key: {@code -snn.epsilon} </p>
@@ -60,6 +52,20 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
     private final IntParameter EPSILON_PARAM = new IntParameter(
         EPSILON_ID,
         new GreaterConstraint(0));
+
+    /**
+     * Holds the value of {@link #EPSILON_PARAM}.
+     */
+    private IntegerDistance epsilon;
+
+    /**
+     * OptionID for {@link #MINPTS_PARAM}
+     */
+    public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID(
+        "snn.minpts",
+        "Threshold for minimum number of points in " +
+            "the epsilon-SNN-neighborhood of a point."
+    );
 
     /**
      * Parameter to specify the threshold for minimum number of points in
@@ -72,12 +78,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
         new GreaterConstraint(0));
 
     /**
-     * Holds the Epsilon value.
-     */
-    private IntegerDistance epsilon;
-
-    /**
-     * Holds the minimum points value.
+     * Holds the value of {@link #MINPTS_PARAM}.
      */
     private int minpts;
 
@@ -107,8 +108,11 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
     private SharedNearestNeighborSimilarityFunction<O, D> similarityFunction = new SharedNearestNeighborSimilarityFunction<O, D>();
 
     /**
-     * Sets epsilon and minimum points to the optionhandler additionally to the
-     * parameters provided by super-classes.
+     * Provides a shared nearest neighbor clustering algorithm,
+     * adding parameters
+     * {@link #EPSILON_PARAM} and {@link #MINPTS_PARAM}
+     * to the option handler
+     * additionally to parameters of super class.
      */
     public SNNClustering() {
         super();
@@ -170,6 +174,13 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
         }
     }
 
+    /**
+     * Returns the shared nearest neighbors of the specified query object in the given database.
+     *
+     * @param database    the database holding the objects
+     * @param queryObject the query object
+     * @return the shared nearest neighbors of the specified query object in the given database
+     */
     protected List<Integer> findSNNNeighbors(Database<O> database, Integer queryObject) {
         List<Integer> neighbors = new LinkedList<Integer>();
         for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
@@ -266,13 +277,20 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
      * @see Algorithm#getDescription()
      */
     public Description getDescription() {
-        return new Description("SNN", "Shared Nearest Neighbor Clustering", "Algorithm to find shared-nearest-neighbors-density-connected sets in a database based on the parameters minPts and epsilon (specifying a volume). These two parameters determine a density threshold for clustering.", "L. Ert\u00F6z, M. Steinbach, V. Kumar: Finding Clusters of Different Sizes, Shapes, and Densities in Noisy, High Dimensional Data. In: Proc. of SIAM Data Mining (SDM), 2003");
+        return new Description("SNN",
+            "Shared Nearest Neighbor Clustering",
+            "Algorithm to find shared-nearest-neighbors-density-connected sets in a database based on the " +
+                "parameters minPts and epsilon (specifying a volume). " +
+                "These two parameters determine a density threshold for clustering.",
+            "L. Ert\u00F6z, M. Steinbach, V. Kumar: Finding Clusters of Different Sizes, Shapes, and Densities in Noisy, High Dimensional Data. " +
+                "In: Proc. of SIAM Data Mining (SDM), 2003");
     }
 
     /**
-     * Sets the parameters epsilon and minpts additionally to the parameters set
-     * by the super-class' method. Both epsilon and minpts are required
-     * parameters.
+     * Calls {@link AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
+     * and sets additionally the values of the parameters
+     * {@link #EPSILON_PARAM} and {@link #MINPTS_PARAM}.
+     * The remaining parameters are passed to the {@link #similarityFunction}.
      *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
@@ -298,22 +316,19 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
         return result;
     }
 
-    /*
+    /**
+     * Returns the value of {@link #EPSILON_PARAM}.
      *
-     *
-     *
-     * @return
-     *
-    public Option<?>[] getOptions() {
-      return this.getOptions();
-    }
-    */
-
+     * @return the value of {@link #EPSILON_PARAM}
+     */
     public IntegerDistance getEpsilon() {
         return epsilon;
     }
 
 
+    /**
+     * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#description()
+     */
     @Override
     public String description() {
         StringBuilder description = new StringBuilder();
@@ -324,6 +339,13 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
         return description.toString();
     }
 
+    /**
+     * Calls {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#getAttributeSettings()}
+     * and adds to the returned attribute settings the attribute settings of
+     * the {@link #similarityFunction}.
+     *
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
+     */
     @Override
     public List<AttributeSettings> getAttributeSettings() {
         List<AttributeSettings> attributeSettings = super.getAttributeSettings();

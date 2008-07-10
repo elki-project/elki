@@ -25,7 +25,8 @@ import java.util.Random;
  * <p>Reference:
  * J. McQueen: Some Methods for Classification and Analysis of Multivariate Observations.
  * <br>In 5th Berkeley Symp. Math. Statist. Prob., Vol. 1, 1967, pp 281-297.
- *
+ * </p>
+ * 
  * @author Arthur Zimek
  * @param <D> a type of {@link Distance} as returned by the used distance function
  * @param <V> a type of {@link RealVector} as a suitable datatype for this algorithm

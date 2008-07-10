@@ -33,6 +33,7 @@ import java.util.Set;
  * <br>E. Achtert, C. Boehm, H.-P. Kriegel, P. Kroeger, A. Zimek:
  * Deriving Quantitative Dependencies for Correlation Clusters.
  * <br>In Proc. 12th Int. Conf. on Knowledge Discovery and Data Mining (KDD '06), Philadelphia, PA 2006.
+ * </p>
  *
  * @author Arthur Zimek
  * @param <V> the type of RealVector handled by this Algorithm

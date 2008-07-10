@@ -28,6 +28,7 @@ import java.util.Map;
  * <p>Reference:
  * <br>R. Agrawal, R. Srikant: Fast Algorithms for Mining Association Rules in Large Databases.
  * <br>In Proc. 20th Int. Conf. on Very Large Data Bases (VLDB '94), Santiago de Chile, Chile 1994.
+ * </p>
  *
  * @author Arthur Zimek
  */

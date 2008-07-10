@@ -27,16 +27,17 @@ import java.util.Random;
 
 /**
  * Provides the EM algorithm (clustering by expectation maximization).
- * <p/>
+ * <p>
  * Initialization is implemented as
  * random initialization of means (uniformly distributed within the attribute ranges
  * of the given database)
  * and initial zero-covariance and variance=1 in covariance matrices.
+ * </p>
  * <p>Reference:
  * A. P. Dempster, N. M. Laird, D. B. Rubin:
  * Maximum Likelihood from Incomplete Data via the EM algorithm.
  * <br>In Journal of the Royal Statistical Society, Series B, 39(1), 1977, pp. 1-31
- *
+ * </p>
  * @author Arthur Zimek
  * @param <V> a type of {@link RealVector} as a suitable datatype for this algorithm
  */

@@ -26,7 +26,8 @@ import java.util.*;
  * <br>M. Ester, H.-P. Kriegel, J. Sander, and X. Xu:
  * A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise.
  * <br>In Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996.
- *
+ * </p>
+ * 
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObject the algorithm is applied on
  * @param <D> the type of Distance used

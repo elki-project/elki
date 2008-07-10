@@ -41,6 +41,7 @@ import java.util.Set;
  * <br>E. Achtert, C. Boehm, P. Kroeger:
  * DeLiClu: Boosting Robustness, Completeness, Usability, and Efficiency of Hierarchical Clustering by a Closest Pair Ranking.
  * <br>In Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD 2006), Singapore, 2006.
+ * </p>
  *
  * @author Elke Achtert
  * @param <O> the type of NumberVector handled by this Algorithm
@@ -103,20 +104,20 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
         if (!(database instanceof SpatialIndexDatabase)) {
             throw new IllegalArgumentException(
                 "Database must be an instance of "
-                + SpatialIndexDatabase.class.getName());
+                    + SpatialIndexDatabase.class.getName());
         }
         SpatialIndexDatabase<O, DeLiCluNode, DeLiCluEntry> db = (SpatialIndexDatabase<O, DeLiCluNode, DeLiCluEntry>) database;
 
         if (!(db.getIndex() instanceof DeLiCluTree)) {
             throw new IllegalArgumentException("Index must be an instance of "
-                                               + DeLiCluTree.class.getName());
+                + DeLiCluTree.class.getName());
         }
         DeLiCluTree<O> index = (DeLiCluTree<O>) db.getIndex();
 
         if (!(getDistanceFunction() instanceof SpatialDistanceFunction)) {
             throw new IllegalArgumentException(
                 "Distance Function must be an instance of "
-                + SpatialDistanceFunction.class.getName());
+                    + SpatialDistanceFunction.class.getName());
         }
         SpatialDistanceFunction<O, D> distFunction = (SpatialDistanceFunction<O, D>) getDistanceFunction();
 
@@ -165,7 +166,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
                     .setHandled(db.get(dataPair.entry1.getID()));
                 if (path == null)
                     throw new RuntimeException("snh: parent("
-                                               + dataPair.entry1.getID() + ") = null!!!");
+                        + dataPair.entry1.getID() + ") = null!!!");
                 // add to cluster order
                 clusterOrder.add(dataPair.entry1.getID(), dataPair.entry2
                     .getID(), pqNode.getKey());
@@ -189,12 +190,12 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
             "DeliClu",
             "Density-Based Hierarchical Clustering",
             "Hierachical algorithm to find density-connected sets in a database based on the parameter "
-            + MINPTS_PARAM.getName(),
+                + MINPTS_PARAM.getName(),
             "E. Achtert, C. B\u00f6hm, P. Kr\u00f6ger: DeLiClu: Boosting "
-            + "Robustness, Completeness, Usability, and Efficiency of Hierarchical Clustering "
-            + "by a Closest Pair Ranking. "
-            + "In Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD 2006), "
-            + "Singapore, 2006.");
+                + "Robustness, Completeness, Usability, and Efficiency of Hierarchical Clustering "
+                + "by a Closest Pair Ranking. "
+                + "In Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD 2006), "
+                + "Singapore, 2006.");
     }
 
     /**
