@@ -27,6 +27,16 @@ import java.util.logging.Logger;
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  */
 public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
+  
+  /**
+   * Information for citation and version.
+   */
+  public static final String INFORMATION = "Version 0.1 (2008, July)\n\n" +
+                                           "published in:\n"+ 
+                                           "Elke Achtert, Hans-Peter Kriegel, Arthur Zimek:\n"+
+                                           "ELKI: A Software System for Evaluation of Subspace Clustering Algorithms.\n"+
+                                           "In Proc. 20th International Conference on Scientific and Statistical Database Management (SSDBM 2008), Hong Kong, China, 2008.\n\n";
+  
     /**
      * The String for calling this class' main routine on command line
      * interface.
@@ -221,7 +231,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
 
         // help
         if (helpOptionHandler.isSet(HELP_FLAG) || helpOptionHandler.isSet(HELP_LONG_FLAG)) {
-            throw new AbortException(description());
+            throw new AbortException(INFORMATION+description());
         }
 
         // description
