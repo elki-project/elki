@@ -31,14 +31,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 /**
- * DeLiClu provides the DeLiClu algorithm.
+ * DeLiClu provides the DeLiClu algorithm, a hierachical algorithm to find density-connected sets in a database.
+ * <p>Reference:
+ * <br>E. Achtert, C. Boehm, P. Kroeger:
+ * DeLiClu: Boosting Robustness, Completeness, Usability, and Efficiency of Hierarchical Clustering by a Closest Pair Ranking.
+ * <br>In Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD 2006), Singapore, 2006.
  *
  * @author Elke Achtert
  * @param <O> the type of NumberVector handled by this Algorithm
@@ -48,12 +50,19 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
     DistanceBasedAlgorithm<O, D> {
 
     /**
-     * Parameter to specify the threshold for minimum number of points in
-     * the epsilon-neighborhood of a point,
-     * must be an integer greater than 0.
-     * <p>Key: {@code -optics.minpts} </p>
+     * OptionID for {@link #MINPTS_PARAM}
      */
-    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.DELICLU_MINPTS,
+    public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID(
+        "deliclu.minpts",
+        "Threshold for minimum number of points within a cluster."
+    );
+
+    /**
+     * Parameter to specify the threshold for minimum number of points within a cluster,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -deliclu.minpts} </p>
+     */
+    private final IntParameter MINPTS_PARAM = new IntParameter(MINPTS_ID,
         new GreaterConstraint(0));
 
     /**
@@ -77,12 +86,14 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
     private int numNodes;
 
     /**
-     * Sets minimum points to the optionhandler additionally to the parameters
-     * provided by super-classes.
+     * Provides the DeLiClu algorithm,
+     * adding parameter
+     * {@link #MINPTS_PARAM}
+     * to the option handler additionally to parameters of super class.
      */
     public DeLiClu() {
         super();
-        optionHandler.put(MINPTS_PARAM);
+        addOption(MINPTS_PARAM);
     }
 
     /**
@@ -135,7 +146,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
         index.setHandled(db.get(startID));
         SpatialEntry rootEntry = db.getRootEntry();
         SpatialObjectPair spatialObjectPair = new SpatialObjectPair(rootEntry,
-                                                                    rootEntry, true);
+            rootEntry, true);
         updateHeap(distFunction.nullDistance(), spatialObjectPair);
 
         while (numHandled != size) {
@@ -177,18 +188,23 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
         return new Description(
             "DeliClu",
             "Density-Based Hierarchical Clustering",
-            "Algorithm to find density-connected sets in a database based on the parameter "
+            "Hierachical algorithm to find density-connected sets in a database based on the parameter "
             + MINPTS_PARAM.getName(),
-            "Elke Achtert, Christian B\u00f6hm, Peer Kr\u00f6ger: DeLiClu: Boosting "
+            "E. Achtert, C. B\u00f6hm, P. Kr\u00f6ger: DeLiClu: Boosting "
             + "Robustness, Completeness, Usability, and Efficiency of Hierarchical Clustering "
-            + "by a Closest Pair Ranking, "
+            + "by a Closest Pair Ranking. "
             + "In Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD 2006), "
-            + "Singapore, 2006, pp. 119-128.");
+            + "Singapore, 2006.");
     }
 
     /**
+     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm#setParameters(String[]) DistanceBasedAlgorithm#setParameters(args)}.
+     * The remaining parameters and the value of parameter {@link #MINPTS_PARAM}
+     * are passed to the {@link #knnJoin}.
+     *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
@@ -196,19 +212,23 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
         int minpts = getParameterValue(MINPTS_PARAM);
 
         // knn join
-        List<String> params = new ArrayList<String>(Arrays.asList(remainingParameters));
-        Util.addParameter(params, knnJoin.K_PARAM, Integer.toString(minpts));
-        remainingParameters = knnJoin.setParameters(params.toArray(new String[params.size()]));
+        String[] kNNJoinParameters = new String[remainingParameters.length];
+        System.arraycopy(remainingParameters, 0, kNNJoinParameters, 0, remainingParameters.length);
+        Util.addParameter(kNNJoinParameters, knnJoin.K_PARAM, Integer.toString(minpts));
+        remainingParameters = knnJoin.setParameters(kNNJoinParameters);
         setParameters(args, remainingParameters);
 
         return remainingParameters;
     }
 
     /**
-     * Returns the parameter setting of this algorithm.
+     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm#getAttributeSettings()}
+     * and adds to the returned attribute settings the attribute settings of
+     * the {@link #knnJoin}.
      *
-     * @return the parameter setting of this algorithm
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
      */
+    @Override
     public List<AttributeSettings> getAttributeSettings() {
         List<AttributeSettings> attributeSettings = super.getAttributeSettings();
         attributeSettings.addAll(knnJoin.getAttributeSettings());
@@ -329,7 +349,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
                     .getMBR());
 
                 SpatialObjectPair nodePair = new SpatialObjectPair(entry1,
-                                                                   entry2, true);
+                    entry2, true);
                 updateHeap(distance, nodePair);
             }
         }
@@ -367,7 +387,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
                 D reach = Util.max(distance, knns
                     .getKNNDistance(entry2.getID()));
                 SpatialObjectPair dataPair = new SpatialObjectPair(entry1,
-                                                                   entry2, false);
+                    entry2, false);
                 updateHeap(reach, dataPair);
             }
         }
@@ -408,7 +428,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
                 D reach = Util.max(distance, knns
                     .getKNNDistance(entry2.getID()));
                 SpatialObjectPair dataPair = new SpatialObjectPair(entry1,
-                                                                   entry2, false);
+                    entry2, false);
                 updateHeap(reach, dataPair);
             }
         }
@@ -421,7 +441,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
                 // not yet expanded
                 if (!expanded.contains(entry1.getID())) {
                     SpatialObjectPair nodePair = new SpatialObjectPair(entry1,
-                                                                       entry2, true);
+                        entry2, true);
                     D distance = distFunction.distance(entry1.getMBR(), entry2
                         .getMBR());
                     updateHeap(distance, nodePair);
@@ -430,7 +450,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
                 // already expanded
                 else {
                     reinsertExpanded(distFunction, index, path, pos + 1,
-                                     entry1, knns);
+                        entry1, knns);
                 }
             }
         }

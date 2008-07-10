@@ -206,13 +206,6 @@ public final class OptionID extends ConstantObject<OptionID> {
     );
 
     /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.DeLiClu#MINPTS_PARAM}
-     */
-    public static final OptionID DELICLU_MINPTS = new OptionID("deliclu.minpts",
-        "Threshold for minimum number of points in the epsilon-neighborhood of a point."
-    );
-
-    /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator#RANDOM_SAMPLE_FLAG}
      */
     public static final OptionID DEPENDENCY_DERIVATOR_RANDOM_SAMPLE = new OptionID("derivator.randomSample",
