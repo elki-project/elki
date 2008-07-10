@@ -13,10 +13,18 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Provides the k-means algorithm.
+ * <p>Reference:
+ * J. McQueen: Some Methods for Classification and Analysis of Multivariate Observations.
+ * <br>In 5th Berkeley Symp. Math. Statist. Prob., Vol. 1, 1967, pp 281-297.
  *
  * @author Arthur Zimek
  * @param <D> a type of {@link Distance} as returned by the used distance function
@@ -25,14 +33,22 @@ import java.util.*;
 public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, D> implements Clustering<V> {
 
     /**
+     * OptionID for {@link #K_PARAM}
+     */
+    public static final OptionID K_ID = OptionID.getOrCreateOptionID(
+        "kmeans.k",
+        "The number of clusters to find."
+    );
+
+    /**
      * Parameter to specify the number of clusters to find,
      * must be an integer greater than 0.
      * <p>Key: {@code -kmeans.k} </p>
      */
-    private final IntParameter K_PARAM = new IntParameter(OptionID.KMEANS_K, new GreaterConstraint(0));
+    private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(0));
 
     /**
-     * Keeps k - the number of clusters to find.
+     * Holds the value of {@link #K_PARAM}.
      */
     private int k;
 
@@ -42,7 +58,11 @@ public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends D
     private Clusters<V> result;
 
     /**
-     * Provides the k-means algorithm.
+     * Provides the k-means algorithm,
+     * adding parameter
+     * {@link #K_PARAM}
+     * to the option handler
+     * additionally to parameters of super class.
      */
     public KMeans() {
         super();
@@ -53,7 +73,11 @@ public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends D
      * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getDescription()
      */
     public Description getDescription() {
-        return new Description("K-Means", "K-Means", "finds a partitioning into k clusters", "J. McQueen: Some Methods for Classification and Analysis of Multivariate Observations. In 5th Berkeley Symp. Math. Statist. Prob., Vol. 1, 1967, pp 281-297");
+        return new Description("K-Means",
+            "K-Means",
+            "Finds a partitioning into k clusters.",
+            "J. McQueen: Some Methods for Classification and Analysis of Multivariate Observations. " +
+                "In 5th Berkeley Symp. Math. Statist. Prob., Vol. 1, 1967, pp 281-297");
     }
 
     /**
@@ -198,7 +222,9 @@ public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends D
     }
 
     /**
-     * Sets parameter {@link #k}.
+     * Calls {@link DistanceBasedAlgorithm#setParameters(String[]) DistanceBasedAlgorithm#setParameters(args)}
+     * and sets additionally the value of the parameter
+     * {@link #K_PARAM}.
      *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */

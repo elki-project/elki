@@ -117,7 +117,7 @@ public class ClassParameter<C> extends Parameter<String, String> {
     public boolean isValid(String value) throws ParameterException {
         if (value == null) {
             throw new WrongParameterValueException("Parameter Error.\n" +
-                "No value for parameter \"" + getName() + "\" " + "given.");
+                                                   "No value for parameter \"" + getName() + "\" " + "given.");
         }
 
         try {
@@ -135,10 +135,10 @@ public class ClassParameter<C> extends Parameter<String, String> {
 
         catch (ClassNotFoundException e) {
             throw new WrongParameterValueException(this.name, value, "subclass / implementing class of "
-                + restrictionClass.getName(), e);
+                                                                     + restrictionClass.getName(), e);
         }
         throw new WrongParameterValueException(this.name, value, "subclass / implementing class of "
-            + restrictionClass.getName());
+                                                                 + restrictionClass.getName());
     }
 
     /**
@@ -198,7 +198,7 @@ public class ClassParameter<C> extends Parameter<String, String> {
      *                            or the value of this class parameter is not set
      */
     public C instantiateClass() throws ParameterException {
-        if (value == null && !optionalParameter){
+        if (value == null && !optionalParameter) {
             throw new UnusedParameterException("Value of parameter " + name + " has not been specified.");
         }
         C instance;
@@ -209,7 +209,7 @@ public class ClassParameter<C> extends Parameter<String, String> {
             catch (ClassNotFoundException e) {
                 // try package of type
                 instance = restrictionClass.cast(Class.forName(restrictionClass.getPackage().getName() +
-                    "." + value).newInstance());
+                                                               "." + value).newInstance());
             }
         }
         catch (Exception e) {

@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.wrapper;
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.algorithm.CoDeC;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.COPAC;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
@@ -118,10 +119,10 @@ public class CODECWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, COPAC.PARTITION_ALGORITHM_ID, DBSCAN.class.getName());
 
         // epsilon
-        Util.addParameter(parameters, OptionID.OPTICS_EPSILON, getParameterValue(EPSILON_PARAM));
+        Util.addParameter(parameters, OPTICS.EPSILON_ID, getParameterValue(EPSILON_PARAM));
 
         // minpts
-        Util.addParameter(parameters, OptionID.OPTICS_MINPTS,
+        Util.addParameter(parameters, OPTICS.MINPTS_ID,
             Integer.toString(getParameterValue(MINPTS_PARAM)));
 
         // distance function

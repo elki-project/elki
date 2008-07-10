@@ -7,7 +7,11 @@ import de.lmu.ifi.dbs.elki.algorithm.result.clustering.ClusterOrder;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
-import de.lmu.ifi.dbs.elki.utilities.*;
+import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.Identifiable;
+import de.lmu.ifi.dbs.elki.utilities.Progress;
+import de.lmu.ifi.dbs.elki.utilities.QueryResult;
+import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
@@ -34,12 +38,35 @@ import java.util.Set;
  * @param <D> the type of Distance used to discern objects
  */
 public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D> {
+
+    /**
+     * OptionID for {@link #EPSILON_PARAM}
+     */
+    public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID(
+        "optics.epsilon",
+        "The maximum radius of the neighborhood to be considered."
+    );
+
     /**
      * Parameter to specify the maximum radius of the neighborhood to be considered,
      * must be suitable to the distance function specified.
      * <p>Key: {@code -optics.epsilon} </p>
      */
-    private final PatternParameter EPSILON_PARAM = new PatternParameter(OptionID.OPTICS_EPSILON);
+    private final PatternParameter EPSILON_PARAM = new PatternParameter(EPSILON_ID);
+
+    /**
+     * Hold the value of {@link #EPSILON_PARAM}.
+     */
+    private String epsilon;
+
+    /**
+     * OptionID for {@link #MINPTS_PARAM}
+     */
+    public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID(
+        "optics.minpts",
+        "Threshold for minimum number of points in " +
+            "the epsilon-neighborhood of a point."
+    );
 
     /**
      * Parameter to specify the threshold for minimum number of points in
@@ -47,16 +74,11 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
      * must be an integer greater than 0.
      * <p>Key: {@code -optics.minpts} </p>
      */
-    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.OPTICS_MINPTS,
+    private final IntParameter MINPTS_PARAM = new IntParameter(MINPTS_ID,
         new GreaterConstraint(0));
 
     /**
-     * Hold the value of the epsilon parameter.
-     */
-    private String epsilon;
-
-    /**
-     * Holds the value of the minpts parameter.
+     * Holds the value of {@link #MINPTS_PARAM}.
      */
     private int minpts;
 
@@ -76,8 +98,10 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
     private Heap<D, COEntry> heap;
 
     /**
-     * Sets epsilon and minimum points to the optionhandler additionally to the
-     * parameters provided by super-classes.
+     * Provides the OPTICS algorithm,
+     * adding parameters
+     * {@link #EPSILON_PARAM} and {@link #MINPTS_PARAM}
+     * to the option handler additionally to parameters of super class.
      */
     public OPTICS() {
         super();
@@ -94,6 +118,8 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
     }
 
     /**
+     * Performs the OPTICS algorithm on the given database.
+     *
      * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
     protected void runInTime(Database<O> database) {
@@ -186,6 +212,10 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
     }
 
     /**
+     * Calls {@link DistanceBasedAlgorithm#setParameters(String[]) DistanceBasedAlgorithm#setParameters(args)}
+     * and sets additionally the values of the parameters
+     * {@link #EPSILON_PARAM} and {@link #MINPTS_PARAM}.
+     *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
@@ -302,10 +332,14 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
 
         /**
          * Indicates whether some other object is "equal to" this one.
+         * The result is <code>true</code> if and only if the argument is not
+         * <code>null</code> and is an <code>COEntry</code> object and
+         * <code>objectID.equals(((COEntry) o).objectID)</code>
+         * returns <code>true</code>.
          *
-         * @param o the reference object with which to compare.
-         * @return <code>true</code> if this object is the same as the obj
-         *         argument; <code>false</code> otherwise.
+         * @param o the object to compare with
+         * @return <code>true</code> if the specified object is equal to this one,
+         *         <code>false</code> otherwise.
          */
         @Override
         public boolean equals(Object o) {
@@ -317,16 +351,14 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
             }
 
             // noinspection unchecked
-            final COEntry coEntry = (COEntry) o;
-            return objectID.equals(coEntry.objectID);
+            return objectID.equals(((COEntry) o).objectID);
         }
 
         /**
-         * Returns a hash code value for the object. This method is supported
-         * for the benefit of hashtables such as those provided by
-         * <code>java.util.Hashtable</code>.
+         * Returns a hash code value for the object
+         * which is the hash code of the <code>objectID</code> of this object.
          *
-         * @return hash code value for the object
+         * @return the hash code of the <code>objectID</code> of this object
          */
         @Override
         public int hashCode() {

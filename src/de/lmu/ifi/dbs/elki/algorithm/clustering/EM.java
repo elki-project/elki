@@ -19,7 +19,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Provides the EM algorithm (clustering by expectation maximization).
@@ -28,6 +32,10 @@ import java.util.*;
  * random initialization of means (uniformly distributed within the attribute ranges
  * of the given database)
  * and initial zero-covariance and variance=1 in covariance matrices.
+ * <p>Reference:
+ * A. P. Dempster, N. M. Laird, D. B. Rubin:
+ * Maximum Likelihood from Incomplete Data via the EM algorithm.
+ * <br>In Journal of the Royal Statistical Society, Series B, 39(1), 1977, pp. 1-31
  *
  * @author Arthur Zimek
  * @param <V> a type of {@link RealVector} as a suitable datatype for this algorithm
@@ -40,11 +48,34 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impleme
     private static final double SINGULARITY_CHEAT = 1E-9;
 
     /**
+     * OptionID for {@link #K_PARAM}
+     */
+    public static final OptionID K_ID = OptionID.getOrCreateOptionID(
+        "em.k",
+        "The number of clusters to find."
+    );
+
+    /**
      * Parameter to specify the number of clusters to find,
      * must be an integer greater than 0.
      * <p>Key: {@code -em.k} </p>
      */
-    private final IntParameter K_PARAM = new IntParameter(OptionID.EM_K, new GreaterConstraint(0));
+    private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(0));
+
+    /**
+     * Holds the value of {@link #K_PARAM}.
+     */
+    private int k;
+
+    /**
+     * OptionID for {@link #DELTA_PARAM}
+     */
+    public static final OptionID DELTA_ID = OptionID.getOrCreateOptionID(
+        "em.delta",
+        "The termination criterion for maximization of E(M): " +
+            "E(M) - E(M') < em.delta"
+    );
+
 
     /**
      * Parameter to specify the termination criterion for maximization of E(M): E(M) - E(M') < em.delta,
@@ -52,17 +83,12 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impleme
      * <p>Default value: {@code 0.0} </p>
      * <p>Key: {@code -em.delta} </p>
      */
-    private final DoubleParameter DELTA_PARAM = new DoubleParameter(OptionID.EM_DELTA,
+    private final DoubleParameter DELTA_PARAM = new DoubleParameter(DELTA_ID,
         new GreaterEqualConstraint(0.0),
         0.0);
 
     /**
-     * Keeps k - the number of clusters to find.
-     */
-    private int k;
-
-    /**
-     * Keeps delta - a small value as termination criterion in expectation maximization
+     * Holds the value of {@link #DELTA_PARAM}.
      */
     private double delta;
 
@@ -72,12 +98,16 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impleme
     private EMClusters<V> result;
 
     /**
-     * Provides the EM algorithm (clustering by expectation maximization).
+     * Provides the EM algorithm (clustering by expectation maximization),
+     * adding parameters
+     * {@link #K_PARAM} and {@link #DELTA_PARAM}
+     * to the option handler
+     * additionally to parameters of super class.
      */
     public EM() {
         super();
-        this.addOption(K_PARAM);
-        this.addOption(DELTA_PARAM);
+        addOption(K_PARAM);
+        addOption(DELTA_PARAM);
     }
 
     /**
@@ -359,7 +389,11 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impleme
      * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getDescription()
      */
     public Description getDescription() {
-        return new Description("EM-Clustering", "Clustering by Expectation Maximization", "Provides k Gaussian mixtures maximizing the probability of the given data", "A. P. Dempster, N. M. Laird, D. B. Rubin: Maximum Likelihood from Incomplete Data via the EM algorithm. In Journal of the Royal Statistical Society, Series B, 39(1), 1977, pp. 1-31");
+        return new Description("EM-Clustering",
+            "Clustering by Expectation Maximization",
+            "Provides k Gaussian mixtures maximizing the probability of the given data",
+            "A. P. Dempster, N. M. Laird, D. B. Rubin: Maximum Likelihood from Incomplete Data via the EM algorithm. " +
+                "In Journal of the Royal Statistical Society, Series B, 39(1), 1977, pp. 1-31");
     }
 
     /**
@@ -370,7 +404,9 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impleme
     }
 
     /**
-     * Sets parameters {@link #k} and {@link #delta}.
+     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
+     * and sets additionally the values of the parameters
+     * {@link #K_PARAM} and {@link #DELTA_PARAM}.
      *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */

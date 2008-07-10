@@ -201,49 +201,12 @@ public final class OptionID extends ConstantObject<OptionID> {
     );
 
     /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.EM#DELTA_PARAM}
-     */
-    public static final OptionID EM_DELTA = new OptionID("em.delta",
-        "The termination criterion for maximization of E(M): " +
-        "E(M) - E(M') < em.delta"
-    );
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.EM#K_PARAM}
-     */
-    public static final OptionID EM_K = new OptionID("em.k",
-        "The number of clusters to find."
-    );
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.KMeans#K_PARAM}
-     */
-    public static final OptionID KMEANS_K = new OptionID("kmeans.k",
-        "The number of clusters to find."
-    );
-
-    /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor#K_PARAM}
      */
     public static final OptionID KNN_HICO_PREPROCESSOR_K = new OptionID("hicopreprocessor.k",
         "<The number of nearest neighbors considered in the PCA. " +
         "If this parameter is not set, k ist set to three " +
         "times of the dimensionality of the database objects."
-    );
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS#EPSILON_PARAM}
-     */
-    public static final OptionID OPTICS_EPSILON = new OptionID("optics.epsilon",
-        "The maximum radius of the neighborhood to be considered."
-    );
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS#MINPTS_PARAM}
-     */
-    public static final OptionID OPTICS_MINPTS = new OptionID("optics.minpts",
-        "Threshold for minimum number of points in " +
-        "the epsilon-neighborhood of a point."
     );
 
     /**

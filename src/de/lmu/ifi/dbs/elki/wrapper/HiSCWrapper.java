@@ -88,10 +88,10 @@ public class HiSCWrapper extends FileBasedDatabaseConnectionWrapper {
         parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F);
 
         // epsilon for OPTICS
-        Util.addParameter(parameters, OptionID.OPTICS_EPSILON, HiSCDistanceFunction.INFINITY_PATTERN);
+        Util.addParameter(parameters, OPTICS.EPSILON_ID, HiSCDistanceFunction.INFINITY_PATTERN);
 
         // minpts for OPTICS
-        Util.addParameter(parameters, OptionID.OPTICS_MINPTS, "2");
+        Util.addParameter(parameters, OPTICS.MINPTS_ID, "2");
 
         // preprocessor
         parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.PREPROCESSOR_CLASS_P);

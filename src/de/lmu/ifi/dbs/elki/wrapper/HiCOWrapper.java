@@ -28,7 +28,7 @@ public class HiCOWrapper extends NormalizationWrapper {
      * must be an integer greater than 0.
      * <p>Key: {@code -optics.minpts} </p>
      */
-    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.OPTICS_MINPTS,
+    private final IntParameter MINPTS_PARAM = new IntParameter(OPTICS.MINPTS_ID,
         new GreaterConstraint(0));
 
     /**
@@ -129,7 +129,7 @@ public class HiCOWrapper extends NormalizationWrapper {
         parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F);
 
         // epsilon
-        Util.addParameter(parameters, OptionID.OPTICS_EPSILON, PCABasedCorrelationDistanceFunction.INFINITY_PATTERN);
+        Util.addParameter(parameters, OPTICS.EPSILON_ID, PCABasedCorrelationDistanceFunction.INFINITY_PATTERN);
 
         // minpts
         Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(getParameterValue(MINPTS_PARAM)));

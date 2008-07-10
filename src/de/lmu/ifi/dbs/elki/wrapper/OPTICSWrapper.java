@@ -31,7 +31,7 @@ public class OPTICSWrapper extends NormalizationWrapper {
      * must be an integer greater than 0.
      * <p>Key: {@code -optics.minpts} </p>
      */
-    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.OPTICS_MINPTS,
+    private final IntParameter MINPTS_PARAM = new IntParameter(OPTICS.MINPTS_ID,
         new GreaterConstraint(0));
 
     /**
@@ -74,7 +74,7 @@ public class OPTICSWrapper extends NormalizationWrapper {
     public OPTICSWrapper() {
         super();
         // parameter epsilon
-        EPSILON_PARAM = new PatternParameter(OptionID.OPTICS_EPSILON);
+        EPSILON_PARAM = new PatternParameter(OPTICS.EPSILON_ID);
         EPSILON_PARAM.setShortDescription("The maximum radius of the neighborhood " +
             "to be considered, must be suitable to " +
             EuklideanDistanceFunction.class.getName());
