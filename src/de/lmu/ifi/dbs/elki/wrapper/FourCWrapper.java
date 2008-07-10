@@ -34,7 +34,7 @@ public class FourCWrapper extends NormalizationWrapper {
      * must be suitable to {@link de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction}.
      * <p>Key: {@code -projdbscan.epsilon} </p>
      */
-    private final PatternParameter EPSILON_PARAM = new PatternParameter(FourC.DBSCAN_EPSILON_ID);
+    private final PatternParameter EPSILON_PARAM = new PatternParameter(FourC.EPSILON_ID);
 
 
     /**

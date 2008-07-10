@@ -179,8 +179,9 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
                 processedIDs.add(current.objectID);
 
                 neighbours = database.rangeQuery(current.objectID, epsilon, getDistanceFunction());
-                coreDistance = neighbours.size() < minpts ? getDistanceFunction().infiniteDistance() : neighbours.get(minpts - 1)
-                    .getDistance();
+                coreDistance = neighbours.size() < minpts ?
+                    getDistanceFunction().infiniteDistance() :
+                    neighbours.get(minpts - 1).getDistance();
 
                 if (!getDistanceFunction().isInfiniteDistance(coreDistance)) {
                     for (QueryResult<D> neighbour : neighbours) {
