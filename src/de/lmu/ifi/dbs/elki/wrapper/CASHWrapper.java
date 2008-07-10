@@ -23,7 +23,7 @@ public class CASHWrapper extends FileBasedDatabaseConnectionWrapper {
      * must be an integer greater than 0.
      * <p>Key: {@code -cash.minpts} </p>
      */
-    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.CASH_MINPTS,
+    private final IntParameter MINPTS_PARAM = new IntParameter(CASH.MINPTS_ID,
         new GreaterConstraint(0));
 
     /**
@@ -31,7 +31,7 @@ public class CASHWrapper extends FileBasedDatabaseConnectionWrapper {
      * must be an integer greater than 0.
      * <p>Key: {@code -cash.maxlevel} </p>
      */
-    private final IntParameter MAXLEVEL_PARAM = new IntParameter(OptionID.CASH_MAXLEVEL,
+    private final IntParameter MAXLEVEL_PARAM = new IntParameter(CASH.MAXLEVEL_ID,
         new GreaterConstraint(0));
 
     /**

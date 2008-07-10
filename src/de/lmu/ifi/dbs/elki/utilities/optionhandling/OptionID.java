@@ -100,59 +100,6 @@ public final class OptionID extends ConstantObject<OptionID> {
     public static final OptionID ALGORITHM_TIME = new OptionID("time",
         "Flag to request output of performance time.");
 
-//    /**
-//     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.APRIORI#MINFREQ_PARAM}
-//     */
-//    public static final OptionID APRIORI_MINFREQ = new OptionID("apriori.minfreq",
-//        "Threshold for minimum frequency as percentage value " +
-//            "(alternatively to parameter apriori.minsupp)."
-//    );
-//
-//    /**
-//     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.APRIORI#MINSUPP_PARAM}
-//     */
-//    public static final OptionID APRIORI_MINSUPP = new OptionID("apriori.minsupp",
-//        "Threshold for minimum support as minimally required number of transactions " +
-//            "(alternatively to parameter apriori.minfreq" +
-//            " - setting apriori.minsupp is slightly preferable over setting " +
-//            "apriori.minfreq in terms of efficiency)."
-//    );
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.CASH#ADJUST_FLAG}
-     */
-    public static final OptionID CASH_ADJUST = new OptionID("cash.adjust",
-        "Flag to indicate that an adjustment of the applied heuristic for choosing an interval " +
-        "is performed after an interval is selected.");
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.CASH#JITTER_PARAM}
-     */
-    public static final OptionID CASH_JITTER = new OptionID("cash.jitter",
-        "The maximum jitter for distance values."
-    );
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.CASH#MAXLEVEL_PARAM}
-     */
-    public static final OptionID CASH_MAXLEVEL = new OptionID("cash.maxlevel",
-        "The maximum level for splitting the hypercube."
-    );
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.CASH#MINDIM_PARAM}
-     */
-    public static final OptionID CASH_MINDIM = new OptionID("cash.mindim",
-        "The minimum dimensionality of the subspaces to be found."
-    );
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.CASH#MINPTS_PARAM}
-     */
-    public static final OptionID CASH_MINPTS = new OptionID("cash.minpts",
-        "Threshold for minimum number of points in a cluster."
-    );
-
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.CLIQUE#PRUNE_FLAG}
      */

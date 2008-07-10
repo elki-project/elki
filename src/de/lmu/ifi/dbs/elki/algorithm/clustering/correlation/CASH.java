@@ -46,28 +46,67 @@ import java.util.Set;
 import java.util.Vector;
 
 /**
- * Subspace clustering algorithm based on the hough transform.
- * todo elke hierarchy (later)
+ * Provides the CASH algorithm, an subspace clustering algorithm based on the hough transform.
+ * <p>Reference:
+ * E. Achtert, C. Boehm, J. David, P. Kroeger, A. Zimek:
+ * Robust clustering in arbitraily oriented subspaces.
+ * <br>In Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008
+ * </p>
  *
  * @author Elke Achtert
  */
+//todo elke hierarchy (later)
 public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
+
+    /**
+     * OptionID for {@link #MINPTS_PARAM}
+     */
+    public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID(
+        "cash.minpts",
+        "Threshold for minimum number of points in a cluster."
+    );
 
     /**
      * Parameter to specify the threshold for minimum number of points in a cluster,
      * must be an integer greater than 0.
      * <p>Key: {@code -cash.minpts} </p>
      */
-    private final IntParameter MINPTS_PARAM = new IntParameter(OptionID.CASH_MINPTS,
+    private final IntParameter MINPTS_PARAM = new IntParameter(MINPTS_ID,
         new GreaterConstraint(0));
+
+    /**
+     * Holds the value of {@link #MINPTS_PARAM}.
+     */
+    private int minPts;
+
+    /**
+     * OptionID for {@link #MAXLEVEL_PARAM}.
+     */
+    public static final OptionID MAXLEVEL_ID = OptionID.getOrCreateOptionID(
+        "cash.maxlevel",
+        "The maximum level for splitting the hypercube."
+    );
 
     /**
      * Parameter to specify the maximum level for splitting the hypercube,
      * must be an integer greater than 0.
      * <p>Key: {@code -cash.maxlevel} </p>
      */
-    private final IntParameter MAXLEVEL_PARAM = new IntParameter(OptionID.CASH_MAXLEVEL,
+    private final IntParameter MAXLEVEL_PARAM = new IntParameter(MAXLEVEL_ID,
         new GreaterConstraint(0));
+
+    /**
+     * Holds the value of {@link #MAXLEVEL_PARAM}.
+     */
+    private int maxLevel;
+
+    /**
+     * OptionID for {@link #MINDIM_PARAM}
+     */
+    public static final OptionID MINDIM_ID = OptionID.getOrCreateOptionID(
+        "cash.mindim",
+        "The minimum dimensionality of the subspaces to be found."
+    );
 
     /**
      * Parameter to specify the minimum dimensionality of the subspaces to be found,
@@ -75,55 +114,60 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
      * <p>Default value: {@code 1} </p>
      * <p>Key: {@code -cash.mindim} </p>
      */
-    private final IntParameter MINDIM_PARAM = new IntParameter(OptionID.CASH_MINDIM,
+    private final IntParameter MINDIM_PARAM = new IntParameter(MINDIM_ID,
         new GreaterConstraint(0), 1);
+
+    /**
+     * Holds the value of {@link #MINDIM_PARAM}.
+     */
+    private int minDim;
+
+    /**
+     * OptionID for {@link #JITTER_PARAM}
+     */
+    public static final OptionID JITTER_ID = OptionID.getOrCreateOptionID(
+        "cash.jitter",
+        "The maximum jitter for distance values."
+    );
+
 
     /**
      * Parameter to specify the maximum jitter for distance values,
      * must be a double greater than 0.
      * <p>Key: {@code -cash.jitter} </p>
      */
-    private final DoubleParameter JITTER_PARAM = new DoubleParameter(OptionID.CASH_JITTER,
+    private final DoubleParameter JITTER_PARAM = new DoubleParameter(JITTER_ID,
         new GreaterConstraint(0));
+
+    /**
+     * Holds the value of {@link #JITTER_PARAM}.
+     */
+    private double jitter;
+
+    /**
+     * OptionID for {@link #ADJUST_FLAG}
+     */
+    public static final OptionID ADJUST_ID = OptionID.getOrCreateOptionID(
+        "cash.adjust",
+        "Flag to indicate that an adjustment of the applied heuristic for choosing an interval " +
+            "is performed after an interval is selected.");
 
     /**
      * Flag to indicate that an adjustment of the applied heuristic for choosing an interval
      * is performed after an interval is selected.
      * <p>Key: {@code -cash.adjust} </p>
      */
-    private final Flag ADJUST_FLAG = new Flag(OptionID.CASH_ADJUST);
+    private final Flag ADJUST_FLAG = new Flag(ADJUST_ID);
+
+    /**
+     * Holds the value of {@link #ADJUST_FLAG}.
+     */
+    private boolean adjust;
 
     /**
      * The result.
      */
     private CASHResult result;
-
-    /**
-     * Minimum points in a cluster.
-     */
-    private int minPts;
-
-    /**
-     * Flag indicating that an adjustment of the
-     * applied heuristic for choosing an interval
-     * is performed after an interval is selected.
-     */
-    private boolean adjust;
-
-    /**
-     * The maximum level for splitting the hypercube.
-     */
-    private int maxLevel;
-
-    /**
-     * The minmum dimensionality for the subspaces to be found.
-     */
-    private int minDim;
-
-    /**
-     * The maximum allowed jitter for distance values.
-     */
-    private double jitter;
 
     /**
      * Holds the dimensionality for noise.
@@ -141,7 +185,11 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
     private Database<ParameterizationFunction> database;
 
     /**
-     * Provides a new CASH algorithm.
+     * Provides a new CASH algorithm,
+     * adding parameters
+     * {@link #MINPTS_PARAM}, {@link #MAXLEVEL_PARAM}, {@link #MINDIM_PARAM}, {@link #JITTER_PARAM},
+     * and flag {@link #ADJUST_FLAG}
+     * to the option handler additionally to parameters of super class.
      */
     public CASH() {
         super();
@@ -236,11 +284,16 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
             "Robust clustering in arbitrarily oriented subspaces",
             "Subspace clustering algorithm based on the hough transform.",
             "E. Achtert, C. Boehm, J. David, P. Kroeger, A. Zimek: " +
-            "Robust clustering in arbitraily oriented subspaces. " +
-            "In Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008");
+                "Robust clustering in arbitraily oriented subspaces. " +
+                "In Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008");
     }
 
     /**
+     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
+     * and sets additionally the values of the parameters
+     * {@link #MINPTS_PARAM}, {@link #MAXLEVEL_PARAM}, {@link #MINDIM_PARAM}, {@link #JITTER_PARAM},
+     * and the flag {@link #ADJUST_FLAG}.
+     *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     public String[] setParameters(String[] args) throws ParameterException {
