@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.wrapper;
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.ERiC;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.COPAC;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ERiCDistanceFunction;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
@@ -109,7 +110,7 @@ public class ERiCWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, OptionID.ALGORITHM, ERiC.class.getName());
 
         // partition algorithm DBSCAN
-        Util.addParameter(parameters, OptionID.COPAA_PARTITION_ALGORITHM, DBSCAN.class.getName());
+        Util.addParameter(parameters, COPAC.PARTITION_ALGORITHM_ID, DBSCAN.class.getName());
 
         // epsilon
         Util.addParameter(parameters, DBSCAN.EPSILON_ID, "0");
@@ -124,7 +125,7 @@ public class ERiCWrapper extends NormalizationWrapper {
         parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F);
 
         // preprocessor for correlation dimension
-        Util.addParameter(parameters, OptionID.COPAA_PREPROCESSOR, KnnQueryBasedHiCOPreprocessor.class.getName());
+        Util.addParameter(parameters, COPAC.PREPROCESSOR_ID, KnnQueryBasedHiCOPreprocessor.class.getName());
 
         // k
         Util.addParameter(parameters, K_PARAM, Integer.toString(getParameterValue(K_PARAM)));

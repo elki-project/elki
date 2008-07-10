@@ -151,16 +151,6 @@ public class ClassParameter<C> extends Parameter<String, String> {
     }
 
     /**
-     * Sets the restriction class of
-     * this class parameter.
-     *
-     * @param restrictionClass the restriction class to be set
-     */
-    public void setRestrictionClass(Class<C> restrictionClass) {
-        this.restrictionClass = restrictionClass;
-    }
-
-    /**
      * Tries to set the correct value for this class parameter.
      *
      * @param value the value to be set

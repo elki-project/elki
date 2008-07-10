@@ -115,7 +115,7 @@ public class CODECWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, CoDeC.CLUSTERING_ALGORITHM_ID, COPAC.class.getName());
 
         // partition algorithm
-        Util.addParameter(parameters, OptionID.COPAA_PARTITION_ALGORITHM, DBSCAN.class.getName());
+        Util.addParameter(parameters, COPAC.PARTITION_ALGORITHM_ID, DBSCAN.class.getName());
 
         // epsilon
         Util.addParameter(parameters, OptionID.OPTICS_EPSILON, getParameterValue(EPSILON_PARAM));
@@ -131,7 +131,7 @@ public class CODECWrapper extends NormalizationWrapper {
         parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F);
 
         // preprocessor for correlation dimension
-        Util.addParameter(parameters, OptionID.COPAA_PREPROCESSOR, KnnQueryBasedHiCOPreprocessor.class.getName());
+        Util.addParameter(parameters, COPAC.PREPROCESSOR_ID, KnnQueryBasedHiCOPreprocessor.class.getName());
 
         // k
         Util.addParameter(parameters, K_PARAM, Integer.toString(getParameterValue(K_PARAM)));

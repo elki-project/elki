@@ -1,10 +1,8 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
-import de.lmu.ifi.dbs.elki.preprocessing.HiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.ConstantObject;
 import de.lmu.ifi.dbs.elki.varianceanalysis.EigenPairFilter;
@@ -24,23 +22,23 @@ public final class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID HELP = new OptionID("h",
         "Flag to obtain help-message, either for the main-routine or for any specified algorithm. " +
-            "Causes immediate stop of the program.");
+        "Causes immediate stop of the program.");
 
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#HELP_LONG_FLAG}
      */
     public static final OptionID HELP_LONG = new OptionID("help",
         "Flag to obtain help-message, either for the main-routine or for any specified algorithm. " +
-            "Causes immediate stop of the program.");
+        "Causes immediate stop of the program.");
 
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#ALGORITHM_PARAM}
      */
     public static final OptionID ALGORITHM = new OptionID("algorithm",
         "Classname of an algorithm " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Algorithm.class) +
-            ". Either full name to identify classpath or only classname, if its package is " +
-            Algorithm.class.getPackage().getName() + "."
+        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Algorithm.class) +
+        ". Either full name to identify classpath or only classname, if its package is " +
+        Algorithm.class.getPackage().getName() + "."
     );
 
     /**
@@ -49,8 +47,8 @@ public final class OptionID extends ConstantObject<OptionID> {
     public static final OptionID DESCRIPTION = new OptionID("description",
         "Name of a class to obtain a description " +
 //            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Parameterizable.class) +
-            "- for classes that implement " + Parameterizable.class.getName() + ")" +
-            " -- no further processing will be performed."
+"- for classes that implement " + Parameterizable.class.getName() + ")" +
+" -- no further processing will be performed."
     );
 
     /**
@@ -58,9 +56,9 @@ public final class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID DATABASE_CONNECTION = new OptionID("dbc",
         "Classname of a database connection " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DatabaseConnection.class) +
-            ". Either full name to identify classpath or only classname, if its package is " +
-            DatabaseConnection.class.getPackage().getName() + "."
+        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DatabaseConnection.class) +
+        ". Either full name to identify classpath or only classname, if its package is " +
+        DatabaseConnection.class.getPackage().getName() + "."
     );
 
     /**
@@ -69,9 +67,9 @@ public final class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID OUTPUT = new OptionID("out",
         "Name of the file to write the obtained results in. " +
-            "If an algorithm requires several outputfiles, the given filename will be used " +
-            "as prefix followed by automatically created markers. " +
-            "If this parameter is omitted, per default the output will sequentially be given to STDOUT."
+        "If an algorithm requires several outputfiles, the given filename will be used " +
+        "as prefix followed by automatically created markers. " +
+        "If this parameter is omitted, per default the output will sequentially be given to STDOUT."
     );
 
     /**
@@ -79,8 +77,8 @@ public final class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID NORMALIZATION = new OptionID("norm",
         "Classname of a normalization in order to use a database with normalized values " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Normalization.class) +
-            ". "
+        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Normalization.class) +
+        ". "
     );
 
     /**
@@ -88,7 +86,7 @@ public final class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID NORMALIZATION_UNDO = new OptionID("normUndo",
         "Flag to revert result to original values - " +
-            "invalid option if no normalization has been performed.");
+        "invalid option if no normalization has been performed.");
 
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#VERBOSE_FLAG}
@@ -125,7 +123,7 @@ public final class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID CASH_ADJUST = new OptionID("cash.adjust",
         "Flag to indicate that an adjustment of the applied heuristic for choosing an interval " +
-            "is performed after an interval is selected.");
+        "is performed after an interval is selected.");
 
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.CASH#JITTER_PARAM}
@@ -160,8 +158,8 @@ public final class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID CLIQUE_PRUNE = new OptionID("clique.prune",
         "Flag to indicate that only subspaces with large coverage " +
-            "(i.e. the fraction of the database that is covered by the dense units) " +
-            "are selected, the rest will be pruned."
+        "(i.e. the fraction of the database that is covered by the dense units) " +
+        "are selected, the rest will be pruned."
     );
 
     /**
@@ -169,7 +167,7 @@ public final class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID CLIQUE_TAU = new OptionID("clique.tau",
         "The density threshold for the selectivity of a unit, where the selectivity is" +
-            "the fraction of total feature vectors contained in this unit."
+        "the fraction of total feature vectors contained in this unit."
     );
 
     /**
@@ -177,32 +175,6 @@ public final class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID CLIQUE_XSI = new OptionID("clique.xsi",
         "The number of intervals (units) in each dimension."
-    );
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.COPAA#PREPROCESSOR_PARAM}
-     */
-    public static final OptionID COPAA_PREPROCESSOR = new OptionID("copaa.preprocessor",
-        "Classname of the preprocessor to derive partition criterion " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(HiCOPreprocessor.class) +
-            ".");
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.COPAA#PARTITION_ALGORITHM_PARAM}
-     */
-    public static final OptionID COPAA_PARTITION_ALGORITHM = new OptionID("copaa.partitionAlgorithm",
-        "Classname of the algorithm to apply to each partition " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Algorithm.class) +
-            ".");
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.COPAC#PARTITION_DB_PARAM}
-     */
-    public static final OptionID COPAA_PARTITION_DATABASE = new OptionID("copaa.partitionDB",
-        "Classname of the database for each partition " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Database.class) +
-            ". If this parameter is not set, the databases of the partitions have " +
-            "the same class as the original database."
     );
 
     /**
@@ -217,8 +189,8 @@ public final class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID DISH_EPSILON = new OptionID("dish.epsilon",
         "The maximum radius of the neighborhood " +
-            "to be considered in each dimension for determination of " +
-            "the preference vector."
+        "to be considered in each dimension for determination of " +
+        "the preference vector."
     );
 
     /**
@@ -233,7 +205,7 @@ public final class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID EM_DELTA = new OptionID("em.delta",
         "The termination criterion for maximization of E(M): " +
-            "E(M) - E(M') < em.delta"
+        "E(M) - E(M') < em.delta"
     );
 
     /**
@@ -255,8 +227,8 @@ public final class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID KNN_HICO_PREPROCESSOR_K = new OptionID("hicopreprocessor.k",
         "<The number of nearest neighbors considered in the PCA. " +
-            "If this parameter is not set, k ist set to three " +
-            "times of the dimensionality of the database objects."
+        "If this parameter is not set, k ist set to three " +
+        "times of the dimensionality of the database objects."
     );
 
     /**
@@ -271,7 +243,7 @@ public final class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID OPTICS_MINPTS = new OptionID("optics.minpts",
         "Threshold for minimum number of points in " +
-            "the epsilon-neighborhood of a point."
+        "the epsilon-neighborhood of a point."
     );
 
     /**
@@ -286,8 +258,8 @@ public final class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID PCA_EIGENPAIR_FILTER = new OptionID("pca.filter",
         "Classname of the filter to determine the strong and weak eigenvectors " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(EigenPairFilter.class) +
-            "."
+        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(EigenPairFilter.class) +
+        "."
     );
 
     /**
