@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.ProjectedClustering;
 import de.lmu.ifi.dbs.elki.algorithm.result.clustering.Clusters;
@@ -19,17 +18,33 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.LogRecord;
 
 /**
- * ORCLUS provides the ORCLUS algorithm.
+ * ORCLUS provides the ORCLUS algorithm, an algorithm to find clusters in high dimensional spaces.
+ * <p>Reference:
+ * C. C. Aggrawal, P. S. Yu:
+ * Finding Generalized Projected Clusters in High Dimensional Spaces
+ * <br>In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00).
  *
  * @author Elke Achtert
  * @param <V> the type of Realvector handled by this Algorithm
  */
 
 public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
+    /**
+     * OptionID for {@link #ALPHA_PARAM}.
+     */
+    public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID(
+        "orclus.alpha",
+        "The factor for reducing the number of current clusters in each iteration."
+    );
 
     /**
      * Parameter to specify the factor for reducing the number of current clusters in each iteration,
@@ -37,19 +52,21 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
      * <p>Default value: {@code 0.5} </p>
      * <p>Key: {@code -orclus.alpha} </p>
      */
-    private final DoubleParameter ALPHA_PARAM = new DoubleParameter(OptionID.ORCLUS_ALPHA,
+    private final DoubleParameter ALPHA_PARAM = new DoubleParameter(ALPHA_ID,
         new IntervalConstraint(0, IntervalConstraint.IntervalBoundary.OPEN,
             1, IntervalConstraint.IntervalBoundary.CLOSE),
         0.5);
 
     /**
-     * Holds alpha.
+     * Holds the value of {@link #ALPHA_PARAM}.
      */
     private double alpha;
 
     /**
-     * Adds the parameter {@link #ALPHA_PARAM} additionally to the
-     * parameters provided by super-classes.
+     * Provides the ORCLUS algorithm,
+     * adding parameter
+     * {@link #ALPHA_PARAM}
+     * to the option handler additionally to parameters of super class.
      */
     public ORCLUS() {
         super();
@@ -58,7 +75,9 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
     }
 
     /**
-     * @see AbstractAlgorithm#runInTime(Database)
+     * Performs the ORCLUS algorithm on the given database.
+     *
+     * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.elki.database.Database)
      */
     protected void runInTime(Database<V> database) throws IllegalStateException {
 
@@ -127,14 +146,16 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
      */
     public Description getDescription() {
         return new Description("ORCLUS", "Arbitrarily ORiented projected CLUSter generation",
-            "Algorithm to find clusters in high dimensional spaces.", "C. C. Aggrawal, P. S. Yu: "
-            + "Finding Generalized Projected Clusters in High Dimensional Spaces "
-            + "In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00)");
+            "Algorithm to find clusters in high dimensional spaces.",
+            "C. C. Aggrawal, P. S. Yu: " +
+                "Finding Generalized Projected Clusters in High Dimensional Spaces. " +
+                "In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00).");
     }
 
     /**
-     * Sets the parameters {@link #ALPHA_PARAM} additionally to the parameters set by the
-     * super-class' method.
+     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.ProjectedClustering#setParameters(String[]) ProjectedClustering#setParameters(args)}
+     * and sets additionally the value of the parameter
+     * {@link #ALPHA_PARAM}.
      *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
@@ -440,6 +461,9 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
         }
     }
 
+    /**
+     * Encapsulates the projected energy for a cluster.
+     */
     private class ProjectedEnergy implements Comparable<ProjectedEnergy> {
         int i;
 

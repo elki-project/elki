@@ -98,7 +98,9 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
     }
 
     /**
-     * @see Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
+     * Performs the DeLiClu algorithm on the given database.
+     *
+     * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.elki.database.Database)
      */
     protected void runInTime(Database<O> database) throws IllegalStateException {
         if (!(database instanceof SpatialIndexDatabase)) {

@@ -97,6 +97,7 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
     }
 
     /**
+     * Provides an order of the kNN-distances for all objects within the specified database.
      * @see AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.elki.database.Database)
      */
     @Override

@@ -22,12 +22,24 @@ import de.lmu.ifi.dbs.elki.varianceanalysis.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.elki.varianceanalysis.LinearLocalPCA;
 import de.lmu.ifi.dbs.elki.varianceanalysis.LocalPCA;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * Performs correlation clustering on the data
  * partitioned according to local correlation dimensionality and builds
  * a hierarchy of correlation clusters that allows multiple inheritance from the clustering result.
+ * <p>Reference:
+ * E. Achtert, C. Boehm, H.-P. Kriegel, P. Kröger, and A. Zimek:
+ * On Exploring Complex Relationships of Correlation Clusters.
+ * <br>In Proc. 19th International Conference on Scientific and Statistical Database Management (SSDBM 2007), Banff, Canada, 2007.
+ * </p>
  *
  * @author Elke Achtert
  * @param <V> the type of Realvector handled by this Algorithm
@@ -49,16 +61,13 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
      */
     public ERiC() {
 //    this.debug = true;
-      copacAlgorithm = new COPAC<V>();
+        copacAlgorithm = new COPAC<V>();
     }
 
     /**
-     * The run method encapsulated in measure of runtime. An extending class
-     * needs not to take care of runtime itself.
+     * Performs the ERiC algorithm on the given database.
      *
-     * @param database the database to run the algorithm on
-     * @throws IllegalStateException if the algorithm has not been initialized properly (e.g. the
-     *                               setParameters(String[]) method has been failed to be called).
+     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
     @Override
     protected void runInTime(Database<V> database) throws IllegalStateException {
@@ -131,17 +140,15 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         return result;
     }
 
-    
-
     @Override
     public String description() {
-      StringBuilder description = new StringBuilder();
-      description.append(super.description());
-      description.append('\n');
-      description.append(ERiC.class.getName());
-      description.append(" requires parametrization of underlying partitioning algorithm:\n");
-      description.append(copacAlgorithm.description());
-      return description.toString();
+        StringBuilder description = new StringBuilder();
+        description.append(super.description());
+        description.append('\n');
+        description.append(ERiC.class.getName());
+        description.append(" requires parametrization of underlying partitioning algorithm:\n");
+        description.append(copacAlgorithm.description());
+        return description.toString();
     }
 
     /**
@@ -154,8 +161,10 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
             "ERiC",
             "Exploring Relationships among Correlation Clusters",
             "Performs the DBSCAN algorithm on the data using a special distance function taking into account correlations among attributes and builds " +
-            "a hierarchy that allows multiple inheritance from the correlation clustering result.",
-            "E. Achtert, C. B\u00F6hm, H.-P. Kriegel, P. Kr\u00F6ger, and A. Zimek: On Exploring Complex Relationships of Correlation Clusters. In Proc. 19th International Conference on Scientific and Statistical Database Management (SSDBM 2007), Banff, Canada, 2007");
+                "a hierarchy that allows multiple inheritance from the correlation clustering result.",
+            "E. Achtert, C. B\u00F6hm, H.-P. Kriegel, P. Kr\u00F6ger, and A. Zimek: " +
+                "On Exploring Complex Relationships of Correlation Clusters. " +
+                "In Proc. 19th International Conference on Scientific and Statistical Database Management (SSDBM 2007), Banff, Canada, 2007");
     }
 
     /**

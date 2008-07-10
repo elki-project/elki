@@ -58,11 +58,9 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends
     }
 
     /**
-     * Runs the algorithm.
+     * Performs the SLINK algorithm on the given database.
      *
-     * @param database the database to run the algorithm on
-     * @throws IllegalStateException if the algorithm has not been initialized properly (e.g. the
-     *                               setParameters(String[]) method has been failed to be called).
+     * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.elki.database.Database)
      */
     @SuppressWarnings("unchecked")
     @Override

@@ -41,7 +41,9 @@ public class ICA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
     }
 
     /**
-     * @see AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.elki.database.Database)
+     * Performs the ICA algorithm on the given database.
+     *
+     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
     protected void runInTime(Database<V> database) throws IllegalStateException {
         ica.run(database, isVerbose());

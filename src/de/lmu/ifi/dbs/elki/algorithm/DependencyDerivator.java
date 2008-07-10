@@ -132,15 +132,15 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
             "Deriving numerical inter-dependencies on data",
             "Derives an equality-system describing dependencies between attributes in a correlation-cluster",
             "E. Achtert, C. Boehm, H.-P. Kriegel, P. Kroeger, A. Zimek: " +
-            "Deriving Quantitative Dependencies for Correlation Clusters. " +
-            "In Proc. 12th Int. Conf. on Knowledge Discovery and Data Mining (KDD '06), Philadelphia, PA 2006.");
+                "Deriving Quantitative Dependencies for Correlation Clusters. " +
+                "In Proc. 12th Int. Conf. on Knowledge Discovery and Data Mining (KDD '06), Philadelphia, PA 2006.");
     }
 
     /**
-     * Runs the pca.
+     * Computes quantitativly linear dependencies among the attributes of the given database
+     * based on a linear correlation PCA.
      *
-     * @param db the database
-     * @see AbstractAlgorithm#runInTime(Database)
+     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
     @Override
     public void runInTime(Database<V> db) throws IllegalStateException {

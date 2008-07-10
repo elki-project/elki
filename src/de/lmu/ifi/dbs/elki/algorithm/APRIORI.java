@@ -120,7 +120,9 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
     }
 
     /**
-     * @see Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
+     * Performs the APRIORI algorithm on the given database.
+     *
+     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
     @Override
     protected void runInTime(Database<BitVector> database)

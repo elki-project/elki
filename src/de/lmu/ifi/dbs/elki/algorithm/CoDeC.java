@@ -141,7 +141,9 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
     }
 
     /**
-     * @see AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.elki.database.Database)
+     * Performs the CoDeC algorithm on the given database.
+     *
+     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
     @SuppressWarnings("unchecked")
     @Override

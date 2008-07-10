@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.FractalDimensionBasedDistan
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -25,7 +26,7 @@ import java.util.List;
 public class FractalDimensionTest<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
 
     /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.FractalDimensionTest#ID1_PARAM}
+     * OptionID for {@link #ID1_PARAM}
      */
     public static final OptionID ID1_ID = OptionID.getOrCreateOptionID(
         "fractaldimensiontest.id1",
@@ -33,7 +34,7 @@ public class FractalDimensionTest<V extends RealVector<V, ?>> extends AbstractAl
     );
 
     /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.FractalDimensionTest#ID1_PARAM}
+     * OptionID for {@link #ID2_PARAM}
      */
     public static final OptionID ID2_ID = OptionID.getOrCreateOptionID(
         "fractaldimensiontest.id2",
@@ -48,25 +49,39 @@ public class FractalDimensionTest<V extends RealVector<V, ?>> extends AbstractAl
     private final IntParameter ID1_PARAM = new IntParameter(ID1_ID);
 
     /**
+     * Holds the value of {@link #ID1_PARAM}.
+     */
+    private int id1;
+
+    /**
      * todo arthur: constraints, default value, description
      * Parameter that specifies the second id.
      * <p>Key: {@code -fractaldimensiontest.id2} </p>
      */
     private final IntParameter ID2_PARAM = new IntParameter(ID1_ID);
 
+    /**
+     * Holds the value of {@link #ID2_PARAM}.
+     */
+    private int id2;
+
+    /**
+     * Holds the result.
+     */
     private FractalDimensionTestResult<V> result;
 
     //private IntParameter supporters = new IntParameter("supporters", "number of supporters");
-
-    private int id1;
-
-    private int id2;
 
     //private int k;
 
     private FractalDimensionBasedDistanceFunction<V> distanceFunction = new FractalDimensionBasedDistanceFunction<V>();
     //private EuklideanDistanceFunction<V> distanceFunction = new EuklideanDistanceFunction<V>();
 
+    /**
+     * Adds parameters
+     * {@link #ID1_PARAM} and {@link #ID2_PARAM}
+     * to the option handler additionally to parameters of super class.
+     */
     public FractalDimensionTest() {
         super();
         addOption(ID1_PARAM);
@@ -97,6 +112,11 @@ public class FractalDimensionTest<V extends RealVector<V, ?>> extends AbstractAl
     }
 
     /**
+     * Calls {@link AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
+     * and sets additionally the values of the parameters
+     * {@link #ID1_PARAM} and {@link #ID2_PARAM}.
+     * The remaining parameters are passed to {@link #distanceFunction}.
+     *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
@@ -110,6 +130,21 @@ public class FractalDimensionTest<V extends RealVector<V, ?>> extends AbstractAl
         setParameters(args, remainingParameters);
 
         return remainingParameters;
+    }
+
+
+    /**
+     * Calls {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#getAttributeSettings()}
+     * and adds to the returned attribute settings the attribute settings of
+     * the {@link #distanceFunction}.
+     *
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
+     */
+    @Override
+    public List<AttributeSettings> getAttributeSettings() {
+        List<AttributeSettings> attributeSettings = super.getAttributeSettings();
+        attributeSettings.addAll(distanceFunction.getAttributeSettings());
+        return attributeSettings;
     }
 
     /**

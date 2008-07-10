@@ -157,13 +157,6 @@ public final class OptionID extends ConstantObject<OptionID> {
     );
 
     /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.ORCLUS#ALPHA_PARAM}
-     */
-    public static final OptionID ORCLUS_ALPHA = new OptionID("orclus.alpha",
-        "The factor for reducing the number of current clusters in each iteration."
-    );
-
-    /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.varianceanalysis.AbstractPCA#EIGENPAIR_FILTER_PARAM}
      */
     public static final OptionID PCA_EIGENPAIR_FILTER = new OptionID("pca.filter",

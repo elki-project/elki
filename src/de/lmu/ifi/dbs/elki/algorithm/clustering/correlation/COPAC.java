@@ -33,6 +33,7 @@ import java.util.Map;
  * Achtert E., Boehm C., Kriegel H.-P., Kroeger P., Zimek A.:
  * Robust, Complete, and Efficient Correlation Clustering.
  * <br>In Proc. 7th SIAM International Conference on Data Mining (SDM'07), Minneapolis, MN, 2007
+ * </p>
  *
  * @author Arthur Zimek
  * @param <V> the type of RealVector handled by this Algorithm
@@ -134,6 +135,8 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
     }
 
     /**
+     * Performs the COPAC algorithm on the given database.
+     *
      * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
     @Override

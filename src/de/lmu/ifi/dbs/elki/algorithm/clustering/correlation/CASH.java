@@ -211,12 +211,9 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
     }
 
     /**
-     * The run method encapsulated in measure of runtime. An extending class
-     * needs not to take care of runtime itself.
+     * Performs the CASH algorithm on the given database.
      *
-     * @param database the database to run the algorithm on
-     * @throws IllegalStateException if the algorithm has not been initialized properly (e.g. the
-     *                               setParameters(String[]) method has been failed to be called).
+     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
     protected void runInTime(Database<ParameterizationFunction> database) throws IllegalStateException {
         this.database = database;

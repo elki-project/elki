@@ -72,22 +72,22 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
     }
 
     /**
-     * Runs the algorithm.
+     * Joins in the given spatial database to each object its k-nearest neighbors.
      *
-     * @param database the database to run the algorithm on
-     * @throws IllegalStateException if the algorithm has not been initialized properly (e.g. the
-     *                               setParameters(String[]) method has been failed to be called).
+     * @throws IllegalStateException if the specifiied database is not an instance of {@link SpatialIndexDatabase}
+     *                               or the specified distance function is not an instance of {@link SpatialDistanceFunction}.
+     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
     protected void runInTime(Database<V> database) throws IllegalStateException {
         if (!(database instanceof SpatialIndexDatabase)) {
             throw new IllegalStateException(
                 "Database must be an instance of "
-                + SpatialIndexDatabase.class.getName());
+                    + SpatialIndexDatabase.class.getName());
         }
         if (!(getDistanceFunction() instanceof SpatialDistanceFunction)) {
             throw new IllegalStateException(
                 "Distance Function must be an instance of "
-                + SpatialDistanceFunction.class.getName());
+                    + SpatialDistanceFunction.class.getName());
         }
         int k = getParameterValue(K_PARAM);
         SpatialIndexDatabase<V, N, E> db = (SpatialIndexDatabase<V, N, E>) database;
@@ -158,8 +158,8 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
                 if (isVerbose()) {
                     progress.setProcessed(processed);
                     progress(new ProgressLogRecord(LogLevel.PROGRESS, "\r" + progress.toString()
-                                                                      + " Number of processed data pages: "
-                                                                      + processedPages++,
+                        + " Number of processed data pages: "
+                        + processedPages++,
                         progress.getTask(), progress.status()));
                 }
             }
