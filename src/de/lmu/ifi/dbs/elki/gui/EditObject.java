@@ -130,7 +130,7 @@ public class EditObject {
 	 * Returns the description of this EditObject if it is parameterizable. If
 	 * it is not the method returns an empty string.
 	 * 
-	 * @return
+	 * @return description of this EditObject or empty string
 	 */
 	public String getDescription() {
 		if (isParameterizable()) {
@@ -144,7 +144,7 @@ public class EditObject {
 	 * the description of the algorithm. If it is not an empty string is
 	 * returned.
 	 * 
-	 * @return
+	 * @return description of the algorithm or empty string
 	 */
 	public String getAlgorithmInfo() {
 		if (isAlgorithm()) {

@@ -40,7 +40,7 @@ public class SODResult<O extends RealVector<O, Double>> extends AbstractResult<O
      * <p/>
      * The database needs to contain associations for the computed SODs with
      * <code>AssociationID</code>
-     * {@link de.lmu.ifi.dbs.elki.database.AssociationID#SOD_MODEL SOD_MODEL}.
+     * {@link de.lmu.ifi.dbs.elki.algorithm.outlier.SOD#SOD_MODEL SOD_MODEL}.
      *
      * @param db the database containing the SODs as association
      */

@@ -58,99 +58,44 @@
 	<target name="complete" description="creates javadoc and builds the project" depends="javadoc,build" />
 
 	<target name="javadoc">
-		<javadoc destdir="${windows.disk.prefix}${javadoc.destdir}" access="private" use="true" notree="false" nonavbar="false" noindex="false" splitindex="true" author="true" version="true" nodeprecatedlist="false" nodeprecated="false" link="http://java.sun.com/javase/6/docs/api/"
-			packagenames="de.lmu.ifi.dbs.elki.algorithm,
-                    de.lmu.ifi.dbs.elki.algorithm.classifier,
-                    de.lmu.ifi.dbs.elki.algorithm.clustering,
-                    de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering,
-                    de.lmu.ifi.dbs.elki.algorithm.clustering.correlation,
-                    de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.cash,
-                    de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical,
-                    de.lmu.ifi.dbs.elki.algorithm.clustering.subspace,
-                    de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.clique,
-                    de.lmu.ifi.dbs.elki.algorithm.outlier,
-                    de.lmu.ifi.dbs.elki.algorithm.result,
-                    de.lmu.ifi.dbs.elki.algorithm.result.clustering,
-                    de.lmu.ifi.dbs.elki.algorithm.result.clustering.biclustering,
-                    de.lmu.ifi.dbs.elki.algorithm.result.clustering.outlier,
-			        de.lmu.ifi.dbs.elki.converter,
-                    de.lmu.ifi.dbs.elki.data,
-                    de.lmu.ifi.dbs.elki.data.synthetic,
-                    de.lmu.ifi.dbs.elki.database,
-                    de.lmu.ifi.dbs.elki.database.connection,
-                    de.lmu.ifi.dbs.elki.distance,
-                    de.lmu.ifi.dbs.elki.distance.distancefunction,
-                    de.lmu.ifi.dbs.elki.distance.similarityfunction,
-                    de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel,
-                    de.lmu.ifi.dbs.elki.evaluation,
-                    de.lmu.ifi.dbs.elki.evaluation.holdout,
-                    de.lmu.ifi.dbs.elki.evaluation.procedure,
-                    de.lmu.ifi.dbs.elki.index,
-	                de.lmu.ifi.dbs.elki.index.tree,
-                    de.lmu.ifi.dbs.elki.index.tree.metrical,
-                    de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants,
-                    de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mkapp,
-                    de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mkcop,
-                    de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mkmax,
-                    de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktab,
-                    de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree,
-                    de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.util,
-                    de.lmu.ifi.dbs.elki.index.tree.spatial,
-                    de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants,
-                    de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu,
-                    de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.flat,
-                    de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rdknn,
-                    de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar,
-                    de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util,
-                    de.lmu.ifi.dbs.elki.logging,
-                    de.lmu.ifi.dbs.elki.math,
-                    de.lmu.ifi.dbs.elki.math.analysis,
-                    de.lmu.ifi.dbs.elki.math.linearalgebra,
-                    de.lmu.ifi.dbs.elki.math.spacefillingcurves,
-                    de.lmu.ifi.dbs.elki.math.statistics,
-                    de.lmu.ifi.dbs.elki.normalization,
-                    de.lmu.ifi.dbs.elki.parser,
-                    de.lmu.ifi.dbs.elki.persistent,
-                    de.lmu.ifi.dbs.elki.preprocessing,
-                    de.lmu.ifi.dbs.elki.properties,
-                    de.lmu.ifi.dbs.elki.tree,
-                    de.lmu.ifi.dbs.elki.tree.btree,
-                    de.lmu.ifi.dbs.elki.utilities,
-                    de.lmu.ifi.dbs.elki.utilities.heap,
-                    de.lmu.ifi.dbs.elki.utilities.optionhandling,
-                    de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints,
-                    de.lmu.ifi.dbs.elki.utilities.output,
-                    de.lmu.ifi.dbs.elki.varianceanalysis,
-                    de.lmu.ifi.dbs.elki.varianceanalysis.ica,
-                    de.lmu.ifi.dbs.elki.wrapper" overview="src/overview.html" sourcepath="src" classpath="bin" doctitle="KDD-Framework" windowtitle="KDD-Framework">
+		<javadoc destdir="${windows.disk.prefix}${javadoc.destdir}"
+			access="private"
+			use="true"
+			notree="false"
+			nonavbar="false" noindex="false" splitindex="true"
+			author="true" version="true" nodeprecatedlist="false"
+			nodeprecated="false" link="http://java.sun.com/javase/6/docs/api/"
+			overview="src/overview.html" sourcepath="src" classpath="bin"
+			doctitle="ELKI (internal version)" windowtitle="ELKI (internal version)">
+			<packageset dir="src"/>
 			<footer>
-                    &lt;table style="font-size:xx-small;"&gt;
-                    &lt;tr&gt;
-                    &lt;td colspan="2" align="left"&gt;
-                    Documentation created
-                    &lt;/td&gt;
-                    &lt;/tr&gt;
+                &lt;table style="font-size:xx-small;"&gt;
+                &lt;tr&gt;
+                &lt;td colspan="2" align="left"&gt;
+                Documentation created
+                &lt;/td&gt;
+                &lt;/tr&gt;
 
-                    &lt;tr&gt;
-                    &lt;td align="left"&gt;
-                    at
-                    &lt;/td&gt;
-                    &lt;td align="right"&gt;
-                    ${now}
-                    &lt;/td&gt;
-                    &lt;/tr&gt;
+                &lt;tr&gt;
+                &lt;td align="left"&gt;
+                at
+                &lt;/td&gt;
+                &lt;td align="right"&gt;
+                ${now}
+                &lt;/td&gt;
+                &lt;/tr&gt;
 
-                    &lt;tr&gt;
-                    &lt;td align="left"&gt;
-                    by
-                    &lt;/td&gt;
-                    &lt;td align="right"&gt;
-                    ${user.name}
-                    &lt;/td&gt;
-                    &lt;/tr&gt;
-                    &lt;/table&gt;
-                </footer>
-			<header>KDD-Framework</header>
+                &lt;tr&gt;
+                &lt;td align="left"&gt;
+                by
+                &lt;/td&gt;
+                &lt;td align="right"&gt;
+                ${user.name}
+                &lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;/table&gt;
+            </footer>
+			<header>ELKI (internal version)</header>
 		</javadoc>
 	</target>
 
