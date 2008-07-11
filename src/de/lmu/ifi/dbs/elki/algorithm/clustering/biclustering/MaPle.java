@@ -1,12 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
 import de.lmu.ifi.dbs.elki.algorithm.result.clustering.biclustering.Bicluster;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.utilities.Description;
@@ -16,6 +9,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Provides a BiclusteringAlgorithm which finds a bicluster based on all of its
@@ -34,51 +34,50 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
  */
 public class MaPle<V extends RealVector<V, Double>> extends
 		AbstractBiclustering<V> {
-	
+
 	/**
-	   * OptionID for the parameter {@link #NUMBER_COLS_PARAM}.
-	   */
-	  public static final OptionID NUMBER_COLS_ID =
-	OptionID.getOrCreateOptionID("MaPle.nc", "indicates the minimum columnsize of the resulting biclusters");
+	 * OptionID for the parameter {@link #NUMBER_COLS_PARAM}.
+	 */
+	public static final OptionID NUMBER_COLS_ID = OptionID.getOrCreateOptionID(
+			"maple.nc",
+			"indicates the minimum columnsize of the resulting biclusters");
 
-	  /**
-	   * Parameter to indicate the minimum columnsize of the resulting
-	biclusters.
-	   * <p>
-	   * Key: {@code -MaPle.nc}
-	   * </p>
-	   */
-	  public final IntParameter NUMBER_COLS_PARAM = new
-	IntParameter(NUMBER_COLS_ID,
-	      new GreaterEqualConstraint(1));
-
-	
-	  /**
-	   * OptionID for the parameter {@link #NUMBER_ROWS_PARAM}.
-	   */
-	  public static final OptionID NUMBER_ROWS_ID =
-	OptionID.getOrCreateOptionID("MaPle.nr", "indicates the minimum rowsize of the resulting biclusters");
- 
-	  /**
-	 * Parameter to indicate the minimum rowsize of the resulting biclusters.
+	/**
+	 * Parameter to indicate the minimum columnsize of the resulting biclusters.
 	 * <p>
-	 * Key: {@code -MaPle.nr}
+	 * Key: {@code -maple.nc}
 	 * </p>
 	 */
-	public final IntParameter NUMBER_ROWS_PARAM = new IntParameter(NUMBER_ROWS_ID,
-			new GreaterEqualConstraint(1));
+	public final IntParameter NUMBER_COLS_PARAM = new IntParameter(
+			NUMBER_COLS_ID, new GreaterEqualConstraint(1));
 
 	/**
-	   * OptionID for the parameter {@link #SIGMA_PARAM}.
-	   */
-	  public static final OptionID SIGMA_ID =
-	OptionID.getOrCreateOptionID("MaPle.sigma", "treshhold value to determine the maximal acceptable score of a bicluster");
+	 * OptionID for the parameter {@link #NUMBER_ROWS_PARAM}.
+	 */
+	public static final OptionID NUMBER_ROWS_ID = OptionID.getOrCreateOptionID(
+			"maple.nr",
+			"indicates the minimum rowsize of the resulting biclusters");
 
-	
+	/**
+	 * Parameter to indicate the minimum rowsize of the resulting biclusters.
+	 * <p>
+	 * Key: {@code -maple.nr}
+	 * </p>
+	 */
+	public final IntParameter NUMBER_ROWS_PARAM = new IntParameter(
+			NUMBER_ROWS_ID, new GreaterEqualConstraint(1));
+
+	/**
+	 * OptionID for the parameter {@link #SIGMA_PARAM}.
+	 */
+	public static final OptionID SIGMA_ID = OptionID
+			.getOrCreateOptionID("maple.sigma",
+					"treshhold value to determine the maximal acceptable score of a bicluster");
+
 	/**
 	 * Threshold value to determine the maximal acceptable score of a bicluster.
 	 * <p>
-	 * Key: {@code -MaPle.sigma}
+	 * Key: {@code -maple.sigma}
 	 * </p>
 	 */
 	public final DoubleParameter SIGMA_PARAM = new DoubleParameter(SIGMA_ID,
@@ -97,13 +96,11 @@ public class MaPle<V extends RealVector<V, Double>> extends
 	/**
 	 * Keeps the number of rows in the database.
 	 */
-	private int rowDim;
-
+	// private int rowDim;
 	/**
 	 * Keeps the number of columns in the database.
 	 */
-	private int colDim;
-
+	// private int colDim;
 	/**
 	 * Keeps all rows of the database as a Bitset. Rows belonging to the
 	 * database are set to true.
@@ -202,10 +199,10 @@ public class MaPle<V extends RealVector<V, Double>> extends
 
 	/**
 	 * Calls
-	 * {@link de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
+	 * {@link de.lmu.ifi.dbs.algorithm.AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
 	 * and sets additionally the parameters for nc, nr, and sigma
 	 * 
-	 * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#setParameters(String[])
+	 * @see de.lmu.ifi.dbs.algorithm.AbstractAlgorithm#setParameters(String[])
 	 */
 	@Override
 	public String[] setParameters(String[] args) throws ParameterException {
@@ -222,8 +219,8 @@ public class MaPle<V extends RealVector<V, Double>> extends
 	private void initiateMaple() {
 		rowMDS = new HashMap<IntegerTriple, BitSet>();
 		colMDS = new HashMap<IntegerTriple, BitSet>();
-		rowDim = super.getRowDim();
-		colDim = super.getColDim();
+		int rowDim = super.getRowDim();
+		int colDim = super.getColDim();
 		rows = new BitSet();
 		rows.set(0, rowDim);
 		cols = new BitSet();
@@ -237,23 +234,33 @@ public class MaPle<V extends RealVector<V, Double>> extends
 	 * Creates the columnMDSs for every columnpair of the dataset.
 	 */
 	private void setColMDS() {
+		int colmdss = 0;
 		resetEnumeration(rows);
+		int colDim = cols.cardinality();
 		for (int a = 0; a < colDim - 1; a++) {
 			for (int b = a + 1; b < colDim; b++) {
+				if (a == 1 && b == 8) {
+					System.out.println();
+				}
 				ArrayList<BitSet> mds = pairCluster(a, b, rows, nr, false);
 				int size = mds.size();
+				if (size > 0) {
+					colmdss++;
+				}
 				for (int i = 0; i < size; i++) {
 					IntegerTriple cols = new IntegerTriple(a, b, i);
 					colMDS.put(cols, mds.get(i));
 				}
 			}
 		}
+		verbose("Number of colMDSs before pruning: " + colmdss);
 	}
 
 	/**
 	 * Creates the rowMDSs for every rowpair of the dataset, not already pruned.
 	 */
 	private void setRowMDS() {
+		int rowmdss = 0;
 		resetEnumeration(cols);
 		for (int x = rows.nextSetBit(0); x >= 0; x = rows.nextSetBit(x + 1)) {
 			for (int y = rows.nextSetBit(x + 1); y >= 0; y = rows
@@ -261,6 +268,9 @@ public class MaPle<V extends RealVector<V, Double>> extends
 				ArrayList<BitSet> mds = pairCluster(x, y, cols, nc, true);
 				if (mds != null) {
 					int size = mds.size();
+					if (size > 0) {
+						rowmdss++;
+					}
 					for (int i = 0; i < size; i++) {
 						IntegerTriple rows = new IntegerTriple(x, y, i);
 						rowMDS.put(rows, mds.get(i));
@@ -268,6 +278,7 @@ public class MaPle<V extends RealVector<V, Double>> extends
 				}
 			}
 		}
+		verbose("Number of rowMDSs after first pruning: " + rowmdss);
 	}
 
 	/**
@@ -299,7 +310,7 @@ public class MaPle<V extends RealVector<V, Double>> extends
 		}
 		int attributeSize = attributeRanks.size();
 		attributeList = new int[attributeSize];
-		
+
 		for (int i = 0; i < attributeSize; i++) {
 			attributeList[i] = -1;
 		}
@@ -316,11 +327,11 @@ public class MaPle<V extends RealVector<V, Double>> extends
 				int previousRank = attributeRanks.get(attributeList[j])
 						.cardinality();
 				if (currentRank > previousRank) {
-					// verschieben aller einträge nach rechts
+					// shifts all entries to the right
 					int temp = attributeList[j];
 					attributeList[j] = i;
 					int place = j + 1;
-					while (place < colDim) {
+					while (place < cols.cardinality()) {
 						int c = attributeList[place];
 						attributeList[place] = temp;
 						if (c == -1) {
@@ -369,7 +380,7 @@ public class MaPle<V extends RealVector<V, Double>> extends
 					exists = false;
 				}
 			}
-		} else{//a>=0
+		} else {// a>=0
 			BitSet currRows = (BitSet) rows.clone();
 			rowsSet = makeAllPermutations(currRows, attributes, a, rowsSet);
 		}
@@ -409,9 +420,11 @@ public class MaPle<V extends RealVector<V, Double>> extends
 			BitSet mds = colMDS.get(mdsKey);
 			BitSet newRows = (BitSet) oldRows.clone();
 			newRows.and(mds);
-			BitSet newAttributes = (BitSet) attributes.clone();
-			newAttributes.clear(i);
-			makeAllPermutations(newRows, newAttributes, a, rowsSet);
+			if (newRows.cardinality() >= nr) {
+				BitSet newAttributes = (BitSet) attributes.clone();
+				newAttributes.clear(i);
+				makeAllPermutations(newRows, newAttributes, a, rowsSet);
+			}
 			var++;
 			mdsKey.setLast(var);
 		}
@@ -436,34 +449,27 @@ public class MaPle<V extends RealVector<V, Double>> extends
 				currMaxCluster = findRowMaxCluster(null, cols, -1);
 				for (int key = 0; key < currMaxCluster.size(); key++) {
 					BitSet rows = currMaxCluster.get(key);
-					search(rows, (BitSet) cols.clone(), attributeList[j]);
+					search(rows, (BitSet) cols.clone(), j);
 				}
 			}
 		}
 	}
 
-
 	/**
 	 * Finds every set of rows which forms a bicluster with
 	 * 
 	 * @param cols
-	 *            and column
-	 * @param newCol
-	 *            new candidate-column for a cluster
+	 * @param place
+	 *            the index, which the column with the lowest rank of cols, has
+	 *            in the attributeList
 	 * @param rows
 	 *            set of rows forming a bicluster with parameter cols
 	 */
-	private void search(BitSet rows, BitSet cols, int newCol) {
-		int max = -1;
-		for (int i = 0; i < attributeList.length; i++) {
-			if (attributeList[i] == newCol) {
-				max = i;
-				break;
-			}
-		}
+	private void search(BitSet rows, BitSet cols, int place) {
+
 		// Calculates PD (possible attributes with respect to cols)
 		ArrayList<Integer> possibleAttributes = new ArrayList<Integer>();
-		for (int z = max + 1; z < attributeList.length; z++) {
+		for (int z = place + 1; z < attributeList.length; z++) {
 			int attribute = attributeList[z];
 			int pd = 0;
 			for (int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
@@ -478,9 +484,7 @@ public class MaPle<V extends RealVector<V, Double>> extends
 						}
 						if (mds.get(attribute)) {
 							pd++;
-							// break; // muss womöglich weg da alle mds
-							// berücksichtigt werden müssen, nicht nur
-							// max 1 pro key
+							// break;
 						}
 					}
 				}
@@ -499,37 +503,45 @@ public class MaPle<V extends RealVector<V, Double>> extends
 		BitSet commonAttributes = new BitSet();
 		for (int pd = 0; pd < possibleAttributes.size(); pd++) {
 			int a = possibleAttributes.get(pd);
-			if (objMDSContainsAttr(rows, a)) {
+			cols.set(a);
+			if (someObjMDSContainsAttr(rows, cols)) {
 				commonAttributes.set(a);
 			}
+			cols.clear(a);
 		}
 
 		// Pruning 3
 		BitSet validation = new BitSet();
-		for (int i = cols.nextSetBit(0); i >= 0; i = cols.nextSetBit(i + 1)) {
+		label: for (int i = cols.nextSetBit(0); i >= 0; i = cols
+				.nextSetBit(i + 1)) {
 			for (int j = 0; j < attributeList.length; j++) {
 				if (i == attributeList[j]) {
 					validation.set(j);
+					continue label;
 				}
 			}
 		}
-		for (int i = 0; i < validation.cardinality(); i++) {
-			if (!validation.get(i)) {
-				if (objMDSContainsAttr(rows, attributeList[i])) {
+		int start = validation.nextSetBit(0);
+		while (start >= 0) {
+			int i = 0;
+			for (i = start + 1; i < validation.nextSetBit(start + 1); i++) {
+				if (allObjMDSContainAttr(rows, attributeList[i])) {
 					return;
 				}
 			}
+			start = validation.nextSetBit(i);
 		}
 
 		// finding rowMaximalPClusters
+		int newPlace = place;
 		for (int i = 0; i < possibleAttributes.size(); i++) {
+			newPlace++;
 			int newAttribute = possibleAttributes.get(i);
 			// if this possible attribute is a common attribute, it is extracted
 			// directly
 			if (commonAttributes.get(newAttribute)) {
 				cols.set(newAttribute);
 				continue;
-				// search(rows, cols, newAttribute);
 			}
 			ArrayList<BitSet> rowMaxClusters = findRowMaxCluster(rows, cols,
 					newAttribute);
@@ -537,7 +549,7 @@ public class MaPle<V extends RealVector<V, Double>> extends
 				BitSet rMC = rowMaxClusters.get(j);
 				BitSet newCols = (BitSet) cols.clone();
 				newCols.set(newAttribute);
-				search(rMC, newCols, newAttribute);
+				search(rMC, newCols, newPlace);
 			}
 		}
 
@@ -559,12 +571,40 @@ public class MaPle<V extends RealVector<V, Double>> extends
 	 * Checks if column
 	 * 
 	 * @param a
-	 *            appears in every rowMDS with keys contained in
+	 *            appears in each rowMDS, for every pair of keys contained in
 	 * @param rows
-	 * @return true if a appears in every rowMDS built by pairs of rows, false
+	 * @return true if a appears in each rowMDS built by pairs of rows, false
 	 *         otherwise
 	 */
-	private boolean objMDSContainsAttr(BitSet rows, int a) {
+	private boolean allObjMDSContainAttr(BitSet rows, int a) {
+		for (int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
+			for (int j = rows.nextSetBit(i + 1); j >= 0; j = rows
+					.nextSetBit(j + 1)) {
+				for (int counter = 0; true; counter++) {
+					IntegerTriple key = new IntegerTriple(i, j, counter);
+					BitSet currCols = rowMDS.get(key);
+					if (currCols == null) {
+						break;
+					} else if (!currCols.get(a)) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Checks if column
+	 * 
+	 * @param a
+	 *            appears in at least one rowMDS, for every pair of keys
+	 *            contained in
+	 * @param rows
+	 * @return true if a appears in some rowMDS for each pair of rows, false
+	 *         otherwise
+	 */
+	private boolean someObjMDSContainsAttr(BitSet rows, BitSet cols) {
 		boolean contains = false;
 		for (int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
 			for (int j = rows.nextSetBit(i + 1); j >= 0; j = rows
@@ -576,7 +616,9 @@ public class MaPle<V extends RealVector<V, Double>> extends
 					if (currCols == null) {
 						break;
 					}
-					if (currCols.get(a)) {
+					currCols = (BitSet) currCols.clone();
+					currCols.and(cols);
+					if (currCols.equals(cols)) {
 						contains = true;
 						break;
 					}
@@ -635,28 +677,48 @@ public class MaPle<V extends RealVector<V, Double>> extends
 	 * 
 	 * @param what
 	 *            row/column to be removed
-	 * @param where1
+	 * @param pair
 	 *            rowMDS or columnMDS
-	 * @param where2
-	 *            columnMDS or rowMDS
 	 */
-	private void removeFromMDS(int what, Map<IntegerTriple, BitSet> where1,
-			Map<IntegerTriple, BitSet> where2) {
-		Iterator<IntegerTriple> iterator = where1.keySet().iterator();
+	private void removeFromMDS(int what, Map<IntegerTriple, BitSet> pair) {
+		Iterator<IntegerTriple> iterator = pair.keySet().iterator();
 		ArrayList<IntegerTriple> toremove = new ArrayList<IntegerTriple>();
-		for (int i = 0; i < where1.size(); i++) {
+		for (int i = 0; i < pair.size(); i++) {
 			IntegerTriple key = iterator.next();
 			if (key.getFirst() == what || key.getSecond() == what) {
 				toremove.add(key);
 			}
 		}
-		for (int i = 0; i < toremove.size(); i++) {
-			where1.remove(toremove.get(i));
-		}
 
-		iterator = where2.keySet().iterator();
-		for (int i = 0; i < where2.size(); i++) {
-			where2.get(iterator.next()).clear(what);
+		removeAndUpdate(pair, toremove);
+	}
+
+	/**
+	 * Removes rows- or columnMDSs which do not longer comply with the
+	 * requirements of a MDS after pruning, and restores the continuous enumeration of the
+	 * MDSs belonging to the same rows/columns.
+	 * 
+	 * @param mds
+	 *            row- or columnMDS
+	 * @param toremove
+	 *            list of keys to the MDSs in mds
+	 */
+	private void removeAndUpdate(Map<IntegerTriple, BitSet> mds,
+			ArrayList<IntegerTriple> toremove) {
+		for (int i = 0; i < toremove.size(); i++) {
+			IntegerTriple key = toremove.get(i);
+			mds.remove(key);
+			for (int j = key.getLast() + 1; true; j++) {
+				key.setLast(j);
+				if (!mds.containsKey(key)) {
+					break;
+				}
+				BitSet updateKeySet = (BitSet) mds.get(key).clone();
+				mds.remove(key);
+				IntegerTriple newKey = new IntegerTriple(key.getFirst(), key
+						.getSecond(), j - 1);
+				mds.put(newKey, updateKeySet);
+			}
 		}
 	}
 
@@ -675,13 +737,13 @@ public class MaPle<V extends RealVector<V, Double>> extends
 		Iterator<IntegerTriple> iterator = mds.keySet().iterator();
 		for (int i = 0; i < mds.size(); i++) {
 			IntegerTriple key = iterator.next();
-			if (mds.get(key).cardinality() < min) {
+			BitSet cluster = mds.get(key);
+			if (cluster.cardinality() < min) {
 				toRemove.add(key);
 			}
 		}
-		for (int i = 0; i < toRemove.size(); i++) {
-			mds.remove(toRemove.get(i));
-		}
+
+		removeAndUpdate(mds, toRemove);
 	}
 
 	/**
@@ -689,46 +751,33 @@ public class MaPle<V extends RealVector<V, Double>> extends
 	 */
 	private void firstPrune() {
 		countOccurrences(colMDS);
-		ArrayList<IntegerTriple> toremove = new ArrayList<IntegerTriple>();
+		BitSet rowsToRemove = new BitSet();
+
+		for (int i = cols.nextSetBit(0); i >= 0; i = cols.nextSetBit(i + 1)) {
+			Integer occurrence = pairOccurrences.get(i);
+			if (occurrence == null) {
+				cols.clear(i);
+			} else if (occurrence < nc - 1) {
+				cols.clear(i);
+				removeFromMDS(i, colMDS);
+			}
+		}
+
 		for (int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
 			Integer occurrence = clusterOccurrences.get(i);
 			if (occurrence == null || occurrence < (nc * (nc - 1)) / 2) {
-				Iterator<IntegerTriple> iterator = colMDS.keySet().iterator();
-				for (int j = 0; j < colMDS.size(); j++) {
-					IntegerTriple iter = iterator.next();
-					BitSet mds = colMDS.get(iter);
-					mds.clear(i);
-					if (mds.cardinality() < nc) {
-						toremove.add(iter);
-					}
-				}
 				rows.clear(i);
-				rowDim--;
+				rowsToRemove.set(i);
 			}
 		}
 
-		for (int i = 0; i < toremove.size(); i++) {
-			colMDS.remove(toremove.get(i));
+		Iterator<IntegerTriple> iter = colMDS.keySet().iterator();
+		for (int i = 0; i < colMDS.size(); i++) {
+			IntegerTriple key = iter.next();
+			colMDS.get(key).andNot(rowsToRemove);
 		}
 
-		toremove = new ArrayList<IntegerTriple>();
-		for (int i = cols.nextSetBit(0); i >= 0; i = cols.nextSetBit(i + 1)) {
-			Integer occurrence = pairOccurrences.get(i);
-			if (occurrence == null || occurrence < nc - 1) {
-				cols.clear(i);
-				colDim--;// variable may not be necessary
-				Iterator<IntegerTriple> iterator = colMDS.keySet().iterator();
-				for (int j = 0; j < colMDS.size(); j++) {
-					IntegerTriple key = iterator.next();
-					if (key.getFirst() == i || key.getSecond() == i) {
-						toremove.add(key);
-					}
-				}
-			}
-		}
-		for (int i = 0; i < toremove.size(); i++) {
-			colMDS.remove(toremove.get(i));
-		}
+		// removeMDS(colMDS, nr);
 
 	}
 
@@ -737,65 +786,72 @@ public class MaPle<V extends RealVector<V, Double>> extends
 	 * their occurrence is too small.
 	 */
 	private void prune() {
-
 		boolean pruning = true;
 
 		while (pruning) {
 			pruning = false;
-			countOccurrences(colMDS);
-
-			// Lemma 3.1
-			// Attributes
-			for (int i = cols.nextSetBit(0); i >= 0; i = cols.nextSetBit(i + 1)) {
-				Integer occurrence = pairOccurrences.get(i);
-				if (occurrence == null || occurrence < nc - 1) {
-					removeFromMDS(i, colMDS, rowMDS);
-					cols.clear(i);
-					colDim--;
-					pruning = true;
-				}
-
-			}
-			// Objects
-			for (int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
-				Integer occurrence = clusterOccurrences.get(i);
-				if (occurrence == null || occurrence < (nc * (nc - 1)) / 2) {
-					removeFromMDS(i, rowMDS, colMDS);
-					rows.clear(i);
-					rowDim--;
-					pruning = true;
-				}
-			}
-
-			removeMDS(rowMDS, nc);
-
 			countOccurrences(rowMDS);
+			BitSet colsToRemove = new BitSet();
 
-			// Lemma 3.1
-			// Attributes
+			for (int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
+				Integer occurrence = pairOccurrences.get(i);
+				if (occurrence == null) {
+					rows.clear(i);
+				} else if (occurrence < nr - 1) {
+					rows.clear(i);
+					removeFromMDS(i, rowMDS);
+					pruning = true;
+				}
+			}
+
 			for (int i = cols.nextSetBit(0); i >= 0; i = cols.nextSetBit(i + 1)) {
 				Integer occurrence = clusterOccurrences.get(i);
 				if (occurrence == null || occurrence < (nr * (nr - 1)) / 2) {
-					removeFromMDS(i, colMDS, rowMDS);
 					cols.clear(i);
-					colDim--;
+					colsToRemove.set(i);
 					pruning = true;
 				}
-
 			}
-			// Objects
-			for (int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
+
+			Iterator<IntegerTriple> iter = rowMDS.keySet().iterator();
+			for (int i = 0; i < rowMDS.size(); i++) {
+				IntegerTriple key = iter.next();
+				rowMDS.get(key).andNot(colsToRemove);
+			}
+
+			// removeMDS(colMDS, nr);
+
+			countOccurrences(colMDS);
+			BitSet rowsToRemove = new BitSet();
+
+			for (int i = cols.nextSetBit(0); i >= 0; i = cols.nextSetBit(i + 1)) {
 				Integer occurrence = pairOccurrences.get(i);
-				if (occurrence == null || occurrence < nr - 1) {
-					removeFromMDS(i, rowMDS, colMDS);
-					rows.clear(i);
-					rowDim--;
+				if (occurrence == null) {
+					cols.clear(i);
+				} else if (occurrence < nc - 1) {
+					cols.clear(i);
+					removeFromMDS(i, colMDS);
 					pruning = true;
 				}
 			}
-			removeMDS(colMDS, nr);
-		}
 
+			for (int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
+				Integer occurrence = clusterOccurrences.get(i);
+				if (occurrence == null || occurrence < (nc * (nc - 1)) / 2) {
+					rows.clear(i);
+					rowsToRemove.set(i);
+					pruning = true;
+				}
+			}
+
+			iter = colMDS.keySet().iterator();
+			for (int i = 0; i < colMDS.size(); i++) {
+				IntegerTriple key = iter.next();
+				colMDS.get(key).andNot(rowsToRemove);
+			}
+
+			// removeMDS(rowMDS, nc);
+		}
 	}
 
 	/**
@@ -1030,8 +1086,10 @@ public class MaPle<V extends RealVector<V, Double>> extends
 				"MaPle",
 				"A Fast Algorithm for Maximal Pattern-based Clustering",
 				"finding correlated values in a subset of rows and a subset of columns",
-				"");
+				"J. Pei, X. Zhang, M. Cho, H.Wang, and P. S. Yu. MaPle: A fast algorithm for maximal pattern-based"
+				+ "clustering. In Proceedings of the 3th International Conference on Data Mining (ICDM), Melbourne,"
+				+ "FL, 2003.");
+
 		return abs;
 	}
-
 }

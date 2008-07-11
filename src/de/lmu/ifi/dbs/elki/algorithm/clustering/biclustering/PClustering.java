@@ -1,12 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.result.clustering.biclustering.Bicluster;
 import de.lmu.ifi.dbs.elki.data.RealVector;
@@ -17,6 +10,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Provides a BiclusteringAlgorithm which finds a bicluster based on all of its
@@ -36,53 +36,55 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
 public class PClustering<V extends RealVector<V, Double>> extends
 		AbstractBiclustering<V> {
 
+
 	/**
 	 * OptionID for the parameter {@link #NUMBER_COLS_PARAM}.
 	 */
-	public static final OptionID NUMBER_COLS_ID = OptionID.getOrCreateOptionID("PClustering.nc",
+	public static final OptionID NUMBER_COLS_ID = OptionID.getOrCreateOptionID(
+			"pclustering.nc",
 			"indicates the minimum columnsize of the resulting biclusters");
 
-	
 	/**
 	 * Parameter to indicate the minimum columnsize of the resulting biclusters.
 	 * <p>
-	 * Key: {@code -PClustering.nc}
+	 * Key: {@code -pclustering.nc}
 	 * </p>
 	 */
-	public final IntParameter NUMBER_COLS_PARAM = new IntParameter(NUMBER_COLS_ID,
-			new GreaterEqualConstraint(1));
-	
+	public final IntParameter NUMBER_COLS_PARAM = new IntParameter(
+			NUMBER_COLS_ID, new GreaterEqualConstraint(1));
+
 	/**
 	 * OptionID for the parameter {@link #NUMBER_ROWS_PARAM}.
 	 */
-	public static final OptionID NUMBER_ROWS_ID = OptionID.getOrCreateOptionID("PClustering.nr",
+	public static final OptionID NUMBER_ROWS_ID = OptionID.getOrCreateOptionID(
+			"pclustering.nr",
 			"indicates the minimum rowsize of the resulting biclusters");
 
 	/**
 	 * Parameter to indicate the minimum rowsize of the resulting biclusters.
 	 * <p>
-	 * Key: {@code -PClustering.nr}
+	 * Key: {@code -pclustering.nr}
 	 * </p>
 	 */
-	public final IntParameter NUMBER_ROWS_PARAM = new IntParameter(NUMBER_ROWS_ID,
-			new GreaterEqualConstraint(1));
-	
+	public final IntParameter NUMBER_ROWS_PARAM = new IntParameter(
+			NUMBER_ROWS_ID, new GreaterEqualConstraint(1));
+
 	/**
 	 * OptionID for the parameter {@link #SIGMA_PARAM}.
 	 */
-	public static final OptionID SIGMA_ID = OptionID.getOrCreateOptionID(
-			"PClustering.sigma",
-			"treshhold value to determine the maximal acceptable score of a bicluster");
+	public static final OptionID SIGMA_ID = OptionID
+			.getOrCreateOptionID("pclustering.sigma",
+					"treshhold value to determine the maximal acceptable score of a bicluster");
 
 	/**
 	 * Threshold value to determine the maximal acceptable score of a bicluster.
 	 * <p>
-	 * Key: {@code -PClustering.sigma}
+	 * Key: {@code -pclustering.sigma}
 	 * </p>
 	 */
 	public final DoubleParameter SIGMA_PARAM = new DoubleParameter(SIGMA_ID,
 			new GreaterEqualConstraint(0.0));
-
+	
 	/**
 	 * Parameter which indicates how many columns a resulting bicluster should
 	 * have at least.
@@ -287,7 +289,7 @@ public class PClustering<V extends RealVector<V, Double>> extends
 			BitSet i = new BitSet();
 			i.set(iter.getFirst());
 			i.set(iter.getSecond());
-			BitSet cols = rowMDS.get(iter);
+			BitSet cols = (BitSet) rowMDS.get(iter).clone();
 			tree.insertTree(cols, i, cols.cardinality());
 		}
 
@@ -323,6 +325,17 @@ public class PClustering<V extends RealVector<V, Double>> extends
 
 				}
 			}
+			// ArrayList<BiclusteringTree> nodesToAdd = new
+			// ArrayList<BiclusteringTree>();
+			// treeWalk(nodesToAdd, child, child.getDepth() - 1);
+			// for (int i = 0; i < nodesToAdd.size(); i++) {
+			// BiclusteringTree currChild = nodesToAdd.get(i);
+			// if (currChild.getParent().getNode().cardinality() > 0
+			// && currChild.getParent() != null) {
+			// currChild.getParent().setNode(objects);
+			// }
+			// }
+
 			if (child.getParent().getNode().cardinality() > 0
 					&& child.getParent() != null) {
 				child.getParent().setNode(objects);
@@ -333,6 +346,21 @@ public class PClustering<V extends RealVector<V, Double>> extends
 			}
 		}
 	}
+
+//	private ArrayList<BiclusteringTree> treeWalk(
+//			ArrayList<BiclusteringTree> resultTrees, BiclusteringTree tree,
+//			int depth) {
+//		ArrayList<BiclusteringTree> newTrees = tree.getChildren();
+//		for (int i = 0; i < newTrees.size(); i++) {
+//			BiclusteringTree currTree = newTrees.get(i);
+//			if (currTree.getDepth() == depth) {
+//				resultTrees.add(currTree);
+//			} else {
+//				return treeWalk(resultTrees, currTree, depth);
+//			}
+//		}
+//		return resultTrees;
+//	}
 
 	/**
 	 * removes the objects not contained in c from oldObjects
@@ -398,10 +426,10 @@ public class PClustering<V extends RealVector<V, Double>> extends
 		for (int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
 			Integer occurrence = clusterOccurrences.get(i);
 			if (occurrence == null || occurrence < nr - 1) {
-				Iterator<IntegerTriple> iterator = colMDS.keySet().iterator();
-				for (int j = 0; j < colMDS.size(); j++) {
-					colMDS.get(iterator.next()).clear(i);
-				}
+//				Iterator<IntegerTriple> iterator = colMDS.keySet().iterator();
+//				for (int j = 0; j < colMDS.size(); j++) {
+//					colMDS.get(iterator.next()).clear(i);
+//				}
 				rows.clear(i);
 				rowDim--;
 			}
@@ -469,9 +497,8 @@ public class PClustering<V extends RealVector<V, Double>> extends
 				IntegerTriple i = iterator.next();
 				pruneRowMDS(i);
 			}
-			for (int i = 0; i < pruningKeys.size(); i++) {
-				rowMDS.remove(pruningKeys.get(i));
-			}
+
+			removeAndUpdate(rowMDS, pruningKeys);
 
 			// columnPruning
 			pruningKeys = new ArrayList<IntegerTriple>();
@@ -481,12 +508,30 @@ public class PClustering<V extends RealVector<V, Double>> extends
 				IntegerTriple i = iterator.next();
 				pruneColMDS(i);
 			}
-			for (int i = 0; i < pruningKeys.size(); i++) {
-				colMDS.remove(pruningKeys.get(i));
-			}
+
+			removeAndUpdate(colMDS, pruningKeys);
 		}
 		fillTree();
 		postOrder(tree);
+	}
+
+	private void removeAndUpdate(Map<IntegerTriple, BitSet> pair,
+			ArrayList<IntegerTriple> toremove) {
+		for (int i = 0; i < toremove.size(); i++) {
+			IntegerTriple key = toremove.get(i);
+			pair.remove(key);
+			for (int j = key.getLast() + 1; true; j++) {
+				key.setLast(j);
+				if (!pair.containsKey(key)) {
+					break;
+				}
+				BitSet updateKeySet = (BitSet) pair.get(key).clone();
+				pair.remove(key);
+				IntegerTriple newKey = new IntegerTriple(key.getFirst(), key
+						.getSecond(), j - 1);
+				pair.put(newKey, updateKeySet);
+			}
+		}
 	}
 
 	/**
@@ -584,10 +629,10 @@ public class PClustering<V extends RealVector<V, Double>> extends
 	}
 
 	/**
-	 * Prunes colMDSs. A row a is removed from a colMDS, if and only if, the
-	 * two columns of the colMDS appear in less then nr rowMDSs containing
-	 * row a. If the removal of row a makes the cardinality of the MDS
-	 * less then nr, the whole MDS is deleted.
+	 * Prunes colMDSs. A row a is removed from a colMDS, if and only if, the two
+	 * columns of the colMDS appear in less then nr rowMDSs containing row a. If
+	 * the removal of row a makes the cardinality of the MDS less then nr, the
+	 * whole MDS is deleted.
 	 * 
 	 * @param colkey
 	 *            key of the colMDS currently worked at
@@ -627,6 +672,7 @@ public class PClustering<V extends RealVector<V, Double>> extends
 
 	/**
 	 * resets the enumeration in ascending order of the values in t
+	 * 
 	 * @param t
 	 *            set containing rows/columns to be clustered
 	 */
@@ -761,7 +807,9 @@ public class PClustering<V extends RealVector<V, Double>> extends
 				"PClustering",
 				"Clustering by Pattern Similarity in large Data Sets",
 				"finding correlated values in a subset of rows and a subset of columns",
-				"");
+				"H. Wang, W. Wang, J. Yang, and P. S. Yu. Clustering by pattern similarity in large data sets. In"+
+						"Proceedings of the ACM International Conference on Management of Data (SIGMOD), Madison,"+
+						"WI, 2002.");
 		return abs;
 	}
 }

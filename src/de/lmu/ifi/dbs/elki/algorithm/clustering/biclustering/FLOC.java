@@ -1,12 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.result.clustering.biclustering.Bicluster;
 import de.lmu.ifi.dbs.elki.data.RealVector;
@@ -17,6 +10,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
+
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 /**
  * Provides a BiclusteringAlgorithm which deletes or inserts rows/columns in an
@@ -37,7 +37,7 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	 * OptionID for the parameter {@link #ACTION_ORDER_PARAM}.
 	 */
 	public static final OptionID ACTION_ORDER_ID = OptionID
-			.getOrCreateOptionID("FLOC.actionOrder",
+			.getOrCreateOptionID("floc.actionOrder",
 					"specifies the order of actions");
 
 	/**
@@ -50,7 +50,7 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	 * Default value: 0
 	 * </p>
 	 * <p>
-	 * Key: {@code -FLOC.actionOrder}
+	 * Key: {@code -floc.actionOrder}
 	 * </p>
 	 */
 	public final IntParameter ACTION_ORDER_PARAM = new IntParameter(
@@ -60,7 +60,7 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	 * OptionID for the parameter {@link #SEED_PARAM}.
 	 */
 	public static final OptionID SEED_ID = OptionID.getOrCreateOptionID(
-			"FLOC.seed", "seed for initial clusters");
+			"floc.seed", "seed for initial clusters");
 
 	/**
 	 * Seed for creating initial clusters.
@@ -68,7 +68,7 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	 * Default value: 1
 	 * </p>
 	 * <p>
-	 * Key: {@code -FLOC.seed}
+	 * Key: {@code -floc.seed}
 	 * </p>
 	 */
 	public final IntParameter SEED_PARAM = new IntParameter(SEED_ID,
@@ -77,7 +77,7 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	/**
 	 * OptionID for the parameter {@link #K_PARAM}.
 	 */
-	public static final OptionID K_ID = OptionID.getOrCreateOptionID("FLOC.k",
+	public static final OptionID K_ID = OptionID.getOrCreateOptionID("floc.k",
 			"indicates how many biclusters should be found");
 
 	/**
@@ -86,7 +86,7 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	 * Default value: 1
 	 * </p>
 	 * <p>
-	 * Key: {@code -FLOC.k}
+	 * Key: {@code -floc.k}
 	 * </p>
 	 */
 	public final IntParameter K_PARAM = new IntParameter(K_ID,
@@ -96,13 +96,13 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	 * OptionID for the parameter {@link #INITIAL_ROW_DIM_PARAM}.
 	 */
 	public static final OptionID INITIAL_ROW_DIM_ID = OptionID
-			.getOrCreateOptionID("FLOC.initialRowDim",
+			.getOrCreateOptionID("floc.initialRowDim",
 					"Parameter to approximate the rowDimension of a initial bicluster");
 
 	/**
 	 * Parameter to approximate the rowDimension of an initial bicluster.
 	 * <p>
-	 * Key: {@code -FLOC.initialRowDim}
+	 * Key: {@code -floc.initialRowDim}
 	 * </p>
 	 */
 	public final DoubleParameter INITIAL_ROW_DIM_PARAM = new DoubleParameter(
@@ -112,13 +112,13 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	 * OptionID for the parameter {@link #INITIAL_COL_DIM_PARAM}.
 	 */
 	public static final OptionID INITIAL_COL_DIM_ID = OptionID
-			.getOrCreateOptionID("FLOC.initialColDim",
+			.getOrCreateOptionID("floc.initialColDim",
 					"Parameter to approximate the columnDimension of a initial bicluster");
 
 	/**
 	 * Parameter to approximate the columnDimension of an initial bicluster.
 	 * <p>
-	 * Key: {@code -FLOC.initialColDim}
+	 * Key: {@code -floc.initialColDim}
 	 * </p>
 	 */
 	public final DoubleParameter INITIAL_COL_DIM_PARAM = new DoubleParameter(
@@ -128,13 +128,13 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	 * OptionID for the parameter {@link #MISSING_PARAM}.
 	 */
 	public static final OptionID MISSING_ID = OptionID.getOrCreateOptionID(
-			"FLOC.missing",
+			"floc.missing",
 			"Keeps the value which marks a missing entry within the dataset");
 
 	/**
 	 * Keeps the value which marks a missing entry within the database.
 	 * <p>
-	 * Key: {@code -FLOC.missing}
+	 * Key: {@code -floc.missing}
 	 * </p>
 	 */
 	public final DoubleParameter MISSING_PARAM = new DoubleParameter(MISSING_ID);
@@ -362,16 +362,9 @@ public class FLOC<V extends RealVector<V, Double>> extends
 		currCols = new BitSet();
 		rowClusters = new BitSet[k];
 		colClusters = new BitSet[k];
-
 		rowActionPerformed = new BitSet();
-		colActionPerformed = new BitSet();
-		// rows = new BitSet();
-		// rows.set(0, rowDim);
-		// cols = new BitSet();
-		// cols.set(0, colDim);
-		// eraseMissingValues();
+		colActionPerformed = new BitSet();	
 		createRandomCluster();
-		// resetValues(rows, cols);
 		performBestAction();
 	}
 
@@ -1026,7 +1019,9 @@ public class FLOC<V extends RealVector<V, Double>> extends
 				"a biclustering method, calculating biclusters by deleting/inserting "
 						+ "rows and columns depending on the gain of an action",
 				"finding correlated values in a subset of rows and a subset of columns",
-				"");
+				"J. Yang, W. Wang, H. Wang, and P. S. Yu. &delta;-clusters: Capturing subspace correlation in a large data"
+						+ "set. In Proceedings of the 18th International Conference on Data Engineering (ICDE), San Jose,"
+						+ "CA, 2002.");
 		return abs;
 	}
 

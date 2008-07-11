@@ -13,10 +13,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 
 import java.util.BitSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 /**
  * Provides a BiclusteringAlgorithm which deletes or inserts rows/columns
@@ -37,7 +37,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	 * OptionID for the parameter {@link #SEED_PARAM}.
 	 */
 	public static final OptionID SEED_ID = OptionID.getOrCreateOptionID(
-			"ChengAndChurch.random",
+			"chengandchurch.random",
 			"seed for initializing random list for the masking values");
 
 	/**
@@ -46,7 +46,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	 * Default value: 1
 	 * </p>
 	 * <p>
-	 * Key: {@code -ChengAndChurch.random}
+	 * Key: {@code -chengandchurch.random}
 	 * </p>
 	 */
 	public final LongParameter SEED_PARAM = new LongParameter(SEED_ID);
@@ -55,7 +55,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	 * OptionID for the parameter {@link #MULTIPLE_ADDITION_PARAM}.
 	 */
 	public static final OptionID MULTIPLE_ADDITION_ID = OptionID
-			.getOrCreateOptionID("ChengAndChurch.multipleAddition",
+			.getOrCreateOptionID("chengandchurch.multipleAddition",
 					"indicates how many times the algorithm to add Nodes should be performed");
 
 	/**
@@ -66,7 +66,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	 * Default value: 1
 	 * </p>
 	 * <p>
-	 * Key: {@code -ChengAndChurch.multipleAddition}
+	 * Key: {@code -chengandchurch.multipleAddition}
 	 * </p>
 	 */
 	public final IntParameter MULTIPLE_ADDITION_PARAM = new IntParameter(
@@ -75,14 +75,14 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	/**
 	 * OptionID for the parameter {@link #SIGMA_PARAM}.
 	 */
-	public static final OptionID SIGMA_ID = OptionID.getOrCreateOptionID(
-			"ChengAndChurch.sigma",
-			"treshhold value to determine the maximal acceptable score of a bicluster");
+	public static final OptionID SIGMA_ID = OptionID
+			.getOrCreateOptionID("chengandchurch.sigma",
+					"treshhold value to determine the maximal acceptable score of a bicluster");
 
 	/**
 	 * Treshhold value to determine the maximal acceptable score of a bicluster.
 	 * <p>
-	 * Key: {@code -ChengAndChurch.sigma}
+	 * Key: {@code -chengandchurch.sigma}
 	 * </p>
 	 */
 	public final DoubleParameter SIGMA_PARAM = new DoubleParameter(SIGMA_ID,
@@ -91,13 +91,14 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	/**
 	 * OptionID for the parameter {@link #ALPHA_PARAM}.
 	 */
-	public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("ChengAndChurch.alpha",
-			"parameter for multiple node deletion to accelerate the algorithm ");
+	public static final OptionID ALPHA_ID = OptionID
+			.getOrCreateOptionID("chengandchurch.alpha",
+					"parameter for multiple node deletion to accelerate the algorithm ");
 
 	/**
 	 * Parameter for multiple node deletion to accelerate the algorithm.
 	 * <p>
-	 * Key: {@code -ChengAndChurch.alpha}
+	 * Key: {@code -chengandchurch.alpha}
 	 * </p>
 	 */
 	public final DoubleParameter ALPHA_PARAM = new DoubleParameter(ALPHA_ID,
@@ -106,8 +107,8 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	/**
 	 * OptionID for the parameter {@link #N_PARAM}.
 	 */
-	public static final OptionID N_ID = OptionID.getOrCreateOptionID("ChengAndChurch.n",
-			"number of biclusters to be found ");
+	public static final OptionID N_ID = OptionID.getOrCreateOptionID(
+			"chengandchurch.n", "number of biclusters to be found ");
 
 	/**
 	 * Number of biclusters to be found.
@@ -115,21 +116,22 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	 * Default value: 1
 	 * </p>
 	 * <p>
-	 * Key: {@code -ChengAndChurch.n}
+	 * Key: {@code -chengandchurch.n}
 	 * </p>
 	 */
-	public final IntParameter N_PARAM = new IntParameter(N_ID, new GreaterEqualConstraint(1));
+	public final IntParameter N_PARAM = new IntParameter(N_ID,
+			new GreaterEqualConstraint(1));
 
 	/**
 	 * OptionID for the parameter {@link #BEGIN_PARAM}.
 	 */
 	public static final OptionID BEGIN_ID = OptionID.getOrCreateOptionID(
-			"ChengAndChurch.begin", "lower limit for maskingValues");
+			"chengandchurch.begin", "lower limit for maskingValues");
 
 	/**
 	 * Lower limit for maskingValues.
 	 * <p>
-	 * Key: {@code -ChengAndChurch.begin}
+	 * Key: {@code -chengandchurch.begin}
 	 * </p>
 	 */
 	public final IntParameter BEGIN_PARAM = new IntParameter(BEGIN_ID);
@@ -137,12 +139,13 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	/**
 	 * OptionID for the parameter {@link #END_PARAM}.
 	 */
-	public static final OptionID END_ID = OptionID.getOrCreateOptionID("ChengAndChurch.end", "upper limit for maskingValues");
+	public static final OptionID END_ID = OptionID.getOrCreateOptionID(
+			"chengandchurch.end", "upper limit for maskingValues");
 
 	/**
 	 * Upper limit for maskingValues.
 	 * <p>
-	 * Key: {@code -ChengAndChurch.end}
+	 * Key: {@code -chengandchurch.end}
 	 * </p>
 	 */
 	public final IntParameter END_PARAM = new IntParameter(END_ID);
@@ -150,13 +153,14 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	/**
 	 * OptionID for the parameter {@link #MISSING_PARAM}.
 	 */
-	public static final OptionID MISSING_ID = OptionID.getOrCreateOptionID("ChengAndChurch.missing",
+	public static final OptionID MISSING_ID = OptionID.getOrCreateOptionID(
+			"chengandchurch.missing",
 			"missing Value in database to be raplaced with maskingValues");
 
 	/**
 	 * Missing Value in database to be replaced with maskingValues.
 	 * <p>
-	 * Key: {@code -ChengAndChurch.missing}
+	 * Key: {@code -chengandchurch.missing}
 	 * </p>
 	 */
 	public final IntParameter MISSING_PARAM = new IntParameter(MISSING_ID);
@@ -282,8 +286,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	/**
 	 * 
 	 * Sets the options for the ParameterValues random, sigma, alpha, n,
-	 * missing, begin and end.
-	 * Adds the parameterValues.
+	 * missing, begin and end. Adds the parameterValues.
 	 */
 	public ChengAndChurch() {
 		SEED_PARAM.setDefaultValue(1L);
@@ -309,7 +312,8 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	/**
 	 * Calls
 	 * {@link AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
-	 * and sets additionally the parameters for random, sigma, alpha, n, begin, end
+	 * and sets additionally the parameters for random, sigma, alpha, n, begin,
+	 * end
 	 * 
 	 * @see AbstractAlgorithm#setParameters(String[])
 	 */
@@ -374,7 +378,8 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 		double columnMean = columnMeans.get(j);
 		double biclusterM = biclusterMean;
 
-		double residue = Math.pow(val - rowMean - columnMean + biclusterM, 2);
+		double residue = (val - rowMean - columnMean + biclusterM)
+				* (val - rowMean - columnMean + biclusterM);
 		return residue;
 	}
 
@@ -474,7 +479,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	 * 
 	 * @return a list of scores mapped to their row
 	 */
-	protected Map<Integer, Double> ReductionValuesRows() {
+	protected Map<Integer, Double> reductionValuesRows() {
 		Map<Integer, Double> resultRows = new LinkedHashMap<Integer, Double>();
 		double temp = 0;
 		for (int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
@@ -494,7 +499,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	 * 
 	 * @return a list of scores mapped to their column
 	 */
-	protected Map<Integer, Double> ReductionValuesCols() {
+	protected Map<Integer, Double> reductionValuesCols() {
 		Map<Integer, Double> resultCols = new LinkedHashMap<Integer, Double>();
 		double temp = 0;
 		for (int j = cols.nextSetBit(0); j >= 0; j = cols.nextSetBit(j + 1)) {
@@ -546,7 +551,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 		missingRowsToMask = new BitSet();
 		missingColsToMask = new BitSet();
 		findMissingValues();
-		aplyAlgorithms();
+		applyAlgorithms();
 	}
 
 	/**
@@ -585,7 +590,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	 * nodeAddition, masks the remaining rows and columns within the resulting
 	 * bicluster adds the found bicluster to the result.
 	 */
-	public void aplyAlgorithms() {
+	public void applyAlgorithms() {
 		for (int i = 0; i < n; i++) {
 			multipleNodeDeletion();
 			singleNodeDeletion();
@@ -620,7 +625,9 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	}
 
 	/**
-	 * Recalculates the necessary structures for multipleNodeDeletion.
+	 * Recalculates the necessary structures for multipleNodeDeletion. Performs
+	 * multiple node deletion until the score of the resulting bicluster is
+	 * lower or equal to alpha &lowast; sigma.
 	 */
 	public void multipleNodeDeletion() {
 		rows = new BitSet(rowDim - 1);
@@ -630,44 +637,39 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 		rowMeans = new LinkedHashMap<Integer, Double>();
 		columnMeans = new LinkedHashMap<Integer, Double>();
 		recomputeValues();
-		chooseMaxRAlgorithm2();
-	}
-
-	/**
-	 * Performs multiple node deletion until the score of the resulting
-	 * bicluster is lower or equal to alpha &lowast; sigma.
-	 */
-	private void chooseMaxRAlgorithm2() {
-		if (valueH > sigma) {
+		removed = true;
+		while (removed) {
 			removed = false;
-			if (rowDim >= 100) {
-				Map<Integer, Double> delRows = ReductionValuesRows();
-				for (int i = rows.nextSetBit(0); i >= 0; i = rows
-						.nextSetBit(i + 1)) {
-					if ((Double) delRows.get(i) > alpha * valueH) {
-						rows.clear(i);
-						removed = true;
+			if (valueH > sigma) {
+				if (rowDim >= 100) {
+					Map<Integer, Double> delRows = reductionValuesRows();
+					for (int i = rows.nextSetBit(0); i >= 0; i = rows
+							.nextSetBit(i + 1)) {
+						if ((Double) delRows.get(i) > alpha * valueH) {
+							rows.clear(i);
+							removed = true;
+						}
+					}
+					initiateColMeans();
+					biclusterMean = meanOfBicluster(rows, cols);
+					valueH = getValueH();
+				}
+
+				if (colDim >= 100) {
+					Map<Integer, Double> delCols = reductionValuesCols();
+					for (int j = cols.nextSetBit(0); j >= 0; j = cols
+							.nextSetBit(j + 1)) {
+						if ((Double) delCols.get(j) > alpha * valueH) {
+							cols.clear(j);
+							removed = true;
+						}
 					}
 				}
-				initiateColMeans();
-				biclusterMean = meanOfBicluster(rows, cols);
-				valueH = getValueH();
-			}
+				recomputeValues();
 
-			if (colDim >= 100) {
-				Map<Integer, Double> delCols = ReductionValuesCols();
-				for (int j = cols.nextSetBit(0); j >= 0; j = cols
-						.nextSetBit(j + 1)) {
-					if ((Double) delCols.get(j) > alpha * valueH) {
-						cols.clear(j);
-						removed = true;
-					}
-				}
-			}
-			recomputeValues();
-
-			if (removed) {
-				chooseMaxRAlgorithm2();
+				// if (removed) {
+				// chooseMaxRAlgorithm2();
+				// }
 			}
 		}
 	}
@@ -681,8 +683,8 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 		if (valueH > sigma) {
 			int maxDelRow = -1;
 			int maxDelColumn = -1;
-			Map<Integer, Double> delRows = ReductionValuesRows();
-			Map<Integer, Double> delCols = ReductionValuesCols();
+			Map<Integer, Double> delRows = reductionValuesRows();
+			Map<Integer, Double> delCols = reductionValuesCols();
 
 			if (delRows.size() != 0) {
 				maxDelRow = chooseMax(delRows);
@@ -702,7 +704,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	}
 
 	/**
-	 * Determines the key associated with the major doubleValue within the map.
+	 * Determines the key associated with the doubleValue within the map.
 	 * 
 	 * @param a
 	 *            a map with scores associated to their row
@@ -710,12 +712,12 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	 */
 	public static int chooseMax(Map<Integer, Double> a) {
 		if (a != null && a.size() != 0) {
-			Set<Integer> set = a.keySet();
-			Object[] array = set.toArray();
-			Integer max = (Integer) array[0];
-			for (int i = 0; i < array.length; i++) {
-				if ((Double) a.get(array[i]) > (Double) a.get(max)) {
-					max = (Integer) array[i];
+			Iterator<Integer> iter = a.keySet().iterator();
+			Integer max = iter.next();
+			for (int i = 1; i < a.size(); i++) {
+				Integer potentialMax = iter.next();
+				if ((Double) a.get(potentialMax) > (Double) a.get(max)) {
+					max = potentialMax;
 				}
 			}
 			return max;
@@ -772,7 +774,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 			}
 		}
 
-		Map<Integer, Double> rowAddsInv = ReductionValuesRowsInv();
+		Map<Integer, Double> rowAddsInv = reductionValuesRowsInv();
 		if (rowAddsInv.size() != 0) {
 			for (int i = rows.nextClearBit(0); i >= 0; i = rows
 					.nextClearBit(i + 1)) {
@@ -856,7 +858,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	 * 
 	 * @return list of scores mapped to their rows
 	 */
-	protected Map<Integer, Double> ReductionValuesRowsInv() {
+	protected Map<Integer, Double> reductionValuesRowsInv() {
 		Map<Integer, Double> resultRows = new LinkedHashMap<Integer, Double>();
 		double temp = 0;
 		for (int i = rows.nextClearBit(0); i >= 0; i = rows.nextClearBit(i + 1)) {
@@ -869,11 +871,8 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 				double rowMean = -rowMeans.get(i);
 				double columnMean = columnMeans.get(j);
 				double biclusterM = biclusterMean;
-
-				temp = temp
-						+ Math
-								.pow(value - rowMean - columnMean + biclusterM,
-										2);
+				double term = (value - rowMean - columnMean + biclusterM);
+				temp = temp + term * term;
 			}
 			resultRows.put(i, temp / cols.cardinality());
 		}
@@ -888,10 +887,8 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 				"ChengAndChurch",
 				"a biclustering method on row- and columnScoreBases",
 				"finding correlated values in a subset of rows and a subset of columns",
-				"Yizong Cheng and George M. Church "
-						+ "Department of Genetics, Harvard Medical School, Boston, MA 02115 "
-						+ "Department of ECECS, University of Cincinnati, Cinncinati, OH 45221"
-						+ "yizong.cheng@uc.edu, church@salt2.med.harvard.edu");
+				"Y. Cheng and G. M. Church. Biclustering of expression data. In Proceedings of the 8th International"
+						+ "Conference on Intelligent Systems for Molecular Biology (ISMB), San Diego, CA, 2000.");
 		return abs;
 	}
 

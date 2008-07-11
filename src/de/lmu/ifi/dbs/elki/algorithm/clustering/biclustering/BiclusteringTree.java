@@ -5,10 +5,10 @@ import java.util.BitSet;
 
 /**
  * Provides a treeStructure with BitSets as nodes and Integers as edges. Every
- * node of the tree has a path to the root, defined trough the edges
- * leading from the node to the root. This class is used by PClustering as a
+ * node of the tree has a path to the root, defined trough the edges leading
+ * from the node to the root. This class is used by PClustering as a
  * clusterTree, the edges representing columns and the nodes representing rows.
- * Every path from the root to some node of predefined depth, forms a bicluster 
+ * Every path from the root to some node of predefined depth, forms a bicluster
  * with that node.
  * 
  * @author Noemi Andor
@@ -52,7 +52,12 @@ public class BiclusteringTree {
 	private BiclusteringTree parent;
 
 	/**
-	 * Constructor creating a new RootTree-Object.
+	 * Constructor creating a new RootTree-Object. A node contains of a BitSet
+	 * clustered to the edges leading to that node. Every edge is represented by
+	 * an Integer-value and the edges belonging to same node are inserted in
+	 * ascending order. All edges belonging to the same node are pairwise diverse.
+	 * Each node has a single rootEdge, which is one of the edges of the parent-node.
+	 * The rootEdge of the root has the value -1.
 	 */
 	public BiclusteringTree() {
 		node = new BitSet();
@@ -129,9 +134,14 @@ public class BiclusteringTree {
 	}
 
 	/**
-	 * Getter
+	 * A node contains a subset of rows belonging to a potential bicluster, such
+	 * that the edges (representing columns) leading to that node may form a
+	 * bicluster with some of the rows in the node. A node is always empty if
+	 * the number of rootedges is less then the minimal number of columns a
+	 * bicluster must contain.
 	 * 
-	 * @return the node of this tree.
+	 * @return the node of this tree, representing potential rows of a potential
+	 *         bicluster.
 	 */
 	public BitSet getNode() {
 		return node;
@@ -167,8 +177,10 @@ public class BiclusteringTree {
 	}
 
 	/**
+	 * Returns the tree with the parent-node as root. The parent-node has the
+	 * actual rootEdge of this tree as one of its edges.
 	 * 
-	 * @return the parent of this tree.
+	 * @return the tree containing the parent-node of the current root as root.
 	 */
 	public BiclusteringTree getParent() {
 		return this.parent;
@@ -183,8 +195,10 @@ public class BiclusteringTree {
 	 * @param edge
 	 *            a BitSet of edges indicating the path on which end the node
 	 *            should be inserted
-	 * @param node node to be added to the tree
-	 * @param initialEdge rootEdge leading to the current node.
+	 * @param node
+	 *            node to be added to the tree
+	 * @param initialEdge
+	 *            rootEdge leading to the current node.
 	 */
 	public void insertTree(BitSet edge, BitSet node, int initialEdge) {
 		for (int i = edge.nextSetBit(0); i >= 0; i = edge.nextSetBit(i + 1)) {
