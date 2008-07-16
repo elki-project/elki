@@ -14,11 +14,27 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Interval;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 
 /**
@@ -31,19 +47,44 @@ import java.util.*;
  * <p/>
  * The third step of the original algorithm (Generation of minimal description
  * for the clusters) is not (yet) implemented.
+ * <p>Reference:
+ * R. Agrawal, J. Gehrke, D. Gunopulos, P. Raghavan::
+ * Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications.
+ * <br>In Proc. ACM SIGMOD Int. Conf. on Management of Data, Seattle, WA, 1998.
  *
  * @author Elke Achtert
  * @param <V> the type of RealVector handled by this Algorithm
  */
 public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> implements Clustering<V> {
+    /**
+     * OptionID for {@link #XSI_PARAM}
+     */
+    public static final OptionID XSI_ID = OptionID.getOrCreateOptionID(
+        "clique.xsi",
+        "The number of intervals (units) in each dimension."
+    );
 
     /**
      * Parameter to specify the number of intervals (units) in each dimension,
      * must be an integer greater than 0.
      * <p>Key: {@code -clique.xsi} </p>
      */
-    private final IntParameter XSI_PARAM = new IntParameter(OptionID.CLIQUE_XSI,
+    private final IntParameter XSI_PARAM = new IntParameter(XSI_ID,
         new GreaterConstraint(0));
+
+    /**
+     * Holds the value of {@link #XSI_PARAM}.
+     */
+    private int xsi;
+
+    /**
+     * OptionID for {@link #TAU_PARAM}
+     */
+    public static final OptionID TAU_ID = OptionID.getOrCreateOptionID(
+        "clique.tau",
+        "The density threshold for the selectivity of a unit, where the selectivity is" +
+            "the fraction of total feature vectors contained in this unit."
+    );
 
     /**
      * Parameter to specify the density threshold for the selectivity of a unit,
@@ -51,8 +92,24 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
      * must be a double greater than 0 and less than 1.
      * <p>Key: {@code -clique.tau} </p>
      */
-    private final DoubleParameter TAU_PARAM = new DoubleParameter(OptionID.CLIQUE_TAU,
+    private final DoubleParameter TAU_PARAM = new DoubleParameter(
+        TAU_ID,
         new IntervalConstraint(0, IntervalConstraint.IntervalBoundary.OPEN, 1, IntervalConstraint.IntervalBoundary.OPEN));
+
+    /**
+     * Holds the value of {@link #TAU_PARAM}.
+     */
+    private double tau;
+
+    /**
+     * OptionID for {@link #PRUNE_FLAG}
+     */
+    public static final OptionID PRUNE_ID = OptionID.getOrCreateOptionID(
+        "clique.prune",
+        "Flag to indicate that only subspaces with large coverage " +
+            "(i.e. the fraction of the database that is covered by the dense units) " +
+            "are selected, the rest will be pruned."
+    );
 
     /**
      * Flag to indicate that that only subspaces with large coverage
@@ -60,20 +117,10 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
      * are selected, the rest will be pruned.
      * <p>Key: {@code -clique.prune} </p>
      */
-    private final Flag PRUNE_FLAG = new Flag(OptionID.CLIQUE_PRUNE);
+    private final Flag PRUNE_FLAG = new Flag(PRUNE_ID);
 
     /**
-     * Number of units in each dimension.
-     */
-    private int xsi;
-
-    /**
-     * Threshold for the selectivity of a unit.
-     */
-    private double tau;
-
-    /**
-     * Flag indicating that subspaces with low coverage are pruned.
+     * Holds the value of {@link #PRUNE_FLAG}.
      */
     private boolean prune;
 
@@ -82,7 +129,12 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
      */
     private Clusters<V> result;
 
-
+    /**
+     * Provides the CLIQUE algorithm,
+     * adding parameters
+     * {@link #XSI_PARAM},  {@link #TAU_PARAM}, and  flag {@link #PRUNE_FLAG}
+     * to the option handler additionally to parameters of super class.
+     */
     public CLIQUE() {
         super();
 //    this.debug = true;
@@ -123,10 +175,7 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
     /**
      * Performs the CLIQUE algorithm on the given database.
      *
-     * @param database the database to run the algorithm on
-     * @throws IllegalStateException if the algorithm has not been initialized
-     *                               properly (e.g. the setParameters(String[]) method has been failed
-     *                               to be called).
+     * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.elki.database.Database)
      */
     protected void runInTime(Database<V> database) throws IllegalStateException {
         Map<CLIQUEModel<V>, Set<Integer>> modelsAndClusters = new HashMap<CLIQUEModel<V>, Set<Integer>>();
@@ -185,8 +234,9 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
     }
 
     /**
-     * Sets the parameters xsi, tau and prune additionally to the parameters set
-     * by the super-class' method.
+     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
+     * and sets additionally the value of the parameters
+     * {@link #XSI_PARAM}, {@link #TAU_PARAM}, and {flag @link #PRUNE_FLAG}.
      *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */

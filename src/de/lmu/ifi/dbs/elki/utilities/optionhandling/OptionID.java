@@ -101,30 +101,6 @@ public final class OptionID extends ConstantObject<OptionID> {
         "Flag to request output of performance time.");
 
     /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.CLIQUE#PRUNE_FLAG}
-     */
-    public static final OptionID CLIQUE_PRUNE = new OptionID("clique.prune",
-        "Flag to indicate that only subspaces with large coverage " +
-        "(i.e. the fraction of the database that is covered by the dense units) " +
-        "are selected, the rest will be pruned."
-    );
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.CLIQUE#TAU_PARAM}
-     */
-    public static final OptionID CLIQUE_TAU = new OptionID("clique.tau",
-        "The density threshold for the selectivity of a unit, where the selectivity is" +
-        "the fraction of total feature vectors contained in this unit."
-    );
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.CLIQUE#XSI_PARAM}
-     */
-    public static final OptionID CLIQUE_XSI = new OptionID("clique.xsi",
-        "The number of intervals (units) in each dimension."
-    );
-
-    /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator#RANDOM_SAMPLE_FLAG}
      */
     public static final OptionID DEPENDENCY_DERIVATOR_RANDOM_SAMPLE = new OptionID("derivator.randomSample",

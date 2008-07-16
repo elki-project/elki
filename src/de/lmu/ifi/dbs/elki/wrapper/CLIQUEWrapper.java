@@ -25,7 +25,7 @@ public class CLIQUEWrapper extends FileBasedDatabaseConnectionWrapper {
      * must be an integer greater than 0.
      * <p>Key: {@code -clique.xsi} </p>
      */
-    private final IntParameter XSI_PARAM = new IntParameter(OptionID.CLIQUE_XSI, new GreaterConstraint(0));
+    private final IntParameter XSI_PARAM = new IntParameter(CLIQUE.XSI_ID, new GreaterConstraint(0));
 
     /**
      * Parameter to specify the density threshold for the selectivity of a unit,
@@ -33,7 +33,7 @@ public class CLIQUEWrapper extends FileBasedDatabaseConnectionWrapper {
      * must be a double greater than 0 and less than 1.
      * <p>Key: {@code -clique.tau} </p>
      */
-    private final DoubleParameter TAU_PARAM = new DoubleParameter(OptionID.CLIQUE_TAU,
+    private final DoubleParameter TAU_PARAM = new DoubleParameter(CLIQUE.TAU_ID,
         new IntervalConstraint(0, IntervalConstraint.IntervalBoundary.OPEN, 1, IntervalConstraint.IntervalBoundary.OPEN));
 
     /**
@@ -42,7 +42,7 @@ public class CLIQUEWrapper extends FileBasedDatabaseConnectionWrapper {
      * are selected, the rest will be pruned.
      * <p>Key: {@code -clique.prune} </p>
      */
-    private final Flag PRUNE_FLAG = new Flag(OptionID.CLIQUE_PRUNE);
+    private final Flag PRUNE_FLAG = new Flag(CLIQUE.PRUNE_ID);
 
 
     /**

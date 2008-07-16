@@ -30,13 +30,12 @@ import java.util.logging.LogRecord;
  * ORCLUS provides the ORCLUS algorithm, an algorithm to find clusters in high dimensional spaces.
  * <p>Reference:
  * C. C. Aggrawal, P. S. Yu:
- * Finding Generalized Projected Clusters in High Dimensional Spaces
+ * Finding Generalized Projected Clusters in High Dimensional Spaces.
  * <br>In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00).
  *
  * @author Elke Achtert
  * @param <V> the type of Realvector handled by this Algorithm
  */
-
 public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
     /**
      * OptionID for {@link #ALPHA_PARAM}.
