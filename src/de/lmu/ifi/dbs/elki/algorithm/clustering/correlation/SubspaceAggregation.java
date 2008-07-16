@@ -12,8 +12,8 @@ import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.io.File;
@@ -27,10 +27,18 @@ import java.util.Random;
 
 /**
  * todo arthur comment class
+ *
  * @author Arthur Zimek
  * @param <V> the type of Realvector handled by this Algorithm
  */
 public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> implements Clustering<V> {
+
+    /**
+     * Small value to increment diagonally of a matrix
+     * in order to avoid singularity befor building the inverse.
+     */
+    private static final double SINGULARITY_CHEAT = 1E-9;
+
     /**
      * OptionID for {@link #K_PARAM}
      */
@@ -38,12 +46,6 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
         "subspaceagg.k",
         "The number of clusters to find."
     );
-
-    /**
-     * Small value to increment diagonally of a matrix
-     * in order to avoid singularity befor building the inverse.
-     */
-    private static final double SINGULARITY_CHEAT = 1E-9;
 
     /**
      * Parameter to specify the number of clusters to find,
@@ -55,7 +57,7 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
         new GreaterConstraint(0));
 
     /**
-     * Keeps k - the number of clusters to find.
+     * Holds the value of {@link #K_PARAM}.
      */
     private int k;
 
@@ -65,7 +67,9 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
     private Clusters<V> result;
 
     /**
-     *  todo arthur comment
+     * Adds parameter
+     * {@link #K_PARAM}
+     * to the option handler additionally to parameters of super class.
      */
     public SubspaceAggregation() {
         super();
@@ -318,7 +322,11 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
+     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
+     * and sets additionally the value of the parameter
+     * {@link #K_PARAM}.
+     *
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

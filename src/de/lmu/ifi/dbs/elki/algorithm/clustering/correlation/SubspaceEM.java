@@ -40,6 +40,12 @@ import java.util.Random;
 public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> implements Clustering<V> {
 
     /**
+     * Small value to increment diagonally of a matrix
+     * in order to avoid singularity befor building the inverse.
+     */
+    private static final double SINGULARITY_CHEAT = 1E-9;
+
+    /**
      * OptionID for {@link #DELTA_PARAM}
      */
     public static final OptionID DELTA_ID = OptionID.getOrCreateOptionID(
@@ -57,21 +63,6 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
     );
 
     /**
-     * Small value to increment diagonally of a matrix
-     * in order to avoid singularity befor building the inverse.
-     */
-    private static final double SINGULARITY_CHEAT = 1E-9;
-
-    /**
-     * Parameter to specify the number of clusters to find,
-     * must be an integer greater than 0.
-     * <p>Key: {@code -subspaceem.k} </p>
-     */
-    private final IntParameter K_PARAM = new IntParameter(
-        K_ID,
-        new GreaterConstraint(0));
-
-    /**
      * Parameter to specify the termination criterion for maximization of E(M): E(M) - E(M') < subspaceem.delta,
      * must be a double equal to or greater than 0.
      * <p>Default value: {@code 0.0} </p>
@@ -83,14 +74,23 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
         0.0);
 
     /**
-     * Keeps k - the number of clusters to find.
-     */
-    private int k;
-
-    /**
-     * Keeps delta - a small value as termination criterion in expectation maximization
+     * Holds the value of {@link #DELTA_PARAM}.
      */
     private double delta;
+
+    /**
+     * Parameter to specify the number of clusters to find,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -subspaceem.k} </p>
+     */
+    private final IntParameter K_PARAM = new IntParameter(
+        K_ID,
+        new GreaterConstraint(0));
+
+    /**
+     * Holds the value of {@link #K_PARAM}.
+     */
+    private int k;
 
     /**
      * Stores the result.
@@ -98,7 +98,9 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
     private Clusters<V> result;
 
     /**
-     * todo arthur comment
+     * Adds parameters
+     * {@link #DELTA_PARAM} and {@link #K_PARAM}
+     * to the option handler additionally to parameters of super class.
      */
     public SubspaceEM() {
         super();
@@ -511,7 +513,11 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
+     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
+     * and sets additionally the value of the parameters
+     * {@link #K_PARAM} and {@link #DELTA_PARAM}.
+     *
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

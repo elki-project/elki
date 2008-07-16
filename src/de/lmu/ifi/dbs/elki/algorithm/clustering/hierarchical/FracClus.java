@@ -42,7 +42,7 @@ public class FracClus<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         new GreaterEqualConstraint(2));
 
     /**
-     * Holds the value of the number of supporters parameter.
+     * Holds the value of {@link #NUMBER_OF_SUPPORTERS_PARAM}.
      */
     private int k;
 
@@ -52,7 +52,9 @@ public class FracClus<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
     private HierarchicalClusters<HierarchicalFractalDimensionCluster<V>, V> result;
 
     /**
-     * todo comment
+     * Adds parameter
+     * {@link #NUMBER_OF_SUPPORTERS_PARAM}
+     * to the option handler additionally to parameters of super class.
      */
     public FracClus() {
         super();
@@ -124,6 +126,10 @@ public class FracClus<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
     }
 
     /**
+     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
+     * and sets additionally the value of the parameter
+     * {@link #NUMBER_OF_SUPPORTERS_PARAM}.
+     *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
