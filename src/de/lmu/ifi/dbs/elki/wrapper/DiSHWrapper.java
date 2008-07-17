@@ -73,9 +73,10 @@ public class DiSHWrapper extends NormalizationWrapper {
         }
     }
 
-    /**
-     * Sets the parameter minpts and k in the parameter map additionally to the
-     * parameters provided by super-classes.
+     /**
+     * Adds parameters
+     * {@link #MU_PARAM}, {@link #EPSILON_PARAM}, and {@link } todo
+     * to the option handler additionally to parameters of super class.
      */
     public DiSHWrapper() {
         super();

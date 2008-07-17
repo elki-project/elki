@@ -48,9 +48,9 @@ public abstract class KDDTaskWrapper<O extends DatabaseObject> extends AbstractW
     private boolean time;
 
     /**
-     * Sets additionally to the parameters set by the super class the time flag
-     * and the parameter out in the parameter map. Any extending class should
-     * call this constructor, then add further parameters.
+     * Adds parameter
+     * {@link #OUTPUT_PARAM} and flag {@link #TIME_FLAG}
+     * to the option handler additionally to parameters of super class.
      */
     protected KDDTaskWrapper() {
         super();

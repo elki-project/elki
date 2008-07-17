@@ -69,8 +69,9 @@ public class CLIQUEWrapper extends FileBasedDatabaseConnectionWrapper {
     }
 
     /**
-     * Sets the parameters epsilon and minpts in the parameter map additionally to the
-     * parameters provided by super-classes.
+     * Adds parameters
+     * {@link #XSI_PARAM}, {@link #TAU_PARAM}, and flag {@link #PRUNE_FLAG}
+     * to the option handler additionally to parameters of super class.
      */
     public CLIQUEWrapper() {
         super();

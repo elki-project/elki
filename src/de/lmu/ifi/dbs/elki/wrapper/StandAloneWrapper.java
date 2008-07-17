@@ -32,9 +32,9 @@ public abstract class StandAloneWrapper extends AbstractWrapper {
     private File output;
 
     /**
-     * Sets additionally to the parameters set by the super class the
-     * parameter for out in the parameter map. Any extending
-     * class should call this constructor, then add further parameters.
+     * Adds parameter
+     * {@link } todo
+     * to the option handler additionally to parameters of super class.
      */
     protected StandAloneWrapper() {
         super();

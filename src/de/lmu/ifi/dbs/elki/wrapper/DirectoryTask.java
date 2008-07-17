@@ -60,6 +60,11 @@ public class DirectoryTask extends StandAloneInputWrapper {
         }
     }
 
+     /**
+     * Adds parameter
+     * {@link } todo
+     * to the option handler additionally to parameters of super class.
+     */
     public DirectoryTask() {
         optionHandler.put(new ClassParameter<Wrapper>(WRAPPER_P, WRAPPER_D, Wrapper.class));
     }

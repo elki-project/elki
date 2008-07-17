@@ -69,7 +69,9 @@ public class PreDeConWrapper extends NormalizationWrapper {
     }
 
     /**
-     * Provides a wrapper for the 4C algorithm.
+     * Adds parameters
+     * {@link #EPSILON_PARAM}, {@link #MINPTS_PARAM} and {@link #LAMBDA_PARAM}
+     * to the option handler additionally to parameters of super class.
      */
     public PreDeConWrapper() {
         super();

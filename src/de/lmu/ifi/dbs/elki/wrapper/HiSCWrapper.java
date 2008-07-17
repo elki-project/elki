@@ -12,14 +12,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
 import java.util.List;
 
 /**
- * Wrapper class for HiSC algorithm. Performs an attribute wise normalization on
- * the database objects.
+ * Wrapper class for HiSC algorithm.
  *
  * @author Elke Achtert
  *         todo parameter
  */
-//public class HiSCWrapper extends NormalizationWrapper {
-// todo: richtig?
 public class HiSCWrapper extends FileBasedDatabaseConnectionWrapper {
 
     /**
@@ -57,8 +54,9 @@ public class HiSCWrapper extends FileBasedDatabaseConnectionWrapper {
     }
 
     /**
-     * Sets the parameter minpts and k in the parameter map additionally to the
-     * parameters provided by super-classes.
+     * Adds parameters
+     * {@link } and {@link } todo
+     * to the option handler additionally to parameters of super class.
      */
     public HiSCWrapper() {
         super();

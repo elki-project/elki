@@ -23,8 +23,9 @@ public abstract class FileBasedDatabaseConnectionWrapper extends KDDTaskWrapper 
     private File input;
 
     /**
-     * Sets the parameter database connection in the parameter map additionally to the
-     * parameters provided by super-classes.
+     * Adds parameter
+     * {@link } todo
+     * to the option handler additionally to parameters of super class.
      */
     public FileBasedDatabaseConnectionWrapper() {
         super();

@@ -43,18 +43,9 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
     private List<String> remainingParameters;
 
     /**
-     * Sets the parameters for the verbose and help flags in the parameter map.
+     * Adds the flags {@link #VERBOSE_FLAG} and {@link #HELP_FLAG} to the option handler.
      * Any extending class should call this constructor, then add further
-     * parameters. Any non-abstract extending class should finally initialize
-     * optionHandler like this: <p/>
-     * <p/>
-     * <pre>
-     *   {
-     *       parameterToDescription.put(YOUR_PARAMETER_NAME+OptionHandler.EXPECTS_VALUE,YOUR_PARAMETER_DESCRIPTION);
-     *       ...
-     *       optionHandler = new OptionHandler(parameterToDescription,yourClass.class.getName());
-     *   }
-     * </pre>
+     * parameters.
      */
     protected AbstractWrapper() {
         // verbose
@@ -68,9 +59,14 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
         optionHandler.put(HELP_FLAG);
     }
 
-    /**
+     /**
+     * Calls {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters(String[]) AbstractParameterizable#setParameters(args)}
+     * and sets additionally the values of the flags
+     * {@link #VERBOSE_FLAG} and {@link #HELP_FLAG}.
+     *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
         this.remainingParameters = new ArrayList<String>(remainingParameters.length);

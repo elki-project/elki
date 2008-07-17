@@ -8,7 +8,13 @@ import de.lmu.ifi.dbs.elki.tree.btree.BTreeData;
 import de.lmu.ifi.dbs.elki.tree.btree.DefaultKey;
 import de.lmu.ifi.dbs.elki.utilities.output.ObjectPrinter;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.util.regex.Pattern;
 
 /**
@@ -46,30 +52,27 @@ public class LOFTable extends AbstractLoggable {
     /**
      * Creates a new LOFTable from a given file with the specified parameters.
      *
-     * @param fileName  the name of the file containing the entries
+     * @param file      the file containing the entries
      * @param pageSize  the size of a page in Bytes
      * @param cacheSize the size of the cache in Bytes
      * @param minpts    number of nearest neighbors of an object to be considered for
      *                  computing its LOF
      * @throws java.io.IOException if an I/O Exception occurs during reading the file
      */
-    public LOFTable(String fileName, int pageSize, int cacheSize, int minpts)
-        throws IOException {
+    public LOFTable(File file, int pageSize, int cacheSize, int minpts) throws IOException {
         this(pageSize, cacheSize, minpts);
 
-        InputStream in = new FileInputStream(fileName);
+        InputStream in = new FileInputStream(file);
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         int lineNumber = 0;
         for (String line; (line = reader.readLine()) != null; lineNumber++) {
             if (!line.startsWith(AbstractParser.COMMENT)) {
                 try {
-                    BTreeData<DefaultKey, LOFEntry> data = printer
-                        .restoreObject(line);
+                    BTreeData<DefaultKey, LOFEntry> data = printer.restoreObject(line);
                     lof.insert(data);
                 }
                 catch (Exception e) {
-                    throw new RuntimeException("Error while parsing line "
-                        + lineNumber, e);
+                    throw new RuntimeException("Error while parsing line " + lineNumber, e);
                 }
             }
         }
@@ -212,5 +215,5 @@ public class LOFTable extends AbstractLoggable {
      */
     public boolean equals(Object obj) {
         return obj instanceof LOFTable && super.equals(obj);
-	}
+    }
 }

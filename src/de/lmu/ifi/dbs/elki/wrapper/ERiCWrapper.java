@@ -72,8 +72,9 @@ public class ERiCWrapper extends NormalizationWrapper {
     }
 
     /**
-     * Sets the parameter epsilon, minpts and k in the parameter map additionally to the
-     * parameters provided by super-classes.
+     * Adds parameters
+     * {@link #MINPTS_PARAM}, {@link #K_PARAM}, and {@link } todo
+     * to the option handler additionally to parameters of super class.
      */
     public ERiCWrapper() {
         super();

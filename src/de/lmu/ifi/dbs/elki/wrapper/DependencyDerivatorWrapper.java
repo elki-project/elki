@@ -12,7 +12,6 @@ import java.util.List;
  * Wrapper class for the dependency derivator.
  *
  * @author Elke Achtert
- * todo parameter
  */
 public class DependencyDerivatorWrapper extends FileBasedDatabaseConnectionWrapper {
 

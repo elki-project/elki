@@ -70,8 +70,9 @@ public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
     }
 
     /**
-     * Sets the parameters k, k_i and dim in the parameter map additionally to
-     * the parameters provided by super-classes.
+     * Adds parameters
+     * {@link #K_PARAM}, {@link #K_I_PARAM} and {@link #L_PARAM}
+     * to the option handler additionally to parameters of super class.
      */
     public ORCLUSWrapper() {
         super();

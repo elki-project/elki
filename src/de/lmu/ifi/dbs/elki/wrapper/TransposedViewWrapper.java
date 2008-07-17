@@ -66,7 +66,9 @@ public class TransposedViewWrapper<V extends RealVector<V, ?>> extends StandAlon
     }
 
     /**
-     * Initializes the option handler.
+     * Adds parameter
+     * {@link #} todo 
+     * to the option handler additionally to parameters of super class.
      */
     public TransposedViewWrapper() {
         super();

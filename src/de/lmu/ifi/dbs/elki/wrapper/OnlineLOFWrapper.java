@@ -6,20 +6,16 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
-import java.io.File;
 import java.util.List;
 
 /**
- * Wrapper class for LOF algorithm. Performs an attribute wise normalization
- * on the database objects.
+ * Wrapper class for Online LOF algorithm.
  *
  * @author Elke Achtert
- *         todo parameter
  */
 public class OnlineLOFWrapper extends FileBasedDatabaseConnectionWrapper {
 
@@ -33,19 +29,25 @@ public class OnlineLOFWrapper extends FileBasedDatabaseConnectionWrapper {
         new GreaterConstraint(0));
 
     /**
-     * The value of the insertions parameter.
+     * Parameter to specify the name of the file containing tthe objects to be inserted.
+     * <p>Key: {@code -onlinelof.insertions} </p>
      */
-    private File insertions;
+    private final FileParameter INSERTIONS_PARAM = new FileParameter(OnlineLOF.INSERTIONS_ID, FileParameter.FileType.INPUT_FILE);
+
 
     /**
-     * The value of the lof parameter.
+     * Parameter to specify the name of the file containing the LOFs of the input file.
+     * <p>Key: {@code -onlinelof.lof} </p>
      */
-    private File lof;
+    private final FileParameter LOF_PARAM = new FileParameter(OnlineLOF.LOF_ID, FileParameter.FileType.INPUT_FILE);
+
 
     /**
-     * The value of the nn parameter.
+     * Parameter to specify the name of the file containing the nearest neighbors of the input file.
+     * <p>Key: {@code -onlinelof.nn} </p>
      */
-    private File nn;
+    private final FileParameter NN_PARAM = new FileParameter(OnlineLOF.NN_ID, FileParameter.FileType.INPUT_FILE);
+
 
     /**
      * Main method to run this wrapper.
@@ -72,7 +74,7 @@ public class OnlineLOFWrapper extends FileBasedDatabaseConnectionWrapper {
 
     /**
      * Adds parameter
-     * {@link #MINPTS_PARAM} todo
+     * {@link #MINPTS_PARAM}, {@link #INSERTIONS_PARAM}, {@link #LOF_PARAM}, and {@link #NN_PARAM}
      * to the option handler additionally to parameters of super class.
      */
     public OnlineLOFWrapper() {
@@ -81,16 +83,13 @@ public class OnlineLOFWrapper extends FileBasedDatabaseConnectionWrapper {
         addOption(MINPTS_PARAM);
 
         // parameter insertions
-        optionHandler.put(new FileParameter(OnlineLOF.INSERTIONS_P, OnlineLOF.INSERTIONS_D,
-            FileParameter.FileType.INPUT_FILE));
+        addOption(INSERTIONS_PARAM);
 
         // parameter LOF
-        optionHandler.put(new FileParameter(OnlineLOF.LOF_P, OnlineLOF.LOF_D,
-            FileParameter.FileType.INPUT_FILE));
+        addOption(LOF_PARAM);
 
         //parameter nn
-        optionHandler.put(new FileParameter(OnlineLOF.NN_P, OnlineLOF.NN_D,
-            FileParameter.FileType.INPUT_FILE));
+        addOption(NN_PARAM);
     }
 
     /**
@@ -106,16 +105,13 @@ public class OnlineLOFWrapper extends FileBasedDatabaseConnectionWrapper {
         Util.addParameter(parameters, OnlineLOF.MINPTS_ID, Integer.toString(getParameterValue(MINPTS_PARAM)));
 
         // insertions
-        parameters.add(OptionHandler.OPTION_PREFIX + OnlineLOF.INSERTIONS_P);
-        parameters.add(insertions.getPath());
+        Util.addParameter(parameters, OnlineLOF.INSERTIONS_ID, getParameterValue(INSERTIONS_PARAM).getPath());
 
         // lof
-        parameters.add(OptionHandler.OPTION_PREFIX + OnlineLOF.LOF_P);
-        parameters.add(lof.getPath());
+        Util.addParameter(parameters, OnlineLOF.LOF_ID, getParameterValue(LOF_PARAM).getPath());
 
         // nn
-        parameters.add(OptionHandler.OPTION_PREFIX + OnlineLOF.NN_P);
-        parameters.add(nn.getPath());
+        Util.addParameter(parameters, OnlineLOF.NN_ID, getParameterValue(NN_PARAM).getPath());
 
         // distance function
         Util.addParameter(parameters, OnlineLOF.DISTANCE_FUNCTION_ID, EuklideanDistanceFunction.class.getName());
@@ -130,18 +126,5 @@ public class OnlineLOFWrapper extends FileBasedDatabaseConnectionWrapper {
 
 
         return parameters;
-    }
-
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
-
-        insertions = (File) optionHandler.getOptionValue(OnlineLOF.INSERTIONS_P);
-        lof = (File) optionHandler.getOptionValue(OnlineLOF.LOF_P);
-        nn = (File) optionHandler.getOptionValue(OnlineLOF.NN_P);
-
-        return remainingParameters;
     }
 }

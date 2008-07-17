@@ -4,7 +4,10 @@ import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.util.List;
@@ -14,7 +17,6 @@ import java.util.List;
  * on the database objects.
  *
  * @author Elke Achtert
- * todo parameter
  */
 public class OPTICSWrapper extends NormalizationWrapper {
 
@@ -33,16 +35,6 @@ public class OPTICSWrapper extends NormalizationWrapper {
      */
     private final IntParameter MINPTS_PARAM = new IntParameter(OPTICS.MINPTS_ID,
         new GreaterConstraint(0));
-
-    /**
-     * Holds the value of the epsilon parameter.
-     */
-    private String epsilon;
-
-    /**
-     * THolds the value of the minpts parameter.
-     */
-    private int minpts;
 
     /**
      * Main method to run this wrapper.
@@ -68,8 +60,9 @@ public class OPTICSWrapper extends NormalizationWrapper {
     }
 
     /**
-     * Sets the parameters epsilon and minpts in the parameter map additionally
-     * to the parameters provided by super-classes.
+     * Adds parameters
+     * {@link #EPSILON_PARAM} and {@link #MINPTS_PARAM}
+     * to the option handler additionally to parameters of super class.
      */
     public OPTICSWrapper() {
         super();
@@ -94,10 +87,10 @@ public class OPTICSWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, OptionID.ALGORITHM, OPTICS.class.getName());
 
         // epsilon
-        Util.addParameter(parameters, EPSILON_PARAM, epsilon);
+        Util.addParameter(parameters, EPSILON_PARAM, getParameterValue(EPSILON_PARAM));
 
         // minpts
-        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(minpts));
+        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(getParameterValue(MINPTS_PARAM)));
 
         // distance function
         Util.addParameter(parameters, OPTICS.DISTANCE_FUNCTION_ID, EuklideanDistanceFunction.class.getName());
@@ -125,18 +118,5 @@ public class OPTICSWrapper extends NormalizationWrapper {
         // params.add("120000");
 
         return parameters;
-    }
-
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
-
-        // epsilon, minpts
-        epsilon = getParameterValue(EPSILON_PARAM);
-        minpts = getParameterValue(MINPTS_PARAM);
-
-        return remainingParameters;
     }
 }

@@ -16,13 +16,16 @@ import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,56 +37,69 @@ import java.util.Map;
  *
  * @author Elke Achtert
  * @param <O> the type of DatabaseObjects handled by this Algorithm
- * todo parameter
  */
 public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
+    /**
+     * OptionID for {@link #LOF_PARAM}
+     */
+    public static final OptionID LOF_ID = OptionID.getOrCreateOptionID(
+        "onlinelof.lof",
+        "The name of the file containing the LOFs of the input file."
+    );
 
     /**
-     * Parameter lof.
+     * Parameter to specify the name of the file containing the LOFs of the input file.
+     * <p>Key: {@code -onlinelof.lof} </p>
      */
-    public static final String LOF_P = "lof";
+    private final FileParameter LOF_PARAM = new FileParameter(LOF_ID, FileParameter.FileType.INPUT_FILE);
 
     /**
-     * Description for parameter lof.
+     * OptionID for {@link #NN_PARAM}
      */
-    public static final String LOF_D = "file that contains the LOFs of the input file.";
+    public static final OptionID NN_ID = OptionID.getOrCreateOptionID(
+        "onlinelof.nn",
+        "The name of the file containing the nearest neighbors of the input file."
+    );
 
     /**
-     * Parameter nn.
+     * Parameter to specify the name of the file containing the nearest neighbors of the input file.
+     * <p>Key: {@code -onlinelof.nn} </p>
      */
-    public static final String NN_P = "nn";
+    private final FileParameter NN_PARAM = new FileParameter(NN_ID, FileParameter.FileType.INPUT_FILE);
 
     /**
-     * Description for parameter n.
+     * OptionID for {@link #INSERTIONS_PARAM}
      */
-    public static final String NN_D = "file that contains the nearest neighbors of the input file.";
+    public static final OptionID INSERTIONS_ID = OptionID.getOrCreateOptionID(
+        "onlinelof.insertions",
+        "The name of the file containing the objects to be inserted."
+    );
 
     /**
-     * Parameter lof.
+     * Parameter to specify the name of the file containing tthe objects to be inserted.
+     * <p>Key: {@code -onlinelof.insertions} </p>
      */
-    public static final String INSERTIONS_P = "insertions";
+    private final FileParameter INSERTIONS_PARAM = new FileParameter(INSERTIONS_ID, FileParameter.FileType.INPUT_FILE);
 
     /**
-     * Description for parameter lof.
+     * OptionID for {@link #PARSER_PARAM}
      */
-    public static final String INSERTIONS_D = "file that contains the objects to be inserted.";
+    public static final OptionID PARSER_ID = OptionID.getOrCreateOptionID(
+        "onlinelof.parser",
+        "Classname of the parser to parse the insertion and/or deletion files " +
+            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Parser.class) + "."
+    );
 
     /**
-     * Default parser.
+     * Parameter to specify the parser to parse the insertion and/or deletion files,
+     * must extend {@link Parser}.
+     * <p>Key: {@code -onlinelof.parser} </p>
+     * <p>Default value: {@link RealVectorLabelParser} </p>
      */
-    public final static String DEFAULT_PARSER = RealVectorLabelParser.class.getName();
-
-    /**
-     * Parameter parser.
-     */
-    public final static String PARSER_P = "parser";
-
-    /**
-     * Description of parameter parser.
-     */
-    public final static String PARSER_D = "a parser to parse the insertion and/or deletion files " +
-        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Parser.class) +
-        ". Default: " + DEFAULT_PARSER;
+    protected final ClassParameter<Parser> PARSER_PARAM =
+        new ClassParameter<Parser>(PARSER_ID,
+            Parser.class,
+            RealVectorLabelParser.class.getName());
 
     /**
      * The objects to be inserted.
@@ -91,34 +107,33 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
     private List<ObjectAndAssociations<O>> insertions;
 
     /**
-     * Sets minimum points to the optionhandler additionally to the
-     * parameters provided by super-classes.
+     * Provides the Online LOF algorithm,
+     * adding parameters
+     * {@link #LOF_PARAM}, {@link #NN_PARAM}, {@link #INSERTIONS_PARAM}, and {@link #PARSER_PARAM}
+     * to the option handler additionally to parameters of super class.
      */
     public OnlineLOF() {
         super();
-        //parameter lof
-        optionHandler.put(new FileParameter(LOF_P, LOF_D, FileParameter.FileType.INPUT_FILE));
 
-        //parameter nn
-        optionHandler.put(new FileParameter(NN_P, NN_D, FileParameter.FileType.INPUT_FILE));
+        //parameter lof
+        addOption(LOF_PARAM);
+
+        //parameter lof
+        addOption(NN_PARAM);
 
         //parameter insertions
-        optionHandler.put(new FileParameter(INSERTIONS_P, INSERTIONS_D, FileParameter.FileType.INPUT_FILE));
+        addOption(INSERTIONS_PARAM);
 
         //parameter parser
-        ClassParameter<Parser<O>> parser = new ClassParameter(PARSER_P, PARSER_D, Parser.class);
-        parser.setDefaultValue(DEFAULT_PARSER);
-        optionHandler.put(parser);
+        addOption(PARSER_PARAM);
     }
 
     /**
-     * The run method encapsulated in measure of runtime. An extending class
-     * needs not to take care of runtime itself.
+     * Performs the Online LOF algorithm on the given database.
      *
-     * @param database the database to run the algorithm on
-     * @throws IllegalStateException if the algorithm has not been initialized properly (e.g. the
-     *                               setParameters(String[]) method has been failed to be called).
+     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
+    @Override
     protected void runInTime(Database<O> database) throws IllegalStateException {
         lofTable.resetPageAccess();
         nnTable.resetPageAccess();
@@ -145,10 +160,9 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
     }
 
     /**
-     * Returns a description of the algorithm.
-     *
-     * @return a description of the algorithm
+     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getDescription()
      */
+    @Override
     public Description getDescription() {
         return new Description("OnlineLOF", "Online Local Outlier Factor",
             "Algorithm to efficiently update density-based local outlier factors in a database " +
@@ -157,55 +171,57 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
     }
 
     /**
+     * Calls {@link LOF#setParameters(String[]) LOF#setParameters(args)}
+     * and sets additionally the values of the parameters
+     * {@link #LOF_PARAM}, {@link #NN_PARAM}, {@link #INSERTIONS_PARAM}, and {@link #PARSER_PARAM}.
+     *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
         // lofTable
-        String lofString = ((File) optionHandler.getOptionValue(LOF_P)).getPath();
         try {
-            lofTable = new LOFTable(lofString, pageSize, cacheSize, minpts);
+            lofTable = new LOFTable(getParameterValue(LOF_PARAM), pageSize, cacheSize, minpts);
         }
         catch (IOException e) {
-            throw new WrongParameterValueException(LOF_P, lofString, LOF_D, e);
+            throw new WrongParameterValueException(LOF_PARAM, getParameterValue(LOF_PARAM).getName(), e);
         }
 
         // nnTable
-        String nnString = ((File) optionHandler.getOptionValue(NN_P)).getPath();
         try {
-            nnTable = new NNTable(nnString, pageSize, cacheSize, minpts);
+            nnTable = new NNTable(getParameterValue(NN_PARAM), pageSize, cacheSize, minpts);
         }
         catch (IOException e) {
-            throw new WrongParameterValueException(NN_P, nnString, NN_D, e);
+            throw new WrongParameterValueException(NN_PARAM, getParameterValue(NN_PARAM).getName(), e);
         }
 
         // parser for insertions
-        String parserClass = (String) optionHandler.getOptionValue(PARSER_P);
-        Parser<O> parser;
-        try {
-            //noinspection unchecked
-            // todo
-            parser = Util.instantiate(Parser.class, parserClass);
-        }
-        catch (UnableToComplyException e) {
-            throw new WrongParameterValueException(PARSER_P, parserClass, PARSER_D);
-        }
+        //noinspection unchecked
+        Parser<O> parser = PARSER_PARAM.instantiateClass();
 
         // insertions
-        String insertionString = ((File) optionHandler.getOptionValue(INSERTIONS_P)).getName();
         try {
-            InputStream in = new FileInputStream(insertionString);
+            InputStream in = new FileInputStream(getParameterValue(INSERTIONS_PARAM));
             ParsingResult<O> parsingResult = parser.parse(in);
             insertions = transformObjectAndLabels(parsingResult.getObjectAndLabelList());
         }
         catch (FileNotFoundException e) {
-            throw new WrongParameterValueException(INSERTIONS_P, insertionString, INSERTIONS_D, e);
+            throw new WrongParameterValueException(INSERTIONS_PARAM, getParameterValue(INSERTIONS_PARAM).getName(), e);
         }
 
         return remainingParameters;
     }
 
+    /**
+     * Inserts the specified objects and their associations into the given database
+     * and updates the {@link #nnTable} and {@link #lofTable} storing the neighbors and LOFs.
+     *
+     * @param database             the database to perform the insertion on
+     * @param objectAndAssociation the objects and their associations to be inserted
+     * @throws UnableToComplyException if insertion is not possible
+     */
     private void insert(Database<O> database, ObjectAndAssociations<O> objectAndAssociation) throws UnableToComplyException {
         // insert o into db
         Integer o = database.insert(objectAndAssociation);
@@ -333,6 +349,13 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
         }
     }
 
+    /**
+     * Auxiliary method for {@link #insert(de.lmu.ifi.dbs.elki.database.Database,de.lmu.ifi.dbs.elki.database.ObjectAndAssociations)}:
+     * inserts the objects with the specified id into the the {@link #nnTable} and {@link #lofTable}.
+     *
+     * @param id        the id of the object to be inserted
+     * @param neighbors the neighbors of the object to be inserted
+     */
     private void insertObjectIntoTables(Integer id, List<QueryResult<DoubleDistance>> neighbors) {
         double sum1 = 0;
         double[] sum2 = new double[minpts];

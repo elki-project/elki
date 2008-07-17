@@ -16,8 +16,7 @@ import java.util.List;
 
 /**
  * Wrapper class for COPAC algorithm. Performs an attribute wise normalization on
- * the database objects, partitions the database according to the correlation dimension of
- * its objects and then performs the algorithm DBSCAN over the partitions.
+ * the database objects.
  *
  * @author Elke Achtert
  */
@@ -73,8 +72,9 @@ public class COPACWrapper extends NormalizationWrapper {
     }
 
     /**
-     * Sets the parameter epsilon, minpts and k in the parameter map additionally to the
-     * parameters provided by super-classes.
+     * Adds parameters
+     * {@link #EPSILON_PARAM}, {@link #MINPTS_PARAM}, and {@link #K_PARAM}
+     * to the option handler additionally to parameters of super class.
      */
     public COPACWrapper() {
         super();

@@ -90,7 +90,9 @@ public class FourCWrapper extends NormalizationWrapper {
     }
 
     /**
-     * Provides a wrapper for the 4C algorithm.
+     * Adds parameters
+     * {@link #EPSILON_PARAM}, {@link #MINPTS_PARAM}, {@link #LAMBDA_PARAM}, {@link } and flag {@link } todo
+     * to the option handler additionally to parameters of super class.
      */
     public FourCWrapper() {
         super();
@@ -103,10 +105,6 @@ public class FourCWrapper extends NormalizationWrapper {
         // lambda
         addOption(LAMBDA_PARAM);
 
-        // absolute flag
-        absolute = new Flag(FourCPreprocessor.ABSOLUTE_F, FourCPreprocessor.ABSOLUTE_D);
-        optionHandler.put(absolute);
-
         // delta
         List<ParameterConstraint<Number>> cons = new Vector<ParameterConstraint<Number>>();
         cons.add(new GreaterEqualConstraint(0));
@@ -114,6 +112,10 @@ public class FourCWrapper extends NormalizationWrapper {
         delta = new DoubleParameter(FourCPreprocessor.DELTA_P, FourCPreprocessor.DELTA_D, cons);
         delta.setDefaultValue(LimitEigenPairFilter.DEFAULT_DELTA);
         optionHandler.put(delta);
+
+        // absolute flag
+        absolute = new Flag(FourCPreprocessor.ABSOLUTE_F, FourCPreprocessor.ABSOLUTE_D);
+        optionHandler.put(absolute);
     }
 
     /**

@@ -33,9 +33,9 @@ public abstract class StandAloneInputWrapper extends StandAloneWrapper {
     private File input;
 
     /**
-     * Sets additionally to the parameters set by the super class the
-     * parameter in in the parameter map. Any extending
-     * class should call this constructor, then add further parameters.
+     * Adds parameter
+     * {@link } todo
+     * to the option handler additionally to parameters of super class.
      */
     protected StandAloneInputWrapper() {
         super();

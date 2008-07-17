@@ -225,9 +225,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
         if (args.length == 0) {
             throw new AbortException("No options specified. Try flag -h to gain more information.");
         }
-        String[] remainingParameters = helpOptionHandler.grabOptions(args);
-
-        
+        helpOptionHandler.grabOptions(args);
 
         // help
         if (helpOptionHandler.isSet(HELP_FLAG) || helpOptionHandler.isSet(HELP_LONG_FLAG)) {
@@ -260,7 +258,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
             }
         }
 
-        remainingParameters = super.setParameters(args);
+        String[] remainingParameters = super.setParameters(args);
         
         // algorithm
         algorithm = ALGORITHM_PARAM.instantiateClass();

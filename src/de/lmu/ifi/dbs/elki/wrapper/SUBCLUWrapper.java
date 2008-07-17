@@ -60,8 +60,9 @@ public class SUBCLUWrapper extends NormalizationWrapper {
     }
 
     /**
-     * Sets the parameters epsilon and minpts in the parameter map additionally to the
-     * parameters provided by super-classes.
+     * Adds parameters
+     * {@link #EPSILON_PARAM} and  {@link #MINPTS_PARAM}
+     * to the option handler additionally to parameters of super class.
      */
     public SUBCLUWrapper() {
         super();

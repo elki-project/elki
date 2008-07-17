@@ -1,10 +1,12 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
 import de.lmu.ifi.dbs.elki.algorithm.ICA;
+import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.varianceanalysis.PercentageEigenPairFilter;
 import de.lmu.ifi.dbs.elki.varianceanalysis.ica.FastICA;
 import de.lmu.ifi.dbs.elki.varianceanalysis.ica.KurtosisBasedContrastFunction;
@@ -15,7 +17,7 @@ import java.util.List;
  * Wrapper class for ICA algorithm.
  *
  * @author Elke Achtert
- * todo parameter
+ *         todo parameter
  */
 public class ICAWrapper extends FileBasedDatabaseConnectionWrapper {
     /**
@@ -37,24 +39,16 @@ public class ICAWrapper extends FileBasedDatabaseConnectionWrapper {
             wrapper.setParameters(args);
             wrapper.run();
         }
-//    catch (ParameterException e) {
-//      Throwable cause = e.getCause() != null ? e.getCause() : e;
-//      wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
-//    }
-//    catch (AbortException e) {
-//      wrapper.verbose(e.getMessage());
-//    }
+        catch (ParameterException e) {
+            Throwable cause = e.getCause() != null ? e.getCause() : e;
+            wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
+        }
+        catch (AbortException e) {
+            wrapper.verbose(e.getMessage());
+        }
         catch (Exception e) {
             wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
         }
-    }
-
-    /**
-     * Sets the parameters epsilon and minpts in the parameter map additionally to the
-     * parameters provided by super-classes.
-     */
-    public ICAWrapper() {
-        super();
     }
 
     /**

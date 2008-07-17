@@ -51,8 +51,9 @@ public class CASHWrapper extends FileBasedDatabaseConnectionWrapper {
     }
 
     /**
-     * Sets the parameters epsilon and minpts in the parameter map additionally to the
-     * parameters provided by super-classes.
+     * Adds parameters
+     * {@link #MINPTS_PARAM} and {@link #MAXLEVEL_PARAM}
+     * to the option handler additionally to parameters of super class.
      */
     public CASHWrapper() {
         super();
@@ -66,6 +67,7 @@ public class CASHWrapper extends FileBasedDatabaseConnectionWrapper {
     /**
      * @see de.lmu.ifi.dbs.elki.wrapper.KDDTaskWrapper#getKDDTaskParameters()
      */
+    @Override
     public List<String> getKDDTaskParameters() {
         List<String> parameters = super.getKDDTaskParameters();
 
