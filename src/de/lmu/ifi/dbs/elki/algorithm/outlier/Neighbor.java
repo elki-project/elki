@@ -148,9 +148,9 @@ public class Neighbor implements Externalizable, Comparable<Neighbor> {
         long temp;
         result = neighborID.hashCode();
         result = 29 * result + index;
-        temp = distance != +0.0d ? Double.doubleToLongBits(distance) : 0L;
+        temp = distance != 0.0d ? Double.doubleToLongBits(distance) : 0L;
         result = 29 * result + (int) (temp ^ (temp >>> 32));
-        temp = reachabilityDistance != +0.0d ? Double.doubleToLongBits(reachabilityDistance) : 0L;
+        temp = reachabilityDistance != 0.0d ? Double.doubleToLongBits(reachabilityDistance) : 0L;
         result = 29 * result + (int) (temp ^ (temp >>> 32));
         return result;
     }

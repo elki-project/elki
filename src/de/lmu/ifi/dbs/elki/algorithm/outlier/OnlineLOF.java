@@ -36,7 +36,7 @@ import java.util.Map;
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * todo parameter
  */
-public class OnlineLOF<O extends DatabaseObject> extends OnlineBasicLOF<O> {
+public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
 
     /**
      * Parameter lof.

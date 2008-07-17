@@ -1,11 +1,10 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.OnlineBasicLOF;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.LOF;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -13,18 +12,20 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
 import java.util.List;
 
 /**
- * Wrapper class for LOF algorithm. Performs an attribute wise normalization
- * on the database objects.
+ * Wrapper class for LOF algorithm.
  *
  * @author Elke Achtert
- *         todo parameter
  */
-public class OnlineBasicLOFWrapper extends FileBasedDatabaseConnectionWrapper {
+public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
 
     /**
-     * The value of the minpts parameter.
+     * Parameter to specify the number of nearest neighbors of an object to be considered for computing its LOF,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -lof.minpts} </p>
      */
-    private int minpts;
+    private final IntParameter MINPTS_PARAM = new IntParameter(
+        LOF.MINPTS_ID,
+        new GreaterConstraint(0));
 
     /**
      * Main method to run this wrapper.
@@ -32,7 +33,7 @@ public class OnlineBasicLOFWrapper extends FileBasedDatabaseConnectionWrapper {
      * @param args the arguments to run this wrapper
      */
     public static void main(String[] args) {
-        OnlineBasicLOFWrapper wrapper = new OnlineBasicLOFWrapper();
+        LOFWrapper wrapper = new LOFWrapper();
         try {
             wrapper.setParameters(args);
             wrapper.run();
@@ -50,12 +51,13 @@ public class OnlineBasicLOFWrapper extends FileBasedDatabaseConnectionWrapper {
     }
 
     /**
-     * Sets the parameter minpts in the parameter map additionally
-     * to the parameters provided by super-classes.
+     * Adds parameter
+     * {@link #MINPTS_PARAM}
+     * to the option handler additionally to parameters of super class.
      */
-    public OnlineBasicLOFWrapper() {
+    public LOFWrapper() {
         super();
-        optionHandler.put(new IntParameter(OnlineBasicLOF.MINPTS_P, OnlineBasicLOF.MINPTS_D, new GreaterConstraint(0)));
+        addOption(MINPTS_PARAM);
     }
 
     /**
@@ -65,14 +67,13 @@ public class OnlineBasicLOFWrapper extends FileBasedDatabaseConnectionWrapper {
         List<String> parameters = super.getKDDTaskParameters();
 
         // algorithm LOF
-        Util.addParameter(parameters, OptionID.ALGORITHM, OnlineBasicLOF.class.getName());
+        Util.addParameter(parameters, OptionID.ALGORITHM, LOF.class.getName());
 
         // minpts
-        parameters.add(OptionHandler.OPTION_PREFIX + OnlineBasicLOF.MINPTS_P);
-        parameters.add(Integer.toString(minpts));
+        Util.addParameter(parameters, LOF.MINPTS_ID, Integer.toString(getParameterValue(MINPTS_PARAM)));
 
         // distance function
-        Util.addParameter(parameters, OnlineBasicLOF.DISTANCE_FUNCTION_ID, EuklideanDistanceFunction.class.getName());
+        Util.addParameter(parameters, LOF.DISTANCE_FUNCTION_ID, EuklideanDistanceFunction.class.getName());
 
         // normalization
 //    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
@@ -88,15 +89,6 @@ public class OnlineBasicLOFWrapper extends FileBasedDatabaseConnectionWrapper {
 //    parameters.add("" + 8000 * 10);
 
         return parameters;
-    }
-
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
-        minpts = (Integer) optionHandler.getOptionValue(OnlineBasicLOF.MINPTS_P);
-        return remainingParameters;
     }
 }
 

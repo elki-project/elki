@@ -49,9 +49,9 @@ public class LOFEntry implements Externalizable {
     public String toString() {
         StringBuffer result = new StringBuffer();
         result.append(sum1);
-        for (int i = 0; i < this.sum2Array.length; i++) {
+        for (double sum2 : this.sum2Array) {
             result.append(" ");
-            result.append(this.sum2Array[i]);
+            result.append(sum2);
         }
         return result.toString();
     }
@@ -208,7 +208,7 @@ public class LOFEntry implements Externalizable {
      * @return a hash code value for this object.
      */
     public int hashCode() {
-        final long temp = sum1 != +0.0d ? Double.doubleToLongBits(sum1) : 0L;
+        final long temp = sum1 != 0.0d ? Double.doubleToLongBits(sum1) : 0L;
         return (int) (temp ^ (temp >>> 32));
     }
 }

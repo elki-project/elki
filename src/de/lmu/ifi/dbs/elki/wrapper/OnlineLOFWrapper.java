@@ -4,7 +4,11 @@ import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OnlineLOF;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.io.File;
@@ -20,9 +24,13 @@ import java.util.List;
 public class OnlineLOFWrapper extends FileBasedDatabaseConnectionWrapper {
 
     /**
-     * The value of the minpts parameter.
+     * Parameter to specify the number of nearest neighbors of an object to be considered for computing its LOF,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -lof.minpts} </p>
      */
-    private int minpts;
+    private final IntParameter MINPTS_PARAM = new IntParameter(
+        OnlineLOF.MINPTS_ID,
+        new GreaterConstraint(0));
 
     /**
      * The value of the insertions parameter.
@@ -63,13 +71,14 @@ public class OnlineLOFWrapper extends FileBasedDatabaseConnectionWrapper {
     }
 
     /**
-     * Sets the parameters epsilon and minpts in the parameter map additionally
-     * to the parameters provided by super-classes.
+     * Adds parameter
+     * {@link #MINPTS_PARAM} todo
+     * to the option handler additionally to parameters of super class.
      */
     public OnlineLOFWrapper() {
         super();
         // parameter min points
-        optionHandler.put(new IntParameter(OnlineLOF.MINPTS_P, OnlineLOF.MINPTS_D, new GreaterConstraint(0)));
+        addOption(MINPTS_PARAM);
 
         // parameter insertions
         optionHandler.put(new FileParameter(OnlineLOF.INSERTIONS_P, OnlineLOF.INSERTIONS_D,
@@ -94,8 +103,7 @@ public class OnlineLOFWrapper extends FileBasedDatabaseConnectionWrapper {
         Util.addParameter(parameters, OptionID.ALGORITHM, OnlineLOF.class.getName());
 
         // minpts
-        parameters.add(OptionHandler.OPTION_PREFIX + OnlineLOF.MINPTS_P);
-        parameters.add(Integer.toString(minpts));
+        Util.addParameter(parameters, OnlineLOF.MINPTS_ID, Integer.toString(getParameterValue(MINPTS_PARAM)));
 
         // insertions
         parameters.add(OptionHandler.OPTION_PREFIX + OnlineLOF.INSERTIONS_P);
@@ -130,7 +138,6 @@ public class OnlineLOFWrapper extends FileBasedDatabaseConnectionWrapper {
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
-        minpts = (Integer) optionHandler.getOptionValue(OnlineLOF.MINPTS_P);
         insertions = (File) optionHandler.getOptionValue(OnlineLOF.INSERTIONS_P);
         lof = (File) optionHandler.getOptionValue(OnlineLOF.LOF_P);
         nn = (File) optionHandler.getOptionValue(OnlineLOF.NN_P);

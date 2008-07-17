@@ -11,11 +11,14 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuklideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.properties.Properties;
-import de.lmu.ifi.dbs.elki.utilities.*;
+import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.Progress;
+import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.util.Iterator;
@@ -27,42 +30,51 @@ import java.util.List;
  *
  * @author Peer Kr&ouml;ger
  * @param <O> the type of DatabaseObjects handled by this Algorithm
- * todo parameter
  */
 public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, DoubleDistance> {
-
     /**
-     * The default reachability distance function.
+     * OptionID for {@link #REACHABILITY_DISTANCE_FUNCTION_PARAM}
      */
-    public static final String DEFAULT_REACHABILITY_DISTANCE_FUNCTION = EuklideanDistanceFunction.class.getName();
+    public static final OptionID REACHABILITY_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID(
+        "genlof.reachdistfunction",
+        "Classname of the distance function to determine the reachability distance between database objects " +
+            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) + "."
+    );
 
     /**
-     * Parameter for distance function to determine reachability distance.
+     * The distance function to determine the reachability distance between database objects.
+     * <p>Default value: {@link EuklideanDistanceFunction} </p>
+     * <p>Key: {@code -genlof.reachdistfunction} </p>
      */
-    public static final String REACHABILITY_DISTANCE_FUNCTION_P = "reachdistfunction";
+    private final ClassParameter<DistanceFunction> REACHABILITY_DISTANCE_FUNCTION_PARAM =
+        new ClassParameter<DistanceFunction>(
+            DISTANCE_FUNCTION_ID,
+            DistanceFunction.class,
+            EuklideanDistanceFunction.class.getName());
 
     /**
-     * Description for parameter reachability distance function.
-     */
-    public static final String REACHABILITY_DISTANCE_FUNCTION_D = "The distance function to determine the reachability distance between database objects " + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) + ". Default: " + DEFAULT_REACHABILITY_DISTANCE_FUNCTION;
-
-    /**
-     * The reachability distance function.
+     * Holds the instance of the reachability distance function specified by
+     * {@link #REACHABILITY_DISTANCE_FUNCTION_PARAM}.
      */
     private DistanceFunction<O, DoubleDistance> reachabilityDistanceFunction;
 
     /**
-     * Parameter k nearest neighbors.
+     * OptionID for {@link #K_PARAM}
      */
-    public static final String K_P = "k";
+    public static final OptionID K_ID = OptionID.getOrCreateOptionID(
+        "genlof.k",
+        "The number of nearest neighbors of an object to be considered for computing its LOF."
+    );
 
     /**
-     * Description for parameter  k nearest neighbors.
+     * Parameter to specify the number of nearest neighbors of an object to be considered for computing its LOF,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -genlof.k} </p>
      */
-    public static final String K_D = "positive number of nearest neighbors of an object to be considered for computing its LOF.";
+    private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(0));
 
     /**
-     * Number of neighbors to be considered.
+     * Holds the value of {@link #K_PARAM}.
      */
     int k;
 
@@ -72,20 +84,23 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
     GeneralizedLOFResult<O> result;
 
     /**
-     * Sets minimum points to the optionhandler additionally to the parameters
-     * provided by super-classes.
+     * Provides the Generalized LOF algorithm,
+     * adding parameters
+     * {@link #K_PARAM} and {@link #REACHABILITY_DISTANCE_FUNCTION_PARAM}
+     * to the option handler additionally to parameters of super class.
      */
     public GeneralizedLOF() {
         super();
-        ClassParameter<DistanceFunction<O, DoubleDistance>> reachabilityDistance = new ClassParameter(REACHABILITY_DISTANCE_FUNCTION_P, REACHABILITY_DISTANCE_FUNCTION_D, DistanceFunction.class);
-        reachabilityDistance.setDefaultValue(DEFAULT_REACHABILITY_DISTANCE_FUNCTION);
-        optionHandler.put(reachabilityDistance);
         //parameter k
-        optionHandler.put(new IntParameter(K_P, K_D, new GreaterConstraint(0)));
+        addOption(K_PARAM);
+        // parameter reachability distance function
+        addOption(REACHABILITY_DISTANCE_FUNCTION_PARAM);
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#runInTime(Database)
+     * Performs the Generalized LOF algorithm on the given database.
+     *
+     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
     protected void runInTime(Database<O> database) throws IllegalStateException {
         getDistanceFunction().setDatabase(database, isVerbose(), isTime());
@@ -144,11 +159,12 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
                 Integer id = iter.next();
                 double sum = 0;
+                //noinspection unchecked
                 List<QueryResult<DoubleDistance>> neighbors = (List<QueryResult<DoubleDistance>>) database.getAssociation(AssociationID.NEIGHBORS_2, id);
-                for (Iterator<QueryResult<DoubleDistance>> neighbor = neighbors.iterator(); neighbor.hasNext();) {
-                    QueryResult<DoubleDistance> neighborQueryResult = neighbor.next();
-                    List<QueryResult<DoubleDistance>> neighborsNeighbors = (List<QueryResult<DoubleDistance>>) database.getAssociation(AssociationID.NEIGHBORS_2, neighborQueryResult.getID());
-                    sum += Math.max(neighborQueryResult.getDistance().getDoubleValue(),
+                for (QueryResult<DoubleDistance> neighbor : neighbors) {
+                    //noinspection unchecked
+                    List<QueryResult<DoubleDistance>> neighborsNeighbors = (List<QueryResult<DoubleDistance>>) database.getAssociation(AssociationID.NEIGHBORS_2, neighbor.getID());
+                    sum += Math.max(neighbor.getDistance().getDoubleValue(),
                         neighborsNeighbors.get(neighborsNeighbors.size() - 1).getDistance().getDoubleValue());
                 }
                 Double lrd = neighbors.size() / sum;
@@ -173,11 +189,12 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
                 Integer id = iter.next();
                 //computeLOF(database, id);
-                Double lrd = (Double) database.getAssociation(AssociationID.LRD, id);
+                Double lrd = database.getAssociation(AssociationID.LRD, id);
+                // noinspection unchecked
                 List<QueryResult<DoubleDistance>> neighbors = (List<QueryResult<DoubleDistance>>) database.getAssociation(AssociationID.NEIGHBORS, id);
                 double sum = 0;
-                for (Iterator<QueryResult<DoubleDistance>> neighbor = neighbors.iterator(); neighbor.hasNext();) {
-                    sum += (Double) database.getAssociation(AssociationID.LRD, neighbor.next().getID()) / lrd;
+                for (QueryResult<DoubleDistance> neighbor1 : neighbors) {
+                    sum += database.getAssociation(AssociationID.LRD, neighbor1.getID()) / lrd;
                 }
                 Double lof = neighbors.size() / sum;
                 database.associate(AssociationID.LOF, id, lof);
@@ -198,12 +215,20 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
      * @see Algorithm#getDescription()
      */
     public Description getDescription() {
-        return new Description("GeneralizedLOF", "Generalized Local Outlier Factor", "Algorithm to compute density-based local outlier factors in a database based on the parameter " + K_P + " and different distance functions", "unpublished");
+        return new Description("GeneralizedLOF",
+            "Generalized Local Outlier Factor",
+            "Algorithm to compute density-based local outlier factors in a database based on the parameter " +
+                K_PARAM + " and different distance functions",
+            "unpublished");
     }
 
     /**
-     * Sets the parameters minpts additionally to the parameters set by the
-     * super-class method.
+     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm#setParameters(String[]) DistanceBasedAlgorithm#setParameters(args)}
+     * and sets additionally the value of the parameter
+     * {@link #K_PARAM}
+     * and instantiates {@link #reachabilityDistanceFunction} according to the value of parameter
+     * {@link #REACHABILITY_DISTANCE_FUNCTION_PARAM}.
+     * The remaining parameters are passed to the {@link #reachabilityDistanceFunction}.
      *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
@@ -211,19 +236,30 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
-        // minpts
-        k = (Integer) optionHandler.getOptionValue(K_P);
+        // k
+        k = getParameterValue(K_PARAM);
+
         // reachabilityDistanceFunction
-        String reachabilityDistanceFunctionName = (String) optionHandler.getOptionValue(REACHABILITY_DISTANCE_FUNCTION_P);
-        try {
-            // todo
-            reachabilityDistanceFunction = Util.instantiate(DistanceFunction.class, reachabilityDistanceFunctionName);
-        }
-        catch (UnableToComplyException e) {
-            throw new WrongParameterValueException(REACHABILITY_DISTANCE_FUNCTION_P, reachabilityDistanceFunctionName, REACHABILITY_DISTANCE_FUNCTION_D, e);
-        }
+        // noinspection unchecked
+        reachabilityDistanceFunction = REACHABILITY_DISTANCE_FUNCTION_PARAM.instantiateClass();
+        remainingParameters = reachabilityDistanceFunction.setParameters(remainingParameters);
+        setParameters(args, remainingParameters);
 
         return remainingParameters;
+    }
+
+    /**
+     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm#getAttributeSettings()}
+     * and adds to the returned attribute settings the attribute settings of
+     * the {@link #reachabilityDistanceFunction}.
+     *
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
+     */
+    @Override
+    public List<AttributeSettings> getAttributeSettings() {
+        List<AttributeSettings> attributeSettings = super.getAttributeSettings();
+        attributeSettings.addAll(reachabilityDistanceFunction.getAttributeSettings());
+        return attributeSettings;
     }
 
     /**

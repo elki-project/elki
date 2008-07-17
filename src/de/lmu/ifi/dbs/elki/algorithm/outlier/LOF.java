@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
@@ -18,72 +19,88 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * <p/>
  * Algorithm to compute density-based local outlier factors in a database based
- * on a specified parameter minpts.
+ * on a specified parameter minpts. The computed nearest neighbors and LOFs are persistently stored in
+ * tables in order to enable insertions or deletions of database objects using the algorithm {@link de.lmu.ifi.dbs.elki.algorithm.outlier.OnlineLOF}.
+ * </p>
+ * <p/>
+ * Reference:
+ * <br>M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander:
+ * LOF: Identifying Density-Based Local Outliers.
+ * <br>In: Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00), Dallas, TX, 2000.
+ * </p>
  *
  * @author Elke Achtert
  * @param <O> the type of DatabaseObjects handled by this Algorithm
- * todo parameter
  */
-public class OnlineBasicLOF<O extends DatabaseObject> extends
+public class LOF<O extends DatabaseObject> extends
     DistanceBasedAlgorithm<O, DoubleDistance> {
 
     /**
-     * The default pagesize.
+     * OptionID for {@link #PAGE_SIZE_PARAM}
      */
-    public static final int DEFAULT_PAGE_SIZE = 4000;
+    public static final OptionID PAGE_SIZE_ID = OptionID.getOrCreateOptionID(
+        "lof.pagesize",
+        "The size of a page in bytes."
+    );
 
     /**
-     * Parameter pagesize.
+     * Parameter to specify the size of a page in bytes,
+     * must be an integer greater than 0.
+     * <p>Default value: {@code 4000} </p>
+     * <p>Key: {@code -lof.pagesize} </p>
      */
-    public static final String PAGE_SIZE_P = "pagesize";
+    private final IntParameter PAGE_SIZE_PARAM = new IntParameter(
+        PAGE_SIZE_ID, new GreaterConstraint(0), 4000);
 
     /**
-     * Description for parameter filename.
-     */
-    public static final String PAGE_SIZE_D = "a positive integer value specifying the size of a page in bytes, "
-        + "default is " + DEFAULT_PAGE_SIZE + " Byte.";
-
-    /**
-     * The default cachesize.
-     */
-    public static final int DEFAULT_CACHE_SIZE = Integer.MAX_VALUE;
-
-    /**
-     * Parameter cachesize.
-     */
-    public static final String CACHE_SIZE_P = "cachesize";
-
-    /**
-     * Description for parameter cachesize.
-     */
-    public static final String CACHE_SIZE_D = "a positive integer value specifying the size of the cache in bytes, "
-        + "default is Integer.MAX_VALUE Byte.";
-
-    /**
-     * Parameter minimum points.
-     */
-    public static final String MINPTS_P = "minpts";
-
-    /**
-     * Description for parameter minimum points.
-     */
-    public static final String MINPTS_D = "positive number of nearest neighbors of an object to be considered for computing its LOF.";
-
-    /**
-     * Minimum points.
-     */
-    int minpts;
-
-    /**
-     * The size of a page in Bytes.
+     * Holds the value of {@link #PAGE_SIZE_PARAM}.
      */
     int pageSize;
 
     /**
-     * The size of the cache in Bytes.
+     * OptionID for {@link #CACHE_SIZE_PARAM}
+     */
+    public static final OptionID CACHE_SIZE_ID = OptionID.getOrCreateOptionID(
+        "lof.cachesize",
+        "The size of the cache in bytes."
+    );
+
+    /**
+     * Parameter to specify the size of the cache in bytes,
+     * must be an integer greater than 0.
+     * <p>Default value: {@link Integer#MAX_VALUE} </p>
+     * <p>Key: {@code -lof.cachesize} </p>
+     */
+    private final IntParameter CACHE_SIZE_PARAM = new IntParameter(
+        CACHE_SIZE_ID, new GreaterConstraint(0), Integer.MAX_VALUE);
+
+    /**
+     * Holds the value of {@link #CACHE_SIZE_PARAM}.
      */
     int cacheSize;
+
+    /**
+     * OptionID for {@link #MINPTS_PARAM}
+     */
+    public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID(
+        "lof.minpts",
+        "The number of nearest neighbors of an object to be considered for computing its LOF."
+    );
+
+    /**
+     * Parameter to specify the number of nearest neighbors of an object to be considered for computing its LOF,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -lof.minpts} </p>
+     */
+    private final IntParameter MINPTS_PARAM = new IntParameter(MINPTS_ID,
+        new GreaterConstraint(0));
+
+    /**
+     * Holds the value of {@link #MINPTS_PARAM}.
+     */
+    int minpts;
 
     /**
      * Provides the result of the algorithm.
@@ -101,27 +118,27 @@ public class OnlineBasicLOF<O extends DatabaseObject> extends
     LOFTable lofTable;
 
     /**
-     * Sets minimum points to the optionhandler additionally to the parameters
-     * provided by super-classes.
+     * Provides the LOF algorithm,
+     * adding parameters
+     * {@link #PAGE_SIZE_PARAM}, {@link #CACHE_SIZE_PARAM}, and {@link #MINPTS_PARAM}
+     * to the option handler additionally to parameters of super class.
      */
-    public OnlineBasicLOF() {
+    public LOF() {
         super();
         // parameter page size
-        IntParameter pageSize = new IntParameter(PAGE_SIZE_P, PAGE_SIZE_D, new GreaterConstraint(0));
-        pageSize.setDefaultValue(DEFAULT_PAGE_SIZE);
-        optionHandler.put(pageSize);
+        addOption(PAGE_SIZE_PARAM);
 
         // parameter cache size
-        IntParameter cacheSize = new IntParameter(CACHE_SIZE_P, CACHE_SIZE_D, new GreaterConstraint(0));
-        cacheSize.setDefaultValue(DEFAULT_CACHE_SIZE);
-        optionHandler.put(cacheSize);
+        addOption(CACHE_SIZE_PARAM);
 
         //parameter minpts
-        optionHandler.put(new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
+        addOption(MINPTS_PARAM);
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#runInTime(Database)
+     * Performs the LOF algorithm on the given database.
+     *
+     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
     protected void runInTime(Database<O> database) throws IllegalStateException {
         getDistanceFunction().setDatabase(database, isVerbose(), isTime());
@@ -270,17 +287,17 @@ public class OnlineBasicLOF<O extends DatabaseObject> extends
         return new Description(
             "LOF",
             "Local Outlier Factor",
-            "Algorithm to compute density-based local outlier factors in a database based on the parameter "
-                + MINPTS_P,
-            "M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander: "
-                + " LOF: Identifying Density-Based Local Outliers. "
-                + "In: Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00), "
-                + "Dallas, TX, 2000.");
+            "Algorithm to compute density-based local outlier factors in a database based on the parameter " +
+                MINPTS_PARAM,
+            "M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander: " +
+                " LOF: Identifying Density-Based Local Outliers. " +
+                "In: Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00), Dallas, TX, 2000.");
     }
 
     /**
-     * Sets the parameters minpts additionally to the parameters set by the
-     * super-class method.
+     * Calls {@link DistanceBasedAlgorithm#setParameters(String[]) DistanceBasedAlgorithm#setParameters(args)}
+     * and sets additionally the values of the parameters
+     * {@link #PAGE_SIZE_PARAM}, {@link #CACHE_SIZE_PARAM}, and {@link #MINPTS_PARAM}.
      *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
@@ -289,13 +306,13 @@ public class OnlineBasicLOF<O extends DatabaseObject> extends
         String[] remainingParameters = super.setParameters(args);
 
         // pagesize
-        pageSize = (Integer) optionHandler.getOptionValue(PAGE_SIZE_P);
+        pageSize = getParameterValue(PAGE_SIZE_PARAM);
 
         // cachesize
-        cacheSize = (Integer) optionHandler.getOptionValue(CACHE_SIZE_P);
+        cacheSize = getParameterValue(CACHE_SIZE_PARAM);
 
         // minpts
-        minpts = (Integer) optionHandler.getOptionValue(MINPTS_P);
+        minpts = getParameterValue(MINPTS_PARAM);
 
         return remainingParameters;
     }
