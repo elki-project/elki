@@ -144,4 +144,23 @@ public class TransposedViewWrapper<V extends RealVector<V, ?>> extends StandAlon
 
         return remainingParameters;
     }
+
+
+    /**
+     * Returns the description for the input parameter.
+     *
+     * @return the description for the input parameter
+     */
+    public String getInputDescription() {
+        return "The name of the input file.";
+    }
+
+    /**
+     * Returns the description for the output parameter.
+     *
+     * @return the description for the output parameter
+     */
+    public String getOutputDescription() {
+        return "The name of the output file.";
+    }
 }

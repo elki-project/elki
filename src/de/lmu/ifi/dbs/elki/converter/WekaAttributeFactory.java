@@ -13,62 +13,62 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
  */
 public final class WekaAttributeFactory// implements Parameterizable
 {
-  /**
-   * The classLabel class for nominal attributes.
-   */
-  private Class<HierarchicalClassLabel> classLabelClass = HierarchicalClassLabel.class;
+    /**
+     * The classLabel class for nominal attributes.
+     */
+    private Class<HierarchicalClassLabel> classLabelClass = HierarchicalClassLabel.class;
 
-  /**
-   * Creates a {@link WekaNumericAttribute WekaNumericAttribute}
-   * if the given value can be parsed as double.
-   * Otherwise a {@link WekaNominalAttribute WekaNominalAttribute}
-   * is created.
-   *
-   * @param value the value of the new attribute.
-   * @return a new weka attribute for the given value
-   */
-  @SuppressWarnings("unchecked")
-  public WekaAttribute getAttribute(String value) {
-    try {
-      Double dvalue = Double.parseDouble(value);
-      return  new WekaNumericAttribute(dvalue);
+    /**
+     * Creates a {@link WekaNumericAttribute WekaNumericAttribute}
+     * if the given value can be parsed as double.
+     * Otherwise a {@link WekaNominalAttribute WekaNominalAttribute}
+     * is created.
+     *
+     * @param value the value of the new attribute.
+     * @return a new weka attribute for the given value
+     */
+    @SuppressWarnings("unchecked")
+    public WekaAttribute getAttribute(String value) {
+        try {
+            Double dvalue = Double.parseDouble(value);
+            return new WekaNumericAttribute(dvalue);
+        }
+        catch (NumberFormatException e) {
+            ClassLabel<HierarchicalClassLabel> classLabel;
+            try {
+                classLabel = Util.instantiate(ClassLabel.class, classLabelClass.getName());
+            }
+            catch (UnableToComplyException e1) {
+                throw new RuntimeException("This should never happen!", e);
+            }
+            classLabel.init(value);
+            return new WekaNominalAttribute(classLabel);
+        }
     }
-    catch (NumberFormatException e) {
-      ClassLabel<HierarchicalClassLabel> classLabel;
-      try {
-        classLabel = Util.instantiate(ClassLabel.class, classLabelClass.getName());
-      }
-      catch (UnableToComplyException e1) {
-        throw new RuntimeException("This should never happen!", e);
-      }
-      classLabel.init(value);
-      return  new WekaNominalAttribute(classLabel);
-    }
-  }
 
-  /**
-   * Returns a {@link WekaStringAttribute WekaStringAttribute}
-   * if the parameter string is set to true.
-   * Otherwise the result is the same as from
-   * {@link #getAttribute(String) getAttribute(value)}.
-   *
-   * @param value  the value of the new attribute
-   * @param string if true, the new attribute will be a {@link WekaStringAttribute WekaStringAttribute},
-   *               otherwise it will be the result of
-   *               {@link #getAttribute(String) getAttribute(value)}
-   * @return a {@link WekaStringAttribute WekaStringAttribute}
-   *         if the parameter string is set to true.
-   *         Otherwise the result is the same as from
-   *         {@link #getAttribute(String) getAttribute(value)}
-   */
-  public WekaAttribute getAttribute(String value, boolean string) {
-    if (string) {
-      return new WekaStringAttribute(value);
+    /**
+     * Returns a {@link WekaStringAttribute WekaStringAttribute}
+     * if the parameter string is set to true.
+     * Otherwise the result is the same as from
+     * {@link #getAttribute(String) getAttribute(value)}.
+     *
+     * @param value  the value of the new attribute
+     * @param string if true, the new attribute will be a {@link WekaStringAttribute WekaStringAttribute},
+     *               otherwise it will be the result of
+     *               {@link #getAttribute(String) getAttribute(value)}
+     * @return a {@link WekaStringAttribute WekaStringAttribute}
+     *         if the parameter string is set to true.
+     *         Otherwise the result is the same as from
+     *         {@link #getAttribute(String) getAttribute(value)}
+     */
+    public WekaAttribute getAttribute(String value, boolean string) {
+        if (string) {
+            return new WekaStringAttribute(value);
+        }
+        else {
+            return getAttribute(value);
+        }
     }
-    else {
-      return getAttribute(value);
-    }
-  }
 
 
 }

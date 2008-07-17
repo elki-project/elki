@@ -19,10 +19,9 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * TODO arthur comment all
- *
  * @author Arthur Zimek
  */
+//  TODO arthur comment all
 public class Database2Arff<D extends DatabaseObject & WekaObject<W>, W extends WekaAttribute<W>> {
 
     private static final String SEPARATOR = ",";
@@ -102,8 +101,7 @@ public class Database2Arff<D extends DatabaseObject & WekaObject<W>, W extends W
         }
         out.println();
         out.println("@data");
-        for (Iterator<Integer> dbIterator = database.iterator(); dbIterator
-            .hasNext();) {
+        for (Iterator<Integer> dbIterator = database.iterator(); dbIterator.hasNext();) {
             Integer id = dbIterator.next();
             D d = database.get(id);
             W[] attributes = d.getAttributes();

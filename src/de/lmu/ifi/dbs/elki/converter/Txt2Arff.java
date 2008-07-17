@@ -31,10 +31,6 @@ import java.util.Set;
  * as nominal attributes. The values for a nominal attribute are sorted.
  */
 public class Txt2Arff<W extends WekaAttribute<W>> extends StandAloneInputWrapper {
-  
-  static {
-    INPUT_D = "<filename>the txt-file to convert";
-  }
 
   /**
    * Main method to run this wrapper.
@@ -166,4 +162,13 @@ public class Txt2Arff<W extends WekaAttribute<W>> extends StandAloneInputWrapper
   public String getOutputDescription() {
     return "the arff-file to write the converted txt-file in.";
   }
+
+    /**
+     * Returns the description for the input parameter.
+     *
+     * @return the description for the input parameter
+     */
+    public String getInputDescription() {
+        return "The name of the txt-file to convert.";
+    }
 }

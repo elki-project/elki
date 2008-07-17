@@ -5,9 +5,8 @@ import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 
 import java.io.File;
 import java.util.List;
@@ -16,24 +15,28 @@ import java.util.List;
  * Wrapper to run another wrapper for all files in the directory given as input.
  *
  * @author Arthur Zimek
- *         todo parameter
  */
 public class DirectoryTask extends StandAloneInputWrapper {
 
     /**
-     * Label for parameter wrapper.
+     * OptionID for {@link #WRAPPER_PARAM}
      */
-    public static final String WRAPPER_P = "wrapper";
+    public static final OptionID WRAPPER_ID = OptionID.getOrCreateOptionID(
+        "directorytask.wrapper",
+        "Classname of the wrapper to run over all files in the specified directory. " +
+            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Wrapper.class) + "."
+    );
 
     /**
-     * Description for parameter wrapper.
+     * Parameter to specify the wrapper to run over all files in the specified directory,
+     * must extend {@link Wrapper}.
+     * <p>Key: {@code -directorytask.wrapper} </p>
      */
-    public static final String WRAPPER_D = "wrapper to run over all files in a specified directory " +
-        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Wrapper.class) +
-        ".";
+    protected final ClassParameter<Wrapper> WRAPPER_PARAM =
+        new ClassParameter<Wrapper>(WRAPPER_ID, Wrapper.class);
 
     /**
-     * Wrapper to run over all files.
+     * Holds the instance of the wrapper specified by {@link #WRAPPER_PARAM}.
      */
     private Wrapper wrapper;
 
@@ -60,13 +63,14 @@ public class DirectoryTask extends StandAloneInputWrapper {
         }
     }
 
-     /**
+    /**
      * Adds parameter
-     * {@link } todo
+     * {@link #WRAPPER_PARAM}
      * to the option handler additionally to parameters of super class.
      */
     public DirectoryTask() {
-        optionHandler.put(new ClassParameter<Wrapper>(WRAPPER_P, WRAPPER_D, Wrapper.class));
+        super();
+        addOption(WRAPPER_PARAM);
     }
 
     /**
@@ -81,10 +85,11 @@ public class DirectoryTask extends StandAloneInputWrapper {
         for (File inputFile : inputFiles) {
             try {
                 List<String> wrapperParameters = getRemainingParameters();
-                wrapperParameters.add(OptionHandler.OPTION_PREFIX + INPUT_P);
-                wrapperParameters.add(inputFile.getAbsolutePath());
-                wrapperParameters.add(OptionHandler.OPTION_PREFIX + OUTPUT_P);
-                wrapperParameters.add(getOutput() + File.separator + inputFile.getName());
+                // input
+                Util.addParameter(wrapperParameters, INPUT_ID, inputFile.getAbsolutePath());
+                // output
+                Util.addParameter(wrapperParameters, OUTPUT_ID, getOutput() + File.separator + inputFile.getName());
+
                 wrapper.setParameters(wrapperParameters.toArray(new String[wrapperParameters.size()]));
                 wrapper.run();
             }
@@ -95,19 +100,37 @@ public class DirectoryTask extends StandAloneInputWrapper {
     }
 
     /**
+     * Calls {@link de.lmu.ifi.dbs.elki.wrapper.StandAloneInputWrapper#setParameters(String[]) StandAloneInputWrapper#setParameters(args)}
+     * and instantiates {@link #wrapper} according to the value of parameter
+     * {@link #WRAPPER_PARAM}.
+     *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
         // wrapper
-        try {
-            // todo
-            wrapper = Util.instantiate(Wrapper.class, (String) optionHandler.getOptionValue(WRAPPER_P));
-        }
-        catch (UnableToComplyException e) {
-            throw new WrongParameterValueException(WRAPPER_P, (String) optionHandler.getOptionValue(WRAPPER_P), WRAPPER_D);
-        }
+        wrapper = WRAPPER_PARAM.instantiateClass();
 
         return remainingParameters;
+    }
+
+
+    /**
+     * Returns the description for the input parameter.
+     *
+     * @return the description for the input parameter
+     */
+    public String getInputDescription() {
+        return "The name of the directory to run the wrapper on.";
+    }
+
+    /**
+     * Returns the description for the output parameter.
+     *
+     * @return the description for the output parameter
+     */
+    public String getOutputDescription() {
+        return "The name of the output file.";
     }
 }

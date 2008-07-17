@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 import java.io.File;
@@ -16,43 +17,51 @@ import java.io.File;
  *         todo parameter
  */
 public abstract class StandAloneWrapper extends AbstractWrapper {
-    /**
-     * Label for parameter output.
-     */
-    public static final String OUTPUT_P = "out";
 
     /**
-     * The parameter output.
+     * OptionID for {@link #OUTPUT_PARAM}
      */
-    private FileParameter outputParameter;
+    public static final OptionID OUTPUT_ID = OptionID.getOrCreateOptionID(
+        "wrapper.out",
+        ""
+    );
 
     /**
-     * The output file.
+     * Parameter that specifies the name of the output file.
+     * <p>Key: {@code -wrapper.out} </p>
+     */
+    private final FileParameter OUTPUT_PARAM =
+        new FileParameter(OUTPUT_ID, FileParameter.FileType.INPUT_FILE);
+
+    /**
+     * Holds the value of {@link #OUTPUT_PARAM}.
      */
     private File output;
 
     /**
      * Adds parameter
-     * {@link } todo
+     * {@link #OUTPUT_PARAM}
      * to the option handler additionally to parameters of super class.
      */
     protected StandAloneWrapper() {
         super();
-        outputParameter = new FileParameter(OUTPUT_P, getOutputDescription(),
-            FileParameter.FileType.OUTPUT_FILE);
-        optionHandler.put(outputParameter);
+        OUTPUT_PARAM.setShortDescription(getOutputDescription());
+        addOption(OUTPUT_PARAM);
     }
 
     /**
+     * Calls {@link de.lmu.ifi.dbs.elki.wrapper.AbstractWrapper#setParameters(String[]) AbstractWrapper#setParameters(args)}
+     * and sets additionally the value of the parameter
+     * {@link #OUTPUT_PARAM}.
+     *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
         // output
-        if (optionHandler.isSet(outputParameter)) {
-            output = getParameterValue(outputParameter);
-        }
+        output = getParameterValue(OUTPUT_PARAM);
 
         return remainingParameters;
     }
@@ -67,12 +76,9 @@ public abstract class StandAloneWrapper extends AbstractWrapper {
     }
 
     /**
-     * Returns the description for the output parameter. Subclasses may
-     * need to overwrite this method.
+     * Returns the description for the output parameter.
      *
      * @return the description for the output parameter
      */
-    public String getOutputDescription() {
-        return "the name of the output file.";
-    }
+    public abstract String getOutputDescription();
 }

@@ -18,85 +18,80 @@ import java.io.PrintStream;
 
 /**
  * Converts an arff file into a whitespace separated txt file.
+ *
  * @author Elke Achtert
- * todo parameter
  */
 public class Arff2Txt extends StandAloneInputWrapper {
+    /**
+     * Main method to run this wrapper.
+     *
+     * @param args the arguments to run this wrapper
+     */
+    public static void main(String[] args) {
+        Arff2Txt wrapper = new Arff2Txt();
+        try {
+            wrapper.setParameters(args);
+            wrapper.run();
+        }
+        catch (ParameterException e) {
+            Throwable cause = e.getCause() != null ? e.getCause() : e;
+            wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
+        }
+        catch (UnableToComplyException e) {
+            Throwable cause = e.getCause() != null ? e.getCause() : e;
+            wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
+        }
+        catch (AbortException e) {
+            wrapper.verbose(e.getMessage());
+        }
+        catch (Exception e) {
+            wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
+        }
+    }
 
-	static {
-		INPUT_D = "<filename>the arff-file to convert";
-	}
+    /**
+     * Runs the wrapper with the specified arguments.
+     */
+    public void run() throws UnableToComplyException {
+        try {
+            File inputFile = getInput();
+            File outputFile = getOutput();
 
-	/**
-	 * Main method to run this wrapper.
-	 * 
-	 * @param args
-	 *            the arguments to run this wrapper
-	 */
-	public static void main(String[] args) {
-		Arff2Txt wrapper = new Arff2Txt();
-		try {
-			wrapper.setParameters(args);
-			wrapper.run();
-		} catch (ParameterException e) {
-			Throwable cause = e.getCause() != null ? e.getCause() : e;
-			wrapper.exception(wrapper.optionHandler.usage(e
-					.getMessage()), cause);
-		} catch (UnableToComplyException e) {
-			Throwable cause = e.getCause() != null ? e.getCause() : e;
-			wrapper.exception(wrapper.optionHandler.usage(e
-					.getMessage()), cause);
-		} catch (AbortException e) {
-			wrapper.verbose(e.getMessage());
-		} catch (Exception e) {
-			wrapper.exception(wrapper.optionHandler.usage(e
-					.getMessage()), e);
-		}
-	}
+            if (outputFile.exists()) {
+                outputFile.delete();
+                if (isVerbose()) {
+                    verbose("The file " + outputFile + " existed and has been replaced.");
+                }
+            }
 
-	/**
-	 * Runs the wrapper with the specified arguments.
-	 */
-	public void run() throws UnableToComplyException {
-		try {
-			File inputFile = getInput();
-			File outputFile = getOutput();
-
-			if (outputFile.exists()) {
-				outputFile.delete();
-				if (isVerbose()) {
-					verbose("The file " + outputFile+ " existed and has been replaced.");
-				}
-			}
-
-			outputFile.createNewFile();
-            InputStream in = new FileInputStream(inputFile); 
+            outputFile.createNewFile();
+            InputStream in = new FileInputStream(inputFile);
             OutputStream out = new FileOutputStream(outputFile);
             translate(in, out);
 
-			in.close();
-			out.close();
-            
-		} catch (IOException e) {
-			UnableToComplyException ue = new UnableToComplyException(
-					"I/O Exception occured. " + e.getMessage());
-			ue.fillInStackTrace();
-			throw ue;
-		}
-	}
-    
+            in.close();
+            out.close();
+
+        }
+        catch (IOException e) {
+            UnableToComplyException ue = new UnableToComplyException(
+                "I/O Exception occured. " + e.getMessage());
+            ue.fillInStackTrace();
+            throw ue;
+        }
+    }
+
     /**
      * Translates the arff-formatted data in InputStream {@code in}
-     * to whitespace separated data into OutputStream {@code out}. 
-     * 
+     * to whitespace separated data into OutputStream {@code out}.
+     * <p/>
      * {@code out} is flushed, but neither {@code out} nor {@code in} are closed.
-     * 
-     * @param in the arff formatted data source
+     *
+     * @param in  the arff formatted data source
      * @param out the whitespace separated data target
      * @throws IOException if an error occurs during reading the InputStream
      */
-    public static void translate(InputStream in, OutputStream out) throws IOException
-    {
+    public static void translate(InputStream in, OutputStream out) throws IOException {
         PrintStream outStream = new PrintStream(out);
 
         String line;
@@ -125,13 +120,23 @@ public class Arff2Txt extends StandAloneInputWrapper {
         outStream.flush();
     }
 
-  /**
-   * Returns the description for the output parameter. Subclasses may
-   * need to overwrite this method.
-   *
-   * @return the description for the output parameter
-   */
-  public String getOutputDescription() {
-    return "the txt-file to write the converted arff-file in.";
-  }
+    /**
+     * Returns the description for the output parameter. Subclasses may
+     * need to overwrite this method.
+     *
+     * @return the description for the output parameter
+     */
+    public String getOutputDescription() {
+        return "the txt-file to write the converted arff-file in.";
+    }
+
+
+    /**
+     * Returns the description for the input parameter.
+     *
+     * @return the description for the input parameter
+     */
+    public String getInputDescription() {
+        return "The name of the arff-file to convert.";
+    }
 }
