@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * <p>
  * Algorithm for detecting subspace hierarchies.
  * <p/>
  * <p>Reference:

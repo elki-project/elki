@@ -11,7 +11,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
 /**
- * Abstract superclass for PROCLUS and ORCLUS.
+ * Abstract superclass for projected clustering algorithms,
+ * like {@link PROCLUS} and {@link de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.ORCLUS}.
  *
  * @author Elke Achtert
  * @param <V> the type of Realvector handled by this Algorithm
@@ -28,22 +29,6 @@ public abstract class ProjectedClustering<V extends RealVector<V, ?>>
     );
 
     /**
-     * OptionID for {@link #K_I_PARAM}
-     */
-    public static final OptionID K_I_ID = OptionID.getOrCreateOptionID(
-        "projectedclustering.k_i",
-        "The multiplier for the initial number of seeds."
-    );
-
-    /**
-     * OptionID for {@link #L_PARAM}
-     */
-    public static final OptionID L_ID = OptionID.getOrCreateOptionID(
-        "projectedclustering.l",
-        "The dimensionality of the clusters to find."
-    );
-
-    /**
      * Parameter to specify the number of clusters to find,
      * must be an integer greater than 0.
      * <p>Key: {@code -projectedclustering.k} </p>
@@ -51,6 +36,20 @@ public abstract class ProjectedClustering<V extends RealVector<V, ?>>
     private final IntParameter K_PARAM = new IntParameter(
         K_ID,
         new GreaterConstraint(0));
+
+    /**
+     * Holds the value of {@link #K_PARAM}.
+     */
+    private int k;
+
+    /**
+     * OptionID for {@link #K_I_PARAM}
+     */
+    public static final OptionID K_I_ID = OptionID.getOrCreateOptionID(
+        "projectedclustering.k_i",
+        "The multiplier for the initial number of seeds."
+    );
+
 
     /**
      * Parameter to specify the multiplier for the initial number of seeds,
@@ -64,6 +63,19 @@ public abstract class ProjectedClustering<V extends RealVector<V, ?>>
         30);
 
     /**
+     * Holds the value of {@link #K_I_PARAM}.
+     */
+    private int k_i;
+
+    /**
+     * OptionID for {@link #L_PARAM}
+     */
+    public static final OptionID L_ID = OptionID.getOrCreateOptionID(
+        "projectedclustering.l",
+        "The dimensionality of the clusters to find."
+    );
+
+    /**
      * Parameter to specify the dimensionality of the clusters to find,
      * must be an integer greater than 0.
      * <p>Key: {@code -projectedclustering.l} </p>
@@ -73,17 +85,7 @@ public abstract class ProjectedClustering<V extends RealVector<V, ?>>
         new GreaterConstraint(0));
 
     /**
-     * Number of clusters.
-     */
-    private int k;
-
-    /**
-     * Multiplier for initial number of seeds.
-     */
-    private int k_i;
-
-    /**
-     * Dimensionality of the clusters.
+     * Holds the value of {@link #L_PARAM}.
      */
     private int l;
 
@@ -98,8 +100,9 @@ public abstract class ProjectedClustering<V extends RealVector<V, ?>>
     private Clusters<V> result;
 
     /**
-     * Sets the parameter k and l the optionhandler additionally to the
-     * parameters provided by super-classes.
+     * Adds parameters
+     * {@link #K_PARAM}, {@link #K_I_PARAM}, and {@link #L_PARAM}
+     * to the option handler additionally to parameters of super class.
      */
     public ProjectedClustering() {
         super();
@@ -114,8 +117,13 @@ public abstract class ProjectedClustering<V extends RealVector<V, ?>>
     }
 
     /**
+     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
+     * and sets additionally the value of the parameters
+     * {@link #K_PARAM}, {@link #K_I_PARAM}, and {@link #L_PARAM}.
+     *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
@@ -148,7 +156,7 @@ public abstract class ProjectedClustering<V extends RealVector<V, ?>>
     }
 
     /**
-     * Returns the value of parameter k.
+     * Returns the value of {@link #K_PARAM}.
      *
      * @return the number of clusters to be found
      */
@@ -157,7 +165,7 @@ public abstract class ProjectedClustering<V extends RealVector<V, ?>>
     }
 
     /**
-     * Returns the value of parameter k_i.
+     * Returns the value of {@link #K_I_PARAM}.
      *
      * @return the initial number of clusters
      */
@@ -166,7 +174,7 @@ public abstract class ProjectedClustering<V extends RealVector<V, ?>>
     }
 
     /**
-     * Returns the value of parameter l.
+     * Returns the value of {@link #L_PARAM}..
      *
      * @return the average dimesnionality of the clusters to be found
      */

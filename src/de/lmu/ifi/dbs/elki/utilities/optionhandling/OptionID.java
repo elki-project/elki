@@ -124,14 +124,7 @@ public final class OptionID extends ConstantObject<OptionID> {
         Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(EigenPairFilter.class) +
         "."
     );
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PROCLUS#M_I_PARAM}
-     */
-    public static final OptionID PROCLUS_M_I = new OptionID("proclus.mi",
-        "The multiplier for the initial number of medoids."
-    );
-
+    
     /**
      * The description of the OptionID.
      */

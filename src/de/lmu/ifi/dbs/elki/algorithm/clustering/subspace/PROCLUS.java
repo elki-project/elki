@@ -1,26 +1,51 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.ProjectedClustering;
 import de.lmu.ifi.dbs.elki.algorithm.result.clustering.Clusters;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.utilities.*;
+import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.IDDoublePair;
+import de.lmu.ifi.dbs.elki.utilities.IDIDDoubleTriple;
+import de.lmu.ifi.dbs.elki.utilities.QueryResult;
+import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 /**
- * PROCLUS provides the PROCLUS algorithm.
+ * <p/>
+ * Provides the PROCLUS algorithm, an algorithm to find subspace clusters in high dimensional spaces.
+ * </p>
+ * <p/>
+ * Reference:
+ * <br>C. C. Aggrawal, C. Procopiuc, J. L. Wolf, P. S. Yu, J. S. Park:
+ * Fast Algorithms for Projected Clustering.
+ * <br>In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99).
+ * </p>
  *
  * @author Elke Achtert
  * @param <V> the type of Realvector handled by this Algorithm
  */
-
 public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
+    /**
+     * OptionID for {@link #M_I_PARAM}
+     */
+    public static final OptionID M_I_ID = OptionID.getOrCreateOptionID(
+        "proclus.mi",
+        "The multiplier for the initial number of medoids."
+    );
 
     /**
      * Parameter to specify the the multiplier for the initial number of medoids,
@@ -28,17 +53,19 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
      * <p>Default value: {@code 10} </p>
      * <p>Key: {@code -proclus.mi} </p>
      */
-    private final IntParameter M_I_PARAM = new IntParameter(OptionID.PROCLUS_M_I,
+    private final IntParameter M_I_PARAM = new IntParameter(M_I_ID,
         new GreaterConstraint(0), 10);
 
     /**
-     * Holds m_i.
+     * Holds the value of {@link #M_I_PARAM}.
      */
     private int m_i;
 
     /**
-     * Adds the parameter {@link #M_I_PARAM} to the option handler additionally to the
-     * parameters provided by super-classes.
+     * Provides the PROCLUS algorithm,
+     * adding parameter
+     * {@link #M_I_PARAM}
+     * to the option handler additionally to parameters of super class.
      */
     public PROCLUS() {
         super();
@@ -49,7 +76,9 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.elki.database.Database)
+     * Performs the PROCLUS algorithm on the given database.
+     *
+     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
     protected void runInTime(Database<V> database) throws IllegalStateException {
 
@@ -135,13 +164,14 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
             "PROjected CLUStering",
             "Algorithm to find subspace clusters in high dimensional spaces.",
             "C. C. Aggrawal, C. Procopiuc, J. L. Wolf, P. S. Yu, J. S. Park: "
-                + "Fast Algorithms for Projected Clustering "
-                + "In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)");
+                + "Fast Algorithms for Projected Clustering. "
+                + "In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99).");
     }
 
     /**
-     * Sets the parameters k and l additionally to the parameters set by the
-     * super-class' method. Both k and l are required parameters.
+     * Calls {@link ProjectedClustering#setParameters(String[]) ProjectedClustering#setParameters(args)}
+     * and sets additionally the value of the parameter
+     * {@link #M_I_PARAM}.
      *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
@@ -218,6 +248,14 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
         return initialSet;
     }
 
+    /**
+     * Computes the set of medoids in current iteration.
+     *
+     * @param m      the medoids
+     * @param m_best the best set of medoids found so far
+     * @param m_bad  the bad medoids
+     * @return m_current, the set of medoids in current iteration
+     */
     private Set<Integer> computeM_current(Set<Integer> m, Set<Integer> m_best, Set<Integer> m_bad) {
         Random random = new Random(1);
         List<Integer> m_list = new ArrayList<Integer>(m);
@@ -242,6 +280,13 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
         return m_current;
     }
 
+    /**
+     * Computes the localities of the specified medoids.
+     *
+     * @param m_c      the ids of the medoids
+     * @param database the database holding the objects
+     * @return a mapping of the medoid's id to its locality
+     */
     private Map<Integer, List<QueryResult<DoubleDistance>>> getLocalities(Set<Integer> m_c, Database<V> database) {
         Map<Integer, List<QueryResult<DoubleDistance>>> result = new HashMap<Integer, List<QueryResult<DoubleDistance>>>();
         for (Integer m : m_c) {
@@ -370,7 +415,7 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
         Map<Integer, Cluster> clusters = new HashMap<Integer, Cluster>();
         for (Integer m_i : dimensions.keySet()) {
             Set<Integer> objectIDs = clusterIDs.get(m_i);
-            if (! objectIDs.isEmpty()) {
+            if (!objectIDs.isEmpty()) {
                 Set<Integer> clusterDimensions = dimensions.get(m_i);
                 V centroid = Util.centroid(database, objectIDs);
                 clusters.put(m_i, new Cluster(objectIDs, clusterDimensions, centroid));
@@ -443,7 +488,7 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
 
     /**
      * Computes the bad medoids, where the medoid of a cluster with less than the specified threshold of
-     * objkects is bad.
+     * objects is bad.
      *
      * @param clusters  the clusters
      * @param threshold the threshold

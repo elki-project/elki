@@ -18,25 +18,34 @@ import java.util.BitSet;
 import java.util.Map;
 
 /**
- * todo arthur comment class, parameters, constructor
+ * Provides FIRES, a generic framework for Subspace Clustering.
+ * <p/>
+ * Reference:
+ * <br>H.-P. Kriegel, P. Kroeger, M. Renz, S. Wurst:
+ * A Generic Framework for Efficient Subspace Clustering of High-Dimensional Data.
+ * <br>In: Proc. 5th IEEE International Conference on Data Mining (ICDM), Houston, TX, 2005).
+ * </P>
  *
  * @author Arthur Zimek
  * @param <V> the type of Realvector handled by this Algorithm
  */
 public class FIRES<V extends RealVector<V, Double>> extends AbstractAlgorithm<V> implements Clustering<V> {
+
+    // todo arthur comment
     private int kMostSimilar;
 
+    // todo arthur comment
     private Clustering<V> preclustering;
 
-    /**
-     *
-     */
+    // todo arthur comment
     public FIRES() {
-        // TODO Auto-generated constructor stub
+        // TODO arthur
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.elki.database.Database)
+     * Performs the FIRES algorithm on the given database.
+     *
+     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
     protected void runInTime(Database<V> database) throws IllegalStateException {
         if (database.size() == 0) {
@@ -91,15 +100,15 @@ public class FIRES<V extends RealVector<V, Double>> extends AbstractAlgorithm<V>
             "FIRES",
             "Generic Framework for Subspace Clustering",
             "H.-P. Kriegel, P. Kr\u00F6ger, M. Renz, S. Wurst: " +
-                "A Generic Framework for Efficient Subspace Clustering of High-Dimensional Data, " +
-                "In: Proc. 5th IEEE International Conference on Data Mining (ICDM), Houston, TX, 2005");
+                "A Generic Framework for Efficient Subspace Clustering of High-Dimensional Data. " +
+                "In: Proc. 5th IEEE International Conference on Data Mining (ICDM), Houston, TX, 2005.");
     }
 
     /**
      * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getResult()
      */
     public ClusteringResult<V> getResult() {
-        // TODO Auto-generated method stub
+        // TODO arthur
         return null;
     }
 }

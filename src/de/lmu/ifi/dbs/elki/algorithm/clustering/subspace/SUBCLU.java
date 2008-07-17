@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionsSelectingEuklidea
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
@@ -20,7 +21,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.util.ArrayList;
@@ -28,18 +28,26 @@ import java.util.BitSet;
 import java.util.List;
 
 /**
+ * <p/>
  * Implementation of the SUBCLU algorithm, an algorithm to
  * detect arbitrarily shaped and positioned clusters
  * in subspaces.
  * SUBCLU delivers for each subspace the same clusters
  * DBSCAN would have found, when applied to this
  * subspace seperately.
+ * </p>
+ * <p/>
+ * Reference:
+ * <br>K. Kailing, H.-P. Kriegel, P. Kroeger:
+ * Density connected Subspace Clustering for High Dimensional Data.
+ * <br>In Proc. SIAM Int. Conf. on Data Mining (SDM'04), Lake Buena Vista, FL, 2004.
+ * </p>
  *
  * @author Elke Achtert
  * @param <V> the type of NumberVector handled by this Algorithm
  * @param <D> the type of Distance used
- * todo implementation
  */
+// todo elke implementation
 public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<V> implements Clustering<V> {
 
     /**
@@ -50,39 +58,6 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
         "Classname of the distance function to determine the distance between database objects " +
             Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(AbstractDimensionsSelectingDoubleDistanceFunction.class) + "."
     );
-
-    /**
-     * OptionID for {@link #EPSILON_PARAM}
-     */
-    public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID(
-        "subclu.epsilon",
-        "The maximum radius of the neighborhood to be considered."
-    );
-
-    /**
-     * OptionID for {@link #MINPTS_PARAM}
-     */
-    public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID(
-        "subclu.minpts",
-        "Threshold for minimum number of points in the epsilon-neighborhood of a point."
-    );
-
-    /**
-     * Parameter to specify the maximum radius of the neighborhood to be considered,
-     * must be suitable to {@link AbstractDimensionsSelectingDoubleDistanceFunction}.
-     * <p>Key: {@code -subclu.epsilon} </p>
-     */
-    private final PatternParameter EPSILON_PARAM = new PatternParameter(EPSILON_ID);
-
-    /**
-     * Parameter to specify the threshold for minimum number of points in
-     * the epsilon-neighborhood of a point,
-     * must be an integer greater than 0.
-     * <p>Key: {@code -subclu.minpts} </p>
-     */
-    private final IntParameter MINPTS_PARAM = new IntParameter(
-        MINPTS_ID,
-        new GreaterConstraint(0));
 
     /**
      * The distance function to determine the distance between database objects.
@@ -96,24 +71,63 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
             DimensionsSelectingEuklideanDistanceFunction.class.getName());
 
     /**
-     * The maximum radius of the neighborhood to be considered.
-     */
-    private String epsilon;
-
-    /**
-     * The threshold for minimum number of points in the
-     * epsilon-neighborhood of a point.
-     */
-    private int minpts;
-
-    /**
-     * The distance function.
+     * Holds the instance of the distance function specified by {@link #DISTANCE_FUNCTION_PARAM}.
      */
     private AbstractDimensionsSelectingDoubleDistanceFunction<V> distanceFunction;
 
     /**
-     * Sets epsilon and minimum points to the optionhandler additionally to the
-     * parameters provided by super-classes.
+     * OptionID for {@link #EPSILON_PARAM}
+     */
+    public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID(
+        "subclu.epsilon",
+        "The maximum radius of the neighborhood to be considered."
+    );
+
+    /**
+     * Parameter to specify the maximum radius of the neighborhood to be considered,
+     * must be suitable to {@link AbstractDimensionsSelectingDoubleDistanceFunction}.
+     * <p>Key: {@code -subclu.epsilon} </p>
+     */
+    private final PatternParameter EPSILON_PARAM = new PatternParameter(EPSILON_ID);
+
+    /**
+     * Holds the value of {@link #EPSILON_PARAM}.
+     */
+    private String epsilon;
+
+    /**
+     * OptionID for {@link #MINPTS_PARAM}
+     */
+    public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID(
+        "subclu.minpts",
+        "Threshold for minimum number of points in the epsilon-neighborhood of a point."
+    );
+
+    /**
+     * Parameter to specify the threshold for minimum number of points in
+     * the epsilon-neighborhood of a point,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -subclu.minpts} </p>
+     */
+    private final IntParameter MINPTS_PARAM = new IntParameter(
+        MINPTS_ID,
+        new GreaterConstraint(0));
+
+    /**
+     * Holds the value of {@link #MINPTS_PARAM}.
+     */
+    private int minpts;
+
+    /**
+     * Holds the result;
+     */
+    private ClusteringResult<V> result;
+
+    /**
+     * Provides the SUBCLU algorithm,
+     * adding parameters
+     * {@link #EPSILON_PARAM}, {@link #MINPTS_PARAM}, and {@link #DISTANCE_FUNCTION_PARAM}
+     * to the option handler additionally to parameters of super class.
      */
     public SUBCLU() {
         super();
@@ -130,18 +144,15 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
 
         // global constraint epsilon <-> distance function
         // noinspection unchecked
-        GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint(EPSILON_PARAM, DISTANCE_FUNCTION_PARAM);
-        optionHandler.setGlobalParameterConstraint(gpc);
+        optionHandler.setGlobalParameterConstraint(
+            new GlobalDistanceFunctionPatternConstraint(EPSILON_PARAM, DISTANCE_FUNCTION_PARAM));
     }
 
 
     /**
      * Performs the SUBCLU algorithm on the given database.
      *
-     * @param database the database to run the algorithm on
-     * @throws IllegalStateException if the algorithm has not been initialized
-     *                               properly (e.g. the setParameters(String[]) method has been failed
-     *                               to be called).
+     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
     protected void runInTime(Database<V> database) throws IllegalStateException {
         try {
@@ -172,8 +183,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
      * @return the result of the algorithm
      */
     public ClusteringResult<V> getResult() {
-        // todo
-        return null;
+        return result;
     }
 
     /**
@@ -193,9 +203,12 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
     }
 
     /**
-     * Sets the parameters epsilon and minpts additionally to the parameters set
-     * by the super-class' method. Both epsilon and minpts are required
-     * parameters.
+     * Calls {@link AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
+     * and sets additionally the value of the parameters
+     * {@link #EPSILON_PARAM}, {@link #MINPTS_PARAM}, and {@link #DISTANCE_FUNCTION_PARAM}
+     * and instantiates {@link #distanceFunction} according to the value of parameter
+     * {@link #DISTANCE_FUNCTION_PARAM}.
+     * The remaining parameters are passed to the {@link #distanceFunction}.
      *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
@@ -215,6 +228,20 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
         setParameters(args, remainingParameters);
 
         return remainingParameters;
+    }
+
+    /**
+     * Calls {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#getAttributeSettings()}
+     * and adds to the returned attribute settings the attribute settings of
+     * the {@link #distanceFunction}.
+     *
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
+     */
+    @Override
+    public List<AttributeSettings> getAttributeSettings() {
+        List<AttributeSettings> attributeSettings = super.getAttributeSettings();
+        attributeSettings.addAll(distanceFunction.getAttributeSettings());
+        return attributeSettings;
     }
 
     /**
