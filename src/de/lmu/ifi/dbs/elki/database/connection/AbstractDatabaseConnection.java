@@ -18,7 +18,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.NumberParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.NotEqualValueGlobalConstraint;
@@ -49,7 +48,8 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
     );
 
     /**
-     * Parameter to specify the database to be provided by the parse method.
+     * Parameter to specify the database to be provided by the parse method,
+     * must extend {@link Database}.
      * <p>Default value: {@link SequentialDatabase} </p>
      * <p>Key: {@code -dbconnection.database} </p>
      */
@@ -57,56 +57,75 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
         DATABASE_ID, Database.class, SequentialDatabase.class.getName());
 
     /**
-     * Option string for parameter externalIDIndex.
+     * Holds the instance of the database specified by {@link #DATABASE_PARAM}.
      */
-    public static final String EXTERNAL_ID_INDEX_P = "externalIDIndex";
+    Database<O> database;
 
     /**
-     * Description for parameter classLabelIndex.
+     * OptionID for {@link #CLASS_LABEL_INDEX_PARAM}
      */
-    public static final String EXTERNAL_ID_INDEX_D = "a positive integer specifiying the index of the label to be used as a external id.";
+    public static final OptionID CLASS_LABEL_INDEX_ID = OptionID.getOrCreateOptionID(
+        "dbconnection.classLabelIndex",
+        "The index of the label to be used as class label."
+    );
 
     /**
-     * Option string for parameter classLabelIndex.
+     * Optional parameter that specifies the index of the label to be used as class label,
+     * must be an integer equal to or greater than 0.
+     * <p>Key: {@code -dbconnection.classLabelIndex} </p>
      */
-    public static final String CLASS_LABEL_INDEX_P = "classLabelIndex";
+    private final IntParameter CLASS_LABEL_INDEX_PARAM =
+        new IntParameter(CLASS_LABEL_INDEX_ID, new GreaterEqualConstraint(0), true);
 
     /**
-     * Description for parameter classLabelIndex.
-     */
-    public static final String CLASS_LABEL_INDEX_D = "a positive integer specifiying the index of the label to be used as class label.";
-
-    /**
-     * Option string for parameter classLabelClass.
-     */
-    public static final String CLASS_LABEL_CLASS_P = "classLabelClass";
-
-    /**
-     * Description for parameter classLabelClass.
-     */
-    public static final String CLASS_LABEL_CLASS_D = "a class as association of occuring class labels "
-        + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(ClassLabel.class) + ". Default: " + SimpleClassLabel.class.getName();
-
-    /**
-     * The index of the external id label, null if no external id label is
-     * specified.
-     */
-    private Integer externalIDIndex;
-
-    /**
-     * The index of the class label, null if no class label is specified.
+     * Holds the value of {@link #CLASS_LABEL_INDEX_PARAM}, null if no class label is specified.
      */
     protected Integer classLabelIndex;
 
     /**
-     * The class name for a class label.
+     * OptionID for {@link #CLASS_LABEL_CLASS_PARAM}
+     */
+    public static final OptionID CLASS_LABEL_CLASS_ID = OptionID.getOrCreateOptionID(
+        "dbconnection.classLabelClass",
+        "Classname specifying the association of occuring class labels " +
+            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(ClassLabel.class) +
+            ". "
+    );
+
+    /**
+     * Parameter to specify the association of occuring class labels,
+     * must extend {@link ClassLabel}.
+     * <p>Default value: {@link SimpleClassLabel} </p>
+     * <p>Key: {@code -dbconnection.classLabelClass} </p>
+     */
+    private final ClassParameter<ClassLabel> CLASS_LABEL_CLASS_PARAM = new ClassParameter<ClassLabel>(
+        CLASS_LABEL_CLASS_ID, ClassLabel.class, SimpleClassLabel.class.getName());
+
+    /**
+     * Holds the value of {@link #CLASS_LABEL_CLASS_PARAM}.
      */
     private String classLabelClass;
 
     /**
-     * The database.
+     * OptionID for {@link #EXTERNAL_ID_INDEX_PARAM}
      */
-    Database<O> database;
+    public static final OptionID EXTERNAL_ID_INDEX_ID = OptionID.getOrCreateOptionID(
+        "dbconnection.externalIDIndex",
+        "The index of the label to be used as an external id."
+    );
+
+    /**
+     * Optional parameter that specifies the index of the label to be used as an external id,
+     * must be an integer equal to or greater than 0.
+     * <p>Key: {@code -dbconnection.externalIDIndex} </p>
+     */
+    private final IntParameter EXTERNAL_ID_INDEX_PARAM =
+        new IntParameter(EXTERNAL_ID_INDEX_ID, new GreaterEqualConstraint(0), true);
+
+    /**
+     * Holds the value of {@link #EXTERNAL_ID_INDEX_PARAM}.
+     */
+    private Integer externalIDIndex;
 
     /**
      * True, if an external label needs to be set. Default is false.
@@ -114,65 +133,66 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
     boolean forceExternalID = false;
 
     /**
-     * AbstractDatabaseConnection already provides the setting of the database
-     * according to parameters.
+     * Adds parameters
+     * {@link #DATABASE_PARAM}, {@link #CLASS_LABEL_INDEX_PARAM}, {@link #CLASS_LABEL_CLASS_PARAM}, and {@link #EXTERNAL_ID_INDEX_PARAM},
+     * to the option handler additionally to parameters of super class.
      */
     protected AbstractDatabaseConnection() {
         super();
 
-        // parameter 'database'
+        // parameter database
         addOption(DATABASE_PARAM);
 
-        // parameter 'class label index'
-        IntParameter classLabelIndex = new IntParameter(CLASS_LABEL_INDEX_P, CLASS_LABEL_INDEX_D, new GreaterEqualConstraint(0));
-        classLabelIndex.setOptional(true);
-        optionHandler.put(classLabelIndex);
+        // parameter class label index
+        addOption(CLASS_LABEL_INDEX_PARAM);
 
-        // parameter 'class label class'
-        ClassParameter<ClassLabel<?>> classLabelClass = new ClassParameter(CLASS_LABEL_CLASS_P, CLASS_LABEL_CLASS_D, ClassLabel.class);
-        classLabelClass.setDefaultValue(SimpleClassLabel.class.getName());
-        optionHandler.put(classLabelClass);
+        // parameter class label class
+        addOption(CLASS_LABEL_CLASS_PARAM);
 
-        // parameter 'external ID index'
-        IntParameter ex = new IntParameter(EXTERNAL_ID_INDEX_P, EXTERNAL_ID_INDEX_D, new GreaterEqualConstraint(Integer.valueOf(0)));
-        ex.setOptional(true);
-        optionHandler.put(ex);
+        // parameter external ID index
+        addOption(EXTERNAL_ID_INDEX_PARAM);
 
         // global parameter constraints
         ArrayList<NumberParameter<Integer>> globalConstraints = new ArrayList<NumberParameter<Integer>>();
-        globalConstraints.add(classLabelIndex);
-        globalConstraints.add(ex);
+        globalConstraints.add(CLASS_LABEL_INDEX_PARAM);
+        globalConstraints.add(EXTERNAL_ID_INDEX_PARAM);
         optionHandler.setGlobalParameterConstraint(new NotEqualValueGlobalConstraint<Integer>(globalConstraints));
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
+     * Calls {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters(String[]) AbstractParameterizable#setParameters(args)}
+     * and sets additionally the value of the parameters
+     * {@link #CLASS_LABEL_INDEX_PARAM}, {@link #CLASS_LABEL_CLASS_PARAM}, and {@link #EXTERNAL_ID_INDEX_PARAM}
+     * and instantiates {@link #database} according to the value of parameter
+     * {@link #DATABASE_PARAM}.
+     * The remaining parameters are passed to the {@link #database}.
+     *
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = optionHandler.grabOptions(args);
+
+        if (isSet(CLASS_LABEL_INDEX_PARAM)) {
+            classLabelIndex = getParameterValue(CLASS_LABEL_INDEX_PARAM);
+            classLabelClass = getParameterValue(CLASS_LABEL_CLASS_PARAM);
+        }
+        else if (!CLASS_LABEL_CLASS_PARAM.tookDefaultValue()) {
+            // throws an exception if the class label class is set but no class
+            // label index!
+            classLabelIndex = getParameterValue(CLASS_LABEL_INDEX_PARAM);
+            classLabelClass = getParameterValue(CLASS_LABEL_CLASS_PARAM);
+        }
+
+        if (isSet(EXTERNAL_ID_INDEX_PARAM) || forceExternalID) {
+            // throws an exception if forceExternalID is true but
+            // externalIDIndex is not set!
+            externalIDIndex = getParameterValue(EXTERNAL_ID_INDEX_PARAM);
+        }
 
         // database
         // noinspection unchecked
         database = DATABASE_PARAM.instantiateClass();
-
-        if (optionHandler.isSet(CLASS_LABEL_INDEX_P)) {
-            classLabelIndex = (Integer) optionHandler.getOptionValue(CLASS_LABEL_INDEX_P);
-
-            classLabelClass = (String) optionHandler.getOptionValue(CLASS_LABEL_CLASS_P);
-        }
-        else if (!((Parameter) optionHandler.getOption(CLASS_LABEL_CLASS_P)).tookDefaultValue()) {
-            // throws an exception if the class label class is set but no class
-            // label index!
-            classLabelIndex = (Integer) optionHandler.getOptionValue(CLASS_LABEL_INDEX_P);
-            classLabelClass = (String) optionHandler.getOptionValue(CLASS_LABEL_CLASS_P);
-        }
-
-        if (optionHandler.isSet(EXTERNAL_ID_INDEX_P) || forceExternalID) {
-            // throws an exception if forceExternalID is true but
-            // externalIDIndex is not set!
-            externalIDIndex = (Integer) optionHandler.getOptionValue(EXTERNAL_ID_INDEX_P);
-        }
-
         remainingParameters = database.setParameters(remainingParameters);
         setParameters(args, remainingParameters);
 
@@ -180,14 +200,17 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
     }
 
     /**
-     * Returns the parameter setting of the attributes.
+     * Calls {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#getAttributeSettings()}
+     * and adds to the returned attribute settings the attribute settings of
+     * the {@link #database}.
      *
-     * @return the parameter setting of the attributes
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
      */
+    @Override
     public List<AttributeSettings> getAttributeSettings() {
-        List<AttributeSettings> result = new ArrayList<AttributeSettings>();
-        result.addAll(database.getAttributeSettings());
-        return result;
+        List<AttributeSettings> attributeSettings = super.getAttributeSettings();
+        attributeSettings.addAll(database.getAttributeSettings());
+        return attributeSettings;
     }
 
     /**

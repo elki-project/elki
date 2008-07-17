@@ -16,13 +16,13 @@ import java.io.PrintStream;
 import java.util.*;
 
 /**
- * TODO Arthur comment class
  *
  * @author Arthur Zimek
  * @param <V> the type of RealVector handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  * @param <L> the type of the ClassLabel the Classifier is assigning
  */
+// todo arthur comment class
 public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Distance<D>, L extends ClassLabel<L>>
     extends AbstractClassifier<V, L> {
 
@@ -31,14 +31,10 @@ public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Di
      */
     private static final long serialVersionUID = -6786297567169490313L;
 
-    /**
-     * todo arthur comment
-     */
+    // todo arthur comment
     private DependencyDerivator<V, D> dependencyDerivator = new DependencyDerivator<V, D>();
 
-    /**
-     * todo arthur comment
-     */
+    // todo arthur comment
     private CorrelationAnalysisSolution<V>[] model;
 
     /**
@@ -138,7 +134,6 @@ public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Di
 
     /**
      * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getDescription()
-     * todo arthur description
      */
     public Description getDescription() {
         return new Description("CorrelationBasedClassifier",

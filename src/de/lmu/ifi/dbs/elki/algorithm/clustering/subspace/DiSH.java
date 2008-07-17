@@ -182,7 +182,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         optics.setVerbose(isVerbose());
         optics.setTime(isTime());
 
-        // todo provide setter
+        // todo provide setters
         // parameters for optics
         List<String> opticsParameters = new ArrayList<String>();
 

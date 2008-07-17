@@ -48,7 +48,7 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
 
     /**
      * Adds parameter
-     * {@link #DISTANCE_FUNCTION_PARAM},
+     * {@link #DISTANCE_FUNCTION_PARAM}
      * to the option handler additionally to parameters of super class.
      */
     protected DistanceBasedAlgorithm() {

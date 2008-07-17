@@ -48,7 +48,7 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
     );
 
     /**
-     * Parameter to specify the the multiplier for the initial number of medoids,
+     * Parameter to specify the multiplier for the initial number of medoids,
      * must be an integer greater than 0.
      * <p>Default value: {@code 10} </p>
      * <p>Key: {@code -proclus.mi} </p>

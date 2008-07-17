@@ -41,7 +41,7 @@ public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implem
     public static final String CLUSTER_LABEL_PREFIX = "C";
 
     /**
-     * todo comment
+     * todo arthur comment
      */
     protected Map<Integer, Result<O>> clusterToModel;
 

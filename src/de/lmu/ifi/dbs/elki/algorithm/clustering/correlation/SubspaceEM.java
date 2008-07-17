@@ -32,11 +32,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * todo Arthur comment
- *
  * @author Arthur Zimek
  * @param <V> the type of Realvector handled by this Algorithm
  */
+//todo arthur comment
 public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> implements Clustering<V> {
 
     /**
@@ -300,9 +299,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
 
     }
 
-    /**
-     * todo arthur comment
-     */
+    //todo arthur comment
     protected Integer[][] hardClustering(Database<V> database) {
         List<List<Integer>> hardClusters = new ArrayList<List<Integer>>(k);
         for (int i = 0; i < k; i++) {
@@ -350,9 +347,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
         return sum;
     }
 
-    /**
-     * todo arthur comment
-     */
+    //todo arthur comment
     protected void assignProbabilities(Database<V> database, double[] normDistributionFactor, double[] standardDeviation, double[] clusterWeight, List<V> means, Matrix[] eigensystems, Matrix selectionStrong) {
         for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
             Integer id = iter.next();

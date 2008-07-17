@@ -18,11 +18,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import java.util.List;
 
 /**
- * todo Arthur comment all
- *
  * @author Arthur Zimek
  * @param <V> the type of Realvector handled by this Algorithm
  */
+// todo arthur comment all
 public class FractalDimensionTest<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
 
     /**
@@ -42,10 +41,10 @@ public class FractalDimensionTest<V extends RealVector<V, ?>> extends AbstractAl
     );
 
     /**
-     * todo arthur: constraints, default value, description
      * Parameter that specifies the first id.
      * <p>Key: {@code -fractaldimensiontest.id1} </p>
      */
+    // todo arthur: constraints, default value, description
     private final IntParameter ID1_PARAM = new IntParameter(ID1_ID);
 
     /**
@@ -54,10 +53,10 @@ public class FractalDimensionTest<V extends RealVector<V, ?>> extends AbstractAl
     private int id1;
 
     /**
-     * todo arthur: constraints, default value, description
      * Parameter that specifies the second id.
      * <p>Key: {@code -fractaldimensiontest.id2} </p>
      */
+    // todo arthur: constraints, default value, description
     private final IntParameter ID2_PARAM = new IntParameter(ID1_ID);
 
     /**

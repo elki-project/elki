@@ -17,11 +17,10 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * todo arthur comment class
- *
  * @author Arthur Zimek
  * @param <V> the type of RealVector handled by this Algorithm
  */
+//todo arthur comment class
 public class FracClus<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
 
     /**

@@ -26,12 +26,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * TODO Arthur comment class and constructor
- *
  * @author Arthur Zimek
  * @param <V> the type of RealVector handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  */
+// todo arthur comment class and constructor
 public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends ClassLabel<L>> extends AbstractAlgorithm<V> {
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.CoDeC#CLASSLABEL_PARAM}

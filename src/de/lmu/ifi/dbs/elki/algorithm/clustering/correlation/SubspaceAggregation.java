@@ -26,11 +26,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * todo arthur comment class
- *
  * @author Arthur Zimek
  * @param <V> the type of Realvector handled by this Algorithm
  */
+// todo arthur comment class
 public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> implements Clustering<V> {
 
     /**
@@ -179,9 +178,7 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
         result = new Clusters<V>(resultClusters, database);
     }
 
-    /**
-     * todo arthur comment
-     */
+    //todo arthur comment
     protected static <V extends RealVector<V, ?>> double projectionDistance(V p, V mean, Matrix strongEigenvectors) {
         Matrix p_minus_a = p.getColumnVector().minus(mean.getColumnVector());
         Matrix proj = p_minus_a.projection(strongEigenvectors);
@@ -238,9 +235,7 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
         }
     }
 
-    /**
-     * todo arthur comment
-     */
+    //todo arthur comment
     protected Matrix[] initialEigensystems(int dimensionality) {
         Random random = new Random();
         Matrix[] eigensystems = new Matrix[k];
@@ -265,9 +260,7 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
         return eigensystems;
     }
 
-    /**
-     * todo arthur comment
-     */
+    //todo arthur comment
     private void gnuplot(String title, Database<V> db, List<V> means, Matrix[] eigensystems) {
         if (means.size() != eigensystems.length) {
             throw new IllegalArgumentException("number of means: " + means.size() + " -- number of eigensystems: " + eigensystems.length);
