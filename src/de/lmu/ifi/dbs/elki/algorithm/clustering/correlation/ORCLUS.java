@@ -31,8 +31,8 @@ import java.util.logging.LogRecord;
  * <p>Reference:
  * C. C. Aggrawal, P. S. Yu:
  * Finding Generalized Projected Clusters in High Dimensional Spaces.
- * <br>In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00).
- *
+ * <br/>In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00).
+ * </p>
  * @author Elke Achtert
  * @param <V> the type of Realvector handled by this Algorithm
  */

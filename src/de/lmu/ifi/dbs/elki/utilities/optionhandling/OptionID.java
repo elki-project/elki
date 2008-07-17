@@ -106,23 +106,7 @@ public final class OptionID extends ConstantObject<OptionID> {
     public static final OptionID DEPENDENCY_DERIVATOR_RANDOM_SAMPLE = new OptionID("derivator.randomSample",
         "Flag to use random sample (use knn query around centroid, if flag is not set)."
     );
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.DiSH#EPSILON_PARAM}
-     */
-    public static final OptionID DISH_EPSILON = new OptionID("dish.epsilon",
-        "The maximum radius of the neighborhood " +
-        "to be considered in each dimension for determination of " +
-        "the preference vector."
-    );
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.DiSH#MU_PARAM}
-     */
-    public static final OptionID DISH_MU = new OptionID("dish.mu",
-        "The minimum number of points as a smoothing factor to avoid the single-link-effekt."
-    );
-
+    
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor#K_PARAM}
      */

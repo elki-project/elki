@@ -4,12 +4,16 @@ import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.DiSH;
 import de.lmu.ifi.dbs.elki.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.StringParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 
 import java.util.List;
-import java.util.Arrays;
 
 /**
  * todo parameter
@@ -28,7 +32,7 @@ public class DiSHWrapper extends NormalizationWrapper {
      * <p>Key: {@code -dish.epsilon} </p>
      */
     private final DoubleParameter EPSILON_PARAM =
-        new DoubleParameter(OptionID.DISH_EPSILON, new GreaterEqualConstraint(0), 0.001);
+        new DoubleParameter(DiSH.EPSILON_ID, new GreaterEqualConstraint(0), 0.001);
 
     /**
      * Parameter that specifies the a minimum number of points as a smoothing
@@ -37,7 +41,7 @@ public class DiSHWrapper extends NormalizationWrapper {
      * <p>Default value: {@code 1} </p>
      * <p>Key: {@code -dish.mu} </p>
      */
-    private final IntParameter MU_PARAM = new IntParameter(OptionID.DISH_MU,
+    private final IntParameter MU_PARAM = new IntParameter(DiSH.MU_ID,
         new GreaterConstraint(0), 1);
 
     /**
@@ -98,10 +102,10 @@ public class DiSHWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, OptionID.ALGORITHM, DiSH.class.getName());
 
         // epsilon
-        Util.addParameter(parameters, OptionID.DISH_EPSILON, Double.toString(getParameterValue(EPSILON_PARAM)));
+        Util.addParameter(parameters, DiSH.EPSILON_ID, Double.toString(getParameterValue(EPSILON_PARAM)));
 
         // minpts
-        Util.addParameter(parameters, OptionID.DISH_MU, Integer.toString(getParameterValue(MU_PARAM)));
+        Util.addParameter(parameters, DiSH.MU_ID, Integer.toString(getParameterValue(MU_PARAM)));
 
         // strategy for preprocessor
         if (strategy != null) {

@@ -38,19 +38,24 @@ import java.util.TreeSet;
 
 
 /**
- * Implementation of the CLIQUE algorithm, a grid-based algorithm to identify dense clusters
- * in subspaces of maximum dimensionality.<p>
  * <p/>
- * The implementation consists of two steps:br>
- * 1. Identification of subspaces that contain clusters<br>
- * 2. Identification of clusters<p>
+ * Implementation of the CLIQUE algorithm, a grid-based algorithm to identify dense clusters
+ * in subspaces of maximum dimensionality.
+ * </p>
+ * <p/>
+ * The implementation consists of two steps:
+ * <br> 1. Identification of subspaces that contain clusters
+ * <br> 2. Identification of clusters
+ * </p>
  * <p/>
  * The third step of the original algorithm (Generation of minimal description
  * for the clusters) is not (yet) implemented.
+ * </p>
  * <p>Reference:
- * R. Agrawal, J. Gehrke, D. Gunopulos, P. Raghavan::
+ * <br>R. Agrawal, J. Gehrke, D. Gunopulos, P. Raghavan::
  * Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications.
  * <br>In Proc. ACM SIGMOD Int. Conf. on Management of Data, Seattle, WA, 1998.
+ * </p>
  *
  * @author Elke Achtert
  * @param <V> the type of RealVector handled by this Algorithm

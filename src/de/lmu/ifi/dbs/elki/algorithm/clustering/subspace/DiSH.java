@@ -35,11 +35,26 @@ import java.util.Map;
 
 /**
  * Algorithm for detecting subspace hierarchies.
+ * <p/>
+ * <p>Reference:
+ * <br>E. Achtert, C. Boehm, H.-P. Kriegel, P. Kröger, I. Mueller-Gorman, A. Zimek:
+ * Detection and Visualization of Subspace Cluster Hierarchies.
+ * <br>In Proc. DASFAA Conference, Bangkok, Thailand, 2007.
+ * </p>
  *
  * @author Elke Achtert
  * @param <V> the type of Realvector handled by this Algorithm
  */
 public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
+    /**
+     * OptionID for {@link #EPSILON_PARAM}
+     */
+    public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID(
+        "dish.epsilon",
+        "The maximum radius of the neighborhood " +
+            "to be considered in each dimension for determination of " +
+            "the preference vector."
+    );
 
     /**
      * Parameter that specifies the maximum radius of the neighborhood to be
@@ -49,7 +64,21 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
      * <p>Key: {@code -dish.epsilon} </p>
      */
     private final DoubleParameter EPSILON_PARAM =
-        new DoubleParameter(OptionID.DISH_EPSILON, new GreaterEqualConstraint(0), 0.001);
+        new DoubleParameter(EPSILON_ID, new GreaterEqualConstraint(0), 0.001);
+
+    /**
+     * Holds the value of {@link #EPSILON_PARAM}.
+     */
+    private double epsilon;
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.DiSH#MU_PARAM}
+     */
+    public static final OptionID MU_ID = OptionID.getOrCreateOptionID(
+        "dish.mu",
+        "The minimum number of points as a smoothing factor to avoid the single-link-effekt."
+    );
+
 
     /**
      * Parameter that specifies the a minimum number of points as a smoothing
@@ -58,8 +87,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
      * <p>Default value: {@code 1} </p>
      * <p>Key: {@code -dish.mu} </p>
      */
-    private final IntParameter MU_PARAM = new IntParameter(OptionID.DISH_MU,
-        new GreaterConstraint(0), 1);
+    private final IntParameter MU_PARAM = new IntParameter(MU_ID, new GreaterConstraint(0), 1);
 
     /**
      * The optics algorithm to determine the cluster order.
@@ -72,12 +100,10 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
     private Result<V> result;
 
     /**
-     * Holds the value of epsilon parameter.
-     */
-    private double epsilon;
-
-    /**
-     * Provides a new algorithm for detecting supspace hierarchies.
+     * Provides the DiSH algorithm,
+     * adding parameters
+     * {@link #EPSILON_PARAM} and {@link #MU_PARAM}
+     * to the option handler additionally to parameters of super class.
      */
     public DiSH() {
         super();
@@ -91,12 +117,9 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
     }
 
     /**
-     * The run method encapsulated in measure of runtime. An extending class
-     * needs not to take care of runtime itself.
+     * Performs the DiSH algorithm on the given database.
      *
-     * @param database the database to run the algorithm on
-     * @throws IllegalStateException if the algorithm has not been initialized properly (e.g. the
-     *                               setParameters(String[]) method has been failed to be called).
+     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
     protected void runInTime(Database<V> database) throws IllegalStateException {
         if (isVerbose()) {
@@ -134,7 +157,12 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#setParameters(String[])
+     * Calls {@link AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
+     * and sets additionally the value of the parameters
+     * {@link #EPSILON_PARAM} and {@link #MU_PARAM}.
+     * Then the parameters for the algorithm {@link #optics} are set.
+     *
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
@@ -197,6 +225,10 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
     }
 
     /**
+     * Calls {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#getAttributeSettings()}
+     * and adds to the returned attribute settings the attribute settings of
+     * the algorithm {@link #optics}.
+     *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
      */
     @Override

@@ -168,7 +168,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
     }
 
     /**
-     * Passes remaining parameters to the clustering algorithm.
+     * Passes remaining parameters to the {@link #copacAlgorithm}.
      *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
