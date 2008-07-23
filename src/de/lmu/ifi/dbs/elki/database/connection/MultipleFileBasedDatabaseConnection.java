@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 /**
  * Provides a database connection based on multiple files and parsers to be set.
  *
+ * @param <O> the type of DatabaseObject to be provided by the implementing class as element of the supplied database
  * @author Elke Achterts
  */
 public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
@@ -42,8 +43,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
   /**
    * Default parser.
    */
-  public final static String DEFAULT_PARSER = RealVectorLabelParser.class
-      .getName();
+  public final static String DEFAULT_PARSER = RealVectorLabelParser.class.getName();
 
   /**
    * Label for parameter parser.

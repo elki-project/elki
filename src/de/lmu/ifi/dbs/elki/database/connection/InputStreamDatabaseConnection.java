@@ -24,6 +24,7 @@ import java.util.Map;
  * Provides a database connection expecting input from standard in.
  *
  * @author Arthur Zimek
+ * @param <O> the type of DatabaseObject to be provided by the implementing class as element of the supplied database
  */
 public class InputStreamDatabaseConnection<O extends DatabaseObject> extends AbstractDatabaseConnection<O> {
 

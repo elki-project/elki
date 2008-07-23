@@ -30,6 +30,7 @@ import java.util.List;
  * already provides the setting of the database according to parameters.
  *
  * @author Elke Achtert
+ * @param <O> the type of DatabaseObject to be provided by the implementing class as element of the supplied database
  */
 public abstract class AbstractDatabaseConnection<O extends DatabaseObject> extends AbstractParameterizable implements DatabaseConnection<O> {
     /**
@@ -41,7 +42,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
      * OptionID for {@link #DATABASE_PARAM}
      */
     public static final OptionID DATABASE_ID = OptionID.getOrCreateOptionID(
-        "dbconnection.database",
+        "dbc.database",
         "Classname specifying the database to be provided by the parse method " +
             Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Database.class) +
             ". "
@@ -65,7 +66,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
      * OptionID for {@link #CLASS_LABEL_INDEX_PARAM}
      */
     public static final OptionID CLASS_LABEL_INDEX_ID = OptionID.getOrCreateOptionID(
-        "dbconnection.classLabelIndex",
+        "dbc.classLabelIndex",
         "The index of the label to be used as class label."
     );
 
@@ -86,7 +87,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
      * OptionID for {@link #CLASS_LABEL_CLASS_PARAM}
      */
     public static final OptionID CLASS_LABEL_CLASS_ID = OptionID.getOrCreateOptionID(
-        "dbconnection.classLabelClass",
+        "dbc.classLabelClass",
         "Classname specifying the association of occuring class labels " +
             Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(ClassLabel.class) +
             ". "
@@ -110,7 +111,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
      * OptionID for {@link #EXTERNAL_ID_INDEX_PARAM}
      */
     public static final OptionID EXTERNAL_ID_INDEX_ID = OptionID.getOrCreateOptionID(
-        "dbconnection.externalIDIndex",
+        "dbc.externalIDIndex",
         "The index of the label to be used as an external id."
     );
 

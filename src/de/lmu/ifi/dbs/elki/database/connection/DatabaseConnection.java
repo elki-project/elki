@@ -11,30 +11,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * implementation may either use a parser to parse a sequential file or piped
  * input and provide a file based database or provide an intermediate connection
  * to a database system.
- * 
+ *
+ * @author Arthur Zimek
  * @param <O> the type of DatabaseObject to be provided by the implementing class as element of the supplied database
- * 
- * @author Arthur Zimek 
  */
-public interface DatabaseConnection<O extends DatabaseObject> extends
-        Parameterizable
-{
-    /**
-     * Property key for available parsers.
-     */
-    public static final String PROPERTY_PARSER = "PARSER";
-
-    /**
-     * Property key for available databases.
-     */
-    public static final String PROPERTY_DATABASE = "DATABASE";
-
+public interface DatabaseConnection<O extends DatabaseObject> extends Parameterizable {
     /**
      * Returns a Database according to parameter settings.
-     * 
-     * @param normalization
-     *            Normalization to perform a normalization if this action is
-     *            supported. May remain null.
+     *
+     * @param normalization Normalization to perform a normalization if this action is
+     *                      supported. May remain null.
      * @return a Database according to parameter settings
      */
     Database<O> getDatabase(Normalization<O> normalization);

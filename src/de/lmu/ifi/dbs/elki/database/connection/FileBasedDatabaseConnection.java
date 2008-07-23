@@ -2,51 +2,65 @@ package de.lmu.ifi.dbs.elki.database.connection;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 /**
  * Provides a file based database connection based on the parser to be set.
- * 
+ *
  * @author Arthur Zimek
+ * @param <O> the type of DatabaseObject to be provided by the implementing class as element of the supplied database
  */
 public class FileBasedDatabaseConnection<O extends DatabaseObject> extends InputStreamDatabaseConnection<O> {
+    /**
+     * OptionID for {@link #INPUT_PARAM}
+     */
+    public static final OptionID INPUT_ID = OptionID.getOrCreateOptionID(
+        "dbc.in",
+        "The name of the input file to be parsed."
+    );
 
-	/**
-	 * Label for parameter input.
-	 */
-	public final static String INPUT_P = "in";
+    /**
+     * Parameter that specifies the name of the input file to be parsed.
+     * <p>Key: {@code -dbc.in} </p>
+     */
+    private final FileParameter INPUT_PARAM =
+        new FileParameter(INPUT_ID, FileParameter.FileType.INPUT_FILE);
 
-	/**
-	 * Description for parameter input.
-	 */
-	public final static String INPUT_D = "Input file to be parsed.";
+    /**
+     * Provides a file based database connection based on the parser to be set,
+     * adding parameter
+     * {@link #INPUT_PARAM}
+     * to the option handler additionally to parameters of super class.
+     */
+    public FileBasedDatabaseConnection() {
+        super();
+        addOption(INPUT_PARAM);
+    }
 
-	/**
-	 * Provides a file based database connection based on the parser to be set.
-	 */
-	public FileBasedDatabaseConnection() {
-		super();
-		optionHandler.put(new FileParameter(INPUT_P, INPUT_D, FileParameter.FileType.INPUT_FILE));
-	}
+    /**
+     * Calls {@link de.lmu.ifi.dbs.elki.database.connection.InputStreamDatabaseConnection#setParameters(String[])
+     * InputStreamDatabaseConnection#setParameters(args)}
+     * and sets additionally the value of the parameter
+     * {@link #INPUT_PARAM}.
+     *
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
+     */
+    @Override
+    public String[] setParameters(String[] args) throws ParameterException {
+        String[] remainingParameters = super.setParameters(args);
 
-	/**
-	 * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
-	 */
-	public String[] setParameters(String[] args) throws ParameterException {
-		String[] remainingOptions = super.setParameters(args);
+        try {
+            in = new FileInputStream(getParameterValue(INPUT_PARAM));
+        }
+        catch (FileNotFoundException e) {
+            throw new WrongParameterValueException(INPUT_PARAM, getParameterValue(INPUT_PARAM).getPath(), e);
+        }
 
-		File file = (File) optionHandler.getOptionValue(INPUT_P);
-		try {
-			in = new FileInputStream(file);
-		} catch (FileNotFoundException e) {
-			throw new WrongParameterValueException(INPUT_P, file.getPath(), INPUT_D, e);
-		}
-
-		return remainingOptions;
-	}
+        return remainingParameters;
+    }
 }
