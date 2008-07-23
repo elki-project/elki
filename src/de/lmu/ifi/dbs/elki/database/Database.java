@@ -18,6 +18,7 @@ import java.util.Set;
  * without parameters for dynamic instantiation.
  *
  * @author Elke Achtert
+ * @param <O> the type of DatabaseObject as element of the database
  */
 public interface Database<O extends DatabaseObject> extends Parameterizable {
   /**

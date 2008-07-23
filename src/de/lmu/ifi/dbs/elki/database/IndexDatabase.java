@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.index.Index;
  * structure.
  *
  * @author Elke Achtert
+ * @param <O> the type of DatabaseObject as element of the database
  */
 public abstract class IndexDatabase<O extends DatabaseObject> extends AbstractDatabase<O> {
 

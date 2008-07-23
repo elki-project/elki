@@ -23,6 +23,7 @@ import java.util.Set;
  * entry.
  *
  * @author Arthur Zimek
+ * @param <O> the type of DatabaseObject as element of the database
  */
 public abstract class AbstractDatabase<O extends DatabaseObject> extends AbstractParameterizable implements Database<O> {
     /**

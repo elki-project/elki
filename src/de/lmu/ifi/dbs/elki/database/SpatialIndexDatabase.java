@@ -24,6 +24,9 @@ import java.util.List;
  * spatial index structure.
  *
  * @author Elke Achtert
+ * @param <O> the type of NumberVector as element of the database
+ * @param <N> the type of SpatialNode stored in the index
+ * @param <E> the type of SpatialEntry stored in the index
  */
 public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends IndexDatabase<O> {
 

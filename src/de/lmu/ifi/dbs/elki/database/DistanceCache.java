@@ -8,7 +8,8 @@ import java.util.Map;
 /**
  * Provides a cache for distances between database objects.
  *
- * @author Elke Achtert 
+ * @author Elke Achtert
+ * @param <D> the type of Distance stored in this cache
  */
 public class DistanceCache<D extends Distance<D>> {
   /**

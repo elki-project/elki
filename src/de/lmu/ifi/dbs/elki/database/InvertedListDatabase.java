@@ -18,6 +18,8 @@ import java.util.TreeMap;
 /**
  * Database implemented by inverted lists that supports range queries on a specific dimension.
  *
+ * @param <O> the type of FeatureVector as element of the database
+ * @param <N> the type of the real vector space of the FeatureVector
  * @author Elke Achtert
  */
 public class InvertedListDatabase<N extends Number, O extends FeatureVector<O,N>> extends SequentialDatabase<O> {

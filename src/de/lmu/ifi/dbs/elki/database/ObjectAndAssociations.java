@@ -6,7 +6,8 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
  * Provides a single database objects and a map of associations associated with
  * this object.
  *
- * @author Elke Achtert 
+ * @author Elke Achtert
+ * @param <O> the type of FeatureVector as element of the database
  */
 public class ObjectAndAssociations<O extends DatabaseObject> {
   /**

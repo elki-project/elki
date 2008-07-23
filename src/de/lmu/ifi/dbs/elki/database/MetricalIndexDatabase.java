@@ -21,6 +21,7 @@ import java.util.List;
  * metrical index structure.
  *
  * @author Elke Achtert
+ * @param <O> the type of FeatureVector as element of the database
  */
 public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<D>, N extends MetricalNode<N, E>, E extends MTreeEntry<D>>
     extends IndexDatabase<O> {

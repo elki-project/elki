@@ -15,7 +15,8 @@ import java.util.List;
  * SequentialDatabase is a simple implementation of a Database. <p/> It does not
  * support any index structure and holds all objects in main memory (as a Map).
  *
- * @author Arthur Zimek 
+ * @author Arthur Zimek
+ * @param <O> the type of FeatureVector as element of the database
  */
 public class SequentialDatabase<O extends DatabaseObject> extends AbstractDatabase<O> {
   /**
