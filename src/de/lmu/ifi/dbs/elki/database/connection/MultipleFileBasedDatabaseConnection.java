@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -166,8 +167,16 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
     }
 
     /**
+     * Calls {@link de.lmu.ifi.dbs.elki.database.connection.AbstractDatabaseConnection#setParameters(String[])}
+     * AbstractDatabaseConnection#setParameters(args)}
+     * and instantiates {@link #inputStreams} according to the value of parameter
+     * {@link #INPUT_PARAM}
+     * and {@link #parsers} according to the value of parameter {@link #PARSERS_PARAM} .
+     * The remaining parameters are passed to all instances of {@link #parsers}.
+     *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
@@ -214,5 +223,21 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
         setParameters(args, remainingParameters);
 
         return remainingParameters;
+    }
+
+    /**
+     * Calls {@link AbstractDatabaseConnection#getAttributeSettings()}
+     * and adds to the returned attribute settings the attribute settings of
+     * all instances of {@link #parsers}.
+     *
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
+     */
+    @Override
+    public List<AttributeSettings> getAttributeSettings() {
+        List<AttributeSettings> attributeSettings = super.getAttributeSettings();
+        for (Parser parser : parsers) {
+            attributeSettings.addAll(parser.getAttributeSettings());
+        }
+        return attributeSettings;
     }
 }
