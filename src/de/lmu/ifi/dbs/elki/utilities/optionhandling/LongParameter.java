@@ -24,24 +24,11 @@ public class LongParameter extends NumberParameter<Long> {
      * Constructs a long parameter with the given optionID,
      * and parameter constraint.
      *
-     * @param optionID the unique OptionID for this parameter
-     * @param cons     the parameter constraint for this long parameter
+     * @param optionID   the unique OptionID for this parameter
+     * @param constraint the parameter constraint for this long parameter
      */
-    public LongParameter(OptionID optionID, ParameterConstraint<Number> cons) {
-        this(optionID);
-        addConstraint(cons);
-    }
-
-    /**
-     * Constructs a long parameter with the given optionID,
-     * and parameter constraints.
-     *
-     * @param optionID the unique OptionID for this parameter
-     * @param cons     a list of parameter constraints for this long parameter
-     */
-    public LongParameter(OptionID optionID, List<ParameterConstraint<Number>> cons) {
-        this(optionID);
-        addConstraintList(cons);
+    public LongParameter(OptionID optionID, ParameterConstraint<Number> constraint) {
+        super(optionID, constraint);
     }
 
     /**

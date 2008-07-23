@@ -98,8 +98,6 @@ public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends
      */
     public SOD() {
         super();
-        ALPHA_PARAM.setDefaultValue(1.1);
-        ALPHA_PARAM.setOptional(true);
         addOption(KNN_PARAM);
         addOption(ALPHA_PARAM);
     }

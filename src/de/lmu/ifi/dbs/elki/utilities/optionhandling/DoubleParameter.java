@@ -14,7 +14,7 @@ public class DoubleParameter extends NumberParameter<Double> {
     /**
      * Constructs a double parameter with the given optionID.
      *
-     * @param optionID the unique optionID
+     * @param optionID the unique id of this parameter
      */
     public DoubleParameter(OptionID optionID) {
         super(optionID);
@@ -22,64 +22,48 @@ public class DoubleParameter extends NumberParameter<Double> {
 
     /**
      * Constructs a double parameter with the given optionID,
-     * and optional flag.
-     *
-     * @param optionID the unique optionID
-     * @param optional specifies whether this parameter is an optional parameter
-     */
-    public DoubleParameter(OptionID optionID, boolean optional) {
-        this(optionID);
-        setOptional(optional);
-    }
-
-    /**
-     * Constructs a double parameter with the given optionID,
      * and parameter constraint.
      *
-     * @param optionID the unique optionID
-     * @param cons     the constraint for this double parameter
+     * @param optionID   the unique id of this parameter
+     * @param constraint the constraint of this parameter
      */
-    public DoubleParameter(OptionID optionID, ParameterConstraint<Number> cons) {
-        this(optionID);
-        addConstraint(cons);
+    public DoubleParameter(OptionID optionID, ParameterConstraint<Number> constraint) {
+        super(optionID, constraint);
     }
 
     /**
-     * Constructs a double parameter with the given optionID,
-     * parameter constraint, and optional flag.
+     * Constructs a double parameter with the given optionID, parameter constraint,
+     * and optional flag.
      *
-     * @param optionID the unique optionID
-     * @param cons     the constraint for this double parameter
-     * @param optional specifies whether this parameter is an optional parameter
+     * @param optionID   the unique id of this parameter
+     * @param constraint the constraint of this parameter
+     * @param optional   specifies whether this parameter is an optional parameter
      */
-    public DoubleParameter(OptionID optionID, ParameterConstraint<Number> cons, boolean optional) {
-        this(optionID, cons);
-        setOptional(optional);
+    public DoubleParameter(OptionID optionID, ParameterConstraint<Number> constraint, boolean optional) {
+        super(optionID, constraint, optional, null);
     }
 
     /**
-     * Constructs a double parameter with the given optionID,
-     * parameter constraint, and default value.
+     * Constructs a double parameter with the given optionID, parameter constraint,
+     * and default value.
      *
-     * @param optionID     the unique optionID
-     * @param cons         the constraint for this double parameter
-     * @param defaultValue the default value for this double parameter
+     * @param optionID     the unique id of this parameter
+     * @param constraint   the constraint of this parameter
+     * @param defaultValue the default value for this parameter
      */
-    public DoubleParameter(OptionID optionID, ParameterConstraint<Number> cons, Double defaultValue) {
-        this(optionID, cons);
-        setDefaultValue(defaultValue);
+    public DoubleParameter(OptionID optionID, ParameterConstraint<Number> constraint, Double defaultValue) {
+        super(optionID, constraint, false, defaultValue);
     }
 
     /**
      * Constructs a double parameter with the given optionID,
      * and parameter constraints.
      *
-     * @param optionID the unique optionID
-     * @param cons     a list of parameter constraints for this double parameter
+     * @param optionID    the unique optionID
+     * @param constraints a list of parameter constraints for this double parameter
      */
-    public DoubleParameter(OptionID optionID, List<ParameterConstraint<Number>> cons) {
-        this(optionID);
-        addConstraintList(cons);
+    public DoubleParameter(OptionID optionID, List<ParameterConstraint<Number>> constraints) {
+        super(optionID, constraints);
     }
 
     /**

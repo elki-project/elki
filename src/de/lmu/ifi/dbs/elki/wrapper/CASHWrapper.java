@@ -5,7 +5,6 @@ import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.parser.ParameterizationFunctionLabelParser;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
@@ -75,8 +74,7 @@ public class CASHWrapper extends FileBasedDatabaseConnectionWrapper {
         Util.addParameter(parameters, OptionID.ALGORITHM, CASH.class.getName());
 
         // parser
-        parameters.add(OptionHandler.OPTION_PREFIX + FileBasedDatabaseConnection.PARSER_P);
-        parameters.add(ParameterizationFunctionLabelParser.class.getName());
+        Util.addParameter(parameters, FileBasedDatabaseConnection.PARSER_ID, ParameterizationFunctionLabelParser.class.getName());
 
         // minpts
         Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(getParameterValue(MINPTS_PARAM)));

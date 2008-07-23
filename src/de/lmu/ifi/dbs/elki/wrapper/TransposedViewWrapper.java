@@ -87,8 +87,7 @@ public class TransposedViewWrapper<V extends RealVector<V, ?>> extends StandAlon
             FileBasedDatabaseConnection<V> dbConnection = new FileBasedDatabaseConnection<V>();
 
             List<String> dbParameters = getRemainingParameters();
-            dbParameters.add(FileBasedDatabaseConnection.PARSER_P);
-            dbParameters.add(RealVectorLabelParser.class.getName());
+            Util.addParameter(dbParameters, FileBasedDatabaseConnection.PARSER_ID, RealVectorLabelParser.class.getName());
             Util.addParameter(dbParameters, FileBasedDatabaseConnection.INPUT_ID, getInput().getPath());
             dbConnection.setParameters(dbParameters.toArray(new String[dbParameters.size()]));
 

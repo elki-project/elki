@@ -49,7 +49,8 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
      * Alternatively to parameter {@link APRIORI#MINSUPP_PARAM}).
      * <p>Key: {@code -apriori.minfreq} </p>
      */
-    private final DoubleParameter MINFREQ_PARAM = new DoubleParameter(MINFREQ_ID,
+    private final DoubleParameter MINFREQ_PARAM = new DoubleParameter(
+        MINFREQ_ID,
         new IntervalConstraint(0, IntervalConstraint.IntervalBoundary.CLOSE, 1, IntervalConstraint.IntervalBoundary.CLOSE),
         true);
 

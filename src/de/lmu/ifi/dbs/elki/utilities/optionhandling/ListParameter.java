@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
+
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -20,6 +22,37 @@ public abstract class ListParameter<T> extends Parameter<List<T>, List<T>> {
      * A pattern defining a &quot:&quot.
      */
     public static final Pattern VECTOR_SPLIT = Pattern.compile(":");
+
+    /**
+     * Constructs a list parameter with the given optionID.
+     *
+     * @param optionID the unique id of this parameter
+     */
+    public ListParameter(OptionID optionID) {
+        super(optionID);
+    }
+
+    /**
+     * Constructs a list parameter with the given optionID.
+     *
+     * @param optionID   the unique id of this parameter
+     * @param constraint the constraint of this parameter
+     */
+    public ListParameter(OptionID optionID, ParameterConstraint<List<T>> constraint) {
+        super(optionID, constraint);
+    }
+
+    /**
+     * Constructs a list parameter with the given optionID.
+     *
+     * @param optionID     the unique id of this parameter
+     * @param constraint   the constraint of this parameter, may be null
+     * @param optional     specifies if this parameter is an optional parameter
+     * @param defaultValue the default value of this parameter (may be null)
+     */
+    public ListParameter(OptionID optionID, ParameterConstraint<List<T>> constraint, boolean optional, List<T> defaultValue) {
+        super(optionID, constraint, optional, defaultValue);
+    }
 
     /**
      * Constructs a list parameter with the given name and description.
@@ -66,6 +99,6 @@ public abstract class ListParameter<T> extends Parameter<List<T>, List<T>> {
             }
         }
         buffer.append("]");
-		return buffer.toString();
-	}
+        return buffer.toString();
+    }
 }

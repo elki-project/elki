@@ -25,6 +25,17 @@ public class FileListParameter extends ListParameter<File> {
     private FilesType filesType;
 
     /**
+     * Constructs a file list parameter with the given optionID, and file type.
+     *
+     * @param optionID  the unique id of this file list parameter
+     * @param filesType the file type of this file list parameter
+     */
+    public FileListParameter(OptionID optionID, FilesType filesType) {
+        super(optionID);
+        this.filesType = filesType;
+    }
+
+    /**
      * Constructs a file list parameter with the given name, description, and file type
      *
      * @param name        the parameter name

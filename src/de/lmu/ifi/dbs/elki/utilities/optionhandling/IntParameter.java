@@ -26,8 +26,7 @@ public class IntParameter extends NumberParameter<Integer> {
      * @param constraint the constraint for this integer parameter
      */
     public IntParameter(OptionID optionID, ParameterConstraint<Number> constraint) {
-        this(optionID);
-        addConstraint(constraint);
+        super(optionID, constraint);
     }
 
     /**
@@ -39,8 +38,7 @@ public class IntParameter extends NumberParameter<Integer> {
      * @param optional   specifies if this parameter is an optional parameter
      */
     public IntParameter(OptionID optionID, ParameterConstraint<Number> constraint, boolean optional) {
-        this(optionID, constraint);
-        setOptional(optional);
+        super(optionID, constraint, optional, null);
     }
 
     /**
@@ -52,8 +50,7 @@ public class IntParameter extends NumberParameter<Integer> {
      * @param defaultValue the default value
      */
     public IntParameter(OptionID optionID, ParameterConstraint<Number> constraint, Integer defaultValue) {
-        this(optionID, constraint);
-        setDefaultValue(defaultValue);
+        super(optionID, constraint, false, defaultValue);
     }
 
     /**

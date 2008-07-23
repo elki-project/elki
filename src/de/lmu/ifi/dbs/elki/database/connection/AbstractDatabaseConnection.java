@@ -52,7 +52,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
      * Parameter to specify the database to be provided by the parse method,
      * must extend {@link Database}.
      * <p>Default value: {@link SequentialDatabase} </p>
-     * <p>Key: {@code -dbconnection.database} </p>
+     * <p>Key: {@code -dbc.database} </p>
      */
     private final ClassParameter<Database> DATABASE_PARAM = new ClassParameter<Database>(
         DATABASE_ID, Database.class, SequentialDatabase.class.getName());
@@ -73,7 +73,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
     /**
      * Optional parameter that specifies the index of the label to be used as class label,
      * must be an integer equal to or greater than 0.
-     * <p>Key: {@code -dbconnection.classLabelIndex} </p>
+     * <p>Key: {@code -dbc.classLabelIndex} </p>
      */
     private final IntParameter CLASS_LABEL_INDEX_PARAM =
         new IntParameter(CLASS_LABEL_INDEX_ID, new GreaterEqualConstraint(0), true);
@@ -97,7 +97,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
      * Parameter to specify the association of occuring class labels,
      * must extend {@link ClassLabel}.
      * <p>Default value: {@link SimpleClassLabel} </p>
-     * <p>Key: {@code -dbconnection.classLabelClass} </p>
+     * <p>Key: {@code -dbc.classLabelClass} </p>
      */
     private final ClassParameter<ClassLabel> CLASS_LABEL_CLASS_PARAM = new ClassParameter<ClassLabel>(
         CLASS_LABEL_CLASS_ID, ClassLabel.class, SimpleClassLabel.class.getName());
@@ -118,7 +118,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
     /**
      * Optional parameter that specifies the index of the label to be used as an external id,
      * must be an integer equal to or greater than 0.
-     * <p>Key: {@code -dbconnection.externalIDIndex} </p>
+     * <p>Key: {@code -dbc.externalIDIndex} </p>
      */
     private final IntParameter EXTERNAL_ID_INDEX_PARAM =
         new IntParameter(EXTERNAL_ID_INDEX_ID, new GreaterEqualConstraint(0), true);

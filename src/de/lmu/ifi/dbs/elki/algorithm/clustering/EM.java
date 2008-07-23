@@ -27,7 +27,7 @@ import java.util.Random;
 
 /**
  * Provides the EM algorithm (clustering by expectation maximization).
- * <p>
+ * <p/>
  * Initialization is implemented as
  * random initialization of means (uniformly distributed within the attribute ranges
  * of the given database)
@@ -38,6 +38,7 @@ import java.util.Random;
  * Maximum Likelihood from Incomplete Data via the EM algorithm.
  * <br>In Journal of the Royal Statistical Society, Series B, 39(1), 1977, pp. 1-31
  * </p>
+ *
  * @author Arthur Zimek
  * @param <V> a type of {@link RealVector} as a suitable datatype for this algorithm
  */
@@ -84,7 +85,8 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impleme
      * <p>Default value: {@code 0.0} </p>
      * <p>Key: {@code -em.delta} </p>
      */
-    private final DoubleParameter DELTA_PARAM = new DoubleParameter(DELTA_ID,
+    private final DoubleParameter DELTA_PARAM = new DoubleParameter(
+        DELTA_ID,
         new GreaterEqualConstraint(0.0),
         0.0);
 

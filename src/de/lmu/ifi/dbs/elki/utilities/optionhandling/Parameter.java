@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
@@ -19,22 +20,85 @@ public abstract class Parameter<T, C> extends Option<T> {
     /**
      * The default value of the parameter (may be null).
      */
-    protected T defaultValue;
+    protected T defaultValue = null;
 
     /**
      * Specifies if the default value of this parameter was taken as parameter value.
      */
-    private boolean defaultValueTaken;
+    private boolean defaultValueTaken = false;
 
     /**
      * Specifies if this parameter is an optional parameter.
      */
-    protected boolean optionalParameter;
+    protected boolean optionalParameter = false;
 
     /**
      * Holds parameter constraints for this parameter.
      */
-    protected List<ParameterConstraint<C>> constraints;
+    protected final List<ParameterConstraint<C>> constraints = new Vector<ParameterConstraint<C>>();
+
+    /**
+     * Constructs a parameter with the given optionID, and constraints.
+     *
+     * @param optionID    the unique id of this parameter
+     * @param constraints the constraints of this parameter, may be empty if there are no constraints
+     */
+    public Parameter(OptionID optionID, List<ParameterConstraint<C>> constraints) {
+        super(optionID);
+
+        // constraints
+        if (constraints != null && !constraints.isEmpty()) {
+            this.constraints.addAll(constraints);
+        }
+    }
+
+    /**
+     * Constructs a parameter with the given optionID, and constraint.
+     *
+     * @param optionID   the unique id of this parameter
+     * @param constraint the constraint of this parameter
+     */
+    public Parameter(OptionID optionID, ParameterConstraint<C> constraint) {
+        super(optionID);
+
+        // constraints
+        if (constraint != null) {
+            this.constraints.add(constraint);
+        }
+    }
+
+
+    /**
+     * Constructs a parameter with the given optionID, constraints, and optional flag.
+     *
+     * @param optionID    the unique id of this parameter
+     * @param constraints the constraints of this parameter, may be empty if there are no constraints
+     * @param optional    specifies if this parameter is an optional parameter
+     * @param defaultValue the default value of this parameter (may be null)
+     */
+    public Parameter(OptionID optionID, List<ParameterConstraint<C>> constraints, boolean optional, T defaultValue) {
+        this(optionID, constraints);
+        // optional
+        this.optionalParameter = optional;
+        //defaultValue
+        this.defaultValue = defaultValue;
+    }
+
+    /**
+     * Constructs a parameter with the given optionID, constraint, and optional flag.
+     *
+     * @param optionID   the unique id of this parameter
+     * @param constraint the constraint of this parameter
+     * @param optional   specifies if this parameter is an optional parameter
+     * @param defaultValue the default value of this parameter (may be null)
+     */
+    public Parameter(OptionID optionID, ParameterConstraint<C> constraint, boolean optional, T defaultValue) {
+        this(optionID, constraint);
+        // optional
+        this.optionalParameter = optional;
+        //defaultValue
+        this.defaultValue = defaultValue;
+    }
 
     /**
      * Constructs a parameter with the given optionID.
@@ -42,10 +106,8 @@ public abstract class Parameter<T, C> extends Option<T> {
      * @param optionID the unique id of the option
      */
     public Parameter(OptionID optionID) {
-        super(optionID);
-        constraints = new Vector<ParameterConstraint<C>>();
-        optionalParameter = false;
-        defaultValueTaken = false;
+        // noinspection unchecked
+        this(optionID, Collections.EMPTY_LIST);
     }
 
     /**
@@ -58,9 +120,6 @@ public abstract class Parameter<T, C> extends Option<T> {
     @Deprecated
     public Parameter(String name, String description) {
         super(name, description);
-        constraints = new Vector<ParameterConstraint<C>>();
-        optionalParameter = false;
-        defaultValueTaken = false;
     }
 
     /**
@@ -68,6 +127,7 @@ public abstract class Parameter<T, C> extends Option<T> {
      *
      * @param constraint the parameter constraint to be added
      */
+    // todo private setzen
     protected void addConstraint(ParameterConstraint<C> constraint) {
         constraints.add(constraint);
     }
@@ -77,6 +137,7 @@ public abstract class Parameter<T, C> extends Option<T> {
      *
      * @param constraints list of parameter constraints to be added
      */
+    // todo remove
     protected void addConstraintList(List<ParameterConstraint<C>> constraints) {
         this.constraints.addAll(constraints);
     }
@@ -86,6 +147,7 @@ public abstract class Parameter<T, C> extends Option<T> {
      *
      * @param defaultValue default value of this parameter
      */
+    // todo remove
     public void setDefaultValue(T defaultValue) {
         this.defaultValue = defaultValue;
     }
@@ -191,7 +253,7 @@ public abstract class Parameter<T, C> extends Option<T> {
                     description.append(", ");
                 }
                 description.append(constraint.getDescription(getName()));
-                if (i == constraints.size()-1) {
+                if (i == constraints.size() - 1) {
                     description.append(".");
                 }
             }

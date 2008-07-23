@@ -3,19 +3,46 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.properties.PropertyName;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Parameter class for a parameter specifying a list of class names.
  *
  * @author Steffi Wanka
  */
-public class ClassListParameter extends ListParameter<String> {
+public class ClassListParameter<C> extends ListParameter<String> {
 
     /**
      * The restriction class for the list of class names.
      */
-    private Class<?> restrictionClass;
+    private Class<C> restrictionClass;
+
+    /**
+     * Constructs a class list parameter with the given optionID and
+     * restriction class.
+     *
+     * @param optionID         the unique id of this parameter
+     * @param restrictionClass the restriction class of the list of class names
+     */
+    public ClassListParameter(OptionID optionID, Class<C> restrictionClass) {
+        super(optionID);
+        this.restrictionClass = restrictionClass;
+    }
+
+    /**
+     * Constructs a class list parameter with the given optionID and
+     * restriction class.
+     *
+     * @param optionID         the unique id of this parameter
+     * @param restrictionClass the restriction class of the list of class names
+     * @param optional         specifies if this parameter is an optional parameter
+     */
+    public ClassListParameter(OptionID optionID, Class<C> restrictionClass, boolean optional) {
+        super(optionID, null, optional, null);
+        this.restrictionClass = restrictionClass;
+    }
 
     /**
      * Constructs a class list parameter with the given name, description, and
@@ -27,10 +54,11 @@ public class ClassListParameter extends ListParameter<String> {
      * @deprecated
      */
     @Deprecated
-    public ClassListParameter(String name, String description, Class<?> restrictionClass) {
+    public ClassListParameter(String name, String description, Class<C> restrictionClass) {
         super(name, description);
         this.restrictionClass = restrictionClass;
     }
+
 
     /**
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Option#setValue(String)
@@ -73,12 +101,6 @@ public class ClassListParameter extends ListParameter<String> {
             catch (ClassNotFoundException e) {
                 throw new WrongParameterValueException("Wrong parameter value for parameter +\"" + getName() + "\". Given class " + cl + " does not extend restriction class " + restrictionClass + ".\n");
             }
-//
-//			try {
-//				Util.instantiate(restrictionClass, cl);
-//			} catch (UnableToComplyException e) {
-//				throw new WrongParameterValueException("Wrong parameter value for parameter +\"" + getName() + "\". Given class " + cl + " does not extend restriction class " + restrictionClass + "!\n");
-//			}
         }
 
         return true;
@@ -92,6 +114,42 @@ public class ClassListParameter extends ListParameter<String> {
      */
     protected String getParameterType() {
         return "<class_1,...,class_n>";
+    }
+
+    /**
+     * Returns a list of new instances for the value (i.e., the class name)
+     * of this class list parameter. The instances have the
+     * type of the restriction class of this class list parameter.
+     * <p/> If the Class for the class names is not found, the instantiation is tried
+     * using the package of the restriction class as package of the class name.
+     *
+     * @return alist of new instances for the value of this class list parameter
+     * @throws ParameterException if the instantiation cannot be performed successfully
+     *                            or the value of this class list parameter is not set
+     */
+    public List<C> instantiateClasses() throws ParameterException {
+        if (value == null && !optionalParameter) {
+            throw new UnusedParameterException("Value of parameter " + name + " has not been specified.");
+        }
+        List<C> instances = new ArrayList<C>();
+
+        for (String classname : value) {
+            try {
+                try {
+                    instances.add(restrictionClass.cast(Class.forName(classname).newInstance()));
+                }
+                catch (ClassNotFoundException e) {
+                    // try package of type
+                    instances.add(restrictionClass.cast(Class.forName(restrictionClass.getPackage().getName() +
+                        "." + classname).newInstance()));
+                }
+            }
+            catch (Exception e) {
+                throw new WrongParameterValueException(name, classname, getDescription(), e);
+            }
+        }
+
+        return instances;
     }
 
 }
