@@ -89,7 +89,7 @@ public class ApproximationLine implements Externalizable {
    */
   public double getValueAt(int k) {
     if (k < k_0) return Double.POSITIVE_INFINITY;
-    return m * Math.log(k) + t;
+    return m * StrictMath.log(k) + t;
   }
 
   /**
@@ -99,10 +99,10 @@ public class ApproximationLine implements Externalizable {
    * @param distanceFunction the distance function
    * @return the approximated knn-distance at the specified k
    */
-  public <O extends DatabaseObject, D extends NumberDistance<D>> D getApproximatedKnnDistance(int k, DistanceFunction<O, D> distanceFunction) {
+  public <O extends DatabaseObject, D extends NumberDistance<D,N>, N extends Number> D getApproximatedKnnDistance(int k, DistanceFunction<O, D> distanceFunction) {
     if (k < k_0)
       return distanceFunction.nullDistance();
-    return distanceFunction.valueOf("" + Math.exp(getValueAt(k)));
+    return distanceFunction.valueOf("" + StrictMath.exp(getValueAt(k)));
   }
 
   /**
@@ -158,9 +158,9 @@ public class ApproximationLine implements Externalizable {
   public int hashCode() {
     int result;
     long temp;
-    temp = m != +0.0d ? Double.doubleToLongBits(m) : 0L;
+    temp = m != 0.0d ? Double.doubleToLongBits(m) : 0L;
     result = (int) (temp ^ (temp >>> 32));
-    temp = t != +0.0d ? Double.doubleToLongBits(t) : 0L;
+    temp = t != 0.0d ? Double.doubleToLongBits(t) : 0L;
     result = 29 * result + (int) (temp ^ (temp >>> 32));
     return result;
   }

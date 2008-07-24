@@ -1,106 +1,92 @@
 package de.lmu.ifi.dbs.elki.distance;
 
+import de.lmu.ifi.dbs.elki.data.Bit;
+
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 /**
  * TODO arthur comment
+ *
  * @author Arthur Zimek
  */
-public class BitDistance extends NumberDistance<BitDistance> {
-  /**
-   * Generated serial version UID
-   */
-  private static final long serialVersionUID = 6514853467081717551L;
+public class BitDistance extends NumberDistance<BitDistance, Bit> {
+    /**
+     * Generated serial version UID
+     */
+    private static final long serialVersionUID = 6514853467081717551L;
 
-  /**
-   * The bit value of this distance.
-   */
-  private boolean bit;
+    /**
+     * Empty constructor for serialization purposes.
+     */
+    public BitDistance() {
+        super(null);
+    }
 
-  // TODO arthur comment
-  public BitDistance() {
-    super();
-  }
+    /**
+     * Constructs a new BitDistance object that represents the bit argument.
+     *
+     * @param bit the value to be represented by the BitDistance.
+     */
+    public BitDistance(boolean bit) {
+        super(new Bit(bit));
+    }
 
-  // TODO arthur comment
-  public BitDistance(boolean bit) {
-    super();
-    this.bit = bit;
-  }
+    /**
+     * @see de.lmu.ifi.dbs.elki.distance.Distance#description()
+     */
+    public String description() {
+        return "BitDistance.bitValue";
+    }
 
-  /**
-   * @see NumberDistance#getDoubleValue()
-   */
-  @Override
-  public double getDoubleValue() {
-    return bit ? 1 : 0;
-  }
+    /**
+     * @see Distance#plus(Distance)
+     */
+    public BitDistance plus(BitDistance distance) {
+        return new BitDistance(this.isBit() || distance.isBit());
+    }
 
-  /**
-   * @see AbstractDistance#hashCode()
-   */
-  @Override
-  public int hashCode() {
-    return this.isBit() ? 1231 : 1237;
-  }
+    /**
+     * @see Distance#minus(Distance)
+     */
+    public BitDistance minus(BitDistance distance) {
+        return new BitDistance(this.isBit() ^ distance.isBit());
+    }
 
-  /**
-   * @see Distance#plus(Distance)
-   */
-  public BitDistance plus(BitDistance distance) {
-    return new BitDistance(this.isBit() || distance.isBit());
-  }
+    public boolean isBit() {
+        return this.value.bitValue();
+    }
 
-  /**
-   * @see Distance#minus(Distance)
-   */
-  public BitDistance minus(BitDistance distance) {
-    return new BitDistance(this.isBit() ^ distance.isBit());
-  }
 
-  /**
-   * @see Distance#externalizableSize()
-   */
-  public int externalizableSize() {
-    return 1;
-  }
+    /**
+     * Writes the bit value of this BitDistance to the specified stream.
+     *
+     * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
+     */
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeBoolean(this.isBit());
+    }
 
-  /**
-   * @see Comparable#compareTo(Object)
-   */
-  public int compareTo(BitDistance o) {
-    return ((Boolean) this.isBit()).compareTo(o.isBit());
-  }
+    /**
+     * Reads the bit value of this BitDistance from the specified stream.
+     *
+     * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
+     */
+    public void readExternal(ObjectInput in) throws IOException {
+        this.value = new Bit(in.readBoolean());
+    }
 
-  /**
-   * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
-   */
-  public void writeExternal(ObjectOutput out) throws IOException {
-    out.writeBoolean(this.isBit());
-  }
-
-  /**
-   * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
-   */
-  public void readExternal(ObjectInput in) throws IOException {
-    this.bit = in.readBoolean();
-  }
-
-  public boolean isBit() {
-    return this.bit;
-  }
-
-  /**
-   * Returns a string representation of the object.
-   * @return a string representation of the object.
-   */
-  @Override
-public String toString() {
-    if (this.bit) return "1";
-    else return "0";
-  }
+    /**
+     * Retuns the number of Bytes this distance uses if it is written to an
+     * external file.
+     *
+     * @return 1 (1 Byte for a boolean value)
+     * @see Distance#externalizableSize()
+     */
+    public int externalizableSize() {
+        return 1;
+    }
 
 
 }

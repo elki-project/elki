@@ -13,8 +13,8 @@ import java.util.List;
  * 
  * @author Elke Achtert 
  */
-public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry>
-		extends AbstractRStarTree<O, N, E> {
+public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends AbstractRStarTreeNode<N, E>, E
+    extends SpatialEntry> extends AbstractRStarTree<O, N, E> {
 
 	/**
 	 * Creates a new RTree.

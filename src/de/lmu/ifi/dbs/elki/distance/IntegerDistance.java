@@ -7,102 +7,71 @@ import java.io.ObjectOutput;
 /**
  * @author Arthur Zimek
  */
-public class IntegerDistance extends NumberDistance<IntegerDistance>
-{
+public class IntegerDistance extends NumberDistance<IntegerDistance, Integer> {
     /**
      * Created serial version UID.
      */
     private static final long serialVersionUID = 5583821082931825810L;
 
-    private int value;
-    
-    public IntegerDistance()
-    {
-        super();
-    }
-    
-    public IntegerDistance(int value)
-    {
-        super();
-        this.value = value;
-    }
-    
     /**
-     * 
-     * @see de.lmu.ifi.dbs.elki.distance.NumberDistance#getDoubleValue()
+     * Empty constructor for serialization purposes.
      */
-    @Override
-    public double getDoubleValue()
-    {
-        return value;
+    public IntegerDistance() {
+        super(null);
+    }
+
+    public IntegerDistance(int value) {
+        super(value);
     }
 
     /**
-     * The hashcode is the internal integer value of this distance.
-     * 
-     * @see de.lmu.ifi.dbs.elki.distance.AbstractDistance#hashCode()
+     * @see de.lmu.ifi.dbs.elki.distance.Distance#description()
      */
-    @Override
-    public int hashCode()
-    {
-        return value;
+    public String description() {
+        return "IntegerDistance.distanceValue";
     }
 
     /**
-     * 
-     * @see de.lmu.ifi.dbs.elki.distance.Distance#externalizableSize()
-     */
-    public int externalizableSize()
-    {
-        return 4;
-    }
-
-    /**
-     * 
      * @see de.lmu.ifi.dbs.elki.distance.Distance#minus(de.lmu.ifi.dbs.elki.distance.Distance)
      */
-    public IntegerDistance minus(IntegerDistance distance)
-    {
+    public IntegerDistance minus(IntegerDistance distance) {
         return new IntegerDistance(this.value - distance.value);
     }
 
     /**
-     * 
      * @see de.lmu.ifi.dbs.elki.distance.Distance#plus(de.lmu.ifi.dbs.elki.distance.Distance)
      */
-    public IntegerDistance plus(IntegerDistance distance)
-    {
+    public IntegerDistance plus(IntegerDistance distance) {
         return new IntegerDistance(this.value + distance.value);
     }
 
     /**
-     * Compares this distance with the specified distance
-     * for order. Returns a negative integer, zero, or a positive integer
-     * as this distance is less than, equal to, or greater than the specified distance.
-     * 
-     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     * Writes the integer value of this IntegerDistance to the specified stream.
+     *
+     * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
      */
-    public int compareTo(IntegerDistance o)
-    {
-        return this.value - o.value;
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeInt(value);
     }
 
     /**
-     * 
+     * Reads the integer value of this IntegerDistance from the specified stream.
+     *
      * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
      */
-    public void readExternal(ObjectInput in) throws IOException
-    {
+    public void readExternal(ObjectInput in) throws IOException {
         value = in.readInt();
     }
 
     /**
-     * 
-     * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
+     * Retuns the number of Bytes this distance uses if it is written to an
+     * external file.
+     *
+     * @return 4 (4 Byte for an integer value)
+     * @see Distance#externalizableSize()
      */
-    public void writeExternal(ObjectOutput out) throws IOException
-    {
-        out.writeInt(value);
+    public int externalizableSize() {
+        return 4;
     }
 
 }

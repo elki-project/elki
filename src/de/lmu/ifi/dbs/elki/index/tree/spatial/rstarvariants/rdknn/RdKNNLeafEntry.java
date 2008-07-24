@@ -14,7 +14,9 @@ import java.io.ObjectOutput;
  *
  * @author Elke Achtert 
  */
-public class RdKNNLeafEntry<D extends NumberDistance<D>> extends SpatialLeafEntry implements RdKNNEntry<D> {
+public class RdKNNLeafEntry<D extends NumberDistance<D,N>, N extends Number>
+    extends SpatialLeafEntry implements RdKNNEntry<D,N> {
+    
   /**
    * The knn distance of the underlying data object.
    */

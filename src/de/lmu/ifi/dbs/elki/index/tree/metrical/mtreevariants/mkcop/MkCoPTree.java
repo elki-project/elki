@@ -27,7 +27,8 @@ import java.util.Map;
  *
  * @author Elke Achtert 
  */
-public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> extends AbstractMTree<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>> {
+public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D,N>, N extends Number> 
+    extends AbstractMTree<O, D, MkCoPTreeNode<O, D,N>, MkCoPEntry<D,N>> {
 
   /**
    * Parameter k.
@@ -79,7 +80,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
    *
    * @param entry the entry to be inserted
    */
-  protected void preInsert(MkCoPEntry<D> entry) {
+  protected void preInsert(MkCoPEntry<D,N> entry) {
     throw new UnsupportedOperationException("Insertion of single objects is not supported!");
   }
 
@@ -278,12 +279,12 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
     while (!pq.isEmpty()) {
       PQNode<D> pqNode = (PQNode<D>) pq.getMinNode();
 
-      MkCoPTreeNode<O, D> node = getNode(pqNode.getValue().getID());
+      MkCoPTreeNode<O, D,N> node = getNode(pqNode.getValue().getID());
 
       // directory node
       if (!node.isLeaf()) {
         for (int i = 0; i < node.getNumEntries(); i++) {
-          MkCoPEntry<D> entry = node.getEntry(i);
+          MkCoPEntry<D,N> entry = node.getEntry(i);
           D distance = getDistanceFunction().distance(entry.getRoutingObjectID(), q);
           D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ?
                       getDistanceFunction().nullDistance() :
@@ -297,7 +298,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
       // data node
       else {
         for (int i = 0; i < node.getNumEntries(); i++) {
-          MkCoPLeafEntry<D> entry = (MkCoPLeafEntry<D>) node.getEntry(i);
+          MkCoPLeafEntry<D,N> entry = (MkCoPLeafEntry<D,N>) node.getEntry(i);
           D distance = getDistanceFunction().distance(entry.getRoutingObjectID(), q);
           D approximatedKnnDist_prog = entry.approximateProgressiveKnnDistance(k, getDistanceFunction());
 
@@ -329,18 +330,18 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
    * @param entry    the root entry of the current subtree
    * @param knnLists a map of knn lists for each leaf entry
    */
-  private void adjustApproximatedKNNDistances(MkCoPEntry<D> entry, Map<Integer, KNNList<D>> knnLists) {
-    MkCoPTreeNode<O, D> node = file.readPage(entry.getID());
+  private void adjustApproximatedKNNDistances(MkCoPEntry<D,N> entry, Map<Integer, KNNList<D>> knnLists) {
+    MkCoPTreeNode<O, D,N> node = file.readPage(entry.getID());
 
     if (node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
-        MkCoPLeafEntry<D> leafEntry = (MkCoPLeafEntry<D>) node.getEntry(i);
+        MkCoPLeafEntry<D,N> leafEntry = (MkCoPLeafEntry<D,N>) node.getEntry(i);
         approximateKnnDistances(leafEntry, getKNNList(leafEntry.getRoutingObjectID(), knnLists));
       }
     }
     else {
       for (int i = 0; i < node.getNumEntries(); i++) {
-        MkCoPEntry<D> dirEntry = node.getEntry(i);
+        MkCoPEntry<D,N> dirEntry = node.getEntry(i);
         adjustApproximatedKNNDistances(dirEntry, knnLists);
       }
     }
@@ -383,7 +384,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
    *
    * @param knnDistances TODO: Spezialbehandlung fuer identische Punkte in DB (insbes. Distanz 0)
    */
-  private void approximateKnnDistances(MkCoPLeafEntry<D> entry, List<D> knnDistances) {
+  private void approximateKnnDistances(MkCoPLeafEntry<D,N> entry, List<D> knnDistances) {
     StringBuffer msg = new StringBuffer();
     if (debug) {
       msg.append("\nknnDistances " + knnDistances);
@@ -785,8 +786,8 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
    * @param capacity the capacity of the new node
    * @return a new leaf node
    */
-  protected MkCoPTreeNode<O, D> createNewLeafNode(int capacity) {
-    return new MkCoPTreeNode<O, D>(file, capacity, true);
+  protected MkCoPTreeNode<O, D,N> createNewLeafNode(int capacity) {
+    return new MkCoPTreeNode<O, D,N>(file, capacity, true);
   }
 
   /**
@@ -795,8 +796,8 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
    * @param capacity the capacity of the new node
    * @return a new directory node
    */
-  protected MkCoPTreeNode<O, D> createNewDirectoryNode(int capacity) {
-    return new MkCoPTreeNode<O, D>(file, capacity, false);
+  protected MkCoPTreeNode<O, D,N> createNewDirectoryNode(int capacity) {
+    return new MkCoPTreeNode<O, D,N>(file, capacity, false);
   }
 
   /**
@@ -806,8 +807,8 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
    * @param object         the data object to be represented by the new entry
    * @param parentDistance the distance from the object to the routing object of the parent node
    */
-  protected MkCoPEntry<D> createNewLeafEntry(O object, D parentDistance) {
-    MkCoPLeafEntry<D> leafEntry = new MkCoPLeafEntry<D>(object.getID(), parentDistance, null, null);
+  protected MkCoPEntry<D,N> createNewLeafEntry(O object, D parentDistance) {
+    MkCoPLeafEntry<D,N> leafEntry = new MkCoPLeafEntry<D,N>(object.getID(), parentDistance, null, null);
     return leafEntry;
   }
 
@@ -818,8 +819,9 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
    * @param routingObjectID the id of the routing object of the node
    * @param parentDistance  the distance from the routing object of the node to the routing object of the parent node
    */
-  protected MkCoPEntry<D> createNewDirectoryEntry(MkCoPTreeNode<O, D> node, Integer routingObjectID, D parentDistance) {
-    return new MkCoPDirectoryEntry<D>(routingObjectID, parentDistance, node.getID(),
+  protected MkCoPEntry<D,N> createNewDirectoryEntry(MkCoPTreeNode<O, D,N> node, Integer routingObjectID,
+                                                    D parentDistance) {
+    return new MkCoPDirectoryEntry<D,N>(routingObjectID, parentDistance, node.getID(),
                                       node.coveringRadius(routingObjectID, this),
                                       null);
 //                                      node.conservativeKnnDistanceApproximation(k_max));
@@ -830,7 +832,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D>> ex
    *
    * @return an entry representing the root node
    */
-  protected MkCoPEntry<D> createRootEntry() {
-    return new MkCoPDirectoryEntry<D>(null, null, 0, null, null);
+  protected MkCoPEntry<D,N> createRootEntry() {
+    return new MkCoPDirectoryEntry<D,N>(null, null, 0, null, null);
   }
 }

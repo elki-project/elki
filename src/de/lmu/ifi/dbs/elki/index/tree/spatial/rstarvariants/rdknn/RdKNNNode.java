@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
  *
  * @author Elke Achtert 
  */
-public class RdKNNNode<D extends NumberDistance<D>> extends AbstractRStarTreeNode<RdKNNNode<D>, RdKNNEntry<D>> {
+public class RdKNNNode<D extends NumberDistance<D,N>, N extends Number> extends AbstractRStarTreeNode<RdKNNNode<D,N>, RdKNNEntry<D,N>> {
   /**
    * Empty constructor for Externalizable interface.
    */
@@ -26,7 +26,7 @@ public class RdKNNNode<D extends NumberDistance<D>> extends AbstractRStarTreeNod
    *                 of this node
    * @param isLeaf   indicates wether this node is a leaf node
    */
-  public RdKNNNode(PageFile<RdKNNNode<D>> file, int capacity, boolean isLeaf) {
+  public RdKNNNode(PageFile<RdKNNNode<D,N>> file, int capacity, boolean isLeaf) {
     super(file, capacity, isLeaf);
   }
 
@@ -50,8 +50,8 @@ public class RdKNNNode<D extends NumberDistance<D>> extends AbstractRStarTreeNod
    * @param capacity the capacity of the new node
    * @return a new leaf node
    */
-  protected RdKNNNode<D> createNewLeafNode(int capacity) {
-    return new RdKNNNode<D>(getFile(), capacity, true);
+  protected RdKNNNode<D,N> createNewLeafNode(int capacity) {
+    return new RdKNNNode<D,N>(getFile(), capacity, true);
   }
 
   /**
@@ -60,14 +60,14 @@ public class RdKNNNode<D extends NumberDistance<D>> extends AbstractRStarTreeNod
    * @param capacity the capacity of the new node
    * @return a new directory node
    */
-  protected RdKNNNode<D> createNewDirectoryNode(int capacity) {
-    return new RdKNNNode<D>(getFile(), capacity, false);
+  protected RdKNNNode<D,N> createNewDirectoryNode(int capacity) {
+    return new RdKNNNode<D,N>(getFile(), capacity, false);
   }
 
   /**
    * @see de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode#adjustEntry(de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry)
    */
-  public void adjustEntry(RdKNNEntry<D> entry) {
+  public void adjustEntry(RdKNNEntry<D,N> entry) {
     super.adjustEntry(entry);
     entry.setKnnDistance(kNNDistance());
   }
@@ -79,10 +79,10 @@ public class RdKNNNode<D extends NumberDistance<D>> extends AbstractRStarTreeNod
    * @param parent the parent holding the entry representing this node
    * @param index  the index of the entry in the parents child arry
    */
-  protected void testEntry(RdKNNNode<D> parent, int index) {
+  protected void testEntry(RdKNNNode<D,N> parent, int index) {
     super.testEntry(parent, index);
     // test if knn distance is correctly set
-    RdKNNEntry<D> entry = parent.getEntry(index);
+    RdKNNEntry<D,N> entry = parent.getEntry(index);
     D knnDistance = kNNDistance();
     if (!entry.getKnnDistance().equals(knnDistance)) {
       String soll = knnDistance.toString();

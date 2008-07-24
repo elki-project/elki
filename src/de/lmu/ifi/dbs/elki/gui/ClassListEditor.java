@@ -64,7 +64,7 @@ public class ClassListEditor extends TextFieldParameterEditor {
 		addInputVerifier();
 
 		if (((ClassListParameter) option).hasDefaultValue()) {
-			List<String> defaultValues = ((ClassListParameter) option).getDefaultValue();
+			List<String> defaultValues = ((ClassListParameter<?>) option).getDefaultValue();
 			for (String s : defaultValues) {
 				this.textField.setText(s);
 			}

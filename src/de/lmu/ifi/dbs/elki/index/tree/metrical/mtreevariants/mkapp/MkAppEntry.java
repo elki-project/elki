@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
  * @author Elke Achtert
  */
 
-interface MkAppEntry<D extends NumberDistance<D>> extends MTreeEntry<D> {
+interface MkAppEntry<D extends NumberDistance<D,N>, N extends Number> extends MTreeEntry<D> {
 
   /**
    * Returns the approximated value at the specified k.

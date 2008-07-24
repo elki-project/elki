@@ -37,7 +37,8 @@ import java.util.Map;
  *
  * @author Elke Achtert 
  */
-public class RdKNNTree<O extends NumberVector<O,? >, D extends NumberDistance<D>> extends NonFlatRStarTree<O, RdKNNNode<D>, RdKNNEntry<D>> {
+public class RdKNNTree<O extends NumberVector<O,? >, D extends NumberDistance<D,N>, N extends Number>
+    extends NonFlatRStarTree<O, RdKNNNode<D,N>, RdKNNEntry<D,N>> {
 
   /**
    * Parameter k.
@@ -98,7 +99,7 @@ public class RdKNNTree<O extends NumberVector<O,? >, D extends NumberDistance<D>
    *
    * @param entry the entry to be inserted
    */
-  protected void preInsert(RdKNNEntry<D> entry) {
+  protected void preInsert(RdKNNEntry<D,N> entry) {
     KNNList<D> knns_o = new KNNList<D>(k_max, distanceFunction.infiniteDistance());
     preInsert(entry, getRootEntry(), knns_o);
   }
@@ -329,15 +330,15 @@ public class RdKNNTree<O extends NumberVector<O,? >, D extends NumberDistance<D>
    * @param nodeEntry the entry representing the root of thge current subtree
    * @param knns_q    the knns of q
    */
-  private void preInsert(RdKNNEntry<D> q, RdKNNEntry<D> nodeEntry, KNNList<D> knns_q) {
+  private void preInsert(RdKNNEntry<D,N> q, RdKNNEntry<D,N> nodeEntry, KNNList<D> knns_q) {
     D knnDist_q = knns_q.getKNNDistance();
-    RdKNNNode<D> node = file.readPage(nodeEntry.getID());
+    RdKNNNode<D,N> node = file.readPage(nodeEntry.getID());
     D knnDist_node = distanceFunction.nullDistance();
 
     // leaf node
     if (node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
-        RdKNNLeafEntry<D> p = (RdKNNLeafEntry<D>) node.getEntry(i);
+        RdKNNLeafEntry<D,N> p = (RdKNNLeafEntry<D,N>) node.getEntry(i);
         D dist_pq = distanceFunction.distance(p.getID(), q.getID());
 
         // p is nearer to q than the farthest kNN-candidate of q
@@ -371,9 +372,9 @@ public class RdKNNTree<O extends NumberVector<O,? >, D extends NumberDistance<D>
     }
     // directory node
     else {
-      List<DistanceEntry<D, RdKNNEntry<D>>> entries = getSortedEntries(node, q.getID(), distanceFunction);
-      for (DistanceEntry<D, RdKNNEntry<D>> distEntry : entries) {
-        RdKNNEntry<D> entry = distEntry.getEntry();
+      List<DistanceEntry<D, RdKNNEntry<D,N>>> entries = getSortedEntries(node, q.getID(), distanceFunction);
+      for (DistanceEntry<D, RdKNNEntry<D,N>> distEntry : entries) {
+        RdKNNEntry<D,N> entry = distEntry.getEntry();
         D entry_knnDist = entry.getKnnDistance();
 
         if (distEntry.getDistance().compareTo(entry_knnDist) < 0
@@ -394,10 +395,10 @@ public class RdKNNTree<O extends NumberVector<O,? >, D extends NumberDistance<D>
    * @param o      the id of the object for which the rknn query is performed
    * @param result the list conrtaining the query results
    */
-  private void doReverseKNN(RdKNNNode<D> node, O o, List<QueryResult<D>> result) {
+  private void doReverseKNN(RdKNNNode<D,N> node, O o, List<QueryResult<D>> result) {
     if (node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
-        RdKNNLeafEntry<D> entry = (RdKNNLeafEntry<D>) node.getEntry(i);
+        RdKNNLeafEntry<D,N> entry = (RdKNNLeafEntry<D,N>) node.getEntry(i);
         D distance = distanceFunction.distance(entry.getID(), o);
         if (distance.compareTo(entry.getKnnDistance()) <= 0) {
           result.add(new QueryResult<D>(entry.getID(), distance));
@@ -407,7 +408,7 @@ public class RdKNNTree<O extends NumberVector<O,? >, D extends NumberDistance<D>
     // node is a inner node
     else {
       for (int i = 0; i < node.getNumEntries(); i++) {
-        RdKNNDirectoryEntry<D> entry = (RdKNNDirectoryEntry<D>) node.getEntry(i);
+        RdKNNDirectoryEntry<D,N> entry = (RdKNNDirectoryEntry<D,N>) node.getEntry(i);
         D minDist = distanceFunction.minDist(entry.getMBR(), o);
         if (minDist.compareTo(entry.getKnnDistance()) <= 0) {
           doReverseKNN(file.readPage(entry.getID()), o, result);
@@ -422,12 +423,12 @@ public class RdKNNTree<O extends NumberVector<O,? >, D extends NumberDistance<D>
    * @param entry    the root entry of the current subtree
    * @param knnLists a map of knn lists for each leaf entry
    */
-  private void adjustKNNDistance(RdKNNEntry<D> entry, Map<Integer, KNNList<D>> knnLists) {
-    RdKNNNode<D> node = file.readPage(entry.getID());
+  private void adjustKNNDistance(RdKNNEntry<D,N> entry, Map<Integer, KNNList<D>> knnLists) {
+    RdKNNNode<D,N> node = file.readPage(entry.getID());
     D knnDist_node = distanceFunction.nullDistance();
     if (node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
-        RdKNNEntry<D> leafEntry = node.getEntry(i);
+        RdKNNEntry<D,N> leafEntry = node.getEntry(i);
         KNNList<D> knns = knnLists.get(leafEntry.getID());
         if (knns != null) {
           leafEntry.setKnnDistance(knnLists.get(leafEntry.getID()).getKNNDistance());
@@ -437,7 +438,7 @@ public class RdKNNTree<O extends NumberVector<O,? >, D extends NumberDistance<D>
     }
     else {
       for (int i = 0; i < node.getNumEntries(); i++) {
-        RdKNNEntry<D> dirEntry = node.getEntry(i);
+        RdKNNEntry<D,N> dirEntry = node.getEntry(i);
         adjustKNNDistance(dirEntry, knnLists);
         knnDist_node = Util.max(knnDist_node, dirEntry.getKnnDistance());
       }
@@ -451,8 +452,8 @@ public class RdKNNTree<O extends NumberVector<O,? >, D extends NumberDistance<D>
    * @param capacity the capacity of the new node
    * @return a new leaf node
    */
-  protected RdKNNNode<D> createNewLeafNode(int capacity) {
-    return new RdKNNNode<D>(file, capacity, true);
+  protected RdKNNNode<D,N> createNewLeafNode(int capacity) {
+    return new RdKNNNode<D,N>(file, capacity, true);
   }
 
   /**
@@ -461,8 +462,8 @@ public class RdKNNTree<O extends NumberVector<O,? >, D extends NumberDistance<D>
    * @param capacity the capacity of the new node
    * @return a new directory node
    */
-  protected RdKNNNode<D> createNewDirectoryNode(int capacity) {
-    return new RdKNNNode<D>(file, capacity, false);
+  protected RdKNNNode<D,N> createNewDirectoryNode(int capacity) {
+    return new RdKNNNode<D,N>(file, capacity, false);
   }
 
   /**
@@ -470,8 +471,8 @@ public class RdKNNTree<O extends NumberVector<O,? >, D extends NumberDistance<D>
    *
    * @param object the data object to be represented by the new entry
    */
-  protected RdKNNEntry<D> createNewLeafEntry(O object) {
-    return new RdKNNLeafEntry<D>(object.getID(), getValues(object), distanceFunction.undefinedDistance());
+  protected RdKNNEntry<D,N> createNewLeafEntry(O object) {
+    return new RdKNNLeafEntry<D,N>(object.getID(), getValues(object), distanceFunction.undefinedDistance());
   }
 
   /**
@@ -479,8 +480,8 @@ public class RdKNNTree<O extends NumberVector<O,? >, D extends NumberDistance<D>
    *
    * @param node the node to be represented by the new entry
    */
-  protected RdKNNEntry<D> createNewDirectoryEntry(RdKNNNode<D> node) {
-    return new RdKNNDirectoryEntry<D>(node.getID(), node.mbr(), node.kNNDistance());
+  protected RdKNNEntry<D,N> createNewDirectoryEntry(RdKNNNode<D,N> node) {
+    return new RdKNNDirectoryEntry<D,N>(node.getID(), node.mbr(), node.kNNDistance());
   }
 
   /**
@@ -488,7 +489,7 @@ public class RdKNNTree<O extends NumberVector<O,? >, D extends NumberDistance<D>
    *
    * @return an entry representing the root node
    */
-  protected RdKNNEntry<D> createRootEntry() {
-    return new RdKNNDirectoryEntry<D>(0, null, null);
+  protected RdKNNEntry<D,N> createRootEntry() {
+    return new RdKNNDirectoryEntry<D,N>(0, null, null);
   }
 }

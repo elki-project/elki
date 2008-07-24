@@ -295,7 +295,7 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
             for (Integer m_i : m_c) {
                 if (m_i == m) continue;
                 DoubleDistance dist = getDistanceFunction().distance(m, m_i);
-                IDDoublePair currentDist = new IDDoublePair(m_i, dist.getDoubleValue());
+                IDDoublePair currentDist = new IDDoublePair(m_i, dist.getValue());
                 if (minDist == null || currentDist.compareTo(minDist) < 0)
                     minDist = currentDist;
             }

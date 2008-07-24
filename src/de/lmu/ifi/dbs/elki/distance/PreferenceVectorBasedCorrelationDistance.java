@@ -12,7 +12,8 @@ import java.util.BitSet;
  *
  * @author Elke Achtert
  */
-public class PreferenceVectorBasedCorrelationDistance extends CorrelationDistance<PreferenceVectorBasedCorrelationDistance> {
+public class PreferenceVectorBasedCorrelationDistance
+    extends CorrelationDistance<PreferenceVectorBasedCorrelationDistance> {
 
     /**
      * The common preference vector of the two objects defining this distance.
@@ -23,7 +24,7 @@ public class PreferenceVectorBasedCorrelationDistance extends CorrelationDistanc
      * Empty constructor for serialization purposes.
      */
     public PreferenceVectorBasedCorrelationDistance() {
-        // for serialization
+        super();
     }
 
     /**
@@ -62,18 +63,50 @@ public class PreferenceVectorBasedCorrelationDistance extends CorrelationDistanc
     }
 
     /**
-     * The object implements the writeExternal method to save its contents by
-     * calling the methods of DataOutput for its primitive values or calling the
-     * writeObject method of ObjectOutput for objects, strings, and arrays.
+     * Returns a string representation of the object.
      *
-     * @param out the stream to write the object to
-     * @throws java.io.IOException Includes any I/O exceptions that may occur
-     * @serialData Overriding methods should use this tag to describe the data
-     * layout of this Externalizable object. List the sequence of
-     * element types and, if possible, relate the element to a
-     * public/protected field and/or method of this Externalizable
-     * class.
+     * @return a string representation of the object.
      */
+    public String toString() {
+        return super.toString() + " " + commonPreferenceVector.toString();
+    }
+
+    /**
+     * @see Distance#plus(Distance)
+     */
+    public PreferenceVectorBasedCorrelationDistance plus(PreferenceVectorBasedCorrelationDistance distance) {
+        // todo
+        return new PreferenceVectorBasedCorrelationDistance(getCorrelationValue() + distance.getCorrelationValue(),
+            getEuklideanValue() + distance.getEuklideanValue(),
+            new BitSet());
+    }
+
+    /**
+     * @see Distance#minus(Distance)
+     */
+    public PreferenceVectorBasedCorrelationDistance minus(PreferenceVectorBasedCorrelationDistance distance) {
+        // todo
+        return new PreferenceVectorBasedCorrelationDistance(getCorrelationValue() - distance.getCorrelationValue(),
+            getEuklideanValue() - distance.getEuklideanValue(),
+            new BitSet());
+    }
+
+    /**
+     * @throws UnsupportedOperationException
+     * @see Comparable#compareTo(Object)
+     */
+    public int compareTo(PreferenceVectorBasedCorrelationDistance o) {
+        // todo
+        return super.compareTo(o);
+    }
+
+    /**
+     * Writes the correlation value and the euklidean value
+     * of this CorrelationDistance to the specified stream.
+     *
+     * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
+     */
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         // todo
         super.writeExternal(out);
@@ -104,40 +137,5 @@ public class PreferenceVectorBasedCorrelationDistance extends CorrelationDistanc
     public int externalizableSize() {
         // todo
         return super.externalizableSize();
-    }
-
-    /**
-     * Returns a string representation of the object.
-     *
-     * @return a string representation of the object.
-     */
-    public String toString() {
-        return super.toString() + " " + commonPreferenceVector.toString();
-    }
-
-    /**
-     * @see Distance#plus(Distance)
-     */
-    public PreferenceVectorBasedCorrelationDistance plus(PreferenceVectorBasedCorrelationDistance distance) {
-        return new PreferenceVectorBasedCorrelationDistance(getCorrelationValue() + distance.getCorrelationValue(),
-            getEuklideanValue() + distance.getEuklideanValue(),
-            new BitSet());
-    }
-
-    /**
-     * @see Distance#minus(Distance)
-     */
-    public PreferenceVectorBasedCorrelationDistance minus(PreferenceVectorBasedCorrelationDistance distance) {
-        return new PreferenceVectorBasedCorrelationDistance(getCorrelationValue() - distance.getCorrelationValue(),
-            getEuklideanValue() - distance.getEuklideanValue(),
-            new BitSet());
-    }
-
-    /**
-     * @throws UnsupportedOperationException
-     * @see Comparable#compareTo(Object)
-     */
-    public int compareTo(PreferenceVectorBasedCorrelationDistance o) {
-        return super.compareTo(o);
     }
 }

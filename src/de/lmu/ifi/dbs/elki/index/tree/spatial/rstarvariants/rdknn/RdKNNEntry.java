@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
  * @author Elke Achtert 
  */
 
-interface RdKNNEntry<D extends NumberDistance<D>> extends SpatialEntry {
+interface RdKNNEntry<D extends NumberDistance<D,N>, N extends Number> extends SpatialEntry {
   /**
    * Returns the knn distance of this entry.
    *

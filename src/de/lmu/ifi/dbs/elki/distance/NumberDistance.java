@@ -2,25 +2,79 @@ package de.lmu.ifi.dbs.elki.distance;
 
 /**
  * Provides a Distance for a number-valued distance.
- * 
- * @author Elke Achtert 
+ *
+ * @author Elke Achtert
+ * @param <D> the type of NumberDistance used
+ * @param <N> the type of Number used (e.g. Double, Integer, Float, etc.)
  */
-public abstract class NumberDistance<D extends NumberDistance<D>> extends
-        AbstractDistance<D>
-{
+public abstract class NumberDistance<D extends NumberDistance<D, N>, N extends Number> extends AbstractDistance<D> {
 
     /**
-     * @see Distance
+     * The value of this distance.
      */
-    public String description()
-    {
-        return "distance";
+    // todo private?
+    N value;
+
+    /**
+     * Constructs a new NumberDistance object that represents the value argument.
+     *
+     * @param value the value to be represented by the NumberDistance.
+     */
+    public NumberDistance(N value) {
+        super();
+        this.value = value;
+    }
+
+    /**
+     * Returns the hash code for this NumberDistance, which is the hash code of its value.
+     *
+     * @return the hash code of the value
+     * @see AbstractDistance#hashCode()
+     */
+    public final int hashCode() {
+        return value.hashCode();
+    }
+
+    /**
+     * Compares this NumberDistance with the given NumberDistance wrt the
+     * represented value. <p/>
+     * <code>d1.compareTo(d2)</code> is the same as
+     * {@link Double#compare(double,double) Double.compare(d1.value, d2.value)}.
+     *
+     * @return a negative integer, zero, or a positive integer as the value of this NumberDistance
+     *         is less than, equal to, or greater than the value of the specified NumberDistance.
+     * @see Comparable#compareTo(Object)
+     */
+    public final int compareTo(D other) {
+        return Double.compare(this.value.doubleValue(), other.value.doubleValue());
+    }
+
+    /**
+     * Returns a string representation of this NumberDistance.
+     *
+     * @return the value of this NumberDistance.
+     * todo notwendig?
+     */
+    public final String toString() {
+        return value.toString();
+    }
+
+    /**
+     * Returns the value of this NumberDistance.
+     *
+     * @return the value of this NumberDistance
+     */
+    public final N getValue() {
+        return value;
     }
 
     /**
      * Returns the double value of this distance.
-     * 
+     *
      * @return the double value of this distance
      */
-    public abstract double getDoubleValue();
+    public final double getDoubleValue() {
+        return value.doubleValue();
+    }
+
 }

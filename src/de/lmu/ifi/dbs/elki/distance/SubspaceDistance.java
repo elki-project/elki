@@ -88,50 +88,6 @@ public class SubspaceDistance<D extends SubspaceDistance<D>> extends AbstractDis
     }
 
     /**
-     * The object implements the writeExternal method to save its contents by
-     * calling the methods of DataOutput for its primitive values or calling the
-     * writeObject method of ObjectOutput for objects, strings, and arrays.
-     *
-     * @param out the stream to write the object to
-     * @throws java.io.IOException Includes any I/O exceptions that may occur
-     * @serialData Overriding methods should use this tag to describe the data
-     * layout of this Externalizable object. List the sequence of
-     * element types and, if possible, relate the element to a
-     * public/protected field and/or method of this Externalizable
-     * class.
-     */
-    public void writeExternal(ObjectOutput out) throws IOException {
-        out.writeDouble(subspaceDistance);
-        out.writeDouble(affineDistance);
-    }
-
-    /**
-     * The object implements the readExternal method to restore its contents by
-     * calling the methods of DataInput for primitive types and readObject for
-     * objects, strings and arrays. The readExternal method must read the values
-     * in the same sequence and with the same types as were written by
-     * writeExternal.
-     *
-     * @param in the stream to read data from in order to restore the object
-     * @throws java.io.IOException    if I/O errors occur
-     * @throws ClassNotFoundException If the class for an object being restored cannot be found.
-     */
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        subspaceDistance = in.readDouble();
-        affineDistance = in.readDouble();
-    }
-
-    /**
-     * Retuns the number of Bytes this distance uses if it is written to an
-     * external file.
-     *
-     * @return 16 (2 * 8 Byte for two double values)
-     */
-    public int externalizableSize() {
-        return 16;
-    }
-
-    /**
      * Returns a string representation of the object.
      *
      * @return a string representation of the object.
@@ -147,6 +103,7 @@ public class SubspaceDistance<D extends SubspaceDistance<D>> extends AbstractDis
      *
      * @see Object#equals(Object)
      */
+    // todo noetig oder reicht in super klasse?
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -190,5 +147,38 @@ public class SubspaceDistance<D extends SubspaceDistance<D>> extends AbstractDis
      */
     public double getAffineDistance() {
         return affineDistance;
+    }
+
+    /**
+     * Writes the subspace distance value and the affine distance value
+     * of this SubspaceDistance to the specified stream.
+     *
+     * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
+     */
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeDouble(subspaceDistance);
+        out.writeDouble(affineDistance);
+    }
+
+    /**
+     * Reads the subspace distance value and the affine distance value
+     * of this SubspaceDistance from the specified stream.
+     *
+     * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
+     */
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        subspaceDistance = in.readDouble();
+        affineDistance = in.readDouble();
+    }
+
+    /**
+     * Retuns the number of Bytes this distance uses if it is written to an
+     * external file.
+     *
+     * @return 16 (2 * 8 Byte for two double values)
+     * @see Distance#externalizableSize()
+     */
+    public int externalizableSize() {
+        return 16;
     }
 }
