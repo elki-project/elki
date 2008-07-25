@@ -140,14 +140,17 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         return result;
     }
 
+    /**
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
+     */
     @Override
     public String description() {
         StringBuilder description = new StringBuilder();
         description.append(super.description());
-        description.append('\n');
-        description.append(ERiC.class.getName());
-        description.append(" requires parametrization of underlying partitioning algorithm:\n");
-        description.append(copacAlgorithm.description());
+        description.append(Description.NEWLINE);
+        description.append(getClass().getName());
+        description.append(" requires parametrization of underlying partitioning algorithm ");
+        description.append(copacAlgorithm.inlineDescription());
         return description.toString();
     }
 

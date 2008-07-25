@@ -1470,55 +1470,6 @@ public final class Util extends AbstractLoggable {
     }
 
     /**
-     * Adds the specified flag to the beginning of the given parameter array.
-     *
-     * @param parameters the array of parameters
-     * @param flag       the flag to be added
-     * @return a new parameter array containing the values of <code>parameters</code> and
-     *         the specified <code>flag</code>.
-     */
-    public static String[] addFlag(String[] parameters, Flag flag) {
-        String[] newParameters = new String[parameters.length + 1];
-        System.arraycopy(parameters, 0, newParameters, 1, parameters.length);
-        newParameters[0] = OptionHandler.OPTION_PREFIX + flag.getName();
-        return newParameters;
-    }
-
-    /**
-     * Adds the specified parameter and its value to the beginning of the given parameter array.
-     *
-     * @param parameters the array of parameters
-     * @param parameter  the parameter to be added
-     * @param value      the value of the parameter to be added
-     * @return a new parameter array containing the values of <code>parameters</code> and
-     *         the specified <code>parameter</code> and its <code>value</code>.
-     */
-    public static String[] addParameter(String[] parameters, Parameter<?, ?> parameter, String value) {
-        String[] newParameters = new String[parameters.length + 2];
-        System.arraycopy(parameters, 0, newParameters, 2, parameters.length);
-        newParameters[0] = OptionHandler.OPTION_PREFIX + parameter.getName();
-        newParameters[1] = value;
-        return newParameters;
-    }
-
-    /**
-     * Adds the specified optionID and its value to the beginning of the given parameter array.
-     *
-     * @param parameters the array of parameters
-     * @param optionID   the optionID to be added
-     * @param value      the value of the optionID to be added
-     * @return a new parameter array containing the values of <code>parameters</code> and
-     *         the specified <code>optionID</code> and its <code>value</code>.
-     */
-    public static String[] addParameter(String[] parameters, OptionID optionID, String value) {
-        String[] newParameters = new String[parameters.length + 2];
-        System.arraycopy(parameters, 0, newParameters, 2, parameters.length);
-        newParameters[0] = OptionHandler.OPTION_PREFIX + optionID.getName();
-        newParameters[1] = value;
-        return newParameters;
-    }
-
-    /**
      * Adds the specified flag to the beginning of the given parameter list.
      *
      * @param parameters the list of parameters
@@ -1563,6 +1514,23 @@ public final class Util extends AbstractLoggable {
     }
 
     /**
+     * Adds the specified optionID and its value to the beginning of the given parameter array.
+     *
+     * @param parameters the array of parameters
+     * @param optionID   the optionID to be added
+     * @param value      the value of the optionID to be added
+     * @return a new parameter array containing the values of <code>parameters</code> and
+     *         the specified <code>optionID</code> and its <code>value</code>.
+     */
+    public static String[] addParameter(String[] parameters, OptionID optionID, String value) {
+        String[] newParameters = new String[parameters.length + 2];
+        System.arraycopy(parameters, 0, newParameters, 2, parameters.length);
+        newParameters[0] = OptionHandler.OPTION_PREFIX + optionID.getName();
+        newParameters[1] = value;
+        return newParameters;
+    }
+
+    /**
      * Returns a string representation of the specified list of
      * options containing the names of the options.
      *
@@ -1602,5 +1570,33 @@ public final class Util extends AbstractLoggable {
         }
         buffer.append("]");
         return buffer.toString();
+    }
+
+    /**
+     * Joins the specified arrays.
+     *
+     * @param array1 the first array
+     * @param array2 the second array
+     * @return a new array containing the entries of <code>array1</code> and
+     *         the <code>array2</code>.
+     */
+    public static String[] joinArray(String[] array1, String[] array2) {
+        String[] newArray = new String[array1.length + array2.length];
+        System.arraycopy(array1, 0, newArray, 0, array1.length);
+        System.arraycopy(array2, 0, newArray, array1.length, array2.length);
+        return newArray;
+    }
+
+    /**
+     * Adds the entries of the specified array
+     * to the end of the given list.
+     *
+     * @param list  the list
+     * @param array the array containing the objects to be added to the list
+     */
+    public static <O> void addToList(List<O> list, O[] array) {
+        for (O object : array) {
+            list.add(object);
+        }
     }
 }

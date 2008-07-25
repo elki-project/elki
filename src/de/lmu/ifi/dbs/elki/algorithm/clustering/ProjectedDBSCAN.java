@@ -405,7 +405,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
         distanceFunctionParameters[3] = OptionHandler.OPTION_PREFIX + ProjectedDBSCANPreprocessor.EPSILON_PARAM.getName();
         distanceFunctionParameters[4] = epsilon;
         // preprocessor minpts
-        Util.addParameter(distanceFunctionParameters, MINPTS_PARAM, Integer.toString(minpts));
+        distanceFunctionParameters = Util.addParameter(distanceFunctionParameters, MINPTS_ID, Integer.toString(minpts));
 
         distanceFunction.setParameters(distanceFunctionParameters);
 

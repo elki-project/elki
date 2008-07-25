@@ -34,6 +34,7 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.ArrayList;
 
 /**
  * DeLiClu provides the DeLiClu algorithm, a hierachical algorithm to find density-connected sets in a database.
@@ -148,8 +149,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
         int numHandled = 1;
         index.setHandled(db.get(startID));
         SpatialEntry rootEntry = db.getRootEntry();
-        SpatialObjectPair spatialObjectPair = new SpatialObjectPair(rootEntry,
-            rootEntry, true);
+        SpatialObjectPair spatialObjectPair = new SpatialObjectPair(rootEntry,rootEntry, true);
         updateHeap(distFunction.nullDistance(), spatialObjectPair);
 
         while (numHandled != size) {
@@ -164,14 +164,12 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
             else {
                 SpatialObjectPair dataPair = pqNode.getValue();
                 // set handled
-                List<TreeIndexPathComponent<DeLiCluEntry>> path = index
-                    .setHandled(db.get(dataPair.entry1.getID()));
+                List<TreeIndexPathComponent<DeLiCluEntry>> path = index.setHandled(db.get(dataPair.entry1.getID()));
                 if (path == null)
                     throw new RuntimeException("snh: parent("
                         + dataPair.entry1.getID() + ") = null!!!");
                 // add to cluster order
-                clusterOrder.add(dataPair.entry1.getID(), dataPair.entry2
-                    .getID(), pqNode.getKey());
+                clusterOrder.add(dataPair.entry1.getID(), dataPair.entry2.getID(), pqNode.getKey());
                 numHandled++;
                 // reinsert expanded leafs
                 reinsertExpanded(distFunction, index, path, knns);
@@ -215,11 +213,13 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
         int minpts = getParameterValue(MINPTS_PARAM);
 
         // knn join
-        String[] kNNJoinParameters = new String[remainingParameters.length];
-        System.arraycopy(remainingParameters, 0, kNNJoinParameters, 0, remainingParameters.length);
-        Util.addParameter(kNNJoinParameters, knnJoin.K_PARAM, Integer.toString(minpts));
-        remainingParameters = knnJoin.setParameters(kNNJoinParameters);
-        setParameters(args, remainingParameters);
+        List<String> kNNJoinParameters = new ArrayList<String>();
+        // parameter k
+        Util.addParameter(kNNJoinParameters, KNNJoin.K_ID, Integer.toString(minpts));
+        // parameter distance function
+        Util.addParameter(kNNJoinParameters, KNNJoin.DISTANCE_FUNCTION_ID, getDistanceFunction().getClass().getName());
+        Util.addToList(kNNJoinParameters, getDistanceFunction().getParameters());
+        knnJoin.setParameters(kNNJoinParameters.toArray(new String[kNNJoinParameters.size()]));
 
         return remainingParameters;
     }
@@ -348,11 +348,9 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
                 if (!entry2.hasHandled()) {
                     continue;
                 }
-                D distance = distFunction.distance(entry1.getMBR(), entry2
-                    .getMBR());
+                D distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
 
-                SpatialObjectPair nodePair = new SpatialObjectPair(entry1,
-                    entry2, true);
+                SpatialObjectPair nodePair = new SpatialObjectPair(entry1,entry2, true);
                 updateHeap(distance, nodePair);
             }
         }
@@ -385,12 +383,9 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
                     continue;
                 }
 
-                D distance = distFunction.distance(entry1.getMBR(), entry2
-                    .getMBR());
-                D reach = Util.max(distance, knns
-                    .getKNNDistance(entry2.getID()));
-                SpatialObjectPair dataPair = new SpatialObjectPair(entry1,
-                    entry2, false);
+                D distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
+                D reach = Util.max(distance, knns.getKNNDistance(entry2.getID()));
+                SpatialObjectPair dataPair = new SpatialObjectPair(entry1,entry2, false);
                 updateHeap(reach, dataPair);
             }
         }
@@ -426,12 +421,9 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
                 if (entry1.hasHandled()) {
                     continue;
                 }
-                D distance = distFunction.distance(entry1.getMBR(), entry2
-                    .getMBR());
-                D reach = Util.max(distance, knns
-                    .getKNNDistance(entry2.getID()));
-                SpatialObjectPair dataPair = new SpatialObjectPair(entry1,
-                    entry2, false);
+                D distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
+                D reach = Util.max(distance, knns.getKNNDistance(entry2.getID()));
+                SpatialObjectPair dataPair = new SpatialObjectPair(entry1,entry2, false);
                 updateHeap(reach, dataPair);
             }
         }

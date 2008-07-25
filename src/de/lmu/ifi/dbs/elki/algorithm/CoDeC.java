@@ -239,12 +239,9 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
 
         // clusteringAlgorithm
         clusteringAlgorithm = CLUSTERING_ALGORITHM_PARAM.instantiateClass();
-        String[] clusteringAlgorithmParameters = new String[remainingParameters.length];
-        System.arraycopy(remainingParameters, 0, clusteringAlgorithmParameters, 0, remainingParameters.length);
         clusteringAlgorithm.setTime(isTime());
         clusteringAlgorithm.setVerbose(isVerbose());
-        remainingParameters = clusteringAlgorithm.setParameters(clusteringAlgorithmParameters);
-        setParameters(args, remainingParameters);
+        remainingParameters = clusteringAlgorithm.setParameters(remainingParameters);
 
         // evaluation
         if (evaluateAsClassifier) {
@@ -259,6 +256,26 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
         }
         setParameters(args, remainingParameters);
         return remainingParameters;
+    }
+
+    /**
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
+     */
+    @Override
+    public String description() {
+        StringBuilder description = new StringBuilder();
+        description.append(super.description());
+        description.append('\n');
+        description.append(this.getClass().getName());
+        description.append(" requires parametrization of underlying clustering algorithm:\n");
+        description.append(clusteringAlgorithm.description());
+        description.append('\n');
+        description.append("If evaluation of the cluster-models as classifier is chosen, ");
+        description.append("the parametrization of the classifier is required:\n");
+        description.append(classifier.description());
+        description.append("Otherwise the parametrization of the dependency derivator is required:\n");
+        description.append(dependencyDerivator.description());
+        return description.toString();
     }
 
 }

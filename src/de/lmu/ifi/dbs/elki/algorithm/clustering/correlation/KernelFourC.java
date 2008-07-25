@@ -39,10 +39,12 @@ public class KernelFourC<V extends RealVector<V, ?>> extends ProjectedDBSCAN<V> 
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
+        // todo richtig?
         // locally weighted distance function
         String[] locallyWeightedDistanceFunctionParameters = new String[args.length];
         System.arraycopy(args, 0, locallyWeightedDistanceFunctionParameters, 0, args.length);
-        Util.addParameter(locallyWeightedDistanceFunctionParameters,
+        locallyWeightedDistanceFunctionParameters =
+            Util.addParameter(locallyWeightedDistanceFunctionParameters,
             DISTANCE_FUNCTION_ID,
             KernelBasedLocallyWeightedDistanceFunction.class.getName());
 

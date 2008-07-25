@@ -5,11 +5,11 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 
 /**
- * CosineDistanceFunction for FeatureVectors.
+ * Cosine distance function for feature vectors.
  *
  * @author Arthur Zimek
  */
-public class CosineDistanceFunction<V extends FeatureVector<V,? >> extends AbstractDoubleDistanceFunction<V> {
+public class CosineDistanceFunction<V extends FeatureVector<V,?>> extends AbstractDoubleDistanceFunction<V> {
 
   /**
    * Provides a CosineDistanceFunction.
@@ -41,7 +41,8 @@ public class CosineDistanceFunction<V extends FeatureVector<V,? >> extends Abstr
    * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
    */
   public String description() {
-    return "Cosine distance for FeatureVectors. No parameters required. Pattern for defining a range: \"" + requiredInputPattern() + "\".";
+    return "Cosine distance for FeatureVectors. No parameters required. " +
+        "Pattern for defining a range: \"" + requiredInputPattern() + "\".";
   }
 
 }

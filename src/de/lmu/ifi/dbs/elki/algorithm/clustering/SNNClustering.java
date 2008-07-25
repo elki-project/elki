@@ -325,7 +325,6 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
         return epsilon;
     }
 
-
     /**
      * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#description()
      */
