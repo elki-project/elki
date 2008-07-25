@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
  *
  * @author Elke Achtert
  */
-public class SubspaceDistance<D extends SubspaceDistance<D>> extends AbstractDistance<D> {
+public class SubspaceDistance extends AbstractDistance<SubspaceDistance> {
     /**
      * Indicates a separator.
      */
@@ -54,9 +54,8 @@ public class SubspaceDistance<D extends SubspaceDistance<D>> extends AbstractDis
     /**
      * @see Distance#plus(de.lmu.ifi.dbs.elki.distance.Distance)
      */
-    @SuppressWarnings("unchecked")
-    public D plus(D distance) {
-        return (D) new SubspaceDistance<D>(
+    public SubspaceDistance plus(SubspaceDistance distance) {
+        return new SubspaceDistance(
             this.subspaceDistance + distance.subspaceDistance,
             this.affineDistance + distance.affineDistance);
     }
@@ -64,9 +63,8 @@ public class SubspaceDistance<D extends SubspaceDistance<D>> extends AbstractDis
     /**
      * @see Distance#minus(de.lmu.ifi.dbs.elki.distance.Distance)
      */
-    @SuppressWarnings("unchecked")
-    public D minus(D distance) {
-        return (D) new SubspaceDistance<D>(
+    public SubspaceDistance minus(SubspaceDistance distance) {
+        return new SubspaceDistance(
             this.subspaceDistance - distance.subspaceDistance,
             this.affineDistance - distance.affineDistance);
     }
@@ -79,52 +77,38 @@ public class SubspaceDistance<D extends SubspaceDistance<D>> extends AbstractDis
     }
 
     /**
-     * @see Comparable#compareTo(Object)
-     */
-    // todo
-    public int compareTo(D other) {
-        if (this.subspaceDistance < other.subspaceDistance) {
-            return -1;
-        }
-        if (this.subspaceDistance > other.subspaceDistance) {
-            return +1;
-        }
-        return Double.compare(this.affineDistance, other.affineDistance);
-    }
-
-    /**
-     * Returns a string representation of the object.
+     * Returns a string representation of this SubspaceDistance.
      *
-     * @return a string representation of the object.
+     * @return the values of the subspace distance and the affine distance separated by blank
      */
     public String toString() {
         return Double.toString(subspaceDistance) + " " + Double.toString(affineDistance);
     }
 
     /**
-     * Returns true if o is of the same class as this instance
-     * and <code>this.compareTo(o)</code> is 0,
-     * false otherwise.
+     * Compares this SubspaceDistance with the given SubspaceDistance wrt the
+     * represented subspace distance values. If both values are considered to be equal, the values of
+     * the affine distances are compared.
      *
-     * @see Object#equals(Object)
+     * @return the value of
+     *         {@link Double#compare(double,double) Double.compare(this.subspaceDistance, other.subspaceDistance)}
+     *         if it is a non zero value,
+     *         the value of {@link Double#compare(double,double) Double.compare(this.affineDistance, other.affineDistance)}
+     *         otherwise
+     * @see Comparable#compareTo(Object)
      */
-    // todo noetig oder reicht in super klasse?
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-
-        // noinspection unchecked
-        final D that = (D) o;
-
-        if (Double.compare(that.affineDistance, affineDistance) != 0) return false;
-        return Double.compare(that.subspaceDistance, subspaceDistance) == 0;
+    public int compareTo(SubspaceDistance other) {
+        int compare = Double.compare(this.subspaceDistance, other.subspaceDistance);
+        if (compare != 0) {
+            return compare;
+        }
+        else {
+            return Double.compare(this.affineDistance, other.affineDistance);
+        }
     }
 
     /**
-     * Returns a hash code value for this object.
-     *
-     * @return a hash code value for this object.
+     * @see Object#hashCode()
      */
     public int hashCode() {
         int result;

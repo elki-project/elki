@@ -72,7 +72,11 @@ public class HiSCDistanceFunction<O extends RealVector<O,?>,P extends Preprocess
     BitSet inverseCommonPreferenceVector = (BitSet) commonPreferenceVector.clone();
     inverseCommonPreferenceVector.flip(0, dim);
 
-    return new PreferenceVectorBasedCorrelationDistance(subspaceDim, weightedDistance(v1, v2, inverseCommonPreferenceVector), commonPreferenceVector);
+    return new PreferenceVectorBasedCorrelationDistance(
+        getDatabase().dimensionality(),
+        subspaceDim,
+        weightedDistance(v1, v2, inverseCommonPreferenceVector),
+        commonPreferenceVector);
   }
 
   /**

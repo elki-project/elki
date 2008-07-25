@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.distance;
  * Provides a Distance for a number-valued distance.
  *
  * @author Elke Achtert
- * @param <D> the type of NumberDistance used
+ * @param <D> the (final) type of NumberDistance used
  * @param <N> the type of Number used (e.g. Double, Integer, Float, etc.)
  */
 public abstract class NumberDistance<D extends NumberDistance<D, N>, N extends Number> extends AbstractDistance<D> {

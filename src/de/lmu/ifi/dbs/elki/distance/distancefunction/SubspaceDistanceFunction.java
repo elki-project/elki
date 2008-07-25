@@ -19,8 +19,8 @@ import java.util.regex.Pattern;
  *
  * @author Elke Achtert
  */
-public class SubspaceDistanceFunction<O extends RealVector<O, ?>, P extends Preprocessor<O>, D extends SubspaceDistance<D>>
-    extends AbstractPreprocessorBasedDistanceFunction<O, P, D> {
+public class SubspaceDistanceFunction<O extends RealVector<O, ?>, P extends Preprocessor<O>>
+    extends AbstractPreprocessorBasedDistanceFunction<O, P, SubspaceDistance> {
 
     /**
      * The Assocoiation ID for the association to be set by the preprocessor.
@@ -85,14 +85,13 @@ public class SubspaceDistanceFunction<O extends RealVector<O, ?>, P extends Prep
     /**
      * @see de.lmu.ifi.dbs.elki.distance.MeasurementFunction#valueOf(String)
      */
-    public D valueOf(String pattern) throws IllegalArgumentException {
+    public SubspaceDistance valueOf(String pattern) throws IllegalArgumentException {
         if (pattern.equals(INFINITY_PATTERN)) {
             return infiniteDistance();
         }
         if (matches(pattern)) {
             String[] values = AbstractCorrelationDistanceFunction.SEPARATOR.split(pattern);
-            // noinspection unchecked
-            return (D) new SubspaceDistance<D>(Double.parseDouble(values[0]), Double.parseDouble(values[1]));
+            return new SubspaceDistance(Double.parseDouble(values[0]), Double.parseDouble(values[1]));
         }
         else {
             throw new IllegalArgumentException("Given pattern \"" +
@@ -105,25 +104,22 @@ public class SubspaceDistanceFunction<O extends RealVector<O, ?>, P extends Prep
     /**
      * @see de.lmu.ifi.dbs.elki.distance.MeasurementFunction#infiniteDistance()
      */
-    public D infiniteDistance() {
-        // noinspection unchecked
-        return (D) new SubspaceDistance<D>(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+    public SubspaceDistance infiniteDistance() {
+        return new SubspaceDistance(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
     }
 
     /**
      * @see de.lmu.ifi.dbs.elki.distance.MeasurementFunction#nullDistance()
      */
-    public D nullDistance() {
-        // noinspection unchecked
-        return (D) new SubspaceDistance<D>(0, 0);
+    public SubspaceDistance nullDistance() {
+        return new SubspaceDistance(0, 0);
     }
 
     /**
      * @see de.lmu.ifi.dbs.elki.distance.MeasurementFunction#undefinedDistance()
      */
-    public D undefinedDistance() {
-        // noinspection unchecked
-        return (D) new SubspaceDistance<D>(Double.NaN, Double.NaN);
+    public SubspaceDistance undefinedDistance() {
+        return new SubspaceDistance(Double.NaN, Double.NaN);
     }
 
     /**
@@ -132,7 +128,7 @@ public class SubspaceDistanceFunction<O extends RealVector<O, ?>, P extends Prep
      *
      * @see de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction#distance(de.lmu.ifi.dbs.elki.data.DatabaseObject,de.lmu.ifi.dbs.elki.data.DatabaseObject)
      */
-    public D distance(O o1, O o2) {
+    public SubspaceDistance distance(O o1, O o2) {
         // noinspection unchecked
         LocalPCA<O> pca1 = (LocalPCA<O>) getDatabase().getAssociation(AssociationID.LOCAL_PCA, o1.getID());
         // noinspection unchecked
@@ -152,7 +148,7 @@ public class SubspaceDistanceFunction<O extends RealVector<O, ?>, P extends Prep
      * @return the distance between two given DatabaseObjects according to this
      *         distance function
      */
-    public D distance(O o1, O o2, LocalPCA<O> pca1, LocalPCA<O> pca2) {
+    public SubspaceDistance distance(O o1, O o2, LocalPCA<O> pca1, LocalPCA<O> pca2) {
         if (pca1.getCorrelationDimension() != pca2.getCorrelationDimension()) {
             throw new IllegalStateException("pca1.getCorrelationDimension() != pca2.getCorrelationDimension()");
         }
@@ -168,7 +164,6 @@ public class SubspaceDistanceFunction<O extends RealVector<O, ?>, P extends Prep
         double affineDistance = Math.max(df1.distance(o1, o2).getValue(),
             df2.distance(o1, o2).getValue());
 
-        // noinspection unchecked
-        return (D) new SubspaceDistance<D>(d1, affineDistance);
+        return new SubspaceDistance(d1, affineDistance);
     }
 }

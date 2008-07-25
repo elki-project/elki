@@ -16,6 +16,11 @@ public class PreferenceVectorBasedCorrelationDistance
     extends CorrelationDistance<PreferenceVectorBasedCorrelationDistance> {
 
     /**
+     * The dimensionality of the feature space (needed for serialization).
+     */
+    private int dimensionality;
+
+    /**
      * The common preference vector of the two objects defining this distance.
      */
     private BitSet commonPreferenceVector;
@@ -30,16 +35,19 @@ public class PreferenceVectorBasedCorrelationDistance
     /**
      * Constructs a new CorrelationDistance object.
      *
+     * @param dimensionality         the dimensionality of the feature space (needed for serialization)
      * @param correlationValue       the correlation dimension to be represented by the
      *                               CorrelationDistance
      * @param euklideanValue         the euclidean distance to be represented by the
      *                               CorrelationDistance
      * @param commonPreferenceVector the common preference vector of the two objects defining this distance
      */
-    public PreferenceVectorBasedCorrelationDistance(int correlationValue,
+    public PreferenceVectorBasedCorrelationDistance(int dimensionality,
+                                                    int correlationValue,
                                                     double euklideanValue,
                                                     BitSet commonPreferenceVector) {
         super(correlationValue, euklideanValue);
+        this.dimensionality = dimensionality;
         this.commonPreferenceVector = commonPreferenceVector;
     }
 
@@ -63,79 +71,145 @@ public class PreferenceVectorBasedCorrelationDistance
     }
 
     /**
-     * Returns a string representation of the object.
+     * Returns a string representation of this PreferenceVectorBasedCorrelationDistance.
      *
-     * @return a string representation of the object.
+     * @return the correlation value, the euklidean value and the common preference vector
+     *         separated by blanks
      */
     public String toString() {
         return super.toString() + " " + commonPreferenceVector.toString();
     }
 
     /**
+     * @throws IllegalArgumentException if the dimensionality values and common preference vectors
+     *                                  of this distance and the specified distance are not equal
      * @see Distance#plus(Distance)
      */
     public PreferenceVectorBasedCorrelationDistance plus(PreferenceVectorBasedCorrelationDistance distance) {
-        // todo
-        return new PreferenceVectorBasedCorrelationDistance(getCorrelationValue() + distance.getCorrelationValue(),
+        if (this.dimensionality != distance.dimensionality) {
+            throw new IllegalArgumentException("The dimensionality values of this distance " +
+                "and the specified distance need to be equal.\n" +
+                "this.dimensionality     " + this.dimensionality + "\n" +
+                "distance.dimensionality " + distance.dimensionality + "\n"
+            );
+        }
+
+        if (!this.commonPreferenceVector.equals(distance.commonPreferenceVector)) {
+            throw new IllegalArgumentException("The common preference vectors of this distance " +
+                "and the specified distance need to be equal.\n" +
+                "this.commonPreferenceVector     " + this.commonPreferenceVector + "\n" +
+                "distance.commonPreferenceVector " + distance.commonPreferenceVector + "\n"
+            );
+        }
+
+        return new PreferenceVectorBasedCorrelationDistance(
+            dimensionality,
+            getCorrelationValue() + distance.getCorrelationValue(),
             getEuklideanValue() + distance.getEuklideanValue(),
-            new BitSet());
+            (BitSet) commonPreferenceVector.clone());
     }
 
     /**
+     * @throws IllegalArgumentException if the dimensionality values and common preference vectors
+     *                                  of this distance and the specified distance are not equal
      * @see Distance#minus(Distance)
      */
     public PreferenceVectorBasedCorrelationDistance minus(PreferenceVectorBasedCorrelationDistance distance) {
-        // todo
-        return new PreferenceVectorBasedCorrelationDistance(getCorrelationValue() - distance.getCorrelationValue(),
+        if (this.dimensionality != distance.dimensionality) {
+            throw new IllegalArgumentException("The dimensionality values of this distance " +
+                "and the specified distance need to be equal.\n" +
+                "this.dimensionality     " + this.dimensionality + "\n" +
+                "distance.dimensionality " + distance.dimensionality + "\n"
+            );
+        }
+
+        if (!this.commonPreferenceVector.equals(distance.commonPreferenceVector)) {
+            throw new IllegalArgumentException("The common preference vectors of this distance " +
+                "and the specified distance need to be equal.\n" +
+                "this.commonPreferenceVector     " + this.commonPreferenceVector + "\n" +
+                "distance.commonPreferenceVector " + distance.commonPreferenceVector + "\n"
+            );
+        }
+
+        return new PreferenceVectorBasedCorrelationDistance(
+            dimensionality,
+            getCorrelationValue() - distance.getCorrelationValue(),
             getEuklideanValue() - distance.getEuklideanValue(),
-            new BitSet());
+            (BitSet) commonPreferenceVector.clone());
     }
 
     /**
-     * @throws UnsupportedOperationException
+     * Checks if the dimensionality values and common preference vectors
+     * of this distance and the specified distance are equal.
+     * If the check fails an IllegalArgumentException is thrown,
+     * otherwise {@link CorrelationDistance#compareTo(CorrelationDistance)
+     * CorrelationDistance#compareTo(distance)} is returned.
+     *
+     * @return the value of {@link CorrelationDistance#compareTo(CorrelationDistance) CorrelationDistance#compareTo(distance)}
+     * @throws IllegalArgumentException if the dimensionality values and common preference vectors
+     *                                  of this distance and the specified distance are not equal
      * @see Comparable#compareTo(Object)
      */
-    public int compareTo(PreferenceVectorBasedCorrelationDistance o) {
-        // todo
-        return super.compareTo(o);
+    public int compareTo(PreferenceVectorBasedCorrelationDistance distance) {
+        if (this.dimensionality != distance.dimensionality) {
+            throw new IllegalArgumentException("The dimensionality values of this distance " +
+                "and the specified distance need to be equal.\n" +
+                "this.dimensionality     " + this.dimensionality + "\n" +
+                "distance.dimensionality " + distance.dimensionality + "\n"
+            );
+        }
+
+        if (!this.commonPreferenceVector.equals(distance.commonPreferenceVector)) {
+            throw new IllegalArgumentException("The common preference vectors of this distance " +
+                "and the specified distance need to be equal.\n" +
+                "this.commonPreferenceVector     " + this.commonPreferenceVector + "\n" +
+                "distance.commonPreferenceVector " + distance.commonPreferenceVector + "\n"
+            );
+        }
+
+        return super.compareTo(distance);
     }
 
     /**
-     * Writes the correlation value and the euklidean value
-     * of this CorrelationDistance to the specified stream.
+     * Calls {@link de.lmu.ifi.dbs.elki.distance.CorrelationDistance#writeExternal(java.io.ObjectOutput)}
+     * and writes additionally the dimensionality and each Byte of the common preference vector
+     * to the specified stream.
      *
      * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
      */
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
-        // todo
         super.writeExternal(out);
+        out.writeInt(dimensionality);
+        for (int d = 0; d < dimensionality; d++) {
+            out.writeBoolean(commonPreferenceVector.get(d));
+        }
     }
 
     /**
-     * The object implements the readExternal method to restore its contents by
-     * calling the methods of DataInput for primitive types and readObject for
-     * objects, strings and arrays. The readExternal method must read the values
-     * in the same sequence and with the same types as were written by
-     * writeExternal.
+     * Calls {@link de.lmu.ifi.dbs.elki.distance.CorrelationDistance#readExternal(java.io.ObjectInput)}
+     * and reads additionally the dimensionality and each Byte of the common preference vector
+     * from the specified stream..
      *
-     * @param in the stream to read data from in order to restore the object
-     * @throws java.io.IOException    if I/O errors occur
-     * @throws ClassNotFoundException If the class for an object being restored cannot be found.
+     * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
      */
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        // todo
         super.readExternal(in);
+        dimensionality = in.readInt();
+        commonPreferenceVector = new BitSet();
+        for (int d = 0; d < dimensionality; d++) {
+            commonPreferenceVector.set(d, in.readBoolean());
+        }
     }
 
     /**
      * Retuns the number of Bytes this distance uses if it is written to an
      * external file.
      *
-     * @return 12 (4 Byte for an integer, 8 Byte for a double value)
+     * @return 16 + 4 * dimensionality (8 Byte for two integer, 8 Byte for a double value,
+     *         and 4 * dimensionality for the bit set)
      */
     public int externalizableSize() {
-        // todo
-        return super.externalizableSize();
+        return super.externalizableSize() + 4 + dimensionality * 4;
     }
 }

@@ -83,7 +83,10 @@ public abstract class PreferenceVectorBasedCorrelationDistanceFunction<O extends
     }
     if (matches(pattern)) {
       String[] values = AbstractCorrelationDistanceFunction.SEPARATOR.split(pattern);
-      return new PreferenceVectorBasedCorrelationDistance(Integer.parseInt(values[0]), Double.parseDouble(values[1]), new BitSet());
+      return new PreferenceVectorBasedCorrelationDistance(
+          getDatabase().dimensionality(),
+          Integer.parseInt(values[0]),
+          Double.parseDouble(values[1]), new BitSet());
     }
     else {
       throw new IllegalArgumentException("Given pattern \"" +
@@ -99,7 +102,11 @@ public abstract class PreferenceVectorBasedCorrelationDistanceFunction<O extends
    * @return an infinite distance
    */
   public PreferenceVectorBasedCorrelationDistance infiniteDistance() {
-    return new PreferenceVectorBasedCorrelationDistance(Integer.MAX_VALUE, Double.POSITIVE_INFINITY, new BitSet());
+    return new PreferenceVectorBasedCorrelationDistance(
+        getDatabase().dimensionality(),
+        Integer.MAX_VALUE,
+        Double.POSITIVE_INFINITY,
+        new BitSet());
   }
 
   /**
@@ -108,7 +115,11 @@ public abstract class PreferenceVectorBasedCorrelationDistanceFunction<O extends
    * @return a null distance
    */
   public PreferenceVectorBasedCorrelationDistance nullDistance() {
-    return new PreferenceVectorBasedCorrelationDistance(0, 0, new BitSet());
+    return new PreferenceVectorBasedCorrelationDistance(
+        getDatabase().dimensionality(),
+        0,
+        0,
+        new BitSet());
   }
 
   /**
@@ -117,7 +128,11 @@ public abstract class PreferenceVectorBasedCorrelationDistanceFunction<O extends
    * @return an undefined distance
    */
   public PreferenceVectorBasedCorrelationDistance undefinedDistance() {
-    return new PreferenceVectorBasedCorrelationDistance(-1, Double.NaN, new BitSet());
+    return new PreferenceVectorBasedCorrelationDistance(
+        getDatabase().dimensionality(),
+        -1,
+        Double.NaN,
+        new BitSet());
   }
 
   /**

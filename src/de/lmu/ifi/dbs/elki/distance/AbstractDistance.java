@@ -8,9 +8,9 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
  * At the same time any extending class is to implement hashCode properly.
  *
  * @author Arthur Zimek
- * @param <D> the type of Distance used
+ * @param <D> the (final) type of Distance used
  */
-abstract class AbstractDistance<D extends AbstractDistance<D>> extends AbstractLoggable implements Distance<D> {
+public abstract class AbstractDistance<D extends AbstractDistance<D>> extends AbstractLoggable implements Distance<D> {
 
     /**
      * Sets as debug status
@@ -28,7 +28,10 @@ abstract class AbstractDistance<D extends AbstractDistance<D>> extends AbstractL
     public abstract int hashCode();
 
     /**
-     * Returns true if o is of the same class as this instance
+     * Returns true if <code>this == o</code>
+     * has the value <code>true</code> or
+     * o is not null and
+     * o is of the same class as this instance
      * and <code>this.compareTo(o)</code> is 0,
      * false otherwise.
      *
@@ -43,12 +46,6 @@ abstract class AbstractDistance<D extends AbstractDistance<D>> extends AbstractL
         if (o == null || getClass() != o.getClass())
             return false;
 
-
-        try {
-            return this.compareTo((D) o) == 0;
-        }
-        catch (ClassCastException e) {
-            return false;
-        }
+        return this.compareTo((D) o) == 0;
     }
 }

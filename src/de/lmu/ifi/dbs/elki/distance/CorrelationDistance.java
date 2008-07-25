@@ -5,8 +5,8 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 /**
- * The CorrelationDistance is a special Distance that indicates the
- * dissimilarity between correlation connected objects. The CorrelationDistance
+ * The correlation distance is a special Distance that indicates the
+ * dissimilarity between correlation connected objects. The correlation distance
  * beween two points is a pair consisting of the correlation dimension of two
  * points and the euclidean distance between the two points.
  *
@@ -37,7 +37,8 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
     }
 
     /**
-     * Constructs a new CorrelationDistance object.
+     * Constructs a new CorrelationDistance object consisting of the specified
+     * correlation value and euclidean value..
      *
      * @param correlationValue the correlation dimension to be represented by the
      *                         CorrelationDistance
@@ -47,18 +48,6 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
     public CorrelationDistance(int correlationValue, double euklideanValue) {
         this.correlationValue = correlationValue;
         this.euklideanValue = euklideanValue;
-    }
-
-    /**
-     * @see java.lang.Object#hashCode()
-     */
-    public int hashCode() {
-        int result;
-        long temp;
-        result = correlationValue;
-        temp = euklideanValue != +0.0d ? Double.doubleToLongBits(euklideanValue) : 0l;
-        result = 29 * result + (int) (temp ^ (temp >>> 32));
-        return result;
     }
 
     /**
@@ -85,26 +74,46 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
     }
 
     /**
-     * @see Comparable#compareTo(Object)
-     */
-    public int compareTo(D other) {
-
-        if (this.correlationValue < other.correlationValue) {
-            return -1;
-        }
-        if (this.correlationValue > other.correlationValue) {
-            return +1;
-        }
-        return Double.compare(this.euklideanValue, other.euklideanValue);
-    }
-
-    /**
-     * Returns a string representation of the object.
+     * Returns a string representation of this CorrelationDistance.
      *
-     * @return a string representation of the object.
+     * @return the correlation value and the euklidean value separated by blank
      */
     public String toString() {
         return Integer.toString(correlationValue) + " " + Double.toString(euklideanValue);
+    }
+
+    /**
+     * Compares this CorrelationDistance with the given CorrelationDistance wrt the
+     * represented correlation values. If both values are considered to be equal, the euklidean values
+     * are compared. Subclasses may need to overwrite this method if necessary.
+     *
+     * @return the value of
+     *         {@link Integer#compareTo(Integer)} this.correlationValue.compareTo(other.correlationValue)}
+     *         if it is a non zero value,
+     *         the value of {@link Double#compare(double,double) Double.compare(this.euklideanValue, other.euklideanValue)}
+     *         otherwise
+     * @see Comparable#compareTo(Object)
+     */
+    public int compareTo(D other) {
+        int compare = new Integer(this.correlationValue).compareTo(other.correlationValue);
+        if (compare != 0) {
+            return compare;
+        }
+        else {
+            return Double.compare(this.euklideanValue, other.euklideanValue);
+        }
+    }
+
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    public int hashCode() {
+        int result;
+        long temp;
+        result = correlationValue;
+        temp = euklideanValue != +0.0d ? Double.doubleToLongBits(euklideanValue) : 0l;
+        result = 29 * result + (int) (temp ^ (temp >>> 32));
+        return result;
     }
 
     /**
@@ -125,7 +134,7 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
         return euklideanValue;
     }
 
-   /**
+    /**
      * Writes the correlation value and the euklidean value
      * of this CorrelationDistance to the specified stream.
      *

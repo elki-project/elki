@@ -17,7 +17,8 @@ import java.util.regex.Pattern;
  *
  * @author Elke Achtert 
  */
-public abstract class AbstractPreprocessorBasedDistanceFunction<O extends DatabaseObject, P extends Preprocessor<O>,D extends Distance<D>>
+public abstract class AbstractPreprocessorBasedDistanceFunction<O extends DatabaseObject,
+    P extends Preprocessor<O>,D extends Distance<D>>
     extends AbstractDistanceFunction<O, D> {
 
   /**
