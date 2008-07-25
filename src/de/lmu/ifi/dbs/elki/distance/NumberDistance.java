@@ -12,8 +12,7 @@ public abstract class NumberDistance<D extends NumberDistance<D, N>, N extends N
     /**
      * The value of this distance.
      */
-    // todo private?
-    N value;
+    private N value;
 
     /**
      * Constructs a new NumberDistance object that represents the value argument.
@@ -39,13 +38,14 @@ public abstract class NumberDistance<D extends NumberDistance<D, N>, N extends N
      * Compares this NumberDistance with the given NumberDistance wrt the
      * represented value. <p/>
      * <code>d1.compareTo(d2)</code> is the same as
-     * {@link Double#compare(double,double) Double.compare(d1.value, d2.value)}.
+     * {@link Double#compare(double,double) Double.compare(d1.value.doubleValue(), d2.value.doubleValue())}.
+     * Subclasses may need to overwrite this method if necessary.
      *
      * @return a negative integer, zero, or a positive integer as the value of this NumberDistance
      *         is less than, equal to, or greater than the value of the specified NumberDistance.
      * @see Comparable#compareTo(Object)
      */
-    public final int compareTo(D other) {
+    public int compareTo(D other) {
         return Double.compare(this.value.doubleValue(), other.value.doubleValue());
     }
 
@@ -53,7 +53,6 @@ public abstract class NumberDistance<D extends NumberDistance<D, N>, N extends N
      * Returns a string representation of this NumberDistance.
      *
      * @return the value of this NumberDistance.
-     * todo notwendig?
      */
     public final String toString() {
         return value.toString();
@@ -69,12 +68,10 @@ public abstract class NumberDistance<D extends NumberDistance<D, N>, N extends N
     }
 
     /**
-     * Returns the double value of this distance.
-     *
-     * @return the double value of this distance
+     * Sets the value of this NumberDistance.
+     * @param value the value to be set
      */
-    public final double getDoubleValue() {
-        return value.doubleValue();
+    void setValue(N value) {
+        this.value = value;
     }
-
 }

@@ -204,7 +204,7 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
         Map<Integer, IDDoublePair> distances = new HashMap<Integer, IDDoublePair>();
         for (Integer id : s) {
             DoubleDistance dist = getDistanceFunction().distance(id, m_i);
-            distances.put(id, new IDDoublePair(id, dist.getDoubleValue()));
+            distances.put(id, new IDDoublePair(id, dist.getValue()));
         }
 
 
@@ -222,7 +222,7 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
             for (Integer id : s) {
                 DoubleDistance dist_new = getDistanceFunction().distance(id, m_i);
                 double dist_old = distances.get(id).getValue();
-                double dist = Math.min(dist_new.getDoubleValue(), dist_old);
+                double dist = Math.min(dist_new.getValue(), dist_old);
                 distances.put(id, new IDDoublePair(id, dist));
             }
         }

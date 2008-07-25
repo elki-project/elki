@@ -118,7 +118,7 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
         // todo: constraint auf positive werte
         DoubleListParameter eps = new DoubleListParameter(EPSILON_P, EPSILON_D);
         List<Double> defaultEps = new ArrayList<Double>();
-        defaultEps.add(DEFAULT_EPSILON.getDoubleValue());
+        defaultEps.add(DEFAULT_EPSILON.getValue());
         eps.setDefaultValue(defaultEps);
         optionHandler.put(eps);
 
@@ -250,7 +250,7 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
 
             for (int d = 0; d < eps_list.size(); d++) {
                 epsilon[d] = new DoubleDistance(eps_list.get(d));
-                if (epsilon[d].getDoubleValue() < 0) {
+                if (epsilon[d].getValue() < 0) {
                     throw new WrongParameterValueException(EPSILON_P, eps_list.toString(), EPSILON_D);
                 }
             }

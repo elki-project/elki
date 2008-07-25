@@ -307,7 +307,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D,N>, 
           }
           else {
             D approximatedKnnDist_cons = entry.approximateConservativeKnnDistance(k, getDistanceFunction());
-            double diff = distance.getDoubleValue() - approximatedKnnDist_cons.getDoubleValue();
+            double diff = distance.getValue().doubleValue() - approximatedKnnDist_cons.getValue().doubleValue();
             if (diff <= 0.0000000001) {
               candidates.add(entry.getRoutingObjectID());
             }
@@ -393,7 +393,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D,N>, 
     // count the zero distances
     int k_0 = 0;
     for (int i = 0; i < k_max; i++) {
-      double dist = knnDistances.get(i).getDoubleValue();
+      double dist = knnDistances.get(i).getValue().doubleValue();
       if (dist == 0)
         k_0++;
       else
@@ -409,7 +409,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D,N>, 
     double[] log_kDist = new double[k_max - k_0];
 
     for (int i = 0; i < k_max - k_0; i++) {
-      double dist = knnDistances.get(i + k_0).getDoubleValue();
+      double dist = knnDistances.get(i + k_0).getValue().doubleValue();
       log_kDist[i] = Math.log(dist);
       sum_log_kDist += log_kDist[i];
       sum_log_k_kDist += log_kDist[i] * log_k[i];

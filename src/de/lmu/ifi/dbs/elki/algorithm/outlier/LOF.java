@@ -245,7 +245,7 @@ public class LOF<O extends DatabaseObject> extends
 
         for (int k = 0; k < minpts; k++) {
             QueryResult<DoubleDistance> qr = neighbors.get(k);
-            Neighbor neighbor = new Neighbor(id, k, qr.getID(), 0, qr.getDistance().getDoubleValue());
+            Neighbor neighbor = new Neighbor(id, k, qr.getID(), 0, qr.getDistance().getValue());
             nnTable.insert(neighbor);
         }
     }

@@ -55,7 +55,7 @@ public class FracClusPreprocessor<V extends RealVector<V, ?>> extends AbstractPa
             if (this.debug) {
                 List<DoublePair> points = new ArrayList<DoublePair>(neighbors.size());
                 for (int i = 1; i <= neighbors.size(); i++) {
-                    points.add(new DoublePair(Math.log(distanceFunction.distance(neighbors.get(i - 1), id).getDoubleValue()), Math.log(i)));
+                    points.add(new DoublePair(Math.log(distanceFunction.distance(neighbors.get(i - 1), id).getValue()), Math.log(i)));
                 }
                 double fractalDimension = new LinearRegression(points).getM();
                 debugFine("Fractal Dimension of Point " + id + ": " + fractalDimension + " -- label: " + database.getAssociation(AssociationID.LABEL, id));

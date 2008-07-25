@@ -159,7 +159,7 @@ public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends
         for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
             Integer id = iter.next();
             if (!id.equals(queryObject)) {
-                DoubleDistance distance = new DoubleDistance(1.0 / similarityFunction.similarity(queryObject, id).getDoubleValue());
+                DoubleDistance distance = new DoubleDistance(1.0 / similarityFunction.similarity(queryObject, id).getValue());
                 kNearestNeighbors.add(new QueryResult<DoubleDistance>(id, distance));
             }
         }

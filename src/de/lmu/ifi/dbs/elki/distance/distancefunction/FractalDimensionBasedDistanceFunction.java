@@ -55,7 +55,7 @@ public class FractalDimensionBasedDistanceFunction<V extends RealVector<V, ?>> e
         List<DoublePair> points = new ArrayList<DoublePair>(distances.size());
         for(int i = 0; i < distances.size(); i++)
         {
-            points.add(new DoublePair(Math.log(distances.get(i).getDoubleValue()),Math.log(i+1)));
+            points.add(new DoublePair(Math.log(distances.get(i).getValue()),Math.log(i+1)));
         }
         return new DoubleDistance(new LinearRegression(points).getM());
     }

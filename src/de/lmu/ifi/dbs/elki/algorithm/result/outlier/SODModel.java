@@ -73,7 +73,7 @@ public class SODModel<O extends RealVector<O, Double>> extends AbstractResult<O>
 
     public double subspaceOutlierDegree(O queryObject) {
         O center = queryObject.newInstance(centerValues);
-        double distance = DISTANCE_FUNCTION.distance(queryObject, center).getDoubleValue();
+        double distance = DISTANCE_FUNCTION.distance(queryObject, center).getValue();
         distance /= weightVector.cardinality();
         return distance;
     }

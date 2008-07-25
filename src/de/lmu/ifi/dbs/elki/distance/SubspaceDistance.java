@@ -6,8 +6,8 @@ import java.io.ObjectOutput;
 import java.util.regex.Pattern;
 
 /**
- * The SubspaceDistance is a special distance that indicates the
- * dissimilarity between subspaces of equal dimensionality. The SubspaceDistance
+ * The subspace distance is a special distance that indicates the
+ * dissimilarity between subspaces of equal dimensionality. The subspace distance
  * beween two points is a pair consisting of the distance between the two subspaces
  * spanned by the strong eigenvectors of the two points and the affine distance
  * between the two subspaces.
@@ -38,10 +38,13 @@ public class SubspaceDistance<D extends SubspaceDistance<D>> extends AbstractDis
     }
 
     /**
-     * Constructs a new SubspaceDistance object.
+     * Constructs a new SubspaceDistance object consisting of the specified
+     * subspace distance and affine distance.
      *
-     * @param subspaceDistance the subspace distance
+     * @param subspaceDistance the distance between the two subspaces
+     *                         spanned by the strong eigenvectors of the two points
      * @param affineDistance   the affine distance
+     *                         between the two subspaces
      */
     public SubspaceDistance(double subspaceDistance, double affineDistance) {
         this.subspaceDistance = subspaceDistance;
@@ -53,7 +56,8 @@ public class SubspaceDistance<D extends SubspaceDistance<D>> extends AbstractDis
      */
     @SuppressWarnings("unchecked")
     public D plus(D distance) {
-        return (D) new SubspaceDistance<D>(this.subspaceDistance + distance.subspaceDistance,
+        return (D) new SubspaceDistance<D>(
+            this.subspaceDistance + distance.subspaceDistance,
             this.affineDistance + distance.affineDistance);
     }
 
@@ -62,7 +66,8 @@ public class SubspaceDistance<D extends SubspaceDistance<D>> extends AbstractDis
      */
     @SuppressWarnings("unchecked")
     public D minus(D distance) {
-        return (D) new SubspaceDistance<D>(this.subspaceDistance - distance.subspaceDistance,
+        return (D) new SubspaceDistance<D>(
+            this.subspaceDistance - distance.subspaceDistance,
             this.affineDistance - distance.affineDistance);
     }
 
@@ -76,8 +81,8 @@ public class SubspaceDistance<D extends SubspaceDistance<D>> extends AbstractDis
     /**
      * @see Comparable#compareTo(Object)
      */
+    // todo
     public int compareTo(D other) {
-
         if (this.subspaceDistance < other.subspaceDistance) {
             return -1;
         }

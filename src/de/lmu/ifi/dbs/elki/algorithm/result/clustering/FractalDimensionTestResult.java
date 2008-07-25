@@ -91,7 +91,7 @@ public class FractalDimensionTestResult<V extends RealVector<V, ?>> extends Abst
             pout.println("# id1 fractal dimension");
             List<DoublePair> points = new ArrayList<DoublePair>(this.id1Supporter.size());
             for (int i = 1; i <= id1Supporter.size(); i++) {
-                points.add(new DoublePair(StrictMath.log(distanceFunction.distance(this.id1Supporter.get(i - 1), this.id1).getDoubleValue()),
+                points.add(new DoublePair(StrictMath.log(distanceFunction.distance(this.id1Supporter.get(i - 1), this.id1).getValue()),
                     StrictMath.log(i)));
             }
             LinearRegression id1FC = new LinearRegression(points);
@@ -123,7 +123,7 @@ public class FractalDimensionTestResult<V extends RealVector<V, ?>> extends Abst
             pout.println("# id2 fractal dimension");
             points = new ArrayList<DoublePair>(this.id2Supporter.size());
             for (int i = 1; i <= id2Supporter.size(); i++) {
-                points.add(new DoublePair(StrictMath.log(distanceFunction.distance(this.id2Supporter.get(i - 1), this.id2).getDoubleValue()),
+                points.add(new DoublePair(StrictMath.log(distanceFunction.distance(this.id2Supporter.get(i - 1), this.id2).getValue()),
                     StrictMath.log(i)));
             }
             LinearRegression id2FC = new LinearRegression(points);
@@ -155,7 +155,7 @@ public class FractalDimensionTestResult<V extends RealVector<V, ?>> extends Abst
             pout.println("# centroid fractal dimension");
             points = new ArrayList<DoublePair>(this.centroidSupporter.size());
             for (int i = 1; i <= centroidSupporter.size(); i++) {
-                points.add(new DoublePair(StrictMath.log(distanceFunction.distance(this.centroidSupporter.get(i - 1), this.centroid).getDoubleValue()),
+                points.add(new DoublePair(StrictMath.log(distanceFunction.distance(this.centroidSupporter.get(i - 1), this.centroid).getValue()),
                     StrictMath.log(i)));
             }
             LinearRegression centroidFC = new LinearRegression(points);

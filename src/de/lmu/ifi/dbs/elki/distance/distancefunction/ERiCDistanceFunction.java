@@ -251,12 +251,12 @@ public class ERiCDistanceFunction<V extends RealVector<V, ?>,P extends Preproces
       if (pca1.getCorrelationDimension() == pca2.getCorrelationDimension()) {
         WeightedDistanceFunction<V> df1 = new WeightedDistanceFunction<V>(pca1.similarityMatrix());
         WeightedDistanceFunction<V> df2 = new WeightedDistanceFunction<V>(pca2.similarityMatrix());
-        affineDistance = Math.max(df1.distance(o1, o2).getDoubleValue(),
-                                  df2.distance(o1, o2).getDoubleValue());
+        affineDistance = Math.max(df1.distance(o1, o2).getValue(),
+                                  df2.distance(o1, o2).getValue());
       }
       else {
         WeightedDistanceFunction<V> df1 = new WeightedDistanceFunction<V>(pca1.similarityMatrix());
-        affineDistance = df1.distance(o1, o2).getDoubleValue();
+        affineDistance = df1.distance(o1, o2).getValue();
       }
 
       if (affineDistance > tau) {

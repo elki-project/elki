@@ -343,7 +343,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
                         else {
                             //noinspection unchecked
                             BitDistance dist = distanceFunction.distance(parent.getCentroid(), child.getCentroid(), parent.getPCA(), child.getPCA());
-                            if (!dist.isBit() && (child.getParents().isEmpty() ||
+                            if (!dist.bitValue() && (child.getParents().isEmpty() ||
                                 !isParent(distanceFunction, parent, child.getParents()))) {
                                 parent.addChild(child);
                                 child.addParent(parent);
@@ -387,7 +387,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
                 msg.append("\ndist(").append(child).append(" - ").append(parent).append(") = ").append(dist);
 
             }
-            if (!dist.isBit()) {
+            if (!dist.bitValue()) {
                 if (debug) {
                     debugFine(msg.toString());
                 }

@@ -164,8 +164,8 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
                 for (QueryResult<DoubleDistance> neighbor : neighbors) {
                     //noinspection unchecked
                     List<QueryResult<DoubleDistance>> neighborsNeighbors = (List<QueryResult<DoubleDistance>>) database.getAssociation(AssociationID.NEIGHBORS_2, neighbor.getID());
-                    sum += Math.max(neighbor.getDistance().getDoubleValue(),
-                        neighborsNeighbors.get(neighborsNeighbors.size() - 1).getDistance().getDoubleValue());
+                    sum += Math.max(neighbor.getDistance().getValue(),
+                        neighborsNeighbors.get(neighborsNeighbors.size() - 1).getDistance().getValue());
                 }
                 Double lrd = neighbors.size() / sum;
                 database.associate(AssociationID.LRD, id, lrd);

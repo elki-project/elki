@@ -36,21 +36,21 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
      * @see de.lmu.ifi.dbs.elki.distance.Distance#description()
      */
     public String description() {
-        return "FloatDistance.distanceValue";
+        return "FloatDistance.floatValue";
     }
 
     /**
      * @see de.lmu.ifi.dbs.elki.distance.Distance#plus(Distance)
      */
     public FloatDistance plus(FloatDistance distance) {
-        return new FloatDistance(this.value + distance.value);
+        return new FloatDistance(this.getValue() + distance.getValue());
     }
 
     /**
      * @see de.lmu.ifi.dbs.elki.distance.Distance#minus(Distance)
      */
     public FloatDistance minus(FloatDistance distance) {
-        return new FloatDistance(this.value - distance.value);
+        return new FloatDistance(this.getValue() - distance.getValue());
     }
 
     /**
@@ -62,7 +62,7 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
      *         distance
      */
     public FloatDistance times(FloatDistance distance) {
-        return new FloatDistance(this.value * distance.value);
+        return new FloatDistance(this.getValue() * distance.getValue());
     }
 
     /**
@@ -74,7 +74,7 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
      *         double value
      */
     public FloatDistance times(float lambda) {
-        return new FloatDistance(this.value * lambda);
+        return new FloatDistance(this.getValue() * lambda);
     }
 
     /**
@@ -82,7 +82,7 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
      * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
      */
     public void writeExternal(ObjectOutput out) throws IOException {
-        out.writeFloat(value);
+        out.writeFloat(getValue());
     }
 
     /**
@@ -90,7 +90,7 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
      * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
      */
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        value = in.readFloat();
+        setValue(in.readFloat());
     }
 
     /**

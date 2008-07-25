@@ -90,7 +90,7 @@ public class HierarchicalFractalDimensionCluster<V extends RealVector<V, ?>>
     private double computeFractalDimension() {
         List<DoublePair> points = new ArrayList<DoublePair>(this.getSupporters().size());
         for (int i = 1; i <= this.supporters.size(); i++) {
-            points.add(new DoublePair(StrictMath.log(distanceFunction.distance(this.supporters.get(i - 1), this.representant).getDoubleValue()), StrictMath.log(i)));
+            points.add(new DoublePair(StrictMath.log(distanceFunction.distance(this.supporters.get(i - 1), this.representant).getValue()), StrictMath.log(i)));
         }
         return new LinearRegression(points).getM();
     }

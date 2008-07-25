@@ -165,8 +165,8 @@ public class SubspaceDistanceFunction<O extends RealVector<O, ?>, P extends Prep
         WeightedDistanceFunction<O> df1 = new WeightedDistanceFunction<O>(pca1.similarityMatrix());
         WeightedDistanceFunction<O> df2 = new WeightedDistanceFunction<O>(pca2.similarityMatrix());
 
-        double affineDistance = Math.max(df1.distance(o1, o2).getDoubleValue(),
-            df2.distance(o1, o2).getDoubleValue());
+        double affineDistance = Math.max(df1.distance(o1, o2).getValue(),
+            df2.distance(o1, o2).getValue());
 
         // noinspection unchecked
         return (D) new SubspaceDistance<D>(d1, affineDistance);

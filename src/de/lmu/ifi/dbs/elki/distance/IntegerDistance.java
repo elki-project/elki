@@ -28,21 +28,21 @@ public class IntegerDistance extends NumberDistance<IntegerDistance, Integer> {
      * @see de.lmu.ifi.dbs.elki.distance.Distance#description()
      */
     public String description() {
-        return "IntegerDistance.distanceValue";
+        return "IntegerDistance.intValue";
     }
 
     /**
      * @see de.lmu.ifi.dbs.elki.distance.Distance#minus(de.lmu.ifi.dbs.elki.distance.Distance)
      */
     public IntegerDistance minus(IntegerDistance distance) {
-        return new IntegerDistance(this.value - distance.value);
+        return new IntegerDistance(this.getValue() - distance.getValue());
     }
 
     /**
      * @see de.lmu.ifi.dbs.elki.distance.Distance#plus(de.lmu.ifi.dbs.elki.distance.Distance)
      */
     public IntegerDistance plus(IntegerDistance distance) {
-        return new IntegerDistance(this.value + distance.value);
+        return new IntegerDistance(this.getValue() + distance.getValue());
     }
 
     /**
@@ -51,7 +51,7 @@ public class IntegerDistance extends NumberDistance<IntegerDistance, Integer> {
      * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
      */
     public void writeExternal(ObjectOutput out) throws IOException {
-        out.writeInt(value);
+        out.writeInt(getValue());
     }
 
     /**
@@ -60,7 +60,7 @@ public class IntegerDistance extends NumberDistance<IntegerDistance, Integer> {
      * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
      */
     public void readExternal(ObjectInput in) throws IOException {
-        value = in.readInt();
+        setValue(in.readInt());
     }
 
     /**

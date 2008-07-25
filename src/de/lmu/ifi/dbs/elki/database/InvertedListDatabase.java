@@ -93,7 +93,7 @@ public <D extends Distance<D>>List<QueryResult<D>> rangeQuery(Integer id, String
 
     if (distanceFunction instanceof DimensionSelectingDistanceFunction) {
       DimensionSelectingDistanceFunction df = (DimensionSelectingDistanceFunction) distanceFunction;
-      double eps = df.valueOf(epsilon).getDoubleValue();
+      double eps = df.valueOf(epsilon).getValue();
       int dim = df.getSelectedDimension();
       SortedMap<Double, List<Integer>> invertedList = invertedLists.get(dim);
 

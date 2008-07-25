@@ -73,9 +73,9 @@ public abstract class AbstractDoubleKernelFunction<O extends DatabaseObject> ext
    * @see de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction#distance(DatabaseObject, DatabaseObject)
    */
   public DoubleDistance distance(final O fv1, final O fv2) {
-    return new DoubleDistance(Math.sqrt(similarity(fv1, fv1).getDoubleValue()
-                                        + similarity(fv2, fv2).getDoubleValue()
-                                        - 2 * similarity(fv1, fv2).getDoubleValue()));
+    return new DoubleDistance(Math.sqrt(similarity(fv1, fv1).getValue()
+                                        + similarity(fv2, fv2).getValue()
+                                        - 2 * similarity(fv1, fv2).getValue()));
   }
 
 

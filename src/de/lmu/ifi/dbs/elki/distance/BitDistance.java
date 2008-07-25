@@ -7,7 +7,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 /**
- * TODO arthur comment
+ * Provides a Distance for a bit-valued distance.
  *
  * @author Arthur Zimek
  */
@@ -44,18 +44,23 @@ public class BitDistance extends NumberDistance<BitDistance, Bit> {
      * @see Distance#plus(Distance)
      */
     public BitDistance plus(BitDistance distance) {
-        return new BitDistance(this.isBit() || distance.isBit());
+        return new BitDistance(this.bitValue() || distance.bitValue());
     }
 
     /**
      * @see Distance#minus(Distance)
      */
     public BitDistance minus(BitDistance distance) {
-        return new BitDistance(this.isBit() ^ distance.isBit());
+        return new BitDistance(this.bitValue() ^ distance.bitValue());
     }
 
-    public boolean isBit() {
-        return this.value.bitValue();
+    /**
+     * Returns the value of this BitDistance as a boolean.
+     *
+     * @return the value as a boolean
+     */
+    public boolean bitValue() {
+        return this.getValue().bitValue();
     }
 
 
@@ -65,7 +70,7 @@ public class BitDistance extends NumberDistance<BitDistance, Bit> {
      * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
      */
     public void writeExternal(ObjectOutput out) throws IOException {
-        out.writeBoolean(this.isBit());
+        out.writeBoolean(this.bitValue());
     }
 
     /**
@@ -74,7 +79,7 @@ public class BitDistance extends NumberDistance<BitDistance, Bit> {
      * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
      */
     public void readExternal(ObjectInput in) throws IOException {
-        this.value = new Bit(in.readBoolean());
+        setValue(new Bit(in.readBoolean()));
     }
 
     /**
