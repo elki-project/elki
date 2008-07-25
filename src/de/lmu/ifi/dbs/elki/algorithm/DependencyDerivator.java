@@ -284,15 +284,15 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
     }
 
     /**
+     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm#parameterDescription()}
+     * and appends the parameter description of {@link #pca}.
+     *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */
     @Override
     public String parameterDescription() {
         StringBuilder description = new StringBuilder();
         description.append(super.parameterDescription());
-        description.append(Description.NEWLINE);
-        description.append(this.getClass().getName());
-        description.append(" requires parametrization of underlying PCA:");
         description.append(pca.parameterDescription());
         return description.toString();
     }

@@ -30,7 +30,7 @@ public class ICA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
     /**
      * The independent component analysis.
      */
-    private FastICA<V> ica;
+    private FastICA<V> ica = new FastICA<V>();
 
     /**
      * Provides an ICA algorithm.
@@ -80,7 +80,6 @@ public class ICA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         String[] remainingParameters = super.setParameters(args);
 
         // ica
-        ica = new FastICA<V>();
         remainingParameters = ica.setParameters(remainingParameters);
         setParameters(args, remainingParameters);
 
@@ -99,5 +98,19 @@ public class ICA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         List<AttributeSettings> attributeSettings = super.getAttributeSettings();
         attributeSettings.addAll(ica.getAttributeSettings());
         return attributeSettings;
+    }
+
+    /**
+     * Calls {@link AbstractAlgorithm#parameterDescription()}
+     * and appends the parameter description of {@link #ica}.
+     *
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
+     */
+    @Override
+    public String parameterDescription() {
+        StringBuilder description = new StringBuilder();
+        description.append(super.parameterDescription());
+        description.append(ica.parameterDescription());
+        return description.toString();
     }
 }

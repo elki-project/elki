@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.algorithm;
 
 import de.lmu.ifi.dbs.elki.algorithm.result.AprioriResult;
-import de.lmu.ifi.dbs.elki.algorithm.result.Result;
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.Description;
@@ -183,7 +182,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
                 .nextSetBit(i + 1)) {
                 bitSet.clear(i);
                 unpruned = minfreq > -1 ? support.get(bitSet).doubleValue() / size >= minfreq
-                                        : support.get(bitSet) >= minsupp;
+                    : support.get(bitSet) >= minsupp;
                 bitSet.set(i);
             }
             if (unpruned) {

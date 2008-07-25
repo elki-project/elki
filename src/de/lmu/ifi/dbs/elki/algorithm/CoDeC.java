@@ -262,8 +262,8 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
 
     /**
      * Calls {@link AbstractAlgorithm#parameterDescription()}
-     * and appends the parameter description of {@link #clusteringAlgorithm} (if it is already initialized),
-     * {@link #classifier}, and {@link #dependencyDerivator}.
+     * and appends the parameter description of {@link #clusteringAlgorithm},
+     * {@link #classifier}, and {@link #dependencyDerivator} (if they are already initialized).
      *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */

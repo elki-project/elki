@@ -54,7 +54,6 @@ public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extend
      */
     private DistanceFunction<O, D> distanceFunction;
 
-
     /**
      * Adds parameter
      * {@link #DISTANCE_FUNCTION_PARAM},
@@ -86,21 +85,6 @@ public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extend
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.classifier.AbstractClassifier#getAttributeSettings()}
-     * and adds to the returned attribute settings the attribute settings of
-     * the {@link #distanceFunction}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
-     */
-    @Override
-    public List<AttributeSettings> getAttributeSettings() {
-        List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-        attributeSettings.addAll(distanceFunction.getAttributeSettings());
-        return attributeSettings;
-    }
-
-
-    /**
      * Returns the distanceFunction.
      *
      * @return the distanceFunction
@@ -108,7 +92,6 @@ public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extend
     protected DistanceFunction<O, D> getDistanceFunction() {
         return distanceFunction;
     }
-
 
     /**
      * Calls {@link AbstractClassifier#setParameters(String[]) AbstractClassifier#setParameters(args)}
@@ -131,5 +114,31 @@ public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extend
         return remainingParameters;
     }
 
+    /**
+     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.classifier.AbstractClassifier#getAttributeSettings()}
+     * and adds to the returned attribute settings the attribute settings of
+     * the {@link #distanceFunction}.
+     *
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
+     */
+    @Override
+    public List<AttributeSettings> getAttributeSettings() {
+        List<AttributeSettings> attributeSettings = super.getAttributeSettings();
+        attributeSettings.addAll(distanceFunction.getAttributeSettings());
+        return attributeSettings;
+    }
 
+    /**
+     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.classifier.AbstractClassifier#parameterDescription()}
+     * and appends the parameter description of {@link #distanceFunction} if it is already initialized.
+     *
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
+     */
+    @Override
+    public String parameterDescription() {
+        StringBuffer description = new StringBuffer();
+        description.append(super.parameterDescription());
+        description.append(distanceFunction.parameterDescription());
+        return description.toString();
+    }
 }

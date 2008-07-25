@@ -182,7 +182,7 @@ public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Di
 
     /**
      * Calls {@link de.lmu.ifi.dbs.elki.algorithm.classifier.AbstractClassifier#parameterDescription()}
-     * and appends the parameter description of {@link #dependencyDerivator} (if it is already initialized).
+     * and appends the parameter description of {@link #dependencyDerivator} if it is already initialized.
      *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */

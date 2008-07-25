@@ -29,6 +29,9 @@ public class PrettyPrinter extends AbstractLoggable {
 
     /**
      * Provides a PrettyPrinter with specified columnWidth and specified separator.
+     *
+     * @param columnWidth the column width for each column
+     * @param separator   a separator to separate different columns (could be empty String)
      */
     public PrettyPrinter(int[] columnWidth, String separator) {
         super(LoggingConfiguration.DEBUG);
