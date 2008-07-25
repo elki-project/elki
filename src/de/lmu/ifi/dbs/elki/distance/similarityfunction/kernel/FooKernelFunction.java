@@ -44,10 +44,10 @@ public class FooKernelFunction<O extends FeatureVector> extends AbstractDoubleKe
 	}
 
 	/**
-	 * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
+	 * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
 	 */
 	@Override
-	public String description() {
+	public String parameterDescription() {
 		return "Polynomial Kernel for FeatureVectors. Default max_degree is "+DEFAULT_MAX_DEGREE+".";
 	}
 

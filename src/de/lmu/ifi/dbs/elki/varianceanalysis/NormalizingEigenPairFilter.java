@@ -71,10 +71,10 @@ public class NormalizingEigenPairFilter extends AbstractParameterizable
 	}
 
 	/**
-	 * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
+	 * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
 	 */
 	@Override
-	public String description() {
+	public String parameterDescription() {
 		final StringBuffer description = new StringBuffer();
 		description.append(PercentageEigenPairFilter.class.getName());
 		description.append(" normalizes all eigenpairs, "

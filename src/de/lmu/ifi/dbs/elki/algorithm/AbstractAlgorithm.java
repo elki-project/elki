@@ -57,11 +57,11 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends Abstra
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */
     @Override
-    public String description() {
-        return description("", false);
+    public String parameterDescription() {
+        return parameterDescription("", false);
     }
 
     /**

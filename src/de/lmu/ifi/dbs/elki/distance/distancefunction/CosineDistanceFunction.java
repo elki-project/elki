@@ -38,9 +38,9 @@ public class CosineDistanceFunction<V extends FeatureVector<V,?>> extends Abstra
   }
 
   /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
+   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
    */
-  public String description() {
+  public String parameterDescription() {
     return "Cosine distance for FeatureVectors. No parameters required. " +
         "Pattern for defining a range: \"" + requiredInputPattern() + "\".";
   }

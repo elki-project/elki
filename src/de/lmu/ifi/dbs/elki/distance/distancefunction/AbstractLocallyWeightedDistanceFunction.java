@@ -81,9 +81,9 @@ public abstract class AbstractLocallyWeightedDistanceFunction<O extends RealVect
   }
 
   /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
+   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
    */
-  public String description() {
+  public String parameterDescription() {
     StringBuffer description = new StringBuffer();
     description.append(optionHandler.usage("Locally weighted distance function. Pattern for defining a range: \"" + requiredInputPattern() + "\".", false));
     description.append('\n');

@@ -134,7 +134,7 @@ public class EditObject {
 	 */
 	public String getDescription() {
 		if (isParameterizable()) {
-			return ((Parameterizable) editObject).description();
+			return ((Parameterizable) editObject).parameterDescription();
 		}
 		return "";
 	}

@@ -162,10 +162,10 @@ public class RealVectorLabelParser<V extends RealVector<V, ?>> extends AbstractP
   }
 
   /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
+   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
    */
   @Override
-  public String description() {
+  public String parameterDescription() {
     StringBuffer description = new StringBuffer();
     description.append(RealVectorLabelParser.class.getName());
     description.append(" expects following format of parsed lines:\n");

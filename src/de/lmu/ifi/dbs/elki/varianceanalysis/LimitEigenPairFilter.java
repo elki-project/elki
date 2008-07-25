@@ -164,9 +164,9 @@ public class LimitEigenPairFilter extends AbstractParameterizable implements Eig
 	}
 
 	/**
-	 * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
+	 * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
 	 */
-	public String description() {
+	public String parameterDescription() {
 		StringBuffer description = new StringBuffer();
 		description.append(PercentageEigenPairFilter.class.getName());
 		description.append(" filters all eigenpairs, " + " which are lower than a given value.\n");

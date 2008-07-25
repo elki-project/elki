@@ -82,9 +82,9 @@ public class SparseBitVectorLabelParser extends AbstractParser<BitVector> {
   }
 
   /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
+   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
    */
-  public String description() {
+  public String parameterDescription() {
     StringBuffer description = new StringBuffer();
     description.append(SparseBitVectorLabelParser.class.getName());
     description.append(" expects following format of parsed lines:\n");

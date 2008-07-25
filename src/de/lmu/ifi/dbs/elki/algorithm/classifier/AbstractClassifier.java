@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.evaluation.holdout.StratifiedCrossValidation;
 import de.lmu.ifi.dbs.elki.evaluation.procedure.ClassifierEvaluationProcedure;
 import de.lmu.ifi.dbs.elki.evaluation.procedure.EvaluationProcedure;
 import de.lmu.ifi.dbs.elki.properties.Properties;
+import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
@@ -46,14 +47,14 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
     );
 
     /**
-        * Parameter to specify the evaluation-procedure to use for evaluation,
-        * must extend {@link EvaluationProcedure}.
-        * <p>Key: {@code -classifier.eval} </p>
-        * <p>Default value: {@link ClassifierEvaluationProcedure} </p>
-        */
-       private final ClassParameter<EvaluationProcedure> EVALUATION_PROCEDURE_PARAM =
-           new ClassParameter<EvaluationProcedure>(EVALUATION_PROCEDURE_ID,
-               EvaluationProcedure.class, ClassifierEvaluationProcedure.class.getName());
+     * Parameter to specify the evaluation-procedure to use for evaluation,
+     * must extend {@link EvaluationProcedure}.
+     * <p>Key: {@code -classifier.eval} </p>
+     * <p>Default value: {@link ClassifierEvaluationProcedure} </p>
+     */
+    private final ClassParameter<EvaluationProcedure> EVALUATION_PROCEDURE_PARAM =
+        new ClassParameter<EvaluationProcedure>(EVALUATION_PROCEDURE_ID,
+            EvaluationProcedure.class, ClassifierEvaluationProcedure.class.getName());
 
     /**
      * Holds the value of {@link #EVALUATION_PROCEDURE_PARAM}.
@@ -217,6 +218,30 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
         attributeSettings.addAll(holdout.getAttributeSettings());
 
         return attributeSettings;
+    }
+
+    /**
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
+     */
+    @Override
+    public String parameterDescription() {
+        StringBuilder description = new StringBuilder();
+        description.append(super.parameterDescription());
+        // evaluationProcedure
+        if (evaluationProcedure != null) {
+            description.append(Description.NEWLINE);
+            description.append(this.getClass().getName());
+            description.append(" requires parametrization of underlying evaluation procedure:");
+            description.append(evaluationProcedure.parameterDescription());
+        }
+        // holdout
+        if (holdout != null) {
+            description.append(Description.NEWLINE);
+            description.append("Additionally parametrization of underlying holdout is required:");
+            description.append(holdout.parameterDescription());
+        }
+
+        return description.toString();
     }
 
     /**

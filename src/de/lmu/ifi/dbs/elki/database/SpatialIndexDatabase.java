@@ -244,7 +244,7 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
      * @return a description of the database
      */
     @Override
-    public String description() {
+    public String parameterDescription() {
         StringBuffer description = new StringBuffer();
         description.append(this.getClass().getName());
         description.append(" holds all the data in a ");

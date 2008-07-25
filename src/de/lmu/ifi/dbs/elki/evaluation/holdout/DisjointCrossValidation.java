@@ -96,9 +96,9 @@ public class DisjointCrossValidation<O extends DatabaseObject, L extends ClassLa
   }
 
   /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
+   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
    */
-  public String description() {
+  public String parameterDescription() {
     return "Provides an n-fold cross-validation holdout with disjoint test sets.";
   }
 

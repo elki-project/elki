@@ -44,9 +44,9 @@ public class SquareRootSupportLengthDependentItemsetDistanceFunction extends Fre
   }
 
   /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
+   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
    */
-  public String description() {
+  public String parameterDescription() {
     return "Distance is (sqrt(1.0 / support(%)) * (1.0 /(i==0 ? 1 : i))) * max{1-ratio(i,o1),1-ratio(i,o2)}, where i is the number of bits shared by both BitVectors, o is the number of bits in the respective BitVector, and ratio(i,o) is 1 if o is 0, i/o otherwise.";
   }
 }

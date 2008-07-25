@@ -165,7 +165,7 @@ public final class Properties extends AbstractLoggable {
 					// desired result
 					desc = ((Algorithm) propertyInstance).getDescription().toString();
 				} else if (propertyInstance instanceof Parameterizable) {
-					desc = ((Parameterizable) propertyInstance).description();
+					desc = ((Parameterizable) propertyInstance).parameterDescription();
 				}
 				result.add(new PropertyDescription(entry, desc));
 			} catch (InstantiationException e) {

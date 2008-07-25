@@ -16,7 +16,7 @@ public interface Parameterizable {
    *
    * @return String a description of the class and the required parameters
    */
-  String description();
+  String parameterDescription();
   
   /**
    * Returns a description of the class and the required parameters.
@@ -27,7 +27,7 @@ public interface Parameterizable {
    *
    * @return String a description of the class and the required parameters
    */
-  String inlineDescription();
+  String inlineParameterDescription();
 
   /**
    * Sets the attributes of the class accordingly to the given parameters.
@@ -72,6 +72,7 @@ public interface Parameterizable {
   /**
    * Checks if all global parameter constraints are kept
    *
+   * @throws ParameterException if the parameters don't satisfy the parameter constraints
    */
   void checkGlobalParameterConstraints() throws ParameterException;
 }

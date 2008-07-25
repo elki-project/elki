@@ -110,9 +110,9 @@ public class StratifiedCrossValidation<O extends DatabaseObject, L extends Class
   }
 
   /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
+   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
    */
-  public String description() {
+  public String parameterDescription() {
     return "Provides a stratified n-fold cross-validation holdout.";
   }
 

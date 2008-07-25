@@ -215,10 +215,10 @@ public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */
     @Override
-    public String description() {
+    public String parameterDescription() {
         final StringBuffer description = new StringBuffer();
         description.append(KernelFourCPreprocessor.class.getName());
         description

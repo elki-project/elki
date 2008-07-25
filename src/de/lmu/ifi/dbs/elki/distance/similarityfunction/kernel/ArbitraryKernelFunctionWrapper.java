@@ -62,10 +62,10 @@ public class ArbitraryKernelFunctionWrapper<O extends RealVector<O, ? >> extends
 	}
 
 	/**
-	 * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
+	 * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
 	 */
 	@Override
-	public String description() {
+	public String parameterDescription() {
 		return "Arbitrary kernel function wrapper for FeatureVectors. No parameters required.";
 	}
 

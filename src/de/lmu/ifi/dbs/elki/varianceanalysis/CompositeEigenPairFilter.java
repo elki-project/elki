@@ -70,9 +70,9 @@ public class CompositeEigenPairFilter extends AbstractParameterizable implements
   }
 
   /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
+   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
    */
-  public String description() {
+  public String parameterDescription() {
     StringBuffer description = new StringBuffer();
     description.append(this.getClass().getName());
     description.append(" builds a chain of user specified eigen pair filters.\n");

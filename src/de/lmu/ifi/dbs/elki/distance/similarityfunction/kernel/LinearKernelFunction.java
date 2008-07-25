@@ -44,12 +44,12 @@ public class LinearKernelFunction<O extends FeatureVector<O, ? >> extends Abstra
   }
 
   /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
+   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
    */
   @Override
-  public String description() {
+  public String parameterDescription() {
     StringBuffer description = new StringBuffer();
-		description.append(super.description());
+		description.append(super.parameterDescription());
 		description.append("Linear Kernel for feature vectors. No parameters required.");
 		return description.toString();
   }

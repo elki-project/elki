@@ -326,14 +326,14 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#description()
+     * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#parameterDescription()
      */
     @Override
-    public String description() {
+    public String parameterDescription() {
         StringBuilder description = new StringBuilder();
-        description.append(super.description());
+        description.append(super.parameterDescription());
         description.append(Description.NEWLINE);
-        description.append(similarityFunction.inlineDescription());
+        description.append(similarityFunction.inlineParameterDescription());
         description.append(Description.NEWLINE);
         return description.toString();
     }

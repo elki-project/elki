@@ -182,10 +182,10 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
     /**
      * Returns a description for printing on command line interface.
      *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */
     @Override
-    public String description() {
+    public String parameterDescription() {
         return optionHandler.usage("");
     }
 
@@ -208,7 +208,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
             usage.append(OptionHandler.OPTION_PREFIX);
             usage.append(ALGORITHM_PARAM.getName());
             usage.append(" ");
-            usage.append(algorithm.description());
+            usage.append(algorithm.parameterDescription());
             usage.append(NEWLINE);
         }
         return usage.toString();
@@ -229,7 +229,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
 
         // help
         if (helpOptionHandler.isSet(HELP_FLAG) || helpOptionHandler.isSet(HELP_LONG_FLAG)) {
-            throw new AbortException(INFORMATION+description());
+            throw new AbortException(INFORMATION+ parameterDescription());
         }
 
         // description
@@ -251,10 +251,10 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
             }
             if (p instanceof Algorithm) {
                 Algorithm<?> a = (Algorithm<?>) p;
-                throw new AbortException(a.getDescription().toString() + '\n' + a.description());
+                throw new AbortException(a.getDescription().toString() + '\n' + a.parameterDescription());
             }
             else {
-                throw new AbortException(p.description());
+                throw new AbortException(p.parameterDescription());
             }
         }
 
@@ -360,13 +360,16 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
             kddTask.run();
         }
         catch (AbortException e) {
+            //e.printStackTrace();
             kddTask.verbose(kddTask.usage(e.getMessage() + "\n\nUSAGE:"));
         }
         catch (ParameterException e) {
+            //e.printStackTrace();
             kddTask.warning(kddTask.usage(e.getMessage() + "\n\nUSAGE:\n"));
         }
         // any other exception
         catch (Exception e) {
+//            e.printStackTrace();
             kddTask.exception(e.getMessage(), e);
         }
     }

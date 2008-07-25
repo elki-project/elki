@@ -208,9 +208,9 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */
-    public String description() {
+    public String parameterDescription() {
         StringBuffer description = new StringBuffer();
         description.append(FourCPreprocessor.class.getName());
         description.append(" computes the local dimensionality and locally weighted matrix of objects of a certain database according to the 4C algorithm.\n");

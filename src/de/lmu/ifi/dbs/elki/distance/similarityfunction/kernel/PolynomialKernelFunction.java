@@ -46,12 +46,12 @@ public class PolynomialKernelFunction<O extends FeatureVector<O, ? >> extends Ab
   }
 
   /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
+   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
    */
   @Override
-  public String description() {
+  public String parameterDescription() {
     StringBuffer description = new StringBuffer();
-    description.append(super.description());
+    description.append(super.parameterDescription());
     description.append("Polynomial Kernel for feature vectors. Default degree is " + DEFAULT_DEGREE + ".");
     return description.toString();
   }

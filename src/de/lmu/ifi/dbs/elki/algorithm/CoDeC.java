@@ -112,12 +112,12 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
     /**
      * The Dependency Derivator algorithm.
      */
-    private DependencyDerivator<V, D> dependencyDerivator = new DependencyDerivator<V, D>();
+    private DependencyDerivator<V, D> dependencyDerivator;
 
     /**
      * The classifier for evaluation.
      */
-    private Classifier<V, L> classifier = new CorrelationBasedClassifier<V, D, L>();
+    private Classifier<V, L> classifier;
 
     /**
      * Adds flag {@link #EVALUATE_AS_CLASSIFIER_FLAG} and
@@ -245,11 +245,13 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
 
         // evaluation
         if (evaluateAsClassifier) {
+            classifier = new CorrelationBasedClassifier<V, D, L>();
             classifier.setTime(isTime());
             classifier.setVerbose(isVerbose());
             remainingParameters = classifier.setParameters(remainingParameters);
         }
         else {
+            dependencyDerivator = new DependencyDerivator<V, D>();
             dependencyDerivator.setTime(isTime());
             dependencyDerivator.setVerbose(isVerbose());
             remainingParameters = dependencyDerivator.setParameters(remainingParameters);
@@ -259,22 +261,32 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
+     * Calls {@link AbstractAlgorithm#parameterDescription()}
+     * and appends the parameter description of {@link #clusteringAlgorithm} (if it is already initialized),
+     * {@link #classifier}, and {@link #dependencyDerivator}.
+     *
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */
     @Override
-    public String description() {
+    public String parameterDescription() {
         StringBuilder description = new StringBuilder();
-        description.append(super.description());
-        description.append('\n');
-        description.append(this.getClass().getName());
-        description.append(" requires parametrization of underlying clustering algorithm:\n");
-        description.append(clusteringAlgorithm.description());
-        description.append('\n');
-        description.append("If evaluation of the cluster-models as classifier is chosen, ");
-        description.append("the parametrization of the classifier is required:\n");
-        description.append(classifier.description());
-        description.append("Otherwise the parametrization of the dependency derivator is required:\n");
-        description.append(dependencyDerivator.description());
+        description.append(super.parameterDescription());
+
+        // clustering algorithm
+        if (clusteringAlgorithm != null) {
+            description.append(Description.NEWLINE);
+            description.append(clusteringAlgorithm.parameterDescription());
+        }
+        // classifier
+        if (classifier != null) {
+            description.append(Description.NEWLINE);
+            description.append(classifier.parameterDescription());
+        }
+        // dependency derivator
+        if (dependencyDerivator != null) {
+            description.append(Description.NEWLINE);
+            description.append(dependencyDerivator.parameterDescription());
+        }
         return description.toString();
     }
 

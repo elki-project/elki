@@ -102,16 +102,17 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
+     * Calls {@link AbstractAlgorithm#parameterDescription()}
+     * and appends the parameter description of {@link #distanceFunction} if it is already initialized.
+     *
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */
-    public String description() {
+    public String parameterDescription() {
         StringBuilder description = new StringBuilder();
-        description.append(super.description());
-        description.append('\n');
-        description.append(getClass().getName());
-        description.append(" requires (eventually) parametrization of " +
-            "its distance function:\n");
-        description.append(distanceFunction.description());
+        description.append(super.parameterDescription());
+        if (distanceFunction != null) {
+            description.append(distanceFunction.parameterDescription());
+        }
         return description.toString();
     }
 }

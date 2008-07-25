@@ -50,7 +50,7 @@ public abstract class AbstractCorrelationDistanceFunction<O extends RealVector<O
    *
    * @return String a description of the class and the required parameters
    */
-  public String description() {
+  public String parameterDescription() {
     StringBuffer description = new StringBuffer();
     description.append(optionHandler.usage("Correlation distance for NumberVectors. Pattern for defining a range: \""
                                            + requiredInputPattern() + "\".", false));

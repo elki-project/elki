@@ -179,9 +179,9 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
     /**
      * Returns a description for printing on command line interface.
      *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */
-    public String description() {
+    public String parameterDescription() {
         return optionHandler.usage("");
     }
 
@@ -204,7 +204,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
             usage.append(OptionHandler.OPTION_PREFIX);
             usage.append(ALGORITHM_P);
             usage.append(" ");
-            usage.append(algorithm.description());
+            usage.append(algorithm.parameterDescription());
             usage.append(NEWLINE);
         }
         return usage.toString();
@@ -223,7 +223,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
 
         // help
         if (optionHandler.isSet(HELP_F) || optionHandler.isSet(HELPLONG_F)) {
-            throw new AbortException(description());
+            throw new AbortException(parameterDescription());
         }
 
         // description
@@ -243,10 +243,10 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
             }
             if (p instanceof Algorithm) {
                 Algorithm<?> a = (Algorithm<?>) p;
-                throw new AbortException(a.getDescription().toString() + '\n' + a.description());
+                throw new AbortException(a.getDescription().toString() + '\n' + a.parameterDescription());
             }
             else {
-                throw new AbortException(p.description());
+                throw new AbortException(p.parameterDescription());
             }
         }
 

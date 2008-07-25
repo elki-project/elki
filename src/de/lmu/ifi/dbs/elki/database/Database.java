@@ -212,7 +212,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable {
    *
    * @return a description of the database
    */
-  String description();
+  String parameterDescription();
 
   /**
    * Returns a Map of partition IDs to Databases of the specified class

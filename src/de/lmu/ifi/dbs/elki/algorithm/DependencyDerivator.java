@@ -91,7 +91,7 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
     /**
      * Holds the object performing the pca.
      */
-    private LinearLocalPCA<V> pca;
+    private LinearLocalPCA<V> pca = new LinearLocalPCA<V>();
 
     /**
      * Holds the solution.
@@ -264,7 +264,6 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
         }
 
         // pca
-        pca = new LinearLocalPCA<V>();
         remainingParameters = pca.setParameters(remainingParameters);
         setParameters(args, remainingParameters);
         return remainingParameters;
@@ -282,5 +281,19 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
         List<AttributeSettings> attributeSettings = super.getAttributeSettings();
         attributeSettings.addAll(pca.getAttributeSettings());
         return attributeSettings;
+    }
+
+    /**
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
+     */
+    @Override
+    public String parameterDescription() {
+        StringBuilder description = new StringBuilder();
+        description.append(super.parameterDescription());
+        description.append(Description.NEWLINE);
+        description.append(this.getClass().getName());
+        description.append(" requires parametrization of underlying PCA:");
+        description.append(pca.parameterDescription());
+        return description.toString();
     }
 }

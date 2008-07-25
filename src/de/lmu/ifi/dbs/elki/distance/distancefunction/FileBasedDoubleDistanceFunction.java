@@ -65,7 +65,7 @@ public class FileBasedDoubleDistanceFunction extends AbstractDoubleDistanceFunct
    *
    * @return String a description of the class and the required parameters
    */
-  public String description() {
+  public String parameterDescription() {
     return "File based double distance for database objects. No parameters required. " +
            "Pattern for defining a range: \"" + requiredInputPattern() + "\".";
   }

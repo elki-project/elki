@@ -68,7 +68,7 @@ public class DimensionSelectingDistanceFunction<N extends Number, O extends Feat
    *
    * @return String a description of the class and the required parameters
    */
-  public String description() {
+  public String parameterDescription() {
     StringBuffer description = new StringBuffer();
     description.append(optionHandler.usage("Distance within one specified dimension for NumberVectors. "));
     description.append('\n');

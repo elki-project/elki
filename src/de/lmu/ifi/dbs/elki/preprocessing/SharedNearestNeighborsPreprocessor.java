@@ -143,14 +143,14 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
     /**
      * Provides a short description of the purpose of this class.
      *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#description()
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#parameterDescription()
      */
     @Override
-    public String description() {
+    public String parameterDescription() {
         StringBuffer description = new StringBuffer();
         description.append(SharedNearestNeighborsPreprocessor.class.getName());
         description.append(" computes the k nearest neighbors of objects of a certain database.\n");
-        description.append(super.description("", false));
+        description.append(super.parameterDescription());
         return description.toString();
     }
 

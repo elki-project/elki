@@ -195,9 +195,9 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
   }
 
   /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
+   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
    */
-  public String description() {
+  public String parameterDescription() {
     return this.getClass().getName() + " performs a confusion matrix based evaluation.";
   }
 

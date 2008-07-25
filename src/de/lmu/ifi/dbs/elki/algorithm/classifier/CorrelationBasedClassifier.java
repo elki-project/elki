@@ -13,10 +13,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
- *
  * @author Arthur Zimek
  * @param <V> the type of RealVector handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
@@ -38,7 +43,7 @@ public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Di
     private CorrelationAnalysisSolution<V>[] model;
 
     /**
-     * @see Classifier#buildClassifier(de.lmu.ifi.dbs.elki.database.Database, de.lmu.ifi.dbs.elki.data.ClassLabel[])
+     * @see Classifier#buildClassifier(de.lmu.ifi.dbs.elki.database.Database,de.lmu.ifi.dbs.elki.data.ClassLabel[])
      */
     @SuppressWarnings("unchecked")
     public void buildClassifier(Database<V> database, L[] classLabels) throws IllegalStateException {
@@ -64,7 +69,7 @@ public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Di
             for (Integer classID : keys) {
                 if (isVerbose()) {
                     verbose("Deriving model for class "
-                            + this.getClassLabel(classID).toString());
+                        + this.getClassLabel(classID).toString());
                 }
                 Database<V> cluster = clusters.get(classID);
                 dependencyDerivator.run(cluster);
@@ -176,13 +181,16 @@ public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Di
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#description()
+     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.classifier.AbstractClassifier#parameterDescription()}
+     * and appends the parameter description of {@link #dependencyDerivator} (if it is already initialized).
+     *
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */
     @Override
-    public String description() {
+    public String parameterDescription() {
         StringBuffer description = new StringBuffer();
-        description.append(super.description());
-        description.append(dependencyDerivator.description());
+        description.append(super.parameterDescription());
+        description.append(dependencyDerivator.parameterDescription());
         return description.toString();
     }
 

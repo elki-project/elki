@@ -103,14 +103,14 @@ public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */
     @Override
-    public String description() {
+    public String parameterDescription() {
         StringBuilder description = new StringBuilder();
-        description.append(super.description());
+        description.append(super.parameterDescription());
         description.append(Description.NEWLINE);
-        description.append(similarityFunction.inlineDescription());
+        description.append(similarityFunction.inlineParameterDescription());
         description.append(Description.NEWLINE);
         return description.toString();
     }

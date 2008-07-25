@@ -51,10 +51,10 @@ public class WeightedDistanceFunction<O extends NumberVector<O, ? >> extends Abs
   }
 
   /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
+   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
    *      todo: parameters required
    */
-  public String description() {
+  public String parameterDescription() {
     return "Weighted distance for feature vectors. " +
            "No parameters required. " +
            "Pattern for defining a range: \"" + requiredInputPattern() + "\".";

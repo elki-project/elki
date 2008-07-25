@@ -165,7 +165,7 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
    *
    * @return String a description of the class and the required parameters
    */
-  public String description() {
+  public String parameterDescription() {
     return optionHandler.usage("", false);
   }
 

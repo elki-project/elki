@@ -163,9 +163,9 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
   }
 
   /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
+   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
    */
-  public String description() {
+  public String parameterDescription() {
     StringBuffer description = new StringBuffer();
     description.append(HiSCPreprocessor.class.getName());
     description.append(" computes the preference vector of objects of a certain database according to the HiSC algorithm.\n");

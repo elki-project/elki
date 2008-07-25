@@ -86,7 +86,7 @@ public class KnnQueryBasedHiCOPreprocessor<V extends RealVector<V, ?>> extends H
      *
      * @return String a description of the class and the required parameters
      */
-    public String description() {
+    public String parameterDescription() {
         StringBuffer description = new StringBuffer();
         description.append(KnnQueryBasedHiCOPreprocessor.class.getName());
         description.append(" computes the correlation dimension of objects of a certain database.\n");

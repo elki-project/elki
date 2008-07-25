@@ -93,7 +93,7 @@ public class RangeQueryBasedHiCOPreprocessor<V extends RealVector<V,? >> extends
 	 * 
 	 * @return String a description of the class and the required parameters
 	 */
-	public String description() {
+	public String parameterDescription() {
 		StringBuffer description = new StringBuffer();
 		description.append(RangeQueryBasedHiCOPreprocessor.class.getName());
 		description.append(" computes the correlation dimension of objects of a certain database.\n");

@@ -63,9 +63,9 @@ public class DummyNormalization<O extends DatabaseObject> extends AbstractParame
   }
 
   /**
-   * @see de.lmu.ifi.dbs.elki.normalization.Normalization#description()
+   * @see de.lmu.ifi.dbs.elki.normalization.Normalization#parameterDescription()
    */
-  public String description() {
+  public String parameterDescription() {
     return "Dummy normalization that does nothing. This class is used at normalization of multi-represented " +
            "objects if one representation needs no normalization.";
   }

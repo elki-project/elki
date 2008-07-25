@@ -84,13 +84,13 @@ public class ProvidedTestSet<O extends DatabaseObject, L extends ClassLabel<L>> 
   }
 
   /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
+   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
    */
-  public String description() {
+  public String parameterDescription() {
     StringBuffer description = new StringBuffer();
     description.append(optionHandler.usage("AllTraining puts the complete database in the training set. A testset is expected via a database connection.", false));
     // TODO: available dbcs?
-    description.append(dbc.description());
+    description.append(dbc.parameterDescription());
     return description.toString();
   }
 

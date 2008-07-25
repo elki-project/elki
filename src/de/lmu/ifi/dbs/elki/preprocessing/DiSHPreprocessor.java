@@ -223,9 +223,9 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */
-    public String description() {
+    public String parameterDescription() {
         StringBuffer description = new StringBuffer();
         description.append(DiSHPreprocessor.class.getName());
         description.append(" computes the preference vector of objects of a certain database according to the DiSH algorithm.\n");

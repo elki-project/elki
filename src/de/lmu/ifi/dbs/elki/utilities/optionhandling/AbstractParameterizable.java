@@ -105,16 +105,16 @@ public abstract class AbstractParameterizable extends AbstractLoggable
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */
-    public String description() {
+    public String parameterDescription() {
         return optionHandler.usage("");
     }
 
     /**
-     * @see Parameterizable#inlineDescription()
+     * @see Parameterizable#inlineParameterDescription()
      */
-    public String inlineDescription() {
+    public String inlineParameterDescription() {
         return optionHandler.usage("", false);
     }
 
@@ -125,7 +125,7 @@ public abstract class AbstractParameterizable extends AbstractLoggable
      * @param message some error-message, if needed (may be null or empty String)
      * @return an usage-String
      */
-    protected String description(String message) {
+    protected String parameterDescription(String message) {
         return this.optionHandler.usage(message);
     }
 
@@ -138,7 +138,7 @@ public abstract class AbstractParameterizable extends AbstractLoggable
      *                   method
      * @return an usage-String
      */
-    protected String description(String message, boolean standalone) {
+    protected String parameterDescription(String message, boolean standalone) {
         return this.optionHandler.usage(message, standalone);
     }
 

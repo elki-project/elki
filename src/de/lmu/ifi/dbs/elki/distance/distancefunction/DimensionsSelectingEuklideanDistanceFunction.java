@@ -62,10 +62,10 @@ public class DimensionsSelectingEuklideanDistanceFunction<V extends NumberVector
 
 
   /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
+   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
    */
   @Override
-  public String description() {
+  public String parameterDescription() {
     return "Euklidean distance for feature vectors considering only specified dimensions. " +
            "No parameters required. " +
            "Pattern for defining a range: \"" + requiredInputPattern() + "\".";

@@ -233,7 +233,7 @@ public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ? >> e
    *
    * @return String a description of the class and the required parameters
    */
-  public String description() {
+  public String parameterDescription() {
     return optionHandler.usage("", false);
   }
 
