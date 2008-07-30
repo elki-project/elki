@@ -279,6 +279,45 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
     }
 
     /**
+     * Calls {@link AbstractAlgorithm#parameterDescription()}
+     * and appends the parameter description of
+     * the {@link #preprocessor}, the {@link #partitionAlgorithm},
+     * and {@link #partitionDatabase} (if they are already initialized).
+     *
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
+     */
+    @Override
+    public String parameterDescription() {
+        StringBuilder description = new StringBuilder();
+        description.append(super.parameterDescription());
+
+        // preprocessor
+        if (preprocessor != null) {
+            description.append(Description.NEWLINE);
+            description.append(preprocessor.parameterDescription());
+        }
+        // partition algorithm
+        if (partitionAlgorithm != null) {
+            description.append(Description.NEWLINE);
+            description.append(partitionAlgorithm.parameterDescription());
+        }
+        // partition database
+        if (optionHandler.isSet(PARTITION_DB_PARAM)) {
+            try {
+                // noinspection unchecked
+                Database<V> tmpDB = (Database<V>) Util.instantiate(Database.class, partitionDatabase.getName());
+                description.append(Description.NEWLINE);
+                description.append(tmpDB.parameterDescription());
+            }
+            catch (UnableToComplyException e) {
+                // tested before
+                throw new RuntimeException("This should never happen!", e);
+            }
+        }
+        return description.toString();
+    }
+
+    /**
      * Runs the partition algorithm and creates the result.
      *
      * @param database     the database to run this algorithm on

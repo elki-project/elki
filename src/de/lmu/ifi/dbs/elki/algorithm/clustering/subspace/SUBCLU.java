@@ -245,6 +245,26 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
     }
 
     /**
+     * Calls {@link AbstractAlgorithm#parameterDescription()}
+     * and appends the parameter description of {@link #distanceFunction} (if it is already initialized).
+     *
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
+     */
+    @Override
+    public String parameterDescription() {
+        StringBuilder description = new StringBuilder();
+        description.append(super.parameterDescription());
+
+        // distanceFunction
+        if (distanceFunction != null) {
+            description.append(Description.NEWLINE);
+            description.append(distanceFunction.parameterDescription());
+        }
+
+        return description.toString();
+    }
+
+    /**
      * Initializes the DBSCAN algorithm
      *
      * @param selectedDimensions the dimensions to be considered for distance computation

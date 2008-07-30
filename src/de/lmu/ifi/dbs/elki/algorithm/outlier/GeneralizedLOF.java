@@ -263,6 +263,27 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
     }
 
     /**
+     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm#parameterDescription()}
+     * and appends the parameter description of {@link #reachabilityDistanceFunction}
+     * (if it is already initialized).
+     *
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
+     */
+    @Override
+    public String parameterDescription() {
+        StringBuilder description = new StringBuilder();
+        description.append(super.parameterDescription());
+
+        // reachabilityDistanceFunction
+        if (reachabilityDistanceFunction != null) {
+            description.append(Description.NEWLINE);
+            description.append(reachabilityDistanceFunction.parameterDescription());
+        }
+
+        return description.toString();
+    }
+
+    /**
      * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getResult()
      */
     public Result<O> getResult() {

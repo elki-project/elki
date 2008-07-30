@@ -147,6 +147,25 @@ public class FractalDimensionTest<V extends RealVector<V, ?>> extends AbstractAl
     }
 
     /**
+     * Calls {@link AbstractAlgorithm#parameterDescription()}
+     * and appends the parameter description of
+     * the {@link #distanceFunction}.
+     *
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
+     */
+    @Override
+    public String parameterDescription() {
+        StringBuilder description = new StringBuilder();
+        description.append(super.parameterDescription());
+
+        // distance function
+        description.append(Description.NEWLINE);
+        description.append(distanceFunction.parameterDescription());
+
+        return description.toString();
+    }
+
+    /**
      * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getDescription()
      */
     public Description getDescription() {

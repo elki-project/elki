@@ -80,7 +80,6 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         "The minimum number of points as a smoothing factor to avoid the single-link-effekt."
     );
 
-
     /**
      * Parameter that specifies the a minimum number of points as a smoothing
      * factor to avoid the single-link-effect,
@@ -93,7 +92,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
     /**
      * The optics algorithm to determine the cluster order.
      */
-    private OPTICS<V, PreferenceVectorBasedCorrelationDistance> optics;
+    private OPTICS<V, PreferenceVectorBasedCorrelationDistance> optics = new OPTICS<V, PreferenceVectorBasedCorrelationDistance>();
 
     /**
      * Holds the result;
@@ -176,8 +175,6 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         int minpts = getParameterValue(MU_PARAM);
 
         // OPTICS
-        optics = new OPTICS<V, PreferenceVectorBasedCorrelationDistance>();
-
         // verbose and time
         optics.setVerbose(isVerbose());
         optics.setTime(isTime());

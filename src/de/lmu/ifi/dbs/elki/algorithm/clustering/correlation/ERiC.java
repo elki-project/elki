@@ -141,16 +141,21 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
     }
 
     /**
+     * Calls {@link AbstractAlgorithm#parameterDescription()}
+     * and appends the parameter description of
+     * the {@link #copacAlgorithm}.
+     *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */
     @Override
     public String parameterDescription() {
         StringBuilder description = new StringBuilder();
         description.append(super.parameterDescription());
+
+        // copac algorithm
         description.append(Description.NEWLINE);
-        description.append(getClass().getName());
-        description.append(" requires parametrization of underlying partitioning algorithm ");
-        description.append(copacAlgorithm.inlineParameterDescription());
+        description.append(copacAlgorithm.parameterDescription());
+
         return description.toString();
     }
 
@@ -180,11 +185,9 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         String[] remainingParameters = super.setParameters(args);
 
         // copac algorithm
-        String[] copacAlgorithmParameters = new String[remainingParameters.length];
-        System.arraycopy(remainingParameters, 0, copacAlgorithmParameters, 0, remainingParameters.length);
         copacAlgorithm.setVerbose(isVerbose());
         copacAlgorithm.setTime(isTime());
-        remainingParameters = copacAlgorithm.setParameters(copacAlgorithmParameters);
+        remainingParameters = copacAlgorithm.setParameters(remainingParameters);
         setParameters(args, remainingParameters);
 
         return remainingParameters;
@@ -202,16 +205,6 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         return attributeSettings;
     }
 
-    /**
-     * Extracts the correlation clusters and noise from the copac result
-     * and returns a mapping of correlation dimension to maps of clusters within
-     * this correlation dimension. Each cluster is defined by the basis vectors defining
-     * the subspace in which the cluster appears.
-     *
-     * @param database       the database containing the objects
-     * @param dimensionality the dimensionality of the feature space
-     * @return a mapping of correlation dimension to maps of clusters
-     */
     private SortedMap<Integer, List<HierarchicalCorrelationCluster<V>>> extractCorrelationClusters(Database<V> database,
                                                                                                    int dimensionality) {
         try {

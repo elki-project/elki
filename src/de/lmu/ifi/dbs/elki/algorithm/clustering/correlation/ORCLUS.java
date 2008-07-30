@@ -98,7 +98,8 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
             // pick k0 > k points from the database
             List<Cluster> clusters = initialSeeds(database, k_c);
 
-            double beta = Math.exp(-Math.log((double) dim_c / (double) dim) * Math.log(1 / alpha) / Math.log((double) k_c / (double) k));
+            double beta = StrictMath.exp(-StrictMath.log((double) dim_c / (double) dim) *
+                StrictMath.log(1 / alpha) / StrictMath.log((double) k_c / (double) k));
 
             while (k_c > k) {
                 if (isVerbose()) {

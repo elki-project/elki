@@ -103,15 +103,20 @@ public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends
     }
 
     /**
+     * Calls {@link AbstractAlgorithm#parameterDescription()}
+     * and appends the parameter description of {@link #similarityFunction}.
+     *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */
     @Override
     public String parameterDescription() {
         StringBuilder description = new StringBuilder();
         description.append(super.parameterDescription());
+
+        // similarityFunction
         description.append(Description.NEWLINE);
-        description.append(similarityFunction.inlineParameterDescription());
-        description.append(Description.NEWLINE);
+        description.append(similarityFunction.parameterDescription());
+
         return description.toString();
     }
 
