@@ -17,9 +17,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
 import java.util.List;
 
 /**
- * Handler class for all distance function using a preprocessor.
+ * Handler class for all distance functions using a preprocessor.
  *
- * @author Elke Achtert 
+ * @author Elke Achtert
+ * @param <O> the type of DatabaseObject used
+ * @param <P> the type of Preprocessor used
  */
 public class PreprocessorHandler<O extends DatabaseObject,P extends Preprocessor<O>> implements DatabaseListener {
 

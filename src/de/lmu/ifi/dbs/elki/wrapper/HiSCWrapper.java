@@ -106,8 +106,7 @@ public class HiSCWrapper extends FileBasedDatabaseConnectionWrapper {
         parameters.add(Double.toString(alpha));
 
         // epsilon for distance function
-        parameters.add(OptionHandler.OPTION_PREFIX + HiSCDistanceFunction.EPSILON_P);
-        parameters.add(Double.toString(alpha));
+        Util.addParameter(parameters, HiSCDistanceFunction.EPSILON_ID, Double.toString(alpha));
 
         return parameters;
     }

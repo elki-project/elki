@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <p>
+ * <p/>
  * Algorithm for detecting subspace hierarchies.
  * <p/>
  * <p>Reference:
@@ -193,8 +193,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         Util.addParameter(opticsParameters, OPTICS.DISTANCE_FUNCTION_ID, DiSHDistanceFunction.class.getName());
 
         // epsilon for distance function
-        opticsParameters.add(OptionHandler.OPTION_PREFIX + DiSHDistanceFunction.EPSILON_P);
-        opticsParameters.add(Double.toString(epsilon));
+        Util.addParameter(opticsParameters, DiSHDistanceFunction.EPSILON_ID, Double.toString(epsilon));
 
         // omit flag
         opticsParameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F);

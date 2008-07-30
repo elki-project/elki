@@ -5,7 +5,6 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
-import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 
 import java.util.BitSet;
@@ -16,19 +15,7 @@ import java.util.BitSet;
  * @author Elke Achtert
  */
 public class DiSHDistanceFunction<V extends RealVector<V, ?>, P extends Preprocessor<V>>
-    extends PreferenceVectorBasedCorrelationDistanceFunction<V, P> {
-    /**
-     * The default preprocessor class name.
-     */
-    public static final String DEFAULT_PREPROCESSOR_CLASS = DiSHPreprocessor.class.getName();
-
-
-    /**
-     * Description for parameter preprocessor.
-     */
-    public static final String PREPROCESSOR_CLASS_D = "<class>the preprocessor to determine the preference vectors of the objects "
-        + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(PREPROCESSOR_SUPER_CLASS)
-        + ". (Default: " + DEFAULT_PREPROCESSOR_CLASS;
+    extends AbstractPreferenceVectorBasedCorrelationDistanceFunction<V, P> {
 
     /**
      * Computes the correlation distance between the two specified vectors
@@ -79,15 +66,11 @@ public class DiSHDistanceFunction<V extends RealVector<V, ?>, P extends Preproce
 
     /**
      * Returns the name of the default preprocessor.
+     *
+     * @return the name of the default preprocessor, which is {@link DiSHPreprocessor}
+     * @see AbstractPreprocessorBasedDistanceFunction#getDefaultPreprocessorClassName() 
      */
     String getDefaultPreprocessorClassName() {
-        return DEFAULT_PREPROCESSOR_CLASS;
-    }
-
-    /**
-     * Returns the description for parameter preprocessor.
-     */
-    String getPreprocessorClassDescription() {
-        return PREPROCESSOR_CLASS_D;
+        return DiSHPreprocessor.class.getName();
     }
 }

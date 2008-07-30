@@ -113,9 +113,9 @@ public class SubspaceDistance extends AbstractDistance<SubspaceDistance> {
     public int hashCode() {
         int result;
         long temp;
-        temp = subspaceDistance != +0.0d ? Double.doubleToLongBits(subspaceDistance) : 0L;
+        temp = subspaceDistance != 0.0d ? Double.doubleToLongBits(subspaceDistance) : 0L;
         result = (int) (temp ^ (temp >>> 32));
-        temp = affineDistance != +0.0d ? Double.doubleToLongBits(affineDistance) : 0L;
+        temp = affineDistance != 0.0d ? Double.doubleToLongBits(affineDistance) : 0L;
         result = 29 * result + (int) (temp ^ (temp >>> 32));
         return result;
     }

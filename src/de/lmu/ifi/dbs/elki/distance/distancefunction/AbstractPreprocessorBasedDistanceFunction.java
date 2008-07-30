@@ -16,10 +16,12 @@ import java.util.regex.Pattern;
  * Abstract super class for distance functions needing a preprocessor.
  *
  * @author Elke Achtert
+ * @param <O> the type of DatabaseObject to compute the distances in between
+ * @param <D> the type of Distance used
+ * @param <P> the type of Preprocessor used
  */
 public abstract class AbstractPreprocessorBasedDistanceFunction<O extends DatabaseObject,
-    P extends Preprocessor<O>, D extends Distance<D>>
-    extends AbstractDistanceFunction<O, D> {
+    P extends Preprocessor<O>, D extends Distance<D>> extends AbstractDistanceFunction<O, D> {
 
     /**
      * The handler class for the preprocessor.
@@ -33,7 +35,8 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
      */
     public AbstractPreprocessorBasedDistanceFunction(Pattern pattern) {
         super(pattern);
-        preprocessorHandler = new PreprocessorHandler(optionHandler,
+        preprocessorHandler = new PreprocessorHandler(
+            optionHandler,
             this.getPreprocessorClassDescription(),
             this.getPreprocessorSuperClassName(),
             this.getDefaultPreprocessorClassName(),
@@ -91,21 +94,29 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
 
     /**
      * Returns the name of the default preprocessor.
+     *
+     * @return the name of the default preprocessor
      */
     abstract String getDefaultPreprocessorClassName();
 
     /**
      * Returns the description for parameter preprocessor.
+     *
+     * @return the description for parameter preprocessor
      */
     abstract String getPreprocessorClassDescription();
 
     /**
      * Returns the super class for the preprocessor.
+     *
+     * @return the super class for the preprocessor
      */
     abstract Class<? extends Preprocessor> getPreprocessorSuperClassName();
 
     /**
      * Returns the assocoiation ID for the association to be set by the preprocessor.
+     *
+     * @return the assocoiation ID for the association to be set by the preprocessor
      */
     abstract AssociationID getAssociationID();
 }
