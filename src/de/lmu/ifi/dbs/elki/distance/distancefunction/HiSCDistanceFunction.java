@@ -13,14 +13,11 @@ import java.util.BitSet;
  * Distance function used in the HiSC algorithm.
  *
  * @author Elke Achtert
+ * @param <V> the type of RealVector used
+ * @param <P> the type of Preprocessor used
  */
-public class HiSCDistanceFunction<O extends RealVector<O, ?>, P extends Preprocessor<O>>
-    extends AbstractPreferenceVectorBasedCorrelationDistanceFunction<O, P> {
-
-    /**
-     * The default preprocessor class name.
-     */
-    public static final String DEFAULT_PREPROCESSOR_CLASS = HiSCPreprocessor.class.getName();
+public class HiSCDistanceFunction<V extends RealVector<V, ?>, P extends Preprocessor<V>>
+    extends AbstractPreferenceVectorBasedCorrelationDistanceFunction<V, P> {
 
     /**
      * Computes the correlation distance between the two specified vectors
@@ -32,7 +29,7 @@ public class HiSCDistanceFunction<O extends RealVector<O, ?>, P extends Preproce
      * @param pv2 the second preference vector
      * @return the correlation distance between the two specified vectors
      */
-    public PreferenceVectorBasedCorrelationDistance correlationDistance(O v1, O v2, BitSet pv1, BitSet pv2) {
+    public PreferenceVectorBasedCorrelationDistance correlationDistance(V v1, V v2, BitSet pv1, BitSet pv2) {
         BitSet commonPreferenceVector = (BitSet) pv1.clone();
         commonPreferenceVector.and(pv2);
         int dim = v1.getDimensionality();
@@ -74,9 +71,9 @@ public class HiSCDistanceFunction<O extends RealVector<O, ?>, P extends Preproce
      * Returns the name of the default preprocessor.
      *
      * @return the name of the default preprocessor, which is {@link HiSCPreprocessor}
-     * @see AbstractPreprocessorBasedDistanceFunction#getDefaultPreprocessorClassName()
+     * @see de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction#getDefaultPreprocessorClassName()
      */
-    String getDefaultPreprocessorClassName() {
+    public String getDefaultPreprocessorClassName() {
         return HiSCPreprocessor.class.getName();
     }
 

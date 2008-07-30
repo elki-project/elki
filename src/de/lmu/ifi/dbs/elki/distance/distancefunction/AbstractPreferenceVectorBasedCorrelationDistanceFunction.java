@@ -17,15 +17,17 @@ import java.util.BitSet;
  * Abstract super class for all preference vector based correlation distance functions.
  *
  * @author Arthur Zimek
+ * @param <V> the type of RealVector used
+ * @param <P> the type of Preprocessor used
  */
-public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<O extends RealVector<O, ?>, P extends Preprocessor<O>>
-    extends AbstractCorrelationDistanceFunction<O, P, PreferenceVectorBasedCorrelationDistance> {
+public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P extends Preprocessor<V>>
+    extends AbstractCorrelationDistanceFunction<V, P, PreferenceVectorBasedCorrelationDistance> {
 
     /**
      * OptionID for {@link #EPSILON_PARAM}
      */
     public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID(
-        "pvbasedcorrelationdf.epsilon",
+        "distancefunction.epsilon",
         "The maximum distance between two vectors with equal preference vectors before considering them as parallel."
     );
 
@@ -61,15 +63,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<O
     }
 
     /**
-     * Provides a distance suitable to this DistanceFunction based on the given
-     * pattern.
-     *
-     * @param pattern A pattern defining a distance suitable to this
-     *                DistanceFunction
-     * @return a distance suitable to this DistanceFunction based on the given
-     *         pattern
-     * @throws IllegalArgumentException if the given pattern is not compatible with the requirements
-     *                                  of this DistanceFunction
+     * @see de.lmu.ifi.dbs.elki.distance.MeasurementFunction#valueOf(String)
      */
     public PreferenceVectorBasedCorrelationDistance valueOf(String pattern)
         throws IllegalArgumentException {
@@ -92,9 +86,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<O
     }
 
     /**
-     * Provides an infinite distance.
-     *
-     * @return an infinite distance
+     * @see de.lmu.ifi.dbs.elki.distance.MeasurementFunction#infiniteDistance()
      */
     public PreferenceVectorBasedCorrelationDistance infiniteDistance() {
         return new PreferenceVectorBasedCorrelationDistance(
@@ -105,9 +97,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<O
     }
 
     /**
-     * Provides a null distance.
-     *
-     * @return a null distance
+     * @see de.lmu.ifi.dbs.elki.distance.MeasurementFunction#nullDistance()
      */
     public PreferenceVectorBasedCorrelationDistance nullDistance() {
         return new PreferenceVectorBasedCorrelationDistance(
@@ -118,9 +108,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<O
     }
 
     /**
-     * Provides an undefined distance.
-     *
-     * @return an undefined distance
+     * @see de.lmu.ifi.dbs.elki.distance.MeasurementFunction#undefinedDistance()
      */
     public PreferenceVectorBasedCorrelationDistance undefinedDistance() {
         return new PreferenceVectorBasedCorrelationDistance(
@@ -133,7 +121,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<O
     /**
      * @see de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractCorrelationDistanceFunction#correlationDistance(de.lmu.ifi.dbs.elki.data.RealVector,de.lmu.ifi.dbs.elki.data.RealVector)
      */
-    protected PreferenceVectorBasedCorrelationDistance correlationDistance(O v1, O v2) {
+    protected PreferenceVectorBasedCorrelationDistance correlationDistance(V v1, V v2) {
         BitSet preferenceVector1 = getDatabase().getAssociation(AssociationID.PREFERENCE_VECTOR, v1.getID());
         BitSet preferenceVector2 = getDatabase().getAssociation(AssociationID.PREFERENCE_VECTOR, v2.getID());
         return correlationDistance(v1, v2, preferenceVector1, preferenceVector2);
@@ -149,7 +137,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<O
      * @param pv2 the second preference vector
      * @return the correlation distance between the two specified vectors
      */
-    public abstract PreferenceVectorBasedCorrelationDistance correlationDistance(O v1, O v2, BitSet pv1, BitSet pv2);
+    public abstract PreferenceVectorBasedCorrelationDistance correlationDistance(V v1, V v2, BitSet pv1, BitSet pv2);
 
     /**
      * Computes the weighted distance between the two specified vectors
@@ -160,7 +148,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<O
      * @param weightVector the preference vector
      * @return the weighted distance between the two specified vectors according to the given preference vector
      */
-    public double weightedDistance(O dv1, O dv2, BitSet weightVector) {
+    public double weightedDistance(V dv1, V dv2, BitSet weightVector) {
         if (dv1.getDimensionality() != dv2.getDimensionality()) {
             throw new IllegalArgumentException("Different dimensionality of NumberVectors\n  first argument: " + dv1.toString() + "\n  second argument: " + dv2.toString());
         }
@@ -197,7 +185,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<O
      * @return the weighted distance between the two specified vectors
      *         according to the preference vector of the first data vector
      */
-    public double weightedPrefereneceVectorDistance(O rv1, O rv2) {
+    public double weightedPrefereneceVectorDistance(V rv1, V rv2) {
         double d1 = weightedDistance(rv1, rv2, getDatabase().getAssociation(AssociationID.PREFERENCE_VECTOR, rv1.getID()));
         double d2 = weightedDistance(rv2, rv1, getDatabase().getAssociation(AssociationID.PREFERENCE_VECTOR, rv2.getID()));
 
@@ -218,7 +206,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<O
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction#setParameters(String[])
+     * Calls {@link AbstractPreprocessorBasedDistanceFunction#setParameters(String[])
      * AbstractPreprocessorBasedDistanceFunction#setParameters(args)}
      * and sets additionally the value of the parameter
      * {@link #EPSILON_PARAM}.
@@ -249,9 +237,9 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<O
      *
      * @return the assocoiation ID for the association to be set by the preprocessor,
      *         which is {@link AssociationID#PREFERENCE_VECTOR}
-     * @see AbstractPreprocessorBasedDistanceFunction#getAssociationID()
+     * @see de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction#getAssociationID()
      */
-    final AssociationID getAssociationID() {
+    public final AssociationID getAssociationID() {
         return AssociationID.PREFERENCE_VECTOR;
     }
 
@@ -260,17 +248,16 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<O
      *
      * @return the super class for the preprocessor,
      *         which is {@link PreferenceVectorPreprocessor}
-     * @see AbstractPreprocessorBasedDistanceFunction#getPreprocessorSuperClassName()
+     * @see de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction#getPreprocessorSuperClassName()
      */
-    final Class<PreferenceVectorPreprocessor> getPreprocessorSuperClassName() {
+    public final Class<PreferenceVectorPreprocessor> getPreprocessorSuperClassName() {
         return PreferenceVectorPreprocessor.class;
     }
 
-
     /**
-     * @see AbstractPreprocessorBasedDistanceFunction#getPreprocessorClassDescription()
+     * @see de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction#getPreprocessorDescription() ()
      */
-    final String getPreprocessorClassDescription() {
+    public final String getPreprocessorDescription() {
         return "Classname of the preprocessor to determine the preference vectors of the objects "
             + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(getPreprocessorSuperClassName());
     }

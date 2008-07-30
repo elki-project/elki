@@ -393,21 +393,21 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
 
         // parameters for the distance function
         // todo provide setters
-        String[] distanceFunctionParameters = new String[remainingParameters.length + 5];
-        System.arraycopy(remainingParameters, 0, distanceFunctionParameters, 5, remainingParameters.length);
-
+        List<String> distanceFunctionParameters = new ArrayList<String>();
+        for (String p: remainingParameters) {
+            distanceFunctionParameters.add(p);
+        }
         // omit preprocessing flag
-        distanceFunctionParameters[0] = OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F;
+        Util.addFlag(distanceFunctionParameters, PreprocessorHandler.OMIT_PREPROCESSING_ID);
         // preprocessor
-        distanceFunctionParameters[1] = OptionHandler.OPTION_PREFIX + PreprocessorHandler.PREPROCESSOR_CLASS_P;
-        distanceFunctionParameters[2] = preprocessorClass().getName();
+        Util.addParameter(distanceFunctionParameters, PreprocessorHandler.PREPROCESSOR_ID, preprocessorClass().getName());
         // preprocessor epsilon
-        distanceFunctionParameters[3] = OptionHandler.OPTION_PREFIX + ProjectedDBSCANPreprocessor.EPSILON_PARAM.getName();
-        distanceFunctionParameters[4] = epsilon;
+        distanceFunctionParameters.add(3, OptionHandler.OPTION_PREFIX + ProjectedDBSCANPreprocessor.EPSILON_PARAM.getName());
+        distanceFunctionParameters.add(4,epsilon);
         // preprocessor minpts
-        distanceFunctionParameters = Util.addParameter(distanceFunctionParameters, MINPTS_ID, Integer.toString(minpts));
+        Util.addParameter(distanceFunctionParameters, MINPTS_ID, Integer.toString(minpts));
 
-        distanceFunction.setParameters(distanceFunctionParameters);
+        distanceFunction.setParameters(distanceFunctionParameters.toArray(new String[distanceFunctionParameters.size()]));
 
         setParameters(args, remainingParameters);
         return remainingParameters;

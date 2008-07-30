@@ -57,28 +57,28 @@ public class SubspaceDistanceFunction<O extends RealVector<O, ?>, P extends Prep
     /**
      * Returns the name of the default preprocessor.
      */
-    String getDefaultPreprocessorClassName() {
+    public String getDefaultPreprocessorClassName() {
         return DEFAULT_PREPROCESSOR_CLASS;
     }
 
     /**
      * Returns the description for parameter preprocessor.
      */
-    String getPreprocessorClassDescription() {
+    public String getPreprocessorDescription() {
         return PREPROCESSOR_CLASS_D;
     }
 
     /**
      * Returns the super class for the preprocessor.
      */
-    Class<Preprocessor> getPreprocessorSuperClassName() {
+    public Class<Preprocessor> getPreprocessorSuperClassName() {
         return PREPROCESSOR_SUPER_CLASS;
     }
 
     /**
      * Returns the assocoiation ID for the association to be set by the preprocessor.
      */
-    AssociationID getAssociationID() {
+    public AssociationID getAssociationID() {
         return ASSOCIATION_ID;
     }
 
@@ -165,5 +165,13 @@ public class SubspaceDistanceFunction<O extends RealVector<O, ?>, P extends Prep
             df2.distance(o1, o2).getValue());
 
         return new SubspaceDistance(d1, affineDistance);
+    }
+
+    /**
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
+     */
+    @Override
+    public String parameterDescription() {
+        return "Subspace distance for real vectors. " + super.parameterDescription();
     }
 }

@@ -97,4 +97,17 @@ public abstract class AbstractMeasurementFunction<O extends DatabaseObject, D ex
     protected final void setRequiredInputPattern(Pattern pattern) {
         this.pattern = pattern;
     }
+
+
+    /**
+     * Returns the required input pattern.
+     *
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
+     */
+    public String parameterDescription() {
+        StringBuffer description = new StringBuffer(super.parameterDescription());
+        description.append(optionHandler.usage("Pattern for defining a range: " +
+            "\"" + requiredInputPattern() + "\".", false));
+        return description.toString();
+    }
 }

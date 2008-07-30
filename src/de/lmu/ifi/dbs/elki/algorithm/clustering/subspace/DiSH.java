@@ -196,11 +196,10 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         Util.addParameter(opticsParameters, DiSHDistanceFunction.EPSILON_ID, Double.toString(epsilon));
 
         // omit flag
-        opticsParameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F);
+        Util.addFlag(opticsParameters, PreprocessorHandler.OMIT_PREPROCESSING_ID);
 
         // preprocessor
-        opticsParameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.PREPROCESSOR_CLASS_P);
-        opticsParameters.add(DiSHPreprocessor.class.getName());
+        Util.addParameter(opticsParameters, PreprocessorHandler.PREPROCESSOR_ID, DiSHPreprocessor.class.getName());
 
         // preprocessor epsilon
         opticsParameters.add(OptionHandler.OPTION_PREFIX + DiSHPreprocessor.EPSILON_P);

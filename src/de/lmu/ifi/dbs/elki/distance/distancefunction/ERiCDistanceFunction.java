@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.elki.data.Bit;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.BitDistance;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
@@ -141,28 +142,28 @@ public class ERiCDistanceFunction<V extends RealVector<V, ?>,P extends Preproces
   /**
    * Returns the name of the default preprocessor.
    */
-  String getDefaultPreprocessorClassName() {
+  public String getDefaultPreprocessorClassName() {
     return DEFAULT_PREPROCESSOR_CLASS;
   }
 
   /**
    * Returns the description for parameter preprocessor.
    */
-  String getPreprocessorClassDescription() {
+  public String getPreprocessorDescription() {
     return PREPROCESSOR_CLASS_D;
   }
 
   /**
    * Returns the super class for the preprocessor.
    */
-  Class<Preprocessor> getPreprocessorSuperClassName() {
+  public Class<Preprocessor> getPreprocessorSuperClassName() {
     return PREPROCESSOR_SUPER_CLASS;
   }
 
   /**
    * Returns the assocoiation ID for the association to be set by the preprocessor.
    */
-  AssociationID getAssociationID() {
+  public AssociationID getAssociationID() {
     return ASSOCIATION_ID;
   }
 

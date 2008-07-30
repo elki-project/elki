@@ -5,213 +5,241 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
 import de.lmu.ifi.dbs.elki.database.DatabaseListener;
-import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.List;
 
 /**
- * Handler class for all distance functions using a preprocessor.
+ * Handler class for all objects (e.g. distance functions)
+ * using a preprocessor running on a certain database.
  *
  * @author Elke Achtert
  * @param <O> the type of DatabaseObject used
  * @param <P> the type of Preprocessor used
  */
-public class PreprocessorHandler<O extends DatabaseObject,P extends Preprocessor<O>> implements DatabaseListener {
+public class PreprocessorHandler<O extends DatabaseObject, P extends Preprocessor<O>>
+    extends AbstractParameterizable implements DatabaseListener {
 
-  /**
-   * Parameter for preprocessor.
-   */
-  public static final String PREPROCESSOR_CLASS_P = "preprocessor";
+    /**
+     * OptionID for {@link #PREPROCESSOR_PARAM}
+     */
+    public static final OptionID PREPROCESSOR_ID = OptionID.getOrCreateOptionID(
+        "preprocessorhandler.preprocessor",
+        "Classname of the preprocessor to be used."
+    );
 
-  /**
-   * Flag for omission of preprocessing.
-   */
-  public static final String OMIT_PREPROCESSING_F = "omitPreprocessing";
+    /**
+     * Parameter to specify the preprocessor to be used,
+     * must extend at least {@link Preprocessor}.
+     * <p>Key: {@code -distancefunction.preprocessor} </p>
+     */
+    private final ClassParameter<P> PREPROCESSOR_PARAM;
 
-  /**
-   * Description for flag for force of preprocessing.
-   * TODO: description: matrix?
-   */
-  public static final String OMIT_PREPROCESSING_D = "flag to omit (a new) preprocessing if for each object a matrix already has been associated.";
+    /**
+     * Holds the instance of the preprocessor specified by {@link #PREPROCESSOR_PARAM}.
+     */
+    private P preprocessor;
 
-  public static final Flag OMIT_PREPROCESSING_FLAG = new Flag(OMIT_PREPROCESSING_F, OMIT_PREPROCESSING_D);
-  
-  /**
-   * True, if preprocessing is omitted, false otherwise.
-   */
-  private boolean omit;
+    /**
+     * OptionID for {@link #OMIT_PREPROCESSING_FLAG}
+     */
+    public static final OptionID OMIT_PREPROCESSING_ID = OptionID.getOrCreateOptionID(
+        "preprocessorhandler.omitPreprocessing",
+        "Flag to omit (a new) preprocessing if for each object the association has already been set."
+    );
 
-  /**
-   * The preprocessor to run the variance analysis of the objects.
-   */
-  private P preprocessor;
+    /**
+     * Flag to omit (a new) preprocessing if for each object the association has already been set.
+     * <p>Key: {@code -distancefunction.omitPreprocessing} </p>
+     */
+    private final Flag OMIT_PREPROCESSING_FLAG = new Flag(OMIT_PREPROCESSING_ID);
 
-  /**
-   * The assocoiation ID for the association to be set by the preprocessor
-   */
-  private AssociationID associationID;
+    /**
+     * Holds the value of {@link #OMIT_PREPROCESSING_FLAG}.
+     */
+    private boolean omit;
 
-  /**
-   * The super class for the preprocessor class.
-   */
-  private Class<? extends Preprocessor> preprocessorSuperClassName;
+    /**
+     * The assocoiation ID for the association to be set by the preprocessor.
+     */
+    private AssociationID associationID;
 
-  /**
-   * The description for the preprocessor class.
-   */
-  private String preprocessorClassDescription;
+    /**
+     * Indicates if the verbose flag is set for preprocessing.
+     */
+    private boolean verbose;
 
-  /**
-   * Indicates if the verbose flag is set for preprocessing..
-   */
-  private boolean verbose;
+    /**
+     * Indicates if the time flag is set for preprocessing.
+     */
+    private boolean time;
 
-  /**
-   * Indicates if the time flag is set for preprocessing.
-   */
-  private boolean time;
+    /**
+     * The database to run the preprocessor on.
+     */
+    private Database<O> database;
 
-  /**
-   * The database to run the preprocessor on.
-   */
-  private Database<O> database;
+    /**
+     * Provides a handler class for all objects using a preprocessor,
+     * adding parameter
+     * {@link #PREPROCESSOR_PARAM} and flag {@link #OMIT_PREPROCESSING_FLAG}
+     * to the option handler additionally to parameters of super class.
+     *
+     * @param preprocessorParamDescription the description for the preprocessor class
+     * @param preprocessorSuperClassName   the super class for the preprocessor class
+     * @param defaultPreprocessorClassName the class name for the default preprocessor class
+     * @param associationID                the assocoiation ID for the association to be set by the preprocessor
+     */
+    public PreprocessorHandler(String preprocessorParamDescription,
+                               Class<P> preprocessorSuperClassName,
+                               String defaultPreprocessorClassName,
+                               AssociationID associationID) {
 
-  /**
-   * Provides a handler class for all distance function using a preprocessor.
-   *
-   * @param optionHandler                the option handler for parameter handling.
-   * @param preprocessorClassDescription the description for the preprocessor class
-   * @param preprocessorSuperClassName   the super class for the preprocessor class
-   * @param defaultPreprocessorClassName the class name for the default preprocessor class
-   * @param associationID                the assocoiation ID for the association to be set by the preprocessor
-   */
-  public PreprocessorHandler(OptionHandler optionHandler,
-                             String preprocessorClassDescription,
-                             Class<P> preprocessorSuperClassName,
-                             String defaultPreprocessorClassName,
-                             AssociationID associationID) {
+        // preprocessor
+        PREPROCESSOR_PARAM = new ClassParameter<P>(
+            PREPROCESSOR_ID,
+            preprocessorSuperClassName,
+            defaultPreprocessorClassName);
+        PREPROCESSOR_PARAM.setShortDescription(preprocessorParamDescription);
+        addOption(PREPROCESSOR_PARAM);
 
-    this.associationID = associationID;
-    this.preprocessorSuperClassName = preprocessorSuperClassName;
-    this.preprocessorClassDescription = preprocessorClassDescription;
+        // omit flag
+        addOption(OMIT_PREPROCESSING_FLAG);
 
-    // omit flag
-    optionHandler.put(PreprocessorHandler.OMIT_PREPROCESSING_FLAG);
-
-    // preprocessor
-    ClassParameter<P> prepClass = new ClassParameter<P> 
-    											(PreprocessorHandler.PREPROCESSOR_CLASS_P,
-                                                preprocessorClassDescription,
-                                                preprocessorSuperClassName);
-    prepClass.setDefaultValue(defaultPreprocessorClassName);
-    optionHandler.put(prepClass);
-  }
-
-  /**
-   * Sets the values for the parameters delta and preprocessor if specified.
-   * If the parameters are not specified default values are set.
-   *
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
-  public String[] setParameters(OptionHandler optionHandler, String[] parameters) throws ParameterException {
-    // preprocessor
-    String prepClassString = optionHandler.getOptionValue(PREPROCESSOR_CLASS_P);
-
-    try {
-      // noinspection unchecked
-        // todo
-      preprocessor = (P) Util.instantiate(preprocessorSuperClassName, prepClassString);
-    }
-    catch (UnableToComplyException e) {
-      throw new WrongParameterValueException(PREPROCESSOR_CLASS_P,
-                                             prepClassString,
-                                             preprocessorClassDescription,
-                                             e);
+        // association id
+        this.associationID = associationID;
     }
 
-    // omit
-    omit = optionHandler.isSet(OMIT_PREPROCESSING_F);
+    /**
+     * Calls {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters(String[])
+     * AbstractParameterizable#setParameters(args)}
+     * and sets additionally the value of flag {@link #OMIT_PREPROCESSING_FLAG}
+     * and instantiates {@link #preprocessor} according to the value of parameter {@link #PREPROCESSOR_PARAM}
+     * The remaining parameters are passed to the {@link #preprocessor}.
+     *
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
+     */
+    public String[] setParameters(String[] args) throws ParameterException {
+        String[] remainingParameters = super.setParameters(args);
 
-    return preprocessor.setParameters(parameters);
-  }
+        // omit
+        omit = isSet(OMIT_PREPROCESSING_FLAG);
 
-  /**
-   * Adds the parameter settings of the preprocessor to the specified list.
-   *
-   * @param settingsList the list of parameter settings to add the parameter settings
-   *             of the preprocessor to
-   */
-  public void addAttributeSettings(List<AttributeSettings> settingsList) {
-    settingsList.addAll(preprocessor.getAttributeSettings());
-  }
+        // preprocessor
+        // noinspection unchecked
+        preprocessor = PREPROCESSOR_PARAM.instantiateClass();
+        remainingParameters = preprocessor.setParameters(remainingParameters);
+        setParameters(args, remainingParameters);
 
- /**
-   * Invoked after objects of the database have been updated in some way.
-   * Use <code>e.getObjects()</code> to get the updated database objects.
-   */
-  public void objectsChanged(DatabaseEvent e) {
-    if (!omit) {
-      preprocessor.run(database, verbose, time);
+        return remainingParameters;
     }
-  }
 
-  /**
-   * Invoked after an object has been inserted into the database.
-   * Use <code>e.getObjects()</code> to get the newly inserted database objects.
-   */
-  public void objectsInserted(DatabaseEvent e) {
-    if (!omit) {
-      preprocessor.run(database, verbose, time);
+    /**
+     * Calls {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#getAttributeSettings()}
+     * and adds to the returned attribute settings the attribute settings of
+     * {@link #preprocessor}.
+     *
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
+     */
+    @Override
+    public List<AttributeSettings> getAttributeSettings() {
+        List<AttributeSettings> attributeSettings = super.getAttributeSettings();
+        attributeSettings.addAll(preprocessor.getAttributeSettings());
+        return attributeSettings;
     }
-  }
 
-  /**
-   * Invoked after an object has been deleted from the database.
-   * Use <code>e.getObjects()</code> to get the inserted database objects.
-   */
-  public void objectsRemoved(DatabaseEvent e) {
-    if (!omit) {
-      preprocessor.run(database, verbose, time);
+    /**
+     * Calls {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#parameterDescription()}
+     * and appends the parameter description of {@link #preprocessor} (if it is already initialized).
+     *
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
+     */
+    @Override
+    public String parameterDescription() {
+        StringBuilder description = new StringBuilder();
+        description.append(super.parameterDescription());
+
+        // preprocessor
+        if (preprocessor != null) {
+            description.append(Description.NEWLINE);
+            description.append(preprocessor.parameterDescription());
+        }
+
+        return description.toString();
     }
-  }
 
-  /**
-   * Returns the preprocessor of this distance function.
-   *
-   * @return the preprocessor of this distance function
-   */
-  public P getPreprocessor() {
-    return preprocessor;
-  }
-
-  /**
-   * Runs the preprocessor on the database if
-   * the omit flag is not set or the database does contain the
-   * association id neither for any id nor as global association.
-   *
-   * @param database the database to run the preprocessor on
-   * @param verbose  flag to allow verbose messages while performing the method
-   * @param time     flag to request output of performance time
-   */
-  public void runPreprocessor(Database<O> database, boolean verbose, boolean time) {
-    this.database = database;
-    this.verbose = verbose;
-    this.time = time;
-    if (!omit ||
-            !( (database.isSet(associationID)
-                || database.isSetGlobally(associationID) )
-                )
-       )
-                {
-      preprocessor.run(database, verbose, time);
+    /**
+     * Invoked after objects of the database have been updated in some way.
+     * Runs the preprocessor if {@link #OMIT_PREPROCESSING_FLAG} is not set.
+     *
+     * @see de.lmu.ifi.dbs.elki.database.DatabaseListener#objectsChanged(de.lmu.ifi.dbs.elki.database.DatabaseEvent)
+     */
+    public void objectsChanged(DatabaseEvent e) {
+        if (!omit) {
+            preprocessor.run(database, verbose, time);
+        }
     }
-    database.addDatabaseListener(this);
-  }
+
+    /**
+     * Invoked after an object has been inserted into the database.
+     * Runs the preprocessor if {@link #OMIT_PREPROCESSING_FLAG} is not set.
+     *
+     * @see de.lmu.ifi.dbs.elki.database.DatabaseListener#objectsInserted(de.lmu.ifi.dbs.elki.database.DatabaseEvent)
+     */
+    public void objectsInserted(DatabaseEvent e) {
+        if (!omit) {
+            preprocessor.run(database, verbose, time);
+        }
+    }
+
+    /**
+     * Invoked after an object has been deleted from the database.
+     * Runs the preprocessor if {@link #OMIT_PREPROCESSING_FLAG} is not set.
+     *
+     * @see de.lmu.ifi.dbs.elki.database.DatabaseListener#objectsRemoved(de.lmu.ifi.dbs.elki.database.DatabaseEvent)
+     */
+    public void objectsRemoved(DatabaseEvent e) {
+        if (!omit) {
+            preprocessor.run(database, verbose, time);
+        }
+    }
+
+    /**
+     * Returns the preprocessor.
+     *
+     * @return the instance of the preprocessor specified by {@link #PREPROCESSOR_PARAM}
+     */
+    public P getPreprocessor() {
+        return preprocessor;
+    }
+
+    /**
+     * Runs the preprocessor on the database if
+     * the omit flag is not set or the database does contain the
+     * association id neither for any id nor as global association.
+     *
+     * @param database the database to run the preprocessor on
+     * @param verbose  flag to allow verbose messages while performing the method
+     * @param time     flag to request output of performance time
+     */
+    public void runPreprocessor(Database<O> database, boolean verbose, boolean time) {
+        this.database = database;
+        this.verbose = verbose;
+        this.time = time;
+
+        if (!omit ||
+            !((database.isSet(associationID)
+                || database.isSetGlobally(associationID))
+            )
+            ) {
+            preprocessor.run(database, verbose, time);
+        }
+        database.addDatabaseListener(this);
+    }
 }

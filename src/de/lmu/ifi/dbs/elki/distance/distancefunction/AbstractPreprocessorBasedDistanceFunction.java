@@ -1,11 +1,12 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
+import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
@@ -17,11 +18,11 @@ import java.util.regex.Pattern;
  *
  * @author Elke Achtert
  * @param <O> the type of DatabaseObject to compute the distances in between
- * @param <D> the type of Distance used
  * @param <P> the type of Preprocessor used
+ * @param <D> the type of Distance used
  */
-public abstract class AbstractPreprocessorBasedDistanceFunction<O extends DatabaseObject,
-    P extends Preprocessor<O>, D extends Distance<D>> extends AbstractDistanceFunction<O, D> {
+public abstract class AbstractPreprocessorBasedDistanceFunction<O extends DatabaseObject, P extends Preprocessor<O>, D extends Distance<D>>
+    extends AbstractDistanceFunction<O, D> implements PreprocessorBasedMeasurementFunction<O, P, D> {
 
     /**
      * The handler class for the preprocessor.
@@ -35,16 +36,18 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
      */
     public AbstractPreprocessorBasedDistanceFunction(Pattern pattern) {
         super(pattern);
+        // noinspection unchecked
         preprocessorHandler = new PreprocessorHandler(
-            optionHandler,
-            this.getPreprocessorClassDescription(),
+            this.getPreprocessorDescription(),
             this.getPreprocessorSuperClassName(),
             this.getDefaultPreprocessorClassName(),
             this.getAssociationID());
     }
 
     /**
-     * Runs the preprocessor on the database.
+     * Calls {@link de.lmu.ifi.dbs.elki.distance.AbstractMeasurementFunction#setDatabase(de.lmu.ifi.dbs.elki.database.Database,boolean,boolean)
+     * AbstractMeasurementFunction(database, verbose, time)} and
+     * runs the preprocessor on the database.
      *
      * @param database the database to be set
      * @param verbose  flag to allow verbose messages while performing the method
@@ -57,8 +60,9 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
     }
 
     /**
-     * Sets the values for the parameters delta and preprocessor if specified.
-     * If the parameters are not specified default values are set.
+     * Calls {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters(String[])
+     * AbstractParameterizable#setParameters(args)}
+     * and passes the remaining parameters to the {@link #preprocessorHandler}.
      *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
@@ -66,57 +70,49 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
-        remainingParameters = preprocessorHandler.setParameters(optionHandler, remainingParameters);
+        remainingParameters = preprocessorHandler.setParameters(remainingParameters);
+        setParameters(args, remainingParameters);
 
         return remainingParameters;
     }
 
     /**
-     * Returns the parameter setting of the attributes.
+     * Calls {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#getAttributeSettings()}
+     * and adds to the returned attribute settings the attribute settings of the
+     * {@link #preprocessorHandler}.
      *
-     * @return the parameter setting of the attributes
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
      */
     @Override
     public List<AttributeSettings> getAttributeSettings() {
-        List<AttributeSettings> result = super.getAttributeSettings();
-        preprocessorHandler.addAttributeSettings(result);
-        return result;
+        List<AttributeSettings> mySettings = super.getAttributeSettings();
+        mySettings.addAll(preprocessorHandler.getAttributeSettings());
+        return mySettings;
     }
 
     /**
-     * Returns the preprocessor of this distance function.
-     *
-     * @return the preprocessor of this distance function
+     * @see de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction#getPreprocessor()
      */
-    public P getPreprocessor() {
+    public final P getPreprocessor() {
         return preprocessorHandler.getPreprocessor();
     }
 
     /**
-     * Returns the name of the default preprocessor.
+     * Calls {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#parameterDescription()}
+     * and appends the parameter description of the {@link #preprocessorHandler}.
      *
-     * @return the name of the default preprocessor
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */
-    abstract String getDefaultPreprocessorClassName();
+    @Override
+    public String parameterDescription() {
+        StringBuilder description = new StringBuilder();
+        description.append(super.parameterDescription());
 
-    /**
-     * Returns the description for parameter preprocessor.
-     *
-     * @return the description for parameter preprocessor
-     */
-    abstract String getPreprocessorClassDescription();
+        // preprocessor handler
+        description.append(Description.NEWLINE);
+        description.append("Requires parametrization of the underlying preprocessor handler: \n");
+        description.append(preprocessorHandler.parameterDescription());
 
-    /**
-     * Returns the super class for the preprocessor.
-     *
-     * @return the super class for the preprocessor
-     */
-    abstract Class<? extends Preprocessor> getPreprocessorSuperClassName();
-
-    /**
-     * Returns the assocoiation ID for the association to be set by the preprocessor.
-     *
-     * @return the assocoiation ID for the association to be set by the preprocessor
-     */
-    abstract AssociationID getAssociationID();
+        return description.toString();
+    }
 }

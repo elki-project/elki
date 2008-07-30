@@ -6,7 +6,11 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.HiSCDistanceFunction;
 import de.lmu.ifi.dbs.elki.preprocessing.HiSCPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.util.List;
@@ -83,7 +87,7 @@ public class HiSCWrapper extends FileBasedDatabaseConnectionWrapper {
         Util.addParameter(parameters, OPTICS.DISTANCE_FUNCTION_ID, HiSCDistanceFunction.class.getName());
 
         // omit flag
-        parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F);
+        Util.addFlag(parameters, PreprocessorHandler.OMIT_PREPROCESSING_ID);
 
         // epsilon for OPTICS
         Util.addParameter(parameters, OPTICS.EPSILON_ID, HiSCDistanceFunction.INFINITY_PATTERN);
@@ -92,8 +96,7 @@ public class HiSCWrapper extends FileBasedDatabaseConnectionWrapper {
         Util.addParameter(parameters, OPTICS.MINPTS_ID, "2");
 
         // preprocessor
-        parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.PREPROCESSOR_CLASS_P);
-        parameters.add(HiSCPreprocessor.class.getName());
+        Util.addParameter(parameters, PreprocessorHandler.PREPROCESSOR_ID, HiSCPreprocessor.class.getName());
 
         // k for preprocessor
         if (k != null) {

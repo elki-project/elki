@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.statistics.LinearRegression;
 import de.lmu.ifi.dbs.elki.preprocessing.FracClusPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.DoublePair;
@@ -19,8 +20,9 @@ import java.util.regex.Pattern;
 /**
  * @author Arthur Zimek
  */
-public class FractalDimensionBasedDistanceFunction<V extends RealVector<V, ?>> extends AbstractPreprocessorBasedDistanceFunction<V, FracClusPreprocessor<V>, DoubleDistance>
-{
+public class FractalDimensionBasedDistanceFunction<V extends RealVector<V, ?>>
+    extends AbstractPreprocessorBasedDistanceFunction<V, FracClusPreprocessor<V>, DoubleDistance> {
+
     public final EuklideanDistanceFunction<V> STANDARD_DOUBLE_DISTANCE_FUNCTION = new EuklideanDistanceFunction<V>();
         
     public FractalDimensionBasedDistanceFunction()
@@ -80,26 +82,22 @@ public class FractalDimensionBasedDistanceFunction<V extends RealVector<V, ?>> e
         return STANDARD_DOUBLE_DISTANCE_FUNCTION.valueOf(pattern);
     }
 
-    @Override
-    AssociationID getAssociationID()
+    public AssociationID getAssociationID()
     {
         return AssociationID.NEIGHBORS;
     }
 
-    @Override
-    String getDefaultPreprocessorClassName()
+    public String getDefaultPreprocessorClassName()
     {
         return FracClusPreprocessor.class.getName();
     }
 
-    @Override
-    String getPreprocessorClassDescription()
+    public String getPreprocessorDescription()
     {
         return this.optionHandler.usage("");
     }
 
-    @Override
-    Class<FracClusPreprocessor> getPreprocessorSuperClassName()
+    public Class<FracClusPreprocessor> getPreprocessorSuperClassName()
     {
         return  FracClusPreprocessor.class;
     }

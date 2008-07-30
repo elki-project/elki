@@ -3,15 +3,12 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.distance.CorrelationDistance;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
-import de.lmu.ifi.dbs.elki.properties.Properties;
 
 import java.util.regex.Pattern;
 
 /**
  * Abstract super class for correlation based distance functions. Provides the
- * correlation distance for real valued vectors. All subclasses must implement a
- * method to process the preprocessing step in terms of doing the PCA for each
- * object of the database.
+ * correlation distance for real valued vectors.
  *
  * @author Elke Achtert
  */
@@ -33,34 +30,24 @@ public abstract class AbstractCorrelationDistanceFunction<O extends RealVector<O
     }
 
     /**
-     * Provides the Correlation distance between the given two vectors.
+     * Provides the Correlation distance between the given two vectors by
+     * calling {@link #correlationDistance(de.lmu.ifi.dbs.elki.data.RealVector,de.lmu.ifi.dbs.elki.data.RealVector)
+     * correlationDistance(rv1, rv2)}.
      *
      * @return the Correlation distance between the given two vectors as an
      *         instance of {@link CorrelationDistance CorrelationDistance}.
-     * @see DistanceFunction#distance(de.lmu.ifi.dbs.elki.data.DatabaseObject,
-     *de.lmu.ifi.dbs.elki.data.DatabaseObject)
+     * @see DistanceFunction#distance(de.lmu.ifi.dbs.elki.data.DatabaseObject,de.lmu.ifi.dbs.elki.data.DatabaseObject)
      */
-    public D distance(O rv1, O rv2) {
+    public final D distance(O rv1, O rv2) {
         return correlationDistance(rv1, rv2);
     }
 
     /**
-     * Returns a description of the class and the required parameters.
-     *
-     * @return String a description of the class and the required parameters
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */
+    @Override
     public String parameterDescription() {
-        StringBuffer description = new StringBuffer();
-        description.append(optionHandler.usage("Correlation distance for NumberVectors. Pattern for defining a range: \""
-            + requiredInputPattern() + "\".", false));
-        description.append('\n');
-        description.append("Preprocessors available within this framework for distance function ");
-        description.append(this.getClass().getName());
-        description.append(":\n");
-        description.append(Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(getPreprocessorSuperClassName()));
-        description.append('\n');
-        return description.toString();
-
+        return "Correlation distance for real vectors. " + super.parameterDescription();
     }
 
     /**

@@ -13,6 +13,8 @@ import java.util.BitSet;
  * Distance function used in the DiSH algorithm.
  *
  * @author Elke Achtert
+ * @param <V> the type of RealVector used
+ * @param <P> the type of Preprocessor used
  */
 public class DiSHDistanceFunction<V extends RealVector<V, ?>, P extends Preprocessor<V>>
     extends AbstractPreferenceVectorBasedCorrelationDistanceFunction<V, P> {
@@ -68,9 +70,9 @@ public class DiSHDistanceFunction<V extends RealVector<V, ?>, P extends Preproce
      * Returns the name of the default preprocessor.
      *
      * @return the name of the default preprocessor, which is {@link DiSHPreprocessor}
-     * @see AbstractPreprocessorBasedDistanceFunction#getDefaultPreprocessorClassName() 
+     * @see de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction#getDefaultPreprocessorClassName()
      */
-    String getDefaultPreprocessorClassName() {
+    public String getDefaultPreprocessorClassName() {
         return DiSHPreprocessor.class.getName();
     }
 }

@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PCABasedCorrelationDistanceFunction;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
+import de.lmu.ifi.dbs.elki.preprocessing.HiSCPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.*;
@@ -127,7 +128,7 @@ public class HiCOWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, OPTICS.DISTANCE_FUNCTION_ID, PCABasedCorrelationDistanceFunction.class.getName());
 
         // omit flag
-        parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F);
+        Util.addFlag(parameters, PreprocessorHandler.OMIT_PREPROCESSING_ID);
 
         // epsilon
         Util.addParameter(parameters, OPTICS.EPSILON_ID, PCABasedCorrelationDistanceFunction.INFINITY_PATTERN);
@@ -136,8 +137,7 @@ public class HiCOWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(getParameterValue(MINPTS_PARAM)));
 
         // preprocessor
-        parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.PREPROCESSOR_CLASS_P);
-        parameters.add(KnnQueryBasedHiCOPreprocessor.class.getName());
+        Util.addParameter(parameters, PreprocessorHandler.PREPROCESSOR_ID, KnnQueryBasedHiCOPreprocessor.class.getName());
 
         // k for preprocessor
         Util.addParameter(parameters, K_PARAM, Integer.toString(getParameterValue(K_PARAM)));

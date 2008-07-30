@@ -127,7 +127,7 @@ public class CODECWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, DBSCAN.DISTANCE_FUNCTION_ID, LocallyWeightedDistanceFunction.class.getName());
 
         // omit preprocessing
-        parameters.add(OptionHandler.OPTION_PREFIX + PreprocessorHandler.OMIT_PREPROCESSING_F);
+        Util.addFlag(parameters, PreprocessorHandler.OMIT_PREPROCESSING_ID);
 
         // preprocessor for correlation dimension
         Util.addParameter(parameters, COPAC.PREPROCESSOR_ID, KnnQueryBasedHiCOPreprocessor.class.getName());

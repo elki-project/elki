@@ -60,7 +60,7 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
     private L classLabel;
 
     /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.CoDeC#CLUSTERING_ALGORITHM_PARAM}
+     * OptionID for {@link #CLUSTERING_ALGORITHM_PARAM}
      */
     public static final OptionID CLUSTERING_ALGORITHM_ID = OptionID.getOrCreateOptionID(
         "codec.clusteringAlgorithm",
@@ -82,7 +82,7 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
             COPAC.class.getName());
 
     /**
-     * Holds the value of {@link #CLUSTERING_ALGORITHM_PARAM}.
+     * Holds the instance of the clustering algorithm by {@link #CLUSTERING_ALGORITHM_PARAM}.
      */
     private Clustering<V> clusteringAlgorithm;
 
