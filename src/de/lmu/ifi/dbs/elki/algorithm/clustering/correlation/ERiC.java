@@ -36,7 +36,7 @@ import java.util.TreeMap;
  * partitioned according to local correlation dimensionality and builds
  * a hierarchy of correlation clusters that allows multiple inheritance from the clustering result.
  * <p>Reference:
- * E. Achtert, C. Boehm, H.-P. Kriegel, P. Kröger, and A. Zimek:
+ * E. Achtert, C. Boehm, H.-P. Kriegel, P. Krï¿½ger, and A. Zimek:
  * On Exploring Complex Relationships of Correlation Clusters.
  * <br>In Proc. 19th International Conference on Scientific and Statistical Database Management (SSDBM 2007), Banff, Canada, 2007.
  * </p>
@@ -205,6 +205,16 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         return attributeSettings;
     }
 
+    /**
+     * Extracts the correlation clusters and noise from the copac result
+     * and returns a mapping of correlation dimension to maps of clusters within
+     * this correlation dimension. Each cluster is defined by the basis vectors defining
+     * the subspace in which the cluster appears.
+     * 
+     * @param database       the database containing the objects
+     * @param dimensionality the dimensionality of the feature space
+     * @return a mapping of correlation dimension to maps of clusters
+     */
     private SortedMap<Integer, List<HierarchicalCorrelationCluster<V>>> extractCorrelationClusters(Database<V> database,
                                                                                                    int dimensionality) {
         try {
@@ -230,6 +240,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
                     // clusters
                     for (Database<V> db : clustering.values()) {
                         // run pca
+                        // FIXME: Hard-coded PCA class name!
                         LocalPCA<V> pca = new LinearLocalPCA<V>();
                         pca.setParameters(pcaParameters(correlationDimension));
                         pca.run(Util.getDatabaseIDs(db), db);
