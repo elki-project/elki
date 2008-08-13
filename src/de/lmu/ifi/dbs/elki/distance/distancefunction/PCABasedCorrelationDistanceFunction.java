@@ -52,7 +52,7 @@ public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P e
     private double delta;
 
     /**
-     * Provides a CorrelationDistanceFunction,
+     * Provides a PCABasedCorrelationDistanceFunction,
      * adding parameter
      * {@link #DELTA_PARAM}
      * to the option handler additionally to parameters of super class.

@@ -2,16 +2,20 @@ package de.lmu.ifi.dbs.elki.wrapper;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.ERiC;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.COPAC;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.ERiC;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ERiCDistanceFunction;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.DefaultValueGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 
 import java.util.List;
 
@@ -20,7 +24,6 @@ import java.util.List;
  * the database objects.
  *
  * @author Elke Achtert
- *         todo parameter
  */
 public class ERiCWrapper extends NormalizationWrapper {
 
@@ -30,7 +33,8 @@ public class ERiCWrapper extends NormalizationWrapper {
      * must be an integer greater than 0.
      * <p>Key: {@code -dbscan.minpts} </p>
      */
-    private final IntParameter MINPTS_PARAM = new IntParameter(DBSCAN.MINPTS_ID,
+    private final IntParameter MINPTS_PARAM = new IntParameter(
+        DBSCAN.MINPTS_ID,
         new GreaterConstraint(0));
 
     /**
@@ -40,13 +44,25 @@ public class ERiCWrapper extends NormalizationWrapper {
      * <p>Key: {@code -hicopreprocessor.k} </p>
      * <p>Default value: {@link ERiCWrapper#MINPTS_PARAM} </p>
      */
-    private final IntParameter K_PARAM = new IntParameter(OptionID.KNN_HICO_PREPROCESSOR_K,
+    private final IntParameter K_PARAM = new IntParameter(
+        OptionID.KNN_HICO_PREPROCESSOR_K,
         new GreaterConstraint(0), true);
 
     /**
-     * The value of the delta parameter.
+     * Parameter to specify the threshold for approximate linear dependency:
+     * the strong eigenvectors of q are approximately linear dependent
+     * from the strong eigenvectors p if the following condition
+     * holds for all stroneg eigenvectors q_i of q (lambda_q < lambda_p):
+     * q_i' * M^check_p * q_i <= delta^2,
+     * must be a double equal to or greater than 0.
+     * <p>Default value: {@code 0.1} </p>
+     * <p>Key: {@code -ericdf.delta} </p>
      */
-    private double delta;
+    private final DoubleParameter DELTA_PARAM = new DoubleParameter(
+        ERiCDistanceFunction.DELTA_ID,
+        new GreaterEqualConstraint(0),
+        0.1
+    );
 
     /**
      * Main method to run this wrapper.
@@ -73,20 +89,20 @@ public class ERiCWrapper extends NormalizationWrapper {
 
     /**
      * Adds parameters
-     * {@link #MINPTS_PARAM}, {@link #K_PARAM}, and {@link } todo
+     * {@link #MINPTS_PARAM}, {@link #K_PARAM}, and {@link #DELTA_PARAM}
      * to the option handler additionally to parameters of super class.
      */
     public ERiCWrapper() {
         super();
 
         // parameter minpts
-        optionHandler.put(MINPTS_PARAM);
+        addOption(MINPTS_PARAM);
 
         // parameter k
         K_PARAM.setShortDescription("The number of nearest neighbors considered in the PCA. " +
             "If this parameter is not set, k ist set to the value of " +
             MINPTS_PARAM.getName() + ".");
-        optionHandler.put(K_PARAM);
+        addOption(K_PARAM);
 
         // global constraint k <-> minpts
         // noinspection unchecked
@@ -94,11 +110,7 @@ public class ERiCWrapper extends NormalizationWrapper {
         optionHandler.setGlobalParameterConstraint(gpc);
 
         // parameter delta
-        DoubleParameter deltaPam = new DoubleParameter(ERiCDistanceFunction.DELTA_P,
-            ERiCDistanceFunction.DELTA_D,
-            new GreaterConstraint(0));
-        deltaPam.setDefaultValue(ERiCDistanceFunction.DEFAULT_DELTA);
-        optionHandler.put(deltaPam);
+        addOption(DELTA_PARAM);
     }
 
     /**
@@ -132,25 +144,11 @@ public class ERiCWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, K_PARAM, Integer.toString(getParameterValue(K_PARAM)));
 
         // delta
-        parameters.add(OptionHandler.OPTION_PREFIX + ERiCDistanceFunction.DELTA_P);
-        parameters.add(Double.toString(delta));
+        Util.addParameter(parameters, ERiCDistanceFunction.DELTA_ID, Double.toString(getParameterValue(DELTA_PARAM)));
 
         // tau
-        parameters.add(OptionHandler.OPTION_PREFIX + ERiCDistanceFunction.TAU_P);
-        parameters.add(Double.toString(delta));
+        Util.addParameter(parameters, ERiCDistanceFunction.TAU_ID, Double.toString(getParameterValue(DELTA_PARAM)));
 
         return parameters;
-    }
-
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
-
-        // delta
-        delta = (Double) optionHandler.getOptionValue(ERiCDistanceFunction.DELTA_P);
-
-        return remainingParameters;
     }
 }
