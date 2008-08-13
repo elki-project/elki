@@ -1,10 +1,13 @@
 package de.lmu.ifi.dbs.elki.database;
 
 
+import de.lmu.ifi.dbs.elki.algorithm.result.CorrelationAnalysisSolution;
+import de.lmu.ifi.dbs.elki.algorithm.result.MultivariateModel;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.ConstantObject;
 import de.lmu.ifi.dbs.elki.varianceanalysis.LocalPCA;
 
@@ -92,6 +95,44 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
     public static final AssociationID<Double> LOF = new AssociationID<Double>("lof", Double.class);
 
     /**
+   * The association id to associate the Correlation Outlier Probability of an object
+   */
+  public static final AssociationID<Double> COP = new AssociationID<Double>("cop", Double.class);
+  
+  /**
+   * The association id to associate the COP error vector of an object for the COP
+   * algorithm.
+   */
+  public static final AssociationID<Vector> COP_ERROR_VECTOR = new AssociationID<Vector>("cop error vector", Vector.class);
+  
+  /**
+   * The association id to associate the COP data vector of an object for the COP
+   * algorithm.
+   */
+  public static final AssociationID<Matrix> COP_DATA_VECTORS = new AssociationID<Matrix>("cop data vectors", Matrix.class);
+  
+  /**
+   * The association id to associate the COP correlation dimensionality of an object for the COP
+   * algorithm.
+   */
+  public static final AssociationID<Integer> COP_DIM = new AssociationID<Integer>("cop dim", Integer.class);
+  
+  /**
+   * The association id to associate the COP correlation solution
+   */
+  public static final AssociationID<CorrelationAnalysisSolution> COP_SOL = new AssociationID<CorrelationAnalysisSolution>("cop sol", CorrelationAnalysisSolution.class);
+  
+  /**
+   * The association id to associate the Multivariate Correlation Outlier Probability of an object
+   */
+  public static final AssociationID<MultivariateModel> LOCAL_MODEL = new AssociationID<MultivariateModel>("multivariate model", MultivariateModel.class);
+  
+  /**
+   * The association id to associate the Multivariate Correlation Outlier Probability of an object
+   */
+  public static final AssociationID<Double> MCOP = new AssociationID<Double>("mcop", Double.class);
+  
+  /**
      * AssociationID to associate the probabilities for an instance given a (set
      * of) distribution(s).
      */
