@@ -18,31 +18,11 @@ import java.util.regex.Pattern;
  * between the two subspaces.
  *
  * @author Elke Achtert
+ * @param <V> the type of RealVector to compute the distances in between
+ * @param <P> the type of Preprocessor used
  */
-public class SubspaceDistanceFunction<O extends RealVector<O, ?>, P extends Preprocessor<O>>
-    extends AbstractPreprocessorBasedDistanceFunction<O, P, SubspaceDistance> {
-
-    /**
-     * The Assocoiation ID for the association to be set by the preprocessor.
-     */
-    public static final AssociationID ASSOCIATION_ID = AssociationID.LOCAL_PCA;
-
-    /**
-     * The super class for the preprocessor.
-     */
-    public static final Class<Preprocessor> PREPROCESSOR_SUPER_CLASS = Preprocessor.class;
-
-    /**
-     * The default preprocessor class name.
-     */
-    public static final String DEFAULT_PREPROCESSOR_CLASS = KnnQueryBasedHiCOPreprocessor.class.getName();
-
-    /**
-     * Description for parameter preprocessor.
-     */
-    public static final String PREPROCESSOR_CLASS_D = "the preprocessor to determine the correlation dimensions of the objects " +
-        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Preprocessor.class) +
-        ". Default: " + SubspaceDistanceFunction.DEFAULT_PREPROCESSOR_CLASS;
+public class SubspaceDistanceFunction<V extends RealVector<V, ?>, P extends Preprocessor<V>>
+    extends AbstractPreprocessorBasedDistanceFunction<V, P, SubspaceDistance> {
 
     /**
      * Provides a distance function to determine distances
@@ -56,30 +36,44 @@ public class SubspaceDistanceFunction<O extends RealVector<O, ?>, P extends Prep
 
     /**
      * Returns the name of the default preprocessor.
+     *
+     * @return the name of the default preprocessor,
+     *         which is {@link de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor}
+     * @see de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction#getDefaultPreprocessorClassName()
      */
     public String getDefaultPreprocessorClassName() {
-        return DEFAULT_PREPROCESSOR_CLASS;
+        return KnnQueryBasedHiCOPreprocessor.class.getName();
     }
 
     /**
-     * Returns the description for parameter preprocessor.
+     * @see de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction#getPreprocessorDescription() ()
      */
-    public String getPreprocessorDescription() {
-        return PREPROCESSOR_CLASS_D;
+    public final String getPreprocessorDescription() {
+        return "Classname of the preprocessor to determine the correlation dimension of each object "
+            + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(getPreprocessorSuperClassName()) +
+            ".";
     }
 
     /**
      * Returns the super class for the preprocessor.
+     *
+     * @return the super class for the preprocessor,
+     *         which is {@link de.lmu.ifi.dbs.elki.preprocessing.Preprocessor}
+     * @see de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction#getPreprocessorSuperClassName()
      */
     public Class<Preprocessor> getPreprocessorSuperClassName() {
-        return PREPROCESSOR_SUPER_CLASS;
+        return Preprocessor.class;
     }
 
     /**
      * Returns the assocoiation ID for the association to be set by the preprocessor.
+     *
+     * @return the assocoiation ID for the association to be set by the preprocessor,
+     *         which is {@link AssociationID#LOCAL_PCA}
+     * @see de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction#getAssociationID()
      */
     public AssociationID getAssociationID() {
-        return ASSOCIATION_ID;
+        return AssociationID.LOCAL_PCA;
     }
 
     /**
@@ -128,11 +122,11 @@ public class SubspaceDistanceFunction<O extends RealVector<O, ?>, P extends Prep
      *
      * @see de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction#distance(de.lmu.ifi.dbs.elki.data.DatabaseObject,de.lmu.ifi.dbs.elki.data.DatabaseObject)
      */
-    public SubspaceDistance distance(O o1, O o2) {
+    public SubspaceDistance distance(V o1, V o2) {
         // noinspection unchecked
-        LocalPCA<O> pca1 = (LocalPCA<O>) getDatabase().getAssociation(AssociationID.LOCAL_PCA, o1.getID());
+        LocalPCA<V> pca1 = (LocalPCA<V>) getDatabase().getAssociation(AssociationID.LOCAL_PCA, o1.getID());
         // noinspection unchecked
-        LocalPCA<O> pca2 = (LocalPCA<O>) getDatabase().getAssociation(AssociationID.LOCAL_PCA, o2.getID());
+        LocalPCA<V> pca2 = (LocalPCA<V>) getDatabase().getAssociation(AssociationID.LOCAL_PCA, o2.getID());
         return distance(o1, o2, pca1, pca2);
     }
 
@@ -148,7 +142,7 @@ public class SubspaceDistanceFunction<O extends RealVector<O, ?>, P extends Prep
      * @return the distance between two given DatabaseObjects according to this
      *         distance function
      */
-    public SubspaceDistance distance(O o1, O o2, LocalPCA<O> pca1, LocalPCA<O> pca2) {
+    public SubspaceDistance distance(V o1, V o2, LocalPCA<V> pca1, LocalPCA<V> pca2) {
         if (pca1.getCorrelationDimension() != pca2.getCorrelationDimension()) {
             throw new IllegalStateException("pca1.getCorrelationDimension() != pca2.getCorrelationDimension()");
         }
@@ -158,8 +152,8 @@ public class SubspaceDistanceFunction<O extends RealVector<O, ?>, P extends Prep
         Matrix m1 = weak_ev2.getColumnDimensionality() == 0 ? strong_ev1.transpose() : strong_ev1.transpose().times(weak_ev2);
         double d1 = m1.norm2();
 
-        WeightedDistanceFunction<O> df1 = new WeightedDistanceFunction<O>(pca1.similarityMatrix());
-        WeightedDistanceFunction<O> df2 = new WeightedDistanceFunction<O>(pca2.similarityMatrix());
+        WeightedDistanceFunction<V> df1 = new WeightedDistanceFunction<V>(pca1.similarityMatrix());
+        WeightedDistanceFunction<V> df2 = new WeightedDistanceFunction<V>(pca2.similarityMatrix());
 
         double affineDistance = Math.max(df1.distance(o1, o2).getValue(),
             df2.distance(o1, o2).getValue());
