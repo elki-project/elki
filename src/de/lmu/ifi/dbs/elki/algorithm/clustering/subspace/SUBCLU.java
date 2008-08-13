@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDimensionsSelectingDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionsSelectingEuklideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionsSelectingEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Util;
@@ -61,14 +61,14 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
 
     /**
      * The distance function to determine the distance between database objects.
-     * <p>Default value: {@link DimensionsSelectingEuklideanDistanceFunction} </p>
+     * <p>Default value: {@link DimensionsSelectingEuclideanDistanceFunction} </p>
      * <p>Key: {@code -subclu.distancefunction} </p>
      */
     private final ClassParameter<AbstractDimensionsSelectingDoubleDistanceFunction> DISTANCE_FUNCTION_PARAM =
         new ClassParameter<AbstractDimensionsSelectingDoubleDistanceFunction>(
             DISTANCE_FUNCTION_ID,
             AbstractDimensionsSelectingDoubleDistanceFunction.class,
-            DimensionsSelectingEuklideanDistanceFunction.class.getName());
+            DimensionsSelectingEuclideanDistanceFunction.class.getName());
 
     /**
      * Holds the instance of the distance function specified by {@link #DISTANCE_FUNCTION_PARAM}.

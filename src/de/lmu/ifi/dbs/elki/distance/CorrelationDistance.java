@@ -27,7 +27,7 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
     /**
      * The euclidean distance.
      */
-    private double euklideanValue;
+    private double euclideanValue;
 
     /**
      * Empty constructor for serialization purposes.
@@ -38,16 +38,16 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
 
     /**
      * Constructs a new CorrelationDistance object consisting of the specified
-     * correlation value and euclidean value..
+     * correlation value and euclidean value.
      *
      * @param correlationValue the correlation dimension to be represented by the
      *                         CorrelationDistance
-     * @param euklideanValue   the euclidean distance to be represented by the
+     * @param euclideanValue   the euclidean distance to be represented by the
      *                         CorrelationDistance
      */
-    public CorrelationDistance(int correlationValue, double euklideanValue) {
+    public CorrelationDistance(int correlationValue, double euclideanValue) {
         this.correlationValue = correlationValue;
-        this.euklideanValue = euklideanValue;
+        this.euclideanValue = euclideanValue;
     }
 
     /**
@@ -55,7 +55,7 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
      */
     @SuppressWarnings("unchecked")
     public D plus(D distance) {
-        return (D) new CorrelationDistance<D>(this.correlationValue + distance.correlationValue, this.euklideanValue + distance.euklideanValue);
+        return (D) new CorrelationDistance<D>(this.correlationValue + distance.correlationValue, this.euclideanValue + distance.euclideanValue);
     }
 
     /**
@@ -63,34 +63,35 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
      */
     @SuppressWarnings("unchecked")
     public D minus(D distance) {
-        return (D) new CorrelationDistance<D>(this.correlationValue - distance.correlationValue, this.euklideanValue - distance.euklideanValue);
+        return (D) new CorrelationDistance<D>(this.correlationValue - distance.correlationValue, this.euclideanValue - distance.euclideanValue);
     }
 
     /**
      * @see de.lmu.ifi.dbs.elki.distance.Distance#description()
      */
     public String description() {
-        return "CorrelationDistance.correlationValue CorrelationDistance.euklideanValue";
+        return "CorrelationDistance.correlationValue CorrelationDistance.euclideanValue";
     }
 
     /**
      * Returns a string representation of this CorrelationDistance.
      *
-     * @return the correlation value and the euklidean value separated by blank
+     * @return the correlation value and the euclidean value separated by blank
      */
     public String toString() {
-        return Integer.toString(correlationValue) + " " + Double.toString(euklideanValue);
+        return Integer.toString(correlationValue) + " " + Double.toString(euclideanValue);
     }
 
     /**
      * Compares this CorrelationDistance with the given CorrelationDistance wrt the
-     * represented correlation values. If both values are considered to be equal, the euklidean values
-     * are compared. Subclasses may need to overwrite this method if necessary.
+     * represented correlation values. If both values are considered to be equal,
+     * the euclidean values are compared.
+     * Subclasses may need to overwrite this method if necessary.
      *
      * @return the value of
      *         {@link Integer#compareTo(Integer)} this.correlationValue.compareTo(other.correlationValue)}
      *         if it is a non zero value,
-     *         the value of {@link Double#compare(double,double) Double.compare(this.euklideanValue, other.euklideanValue)}
+     *         the value of {@link Double#compare(double,double) Double.compare(this.euclideanValue, other.euclideanValue)}
      *         otherwise
      * @see Comparable#compareTo(Object)
      */
@@ -100,7 +101,7 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
             return compare;
         }
         else {
-            return Double.compare(this.euklideanValue, other.euklideanValue);
+            return Double.compare(this.euclideanValue, other.euclideanValue);
         }
     }
 
@@ -111,7 +112,7 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
         int result;
         long temp;
         result = correlationValue;
-        temp = euklideanValue != +0.0d ? Double.doubleToLongBits(euklideanValue) : 0l;
+        temp = euclideanValue != +0.0d ? Double.doubleToLongBits(euclideanValue) : 0l;
         result = 29 * result + (int) (temp ^ (temp >>> 32));
         return result;
     }
@@ -130,30 +131,30 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
      *
      * @return the euclidean distance
      */
-    public double getEuklideanValue() {
-        return euklideanValue;
+    public double getEuclideanValue() {
+        return euclideanValue;
     }
 
     /**
-     * Writes the correlation value and the euklidean value
+     * Writes the correlation value and the euclidean value
      * of this CorrelationDistance to the specified stream.
      *
      * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
      */
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeInt(correlationValue);
-        out.writeDouble(euklideanValue);
+        out.writeDouble(euclideanValue);
     }
 
     /**
-     * Reads the correlation value and the euklidean value
+     * Reads the correlation value and the euclidean value
      * of this CorrelationDistance from the specified stream.
      *
      * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
      */
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         correlationValue = in.readInt();
-        euklideanValue = in.readDouble();
+        euclideanValue = in.readDouble();
     }
 
     /**

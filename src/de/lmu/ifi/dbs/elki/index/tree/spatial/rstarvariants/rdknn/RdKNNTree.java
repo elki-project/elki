@@ -5,7 +5,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
@@ -54,7 +54,7 @@ public class RdKNNTree<O extends NumberVector<O,? >, D extends NumberDistance<D,
   /**
    * The default distance function.
    */
-  public static final String DEFAULT_DISTANCE_FUNCTION = EuklideanDistanceFunction.class.getName();
+  public static final String DEFAULT_DISTANCE_FUNCTION = EuclideanDistanceFunction.class.getName();
 
   /**
    * Parameter for distance function.

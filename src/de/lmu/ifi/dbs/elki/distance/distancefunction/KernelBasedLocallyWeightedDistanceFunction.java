@@ -27,7 +27,7 @@ import java.util.List;
  * K<sub>P_complete</sub>(P,Q) is the kernel derived distance between P and Q.
  * The distance component of the strong eigenvectors K<sub>P_strong</sub>(P,Q) is computed as follows:
  * First, the vectors P and Q are projected onto the strong eigenvectors of the kernel matrix of P, which results in
- * the two vectors P<sub>p</sub> and Q<sub>p</sub>. Then, the euklidean distance is used to compute the distance
+ * the two vectors P<sub>p</sub> and Q<sub>p</sub>. Then, the euclidean distance is used to compute the distance
  * between P<sub>p</sub> and Q<sub>p</sub>.
  * In case of the linear kernel function, this distance is identical to those computed by the LocallyWeightedDistanceFunction with
  * parameters big = 1.0 and small = 0.0

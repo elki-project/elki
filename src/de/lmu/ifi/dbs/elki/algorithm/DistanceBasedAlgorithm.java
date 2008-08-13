@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.algorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
@@ -35,11 +35,11 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
      * Parameter to specify the distance function to determine the distance between database objects,
      * must extend {@link de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction}.
      * <p>Key: {@code -algorithm.distancefunction} </p>
-     * <p>Default value: {@link de.lmu.ifi.dbs.elki.distance.distancefunction.EuklideanDistanceFunction} </p>
+     * <p>Default value: {@link de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction} </p>
      */
     protected final ClassParameter<DistanceFunction> DISTANCE_FUNCTION_PARAM =
         new ClassParameter<DistanceFunction>(DISTANCE_FUNCTION_ID,
-            DistanceFunction.class, EuklideanDistanceFunction.class.getName());
+            DistanceFunction.class, EuclideanDistanceFunction.class.getName());
 
     /**
      * Holds the instance of the distance function specified by {@link #DISTANCE_FUNCTION_PARAM}.

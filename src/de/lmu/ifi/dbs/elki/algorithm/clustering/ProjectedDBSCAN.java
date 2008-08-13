@@ -52,7 +52,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
      * Parameter to specify the distance function to determine the distance between database objects,
      * must extend {@link de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractLocallyWeightedDistanceFunction}.
      * <p>Key: {@code -projdbscan.distancefunction} </p>
-     * <p>Default value: {@link de.lmu.ifi.dbs.elki.distance.distancefunction.EuklideanDistanceFunction} </p>
+     * <p>Default value: {@link de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction} </p>
      */
     protected final ClassParameter<AbstractLocallyWeightedDistanceFunction> DISTANCE_FUNCTION_PARAM =
         new ClassParameter<AbstractLocallyWeightedDistanceFunction>(

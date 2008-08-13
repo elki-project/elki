@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.algorithm.result.clustering;
 import de.lmu.ifi.dbs.elki.algorithm.result.AbstractResult;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.statistics.LinearRegression;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.utilities.DoublePair;
@@ -36,7 +36,7 @@ public class FractalDimensionTestResult<V extends RealVector<V, ?>> extends Abst
 
     private List<Integer> centroidSupporter;
 
-    private EuklideanDistanceFunction<V> distanceFunction = new EuklideanDistanceFunction<V>();
+    private EuclideanDistanceFunction<V> distanceFunction = new EuclideanDistanceFunction<V>();
 
     public FractalDimensionTestResult(Database<V> database, Integer id1, Integer id2, List<Integer> id1_supporter, List<Integer> id2_supporter, V centroid, List<Integer> centroid_supporter) {
         super(database);

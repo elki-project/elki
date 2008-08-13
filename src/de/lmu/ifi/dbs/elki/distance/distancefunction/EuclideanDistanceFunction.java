@@ -6,26 +6,26 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 
 /**
- * Provides the Euklidean distance for FeatureVectors.
+ * Provides the Euclidean distance for FeatureVectors.
  *
  * @author Arthur Zimek
  */
-public class EuklideanDistanceFunction<T extends NumberVector<T, ?>>
+public class EuclideanDistanceFunction<T extends NumberVector<T, ?>>
     extends AbstractDoubleDistanceFunction<T>
     implements SpatialDistanceFunction<T, DoubleDistance> {
 
   /**
-   * Provides a Euklidean distance function that can compute the Euklidean
+   * Provides a Euclidean distance function that can compute the Euclidean
    * distance (that is a DoubleDistance) for FeatureVectors.
    */
-  public EuklideanDistanceFunction() {
+  public EuclideanDistanceFunction() {
     super();
   }
 
   /**
-   * Provides the Euklidean distance between the given two vectors.
+   * Provides the Euclidean distance between the given two vectors.
    *
-   * @return the Euklidean distance between the given two vectors as an
+   * @return the Euclidean distance between the given two vectors as an
    *         instance of {@link DoubleDistance DoubleDistance}.
    * @see de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction#distance(de.lmu.ifi.dbs.elki.data.DatabaseObject,de.lmu.ifi.dbs.elki.data.DatabaseObject)
    */
@@ -46,7 +46,7 @@ public class EuklideanDistanceFunction<T extends NumberVector<T, ?>>
    */
   @Override
   public String parameterDescription() {
-    return "Euklidean distance for FeatureVectors. No parameters required. Pattern for defining a range: \"" + requiredInputPattern() + "\".";
+    return "Euclidean distance for FeatureVectors. No parameters required. Pattern for defining a range: \"" + requiredInputPattern() + "\".";
   }
 
   /**

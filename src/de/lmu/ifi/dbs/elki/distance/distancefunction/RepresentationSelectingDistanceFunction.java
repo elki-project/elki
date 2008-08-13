@@ -29,7 +29,7 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
   /**
    * The default distance function.
    */
-  public static final String DEFAULT_DISTANCE_FUNCTION = EuklideanDistanceFunction.class.getName();
+  public static final String DEFAULT_DISTANCE_FUNCTION = EuclideanDistanceFunction.class.getName();
 
   /**
    * Parameter for distance functions.

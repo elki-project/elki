@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
@@ -43,14 +43,14 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
 
     /**
      * The distance function to determine the reachability distance between database objects.
-     * <p>Default value: {@link EuklideanDistanceFunction} </p>
+     * <p>Default value: {@link EuclideanDistanceFunction} </p>
      * <p>Key: {@code -genlof.reachdistfunction} </p>
      */
     private final ClassParameter<DistanceFunction> REACHABILITY_DISTANCE_FUNCTION_PARAM =
         new ClassParameter<DistanceFunction>(
             DISTANCE_FUNCTION_ID,
             DistanceFunction.class,
-            EuklideanDistanceFunction.class.getName());
+            EuclideanDistanceFunction.class.getName());
 
     /**
      * Holds the instance of the reachability distance function specified by

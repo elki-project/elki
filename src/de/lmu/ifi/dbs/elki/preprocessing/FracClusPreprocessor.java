@@ -4,7 +4,7 @@ import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.statistics.LinearRegression;
 import de.lmu.ifi.dbs.elki.utilities.DoublePair;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
@@ -39,7 +39,7 @@ public class FracClusPreprocessor<V extends RealVector<V, ?>> extends AbstractPa
      * @see de.lmu.ifi.dbs.elki.preprocessing.Preprocessor#run(de.lmu.ifi.dbs.elki.database.Database,boolean,boolean)
      */
     public void run(Database<V> database, boolean verbose, boolean time) {
-        EuklideanDistanceFunction<V> distanceFunction = new EuklideanDistanceFunction<V>();
+        EuclideanDistanceFunction<V> distanceFunction = new EuclideanDistanceFunction<V>();
         distanceFunction.setDatabase(database, false, false); //  TODO: parameters verbose, time???
         if (verbose) {
             verbose("assigning database objects to base clusters");

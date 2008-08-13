@@ -4,7 +4,7 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.Clustering;
 import de.lmu.ifi.dbs.elki.algorithm.result.clustering.Clusters;
 import de.lmu.ifi.dbs.elki.data.RealVector;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -90,9 +90,9 @@ public abstract class ProjectedClustering<V extends RealVector<V, ?>>
     private int l;
 
     /**
-     * The euklidean distance function.
+     * The euclidean distance function.
      */
-    private EuklideanDistanceFunction<V> distanceFunction = new EuklideanDistanceFunction<V>();
+    private EuclideanDistanceFunction<V> distanceFunction = new EuclideanDistanceFunction<V>();
 
     /**
      * The result.
@@ -151,7 +151,7 @@ public abstract class ProjectedClustering<V extends RealVector<V, ?>>
      *
      * @return the distance function
      */
-    protected EuklideanDistanceFunction<V> getDistanceFunction() {
+    protected EuclideanDistanceFunction<V> getDistanceFunction() {
         return distanceFunction;
     }
 

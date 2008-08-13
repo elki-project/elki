@@ -38,15 +38,15 @@ public class PreferenceVectorBasedCorrelationDistance
      * @param dimensionality         the dimensionality of the feature space (needed for serialization)
      * @param correlationValue       the correlation dimension to be represented by the
      *                               CorrelationDistance
-     * @param euklideanValue         the euclidean distance to be represented by the
+     * @param euclideanValue         the euclidean distance to be represented by the
      *                               CorrelationDistance
      * @param commonPreferenceVector the common preference vector of the two objects defining this distance
      */
     public PreferenceVectorBasedCorrelationDistance(int dimensionality,
                                                     int correlationValue,
-                                                    double euklideanValue,
+                                                    double euclideanValue,
                                                     BitSet commonPreferenceVector) {
-        super(correlationValue, euklideanValue);
+        super(correlationValue, euclideanValue);
         this.dimensionality = dimensionality;
         this.commonPreferenceVector = commonPreferenceVector;
     }
@@ -66,14 +66,14 @@ public class PreferenceVectorBasedCorrelationDistance
      */
     public String description() {
         return "PreferenceVectorBasedCorrelationDistance.correlationValue, " +
-            "PreferenceVectorBasedCorrelationDistance.euklideanValue, " +
+            "PreferenceVectorBasedCorrelationDistance.euclideanValue, " +
             "PreferenceVectorBasedCorrelationDistance.commonPreferenceVector";
     }
 
     /**
      * Returns a string representation of this PreferenceVectorBasedCorrelationDistance.
      *
-     * @return the correlation value, the euklidean value and the common preference vector
+     * @return the correlation value, the euclidean value and the common preference vector
      *         separated by blanks
      */
     public String toString() {
@@ -105,7 +105,7 @@ public class PreferenceVectorBasedCorrelationDistance
         return new PreferenceVectorBasedCorrelationDistance(
             dimensionality,
             getCorrelationValue() + distance.getCorrelationValue(),
-            getEuklideanValue() + distance.getEuklideanValue(),
+            getEuclideanValue() + distance.getEuclideanValue(),
             (BitSet) commonPreferenceVector.clone());
     }
 
@@ -134,7 +134,7 @@ public class PreferenceVectorBasedCorrelationDistance
         return new PreferenceVectorBasedCorrelationDistance(
             dimensionality,
             getCorrelationValue() - distance.getCorrelationValue(),
-            getEuklideanValue() - distance.getEuklideanValue(),
+            getEuclideanValue() - distance.getEuclideanValue(),
             (BitSet) commonPreferenceVector.clone());
     }
 

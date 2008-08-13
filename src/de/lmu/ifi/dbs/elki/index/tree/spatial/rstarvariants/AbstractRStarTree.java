@@ -4,7 +4,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndex;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPath;
@@ -1020,7 +1020,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
    */
   private void reInsert(N node, int level, TreeIndexPath<E> path) {
     HyperBoundingBox mbr = node.mbr();
-    EuklideanDistanceFunction<O> distFunction = new EuklideanDistanceFunction<O>();
+    EuclideanDistanceFunction<O> distFunction = new EuclideanDistanceFunction<O>();
     //noinspection unchecked
     DistanceEntry<DoubleDistance, E>[] reInsertEntries = new DistanceEntry[node.getNumEntries()];
 

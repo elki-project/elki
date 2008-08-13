@@ -5,7 +5,7 @@ import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
@@ -41,13 +41,13 @@ public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extend
      * Parameter to specify the distance function to determine the distance between database objects,
      * must extend {@link de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction}.
      * <p>Key: {@code -classifier.distancefunction} </p>
-     * <p>Default value: {@link de.lmu.ifi.dbs.elki.distance.distancefunction.EuklideanDistanceFunction} </p>
+     * <p>Default value: {@link de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction} </p>
      */
     private final ClassParameter<DistanceFunction> DISTANCE_FUNCTION_PARAM =
         new ClassParameter<DistanceFunction>(
             DISTANCE_FUNCTION_ID,
             DistanceFunction.class,
-            EuklideanDistanceFunction.class.getName());
+            EuclideanDistanceFunction.class.getName());
 
     /**
      * Holds the instance of the distance function specified by {@link #DISTANCE_FUNCTION_PARAM}.

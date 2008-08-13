@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.wrapper;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.LOF;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -73,7 +73,7 @@ public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
         Util.addParameter(parameters, LOF.MINPTS_ID, Integer.toString(getParameterValue(MINPTS_PARAM)));
 
         // distance function
-        Util.addParameter(parameters, LOF.DISTANCE_FUNCTION_ID, EuklideanDistanceFunction.class.getName());
+        Util.addParameter(parameters, LOF.DISTANCE_FUNCTION_ID, EuclideanDistanceFunction.class.getName());
 
         // normalization
 //    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);

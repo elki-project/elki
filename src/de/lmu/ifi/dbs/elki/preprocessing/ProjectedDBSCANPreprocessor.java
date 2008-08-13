@@ -5,7 +5,7 @@ import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
@@ -62,7 +62,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
     /**
      * The default range query distance function.
      */
-    public static final String DEFAULT_DISTANCE_FUNCTION = EuklideanDistanceFunction.class.getName();
+    public static final String DEFAULT_DISTANCE_FUNCTION = EuclideanDistanceFunction.class.getName();
 
     /**
      * Parameter for range query distance function.

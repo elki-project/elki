@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.wrapper;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -22,7 +22,7 @@ public class DBSCANWrapper extends NormalizationWrapper {
 
     /**
      * Parameter to specify the maximum radius of the neighborhood to be considered,
-     * must be suitable to {@link de.lmu.ifi.dbs.elki.distance.distancefunction.EuklideanDistanceFunction}.
+     * must be suitable to {@link de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction}.
      * <p>Key: {@code -dbscan.epsilon} </p>
      */
     private final PatternParameter EPSILON_PARAM = new PatternParameter(DBSCAN.EPSILON_ID);
@@ -71,7 +71,7 @@ public class DBSCANWrapper extends NormalizationWrapper {
         // parameter epsilon
         EPSILON_PARAM.setShortDescription("The maximum radius of the neighborhood " +
                                      "to be considerd, must be suitable to " +
-                                     EuklideanDistanceFunction.class.getName());
+                                     EuclideanDistanceFunction.class.getName());
         addOption(EPSILON_PARAM);
 
         // parameter min points

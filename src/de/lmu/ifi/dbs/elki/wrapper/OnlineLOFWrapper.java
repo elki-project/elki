@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.wrapper;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OnlineLOF;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
@@ -114,7 +114,7 @@ public class OnlineLOFWrapper extends FileBasedDatabaseConnectionWrapper {
         Util.addParameter(parameters, OnlineLOF.NN_ID, getParameterValue(NN_PARAM).getPath());
 
         // distance function
-        Util.addParameter(parameters, OnlineLOF.DISTANCE_FUNCTION_ID, EuklideanDistanceFunction.class.getName());
+        Util.addParameter(parameters, OnlineLOF.DISTANCE_FUNCTION_ID, EuclideanDistanceFunction.class.getName());
 
         // page size
 //    parameters.add(OptionHandler.OPTION_PREFIX + LOF.PAGE_SIZE_P);

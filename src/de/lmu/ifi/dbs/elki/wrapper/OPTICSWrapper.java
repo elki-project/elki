@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.wrapper;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -22,7 +22,7 @@ public class OPTICSWrapper extends NormalizationWrapper {
 
     /**
      * Parameter to specify the maximum radius of the neighborhood to be considered,
-     * must be suitable to {@link EuklideanDistanceFunction EuklideanDistanceFunction}.
+     * must be suitable to {@link EuclideanDistanceFunction}.
      * <p>Key: {@code -optics.epsilon} </p>
      */
     private final PatternParameter EPSILON_PARAM;
@@ -70,7 +70,7 @@ public class OPTICSWrapper extends NormalizationWrapper {
         EPSILON_PARAM = new PatternParameter(OPTICS.EPSILON_ID);
         EPSILON_PARAM.setShortDescription("The maximum radius of the neighborhood " +
             "to be considered, must be suitable to " +
-            EuklideanDistanceFunction.class.getName());
+            EuclideanDistanceFunction.class.getName());
         optionHandler.put(EPSILON_PARAM);
 
         //parameter min points
@@ -93,7 +93,7 @@ public class OPTICSWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(getParameterValue(MINPTS_PARAM)));
 
         // distance function
-        Util.addParameter(parameters, OPTICS.DISTANCE_FUNCTION_ID, EuklideanDistanceFunction.class.getName());
+        Util.addParameter(parameters, OPTICS.DISTANCE_FUNCTION_ID, EuclideanDistanceFunction.class.getName());
 
         // database
         // params.add(OptionHandler.OPTION_PREFIX +

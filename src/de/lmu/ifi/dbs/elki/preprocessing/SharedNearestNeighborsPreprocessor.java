@@ -5,7 +5,7 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
@@ -44,14 +44,14 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
     /**
      * Parameter to indicate the distance function to be used to ascertain the nearest neighbors.
      * <p/>
-     * <p>Default value: {@link EuklideanDistanceFunction}</p>
+     * <p>Default value: {@link EuclideanDistanceFunction}</p>
      * <p>Key: {@code SNNDistanceFunction}</p>
      */
     @SuppressWarnings("unchecked")
     public static final ClassParameter<DistanceFunction> DISTANCE_FUNCTION_PARAM = new ClassParameter("SNNDistanceFunction", "the distance function to asses the nearest neighbors", DistanceFunction.class);
 
     static {
-        DISTANCE_FUNCTION_PARAM.setDefaultValue(EuklideanDistanceFunction.class.getName());
+        DISTANCE_FUNCTION_PARAM.setDefaultValue(EuclideanDistanceFunction.class.getName());
     }
 
     /**

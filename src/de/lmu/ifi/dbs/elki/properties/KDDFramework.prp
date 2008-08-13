@@ -55,9 +55,9 @@ de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection=de.lmu.ifi.dbs.elki.d
 # distance functions - default package: de.lmu.ifi.dbs.elki.distance.distancefunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction= de.lmu.ifi.dbs.elki.distance.distancefunction.CosineDistanceFunction,\
            de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionSelectingDistanceFunction,\
-           de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionsSelectingEuklideanDistanceFunction,\
+           de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionsSelectingEuclideanDistanceFunction,\
            de.lmu.ifi.dbs.elki.distance.distancefunction.DirectSupportDependentItemsetDistanceFunction,\
-           de.lmu.ifi.dbs.elki.distance.distancefunction.EuklideanDistanceFunction,\
+           de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction,\
            de.lmu.ifi.dbs.elki.distance.distancefunction.FileBasedDoubleDistanceFunction,\
            de.lmu.ifi.dbs.elki.distance.distancefunction.FileBasedFloatDistanceFunction,\
            de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction,\
@@ -77,7 +77,7 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractLocallyWeightedDistanceFun
            de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction
 # #######################################################
 # dimensions selecting distance functions - default package: de.lmu.ifi.dbs.elki.distance.distancefunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDimensionsSelectingDoubleDistanceFunction=de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionsSelectingEuklideanDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDimensionsSelectingDoubleDistanceFunction=de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionsSelectingEuclideanDistanceFunction
 # #######################################################
 # Holdout - default package: de.lmu.ifi.dbs.elki.evaluation.holdout
 #de.lmu.ifi.dbs.elki.evaluation.holdout.Holdout=de.lmu.ifi.dbs.elki.evaluation.holdout.LeaveOneOut,\

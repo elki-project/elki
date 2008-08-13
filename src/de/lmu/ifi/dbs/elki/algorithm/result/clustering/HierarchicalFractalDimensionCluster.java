@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.algorithm.result.clustering;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.statistics.LinearRegression;
 import de.lmu.ifi.dbs.elki.utilities.DoublePair;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
@@ -26,14 +26,14 @@ public class HierarchicalFractalDimensionCluster<V extends RealVector<V, ?>>
 
     private List<Integer> strongSupporters;
 
-    private EuklideanDistanceFunction<V> distanceFunction;
+    private EuclideanDistanceFunction<V> distanceFunction;
 
     private double fractalDimension;
 
     public HierarchicalFractalDimensionCluster(Integer pointID, Database<V> database, int k) {
         final int NUMBER_STRONG_SUPPORTERS = (k + 1) / 2;
         this.representant = database.get(pointID);
-        this.distanceFunction = new EuklideanDistanceFunction<V>();
+        this.distanceFunction = new EuclideanDistanceFunction<V>();
         distanceFunction.setDatabase(database, false, false); //  TODO: parameters verbose, time???
         List<QueryResult<DoubleDistance>> kNN = database.kNNQueryForID(pointID, k + 1, distanceFunction);
         this.supporters = new ArrayList<Integer>(k);
@@ -58,7 +58,7 @@ public class HierarchicalFractalDimensionCluster<V extends RealVector<V, ?>>
             .plus(cluster2.getRepresentant().multiplicate(cluster2.size()))
             .multiplicate(1.0 / (cluster1.size() + cluster2.size()));
 
-        this.distanceFunction = new EuklideanDistanceFunction<V>();
+        this.distanceFunction = new EuclideanDistanceFunction<V>();
         distanceFunction.setDatabase(database, false, false); //  TODO: parameters verbose, time???
         KNNList<DoubleDistance> knnList = new KNNList<DoubleDistance>(k, distanceFunction.infiniteDistance());
 

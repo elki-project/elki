@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.algorithm.result.outlier;
 import de.lmu.ifi.dbs.elki.algorithm.result.AbstractResult;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionsSelectingEuklideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionsSelectingEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
@@ -21,7 +21,7 @@ import java.util.List;
  */
 public class SODModel<O extends RealVector<O, Double>> extends AbstractResult<O> {
 
-    private final DimensionsSelectingEuklideanDistanceFunction<O> DISTANCE_FUNCTION = new DimensionsSelectingEuklideanDistanceFunction<O>();
+    private final DimensionsSelectingEuclideanDistanceFunction<O> DISTANCE_FUNCTION = new DimensionsSelectingEuclideanDistanceFunction<O>();
 
     private double[] centerValues;
 

@@ -74,7 +74,6 @@ public class FractalDimensionTest<V extends RealVector<V, ?>> extends AbstractAl
     //private int k;
 
     private FractalDimensionBasedDistanceFunction<V> distanceFunction = new FractalDimensionBasedDistanceFunction<V>();
-    //private EuklideanDistanceFunction<V> distanceFunction = new EuklideanDistanceFunction<V>();
 
     /**
      * Adds parameters

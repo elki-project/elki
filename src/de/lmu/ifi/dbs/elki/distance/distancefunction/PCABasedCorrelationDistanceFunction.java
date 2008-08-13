@@ -21,25 +21,8 @@ import de.lmu.ifi.dbs.elki.varianceanalysis.LocalPCA;
  * @param <P> the type of Preprocessor used
  * @param <D> the type of Distance used
  */
-public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P extends Preprocessor<V>, D extends CorrelationDistance<D>> extends
-    AbstractCorrelationDistanceFunction<V, P, D> {
-
-    /**
-     * The super class for the preprocessor.
-     */
-    public static final Class<HiCOPreprocessor> PREPROCESSOR_SUPER_CLASS = HiCOPreprocessor.class;
-
-    /**
-     * The default preprocessor class name.
-     */
-    public static final String DEFAULT_PREPROCESSOR_CLASS = KnnQueryBasedHiCOPreprocessor.class.getName();
-
-    /**
-     * Description for parameter preprocessor.
-     */
-    public static final String PREPROCESSOR_CLASS_D = "<class>the preprocessor to determine the correlation dimension of the objects "
-        + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(PREPROCESSOR_SUPER_CLASS)
-        + ". (Default: " + DEFAULT_PREPROCESSOR_CLASS;
+public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P extends Preprocessor<V>, D extends CorrelationDistance<D>>
+    extends AbstractCorrelationDistanceFunction<V, P, D> {
 
     /**
      * The default value for delta.
@@ -259,11 +242,11 @@ public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P e
     }
 
     /**
-     * Computes the Euklidean distance between the given two vectors.
+     * Computes the Euclidean distance between the given two vectors.
      *
      * @param dv1 first NumberVector
      * @param dv2 second NumberVector
-     * @return the Euklidean distance between the given two vectors
+     * @return the Euclidean distance between the given two vectors
      */
     private double euclideanDistance(V dv1, V dv2) {
         if (dv1.getDimensionality() != dv2.getDimensionality()) {
@@ -283,22 +266,29 @@ public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P e
 
     /**
      * Returns the name of the default preprocessor.
+     *
+     * @return the name of the default preprocessor,
+     *         which is {@link de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor}
+     * @see de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction#getDefaultPreprocessorClassName()
      */
     public String getDefaultPreprocessorClassName() {
-        return DEFAULT_PREPROCESSOR_CLASS;
+        return KnnQueryBasedHiCOPreprocessor.class.getName();
     }
 
     /**
-     * Returns the description for parameter preprocessor.
+     * @see de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction#getPreprocessorDescription() ()
      */
     public String getPreprocessorDescription() {
-        return PREPROCESSOR_CLASS_D;
+        return "Classname of the preprocessor to determine the correlation dimension of each object "
+        + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(getPreprocessorSuperClassName())
+        + ".";
     }
 
     /**
      * Returns the super class for the preprocessor.
+     *
      * @return the super class for the preprocessor,
-     * which is {@link HiCOPreprocessor}
+     *         which is {@link HiCOPreprocessor}
      * @see de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction#getPreprocessorSuperClassName()
      */
     public Class<HiCOPreprocessor> getPreprocessorSuperClassName() {

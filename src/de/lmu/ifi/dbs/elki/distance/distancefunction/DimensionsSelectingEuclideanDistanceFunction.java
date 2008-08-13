@@ -6,31 +6,31 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 
 /**
- * Provides a distance function that computes the Euklidean distance
+ * Provides a distance function that computes the Euclidean distance
  * between feature vectors only in specified dimensions.
  *
  * @author Elke Achtert
  */
-public class DimensionsSelectingEuklideanDistanceFunction<V extends NumberVector<V, ?>>
+public class DimensionsSelectingEuclideanDistanceFunction<V extends NumberVector<V, ?>>
     extends AbstractDimensionsSelectingDoubleDistanceFunction<V>
     implements SpatialDistanceFunction<V, DoubleDistance> {
 
   /**
-   * Provides a distance function that computes the Euklidean distance
+   * Provides a distance function that computes the Euclidean distance
    * between feature vectors only in specified dimensions
    */
-  public DimensionsSelectingEuklideanDistanceFunction() {
+  public DimensionsSelectingEuclideanDistanceFunction() {
     super();
   }
 
 
   /**
-   * Provides the Euklidean distance
+   * Provides the Euclidean distance
    * between two given feature vectors in the selected dimensions.
    *
    * @param v1 first feature vector
    * @param v2 second feature vector
-   * @return the Euklidean distance
+   * @return the Euclidean distance
    *         between two given feature vectors in the selected dimensions
    */
   public DoubleDistance distance(V v1, V v2) {
@@ -66,7 +66,7 @@ public class DimensionsSelectingEuklideanDistanceFunction<V extends NumberVector
    */
   @Override
   public String parameterDescription() {
-    return "Euklidean distance for feature vectors considering only specified dimensions. " +
+    return "Euclidean distance for feature vectors considering only specified dimensions. " +
            "No parameters required. " +
            "Pattern for defining a range: \"" + requiredInputPattern() + "\".";
   }

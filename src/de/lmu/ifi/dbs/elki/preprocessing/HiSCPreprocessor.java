@@ -5,7 +5,7 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.Util;
@@ -114,7 +114,7 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
       k = 3 * obj.getDimensionality();
     }
 
-    DistanceFunction<V, DoubleDistance> distanceFunction = new EuklideanDistanceFunction<V>();
+    DistanceFunction<V, DoubleDistance> distanceFunction = new EuclideanDistanceFunction<V>();
     distanceFunction.setDatabase(database, verbose, time);
 
     Iterator<Integer> it = database.iterator();

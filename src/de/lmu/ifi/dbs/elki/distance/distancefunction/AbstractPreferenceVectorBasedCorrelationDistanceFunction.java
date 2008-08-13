@@ -258,7 +258,8 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
      * @see de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction#getPreprocessorDescription() ()
      */
     public final String getPreprocessorDescription() {
-        return "Classname of the preprocessor to determine the preference vectors of the objects "
-            + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(getPreprocessorSuperClassName());
+        return "Classname of the preprocessor to determine the preference vector of each object "
+            + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(getPreprocessorSuperClassName()) +
+            ".";
     }
 }

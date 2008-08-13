@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.database.*;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionSelectingDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.EuklideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
@@ -164,8 +164,8 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
             DimensionSelectingDistanceFunction<N, V>[] distanceFunctions = initDistanceFunctions(database, dim, verbose, time);
 
             // noinspection unchecked
-            final DistanceFunction<V, DoubleDistance> euklideanDistanceFunction = new EuklideanDistanceFunction();
-            euklideanDistanceFunction.setDatabase(database, false, false);
+            final DistanceFunction<V, DoubleDistance> euclideanDistanceFunction = new EuclideanDistanceFunction();
+            euclideanDistanceFunction.setDatabase(database, false, false);
 
             int processed = 1;
             for (Iterator<Integer> it = database.iterator(); it.hasNext();) {
