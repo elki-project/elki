@@ -5,10 +5,18 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PCABasedCorrelationDistanceFunction;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
-import de.lmu.ifi.dbs.elki.preprocessing.HiSCPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.*;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.DefaultValueGlobalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 import de.lmu.ifi.dbs.elki.varianceanalysis.PercentageEigenPairFilter;
 
 import java.util.ArrayList;
@@ -29,7 +37,8 @@ public class HiCOWrapper extends NormalizationWrapper {
      * must be an integer greater than 0.
      * <p>Key: {@code -optics.minpts} </p>
      */
-    private final IntParameter MINPTS_PARAM = new IntParameter(OPTICS.MINPTS_ID,
+    private final IntParameter MINPTS_PARAM = new IntParameter(
+        OPTICS.MINPTS_ID,
         new GreaterConstraint(0));
 
     /**
@@ -39,18 +48,28 @@ public class HiCOWrapper extends NormalizationWrapper {
      * <p>Key: {@code -hicopreprocessor.k} </p>
      * <p>Default value: {@link HiCOWrapper#MINPTS_PARAM} </p>
      */
-    private final IntParameter K_PARAM = new IntParameter(OptionID.KNN_HICO_PREPROCESSOR_K,
-        new GreaterConstraint(0), true);
+    private final IntParameter K_PARAM = new IntParameter(
+        OptionID.KNN_HICO_PREPROCESSOR_K,
+        new GreaterConstraint(0),
+        true);
 
     /**
      * The alpha parameter.
      */
-    private DoubleParameter alpha;
+    private DoubleParameter ALPHA_PARAM;
 
     /**
-     * The delta parameter.
+     * Parameter to specify the threshold of a distance between a vector q and a given space
+     * that indicates that q adds a new dimension to the space,
+     * must be a double equal to or greater than 0.
+     * <p>Default value: {@code 0.25} </p>
+     * <p>Key: {@code -pcabasedcorrelationdf.delta} </p>
      */
-    private DoubleParameter delta;
+    private final DoubleParameter DELTA_PARAM = new DoubleParameter(
+        PCABasedCorrelationDistanceFunction.DELTA_ID,
+        new GreaterEqualConstraint(0),
+        0.25
+    );
 
     /**
      * Main method to run this wrapper.
@@ -77,7 +96,7 @@ public class HiCOWrapper extends NormalizationWrapper {
 
     /**
      * Adds parameters
-     * {@link #MINPTS_PARAM}, {@link #K_PARAM}, {@link }, and {@link } todo
+     * {@link #MINPTS_PARAM}, {@link #K_PARAM}, {@link #DELTA_PARAM}, and {@link #ALPHA_PARAM}
      * to the option handler additionally to parameters of super class.
      */
     public HiCOWrapper() {
@@ -98,21 +117,17 @@ public class HiCOWrapper extends NormalizationWrapper {
         optionHandler.setGlobalParameterConstraint(gpc);
 
         // parameter delta
-        delta = new DoubleParameter(PCABasedCorrelationDistanceFunction.DELTA_P,
-            PCABasedCorrelationDistanceFunction.DELTA_D,
-            new GreaterEqualConstraint(0));
-        delta.setDefaultValue(PCABasedCorrelationDistanceFunction.DEFAULT_DELTA);
-        optionHandler.put(delta);
+        optionHandler.put(DELTA_PARAM);
 
         // parameter alpha
         ArrayList<ParameterConstraint<Number>> alphaConstraints = new ArrayList<ParameterConstraint<Number>>();
         alphaConstraints.add(new GreaterConstraint(0));
         alphaConstraints.add(new LessConstraint(1));
-        alpha = new DoubleParameter(PercentageEigenPairFilter.ALPHA_P,
+        ALPHA_PARAM = new DoubleParameter(PercentageEigenPairFilter.ALPHA_P,
             PercentageEigenPairFilter.ALPHA_D,
             alphaConstraints);
-        alpha.setDefaultValue(PercentageEigenPairFilter.DEFAULT_ALPHA);
-        optionHandler.put(alpha);
+        ALPHA_PARAM.setDefaultValue(PercentageEigenPairFilter.DEFAULT_ALPHA);
+        optionHandler.put(ALPHA_PARAM);
     }
 
     /**
@@ -143,12 +158,12 @@ public class HiCOWrapper extends NormalizationWrapper {
         Util.addParameter(parameters, K_PARAM, Integer.toString(getParameterValue(K_PARAM)));
 
         // alpha
-        parameters.add(OptionHandler.OPTION_PREFIX + alpha.getName());
-        parameters.add(Double.toString(getParameterValue(alpha)));
+        parameters.add(OptionHandler.OPTION_PREFIX + ALPHA_PARAM.getName());
+        parameters.add(Double.toString(getParameterValue(ALPHA_PARAM)));
 
         // delta
-        parameters.add(OptionHandler.OPTION_PREFIX + delta.getName());
-        parameters.add(Double.toString(getParameterValue(delta)));
+        parameters.add(OptionHandler.OPTION_PREFIX + DELTA_PARAM.getName());
+        parameters.add(Double.toString(getParameterValue(DELTA_PARAM)));
 
         return parameters;
     }

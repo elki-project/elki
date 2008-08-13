@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.varianceanalysis.LocalPCA;
@@ -19,56 +20,62 @@ import de.lmu.ifi.dbs.elki.varianceanalysis.LocalPCA;
  * @author Elke Achtert
  * @param <V> the type of RealVector used
  * @param <P> the type of Preprocessor used
- * @param <D> the type of Distance used
+ * @param <D> the type of CorrelationDistance used
  */
 public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P extends Preprocessor<V>, D extends CorrelationDistance<D>>
     extends AbstractCorrelationDistanceFunction<V, P, D> {
 
     /**
-     * The default value for delta.
+     * OptionID for {@link #DELTA_PARAM}
      */
-    public static final double DEFAULT_DELTA = 0.25;
+    public static final OptionID DELTA_ID = OptionID.getOrCreateOptionID(
+        "pcabasedcorrelationdf.delta",
+        "Threshold of a distance between a vector q and a given space that indicates that " +
+            "q adds a new dimension to the space."
+    );
 
     /**
-     * Option string for parameter delta.
+     * Parameter to specify the threshold of a distance between a vector q and a given space
+     * that indicates that q adds a new dimension to the space,
+     * must be a double equal to or greater than 0.
+     * <p>Default value: {@code 0.25} </p>
+     * <p>Key: {@code -pcabasedcorrelationdf.delta} </p>
      */
-    public static final String DELTA_P = "delta";
+    private static DoubleParameter DELTA_PARAM = new DoubleParameter(
+        DELTA_ID,
+        new GreaterEqualConstraint(0),
+        0.25);
 
     /**
-     * Description for parameter delta.
-     */
-    public static final String DELTA_D = "a double specifying the threshold of a distance between a vector q and a given space that indicates that q adds a new dimension to the space (default is delta = " + DEFAULT_DELTA + ")";
-
-    /**
-     * The threshold of a distance between a vector q and a given space that
-     * indicates that q adds a new dimension to the space.
+     * Holds the value of {@link #DELTA_PARAM}.
      */
     private double delta;
 
     /**
-     * Provides a CorrelationDistanceFunction with a pattern defined to accept
-     * Strings that define an Integer followed by a separator followed by a
-     * Double.
+     * Provides a CorrelationDistanceFunction,
+     * adding parameter
+     * {@link #DELTA_PARAM}
+     * to the option handler additionally to parameters of super class.
      */
     public PCABasedCorrelationDistanceFunction() {
         super();
-
-        DoubleParameter delta = new DoubleParameter(DELTA_P, DELTA_D, new GreaterEqualConstraint(0));
-        delta.setDefaultValue(DEFAULT_DELTA);
-        optionHandler.put(delta);
+        addOption(DELTA_PARAM);
     }
 
     /**
-     * Sets the values for the parameters delta and preprocessor if specified.
-     * If the parameters are not specified default values are set.
+     * Calls {@link de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction#setParameters(String[])
+     * AbstractPreprocessorBasedDistanceFunction#setParameters(args)}
+     * and sets additionally the value of the parameter
+     * {@link #DELTA_PARAM}.
      *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
         // delta
-        delta = (Double) optionHandler.getOptionValue(DELTA_P);
+        delta = getParameterValue(DELTA_PARAM);
 
         return remainingParameters;
     }
@@ -91,6 +98,7 @@ public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P e
         }
         if (matches(pattern)) {
             String[] values = AbstractCorrelationDistanceFunction.SEPARATOR.split(pattern);
+            // noinspection unchecked
             return (D) new CorrelationDistance<D>(Integer.parseInt(values[0]), Double.parseDouble(values[1]));
         }
         else {
@@ -107,6 +115,7 @@ public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P e
      * @return an infinite distance
      */
     public D infiniteDistance() {
+        // noinspection unchecked
         return (D) new CorrelationDistance<D>(Integer.MAX_VALUE, Double.POSITIVE_INFINITY);
     }
 
@@ -116,6 +125,7 @@ public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P e
      * @return a null distance
      */
     public D nullDistance() {
+        // noinspection unchecked
         return (D) new CorrelationDistance<D>(0, 0);
     }
 
@@ -125,12 +135,14 @@ public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P e
      * @return an undefined distance
      */
     public D undefinedDistance() {
+        // noinspection unchecked
         return (D) new CorrelationDistance<D>(-1, Double.NaN);
     }
 
     /**
      * @see AbstractCorrelationDistanceFunction#correlationDistance(de.lmu.ifi.dbs.elki.data.RealVector,de.lmu.ifi.dbs.elki.data.RealVector)
      */
+    @SuppressWarnings("unchecked")
     D correlationDistance(V dv1, V dv2) {
         LocalPCA<V> pca1 = (LocalPCA<V>) getDatabase().getAssociation(AssociationID.LOCAL_PCA, dv1.getID());
         LocalPCA<V> pca2 = (LocalPCA<V>) getDatabase().getAssociation(AssociationID.LOCAL_PCA, dv2.getID());
@@ -280,8 +292,8 @@ public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P e
      */
     public String getPreprocessorDescription() {
         return "Classname of the preprocessor to determine the correlation dimension of each object "
-        + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(getPreprocessorSuperClassName())
-        + ".";
+            + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(getPreprocessorSuperClassName())
+            + ".";
     }
 
     /**

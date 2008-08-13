@@ -11,9 +11,12 @@ import java.util.regex.Pattern;
  * correlation distance for real valued vectors.
  *
  * @author Elke Achtert
+ * @param <V> the type of RealVector used
+ * @param <P> the type of Preprocessor used
+ * @param <D> the type of CorrelationDistance used
  */
-public abstract class AbstractCorrelationDistanceFunction<O extends RealVector<O, ?>, P extends Preprocessor<O>, D extends CorrelationDistance<D>>
-    extends AbstractPreprocessorBasedDistanceFunction<O, P, D> {
+public abstract class AbstractCorrelationDistanceFunction<V extends RealVector<V, ?>, P extends Preprocessor<V>, D extends CorrelationDistance<D>>
+    extends AbstractPreprocessorBasedDistanceFunction<V, P, D> {
 
     /**
      * Indicates a separator.
@@ -38,7 +41,7 @@ public abstract class AbstractCorrelationDistanceFunction<O extends RealVector<O
      *         instance of {@link CorrelationDistance CorrelationDistance}.
      * @see DistanceFunction#distance(de.lmu.ifi.dbs.elki.data.DatabaseObject,de.lmu.ifi.dbs.elki.data.DatabaseObject)
      */
-    public final D distance(O rv1, O rv2) {
+    public final D distance(V rv1, V rv2) {
         return correlationDistance(rv1, rv2);
     }
 
@@ -57,5 +60,5 @@ public abstract class AbstractCorrelationDistanceFunction<O extends RealVector<O
      * @param dv2 second RealVector
      * @return the correlation distance between the two specified vectors
      */
-    abstract D correlationDistance(O dv1, O dv2);
+    abstract D correlationDistance(V dv1, V dv2);
 }
