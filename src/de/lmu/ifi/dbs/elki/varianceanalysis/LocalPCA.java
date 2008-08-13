@@ -1,14 +1,17 @@
 package de.lmu.ifi.dbs.elki.varianceanalysis;
 
 import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessGlobalConstraint;
 
 import java.util.Collection;
@@ -53,10 +56,12 @@ public abstract class LocalPCA<V extends RealVector<V, ?>> extends AbstractPCA {
      * must be a double greater than 0.
      * <p>Default value: {@code 0.0} </p>
      * <p>Key: {@code -localpca.small} </p>
+     * 
+     * FIXME: why is the default of 0.0 ok when it must be > 0?
      */
     private final DoubleParameter SMALL_PARAM = new DoubleParameter(
         SMALL_ID,
-        new GreaterConstraint(0),
+        new GreaterEqualConstraint(0),
         0.0);
 
     /**
@@ -187,6 +192,78 @@ public abstract class LocalPCA<V extends RealVector<V, ?>> extends AbstractPCA {
     }
 
     /**
+     * Performs a LocalPCA for the object with the specified ids stored in the
+     * given database.
+     * 
+     * @param results the ids of the objects for which the PCA should be performed
+     * @param database the database containing the objects
+     */
+    public void runResults(Collection<QueryResult<DoubleDistance>> results, Database<V> database)
+    {
+        // logging
+        StringBuffer msg = new StringBuffer();
+        if(this.debug)
+        {
+            V o = database.get(results.iterator().next().getID());
+            String label = (String) database.getAssociation(AssociationID.LABEL, o.getID());
+            msg.append("\nobject ").append(o).append(" ").append(label);
+        }
+
+        // sorted eigenpairs, eigenvectors, eigenvalues
+        Matrix pcaMatrix = pcaMatrixResults(database, results);
+        determineEigenPairs(pcaMatrix);
+
+        // correlationDimension = #strong EV
+        correlationDimension = getStrongEigenvalues().length;
+        int dim = getEigenvalues().length;
+
+        // selection Matrix for weak and strong EVs
+        e_hat = new Matrix(dim, dim);
+        e_czech = new Matrix(dim, dim);
+        for(int d = 0; d < dim; d++) {
+            if(d < correlationDimension) {
+                e_czech.set(d, d, big);
+                e_hat.set(d, d, small);
+            }
+            else {
+                e_czech.set(d, d, small);
+                e_hat.set(d, d, big);
+            }
+        }
+
+        Matrix V = getEigenvectors();
+        adapatedStrongEigenvectors = V.times(e_czech).times(Matrix.identity(dim, correlationDimension));
+
+        m_hat = V.times(e_hat).times(V.transpose());
+        m_czech = V.times(e_czech).times(V.transpose());
+
+        if(this.debug) {
+            msg.append("\n ids =");
+            for(QueryResult<DoubleDistance> qr : results)
+            {
+                msg.append(database.getAssociation(AssociationID.LABEL, qr.getID()) + ", ");
+            }
+
+            msg.append("\n  E = ");
+            msg.append(Util.format(getEigenvalues(), ",", 6));
+
+            msg.append("\n  V = ");
+            msg.append(V);
+
+            msg.append("\n  E_hat = ");
+            msg.append(e_hat);
+
+            msg.append("\n  E_czech = ");
+            msg.append(e_czech);
+
+            msg.append("\n  corrDim = ");
+            msg.append(correlationDimension);
+
+            debugFine(msg.toString() + "\n");
+        }
+    }
+
+    /**
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
@@ -266,6 +343,20 @@ public abstract class LocalPCA<V extends RealVector<V, ?>> extends AbstractPCA {
      * @param ids      the list of the object ids for which the matrix should be
      *                 determined
      * @return he matrix that is used for performaing a pca
+     * 
+     * FIXME: the name pcaMatrix is misleading. It's a covariance matrix.
+     */
+    protected abstract Matrix pcaMatrixResults(Database<V> database, Collection<QueryResult<DoubleDistance>> results);
+
+    /**
+     * Determines and returns the matrix that is used for performaing the pca.
+     * 
+     * @param database the database holding the objects
+     * @param ids the list of the object ids for which the matrix should be
+     *        determined
+     * @return he matrix that is used for performaing a pca
+     * 
+     * FIXME: the name pcaMatrix is misleading. It's a covariance matrix.
      */
     protected abstract Matrix pcaMatrix(Database<V> database, Collection<Integer> ids);
 }

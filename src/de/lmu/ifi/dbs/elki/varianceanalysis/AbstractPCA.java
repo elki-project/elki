@@ -46,6 +46,11 @@ public abstract class AbstractPCA extends AbstractParameterizable implements PCA
     private Matrix eigenvectors;
 
     /**
+     * The eigenpaiss in decreasing order.
+     */
+    private SortedEigenPairs eigenPairs;
+
+    /**
      * The strong eigenvalues.
      */
     private double[] strongEigenvalues;
@@ -59,6 +64,11 @@ public abstract class AbstractPCA extends AbstractParameterizable implements PCA
      * The weak eigenvalues.
      */
     private double[] weakEigenvalues;
+
+    /**
+     * The amount of Variance explained.
+     */
+    private double explainedVariance;
 
     /**
      * The weak eigenvectors to their corresponding filtered eigenvalues.
@@ -91,6 +101,17 @@ public abstract class AbstractPCA extends AbstractParameterizable implements PCA
      */
     public final double[] getEigenvalues() {
         return Util.copy(eigenvalues);
+    }
+
+    /**
+     * Returns a copy of the eigenpairs of the object to which this PCA belongs to
+     * in decreasing order.
+     *
+     * @return the eigenpairs
+     */
+    public final SortedEigenPairs getEigenPairs() {
+        // FIXME: return a copy.
+        return eigenPairs;
     }
 
     /**
@@ -134,6 +155,15 @@ public abstract class AbstractPCA extends AbstractParameterizable implements PCA
     }
 
     /**
+     * Returns explained variance
+     *
+     * @return the variance explained by the strong Eigenvectors
+     */
+    public double getExplainedVariance() {
+        return explainedVariance;
+    }
+
+    /**
      * Determines the (strong and weak) eigenpairs (i.e. the eigenvectors and their
      * corresponding eigenvalues) sorted in descending order of their eigenvalues of
      * the specified matrix.
@@ -143,7 +173,7 @@ public abstract class AbstractPCA extends AbstractParameterizable implements PCA
     protected void determineEigenPairs(Matrix pcaMatrix) {
         // eigen value decomposition
         EigenvalueDecomposition evd = pcaMatrix.eig();
-        SortedEigenPairs eigenPairs = new SortedEigenPairs(evd, false);
+        eigenPairs = new SortedEigenPairs(evd, false);
         eigenvectors = eigenPairs.eigenVectors();
         eigenvalues = eigenPairs.eigenValues();
 
@@ -164,6 +194,8 @@ public abstract class AbstractPCA extends AbstractParameterizable implements PCA
             debugFine(msg.toString());
         }
 
+        double sumStrongEigenvalues = 0;
+        double sumWeakEigenvalues = 0;
         {// strong eigenpairs
             List<EigenPair> strongEigenPairs = filteredEigenPairs.getStrongEigenPairs();
             strongEigenvalues = new double[strongEigenPairs.size()];
@@ -173,6 +205,7 @@ public abstract class AbstractPCA extends AbstractParameterizable implements PCA
                 EigenPair eigenPair = it.next();
                 strongEigenvalues[i] = eigenPair.getEigenvalue();
                 strongEigenvectors.setColumn(i, eigenPair.getEigenvector());
+                sumStrongEigenvalues += strongEigenvalues[i];
             }
         }
 
@@ -185,8 +218,10 @@ public abstract class AbstractPCA extends AbstractParameterizable implements PCA
                 EigenPair eigenPair = it.next();
                 weakEigenvalues[i] = eigenPair.getEigenvalue();
                 weakEigenvectors.setColumn(i, eigenPair.getEigenvector());
+                sumWeakEigenvalues += weakEigenvalues[i];
             }
         }
+        explainedVariance = sumStrongEigenvalues / (sumStrongEigenvalues + sumWeakEigenvalues);
     }
 
     /**
