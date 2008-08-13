@@ -26,12 +26,12 @@ public class SortedEigenPairs {
    * @param ascending a boolean that indicates ascending order
    */
   public SortedEigenPairs(EigenvalueDecomposition evd, final boolean ascending) {
-    double[] eigenvalues = evd.getD().getDiagonal();
+    double[] eigenvalues = evd.getRealEigenvalues();
     Matrix eigenvectors = evd.getV();
 
     this.eigenPairs = new EigenPair[eigenvalues.length];
     for (int i = 0; i < eigenvalues.length; i++) {
-      double e = eigenvalues[i];
+      double e = java.lang.Math.abs(eigenvalues[i]);
       Matrix v = eigenvectors.getColumn(i);
       eigenPairs[i] = new EigenPair(v, e);
     }
@@ -103,6 +103,21 @@ public class SortedEigenPairs {
     Matrix eigenVectors = new Matrix(eigenPairs.length, n);
     for (int i = 0; i < n; i++) {
       EigenPair eigenPair = eigenPairs[i];
+      eigenVectors.setColumn(i, eigenPair.getEigenvector());
+    }
+    return eigenVectors;
+  }
+
+  /**
+   * Returns the last <code>n</code> sorted eigenvectors as a matrix.
+   *
+   * @param n the number of eigenvectors (columns) to be returned
+   * @return the last <code>n</code> sorted eigenvectors
+   */
+  public Matrix reverseEigenVectors(int n) {
+    Matrix eigenVectors = new Matrix(eigenPairs.length, n);
+    for (int i = 0; i < n; i++) {
+      EigenPair eigenPair = eigenPairs[eigenPairs.length-1-i];
       eigenVectors.setColumn(i, eigenPair.getEigenvector());
     }
     return eigenVectors;

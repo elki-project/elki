@@ -353,6 +353,7 @@ public class EigenvalueDecomposition implements java.io.Serializable
 
     private void orthes()
     {
+        // FIXME: does this fail on NaN/inf values?
 
         // This is derived from the Algol procedures orthes and ortran,
         // by Martin and Wilkinson, Handbook for Auto. Comp.,
@@ -488,6 +489,7 @@ public class EigenvalueDecomposition implements java.io.Serializable
 
     private void hqr2()
     {
+        // FIXME: does this fail on NaN/inf values?
 
         // This is derived from the Algol procedure hqr2,
         // by Martin and Wilkinson, Handbook for Auto. Comp.,
@@ -1040,6 +1042,12 @@ public class EigenvalueDecomposition implements java.io.Serializable
             for (int i = 0; (i < n) & issymmetric; i++)
             {
                 issymmetric = (A[i][j] == A[j][i]);
+                if (Double.isNaN(A[i][j])) {
+                  throw new IllegalArgumentException("NaN in EigenvalueDecomposition!");
+                }
+                if (Double.isInfinite(A[i][j])) {
+                  throw new IllegalArgumentException("+-inf in EigenvalueDecomposition!");
+                }
             }
         }
 
