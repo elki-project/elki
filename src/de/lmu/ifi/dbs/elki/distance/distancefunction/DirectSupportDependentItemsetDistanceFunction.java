@@ -11,7 +11,8 @@ import java.util.BitSet;
  *
  * @author Arthur Zimek
  */
-public class DirectSupportDependentItemsetDistanceFunction extends FrequencyDependentItemsetDistanceFunction {
+public class DirectSupportDependentItemsetDistanceFunction
+    extends FrequencyDependentItemsetDistanceFunction {
 
   /**
    * Provides a DistanceFunction to compute
@@ -28,13 +29,13 @@ public class DirectSupportDependentItemsetDistanceFunction extends FrequencyDepe
    * o is the number of bits in the respective BitVector,
    * and ratio(i,card) is 1 if card is 0, i/card otherwise.
    *
-   * @param o1 first BitVector
-   * @param o2 second BitVector
+   * @param v1 first BitVector
+   * @param v2 second BitVector
    * @return Distance between o1 and o2
    */
-  public DoubleDistance distance(BitVector o1, BitVector o2) {
-    BitSet b1 = o1.getBits();
-    BitSet b2 = o2.getBits();
+  public DoubleDistance distance(BitVector v1, BitVector v2) {
+    BitSet b1 = v1.getBits();
+    BitSet b2 = v2.getBits();
     int card1 = b1.cardinality();
     int card2 = b2.cardinality();
     b1.and(b2);

@@ -17,6 +17,8 @@ import java.util.List;
  * to compute the local weight matrix.
  *
  * @author Elke Achtert
+ * @param <O> the type of DatabaseObject to compute the distances in between
+ * todo parameter
  */
 public abstract class AbstractLocallyWeightedDistanceFunction<O extends RealVector<O, ?>, P extends Preprocessor<O>>
     extends AbstractDoubleDistanceFunction<O> {

@@ -49,6 +49,7 @@ public class FileBasedFloatDistanceFunction extends
    * @param id2 second object id
    * @return the distance between the two objcts specified by their obejct ids
    */
+  @SuppressWarnings("unchecked")
   public FloatDistance distance(Integer id1, Integer id2) {
     // the smaller id is the first key
     if (id1 > id2) {

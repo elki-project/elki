@@ -18,9 +18,13 @@ import java.util.regex.Pattern;
  * Distance function for multirepresented objects that selects one representation and
  * computes the distances only within the selected representation.
  *
- * @author Elke Achtert 
+ * @author Elke Achtert
+ * @param <M> the type of MultiRepresentedObject to compute the distances in between
+ * @param <O> the type of represented DatabaseObjects
+ * @param <D> the type of Distance used
  */
-public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M extends MultiRepresentedObject<O>, D extends Distance<D>> extends AbstractDistanceFunction<M, D> {
+public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M extends MultiRepresentedObject<O>, D extends Distance<D>>
+    extends AbstractDistanceFunction<M, D> {
   /**
    * A pattern defining a comma.
    */

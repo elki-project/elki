@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.elki.varianceanalysis.LocalPCA;
  * Provides a distance function for building the hierarchiy in the ERiC algorithm.
  *
  * @author Elke Achtert
- * @param <V> the type of RealVector used
+ * @param <V> the type of RealVector to compute the distances in between
  * @param <P> the type of Preprocessor used
  */
 public class ERiCDistanceFunction<V extends RealVector<V, ?>, P extends Preprocessor<V>>
@@ -205,10 +205,10 @@ public class ERiCDistanceFunction<V extends RealVector<V, ?>, P extends Preproce
      * @see DistanceFunction#distance(de.lmu.ifi.dbs.elki.data.DatabaseObject,de.lmu.ifi.dbs.elki.data.DatabaseObject)
      */
     @SuppressWarnings("unchecked")
-    public BitDistance distance(V o1, V o2) {
-        LocalPCA<V> pca1 = (LocalPCA<V>) getDatabase().getAssociation(AssociationID.LOCAL_PCA, o1.getID());
-        LocalPCA<V> pca2 = (LocalPCA<V>) getDatabase().getAssociation(AssociationID.LOCAL_PCA, o2.getID());
-        return distance(o1, o2, pca1, pca2);
+    public BitDistance distance(V v1, V v2) {
+        LocalPCA<V> pca1 = (LocalPCA<V>) getDatabase().getAssociation(AssociationID.LOCAL_PCA, v1.getID());
+        LocalPCA<V> pca2 = (LocalPCA<V>) getDatabase().getAssociation(AssociationID.LOCAL_PCA, v2.getID());
+        return distance(v1, v2, pca1, pca2);
     }
 
     /**
@@ -216,14 +216,14 @@ public class ERiCDistanceFunction<V extends RealVector<V, ?>, P extends Preproce
      * distance function. Note, that the first pca must have equal or more strong
      * eigenvectors than the second pca.
      *
-     * @param o1   first DatabaseObject
-     * @param o2   second DatabaseObject
+     * @param v1   first DatabaseObject
+     * @param v2   second DatabaseObject
      * @param pca1 first PCA
      * @param pca2 second PCA
      * @return the distance between two given DatabaseObjects according to this
      *         distance function
      */
-    public BitDistance distance(V o1, V o2, LocalPCA<V> pca1, LocalPCA<V> pca2) {
+    public BitDistance distance(V v1, V v2, LocalPCA<V> pca1, LocalPCA<V> pca2) {
         if (pca1.getCorrelationDimension() < pca2.getCorrelationDimension()) {
             throw new IllegalStateException("pca1.getCorrelationDimension() < pca2.getCorrelationDimension(): " +
                 pca1.getCorrelationDimension() + " < " + pca2.getCorrelationDimension());
@@ -249,12 +249,12 @@ public class ERiCDistanceFunction<V extends RealVector<V, ?>, P extends Preproce
             if (pca1.getCorrelationDimension() == pca2.getCorrelationDimension()) {
                 WeightedDistanceFunction<V> df1 = new WeightedDistanceFunction<V>(pca1.similarityMatrix());
                 WeightedDistanceFunction<V> df2 = new WeightedDistanceFunction<V>(pca2.similarityMatrix());
-                affineDistance = Math.max(df1.distance(o1, o2).getValue(),
-                    df2.distance(o1, o2).getValue());
+                affineDistance = Math.max(df1.distance(v1, v2).getValue(),
+                    df2.distance(v1, v2).getValue());
             }
             else {
                 WeightedDistanceFunction<V> df1 = new WeightedDistanceFunction<V>(pca1.similarityMatrix());
-                affineDistance = df1.distance(o1, o2).getValue();
+                affineDistance = df1.distance(v1, v2).getValue();
             }
 
             if (affineDistance > tau) {

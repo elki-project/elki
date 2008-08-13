@@ -33,8 +33,13 @@ import java.util.List;
  * parameters big = 1.0 and small = 0.0
  *
  * @author Simon Paradies
+ * @param <V> the type of RealVector to compute the distances in between
+ * @param <P> the type of Preprocessor used
+ * todo parameter
  */
-public class KernelBasedLocallyWeightedDistanceFunction<O extends RealVector<O,?>,P extends Preprocessor<O>> extends AbstractLocallyWeightedDistanceFunction<O,P> {
+public class KernelBasedLocallyWeightedDistanceFunction<V extends RealVector<V,?>,P extends Preprocessor<V>>
+    extends AbstractLocallyWeightedDistanceFunction<V,P> {
+
   /**
    * The default kernel function.
    */
@@ -54,12 +59,12 @@ public class KernelBasedLocallyWeightedDistanceFunction<O extends RealVector<O,?
   /**
    * The kernel function that is used.
    */
-  private KernelFunction<O, DoubleDistance> kernelFunction;
+  private KernelFunction<V, DoubleDistance> kernelFunction;
 
   /**
    * The global precomputed kernel matrix
    */
-  private KernelMatrix<O> kernelMatrix;
+  private KernelMatrix<V> kernelMatrix;
 
   /**
    * Provides a kernel based locally weighted distance function.
@@ -67,7 +72,7 @@ public class KernelBasedLocallyWeightedDistanceFunction<O extends RealVector<O,?
   public KernelBasedLocallyWeightedDistanceFunction() {
     super();
     //kernel function
-    ClassParameter<KernelFunction<O,DoubleDistance>> kernelFunctionClass = new ClassParameter(KERNEL_FUNCTION_CLASS_P, KERNEL_FUNCTION_CLASS_D, KernelFunction.class);
+    ClassParameter<KernelFunction<V,DoubleDistance>> kernelFunctionClass = new ClassParameter(KERNEL_FUNCTION_CLASS_P, KERNEL_FUNCTION_CLASS_D, KernelFunction.class);
     kernelFunctionClass.setDefaultValue(DEFAULT_KERNEL_FUNCTION_CLASS);
     optionHandler.put(kernelFunctionClass);
   }
@@ -76,15 +81,15 @@ public class KernelBasedLocallyWeightedDistanceFunction<O extends RealVector<O,?
    * Computes the distance between two given DatabaseObjects according to this
    * distance function.
    *
-   * @param o1 first DatabaseObject
-   * @param o2 second DatabaseObject
+   * @param v1 first DatabaseObject
+   * @param v2 second DatabaseObject
    * @return the distance between two given DatabaseObjects according to this
    *         distance function
    */
-  public DoubleDistance distance(O o1, O o2) {
+  public DoubleDistance distance(V v1, V v2) {
     double value;
-    if (o1 != o2) {
-      value = Math.max(computeDistance(o1, o2), computeDistance(o2, o1));
+    if (v1 != v2) {
+      value = Math.max(computeDistance(v1, v2), computeDistance(v2, v1));
     }
     else {
       value = 0.0;
@@ -119,32 +124,32 @@ public class KernelBasedLocallyWeightedDistanceFunction<O extends RealVector<O,?
    * Computes the distance between two given real vectors according to this
    * distance function.
    *
-   * @param o1 first FeatureVector
-   * @param o2 second FeatureVector
+   * @param v1 first FeatureVector
+   * @param v2 second FeatureVector
    * @return the distance between two given real vectors according to this
    *         distance function
    */
-  private double computeDistance(final O o1, final O o2) {
+  private double computeDistance(final V v1, final V v2) {
     //get list of neighbor objects
-    final List<Integer> neighbors = (List<Integer>) getDatabase().getAssociation(AssociationID.NEIGHBORS, o1.getID());
+    final List<Integer> neighbors = (List<Integer>) getDatabase().getAssociation(AssociationID.NEIGHBORS, v1.getID());
 
     //the colums in the kernel matrix corresponding to the two objects o1 and o2
     //maybe kernel_o1 column has already been computed
-    Matrix kernel_o1 = (Matrix) getDatabase().getAssociation(AssociationID.CACHED_MATRIX, o1.getID());
+    Matrix kernel_o1 = (Matrix) getDatabase().getAssociation(AssociationID.CACHED_MATRIX, v1.getID());
     Matrix kernel_o2;
     //has kernel_o1 column been computed yet
     if (kernel_o1 == null) {
-      kernel_o1 = kernelMatrix.getSubColumn(o1.getID(), neighbors);
-      kernel_o2 = kernelMatrix.getSubColumn(o2.getID(), neighbors);
+      kernel_o1 = kernelMatrix.getSubColumn(v1.getID(), neighbors);
+      kernel_o2 = kernelMatrix.getSubColumn(v2.getID(), neighbors);
       //save kernel_o1 column
-      getDatabase().associate(AssociationID.CACHED_MATRIX, o1.getID(), kernel_o1);
+      getDatabase().associate(AssociationID.CACHED_MATRIX, v1.getID(), kernel_o1);
     }
     else {
-      kernel_o2 = kernelMatrix.getSubColumn(o2.getID(), neighbors);
+      kernel_o2 = kernelMatrix.getSubColumn(v2.getID(), neighbors);
     }
 
     //get the strong eigenvector matrix of object o1
-    final Matrix strongEigenvectorMatrix = (Matrix) getDatabase().getAssociation(AssociationID.STRONG_EIGENVECTOR_MATRIX, o1.getID());
+    final Matrix strongEigenvectorMatrix = (Matrix) getDatabase().getAssociation(AssociationID.STRONG_EIGENVECTOR_MATRIX, v1.getID());
 
     //compute the delta vector
     final Matrix delta = kernel_o1.minus(kernel_o2);
@@ -157,7 +162,7 @@ public class KernelBasedLocallyWeightedDistanceFunction<O extends RealVector<O,?
 
     //compute the square of the complete kernel derived distance
     //final double distC = Math.pow(kernelFunction.distance(o1, o2).getDoubleValue(),2.0);
-    final double distC = kernelMatrix.getSquaredDistance(o1.getID(), o2.getID());
+    final double distC = kernelMatrix.getSquaredDistance(v1.getID(), v2.getID());
 
     //indirectly compute the distance on the weak components of the projected objects using both other distances
     final double distW = Math.sqrt(Math.abs(distC - distS));
@@ -168,17 +173,21 @@ public class KernelBasedLocallyWeightedDistanceFunction<O extends RealVector<O,?
    * @see DistanceFunction#setDatabase(de.lmu.ifi.dbs.elki.database.Database, boolean, boolean)
    */
   @Override
-  public void setDatabase(Database<O> database, boolean verbose, boolean time) {
+  public void setDatabase(Database<V> database, boolean verbose, boolean time) {
     //precompute kernelMatrix and store it in the database
-    kernelMatrix = new KernelMatrix<O>(kernelFunction, database);
+    kernelMatrix = new KernelMatrix<V>(kernelFunction, database);
     KernelMatrix.centerKernelMatrix(kernelMatrix);
     database.associateGlobally(AssociationID.KERNEL_MATRIX, kernelMatrix);
     super.setDatabase(database, verbose, time);
   }
 
   /**
-   * Returns the assocoiation ID for the association to be set by the preprocessor.
-   */
+     * Returns the assocoiation ID for the association to be set by the preprocessor.
+     *
+     * @return the assocoiation ID for the association to be set by the preprocessor,
+     *         which is {@link de.lmu.ifi.dbs.elki.database.AssociationID#STRONG_EIGENVECTOR_MATRIX}.
+     * @see AbstractLocallyWeightedDistanceFunction#getAssociationID()
+     */
   AssociationID getAssociationID() {
     return AssociationID.STRONG_EIGENVECTOR_MATRIX;
   }

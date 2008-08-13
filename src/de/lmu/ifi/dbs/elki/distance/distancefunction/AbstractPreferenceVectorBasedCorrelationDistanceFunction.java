@@ -17,7 +17,7 @@ import java.util.BitSet;
  * Abstract super class for all preference vector based correlation distance functions.
  *
  * @author Arthur Zimek
- * @param <V> the type of RealVector used
+ * @param <V> the type of RealVector to compute the distances in between
  * @param <P> the type of Preprocessor used
  */
 public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P extends Preprocessor<V>>
@@ -143,20 +143,20 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
      * Computes the weighted distance between the two specified vectors
      * according to the given preference vector.
      *
-     * @param dv1          the first vector
-     * @param dv2          the second vector
+     * @param v1          the first vector
+     * @param v2          the second vector
      * @param weightVector the preference vector
      * @return the weighted distance between the two specified vectors according to the given preference vector
      */
-    public double weightedDistance(V dv1, V dv2, BitSet weightVector) {
-        if (dv1.getDimensionality() != dv2.getDimensionality()) {
-            throw new IllegalArgumentException("Different dimensionality of NumberVectors\n  first argument: " + dv1.toString() + "\n  second argument: " + dv2.toString());
+    public double weightedDistance(V v1, V v2, BitSet weightVector) {
+        if (v1.getDimensionality() != v2.getDimensionality()) {
+            throw new IllegalArgumentException("Different dimensionality of NumberVectors\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
         }
 
         double sqrDist = 0;
-        for (int i = 1; i <= dv1.getDimensionality(); i++) {
+        for (int i = 1; i <= v1.getDimensionality(); i++) {
             if (weightVector.get(i - 1)) {
-                double manhattanI = dv1.getValue(i).doubleValue() - dv2.getValue(i).doubleValue();
+                double manhattanI = v1.getValue(i).doubleValue() - v2.getValue(i).doubleValue();
                 sqrDist += manhattanI * manhattanI;
             }
         }
@@ -180,14 +180,14 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
      * Computes the weighted distance between the two specified data vectors
      * according to their preference vectors.
      *
-     * @param rv1 the first vector
-     * @param rv2 the the second vector
+     * @param v1 the first vector
+     * @param v2 the the second vector
      * @return the weighted distance between the two specified vectors
      *         according to the preference vector of the first data vector
      */
-    public double weightedPrefereneceVectorDistance(V rv1, V rv2) {
-        double d1 = weightedDistance(rv1, rv2, getDatabase().getAssociation(AssociationID.PREFERENCE_VECTOR, rv1.getID()));
-        double d2 = weightedDistance(rv2, rv1, getDatabase().getAssociation(AssociationID.PREFERENCE_VECTOR, rv2.getID()));
+    public double weightedPrefereneceVectorDistance(V v1, V v2) {
+        double d1 = weightedDistance(v1, v2, getDatabase().getAssociation(AssociationID.PREFERENCE_VECTOR, v1.getID()));
+        double d2 = weightedDistance(v2, v1, getDatabase().getAssociation(AssociationID.PREFERENCE_VECTOR, v2.getID()));
 
         return Math.max(d1, d2);
     }

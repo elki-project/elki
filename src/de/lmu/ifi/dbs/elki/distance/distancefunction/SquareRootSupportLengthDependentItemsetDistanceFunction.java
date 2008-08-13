@@ -11,7 +11,8 @@ import java.util.BitSet;
  *
  * @author Arthur Zimek
  */
-public class SquareRootSupportLengthDependentItemsetDistanceFunction extends FrequencyDependentItemsetDistanceFunction {
+public class SquareRootSupportLengthDependentItemsetDistanceFunction
+    extends FrequencyDependentItemsetDistanceFunction {
 
   /**
    * Provides a DistanceFunction to compute

@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.elki.distance.MeasurementFunction;
  * Interface DistanceFunction describes the requirements of any distance
  * function.
  *
- * @param <O> the type of DatabaseObjects handled by this DistanceFunction
+ * @param <O> the type of DatabaseObject to compute the distances in between
  * @param <D> the type of Distance used by this DistanceFunction
  * @author Arthur Zimek
  */

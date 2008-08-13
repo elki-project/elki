@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.elki.varianceanalysis.LocalPCA;
  * Provides the correlation distance for real valued vectors.
  *
  * @author Elke Achtert
- * @param <V> the type of RealVector used
+ * @param <V> the type of RealVector to compute the distances in between
  * @param <P> the type of Preprocessor used
  * @param <D> the type of CorrelationDistance used
  */

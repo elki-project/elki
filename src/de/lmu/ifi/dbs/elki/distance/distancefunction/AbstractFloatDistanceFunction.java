@@ -8,7 +8,8 @@ import java.util.regex.Pattern;
 /**
  * Provides a DistanceFunction that is based on FloatDistance.
  *
- * @author Arthur Zimek 
+ * @author Arthur Zimek
+ * @param <O> the type of DatabaseObject to compute the distances in between
  */
 public abstract class AbstractFloatDistanceFunction<O extends DatabaseObject> extends
     AbstractDistanceFunction<O, FloatDistance> {

@@ -13,6 +13,8 @@ import java.util.List;
  * (which is a double distance) between feature vectors only in specified dimensions.
  *
  * @author Elke Achtert
+ * @param <V> the type of NumberVector to compute the distances in between
+ * todo parameter
  */
 public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extends NumberVector<V, ?>>
     extends AbstractDoubleDistanceFunction<V> {

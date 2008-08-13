@@ -35,14 +35,14 @@ public abstract class AbstractCorrelationDistanceFunction<V extends RealVector<V
     /**
      * Provides the Correlation distance between the given two vectors by
      * calling {@link #correlationDistance(de.lmu.ifi.dbs.elki.data.RealVector,de.lmu.ifi.dbs.elki.data.RealVector)
-     * correlationDistance(rv1, rv2)}.
+     * correlationDistance(v1, v2)}.
      *
      * @return the Correlation distance between the given two vectors as an
      *         instance of {@link CorrelationDistance CorrelationDistance}.
      * @see DistanceFunction#distance(de.lmu.ifi.dbs.elki.data.DatabaseObject,de.lmu.ifi.dbs.elki.data.DatabaseObject)
      */
-    public final D distance(V rv1, V rv2) {
-        return correlationDistance(rv1, rv2);
+    public final D distance(V v1, V v2) {
+        return correlationDistance(v1, v2);
     }
 
     /**
@@ -56,9 +56,9 @@ public abstract class AbstractCorrelationDistanceFunction<V extends RealVector<V
     /**
      * Computes the correlation distance between the two specified vectors.
      *
-     * @param dv1 first RealVector
-     * @param dv2 second RealVector
+     * @param v1 first RealVector
+     * @param v2 second RealVector
      * @return the correlation distance between the two specified vectors
      */
-    abstract D correlationDistance(V dv1, V dv2);
+    abstract D correlationDistance(V v1, V v2);
 }

@@ -9,8 +9,10 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
  *
  * @author Elke Achtert 
  *         todo weight matrix as parameter
+ * @param <V> the type of NumberVector to compute the distances in between
  */
-public class WeightedDistanceFunction<O extends NumberVector<O, ? >> extends AbstractDoubleDistanceFunction<O> {
+public class WeightedDistanceFunction<V extends NumberVector<V, ? >>
+    extends AbstractDoubleDistanceFunction<V> {
 
   /**
    * The weight matrix.
@@ -32,7 +34,7 @@ public class WeightedDistanceFunction<O extends NumberVector<O, ? >> extends Abs
    *         instance of {@link de.lmu.ifi.dbs.elki.distance.DoubleDistance DoubleDistance}.
    * @see DistanceFunction#distance(de.lmu.ifi.dbs.elki.data.DatabaseObject, de.lmu.ifi.dbs.elki.data.DatabaseObject)
    */
-  public DoubleDistance distance(O o1, O o2) {
+  public DoubleDistance distance(V o1, V o2) {
     if (o1.getDimensionality() != o2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of NumberVectors" +
                                          "\n  first argument: " + o1.toString() +

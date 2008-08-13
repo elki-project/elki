@@ -29,15 +29,15 @@ public class FractalDimensionBasedDistanceFunction<V extends RealVector<V, ?>>
         super(Pattern.compile(new EuclideanDistanceFunction<V>().requiredInputPattern()));
     }
 
-    public DoubleDistance distance(V o1, V o2) {
-        List<Integer> neighbors1 = (List<Integer>) this.getDatabase().getAssociation(this.getAssociationID(), o1.getID());
-        List<Integer> neighbors2 = (List<Integer>) this.getDatabase().getAssociation(this.getAssociationID(), o2.getID());
+    public DoubleDistance distance(V v1, V v2) {
+        List<Integer> neighbors1 = (List<Integer>) this.getDatabase().getAssociation(this.getAssociationID(), v1.getID());
+        List<Integer> neighbors2 = (List<Integer>) this.getDatabase().getAssociation(this.getAssociationID(), v2.getID());
 
         Set<Integer> supporters = new HashSet<Integer>();
         supporters.addAll(neighbors1);
         supporters.addAll(neighbors2);
 
-        V centroid = o1.plus(o2).multiplicate(0.5);
+        V centroid = v1.plus(v2).multiplicate(0.5);
 
         KNNList<DoubleDistance> knnList = new KNNList<DoubleDistance>(this.getPreprocessor().getK(), STANDARD_DOUBLE_DISTANCE_FUNCTION.infiniteDistance());
         for (Integer id : supporters) {

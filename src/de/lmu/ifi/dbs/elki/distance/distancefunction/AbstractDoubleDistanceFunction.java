@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
  * Provides an abstract superclass for DistanceFunctions that are based on DoubleDistance.
  *
  * @author Arthur Zimek
+ * @param <O> the type of DatabaseObject to compute the distances in between
  */
 public abstract class AbstractDoubleDistanceFunction<O extends DatabaseObject>
     extends AbstractDistanceFunction<O, DoubleDistance> {

@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
  * Cosine distance function for feature vectors.
  *
  * @author Arthur Zimek
+ * @param <V> the type of FeatureVector to compute the distances in between
  */
 public class CosineDistanceFunction<V extends FeatureVector<V,?>> extends AbstractDoubleDistanceFunction<V> {
 
@@ -19,20 +20,20 @@ public class CosineDistanceFunction<V extends FeatureVector<V,?>> extends Abstra
   }
 
   /**
-   * Computes the cosine distance for two given FeatureVectors.
+   * Computes the cosine distance for two given feature vectors.
    *
-   * @param o1 first FeatureVector
-   * @param o2 second FeatureVector
-   * @return the cosine distance for two given FeatureVectors o1 and o2
+   * @param v1 first feature vector
+   * @param v2 second feature vector
+   * @return the cosine distance for two given feature vectors v1 and v2
    * @see de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction#distance(de.lmu.ifi.dbs.elki.data.DatabaseObject, de.lmu.ifi.dbs.elki.data.DatabaseObject)
    */
-  public DoubleDistance distance(V o1, V o2) {
-    Matrix v1 = o1.getColumnVector();
-    v1.normalizeColumns();
-    Matrix v2 = o2.getColumnVector();
-    v2.normalizeColumns();
+  public DoubleDistance distance(V v1, V v2) {
+    Matrix m1 = v1.getColumnVector();
+    m1.normalizeColumns();
+    Matrix m2 = v2.getColumnVector();
+    m2.normalizeColumns();
 
-    double d = 1 - v1.transpose().times(v2).get(0, 0);
+    double d = 1 - m1.transpose().times(m2).get(0, 0);
     if (d < 0) d = 0;
     return new DoubleDistance(d);
   }

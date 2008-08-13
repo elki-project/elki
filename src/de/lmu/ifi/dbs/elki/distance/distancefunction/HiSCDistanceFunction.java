@@ -13,7 +13,7 @@ import java.util.BitSet;
  * Distance function used in the HiSC algorithm.
  *
  * @author Elke Achtert
- * @param <V> the type of RealVector used
+ * @param <V> the type of RealVector to compute the distances in between
  * @param <P> the type of Preprocessor used
  */
 public class HiSCDistanceFunction<V extends RealVector<V, ?>, P extends Preprocessor<V>>
