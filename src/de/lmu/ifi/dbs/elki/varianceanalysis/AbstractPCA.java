@@ -119,7 +119,7 @@ public abstract class AbstractPCA extends AbstractParameterizable implements PCA
      *
      * @return the matrix of eigenvectors
      */
-    public Matrix getWeakEigenvectors() {
+    public final Matrix getWeakEigenvectors() {
         return weakEigenvectors.copy();
     }
 
@@ -129,7 +129,7 @@ public abstract class AbstractPCA extends AbstractParameterizable implements PCA
      *
      * @return the eigenvalues
      */
-    public double[] getWeakEigenvalues() {
+    public final double[] getWeakEigenvalues() {
         return Util.copy(weakEigenvalues);
     }
 
