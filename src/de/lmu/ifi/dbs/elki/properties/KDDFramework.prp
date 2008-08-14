@@ -27,10 +27,10 @@ de.lmu.ifi.dbs.elki.algorithm.Algorithm=de.lmu.ifi.dbs.elki.algorithm.APRIORI,\
 		   de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PreDeCon,\
 		   de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PROCLUS,\
 		   de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.SUBCLU,\
-		   de.lmu.ifi.dbs.elki.algorithm.outlier.CorrelationOutlierProbability, \
+		   de.lmu.ifi.dbs.elki.algorithm.outlier.CorrelationOutlierProbability,\
 		   de.lmu.ifi.dbs.elki.algorithm.outlier.GeneralizedLOF,\
 		   de.lmu.ifi.dbs.elki.algorithm.outlier.LOF,\
-		   de.lmu.ifi.dbs.elki.algorithm.outlier.MultivariateCorrelationOutlierProbability, \
+		   de.lmu.ifi.dbs.elki.algorithm.outlier.MultivariateCorrelationOutlierProbability,\
 		   de.lmu.ifi.dbs.elki.algorithm.outlier.OnlineLOF
 #		   
 #           de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering.ChengAndChurch,\
@@ -80,7 +80,7 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction= de.lmu.ifi.dbs.e
            de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionsSelectingEuclideanDistanceFunction,\
            de.lmu.ifi.dbs.elki.distance.distancefunction.DirectSupportDependentItemsetDistanceFunction,\
            de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction,\
-           de.lmu.ifi.dbs.elki.distance.distancefunction.ERiCDistanceFunction,\	
+           de.lmu.ifi.dbs.elki.distance.distancefunction.ERiCDistanceFunction,\
            de.lmu.ifi.dbs.elki.distance.distancefunction.FileBasedDoubleDistanceFunction,\
            de.lmu.ifi.dbs.elki.distance.distancefunction.FileBasedFloatDistanceFunction,\
            de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction,\
