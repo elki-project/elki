@@ -104,6 +104,10 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
      * @return the remaining parameters
      */
     public final List<String> getRemainingParameters() {
+        if (remainingParameters == null) {
+            return new ArrayList<String>();
+        }
+        
         List<String> result = new ArrayList<String>(remainingParameters.size());
         result.addAll(remainingParameters);
         return result;

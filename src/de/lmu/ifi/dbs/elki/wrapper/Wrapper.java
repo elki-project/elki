@@ -13,5 +13,5 @@ public interface Wrapper extends Parameterizable {
      * Runs the wrapper.
      * @throws de.lmu.ifi.dbs.elki.utilities.UnableToComplyException if an error occurs during runninmg the wrapper
      */
-    public void run() throws UnableToComplyException;
+    public void run() throws UnableToComplyException;    
 }

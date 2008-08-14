@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
+import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
@@ -77,7 +78,7 @@ public class AlgorithmTest extends AbstractParameterizable {
     public static final OptionID OUTPUT_ID = OptionID.getOrCreateOptionID(
         "test.out",
         "Name of the directory to write the results of the specified algorithms in. " +
-        "The result of each algorithm is written into a file/directory with the name of " +
+            "The result of each algorithm is written into a file/directory with the name of " +
             "the class of the according algorithm."
     );
 
@@ -106,13 +107,13 @@ public class AlgorithmTest extends AbstractParameterizable {
         AlgorithmTest algorithmTest = new AlgorithmTest();
         try {
             algorithmTest.setParameters(args);
-            algorithmTest.run();
         }
         catch (Exception e) {
-//            e.printStackTrace();
             Throwable cause = e.getCause() != null ? e.getCause() : e;
             algorithmTest.exception(algorithmTest.optionHandler.usage(e.getMessage()), cause);
         }
+
+        algorithmTest.run();
     }
 
     /**
@@ -149,9 +150,9 @@ public class AlgorithmTest extends AbstractParameterizable {
 
         // output
         output = getParameterValue(OUTPUT_PARAM);
-        if (! output.isDirectory()) {
+        if (!output.isDirectory()) {
             throw new WrongParameterValueException("Required parameter " +
-                OUTPUT_PARAM.getName()+" is no (valid) directory!");
+                OUTPUT_PARAM.getName() + " is no (valid) directory!");
         }
 
         // algorithms
@@ -195,22 +196,56 @@ public class AlgorithmTest extends AbstractParameterizable {
     /**
      * Runs the specified algorithms with default parametrization.
      */
-    private void run() throws UnableToComplyException {
-        for (Algorithm algorithm: algorithms) {
-            verbose("Running " + algorithm.getClass().getName());
+    private void run() {
+        for (Algorithm algorithm : algorithms) {
+            verbose("\n*******************************************************************" +
+                "\nRunning " + algorithm.getClass().getName());
 
-            Wrapper wrapper;
+            FileBasedDatabaseConnectionWrapper wrapper;
             try {
-                wrapper = Util.instantiate(Wrapper.class, algorithm.getClass().getSimpleName()+"Wrapper");
+                wrapper = Util.instantiate(FileBasedDatabaseConnectionWrapper.class, algorithm.getClass().getSimpleName() + "Wrapper");
             }
             catch (UnableToComplyException e) {
-                warning("No wrapper class for " + algorithm.getClass() + " available: " + e.getMessage() + " ");
+                warning("No wrapper class for " + algorithm.getClass() + " available (" + e.getMessage() + ")");
+                continue;
             }
-        }
 
+            try {
+                wrapper.setParameters(buildParameters(algorithm));
+                wrapper.run();
+            }
+            catch (UnableToComplyException e) {
+                warning(algorithm.getClass() + " is unable to comply: " +
+                    e.getMessage() + " ");
+            }
+            catch (ParameterException e) {
+                warning(algorithm.getClass() + " has a parameter exception: " +
+                    e.getMessage() + " ");
+            }
+
+        }
 
 
     }
 
+    /**
+     * Returns the array of parameters for the specified algorithm.
+     * @param algorithm the algorithm object
+     * @return the array of parameters for the specified algorithm
+     */
+    private String[] buildParameters(Algorithm algorithm) {
+        List<String> parameters = new ArrayList<String>();
+
+        // in
+        Util.addParameter(parameters, FileBasedDatabaseConnection.INPUT_ID, input.getPath());
+        // out
+        Util.addParameter(parameters, OptionID.OUTPUT,
+            output.getPath() + File.separator + algorithm.getClass().getSimpleName());
+
+        return parameters.toArray(new String[parameters.size()]);
+    }
 
 }
+
+
+

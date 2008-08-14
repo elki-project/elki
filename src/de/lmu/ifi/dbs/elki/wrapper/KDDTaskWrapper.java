@@ -29,7 +29,8 @@ public abstract class KDDTaskWrapper<O extends DatabaseObject> extends AbstractW
      * If this parameter is omitted, per default the output will sequentially be given to STDOUT.
      * <p>Key: {@code -out} </p>
      */
-    private final FileParameter OUTPUT_PARAM = new FileParameter(OptionID.OUTPUT,
+    private final FileParameter OUTPUT_PARAM = new FileParameter(
+        OptionID.OUTPUT,
         FileParameter.FileType.OUTPUT_FILE, true);
 
     /**
