@@ -203,9 +203,9 @@ public class AlgorithmTest extends AbstractParameterizable {
                 continue;
             }
 
-            if (! algorithm.getClass().getSimpleName().startsWith("DiSH")) {
-                continue;
-            }
+//            if (! algorithm.getClass().getSimpleName().startsWith("DiSH")) {
+//                continue;
+//            }
 
             verbose("\n*******************************************************************" +
                 "\nRunning " + algorithm.getClass().getName());
@@ -253,7 +253,7 @@ public class AlgorithmTest extends AbstractParameterizable {
             output.getPath() + File.separator + algorithm.getClass().getSimpleName());
 
         // verbose
-        Util.addFlag(parameters, OptionID.ALGORITHM_VERBOSE);
+//        Util.addFlag(parameters, OptionID.ALGORITHM_VERBOSE);
 
 
         return parameters.toArray(new String[parameters.size()]);
