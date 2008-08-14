@@ -40,13 +40,13 @@ public class DiSHWrapper extends NormalizationWrapper {
      * Parameter that specifies the a minimum number of points as a smoothing
      * factor to avoid the single-link-effect,
      * must be an integer greater than 0.
-     * <p>Default value: {@code 1} </p>
+     * <p>Default value: {@code 10} </p>
      * <p>Key: {@code -dish.mu} </p>
      */
     private final IntParameter MU_PARAM = new IntParameter(
         DiSH.MU_ID,
         new GreaterConstraint(0),
-        1);
+        10);
 
     /**
      * The strategy for determination of the preference vector.
