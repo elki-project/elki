@@ -173,19 +173,19 @@ de.lmu.ifi.dbs.elki.varianceanalysis.CovarianceMatrixBuilder=de.lmu.ifi.dbs.elki
   de.lmu.ifi.dbs.elki.varianceanalysis.WeightedCovarianceMatrixBuilder
 # #######################################################
 # WeightFunction - default package: de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions
-de.lmu.ifi.dbs.elki.varianceanalysis.WeigthFunction=de.lmu.ifi.dbs.elki.varianceanalysis.ConstantWeight,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.ErfcStddevWeight,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.ErfcWeight,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.ExponentialStddevWeight,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.ExponentialWeight,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.GaussStddevWeight,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.GaussWeight,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.InverseLinearWeight,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.InverseProportionalStddevWeight,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.InverseProportionalWeight,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.LinearWeight,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.QuadraticStddevWeight,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.QuadraticWeight
+de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.WeightFunction=de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.ConstantWeight,\
+  de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.ErfcStddevWeight,\
+  de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.ErfcWeight,\
+  de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.ExponentialStddevWeight,\
+  de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.ExponentialWeight,\
+  de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.GaussStddevWeight,\
+  de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.GaussWeight,\
+  de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.InverseLinearWeight,\
+  de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.InverseProportionalStddevWeight,\
+  de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.InverseProportionalWeight,\
+  de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.LinearWeight,\
+  de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.QuadraticStddevWeight,\
+  de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.QuadraticWeight
 # #######################################################
 # ContrastFunction - default package: de.lmu.ifi.dbs.elki.varianceanalysis.ica
 #de.lmu.ifi.dbs.elki.varianceanalysis.ica.ContrastFunction=de.lmu.ifi.dbs.elki.varianceanalysis.ica.ExponentialContrastFunction,\
