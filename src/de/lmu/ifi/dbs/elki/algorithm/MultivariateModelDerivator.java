@@ -70,7 +70,7 @@ public class MultivariateModelDerivator<V extends RealVector<V, ?>, D extends Di
   /**
    * The PCA utility object.
    */
-  private PCAFilteredRunner<V> pca;
+  private PCAFilteredRunner<V> pca = new PCAFilteredRunner<V>();
 
   /**
    * Holds the solution.
