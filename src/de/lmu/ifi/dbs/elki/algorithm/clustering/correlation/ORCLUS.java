@@ -9,8 +9,8 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.elki.varianceanalysis.LinearLocalPCA;
-import de.lmu.ifi.dbs.elki.varianceanalysis.LocalPCA;
+import de.lmu.ifi.dbs.elki.varianceanalysis.PCAResult;
+import de.lmu.ifi.dbs.elki.varianceanalysis.PCARunner;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
@@ -65,26 +65,9 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
   private double alpha;
 
   /**
-   * OptionID for {@link #PCA_PARAM}
-   */
-  public static final OptionID PCA_ID = OptionID.getOrCreateOptionID(
-      "orclus.pca",
-      "Classname of the class to compute PCA " + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(LocalPCA.class) + ".");
-
-  /**
-   * Parameter to specify the PCA implementation to derive local PCA, must
-   * extend {@link de.lmu.ifi.dbs.elki.varianceanalysis.LocalPCA}.
-   * <p>
-   * Key: {@code -orclus.pca}
-   * </p>
-   */
-  private final ClassParameter<LocalPCA> PCA_PARAM = new ClassParameter<LocalPCA>(
-      PCA_ID, LocalPCA.class, LinearLocalPCA.class.getName());
-
-  /**
    * The PCA utility object.
    */
-  private LocalPCA<V> pca;
+  private PCARunner<V> pca;
 
   /**
    * Provides the ORCLUS algorithm, adding parameter {@link #ALPHA_PARAM} to the
@@ -94,7 +77,6 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
     super();
     // parameter alpha
     addOption(ALPHA_PARAM);
-    addOption(PCA_PARAM);
   }
 
   /**
@@ -186,7 +168,6 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
     alpha = getParameterValue(ALPHA_PARAM);
 
     // pca
-    pca = (LocalPCA<V>) PCA_PARAM.instantiateClass();
     remainingParameters = pca.setParameters(remainingParameters);
 
     setParameters(args, remainingParameters);
@@ -282,8 +263,8 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
       results.add(qr);
     }
     Collections.sort(results);
-    pca.runResults(results, database);
-    SortedEigenPairs eigenPairs = pca.getEigenPairs();
+    PCAResult pcares = pca.processQueryResult(results, database);
+    SortedEigenPairs eigenPairs = pcares.getEigenPairs();
     return eigenPairs.reverseEigenVectors(dim);
 
     // Used to be just this:

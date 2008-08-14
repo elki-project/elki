@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.varianceanalysis.LocalPCA;
+import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredResult;
 
 /**
  * Provides the correlation distance for real valued vectors.
@@ -144,8 +144,8 @@ public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P e
      */
     @SuppressWarnings("unchecked")
     D correlationDistance(V dv1, V dv2) {
-        LocalPCA<V> pca1 = (LocalPCA<V>) getDatabase().getAssociation(AssociationID.LOCAL_PCA, dv1.getID());
-        LocalPCA<V> pca2 = (LocalPCA<V>) getDatabase().getAssociation(AssociationID.LOCAL_PCA, dv2.getID());
+        PCAFilteredResult pca1 = getDatabase().getAssociation(AssociationID.LOCAL_PCA, dv1.getID());
+        PCAFilteredResult pca2 = getDatabase().getAssociation(AssociationID.LOCAL_PCA, dv2.getID());
 
         int correlationDistance = correlationDistance(pca1, pca2, dv1.getDimensionality());
         double euclideanDistance = euclideanDistance(dv1, dv2);
@@ -163,7 +163,7 @@ public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P e
      * @return the correlation distance between the two subspaces
      *         defined by the specified PCAs
      */
-    public int correlationDistance(LocalPCA<V> pca1, LocalPCA<V> pca2, int dimensionality) {
+    public int correlationDistance(PCAFilteredResult pca1, PCAFilteredResult pca2, int dimensionality) {
         // TODO nur in eine Richtung?
         // pca of rv1
         Matrix v1 = pca1.getEigenvectors();

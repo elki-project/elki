@@ -5,7 +5,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.varianceanalysis.LocalPCA;
+import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
@@ -77,7 +77,7 @@ public class MultivariateModel<V extends RealVector<V, ?>> extends AbstractResul
    *        induced by the correlation
    * @param nf the number format for output accuracy
    */
-  public MultivariateModel(Database<V> db, Collection<Integer> ids, Vector centroid, LocalPCA pca) {
+  public MultivariateModel(Database<V> db, Collection<Integer> ids, Vector centroid, PCAFilteredResult pca) {
     super(db);
 
     this.correlationDimensionality = pca.getCorrelationDimension();

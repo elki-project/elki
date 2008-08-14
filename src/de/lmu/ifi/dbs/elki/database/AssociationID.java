@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.ConstantObject;
-import de.lmu.ifi.dbs.elki.varianceanalysis.LocalPCA;
+import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredResult;
 
 import java.util.BitSet;
 import java.util.List;
@@ -52,7 +52,7 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
      * The association id to associate a correlation pca to an object.
      */
     @SuppressWarnings("unchecked")
-    public static final AssociationID<LocalPCA> LOCAL_PCA = new AssociationID<LocalPCA>("pca", LocalPCA.class);
+    public static final AssociationID<PCAFilteredResult> LOCAL_PCA = new AssociationID<PCAFilteredResult>("pca", PCAFilteredResult.class);
 
     /**
      * The association id to associate a local dimensionality (e.g. the

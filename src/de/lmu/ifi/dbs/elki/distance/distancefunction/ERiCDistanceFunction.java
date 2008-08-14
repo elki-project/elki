@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.varianceanalysis.LocalPCA;
+import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredResult;
 
 /**
  * Provides a distance function for building the hierarchiy in the ERiC algorithm.
@@ -206,8 +206,8 @@ public class ERiCDistanceFunction<V extends RealVector<V, ?>, P extends Preproce
      */
     @SuppressWarnings("unchecked")
     public BitDistance distance(V v1, V v2) {
-        LocalPCA<V> pca1 = (LocalPCA<V>) getDatabase().getAssociation(AssociationID.LOCAL_PCA, v1.getID());
-        LocalPCA<V> pca2 = (LocalPCA<V>) getDatabase().getAssociation(AssociationID.LOCAL_PCA, v2.getID());
+        PCAFilteredResult pca1 = getDatabase().getAssociation(AssociationID.LOCAL_PCA, v1.getID());
+        PCAFilteredResult pca2 = getDatabase().getAssociation(AssociationID.LOCAL_PCA, v2.getID());
         return distance(v1, v2, pca1, pca2);
     }
 
@@ -223,7 +223,7 @@ public class ERiCDistanceFunction<V extends RealVector<V, ?>, P extends Preproce
      * @return the distance between two given DatabaseObjects according to this
      *         distance function
      */
-    public BitDistance distance(V v1, V v2, LocalPCA<V> pca1, LocalPCA<V> pca2) {
+    public BitDistance distance(V v1, V v2, PCAFilteredResult pca1, PCAFilteredResult pca2) {
         if (pca1.getCorrelationDimension() < pca2.getCorrelationDimension()) {
             throw new IllegalStateException("pca1.getCorrelationDimension() < pca2.getCorrelationDimension(): " +
                 pca1.getCorrelationDimension() + " < " + pca2.getCorrelationDimension());
@@ -275,7 +275,7 @@ public class ERiCDistanceFunction<V extends RealVector<V, ?>, P extends Preproce
      * @return true, if the strong eigenvectors of the two specified
      *         pcas span up the same space
      */
-    private boolean approximatelyLinearDependent(LocalPCA<V> pca1, LocalPCA<V> pca2) {
+    private boolean approximatelyLinearDependent(PCAFilteredResult pca1, PCAFilteredResult pca2) {
         Matrix m1_czech = pca1.dissimilarityMatrix();
         Matrix v2_strong = pca2.adapatedStrongEigenvectors();
         for (int i = 0; i < v2_strong.getColumnDimensionality(); i++) {

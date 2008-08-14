@@ -10,6 +10,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.*;
 import de.lmu.ifi.dbs.elki.varianceanalysis.LimitEigenPairFilter;
 import de.lmu.ifi.dbs.elki.varianceanalysis.LinearLocalPCA;
+import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredResult;
+import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredRunner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,9 +60,9 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
     private boolean absolute;
 
     /**
-     * The parameter settings for the PCA.
+     * The Filtered PCA Runner
      */
-    private String[] pcaParameters;
+    private PCAFilteredRunner<V> pca = new PCAFilteredRunner<V>();
 
     public FourCPreprocessor() {
         super();
@@ -95,31 +97,21 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
      * @param neighbors the neighbors as query results of the given point
      * @param database  the database for which the preprocessing is performed
      */
-    protected void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<V> database) {
-        LinearLocalPCA<V> pca = new LinearLocalPCA<V>();
-        try {
-            pca.setParameters(pcaParameters);
-        }
-        catch (ParameterException e) {
-            // tested before
-            // TODO more sophisticated description
-            throw new RuntimeException("This should never happen!");
-        }
-
+    protected void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<V> database) {        
         List<Integer> ids = new ArrayList<Integer>(neighbors.size());
         for (QueryResult<D> neighbor : neighbors) {
             ids.add(neighbor.getID());
         }
-        pca.run(ids, database);
+        PCAFilteredResult pcares = pca.processIds(ids, database);
 
         if (this.debug) {
             StringBuffer msg = new StringBuffer();
             msg.append("\n").append(id).append(" ").append(database.getAssociation(AssociationID.LABEL, id));
-            msg.append("\ncorrDim ").append(pca.getCorrelationDimension());
+            msg.append("\ncorrDim ").append(pcares.getCorrelationDimension());
             debugFine(msg.toString());
         }
-        database.associate(AssociationID.LOCAL_DIMENSIONALITY, id, pca.getCorrelationDimension());
-        database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, pca.similarityMatrix());
+        database.associate(AssociationID.LOCAL_DIMENSIONALITY, id, pcares.getCorrelationDimension());
+        database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, pcares.similarityMatrix());
     }
 
     /**
@@ -160,7 +152,6 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
 //			throw new WrongParameterValueException("Illegal parameter setting: " + "Flag " + ABSOLUTE_F + " is set, " + "but no value for " + DELTA_P + " is specified.");
 //		}
 
-        LinearLocalPCA<V> tmpPCA = new LinearLocalPCA<V>();
         // save parameters for pca
         List<String> tmpPCAParameters = new ArrayList<String>();
         // eigen pair filter
@@ -179,8 +170,8 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
         // small value
         Util.addParameter(tmpPCAParameters, LinearLocalPCA.SMALL_ID, "1");
 
-        pcaParameters = tmpPCAParameters.toArray(new String[tmpPCAParameters.size()]);
-        tmpPCA.setParameters(pcaParameters);
+        String[] pcaParameters = tmpPCAParameters.toArray(new String[tmpPCAParameters.size()]);
+        pca.setParameters(pcaParameters);
         setParameters(args, remainingParameters);
 
         return remainingParameters;
@@ -194,14 +185,6 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
     public List<AttributeSettings> getAttributeSettings() {
         List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
-        LinearLocalPCA<V> pca = new LinearLocalPCA<V>();
-        try {
-            pca.setParameters(pcaParameters);
-        }
-        catch (ParameterException e) {
-            // tested before
-            throw new RuntimeException("This should never happen!");
-        }
         attributeSettings.addAll(pca.getAttributeSettings());
 
         return attributeSettings;

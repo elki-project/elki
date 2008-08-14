@@ -22,8 +22,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterFlagGlobalConstraint;
 import de.lmu.ifi.dbs.elki.varianceanalysis.CompositeEigenPairFilter;
 import de.lmu.ifi.dbs.elki.varianceanalysis.LimitEigenPairFilter;
-import de.lmu.ifi.dbs.elki.varianceanalysis.LocalKernelPCA;
-import de.lmu.ifi.dbs.elki.varianceanalysis.LocalPCA;
+import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredResult;
+import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.varianceanalysis.NormalizingEigenPairFilter;
 
 import java.util.ArrayList;
@@ -89,9 +89,9 @@ public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector
     private boolean absolute;
 
     /**
-     * The parameter settings for the PCA.
+     * PCA utility object
      */
-    private String[] pcaParameters;
+    private PCAFilteredRunner<V> pca = new PCAFilteredRunner<V>();
 
     /**
      *
@@ -129,28 +129,20 @@ public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector
      */
     @Override
     protected void runVarianceAnalysis(final Integer id, final List<QueryResult<D>> neighbors, final Database<V> database) {
-        final LocalKernelPCA<V> pca = new LocalKernelPCA<V>();
-        try {
-            pca.setParameters(pcaParameters);
-        }
-        catch (final ParameterException e) {
-            // tested before
-            throw new RuntimeException("This should never happen!");
-        }
         final List<Integer> ids = new ArrayList<Integer>(neighbors.size());
         for (final QueryResult<D> neighbor : neighbors) {
             ids.add(neighbor.getID());
         }
-        pca.run(ids, database);
+        PCAFilteredResult pcares = pca.processIds(ids, database);
 
         if (debug) {
             final StringBuffer msg = new StringBuffer();
             msg.append("\n").append(id).append(" ").append(database.getAssociation(AssociationID.LABEL, id));
-            msg.append("\ncorrDim ").append(pca.getCorrelationDimension());
+            msg.append("\ncorrDim ").append(pcares.getCorrelationDimension());
             debugFine(msg.toString());
         }
-        database.associate(AssociationID.LOCAL_DIMENSIONALITY, id, pca.getCorrelationDimension());
-        database.associate(AssociationID.STRONG_EIGENVECTOR_MATRIX, id, pca.getStrongEigenvectors());
+        database.associate(AssociationID.LOCAL_DIMENSIONALITY, id, pcares.getCorrelationDimension());
+        database.associate(AssociationID.STRONG_EIGENVECTOR_MATRIX, id, pcares.getStrongEigenvectors());
         database.associate(AssociationID.NEIGHBORS, id, ids);
     }
 
@@ -178,7 +170,6 @@ public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector
                 + DELTA_P + " is specified.");
         }
 
-        final LocalKernelPCA<V> tmpPCA = new LocalKernelPCA<V>();
         // save parameters for pca
         final List<String> tmpPCAParameters = new ArrayList<String>();
         // eigen pair filter
@@ -202,13 +193,13 @@ public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector
         // Big and small are not used in this version of KernelFourC
         // as they implicitly take the values 1 (big) and 0 (small),
         // big value
-        Util.addParameter(tmpPCAParameters, LocalPCA.BIG_ID, "1");
+        Util.addParameter(tmpPCAParameters, PCAFilteredRunner.BIG_ID, "1");
 
         // small value
-        Util.addParameter(tmpPCAParameters, LocalPCA.SMALL_ID, "0");
+        Util.addParameter(tmpPCAParameters, PCAFilteredRunner.SMALL_ID, "0");
 
-        pcaParameters = tmpPCAParameters.toArray(new String[tmpPCAParameters.size()]);
-        tmpPCA.setParameters(pcaParameters);
+        String[] pcaParameters = tmpPCAParameters.toArray(new String[tmpPCAParameters.size()]);
+        pca.setParameters(pcaParameters);
         setParameters(args, remainingParameters);
 
         return remainingParameters;

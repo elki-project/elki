@@ -6,6 +6,8 @@ import de.lmu.ifi.dbs.elki.algorithm.result.MultivariateModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.varianceanalysis.LocalPCA;
+import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredResult;
+import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
@@ -69,23 +71,9 @@ public class MultivariateModelDerivator<V extends RealVector<V, ?>, D extends Di
   private final Flag RANDOM_SAMPLE_FLAG = new Flag(OptionID.DEPENDENCY_DERIVATOR_RANDOM_SAMPLE);
 
   /**
-   * OptionID for {@link #PCA_PARAM}
-   */
-  public static final OptionID PCA_ID = OptionID.getOrCreateOptionID("derivator.pca", "Classname of the class to compute PCA " + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(LocalPCA.class) + ".");
-
-  /**
-   * Parameter to specify the PCA implementation to derive local PCA, must
-   * extend {@link de.lmu.ifi.dbs.elki.varianceanalysis.LocalPCA}.
-   * <p>
-   * Key: {@code -derivator.pca}
-   * </p>
-   */
-  private final ClassParameter<LocalPCA> PCA_PARAM = new ClassParameter<LocalPCA>(PCA_ID, LocalPCA.class);
-
-  /**
    * The PCA utility object.
    */
-  private LocalPCA<V> pca;
+  private PCAFilteredRunner<V> pca;
 
   /**
    * Holds the solution.
@@ -104,9 +92,6 @@ public class MultivariateModelDerivator<V extends RealVector<V, ?>, D extends Di
 
     // random sample
     addOption(RANDOM_SAMPLE_FLAG);
-
-    // parameter pca-class
-    addOption(PCA_PARAM);
   }
 
   /**
@@ -179,9 +164,9 @@ public class MultivariateModelDerivator<V extends RealVector<V, ?>, D extends Di
 
     Vector centroid = centroidDV.getColumnVector();
 
-    pca.run(ids, db);
+    PCAFilteredResult pcares = pca.processIds(ids, db);
 
-    solution = new MultivariateModel<V>(db, ids, centroid, pca);
+    solution = new MultivariateModel<V>(db, ids, centroid, pcares);
 
     if(isVerbose()) {
       StringBuilder log = new StringBuilder();
@@ -213,7 +198,6 @@ public class MultivariateModelDerivator<V extends RealVector<V, ?>, D extends Di
     }
 
     // pca
-    pca = (LocalPCA<V>) PCA_PARAM.instantiateClass();
     remainingParameters = pca.setParameters(remainingParameters);
 
     setParameters(args, remainingParameters);

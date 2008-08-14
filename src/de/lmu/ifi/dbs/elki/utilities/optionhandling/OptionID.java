@@ -117,7 +117,13 @@ public final class OptionID extends ConstantObject<OptionID> {
     );
 
     /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.varianceanalysis.AbstractPCA#EIGENPAIR_FILTER_PARAM}
+     * OptionID for {@link de.lmu.ifi.dbs.elki.varianceanalysis.PCARunner#COVARIANCE_PARAM}
+     */
+    public static final OptionID PCA_COVARIANCE_MATRIX = new OptionID("pca.covariance",
+      "Class used to compute the covariance matrix.");
+    
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredRunner#EIGENPAIR_FILTER_PARAM}
      */
     public static final OptionID PCA_EIGENPAIR_FILTER = new OptionID("pca.filter",
         "Classname of the filter to determine the strong and weak eigenvectors " +

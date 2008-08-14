@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.algorithm.result.clustering;
 
 import de.lmu.ifi.dbs.elki.data.RealVector;
-import de.lmu.ifi.dbs.elki.varianceanalysis.LocalPCA;
+import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +20,7 @@ public class HierarchicalCorrelationCluster<V extends RealVector<V, ?>>
     /**
      * The PCA of this cluster.
      */
-    private final LocalPCA<V> pca;
+    private final PCAFilteredResult pca;
 
     /**
      * The centroid of this cluster.
@@ -37,7 +37,7 @@ public class HierarchicalCorrelationCluster<V extends RealVector<V, ?>>
      * @param level      the level of this cluster in the graph
      * @param levelIndex the index of this cluster within the level
      */
-    public HierarchicalCorrelationCluster(LocalPCA<V> pca,
+    public HierarchicalCorrelationCluster(PCAFilteredResult pca,
                                           Set<Integer> ids,
                                           String label, int level, int levelIndex) {
         this(pca, ids,
@@ -60,7 +60,7 @@ public class HierarchicalCorrelationCluster<V extends RealVector<V, ?>>
      * @param level      the level of this cluster in the graph
      * @param levelIndex the index of this cluster within the level
      */
-    public HierarchicalCorrelationCluster(LocalPCA<V> pca,
+    public HierarchicalCorrelationCluster(PCAFilteredResult pca,
                                           Set<Integer> ids,
                                           List<HierarchicalCorrelationCluster<V>> children,
                                           List<HierarchicalCorrelationCluster<V>> parents,
@@ -74,7 +74,7 @@ public class HierarchicalCorrelationCluster<V extends RealVector<V, ?>>
      *
      * @return the PCA of this cluster
      */
-    public LocalPCA<V> getPCA() {
+    public PCAFilteredResult getPCA() {
         return pca;
     }
 

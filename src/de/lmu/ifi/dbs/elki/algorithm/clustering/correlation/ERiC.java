@@ -19,8 +19,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.varianceanalysis.FirstNEigenPairFilter;
-import de.lmu.ifi.dbs.elki.varianceanalysis.LinearLocalPCA;
-import de.lmu.ifi.dbs.elki.varianceanalysis.LocalPCA;
+import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredResult;
+import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredRunner;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -232,6 +232,9 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
                 Integer correlationDimension = it.next();
                 ClusteringResult<V> clusteringResult = copacResult.getResult(correlationDimension);
 
+                PCAFilteredRunner<V> pca = new PCAFilteredRunner<V>();
+                pca.setParameters(pcaParameters(correlationDimension));
+
                 // clusters and noise within one corrDim
                 if (noiseDimension == null || correlationDimension != noiseDimension) {
                     List<HierarchicalCorrelationCluster<V>> correlationClusters = new ArrayList<HierarchicalCorrelationCluster<V>>();
@@ -240,13 +243,10 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
                     // clusters
                     for (Database<V> db : clustering.values()) {
                         // run pca
-                        // FIXME: Hard-coded PCA class name!
-                        LocalPCA<V> pca = new LinearLocalPCA<V>();
-                        pca.setParameters(pcaParameters(correlationDimension));
-                        pca.run(Util.getDatabaseIDs(db), db);
+                        PCAFilteredResult pcares = pca.processIds(Util.getDatabaseIDs(db), db);
                         // create a new correlation cluster
                         Set<Integer> ids = new HashSet<Integer>(Util.getDatabaseIDs(db));
-                        HierarchicalCorrelationCluster<V> correlationCluster = new HierarchicalCorrelationCluster<V>(pca, ids,
+                        HierarchicalCorrelationCluster<V> correlationCluster = new HierarchicalCorrelationCluster<V>(pcares, ids,
                             "[" + correlationDimension + "_" + correlationClusters.size() + "]",
                             dimensionality - correlationDimension,
                             correlationClusters.size());
@@ -273,11 +273,11 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
 
             // create noise cluster containing all noise objects over all partitions
             if (!noiseIDs.isEmpty()) {
-                LocalPCA<V> pca = new LinearLocalPCA<V>();
+                PCAFilteredRunner<V> pca = new PCAFilteredRunner<V>();
                 pca.setParameters(pcaParameters(dimensionality));
-                pca.run(noiseIDs, database);
+                PCAFilteredResult pcares = pca.processIds(noiseIDs, database);
                 List<HierarchicalCorrelationCluster<V>> noiseClusters = new ArrayList<HierarchicalCorrelationCluster<V>>();
-                HierarchicalCorrelationCluster<V> noiseCluster = new HierarchicalCorrelationCluster<V>(pca,
+                HierarchicalCorrelationCluster<V> noiseCluster = new HierarchicalCorrelationCluster<V>(pcares,
                     noiseIDs,
                     "[noise]", 0, 0);
                 noiseClusters.add(noiseCluster);

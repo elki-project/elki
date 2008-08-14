@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.varianceanalysis.LocalPCA;
+import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredResult;
 
 import java.util.regex.Pattern;
 
@@ -124,9 +125,9 @@ public class SubspaceDistanceFunction<V extends RealVector<V, ?>, P extends Prep
      */
     public SubspaceDistance distance(V o1, V o2) {
         // noinspection unchecked
-        LocalPCA<V> pca1 = (LocalPCA<V>) getDatabase().getAssociation(AssociationID.LOCAL_PCA, o1.getID());
+        PCAFilteredResult pca1 = getDatabase().getAssociation(AssociationID.LOCAL_PCA, o1.getID());
         // noinspection unchecked
-        LocalPCA<V> pca2 = (LocalPCA<V>) getDatabase().getAssociation(AssociationID.LOCAL_PCA, o2.getID());
+        PCAFilteredResult pca2 = getDatabase().getAssociation(AssociationID.LOCAL_PCA, o2.getID());
         return distance(o1, o2, pca1, pca2);
     }
 
@@ -142,7 +143,7 @@ public class SubspaceDistanceFunction<V extends RealVector<V, ?>, P extends Prep
      * @return the distance between two given DatabaseObjects according to this
      *         distance function
      */
-    public SubspaceDistance distance(V o1, V o2, LocalPCA<V> pca1, LocalPCA<V> pca2) {
+    public SubspaceDistance distance(V o1, V o2, PCAFilteredResult pca1, PCAFilteredResult pca2) {
         if (pca1.getCorrelationDimension() != pca2.getCorrelationDimension()) {
             throw new IllegalStateException("pca1.getCorrelationDimension() != pca2.getCorrelationDimension()");
         }

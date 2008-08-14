@@ -19,7 +19,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.varianceanalysis.LocalPCA;
+import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredResult;
+import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredRunner;
+import de.lmu.ifi.dbs.elki.varianceanalysis.PCARunner;
 
 import java.text.NumberFormat;
 import java.util.Collection;
@@ -106,24 +108,9 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
   private final Flag RANDOM_SAMPLE_FLAG = new Flag(OptionID.DEPENDENCY_DERIVATOR_RANDOM_SAMPLE);
 
   /**
-   * OptionID for
-   * {@link de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator#PCA_PARAM}
-   */
-  public static final OptionID PCA_ID = OptionID.getOrCreateOptionID("derivator.pca", "Classname of the class to compute PCA " + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(LocalPCA.class) + ".");
-
-  /**
-   * Parameter to specify the PCA implementation to derive local PCA, must
-   * extend {@link de.lmu.ifi.dbs.elki.varianceanalysis.LocalPCA}.
-   * <p>
-   * Key: {@code -derivator.pca}
-   * </p>
-   */
-  private final ClassParameter<LocalPCA> PCA_PARAM = new ClassParameter<LocalPCA>(PCA_ID, LocalPCA.class);
-
-  /**
    * Holds the object performing the pca.
    */
-  private LocalPCA<V> pca;
+  private PCAFilteredRunner<V> pca;
 
   /**
    * Holds the solution.
@@ -154,9 +141,6 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
 
     // random sample
     addOption(RANDOM_SAMPLE_FLAG);
-
-    // parameter pca-class
-    addOption(PCA_PARAM);
   }
 
   /**
@@ -232,18 +216,18 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
       verbose("PCA...");
     }
 
-    pca.run(ids, db);
+    PCAFilteredResult pcares = pca.processIds(ids, db);
     // Matrix weakEigenvectors =
     // pca.getEigenvectors().times(pca.selectionMatrixOfWeakEigenvectors());
-    Matrix weakEigenvectors = pca.getWeakEigenvectors();
+    Matrix weakEigenvectors = pcares.getWeakEigenvectors();
     // Matrix strongEigenvectors =
     // pca.getEigenvectors().times(pca.selectionMatrixOfStrongEigenvectors());
-    Matrix strongEigenvectors = pca.getStrongEigenvectors();
+    Matrix strongEigenvectors = pcares.getStrongEigenvectors();
     Vector centroid = centroidDV.getColumnVector();
 
     // TODO: what if we don't have any weak eigenvectors?
     if(weakEigenvectors.getColumnDimensionality() == 0) {
-      sol = new CorrelationAnalysisSolution<V>(null, db, strongEigenvectors, weakEigenvectors, pca.similarityMatrix(), centroid, NF);
+      sol = new CorrelationAnalysisSolution<V>(null, db, strongEigenvectors, weakEigenvectors, pcares.similarityMatrix(), centroid, NF);
     }
     else {
 
@@ -251,13 +235,13 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
       if(this.debug) {
         StringBuilder log = new StringBuilder();
         log.append("strong Eigenvectors:\n");
-        log.append(pca.getEigenvectors().times(pca.selectionMatrixOfStrongEigenvectors()).toString(NF));
+        log.append(pcares.getEigenvectors().times(pcares.selectionMatrixOfStrongEigenvectors()).toString(NF));
         log.append('\n');
         log.append("transposed weak Eigenvectors:\n");
         log.append(transposedWeakEigenvectors.toString(NF));
         log.append('\n');
         log.append("Eigenvalues:\n");
-        log.append(Util.format(pca.getEigenvalues(), " , ", 2));
+        log.append(Util.format(pcares.getEigenvalues(), " , ", 2));
         log.append('\n');
         debugFine(log.toString());
       }
@@ -289,7 +273,7 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
       LinearEquationSystem lq = new LinearEquationSystem(a, b);
       lq.solveByTotalPivotSearch();
 
-      sol = new CorrelationAnalysisSolution<V>(lq, db, strongEigenvectors, pca.getWeakEigenvectors(), pca.similarityMatrix(), centroid, NF);
+      sol = new CorrelationAnalysisSolution<V>(lq, db, strongEigenvectors, pcares.getWeakEigenvectors(), pcares.similarityMatrix(), centroid, NF);
 
       if(isVerbose()) {
         StringBuilder log = new StringBuilder();
@@ -336,8 +320,6 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
       sampleSize = getParameterValue(SAMPLE_SIZE_PARAM);
     }
 
-    // pca
-    pca = (LocalPCA<V>) PCA_PARAM.instantiateClass();
     remainingParameters = pca.setParameters(remainingParameters);
 
     setParameters(args, remainingParameters);

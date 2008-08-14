@@ -12,8 +12,8 @@ import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
-import de.lmu.ifi.dbs.elki.varianceanalysis.LinearLocalPCA;
-import de.lmu.ifi.dbs.elki.varianceanalysis.LocalPCA;
+import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredResult;
+import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredRunner;
 
 import java.util.Iterator;
 import java.util.List;
@@ -25,22 +25,6 @@ import java.util.List;
  * @author Elke Achtert
  */
 public abstract class HiCOPreprocessor<V extends RealVector<V, ?>> extends AbstractParameterizable implements Preprocessor<V> {
-  /**
-   * The default PCA class name.
-   */
-  public static final String DEFAULT_PCA_CLASS = LinearLocalPCA.class.getName();
-
-  /**
-   * Parameter for PCA.
-   */
-  public static final String PCA_CLASS_P = "pca";
-
-  /**
-   * Description for parameter pca.
-   */
-  public static final String PCA_CLASS_D = "the pca to determine the strong eigenvectors "
-    + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(LocalPCA.class) + ". Default: " + DEFAULT_PCA_CLASS;
-
   /**
    * The default distance function for the PCA.
    */
@@ -57,11 +41,6 @@ public abstract class HiCOPreprocessor<V extends RealVector<V, ?>> extends Abstr
   public static final String PCA_DISTANCE_FUNCTION_D = "the distance function for the PCA to determine the distance between database objects " + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) + ". Default: " + DEFAULT_PCA_DISTANCE_FUNCTION;
 
   /**
-   * The classname of the PCA to determine the strong eigenvectors.
-   */
-  protected String pcaClassName;
-
-  /**
    * The parameter settings for the PCA.
    */
   private String[] pcaParameters;
@@ -72,16 +51,16 @@ public abstract class HiCOPreprocessor<V extends RealVector<V, ?>> extends Abstr
   protected DistanceFunction<V, DoubleDistance> pcaDistanceFunction;
 
   /**
+   * PCA utility object
+   */
+  private PCAFilteredRunner<V> pca = new PCAFilteredRunner<V>();
+  
+  /**
    * Provides a new Preprocessor that computes the correlation dimension of
    * objects of a certain database.
    */
   public HiCOPreprocessor() {
     super();
-    // parameter pca-class
-    ClassParameter<LocalPCA<V>> pcaClass = new ClassParameter(PCA_CLASS_P, PCA_CLASS_D, LocalPCA.class);
-    pcaClass.setDefaultValue(DEFAULT_PCA_CLASS);
-    optionHandler.put(pcaClass);
-
     // parameter pca distance function
     ClassParameter<DistanceFunction<V, DoubleDistance>> pcaDist = new ClassParameter(PCA_DISTANCE_FUNCTION_P, PCA_DISTANCE_FUNCTION_D, DistanceFunction.class);
     pcaDist.setDefaultValue(DEFAULT_PCA_DISTANCE_FUNCTION);
@@ -102,48 +81,32 @@ public abstract class HiCOPreprocessor<V extends RealVector<V, ?>> extends Abstr
       throw new IllegalArgumentException("Database must not be null!");
     }
 
-    try {
-      long start = System.currentTimeMillis();
-      Progress progress = new Progress("Preprocessing correlation dimension", database.size());
+    long start = System.currentTimeMillis();
+    Progress progress = new Progress("Preprocessing correlation dimension", database.size());
+    if(verbose) {
+      verbose("Preprocessing:");
+    }
+
+    int processed = 1;
+    for(Iterator<Integer> it = database.iterator(); it.hasNext();) {
+      Integer id = it.next();
+      List<QueryResult<DoubleDistance>> objs = resultsForPCA(id, database, verbose, false);
+
+      PCAFilteredResult pcares = pca.processQueryResult(objs, database);
+
+      database.associate(AssociationID.LOCAL_PCA, id, pcares);
+      database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, pcares.similarityMatrix());
+      progress.setProcessed(processed++);
+
       if(verbose) {
-        verbose("Preprocessing:");
-      }
-
-      int processed = 1;
-      for(Iterator<Integer> it = database.iterator(); it.hasNext();) {
-        Integer id = it.next();
-        List<QueryResult<DoubleDistance>> objs = resultsForPCA(id, database, verbose, false);
-
-        // noinspection unchecked
-        // todo???
-        // FIXME: Can we use a global pca instance, instead of reinstantiating
-        // all the time?
-        LocalPCA<V> pca = Util.instantiate(LocalPCA.class, pcaClassName);
-        pca.setParameters(pcaParameters);
-        pca.runResults(objs, database);
-
-        database.associate(AssociationID.LOCAL_PCA, id, pca);
-        database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, pca.similarityMatrix());
-        progress.setProcessed(processed++);
-
-        if(verbose) {
-          progress(progress);
-        }
-      }
-
-      long end = System.currentTimeMillis();
-      if(time) {
-        long elapsedTime = end - start;
-        verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
+        progress(progress);
       }
     }
-    catch(ParameterException e) {
-      // tested before
-      throw new RuntimeException("This should never happen!", e);
-    }
-    catch(UnableToComplyException e) {
-      // tested before
-      throw new RuntimeException("This should never happen!", e);
+
+    long end = System.currentTimeMillis();
+    if(time) {
+      long elapsedTime = end - start;
+      verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
     }
   }
 
@@ -169,20 +132,7 @@ public abstract class HiCOPreprocessor<V extends RealVector<V, ?>> extends Abstr
     }
     remainingParameters = pcaDistanceFunction.setParameters(remainingParameters);
 
-    // pca
-    LocalPCA<V> tmpPCA;
-    pcaClassName = (String) optionHandler.getOptionValue(PCA_CLASS_P);
-    try {
-      // noinspection unchecked
-      // todo
-      tmpPCA = Util.instantiate(LocalPCA.class, pcaClassName);
-    }
-    catch(UnableToComplyException e) {
-      throw new WrongParameterValueException(PCA_CLASS_P, pcaClassName, PCA_CLASS_D);
-    }
-
-    remainingParameters = tmpPCA.setParameters(remainingParameters);
-    pcaParameters = tmpPCA.getParameters();
+    remainingParameters = pca.setParameters(remainingParameters);
 
     setParameters(args, remainingParameters);
 
@@ -198,22 +148,7 @@ public abstract class HiCOPreprocessor<V extends RealVector<V, ?>> extends Abstr
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 
-    try {
-      // noinspection unchecked
-      // todo???
-      LocalPCA<V> pca = Util.instantiate(LocalPCA.class, pcaClassName);
-      pca.setParameters(pcaParameters);
-      attributeSettings.addAll(pca.getAttributeSettings());
-    }
-    catch(UnableToComplyException e) {
-      // tested before!!! TODO more meaningful message
-      throw new RuntimeException("This should never happen!");
-    }
-    catch(ParameterException e) {
-      // tested before!!! TODO more meaningful message
-      throw new RuntimeException("This should never happen!");
-    }
-
+    attributeSettings.addAll(pca.getAttributeSettings());
     return attributeSettings;
   }
 
