@@ -99,7 +99,7 @@ public class PCAFilteredRunner<V extends RealVector<V, ?>> extends PCARunner<V> 
     addOption(BIG_PARAM);
     addOption(SMALL_PARAM);
     
-    // global constraintsmall <--> big
+    // global constraint small <--> big
     optionHandler.setGlobalParameterConstraint(new LessGlobalConstraint<Double>(SMALL_PARAM, BIG_PARAM));
   }
 

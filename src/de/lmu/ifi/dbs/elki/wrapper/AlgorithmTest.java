@@ -230,6 +230,7 @@ public class AlgorithmTest extends AbstractParameterizable {
 
     /**
      * Returns the array of parameters for the specified algorithm.
+     *
      * @param algorithm the algorithm object
      * @return the array of parameters for the specified algorithm
      */
@@ -241,6 +242,10 @@ public class AlgorithmTest extends AbstractParameterizable {
         // out
         Util.addParameter(parameters, OptionID.OUTPUT,
             output.getPath() + File.separator + algorithm.getClass().getSimpleName());
+
+        // verbose
+        Util.addFlag(parameters, OptionID.ALGORITHM_VERBOSE);
+
 
         return parameters.toArray(new String[parameters.size()]);
     }
