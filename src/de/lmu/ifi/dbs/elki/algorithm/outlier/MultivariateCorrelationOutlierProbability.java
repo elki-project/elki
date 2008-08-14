@@ -56,7 +56,7 @@ public class MultivariateCorrelationOutlierProbability<V extends RealVector<V, ?
   /**
    * Holds the object performing the dependency derivation
    */
-  private MultivariateModelDerivator<V, DoubleDistance> modelDerivator;
+  private MultivariateModelDerivator<V, DoubleDistance> modelDerivator = new MultivariateModelDerivator<V, DoubleDistance>();
 
   /**
    * Provides the result of the algorithm.
@@ -134,8 +134,6 @@ public class MultivariateCorrelationOutlierProbability<V extends RealVector<V, ?
 
     k = getParameterValue(K_PARAM);
 
-    // dependency derivator (currently hardcoded)
-    modelDerivator = new MultivariateModelDerivator<V, DoubleDistance>();
     remainingParameters = modelDerivator.setParameters(remainingParameters);
 
     setParameters(args, remainingParameters);
