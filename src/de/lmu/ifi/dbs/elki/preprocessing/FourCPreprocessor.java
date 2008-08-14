@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.*;
 import de.lmu.ifi.dbs.elki.varianceanalysis.LimitEigenPairFilter;
-import de.lmu.ifi.dbs.elki.varianceanalysis.LinearLocalPCA;
 import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredRunner;
 
@@ -165,10 +164,10 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
         tmpPCAParameters.add(Double.toString(delta));
 
         // big value
-        Util.addParameter(tmpPCAParameters, LinearLocalPCA.BIG_ID, "50");
+        Util.addParameter(tmpPCAParameters, PCAFilteredRunner.BIG_ID, "50");
 
         // small value
-        Util.addParameter(tmpPCAParameters, LinearLocalPCA.SMALL_ID, "1");
+        Util.addParameter(tmpPCAParameters, PCAFilteredRunner.SMALL_ID, "1");
 
         String[] pcaParameters = tmpPCAParameters.toArray(new String[tmpPCAParameters.size()]);
         pca.setParameters(pcaParameters);
