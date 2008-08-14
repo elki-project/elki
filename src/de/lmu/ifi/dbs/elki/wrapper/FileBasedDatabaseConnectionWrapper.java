@@ -17,8 +17,9 @@ public abstract class FileBasedDatabaseConnectionWrapper extends KDDTaskWrapper 
      * Parameter that specifies the name of the input file to be parsed.
      * <p>Key: {@code -dbc.in} </p>
      */
-    private final FileParameter INPUT_PARAM =
-        new FileParameter(FileBasedDatabaseConnection.INPUT_ID, FileParameter.FileType.INPUT_FILE);
+    private final FileParameter INPUT_PARAM = new FileParameter(
+        FileBasedDatabaseConnection.INPUT_ID,
+        FileParameter.FileType.INPUT_FILE);
 
     /**
      * Adds parameter

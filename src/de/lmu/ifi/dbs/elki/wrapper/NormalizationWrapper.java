@@ -9,6 +9,8 @@ import java.util.List;
 /**
  * NormalizationWrapper is an abstract super class for all
  * file based database connection wrappers that need to normalize the input data.
+ * NormalizationWrapper performs an attribute wise normalization on the database objects
+ * and reverts the result to the original values.
  *
  * @author Elke Achtert
  */

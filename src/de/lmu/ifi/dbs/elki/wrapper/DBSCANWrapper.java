@@ -13,8 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
 import java.util.List;
 
 /**
- * Wrapper class for DBSCAN algorithm. Performs an attribute wise normalization on
- * the database objects.
+ * Wrapper class for the {@link DBSCAN} algorithm with default parametrization.
  *
  * @author Elke Achtert
  */
