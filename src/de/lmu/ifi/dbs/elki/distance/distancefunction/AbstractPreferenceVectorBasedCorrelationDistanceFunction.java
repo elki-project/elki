@@ -90,7 +90,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
      */
     public PreferenceVectorBasedCorrelationDistance infiniteDistance() {
         return new PreferenceVectorBasedCorrelationDistance(
-            getDatabase().dimensionality(),
+            dimensionality(),
             Integer.MAX_VALUE,
             Double.POSITIVE_INFINITY,
             new BitSet());
@@ -101,7 +101,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
      */
     public PreferenceVectorBasedCorrelationDistance nullDistance() {
         return new PreferenceVectorBasedCorrelationDistance(
-            getDatabase().dimensionality(),
+            dimensionality(),
             0,
             0,
             new BitSet());
@@ -112,7 +112,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
      */
     public PreferenceVectorBasedCorrelationDistance undefinedDistance() {
         return new PreferenceVectorBasedCorrelationDistance(
-            getDatabase().dimensionality(),
+            dimensionality(),
             -1,
             Double.NaN,
             new BitSet());
@@ -143,8 +143,8 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
      * Computes the weighted distance between the two specified vectors
      * according to the given preference vector.
      *
-     * @param v1          the first vector
-     * @param v2          the second vector
+     * @param v1           the first vector
+     * @param v2           the second vector
      * @param weightVector the preference vector
      * @return the weighted distance between the two specified vectors according to the given preference vector
      */
@@ -261,5 +261,16 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
         return "Classname of the preprocessor to determine the preference vector of each object "
             + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(getPreprocessorSuperClass()) +
             ".";
+    }
+
+    /**
+     * Returns the dimensionality of the database.
+     * @return the dimensionality of the database, -1 if no database is assigned.
+     */
+    private int dimensionality() {
+        if (getDatabase() != null) {
+            return getDatabase().dimensionality();
+        }
+        else return -1;
     }
 }

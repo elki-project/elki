@@ -107,7 +107,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
      */
     public DiSH() {
         super();
-//    debug = true;
+        this.debug = true;
 
         // parameter epsilon
         addOption(EPSILON_PARAM);

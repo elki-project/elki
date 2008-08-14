@@ -31,8 +31,10 @@ public class DiSHWrapper extends NormalizationWrapper {
      * <p>Default value: {@code 0.001} </p>
      * <p>Key: {@code -dish.epsilon} </p>
      */
-    private final DoubleParameter EPSILON_PARAM =
-        new DoubleParameter(DiSH.EPSILON_ID, new GreaterEqualConstraint(0), 0.001);
+    private final DoubleParameter EPSILON_PARAM = new DoubleParameter(
+        DiSH.EPSILON_ID,
+        new GreaterEqualConstraint(0),
+        0.001);
 
     /**
      * Parameter that specifies the a minimum number of points as a smoothing
@@ -41,8 +43,10 @@ public class DiSHWrapper extends NormalizationWrapper {
      * <p>Default value: {@code 1} </p>
      * <p>Key: {@code -dish.mu} </p>
      */
-    private final IntParameter MU_PARAM = new IntParameter(DiSH.MU_ID,
-        new GreaterConstraint(0), 1);
+    private final IntParameter MU_PARAM = new IntParameter(
+        DiSH.MU_ID,
+        new GreaterConstraint(0),
+        1);
 
     /**
      * The strategy for determination of the preference vector.

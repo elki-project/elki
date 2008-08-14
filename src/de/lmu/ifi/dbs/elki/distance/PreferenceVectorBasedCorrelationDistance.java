@@ -139,14 +139,14 @@ public class PreferenceVectorBasedCorrelationDistance
     }
 
     /**
-     * Checks if the dimensionality values and common preference vectors
+     * Checks if the dimensionality values
      * of this distance and the specified distance are equal.
      * If the check fails an IllegalArgumentException is thrown,
      * otherwise {@link CorrelationDistance#compareTo(CorrelationDistance)
      * CorrelationDistance#compareTo(distance)} is returned.
      *
      * @return the value of {@link CorrelationDistance#compareTo(CorrelationDistance) CorrelationDistance#compareTo(distance)}
-     * @throws IllegalArgumentException if the dimensionality values and common preference vectors
+     * @throws IllegalArgumentException if the dimensionality values
      *                                  of this distance and the specified distance are not equal
      * @see Comparable#compareTo(Object)
      */
@@ -156,14 +156,6 @@ public class PreferenceVectorBasedCorrelationDistance
                 "and the specified distance need to be equal.\n" +
                 "this.dimensionality     " + this.dimensionality + "\n" +
                 "distance.dimensionality " + distance.dimensionality + "\n"
-            );
-        }
-
-        if (!this.commonPreferenceVector.equals(distance.commonPreferenceVector)) {
-            throw new IllegalArgumentException("The common preference vectors of this distance " +
-                "and the specified distance need to be equal.\n" +
-                "this.commonPreferenceVector     " + this.commonPreferenceVector + "\n" +
-                "distance.commonPreferenceVector " + distance.commonPreferenceVector + "\n"
             );
         }
 
