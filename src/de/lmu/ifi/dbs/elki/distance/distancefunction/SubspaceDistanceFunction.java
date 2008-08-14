@@ -39,18 +39,18 @@ public class SubspaceDistanceFunction<V extends RealVector<V, ?>, P extends Prep
      *
      * @return the name of the default preprocessor,
      *         which is {@link de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor}
-     * @see de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction#getDefaultPreprocessorClassName()
+     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getDefaultPreprocessorClassName()
      */
     public String getDefaultPreprocessorClassName() {
         return KnnQueryBasedHiCOPreprocessor.class.getName();
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction#getPreprocessorDescription() ()
+     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getPreprocessorSuperClass()
      */
     public final String getPreprocessorDescription() {
         return "Classname of the preprocessor to determine the correlation dimension of each object "
-            + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(getPreprocessorSuperClassName()) +
+            + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(getPreprocessorSuperClass()) +
             ".";
     }
 
@@ -59,9 +59,9 @@ public class SubspaceDistanceFunction<V extends RealVector<V, ?>, P extends Prep
      *
      * @return the super class for the preprocessor,
      *         which is {@link de.lmu.ifi.dbs.elki.preprocessing.Preprocessor}
-     * @see de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction#getPreprocessorSuperClassName()
+     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getPreprocessorSuperClass()
      */
-    public Class<Preprocessor> getPreprocessorSuperClassName() {
+    public Class<Preprocessor> getPreprocessorSuperClass() {
         return Preprocessor.class;
     }
 
@@ -70,7 +70,7 @@ public class SubspaceDistanceFunction<V extends RealVector<V, ?>, P extends Prep
      *
      * @return the assocoiation ID for the association to be set by the preprocessor,
      *         which is {@link AssociationID#LOCAL_PCA}
-     * @see de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction#getAssociationID()
+     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getAssociationID()
      */
     public AssociationID getAssociationID() {
         return AssociationID.LOCAL_PCA;

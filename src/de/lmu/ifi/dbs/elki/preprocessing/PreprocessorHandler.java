@@ -20,7 +20,7 @@ import java.util.List;
  * using a preprocessor running on a certain database.
  *
  * @author Elke Achtert
- * @param <O> the type of DatabaseObject used
+ * @param <O> the type of DatabaseObject to run the Preprocessor on
  * @param <P> the type of Preprocessor used
  */
 public class PreprocessorHandler<O extends DatabaseObject, P extends Preprocessor<O>>
@@ -91,29 +91,24 @@ public class PreprocessorHandler<O extends DatabaseObject, P extends Preprocesso
      * {@link #PREPROCESSOR_PARAM} and flag {@link #OMIT_PREPROCESSING_FLAG}
      * to the option handler additionally to parameters of super class.
      *
-     * @param preprocessorParamDescription the description for the preprocessor class
-     * @param preprocessorSuperClassName   the super class for the preprocessor class
-     * @param defaultPreprocessorClassName the class name for the default preprocessor class
-     * @param associationID                the assocoiation ID for the association to be set by the preprocessor
+     * @param preprocessorClient the class using this handler
      */
-    public PreprocessorHandler(String preprocessorParamDescription,
-                               Class<P> preprocessorSuperClassName,
-                               String defaultPreprocessorClassName,
-                               AssociationID associationID) {
+    public PreprocessorHandler(PreprocessorClient preprocessorClient) {
 
         // preprocessor
-        PREPROCESSOR_PARAM = new ClassParameter<P>(
+        // noinspection unchecked
+        PREPROCESSOR_PARAM = new ClassParameter(
             PREPROCESSOR_ID,
-            preprocessorSuperClassName,
-            defaultPreprocessorClassName);
-        PREPROCESSOR_PARAM.setShortDescription(preprocessorParamDescription);
+            preprocessorClient.getPreprocessorSuperClass(),
+            preprocessorClient.getDefaultPreprocessorClassName());
+        PREPROCESSOR_PARAM.setShortDescription(preprocessorClient.getPreprocessorDescription());
         addOption(PREPROCESSOR_PARAM);
 
         // omit flag
         addOption(OMIT_PREPROCESSING_FLAG);
 
         // association id
-        this.associationID = associationID;
+        this.associationID = preprocessorClient.getAssociationID();
     }
 
     /**

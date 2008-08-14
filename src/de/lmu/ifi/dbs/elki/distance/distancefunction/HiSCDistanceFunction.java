@@ -70,8 +70,9 @@ public class HiSCDistanceFunction<V extends RealVector<V, ?>, P extends Preproce
     /**
      * Returns the name of the default preprocessor.
      *
-     * @return the name of the default preprocessor, which is {@link HiSCPreprocessor}
-     * @see de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction#getDefaultPreprocessorClassName()
+     * @return the name of the default preprocessor,
+     * which is {@link HiSCPreprocessor}
+     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getDefaultPreprocessorClassName()
      */
     public String getDefaultPreprocessorClassName() {
         return HiSCPreprocessor.class.getName();

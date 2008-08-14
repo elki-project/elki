@@ -237,29 +237,29 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
      *
      * @return the assocoiation ID for the association to be set by the preprocessor,
      *         which is {@link AssociationID#PREFERENCE_VECTOR}
-     * @see de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction#getAssociationID()
+     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getAssociationID()
      */
     public final AssociationID getAssociationID() {
         return AssociationID.PREFERENCE_VECTOR;
     }
 
     /**
-     * Returns the super class for the preprocessor.
+     * Returns the super class for the preprocessor parameter.
      *
-     * @return the super class for the preprocessor,
+     * @return the super class for the preprocessor parameter,
      *         which is {@link PreferenceVectorPreprocessor}
-     * @see de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction#getPreprocessorSuperClassName()
+     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getPreprocessorSuperClass()
      */
-    public final Class<PreferenceVectorPreprocessor> getPreprocessorSuperClassName() {
+    public final Class<PreferenceVectorPreprocessor> getPreprocessorSuperClass() {
         return PreferenceVectorPreprocessor.class;
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction#getPreprocessorDescription() ()
+     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getPreprocessorSuperClass()
      */
     public final String getPreprocessorDescription() {
         return "Classname of the preprocessor to determine the preference vector of each object "
-            + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(getPreprocessorSuperClassName()) +
+            + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(getPreprocessorSuperClass()) +
             ".";
     }
 }

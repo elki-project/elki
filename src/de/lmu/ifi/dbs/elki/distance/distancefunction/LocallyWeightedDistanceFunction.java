@@ -157,9 +157,9 @@ public class LocallyWeightedDistanceFunction<V extends RealVector<V, ?>, P exten
      *
      * @return the assocoiation ID for the association to be set by the preprocessor,
      *         which is {@link de.lmu.ifi.dbs.elki.database.AssociationID#LOCALLY_WEIGHTED_MATRIX}.
-     * @see AbstractLocallyWeightedDistanceFunction#getAssociationID()
+     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getAssociationID()
      */
-    AssociationID getAssociationID() {
+    public AssociationID getAssociationID() {
         return AssociationID.LOCALLY_WEIGHTED_MATRIX;
     }
 

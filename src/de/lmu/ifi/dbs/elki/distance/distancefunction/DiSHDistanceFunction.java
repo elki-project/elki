@@ -69,8 +69,9 @@ public class DiSHDistanceFunction<V extends RealVector<V, ?>, P extends Preproce
     /**
      * Returns the name of the default preprocessor.
      *
-     * @return the name of the default preprocessor, which is {@link DiSHPreprocessor}
-     * @see de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction#getDefaultPreprocessorClassName()
+     * @return the name of the default preprocessor,
+     * which is {@link DiSHPreprocessor}
+     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getDefaultPreprocessorClassName()
      */
     public String getDefaultPreprocessorClassName() {
         return DiSHPreprocessor.class.getName();

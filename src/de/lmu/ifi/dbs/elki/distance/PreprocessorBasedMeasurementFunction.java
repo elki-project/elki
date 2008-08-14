@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.elki.distance;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
+import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient;
 
 /**
  * Describes the requirements of any measurement
@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
  * @param <P> the type of Preprocessor used
  */
 public interface PreprocessorBasedMeasurementFunction<O extends DatabaseObject, P extends Preprocessor<O>, D extends Distance<D>>
-    extends MeasurementFunction<O, D> {
+    extends MeasurementFunction<O, D>, PreprocessorClient {
 
     /**
      * Returns the preprocessor of this measurement function.
@@ -23,32 +23,4 @@ public interface PreprocessorBasedMeasurementFunction<O extends DatabaseObject, 
      * @return the preprocessor of this measurement function
      */
     P getPreprocessor();
-
-    /**
-     * Returns the name of the default preprocessor.
-     *
-     * @return the name of the default preprocessor
-     */
-    String getDefaultPreprocessorClassName();
-
-    /**
-     * Returns the description for the preprocessor.
-     *
-     * @return the description for the preprocessor
-     */
-    String getPreprocessorDescription();
-
-    /**
-     * Returns the super class for the preprocessor.
-     *
-     * @return the super class for the preprocessor
-     */
-    Class<? extends Preprocessor> getPreprocessorSuperClassName();
-
-    /**
-     * Returns the assocoiation ID for the association to be set by the preprocessor.
-     *
-     * @return the assocoiation ID for the association to be set by the preprocessor
-     */
-    AssociationID getAssociationID();
 }

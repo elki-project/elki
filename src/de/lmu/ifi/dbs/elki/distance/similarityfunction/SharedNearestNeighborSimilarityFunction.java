@@ -140,7 +140,7 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
      *
      * @return the assocoiation ID for the association to be set by the preprocessor,
      *         which is {@link AssociationID#SHARED_NEAREST_NEIGHBORS_SET}
-     * @see de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction#getAssociationID()
+     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getAssociationID()
      */
     public AssociationID<SortedSet> getAssociationID() {
         return AssociationID.SHARED_NEAREST_NEIGHBORS_SET;
@@ -151,14 +151,14 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
      *
      * @return the name of the default preprocessor,
      *         which is {@link SharedNearestNeighborsPreprocessor}
-     * @see de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction#getDefaultPreprocessorClassName()
+     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getDefaultPreprocessorClassName()
      */
     public String getDefaultPreprocessorClassName() {
         return SharedNearestNeighborsPreprocessor.class.getName();
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction#getPreprocessorDescription() ()
+     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getPreprocessorSuperClass()
      */
     public String getPreprocessorDescription() {
         return "The Classname of the preprocessor to determine the neighbors of the objects.";
@@ -169,9 +169,9 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
      *
      * @return the super class for the preprocessor,
      *         which is {@link SharedNearestNeighborsPreprocessor}
-     * @see de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction#getPreprocessorSuperClassName()
+     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getPreprocessorSuperClass()
      */
-    public Class<? extends Preprocessor> getPreprocessorSuperClassName() {
+    public Class<? extends Preprocessor> getPreprocessorSuperClass() {
         return SharedNearestNeighborsPreprocessor.class;
     }
 }

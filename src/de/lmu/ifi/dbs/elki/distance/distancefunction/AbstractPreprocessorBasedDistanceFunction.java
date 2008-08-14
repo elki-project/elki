@@ -36,12 +36,7 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
      */
     public AbstractPreprocessorBasedDistanceFunction(Pattern pattern) {
         super(pattern);
-        // noinspection unchecked
-        preprocessorHandler = new PreprocessorHandler(
-            this.getPreprocessorDescription(),
-            this.getPreprocessorSuperClassName(),
-            this.getDefaultPreprocessorClassName(),
-            this.getAssociationID());
+        preprocessorHandler = new PreprocessorHandler<O,P>(this);
     }
 
     /**

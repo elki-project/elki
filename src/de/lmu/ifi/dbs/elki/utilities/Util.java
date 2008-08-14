@@ -961,16 +961,16 @@ public final class Util extends AbstractLoggable {
             }
         }
         catch (InstantiationException e) {
-            throw new UnableToComplyException(e.getMessage(), e);
+            throw new UnableToComplyException("InstantiationException: " + e.getMessage(), e);
         }
         catch (IllegalAccessException e) {
-            throw new UnableToComplyException(e.getMessage(), e);
+            throw new UnableToComplyException("IllegalAccessException: " + e.getMessage(), e);
         }
         catch (ClassNotFoundException e) {
-            throw new UnableToComplyException(e.getMessage(), e);
+            throw new UnableToComplyException("ClassNotFoundException: " + e.getMessage(), e);
         }
         catch (ClassCastException e) {
-            throw new UnableToComplyException(e.getMessage(), e);
+            throw new UnableToComplyException("ClassCastException: " + e.getMessage(), e);
         }
         return instance;
     }

@@ -37,158 +37,158 @@ import java.util.List;
  * @param <P> the type of Preprocessor used
  * todo parameter
  */
-public class KernelBasedLocallyWeightedDistanceFunction<V extends RealVector<V,?>,P extends Preprocessor<V>>
-    extends AbstractLocallyWeightedDistanceFunction<V,P> {
+public class KernelBasedLocallyWeightedDistanceFunction<V extends RealVector<V, ?>, P extends Preprocessor<V>>
+    extends AbstractLocallyWeightedDistanceFunction<V, P> {
 
-  /**
-   * The default kernel function.
-   */
-  public static final String DEFAULT_KERNEL_FUNCTION_CLASS = LinearKernelFunction.class.getName();
+    /**
+     * The default kernel function.
+     */
+    public static final String DEFAULT_KERNEL_FUNCTION_CLASS = LinearKernelFunction.class.getName();
 
-  /**
-   * Description for parameter kernel.
-   */
-  public static final String KERNEL_FUNCTION_CLASS_D = "the kernel function which is used to compute the similarity." +
-                                                       "Default: " + DEFAULT_KERNEL_FUNCTION_CLASS;
+    /**
+     * Description for parameter kernel.
+     */
+    public static final String KERNEL_FUNCTION_CLASS_D = "the kernel function which is used to compute the similarity." +
+        "Default: " + DEFAULT_KERNEL_FUNCTION_CLASS;
 
-  /**
-   * Parameter for kernel.
-   */
-  public static final String KERNEL_FUNCTION_CLASS_P = "kernel";
+    /**
+     * Parameter for kernel.
+     */
+    public static final String KERNEL_FUNCTION_CLASS_P = "kernel";
 
-  /**
-   * The kernel function that is used.
-   */
-  private KernelFunction<V, DoubleDistance> kernelFunction;
+    /**
+     * The kernel function that is used.
+     */
+    private KernelFunction<V, DoubleDistance> kernelFunction;
 
-  /**
-   * The global precomputed kernel matrix
-   */
-  private KernelMatrix<V> kernelMatrix;
+    /**
+     * The global precomputed kernel matrix
+     */
+    private KernelMatrix<V> kernelMatrix;
 
-  /**
-   * Provides a kernel based locally weighted distance function.
-   */
-  public KernelBasedLocallyWeightedDistanceFunction() {
-    super();
-    //kernel function
-    ClassParameter<KernelFunction<V,DoubleDistance>> kernelFunctionClass = new ClassParameter(KERNEL_FUNCTION_CLASS_P, KERNEL_FUNCTION_CLASS_D, KernelFunction.class);
-    kernelFunctionClass.setDefaultValue(DEFAULT_KERNEL_FUNCTION_CLASS);
-    optionHandler.put(kernelFunctionClass);
-  }
-
-  /**
-   * Computes the distance between two given DatabaseObjects according to this
-   * distance function.
-   *
-   * @param v1 first DatabaseObject
-   * @param v2 second DatabaseObject
-   * @return the distance between two given DatabaseObjects according to this
-   *         distance function
-   */
-  public DoubleDistance distance(V v1, V v2) {
-    double value;
-    if (v1 != v2) {
-      value = Math.max(computeDistance(v1, v2), computeDistance(v2, v1));
-    }
-    else {
-      value = 0.0;
-    }
-    return new DoubleDistance(value);
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
-
-    // kernel function
-    String kernelFunctionClass = (String) optionHandler.getOptionValue(KERNEL_FUNCTION_CLASS_P);
-    remainingParameters = kernelFunction.setParameters(remainingParameters);
-    setParameters(args, remainingParameters);
-
-    return remainingParameters;
-  }
-
-  /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = super.getAttributeSettings();
-    result.addAll(kernelFunction.getAttributeSettings());
-    return result;
-  }
-
-  /**
-   * Computes the distance between two given real vectors according to this
-   * distance function.
-   *
-   * @param v1 first FeatureVector
-   * @param v2 second FeatureVector
-   * @return the distance between two given real vectors according to this
-   *         distance function
-   */
-  private double computeDistance(final V v1, final V v2) {
-    //get list of neighbor objects
-    final List<Integer> neighbors = (List<Integer>) getDatabase().getAssociation(AssociationID.NEIGHBORS, v1.getID());
-
-    //the colums in the kernel matrix corresponding to the two objects o1 and o2
-    //maybe kernel_o1 column has already been computed
-    Matrix kernel_o1 = (Matrix) getDatabase().getAssociation(AssociationID.CACHED_MATRIX, v1.getID());
-    Matrix kernel_o2;
-    //has kernel_o1 column been computed yet
-    if (kernel_o1 == null) {
-      kernel_o1 = kernelMatrix.getSubColumn(v1.getID(), neighbors);
-      kernel_o2 = kernelMatrix.getSubColumn(v2.getID(), neighbors);
-      //save kernel_o1 column
-      getDatabase().associate(AssociationID.CACHED_MATRIX, v1.getID(), kernel_o1);
-    }
-    else {
-      kernel_o2 = kernelMatrix.getSubColumn(v2.getID(), neighbors);
+    /**
+     * Provides a kernel based locally weighted distance function.
+     */
+    public KernelBasedLocallyWeightedDistanceFunction() {
+        super();
+        //kernel function
+        ClassParameter<KernelFunction<V, DoubleDistance>> kernelFunctionClass = new ClassParameter(KERNEL_FUNCTION_CLASS_P, KERNEL_FUNCTION_CLASS_D, KernelFunction.class);
+        kernelFunctionClass.setDefaultValue(DEFAULT_KERNEL_FUNCTION_CLASS);
+        optionHandler.put(kernelFunctionClass);
     }
 
-    //get the strong eigenvector matrix of object o1
-    final Matrix strongEigenvectorMatrix = (Matrix) getDatabase().getAssociation(AssociationID.STRONG_EIGENVECTOR_MATRIX, v1.getID());
+    /**
+     * Computes the distance between two given DatabaseObjects according to this
+     * distance function.
+     *
+     * @param v1 first DatabaseObject
+     * @param v2 second DatabaseObject
+     * @return the distance between two given DatabaseObjects according to this
+     *         distance function
+     */
+    public DoubleDistance distance(V v1, V v2) {
+        double value;
+        if (v1 != v2) {
+            value = Math.max(computeDistance(v1, v2), computeDistance(v2, v1));
+        }
+        else {
+            value = 0.0;
+        }
+        return new DoubleDistance(value);
+    }
 
-    //compute the delta vector
-    final Matrix delta = kernel_o1.minus(kernel_o2);
+    /**
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
+     */
+    public String[] setParameters(String[] args) throws ParameterException {
+        String[] remainingParameters = super.setParameters(args);
 
-    //project objects on principal components of kernel space
-    final Matrix delta_projected = delta.transpose().times(strongEigenvectorMatrix);
+        // kernel function
+        String kernelFunctionClass = (String) optionHandler.getOptionValue(KERNEL_FUNCTION_CLASS_P);
+        remainingParameters = kernelFunction.setParameters(remainingParameters);
+        setParameters(args, remainingParameters);
 
-    //compute the squared distance on the principal components of the projected objects
-    final double distS = delta_projected.times(delta_projected.transpose()).get(0, 0);
+        return remainingParameters;
+    }
 
-    //compute the square of the complete kernel derived distance
-    //final double distC = Math.pow(kernelFunction.distance(o1, o2).getDoubleValue(),2.0);
-    final double distC = kernelMatrix.getSquaredDistance(v1.getID(), v2.getID());
+    /**
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
+     */
+    public List<AttributeSettings> getAttributeSettings() {
+        List<AttributeSettings> result = super.getAttributeSettings();
+        result.addAll(kernelFunction.getAttributeSettings());
+        return result;
+    }
 
-    //indirectly compute the distance on the weak components of the projected objects using both other distances
-    final double distW = Math.sqrt(Math.abs(distC - distS));
-    return distW;
-  }
+    /**
+     * Computes the distance between two given real vectors according to this
+     * distance function.
+     *
+     * @param v1 first FeatureVector
+     * @param v2 second FeatureVector
+     * @return the distance between two given real vectors according to this
+     *         distance function
+     */
+    private double computeDistance(final V v1, final V v2) {
+        //get list of neighbor objects
+        final List<Integer> neighbors = (List<Integer>) getDatabase().getAssociation(AssociationID.NEIGHBORS, v1.getID());
 
-  /**
-   * @see DistanceFunction#setDatabase(de.lmu.ifi.dbs.elki.database.Database, boolean, boolean)
-   */
-  @Override
-  public void setDatabase(Database<V> database, boolean verbose, boolean time) {
-    //precompute kernelMatrix and store it in the database
-    kernelMatrix = new KernelMatrix<V>(kernelFunction, database);
-    KernelMatrix.centerKernelMatrix(kernelMatrix);
-    database.associateGlobally(AssociationID.KERNEL_MATRIX, kernelMatrix);
-    super.setDatabase(database, verbose, time);
-  }
+        //the colums in the kernel matrix corresponding to the two objects o1 and o2
+        //maybe kernel_o1 column has already been computed
+        Matrix kernel_o1 = (Matrix) getDatabase().getAssociation(AssociationID.CACHED_MATRIX, v1.getID());
+        Matrix kernel_o2;
+        //has kernel_o1 column been computed yet
+        if (kernel_o1 == null) {
+            kernel_o1 = kernelMatrix.getSubColumn(v1.getID(), neighbors);
+            kernel_o2 = kernelMatrix.getSubColumn(v2.getID(), neighbors);
+            //save kernel_o1 column
+            getDatabase().associate(AssociationID.CACHED_MATRIX, v1.getID(), kernel_o1);
+        }
+        else {
+            kernel_o2 = kernelMatrix.getSubColumn(v2.getID(), neighbors);
+        }
 
-  /**
+        //get the strong eigenvector matrix of object o1
+        final Matrix strongEigenvectorMatrix = (Matrix) getDatabase().getAssociation(AssociationID.STRONG_EIGENVECTOR_MATRIX, v1.getID());
+
+        //compute the delta vector
+        final Matrix delta = kernel_o1.minus(kernel_o2);
+
+        //project objects on principal components of kernel space
+        final Matrix delta_projected = delta.transpose().times(strongEigenvectorMatrix);
+
+        //compute the squared distance on the principal components of the projected objects
+        final double distS = delta_projected.times(delta_projected.transpose()).get(0, 0);
+
+        //compute the square of the complete kernel derived distance
+        //final double distC = Math.pow(kernelFunction.distance(o1, o2).getDoubleValue(),2.0);
+        final double distC = kernelMatrix.getSquaredDistance(v1.getID(), v2.getID());
+
+        //indirectly compute the distance on the weak components of the projected objects using both other distances
+        final double distW = Math.sqrt(Math.abs(distC - distS));
+        return distW;
+    }
+
+    /**
+     * @see DistanceFunction#setDatabase(de.lmu.ifi.dbs.elki.database.Database,boolean,boolean)
+     */
+    @Override
+    public void setDatabase(Database<V> database, boolean verbose, boolean time) {
+        //precompute kernelMatrix and store it in the database
+        kernelMatrix = new KernelMatrix<V>(kernelFunction, database);
+        KernelMatrix.centerKernelMatrix(kernelMatrix);
+        database.associateGlobally(AssociationID.KERNEL_MATRIX, kernelMatrix);
+        super.setDatabase(database, verbose, time);
+    }
+
+    /**
      * Returns the assocoiation ID for the association to be set by the preprocessor.
      *
      * @return the assocoiation ID for the association to be set by the preprocessor,
      *         which is {@link de.lmu.ifi.dbs.elki.database.AssociationID#STRONG_EIGENVECTOR_MATRIX}.
-     * @see AbstractLocallyWeightedDistanceFunction#getAssociationID()
+     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getAssociationID()
      */
-  AssociationID getAssociationID() {
-    return AssociationID.STRONG_EIGENVECTOR_MATRIX;
-  }
+    public AssociationID getAssociationID() {
+        return AssociationID.STRONG_EIGENVECTOR_MATRIX;
+    }
 }
