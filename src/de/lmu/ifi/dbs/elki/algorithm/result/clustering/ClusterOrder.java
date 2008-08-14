@@ -88,21 +88,26 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>>
     /**
      * @see de.lmu.ifi.dbs.elki.algorithm.result.Result#output(File,Normalization,List)
      */
-    public void output(File out, Normalization<O> normalization,
+    public void output(File out,
+                       Normalization<O> normalization,
                        List<AttributeSettings> settings) throws UnableToComplyException {
+
+        if (!out.getName().endsWith(".txt")) {
+            out = new File(out.getPath() + ".txt");
+        }
+
         PrintStream outStream;
         try {
             outStream = new PrintStream(new FileOutputStream(out));
         }
         catch (Exception e) {
-            outStream = new PrintStream(
-                new FileOutputStream(FileDescriptor.out));
+            outStream = new PrintStream(new FileOutputStream(FileDescriptor.out));
         }
         output(outStream, normalization, settings);
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.result.Result#output(java.io.PrintStream, de.lmu.ifi.dbs.elki.normalization.Normalization, java.util.List)
+     * @see de.lmu.ifi.dbs.elki.algorithm.result.Result#output(java.io.PrintStream,de.lmu.ifi.dbs.elki.normalization.Normalization,java.util.List)
      */
     public void output(PrintStream outStream, Normalization<O> normalization,
                        List<AttributeSettings> settings) throws UnableToComplyException {
@@ -210,5 +215,5 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>>
      */
     public Iterator<ClusterOrderEntry<D>> iterator() {
         return co.iterator();
-  }
+    }
 }
