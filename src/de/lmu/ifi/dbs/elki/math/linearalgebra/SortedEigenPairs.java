@@ -18,6 +18,13 @@ public class SortedEigenPairs {
   private EigenPair[] eigenPairs;
 
   /**
+   * Creates a new empty SortedEigenPairs object.
+   * Can only be called from the copy() method.
+   */
+  private SortedEigenPairs() {    
+  }
+
+  /**
    * Creates a new SortedEigenPairs object from the specified eigenvalue
    * decomposition. The eigenvectors are sorted according to the specified
    * order.
@@ -153,5 +160,16 @@ public class SortedEigenPairs {
       result.append("\n").append(eigenPair);
     }
     return result.toString();
+  }
+  
+  /**
+   * Returns a deep copy of this object
+   * 
+   * @return new copy
+   */
+  public SortedEigenPairs copy() {
+    SortedEigenPairs cp = new SortedEigenPairs();
+    cp.eigenPairs = this.eigenPairs.clone();
+    return cp;
   }
 }
