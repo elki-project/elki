@@ -65,7 +65,7 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
      */
     public static final OptionID HOLDOUT_ID = OptionID.getOrCreateOptionID(
         "classifier.holdout",
-        "<Classname of the holdout for evaluation  " +
+        "<Classname of the holdout for evaluation " +
             Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Holdout.class) + "."
     );
 
@@ -75,9 +75,10 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
      * <p>Key: {@code -classifier.holdout} </p>
      * <p>Default value: {@link StratifiedCrossValidation} </p>
      */
-    private final ClassParameter<Holdout> HOLDOUT_PARAM =
-        new ClassParameter<Holdout>(EVALUATION_PROCEDURE_ID,
-            Holdout.class, StratifiedCrossValidation.class.getName());
+    private final ClassParameter<Holdout> HOLDOUT_PARAM = new ClassParameter<Holdout>(
+        HOLDOUT_ID,
+        Holdout.class,
+        StratifiedCrossValidation.class.getName());
 
     /**
      * Holds the value of {@link #HOLDOUT_PARAM}.

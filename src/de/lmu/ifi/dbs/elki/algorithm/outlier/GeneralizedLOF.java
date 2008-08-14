@@ -48,7 +48,7 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
      */
     private final ClassParameter<DistanceFunction> REACHABILITY_DISTANCE_FUNCTION_PARAM =
         new ClassParameter<DistanceFunction>(
-            DISTANCE_FUNCTION_ID,
+            REACHABILITY_DISTANCE_FUNCTION_ID,
             DistanceFunction.class,
             EuclideanDistanceFunction.class.getName());
 

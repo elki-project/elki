@@ -198,6 +198,10 @@ public class AlgorithmTest extends AbstractParameterizable {
      */
     private void run() {
         for (Algorithm algorithm : algorithms) {
+            if (algorithm.getClass().getSimpleName().startsWith("Dependency")) {
+                continue;
+            }
+
             verbose("\n*******************************************************************" +
                 "\nRunning " + algorithm.getClass().getName());
 

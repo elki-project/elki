@@ -71,9 +71,9 @@ public abstract class Parameter<T, C> extends Option<T> {
     /**
      * Constructs a parameter with the given optionID, constraints, and optional flag.
      *
-     * @param optionID    the unique id of this parameter
-     * @param constraints the constraints of this parameter, may be empty if there are no constraints
-     * @param optional    specifies if this parameter is an optional parameter
+     * @param optionID     the unique id of this parameter
+     * @param constraints  the constraints of this parameter, may be empty if there are no constraints
+     * @param optional     specifies if this parameter is an optional parameter
      * @param defaultValue the default value of this parameter (may be null)
      */
     public Parameter(OptionID optionID, List<ParameterConstraint<C>> constraints, boolean optional, T defaultValue) {
@@ -87,9 +87,9 @@ public abstract class Parameter<T, C> extends Option<T> {
     /**
      * Constructs a parameter with the given optionID, constraint, and optional flag.
      *
-     * @param optionID   the unique id of this parameter
-     * @param constraint the constraint of this parameter
-     * @param optional   specifies if this parameter is an optional parameter
+     * @param optionID     the unique id of this parameter
+     * @param constraint   the constraint of this parameter
+     * @param optional     specifies if this parameter is an optional parameter
      * @param defaultValue the default value of this parameter (may be null)
      */
     public Parameter(OptionID optionID, ParameterConstraint<C> constraint, boolean optional, T defaultValue) {
@@ -209,8 +209,9 @@ public abstract class Parameter<T, C> extends Option<T> {
      */
     @Override
     public T getValue() throws UnusedParameterException {
-        if (value == null && !optionalParameter)
+        if (value == null && !optionalParameter) {
             throw new UnusedParameterException("Value of parameter " + name + " has not been specified.");
+        }
 
         return value;
     }
