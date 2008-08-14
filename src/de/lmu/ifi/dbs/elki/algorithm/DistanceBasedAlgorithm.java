@@ -38,8 +38,10 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
      * <p>Default value: {@link de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction} </p>
      */
     protected final ClassParameter<DistanceFunction> DISTANCE_FUNCTION_PARAM =
-        new ClassParameter<DistanceFunction>(DISTANCE_FUNCTION_ID,
-            DistanceFunction.class, EuclideanDistanceFunction.class.getName());
+        new ClassParameter<DistanceFunction>(
+            DISTANCE_FUNCTION_ID,
+            DistanceFunction.class,
+            EuclideanDistanceFunction.class.getName());
 
     /**
      * Holds the instance of the distance function specified by {@link #DISTANCE_FUNCTION_PARAM}.

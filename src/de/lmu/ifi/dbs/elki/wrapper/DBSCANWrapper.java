@@ -23,18 +23,24 @@ public class DBSCANWrapper extends NormalizationWrapper {
     /**
      * Parameter to specify the maximum radius of the neighborhood to be considered,
      * must be suitable to {@link de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction}.
+     * <p>Default value: {@code 1.0} </p>
      * <p>Key: {@code -dbscan.epsilon} </p>
      */
-    private final PatternParameter EPSILON_PARAM = new PatternParameter(DBSCAN.EPSILON_ID);
+    private final PatternParameter EPSILON_PARAM = new PatternParameter(
+        DBSCAN.EPSILON_ID,
+        "1.0");
 
     /**
      * Parameter to specify the threshold for minimum number of points in
      * the epsilon-neighborhood of a point,
      * must be an integer greater than 0.
+     * <p>Default value: {@code 10} </p>
      * <p>Key: {@code -dbscan.minpts} </p>
      */
-    private final IntParameter MINPTS_PARAM = new IntParameter(DBSCAN.MINPTS_ID,
-        new GreaterConstraint(0));
+    private final IntParameter MINPTS_PARAM = new IntParameter(
+        DBSCAN.MINPTS_ID,
+        new GreaterConstraint(0),
+        10);
 
 
     /**

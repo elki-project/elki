@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
 
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.ArrayList;
 
 /**
  * Parameter class for a parameter specifying a pattern.
@@ -19,6 +20,16 @@ public class PatternParameter extends Parameter<String, String> {
      */
     public PatternParameter(OptionID optionID) {
         super(optionID);
+    }
+
+    /**
+     * Constructs a pattern parameter with the given optionID, and default value.
+     *
+     * @param optionID the unique id of the parameter
+     * @param defaultValue the default value of the parameter
+     */
+    public PatternParameter(OptionID optionID, String defaultValue) {
+        super(optionID, new ArrayList<ParameterConstraint<String>>(), false, defaultValue);
     }
 
     /**

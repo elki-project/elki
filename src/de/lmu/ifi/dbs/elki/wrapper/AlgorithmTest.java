@@ -204,7 +204,7 @@ public class AlgorithmTest extends AbstractParameterizable {
                 wrapper = Util.instantiate(Wrapper.class, algorithm.getClass().getSimpleName()+"Wrapper");
             }
             catch (UnableToComplyException e) {
-                warning("No wrapper class for " + algorithm.getClass() + " available! " + e.getMessage() + " ");
+                warning("No wrapper class for " + algorithm.getClass() + " available: " + e.getMessage() + " ");
             }
         }
 
