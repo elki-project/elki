@@ -34,7 +34,7 @@ public class FilteredEigenPairs {
   }
 
   /**
-   * Returns the weak eigenpairs.
+   * Returns the weak eigenpairs (no copy).
    * @return the weak eigenpairs
    */
   public List<EigenPair> getWeakEigenPairs() {
@@ -42,11 +42,27 @@ public class FilteredEigenPairs {
   }
 
   /**
-   * Returns the strong eigenpairs.
+   * Counts the strong eigenpairs.
+   * @return number of strong eigenpairs
+   */
+  public int countWeakEigenPairs() {
+    return strongEigenPairs.size();
+  }
+
+  /**
+   * Returns the strong eigenpairs (no copy).
    * @return the strong eigenpairs
    */
   public List<EigenPair> getStrongEigenPairs() {
     return strongEigenPairs;
+  }
+  
+  /**
+   * Counts the strong eigenpairs.
+   * @return number of strong eigenpairs
+   */
+  public int countStrongEigenPairs() {
+    return strongEigenPairs.size();
   }
 
   /**
