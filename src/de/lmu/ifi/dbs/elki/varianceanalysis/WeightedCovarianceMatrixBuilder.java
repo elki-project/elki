@@ -138,9 +138,10 @@ public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends
    * 
    * @param results a collection of QueryResults
    * @param database the database used
+   * @param k number of elements to process
    * @return Covariance Matrix
    */
-  public Matrix processQueryResults(Collection<QueryResult<DoubleDistance>> results, Database<V> database) {
+  public Matrix processQueryResults(Collection<QueryResult<DoubleDistance>> results, Database<V> database, int k) {
     int dim = database.dimensionality();
     // collecting the sums in each dimension
     double[] sums = new double[dim];
@@ -149,12 +150,15 @@ public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends
     // for collecting weights
     double weightsum = 0.0;
 
+    // avoid bad parameters
+    if (k > results.size()) k = results.size();
+    
     // find maximum distance
     double maxdist = 0.0;
     double stddev = 0.0;
     {
       int i = 0;
-      for(Iterator<QueryResult<DoubleDistance>> it = results.iterator(); it.hasNext() && i < results.size(); i++) {
+      for(Iterator<QueryResult<DoubleDistance>> it = results.iterator(); it.hasNext() && i < k; i++) {
         QueryResult<DoubleDistance> res = it.next();
         double dist = res.getDistance().getValue();
         stddev += dist * dist;
@@ -163,12 +167,12 @@ public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends
       }
       if(maxdist == 0.0)
         maxdist = 1.0;
-      stddev = Math.sqrt(stddev / results.size());
+      stddev = Math.sqrt(stddev / k);
     }
 
     // calculate weighted PCA
     int i = 0;
-    for(Iterator<QueryResult<DoubleDistance>> it = results.iterator(); it.hasNext() && i < results.size(); i++) {
+    for(Iterator<QueryResult<DoubleDistance>> it = results.iterator(); it.hasNext() && i < k; i++) {
       QueryResult<DoubleDistance> res = it.next();
       V obj = database.get(res.getID());
       double weight = weightfunction.getWeight(res.getDistance().getValue(), maxdist, stddev);
