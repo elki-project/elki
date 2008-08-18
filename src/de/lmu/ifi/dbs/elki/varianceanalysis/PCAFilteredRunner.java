@@ -176,4 +176,12 @@ public class PCAFilteredRunner<V extends RealVector<V, ?>> extends PCARunner<V> 
     FilteredEigenPairs filteredEigenPairs = eigenPairFilter.filter(eigenPairs);
     return new PCAFilteredResult(eigenPairs, filteredEigenPairs, big, small);
   }
+
+  /**
+   * Retrieve the EigenPairFilter to be used. For derived PCA Runners
+   * @return eigen pair filter configured.
+   */
+  protected EigenPairFilter getEigenPairFilter() {
+    return eigenPairFilter;
+  }
 }

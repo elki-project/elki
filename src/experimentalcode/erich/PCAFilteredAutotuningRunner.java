@@ -78,7 +78,7 @@ public class PCAFilteredAutotuningRunner<V extends RealVector<V, ?>> extends PCA
       Matrix covMat = covarianceBuilder.processQueryResults(results, database);
       EigenvalueDecomposition evd = covMat.eig();
       SortedEigenPairs eigenPairs = new SortedEigenPairs(evd, false);
-      FilteredEigenPairs filteredEigenPairs = eigenPairFilter.filter(eigenPairs);
+      FilteredEigenPairs filteredEigenPairs = getEigenPairFilter().filter(eigenPairs);
       
       // correlationDimension = #strong EV
       int thisdim = filteredEigenPairs.countStrongEigenPairs();
