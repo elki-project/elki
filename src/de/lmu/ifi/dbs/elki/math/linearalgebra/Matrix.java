@@ -2025,12 +2025,14 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
         if (getClass() != obj.getClass())
             return false;
         final Matrix other = (Matrix) obj;
-        if (!Arrays.equals(this.elements, other.elements))
-            return false;
         if (this.rowdimension != other.rowdimension)
             return false;
         if (this.columndimension != other.columndimension)
             return false;
+        for (int i=0; i < this.rowdimension; i++)
+          for (int j=0; j < this.columndimension; j++)
+            if (this.elements[i][j] != other.elements[i][j])
+               return false;
         return true;
     }
 
