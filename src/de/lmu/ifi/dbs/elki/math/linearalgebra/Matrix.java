@@ -2036,4 +2036,41 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
         return true;
     }
 
+    /**
+     * Compare two matrices with a delta parameter to take numerical
+     * errors into account.
+     * 
+     * @param obj other object to compare with
+     * @param maxdelta maximum delta allowed
+     * @return
+     */
+    public boolean almostEquals(Object obj, double maxdelta) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final Matrix other = (Matrix) obj;
+        if (this.rowdimension != other.rowdimension)
+            return false;
+        if (this.columndimension != other.columndimension)
+            return false;
+        for (int i=0; i < this.rowdimension; i++)
+          for (int j=0; j < this.columndimension; j++)
+            if (Math.abs(this.elements[i][j] - other.elements[i][j]) > maxdelta)
+               return false;
+        return true;
+    }
+
+    /**
+     * Compare two matrices with a delta parameter to take numerical
+     * errors into account.
+     * 
+     * @param obj other object to compare with
+     * @return
+     */
+    public boolean almostEquals(Object obj) {
+      return almostEquals(obj, DELTA);
+    }
 }
