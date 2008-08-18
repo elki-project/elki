@@ -67,6 +67,7 @@
 	<target name="copy4release" description="copies selected resources to current release directory">
 		<copy todir="${deploy.srcdir}/src">
 			<fileset dir="src">
+				<exclude name="experimentalcode/**"/>
 				<!-- CoDeC requires classifier -->
 				<exclude name="${basepackage}algorithm/CoDeC.*"/>
 				<exclude name="${basepackage}algorithm/ICA.*"/>
