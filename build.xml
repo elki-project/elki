@@ -131,6 +131,7 @@
 			<exclude name="*.jar" />
 			<exclude name="*.xsd" />
 			<exclude name="**/zelki/**" />
+			<exclude name="**/test/**"/>
 			<src path="${source}" />
 		</javac>
 	</target>
