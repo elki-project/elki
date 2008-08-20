@@ -5,10 +5,12 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 
 /**
  * The ProgressiveEigenPairFilter sorts the eigenpairs in decending order of
@@ -54,23 +56,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
  */
 
 public class ProgressiveEigenPairFilter extends AbstractParameterizable implements EigenPairFilter {
-
   /**
    * The default value for alpha.
    */
   public static final double DEFAULT_PALPHA = 0.5;
 
   /**
-   * Option string for parameter alpha.
+   * Parameter progressive alpha.
    */
-  public static final String PALPHA_P = "palpha";
-
-  /**
-   * Description for parameter alpha.
-   * 
-   * TODO: better description?
-   */
-  public static final String PALPHA_D = "<double>a double between 0 and 1 specifying " + "the threshold for strong eigenvectors: " + "the strong eigenvectors explain a " + "portion of at least alpha of the total variance " + "(default is alpha = " + DEFAULT_PALPHA + ")";
+  private final DoubleParameter PALPHA_PARAM = new DoubleParameter(OptionID.EIGENPAIR_FILTER_PALPHA,
+      new IntervalConstraint(0.0,IntervalConstraint.IntervalBoundary.OPEN,1.0,
+          IntervalConstraint.IntervalBoundary.OPEN), DEFAULT_PALPHA);
 
   /**
    * The threshold for strong eigenvectors: the strong eigenvectors explain a
@@ -84,14 +80,10 @@ public class ProgressiveEigenPairFilter extends AbstractParameterizable implemen
   public static final double DEFAULT_WALPHA = 0.95;
 
   /**
-   * Option string for parameter alpha.
+   * Parameter weak alpha.
    */
-  public static final String WALPHA_P = "walpha";
-
-  /**
-   * Description for parameter alpha.
-   */
-  public static final String WALPHA_D = "<double>a double larger than 0 specifying " + "the sensitivity niveau for weak eigenvectors: " + "An eigenvector which is at less than walpha times " + "the statistical average variance is considered weak. " + "(default is walpha = " + DEFAULT_WALPHA + ")";
+  private final DoubleParameter WALPHA_PARAM = new DoubleParameter(OptionID.EIGENPAIR_FILTER_WALPHA,
+      new GreaterEqualConstraint(0.0), DEFAULT_WALPHA);
 
   /**
    * The noise tolerance niveau for weak eigenvectors
@@ -107,18 +99,8 @@ public class ProgressiveEigenPairFilter extends AbstractParameterizable implemen
   public ProgressiveEigenPairFilter() {
     super();
 
-    ArrayList<ParameterConstraint<Number>> constraints = new ArrayList<ParameterConstraint<Number>>();
-    constraints.add(new GreaterConstraint(0));
-    constraints.add(new LessConstraint(1));
-    DoubleParameter palpha = new DoubleParameter(PALPHA_P, PALPHA_D, constraints);
-    palpha.setDefaultValue(DEFAULT_PALPHA);
-    optionHandler.put(palpha);
-
-    ArrayList<ParameterConstraint<Number>> wconstraints = new ArrayList<ParameterConstraint<Number>>();
-    wconstraints.add(new GreaterConstraint(0));
-    DoubleParameter walpha = new DoubleParameter(WALPHA_P, WALPHA_D, wconstraints);
-    walpha.setDefaultValue(DEFAULT_WALPHA);
-    optionHandler.put(walpha);
+    addOption(PALPHA_PARAM);
+    addOption(WALPHA_PARAM);    
   }
 
   /**
@@ -192,10 +174,10 @@ public class ProgressiveEigenPairFilter extends AbstractParameterizable implemen
     String[] remainingParameters = super.setParameters(args);
 
     // palpha
-    palpha = (Double) optionHandler.getOptionValue(PALPHA_P);
+    palpha = PALPHA_PARAM.getValue();
 
     // walpha
-    walpha = (Double) optionHandler.getOptionValue(WALPHA_P);
+    walpha = WALPHA_PARAM.getValue();
 
     return remainingParameters;
   }

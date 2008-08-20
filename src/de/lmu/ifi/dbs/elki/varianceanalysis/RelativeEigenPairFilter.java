@@ -7,7 +7,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 
 /**
  * The RelativeEigenPairFilter sorts the eigenpairs in decending order of their
@@ -32,14 +31,10 @@ public class RelativeEigenPairFilter extends AbstractParameterizable implements 
   public static final double DEFAULT_RALPHA = 1.1;
 
   /**
-   * Option string for parameter ralpha.
+   * Parameter relative alpha.
    */
-  public static final String RALPHA_P = "ralpha";
-
-  /**
-   * Description for parameter ralpha.
-   */
-  public static final String RALPHA_D = "<double>a double larger than 1 specifying " + "the sensitivity niveau for weak eigenvectors: " + "An eigenvector which is at less than ralpha times " + "the statistical average variance is considered weak. " + "(default is ralpha = " + DEFAULT_RALPHA + ")";
+  private final DoubleParameter RALPHA_PARAM = new DoubleParameter(OptionID.EIGENPAIR_FILTER_RALPHA,
+      new GreaterEqualConstraint(0.0), DEFAULT_RALPHA);
 
   /**
    * The noise tolerance niveau for weak eigenvectors
@@ -55,12 +50,7 @@ public class RelativeEigenPairFilter extends AbstractParameterizable implements 
   public RelativeEigenPairFilter() {
     super();
 
-    ArrayList<ParameterConstraint<Number>> constraints = new ArrayList<ParameterConstraint<Number>>();
-    constraints.add(new GreaterEqualConstraint(1));
-    DoubleParameter ralpha = new DoubleParameter(RALPHA_P, RALPHA_D, constraints);
-    ralpha.setDefaultValue(DEFAULT_RALPHA);
-    optionHandler.put(ralpha);
-
+    addOption(RALPHA_PARAM);
   }
 
   /**
@@ -116,7 +106,7 @@ public class RelativeEigenPairFilter extends AbstractParameterizable implements 
     String[] remainingParameters = super.setParameters(args);
 
     // alpha
-    ralpha = (Double) optionHandler.getOptionValue(RALPHA_P);
+    ralpha = RALPHA_PARAM.getValue();
 
     return remainingParameters;
   }

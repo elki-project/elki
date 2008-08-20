@@ -7,7 +7,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 
 /**
  * The WeakEigenPairFilter sorts the eigenpairs in decending order of their
@@ -24,14 +23,10 @@ public class WeakEigenPairFilter extends AbstractParameterizable implements Eige
   public static final double DEFAULT_WALPHA = 0.95;
 
   /**
-   * Option string for parameter walpha.
+   * Parameter weak alpha.
    */
-  public static final String WALPHA_P = "walpha";
-
-  /**
-   * Description for parameter walpha.
-   */
-  public static final String WALPHA_D = "<double>a double larger than 0 specifying " + "the sensitivity niveau for weak eigenvectors: " + "An eigenvector which is less than walpha times " + "the statistical average variance is considered weak. " + "(default is walpha = " + DEFAULT_WALPHA + ")";
+  private final DoubleParameter WALPHA_PARAM = new DoubleParameter(OptionID.EIGENPAIR_FILTER_WALPHA,
+      new GreaterEqualConstraint(0.0), DEFAULT_WALPHA);
 
   /**
    * The noise tolerance niveau for weak eigenvectors
@@ -46,12 +41,7 @@ public class WeakEigenPairFilter extends AbstractParameterizable implements Eige
    */
   public WeakEigenPairFilter() {
     super();
-
-    ArrayList<ParameterConstraint<Number>> constraints = new ArrayList<ParameterConstraint<Number>>();
-    constraints.add(new GreaterEqualConstraint(0));
-    DoubleParameter walpha = new DoubleParameter(WALPHA_P, WALPHA_D, constraints);
-    walpha.setDefaultValue(DEFAULT_WALPHA);
-    optionHandler.put(walpha);
+    addOption(WALPHA_PARAM);
   }
 
   /**
@@ -107,7 +97,7 @@ public class WeakEigenPairFilter extends AbstractParameterizable implements Eige
     String[] remainingParameters = super.setParameters(args);
 
     // alpha
-    walpha = (Double) optionHandler.getOptionValue(WALPHA_P);
+    walpha = WALPHA_PARAM.getValue();
 
     return remainingParameters;
   }

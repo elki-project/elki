@@ -7,7 +7,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 
 /**
  * The SignificantEigenPairFilter sorts the eigenpairs in decending order of
@@ -30,18 +29,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
 public class SignificantEigenPairFilter extends AbstractParameterizable implements EigenPairFilter {
   /**
    * The default value for walpha.
+   * Not used by default, we're going for maximum contrast only.
    */
   public static final double DEFAULT_WALPHA = 0.0;
 
   /**
-   * Option string for parameter walpha.
+   * Parameter weak alpha.
    */
-  public static final String WALPHA_P = "walpha";
-
-  /**
-   * Description for parameter walpha.
-   */
-  public static final String WALPHA_D = "<double>a double larger than 0 specifying " + "the sensitivity niveau for weak eigenvectors: " + "An eigenvector which is at less than walpha times " + "the statistical average variance of the remaining " + "eigenvectors is considered weak. " + "(default is walpha = " + DEFAULT_WALPHA + ")";
+  private final DoubleParameter WALPHA_PARAM = new DoubleParameter(OptionID.EIGENPAIR_FILTER_WALPHA,
+      new GreaterEqualConstraint(0.0), DEFAULT_WALPHA);
 
   /**
    * The noise tolerance niveau for weak eigenvectors
@@ -56,11 +52,7 @@ public class SignificantEigenPairFilter extends AbstractParameterizable implemen
    */
   public SignificantEigenPairFilter() {
     super();
-    ArrayList<ParameterConstraint<Number>> wconstraints = new ArrayList<ParameterConstraint<Number>>();
-    wconstraints.add(new GreaterEqualConstraint(0));
-    DoubleParameter walpha = new DoubleParameter(WALPHA_P, WALPHA_D, wconstraints);
-    walpha.setDefaultValue(DEFAULT_WALPHA);
-    optionHandler.put(walpha);
+    addOption(WALPHA_PARAM);
   }
 
   /**
@@ -125,8 +117,8 @@ public class SignificantEigenPairFilter extends AbstractParameterizable implemen
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
-    // alpha
-    walpha = (Double) optionHandler.getOptionValue(WALPHA_P);
+    // weak alpha
+    walpha = WALPHA_PARAM.getValue();
 
     return remainingParameters;
   }

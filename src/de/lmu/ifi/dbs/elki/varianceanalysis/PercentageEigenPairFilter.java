@@ -1,16 +1,15 @@
 package de.lmu.ifi.dbs.elki.varianceanalysis;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
-
-import java.util.ArrayList;
-import java.util.List;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 
 /**
  * The PercentageEigenPairFilter sorts the eigenpairs in decending order
@@ -29,18 +28,11 @@ public class PercentageEigenPairFilter extends AbstractParameterizable implement
   public static final double DEFAULT_ALPHA = 0.85;
 
   /**
-   * Option string for parameter alpha.
+   * Parameter alpha.
    */
-  public static final String ALPHA_P = "alpha";
-
-  /**
-   * Description for parameter alpha.
-   */
-  public static final String ALPHA_D = "<double>a double between 0 and 1 specifying " +
-                                       "the threshold for strong eigenvectors: " +
-                                       "the strong eigenvectors explain a " +
-                                       "portion of at least alpha of the total variance " +
-                                       "(default is alpha = " + DEFAULT_ALPHA + ")";
+  private final DoubleParameter ALPHA_PARAM = new DoubleParameter(OptionID.EIGENPAIR_FILTER_ALPHA,
+      new IntervalConstraint(0.0,IntervalConstraint.IntervalBoundary.OPEN,1.0,
+          IntervalConstraint.IntervalBoundary.OPEN), DEFAULT_ALPHA);
 
   /**
    * The threshold for strong eigenvectors: the strong eigenvectors explain a
@@ -55,14 +47,8 @@ public class PercentageEigenPairFilter extends AbstractParameterizable implement
    * as string eigenpairs.
    */
   public PercentageEigenPairFilter() {
-    super();
-
-    ArrayList<ParameterConstraint<Number>> constraints = new ArrayList<ParameterConstraint<Number>>();
-    constraints.add(new GreaterConstraint(0));
-    constraints.add(new LessConstraint(1));
-    DoubleParameter alpha = new DoubleParameter(ALPHA_P,ALPHA_D,constraints);
-    alpha.setDefaultValue(DEFAULT_ALPHA);
-    optionHandler.put(alpha);
+    super();    
+    addOption(ALPHA_PARAM);
   }
 
   /**
@@ -138,7 +124,7 @@ public class PercentageEigenPairFilter extends AbstractParameterizable implement
     String[] remainingParameters = super.setParameters(args);
 
     //alpha
-    alpha = (Double)optionHandler.getOptionValue(ALPHA_P);
+    alpha = getParameterValue(ALPHA_PARAM);
 
     return remainingParameters;
   }
