@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
@@ -56,22 +57,13 @@ public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector
     /**
      * Flag for marking parameter delta as an absolute value.
      */
-    public static final String ABSOLUTE_F = LimitEigenPairFilter.ABSOLUTE_F;
-
-    /**
-     * Description for flag abs.
-     */
-    public static final String ABSOLUTE_D = LimitEigenPairFilter.ABSOLUTE_D;
+    private final Flag ABSOLUTE_PARAM = new Flag(OptionID.EIGENPAIR_FILTER_ABSOLUTE);
 
     /**
      * Option string for parameter delta.
      */
-    public static final String DELTA_P = LimitEigenPairFilter.DELTA_P;
-
-    /**
-     * Description for parameter delta.
-     */
-    public static final String DELTA_D = LimitEigenPairFilter.DELTA_D;
+    private final DoubleParameter DELTA_PARAM = new DoubleParameter(OptionID.EIGENPAIR_FILTER_DELTA,
+        new GreaterEqualConstraint(0), DEFAULT_DELTA);
 
     /**
      * The default value for delta.
@@ -96,24 +88,20 @@ public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector
     /**
      *
      */
+    @SuppressWarnings("unchecked")
     public KernelFourCPreprocessor() {
         super();
-        // parameter delta
+        addOption(DELTA_PARAM);
+        addOption(ABSOLUTE_PARAM);
+
         // parameter constraints are only valid if delta is a relative value! Thus they are
         // dependent on the absolute flag, that is they are global constraints!
         final ArrayList<ParameterConstraint> deltaCons = new ArrayList<ParameterConstraint>();
-        deltaCons.add(new GreaterEqualConstraint(0));
+        // TODO: I moved the constraint up to the parameter itself, since it applies in both cases, right? -- erich
+        //deltaCons.add(new GreaterEqualConstraint(0));
         deltaCons.add(new LessEqualConstraint(1));
 
-        final DoubleParameter delta = new DoubleParameter(DELTA_P, DELTA_D);
-        delta.setDefaultValue(DEFAULT_DELTA);
-        optionHandler.put(delta);
-
-        // parameter absolute flag
-        Flag abs = new Flag(ABSOLUTE_F, ABSOLUTE_D);
-        optionHandler.put(abs);
-
-        GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint(delta, deltaCons, abs, false);
+        GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint(DELTA_PARAM, deltaCons, ABSOLUTE_PARAM, false);
         optionHandler.setGlobalParameterConstraint(gpc);
     }
 
@@ -161,34 +149,32 @@ public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector
         preprocessorParameters[1] = ArbitraryKernelFunctionWrapper.class.getName();
         final String[] remainingParameters = super.setParameters(preprocessorParameters);
         // absolute
-        absolute = optionHandler.isSet(ABSOLUTE_F);
+        absolute = ABSOLUTE_PARAM.isSet();
 
         // delta
-        delta = (Double) optionHandler.getOptionValue(DELTA_P);
-        if (absolute && ((Parameter) optionHandler.getOption(DELTA_P)).tookDefaultValue()) {
-            throw new WrongParameterValueException("Illegal parameter setting: " + "Flag " + ABSOLUTE_F + " is set, " + "but no value for "
-                + DELTA_P + " is specified.");
+        delta = DELTA_PARAM.getValue();
+        if (absolute && DELTA_PARAM.tookDefaultValue()) {
+            throw new WrongParameterValueException("Illegal parameter setting: " + "Flag " + ABSOLUTE_PARAM.getName() + " is set, " + "but no value for "
+                + DELTA_PARAM.getName() + " is specified.");
         }
 
         // save parameters for pca
         final List<String> tmpPCAParameters = new ArrayList<String>();
         // eigen pair filter
         Util.addParameter(tmpPCAParameters, OptionID.PCA_EIGENPAIR_FILTER, CompositeEigenPairFilter.class.getName());
-        tmpPCAParameters.add(OptionHandler.OPTION_PREFIX + CompositeEigenPairFilter.FILTERS_P);
-        tmpPCAParameters.add(LimitEigenPairFilter.class.getName() + CompositeEigenPairFilter.COMMA_SPLIT
-            + NormalizingEigenPairFilter.class.getName() + CompositeEigenPairFilter.COMMA_SPLIT + LimitEigenPairFilter.class.getName());
+        Util.addParameter(tmpPCAParameters, OptionID.EIGENPAIR_FILTER_COMPOSITE_LIST,
+            LimitEigenPairFilter.class.getName() + ListParameter.SPLIT
+            + NormalizingEigenPairFilter.class.getName() + ListParameter.SPLIT
+            + LimitEigenPairFilter.class.getName());
         // parameters for eigenpair filtering
-        // eleminate eigenpairs with eigenvalue < 0.0
-        tmpPCAParameters.add(OptionHandler.OPTION_PREFIX + LimitEigenPairFilter.ABSOLUTE_F);
-        tmpPCAParameters.add(OptionHandler.OPTION_PREFIX + LimitEigenPairFilter.DELTA_P);
-        tmpPCAParameters.add("0.0");
-        // separate in strong and weak (delta)
-        tmpPCAParameters.add(OptionHandler.OPTION_PREFIX + LimitEigenPairFilter.DELTA_P);
-        tmpPCAParameters.add(Double.toString(delta));
+        // FIXME: at some point, the code here used to always set ABSOLUTE, and DELTA=0.0,
+        //        Then set absolute again and the new value for delta. I've removed this. -- erich
         // abs
         if (absolute) {
-            tmpPCAParameters.add(OptionHandler.OPTION_PREFIX + LimitEigenPairFilter.ABSOLUTE_F);
+          Util.addFlag(tmpPCAParameters, OptionID.EIGENPAIR_FILTER_ABSOLUTE);
         }
+        // delta
+        Util.addParameter(tmpPCAParameters, OptionID.EIGENPAIR_FILTER_DELTA, Double.toString(delta));
 
         // Big and small are not used in this version of KernelFourC
         // as they implicitly take the values 1 (big) and 0 (small),

@@ -1,11 +1,15 @@
 package de.lmu.ifi.dbs.elki.varianceanalysis;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
+
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
@@ -13,10 +17,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterFlagGlobalConstraint;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
 
 /**
  * The LimitEigenPairFilter marks all eigenpairs having an (absolute) eigenvalue
@@ -27,34 +27,21 @@ import java.util.Vector;
  */
 
 public class LimitEigenPairFilter extends AbstractParameterizable implements EigenPairFilter {
-
-	/**
-	 * Flag for marking parameter delta as an absolute value.
-	 */
-	public static final String ABSOLUTE_F = "abs";
-
-	/**
-	 * Description for flag abs.
-	 */
-	public static final String ABSOLUTE_D = "flag to mark delta as an absolute value.";
+  /**
+   * "absolute" Flag
+   */
+  private final Flag ABSOLUTE_PARAM = new Flag(OptionID.EIGENPAIR_FILTER_ABSOLUTE);
 
 	/**
 	 * The default value for delta.
 	 */
 	public static final double DEFAULT_DELTA = 0.01;
 
-	/**
-	 * Option string for parameter delta.
-	 */
-	public static final String DELTA_P = "delta";
-
-	/**
-	 * Description for parameter delta.
-	 */
-	public static final String DELTA_D = "a double specifying the threshold for "
-			+ "strong Eigenvalues. If not otherwise specified, delta " + "is a relative value w.r.t. the (absolute) highest "
-			+ "Eigenvalues and has to be a double between 0 and 1 " + "(default is delta = " + DEFAULT_DELTA + "). "
-			+ "To mark delta as an absolute value, use " + "the option -" + ABSOLUTE_F + ".";
+  /**
+   * Parameter delta
+   */
+  private final DoubleParameter DELTA_PARAM = new DoubleParameter(OptionID.EIGENPAIR_FILTER_DELTA,
+      new GreaterEqualConstraint(0), DEFAULT_DELTA);
 
 	/**
 	 * Threshold for strong eigenpairs, can be absolute or relative.
@@ -71,25 +58,25 @@ public class LimitEigenPairFilter extends AbstractParameterizable implements Eig
 	 * (absolute) eigenvalue below the specified threshold (relative or
 	 * absolute) as weak eigenpairs, the others are marked as strong eigenpairs.
 	 */
-	public LimitEigenPairFilter() {
+	@SuppressWarnings("unchecked")
+  public LimitEigenPairFilter() {
 		super();
 
-		DoubleParameter delta = new DoubleParameter(DELTA_P, DELTA_D);
-		delta.setDefaultValue(DEFAULT_DELTA);
-		optionHandler.put(delta);
-		// delta must be >= 0 and <= 1 if it's a relative value
+    addOption(DELTA_PARAM);
+    addOption(ABSOLUTE_PARAM);
+
+    // Conditional Constraint:
+    // delta must be >= 0 and <= 1 if it's a relative value
 		// Since relative or absolute is dependent on the absolute flag this is a
 		// global constraint!
 		List<ParameterConstraint> cons = new Vector<ParameterConstraint>();
-		ParameterConstraint aboveNull = new GreaterEqualConstraint(0);
-		cons.add(aboveNull);
+    // TODO: I moved the constraint up to the parameter itself, since it applies in both cases, right? -- erich
+		//ParameterConstraint aboveNull = new GreaterEqualConstraint(0);
+		//cons.add(aboveNull);
 		ParameterConstraint underOne = new LessEqualConstraint(1);
 		cons.add(underOne);
 
-		Flag abs = new Flag(ABSOLUTE_F, ABSOLUTE_D);
-		optionHandler.put(abs);
-
-		GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint(delta, cons, abs, false);
+		GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint(DELTA_PARAM, cons, ABSOLUTE_PARAM, false);
 		optionHandler.setGlobalParameterConstraint(gpc);
 	}
 
@@ -151,13 +138,13 @@ public class LimitEigenPairFilter extends AbstractParameterizable implements Eig
 		String[] remainingParameters = super.setParameters(args);
 
 		// absolute
-		absolute = optionHandler.isSet(ABSOLUTE_F);
+		absolute = ABSOLUTE_PARAM.isSet();
 
 		// delta
-		delta = (Double) optionHandler.getOptionValue(DELTA_P);
-		if (absolute && ((Parameter) optionHandler.getOption(DELTA_P)).tookDefaultValue()) {
-			throw new WrongParameterValueException("Illegal parameter setting: " + "Flag " + ABSOLUTE_F + " is set, " + "but no value for "
-					+ DELTA_P + " is specified.");
+		delta = DELTA_PARAM.getValue();
+		if (absolute && DELTA_PARAM.tookDefaultValue()) {
+			throw new WrongParameterValueException("Illegal parameter setting: " + "Flag " + ABSOLUTE_PARAM.getName() + " is set, " + "but no value for "
+					+ DELTA_PARAM.getName() + " is specified.");
 		}
 
 		return remainingParameters;

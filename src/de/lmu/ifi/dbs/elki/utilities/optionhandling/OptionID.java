@@ -164,7 +164,33 @@ public final class OptionID extends ConstantObject<OptionID> {
         "The sensitivity niveau for weak eigenvectors: An eigenvector which is at less than " + 
         "the given share of the statistical average variance is considered weak."
     );
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.elki.varianceanalysis.LimitEigenPairFilter#ABSOLUTE_FLAG}
+     */
+    public static final OptionID EIGENPAIR_FILTER_ABSOLUTE = new OptionID("pca.filter.absolute",
+        "Flag to mark delta as an absolute value."
+    );
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.elki.varianceanalysis.LimitEigenPairFilter#DELTA_PARAM}
+     */
+    public static final OptionID EIGENPAIR_FILTER_DELTA = new OptionID("pca.filter.delta",
+        "The threshold for strong Eigenvalues. If not otherwise specified, delta " +
+        "is a relative value w.r.t. the (absolute) highest Eigenvalues and has to be " +
+        "a double between 0 and 1. To mark delta as an absolute value, use " +
+        "the option -" + EIGENPAIR_FILTER_ABSOLUTE.getName() + "."
+    );
+
     
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.elki.varianceanalysis.CompositeEigenPairFilter#FILTERS_PARAM}
+     */
+    public static final OptionID EIGENPAIR_FILTER_COMPOSITE_LIST = new OptionID("pca.filter.composite.list",
+        "A comma separated list of the class names of the filters to be used. " +
+        "The specified filters will be applied sequentially in the given order."
+    );
+       
     
     /**
      * The description of the OptionID.

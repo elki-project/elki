@@ -1,17 +1,11 @@
 package de.lmu.ifi.dbs.elki.varianceanalysis;
 
+import java.util.List;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.elki.properties.Properties;
-import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassListParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * The <code>CompositeEigenPairFilter</code> can be used to
@@ -20,24 +14,10 @@ import java.util.regex.Pattern;
  * @author Elke Achtert 
  */
 public class CompositeEigenPairFilter extends AbstractParameterizable implements EigenPairFilter {
-  /**
-   * A pattern defining a comma.
-   */
-  public static final Pattern COMMA_SPLIT = Pattern.compile(",");
-
-  /**
-   * Parameter for filters.
-   */
-  public static final String FILTERS_P = "filters";
-
-  /**
-   * Description for parameter filters.
-   */
-  public static final String FILTERS_D = "A comma separated list of the class names of " +
-                                         "the filters to be used. The specified filters will be applied " +
-                                         "sequentially in the given order. " +
-                                         Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(EigenPairFilter.class);
-
+  private final ClassListParameter<EigenPairFilter> FILTERS_PARAM = new ClassListParameter<EigenPairFilter>(
+      OptionID.EIGENPAIR_FILTER_COMPOSITE_LIST,
+      EigenPairFilter.class);
+  
   /**
    * The filters to be applied.
    */
@@ -49,7 +29,7 @@ public class CompositeEigenPairFilter extends AbstractParameterizable implements
   public CompositeEigenPairFilter() {
     super();
 
-    optionHandler.put(new ClassListParameter(FILTERS_P, FILTERS_D,EigenPairFilter.class));
+    addOption(FILTERS_PARAM);
   }
 
   /**
@@ -87,20 +67,9 @@ public class CompositeEigenPairFilter extends AbstractParameterizable implements
     String[] remainingParameters = super.setParameters(args);
 
     //filters
-    List<String> filtersString = (List<String>)optionHandler.getOptionValue(FILTERS_P);
-    filters = new ArrayList<EigenPairFilter>(filtersString.size());
-
-    for (String filterClass : filtersString) {
-      try {
-          // todo
-        EigenPairFilter f = Util.instantiate(EigenPairFilter.class, filterClass);
-        remainingParameters = f.setParameters(remainingParameters);
-        filters.add(f);
-      }
-      catch (UnableToComplyException e) {
-        throw new WrongParameterValueException(FILTERS_P, filterClass, FILTERS_D, e);
-      }
-    }
+    filters = FILTERS_PARAM.instantiateClasses();
+    // TODO: do we need to pass parameters manually?
+    
     setParameters(args, remainingParameters);
 
     return remainingParameters;

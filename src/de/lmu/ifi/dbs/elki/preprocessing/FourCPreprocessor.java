@@ -22,26 +22,16 @@ import java.util.List;
  * @author Arthur Zimek
  */
 public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>> extends ProjectedDBSCANPreprocessor<D, V> {
-
     /**
      * Flag for marking parameter delta as an absolute value.
      */
-    public static final String ABSOLUTE_F = LimitEigenPairFilter.ABSOLUTE_F;
-
-    /**
-     * Description for flag abs.
-     */
-    public static final String ABSOLUTE_D = LimitEigenPairFilter.ABSOLUTE_D;
+    private final Flag ABSOLUTE_PARAM = new Flag(OptionID.EIGENPAIR_FILTER_ABSOLUTE);
 
     /**
      * Option string for parameter delta.
      */
-    public static final String DELTA_P = LimitEigenPairFilter.DELTA_P;
-
-    /**
-     * Description for parameter delta.
-     */
-    public static final String DELTA_D = LimitEigenPairFilter.DELTA_D;
+    private final DoubleParameter DELTA_PARAM = new DoubleParameter(OptionID.EIGENPAIR_FILTER_DELTA,
+        new GreaterEqualConstraint(0), DEFAULT_DELTA);
 
     /**
      * The default value for delta.
@@ -63,6 +53,7 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
      */
     private PCAFilteredRunner<V> pca = new PCAFilteredRunner<V>();
 
+    @SuppressWarnings("unchecked")
     public FourCPreprocessor() {
         super();
 
@@ -70,19 +61,17 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
         // parameter constraint are only valid if delta is a relative value!
         // Thus they are
         // dependent on the absolute flag, that is they are global constraints!
-        DoubleParameter delta = new DoubleParameter(DELTA_P, DELTA_D);
-        delta.setDefaultValue(DEFAULT_DELTA);
-        optionHandler.put(delta);
-
-        final ArrayList<ParameterConstraint<Number>> deltaCons = new ArrayList<ParameterConstraint<Number>>();
-        deltaCons.add(new GreaterEqualConstraint(0));
-        deltaCons.add(new LessEqualConstraint(1));
+        addOption(DELTA_PARAM);
 
         // flag absolute
-        Flag abs = new Flag(ABSOLUTE_F, ABSOLUTE_D);
-        optionHandler.put(abs);
+        addOption(ABSOLUTE_PARAM);
+ 
+        final ArrayList<ParameterConstraint<Number>> deltaCons = new ArrayList<ParameterConstraint<Number>>();
+        // TODO: this constraint is already set in the parameter itself, since it also applies to the relative case, right? -- erich
+        //deltaCons.add(new GreaterEqualConstraint(0));
+        deltaCons.add(new LessEqualConstraint(1));
 
-        GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint(delta, deltaCons, abs, false);
+        GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint(DELTA_PARAM, deltaCons, ABSOLUTE_PARAM, false);
         optionHandler.setGlobalParameterConstraint(gpc);
     }
 
@@ -123,7 +112,7 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
         String[] remainingParameters = super.setParameters(args);
 
         // absolute
-        absolute = optionHandler.isSet(ABSOLUTE_F);
+        absolute = ABSOLUTE_PARAM.isSet();
 
         // delta
 
@@ -132,10 +121,10 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
            * wurde!! somit kann ich also auf den flag 'absolute' reagieren...
            * Trotzdem ist die abfrage irgendwie seltsam...
            */
-        delta = (Double) optionHandler.getOptionValue(DELTA_P);
-        if (absolute && ((Parameter) optionHandler.getOption(DELTA_P)).tookDefaultValue()) {
-            throw new WrongParameterValueException("Illegal parameter setting: " + "Flag " + ABSOLUTE_F + " is set, " + "but no value for "
-                + DELTA_P + " is specified.");
+        delta = DELTA_PARAM.getValue();
+        if (absolute && DELTA_PARAM.tookDefaultValue()) {
+            throw new WrongParameterValueException("Illegal parameter setting: " + "Flag " + ABSOLUTE_PARAM.getName() + " is set, " + "but no value for "
+                + DELTA_PARAM.getName() + " is specified.");
         }
 //		if (optionHandler.isSet(DELTA_P)) {
 //			delta = (Double) optionHandler.getOptionValue(DELTA_P);
@@ -157,11 +146,10 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
         Util.addParameter(tmpPCAParameters, OptionID.PCA_EIGENPAIR_FILTER, LimitEigenPairFilter.class.getName());
         // abs
         if (absolute) {
-            tmpPCAParameters.add(OptionHandler.OPTION_PREFIX + LimitEigenPairFilter.ABSOLUTE_F);
+          Util.addFlag(tmpPCAParameters, OptionID.EIGENPAIR_FILTER_ABSOLUTE);
         }
         // delta
-        tmpPCAParameters.add(OptionHandler.OPTION_PREFIX + LimitEigenPairFilter.DELTA_P);
-        tmpPCAParameters.add(Double.toString(delta));
+        Util.addParameter(tmpPCAParameters, OptionID.EIGENPAIR_FILTER_DELTA, Double.toString(delta));
 
         // big value
         Util.addParameter(tmpPCAParameters, PCAFilteredRunner.BIG_ID, "50");
