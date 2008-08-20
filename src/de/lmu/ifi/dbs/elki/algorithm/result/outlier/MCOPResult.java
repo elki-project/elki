@@ -1,23 +1,21 @@
 package de.lmu.ifi.dbs.elki.algorithm.result.outlier;
 
-import de.lmu.ifi.dbs.elki.algorithm.result.AbstractResult;
-import de.lmu.ifi.dbs.elki.data.ClassLabel;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
-import de.lmu.ifi.dbs.elki.normalization.Normalization;
-import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
-
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.List;
+
+import de.lmu.ifi.dbs.elki.algorithm.result.AbstractResult;
+import de.lmu.ifi.dbs.elki.data.ClassLabel;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.AssociationID;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
+import de.lmu.ifi.dbs.elki.normalization.Normalization;
+import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 
 /**
  * Provides the short result of Multivariate Correlation Outlier Probability.
