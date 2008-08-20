@@ -90,7 +90,6 @@ public class CorrelationOutlierProbability<V extends RealVector<V, ?>> extends D
       }
       Progress progressLocalPCA = new Progress("COD", database.size());
       int counter = 1;
-      double sqrt2pi = Math.sqrt(2.0 * Math.PI);
       double sqrt2 = Math.sqrt(2.0);
       for(Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
         Integer id = iter.next();

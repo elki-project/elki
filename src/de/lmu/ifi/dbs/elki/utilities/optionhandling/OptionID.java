@@ -190,7 +190,15 @@ public final class OptionID extends ConstantObject<OptionID> {
         "A comma separated list of the class names of the filters to be used. " +
         "The specified filters will be applied sequentially in the given order."
     );
-       
+    
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.elki.varianceanalysis.FirstNEigenPairFilter#N_PARAM}
+     */
+    public static final OptionID EIGENPAIR_FILTER_N = new OptionID("pca.filter.n",
+        "The number of strong eigenvectors: n eigenvectors with the n highest" +
+        "eigenvalues are marked as strong eigenvectors."
+    );
+
     
     /**
      * The description of the OptionID.

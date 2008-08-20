@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.varianceanalysis.FirstNEigenPairFilter;
@@ -170,8 +169,7 @@ public class SubspaceClusterMap {
 
             List<String> parameters = new ArrayList<String>();
             Util.addParameter(parameters, OptionID.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
-            parameters.add(OptionHandler.OPTION_PREFIX + FirstNEigenPairFilter.N_P);
-            parameters.add(Integer.toString(dimensionality));
+            Util.addParameter(parameters, OptionID.EIGENPAIR_FILTER_N, Integer.toString(dimensionality));
             derivator.setParameters(parameters.toArray(new String[parameters.size()]));
 
             //noinspection unchecked

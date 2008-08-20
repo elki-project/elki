@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 
@@ -18,19 +19,11 @@ import java.util.List;
  */
 
 public class FirstNEigenPairFilter extends AbstractParameterizable implements EigenPairFilter {
-
   /**
-   * Option string for parameter n.
+   * Parameter n.
    */
-  public static final String N_P = "n";
-
-  /**
-   * Description for parameter alpha.
-   */
-  public static final String N_D = "an integer specifying " +
-                                   "the number of strong eigenvectors: " +
-                                   "n eigenvectors with the n highest eigenvalues " +
-                                   "are marked as strong eigenvectors.";
+  private final IntParameter N_PARAM = new IntParameter(OptionID.EIGENPAIR_FILTER_N,
+      new GreaterEqualConstraint(0));
 
   /**
    * The threshold for strong eigenvectors: n eigenvectors with
@@ -46,7 +39,7 @@ public class FirstNEigenPairFilter extends AbstractParameterizable implements Ei
     super();
 //    this.debug = true;
 
-    optionHandler.put(new IntParameter(N_P, N_D, new GreaterEqualConstraint(0)));
+    addOption(N_PARAM);
   }
 
   /**
@@ -104,7 +97,7 @@ public class FirstNEigenPairFilter extends AbstractParameterizable implements Ei
     String[] remainingParameters = super.setParameters(args);
 
     //n
-    n = (Integer)optionHandler.getOptionValue(FirstNEigenPairFilter.N_P);
+    n = N_PARAM.getValue();
     
     return remainingParameters;
   }

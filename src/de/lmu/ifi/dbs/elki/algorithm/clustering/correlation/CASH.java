@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.utilities.heap.HeapNode;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -768,8 +767,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
         // set the parameters
         List<String> parameters = new ArrayList<String>();
         Util.addParameter(parameters, OptionID.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
-        parameters.add(OptionHandler.OPTION_PREFIX + FirstNEigenPairFilter.N_P);
-        parameters.add(Integer.toString(dim - 1));
+        Util.addParameter(parameters, OptionID.EIGENPAIR_FILTER_N, Integer.toString(dim - 1));
         derivator.setParameters(parameters.toArray(new String[parameters.size()]));
 
         //noinspection unchecked
