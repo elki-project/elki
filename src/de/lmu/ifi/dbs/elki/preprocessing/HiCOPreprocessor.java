@@ -41,11 +41,6 @@ public abstract class HiCOPreprocessor<V extends RealVector<V, ?>> extends Abstr
   public static final String PCA_DISTANCE_FUNCTION_D = "the distance function for the PCA to determine the distance between database objects " + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) + ". Default: " + DEFAULT_PCA_DISTANCE_FUNCTION;
 
   /**
-   * The parameter settings for the PCA.
-   */
-  private String[] pcaParameters;
-
-  /**
    * The distance function for the PCA.
    */
   protected DistanceFunction<V, DoubleDistance> pcaDistanceFunction;
