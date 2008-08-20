@@ -53,6 +53,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
     /**
      * Description for parameter corrdim.
      */
+    // todo "correlation" <-> axes parallel???
     public static final String CORRDIM_D = "the correlation dimensionality of the correlation hyperplane.";
 
     /**
