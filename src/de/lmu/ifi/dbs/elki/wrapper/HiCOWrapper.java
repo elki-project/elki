@@ -15,11 +15,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.DefaultValueGlob
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.varianceanalysis.PercentageEigenPairFilter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -56,7 +54,9 @@ public class HiCOWrapper extends NormalizationWrapper {
     /**
      * The alpha parameter.
      */
-    private DoubleParameter ALPHA_PARAM;
+    private DoubleParameter ALPHA_PARAM = new DoubleParameter(OptionID.EIGENPAIR_FILTER_ALPHA,
+        new IntervalConstraint(0.0,IntervalConstraint.IntervalBoundary.OPEN,1.0,
+            IntervalConstraint.IntervalBoundary.OPEN), PercentageEigenPairFilter.DEFAULT_ALPHA);
 
     /**
      * Parameter to specify the threshold of a distance between a vector q and a given space
@@ -120,13 +120,6 @@ public class HiCOWrapper extends NormalizationWrapper {
         optionHandler.put(DELTA_PARAM);
 
         // parameter alpha
-        ArrayList<ParameterConstraint<Number>> alphaConstraints = new ArrayList<ParameterConstraint<Number>>();
-        alphaConstraints.add(new GreaterConstraint(0));
-        alphaConstraints.add(new LessConstraint(1));
-        ALPHA_PARAM = new DoubleParameter(PercentageEigenPairFilter.ALPHA_P,
-            PercentageEigenPairFilter.ALPHA_D,
-            alphaConstraints);
-        ALPHA_PARAM.setDefaultValue(PercentageEigenPairFilter.DEFAULT_ALPHA);
         optionHandler.put(ALPHA_PARAM);
     }
 

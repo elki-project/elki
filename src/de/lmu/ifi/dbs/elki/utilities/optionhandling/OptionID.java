@@ -111,7 +111,7 @@ public final class OptionID extends ConstantObject<OptionID> {
      * OptionID for {@link de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor#K_PARAM}
      */
     public static final OptionID KNN_HICO_PREPROCESSOR_K = new OptionID("hicopreprocessor.k",
-        "<The number of nearest neighbors considered in the PCA. " +
+        "The number of nearest neighbors considered in the PCA. " +
         "If this parameter is not set, k ist set to three " +
         "times of the dimensionality of the database objects."
     );
@@ -130,6 +130,41 @@ public final class OptionID extends ConstantObject<OptionID> {
         Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(EigenPairFilter.class) +
         "."
     );
+    
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.elki.varianceanalysis.PercentageEigenPairFilter#ALPHA_PARAM}
+     * and {@link de.lmu.ifi.dbs.elki.varianceanalysis.ProgressiveEigenPairFilter#ALPHA_PARAM}
+     */
+    public static final OptionID EIGENPAIR_FILTER_ALPHA = new OptionID("pca.filter.alpha",
+        "The share (0.0 to 1.0) of variance that needs to be explained by the 'strong' eigenvectors." +
+        "The filter class will choose the number of strong eigenvectors by this share."
+    );
+    
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.elki.varianceanalysis.ProgressiveEigenPairFilter#PALPHA_PARAM}
+     */
+    public static final OptionID EIGENPAIR_FILTER_PALPHA = new OptionID("pca.filter.progressivealpha",
+        "The share (0.0 to 1.0) of variance that needs to be explained by the 'strong' eigenvectors." +
+        "The filter class will choose the number of strong eigenvectors by this share."
+    );
+    
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.elki.varianceanalysis.WeakEigenPairFilter#WALPHA_PARAM}
+     * and {@link de.lmu.ifi.dbs.elki.varianceanalysis.ProgressiveEigenPairFilter#WALPHA_PARAM}
+     */
+    public static final OptionID EIGENPAIR_FILTER_WALPHA = new OptionID("pca.filter.weakalpha",
+        "The minimum strength of the statistically expected variance (1/n) share an eigenvector " +
+        "needs to have to be considered 'strong'."
+    );
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.elki.varianceanalysis.RelativeEigenPairFilter#RALPHA_PARAM}
+     */
+    public static final OptionID EIGENPAIR_FILTER_RALPHA = new OptionID("pca.filter.relativealpha",
+        "The sensitivity niveau for weak eigenvectors: An eigenvector which is at less than " + 
+        "the given share of the statistical average variance is considered weak."
+    );
+    
     
     /**
      * The description of the OptionID.

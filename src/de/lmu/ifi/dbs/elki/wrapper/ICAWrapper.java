@@ -91,8 +91,7 @@ public class ICAWrapper extends FileBasedDatabaseConnectionWrapper {
         parameters.add("1000");
 
         // epsilon
-        parameters.add(OptionHandler.OPTION_PREFIX + PercentageEigenPairFilter.ALPHA_P);
-        parameters.add("0.95");
+        Util.addParameter(parameters, OptionID.EIGENPAIR_FILTER_ALPHA, "0.95");
 
         return parameters;
     }
