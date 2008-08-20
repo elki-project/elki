@@ -26,7 +26,8 @@ import java.util.Map;
  *
  * @author Elke Achtert 
  */
-public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends AbstractMTree<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> {
+public class MkTabTree<O extends DatabaseObject, D extends Distance<D>>
+    extends AbstractMTree<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> {
 
   /**
    * Parameter k.

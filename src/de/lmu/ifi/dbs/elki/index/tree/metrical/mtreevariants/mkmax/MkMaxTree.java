@@ -26,7 +26,8 @@ import java.util.Map;
  *
  * @author Elke Achtert 
  */
-public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends AbstractMTree<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> {
+public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
+    extends AbstractMTree<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> {
 
   /**
    * Parameter k.

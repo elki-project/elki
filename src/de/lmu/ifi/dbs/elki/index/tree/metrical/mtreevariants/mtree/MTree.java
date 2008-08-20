@@ -13,9 +13,12 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
  * Apart from organizing the objects it also provides several methods to search
  * for certain object in the structure. Persistence is not yet ensured.
  *
- * @author Elke Achtert 
+ * @author Elke Achtert
+ * @param <O> the type of DatabaseObject to be stored in the metrical index
+ * @param <D> the type of Distance used in the metrical index
  */
-public class MTree<O extends DatabaseObject, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNode<O, D>, MTreeEntry<D>> {
+public class MTree<O extends DatabaseObject, D extends Distance<D>>
+    extends AbstractMTree<O, D, MTreeNode<O, D>, MTreeEntry<D>> {
 
   /**
    * Provides a new M-Tree.

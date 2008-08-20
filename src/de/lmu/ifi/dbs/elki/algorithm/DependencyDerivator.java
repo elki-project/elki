@@ -229,7 +229,6 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
             sol = new CorrelationAnalysisSolution<V>(null, db, strongEigenvectors, weakEigenvectors, pcares.similarityMatrix(), centroid, NF);
         }
         else {
-
             Matrix transposedWeakEigenvectors = weakEigenvectors.transpose();
             if (this.debug) {
                 StringBuilder log = new StringBuilder();
@@ -278,7 +277,7 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
                 StringBuilder log = new StringBuilder();
                 log.append("Solution:");
                 log.append('\n');
-                log.append("Standard deviation ").append(this.solution.getStandardDeviation());
+                log.append("Standard deviation ").append(sol.getStandardDeviation());
                 log.append('\n');
                 log.append(lq.equationsToString(NF.getMaximumFractionDigits()));
                 log.append('\n');

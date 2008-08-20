@@ -8,5 +8,4 @@ import de.lmu.ifi.dbs.elki.index.tree.Entry;
  * @author Elke Achtert
  */
 public interface MetricalEntry extends Entry {
-	//TODO any methods?
 }

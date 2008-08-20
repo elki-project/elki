@@ -15,280 +15,300 @@ import java.util.NoSuchElementException;
 /**
  * Abstract superclass for nodes in an tree based index structure.
  *
- * @author Elke Achtert 
+ * @author Elke Achtert
+ * @param <N> the type of Node used in the index
+ * @param <E> the type of Entry used in the index
  */
-public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry> extends AbstractPage<N> implements Node<N, E> {
-  /**
-   * The number of entries in this node.
-   */
-  private int numEntries;
+public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry>
+    extends AbstractPage<N> implements Node<N, E> {
+    /**
+     * The number of entries in this node.
+     */
+    private int numEntries;
 
-  /**
-   * The entries (children) of this node.
-   */
-  private E[] entries;
+    /**
+     * The entries (children) of this node.
+     */
+    private E[] entries;
 
-  /**
-   * Indicates wether this node is a leaf node.
-   */
-  private boolean isLeaf;
+    /**
+     * Indicates wether this node is a leaf node.
+     */
+    private boolean isLeaf;
 
-  /**
-   * Empty constructor for Externalizable interface.
-   */
-  public AbstractNode() {
-    super();
-  }
+    /**
+     * Empty constructor for Externalizable interface.
+     */
+    public AbstractNode() {
+        super();
+    }
 
-  /**
-   * Creates a new Node with the specified parameters.
-   *
-   * @param file     the file storing the index
-   * @param capacity the capacity (maximum number of entries plus 1 for overflow)
-   *                 of this node
-   * @param isLeaf   indicates wether this node is a leaf node
-   */
-  @SuppressWarnings("unchecked")
-  public AbstractNode(PageFile<N> file, int capacity, boolean isLeaf) {
-    super(file);
-    this.numEntries = 0;
-    this.entries = (E[]) new Entry[capacity];
-    this.isLeaf = isLeaf;
-  }
+    /**
+     * Creates a new Node with the specified parameters.
+     *
+     * @param file     the file storing the index
+     * @param capacity the capacity (maximum number of entries plus 1 for overflow)
+     *                 of this node
+     * @param isLeaf   indicates wether this node is a leaf node
+     */
+    @SuppressWarnings("unchecked")
+    public AbstractNode(PageFile<N> file, int capacity, boolean isLeaf) {
+        super(file);
+        this.numEntries = 0;
+        this.entries = (E[]) new Entry[capacity];
+        this.isLeaf = isLeaf;
+    }
 
-  /**
-   * @see Node#children(TreeIndexPath)
-   */
-  public final Enumeration<TreeIndexPath<E>> children(final TreeIndexPath<E> parentPath) {
-    return new Enumeration<TreeIndexPath<E>>() {
-      int count = 0;
+    /**
+     * @see Node#children(TreeIndexPath)
+     */
+    public final Enumeration<TreeIndexPath<E>> children(final TreeIndexPath<E> parentPath) {
+        return new Enumeration<TreeIndexPath<E>>() {
+            int count = 0;
 
-      public boolean hasMoreElements() {
-        return count < numEntries;
-      }
+            public boolean hasMoreElements() {
+                return count < numEntries;
+            }
 
-      public TreeIndexPath<E> nextElement() {
-        synchronized (AbstractNode.this) {
-          if (count < numEntries) {
-            return parentPath.pathByAddingChild(
-                new TreeIndexPathComponent<E>(entries[count], count++));
-          }
+            public TreeIndexPath<E> nextElement() {
+                synchronized (AbstractNode.this) {
+                    if (count < numEntries) {
+                        return parentPath.pathByAddingChild(
+                            new TreeIndexPathComponent<E>(entries[count], count++));
+                    }
+                }
+                throw new NoSuchElementException();
+            }
+        };
+    }
+
+    /**
+     * @see Node#getNumEntries()
+     */
+    public final int getNumEntries() {
+        return numEntries;
+    }
+
+    /**
+     * @see Node#isLeaf()
+     */
+    public final boolean isLeaf() {
+        return isLeaf;
+    }
+
+    /**
+     * @see Node#getEntry(int)
+     */
+    public final E getEntry(int index) {
+        return entries[index];
+    }
+
+    /**
+     * Writes the id of this node, the numEntries and the entries array to the
+     * specified stream.
+     *
+     * @param out the stream to write the object to
+     * @throws java.io.IOException Includes any I/O exceptions that may occur
+     */
+    public void writeExternal(ObjectOutput out) throws IOException {
+        super.writeExternal(out);
+        out.writeInt(numEntries);
+        out.writeObject(entries);
+    }
+
+    /**
+     * Reads the id of this node, the numEntries and the entries array from the
+     * specified stream.
+     *
+     * @param in the stream to read data from in order to restore the object
+     * @throws java.io.IOException    if I/O errors occur
+     * @throws ClassNotFoundException If the class for an object being
+     *                                restored cannot be found.
+     */
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        super.readExternal(in);
+        numEntries = in.readInt();
+        // noinspection unchecked
+        entries = (E[]) in.readObject();
+    }
+
+    /**
+     * Returns <code>true</code> if <code>this == o</code>
+     * has the value <code>true</code> or
+     * o is not null and
+     * o is of the same class as this instance and
+     * <code>super.equals(o)</code> returns <code>true</code> and
+     * both nodes are of the same type (leaf node or directory node) and
+     * have contain the same entries,
+     * <code>false</code> otherwise.
+     *
+     * @see Object#equals(Object)
+     * @see de.lmu.ifi.dbs.elki.persistent.AbstractPage#equals(Object)
+     * @see de.lmu.ifi.dbs.elki.index.tree.Entry#equals(Object)
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
         }
-        throw new NoSuchElementException();
-      }
-    };
-  }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
-  /**
-   * @see Node#getNumEntries()
-   */
-  public final int getNumEntries() {
-    return numEntries;
-  }
+        if (!super.equals(o)) {
+            return false;
+        }
 
-  /**
-   * @see Node#isLeaf()
-   */
-  public final boolean isLeaf() {
-    return isLeaf;
-  }
+        // noinspection unchecked
+        final N that = (N) o;
 
-  /**
-   * @see Node#getEntry(int)
-   */
-  public final E getEntry(int index) {
-    return entries[index];
-  }
-
-  /**
-   * Writes the id of this node, the numEntries and the entries array to the
-   * specified stream.
-   *
-   * @param out the stream to write the object to
-   * @throws java.io.IOException Includes any I/O exceptions that may occur
-   */
-  public void writeExternal(ObjectOutput out) throws IOException {
-    super.writeExternal(out);
-    out.writeInt(numEntries);
-    out.writeObject(entries);
-  }
-
-  /**
-   * Reads the id of this node, the numEntries and the entries array from the
-   * specified stream.
-   *
-   * @param in the stream to read data from in order to restore the object
-   * @throws java.io.IOException    if I/O errors occur
-   * @throws ClassNotFoundException If the class for an object being
-   *                                restored cannot be found.
-   */
-  public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-    super.readExternal(in);
-    numEntries = in.readInt();
-    // noinspection unchecked
-    entries = (E[]) in.readObject();
-  }
-
-  /**
-   * Indicates whether some other object is "equal to" this one.
-   *
-   * @param o the object to be tested
-   * @return true, if o is an AbstractNode and has the same
-   *         id and the same entries as this node.
-   */
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    if (!super.equals(o)) return false;
-
-    final N that = (N) o;
-
-    return isLeaf == that.isLeaf &&
-           numEntries == that.numEntries &&
-           Arrays.equals(entries, that.entries);
-  }
-
-  /**
-   * Returns a string representation of this node.
-   *
-   * @return a string representation of this node
-   */
-  public final String toString() {
-    if (isLeaf)
-      return "LeafNode " + getID();
-    else
-      return "DirNode " + getID();
-  }
-
-  /**
-   * Adds a new leaf entry to this node's children
-   * and returns the index of the entry in this node's children array.
-   * An UnsupportedOperationException will be thrown if the entry is not a leaf entry or
-   * this node is not a leaf node.
-   *
-   * @param entry the leaf entry to be added
-   * @return the index of the entry in this node's children array
-   * @throws UnsupportedOperationException if entry is not a leaf entry or
-   *                                       this node is not a leaf node
-   */
-  public final int addLeafEntry(E entry) {
-    // entry is not a leaf entry
-    if (!entry.isLeafEntry()) {
-      throw new UnsupportedOperationException("Entry is not a leaf entry!");
-    }
-    // this is a not a leaf node
-    if (!isLeaf()) {
-      throw new UnsupportedOperationException("Node is not a leaf node!");
+        return isLeaf == that.isLeaf &&
+            numEntries == that.numEntries &&
+            Arrays.equals(entries, that.entries);
     }
 
-    // leaf node
-    return addEntry(entry);
-  }
-
-  /**
-   * Adds a new directory entry to this node's children
-   * and returns the index of the entry in this node's children array.
-   * An UnsupportedOperationException will be thrown if the entry is not a directory entry or
-   * this node is not a directory node.
-   *
-   * @param entry the directory entry to be added
-   * @return the index of the entry in this node's children array
-   * @throws UnsupportedOperationException if entry is not a directory entry or
-   *                                       this node is not a directory node
-   */
-  public final int addDirectoryEntry(E entry) {
-    // entry is not a directory entry
-    if (entry.isLeafEntry()) {
-      throw new UnsupportedOperationException("Entry is not a directory entry!");
-    }
-    // this is a not a directory node
-    if (isLeaf()) {
-      throw new UnsupportedOperationException("Node is not a directory node!");
+    /**
+     * Returns a string representation of this node.
+     *
+     * @return the type of this node (LeafNode or DirNode) followed by its id
+     */
+    @Override
+    public final String toString() {
+        if (isLeaf)
+            return "LeafNode " + getID();
+        else
+            return "DirNode " + getID();
     }
 
-    return addEntry(entry);
-  }
+    /**
+     * Adds a new leaf entry to this node's children
+     * and returns the index of the entry in this node's children array.
+     * An UnsupportedOperationException will be thrown if the entry is not a leaf entry or
+     * this node is not a leaf node.
+     *
+     * @param entry the leaf entry to be added
+     * @return the index of the entry in this node's children array
+     * @throws UnsupportedOperationException if entry is not a leaf entry or
+     *                                       this node is not a leaf node
+     */
+    public final int addLeafEntry(E entry) {
+        // entry is not a leaf entry
+        if (!entry.isLeafEntry()) {
+            throw new UnsupportedOperationException("Entry is not a leaf entry!");
+        }
+        // this is a not a leaf node
+        if (!isLeaf()) {
+            throw new UnsupportedOperationException("Node is not a leaf node!");
+        }
 
-  /**
-   * Deletes the entry at the specified index and shifts all
-   * entries after the index to left.
-   *
-   * @param index the index at which the entry is to be deketed
-   * @return true id deletion was sucessfull
-   */
-  public boolean deleteEntry(int index) {
-    System.arraycopy(entries, index + 1, entries, index, numEntries - index - 1);
-    entries[--numEntries] = null;
-    return true;
-  }
-
-  /**
-   * Deletes all  entries in this node.
-   */
-  protected final void deleteAllEntries() {
-    //noinspection unchecked
-    this.entries = (E[]) new Entry[entries.length];
-    this.numEntries = 0;
-  }
-
-  /**
-   * Increases the length of the entries array to entries.length + 1.
-   */
-  public final void increaseEntries() {
-    E[] tmp = entries;
-    //noinspection unchecked
-    entries = (E[]) new Entry[tmp.length + 1];
-    System.arraycopy(tmp, 0, entries, 0, tmp.length);
-  }
-
-  /**
-   * Returns the capacity of this node (i.e. the length of the entries arrays).
-   *
-   * @return the capacity of this node
-   */
-  public final int getCapacity() {
-    return entries.length;
-  }
-
-  /**
-   * Returns a list of the entries.
-   *
-   * @return a list of the entries
-   */
-  public final List<E> getEntries() {
-    List<E> result = new ArrayList<E>();
-    for (E entry : entries) {
-      result.add(entry);
+        // leaf node
+        return addEntry(entry);
     }
-    return result;
-  }
 
-  /**
-   * Creates a new leaf node with the specified capacity.
-   *
-   * @param capacity the capacity of the new node
-   * @return a new leaf node
-   */
-  protected abstract N createNewLeafNode(int capacity);
+    /**
+     * Adds a new directory entry to this node's children
+     * and returns the index of the entry in this node's children array.
+     * An UnsupportedOperationException will be thrown if the entry is not a directory entry or
+     * this node is not a directory node.
+     *
+     * @param entry the directory entry to be added
+     * @return the index of the entry in this node's children array
+     * @throws UnsupportedOperationException if entry is not a directory entry or
+     *                                       this node is not a directory node
+     */
+    public final int addDirectoryEntry(E entry) {
+        // entry is not a directory entry
+        if (entry.isLeafEntry()) {
+            throw new UnsupportedOperationException("Entry is not a directory entry!");
+        }
+        // this is a not a directory node
+        if (isLeaf()) {
+            throw new UnsupportedOperationException("Node is not a directory node!");
+        }
 
-  /**
-   * Creates a new directory node with the specified capacity.
-   *
-   * @param capacity the capacity of the new node
-   * @return a new directory node
-   */
-  protected abstract N createNewDirectoryNode(int capacity);
+        return addEntry(entry);
+    }
 
-  /**
-   * Adds the specified entry to the entries array and increases the
-   * numEntries counter.
-   *
-   * @param entry the entry to be added
-   * @return the current number of entries
-   */
-  private int addEntry(E entry) {
-    entries[numEntries++] = entry;
-    return numEntries - 1;
-  }
+    /**
+     * Deletes the entry at the specified index and shifts all
+     * entries after the index to left.
+     *
+     * @param index the index at which the entry is to be deketed
+     * @return true id deletion was sucessfull
+     */
+    public boolean deleteEntry(int index) {
+        System.arraycopy(entries, index + 1, entries, index, numEntries - index - 1);
+        entries[--numEntries] = null;
+        return true;
+    }
+
+    /**
+     * Deletes all  entries in this node.
+     */
+    protected final void deleteAllEntries() {
+        //noinspection unchecked
+        this.entries = (E[]) new Entry[entries.length];
+        this.numEntries = 0;
+    }
+
+    /**
+     * Increases the length of the entries array to entries.length + 1.
+     */
+    public final void increaseEntries() {
+        E[] tmp = entries;
+        //noinspection unchecked
+        entries = (E[]) new Entry[tmp.length + 1];
+        System.arraycopy(tmp, 0, entries, 0, tmp.length);
+    }
+
+    /**
+     * Returns the capacity of this node (i.e. the length of the entries arrays).
+     *
+     * @return the capacity of this node
+     */
+    public final int getCapacity() {
+        return entries.length;
+    }
+
+    /**
+     * Returns a list of the entries.
+     *
+     * @return a list of the entries
+     */
+    public final List<E> getEntries() {
+        List<E> result = new ArrayList<E>();
+        for (E entry : entries) {
+            result.add(entry);
+        }
+        return result;
+    }
+
+    /**
+     * Creates a new leaf node with the specified capacity.
+     *
+     * @param capacity the capacity of the new node
+     * @return a new leaf node
+     */
+    protected abstract N createNewLeafNode(int capacity);
+
+    /**
+     * Creates a new directory node with the specified capacity.
+     *
+     * @param capacity the capacity of the new node
+     * @return a new directory node
+     */
+    protected abstract N createNewDirectoryNode(int capacity);
+
+    /**
+     * Adds the specified entry to the entries array and increases the
+     * numEntries counter.
+     *
+     * @param entry the entry to be added
+     * @return the current number of entries
+     */
+    private int addEntry(E entry) {
+        entries[numEntries++] = entry;
+        return numEntries - 1;
+    }
 
 }

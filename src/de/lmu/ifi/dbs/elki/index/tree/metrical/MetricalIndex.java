@@ -11,10 +11,15 @@ import java.util.List;
 /**
  * Abstract super class for all metrical index classes.
  *
- * @author Elke Achtert 
+ * @author Elke Achtert
+ * @param <O> the type of DatabaseObject to be stored in the metrical index
+ * @param <D> the type of Distance used in the metrical index
+ * @param <N> the type of MetricalNode used in the metrical index
+ * @param <E> the type of MetricalEntry used in the metrical index
  */
 
-public abstract class MetricalIndex<O extends DatabaseObject, D extends Distance<D>, N extends MetricalNode<N,E>, E extends MetricalEntry> extends TreeIndex<O, N, E> {
+public abstract class MetricalIndex<O extends DatabaseObject, D extends Distance<D>, N extends MetricalNode<N,E>, E extends MetricalEntry>
+    extends TreeIndex<O, N, E> {
   /**
    * Performs a range query for the given object with the given
    * epsilon range and the according distance function.
