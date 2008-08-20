@@ -5,6 +5,13 @@
 		<format property="now" pattern="yyyy-MM-dd_HHmm" />
 	</tstamp>
 
+	<property name="classpath" value="classesBuild" />
+	<property name="build.lib" value="lib"/>
+	<property name="buildpath" value="build" />
+	<property name="jarFile" value="kdd.jar" />
+	<property name="main-class" value="de.lmu.ifi.dbs.elki.KDDTask" />
+	<property name="source" value="src" />
+	
 	<condition property="windows.disk.prefix" value="P:">
 		<or>
 			<equals arg1="${user.name}" arg2="achtert" />
@@ -54,7 +61,14 @@
 			<isset property="${deploy.executable}" />
 		</not>
 	</condition>
-
+	
+	<path id="compileClasspath">
+		<fileset dir="${build.lib}">
+			<include name="**/*.jar"/>
+		</fileset>
+		<dirset dir="${source}" />
+	</path>
+	
 	<target name="complete" description="creates javadoc and builds the project" depends="javadoc,build" />
 
 	<target name="javadoc">
@@ -65,8 +79,9 @@
 			nonavbar="false" noindex="false" splitindex="true"
 			author="true" version="true" nodeprecatedlist="false"
 			nodeprecated="false" link="http://java.sun.com/javase/6/docs/api/"
-			overview="src/overview.html" sourcepath="src" classpath="bin"
+			overview="src/overview.html" sourcepath="src"
 			doctitle="ELKI (internal version)" windowtitle="ELKI (internal version)">
+			<classpath refid="compileClasspath"/>
 			<packageset dir="src"/>
 			<footer>
                 &lt;table style="font-size:xx-small;"&gt;
@@ -102,14 +117,9 @@
 
 	<target name="build" description="build project" depends="init,recompile,copy4jar,createjar,copy,delete_inproject" />
 
-	<target name="init" description="initial conditions">
-		<property name="classpath" value="classesBuild" />
-		<property name="buildpath" value="build" />
+	<target name="init" description="initial conditions">		
 		<property name="deploy" value="${windows.disk.prefix}${deploy.archive}version-${now}" />
-		<property name="executable" value="${windows.disk.prefix}${deploy.executable}" />
-		<property name="jarFile" value="kdd.jar" />
-		<property name="main-class" value="de.lmu.ifi.dbs.elki.KDDTask" />
-		<property name="source" value="src" />
+		<property name="executable" value="${windows.disk.prefix}${deploy.executable}" />		
 		<mkdir dir="${deploy}" />
 		<delete file="${jarFile}" />
 		<delete dir="${buildpath}" />
@@ -119,9 +129,7 @@
 	<target name="recompile" description="cleaning up classpath, recompiling all classes" depends="init">
 		<delete dir="${classpath}" />
 		<mkdir dir="${classpath}" />
-		<path id="compileClasspath">
-			<dirset dir="${source}" />
-		</path>
+		
 
 		<javac destdir="${classpath}" deprecation="true" debug="true" optimize="true" source="1.6" debuglevel="">
 			<compilerarg value="-Xlint:all"/>
@@ -143,17 +151,26 @@
 			</fileset>
 			<fileset dir="${classpath}" />
 		</copy>
-		<copy todir="${buildpath}/de">
-			<fileset dir="${source}/de">
+		<unjar dest="${buildpath}" src="${build.lib}/junit-4.5.jar"/>
+		<copy todir="${buildpath}">
+			<fileset dir="${source}">
 				<exclude name="**/*.java" />
+				<exclude name="**/*.html"/>
+				<exclude name="**/*.txt"/>
 			</fileset>
 		</copy>
-		<copy todir="${buildpath}/src/de">
-			<fileset dir="${source}/de" />
+		<copy todir="${buildpath}/src">
+			<fileset dir="${source}">
+				<exclude name="**/*.html"/>
+			</fileset>
 		</copy>
 		<!-- insert patterns to exclude certain classes from deployment -->
 		<delete>
-			<fileset dir="${buildpath}" includes="**/zelki/**" />
+			<fileset dir="${buildpath}">
+				<include name="**/zelki/**" />
+				<include name="**/*.html"/>
+				<include name="**/*.txt"/>
+			</fileset>
 		</delete>
 	</target>
 

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <project name="ELKI" default="preliminary" basedir=".">
-	<property name="RELEASE" value="0.1"/>
+	<property name="RELEASE" value="0.1.1"/>
 	
 	<property name="release.overview" value="release_0_1.html"/>
 	
@@ -102,6 +102,7 @@
                 <exclude name="${basepackage}index/tree/spatial/rstarvariants/flat/**"/>
                 <exclude name="${basepackage}math/analysis/**"/>
 				<exclude name="${basepackage}parser/ArffFileParser.**"/>
+				<exclude name="${basepackage}test/**"/>
                 <exclude name="${basepackage}tree/btree/**"/>
                 <exclude name="${basepackage}varianceanalysis/ica/**"/>
 				<exclude name="${basepackage}wrapper/**"/>
