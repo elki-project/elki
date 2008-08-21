@@ -121,8 +121,10 @@ public class AffineTransformation {
    * @param angle rotation angle in radians.
    */
   public void addRotation(int axis1, int axis2, double angle) {
-    assert(axis1 < dim);
-    assert(axis2 < dim);
+    // TODO: throw an exception instead of using assert
+    assert(axis1 >= 0); assert(axis1 < dim);
+    assert(axis1 >= 0); assert(axis2 < dim);
+    assert(axis1 != axis2);
 
     // reset inverse transformation - needs recomputation.
     inv = null;
