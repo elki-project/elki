@@ -31,7 +31,7 @@ public abstract class StandAloneWrapper extends AbstractWrapper {
      * <p>Key: {@code -wrapper.out} </p>
      */
     private final FileParameter OUTPUT_PARAM =
-        new FileParameter(OUTPUT_ID, FileParameter.FileType.INPUT_FILE);
+        new FileParameter(OUTPUT_ID, FileParameter.FileType.OUTPUT_FILE);
 
     /**
      * Holds the value of {@link #OUTPUT_PARAM}.
