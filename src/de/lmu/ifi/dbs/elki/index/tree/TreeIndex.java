@@ -247,10 +247,12 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
     }
 
     /**
-     * Creates a header for this index structure.
-     * Subclasses may need to overwrite this method.
+     * Creates a header for this index structure which is an instance of
+     * {@link TreeIndexHeader}.
+     * Subclasses may need to overwrite this method if they need a more
+     * specialized header.
      *
-     * @return a header for this index structure
+     * @return a new header for this index structure
      */
     protected TreeIndexHeader createHeader() {
         return new TreeIndexHeader(pageSize, dirCapacity, leafCapacity, dirMinimum, leafMinimum);
