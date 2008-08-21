@@ -68,6 +68,8 @@ public class TestAffineTransformations {
     assertEquals("Vector wasn't translated properly forward.",v2,v3);
     Vector v4 = t.applyInverse(v2);
     assertEquals("Vector wasn't translated properly backwards.",v1,v4);
+    Vector v5 = t.applyInverse(v3);
+    assertEquals("Vector wasn't translated properly back and forward.",v1,v5);    
   }
 
 
