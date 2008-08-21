@@ -22,7 +22,7 @@ public class AffineTransformation {
    * The transformation matrix of dim+1 x dim+1
    * for homogeneous coordinates
    */
-  private Matrix trans ;
+  private Matrix trans;
   /**
    * the inverse transformation
    */
