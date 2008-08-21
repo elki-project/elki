@@ -10,12 +10,11 @@ import de.lmu.ifi.dbs.elki.utilities.heap.DefaultIdentifiable;
  * object to be stored represents a node in a M-Tree and some additional
  * information. Additionally to the DefaultHeapNode this object holds the id of
  * the routing object of the underlying M-Tree node and its covering radius.
- * 
- * @author Elke Achtert 
+ *
+ * @author Elke Achtert
+ * @param <D> the type of Distance used in the M-Tree
  */
-public class PQNode<D extends Distance<D>> extends
-        DefaultHeapNode<D, Identifiable>
-{
+public class PQNode<D extends Distance<D>> extends DefaultHeapNode<D, Identifiable> {
     /**
      * Generated serialVersionUID.
      */
@@ -29,34 +28,28 @@ public class PQNode<D extends Distance<D>> extends
     /**
      * Empty constructor for serialization purposes.
      */
-    public PQNode()
-    {
+    public PQNode() {
         super();
     }
 
     /**
      * Creates a new heap node with the specified parameters.
-     * 
-     * @param d_min
-     *            the minimum distance of the node
-     * @param nodeID
-     *            the id of the node
-     * @param routingObjectID
-     *            the id of the routing object of the node
+     *
+     * @param d_min           the minimum distance of the node
+     * @param nodeID          the id of the node
+     * @param routingObjectID the id of the routing object of the node
      */
-    public PQNode(D d_min, final Integer nodeID, final Integer routingObjectID)
-    {
+    public PQNode(D d_min, final Integer nodeID, final Integer routingObjectID) {
         super(d_min, new DefaultIdentifiable(nodeID));
         this.routingObjectID = routingObjectID;
     }
 
     /**
      * Returns the id of the routing object.
-     * 
+     *
      * @return the id of the routing object
      */
-    public Integer getRoutingObjectID()
-    {
+    public Integer getRoutingObjectID() {
         return routingObjectID;
     }
 }

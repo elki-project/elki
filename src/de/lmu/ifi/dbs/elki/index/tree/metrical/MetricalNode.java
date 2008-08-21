@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical;
 import de.lmu.ifi.dbs.elki.index.tree.Node;
 
 /**
- * Defines the requirements for an object that can be used as a node in a Metrical Index.
+ * Marker interface for objects that can be used as nodes in a metrical index.
  * A metrical node can be a metrical directory node or a metrical leaf node.
  *
  * @author Elke Achtert

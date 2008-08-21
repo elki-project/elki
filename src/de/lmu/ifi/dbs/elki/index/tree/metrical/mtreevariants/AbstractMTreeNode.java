@@ -13,9 +13,14 @@ import java.util.List;
 /**
  * Represents a node in an AbstractM-Tree.
  *
- * @author Elke Achtert 
+ * @author Elke Achtert
+ * @param <O> the type of DatabaseObject to be stored in the M-Tree
+ * @param <D> the type of Distance used in the M-Tree
+ * @param <N> the type of AbstractMTreeNode used in the M-Tree
+ * @param <E> the type of MetricalEntry used in the M-Tree
  */
-public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends AbstractNode<N, E> implements MetricalNode<N,E> {
+public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>>
+    extends AbstractNode<N, E> implements MetricalNode<N,E> {
 
   /**
    * Empty constructor for Externalizable interface.
@@ -103,7 +108,8 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
   }
 
   /**
-   * Adjusts the parameters of the entry representing this node.
+   * Adjusts the parameters of the entry representing this node (e.g. after insertion
+   * of new objects). Subclasses may need to overwrite this method.
    *
    * @param entry           the entry representing this node
    * @param routingObjectID the id of the (new) routing object of this node

@@ -13,7 +13,8 @@ import java.io.ObjectOutput;
  * of the underlying node), the id of the routing object, the covering radius of the entry and
  * the distance from the routing object of the entry to its parent's routing object in the M-Tree.
  *
- * @author Elke Achtert 
+ * @author Elke Achtert
+ * @param <D> the type of Distance used in the M-Tree
  */
 public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractEntry implements MTreeEntry<D> {
   /**

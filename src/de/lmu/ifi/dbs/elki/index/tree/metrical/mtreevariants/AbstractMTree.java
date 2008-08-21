@@ -11,7 +11,9 @@ import de.lmu.ifi.dbs.elki.index.tree.Entry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.util.Assignments;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.Assignments;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.MLBDistSplit;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.util.PQNode;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.Identifiable;
@@ -69,7 +71,8 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     private DistanceFunction<O, D> distanceFunction;
 
     /**
-     * Adds parameter
+     * Provides a new abstract M-Tree and
+     * adds parameter
      * {@link #DISTANCE_FUNCTION_PARAM}
      * to the option handler additionally to parameters of super class.
      */
@@ -80,50 +83,25 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
 
     /**
-     * Inserts the specified object into this M-Tree.
+     * Throws an UnsupportedOperationException since
+     * deletion of objects is not yet supported by an M-Tree.
      *
-     * @param object the object to be inserted
-     */
-    // todo: in subclasses
-    public void insert(O object) {
-        this.insert(object, true);
-    }
-
-    /**
-     * Inserts the specified objects into this index sequentially. <p/>
-     *
-     * @param objects the objects to be inserted
-     */
-    // todo: in subclasses
-    // todo: bulk load method
-    public void insert(List<O> objects) {
-        for (O object : objects) {
-            insert(object, true);
-        }
-
-        if (debug) {
-            getRoot().test(this, getRootEntry());
-        }
-
-    }
-
-    /**
-     * Deletes the specified obect from this index.
-     *
-     * @param o the object to be deleted
-     * @return true if this index did contain the object, false otherwise
+     * @throws UnsupportedOperationException
+     * @see de.lmu.ifi.dbs.elki.index.Index#delete(de.lmu.ifi.dbs.elki.data.DatabaseObject)
      */
     public final boolean delete(O o) {
         throw new UnsupportedOperationException("Deletion of objects is not yet supported by an M-Tree!");
     }
 
     /**
-     * Performs necessary operations after deleting the specified object.
+     * Throws an UnsupportedOperationException since
+     * deletion of objects is not yet supported by an M-Tree.
      *
-     * @param o the object to be deleted
+     * @throws UnsupportedOperationException
+     * @see de.lmu.ifi.dbs.elki.index.tree.TreeIndex#postDelete(de.lmu.ifi.dbs.elki.data.DatabaseObject)
      */
     protected final void postDelete(O o) {
-        // do nothing
+        throw new UnsupportedOperationException("Deletion of objects is not yet supported by an M-Tree!");
     }
 
     /**
@@ -312,13 +290,17 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
         if (this.debug) {
             debugFine("\ninsertion-subtree " + subtree + "\n");
         }
+
         // determine parent distance
         E parentEntry = subtree.getLastPathComponent().getEntry();
         D parentDistance = distance(parentEntry.getRoutingObjectID(), object.getID());
+
         // create leaf entry and do pre insert
         E entry = createNewLeafEntry(object, parentDistance);
-        if (withPreInsert)
+        if (withPreInsert) {
             preInsert(entry);
+        }
+
         // get parent node
         N parent = getNode(parentEntry);
         parent.addLeafEntry(entry);

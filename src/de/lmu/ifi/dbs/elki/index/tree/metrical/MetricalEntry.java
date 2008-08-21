@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical;
 import de.lmu.ifi.dbs.elki.index.tree.Entry;
 
 /**
- * Defines the requirements for an entry in a node of a Metrical Index.
+ * Marker interface for entries in a node of a metrical index.
  *
  * @author Elke Achtert
  */

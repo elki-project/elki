@@ -11,46 +11,40 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  *
  * @author Elke Achtert
  */
-public class MTreeNode<O extends DatabaseObject, D extends Distance<D>> extends AbstractMTreeNode<O,D,MTreeNode<O,D>,MTreeEntry<D>> {
+public class MTreeNode<O extends DatabaseObject, D extends Distance<D>> extends AbstractMTreeNode<O, D, MTreeNode<O, D>, MTreeEntry<D>> {
 
-  /**
-   * Empty constructor for Externalizable interface.
-   */
-  public MTreeNode() {
-	  // empty constructor
-  }
+    /**
+     * Empty constructor for Externalizable interface.
+     */
+    public MTreeNode() {
+        // empty constructor
+    }
 
-   /**
-   * Creates a new MTreeNode with the specified parameters.
-   *
-   * @param file     the file storing the M-Tree
-   * @param capacity the capacity (maximum number of entries plus 1 for overflow)
-   *                 of this node
-   * @param isLeaf   indicates wether this node is a leaf node
-   */
-  public MTreeNode(PageFile<MTreeNode<O,D>> file, int capacity, boolean isLeaf) {
-    super(file, capacity, isLeaf);
-  }
+    /**
+     * Creates a new MTreeNode with the specified parameters.
+     *
+     * @param file     the file storing the M-Tree
+     * @param capacity the capacity (maximum number of entries plus 1 for overflow)
+     *                 of this node
+     * @param isLeaf   indicates wether this node is a leaf node
+     */
+    public MTreeNode(PageFile<MTreeNode<O, D>> file, int capacity, boolean isLeaf) {
+        super(file, capacity, isLeaf);
+    }
 
-  /**
-   * Creates a new leaf node with the specified capacity.
-   * Subclasses have to overwrite this method.
-   *
-   * @param capacity the capacity of the new node
-   * @return a new leaf node
-   */
-  protected MTreeNode<O,D> createNewLeafNode(int capacity) {
-    return new MTreeNode<O, D>(getFile(), capacity, true);
-  }
+    /**
+     * @return a new MTreeNode which is a leaf node
+     * @see de.lmu.ifi.dbs.elki.index.tree.AbstractNode#createNewLeafNode(int)
+     */
+    protected MTreeNode<O, D> createNewLeafNode(int capacity) {
+        return new MTreeNode<O, D>(getFile(), capacity, true);
+    }
 
-  /**
-   * Creates a new directory node with the specified capacity.
-   * Subclasses have to overwrite this method.
-   *
-   * @param capacity the capacity of the new node
-   * @return a new directory node
-   */
-  protected MTreeNode<O,D> createNewDirectoryNode(int capacity) {
-    return new MTreeNode<O, D>(getFile(), capacity, false);
-  }
+    /**
+     * @return a new MTreeNode which is a directory node
+     * @see de.lmu.ifi.dbs.elki.index.tree.AbstractNode#createNewDirectoryNode(int) 
+     */
+    protected MTreeNode<O, D> createNewDirectoryNode(int capacity) {
+        return new MTreeNode<O, D>(getFile(), capacity, false);
+    }
 }
