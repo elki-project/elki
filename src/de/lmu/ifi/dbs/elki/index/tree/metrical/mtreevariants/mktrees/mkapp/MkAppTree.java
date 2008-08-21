@@ -27,6 +27,9 @@ import java.util.Map;
  * parameter k < kmax.
  *
  * @author Elke Achtert
+ * @param <O> the type of DatabaseObject to be stored in the metrical index
+ * @param <D> the type of NumberDistance used in the metrical index
+ * @param <N> the type of Number used in the NumberDistance
  */
 public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>, N extends Number>
     extends AbstractMTree<O, D, MkAppTreeNode<O, D, N>, MkAppEntry<D, N>> {

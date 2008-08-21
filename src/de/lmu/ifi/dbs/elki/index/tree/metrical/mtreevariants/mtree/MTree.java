@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
+import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>>
      */
     public MTree() {
         super();
-        // this.debug = true;
+        this.debug = true;
     }
 
     /**
@@ -43,7 +44,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>>
 
     /**
      * Inserts the specified objects into this M-Tree sequentially
-     * since no bulk load method is implemented so far.
+     * since a bulk load method is not implemented so far.
      * Calls for each object
      * {@link AbstractMTree#insert(de.lmu.ifi.dbs.elki.data.DatabaseObject,boolean)
      * AbstractMTree.insert(object, false)}.
@@ -71,7 +72,18 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>>
     }
 
     /**
-     * @return a new MTreeLeafEntry
+     * Throws an UnsupportedOperationException since
+     * reverse knn queries are not yet supported by an M-Tree.
+     *
+     * @throws UnsupportedOperationException
+     * @see de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex#reverseKNNQuery
+     */
+    public List<QueryResult<D>> reverseKNNQuery(O object, int k) {
+        throw new UnsupportedOperationException("Reverse knn-queries are not yet supported!");
+    }
+
+    /**
+     * @return a new MTreeLeafEntry representing the specified data object
      * @see AbstractMTree#createNewLeafEntry(DatabaseObject,Distance)
      */
     protected MTreeEntry<D> createNewLeafEntry(O object, D parentDistance) {
@@ -79,7 +91,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>>
     }
 
     /**
-     * @return a new MTreeDirectoryEntry
+     * @return a new MTreeDirectoryEntry representing the specified node
      * @see AbstractMTree#createNewDirectoryEntry(AbstractMTreeNode,Integer,Distance)
      */
     protected MTreeEntry<D> createNewDirectoryEntry(MTreeNode<O, D> node, Integer routingObjectID, D parentDistance) {
@@ -88,8 +100,6 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>>
     }
 
     /**
-     * Creates an entry representing the root node.
-     *
      * @return a new MTreeDirectoryEntry by calling
      *         <code>new MTreeDirectoryEntry<D>(null, null, 0, null)</code>
      * @see de.lmu.ifi.dbs.elki.index.tree.TreeIndex#createRootEntry()

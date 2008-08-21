@@ -40,7 +40,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
     extends DistanceBasedAlgorithm<V, D> {
 
     /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.KNNJoin#K_PARAM}
+     * OptionID for {@link #K_PARAM}
      */
     public static final OptionID K_ID = OptionID.getOrCreateOptionID(
         "knnjoin.k",

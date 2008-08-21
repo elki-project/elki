@@ -144,18 +144,6 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
 
     /**
-     * Performs a reverse k-nearest neighbor query for the given object ID. The
-     * query result is in ascending order to the distance to the query object.
-     *
-     * @param object the query object
-     * @param k      the number of nearest neighbors to be returned
-     * @return a List of the query results
-     */
-    public List<QueryResult<D>> reverseKNNQuery(O object, int k) {
-        throw new UnsupportedOperationException("Not yet supported!");
-    }
-
-    /**
      * Returns the distance function.
      *
      * @return the distance function
@@ -583,8 +571,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
 
     /**
-     * Creates a new leaf entry representing the specified data object in the
-     * specified subtree.
+     * Creates a new leaf entry representing the specified data object.
      *
      * @param object         the data object to be represented by the new entry
      * @param parentDistance the distance from the object to the routing object of the
@@ -867,7 +854,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
 
     /**
-     * Encapsulates a split object and the newly created node-
+     * Encapsulates a split object and the newly created node.
      */
     private class SplitResult {
         private MTreeSplit<O, D, N, E> split;
