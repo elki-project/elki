@@ -158,10 +158,8 @@ public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Di
     }
 
     /**
-     * Calls {@link AbstractClassifier#setParameters(String[]) AbstractClassifier#setParameters(args)}
+     * Calls the super method
      * and passes the remaining parameters to {@link #dependencyDerivator}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
@@ -179,10 +177,8 @@ public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Di
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.classifier.AbstractClassifier#parameterDescription()}
+     * Calls the super method
      * and appends the parameter description of {@link #dependencyDerivator} if it is already initialized.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */
     @Override
     public String parameterDescription() {

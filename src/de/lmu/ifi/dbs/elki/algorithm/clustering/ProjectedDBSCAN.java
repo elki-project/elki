@@ -364,15 +364,13 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
     }
 
     /**
-     * Calls {@link AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
+     * Calls the super method
      * and instantiates {@link #distanceFunction} according to the value of parameter
      * {@link #DISTANCE_FUNCTION_PARAM}
      * and sets additionally the values of the parameters
      * {@link #EPSILON_PARAM} {@link #MINPTS_PARAM}, and {@link #LAMBDA_PARAM}.
      * <p/>
      * The remaining parameters are passed to the {@link #distanceFunction}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     @SuppressWarnings("unchecked")

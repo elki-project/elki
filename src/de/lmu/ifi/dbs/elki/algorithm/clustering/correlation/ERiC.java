@@ -140,11 +140,9 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
     }
 
     /**
-     * Calls {@link AbstractAlgorithm#parameterDescription()}
+     * Calls the super method
      * and appends the parameter description of
      * the {@link #copacAlgorithm}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */
     @Override
     public String parameterDescription() {
@@ -175,9 +173,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
     }
 
     /**
-     * Passes remaining parameters to the {@link #copacAlgorithm}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
+     * Calls the super method and passes remaining parameters to the {@link #copacAlgorithm}.
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

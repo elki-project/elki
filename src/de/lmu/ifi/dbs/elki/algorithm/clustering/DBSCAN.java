@@ -265,11 +265,9 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
     }
 
     /**
-     * Calls {@link DistanceBasedAlgorithm#setParameters(String[]) DistanceBasedAlgorithm#setParameters(args)}
+     * Calls the super method
      * and sets additionally the values of the parameters
      * {@link #EPSILON_PARAM} and {@link #MINPTS_PARAM}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

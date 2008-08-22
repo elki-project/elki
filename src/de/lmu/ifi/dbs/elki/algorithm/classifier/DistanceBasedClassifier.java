@@ -94,12 +94,10 @@ public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extend
     }
 
     /**
-     * Calls {@link AbstractClassifier#setParameters(String[]) AbstractClassifier#setParameters(args)}
+     * Calls the super method
      * and instantiates {@link #distanceFunction} according to the value of parameter
      * {@link #DISTANCE_FUNCTION_PARAM}.
      * The remaining parameters are passed to the {@link #distanceFunction}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
@@ -128,10 +126,8 @@ public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extend
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.classifier.AbstractClassifier#parameterDescription()}
+     * Calls the super method
      * and appends the parameter description of {@link #distanceFunction} if it is already initialized.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */
     @Override
     public String parameterDescription() {

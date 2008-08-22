@@ -203,14 +203,12 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
     }
 
     /**
-     * Calls {@link AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
+     * Calls the super method
      * and sets additionally the value of the parameters
      * {@link #EPSILON_PARAM}, {@link #MINPTS_PARAM}, and {@link #DISTANCE_FUNCTION_PARAM}
      * and instantiates {@link #distanceFunction} according to the value of parameter
      * {@link #DISTANCE_FUNCTION_PARAM}.
      * The remaining parameters are passed to the {@link #distanceFunction}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
@@ -243,10 +241,8 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
     }
 
     /**
-     * Calls {@link AbstractAlgorithm#parameterDescription()}
+     * Calls the super method
      * and appends the parameter description of {@link #distanceFunction} (if it is already initialized).
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */
     @Override
     public String parameterDescription() {

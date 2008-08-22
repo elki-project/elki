@@ -285,12 +285,10 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
+     * Calls the super method
      * and sets additionally the values of the parameters
      * {@link #MINPTS_PARAM}, {@link #MAXLEVEL_PARAM}, {@link #MINDIM_PARAM}, {@link #JITTER_PARAM},
      * and the flag {@link #ADJUST_FLAG}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);

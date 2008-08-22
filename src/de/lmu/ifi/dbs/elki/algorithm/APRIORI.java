@@ -270,7 +270,6 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
      * Calls the super method
      * and sets additionally the values of the parameters
      * {@link #MINFREQ_PARAM} and {@link #MINSUPP_PARAM}.
-     *
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

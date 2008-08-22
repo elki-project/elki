@@ -407,11 +407,9 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impleme
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
+     * Calls the super method
      * and sets additionally the values of the parameters
      * {@link #K_PARAM} and {@link #DELTA_PARAM}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

@@ -123,10 +123,10 @@ public class MultivariateCorrelationOutlierProbability<V extends RealVector<V, ?
     }
 
     /**
-     * Sets the parameters minpts additionally to the parameters set by the
-     * super-class method.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
+     * Calls the super method
+     * and sets additionally the value of the parameter
+     * {@link #K_PARAM}.
+     * The remaining parameters are passed to the {@link #modelDerivator}.
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

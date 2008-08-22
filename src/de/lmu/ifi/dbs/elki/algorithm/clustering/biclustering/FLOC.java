@@ -322,12 +322,9 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	}
 
 	/**
-	 * Calls
-	 * {@link AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
+	 * Calls the super method
 	 * and sets additionally the parameters for k, initialRowDim, initialColDim,
 	 * seed, missing, and actionOrder
-	 * 
-	 * @see AbstractAlgorithm#setParameters(String[])
 	 */
 	@Override
 	public String[] setParameters(String[] args) throws ParameterException {

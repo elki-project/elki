@@ -277,12 +277,10 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
     }
 
     /**
-     * Calls {@link AbstractAlgorithm#parameterDescription()}
+     * Calls the super method
      * and appends the parameter description of
      * the {@link #preprocessor}, the {@link #partitionAlgorithm},
      * and {@link #partitionDatabase} (if they are already initialized).
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */
     @Override
     public String parameterDescription() {

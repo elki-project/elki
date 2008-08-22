@@ -223,14 +223,12 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm#setParameters(String[]) DistanceBasedAlgorithm#setParameters(args)}
+     * Calls the super method
      * and sets additionally the value of the parameter
      * {@link #K_PARAM}
      * and instantiates {@link #reachabilityDistanceFunction} according to the value of parameter
      * {@link #REACHABILITY_DISTANCE_FUNCTION_PARAM}.
      * The remaining parameters are passed to the {@link #reachabilityDistanceFunction}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
@@ -261,11 +259,9 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm#parameterDescription()}
+     * Calls the super method
      * and appends the parameter description of {@link #reachabilityDistanceFunction}
      * (if it is already initialized).
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */
     @Override
     public String parameterDescription() {

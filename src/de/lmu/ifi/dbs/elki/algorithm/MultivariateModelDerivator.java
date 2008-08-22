@@ -181,10 +181,13 @@ public class MultivariateModelDerivator<V extends RealVector<V, ?>, D extends Di
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
+     * Calls the super method
+     * and sets additionally the value of the parameter
+     * {@link #SAMPLE_SIZE_PARAM}.
+     * The remaining parameters are passed to the {@link #pca}.
      */
-    @SuppressWarnings("unchecked")
     @Override
+    @SuppressWarnings("unchecked")
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 

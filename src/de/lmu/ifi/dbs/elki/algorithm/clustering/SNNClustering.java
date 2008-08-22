@@ -287,12 +287,10 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
     }
 
     /**
-     * Calls {@link AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
+     * Calls the super method
      * and sets additionally the values of the parameters
      * {@link #EPSILON_PARAM} and {@link #MINPTS_PARAM}.
      * The remaining parameters are passed to the {@link #similarityFunction}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
@@ -325,8 +323,9 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
         return epsilon;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#parameterDescription()
+     /**
+     * Calls the super method
+     * and appends the parameter description of {@link #similarityFunction}.
      */
     @Override
     public String parameterDescription() {

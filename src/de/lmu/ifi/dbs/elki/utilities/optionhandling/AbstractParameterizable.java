@@ -80,7 +80,6 @@ public abstract class AbstractParameterizable extends AbstractLoggable
      *   // return parameterizableAttribbute.setParameters(remainingParameters);
      * }
      * </pre>
-     *
      */
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = optionHandler.grabOptions(args);
@@ -111,6 +110,7 @@ public abstract class AbstractParameterizable extends AbstractLoggable
 
     /**
      * Returns the settings of all options assigned to the option handler.
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler#addOptionSettings(AttributeSettings)
      */
     public List<AttributeSettings> getAttributeSettings() {
         try {
@@ -125,10 +125,23 @@ public abstract class AbstractParameterizable extends AbstractLoggable
         }
     }
 
+    /**
+     * Returns a description of the class and the required parameters
+     * by calling {@code optionHandler.usage("")}.
+     *
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler#usage(String)
+     */
     public String parameterDescription() {
         return optionHandler.usage("");
     }
 
+
+    /**
+     * Returns a description of the class and the required parameters.
+     * by calling {@code optionHandler.usage("",false)}.
+     *
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler#usage(String,boolean)
+     */
     public String inlineParameterDescription() {
         return optionHandler.usage("", false);
     }
@@ -139,9 +152,10 @@ public abstract class AbstractParameterizable extends AbstractLoggable
      *
      * @param message some error-message, if needed (may be null or empty String)
      * @return an usage-String
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler#usage(String)
      */
     protected String parameterDescription(String message) {
-        return this.optionHandler.usage(message);
+        return optionHandler.usage(message);
     }
 
     /**

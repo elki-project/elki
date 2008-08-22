@@ -128,11 +128,9 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
     }
 
     /**
-     * Calls {@link DistanceBasedClassifier#setParameters(String[]) DistanceBasedClassifier#setParameters(args)}
+     * Calls the super method
      * and sets additionally the value of the parameter
      * {@link #K_PARAM}.
-     *
-     * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

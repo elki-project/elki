@@ -117,11 +117,9 @@ public abstract class ProjectedClustering<V extends RealVector<V, ?>>
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
+     * Calls the super method
      * and sets additionally the value of the parameters
      * {@link #K_PARAM}, {@link #K_I_PARAM}, and {@link #L_PARAM}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

@@ -326,11 +326,8 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
     }
 
     /**
-     * Calls
-     * {@link de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm#parameterDescription()}
+     * Calls the super method
      * and appends the parameter description of {@link #pca}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */
     @Override
     public String parameterDescription() {

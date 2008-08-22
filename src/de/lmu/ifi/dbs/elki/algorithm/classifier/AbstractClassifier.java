@@ -175,13 +175,11 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
     }
 
     /**
-     * Calls {@link AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
+     * Calls the super method
      * and instantiates {@link #evaluationProcedure} according to the value of parameter {@link #EVALUATION_PROCEDURE_PARAM}
      * and {@link #holdout} according to the value of parameter {@link #HOLDOUT_PARAM}.
      * The remaining parameters are passed to the {@link #evaluationProcedure}
      * and, then, to the {@link #holdout}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
@@ -220,11 +218,9 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#parameterDescription()}
+     * Calls the super method
      * and appends the parameter description of
      * {@link #evaluationProcedure} and {@link #holdout} if they are already initialized.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */
     @Override
     public String parameterDescription() {

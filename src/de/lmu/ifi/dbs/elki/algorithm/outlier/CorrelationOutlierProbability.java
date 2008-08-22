@@ -151,10 +151,10 @@ public class CorrelationOutlierProbability<V extends RealVector<V, ?>> extends D
     }
 
     /**
-     * Sets the parameters minpts additionally to the parameters set by the
-     * super-class method.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
+     * Calls the super method
+     * and sets additionally the value of the parameter
+     * {@link #K_PARAM}.
+     * The remaining parameters are passed to {@link #dependencyDerivator}.
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

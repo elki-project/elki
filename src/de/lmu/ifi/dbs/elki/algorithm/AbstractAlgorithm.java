@@ -56,6 +56,11 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends Abstra
         this.addOption(TIME_FLAG);
     }
 
+    /**
+     * Returns {@link #parameterDescription(String,boolean) #parameterDescription("", false)}.
+     *
+     * @see #parameterDescription(String,boolean)
+     */
     @Override
     public String parameterDescription() {
         return parameterDescription("", false);
@@ -109,7 +114,6 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends Abstra
      * Calls the runInTime()-method of extending classes. Measures and prints
      * the runtime and, in case of an index based database,
      * the I/O costs of this method.
-     *
      */
     public final void run(Database<O> database) throws IllegalStateException {
         long start = System.currentTimeMillis();

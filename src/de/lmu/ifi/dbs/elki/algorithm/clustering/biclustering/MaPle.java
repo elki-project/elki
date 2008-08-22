@@ -198,11 +198,8 @@ public class MaPle<V extends RealVector<V, Double>> extends
 	}
 
 	/**
-	 * Calls
-	 * {@link de.lmu.ifi.dbs.algorithm.AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
-	 * and sets additionally the parameters for nc, nr, and sigma
-	 * 
-	 * @see de.lmu.ifi.dbs.algorithm.AbstractAlgorithm#setParameters(String[])
+	 * Calls the super method
+	 * and sets additionally the parameters for nc, nr, and sigma.
 	 */
 	@Override
 	public String[] setParameters(String[] args) throws ParameterException {

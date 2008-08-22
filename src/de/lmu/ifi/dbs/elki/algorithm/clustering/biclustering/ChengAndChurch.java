@@ -310,12 +310,9 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	}
 
 	/**
-	 * Calls
-	 * {@link AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
+	 * Calls the super method
 	 * and sets additionally the parameters for random, sigma, alpha, n, begin,
-	 * end
-	 * 
-	 * @see AbstractAlgorithm#setParameters(String[])
+	 * end.
 	 */
 	@Override
 	public String[] setParameters(String[] args) throws ParameterException {

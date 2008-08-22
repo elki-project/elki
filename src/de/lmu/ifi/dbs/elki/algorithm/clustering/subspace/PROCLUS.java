@@ -169,11 +169,9 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
     }
 
     /**
-     * Calls {@link ProjectedClustering#setParameters(String[]) ProjectedClustering#setParameters(args)}
+     * Calls the super method
      * and sets additionally the value of the parameter
      * {@link #M_I_PARAM}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);

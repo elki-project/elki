@@ -103,10 +103,8 @@ public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends
     }
 
     /**
-     * Calls {@link AbstractAlgorithm#parameterDescription()}
+     * Calls the super method
      * and appends the parameter description of {@link #similarityFunction}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */
     @Override
     public String parameterDescription() {
@@ -172,12 +170,10 @@ public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
+     * Calls the super method
      * and sets additionally the values of the parameters
      * {@link #KNN_PARAM} and {@link #ALPHA_PARAM}.
      * The remaining parameters are passed to the {@link #similarityFunction}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

@@ -18,25 +18,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  */
 public class KernelFourC<V extends RealVector<V, ?>> extends ProjectedDBSCAN<V> {
 
-    /**
-     * @see Algorithm#getDescription()
-     */
     public Description getDescription() {
         return new Description("Kernel4C", "Computing Correlation Connected Clusters using Kernels",
             "(work in progress, stay tuned...)",
             "n/a");
     }
 
-    /**
-     * @see ProjectedDBSCAN#preprocessorClass()
-     */
     public Class<KernelFourCPreprocessor> preprocessorClass() {
         return KernelFourCPreprocessor.class;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
         // todo richtig?

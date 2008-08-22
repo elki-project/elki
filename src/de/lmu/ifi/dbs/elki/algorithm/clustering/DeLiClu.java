@@ -199,11 +199,9 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm#setParameters(String[]) DistanceBasedAlgorithm#setParameters(args)}.
+     * Calls the super method.
      * The remaining parameters and the value of parameter {@link #MINPTS_PARAM}
      * are passed to the {@link #knnJoin}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
