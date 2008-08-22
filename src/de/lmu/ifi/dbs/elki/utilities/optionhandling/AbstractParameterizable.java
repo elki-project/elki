@@ -56,7 +56,31 @@ public abstract class AbstractParameterizable extends AbstractLoggable
     }
 
     /**
-     * @see Parameterizable#setParameters(String[])
+     * Grabs all specified options from the option handler.
+     * Any extending class should call this method first and return the
+     * returned array without further
+     * changes, but after setting further required parameters. An example for
+     * overwritting this method taking advantage from the previously (in
+     * superclasses) defined options would be:
+     * <p/>
+     * <pre>
+     * {
+     *   String[] remainingParameters = super.setParameters(args);
+     *   // set parameters for your class
+     *   // for example like this:
+     *   if(isSet(MY_PARAM_VALUE_PARAM))
+     *   {
+     *      myParamValue = getParameterValue(MY_PARAM_VALUE_PARAM);
+     *   }
+     *   .
+     *   .
+     *   .
+     *   return remainingParameters;
+     *   // or in case of attributes requesting parameters themselves
+     *   // return parameterizableAttribbute.setParameters(remainingParameters);
+     * }
+     * </pre>
+     *
      */
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = optionHandler.grabOptions(args);
@@ -87,8 +111,6 @@ public abstract class AbstractParameterizable extends AbstractLoggable
 
     /**
      * Returns the settings of all options assigned to the option handler.
-     *
-     * @see Parameterizable#getAttributeSettings()
      */
     public List<AttributeSettings> getAttributeSettings() {
         try {
@@ -99,21 +121,14 @@ public abstract class AbstractParameterizable extends AbstractLoggable
             return settings;
         }
         catch (UnusedParameterException e) {
-            // TODO avoid these messages
-            throw new RuntimeException("This should never happen! ", e);
+            throw new RuntimeException(e);
         }
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
-     */
     public String parameterDescription() {
         return optionHandler.usage("");
     }
 
-    /**
-     * @see Parameterizable#inlineParameterDescription()
-     */
     public String inlineParameterDescription() {
         return optionHandler.usage("", false);
     }

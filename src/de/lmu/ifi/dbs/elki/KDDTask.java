@@ -10,7 +10,17 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 
 import java.io.File;
 import java.util.Arrays;
@@ -27,16 +37,16 @@ import java.util.logging.Logger;
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  */
 public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
-  
-  /**
-   * Information for citation and version.
-   */
-  public static final String INFORMATION = "Version 0.1 (2008, July)\n\n" +
-                                           "published in:\n"+ 
-                                           "Elke Achtert, Hans-Peter Kriegel, Arthur Zimek:\n"+
-                                           "ELKI: A Software System for Evaluation of Subspace Clustering Algorithms.\n"+
-                                           "In Proc. 20th International Conference on Scientific and Statistical Database Management (SSDBM 2008), Hong Kong, China, 2008.\n\n";
-  
+
+    /**
+     * Information for citation and version.
+     */
+    public static final String INFORMATION = "Version 0.1 (2008, July)\n\n" +
+        "published in:\n" +
+        "Elke Achtert, Hans-Peter Kriegel, Arthur Zimek:\n" +
+        "ELKI: A Software System for Evaluation of Subspace Clustering Algorithms.\n" +
+        "In Proc. 20th International Conference on Scientific and Statistical Database Management (SSDBM 2008), Hong Kong, China, 2008.\n\n";
+
     /**
      * The String for calling this class' main routine on command line
      * interface.
@@ -138,7 +148,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
      * Whether to undo normalization for result.
      */
     private boolean normalizationUndo = false;
-    
+
     private OptionHandler helpOptionHandler;
 
     /**
@@ -146,11 +156,11 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
      */
     public KDDTask() {
 
-      helpOptionHandler = new OptionHandler(new TreeMap<String, Option<?>>(), this.getClass().getName());
-      helpOptionHandler.put(HELP_FLAG);
-      helpOptionHandler.put(HELP_LONG_FLAG);
-      helpOptionHandler.put(DESCRIPTION_PARAM);
-      
+        helpOptionHandler = new OptionHandler(new TreeMap<String, Option<?>>(), this.getClass().getName());
+        helpOptionHandler.put(HELP_FLAG);
+        helpOptionHandler.put(HELP_LONG_FLAG);
+        helpOptionHandler.put(DESCRIPTION_PARAM);
+
         // parameter algorithm
         addOption(ALGORITHM_PARAM);
 
@@ -181,8 +191,6 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
 
     /**
      * Returns a description for printing on command line interface.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */
     @Override
     public String parameterDescription() {
@@ -214,11 +222,6 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
         return usage.toString();
     }
 
-    /**
-     * Sets the options accordingly to the specified list of parameters.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
     @Override
     @SuppressWarnings("unchecked")
     public String[] setParameters(String[] args) throws ParameterException {
@@ -229,7 +232,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
 
         // help
         if (helpOptionHandler.isSet(HELP_FLAG) || helpOptionHandler.isSet(HELP_LONG_FLAG)) {
-            throw new AbortException(INFORMATION+ parameterDescription());
+            throw new AbortException(INFORMATION + parameterDescription());
         }
 
         // description
@@ -259,7 +262,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
         }
 
         String[] remainingParameters = super.setParameters(args);
-        
+
         // algorithm
         algorithm = ALGORITHM_PARAM.instantiateClass();
         remainingParameters = algorithm.setParameters(remainingParameters);
@@ -292,9 +295,9 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
     }
 
     /**
-     * Returns the parameter setting of the attributes.
-     *
-     * @return the parameter setting of the attributes
+     * Calls the super method
+     * and adds to the returned attribute settings the attribute settings of
+     * the {@link #databaseConnection}, the {@link #normalization}, and {@link #algorithm}.
      */
     @Override
     public List<AttributeSettings> getAttributeSettings() {

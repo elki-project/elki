@@ -36,7 +36,7 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
      */
     public AbstractPreprocessorBasedDistanceFunction(Pattern pattern) {
         super(pattern);
-        preprocessorHandler = new PreprocessorHandler<O,P>(this);
+        preprocessorHandler = new PreprocessorHandler<O, P>(this);
     }
 
     /**
@@ -72,11 +72,9 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#getAttributeSettings()}
+     * Calls the super method
      * and adds to the returned attribute settings the attribute settings of the
      * {@link #preprocessorHandler}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
      */
     @Override
     public List<AttributeSettings> getAttributeSettings() {

@@ -46,8 +46,8 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
     public static final OptionID PREPROCESSOR_ID = OptionID.getOrCreateOptionID(
         "copac.preprocessor",
         "Classname of the preprocessor to derive partition criterion " +
-        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(HiCOPreprocessor.class) +
-        ".");
+            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(HiCOPreprocessor.class) +
+            ".");
 
     /**
      * Parameter to specify the preprocessor to derive partition criterion,
@@ -68,8 +68,8 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
     public static final OptionID PARTITION_ALGORITHM_ID = OptionID.getOrCreateOptionID(
         "copac.partitionAlgorithm",
         "Classname of the clustering algorithm to apply to each partition " +
-        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Clustering.class) +
-        ".");
+            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Clustering.class) +
+            ".");
 
     /**
      * Parameter to specify the clustering algorithm to apply to each partition,
@@ -90,9 +90,9 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
     public static final OptionID PARTITION_DB_ID = OptionID.getOrCreateOptionID(
         "copac.partitionDB",
         "Classname of the database for each partition " +
-        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Database.class) +
-        ". If this parameter is not set, the databases of the partitions have " +
-        "the same class as the original database."
+            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Database.class) +
+            ". If this parameter is not set, the databases of the partitions have " +
+            "the same class as the original database."
     );
 
     /**
@@ -199,10 +199,10 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
             "COPAC",
             "COrrelation PArtition Clustering",
             "Partitions a database according to the correlation dimension of its objects and performs " +
-            "a clustering algorithm over the partitions.",
+                "a clustering algorithm over the partitions.",
             "Achtert E., B\u00F6hm C., Kriegel H.-P., Kr\u00F6ger P., Zimek A.: " +
-            "Robust, Complete, and Efficient Correlation Clustering. " +
-            "In Proc. 7th SIAM International Conference on Data Mining (SDM'07), Minneapolis, MN, 2007");
+                "Robust, Complete, and Efficient Correlation Clustering. " +
+                "In Proc. 7th SIAM International Conference on Data Mining (SDM'07), Minneapolis, MN, 2007");
     }
 
     /**
@@ -251,11 +251,9 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#getAttributeSettings()}
+     * Calls the super method
      * and adds to the returned attribute settings the attribute settings of
      * the {@link #preprocessor}, the {@link #partitionAlgorithm}, and {@link #partitionDatabase}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
      */
     @Override
     public List<AttributeSettings> getAttributeSettings() {
@@ -345,9 +343,9 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
                 else {
                     if (isVerbose()) {
                         verbose("\nRunning " +
-                                partitionAlgorithm.getDescription().getShortTitle() +
-                                " on partition " +
-                                partitionID);
+                            partitionAlgorithm.getDescription().getShortTitle() +
+                            " on partition " +
+                            partitionID);
                     }
                     partitionAlgorithm.run(databasePartitions.get(partitionID));
                     results.put(partitionID, partitionAlgorithm.getResult());
@@ -362,6 +360,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
 
     /**
      * Returns the partition algorithm.
+     *
      * @return the specified partition algorithm
      */
     public Clustering<V> getPartitionAlgorithm() {

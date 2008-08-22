@@ -6,9 +6,9 @@ import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
+import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.Description;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -33,7 +33,7 @@ public abstract class AbstractPreprocessorBasedSimilarityFunction<O extends Data
      */
     public AbstractPreprocessorBasedSimilarityFunction(Pattern pattern) {
         super(pattern);
-        preprocessorHandler = new PreprocessorHandler<O,P>(this);
+        preprocessorHandler = new PreprocessorHandler<O, P>(this);
     }
 
     /**
@@ -69,11 +69,9 @@ public abstract class AbstractPreprocessorBasedSimilarityFunction<O extends Data
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#getAttributeSettings()}
+     * Calls the super method
      * and adds to the returned attribute settings the attribute settings of the
      * {@link #preprocessorHandler}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
      */
     @Override
     public List<AttributeSettings> getAttributeSettings() {

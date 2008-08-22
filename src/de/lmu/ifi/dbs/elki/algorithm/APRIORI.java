@@ -121,8 +121,6 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
 
     /**
      * Performs the APRIORI algorithm on the given database.
-     *
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
     @Override
     protected void runInTime(Database<BitVector> database)
@@ -255,16 +253,10 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
         return frequentItemsets.toArray(new BitSet[frequentItemsets.size()]);
     }
 
-    /**
-     * @see Algorithm#getResult()
-     */
     public AprioriResult getResult() {
         return result;
     }
 
-    /**
-     * @see Algorithm#getDescription()
-     */
     public Description getDescription() {
         return new Description("APRIORI",
             "Algorithm for Mining Association Rules",
@@ -275,11 +267,10 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
     }
 
     /**
-     * Calls {@link AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
+     * Calls the super method
      * and sets additionally the values of the parameters
      * {@link #MINFREQ_PARAM} and {@link #MINSUPP_PARAM}.
      *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

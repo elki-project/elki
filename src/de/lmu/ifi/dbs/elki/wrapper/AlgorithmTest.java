@@ -178,11 +178,9 @@ public class AlgorithmTest extends AbstractParameterizable {
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.database.connection.AbstractDatabaseConnection#getAttributeSettings()}
+     * Calls the super method
      * and adds to the returned attribute settings the attribute settings of
      * all instances of {@link #algorithms}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
      */
     @Override
     public List<AttributeSettings> getAttributeSettings() {

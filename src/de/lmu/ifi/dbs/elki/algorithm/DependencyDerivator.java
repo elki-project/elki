@@ -140,9 +140,6 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
         addOption(RANDOM_SAMPLE_FLAG);
     }
 
-    /**
-     * @see Algorithm#getDescription()
-     */
     public Description getDescription() {
         return new Description("DependencyDerivator",
             "Deriving numerical inter-dependencies on data",
@@ -155,8 +152,6 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
     /**
      * Computes quantitativly linear dependencies among the attributes of the
      * given database based on a linear correlation PCA.
-     *
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
     @Override
     public void runInTime(Database<V> db) throws IllegalStateException {
@@ -194,7 +189,7 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
      *
      * @param db  the database
      * @param ids the set of ids
-     * @return a matrix of equations describing the dependencies 
+     * @return a matrix of equations describing the dependencies
      */
     public CorrelationAnalysisSolution<V> generateModel(Database<V> db, Collection<Integer> ids) {
         V centroidDV = Util.centroid(db, ids);
@@ -287,21 +282,16 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
         return sol;
     }
 
-    /**
-     * @see Algorithm#getResult()
-     */
     public CorrelationAnalysisSolution<V> getResult() {
         return solution;
     }
 
     /**
      * Calls
-     * {@link DistanceBasedAlgorithm#setParameters(String[]) DistanceBasedAlgorithm#setParameters(args)}
+     * the super method
      * and sets additionally the values of the parameters
      * {@link #OUTPUT_ACCURACY_PARAM} and {@link #SAMPLE_SIZE_PARAM}. The
      * remaining parameters are passed to the {@link #pca}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -325,10 +315,8 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
     }
 
     /**
-     * Calls {@link DistanceBasedAlgorithm#getAttributeSettings()} and adds to the
+     * Calls the super method and adds to the
      * returned attribute settings the attribute settings of the {@link #pca}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
      */
     @Override
     public List<AttributeSettings> getAttributeSettings() {

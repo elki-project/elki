@@ -57,7 +57,6 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
         ProjectedDBSCAN.MINPTS_ID,
         new GreaterConstraint(0));
 
-    
 
     /**
      * The default range query distance function.
@@ -205,8 +204,11 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
+     * Calls the super method
+     * and adds to the returned attribute settings the attribute settings of
+     * the {@link #rangeQueryDistanceFunction}.
      */
+    @Override
     public List<AttributeSettings> getAttributeSettings() {
         List<AttributeSettings> attributeSettings = super.getAttributeSettings();
         attributeSettings.addAll(rangeQueryDistanceFunction.getAttributeSettings());

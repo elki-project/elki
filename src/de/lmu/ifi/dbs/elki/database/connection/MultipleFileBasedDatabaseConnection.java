@@ -226,11 +226,9 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
     }
 
     /**
-     * Calls {@link AbstractDatabaseConnection#getAttributeSettings()}
+     * Calls the super method
      * and adds to the returned attribute settings the attribute settings of
      * all instances of {@link #parsers}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
      */
     @Override
     public List<AttributeSettings> getAttributeSettings() {

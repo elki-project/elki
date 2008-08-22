@@ -261,9 +261,7 @@ public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ? >> e
     return remainingParameters;
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
-   */
+  // todo minima und maxima doppelt drin?
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> settings = super.getAttributeSettings();
     AttributeSettings mySettings = settings.get(0);

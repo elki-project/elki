@@ -115,11 +115,10 @@ public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extend
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.classifier.AbstractClassifier#getAttributeSettings()}
+     * Calls the super method
      * and adds to the returned attribute settings the attribute settings of
      * the {@link #distanceFunction}.
      *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
      */
     @Override
     public List<AttributeSettings> getAttributeSettings() {

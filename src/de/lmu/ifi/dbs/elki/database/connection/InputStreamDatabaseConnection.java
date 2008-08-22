@@ -174,11 +174,9 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
     }
 
     /**
-     * Calls {@link AbstractDatabaseConnection#getAttributeSettings()}
+     * Calls the super method
      * and adds to the returned attribute settings the attribute settings of
      * the {@link #parser}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
      */
     @Override
     public List<AttributeSettings> getAttributeSettings() {

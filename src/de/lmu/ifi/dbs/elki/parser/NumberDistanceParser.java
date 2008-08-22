@@ -200,10 +200,11 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
     }
 
     /**
-     * Returns the parameter setting of the attributes.
-     *
-     * @return the parameter setting of the attributes
+     * Calls the super method
+     * and adds to the returned attribute settings the attribute settings of
+     * the {@link #distanceFunction}.
      */
+    @Override
     public List<AttributeSettings> getAttributeSettings() {
         List<AttributeSettings> attributeSettings = super.getAttributeSettings();
         attributeSettings.addAll(distanceFunction.getAttributeSettings());

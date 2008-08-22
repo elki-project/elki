@@ -146,11 +146,9 @@ public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Di
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.classifier.AbstractClassifier#getAttributeSettings()}
+     * Calls the super method
      * and adds to the returned attribute settings the attribute settings of
      * the {@link #dependencyDerivator}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
      */
     @Override
     public List<AttributeSettings> getAttributeSettings() {

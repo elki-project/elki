@@ -56,46 +56,19 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends Abstra
         this.addOption(TIME_FLAG);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
-     */
     @Override
     public String parameterDescription() {
         return parameterDescription("", false);
     }
 
     /**
-     * Grabs all specified options from the option handler and sets the
-     * values for the flags {@link #VERBOSE_FLAG} and {@link #TIME_FLAG}.
-     * Any extending class should
-     * call this method first and return the returned array without further
-     * changes, but after setting further required parameters. An example for
-     * overwritting this method taking advantage from the previously (in
-     * superclasses) defined options would be:
-     * <p/>
-     * <pre>
-     * {
-     *   String[] remainingParameters = super.setParameters(args);
-     *   // set parameters for your class
-     *   // for example like this:
-     *   if(isSet(MY_PARAM_VALUE_PARAM))
-     *   {
-     *      myParamValue = getParameterValue(MY_PARAM_VALUE_PARAM);
-     *   }
-     *   .
-     *   .
-     *   .
-     *   return remainingParameters;
-     *   // or in case of attributes requesting parameters themselves
-     *   // return parameterizableAttribbute.setParameters(remainingParameters);
-     * }
-     * </pre>
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
+     * Calls the super method
+     * and sets additionally the values of the flags
+     * {@link #VERBOSE_FLAG} and {@link #TIME_FLAG}.
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = optionHandler.grabOptions(args);
+        String[] remainingParameters = super.setParameters(args);
         verbose = isSet(VERBOSE_FLAG);
         time = isSet(TIME_FLAG);
         setParameters(args, remainingParameters);
@@ -122,17 +95,11 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends Abstra
         return verbose;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#setVerbose(boolean)
-     */
     public void setVerbose(boolean verbose) {
         this.verbose = verbose;
         VERBOSE_FLAG.setValue(verbose);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#setTime(boolean)
-     */
     public void setTime(boolean time) {
         this.time = time;
         TIME_FLAG.setValue(time);
@@ -143,7 +110,6 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends Abstra
      * the runtime and, in case of an index based database,
      * the I/O costs of this method.
      *
-     * @see Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
     public final void run(Database<O> database) throws IllegalStateException {
         long start = System.currentTimeMillis();

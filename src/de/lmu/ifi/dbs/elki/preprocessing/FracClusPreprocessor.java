@@ -71,15 +71,6 @@ public class FracClusPreprocessor<V extends RealVector<V, ?>> extends AbstractPa
         return remainingParameters;
     }
 
-    @Override
-    public List<AttributeSettings> getAttributeSettings() {
-        List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-        AttributeSettings myAttributeSettings = new AttributeSettings(this);
-        myAttributeSettings.addSetting(NUMBER_OF_SUPPORTERS_P, Integer.toString(k));
-        attributeSettings.add(myAttributeSettings);
-        return attributeSettings;
-    }
-
     public int getK() {
         return this.k;
     }

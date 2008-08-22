@@ -193,9 +193,9 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
     }
 
     /**
-     * Returns the parameter setting of the attributes.
-     *
-     * @return the parameter setting of the attributes
+     * Calls the super method
+     * and adds to the returned attribute settings the attribute settings of
+     * the {@link #copacAlgorithm}.
      */
     @Override
     public List<AttributeSettings> getAttributeSettings() {

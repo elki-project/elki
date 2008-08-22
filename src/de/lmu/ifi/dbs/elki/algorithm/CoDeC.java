@@ -141,8 +141,6 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
 
     /**
      * Performs the CoDeC algorithm on the given database.
-     *
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -179,27 +177,19 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
 
     }
 
-    /**
-     * @see Algorithm#getResult()
-     */
     public Result<V> getResult() {
         return result;
     }
 
-    /**
-     * @see Algorithm#getDescription()
-     */
     public Description getDescription() {
         return new Description("CoDeC", "Correlation Derivator and Classifier", "...", "unpublished");
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#getAttributeSettings()}
+     * Calls the super method
      * and adds to the returned attribute settings the attribute settings of
      * {@link #classifier} or {@link #dependencyDerivator}
      * (if {@link #EVALUATE_AS_CLASSIFIER_FLAG} is set or not).
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
      */
     @Override
     public List<AttributeSettings> getAttributeSettings() {
@@ -216,15 +206,13 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
     }
 
     /**
-     * Calls {@link AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
+     * Calls the super method
      * and sets additionally the value of the flag
      * {@link #EVALUATE_AS_CLASSIFIER_FLAG}
      * and instantiates {@link #classLabel} according to the value of parameter {@link #CLASSLABEL_PARAM}
      * and {@link #clusteringAlgorithm} according to the value of parameter {@link #CLUSTERING_ALGORITHM_PARAM}.
      * The remaining parameters are passed to the {@link #classifier} or {@link #dependencyDerivator}
      * dependent on the value of {@link #EVALUATE_AS_CLASSIFIER_FLAG}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -261,11 +249,10 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
     }
 
     /**
-     * Calls {@link AbstractAlgorithm#parameterDescription()}
+     * Calls the super method
      * and appends the parameter description of {@link #clusteringAlgorithm},
      * {@link #classifier}, and {@link #dependencyDerivator} (if they are already initialized).
      *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */
     @Override
     public String parameterDescription() {

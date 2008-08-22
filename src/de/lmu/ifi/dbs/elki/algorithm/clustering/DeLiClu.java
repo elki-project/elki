@@ -31,10 +31,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.ArrayList;
 
 /**
  * DeLiClu provides the DeLiClu algorithm, a hierachical algorithm to find density-connected sets in a database.
@@ -149,7 +149,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
         int numHandled = 1;
         index.setHandled(db.get(startID));
         SpatialEntry rootEntry = db.getRootEntry();
-        SpatialObjectPair spatialObjectPair = new SpatialObjectPair(rootEntry,rootEntry, true);
+        SpatialObjectPair spatialObjectPair = new SpatialObjectPair(rootEntry, rootEntry, true);
         updateHeap(distFunction.nullDistance(), spatialObjectPair);
 
         while (numHandled != size) {
@@ -225,11 +225,9 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm#getAttributeSettings()}
+     * Calls the super method
      * and adds to the returned attribute settings the attribute settings of
      * the {@link #knnJoin}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
      */
     @Override
     public List<AttributeSettings> getAttributeSettings() {
@@ -350,7 +348,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
                 }
                 D distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
 
-                SpatialObjectPair nodePair = new SpatialObjectPair(entry1,entry2, true);
+                SpatialObjectPair nodePair = new SpatialObjectPair(entry1, entry2, true);
                 updateHeap(distance, nodePair);
             }
         }
@@ -385,7 +383,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
 
                 D distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
                 D reach = Util.max(distance, knns.getKNNDistance(entry2.getID()));
-                SpatialObjectPair dataPair = new SpatialObjectPair(entry1,entry2, false);
+                SpatialObjectPair dataPair = new SpatialObjectPair(entry1, entry2, false);
                 updateHeap(reach, dataPair);
             }
         }
@@ -423,7 +421,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
                 }
                 D distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
                 D reach = Util.max(distance, knns.getKNNDistance(entry2.getID()));
-                SpatialObjectPair dataPair = new SpatialObjectPair(entry1,entry2, false);
+                SpatialObjectPair dataPair = new SpatialObjectPair(entry1, entry2, false);
                 updateHeap(reach, dataPair);
             }
         }

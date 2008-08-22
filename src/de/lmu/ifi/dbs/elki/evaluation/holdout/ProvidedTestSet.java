@@ -119,9 +119,12 @@ public class ProvidedTestSet<O extends DatabaseObject, L extends ClassLabel<L>> 
     return remainingParameters;
   }
 
-  /**
-   * @see AbstractHoldout#getAttributeSettings()
-   */
+    /**
+     * Calls the super method
+     * and adds to the returned attribute settings the attribute settings of
+     * the {@link #dbc}.
+     */
+    @Override
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> attributeSettings = super.getAttributeSettings();
     attributeSettings.addAll(dbc.getAttributeSettings());

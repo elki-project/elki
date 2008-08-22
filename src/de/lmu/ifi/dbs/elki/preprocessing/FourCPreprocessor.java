@@ -165,15 +165,14 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
     }
 
     /**
-     * Returns the parameter setting of the attributes.
-     *
-     * @return the parameter setting of the attributes
+     * Calls the super method
+     * and adds to the returned attribute settings the attribute settings of
+     * the {@link #pca}.
      */
+    @Override
     public List<AttributeSettings> getAttributeSettings() {
         List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-
         attributeSettings.addAll(pca.getAttributeSettings());
-
         return attributeSettings;
     }
 

@@ -119,7 +119,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex#kNNQuery(de.lmu.ifi.dbs.elki.data.DatabaseObject, int)
+     * @see de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex#kNNQuery(de.lmu.ifi.dbs.elki.data.DatabaseObject,int)
      */
     public final List<QueryResult<D>> kNNQuery(O object, int k) {
         if (k < 1) {
@@ -223,11 +223,9 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#getAttributeSettings()}
+     * Calls the super method
      * and adds to the returned attribute settings the attribute settings of
      * the {@link #distanceFunction}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
      */
     @Override
     public List<AttributeSettings> getAttributeSettings() {
@@ -381,8 +379,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
      * @param objectID the id of the obbject to be inserted
      * @return the path of the appropriate subtree to insert the given object
      */
-    // todo: private?
-    protected final TreeIndexPath<E> choosePath(Integer objectID, TreeIndexPath<E> subtree) {
+    private TreeIndexPath<E> choosePath(Integer objectID, TreeIndexPath<E> subtree) {
         N node = getNode(subtree.getLastPathComponent().getEntry());
 
         // leaf

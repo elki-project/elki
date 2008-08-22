@@ -300,10 +300,11 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
     }
 
     /**
-     * Returns the parameter setting of the attributes.
-     *
-     * @return the parameter setting of the attributes
+     * Calls the super method
+     * and adds to the returned attribute settings the attribute settings of
+     * the {@link #databaseConnection}, the {@link #normalization}, and {@link #algorithm}.
      */
+    @Override
     public List<AttributeSettings> getAttributeSettings() {
         List<AttributeSettings> attributeSettings = super.getAttributeSettings();
 

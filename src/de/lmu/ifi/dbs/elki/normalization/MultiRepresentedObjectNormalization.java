@@ -275,11 +275,12 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
     return result.toString();
   }
 
-  /**
-   * Returns the setting of the attributes of the algorithm.
-   *
-   * @return the setting of the attributes of the algorithm
-   */
+   /**
+     * Calls the super method
+     * and adds to the returned attribute settings the attribute settings of
+     * all instances of {@link #normalizations}.
+     */
+    @Override
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> result = super.getAttributeSettings();
 

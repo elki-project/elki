@@ -50,11 +50,12 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>>
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex#reverseKNNQuery(de.lmu.ifi.dbs.elki.data.DatabaseObject, int) 
+     * @see de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex#reverseKNNQuery(de.lmu.ifi.dbs.elki.data.DatabaseObject,int)
      */
     public List<QueryResult<D>> reverseKNNQuery(O object, int k) {
         if (k > this.k_max) {
-            throw new IllegalArgumentException("Parameter k has to be less or equal than " + "parameter kmax of the MkNNTab-Tree!");
+            throw new IllegalArgumentException("Parameter k has to be less or equal than " +
+                "parameter kmax of the MkTab-Tree!");
         }
 
         List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
@@ -104,9 +105,83 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>>
     }
 
     /**
+     * @see de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree#kNNdistanceAdjustment(de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry, java.util.Map) 
+     */
+    protected void kNNdistanceAdjustment(MkTabEntry<D> entry, Map<Integer, KNNList<D>> knnLists) {
+        MkTabTreeNode<O, D> node = file.readPage(entry.getID());
+        List<D> knnDistances_node = initKnnDistanceList();
+        if (node.isLeaf()) {
+            for (int i = 0; i < node.getNumEntries(); i++) {
+                MkTabEntry<D> leafEntry = node.getEntry(i);
+                leafEntry.setKnnDistances(knnLists.get(leafEntry.getID()).distancesToList());
+                knnDistances_node = max(knnDistances_node, leafEntry.getKnnDistances());
+            }
+        }
+        else {
+            for (int i = 0; i < node.getNumEntries(); i++) {
+                MkTabEntry<D> dirEntry = node.getEntry(i);
+                kNNdistanceAdjustment(dirEntry, knnLists);
+                knnDistances_node = max(knnDistances_node, dirEntry.getKnnDistances());
+            }
+        }
+        entry.setKnnDistances(knnDistances_node);
+    }
+
+    protected MkTabTreeNode<O, D> createNewLeafNode(int capacity) {
+        return new MkTabTreeNode<O, D>(file, capacity, true);
+    }
+
+    /**
+     * Creates a new directory node with the specified capacity.
+     *
+     * @param capacity the capacity of the new node
+     * @return a new directory node
+     */
+    protected MkTabTreeNode<O, D> createNewDirectoryNode(int capacity) {
+        return new MkTabTreeNode<O, D>(file, capacity, false);
+    }
+
+    /**
+     * Creates a new leaf entry representing the specified data object in the
+     * specified subtree.
+     *
+     * @param object         the data object to be represented by the new entry
+     * @param parentDistance the distance from the object to the routing object of the
+     *                       parent node
+     */
+    protected MkTabEntry<D> createNewLeafEntry(O object, D parentDistance) {
+        return new MkTabLeafEntry<D>(object.getID(), parentDistance, knnDistances(object.getID()));
+    }
+
+    /**
+     * Creates a new directory entry representing the specified node.
+     *
+     * @param node            the node to be represented by the new entry
+     * @param routingObjectID the id of the routing object of the node
+     * @param parentDistance  the distance from the routing object of the node to the
+     *                        routing object of the parent node
+     */
+    protected MkTabEntry<D> createNewDirectoryEntry(MkTabTreeNode<O, D> node, Integer routingObjectID, D parentDistance) {
+        return new MkTabDirectoryEntry<D>(routingObjectID, parentDistance, node.getID(), node.coveringRadius(routingObjectID, this), node
+            .kNNDistances(getDistanceFunction()));
+    }
+
+    /**
+     * Creates an entry representing the root node.
+     *
+     * @return an entry representing the root node
+     */
+    protected MkTabEntry<D> createRootEntry() {
+        return new MkTabDirectoryEntry<D>(null, null, 0, null, initKnnDistanceList());
+    }
+
+    /**
      * Performs a k-nearest neighbor query in the specified subtree
      * for the given query object and the
      * given parameter k.
+     * It recursively
+     * traverses all paths from the specified node, which cannot be excluded from leading to
+     * qualififying objects.
      *
      * @param k          the parameter k of the knn-query
      * @param q          the id of the query object
@@ -159,32 +234,6 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>>
     }
 
     /**
-     * Adjusts the knn distances in the subtree of the specified root entry.
-     *
-     * @param entry    the root entry of the current subtree
-     * @param knnLists a map of knn lists for each leaf entry
-     */
-    protected void kNNdistanceAdjustment(MkTabEntry<D> entry, Map<Integer, KNNList<D>> knnLists) {
-        MkTabTreeNode<O, D> node = file.readPage(entry.getID());
-        List<D> knnDistances_node = initKnnDistanceList();
-        if (node.isLeaf()) {
-            for (int i = 0; i < node.getNumEntries(); i++) {
-                MkTabEntry<D> leafEntry = node.getEntry(i);
-                leafEntry.setKnnDistances(knnLists.get(leafEntry.getID()).distancesToList());
-                knnDistances_node = max(knnDistances_node, leafEntry.getKnnDistances());
-            }
-        }
-        else {
-            for (int i = 0; i < node.getNumEntries(); i++) {
-                MkTabEntry<D> dirEntry = node.getEntry(i);
-                kNNdistanceAdjustment(dirEntry, knnLists);
-                knnDistances_node = max(knnDistances_node, dirEntry.getKnnDistances());
-            }
-        }
-        entry.setKnnDistances(knnDistances_node);
-    }
-
-    /**
      * Returns an array that holds the maximum values of the both specified
      * arrays in each index.
      *
@@ -220,59 +269,4 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>>
         }
         return knnDistances;
     }
-
-    /**
-     * Creates a new leaf node with the specified capacity.
-     *
-     * @param capacity the capacity of the new node
-     * @return a new leaf node
-     */
-    protected MkTabTreeNode<O, D> createNewLeafNode(int capacity) {
-        return new MkTabTreeNode<O, D>(file, capacity, true);
-    }
-
-    /**
-     * Creates a new directory node with the specified capacity.
-     *
-     * @param capacity the capacity of the new node
-     * @return a new directory node
-     */
-    protected MkTabTreeNode<O, D> createNewDirectoryNode(int capacity) {
-        return new MkTabTreeNode<O, D>(file, capacity, false);
-    }
-
-    /**
-     * Creates a new leaf entry representing the specified data object in the
-     * specified subtree.
-     *
-     * @param object         the data object to be represented by the new entry
-     * @param parentDistance the distance from the object to the routing object of the
-     *                       parent node
-     */
-    protected MkTabEntry<D> createNewLeafEntry(O object, D parentDistance) {
-        return new MkTabLeafEntry<D>(object.getID(), parentDistance, knnDistances(object.getID()));
-    }
-
-    /**
-     * Creates a new directory entry representing the specified node.
-     *
-     * @param node            the node to be represented by the new entry
-     * @param routingObjectID the id of the routing object of the node
-     * @param parentDistance  the distance from the routing object of the node to the
-     *                        routing object of the parent node
-     */
-    protected MkTabEntry<D> createNewDirectoryEntry(MkTabTreeNode<O, D> node, Integer routingObjectID, D parentDistance) {
-        return new MkTabDirectoryEntry<D>(routingObjectID, parentDistance, node.getID(), node.coveringRadius(routingObjectID, this), node
-            .kNNDistances(getDistanceFunction()));
-    }
-
-    /**
-     * Creates an entry representing the root node.
-     *
-     * @return an entry representing the root node
-     */
-    protected MkTabEntry<D> createRootEntry() {
-        return new MkTabDirectoryEntry<D>(null, null, 0, null, initKnnDistanceList());
-    }
-
 }

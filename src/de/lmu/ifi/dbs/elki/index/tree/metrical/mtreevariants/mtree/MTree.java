@@ -48,8 +48,6 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>>
      * Calls for each object
      * {@link AbstractMTree#insert(de.lmu.ifi.dbs.elki.data.DatabaseObject,boolean)
      * AbstractMTree.insert(object, false)}.
-     *
-     * @see de.lmu.ifi.dbs.elki.index.Index#insert(java.util.List)
      */
     // todo: bulk load method
     public void insert(List<O> objects) {

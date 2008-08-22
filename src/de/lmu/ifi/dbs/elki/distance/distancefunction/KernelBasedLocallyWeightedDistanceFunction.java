@@ -112,8 +112,11 @@ public class KernelBasedLocallyWeightedDistanceFunction<V extends RealVector<V, 
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getAttributeSettings()
+     * Calls the super method
+     * and adds to the returned attribute settings the attribute settings of
+     * the {@link #kernelFunction}.
      */
+    @Override
     public List<AttributeSettings> getAttributeSettings() {
         List<AttributeSettings> result = super.getAttributeSettings();
         result.addAll(kernelFunction.getAttributeSettings());
