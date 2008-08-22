@@ -83,6 +83,47 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>>
     }
 
     /**
+     * @see de.lmu.ifi.dbs.elki.index.tree.TreeIndex#initializeCapacities(DatabaseObject,boolean)
+     */
+    protected void initializeCapacities(O object, boolean verbose) {
+        D dummyDistance = getDistanceFunction().nullDistance();
+        int distanceSize = dummyDistance.externalizableSize();
+
+        // overhead = index(4), numEntries(4), id(4), isLeaf(0.125)
+        double overhead = 12.125;
+        if (pageSize - overhead < 0) {
+            throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
+        }
+
+        // dirCapacity = (pageSize - overhead) / (nodeID + objectID +
+        // coveringRadius + parentDistance) + 1
+        dirCapacity = (int) (pageSize - overhead) / (4 + 4 + distanceSize + distanceSize) + 1;
+
+        if (dirCapacity <= 1) {
+            throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
+        }
+
+        if (dirCapacity < 10) {
+            warning("Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
+        }
+        // leafCapacity = (pageSize - overhead) / (objectID + parentDistance) +
+        // 1
+        leafCapacity = (int) (pageSize - overhead) / (4 + distanceSize) + 1;
+
+        if (leafCapacity <= 1) {
+            throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
+        }
+
+        if (leafCapacity < 10) {
+            warning("Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
+        }
+
+        if (verbose) {
+            verbose("Directory Capacity: " + (dirCapacity - 1) + "\nLeaf Capacity:    " + (leafCapacity - 1));
+        }
+    }
+
+    /**
      * @return a new MTreeLeafEntry representing the specified data object
      * @see AbstractMTree#createNewLeafEntry(DatabaseObject,Distance)
      */

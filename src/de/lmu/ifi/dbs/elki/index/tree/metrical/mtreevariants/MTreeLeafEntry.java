@@ -40,16 +40,16 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractEntry impleme
     }
 
     /**
-     * Returns the id of the underlying database object of this entry.
+     * Returns the id of the underlying data object of this entry.
      *
-     * @return the id of the underlying database object of this entry
+     * @return the id of the underlying data object of this entry
      */
     public final Integer getRoutingObjectID() {
         return getID();
     }
 
     /**
-     * Sets the id of the underlying database object of this entry.
+     * Sets the id of the underlying data object of this entry.
      *
      * @param objectID the id to be set
      */
@@ -76,7 +76,7 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractEntry impleme
     }
 
     /**
-     * Returns null.
+     * Returns null, since a leaf entry has no covering radius.
      *
      * @return null
      */
@@ -85,7 +85,7 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractEntry impleme
     }
 
     /**
-     * Throws an UnsupportedOperationException.
+     * Throws an UnsupportedOperationException, since a leaf entry has no covering radius.
      *
      * @throws UnsupportedOperationException
      */
@@ -94,9 +94,9 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractEntry impleme
     }
 
     /**
-     * Returns true if this entry is a leaf entry, false otherwise.
+     * Returns true, since this entry is a leaf entry.
      *
-     * @return true if this entry is a leaf entry, false otherwise
+     * @return true
      */
     public final boolean isLeafEntry() {
         return true;
@@ -105,10 +105,8 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractEntry impleme
     /**
      * Calls the super method and writes the parentDistance of this entry to the specified
      * stream.
-     *
-     * @param out the stream to write the object to
-     * @throws java.io.IOException Includes any I/O exceptions that may occur
      */
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
         out.writeObject(parentDistance);
@@ -117,13 +115,9 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractEntry impleme
     /**
      * Calls the super method and reads the parentDistance of this entry from the specified
      * input stream.
-     *
-     * @param in the stream to read data from in order to restore the object
-     * @throws java.io.IOException    if I/O errors occur
-     * @throws ClassNotFoundException If the class for an object being restored cannot be found.
      */
-    public void readExternal(ObjectInput in) throws IOException,
-                                                    ClassNotFoundException {
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
         //noinspection unchecked
         this.parentDistance = (D) in.readObject();
@@ -142,8 +136,11 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractEntry impleme
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
 
+        // noinspection unchecked
         final MTreeLeafEntry<D> that = (MTreeLeafEntry<D>) o;
 
-        return !(parentDistance != null ? !parentDistance.equals(that.parentDistance) : that.parentDistance != null);
+        return !(parentDistance != null ?
+            !parentDistance.equals(that.parentDistance) :
+            that.parentDistance != null);
     }
 }

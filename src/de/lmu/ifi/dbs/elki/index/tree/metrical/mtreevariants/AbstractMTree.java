@@ -105,15 +105,9 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
 
     /**
-     * Performs a range query for the given spatial object with the given
-     * epsilon range and the according distance function. The query result is in
-     * ascending order to the distance to the query object.
-     *
-     * @param object  the query object
-     * @param epsilon the string representation of the query range
-     * @return a List of the query results
+     * @see de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex#rangeQuery(de.lmu.ifi.dbs.elki.data.DatabaseObject,String)
      */
-    public List<QueryResult<D>> rangeQuery(O object, String epsilon) {
+    public final List<QueryResult<D>> rangeQuery(O object, String epsilon) {
         D range = distanceFunction.valueOf(epsilon);
         final List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
 
@@ -125,15 +119,9 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
 
     /**
-     * Performs a k-nearest neighbor query for the given NumberVector with the
-     * given parameter k and the according distance function. The query result
-     * is in ascending order to the distance to the query object.
-     *
-     * @param object the query object
-     * @param k      the number of nearest neighbors to be returned
-     * @return a List of the query results
+     * @see de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex#kNNQuery(de.lmu.ifi.dbs.elki.data.DatabaseObject, int)
      */
-    public List<QueryResult<D>> kNNQuery(O object, int k) {
+    public final List<QueryResult<D>> kNNQuery(O object, int k) {
         if (k < 1) {
             throw new IllegalArgumentException("At least one object has to be requested!");
         }
@@ -144,19 +132,21 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
 
     /**
-     * Returns the distance function.
-     *
-     * @return the distance function
+     * @see de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex#getDistanceFunction()
      */
     public final DistanceFunction<O, D> getDistanceFunction() {
         return distanceFunction;
     }
 
     /**
-     * Returns a string representation of this RTree.
+     * Returns a string representation of this M-Tree
+     * by performing a breadth first enumeration on the tree
+     * and adding the string representation of the visited nodes and their entries
+     * to the result.
      *
-     * @return a string representation of this RTree
+     * @return a string representation of this M-Tree
      */
+    @Override
     public String toString() {
         StringBuffer result = new StringBuffer();
         int dirNodes = 0;
@@ -180,12 +170,12 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
             Entry entry = path.getLastPathComponent().getEntry();
             if (entry.isLeafEntry()) {
                 objects++;
-                result.append("\n    " + entry.toString());
+                result.append("\n    ").append(entry.toString());
             }
             else {
                 node = file.readPage(entry.getID());
-                result.append("\n\n" + node + ", numEntries = " + node.getNumEntries());
-                result.append("\n" + entry.toString());
+                result.append("\n\n").append(node).append(", numEntries = ").append(node.getNumEntries());
+                result.append("\n").append(entry.toString());
 
                 if (node.isLeaf()) {
                     leafNodes++;
@@ -247,9 +237,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
 
     /**
-     * Sets the databse in the distance function of this index (if existing).
-     *
-     * @param database the database
+     * @see de.lmu.ifi.dbs.elki.index.Index#setDatabase(de.lmu.ifi.dbs.elki.database.Database)
      */
     public final void setDatabase(Database<O> database) {
         distanceFunction.setDatabase(database, false, false);
@@ -263,8 +251,8 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
      * @param withPreInsert if this flag is true, the preInsert method will be called
      *                      before inserting the object
      */
-    // todo: do a bulk load for M-Tree and remove this method
-    protected void insert(O object, boolean withPreInsert) {
+    // todo: implement a bulk load for M-Tree and remove this method
+    protected final void insert(O object, boolean withPreInsert) {
         if (this.debug) {
             debugFine("insert " + object.getID() + " " + object + "\n");
         }
@@ -394,7 +382,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
      * @return the path of the appropriate subtree to insert the given object
      */
     // todo: private?
-    protected TreeIndexPath<E> choosePath(Integer objectID, TreeIndexPath<E> subtree) {
+    protected final TreeIndexPath<E> choosePath(Integer objectID, TreeIndexPath<E> subtree) {
         N node = getNode(subtree.getLastPathComponent().getEntry());
 
         // leaf
@@ -436,9 +424,9 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
 
     /**
-     * Performs a batch knn query.
+     * Performs a batch k-nearest neigbor query for a list of query objects.
      *
-     * @param node     the node for which the query should be performed
+     * @param node     the node reprsenting the subtree on which the query should be performed
      * @param ids      the ids of th query objects
      * @param knnLists the knn lists of the query objcets
      */
@@ -473,47 +461,6 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.tree.TreeIndex#initializeCapacities(DatabaseObject,boolean)
-     */
-    protected void initializeCapacities(O object, boolean verbose) {
-        D dummyDistance = distanceFunction.nullDistance();
-        int distanceSize = dummyDistance.externalizableSize();
-
-        // overhead = index(4), numEntries(4), id(4), isLeaf(0.125)
-        double overhead = 12.125;
-        if (pageSize - overhead < 0) {
-            throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
-        }
-
-        // dirCapacity = (pageSize - overhead) / (nodeID + objectID +
-        // coveringRadius + parentDistance) + 1
-        dirCapacity = (int) (pageSize - overhead) / (4 + 4 + distanceSize + distanceSize) + 1;
-
-        if (dirCapacity <= 1) {
-            throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
-        }
-
-        if (dirCapacity < 10) {
-            warning("Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
-        }
-        // leafCapacity = (pageSize - overhead) / (objectID + parentDistance) +
-        // 1
-        leafCapacity = (int) (pageSize - overhead) / (4 + distanceSize) + 1;
-
-        if (leafCapacity <= 1) {
-            throw new RuntimeException("Node size of " + pageSize + " Bytes is chosen too small!");
-        }
-
-        if (leafCapacity < 10) {
-            warning("Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
-        }
-
-        if (verbose) {
-            verbose("Directory Capacity: " + (dirCapacity - 1) + "\nLeaf Capacity:    " + (leafCapacity - 1));
         }
     }
 
@@ -568,6 +515,19 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
 
         Collections.sort(result);
         return result;
+    }
+
+    /**
+     * Returns the distance between the two specified ids.
+     *
+     * @param id1 the first id
+     * @param id2 the second id
+     * @return the distance between the two specified ids
+     */
+    protected final D distance(Integer id1, Integer id2) {
+        if (id1 == null || id2 == null)
+            return distanceFunction.undefinedDistance();
+        return distanceFunction.distance(id1, id2);
     }
 
     /**
@@ -651,8 +611,8 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
 
     /**
-     * Performs a range query. It starts from the root node and recursively
-     * traverses all paths, which cannot be excluded from leading to
+     * Performs a range query on the specified subtree. It recursively
+     * traverses all paths from the specified node, which cannot be excluded from leading to
      * qualififying objects.
      *
      * @param o_p    the routing object of the specified node
@@ -838,19 +798,6 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
         }
 
         return new TreeIndexPath<E>(new TreeIndexPathComponent<E>(getRootEntry(), null));
-    }
-
-    /**
-     * Returns the distance between the two specified ids.
-     *
-     * @param id1 the first id
-     * @param id2 the second id
-     * @return the distance between the two specified ids
-     */
-    protected D distance(Integer id1, Integer id2) {
-        if (id1 == null || id2 == null)
-            return distanceFunction.undefinedDistance();
-        return distanceFunction.distance(id1, id2);
     }
 
     /**

@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rdknn;
+package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees;
 
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 
@@ -6,12 +6,14 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- * Encapsulates the header information of a RDkNN-Tree. This information is needed
- * for persistent storage.
+ * Encapsulates the header information for subclasses of
+ * {@link de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree}.
+ * This information is needed for persistent storage.
  *
  * @author Elke Achtert
  */
-class RdKNNTreeHeader extends TreeIndexHeader {
+public class MkTreeHeader extends TreeIndexHeader {
+
     /**
      * The size of this header in Bytes,
      * which is 4 Bytes (for {@link #k_max}).
@@ -21,12 +23,12 @@ class RdKNNTreeHeader extends TreeIndexHeader {
     /**
      * The maximum number k of reverse kNN queries to be supported.
      */
-    int k_max;
+    private int k_max;
 
     /**
      * Empty constructor for serialization.
      */
-    public RdKNNTreeHeader() {
+    public MkTreeHeader() {
         super();
     }
 
@@ -34,15 +36,12 @@ class RdKNNTreeHeader extends TreeIndexHeader {
      * Creates a nerw header with the specified parameters.
      *
      * @param pageSize     the size of a page in bytes
-     * @param dirCapacity  the maximum number of entries in a directory node
-     * @param leafCapacity the maximum number of entries in a leaf node
-     * @param dirMinimum   the minmum number of entries in a directory node
-     * @param leafMinimum  the minmum number of entries in a leaf node
-     * @param k_max        the maximum number k of reverse kNN queries to be supported
+     * @param dirCapacity  the capacity of a directory node
+     * @param leafCapacity the capacity of a leaf node
+     * @param k_max        the parameter k
      */
-    public RdKNNTreeHeader(int pageSize, int dirCapacity, int leafCapacity,
-                           int dirMinimum, int leafMinimum, int k_max) {
-        super(pageSize, dirCapacity, leafCapacity, dirMinimum, leafMinimum);
+    public MkTreeHeader(int pageSize, int dirCapacity, int leafCapacity, int k_max) {
+        super(pageSize, dirCapacity, leafCapacity, 0, 0);
         this.k_max = k_max;
     }
 
@@ -74,6 +73,15 @@ class RdKNNTreeHeader extends TreeIndexHeader {
     public void writeHeader(RandomAccessFile file) throws IOException {
         super.writeHeader(file);
         file.writeInt(this.k_max);
+    }
+
+    /**
+     * Returns the parameter k.
+     *
+     * @return the parameter k
+     */
+    public int getK_max() {
+        return k_max;
     }
 
     /**

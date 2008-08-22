@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.util.PQNode;
 import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
+import de.lmu.ifi.dbs.elki.utilities.QueryStatistic;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
@@ -54,7 +55,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     /**
      * Provides some statistics about performed reverse knn-queries.
      */
-    private RkNNStatistic rkNNStatistics = new RkNNStatistic();
+    private QueryStatistic rkNNStatistics = new QueryStatistic();
 
     /**
      * Creates a new MkCopTree.
@@ -150,8 +151,8 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
         Collections.sort(result);
         Collections.sort(candidates);
 
-        rkNNStatistics.numberCandidates += candidates.size();
-        rkNNStatistics.numberTrueHits += result.size();
+        rkNNStatistics.addCandidates(candidates.size());
+        rkNNStatistics.addTrueHits(result.size());
 
         for (Integer id : candidates) {
             List<QueryResult<D>> knns = knnLists.get(id).toList();
@@ -165,7 +166,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
         }
         Collections.sort(result);
 
-        rkNNStatistics.numberResults += result.size();
+        rkNNStatistics.addResults(result.size());
         return result;
     }
 
@@ -174,7 +175,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
      *
      * @return the statistic for performed rknn queries
      */
-    public RkNNStatistic getRkNNStatistics() {
+    public QueryStatistic getRkNNStatistics() {
         return rkNNStatistics;
     }
 

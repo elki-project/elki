@@ -6,14 +6,10 @@ import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.util.RkNNStatistic;
+import de.lmu.ifi.dbs.elki.utilities.QueryStatistic;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,52 +18,27 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * MkNNTree is a metrical index structure based on the concepts of the M-Tree
- * supporting efficient processing of reverse k nearest neighbor queries. The
- * k-nn distance is stored in each entry of a node.
+ * MkMaxTree is a metrical index structure based on the concepts of the M-Tree
+ * supporting efficient processing of reverse k nearest neighbor queries for parameter
+ * k <= k_max. The k-nearest neigbor distance for k = k_max is stored in each entry of a node.
  *
  * @author Elke Achtert
- * @param <O> the type of DatabaseObject to be stored in the metrical index
- * @param <D> the type of NumberDistance used in the metrical index
+ * @param <O> the type of DatabaseObject to be stored in the MkMaxTree
+ * @param <D> the type of Distance used in the MkMaxTree
  */
 public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
     extends AbstractMkTree<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> {
 
     /**
-     * OptionID for {@link #K_PARAM}.
-     */
-    public static final OptionID K_ID = OptionID.getOrCreateOptionID(
-        "mkmaxtree.k",
-        "Specifies the maximal number k of reverse k nearest neighbors to be supported."
-    );
-
-    /**
-     * Parameter the maximal number k of reverse k nearest neighbors to be supported,
-     * must be an integer greater than 0.
-     * <p>Key: {@code -mkmaxtree.k} </p>
-     */
-    public final IntParameter K_PARAM =
-        new IntParameter(K_ID, new GreaterConstraint(0));
-
-    /**
-     * Holds the value of parameter {@link #K_PARAM}.
-     */
-    int k_max;
-
-    /**
      * Provides some statistics about performed reverse knn-queries.
      */
-    private RkNNStatistic rkNNStatistics = new RkNNStatistic();
+    private QueryStatistic rkNNStatistics = new QueryStatistic();
 
     /**
-     * Creates a new MkMaxTree
-     * adding parameter
-     * {@link #K_PARAM}
-     * to the option handler additionally to parameters of super class.
+     * Creates a new MkMaxTree.
      */
     public MkMaxTree() {
         super();
-        addOption(K_PARAM);
         this.debug = true;
     }
 
@@ -83,57 +54,12 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
     }
 
     /**
-     * Calls
-     * {@link #preInsert(MkMaxEntry,MkMaxEntry,de.lmu.ifi.dbs.elki.utilities.KNNList)}
-     * to adapt the knn distances before insertion of the specified entry.
+     * Performs a reverse k-nearest neighbor query for the given object ID.
+     * In the first step the candidates are chosen by performing
+     * a reverse k-nearest neighbor query with k = {@link #k_max}. Then
+     * these candidates are refined in a second step.
      *
-     * @see de.lmu.ifi.dbs.elki.index.tree.TreeIndex#preInsert(de.lmu.ifi.dbs.elki.index.tree.Entry)
-     */
-    protected void preInsert(MkMaxEntry<D> entry) {
-        KNNList<D> knns_o = new KNNList<D>(k_max, getDistanceFunction().infiniteDistance());
-        preInsert(entry, getRootEntry(), knns_o);
-    }
-
-    /**
-     * @return the value of {@link #k_max}
-     * @see de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree#getK_max()
-     */
-    public int getK_max() {
-        return k_max;
-    }
-
-    /**
-     * Adjusts the knn distance in the subtree of the specified root entry.
-     *
-     * @see de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree#distanceAdjustment(de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry,java.util.Map)
-     */
-    public void distanceAdjustment(MkMaxEntry<D> entry, Map<Integer, KNNList<D>> knnLists) {
-        MkMaxTreeNode<O, D> node = file.readPage(entry.getID());
-        D knnDist_node = getDistanceFunction().nullDistance();
-        if (node.isLeaf()) {
-            for (int i = 0; i < node.getNumEntries(); i++) {
-                MkMaxEntry<D> leafEntry = node.getEntry(i);
-                leafEntry.setKnnDistance(knnLists.get(leafEntry.getID()).getKNNDistance());
-                knnDist_node = Util.max(knnDist_node, leafEntry.getKnnDistance());
-            }
-        }
-        else {
-            for (int i = 0; i < node.getNumEntries(); i++) {
-                MkMaxEntry<D> dirEntry = node.getEntry(i);
-                distanceAdjustment(dirEntry, knnLists);
-                knnDist_node = Util.max(knnDist_node, dirEntry.getKnnDistance());
-            }
-        }
-        entry.setKnnDistance(knnDist_node);
-    }
-
-    /**
-     * Performs a reverse k-nearest neighbor query for the given object ID. The
-     * query result is in ascending order to the distance to the query object.
-     *
-     * @param object the query object
-     * @param k      the number of nearest neighbors to be returned
-     * @return a List of the query results
+     * @see de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex#reverseKNNQuery(de.lmu.ifi.dbs.elki.data.DatabaseObject,int)
      */
     public List<QueryResult<D>> reverseKNNQuery(O object, int k) {
         if (k > this.k_max) {
@@ -142,11 +68,12 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
 
         // get the candidates
         List<QueryResult<D>> candidates = new ArrayList<QueryResult<D>>();
-        doReverseKNNQuery(object.getID(), null, getRoot(), candidates);
+        doReverseKNNQuery(object.getID(), getRoot(), null, candidates);
 
         if (k == this.k_max) {
             Collections.sort(candidates);
-            rkNNStatistics.numberResults += candidates.size();
+            rkNNStatistics.addTrueHits(candidates.size());
+            rkNNStatistics.addResults(candidates.size());
             return candidates;
         }
 
@@ -171,8 +98,8 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
             }
         }
 
-        rkNNStatistics.numberResults += result.size();
-        rkNNStatistics.numberCandidates += candidates.size();
+        rkNNStatistics.addResults(result.size());
+        rkNNStatistics.addCandidates(candidates.size());
         Collections.sort(result);
         return result;
     }
@@ -182,7 +109,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
      *
      * @return the statistic for performed rknn queries
      */
-    public RkNNStatistic getRkNNStatistics() {
+    public QueryStatistic getRkNNStatistics() {
         return rkNNStatistics;
     }
 
@@ -194,25 +121,56 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
     }
 
     /**
-     * @return a new MkMaxTreeHeader
+     * Calls
+     * {@link #preInsert(MkMaxEntry,MkMaxEntry,de.lmu.ifi.dbs.elki.utilities.KNNList)}
+     * to adapt the knn distances before insertion of the specified entry.
+     *
+     * @see de.lmu.ifi.dbs.elki.index.tree.TreeIndex#preInsert(de.lmu.ifi.dbs.elki.index.tree.Entry)
      */
-    @Override
-    protected TreeIndexHeader createHeader() {
-        return new MkMaxTreeHeader(pageSize, dirCapacity, leafCapacity, k_max);
+    protected void preInsert(MkMaxEntry<D> entry) {
+        KNNList<D> knns_o = new KNNList<D>(k_max, getDistanceFunction().infiniteDistance());
+        preInsert(entry, getRootEntry(), knns_o);
     }
 
     /**
-     * Performs a k-nearest neighbor query in the specified subtree
-     * for the given query object.
+     * Adjusts the knn distance in the subtree of the specified root entry.
+     *
+     * @see de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree#kNNdistanceAdjustment(de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry,java.util.Map)
+     */
+    protected void kNNdistanceAdjustment(MkMaxEntry<D> entry, Map<Integer, KNNList<D>> knnLists) {
+        MkMaxTreeNode<O, D> node = file.readPage(entry.getID());
+        D knnDist_node = getDistanceFunction().nullDistance();
+        if (node.isLeaf()) {
+            for (int i = 0; i < node.getNumEntries(); i++) {
+                MkMaxEntry<D> leafEntry = node.getEntry(i);
+                leafEntry.setKnnDistance(knnLists.get(leafEntry.getID()).getKNNDistance());
+                knnDist_node = Util.max(knnDist_node, leafEntry.getKnnDistance());
+            }
+        }
+        else {
+            for (int i = 0; i < node.getNumEntries(); i++) {
+                MkMaxEntry<D> dirEntry = node.getEntry(i);
+                kNNdistanceAdjustment(dirEntry, knnLists);
+                knnDist_node = Util.max(knnDist_node, dirEntry.getKnnDistance());
+            }
+        }
+        entry.setKnnDistance(knnDist_node);
+    }
+
+    /**
+     * Performs a reverse k-nearest neighbor query in the specified subtree
+     * for the given query object with k = {@link #k_max}.
+     * It recursively traverses all paths from the specified node, which cannot be excluded from leading to
+     * qualififying objects.
      *
      * @param q          the id of the query object
-     * @param node_entry the entry representing the node
      * @param node       the node of the subtree on which the query is performed
+     * @param node_entry the entry representing the node
      * @param result     the list for the query result
      */
     private void doReverseKNNQuery(Integer q,
-                                   MkMaxEntry<D> node_entry,
                                    MkMaxTreeNode<O, D> node,
+                                   MkMaxEntry<D> node_entry,
                                    List<QueryResult<D>> result) {
 
         // data node
@@ -233,12 +191,13 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
                 D node_knnDist = node_entry != null ? node_entry.getKnnDistance() : getDistanceFunction().infiniteDistance();
 
                 D distance = getDistanceFunction().distance(entry.getRoutingObjectID(), q);
-                D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceFunction().nullDistance() : distance.minus(entry
-                    .getCoveringRadius());
+                D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ?
+                    getDistanceFunction().nullDistance() :
+                    distance.minus(entry.getCoveringRadius());
 
                 if (minDist.compareTo(node_knnDist) <= 0) {
                     MkMaxTreeNode<O, D> childNode = getNode(entry.getID());
-                    doReverseKNNQuery(q, entry, childNode, result);
+                    doReverseKNNQuery(q, childNode, entry, result);
                 }
             }
         }
@@ -316,11 +275,9 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
     }
 
     /**
-     * Determines the maximum and minimum number of entries in a node.
-     *
-     * @param pageSize the size of a page in Bytes
+     * @see de.lmu.ifi.dbs.elki.index.tree.TreeIndex#initializeCapacities(de.lmu.ifi.dbs.elki.data.DatabaseObject,boolean)
      */
-    protected void initCapacity(int pageSize) {
+    protected void initializeCapacities(O object, boolean verbose) {
         D dummyDistance = getDistanceFunction().nullDistance();
         int distanceSize = dummyDistance.externalizableSize();
 
@@ -353,21 +310,6 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
         if (leafCapacity < 10) {
             warning("Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
         }
-    }
-
-    /**
-     * Calls {@link de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree#setParameters(String[])
-     * AbstractMTree#setParameters(args)}
-     * and sets additionally the value of the parameter
-     * {@link #K_PARAM}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
-    @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
-        k_max = getParameterValue(K_PARAM);
-        return remainingParameters;
     }
 
     /**

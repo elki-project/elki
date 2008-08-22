@@ -2,10 +2,15 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,9 +18,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Abstract class that provides the insertion of objects for all
- * M-Tree variants supporting processing of reverse k nearest neighbor queries by
- * using the k-nn distances of the entries.
+ * Abstract class for all
+ * M-Tree variants supporting processing of reverse k-nearest neighbor queries by
+ * using the k-nn distances of the entries, where k is less than or equal to the
+ * specified parameter {@link #K_MAX_PARAM}.
  *
  * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
  * @param <O> the type of DatabaseObject to be stored in the metrical index
@@ -25,6 +31,52 @@ import java.util.Map;
  */
 public abstract class AbstractMkTree<O extends DatabaseObject, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>>
     extends AbstractMTree<O, D, N, E> {
+
+    /**
+     * OptionID for {@link #K_MAX_PARAM}.
+     */
+    public static final OptionID K_MAX_ID = OptionID.getOrCreateOptionID(
+        "mktree.kmax",
+        "Specifies the maximal number k of reverse k nearest neighbors to be supported."
+    );
+
+    /**
+     * Parameter specifying the maximal number k of reverse k nearest neighbors to be supported,
+     * must be an integer greater than 0.
+     * <p>Key: {@code -mktree.kmax} </p>
+     */
+    public final IntParameter K_MAX_PARAM =
+        new IntParameter(K_MAX_ID, new GreaterConstraint(0));
+
+    /**
+     * Holds the value of parameter {@link #K_MAX_PARAM}.
+     */
+    protected int k_max;
+
+    /**
+     * Adds parameter
+     * {@link #K_MAX_PARAM}
+     * to the option handler additionally to parameters of super class.
+     */
+    public AbstractMkTree() {
+        super();
+        addOption(K_MAX_PARAM);
+    }
+
+    /**
+     * Calls {@link de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree#setParameters(String[])
+     * AbstractMTree#setParameters(args)}
+     * and sets additionally the value of the parameter
+     * {@link #K_MAX_PARAM}.
+     *
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
+     */
+    @Override
+    public String[] setParameters(String[] args) throws ParameterException {
+        String[] remainingParameters = super.setParameters(args);
+        k_max = getParameterValue(K_MAX_PARAM);
+        return remainingParameters;
+    }
 
     /**
      * <p>Inserts the specified objects into this M-Tree sequentially
@@ -53,7 +105,7 @@ public abstract class AbstractMkTree<O extends DatabaseObject, D extends Distanc
             // create knnList for the object
             ids.add(object.getID());
             knnLists.put(object.getID(),
-                new KNNList<D>(getK_max(), getDistanceFunction().infiniteDistance()));
+                new KNNList<D>(k_max, getDistanceFunction().infiniteDistance()));
 
             // insert the object
             super.insert(object, false);
@@ -63,7 +115,7 @@ public abstract class AbstractMkTree<O extends DatabaseObject, D extends Distanc
         batchNN(getRoot(), ids, knnLists);
 
         // adjust the knn distances
-        distanceAdjustment(getRootEntry(), knnLists);
+        kNNdistanceAdjustment(getRootEntry(), knnLists);
 
         if (debug) {
             getRoot().test(this, getRootEntry());
@@ -71,13 +123,12 @@ public abstract class AbstractMkTree<O extends DatabaseObject, D extends Distanc
     }
 
     /**
-     * Returns the maximal number k of reverse
-     * k nearest neighbors to be supported.
-     *
-     * @return the maximal number k of reverse
-     *         k nearest neighbors to be supported
+     * @return a new {@link MkTreeHeader}
      */
-    public abstract int getK_max();
+    @Override
+    protected TreeIndexHeader createHeader() {
+        return new MkTreeHeader(pageSize, dirCapacity, leafCapacity, k_max);
+    }
 
     /**
      * Performs a distance adjustment in the subtree of the specified root entry.
@@ -85,5 +136,5 @@ public abstract class AbstractMkTree<O extends DatabaseObject, D extends Distanc
      * @param entry    the root entry of the current subtree
      * @param knnLists a map of knn lists for each leaf entry
      */
-    public abstract void distanceAdjustment(E entry, Map<Integer, KNNList<D>> knnLists);
+    protected abstract void kNNdistanceAdjustment(E entry, Map<Integer, KNNList<D>> knnLists);
 }

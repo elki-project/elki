@@ -2,24 +2,18 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mktab;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.Distance;
-import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkmax.MkMaxTreeHeader;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * MkMaxTree is a metrical index structure based on the concepts of the M-Tree
+ * MkTabTree is a metrical index structure based on the concepts of the M-Tree
  * supporting efficient processing of reverse k nearest neighbor queries for
  * parameter k < kmax. All knn distances for k <= kmax are stored in each entry
  * of a node.
@@ -27,97 +21,36 @@ import java.util.Map;
  * @author Elke Achtert
  */
 public class MkTabTree<O extends DatabaseObject, D extends Distance<D>>
-    extends AbstractMTree<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> {
-
-    /**
-     * Parameter k.
-     */
-    public static final String K_P = "k";
-
-    /**
-     * Description for parameter k.
-     */
-    public static final String K_D = "positive integer specifying the maximal number k of reverse" + "k nearest neighbors to be supported.";
-
-    /**
-     * Parameter k.
-     */
-    int k_max;
+    extends AbstractMkTree<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> {
 
     /**
      * Creates a new MkNNTabTree.
      */
     public MkTabTree() {
         super();
-
-        optionHandler.put(new IntParameter(K_P, K_D, new GreaterConstraint(0)));
         this.debug = true;
     }
 
     /**
-     * Performs necessary operations before inserting the specified entry.
-     *
-     * @param entry the entry to be inserted
+     * @throws UnsupportedOperationException since insertion of single
+     *                                       objects is not supported
+     * @see de.lmu.ifi.dbs.elki.index.tree.TreeIndex#preInsert(de.lmu.ifi.dbs.elki.index.tree.Entry)
      */
     protected void preInsert(MkTabEntry<D> entry) {
         throw new UnsupportedOperationException("Insertion of single objects is not supported!");
     }
 
     /**
-     * Inserts the specified object into this MDkNNTree-Tree. This operation is
-     * not supported.
-     *
-     * @param object the object to be inserted
+     * @throws UnsupportedOperationException since insertion of single
+     *                                       objects is not supported
+     * @see de.lmu.ifi.dbs.elki.index.Index#insert(de.lmu.ifi.dbs.elki.data.DatabaseObject)
      */
     public void insert(O object) {
         throw new UnsupportedOperationException("Insertion of single objects is not supported!");
     }
 
     /**
-     * Inserts the specified objects into this MDkNNTree-Tree.
-     *
-     * @param objects the object to be inserted
-     */
-    public void insert(List<O> objects) {
-        if (this.debug) {
-            debugFine("insert " + objects + "\n");
-        }
-
-        if (!initialized) {
-            initialize(objects.get(0));
-        }
-
-        List<Integer> ids = new ArrayList<Integer>();
-        Map<Integer, KNNList<D>> knnLists = new HashMap<Integer, KNNList<D>>();
-
-        // insert
-        for (O object : objects) {
-            // create knnList for the object
-            ids.add(object.getID());
-            knnLists.put(object.getID(), new KNNList<D>(k_max, getDistanceFunction().infiniteDistance()));
-
-            // insert the object
-            super.insert(object, false);
-        }
-
-        // do batch nn
-        batchNN(getRoot(), ids, knnLists);
-
-        // adjust the knn distances
-        adjustKNNDistances(getRootEntry(), knnLists);
-
-        if (debug) {
-            getRoot().test(this, getRootEntry());
-        }
-    }
-
-    /**
-     * Performs a reverse k-nearest neighbor query for the given object ID. The
-     * query result is in ascending order to the distance to the query object.
-     *
-     * @param object the query object
-     * @param k      the number of nearest neighbors to be returned
-     * @return a List of the query results
+     * @see de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex#reverseKNNQuery(de.lmu.ifi.dbs.elki.data.DatabaseObject, int) 
      */
     public List<QueryResult<D>> reverseKNNQuery(O object, int k) {
         if (k > this.k_max) {
@@ -132,30 +65,9 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>>
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
+     * @see de.lmu.ifi.dbs.elki.index.tree.TreeIndex#initializeCapacities(de.lmu.ifi.dbs.elki.data.DatabaseObject,boolean)
      */
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
-
-        k_max = (Integer) optionHandler.getOptionValue(K_P);
-
-        return remainingParameters;
-    }
-
-    /**
-     * Creates a header for this index structure. Subclasses may need to
-     * overwrite this method.
-     */
-    protected TreeIndexHeader createHeader() {
-        return new MkMaxTreeHeader(pageSize, dirCapacity, leafCapacity, k_max);
-    }
-
-    /**
-     * Determines the maximum and minimum number of entries in a node.
-     *
-     * @param object a object that is stored in the tree
-     */
-    protected void initCapacity(O object) {
+    protected void initializeCapacities(O object, boolean verbose) {
         D dummyDistance = getDistanceFunction().nullDistance();
         int distanceSize = dummyDistance.externalizableSize();
 
@@ -221,8 +133,9 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>>
                 D node_knnDist = node_entry != null ? node_entry.getKnnDistance(k) : getDistanceFunction().infiniteDistance();
 
                 D distance = getDistanceFunction().distance(entry.getRoutingObjectID(), q);
-                D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceFunction().nullDistance() : distance.minus(entry
-                    .getCoveringRadius());
+                D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ?
+                    getDistanceFunction().nullDistance() :
+                    distance.minus(entry.getCoveringRadius());
 
                 if (minDist.compareTo(node_knnDist) <= 0) {
                     MkTabTreeNode<O, D> childNode = getNode(entry.getID());
@@ -246,12 +159,12 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>>
     }
 
     /**
-     * Adjusts the knn distance in the subtree of the specified root entry.
+     * Adjusts the knn distances in the subtree of the specified root entry.
      *
      * @param entry    the root entry of the current subtree
      * @param knnLists a map of knn lists for each leaf entry
      */
-    private void adjustKNNDistances(MkTabEntry<D> entry, Map<Integer, KNNList<D>> knnLists) {
+    protected void kNNdistanceAdjustment(MkTabEntry<D> entry, Map<Integer, KNNList<D>> knnLists) {
         MkTabTreeNode<O, D> node = file.readPage(entry.getID());
         List<D> knnDistances_node = initKnnDistanceList();
         if (node.isLeaf()) {
@@ -264,7 +177,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>>
         else {
             for (int i = 0; i < node.getNumEntries(); i++) {
                 MkTabEntry<D> dirEntry = node.getEntry(i);
-                adjustKNNDistances(dirEntry, knnLists);
+                kNNdistanceAdjustment(dirEntry, knnLists);
                 knnDistances_node = max(knnDistances_node, dirEntry.getKnnDistances());
             }
         }

@@ -13,7 +13,10 @@ import java.io.RandomAccessFile;
  */
 public class TreeIndexHeader extends DefaultPageHeader {
     /**
-     * The size of this header.
+     * The size of this header in Bytes,
+     * which is 16 Bytes (
+     * 4 Bytes for {@link #dirCapacity}, {@link #leafCapacity},
+     * {@link #dirMinimum}, and {@link #leafMinimum}).
      */
     private static int SIZE = 16;
 
@@ -65,11 +68,15 @@ public class TreeIndexHeader extends DefaultPageHeader {
     }
 
     /**
-     * Initializes this header from the specified file,
+     * Initializes this header from the specified file.
+     * Calls {@link de.lmu.ifi.dbs.elki.persistent.DefaultPageHeader#readHeader(java.io.RandomAccessFile)
+     * DefaultPageHeader#readHeader(file)} and reads the integer values of
+     * {@link #dirCapacity}, {@link #leafCapacity}, {@link #dirMinimum}, and {@link #leafMinimum}
+     * from the file.
      *
-     * @param file the file to which this header belongs
-     * @throws java.io.IOException
+     * @see de.lmu.ifi.dbs.elki.persistent.PageHeader#readHeader(java.io.RandomAccessFile)
      */
+    @Override
     public void readHeader(RandomAccessFile file) throws IOException {
         super.readHeader(file);
         this.dirCapacity = file.readInt();
@@ -79,11 +86,14 @@ public class TreeIndexHeader extends DefaultPageHeader {
     }
 
     /**
-     * Writes this header to the specified file,
+     * Writes this header to the specified file.
+     * Writes the integer values of
+     * {@link #dirCapacity}, {@link #leafCapacity}, {@link #dirMinimum}, and {@link #leafMinimum}
+     * to the file.
      *
-     * @param file the file to which this header belongs
-     * @throws java.io.IOException
+     * @see de.lmu.ifi.dbs.elki.persistent.PageHeader#writeHeader(java.io.RandomAccessFile)
      */
+    @Override
     public void writeHeader(RandomAccessFile file) throws IOException {
         super.writeHeader(file);
         file.writeInt(this.dirCapacity);
@@ -133,10 +143,12 @@ public class TreeIndexHeader extends DefaultPageHeader {
     }
 
     /**
-     * Returns the size of this header in Bytes.
+     * Returns {@link de.lmu.ifi.dbs.elki.persistent.DefaultPageHeader#size()}
+     * plus the value of {@link #SIZE}).
      *
-     * @return the size of this header in Bytes
+     * @see de.lmu.ifi.dbs.elki.persistent.PageHeader#size()
      */
+    @Override
     public int size() {
         return super.size() + SIZE;
     }
