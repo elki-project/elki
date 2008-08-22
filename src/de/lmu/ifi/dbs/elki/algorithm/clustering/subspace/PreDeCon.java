@@ -24,9 +24,6 @@ import de.lmu.ifi.dbs.elki.utilities.Description;
  */
 public class PreDeCon<V extends RealVector<V, ?>> extends ProjectedDBSCAN<V> {
 
-    /**
-     * @see Algorithm#getDescription()
-     */
     public Description getDescription() {
         return new Description("PreDeCon", "Subspace Preference weighted Density Connected Clustering",
             "PreDeCon computes clusters of subspace preference weighted connected points. " +
@@ -37,10 +34,6 @@ public class PreDeCon<V extends RealVector<V, ?>> extends ProjectedDBSCAN<V> {
                 "In Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04), Brighton, UK, 2004.");
     }
 
-
-    /**
-     * @see ProjectedDBSCAN#preprocessorClass()
-     */
     public Class<PreDeConPreprocessor> preprocessorClass() {
         return PreDeConPreprocessor.class;
     }

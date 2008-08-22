@@ -137,9 +137,6 @@ public abstract class ProjectedClustering<V extends RealVector<V, ?>>
         return remainingParameters;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.clustering.Clustering#getResult()
-     */
     public Clusters<V> getResult() {
         return result;
     }

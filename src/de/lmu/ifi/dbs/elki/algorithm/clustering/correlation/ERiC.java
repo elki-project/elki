@@ -65,8 +65,6 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
 
     /**
      * Performs the ERiC algorithm on the given database.
-     *
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
     @Override
     protected void runInTime(Database<V> database) throws IllegalStateException {

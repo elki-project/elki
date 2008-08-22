@@ -73,9 +73,6 @@ public class PartitionClusteringResults<O extends DatabaseObject>
         return clusters;
     }
 
-    /**
-     * @see Result#output(File,Normalization,List)
-     */
     @Override
     public void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         for (Integer resultID : partitionResults.keySet()) {
@@ -94,10 +91,6 @@ public class PartitionClusteringResults<O extends DatabaseObject>
         }
     }
 
-    /**
-     * @see PartitionResults#output(java.io.PrintStream,
-     *de.lmu.ifi.dbs.elki.normalization.Normalization,java.util.List)
-     */
     @Override
     public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         for (Integer resultID : partitionResults.keySet()) {
@@ -134,7 +127,6 @@ public class PartitionClusteringResults<O extends DatabaseObject>
      * @param classLabel the most convenient {@link ClassLabel ClassLabel} is
      *                   the {@link HierarchicalClassLabel HierarchicalClassLabel}, that
      *                   would have as top-level label the partition id.
-     * @see ClusteringResult#associate(Class)
      */
     public <L extends ClassLabel<L>> Database<O> associate(Class<L> classLabel) {
         try {
@@ -170,9 +162,6 @@ public class PartitionClusteringResults<O extends DatabaseObject>
         }
     }
 
-    /**
-     * @see ClusteringResult#noise()
-     */
     public Database<O> noise() {
         try {
             if (noise == null) {
@@ -203,7 +192,6 @@ public class PartitionClusteringResults<O extends DatabaseObject>
      * @param classLabel the most convenient {@link ClassLabel ClassLabel} is
      *                   the {@link HierarchicalClassLabel HierarchicalClassLabel}, that
      *                   would have as top-level label the partition id.
-     * @see ClusteringResult#clustering(Class)
      */
     public <L extends ClassLabel<L>> Map<L, Database<O>> clustering(Class<L> classLabel) {
         try {

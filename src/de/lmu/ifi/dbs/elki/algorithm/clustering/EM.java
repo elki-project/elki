@@ -119,8 +119,6 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impleme
      * Finally a hard clustering is provided where each clusters gets assigned the points
      * exhibiting the highest probability to belong to this cluster. But still, the database objects hold
      * associated the complete probability-vector for all models.
-     *
-     * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.elki.database.Database)
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -388,9 +386,6 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impleme
         }
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getDescription()
-     */
     public Description getDescription() {
         return new Description("EM-Clustering",
             "Clustering by Expectation Maximization",
@@ -399,9 +394,6 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impleme
                 "In Journal of the Royal Statistical Society, Series B, 39(1), 1977, pp. 1-31");
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getResult()
-     */
     public Clusters<V> getResult() {
         return this.result;
     }

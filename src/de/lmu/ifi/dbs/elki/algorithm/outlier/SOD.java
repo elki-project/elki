@@ -120,8 +120,6 @@ public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends
 
     /**
      * Performs the PROCLUS algorithm on the given database.
-     *
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
     protected void runInTime(Database<V> database) throws IllegalStateException {
         Progress progress = new Progress("assigning SOD", database.size());
@@ -186,16 +184,10 @@ public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends
         return remainingParameters;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getDescription()
-     */
     public Description getDescription() {
         return new Description("SOD", "Subspace outlier degree", "", "");
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getResult() ()
-     */
     public SODResult<V> getResult() {
         return sodResult;
     }

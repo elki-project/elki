@@ -49,9 +49,6 @@ public class FractalDimensionTestResult<V extends RealVector<V, ?>> extends Abst
         this.distanceFunction.setDatabase(database, false, false);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.result.Result#output(java.io.PrintStream,de.lmu.ifi.dbs.elki.normalization.Normalization,java.util.List)
-     */
     public void output(PrintStream outStream, Normalization normalization, List settings) throws UnableToComplyException {
         throw new UnsupportedOperationException("Specification of output file required.");
 

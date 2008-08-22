@@ -122,8 +122,6 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
 
     /**
      * Performs the SNN clustering algorithm on the given database.
-     *
-     * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.elki.database.Database)
      */
     @Override
     protected void runInTime(Database<O> database) {
@@ -273,9 +271,6 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
         }
     }
 
-    /**
-     * @see Algorithm#getDescription()
-     */
     public Description getDescription() {
         return new Description("SNN",
             "Shared Nearest Neighbor Clustering",
@@ -307,9 +302,6 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
         return remainingParameters;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getResult()
-     */
     public ClustersPlusNoise<O> getResult() {
         return result;
     }

@@ -130,8 +130,6 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
 
     /**
      * Performs the Online LOF algorithm on the given database.
-     *
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
     @Override
     protected void runInTime(Database<O> database) throws IllegalStateException {
@@ -159,9 +157,6 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
         }
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getDescription()
-     */
     @Override
     public Description getDescription() {
         return new Description("OnlineLOF", "Online Local Outlier Factor",

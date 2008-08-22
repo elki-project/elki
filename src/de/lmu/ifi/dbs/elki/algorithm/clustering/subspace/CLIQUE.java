@@ -180,7 +180,6 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
     /**
      * Performs the CLIQUE algorithm on the given database.
      *
-     * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.elki.database.Database)
      */
     protected void runInTime(Database<V> database) throws IllegalStateException {
         Map<CLIQUEModel<V>, Set<Integer>> modelsAndClusters = new HashMap<CLIQUEModel<V>, Set<Integer>>();

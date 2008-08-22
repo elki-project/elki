@@ -47,8 +47,6 @@ public class PriorProbabilityClassifier<O extends DatabaseObject, L extends Clas
 
     /**
      * Learns the prior probability for all classes.
-     *
-     * @see Classifier#buildClassifier(de.lmu.ifi.dbs.elki.database.Database,de.lmu.ifi.dbs.elki.data.ClassLabel[])
      */
     public void buildClassifier(Database<O> database, L[] classLabels) throws IllegalStateException {
         this.setLabels(classLabels);
@@ -77,8 +75,6 @@ public class PriorProbabilityClassifier<O extends DatabaseObject, L extends Clas
      * Returns the index of the most abundant class.
      * According to the prior class probability distribution,
      * this is the index of the class showing maximum prior probability.
-     *
-     * @see Classifier#classify(DatabaseObject)
      */
     @Override
     public int classify(O instance) throws IllegalStateException {
@@ -87,23 +83,15 @@ public class PriorProbabilityClassifier<O extends DatabaseObject, L extends Clas
 
     /**
      * Returns the distribution of the classes' prior probabilities.
-     *
-     * @see Classifier#classDistribution(DatabaseObject)
      */
     public double[] classDistribution(O instance) throws IllegalStateException {
         return distribution;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getDescription()
-     */
     public Description getDescription() {
         return new Description("Prior Probability Classifier", "Prior Probability Classifier", "Classifier to predict simply prior probabilities for all classes as defined by their relative abundance in a given database.", "");
     }
 
-    /**
-     * @see Classifier#model()
-     */
     public String model() {
         StringBuffer output = new StringBuffer();
         for (int i = 0; i < distribution.length; i++) {

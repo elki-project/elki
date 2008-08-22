@@ -67,9 +67,6 @@ public class Biclustering<V extends RealVector<V, Double>> extends AbstractResul
         return biclusters.get(clusterIndex);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.result.Result#output(java.io.PrintStream,de.lmu.ifi.dbs.elki.normalization.Normalization,java.util.List)
-     */
     public void output(PrintStream outStream, Normalization<V> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         int c = 0;
         for (Bicluster<V> bicluster : biclusters) {
@@ -87,9 +84,6 @@ public class Biclustering<V extends RealVector<V, Double>> extends AbstractResul
 
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.result.Result#output(File,Normalization,List)
-     */
     @Override
     public void output(File out, Normalization<V> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         int c = 0;

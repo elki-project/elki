@@ -76,23 +76,14 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
         addOption(K_PARAM);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.clustering.Clustering#getResult()
-     */
     public ClusteringResult<V> getResult() {
         return result;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getDescription()
-     */
     public Description getDescription() {
         return new Description("SubspaceAggregation", "SubspaceAggregation", "", "");
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
-     */
     public void runInTime(Database<V> database) throws IllegalStateException {
         if (database.size() == 0) {
             throw new IllegalArgumentException("database empty: must contain elements");

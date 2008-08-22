@@ -98,7 +98,6 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
 
     /**
      * Provides an order of the kNN-distances for all objects within the specified database.
-     * @see AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.elki.database.Database)
      */
     @Override
     protected void runInTime(Database<O> database) throws IllegalStateException {
@@ -114,9 +113,6 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
         result = new KNNDistanceOrderResult<O, D>(database, knnDistances);
     }
 
-    /**
-     * @see Algorithm#getResult()
-     */
     public Result<O> getResult() {
         return result;
     }
@@ -137,9 +133,6 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
         return remainingParameters;
     }
 
-    /**
-     * @see Algorithm#getDescription()
-     */
     public Description getDescription() {
         return new Description(
             KNNDistanceOrder.class.getName(),

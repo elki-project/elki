@@ -125,9 +125,6 @@ public class CorrelationAnalysisSolution<V extends RealVector<V, ?>> extends Abs
         standardDeviation = Math.sqrt(variance / db.size());
     }
 
-    /**
-     * @see Result#output(File,Normalization,List)
-     */
     @Override
     public void output(File out, Normalization<V> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         PrintStream outStream;
@@ -219,8 +216,8 @@ public class CorrelationAnalysisSolution<V extends RealVector<V, ?>> extends Abs
      * @return the distance of p from the hyperplane underlying this solution
      */
     private double distance(Matrix p) {
-      	// TODO: Is there a particular reason not to do this:
-      	// return p.minus(centroid).projection(weakEigenvectors).euclideanNorm(0);
+        // TODO: Is there a particular reason not to do this:
+        // return p.minus(centroid).projection(weakEigenvectors).euclideanNorm(0);
         // V_affin = V + a
         // dist(p, V_affin) = d(p-a, V) = ||p - a - proj_V(p-a) ||
         Matrix p_minus_a = p.minus(centroid);
@@ -230,17 +227,17 @@ public class CorrelationAnalysisSolution<V extends RealVector<V, ?>> extends Abs
 
     /**
      * Returns the error vectors after projection.
-     * 
+     *
      * @param p a vector in the space underlying this solution
      * @return the error vectors
      */
     public Matrix errorVectors(V p) {
-      	return errorVectors(p.getColumnVector());
+        return errorVectors(p.getColumnVector());
     }
 
     /**
      * Returns the error vectors after projection.
-     * 
+     *
      * @param p a vector in the space underlying this solution
      * @return the error vectors
      */
@@ -250,60 +247,60 @@ public class CorrelationAnalysisSolution<V extends RealVector<V, ?>> extends Abs
 
     /**
      * Returns the error vectors after projection.
-     * 
+     *
      * @param p a vector in the space underlying this solution
      * @return the error vectors
      */
     public Vector errorVector(V p) {
-      	Matrix evs = errorVectors(p.getColumnVector());
-      	Vector result = evs.getColumnVector(0);
-      	// getColumnDimensionality == 1 anyway.
-      	for (int i = 1; i < evs.getColumnDimensionality(); i++)
-      	  result = result.plus(evs.getColumnVector(i));
-      	return result;
+        Matrix evs = errorVectors(p.getColumnVector());
+        Vector result = evs.getColumnVector(0);
+        // getColumnDimensionality == 1 anyway.
+        for (int i = 1; i < evs.getColumnDimensionality(); i++)
+            result = result.plus(evs.getColumnVector(i));
+        return result;
     }
-    
+
     /**
      * Returns the data vectors after projection.
-     * 
+     *
      * @param p a vector in the space underlying this solution
      * @return the data projections
      */
     public Matrix dataProjections(V p) {
-      Matrix centered = p.getColumnVector().minus(centroid);
-      Matrix sum = new Matrix(p.getDimensionality(), strongEigenvectors.getColumnDimensionality());
-      for (int i=0; i < strongEigenvectors.getColumnDimensionality(); i++) {
-    	Matrix v_i = strongEigenvectors.getColumn(i);
-    	Matrix proj = v_i.times(centered.scalarProduct(0, v_i, 0));
-    	
-    	sum.setColumn(i, proj);
-      }
-      return sum;
+        Matrix centered = p.getColumnVector().minus(centroid);
+        Matrix sum = new Matrix(p.getDimensionality(), strongEigenvectors.getColumnDimensionality());
+        for (int i = 0; i < strongEigenvectors.getColumnDimensionality(); i++) {
+            Matrix v_i = strongEigenvectors.getColumn(i);
+            Matrix proj = v_i.times(centered.scalarProduct(0, v_i, 0));
+
+            sum.setColumn(i, proj);
+        }
+        return sum;
     }
 
     /**
      * Returns the data vectors after projection.
-     * 
+     *
      * @param p a vector in the space underlying this solution
      * @return the error vectors
      */
     public Matrix dataVectors(Matrix p) {
-      return  p.minus(centroid).projection(strongEigenvectors);
+        return p.minus(centroid).projection(strongEigenvectors);
     }
 
     /**
      * Returns the data vectors after projection.
-     * 
+     *
      * @param p a vector in the space underlying this solution
      * @return the error vectors
      */
     public Vector dataVector(V p) {
-      	Matrix dvs = dataVectors(p.getColumnVector());
-      	Vector result = dvs.getColumnVector(0);
-      	// getColumnDimensionality == 1 anyway.
-      	for (int i = 1; i < dvs.getColumnDimensionality(); i++)
-      	  result = result.plus(dvs.getColumnVector(i));
-      	return result;
+        Matrix dvs = dataVectors(p.getColumnVector());
+        Vector result = dvs.getColumnVector(0);
+        // getColumnDimensionality == 1 anyway.
+        for (int i = 1; i < dvs.getColumnDimensionality(); i++)
+            result = result.plus(dvs.getColumnVector(i));
+        return result;
     }
 
     /**

@@ -17,8 +17,5 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
  * @param <O> the type of DatabaseObject handled by this Clustering
  */
 public interface Clustering<O extends DatabaseObject> extends Algorithm<O> {
-    /**
-     * @see Algorithm#getResult()
-     */
     ClusteringResult<O> getResult();
 }

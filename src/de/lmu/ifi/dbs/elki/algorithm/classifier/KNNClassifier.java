@@ -73,8 +73,6 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
      * Checks whether the database has the class labels set. Collects the class
      * labels available n the database. Holds the database to lazily classify
      * new instances later on.
-     *
-     * @see Classifier#buildClassifier(de.lmu.ifi.dbs.elki.database.Database,de.lmu.ifi.dbs.elki.data.ClassLabel[])
      */
     public void buildClassifier(Database<O> database, L[] labels) throws IllegalStateException {
         this.setLabels(labels);
@@ -85,8 +83,6 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
      * Provides a class distribution for the given instance. The distribution is
      * the relative value for each possible class among the k nearest neighbors
      * of the given instance in the previously specified database.
-     *
-     * @see Classifier#classDistribution(DatabaseObject)
      */
     public double[] classDistribution(O instance) throws IllegalStateException {
         try {
@@ -116,9 +112,6 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
         }
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getDescription()
-     */
     public Description getDescription() {
         return new Description(
             "kNN-classifier",
@@ -142,9 +135,6 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
         return remainingParameters;
     }
 
-    /**
-     * @see Classifier#model()
-     */
     public String model() {
         return "lazy learner - provides no model";
     }

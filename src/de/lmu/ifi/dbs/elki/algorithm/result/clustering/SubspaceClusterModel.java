@@ -29,9 +29,6 @@ public class SubspaceClusterModel<V extends RealVector<V, ?>> extends AbstractRe
         this.attributes = attributes;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.result.Result#output(java.io.PrintStream,de.lmu.ifi.dbs.elki.normalization.Normalization,java.util.List)
-     */
     public void output(PrintStream outStream, Normalization<V> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         outStream.println("### " + this.getClass().getSimpleName() + ":");
         outStream.println("### relevant attributes (counting starts with 0): " + this.attributes.toString());

@@ -49,10 +49,6 @@ public class SODResult<O extends RealVector<O, Double>> extends AbstractResult<O
         this.db = db;
     }
 
-    /**
-     * @see AbstractResult#output(java.io.File,
-     *de.lmu.ifi.dbs.elki.normalization.Normalization,java.util.List)
-     */
     @Override
     public void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         PrintStream outStream;
@@ -70,12 +66,7 @@ public class SODResult<O extends RealVector<O, Double>> extends AbstractResult<O
         }
     }
 
-    /**
-     * @see AbstractResult#output(java.io.PrintStream,
-     *de.lmu.ifi.dbs.elki.normalization.Normalization,java.util.List)
-     */
     public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
-
         outputSOD(outStream, normalization, settings);
         outStream.flush();
     }

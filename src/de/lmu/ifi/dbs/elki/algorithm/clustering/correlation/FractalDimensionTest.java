@@ -87,9 +87,6 @@ public class FractalDimensionTest<V extends RealVector<V, ?>> extends AbstractAl
         //optionHandler.put(supporters);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.elki.database.Database)
-     */
     @SuppressWarnings("unchecked")
     protected void runInTime(Database<V> database) throws IllegalStateException {
         distanceFunction.setDatabase(database, true, false);
@@ -158,16 +155,10 @@ public class FractalDimensionTest<V extends RealVector<V, ?>> extends AbstractAl
         return description.toString();
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getDescription()
-     */
     public Description getDescription() {
         return new Description("FracClusTest", "FracClusTest", "", "");
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getResult()
-     */
     public FractalDimensionTestResult<V> getResult() {
         return result;
     }

@@ -59,7 +59,6 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>> exte
      * Any concrete algorithm should be implemented within method
      * {@link #biclustering()} by an inheriting biclustering approach.
      *
-     * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.elki.database.Database)
      */
     @Override
     protected final void runInTime(Database<V> database) throws IllegalStateException {
@@ -303,9 +302,6 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>> exte
         return sum / rows.cardinality();
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getResult()
-     */
     public Result<V> getResult() {
         return result;
     }

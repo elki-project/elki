@@ -14,15 +14,14 @@ import java.util.List;
 
 /**
  * Wrapper class to provide the basic properties of a bicluster.
- * 
+ *
  * @author Arthur Zimek
- *         
  * @param <V> the type of RealVector handled by this Result
  */
 public class Bicluster<V extends RealVector<V, Double>> extends AbstractLoggable {
-  /**
-   * The ids of the rows included in the bicluster.
-   */
+    /**
+     * The ids of the rows included in the bicluster.
+     */
     private int[] rowIDs;
 
     /**
@@ -47,9 +46,9 @@ public class Bicluster<V extends RealVector<V, Double>> extends AbstractLoggable
 
     /**
      * Defines a new bicluster for given parameters.
-     * 
-     * @param rowIDs the ids of the rows included in the bicluster
-     * @param colIDs the ids of the rows included in the bicluster
+     *
+     * @param rowIDs   the ids of the rows included in the bicluster
+     * @param colIDs   the ids of the rows included in the bicluster
      * @param database the database this bilcuster is defined for
      */
     public Bicluster(int[] rowIDs, int[] colIDs, Database<V> database) {
@@ -61,8 +60,7 @@ public class Bicluster<V extends RealVector<V, Double>> extends AbstractLoggable
 
     /**
      * Sets the ids of the inverted rows.
-     * 
-     * 
+     *
      * @param invertedRows the ids of the inverted rows
      */
     public void setInvertedRows(int[] invertedRows) {
@@ -73,8 +71,6 @@ public class Bicluster<V extends RealVector<V, Double>> extends AbstractLoggable
     /**
      * Sorts the row and column ids (and - if applicable - the ids of inverted rows)
      * in ascending order.
-     * 
-     *
      */
     public void sortIDs() {
         Arrays.sort(this.rowIDs);
@@ -86,10 +82,9 @@ public class Bicluster<V extends RealVector<V, Double>> extends AbstractLoggable
 
     /**
      * The size of the cluster.
-     * 
+     * <p/>
      * The size of a bicluster is the number of included rows.
-     * 
-     * 
+     *
      * @return the size of the bicluster, i.e., the number or rows included in the bicluster
      */
     public int size() {
@@ -98,8 +93,7 @@ public class Bicluster<V extends RealVector<V, Double>> extends AbstractLoggable
 
     /**
      * Returns the model associated with this bicluster.
-     * 
-     * 
+     *
      * @return the model associated with this bicluster
      */
     public Result<V> model() {
@@ -108,8 +102,7 @@ public class Bicluster<V extends RealVector<V, Double>> extends AbstractLoggable
 
     /**
      * Associates the given model with this bicluster.
-     * 
-     * 
+     *
      * @param model the model to associate with this bicluster
      */
     public void appendModel(Result<V> model) {
@@ -118,10 +111,10 @@ public class Bicluster<V extends RealVector<V, Double>> extends AbstractLoggable
 
     /**
      * Provides an iterator for the row ids.
-     * 
+     * <p/>
      * Note that the iterator is not guaranteed to touch all
      * elements if the {@link #sortIDs()} is called during the lifetime of the iterator.
-     * 
+     *
      * @return an iterator for the row ids
      */
     public Iterator<V> rowIterator() {
@@ -146,8 +139,7 @@ public class Bicluster<V extends RealVector<V, Double>> extends AbstractLoggable
 
     /**
      * Returns a list containing header information for printed outputs.
-     * 
-     * 
+     *
      * @return a list containing header information for printed outputs
      */
     public List<String> headerInformation() {

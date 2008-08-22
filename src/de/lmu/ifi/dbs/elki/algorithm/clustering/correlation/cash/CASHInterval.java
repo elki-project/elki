@@ -258,7 +258,7 @@ public class CASHInterval extends HyperBoundingBox implements Identifiable<CASHI
     }
 
     /**
-     * @see Object#hashCode()
+     * Returns the unique id of this interval as hash code.
      */
     public int hashCode() {
         return intervalID;

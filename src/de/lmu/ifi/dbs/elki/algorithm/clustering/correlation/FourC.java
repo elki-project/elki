@@ -20,9 +20,6 @@ import de.lmu.ifi.dbs.elki.utilities.Description;
  */
 public class FourC<O extends RealVector<O, ?>> extends ProjectedDBSCAN<O> {
 
-    /**
-     * @see Algorithm#getDescription()
-     */
     public Description getDescription() {
         return new Description("4C", "Computing Correlation Connected Clusters",
             "4C identifies local subgroups of data objects sharing a uniform correlation. " +
@@ -33,9 +30,6 @@ public class FourC<O extends RealVector<O, ?>> extends ProjectedDBSCAN<O> {
     }
 
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.clustering.ProjectedDBSCAN#preprocessorClass()
-     */
     public Class<FourCPreprocessor> preprocessorClass() {
         return FourCPreprocessor.class;
     }

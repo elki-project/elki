@@ -85,9 +85,6 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>>
         return co.size();
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.result.Result#output(File,Normalization,List)
-     */
     public void output(File out,
                        Normalization<O> normalization,
                        List<AttributeSettings> settings) throws UnableToComplyException {
@@ -106,9 +103,6 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>>
         output(outStream, normalization, settings);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.result.Result#output(java.io.PrintStream,de.lmu.ifi.dbs.elki.normalization.Normalization,java.util.List)
-     */
     public void output(PrintStream outStream, Normalization<O> normalization,
                        List<AttributeSettings> settings) throws UnableToComplyException {
         try {

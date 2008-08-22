@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
-import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.result.Result;
 import de.lmu.ifi.dbs.elki.algorithm.result.outlier.LOFResult;
@@ -137,8 +136,6 @@ public class LOF<O extends DatabaseObject> extends
 
     /**
      * Performs the LOF algorithm on the given database.
-     *
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
     protected void runInTime(Database<O> database) throws IllegalStateException {
         getDistanceFunction().setDatabase(database, isVerbose(), isTime());
@@ -280,9 +277,6 @@ public class LOF<O extends DatabaseObject> extends
         lofTable.insert(id, entry);
     }
 
-    /**
-     * @see Algorithm#getDescription()
-     */
     public Description getDescription() {
         return new Description(
             "LOF",
@@ -315,9 +309,6 @@ public class LOF<O extends DatabaseObject> extends
         return remainingParameters;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getResult()
-     */
     public Result<O> getResult() {
         return result;
     }

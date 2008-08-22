@@ -59,8 +59,6 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends
 
     /**
      * Performs the SLINK algorithm on the given database.
-     *
-     * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.elki.database.Database)
      */
     @SuppressWarnings("unchecked")
     @Override

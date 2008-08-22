@@ -119,7 +119,6 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
     /**
      * Performs the DBSCAN algorithm on the given database.
      *
-     * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.elki.database.Database)
      */
     @Override
     protected void runInTime(Database<O> database) throws IllegalStateException {
@@ -251,9 +250,6 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
         }
     }
 
-    /**
-     * @see Algorithm#getDescription()
-     */
     public Description getDescription() {
         return new Description("DBSCAN", "Density-Based Clustering of Applications with Noise",
             "Algorithm to find density-connected sets in a database based on the parameters " +
@@ -280,9 +276,6 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
         return remainingParameters;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getResult()
-     */
     public ClustersPlusNoise<O> getResult() {
         return result;
     }

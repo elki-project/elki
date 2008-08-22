@@ -19,64 +19,60 @@ import java.util.List;
  *
  * @author Elke Achtert
  * @param <O> the type of DatabaseObjects handled by this Result
- * @param <D> the type of Distance used by this Result 
+ * @param <D> the type of Distance used by this Result
  */
 public class KNNJoinResult<O extends DatabaseObject, D extends Distance<D>> implements Result<O> {
-  /**
-   * The kNN lists for each object.
-   */
-  private HashMap<Integer, KNNList<D>> knnLists;
+    /**
+     * The kNN lists for each object.
+     */
+    private HashMap<Integer, KNNList<D>> knnLists;
 
-  /**
-   * Creates a new KNNJoinResult.
-   *
-   * @param knnLists the kNN lists for each object
-   */
-  public KNNJoinResult(HashMap<Integer, KNNList<D>> knnLists) {
-    this.knnLists = knnLists;
-  }
-
-  /**
-   * @see Result#output(File, Normalization, List)
-   */
-  public void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
-    PrintStream outStream;
-    try {
-      outStream = new PrintStream(new FileOutputStream(out));
-    }
-    catch (Exception e) {
-      outStream = new PrintStream(new FileOutputStream(FileDescriptor.out));
+    /**
+     * Creates a new KNNJoinResult.
+     *
+     * @param knnLists the kNN lists for each object
+     */
+    public KNNJoinResult(HashMap<Integer, KNNList<D>> knnLists) {
+        this.knnLists = knnLists;
     }
 
-    output(outStream, normalization, settings);
-  }
+    public void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
+        PrintStream outStream;
+        try {
+            outStream = new PrintStream(new FileOutputStream(out));
+        }
+        catch (Exception e) {
+            outStream = new PrintStream(new FileOutputStream(FileDescriptor.out));
+        }
 
-
-  public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
-    for (Integer id : knnLists.keySet()) {
-      outStream.println(id + " " + knnLists.get(id));
+        output(outStream, normalization, settings);
     }
-    outStream.flush();
-  }
 
-  /**
-   * Returns the knn distance of the object with the specified id.
-   *
-   * @param id the id of the object
-   * @return the knn distance of the object with the specified id
-   */
-  public D getKNNDistance(Integer id) {
-    KNNList<D> list = knnLists.get(id);
-    return list.getKNNDistance();
-  }
+    public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
+        for (Integer id : knnLists.keySet()) {
+            outStream.println(id + " " + knnLists.get(id));
+        }
+        outStream.flush();
+    }
 
-  /**
-   * Returns the knns of the object with the specified id.
-   *
-   * @param id the id of the object
-   * @return the knns of the object with the specified id
-   */
-  public KNNList<D> getKNNs(Integer id) {
-    return knnLists.get(id);
-  }
+    /**
+     * Returns the knn distance of the object with the specified id.
+     *
+     * @param id the id of the object
+     * @return the knn distance of the object with the specified id
+     */
+    public D getKNNDistance(Integer id) {
+        KNNList<D> list = knnLists.get(id);
+        return list.getKNNDistance();
+    }
+
+    /**
+     * Returns the knns of the object with the specified id.
+     *
+     * @param id the id of the object
+     * @return the knns of the object with the specified id
+     */
+    public KNNList<D> getKNNs(Integer id) {
+        return knnLists.get(id);
+    }
 }

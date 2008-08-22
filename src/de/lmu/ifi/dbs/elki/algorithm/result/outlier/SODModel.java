@@ -78,10 +78,6 @@ public class SODModel<O extends RealVector<O, Double>> extends AbstractResult<O>
         return distance;
     }
 
-
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.result.Result#output(java.io.PrintStream,de.lmu.ifi.dbs.elki.normalization.Normalization,java.util.List)
-     */
     public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         outStream.println("### " + this.getClass().getSimpleName() + ":");
         outStream.println("### relevant attributes (counting starts with 0): " + this.weightVector.toString());

@@ -48,18 +48,12 @@ public class HierarchicalAxesParallelCorrelationClusters<V extends RealVector<V,
         this.clusterOrder = clusterOrder;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.result.Result#output(java.io.PrintStream,de.lmu.ifi.dbs.elki.normalization.Normalization,java.util.List)
-     */
     @Override
     public void output(PrintStream outStream, Normalization<V> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         super.output(outStream, normalization, settings);
         clusterOrder.output(outStream, normalization, settings);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.result.Result#output(java.io.File,de.lmu.ifi.dbs.elki.normalization.Normalization,java.util.List)
-     */
     @Override
     public void output(File dir, Normalization<V> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         super.output(dir, normalization, settings);

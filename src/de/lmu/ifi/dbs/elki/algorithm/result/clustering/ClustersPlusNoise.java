@@ -76,10 +76,6 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
         clusterToModel = new HashMap<Integer, Result<O>>();
     }
 
-
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.result.clustering.ClusteringResult#getClusters()
-     */
     public Cluster<O>[] getClusters() {
         Cluster[] clusters = new Cluster[clustersAndNoise.length - 1];
         for (int i = 0; i < clustersAndNoise.length - 1; i++) {
@@ -90,10 +86,6 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
         return clusters;
     }
 
-
-    /**
-     * @see Result#output(File,Normalization,List)
-     */
     @Override
     public void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         for (int c = 0; c < this.clustersAndNoise.length; c++) {
@@ -124,10 +116,6 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
         }
     }
 
-    /**
-     * @see Result#output(java.io.PrintStream,
-     *de.lmu.ifi.dbs.elki.normalization.Normalization,java.util.List)
-     */
     public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         for (int c = 0; c < this.clustersAndNoise.length; c++) {
             String marker;
@@ -211,9 +199,6 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
         return clustersAndNoise;
     }
 
-    /**
-     * @see ClusteringResult#associate(Class)
-     */
     public <L extends ClassLabel<L>> Database<O> associate(Class<L> classLabel) {
         List<Integer> nonNoiseObjects = new ArrayList<Integer>();
         for (int clusterID = 0; clusterID < clustersAndNoise.length - 1; clusterID++) {
@@ -242,9 +227,6 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
         return clusterDB;
     }
 
-    /**
-     * @see ClusteringResult#clustering(Class)
-     */
     public <L extends ClassLabel<L>> Map<L, Database<O>> clustering(Class<L> classLabel) {
         Map<Integer, List<Integer>> partitions = new HashMap<Integer, List<Integer>>();
         for (int clusterID = 0; clusterID < clustersAndNoise.length - 1; clusterID++) {
@@ -270,9 +252,6 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
         return map;
     }
 
-    /**
-     * @see ClusteringResult#noise()
-     */
     public Database<O> noise() {
         Map<Integer, List<Integer>> partitions = new HashMap<Integer, List<Integer>>();
         List<Integer> ids = Arrays.asList(clustersAndNoise[clustersAndNoise.length - 1]);
@@ -289,10 +268,6 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
         }
     }
 
-    /**
-     * @see ClusteringResult#appendModel(ClassLabel,
-     *de.lmu.ifi.dbs.elki.algorithm.result.Result)
-     */
     public <L extends ClassLabel<L>> void appendModel(L clusterID, Result<O> model) {
         clusterToModel.put(classLabelToClusterID(clusterID), model);
     }

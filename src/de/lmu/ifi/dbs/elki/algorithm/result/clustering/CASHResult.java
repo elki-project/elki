@@ -67,9 +67,6 @@ public class CASHResult extends AbstractResult<ParameterizationFunction> {
         this.dimensionality = dimensionality;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.result.Result#output(java.io.PrintStream,de.lmu.ifi.dbs.elki.normalization.Normalization,java.util.List)
-     */
     public void output(PrintStream outStream, Normalization<ParameterizationFunction> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         for (Integer d : clusterMap.subspaceDimensionalities()) {
             List<Set<Integer>> ids_d = clusterMap.getCluster(d);
@@ -94,9 +91,6 @@ public class CASHResult extends AbstractResult<ParameterizationFunction> {
         }
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.result.Result#output(java.io.File,de.lmu.ifi.dbs.elki.normalization.Normalization,java.util.List)
-     */
     public void output(File out, Normalization<ParameterizationFunction> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         for (Integer d : clusterMap.subspaceDimensionalities()) {
             List<Set<Integer>> ids_d = clusterMap.getCluster(d);

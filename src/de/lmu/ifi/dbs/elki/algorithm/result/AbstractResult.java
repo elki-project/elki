@@ -82,9 +82,6 @@ public abstract class AbstractResult<O extends DatabaseObject> extends AbstractL
         out.println("################################################################################");
     }
 
-    /**
-     * @see Result#output(File,Normalization,List)
-     */
     public void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         PrintStream outStream;
         try {

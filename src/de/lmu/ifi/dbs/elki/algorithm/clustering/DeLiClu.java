@@ -101,7 +101,6 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
     /**
      * Performs the DeLiClu algorithm on the given database.
      *
-     * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.elki.database.Database)
      */
     protected void runInTime(Database<O> database) throws IllegalStateException {
         if (!(database instanceof SpatialIndexDatabase)) {
@@ -182,9 +181,6 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
         }
     }
 
-    /**
-     * @see Algorithm#getDescription()
-     */
     public Description getDescription() {
         return new Description(
             "DeliClu",
@@ -234,9 +230,6 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
         return attributeSettings;
     }
 
-    /**
-     * @see Algorithm#getResult()
-     */
     public Result<O> getResult() {
         return clusterOrder;
     }

@@ -35,9 +35,6 @@ public class EMModel<V extends RealVector<V, ?>> extends AbstractResult<V> {
         this.covarianceMatrix = covarianceMatrix;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.result.Result#output(java.io.PrintStream,de.lmu.ifi.dbs.elki.normalization.Normalization,java.util.List)
-     */
     public void output(PrintStream outStream, Normalization<V> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         outStream.println("### " + this.getClass().getSimpleName() + ":");
         outStream.println("### mean = ( " + this.mean.toString() + " )");

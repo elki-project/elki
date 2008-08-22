@@ -35,9 +35,7 @@ public class KNNDistanceOrderResult<O extends DatabaseObject, D extends Distance
         this.knnDistances = knnDistances;
     }
 
-    /**
-     * @see Result#output(java.io.File,de.lmu.ifi.dbs.elki.normalization.Normalization,java.util.List)
-     */
+    @Override
     public void output(final File out, final Normalization<O> normalization,
                        final List<AttributeSettings> settings)
         throws UnableToComplyException {

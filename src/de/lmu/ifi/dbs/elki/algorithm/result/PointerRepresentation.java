@@ -13,14 +13,19 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * Provides the result of the single link algorithm SLINK.
  *
  * @author Elke Achtert
  * @param <O> the type of DatabaseObjects handled by this Result
- * @param <D> the type of Distance used by this Result 
+ * @param <D> the type of Distance used by this Result
  */
 public class PointerRepresentation<O extends DatabaseObject, D extends Distance<D>> extends AbstractResult<O> {
 
@@ -56,9 +61,6 @@ public class PointerRepresentation<O extends DatabaseObject, D extends Distance<
         this.distanceFunction = distanceFunction;
     }
 
-    /**
-     * @see Result#output(File,Normalization,List)
-     */
     public void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         PrintStream outStream;
         try {

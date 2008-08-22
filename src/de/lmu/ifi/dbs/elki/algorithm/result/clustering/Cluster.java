@@ -11,7 +11,7 @@ import java.util.Arrays;
  * todo arthur comment
  *
  * @author Arthur Zimek
- * @param <O> the type of DatabaseObjects handled by this Result 
+ * @param <O> the type of DatabaseObjects handled by this Result
  */
 public class Cluster<O extends DatabaseObject> extends AbstractLoggable implements DatabaseObject {
     private int id;
@@ -34,16 +34,10 @@ public class Cluster<O extends DatabaseObject> extends AbstractLoggable implemen
         Arrays.sort(this.clusterIDs);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.data.DatabaseObject#getID()
-     */
     public Integer getID() {
         return this.id;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.data.DatabaseObject#setID(java.lang.Integer)
-     */
     public void setID(Integer id) {
         this.id = id;
     }

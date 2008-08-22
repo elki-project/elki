@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.Clustering;
 import de.lmu.ifi.dbs.elki.algorithm.result.clustering.ClusteringResult;
 import de.lmu.ifi.dbs.elki.algorithm.result.clustering.ClustersPlusNoise;
@@ -136,8 +135,6 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
 
     /**
      * Performs the COPAC algorithm on the given database.
-     *
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
     @Override
     protected void runInTime(Database<V> database) throws IllegalStateException {
@@ -184,16 +181,10 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
         runPartitionAlgorithm(database, partitionMap);
     }
 
-    /**
-     * @see Clustering#getResult()
-     */
     public ClusteringResult<V> getResult() {
         return result;
     }
 
-    /**
-     * @see Algorithm#getDescription()
-     */
     public Description getDescription() {
         return new Description(
             "COPAC",
@@ -206,7 +197,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
     }
 
     /**
-     * Calls {@link AbstractAlgorithm#setParameters(String[]) AbstractAlgorithm#setParameters(args)}
+     * Calls the super method
      * and instantiates {@link #partitionAlgorithm} according to the value of parameter
      * {@link #PARTITION_ALGORITHM_PARAM},
      * {@link #partitionDatabase} according to the value of parameter {@link #PARTITION_DB_PARAM} (if specified),
@@ -214,8 +205,6 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
      * <p/>
      * The remaining parameters are passed to the {@link #partitionAlgorithm},
      * then to the {@link #partitionDatabase} and afterwards to the {@link #preprocessor}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

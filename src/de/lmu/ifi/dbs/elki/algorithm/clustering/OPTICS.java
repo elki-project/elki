@@ -125,7 +125,6 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
     /**
      * Performs the OPTICS algorithm on the given database.
      *
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
     protected void runInTime(Database<O> database) {
         Progress progress = new Progress("Clustering", database.size());
@@ -206,9 +205,6 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
         }
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getDescription()
-     */
     public Description getDescription() {
         return new Description(
             "OPTICS",
@@ -237,9 +233,6 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
         return remainingParameters;
     }
 
-    /**
-     * @see Algorithm#getResult()
-     */
     public Result<O> getResult() {
         return clusterOrder;
     }

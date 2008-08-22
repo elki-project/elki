@@ -152,7 +152,6 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
     /**
      * Performs the SUBCLU algorithm on the given database.
      *
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
     protected void runInTime(Database<V> database) throws IllegalStateException {
         try {

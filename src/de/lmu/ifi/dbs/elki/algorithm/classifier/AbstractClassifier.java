@@ -137,9 +137,6 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
         }
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getResult()
-     */
     public final Result<O> getResult() {
         return evaluationResult;
     }
@@ -160,9 +157,6 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
         return Util.getIndexOfMaximum(classDistribution(instance));
     }
 
-    /**
-     * @see Classifier#getClassLabel(int)
-     */
     public final L getClassLabel(int index) throws IllegalArgumentException {
         try {
             return labels[index];

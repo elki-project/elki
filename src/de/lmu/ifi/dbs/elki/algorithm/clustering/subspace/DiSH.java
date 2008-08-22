@@ -119,7 +119,6 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
     /**
      * Performs the DiSH algorithm on the given database.
      *
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
     protected void runInTime(Database<V> database) throws IllegalStateException {
         if (isVerbose()) {
@@ -142,9 +141,6 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         return result;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getDescription()
-     */
     public Description getDescription() {
         return new Description(
             "DiSH",

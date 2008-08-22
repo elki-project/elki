@@ -78,7 +78,6 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
     /**
      * Performs the PROCLUS algorithm on the given database.
      *
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
     protected void runInTime(Database<V> database) throws IllegalStateException {
 
@@ -155,9 +154,6 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
 
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getDescription()
-     */
     public Description getDescription() {
         return new Description(
             "PROCLUS",

@@ -79,8 +79,6 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
 
   /**
    * Performs the ORCLUS algorithm on the given database.
-   * 
-   * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.elki.database.Database)
    */
   protected void runInTime(Database<V> database) throws IllegalStateException {
 
@@ -143,9 +141,6 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
 
   }
 
-  /**
-   * @see Algorithm#getDescription()
-   */
   public Description getDescription() {
     return new Description("ORCLUS", "Arbitrarily ORiented projected CLUSter generation", "Algorithm to find clusters in high dimensional spaces.", "C. C. Aggrawal, P. S. Yu: " + "Finding Generalized Projected Clusters in High Dimensional Spaces. " + "In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00).");
   }

@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.algorithm.result.clustering;
 
 import de.lmu.ifi.dbs.elki.algorithm.result.CorrelationAnalysisSolution;
-import de.lmu.ifi.dbs.elki.algorithm.result.Result;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -81,9 +80,6 @@ public class ClustersPlusNoisePlusCorrelationAnalysis<V extends RealVector<V, ?>
         this(clustersAndNoise, db, correlationAnalysisSolutions, null);
     }
 
-    /**
-     * @see Result#output(File,Normalization,List)
-     */
     @Override
     public void output(File out,
                        Normalization<V> normalization,
@@ -93,7 +89,7 @@ public class ClustersPlusNoisePlusCorrelationAnalysis<V extends RealVector<V, ?>
             String marker;
             if (c < clustersAndNoise.length - 1) {
                 marker = CLUSTER_MARKER
-                         + Format.format(c + 1, clustersAndNoise.length - 1);
+                    + Format.format(c + 1, clustersAndNoise.length - 1);
             }
             else {
                 marker = NOISE_MARKER;
@@ -101,7 +97,7 @@ public class ClustersPlusNoisePlusCorrelationAnalysis<V extends RealVector<V, ?>
             PrintStream markedOut;
             try {
                 File markedFile = new File(out.getAbsolutePath()
-                                           + File.separator + marker);
+                    + File.separator + marker);
                 markedFile.getParentFile().mkdirs();
                 markedOut = new PrintStream(new FileOutputStream(markedFile));
             }
@@ -144,8 +140,8 @@ public class ClustersPlusNoisePlusCorrelationAnalysis<V extends RealVector<V, ?>
             LinearEquationSystem printSolution = correlationAnalysisSolution.getNormalizedLinearEquationSystem(normalization);
             writeHeader(out, settings, null);
             out.println("### "
-                        + correlationAnalysisSolution.getClass().getSimpleName()
-                        + ":");
+                + correlationAnalysisSolution.getClass().getSimpleName()
+                + ":");
             out.println(printSolution.equationsToString("###  ", nf.getMaximumFractionDigits()));
             out
                 .println("################################################################################");
@@ -157,8 +153,8 @@ public class ClustersPlusNoisePlusCorrelationAnalysis<V extends RealVector<V, ?>
                 v = normalization.restore(v);
             }
             out.println(v.toString()
-                        + SEPARATOR
-                        + db.getAssociation(AssociationID.LABEL,
+                + SEPARATOR
+                + db.getAssociation(AssociationID.LABEL,
                 clustersAndNoise[clusterIndex][i]));
         }
     }

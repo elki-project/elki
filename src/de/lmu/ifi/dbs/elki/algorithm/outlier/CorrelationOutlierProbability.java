@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
-import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator;
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.result.CorrelationAnalysisSolution;
@@ -75,9 +74,6 @@ public class CorrelationOutlierProbability<V extends RealVector<V, ?>> extends D
         addOption(K_PARAM);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#runInTime(Database)
-     */
     protected void runInTime(Database<V> database) throws IllegalStateException {
         getDistanceFunction().setDatabase(database, isVerbose(), isTime());
         if (isVerbose()) {
@@ -143,9 +139,6 @@ public class CorrelationOutlierProbability<V extends RealVector<V, ?>> extends D
         result = new COPVerboseResult<V>(database);
     }
 
-    /**
-     * @see Algorithm#getDescription()
-     */
     public Description getDescription() {
         return new Description("COP", "Correlation Outlier Probability", "Algorithm to compute correlation-based local outlier probabilitys in a database based on the parameter " + K_PARAM + " and different distance functions", "unpublished");
     }
@@ -170,9 +163,6 @@ public class CorrelationOutlierProbability<V extends RealVector<V, ?>> extends D
         return remainingParameters;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getResult()
-     */
     public Result<V> getResult() {
         return result;
     }

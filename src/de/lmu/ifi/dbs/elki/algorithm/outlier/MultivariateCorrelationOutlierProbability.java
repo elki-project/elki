@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
-import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.MultivariateModelDerivator;
 import de.lmu.ifi.dbs.elki.algorithm.result.MultivariateModel;
@@ -72,9 +71,6 @@ public class MultivariateCorrelationOutlierProbability<V extends RealVector<V, ?
         addOption(K_PARAM);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#runInTime(Database)
-     */
     protected void runInTime(Database<V> database) throws IllegalStateException {
         getDistanceFunction().setDatabase(database, isVerbose(), isTime());
         if (isVerbose()) {
@@ -115,9 +111,6 @@ public class MultivariateCorrelationOutlierProbability<V extends RealVector<V, ?
         result = new MCOPResult<V>(database);
     }
 
-    /**
-     * @see Algorithm#getDescription()
-     */
     public Description getDescription() {
         return new Description("MCOP", "Multivariate Correlation Outlier Probability", "Algorithm to compute multivariate correlation-based outlier probability in a database based on the parameter " + K_PARAM + " and different distance functions", "unpublished");
     }
@@ -140,9 +133,6 @@ public class MultivariateCorrelationOutlierProbability<V extends RealVector<V, ?
         return remainingParameters;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getResult()
-     */
     public Result<V> getResult() {
         return result;
     }

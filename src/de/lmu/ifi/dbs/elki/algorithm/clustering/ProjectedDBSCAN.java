@@ -178,9 +178,6 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
         optionHandler.setGlobalParameterConstraint(con);
     }
 
-    /**
-     * @see AbstractAlgorithm#runInTime(Database)
-     */
     @Override
     protected void runInTime(Database<V> database) throws IllegalStateException {
         if (isVerbose()) {
@@ -433,9 +430,6 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
      */
     public abstract Class<?> preprocessorClass();
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getResult()
-     */
     public ClustersPlusNoise<V> getResult() {
         return result;
     }

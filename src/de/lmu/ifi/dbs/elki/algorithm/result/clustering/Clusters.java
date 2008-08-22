@@ -18,7 +18,12 @@ import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Provides a result of a clustering-algorithm that computes several clusters.
@@ -66,9 +71,6 @@ public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implem
     }
 
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.result.clustering.ClusteringResult#getClusters()
-     */
     @SuppressWarnings("unchecked")
     public Cluster<O>[] getClusters() {
         Cluster<O>[] clusters = new Cluster[this.clusters.length];
@@ -82,9 +84,6 @@ public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implem
     }
 
 
-    /**
-     * @see Result#output(File,Normalization,List)
-     */
     @Override
     public void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         for (int c = 0; c < this.clusters.length; c++) {
@@ -110,10 +109,6 @@ public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implem
 
     }
 
-    /**
-     * @see Result#output(java.io.PrintStream,
-     *de.lmu.ifi.dbs.elki.normalization.Normalization,java.util.List)
-     */
     public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         for (int c = 0; c < this.clusters.length; c++) {
             String marker = CLUSTER_MARKER + format(c + 1, clusters.length - 1);
@@ -213,9 +208,6 @@ public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implem
         return clusters;
     }
 
-    /**
-     * @see ClusteringResult#associate(Class)
-     */
     public <L extends ClassLabel<L>> Database<O> associate(Class<L> classLabel) {
         try {
             for (int clusterID = 0; clusterID < clusters.length; clusterID++) {
@@ -236,9 +228,6 @@ public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implem
 
     }
 
-    /**
-     * @see ClusteringResult#clustering(Class)
-     */
     public <L extends ClassLabel<L>> Map<L, Database<O>> clustering(Class<L> classLabel) {
         Map<Integer, List<Integer>> partitions = new HashMap<Integer, List<Integer>>();
         for (int clusterID = 0; clusterID < clusters.length; clusterID++) {
@@ -263,18 +252,10 @@ public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implem
         return map;
     }
 
-    /**
-     * @see ClusteringResult#appendModel(ClassLabel,
-     *de.lmu.ifi.dbs.elki.algorithm.result.Result)
-     */
     public <L extends ClassLabel<L>> void appendModel(L clusterID, Result<O> model) {
         clusterToModel.put(classLabelToClusterID(clusterID), model);
     }
 
-
-    /**
-     * @see ClusteringResult#noise()
-     */
     public Database<O> noise() {
         try {
             Map<Integer, List<Integer>> partitions = new HashMap<Integer, List<Integer>>();

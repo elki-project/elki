@@ -70,9 +70,6 @@ public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends D
         addOption(K_PARAM);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getDescription()
-     */
     public Description getDescription() {
         return new Description("K-Means",
             "K-Means",
@@ -81,17 +78,12 @@ public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends D
                 "In 5th Berkeley Symp. Math. Statist. Prob., Vol. 1, 1967, pp 281-297");
     }
 
-    /**
-     * @see Clustering#getResult()
-     */
     public Clusters<V> getResult() {
         return result;
     }
 
     /**
      * Performs the k-means algorithm on the given database.
-     *
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
     @Override
     protected void runInTime(Database<V> database) throws IllegalStateException {

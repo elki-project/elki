@@ -103,9 +103,6 @@ public class HierarchicalClusters<C extends HierarchicalCluster<C>, O extends Da
         }
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.result.Result#output(java.io.File,de.lmu.ifi.dbs.elki.normalization.Normalization,java.util.List)
-     */
     @Override
     public void output(File dir, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         dir.mkdirs();

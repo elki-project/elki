@@ -58,8 +58,6 @@ public class AprioriResult extends AbstractResult<BitVector> {
     /**
      * Prints the frequent itemsets annotating their reqpective frequency.
      * Parameter normalization will remain unused.
-     *
-     * @see Result#output(File,Normalization,List)
      */
     @Override
     public void output(File out, Normalization<BitVector> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
@@ -73,9 +71,6 @@ public class AprioriResult extends AbstractResult<BitVector> {
         output(outStream, normalization, settings);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.result.Result#output(java.io.PrintStream,de.lmu.ifi.dbs.elki.normalization.Normalization,java.util.List)
-     */
     public void output(PrintStream outStream, Normalization<BitVector> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         writeHeader(outStream, settings, null);
 

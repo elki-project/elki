@@ -212,7 +212,6 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
     /**
      * Performs the CASH algorithm on the given database.
      *
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
     protected void runInTime(Database<ParameterizationFunction> database) throws IllegalStateException {
         this.database = database;

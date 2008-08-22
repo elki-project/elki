@@ -78,9 +78,6 @@ public class LOFResult<O extends DatabaseObject> extends AbstractResult<O> {
         this.nnTable = nnTable;
     }
 
-    /**
-     * @see AbstractResult#output(java.io.File,de.lmu.ifi.dbs.elki.normalization.Normalization,java.util.List)
-     */
     public void output(File out, Normalization<O> normalization,
                        List<AttributeSettings> settings) throws UnableToComplyException {
         PrintStream outStream;
@@ -109,9 +106,6 @@ public class LOFResult<O extends DatabaseObject> extends AbstractResult<O> {
         }
     }
 
-    /**
-     * @see AbstractResult#output(java.io.PrintStream,de.lmu.ifi.dbs.elki.normalization.Normalization,java.util.List)
-     */
     public void output(PrintStream outStream, Normalization<O> normalization,
                        List<AttributeSettings> settings) throws UnableToComplyException {
 
@@ -127,7 +121,8 @@ public class LOFResult<O extends DatabaseObject> extends AbstractResult<O> {
      *                      - may remain null.
      * @param settings      the settings to be written into the header, if this parameter is <code>null</code>,
      *                      no header will be written
-     * @throws de.lmu.ifi.dbs.elki.utilities.UnableToComplyException if an error during normalization occurs
+     * @throws de.lmu.ifi.dbs.elki.utilities.UnableToComplyException
+     *          if an error during normalization occurs
      */
     private void outputLOF(PrintStream outStream, Normalization<O> normalization,
                            List<AttributeSettings> settings) throws UnableToComplyException {

@@ -76,7 +76,6 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
      *
      * @throws IllegalStateException if the specifiied database is not an instance of {@link SpatialIndexDatabase}
      *                               or the specified distance function is not an instance of {@link SpatialDistanceFunction}.
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
     protected void runInTime(Database<V> database) throws IllegalStateException {
         if (!(database instanceof SpatialIndexDatabase)) {

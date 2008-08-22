@@ -45,7 +45,6 @@ public class FIRES<V extends RealVector<V, Double>> extends AbstractAlgorithm<V>
     /**
      * Performs the FIRES algorithm on the given database.
      *
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#run(de.lmu.ifi.dbs.elki.database.Database)
      */
     protected void runInTime(Database<V> database) throws IllegalStateException {
         if (database.size() == 0) {
@@ -91,10 +90,6 @@ public class FIRES<V extends RealVector<V, Double>> extends AbstractAlgorithm<V>
 
     }
 
-
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getDescription()
-     */
     public Description getDescription() {
         return new Description("FIRES",
             "FIRES",
@@ -104,9 +99,6 @@ public class FIRES<V extends RealVector<V, Double>> extends AbstractAlgorithm<V>
                 "In: Proc. 5th IEEE International Conference on Data Mining (ICDM), Houston, TX, 2005.");
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getResult()
-     */
     public ClusteringResult<V> getResult() {
         // TODO arthur
         return null;

@@ -90,9 +90,6 @@ public class MultivariateModelDerivator<V extends RealVector<V, ?>, D extends Di
         addOption(RANDOM_SAMPLE_FLAG);
     }
 
-    /**
-     * @see Algorithm#getDescription()
-     */
     public Description getDescription() {
         return new Description("MultivariateLocalModel", "Deriving a multivariate model of the data", "Derives a multivariate Gaussian model using PCA to decorrelate data.", "unpublished");
     }
@@ -102,7 +99,6 @@ public class MultivariateModelDerivator<V extends RealVector<V, ?>, D extends Di
      * query.
      *
      * @param db the database
-     * @see AbstractAlgorithm#runInTime(Database)
      */
     @Override
     public void runInTime(Database<V> db) throws IllegalStateException {
@@ -173,9 +169,6 @@ public class MultivariateModelDerivator<V extends RealVector<V, ?>, D extends Di
         return solution;
     }
 
-    /**
-     * @see Algorithm#getResult()
-     */
     public MultivariateModel<V> getResult() {
         return solution;
     }

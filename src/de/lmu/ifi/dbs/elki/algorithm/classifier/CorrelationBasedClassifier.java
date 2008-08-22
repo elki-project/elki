@@ -42,9 +42,6 @@ public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Di
     // todo arthur comment
     private CorrelationAnalysisSolution<V>[] model;
 
-    /**
-     * @see Classifier#buildClassifier(de.lmu.ifi.dbs.elki.database.Database,de.lmu.ifi.dbs.elki.data.ClassLabel[])
-     */
     @SuppressWarnings("unchecked")
     public void buildClassifier(Database<V> database, L[] classLabels) throws IllegalStateException {
         setLabels(classLabels);
@@ -100,9 +97,6 @@ public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Di
         return density;
     }
 
-    /**
-     * @see Classifier#classDistribution(de.lmu.ifi.dbs.elki.data.DatabaseObject)
-     */
     public double[] classDistribution(V instance) throws IllegalStateException {
         double[] distribution = new double[this.model.length];
         double sumOfDensities = 0.0;
@@ -117,9 +111,6 @@ public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Di
         return distribution;
     }
 
-    /**
-     * @see Classifier#model()
-     */
     public String model() {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         PrintStream printStream = new PrintStream(stream);
@@ -137,9 +128,6 @@ public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Di
         return stream.toString();
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getDescription()
-     */
     public Description getDescription() {
         return new Description("CorrelationBasedClassifier",
             "CorrelationBasedClassifier", "...", "unpublished");

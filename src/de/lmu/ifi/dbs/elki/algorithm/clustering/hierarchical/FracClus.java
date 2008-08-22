@@ -60,16 +60,10 @@ public class FracClus<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         addOption(NUMBER_OF_SUPPORTERS_PARAM);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getResult()
-     */
     public HierarchicalClusters<HierarchicalFractalDimensionCluster<V>, V> getResult() {
         return result;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.elki.database.Database)
-     */
     protected void runInTime(Database<V> database) throws IllegalStateException {
         List<HierarchicalFractalDimensionCluster<V>> clusters = new ArrayList<HierarchicalFractalDimensionCluster<V>>();
         if (this.isVerbose()) {
@@ -136,9 +130,6 @@ public class FracClus<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         return remainingParameters;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.algorithm.Algorithm#getDescription()
-     */
     public Description getDescription() {
         return new Description("FracClus", "Fractal Dimension based Clustering", "", "unpublished");
     }
