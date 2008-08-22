@@ -51,24 +51,16 @@ public class VectorListParameter extends ListParameter<List<Double>> {
 
     }
 
-    /* (non-Javadoc)
-      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Option#setValue(java.lang.String)
-      */
     public void setValue(String value) throws ParameterException {
-
         if (isValid(value)) {
-
             String[] vectors = VECTOR_SPLIT.split(value);
-
             ArrayList<List<Double>> vecs = new ArrayList<List<Double>>();
 
-            for (int c = 0; c < vectors.length; c++) {
-                String[] coordinates = SPLIT.split(vectors[c]);
-
+            for (String vector : vectors) {
+                String[] coordinates = SPLIT.split(vector);
                 ArrayList<Double> vectorCoord = new ArrayList<Double>();
-                for (int d = 0; d < coordinates.length; d++) {
-
-                    vectorCoord.add(Double.parseDouble(coordinates[d]));
+                for (String coordinate : coordinates) {
+                    vectorCoord.add(Double.parseDouble(coordinate));
                 }
                 vecs.add(vectorCoord);
             }
@@ -94,9 +86,6 @@ public class VectorListParameter extends ListParameter<List<Double>> {
         return sizes;
     }
 
-    /* (non-Javadoc)
-      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Option#isValid(java.lang.String)
-      */
     public boolean isValid(String value) throws ParameterException {
 
         String[] vectors = VECTOR_SPLIT.split(value);
@@ -110,18 +99,18 @@ public class VectorListParameter extends ListParameter<List<Double>> {
         }
 
         List<List<Double>> vecList = new ArrayList<List<Double>>();
-        for (int c = 0; c < vectors.length; c++) {
-            String[] coordinates = SPLIT.split(vectors[c]);
+        for (String vector : vectors) {
+            String[] coordinates = SPLIT.split(vector);
             ArrayList<Double> list = new ArrayList<Double>();
 
-            for (int d = 0; d < coordinates.length; d++) {
+            for (String coordinate : coordinates) {
                 try {
-                    Double.parseDouble(coordinates[d]);
-                    list.add(Double.parseDouble(coordinates[d]));
+                    Double.parseDouble(coordinate);
+                    list.add(Double.parseDouble(coordinate));
                 }
                 catch (NumberFormatException e) {
                     throw new WrongParameterValueException(
-                        "Wrong parameter format! Coordinates of vector \"" + vectors[c]
+                        "Wrong parameter format! Coordinates of vector \"" + vector
                             + "\" are not valid!");
                 }
             }
@@ -139,7 +128,6 @@ public class VectorListParameter extends ListParameter<List<Double>> {
      * Returns a string representation of the parameter's type.
      *
      * @return &quot;&lt;double_11,...,double_1n:...:double_m1,...,double_mn&gt;&quot;
-     * @see Parameter#getParameterType()
      */
     protected String getParameterType() {
         return "<double_11,...,double_1n:...:double_m1,...,double_mn>";

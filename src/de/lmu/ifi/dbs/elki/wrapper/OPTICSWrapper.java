@@ -77,9 +77,7 @@ public class OPTICSWrapper extends NormalizationWrapper {
         optionHandler.put(MINPTS_PARAM);
     }
 
-    /**
-     * @see KDDTaskWrapper#getKDDTaskParameters()
-     */
+    @Override
     public List<String> getKDDTaskParameters() {
         List<String> parameters = super.getKDDTaskParameters();
 

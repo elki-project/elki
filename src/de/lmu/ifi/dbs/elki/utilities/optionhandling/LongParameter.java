@@ -71,9 +71,6 @@ public class LongParameter extends NumberParameter<Long> {
         addConstraintList(cons);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Option#isValid(java.lang.String)
-     */
     public boolean isValid(String value) throws ParameterException {
         try {
             Long.parseLong(value);
@@ -96,9 +93,6 @@ public class LongParameter extends NumberParameter<Long> {
         return true;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Option#setValue(java.lang.String)
-     */
     public void setValue(String value) throws ParameterException {
         if (isValid(value)) {
             this.value = Long.parseLong(value);
@@ -109,7 +103,6 @@ public class LongParameter extends NumberParameter<Long> {
      * Returns a string representation of the parameter's type.
      *
      * @return &quot;&lt;long&gt;&quot;
-     * @see Parameter#getParameterType()
      */
     protected String getParameterType() {
         return "<long>";

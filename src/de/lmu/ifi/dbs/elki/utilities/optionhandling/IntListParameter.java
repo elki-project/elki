@@ -39,9 +39,6 @@ public class IntListParameter extends ListParameter<Integer> {
         addConstraint(con);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Option#setValue(String)
-     */
     public void setValue(String value) throws ParameterException {
         if (isValid(value)) {
             String[] values = SPLIT.split(value);
@@ -53,9 +50,6 @@ public class IntListParameter extends ListParameter<Integer> {
         }
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Option#isValid(java.lang.String)
-     */
     public boolean isValid(String value) throws ParameterException {
         String[] values = SPLIT.split(value);
         if (values.length == 0) {
@@ -97,7 +91,6 @@ public class IntListParameter extends ListParameter<Integer> {
      * Returns a string representation of the parameter's type.
      *
      * @return &quot;&lt;int_1,...,int_n&gt;&quot;
-     * @see Parameter#getParameterType()
      */
     protected String getParameterType() {
         return "<int_1,...,int_n>";

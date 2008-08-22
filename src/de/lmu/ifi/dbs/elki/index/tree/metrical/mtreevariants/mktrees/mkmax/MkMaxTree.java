@@ -3,12 +3,11 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkmax;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
-import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
-import de.lmu.ifi.dbs.elki.utilities.QueryStatistic;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
+import de.lmu.ifi.dbs.elki.utilities.QueryStatistic;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 
 import java.util.ArrayList;
@@ -58,8 +57,6 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
      * In the first step the candidates are chosen by performing
      * a reverse k-nearest neighbor query with k = {@link #k_max}. Then
      * these candidates are refined in a second step.
-     *
-     * @see de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex#reverseKNNQuery(de.lmu.ifi.dbs.elki.data.DatabaseObject,int)
      */
     public List<QueryResult<D>> reverseKNNQuery(O object, int k) {
         if (k > this.k_max) {
@@ -121,11 +118,9 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
     }
 
     /**
-     * Calls
-     * {@link #preInsert(MkMaxEntry,MkMaxEntry,de.lmu.ifi.dbs.elki.utilities.KNNList)}
-     * to adapt the knn distances before insertion of the specified entry.
+     * Adapts the knn distances before insertion of the specified entry.
      *
-     * @see de.lmu.ifi.dbs.elki.index.tree.TreeIndex#preInsert(de.lmu.ifi.dbs.elki.index.tree.Entry)
+     * @see #preInsert(MkMaxEntry,MkMaxEntry,de.lmu.ifi.dbs.elki.utilities.KNNList)
      */
     protected void preInsert(MkMaxEntry<D> entry) {
         KNNList<D> knns_o = new KNNList<D>(k_max, getDistanceFunction().infiniteDistance());
@@ -134,8 +129,6 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
 
     /**
      * Adjusts the knn distance in the subtree of the specified root entry.
-     *
-     * @see de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree#kNNdistanceAdjustment(de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry,java.util.Map)
      */
     protected void kNNdistanceAdjustment(MkMaxEntry<D> entry, Map<Integer, KNNList<D>> knnLists) {
         MkMaxTreeNode<O, D> node = file.readPage(entry.getID());
@@ -274,9 +267,6 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
         nodeEntry.setKnnDistance(knnDist_node);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.tree.TreeIndex#initializeCapacities(de.lmu.ifi.dbs.elki.data.DatabaseObject,boolean)
-     */
     protected void initializeCapacities(O object, boolean verbose) {
         D dummyDistance = getDistanceFunction().nullDistance();
         int distanceSize = dummyDistance.externalizableSize();
@@ -314,7 +304,6 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
 
     /**
      * @return a new MkMaxTreeNode which is a leaf node
-     * @see de.lmu.ifi.dbs.elki.index.tree.TreeIndex#createNewLeafNode(int)
      */
     protected MkMaxTreeNode<O, D> createNewLeafNode(int capacity) {
         return new MkMaxTreeNode<O, D>(file, capacity, true);
@@ -322,7 +311,6 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
 
     /**
      * @return a new MkMaxTreeNode which is a directory node
-     * @see de.lmu.ifi.dbs.elki.index.tree.TreeIndex#createNewDirectoryNode(int)
      */
     protected MkMaxTreeNode<O, D> createNewDirectoryNode(int capacity) {
         return new MkMaxTreeNode<O, D>(file, capacity, false);
@@ -330,7 +318,6 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
 
     /**
      * @return a new MkMaxLeafEntry representing the specified data object
-     * @see AbstractMTree#createNewLeafEntry(DatabaseObject,Distance)
      */
     protected MkMaxEntry<D> createNewLeafEntry(O object, D parentDistance) {
         KNNList<D> knns = new KNNList<D>(k_max - 1, getDistanceFunction().infiniteDistance());
@@ -341,7 +328,6 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
 
     /**
      * @return a new MkMaxDirectoryEntry representing the specified node
-     * @see AbstractMTree#createNewDirectoryEntry(de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode,Integer,Distance)
      */
     protected MkMaxEntry<D> createNewDirectoryEntry(MkMaxTreeNode<O, D> node, Integer routingObjectID, D parentDistance) {
         return new MkMaxDirectoryEntry<D>(
@@ -355,7 +341,6 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
     /**
      * @return a new MkMaxDirectoryEntry by calling
      *         <code>new MkMaxDirectoryEntry<D>(null, null, 0, null)</code>
-     * @see de.lmu.ifi.dbs.elki.index.tree.TreeIndex#createRootEntry()
      */
     protected MkMaxEntry<D> createRootEntry() {
         return new MkMaxDirectoryEntry<D>(null, null, 0, null, null);

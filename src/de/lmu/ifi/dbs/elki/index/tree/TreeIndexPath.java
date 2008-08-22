@@ -149,7 +149,6 @@ public class TreeIndexPath<E extends Entry> {
      * the same components (<code>.equals</code>),
      * <code>false</code> otherwise.
      *
-     * @see Object#equals(Object)
      * @see de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent#equals(Object)
      */
     public boolean equals(Object o) {

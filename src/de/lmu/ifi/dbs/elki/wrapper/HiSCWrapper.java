@@ -74,9 +74,7 @@ public class HiSCWrapper extends FileBasedDatabaseConnectionWrapper {
         optionHandler.put(alpha);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.wrapper.KDDTaskWrapper#getKDDTaskParameters()
-     */
+    @Override
     public List<String> getKDDTaskParameters() {
         List<String> parameters = super.getKDDTaskParameters();
 
@@ -114,9 +112,7 @@ public class HiSCWrapper extends FileBasedDatabaseConnectionWrapper {
         return parameters;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 

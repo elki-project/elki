@@ -61,18 +61,12 @@ public class FileParameter extends Parameter<File, Object> {
         this.fileType = fileType;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Option#setValue(java.lang.String)
-     */
     public void setValue(String value) throws ParameterException {
         if (isValid(value)) {
             this.value = new File(value);
         }
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Option#isValid(java.lang.String)
-     */
     public boolean isValid(String value) throws ParameterException {
         if (value == null) {
             throw new WrongParameterValueException("Parameter \"" + getName()
@@ -99,7 +93,6 @@ public class FileParameter extends Parameter<File, Object> {
      * Returns a string representation of the parameter's type.
      *
      * @return &quot;&lt;file_&gt;&quot;
-     * @see Parameter#getParameterType()
      */
     protected String getParameterType() {
         return "<file>";

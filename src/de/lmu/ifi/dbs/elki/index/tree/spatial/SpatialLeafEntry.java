@@ -39,8 +39,6 @@ public class SpatialLeafEntry extends AbstractEntry implements SpatialEntry {
   }
 
   /**
-   * @see de.lmu.ifi.dbs.elki.index.tree.Entry#isLeafEntry()
-   *
    * @return true
    */
   public boolean isLeafEntry() {
@@ -49,7 +47,6 @@ public class SpatialLeafEntry extends AbstractEntry implements SpatialEntry {
 
   /**
    * @return a MBR consisting of the values array
-   * @see de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry#getMBR()
    */
   public HyperBoundingBox getMBR() {
     return new HyperBoundingBox(values, values);
@@ -59,22 +56,17 @@ public class SpatialLeafEntry extends AbstractEntry implements SpatialEntry {
    * Throws an UnsupportedOperationException
    *
    * @throws UnsupportedOperationException
-   * @see de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry#setMBR(HyperBoundingBox)
    */
   public void setMBR(HyperBoundingBox mbr) {
     throw new UnsupportedOperationException("This entry is a leaf entry!");
   }
 
-  /**
-   * @see SpatialComparable#getDimensionality()
-   */
   public int getDimensionality() {
     return values.length;
   }
 
   /**
    * @return the value at the specified dimension
-   * @see SpatialComparable#getMin(int)
    */
   public double getMin(int dimension) {
     return values[dimension - 1];
@@ -82,7 +74,6 @@ public class SpatialLeafEntry extends AbstractEntry implements SpatialEntry {
 
   /**
    * @return the value at the specified dimension
-   * @see SpatialComparable#getMax(int)
    */
   public double getMax(int dimension) {
     return values[dimension - 1];

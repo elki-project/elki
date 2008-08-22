@@ -87,7 +87,6 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
      * deletion of objects is not yet supported by an M-Tree.
      *
      * @throws UnsupportedOperationException
-     * @see de.lmu.ifi.dbs.elki.index.Index#delete(de.lmu.ifi.dbs.elki.data.DatabaseObject)
      */
     public final boolean delete(O o) {
         throw new UnsupportedOperationException("Deletion of objects is not yet supported by an M-Tree!");
@@ -98,15 +97,11 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
      * deletion of objects is not yet supported by an M-Tree.
      *
      * @throws UnsupportedOperationException
-     * @see de.lmu.ifi.dbs.elki.index.tree.TreeIndex#postDelete(de.lmu.ifi.dbs.elki.data.DatabaseObject)
      */
     protected final void postDelete(O o) {
         throw new UnsupportedOperationException("Deletion of objects is not yet supported by an M-Tree!");
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex#rangeQuery(de.lmu.ifi.dbs.elki.data.DatabaseObject,String)
-     */
     public final List<QueryResult<D>> rangeQuery(O object, String epsilon) {
         D range = distanceFunction.valueOf(epsilon);
         final List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
@@ -118,9 +113,6 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
         return result;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex#kNNQuery(de.lmu.ifi.dbs.elki.data.DatabaseObject,int)
-     */
     public final List<QueryResult<D>> kNNQuery(O object, int k) {
         if (k < 1) {
             throw new IllegalArgumentException("At least one object has to be requested!");
@@ -131,9 +123,6 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
         return knnList.toList();
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex#getDistanceFunction()
-     */
     public final DistanceFunction<O, D> getDistanceFunction() {
         return distanceFunction;
     }
@@ -207,8 +196,6 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
      * and instantiates {@link #distanceFunction} according to the value of parameter
      * {@link #DISTANCE_FUNCTION_PARAM}.
      * The remaining parameters are passed to the {@link #distanceFunction}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
@@ -234,9 +221,6 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
         return attributeSettings;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.Index#setDatabase(de.lmu.ifi.dbs.elki.database.Database)
-     */
     public final void setDatabase(Database<O> database) {
         distanceFunction.setDatabase(database, false, false);
     }
@@ -289,9 +273,6 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
         }
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.tree.TreeIndex#createEmptyRoot(de.lmu.ifi.dbs.elki.data.DatabaseObject)
-     */
     protected final void createEmptyRoot(O object) {
         N root = createNewLeafNode(leafCapacity);
         file.writePage(root);

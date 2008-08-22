@@ -59,9 +59,6 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
         this.isLeaf = isLeaf;
     }
 
-    /**
-     * @see Node#children(TreeIndexPath)
-     */
     public final Enumeration<TreeIndexPath<E>> children(final TreeIndexPath<E> parentPath) {
         return new Enumeration<TreeIndexPath<E>>() {
             int count = 0;
@@ -82,33 +79,21 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
         };
     }
 
-    /**
-     * @see Node#getNumEntries()
-     */
     public final int getNumEntries() {
         return numEntries;
     }
 
-    /**
-     * @see Node#isLeaf()
-     */
     public final boolean isLeaf() {
         return isLeaf;
     }
 
-    /**
-     * @see Node#getEntry(int)
-     */
     public final E getEntry(int index) {
         return entries[index];
     }
 
     /**
-     * Writes the id of this node, the numEntries and the entries array to the
+     * Calls the super method and writes the id of this node, the numEntries and the entries array to the
      * specified stream.
-     *
-     * @param out the stream to write the object to
-     * @throws java.io.IOException Includes any I/O exceptions that may occur
      */
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);

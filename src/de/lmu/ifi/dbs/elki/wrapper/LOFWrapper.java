@@ -60,9 +60,7 @@ public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
         addOption(MINPTS_PARAM);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.wrapper.KDDTaskWrapper#getKDDTaskParameters()
-     */
+    @Override
     public List<String> getKDDTaskParameters() {
         List<String> parameters = super.getKDDTaskParameters();
 

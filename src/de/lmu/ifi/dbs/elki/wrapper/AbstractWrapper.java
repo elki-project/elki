@@ -64,7 +64,6 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
      * and sets additionally the values of the flags
      * {@link #VERBOSE_FLAG} and {@link #HELP_FLAG}.
      *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

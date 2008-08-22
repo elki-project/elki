@@ -98,9 +98,6 @@ public class DeLiCluWrapper extends NormalizationWrapper {
         addOption(CACHE_SIZE_PARAM);
     }
 
-    /**
-     * @see KDDTaskWrapper#getKDDTaskParameters()
-     */
     public List<String> getKDDTaskParameters() {
         List<String> parameters = super.getKDDTaskParameters();
 

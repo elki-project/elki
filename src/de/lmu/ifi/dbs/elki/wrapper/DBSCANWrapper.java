@@ -83,9 +83,6 @@ public class DBSCANWrapper extends NormalizationWrapper {
         addOption(MINPTS_PARAM);
     }
 
-    /**
-     * @see KDDTaskWrapper#getKDDTaskParameters()
-     */
     public List<String> getKDDTaskParameters() {
         List<String> parameters = super.getKDDTaskParameters();
 

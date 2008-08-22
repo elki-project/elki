@@ -85,9 +85,6 @@ public class CLIQUEWrapper extends FileBasedDatabaseConnectionWrapper {
         addOption(PRUNE_FLAG);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.wrapper.KDDTaskWrapper#getKDDTaskParameters()
-     */
     public List<String> getKDDTaskParameters() {
         List<String> parameters = super.getKDDTaskParameters();
 

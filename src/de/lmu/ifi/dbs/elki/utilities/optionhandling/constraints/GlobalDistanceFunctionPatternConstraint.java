@@ -45,7 +45,6 @@ public class GlobalDistanceFunctionPatternConstraint<D extends DistanceFunction<
      * Tests if the pattern is valid for the distance function defined by the class parameter. If not so, a parameter exception
      * is thrown.
      *
-     * @see GlobalParameterConstraint#test()
      */
     public void test() throws ParameterException {
         if (restrictionClass.getRestrictionClass() == null) {
@@ -77,9 +76,6 @@ public class GlobalDistanceFunctionPatternConstraint<D extends DistanceFunction<
 
     }
 
-    /**
-     * @see GlobalParameterConstraint#getDescription()
-     */
     public String getDescription() {
         return "Pattern parameter " + pattern.getName() + " must be a valid pattern for " +
             "distance function parameter " + restrictionClass.getName() + ".";

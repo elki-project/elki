@@ -47,11 +47,9 @@ public abstract class StandAloneInputWrapper extends StandAloneWrapper {
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.wrapper.StandAloneWrapper#setParameters(String[]) StandAloneWrapper#setParameters(args)}
+     * Calls the super method
      * and sets additionally the value of the parameter
      * {@link #INPUT_PARAM}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

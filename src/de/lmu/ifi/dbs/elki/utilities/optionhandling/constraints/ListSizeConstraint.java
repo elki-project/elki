@@ -38,7 +38,6 @@ public class ListSizeConstraint<T> extends AbstractLoggable implements Parameter
      *
      * @throws ParameterException, if the size of the list parameter given is not
      *                             equal to the list size constraint specified.
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint#test(java.lang.Object)
      */
     public void test(List<T> t) throws ParameterException {
         if (t.size() != sizeConstraint) {
@@ -48,9 +47,6 @@ public class ListSizeConstraint<T> extends AbstractLoggable implements Parameter
         }
     }
 
-    /**
-     * @see ParameterConstraint#getDescription(String)
-     */
     public String getDescription(String parameterName) {
         return "size(" + parameterName + ") = " + sizeConstraint;
     }

@@ -128,18 +128,12 @@ public class IntParameter extends NumberParameter<Integer> {
         addConstraintList(constraints);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Option#setValue(String)
-     */
     public void setValue(String value) throws ParameterException {
         if (isValid(value)) {
             this.value = Integer.parseInt(value);
         }
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Option#isValid(java.lang.String)
-     */
     public boolean isValid(String value) throws ParameterException {
         try {
             Integer.parseInt(value);
@@ -165,7 +159,6 @@ public class IntParameter extends NumberParameter<Integer> {
      * Returns a string representation of the parameter's type.
      *
      * @return &quot;&lt;int&gt;&quot;
-     * @see Parameter#getParameterType()
      */
     protected String getParameterType() {
         return "<int>";

@@ -434,9 +434,6 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
     }
   }
 
-  /**
-   * @see TreeIndex#initializeCapacities(de.lmu.ifi.dbs.elki.data.DatabaseObject,boolean)
-   */
   protected void initializeCapacities(O object, boolean verbose) {
     int dimensionality = object.getDimensionality();
 

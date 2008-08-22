@@ -51,8 +51,6 @@ public class MkTreeHeader extends TreeIndexHeader {
      * TreeIndexHeader#readHeader(file)} and reads additionally the integer value of
      * {@link #k_max}
      * from the file.
-     *
-     * @see de.lmu.ifi.dbs.elki.persistent.PageHeader#readHeader(java.io.RandomAccessFile)
      */
     @Override
     public void readHeader(RandomAccessFile file) throws IOException {
@@ -66,8 +64,6 @@ public class MkTreeHeader extends TreeIndexHeader {
      * and writes additionally the integer value of
      * {@link #k_max}
      * to the file.
-     *
-     * @see de.lmu.ifi.dbs.elki.persistent.PageHeader#writeHeader(java.io.RandomAccessFile)
      */
     @Override
     public void writeHeader(RandomAccessFile file) throws IOException {
@@ -87,8 +83,6 @@ public class MkTreeHeader extends TreeIndexHeader {
     /**
      * Returns {@link de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader#size()}
      * plus the value of {@link #SIZE}).
-     *
-     * @see de.lmu.ifi.dbs.elki.persistent.PageHeader#size()
      */
     @Override
     public int size() {

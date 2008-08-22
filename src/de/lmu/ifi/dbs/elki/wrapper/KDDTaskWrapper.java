@@ -63,9 +63,6 @@ public abstract class KDDTaskWrapper<O extends DatabaseObject> extends AbstractW
         optionHandler.put(TIME_FLAG);
     }
 
-    /**
-     * @see Wrapper#run()
-     */
     public final void run() throws UnableToComplyException {
         try {
             List<String> parameters = getKDDTaskParameters();
@@ -113,9 +110,7 @@ public abstract class KDDTaskWrapper<O extends DatabaseObject> extends AbstractW
         return time;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
@@ -133,7 +128,7 @@ public abstract class KDDTaskWrapper<O extends DatabaseObject> extends AbstractW
     /**
      * Returns the parameters that are necessary to run the kdd task correctly.
      *
-     * @return the array containing the parametr setting that is necessary to
+     * @return the array containing the parameter setting that is necessary to
      *         run the kdd task correctly
      */
     public List<String> getKDDTaskParameters() {

@@ -139,7 +139,6 @@ public class AlgorithmTest extends AbstractParameterizable {
      * {@link #INPUT_PARAM}, and {@link #OUTPUT_PARAM}
      * and instantiates {@link #algorithms} according to the value of parameter {@link #ALGORITHMS_PARAM} .
      *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

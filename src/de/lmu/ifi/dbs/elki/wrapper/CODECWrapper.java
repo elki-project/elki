@@ -101,9 +101,6 @@ public class CODECWrapper extends NormalizationWrapper {
         optionHandler.setGlobalParameterConstraint(gpc);
     }
 
-    /**
-     * @see KDDTaskWrapper#getKDDTaskParameters()
-     */
     public List<String> getKDDTaskParameters() {
         List<String> parameters = super.getKDDTaskParameters();
 

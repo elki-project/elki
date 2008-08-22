@@ -59,10 +59,6 @@ public class ClassListParameter<C> extends ListParameter<String> {
         this.restrictionClass = restrictionClass;
     }
 
-
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Option#setValue(String)
-     */
     public void setValue(String value) throws ParameterException {
         if (isValid(value)) {
             String[] classes = SPLIT.split(value);
@@ -83,9 +79,6 @@ public class ClassListParameter<C> extends ListParameter<String> {
         return new String[]{};
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Option#isValid(java.lang.String)
-     */
     public boolean isValid(String value) throws ParameterException {
         String[] classes = SPLIT.split(value);
         if (classes.length == 0) {
@@ -110,7 +103,6 @@ public class ClassListParameter<C> extends ListParameter<String> {
      * Returns a string representation of the parameter's type.
      *
      * @return &quot;&lt;class_1,...,class_n&gt;&quot;
-     * @see Parameter#getParameterType()
      */
     protected String getParameterType() {
         return "<class_1,...,class_n>";

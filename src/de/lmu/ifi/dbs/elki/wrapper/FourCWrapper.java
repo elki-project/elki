@@ -118,9 +118,7 @@ public class FourCWrapper extends NormalizationWrapper {
         optionHandler.put(absolute);
     }
 
-    /**
-     * @see KDDTaskWrapper#getKDDTaskParameters()
-     */
+    @Override
     public List<String> getKDDTaskParameters() {
         List<String> parameters = super.getKDDTaskParameters();
 

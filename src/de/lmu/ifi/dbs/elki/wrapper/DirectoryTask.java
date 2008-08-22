@@ -100,11 +100,9 @@ public class DirectoryTask extends StandAloneInputWrapper {
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.wrapper.StandAloneInputWrapper#setParameters(String[]) StandAloneInputWrapper#setParameters(args)}
+     * Calls the super method
      * and instantiates {@link #wrapper} according to the value of parameter
      * {@link #WRAPPER_PARAM}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

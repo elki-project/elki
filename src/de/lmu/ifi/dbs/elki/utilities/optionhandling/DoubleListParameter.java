@@ -39,9 +39,6 @@ public class DoubleListParameter extends ListParameter<Double> {
         addConstraint(con);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Option#setValue(String)
-     */
     public void setValue(String value) throws ParameterException {
         if (isValid(value)) {
             String[] values = SPLIT.split(value);
@@ -53,9 +50,6 @@ public class DoubleListParameter extends ListParameter<Double> {
         }
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Option#isValid(java.lang.String)
-     */
     public boolean isValid(String value) throws ParameterException {
         String[] values = SPLIT.split(value);
         if (values.length == 0) {
@@ -99,7 +93,6 @@ public class DoubleListParameter extends ListParameter<Double> {
      * Returns a string representation of the parameter's type.
      *
      * @return &quot;&lt;double_1,...,double_n&gt;&quot;
-     * @see Parameter#getParameterType()
      */
     protected String getParameterType() {
         return "<double_1,...,double_n>";

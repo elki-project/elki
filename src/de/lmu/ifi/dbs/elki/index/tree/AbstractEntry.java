@@ -52,8 +52,6 @@ public abstract class AbstractEntry implements Entry {
     /**
      * Writes the id of the object (node or data object) that is
      * represented by this entry to the specified stream.
-     *
-     * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
      */
     public void writeExternal(ObjectOutput out) throws IOException {
         out.write(id);
@@ -62,8 +60,6 @@ public abstract class AbstractEntry implements Entry {
     /**
      * Restores the id of the object (node or data object) that is
      * represented by this entry from the specified stream.
-     *
-     * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
      */
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         this.id = in.readInt();

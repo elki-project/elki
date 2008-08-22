@@ -40,7 +40,6 @@ class MkMaxTreeNode<O extends DatabaseObject, D extends Distance<D>>
 
     /**
      * @return a new MkMaxTreeNode which is a leaf node
-     * @see de.lmu.ifi.dbs.elki.index.tree.AbstractNode#createNewLeafNode(int)
      */
     protected MkMaxTreeNode<O, D> createNewLeafNode(int capacity) {
         return new MkMaxTreeNode<O, D>(getFile(), capacity, true);
@@ -48,7 +47,6 @@ class MkMaxTreeNode<O extends DatabaseObject, D extends Distance<D>>
 
     /**
      * @return a new MkMaxTreeNode which is a directory node
-     * @see de.lmu.ifi.dbs.elki.index.tree.AbstractNode#createNewDirectoryNode(int)
      */
     protected MkMaxTreeNode<O, D> createNewDirectoryNode(int capacity) {
         return new MkMaxTreeNode<O, D>(getFile(), capacity, false);
@@ -74,8 +72,6 @@ class MkMaxTreeNode<O extends DatabaseObject, D extends Distance<D>>
      * Calls the super method
      * and adjust additionally the k-nearest neighbor distance of this node
      * as the maximum of the k-nearest neighbor distances of all its entries.
-     *
-     * @see AbstractMTreeNode#adjustEntry(de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry,Integer,Distance,de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree)
      */
     @Override
     public void adjustEntry(MkMaxEntry<D> entry, Integer routingObjectID, D parentDistance, AbstractMTree<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> mTree) {
@@ -87,8 +83,6 @@ class MkMaxTreeNode<O extends DatabaseObject, D extends Distance<D>>
     /**
      * Calls the super method and tests if
      * the k-nearest neighbor distance of this node is correctly set.
-     *
-     * @see de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode#test(de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry, de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode, int, de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree)
      */
     @Override
     protected void test(MkMaxEntry<D> parentEntry, MkMaxTreeNode<O, D> parent, int index, AbstractMTree<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> mTree) {

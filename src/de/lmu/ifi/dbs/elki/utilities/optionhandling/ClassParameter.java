@@ -84,9 +84,6 @@ public class ClassParameter<C> extends Parameter<String, String> {
         setDefaultValue(defaultValue);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Option#setValue(String)
-     */
     @Override
     public void setValue(String value) throws ParameterException {
         if (isValid(value)) {
@@ -110,14 +107,12 @@ public class ClassParameter<C> extends Parameter<String, String> {
     /**
      * Checks if the given parameter value is valid for this ClassParameter. If
      * not a parameter exception is thrown.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Option#isValid(String)
      */
     @Override
     public boolean isValid(String value) throws ParameterException {
         if (value == null) {
             throw new WrongParameterValueException("Parameter Error.\n" +
-                                                   "No value for parameter \"" + getName() + "\" " + "given.");
+                "No value for parameter \"" + getName() + "\" " + "given.");
         }
 
         try {
@@ -135,10 +130,10 @@ public class ClassParameter<C> extends Parameter<String, String> {
 
         catch (ClassNotFoundException e) {
             throw new WrongParameterValueException(this.name, value, "subclass / implementing class of "
-                                                                     + restrictionClass.getName(), e);
+                + restrictionClass.getName(), e);
         }
         throw new WrongParameterValueException(this.name, value, "subclass / implementing class of "
-                                                                 + restrictionClass.getName());
+            + restrictionClass.getName());
     }
 
     /**
@@ -179,7 +174,6 @@ public class ClassParameter<C> extends Parameter<String, String> {
      * Returns a string representation of the parameter's type.
      *
      * @return &quot;&lt;class&gt;&quot;
-     * @see Parameter#getParameterType()
      */
     @Override
     protected String getParameterType() {
@@ -209,7 +203,7 @@ public class ClassParameter<C> extends Parameter<String, String> {
             catch (ClassNotFoundException e) {
                 // try package of type
                 instance = restrictionClass.cast(Class.forName(restrictionClass.getPackage().getName() +
-                                                               "." + value).newInstance());
+                    "." + value).newInstance());
             }
         }
         catch (Exception e) {

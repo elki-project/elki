@@ -49,9 +49,6 @@ public class FileListParameter extends ListParameter<File> {
         this.filesType = filesType;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Option#setValue(String)
-     */
     public void setValue(String value) throws ParameterException {
         if (isValid(value)) {
             String[] files = SPLIT.split(value);
@@ -63,9 +60,6 @@ public class FileListParameter extends ListParameter<File> {
         }
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Option#isValid(java.lang.String)
-     */
     public boolean isValid(String value) throws ParameterException {
         String[] files = SPLIT.split(value);
         if (files.length == 0) {
@@ -97,7 +91,6 @@ public class FileListParameter extends ListParameter<File> {
      * Returns a string representation of the parameter's type.
      *
      * @return &quot;&lt;file_1,...,file_n&gt;&quot;
-     * @see Parameter#getParameterType()
      */
     protected String getParameterType() {
         return "<file_1,...,file_n>";

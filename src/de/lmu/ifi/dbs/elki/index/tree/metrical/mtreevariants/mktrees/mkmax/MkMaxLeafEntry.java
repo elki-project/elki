@@ -41,16 +41,10 @@ class MkMaxLeafEntry<D extends Distance<D>> extends MTreeLeafEntry<D> implements
         this.knnDistance = knnDistance;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkmax.MkMaxEntry#getKnnDistance()
-     */
     public D getKnnDistance() {
         return knnDistance;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkmax.MkMaxEntry#setKnnDistance(de.lmu.ifi.dbs.elki.distance.Distance)
-     */
     public void setKnnDistance(D knnDistance) {
         this.knnDistance = knnDistance;
     }

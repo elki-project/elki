@@ -57,7 +57,7 @@ public class TreeIndexPathComponent<E extends Entry> {
      * the entry of the o argument,
      * <code>false</code> otherwise.
      *
-     * @see Object#equals(Object)
+     * @see Entry#equals(Object)
      */
     public boolean equals(Object o) {
         if (this == o)

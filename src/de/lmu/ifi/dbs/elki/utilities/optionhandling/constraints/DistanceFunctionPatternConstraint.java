@@ -36,7 +36,6 @@ public class DistanceFunctionPatternConstraint extends AbstractLoggable implemen
 	 * Checks if the given pattern parameter holds a valid pattern for the
 	 * distance function. If not so, a parameter exception ({@link de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException}) is thrown.
 	 * 
-	 * @see ParameterConstraint#test(Object)
 	 */
 	public void test(String t) throws ParameterException {
 		try {
@@ -48,9 +47,6 @@ public class DistanceFunctionPatternConstraint extends AbstractLoggable implemen
 		}
 	}
 
-    /**
-     * @see ParameterConstraint#getDescription(String)
-     */
     public String getDescription(String parameterName) {
         return parameterName + " must be suitable to " + distanceFunction;
     }

@@ -59,18 +59,12 @@ public class PatternParameter extends Parameter<String, String> {
         addConstraint(con);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Option#setValue(String)
-     */
     public void setValue(String value) throws ParameterException {
         if (isValid(value)) {
             this.value = value;
         }
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Option#isValid(java.lang.String)
-     */
     public boolean isValid(String value) throws ParameterException {
         try {
             Pattern.compile(value);
@@ -95,7 +89,6 @@ public class PatternParameter extends Parameter<String, String> {
      * Returns a string representation of the parameter's type.
      *
      * @return &quot;&lt;pattern&gt;&quot;
-     * @see Parameter#getParameterType()
      */
     protected String getParameterType() {
         return "<pattern>";

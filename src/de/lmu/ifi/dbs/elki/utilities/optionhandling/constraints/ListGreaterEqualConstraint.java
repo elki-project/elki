@@ -30,7 +30,6 @@ public class ListGreaterEqualConstraint<N extends Number> extends AbstractNumber
      * are greater than or equal to the constraint value.
      * If not, a parameter exception is thrown.
      *
-     * @see ParameterConstraint#test(Object)
      */
     public void test(List<N> t) throws ParameterException {
         for (Number n : t) {
@@ -42,9 +41,6 @@ public class ListGreaterEqualConstraint<N extends Number> extends AbstractNumber
         }
     }
 
-    /**
-     * @see ParameterConstraint#getDescription(String)
-     */
     public String getDescription(String parameterName) {
         return "all elements of " + parameterName + " < " + constraintValue;
     }

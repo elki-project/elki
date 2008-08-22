@@ -150,12 +150,10 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters(String[])
+     * Calls the super method
      * AbstractParameterizable#setParameters(args)}
      * and sets additionally the values of the parameters
      * {@link #FILE_PARAM}, {@link #PAGE_SIZE_PARAM}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
@@ -178,37 +176,22 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
         return remainingParameters;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.Index#getPhysicalReadAccess()
-     */
     public final long getPhysicalReadAccess() {
         return file.getPhysicalReadAccess();
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.Index#getPhysicalWriteAccess()
-     */
     public final long getPhysicalWriteAccess() {
         return file.getPhysicalWriteAccess();
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.Index#getLogicalPageAccess()
-     */
     public final long getLogicalPageAccess() {
         return file.getLogicalPageAccess();
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.Index#resetPageAccess()
-     */
     public final void resetPageAccess() {
         file.resetPageAccess();
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.Index#close()
-     */
     public final void close() {
         file.close();
     }

@@ -46,7 +46,6 @@ public class LessEqualGlobalConstraint<T extends Number> extends AbstractLoggabl
      * value of the second number parameter. If not, a parameter exception is
      * thrown.
      *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint#test()
      */
     public void test() throws ParameterException {
         if (first.isSet() && second.isSet()) {
@@ -58,9 +57,6 @@ public class LessEqualGlobalConstraint<T extends Number> extends AbstractLoggabl
 		}
 	}
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint#getDescription()
-     */
     public String getDescription() {
         return first.getName() + " <= " + second.getName();
     }

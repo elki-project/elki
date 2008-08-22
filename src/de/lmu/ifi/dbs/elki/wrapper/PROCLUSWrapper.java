@@ -85,9 +85,7 @@ public class PROCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
         addOption(L_PARAM);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.wrapper.KDDTaskWrapper#getKDDTaskParameters()
-     */
+    @Override
     public List<String> getKDDTaskParameters() {
         List<String> parameters = super.getKDDTaskParameters();
 

@@ -48,7 +48,6 @@ public class GlobalVectorListElementSizeConstraint extends AbstractLoggable impl
      * the appropriate size provided by the integer parameter. If not, a
      * parameter exception will be thrown.
      *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint#test()
      */
     public void test() throws ParameterException {
         if (!vector.isSet())
@@ -64,9 +63,6 @@ public class GlobalVectorListElementSizeConstraint extends AbstractLoggable impl
         }
     }
 
-    /**
-     * @see GlobalParameterConstraint#getDescription()
-     */
     public String getDescription() {
         return "The dimensionality of the vectors of vector list parameter " + vector.getName() +
             " must have the value of integer parameter " + size.getName();

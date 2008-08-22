@@ -41,23 +41,15 @@ public class SpatialDirectoryEntry extends AbstractEntry implements SpatialEntry
 
   /**
    * @return false
-   * @see de.lmu.ifi.dbs.elki.index.tree.Entry#isLeafEntry()
    */
   public boolean isLeafEntry() {
     return false;
   }
 
-  /**
-   * @return the MBR of the underlying spatial node
-   * @see SpatialEntry#getMBR
-   */
   public HyperBoundingBox getMBR() {
     return mbr;
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialComparable#getDimensionality()
-   */
   public int getDimensionality() {
     return mbr.getDimensionality();
   }
@@ -65,7 +57,6 @@ public class SpatialDirectoryEntry extends AbstractEntry implements SpatialEntry
   /**
    * @return the coordinate at the specified dimension of the minimum hyper point of the MBR
    *         of the underlying node
-   * @see SpatialComparable#getMin(int)
    */
   public double getMin(int dimension) {
     return mbr.getMin(dimension);
@@ -74,7 +65,6 @@ public class SpatialDirectoryEntry extends AbstractEntry implements SpatialEntry
   /**
    * @return the coordinate at the specified dimension of the maximum hyper point of the MBR
    *         of the underlying node
-   * @see SpatialComparable#getMax(int)
    */
   public double getMax(int dimension) {
     return mbr.getMax(dimension);

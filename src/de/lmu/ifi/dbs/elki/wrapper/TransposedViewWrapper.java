@@ -23,7 +23,7 @@ import java.util.List;
  * written.
  *
  * @author Elke Achtert
- * todo parameter
+ *         todo parameter
  */
 public class TransposedViewWrapper<V extends RealVector<V, ?>> extends StandAloneInputWrapper {
 
@@ -67,7 +67,7 @@ public class TransposedViewWrapper<V extends RealVector<V, ?>> extends StandAlon
 
     /**
      * Adds parameter
-     * {@link #} todo 
+     * {@link #} todo
      * to the option handler additionally to parameters of super class.
      */
     public TransposedViewWrapper() {
@@ -75,9 +75,6 @@ public class TransposedViewWrapper<V extends RealVector<V, ?>> extends StandAlon
         optionHandler.put(new FileParameter(GNUPLOT_P, GNUPLOT_D, FileParameter.FileType.OUTPUT_FILE));
     }
 
-    /**
-     * @see Wrapper#run()
-     */
     public void run() throws UnableToComplyException {
         try {
             File outFile = getOutput();
@@ -132,9 +129,7 @@ public class TransposedViewWrapper<V extends RealVector<V, ?>> extends StandAlon
         }
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
         // gnuplot

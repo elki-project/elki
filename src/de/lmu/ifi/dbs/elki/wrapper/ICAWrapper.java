@@ -51,9 +51,7 @@ public class ICAWrapper extends FileBasedDatabaseConnectionWrapper {
         }
     }
 
-    /**
-     * @see KDDTaskWrapper#getKDDTaskParameters()
-     */
+    @Override
     public List<String> getKDDTaskParameters() {
         List<String> parameters = super.getKDDTaskParameters();
 

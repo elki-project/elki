@@ -44,7 +44,6 @@ public class DefaultValueGlobalConstraint<T extends Comparable<T>> extends Abstr
      * parameter.
      * If not so, a parameter exception is thrown.
      *
-     * @see GlobalParameterConstraint#test()
      */
     public void test() throws ParameterException {
         if (!hasValue.isSet()) {
@@ -64,9 +63,6 @@ public class DefaultValueGlobalConstraint<T extends Comparable<T>> extends Abstr
         }
     }
 
-    /**
-     * @see GlobalParameterConstraint#getDescription()
-     */
     public String getDescription() {
         return "If parameter " + needsValue.getName() + " is not specified, " +
             " its value will be set to the value of parameter " + hasValue.getName();

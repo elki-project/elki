@@ -73,8 +73,6 @@ public class TreeIndexHeader extends DefaultPageHeader {
      * DefaultPageHeader#readHeader(file)} and reads the integer values of
      * {@link #dirCapacity}, {@link #leafCapacity}, {@link #dirMinimum}, and {@link #leafMinimum}
      * from the file.
-     *
-     * @see de.lmu.ifi.dbs.elki.persistent.PageHeader#readHeader(java.io.RandomAccessFile)
      */
     @Override
     public void readHeader(RandomAccessFile file) throws IOException {
@@ -90,8 +88,6 @@ public class TreeIndexHeader extends DefaultPageHeader {
      * Writes the integer values of
      * {@link #dirCapacity}, {@link #leafCapacity}, {@link #dirMinimum}, and {@link #leafMinimum}
      * to the file.
-     *
-     * @see de.lmu.ifi.dbs.elki.persistent.PageHeader#writeHeader(java.io.RandomAccessFile)
      */
     @Override
     public void writeHeader(RandomAccessFile file) throws IOException {

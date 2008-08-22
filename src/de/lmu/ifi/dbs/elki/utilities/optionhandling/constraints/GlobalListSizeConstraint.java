@@ -42,7 +42,6 @@ public class GlobalListSizeConstraint extends AbstractLoggable implements Global
      * Checks is the size of the list parameter is equal to the constraint list
      * size specified. If not, a parameter exception is thrown.
      *
-     * @see GlobalParameterConstraint#test()
      */
     public void test() throws ParameterException {
         if (!list.isSet() || !length.isSet()) {
@@ -61,9 +60,6 @@ public class GlobalListSizeConstraint extends AbstractLoggable implements Global
         }
     }
 
-    /**
-     * @see GlobalParameterConstraint#getDescription()
-     */
     public String getDescription() {
         try {
             return "size(" + list.getName()+") == " + length.getValue();

@@ -34,7 +34,6 @@ public class MTreeNode<O extends DatabaseObject, D extends Distance<D>> extends 
 
     /**
      * @return a new MTreeNode which is a leaf node
-     * @see de.lmu.ifi.dbs.elki.index.tree.AbstractNode#createNewLeafNode(int)
      */
     protected MTreeNode<O, D> createNewLeafNode(int capacity) {
         return new MTreeNode<O, D>(getFile(), capacity, true);
@@ -42,7 +41,6 @@ public class MTreeNode<O extends DatabaseObject, D extends Distance<D>> extends 
 
     /**
      * @return a new MTreeNode which is a directory node
-     * @see de.lmu.ifi.dbs.elki.index.tree.AbstractNode#createNewDirectoryNode(int) 
      */
     protected MTreeNode<O, D> createNewDirectoryNode(int capacity) {
         return new MTreeNode<O, D>(getFile(), capacity, false);

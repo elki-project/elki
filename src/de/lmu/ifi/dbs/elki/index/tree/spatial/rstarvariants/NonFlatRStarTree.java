@@ -75,9 +75,6 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends Ab
 		return height;
 	}
 
-	/**
-	 * @see de.lmu.ifi.dbs.elki.index.tree.TreeIndex#createEmptyRoot(de.lmu.ifi.dbs.elki.data.DatabaseObject)
-	 */
 	protected void createEmptyRoot(O object) {
 		N root = createNewLeafNode(leafCapacity);
 		file.writePage(root);

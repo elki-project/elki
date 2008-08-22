@@ -44,7 +44,6 @@ public class LessGlobalConstraint<T extends Number> extends AbstractLoggable imp
      * Checks if the value of the first number parameter is less than the value
      * of the second number parameter. If not, a parameter exception is thrown.
      *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint#test()
      */
     public void test() throws ParameterException {
         if (first.isSet() && second.isSet()) {
@@ -56,9 +55,6 @@ public class LessGlobalConstraint<T extends Number> extends AbstractLoggable imp
         }
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint#getDescription()
-     */
     public String getDescription() {
         return first.getName() + " < " + second.getName();
     }

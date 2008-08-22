@@ -64,12 +64,10 @@ public abstract class AbstractMkTree<O extends DatabaseObject, D extends Distanc
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree#setParameters(String[])
+     * Calls the super method
      * AbstractMTree#setParameters(args)}
      * and sets additionally the value of the parameter
      * {@link #K_MAX_PARAM}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
@@ -85,8 +83,6 @@ public abstract class AbstractMkTree<O extends DatabaseObject, D extends Distanc
      * {@link AbstractMTree#insert(de.lmu.ifi.dbs.elki.data.DatabaseObject,boolean)
      * AbstractMTree.insert(object, false)}. After insertion
      * a batch knn query is performed and the knn distances are adjusted.<p/>
-     *
-     * @see de.lmu.ifi.dbs.elki.index.Index#insert(java.util.List)
      */
     public final void insert(List<O> objects) {
         if (this.debug) {

@@ -37,8 +37,6 @@ public class AllOrNoneMustBeSetGlobalConstraint extends AbstractLoggable impleme
     /**
      * Checks if either all elements of a list of parameters are set, or none of
      * them. If not, a parameter exception is thrown.
-     *
-     * @see GlobalParameterConstraint#test()
      */
     public void test() throws ParameterException {
 
@@ -62,9 +60,6 @@ public class AllOrNoneMustBeSetGlobalConstraint extends AbstractLoggable impleme
         }
     }
 
-    /**
-     * @see GlobalParameterConstraint#getDescription()
-     */
     public String getDescription() {
         return "Either all of the parameters " + Util.optionsNamesToString(parameterList) +
             " must be set or none of them. ";

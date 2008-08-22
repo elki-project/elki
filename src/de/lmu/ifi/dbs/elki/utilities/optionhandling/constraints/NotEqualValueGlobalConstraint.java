@@ -40,7 +40,6 @@ public class NotEqualValueGlobalConstraint<N extends Number> extends AbstractLog
      * Checks if the elements of the list of number parameters do have different values.
      * If not, a parameter exception is thrown.
      *
-     * @see GlobalParameterConstraint#test()
      */
     public void test() throws ParameterException {
         Set<Number> numbers = new HashSet<Number>();
@@ -57,9 +56,6 @@ public class NotEqualValueGlobalConstraint<N extends Number> extends AbstractLog
         }
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint#getDescription()
-     */
     public String getDescription() {
         return "Parameters " + Util.optionsNamesToString(parameters) + " must have different values.";
     }

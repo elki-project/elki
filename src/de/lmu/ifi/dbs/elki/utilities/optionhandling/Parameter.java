@@ -196,17 +196,11 @@ public abstract class Parameter<T, C> extends Option<T> {
         return defaultValueTaken;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Option#isSet()
-     */
     @Override
     public boolean isSet() {
         return (value != null);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Option#getValue()
-     */
     @Override
     public T getValue() throws UnusedParameterException {
         if (value == null && !optionalParameter) {
@@ -237,7 +231,6 @@ public abstract class Parameter<T, C> extends Option<T> {
 
     /**
      * @return the option's description.
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Option#getDescription()
      */
     public final String getDescription() {
         StringBuffer description = new StringBuffer();

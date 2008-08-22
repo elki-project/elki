@@ -79,7 +79,6 @@ public class IntervalConstraint extends AbstractLoggable implements ParameterCon
      * greater equal than the constraint
      * value. If not, a parameter exception is thrown.
      *
-     * @see ParameterConstraint#test(Object)
      */
     public void test(Number t) throws ParameterException {
         // lower value
@@ -123,9 +122,6 @@ public class IntervalConstraint extends AbstractLoggable implements ParameterCon
         }
     }
 
-    /**
-     * @see ParameterConstraint#getDescription(String)
-     */
     public String getDescription(String parameterName) {
         String description = parameterName + " in ";
         if (lowBoundary.equals(IntervalBoundary.CLOSE)) {

@@ -58,7 +58,6 @@ public class ParameterFlagGlobalConstraint<C, T extends C> extends AbstractLogga
      * Checks the parameter for its parameter constraints dependent on the status of
      * the given flag. If a parameter constraint is breached a parameter exception is thrown.
      *
-     * @see GlobalParameterConstraint#test()
      */
     public void test() throws ParameterException {
         if (flagConstraint) {
@@ -78,9 +77,6 @@ public class ParameterFlagGlobalConstraint<C, T extends C> extends AbstractLogga
         }
     }
 
-    /**
-     * @see GlobalParameterConstraint#getDescription()
-     */
     public String getDescription() {
         StringBuffer description = new StringBuffer();
         if (flagConstraint) {

@@ -84,9 +84,7 @@ public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
         addOption(L_PARAM);
     }
 
-    /**
-     * @see KDDTaskWrapper#getKDDTaskParameters()
-     */
+    @Override
     public List<String> getKDDTaskParameters() {
         List<String> parameters = super.getKDDTaskParameters();
 

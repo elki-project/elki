@@ -50,8 +50,6 @@ public class EqualStringConstraint extends AbstractLoggable implements Parameter
     /**
      * Checks if the given string value of the string parameter is equal to one of the constraint strings.
      * If not, a parameter exception is thrown.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint#test(java.lang.Object)
      */
     public void test(String t) throws ParameterException {
         for (String constraint : testStrings) {
@@ -64,9 +62,6 @@ public class EqualStringConstraint extends AbstractLoggable implements Parameter
             + constraintStrings());
     }
 
-    /**
-     * @see ParameterConstraint#getDescription(String)
-     */
     public String getDescription(String parameterName) {
         return parameterName + " in " + Arrays.asList(testStrings).toString();
     }

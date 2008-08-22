@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.index.tree.Node;
  * @author Elke Achtert
  * @param <N> the type of MetricalNode used in the metrical index
  * @param <E> the type of MetricalEntry used in the metrical index
- * @see de.lmu.ifi.dbs.elki.index.tree.Node
  */
 public interface MetricalNode<N extends MetricalNode<N, E>, E extends MetricalEntry> extends Node<N, E> {
 }

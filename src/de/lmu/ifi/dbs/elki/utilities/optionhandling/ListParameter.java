@@ -82,8 +82,6 @@ public abstract class ListParameter<T> extends Parameter<List<T>, List<T>> {
     /**
      * Returns a string representation of this list parameter. The elements of
      * this list parameters are given in &quot;[ ]&quot;, comma separated.
-     *
-     * @see java.lang.Object#toString()
      */
     public String toString() {
         if (this.value == null) {

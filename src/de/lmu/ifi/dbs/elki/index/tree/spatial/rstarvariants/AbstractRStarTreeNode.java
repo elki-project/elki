@@ -37,23 +37,14 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
     super(file, capacity, isLeaf);
   }
 
-  /**
-   * @see SpatialComparable#getMin(int)
-   */
   public double getMin(int dimension) {
     return mbr().getMin(dimension);
   }
 
-  /**
-   * @see SpatialComparable#getMax(int)
-   */
   public double getMax(int dimension) {
     return mbr().getMax(dimension);
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode#mbr()
-   */
   public HyperBoundingBox mbr() {
     E firstEntry = getEntry(0);
     if (firstEntry == null) return null;
@@ -73,9 +64,6 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
     return new HyperBoundingBox(min, max);
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode#getDimensionality()
-   */
   public int getDimensionality() {
     return getEntry(0).getMBR().getDimensionality();
   }

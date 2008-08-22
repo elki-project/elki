@@ -65,7 +65,7 @@ public abstract class SpatialIndex<O extends NumberVector<O,?>, N extends Spatia
   }
 
   /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
+   * todo
    */
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);

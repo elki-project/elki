@@ -16,9 +16,7 @@ import java.util.List;
  */
 public abstract class NormalizationWrapper extends FileBasedDatabaseConnectionWrapper {
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.wrapper.KDDTaskWrapper#getKDDTaskParameters()
-     */
+    @Override
     public List<String> getKDDTaskParameters() {
         List<String> parameters = super.getKDDTaskParameters();
 

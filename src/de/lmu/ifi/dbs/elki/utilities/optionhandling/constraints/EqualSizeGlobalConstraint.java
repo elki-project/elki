@@ -37,7 +37,6 @@ public class EqualSizeGlobalConstraint extends AbstractLoggable implements Globa
      * Checks if the list parameters have equal list sizes. If not, a parameter
      * exception is thrown.
      *
-     * @see GlobalParameterConstraint#test()
      */
     public void test() throws ParameterException {
         boolean first = false;
@@ -58,9 +57,6 @@ public class EqualSizeGlobalConstraint extends AbstractLoggable implements Globa
         }
     }
 
-    /**
-     * @see GlobalParameterConstraint#getDescription()
-     */
     public String getDescription() {
         return "The list parameters " + Util.optionsNamesToString(parameters) +
             " must have equal list sizes.";

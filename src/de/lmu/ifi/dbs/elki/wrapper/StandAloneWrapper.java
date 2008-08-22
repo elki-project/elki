@@ -50,11 +50,9 @@ public abstract class StandAloneWrapper extends AbstractWrapper {
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.wrapper.AbstractWrapper#setParameters(String[]) AbstractWrapper#setParameters(args)}
+     * Calls the super method
      * and sets additionally the value of the parameter
      * {@link #OUTPUT_PARAM}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

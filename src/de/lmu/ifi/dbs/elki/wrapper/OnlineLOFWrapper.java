@@ -92,9 +92,7 @@ public class OnlineLOFWrapper extends FileBasedDatabaseConnectionWrapper {
         addOption(NN_PARAM);
     }
 
-    /**
-     * @see KDDTaskWrapper#getKDDTaskParameters()
-     */
+    @Override
     public List<String> getKDDTaskParameters() {
         List<String> parameters = super.getKDDTaskParameters();
 

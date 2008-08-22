@@ -98,9 +98,6 @@ public abstract class AbstractParameterizable extends AbstractLoggable
         currentParameterArray = Util.parameterDifference(complete, part);
     }
 
-    /**
-     * @see Parameterizable#getParameters()
-     */
     public final String[] getParameters() {
         String[] param = new String[currentParameterArray.length];
         System.arraycopy(currentParameterArray, 0, param, 0,
@@ -110,7 +107,6 @@ public abstract class AbstractParameterizable extends AbstractLoggable
 
     /**
      * Returns the settings of all options assigned to the option handler.
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler#addOptionSettings(AttributeSettings)
      */
     public List<AttributeSettings> getAttributeSettings() {
         try {
@@ -178,7 +174,7 @@ public abstract class AbstractParameterizable extends AbstractLoggable
      *               or closing &quot;:&quot;.
      * @return boolean true if the value of the given option is set, false
      *         otherwise
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler#isSet(Option)
+     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Option#isSet()
      */
     protected boolean isSet(Option<?> option) {
         return option.isSet();
@@ -205,14 +201,14 @@ public abstract class AbstractParameterizable extends AbstractLoggable
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getPossibleOptions()
+     * @see OptionHandler#getOptions()
      */
     public Option<?>[] getPossibleOptions() {
         return optionHandler.getOptions();
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#checkGlobalParameterConstraints()
+     * @see OptionHandler#checkGlobalParameterConstraints()
      */
     public void checkGlobalParameterConstraints() throws ParameterException {
         this.optionHandler.checkGlobalParameterConstraints();

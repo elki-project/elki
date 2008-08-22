@@ -34,7 +34,6 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>>
     /**
      * @throws UnsupportedOperationException since insertion of single
      *                                       objects is not supported
-     * @see de.lmu.ifi.dbs.elki.index.tree.TreeIndex#preInsert(de.lmu.ifi.dbs.elki.index.tree.Entry)
      */
     protected void preInsert(MkTabEntry<D> entry) {
         throw new UnsupportedOperationException("Insertion of single objects is not supported!");
@@ -43,15 +42,11 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>>
     /**
      * @throws UnsupportedOperationException since insertion of single
      *                                       objects is not supported
-     * @see de.lmu.ifi.dbs.elki.index.Index#insert(de.lmu.ifi.dbs.elki.data.DatabaseObject)
      */
     public void insert(O object) {
         throw new UnsupportedOperationException("Insertion of single objects is not supported!");
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex#reverseKNNQuery(de.lmu.ifi.dbs.elki.data.DatabaseObject,int)
-     */
     public List<QueryResult<D>> reverseKNNQuery(O object, int k) {
         if (k > this.k_max) {
             throw new IllegalArgumentException("Parameter k has to be less or equal than " +
@@ -65,9 +60,6 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>>
         return result;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.tree.TreeIndex#initializeCapacities(de.lmu.ifi.dbs.elki.data.DatabaseObject,boolean)
-     */
     protected void initializeCapacities(O object, boolean verbose) {
         D dummyDistance = getDistanceFunction().nullDistance();
         int distanceSize = dummyDistance.externalizableSize();
@@ -104,9 +96,6 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>>
 
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree#kNNdistanceAdjustment(de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry, java.util.Map) 
-     */
     protected void kNNdistanceAdjustment(MkTabEntry<D> entry, Map<Integer, KNNList<D>> knnLists) {
         MkTabTreeNode<O, D> node = file.readPage(entry.getID());
         List<D> knnDistances_node = initKnnDistanceList();

@@ -50,23 +50,14 @@ class MkTabDirectoryEntry<D extends Distance<D>> extends MTreeDirectoryEntry<D> 
     this.k_max = knnDistances.size();
   }
 
-  /**
-   * @see MkTabEntry#getKnnDistances()
-   */
   public List<D> getKnnDistances() {
     return knnDistances;
   }
 
-  /**
-   * @see MkTabEntry#setKnnDistances(java.util.List)
-   */
   public void setKnnDistances(List<D> knnDistances) {
     this.knnDistances = knnDistances;
   }
 
-  /**
-   * @see MkTabEntry#getKnnDistance(int)
-   */
   public D getKnnDistance(int k) {
     if (k > this.k_max)
       throw new IllegalArgumentException("Parameter k = " + k + " is not supported!");
@@ -74,9 +65,6 @@ class MkTabDirectoryEntry<D extends Distance<D>> extends MTreeDirectoryEntry<D> 
     return knnDistances.get(k - 1);
   }
 
-  /**
-   * @see MkTabEntry#getK_max()
-   */
   public int getK_max() {
     return k_max;
   }

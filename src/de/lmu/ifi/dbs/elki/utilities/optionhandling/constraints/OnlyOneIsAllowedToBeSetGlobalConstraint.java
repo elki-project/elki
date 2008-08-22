@@ -38,7 +38,6 @@ public class OnlyOneIsAllowedToBeSetGlobalConstraint extends AbstractLoggable im
      * Checks if only one parameter of a list of parameters is set. If not, a
      * parameter exception is thrown.
      *
-     * @see GlobalParameterConstraint#test()
      */
     public void test() throws ParameterException {
         Vector<String> set = new Vector<String>();
@@ -54,9 +53,6 @@ public class OnlyOneIsAllowedToBeSetGlobalConstraint extends AbstractLoggable im
         }
     }
 
-    /**
-     * @see GlobalParameterConstraint#getDescription()
-     */
     public String getDescription() {
         return "Only one of the parameters " + Util.optionsNamesToString(parameters) + " is allowed to be set.";
     }
