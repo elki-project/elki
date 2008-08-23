@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
+ * todo erich comment class
  * @author erich
  */
 public class PCAFilteredRunner<V extends RealVector<V, ?>> extends PCARunner<V> {
@@ -36,7 +37,7 @@ public class PCAFilteredRunner<V extends RealVector<V, ?>> extends PCARunner<V> 
     private ClassParameter<EigenPairFilter> EIGENPAIR_FILTER_PARAM = new ClassParameter<EigenPairFilter>(OptionID.PCA_EIGENPAIR_FILTER, EigenPairFilter.class, PercentageEigenPairFilter.class.getName());
 
     /**
-     * The eigenpair filter to determine the strong and weak eigenvectors.
+     * Holds the instance of the EigenPairFilter specified by {@link #EIGENPAIR_FILTER_PARAM}.
      */
     private EigenPairFilter eigenPairFilter;
 
@@ -81,17 +82,17 @@ public class PCAFilteredRunner<V extends RealVector<V, ?>> extends PCARunner<V> 
         0.0);
 
     /**
-     * Holds the big value.
+     * Holds the value of {@link #BIG_PARAM}.
      */
     private double big;
 
     /**
-     * Holds the small value.
+     * Holds the value of {@link #SMALL_PARAM}.
      */
     private double small;
 
     /**
-     *
+     * todo comment
      */
     public PCAFilteredRunner() {
         addOption(EIGENPAIR_FILTER_PARAM);
@@ -102,9 +103,7 @@ public class PCAFilteredRunner<V extends RealVector<V, ?>> extends PCARunner<V> 
         optionHandler.setGlobalParameterConstraint(new LessGlobalConstraint<Double>(SMALL_PARAM, BIG_PARAM));
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
+    // todo comment
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 

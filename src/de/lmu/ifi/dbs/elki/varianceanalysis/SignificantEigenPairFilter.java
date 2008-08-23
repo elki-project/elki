@@ -55,9 +55,6 @@ public class SignificantEigenPairFilter extends AbstractParameterizable implemen
     addOption(WALPHA_PARAM);
   }
 
-  /**
-   * @see EigenPairFilter#filter(de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs)
-   */
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
     // init strong and weak eigenpairs
     List<EigenPair> strongEigenPairs = new ArrayList<EigenPair>();
@@ -100,10 +97,7 @@ public class SignificantEigenPairFilter extends AbstractParameterizable implemen
     return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
-   */
-  public String description() {
+  public String parameterDescription() {
     StringBuffer description = new StringBuffer();
     description.append(SignificantEigenPairFilter.class.getName());
     description.append(" sorts the eigenpairs in decending order " + "of their eigenvalues and looks for the maxmimum contrast of " + "current Eigenvalue / average of remaining Eigenvalues.\n");
@@ -111,9 +105,6 @@ public class SignificantEigenPairFilter extends AbstractParameterizable implemen
     return description.toString();
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 

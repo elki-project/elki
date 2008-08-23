@@ -10,16 +10,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
  * @author Elke Achtert 
  */
 public class KurtosisBasedContrastFunction extends AbstractParameterizable implements ContrastFunction {
-  /**
-   * @see ContrastFunction#function(double)
-   */
+
   public double function(double x) {
     return (x * x * x);
   }
 
-  /**
-   * @see ContrastFunction#derivative(double)
-   */
   public double derivative(double x) {
     return (3 * x * x);
   }

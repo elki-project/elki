@@ -144,18 +144,12 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends RealVector<V,
     database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, simMatrix);
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     delta = (Double) optionHandler.getOptionValue(DELTA_P);
     return remainingParameters;
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
-   */
   public String parameterDescription() {
     StringBuffer description = new StringBuffer();
     description.append(PreDeConPreprocessor.class.getName());

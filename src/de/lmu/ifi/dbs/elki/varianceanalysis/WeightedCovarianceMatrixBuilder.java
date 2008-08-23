@@ -44,9 +44,6 @@ public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends
     addOption(WEIGHT_PARAM);
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
   @SuppressWarnings("unchecked")
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);

@@ -63,9 +63,6 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
         optionHandler.put(distFunc);
     }
 
-    /**
-     * @see Parser#parse(java.io.InputStream)
-     */
     public ParsingResult<ExternalObject> parse(InputStream in) {
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         int lineNumber = 0;
@@ -158,9 +155,6 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
         return distanceFunction;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
-     */
     public String parameterDescription() {
         StringBuffer description = new StringBuffer();
         description.append(NumberDistanceParser.class.getName());
@@ -177,9 +171,6 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
         return usage(description.toString());
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(java.lang.String[])
-     */
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 

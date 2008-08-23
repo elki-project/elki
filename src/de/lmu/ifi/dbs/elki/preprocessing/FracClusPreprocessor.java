@@ -35,9 +35,6 @@ public class FracClusPreprocessor<V extends RealVector<V, ?>> extends AbstractPa
         optionHandler.put(kParameter);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.preprocessing.Preprocessor#run(de.lmu.ifi.dbs.elki.database.Database,boolean,boolean)
-     */
     public void run(Database<V> database, boolean verbose, boolean time) {
         EuclideanDistanceFunction<V> distanceFunction = new EuclideanDistanceFunction<V>();
         distanceFunction.setDatabase(database, false, false); //  TODO: parameters verbose, time???

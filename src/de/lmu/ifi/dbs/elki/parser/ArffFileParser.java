@@ -67,7 +67,6 @@ public class ArffFileParser<O extends DatabaseObject & WekaObject<W>, W extends 
      * Translates the input stream from arff to whitespace separated format
      * and passes the translation to the currently set base parser.
      * 
-     * @see de.lmu.ifi.dbs.elki.parser.Parser#parse(java.io.InputStream)
      */
     public ParsingResult<O> parse(InputStream in)
     {
@@ -89,7 +88,6 @@ public class ArffFileParser<O extends DatabaseObject & WekaObject<W>, W extends 
      * sets the base parser to the specified class or else to the default base parser
      * {@link #DEFAULT_PARSER}.
      * 
-     * @see de.lmu.ifi.dbs.elki.parser.AbstractParser#setParameters(java.lang.String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException

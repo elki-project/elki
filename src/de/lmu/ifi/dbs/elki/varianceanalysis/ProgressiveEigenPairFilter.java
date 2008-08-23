@@ -103,9 +103,6 @@ public class ProgressiveEigenPairFilter extends AbstractParameterizable implemen
     addOption(WALPHA_PARAM);    
   }
 
-  /**
-   * @see EigenPairFilter#filter(de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs)
-   */
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
     // init strong and weak eigenpairs
     List<EigenPair> strongEigenPairs = new ArrayList<EigenPair>();
@@ -156,10 +153,7 @@ public class ProgressiveEigenPairFilter extends AbstractParameterizable implemen
     return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#description()
-   */
-  public String description() {
+  public String parameterDescription() {
     StringBuffer description = new StringBuffer();
     description.append(ProgressiveEigenPairFilter.class.getName());
     description.append(" sorts the eigenpairs in decending order " + "of their eigenvalues and returns the first eigenpairs, whose sum of " + "eigenvalues explains more than the given percentage of the unexpected variance.\n");
@@ -167,9 +161,6 @@ public class ProgressiveEigenPairFilter extends AbstractParameterizable implemen
     return description.toString();
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 

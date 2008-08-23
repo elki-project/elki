@@ -138,7 +138,6 @@ public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector
      * Sets the values for the parameters alpha, pca and pcaDistancefunction if
      * specified. If the parameters are not specified default values are set.
      *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(final String[] args) throws ParameterException {
@@ -191,15 +190,11 @@ public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector
         return remainingParameters;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
-     */
     @Override
     public String parameterDescription() {
         final StringBuffer description = new StringBuffer();
         description.append(KernelFourCPreprocessor.class.getName());
-        description
-            .append(" computes the local dimensionality and locally weighted matrix of objects of a certain database according to the 4C algorithm.\n");
+        description.append(" computes the local dimensionality and locally weighted matrix of objects of a certain database according to the 4C algorithm.\n");
         description.append("The PCA is based on epsilon range queries.\n");
         description.append(optionHandler.usage("", false));
         return description.toString();

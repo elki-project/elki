@@ -14,7 +14,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * A preprocessor for annotation of the ids of nearest neighbors to each database object.
@@ -76,8 +80,6 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
     /**
      * Annotates the nearest neighbors based on the values of {@link #numberOfNeighbors}
      * and {@link #distanceFunction} to each database object.
-     *
-     * @see de.lmu.ifi.dbs.elki.preprocessing.Preprocessor#run(de.lmu.ifi.dbs.elki.database.Database,boolean,boolean)
      */
     public void run(Database<O> database, boolean verbose, boolean time) {
         distanceFunction.setDatabase(database, verbose, time);
@@ -112,8 +114,6 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
      * and {@link #DISTANCE_FUNCTION_PARAM}
      * to {@link #numberOfNeighbors} and
      * {@link #distanceFunction}, respectively.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters(java.lang.String[])
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -142,8 +142,6 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
 
     /**
      * Provides a short description of the purpose of this class.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#parameterDescription()
      */
     @Override
     public String parameterDescription() {

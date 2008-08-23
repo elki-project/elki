@@ -49,7 +49,6 @@ public class DefaultPageHeader implements PageHeader {
     /**
      * Returns the value of {@link #SIZE}).
      *
-     * @see PageHeader#size()
      */
     public int size() {
         return SIZE;
@@ -60,7 +59,6 @@ public class DefaultPageHeader implements PageHeader {
      * Looks for the right version
      * and reads the integer value of {@link #pageSize} from the file.
      *
-     * @see de.lmu.ifi.dbs.elki.persistent.PageHeader#readHeader(java.io.RandomAccessFile)
      */
     public void readHeader(RandomAccessFile file) throws IOException {
         file.seek(0);
@@ -75,7 +73,6 @@ public class DefaultPageHeader implements PageHeader {
      * Writes the {@link #FILE_VERSION version} of this header and
      * the integer value of {@link #pageSize} to the file.
      *
-     * @see de.lmu.ifi.dbs.elki.persistent.PageHeader#writeHeader(java.io.RandomAccessFile)
      */
     public void writeHeader(RandomAccessFile file) throws IOException {
         file.seek(0);

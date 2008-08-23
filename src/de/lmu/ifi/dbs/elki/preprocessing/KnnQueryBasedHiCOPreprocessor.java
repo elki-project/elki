@@ -44,9 +44,6 @@ public class KnnQueryBasedHiCOPreprocessor<V extends RealVector<V, ?>> extends H
     optionHandler.put(K_PARAM);
   }
 
-  /**
-   * @see HiCOPreprocessor#objectIDsForPCA(Integer,Database,boolean,boolean)
-   */
   protected List<Integer> objectIDsForPCA(Integer id, Database<V> database, boolean verbose, boolean time) {
     if(k == null) {
       V obj = database.get(id);
@@ -64,9 +61,6 @@ public class KnnQueryBasedHiCOPreprocessor<V extends RealVector<V, ?>> extends H
     return ids;
   }
 
-  /**
-   * @see HiCOPreprocessor#resultsForPCA(Integer, Database, boolean, boolean)
-   */
   protected List<QueryResult<DoubleDistance>> resultsForPCA(Integer id, Database<V> database, boolean verbose, boolean time) {
     if(k == null) {
       V obj = database.get(id);
@@ -81,7 +75,6 @@ public class KnnQueryBasedHiCOPreprocessor<V extends RealVector<V, ?>> extends H
    * Sets the value for the parameter k. If k is not specified, the default
    * value is used.
    * 
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
@@ -94,12 +87,6 @@ public class KnnQueryBasedHiCOPreprocessor<V extends RealVector<V, ?>> extends H
     return remainingParameters;
   }
 
-  /**
-   * Returns a description of the class and the required parameters. <p/> This
-   * description should be suitable for a usage description.
-   * 
-   * @return String a description of the class and the required parameters
-   */
   public String parameterDescription() {
     StringBuffer description = new StringBuffer();
     description.append(KnnQueryBasedHiCOPreprocessor.class.getName());

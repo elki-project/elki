@@ -57,6 +57,7 @@ public abstract class SelectiveFilter extends AbstractLoggable implements Filter
      *         equals the
      *         {@link #selectedLevel selectedLevel},
      *         false otherwise
+     * @see LogRecord#equals(Object)
      */
     public boolean isLoggable(LogRecord record) {
         return record.getLevel().equals(selectedLevel);

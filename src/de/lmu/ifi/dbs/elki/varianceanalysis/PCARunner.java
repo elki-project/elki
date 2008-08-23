@@ -43,9 +43,7 @@ public class PCARunner<V extends RealVector<V, ?>> extends AbstractParameterizab
         addOption(COVARIANCE_PARAM);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
+    // todo comment
     @SuppressWarnings("unchecked")
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);

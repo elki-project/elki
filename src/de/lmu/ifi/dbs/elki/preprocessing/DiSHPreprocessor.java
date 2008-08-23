@@ -131,9 +131,6 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
         optionHandler.put(strat);
     }
 
-    /**
-     * @see Preprocessor#run(de.lmu.ifi.dbs.elki.database.Database,boolean,boolean)
-     */
     public void run(Database<V> database, boolean verbose, boolean time) {
         if (database == null) {
             throw new IllegalArgumentException("Database must not be null!");
@@ -222,9 +219,6 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
 
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
-     */
     public String parameterDescription() {
         StringBuffer description = new StringBuffer();
         description.append(DiSHPreprocessor.class.getName());
@@ -233,9 +227,6 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
         return description.toString();
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 

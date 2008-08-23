@@ -81,9 +81,6 @@ public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ? >> e
     optionHandler.setGlobalParameterConstraint(new EqualSizeGlobalConstraint(global));
   }
 
-  /**
-   * @see Normalization#normalizeObjects(java.util.List)
-   */
   public List<ObjectAndAssociations<V>> normalizeObjects(List<ObjectAndAssociations<V>> objectAndAssociationsList)
       throws NonNumericFeaturesException {
     if (objectAndAssociationsList.size() == 0)
@@ -116,9 +113,6 @@ public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ? >> e
     }
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.normalization.Normalization#normalize(java.util.List)
-   */
   public List<V> normalize(List<V> featureVectors) throws NonNumericFeaturesException {
     if (featureVectors.size() == 0)
       return new ArrayList<V>();
@@ -148,9 +142,6 @@ public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ? >> e
     }
   }
 
-  /**
-   * @see Normalization#restore(de.lmu.ifi.dbs.elki.data.DatabaseObject)
-   */
   public V restore(V featureVector) throws NonNumericFeaturesException {
     if (featureVector.getDimensionality() == maxima.length && featureVector.getDimensionality() == minima.length) {
       double[] values = new double[featureVector.getDimensionality()];
@@ -167,9 +158,6 @@ public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ? >> e
     }
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.normalization.Normalization#restore(java.util.List)
-   */
   public List<V> restore(List<V> featureVectors) throws NonNumericFeaturesException {
     try {
       List<V> restored = new ArrayList<V>();
@@ -183,9 +171,6 @@ public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ? >> e
     }
   }
 
-  /**
-   * @see Normalization#transform(de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem)
-   */
   public LinearEquationSystem transform(LinearEquationSystem linearEquationSystem) throws NonNumericFeaturesException {
     double[][] coeff = linearEquationSystem.getCoefficents();
     double[] rhs = linearEquationSystem.getRHS();

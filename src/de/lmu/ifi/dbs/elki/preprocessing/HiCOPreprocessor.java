@@ -113,7 +113,6 @@ public abstract class HiCOPreprocessor<V extends RealVector<V, ?>> extends Abstr
      * Sets the values for the parameters alpha, pca and pcaDistancefunction if
      * specified. If the parameters are not specified default values are set.
      *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

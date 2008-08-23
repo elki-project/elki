@@ -117,8 +117,6 @@ public class PreprocessorHandler<O extends DatabaseObject, P extends Preprocesso
      * and sets additionally the value of flag {@link #OMIT_PREPROCESSING_FLAG}
      * and instantiates {@link #preprocessor} according to the value of parameter {@link #PREPROCESSOR_PARAM}
      * The remaining parameters are passed to the {@link #preprocessor}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
@@ -148,10 +146,8 @@ public class PreprocessorHandler<O extends DatabaseObject, P extends Preprocesso
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#parameterDescription()}
+     * Calls the super method
      * and appends the parameter description of {@link #preprocessor} (if it is already initialized).
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */
     @Override
     public String parameterDescription() {
@@ -170,8 +166,6 @@ public class PreprocessorHandler<O extends DatabaseObject, P extends Preprocesso
     /**
      * Invoked after objects of the database have been updated in some way.
      * Runs the preprocessor if {@link #OMIT_PREPROCESSING_FLAG} is not set.
-     *
-     * @see de.lmu.ifi.dbs.elki.database.DatabaseListener#objectsChanged(de.lmu.ifi.dbs.elki.database.DatabaseEvent)
      */
     public void objectsChanged(DatabaseEvent e) {
         if (!omit) {
@@ -182,8 +176,6 @@ public class PreprocessorHandler<O extends DatabaseObject, P extends Preprocesso
     /**
      * Invoked after an object has been inserted into the database.
      * Runs the preprocessor if {@link #OMIT_PREPROCESSING_FLAG} is not set.
-     *
-     * @see de.lmu.ifi.dbs.elki.database.DatabaseListener#objectsInserted(de.lmu.ifi.dbs.elki.database.DatabaseEvent)
      */
     public void objectsInserted(DatabaseEvent e) {
         if (!omit) {
@@ -194,8 +186,6 @@ public class PreprocessorHandler<O extends DatabaseObject, P extends Preprocesso
     /**
      * Invoked after an object has been deleted from the database.
      * Runs the preprocessor if {@link #OMIT_PREPROCESSING_FLAG} is not set.
-     *
-     * @see de.lmu.ifi.dbs.elki.database.DatabaseListener#objectsRemoved(de.lmu.ifi.dbs.elki.database.DatabaseEvent)
      */
     public void objectsRemoved(DatabaseEvent e) {
         if (!omit) {

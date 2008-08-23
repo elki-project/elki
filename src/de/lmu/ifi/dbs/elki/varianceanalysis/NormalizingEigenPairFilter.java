@@ -27,9 +27,6 @@ public class NormalizingEigenPairFilter extends AbstractParameterizable
 		super();
 	}
 
-	/**
-	 * @see EigenPairFilter#filter(de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs)
-	 */
 	public FilteredEigenPairs filter(final SortedEigenPairs eigenPairs) {
 		final StringBuffer msg = new StringBuffer();
 		// init strong and weak eigenpairs
@@ -61,18 +58,7 @@ public class NormalizingEigenPairFilter extends AbstractParameterizable
 		eigenvector.scaleColumn(0, scaling);
 	}
 
-	/**
-	 * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-	 */
-	@Override
-	public String[] setParameters(final String[] args) throws ParameterException {
-		final String[] remainingParameters = super.setParameters(args);
-		return remainingParameters;
-	}
 
-	/**
-	 * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
-	 */
 	@Override
 	public String parameterDescription() {
 		final StringBuffer description = new StringBuffer();

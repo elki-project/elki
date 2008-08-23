@@ -26,9 +26,6 @@ public class RealVectorLabelTransposingParser extends RealVectorLabelParser {
     super();
   }
 
-  /**
-   * @see Parser#parse(java.io.InputStream)
-   */
   @Override
   public ParsingResult<RealVector> parse(InputStream in) {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));

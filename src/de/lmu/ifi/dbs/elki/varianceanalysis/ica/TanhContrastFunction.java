@@ -41,24 +41,15 @@ public class TanhContrastFunction extends AbstractParameterizable implements Con
     optionHandler.put(a);
   }
 
-  /**
-   * @see ContrastFunction#function(double)
-   */
   public double function(double x) {
     return (Math.tanh(a * x));
   }
 
-  /**
-   * @see ContrastFunction#derivative(double)
-   */
   public double derivative(double x) {
     double tanha1x = Math.tanh(a * x);
     return (a * (1 - tanha1x * tanha1x));
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 

@@ -114,9 +114,6 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
         optionHandler.setGlobalParameterConstraint(gpc);
     }
 
-    /**
-     * @see Preprocessor#run(de.lmu.ifi.dbs.elki.database.Database,boolean,boolean)
-     */
     public void run(Database<V> database, boolean verbose, boolean time) {
         if (database == null) {
             throw new IllegalArgumentException("Database must not be null!");
@@ -174,9 +171,6 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
      */
     protected abstract void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<V> database);
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 

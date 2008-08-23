@@ -6,8 +6,17 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.*;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterFlagGlobalConstraint;
 import de.lmu.ifi.dbs.elki.varianceanalysis.LimitEigenPairFilter;
 import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredRunner;
@@ -65,7 +74,7 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
 
         // flag absolute
         addOption(ABSOLUTE_PARAM);
- 
+
         final ArrayList<ParameterConstraint<Number>> deltaCons = new ArrayList<ParameterConstraint<Number>>();
         // TODO: this constraint is already set in the parameter itself, since it also applies to the relative case, right? -- erich
         //deltaCons.add(new GreaterEqualConstraint(0));
@@ -85,7 +94,7 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
      * @param neighbors the neighbors as query results of the given point
      * @param database  the database for which the preprocessing is performed
      */
-    protected void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<V> database) {        
+    protected void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<V> database) {
         List<Integer> ids = new ArrayList<Integer>(neighbors.size());
         for (QueryResult<D> neighbor : neighbors) {
             ids.add(neighbor.getID());
@@ -105,8 +114,6 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
     /**
      * Sets the values for the parameters alpha, pca and pcaDistancefunction if
      * specified. If the parameters are not specified default values are set.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
@@ -146,7 +153,7 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
         Util.addParameter(tmpPCAParameters, OptionID.PCA_EIGENPAIR_FILTER, LimitEigenPairFilter.class.getName());
         // abs
         if (absolute) {
-          Util.addFlag(tmpPCAParameters, OptionID.EIGENPAIR_FILTER_ABSOLUTE);
+            Util.addFlag(tmpPCAParameters, OptionID.EIGENPAIR_FILTER_ABSOLUTE);
         }
         // delta
         Util.addParameter(tmpPCAParameters, OptionID.EIGENPAIR_FILTER_DELTA, Double.toString(delta));
@@ -176,9 +183,6 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
         return attributeSettings;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
-     */
     public String parameterDescription() {
         StringBuffer description = new StringBuffer();
         description.append(FourCPreprocessor.class.getName());

@@ -280,9 +280,6 @@ public class FastICA<V extends RealVector<V, ?>> extends AbstractParameterizable
         this.debug = true;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 

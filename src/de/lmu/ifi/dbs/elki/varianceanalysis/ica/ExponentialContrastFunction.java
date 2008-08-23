@@ -12,16 +12,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
  * @author Elke Achtert 
  */
 public class ExponentialContrastFunction extends AbstractParameterizable implements ContrastFunction {
-  /**
-   * @see ContrastFunction#function(double)
-   */
+
   public double function(double x) {
     return (x * Math.exp(-x * x / 2));
   }
 
-  /**
-   * @see ContrastFunction#derivative(double)
-   */
   public double derivative(double x) {
     return ((1 - x * x) * Math.exp(-x * x / 2));
   }

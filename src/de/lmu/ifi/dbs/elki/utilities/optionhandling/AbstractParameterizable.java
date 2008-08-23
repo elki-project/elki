@@ -123,7 +123,8 @@ public abstract class AbstractParameterizable extends AbstractLoggable
 
     /**
      * Returns a description of the class and the required parameters
-     * by calling {@code optionHandler.usage("")}.
+     * by calling {@code optionHandler.usage("")}. Subclasses may need to overwrite this method
+     * for a more detailled description.
      *
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler#usage(String)
      */

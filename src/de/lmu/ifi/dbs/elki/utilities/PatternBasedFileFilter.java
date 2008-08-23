@@ -32,7 +32,6 @@ public class PatternBasedFileFilter implements FileFilter
      * that is iff {@code this.pattern.matcher(pathname.getName()).matches()},
      * false otherwise.
      * 
-     * @see java.io.FileFilter#accept(java.io.File)
      */
     public boolean accept(File pathname)
     {

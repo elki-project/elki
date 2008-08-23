@@ -141,9 +141,6 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
     return normalized;
   }
 
-  /**
-   * @see Normalization#normalize(java.util.List)
-   */
   public List<MultiRepresentedObject<O>> normalize(
   List<MultiRepresentedObject<O>> featureVectors)
   throws NonNumericFeaturesException {
@@ -251,7 +248,6 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
 
   /**
    * @throws UnsupportedOperationException
-   * @see Normalization#transform(de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem)
    */
   public LinearEquationSystem transform(LinearEquationSystem linearEquationSystem) throws NonNumericFeaturesException {
     throw new UnsupportedOperationException("Operation not supported!");

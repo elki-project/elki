@@ -103,9 +103,6 @@ public class RealVectorLabelParser<V extends RealVector<V, ?>> extends AbstractP
     optionHandler.put(CLASS_LABEL_INDEX_PARAM);
   }
 
-  /**
-   * @see Parser#parse(java.io.InputStream)
-   */
   public ParsingResult<V> parse(InputStream in) {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 1;
@@ -161,9 +158,6 @@ public class RealVectorLabelParser<V extends RealVector<V, ?>> extends AbstractP
     return new ParsingResult<V>(objectAndLabelsList);
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
-   */
   @Override
   public String parameterDescription() {
     StringBuffer description = new StringBuffer();
@@ -179,9 +173,6 @@ public class RealVectorLabelParser<V extends RealVector<V, ?>> extends AbstractP
     return usage(description.toString());
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
   @Override
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParams = super.setParameters(args);

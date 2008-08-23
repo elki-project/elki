@@ -32,9 +32,6 @@ public class BitVectorLabelParser extends AbstractParser<BitVector> {
     super();
   }
 
-  /**
-   * @see Parser#parse(java.io.InputStream)
-   */
   public ParsingResult<BitVector> parse(InputStream in) {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 0;
@@ -75,9 +72,6 @@ public class BitVectorLabelParser extends AbstractParser<BitVector> {
     return new ParsingResult<BitVector>(objectAndLabelsList);
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
-   */
   public String parameterDescription() {
     StringBuffer description = new StringBuffer();
     description.append(BitVectorLabelParser.class.getName());

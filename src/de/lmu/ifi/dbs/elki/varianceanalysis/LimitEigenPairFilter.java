@@ -25,12 +25,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterFlagGlo
  * 
  * @author Elke Achtert 
  */
-
+// todo parameter comments
 public class LimitEigenPairFilter extends AbstractParameterizable implements EigenPairFilter {
   /**
    * "absolute" Flag
    */
-  private final Flag ABSOLUTE_PARAM = new Flag(OptionID.EIGENPAIR_FILTER_ABSOLUTE);
+  private final Flag ABSOLUTE_FLAG = new Flag(OptionID.EIGENPAIR_FILTER_ABSOLUTE);
 
 	/**
 	 * The default value for delta.
@@ -63,7 +63,7 @@ public class LimitEigenPairFilter extends AbstractParameterizable implements Eig
 		super();
 
     addOption(DELTA_PARAM);
-    addOption(ABSOLUTE_PARAM);
+    addOption(ABSOLUTE_FLAG);
 
     // Conditional Constraint:
     // delta must be >= 0 and <= 1 if it's a relative value
@@ -76,13 +76,10 @@ public class LimitEigenPairFilter extends AbstractParameterizable implements Eig
 		ParameterConstraint underOne = new LessEqualConstraint(1);
 		cons.add(underOne);
 
-		GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint(DELTA_PARAM, cons, ABSOLUTE_PARAM, false);
+		GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint(DELTA_PARAM, cons, ABSOLUTE_FLAG, false);
 		optionHandler.setGlobalParameterConstraint(gpc);
 	}
 
-	/**
-	 * @see EigenPairFilter#filter(de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs)
-	 */
 	public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
 		StringBuffer msg = new StringBuffer();
 		if (this.debug) {
@@ -131,29 +128,29 @@ public class LimitEigenPairFilter extends AbstractParameterizable implements Eig
 		return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);
 	}
 
-	/**
-	 * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-	 */
-	public String[] setParameters(String[] args) throws ParameterException {
+    /**
+     * Calls the super method
+     * and sets additionally the values of the flag
+     * {@link #ABSOLUTE_FLAG} and the parameter {@link #DELTA_PARAM}.
+     */
+    @Override
+    public String[] setParameters(String[] args) throws ParameterException {
 		String[] remainingParameters = super.setParameters(args);
 
 		// absolute
-		absolute = ABSOLUTE_PARAM.isSet();
+		absolute = isSet(ABSOLUTE_FLAG);
 
 		// delta
 		delta = DELTA_PARAM.getValue();
 		if (absolute && DELTA_PARAM.tookDefaultValue()) {
-			throw new WrongParameterValueException("Illegal parameter setting: " + "Flag " + ABSOLUTE_PARAM.getName() + " is set, " + "but no value for "
+			throw new WrongParameterValueException("Illegal parameter setting: " + "Flag " + ABSOLUTE_FLAG.getName() + " is set, " + "but no value for "
 					+ DELTA_PARAM.getName() + " is specified.");
 		}
 
 		return remainingParameters;
 	}
 
-	/**
-	 * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
-	 */
-	public String parameterDescription() {
+    public String parameterDescription() {
 		StringBuffer description = new StringBuffer();
 		description.append(PercentageEigenPairFilter.class.getName());
 		description.append(" filters all eigenpairs, " + " which are lower than a given value.\n");
