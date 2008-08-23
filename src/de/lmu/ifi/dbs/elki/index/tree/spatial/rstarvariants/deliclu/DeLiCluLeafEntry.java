@@ -41,34 +41,21 @@ public class DeLiCluLeafEntry extends SpatialLeafEntry implements DeLiCluEntry {
     this.hasUnhandled = true;
   }
 
-  /**
-   * @see DeLiCluEntry#hasHandled()
-   */
   public boolean hasHandled() {
     return hasHandled;
   }
 
-  /**
-   * @see DeLiCluEntry#hasUnhandled()
-   */
   public boolean hasUnhandled() {
     return hasUnhandled;
   }
 
-  /**
-   * @see DeLiCluEntry#setHasHandled(boolean)
-   */
   public void setHasHandled(boolean hasHandled) {
     this.hasHandled = hasHandled;
   }
 
-  /**
-   * @see DeLiCluEntry#setHasUnhandled(boolean)
-   */
   public void setHasUnhandled(boolean hasUnhandled) {
     this.hasUnhandled = hasUnhandled;
   }
-
 
   /**
    * Returns the id as a string representation of this entry.

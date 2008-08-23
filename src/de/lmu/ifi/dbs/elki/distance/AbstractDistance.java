@@ -22,8 +22,6 @@ public abstract class AbstractDistance<D extends AbstractDistance<D>> extends Ab
 
     /**
      * Any extending class should implement a proper hashCode method.
-     *
-     * @see Object#hashCode()
      */
     public abstract int hashCode();
 
@@ -34,8 +32,6 @@ public abstract class AbstractDistance<D extends AbstractDistance<D>> extends Ab
      * o is of the same class as this instance
      * and <code>this.compareTo(o)</code> is 0,
      * false otherwise.
-     *
-     * @see Object#equals(Object)
      */
     @SuppressWarnings("unchecked")
     @Override

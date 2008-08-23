@@ -64,9 +64,6 @@ public class RdKNNNode<D extends NumberDistance<D,N>, N extends Number> extends 
     return new RdKNNNode<D,N>(getFile(), capacity, false);
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode#adjustEntry(de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry)
-   */
   public void adjustEntry(RdKNNEntry<D,N> entry) {
     super.adjustEntry(entry);
     entry.setKnnDistance(kNNDistance());

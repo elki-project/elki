@@ -26,9 +26,6 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
         super(Pattern.compile("\\d+"));
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction#similarity(Integer, Integer)
-     */
     @SuppressWarnings("unchecked")
     public IntegerDistance similarity(Integer id1, Integer id2) {
         SortedSet<Integer> neighbors1 = (SortedSet<Integer>) getDatabase().getAssociation(getAssociationID(), id1);
@@ -81,51 +78,30 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
         return new IntegerDistance(intersection);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.MeasurementFunction#infiniteDistance()
-     */
     public IntegerDistance infiniteDistance() {
         return new IntegerDistance(Integer.MAX_VALUE);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.MeasurementFunction#isInfiniteDistance(de.lmu.ifi.dbs.elki.distance.Distance)
-     */
     public boolean isInfiniteDistance(IntegerDistance distance) {
         return distance.equals(new IntegerDistance(Integer.MAX_VALUE));
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.MeasurementFunction#isNullDistance(de.lmu.ifi.dbs.elki.distance.Distance)
-     */
     public boolean isNullDistance(IntegerDistance distance) {
         return distance.equals(new IntegerDistance(0));
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.MeasurementFunction#isUndefinedDistance(de.lmu.ifi.dbs.elki.distance.Distance)
-     */
     public boolean isUndefinedDistance(IntegerDistance distance) {
         throw new UnsupportedOperationException("Undefinded distance not supported!");
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.MeasurementFunction#nullDistance() ()
-     */
     public IntegerDistance nullDistance() {
         return new IntegerDistance(0);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.MeasurementFunction#undefinedDistance()
-     */
     public IntegerDistance undefinedDistance() {
         throw new UnsupportedOperationException("Undefinded distance not supported!");
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.MeasurementFunction#valueOf(String)
-     */
     public IntegerDistance valueOf(String pattern) throws IllegalArgumentException {
         if (matches(pattern)) {
             return new IntegerDistance(Integer.parseInt(pattern));
@@ -136,40 +112,28 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
     }
 
     /**
-     * Returns the assocoiation ID for the association to be set by the preprocessor.
-     *
      * @return the assocoiation ID for the association to be set by the preprocessor,
      *         which is {@link AssociationID#SHARED_NEAREST_NEIGHBORS_SET}
-     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getAssociationID()
      */
     public AssociationID<SortedSet> getAssociationID() {
         return AssociationID.SHARED_NEAREST_NEIGHBORS_SET;
     }
 
     /**
-     * Returns the name of the default preprocessor.
-     *
      * @return the name of the default preprocessor,
      *         which is {@link SharedNearestNeighborsPreprocessor}
-     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getDefaultPreprocessorClassName()
      */
     public String getDefaultPreprocessorClassName() {
         return SharedNearestNeighborsPreprocessor.class.getName();
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getPreprocessorSuperClass()
-     */
     public String getPreprocessorDescription() {
         return "The Classname of the preprocessor to determine the neighbors of the objects.";
     }
 
     /**
-     * Returns the super class for the preprocessor.
-     *
      * @return the super class for the preprocessor,
      *         which is {@link SharedNearestNeighborsPreprocessor}
-     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getPreprocessorSuperClass()
      */
     public Class<? extends Preprocessor> getPreprocessorSuperClass() {
         return SharedNearestNeighborsPreprocessor.class;

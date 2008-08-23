@@ -32,7 +32,6 @@ public class WeightedDistanceFunction<V extends NumberVector<V, ? >>
    *
    * @return the Weighted distance between the given two vectors as an
    *         instance of {@link de.lmu.ifi.dbs.elki.distance.DoubleDistance DoubleDistance}.
-   * @see DistanceFunction#distance(de.lmu.ifi.dbs.elki.data.DatabaseObject, de.lmu.ifi.dbs.elki.data.DatabaseObject)
    */
   public DoubleDistance distance(V o1, V o2) {
     if (o1.getDimensionality() != o2.getDimensionality()) {
@@ -52,10 +51,7 @@ public class WeightedDistanceFunction<V extends NumberVector<V, ? >>
     return new DoubleDistance(Math.sqrt(sqrDist));
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
-   *      todo: parameters required
-   */
+  // todo: parameters required
   public String parameterDescription() {
     return "Weighted distance for feature vectors. " +
            "No parameters required. " +

@@ -35,9 +35,6 @@ public abstract class AbstractLocallyWeightedDistanceFunction<O extends RealVect
         preprocessorHandler = new PreprocessorHandler<O, P>(this);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction#setDatabase(de.lmu.ifi.dbs.elki.database.Database,boolean,boolean)
-     */
     public void setDatabase(Database<O> database, boolean verbose, boolean time) {
         super.setDatabase(database, verbose, time);
         preprocessorHandler.runPreprocessor(database, verbose, time);
@@ -47,8 +44,6 @@ public abstract class AbstractLocallyWeightedDistanceFunction<O extends RealVect
      * Calls {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters(String[])
      * AbstractParameterizable#setParameters(args)}
      * and passes the remaining parameters to the {@link #preprocessorHandler}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
@@ -72,9 +67,6 @@ public abstract class AbstractLocallyWeightedDistanceFunction<O extends RealVect
         return mySettings;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
-     */
     public String parameterDescription() {
         StringBuilder description = new StringBuilder();
         description.append(super.parameterDescription());
@@ -87,19 +79,13 @@ public abstract class AbstractLocallyWeightedDistanceFunction<O extends RealVect
     }
 
     /**
-     * Returns the name of the default preprocessor.
-     *
      * @return the name of the default preprocessor,
      *         which is {@link de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor}
-     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getDefaultPreprocessorClassName()
      */
     public String getDefaultPreprocessorClassName() {
         return KnnQueryBasedHiCOPreprocessor.class.getName();
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getPreprocessorDescription()
-     */
     public String getPreprocessorDescription() {
         return "Classname of the preprocessor to determine the correlation dimension of each objects " +
             Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(getPreprocessorSuperClass()) +
@@ -108,11 +94,8 @@ public abstract class AbstractLocallyWeightedDistanceFunction<O extends RealVect
 
 
     /**
-     * Returns the super class for the preprocessor.
-     *
      * @return the super class for the preprocessor,
      *         which is {@link de.lmu.ifi.dbs.elki.preprocessing.Preprocessor}
-     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getPreprocessorSuperClass()
      */
     public Class<? extends Preprocessor> getPreprocessorSuperClass() {
         return Preprocessor.class;

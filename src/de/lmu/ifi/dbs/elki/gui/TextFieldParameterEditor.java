@@ -108,11 +108,6 @@ public abstract class TextFieldParameterEditor extends ParameterEditor {
 
 	protected abstract int getColumnNumber();
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.lmu.ifi.dbs.elki.gui.ParameterEditor#parameterToValue()
-	 */
 	public String[] parameterToValue() {
 
 		if (((Parameter<?, ?>) option).isOptional() && this.value == null) {
@@ -126,11 +121,6 @@ public abstract class TextFieldParameterEditor extends ParameterEditor {
 		return paramToValue;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.lmu.ifi.dbs.elki.gui.ParameterEditor#setValue(java.lang.String)
-	 */
 	public void setValue(String value) {
 
 		if (value == null) {

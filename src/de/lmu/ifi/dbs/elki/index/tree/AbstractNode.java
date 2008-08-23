@@ -127,9 +127,8 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
      * have contain the same entries,
      * <code>false</code> otherwise.
      *
-     * @see Object#equals(Object)
-     * @see de.lmu.ifi.dbs.elki.persistent.AbstractPage#equals(Object)
      * @see de.lmu.ifi.dbs.elki.index.tree.Entry#equals(Object)
+     * @see de.lmu.ifi.dbs.elki.persistent.AbstractPage#equals(Object)
      */
     @Override
     public boolean equals(Object o) {

@@ -18,11 +18,11 @@ import java.util.List;
 
 /**
  * TODO comment
- * 
- * @author Arthur Zimek 
+ *
+ * @author Arthur Zimek
  */
-public abstract class AbstractClassifierEvaluation<O extends DatabaseObject, L extends ClassLabel<L>, C extends Classifier<O,L>> extends AbstractResult<O>  implements Evaluation<O, C>{
-    
+public abstract class AbstractClassifierEvaluation<O extends DatabaseObject, L extends ClassLabel<L>, C extends Classifier<O, L>> extends AbstractResult<O> implements Evaluation<O, C> {
+
     /**
      * Holds the used classifier.
      */
@@ -36,49 +36,40 @@ public abstract class AbstractClassifierEvaluation<O extends DatabaseObject, L e
     /**
      * @param database
      * @param classifier
+     * @param testset
      */
-    public AbstractClassifierEvaluation(Database<O> database, Database<O> testset, C classifier)
-    {
+    public AbstractClassifierEvaluation(Database<O> database, Database<O> testset, C classifier) {
         super(database);
         this.testset = testset;
         this.classifier = classifier;
     }
 
     /**
-     * @param normalization
-     *            Normalization is unused.
-     * @see de.lmu.ifi.dbs.elki.algorithm.result.Result#output(java.io.File,
-     *      de.lmu.ifi.dbs.elki.normalization.Normalization, java.util.List)
+     * @param normalization normalization is unused
      */
-    public final void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException
-    {
+    public final void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         PrintStream output;
-        try
-        {
+        try {
             out.getParentFile().mkdirs();
             output = new PrintStream(new FileOutputStream(out));
         }
-        catch(FileNotFoundException e)
-        {
+        catch (FileNotFoundException e) {
             //System.err.println("designated output file \"" + out.getAbsolutePath() + "\" cannot be created or is not writtable. Output is given to STDOUT.");
-        	warning("designated output file \"" + out.getAbsolutePath() + "\" cannot be created or is not writtable. Output is given to STDOUT.");
+            warning("designated output file \"" + out.getAbsolutePath() + "\" cannot be created or is not writtable. Output is given to STDOUT.");
             output = new PrintStream(new FileOutputStream(FileDescriptor.out));
         }
-        catch(Exception e)
-        {
+        catch (Exception e) {
             output = new PrintStream(new FileOutputStream(FileDescriptor.out));
         }
         output(output, normalization, settings);
     }
 
-    public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException
-    {
+    public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         writeHeader(outStream, settings, null);
         outStream.print("Evaluating ");
         outStream.println(classifier.getClass().getName());
         outStream.println(classifier.getAttributeSettings());
-        if(testset != null)
-        {
+        if (testset != null) {
             outStream.println("used testset: ");
             outStream.print(" number of test instances: ");
             outStream.println(testset.size());

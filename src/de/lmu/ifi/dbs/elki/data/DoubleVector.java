@@ -69,7 +69,6 @@ public class DoubleVector extends RealVector<DoubleVector,Double> {
   }
 
   /**
-   * @see RealVector#newInstance(double[])
    * @return a new DoubleVector with the specified values
    */
   @Override
@@ -78,9 +77,8 @@ public DoubleVector newInstance(double[] values) {
   }
 
   /**
-   * Returns a new DoubleVector with values between 0 and 1.
+   * Returns a new DoubleVector with random values between 0 and 1.
    *
-   * @see FeatureVector#randomInstance(Random)
    */
   public DoubleVector randomInstance(Random random) {
     double[] randomValues = new double[getDimensionality()];
@@ -92,9 +90,6 @@ public DoubleVector newInstance(double[] values) {
     return new DoubleVector(randomValues);
   }
 
-  /**
-   * @see FeatureVector#randomInstance(Number, Number, java.util.Random)
-   */
   public DoubleVector randomInstance(Double min, Double max, Random random) {
     double[] randomValues = new double[getDimensionality()];
     for (int i = 0; i < randomValues.length; i++) {
@@ -103,16 +98,10 @@ public DoubleVector newInstance(double[] values) {
     return new DoubleVector(randomValues);
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.data.FeatureVector#getDimensionality()
-   */
   public int getDimensionality() {
     return values.length;
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.data.FeatureVector#getValue(int)
-   */
   public Double getValue(int dimension) {
     if (dimension < 1 || dimension > values.length) {
       throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
@@ -120,23 +109,14 @@ public DoubleVector newInstance(double[] values) {
     return values[dimension - 1];
   }
 
-  /**
-   * @see FeatureVector#getColumnVector()
-   */
   public Vector getColumnVector() {
     return new Vector(values);
   }
 
-  /**
-   * @see FeatureVector#getRowVector()
-   */
   public Matrix getRowVector() {
     return new Matrix(new double[][]{values.clone()});
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.data.FeatureVector#plus(de.lmu.ifi.dbs.elki.data.FeatureVector)
-   */
   public DoubleVector plus(DoubleVector fv) {
     if (fv.getDimensionality() != this.getDimensionality()) {
       throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
@@ -148,23 +128,14 @@ public DoubleVector newInstance(double[] values) {
     return new DoubleVector(values);
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.data.FeatureVector#nullVector()
-   */
   public DoubleVector nullVector() {
     return new DoubleVector(new double[this.values.length]);
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.data.FeatureVector#negativeVector()
-   */
   public DoubleVector negativeVector() {
     return multiplicate(-1);
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.data.FeatureVector#multiplicate(double)
-   */
   public DoubleVector multiplicate(double k) {
     double[] values = new double[this.values.length];
     for (int i = 0; i < values.length; i++) {
@@ -173,9 +144,6 @@ public DoubleVector newInstance(double[] values) {
     return new DoubleVector(values);
   }
 
-  /**
-   * @see FeatureVector#toString()
-   */
   @Override
   public String toString() {
     StringBuffer featureLine = new StringBuffer();

@@ -5,11 +5,10 @@ import java.util.logging.LogRecord;
 
 /**
  * A formatter to format exception messages.
- * 
+ *
  * @author Arthur Zimek
  */
-public class ExceptionFormatter extends Formatter
-{
+public class ExceptionFormatter extends Formatter {
     /**
      * Holds the class specific debug status.
      * In this case, the status true is required
@@ -24,53 +23,43 @@ public class ExceptionFormatter extends Formatter
     /**
      * Provides an exception formatter
      * for exception messages.
-     *
      */
-    public ExceptionFormatter()
-    {
+    public ExceptionFormatter() {
         super();
     }
-    
+
     /**
      * Exception messages are formatted dependent from the
      * debug mode as assigned by DEBUG.
      * <ul>
      * <li>If debug mode is deactivated (i.e. <code>DEBUG=false</code>)
-     *     the regular user information will be provided:
-     *     i.e., the message of the LogEntry only.
+     * the regular user information will be provided:
+     * i.e., the message of the LogEntry only.
      * </li>
      * <li>In debug mode, one more detailed
-     *     information is provided, as the name
-     *     of the causing exception and the stacktrace.
+     * information is provided, as the name
+     * of the causing exception and the stacktrace.
      * </li>
      * </ul>
-     * 
-     * @see java.util.logging.Formatter#format(java.util.logging.LogRecord)
      */
     @Override
-    public String format(LogRecord record)
-    {
+    public String format(LogRecord record) {
         StringBuilder exceptionMessage = new StringBuilder();
         Throwable cause = record.getThrown();
-        if(DEBUG)
-        {
-            exceptionMessage.append("EXCEPTION: ");            
-            if(cause != null)
-            {         
+        if (DEBUG) {
+            exceptionMessage.append("EXCEPTION: ");
+            if (cause != null) {
                 exceptionMessage.append(cause.getClass().getName());
             }
-            else
-            {
+            else {
                 exceptionMessage.append("unknown exception");
             }
             exceptionMessage.append('\n');
-        }        
+        }
         exceptionMessage.append(record.getMessage());
         exceptionMessage.append('\n');
-        if(DEBUG)
-        {
-            if(cause != null)
-            {
+        if (DEBUG) {
+            if (cause != null) {
                 exceptionMessage.append("\nCaused by:\n");
                 exceptionMessage.append(cause.toString());
                 exceptionMessage.append("\n");
@@ -81,22 +70,18 @@ public class ExceptionFormatter extends Formatter
         }
         return exceptionMessage.toString();
     }
-    
-    public String getStackTrace(LogRecord record)
-    {
+
+    public String getStackTrace(LogRecord record) {
         Throwable cause = record.getThrown();
-        if(cause != null)
-        {
+        if (cause != null) {
             StringBuilder stackTrace = new StringBuilder();
-            for(StackTraceElement e : cause.getStackTrace())
-            {
+            for (StackTraceElement e : cause.getStackTrace()) {
                 stackTrace.append(e.toString());
                 stackTrace.append('\n');
             }
             return stackTrace.toString();
         }
-        else
-        {
+        else {
             return "unknown";
         }
     }

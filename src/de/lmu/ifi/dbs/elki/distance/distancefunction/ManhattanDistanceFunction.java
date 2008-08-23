@@ -21,9 +21,6 @@ public class ManhattanDistanceFunction<V extends NumberVector<V, ?>>
         super();
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction#distance(de.lmu.ifi.dbs.elki.data.DatabaseObject,de.lmu.ifi.dbs.elki.data.DatabaseObject)
-     */
     public DoubleDistance distance(V v1, V v2) {
         if (v1.getDimensionality() != v2.getDimensionality()) {
             throw new IllegalArgumentException("Different dimensionality of NumberVectors" +

@@ -32,23 +32,14 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
         super(value);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.Distance#description()
-     */
     public String description() {
         return "FloatDistance.floatValue";
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.Distance#plus(Distance)
-     */
     public FloatDistance plus(FloatDistance distance) {
         return new FloatDistance(this.getValue() + distance.getValue());
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.Distance#minus(Distance)
-     */
     public FloatDistance minus(FloatDistance distance) {
         return new FloatDistance(this.getValue() - distance.getValue());
     }
@@ -79,7 +70,6 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
 
     /**
      * Writes the float value of this FloatDistance to the specified stream.
-     * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
      */
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeFloat(getValue());
@@ -87,7 +77,6 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
 
     /**
      * Reads the float value of this FloatDistance from the specified stream.
-     * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
      */
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         setValue(in.readFloat());
@@ -98,7 +87,6 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
      * external file.
      *
      * @return 4 (4 Byte for a float value)
-     * @see Distance#externalizableSize() 
      */
     public int externalizableSize() {
         return 4;

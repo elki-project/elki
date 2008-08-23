@@ -50,25 +50,16 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
         this.euclideanValue = euclideanValue;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.Distance#plus(Distance)
-     */
     @SuppressWarnings("unchecked")
     public D plus(D distance) {
         return (D) new CorrelationDistance<D>(this.correlationValue + distance.correlationValue, this.euclideanValue + distance.euclideanValue);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.Distance#minus(Distance)
-     */
     @SuppressWarnings("unchecked")
     public D minus(D distance) {
         return (D) new CorrelationDistance<D>(this.correlationValue - distance.correlationValue, this.euclideanValue - distance.euclideanValue);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.Distance#description()
-     */
     public String description() {
         return "CorrelationDistance.correlationValue CorrelationDistance.euclideanValue";
     }
@@ -93,7 +84,6 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
      *         if it is a non zero value,
      *         the value of {@link Double#compare(double,double) Double.compare(this.euclideanValue, other.euclideanValue)}
      *         otherwise
-     * @see Comparable#compareTo(Object)
      */
     public int compareTo(D other) {
         int compare = new Integer(this.correlationValue).compareTo(other.correlationValue);
@@ -105,9 +95,6 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
         }
     }
 
-    /**
-     * @see java.lang.Object#hashCode()
-     */
     public int hashCode() {
         int result;
         long temp;
@@ -138,8 +125,6 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
     /**
      * Writes the correlation value and the euclidean value
      * of this CorrelationDistance to the specified stream.
-     *
-     * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
      */
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeInt(correlationValue);
@@ -149,8 +134,6 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
     /**
      * Reads the correlation value and the euclidean value
      * of this CorrelationDistance from the specified stream.
-     *
-     * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
      */
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         correlationValue = in.readInt();

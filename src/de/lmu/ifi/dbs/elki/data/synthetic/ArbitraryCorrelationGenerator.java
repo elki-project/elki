@@ -6,7 +6,12 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleListParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.VectorListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalListSizeConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalVectorListElementSizeConstraint;
@@ -148,9 +153,7 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
         }
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
+    // todo comment
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
@@ -419,7 +422,7 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
      * @param featureVectors the feature vectors to be written
      * @param dependency     the dependeny of the feature vectors
      * @param std            the standard deviation of the jitter of the feature vectors
-     * @throws IOException   if an I/O exception occurs during writing
+     * @throws IOException if an I/O exception occurs during writing
      */
     private void output(OutputStreamWriter outStream, List<DoubleVector> featureVectors, LinearEquationSystem dependency, double std)
         throws IOException {

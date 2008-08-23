@@ -21,9 +21,6 @@ public class WekaStringAttribute extends WekaAbstractAttribute<WekaStringAttribu
         this.value = value;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.converter.WekaAttribute#getValue()
-     */
     public String getValue() {
         return value;
     }

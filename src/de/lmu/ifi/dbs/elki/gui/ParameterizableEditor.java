@@ -5,24 +5,16 @@ import de.lmu.ifi.dbs.elki.properties.PropertyName;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
+import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 // todo steffi comment all
 public class ParameterizableEditor extends ParameterEditor implements PopUpTreeListener,
@@ -187,9 +179,6 @@ public class ParameterizableEditor extends ParameterEditor implements PopUpTreeL
 
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.gui.PopUpTreeListener#selectedClassChanged(java.lang.String)
-     */
     public void selectedClassChanged(String selectedClass) {
 
         // TODO perhaps still do the test here!!
@@ -245,11 +234,6 @@ public class ParameterizableEditor extends ParameterEditor implements PopUpTreeL
         return bob.toString();
     }
 
-    /*
-      * (non-Javadoc)
-      *
-      * @see de.lmu.ifi.dbs.elki.gui.ParameterEditor#parameterToValue()
-      */
     public String[] parameterToValue() {
         String[] temp = getValue().split(" ");
         String[] paramToValue = new String[temp.length + 1];

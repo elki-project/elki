@@ -28,9 +28,6 @@ public abstract class FrequencyDependentItemsetDistanceFunction
 
     /**
      * Sets the database, initializes a new map of frequencies.
-     *
-     * @see de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction#setDatabase(de.lmu.ifi.dbs.elki.database.Database,
-     *boolean,boolean)
      */
     @Override
     public void setDatabase(Database<BitVector> database, boolean verbose,

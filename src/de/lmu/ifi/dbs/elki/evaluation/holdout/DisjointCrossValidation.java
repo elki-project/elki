@@ -56,8 +56,6 @@ public class DisjointCrossValidation<O extends DatabaseObject, L extends ClassLa
   /**
    * Provides a set of n partitions of a database to
    * perform n-fold cross-validation.
-   *
-   * @see Holdout#partition(de.lmu.ifi.dbs.elki.database.Database)
    */
   public TrainingAndTestSet<O,L>[] partition(Database<O> database) {
     this.database = database;
@@ -95,9 +93,6 @@ public class DisjointCrossValidation<O extends DatabaseObject, L extends ClassLa
     return partitions;
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
-   */
   public String parameterDescription() {
     return "Provides an n-fold cross-validation holdout with disjoint test sets.";
   }
@@ -105,7 +100,6 @@ public class DisjointCrossValidation<O extends DatabaseObject, L extends ClassLa
   /**
    * Sets the parameter n.
    *
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
    */
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);

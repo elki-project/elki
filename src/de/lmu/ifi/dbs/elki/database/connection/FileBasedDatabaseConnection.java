@@ -43,12 +43,10 @@ public class FileBasedDatabaseConnection<O extends DatabaseObject> extends Input
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.database.connection.InputStreamDatabaseConnection#setParameters(String[])
+     * Calls the super method
      * InputStreamDatabaseConnection#setParameters(args)}
      * and sets additionally the value of the parameter
      * {@link #INPUT_PARAM}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

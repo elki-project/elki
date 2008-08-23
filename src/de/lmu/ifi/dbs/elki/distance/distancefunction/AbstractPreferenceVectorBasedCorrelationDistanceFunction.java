@@ -62,9 +62,6 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
         addOption(EPSILON_PARAM);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.MeasurementFunction#valueOf(String)
-     */
     public PreferenceVectorBasedCorrelationDistance valueOf(String pattern)
         throws IllegalArgumentException {
         if (pattern.equals(INFINITY_PATTERN)) {
@@ -85,9 +82,6 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
         }
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.MeasurementFunction#infiniteDistance()
-     */
     public PreferenceVectorBasedCorrelationDistance infiniteDistance() {
         return new PreferenceVectorBasedCorrelationDistance(
             dimensionality(),
@@ -96,9 +90,6 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
             new BitSet());
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.MeasurementFunction#nullDistance()
-     */
     public PreferenceVectorBasedCorrelationDistance nullDistance() {
         return new PreferenceVectorBasedCorrelationDistance(
             dimensionality(),
@@ -107,9 +98,6 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
             new BitSet());
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.MeasurementFunction#undefinedDistance()
-     */
     public PreferenceVectorBasedCorrelationDistance undefinedDistance() {
         return new PreferenceVectorBasedCorrelationDistance(
             dimensionality(),
@@ -118,9 +106,6 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
             new BitSet());
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractCorrelationDistanceFunction#correlationDistance(de.lmu.ifi.dbs.elki.data.RealVector,de.lmu.ifi.dbs.elki.data.RealVector)
-     */
     protected PreferenceVectorBasedCorrelationDistance correlationDistance(V v1, V v2) {
         BitSet preferenceVector1 = getDatabase().getAssociation(AssociationID.PREFERENCE_VECTOR, v1.getID());
         BitSet preferenceVector2 = getDatabase().getAssociation(AssociationID.PREFERENCE_VECTOR, v2.getID());
@@ -206,12 +191,9 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
     }
 
     /**
-     * Calls {@link AbstractPreprocessorBasedDistanceFunction#setParameters(String[])
-     * AbstractPreprocessorBasedDistanceFunction#setParameters(args)}
+     * Calls the super method
      * and sets additionally the value of the parameter
      * {@link #EPSILON_PARAM}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
@@ -237,26 +219,19 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
      *
      * @return the assocoiation ID for the association to be set by the preprocessor,
      *         which is {@link AssociationID#PREFERENCE_VECTOR}
-     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getAssociationID()
      */
     public final AssociationID getAssociationID() {
         return AssociationID.PREFERENCE_VECTOR;
     }
 
     /**
-     * Returns the super class for the preprocessor parameter.
-     *
      * @return the super class for the preprocessor parameter,
      *         which is {@link PreferenceVectorPreprocessor}
-     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getPreprocessorSuperClass()
      */
     public final Class<PreferenceVectorPreprocessor> getPreprocessorSuperClass() {
         return PreferenceVectorPreprocessor.class;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getPreprocessorSuperClass()
-     */
     public final String getPreprocessorDescription() {
         return "Classname of the preprocessor to determine the preference vector of each object "
             + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(getPreprocessorSuperClass()) +
@@ -265,6 +240,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
 
     /**
      * Returns the dimensionality of the database.
+     *
      * @return the dimensionality of the database, -1 if no database is assigned.
      */
     private int dimensionality() {

@@ -58,8 +58,6 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
      * Calls {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters(String[])
      * AbstractParameterizable#setParameters(args)}
      * and passes the remaining parameters to the {@link #preprocessorHandler}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
@@ -83,18 +81,13 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
         return mySettings;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction#getPreprocessor()
-     */
     public final P getPreprocessor() {
         return preprocessorHandler.getPreprocessor();
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#parameterDescription()}
+     * Calls the super method
      * and appends the parameter description of the {@link #preprocessorHandler}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */
     @Override
     public String parameterDescription() {

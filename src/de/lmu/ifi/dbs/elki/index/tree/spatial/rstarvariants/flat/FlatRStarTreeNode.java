@@ -40,16 +40,10 @@ public class FlatRStarTreeNode extends AbstractRStarTreeNode<FlatRStarTreeNode, 
     super(file, capacity, isLeaf);
   }
 
-  /**
-   * @see AbstractRStarTreeNode#createNewLeafNode(int)
-   */
   protected FlatRStarTreeNode createNewLeafNode(int capacity) {
     return new FlatRStarTreeNode(getFile(), capacity, true);
   }
 
-  /**
-   * @see AbstractRStarTreeNode#createNewDirectoryNode(int)
-   */
   protected FlatRStarTreeNode createNewDirectoryNode(int capacity) {
     return new FlatRStarTreeNode(getFile(), capacity, false);
   }

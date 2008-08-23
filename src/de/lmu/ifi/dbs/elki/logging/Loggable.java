@@ -15,25 +15,26 @@ public interface Loggable {
 	/**
 	 * Log an EXCEPTION message.
 	 * 
-	 * @param msg The String message
+	 * @param msg the string message
+     * @param e the exception
 	 */
 	void exception(String msg, Throwable e);
 	
 	/**
 	 * Log a WARNING message:
-	 * @param msg The String message
+	 * @param msg the string message
 	 */
 	void warning(String msg);
 	
 	/**
 	 * Log a MESSAGE.
-	 * @param msg The String message
+	 * @param msg the string message
 	 */
 	void message(String msg);
 	
 	/**
 	 * Log a PROGRESS message.
-	 * @param pgr The Progress to be logged
+	 * @param pgr the progress to be logged
 	 */
 	void progress(Progress pgr);
 	
@@ -47,7 +48,7 @@ public interface Loggable {
 	
 	/**
 	 * Log a VERBOSE message.
-	 * @param msg The String message.
+	 * @param msg the string message
 	 */
 	void verbose(String msg);
     
@@ -60,19 +61,19 @@ public interface Loggable {
 	
 	/**
 	 * Log a DEBUG_FINE message. 
-	 * @param msg The String message
+	 * @param msg the string message
 	 */
 	void debugFine(String msg);
 	
 	/**
 	 * Log a DEBUG_FINER message.
-	 * @param msg The String message
+	 * @param msg the string message
 	 */
 	void debugFiner(String msg);
 	
 	/**
 	 * Log a DEBUG_FINEST message.
-	 * @param msg The String message
+	 * @param msg the string message
 	 */
 	void debugFinest(String msg);
 }

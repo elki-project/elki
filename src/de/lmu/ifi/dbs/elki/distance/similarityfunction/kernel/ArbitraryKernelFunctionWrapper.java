@@ -31,7 +31,6 @@ public class ArbitraryKernelFunctionWrapper<O extends RealVector<O, ? >> extends
 	 * @param o1 first vector
 	 * @param o2 second vector
 	 * @return the linear kernel similarity which is stored in the Global Database
-	 * @see DistanceFunction#distance(de.lmu.ifi.dbs.elki.data.DatabaseObject, de.lmu.ifi.dbs.elki.data.DatabaseObject)
 	 */
 	public DoubleDistance similarity(final O o1, final O o2) {
 		return new DoubleDistance(kernelMatrix.getSimilarity(o1.getID(), o2.getID()));
@@ -61,17 +60,11 @@ public class ArbitraryKernelFunctionWrapper<O extends RealVector<O, ? >> extends
 		return new DoubleDistance(kernelMatrix.getDistance(id1, id2));
 	}
 
-	/**
-	 * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
-	 */
 	@Override
 	public String parameterDescription() {
 		return "Arbitrary kernel function wrapper for FeatureVectors. No parameters required.";
 	}
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.distance.MeasurementFunction#setDatabase(de.lmu.ifi.dbs.elki.database.Database, boolean, boolean)
-   */
   public void setDatabase(Database<O> database, boolean verbose, boolean time) {
     super.setDatabase(database, verbose, time);
     //noinspection unchecked

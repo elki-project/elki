@@ -120,7 +120,6 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
     /**
      * Adapts the knn distances before insertion of the specified entry.
      *
-     * @see #preInsert(MkMaxEntry,MkMaxEntry,de.lmu.ifi.dbs.elki.utilities.KNNList)
      */
     protected void preInsert(MkMaxEntry<D> entry) {
         KNNList<D> knns_o = new KNNList<D>(k_max, getDistanceFunction().infiniteDistance());

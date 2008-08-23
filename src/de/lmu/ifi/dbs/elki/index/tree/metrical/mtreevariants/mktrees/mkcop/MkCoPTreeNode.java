@@ -138,9 +138,6 @@ class MkCoPTreeNode<O extends DatabaseObject, D extends NumberDistance<D, N>, N 
         return new ApproximationLine(k_0, m, t);
     }
 
-    /**
-     * @see AbstractMTreeNode#adjustEntry(de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry,Integer,de.lmu.ifi.dbs.elki.distance.Distance,de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree)
-     */
     public void adjustEntry(MkCoPEntry<D, N> entry, Integer routingObjectID, D parentDistance,
                             AbstractMTree<O, D, MkCoPTreeNode<O, D, N>, MkCoPEntry<D, N>> mTree) {
         super.adjustEntry(entry, routingObjectID, parentDistance, mTree);
@@ -149,9 +146,6 @@ class MkCoPTreeNode<O extends DatabaseObject, D extends NumberDistance<D, N>, N 
 //    entry.setConservativeKnnDistanceApproximation(conservativeKnnDistanceApproximation(k_max));
     }
 
-    /**
-     * @see AbstractMTreeNode#test(de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry,AbstractMTreeNode,int,de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree)
-     */
     protected void test(MkCoPEntry<D, N> parentEntry, MkCoPTreeNode<O, D, N> parent, int index,
                         AbstractMTree<O, D, MkCoPTreeNode<O, D, N>, MkCoPEntry<D, N>> mTree) {
         super.test(parentEntry, parent, index, mTree);

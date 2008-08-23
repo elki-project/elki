@@ -52,11 +52,9 @@ public abstract class AbstractPreprocessorBasedSimilarityFunction<O extends Data
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters(String[])
-     * AbstractParameterizable#setParameters(args)}
+     * Calls the super method
      * and passes the remaining parameters to the {@link #preprocessorHandler}.
      *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
@@ -81,10 +79,9 @@ public abstract class AbstractPreprocessorBasedSimilarityFunction<O extends Data
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#parameterDescription()}
+     * Calls the super method
      * and appends the parameter description of the {@link #preprocessorHandler}.
      *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */
     @Override
     public String parameterDescription() {
@@ -100,7 +97,7 @@ public abstract class AbstractPreprocessorBasedSimilarityFunction<O extends Data
     }
 
     /**
-     * @see de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction#getPreprocessor()
+     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler#getPreprocessor()
      */
     public final P getPreprocessor() {
         return preprocessorHandler.getPreprocessor();

@@ -33,23 +33,14 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
         super(value);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.Distance#description()
-     */
     public String description() {
         return "DoubleDistance.doubleValue";
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.Distance#plus(Distance)
-     */
     public DoubleDistance plus(DoubleDistance distance) {
         return new DoubleDistance(this.getValue() + distance.getValue());
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.Distance#minus(Distance)
-     */
     public DoubleDistance minus(DoubleDistance distance) {
         return new DoubleDistance(this.getValue() - distance.getValue());
     }
@@ -80,8 +71,6 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
 
     /**
      * Writes the double value of this DoubleDistance to the specified stream.
-     *
-     * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
      */
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeDouble(this.getValue());
@@ -89,8 +78,6 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
 
     /**
      * Reads the double value of this DoubleDistance from the specified stream.
-     *
-     * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
      */
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         setValue(in.readDouble());
@@ -101,7 +88,6 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
      * external file.
      *
      * @return 8 (8 Byte for a double value)
-     * @see Distance#externalizableSize()
      */
     public int externalizableSize() {
         return 8;

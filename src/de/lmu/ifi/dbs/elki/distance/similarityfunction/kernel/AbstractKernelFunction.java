@@ -31,16 +31,10 @@ public abstract class AbstractKernelFunction<O extends DatabaseObject, D extends
     super();
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction#similarity(Integer, Integer)
-   */
   public final D similarity(Integer id1, Integer id2) {
     return similarity(getDatabase().get(id1), getDatabase().get(id2));
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction#similarity(Integer, DatabaseObject)
-   */
   public final D similarity(Integer id1, O o2) {
     return similarity(getDatabase().get(id1), o2);
   }

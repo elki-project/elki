@@ -174,9 +174,6 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
         return k_max;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 

@@ -43,18 +43,11 @@ public class FooKernelFunction<O extends FeatureVector> extends AbstractDoubleKe
 		optionHandler.put(maxDeg);
 	}
 
-	/**
-	 * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
-	 */
 	@Override
 	public String parameterDescription() {
 		return "Polynomial Kernel for FeatureVectors. Default max_degree is "+DEFAULT_MAX_DEGREE+".";
 	}
 
-	/**
-	 * @throws ParameterException
-	 * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-	 */
 	@Override
 	public String[] setParameters(final String[] args) throws ParameterException{
 		final String[] remainingParameters = super.setParameters(args);
@@ -71,7 +64,6 @@ public class FooKernelFunction<O extends FeatureVector> extends AbstractDoubleKe
 	 * @param o2 second vector
 	 * @return the experimental kernel similarity between the given two vectors as an
 	 *         instance of {@link DoubleDistance DoubleDistance}.
-	 * @see DistanceFunction#distance(de.lmu.ifi.dbs.elki.data.DatabaseObject, de.lmu.ifi.dbs.elki.data.DatabaseObject)
 	 */
 	public DoubleDistance similarity(final O o1, final O o2) {
 		if (o1.getDimensionality() != o2.getDimensionality()) {

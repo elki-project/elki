@@ -99,9 +99,6 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
         addOption(INPUT_PARAM);
     }
 
-    /**
-     * @see DatabaseConnection#getDatabase(de.lmu.ifi.dbs.elki.normalization.Normalization)
-     */
     public Database<MultiRepresentedObject<O>> getDatabase(
         Normalization<MultiRepresentedObject<O>> normalization) {
         try {
@@ -167,14 +164,11 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.database.connection.AbstractDatabaseConnection#setParameters(String[])}
-     * AbstractDatabaseConnection#setParameters(args)}
+     * Calls the super method
      * and instantiates {@link #inputStreams} according to the value of parameter
      * {@link #INPUT_PARAM}
      * and {@link #parsers} according to the value of parameter {@link #PARSERS_PARAM} .
      * The remaining parameters are passed to all instances of {@link #parsers}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

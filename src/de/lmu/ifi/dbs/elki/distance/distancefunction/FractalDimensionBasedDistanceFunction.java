@@ -74,40 +74,28 @@ public class FractalDimensionBasedDistanceFunction<V extends RealVector<V, ?>>
     }
 
     /**
-     * Returns the assocoiation ID for the association to be set by the preprocessor.
-     *
      * @return the assocoiation ID for the association to be set by the preprocessor,
      *         which is {@link AssociationID#NEIGHBORS}
-     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getAssociationID()
      */
     public AssociationID getAssociationID() {
         return AssociationID.NEIGHBORS;
     }
 
     /**
-     * Returns the name of the default preprocessor.
-     *
      * @return the name of the default preprocessor,
      *         which is {@link de.lmu.ifi.dbs.elki.preprocessing.FracClusPreprocessor}
-     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getDefaultPreprocessorClassName()
      */
     public String getDefaultPreprocessorClassName() {
         return FracClusPreprocessor.class.getName();
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getPreprocessorSuperClass()
-     */
     public String getPreprocessorDescription() {
         return this.optionHandler.usage("");
     }
 
     /**
-     * Returns the super class for the preprocessor parameter.
-     *
      * @return the super class for the preprocessor parameter,
      *         which is {@link de.lmu.ifi.dbs.elki.preprocessing.FracClusPreprocessor}
-     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getPreprocessorSuperClass()
      */
     public Class<FracClusPreprocessor> getPreprocessorSuperClass() {
         return FracClusPreprocessor.class;

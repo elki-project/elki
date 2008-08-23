@@ -24,9 +24,6 @@ public class WekaNominalAttribute<L extends ClassLabel<L>> extends WekaAbstractA
         this.value = value;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.converter.WekaAttribute#getValue()
-     */
     public String getValue() {
         return value.toString();
     }

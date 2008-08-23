@@ -25,7 +25,6 @@ public class CosineDistanceFunction<V extends FeatureVector<V,?>> extends Abstra
    * @param v1 first feature vector
    * @param v2 second feature vector
    * @return the cosine distance for two given feature vectors v1 and v2
-   * @see de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction#distance(de.lmu.ifi.dbs.elki.data.DatabaseObject, de.lmu.ifi.dbs.elki.data.DatabaseObject)
    */
   public DoubleDistance distance(V v1, V v2) {
     Matrix m1 = v1.getColumnVector();
@@ -38,9 +37,6 @@ public class CosineDistanceFunction<V extends FeatureVector<V,?>> extends Abstra
     return new DoubleDistance(d);
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
-   */
   public String parameterDescription() {
     return "Cosine distance for feature vectors. No parameters required. " +
         super.parameterDescription();

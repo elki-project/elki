@@ -83,37 +83,22 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
     this.currentRepresentationIndex = index;
   }
 
-  /**
-   * @see DistanceFunction#valueOf(String)
-   */
   public D valueOf(String pattern) throws IllegalArgumentException {
     return getDistanceFunctionForCurrentRepresentation().valueOf(pattern);
   }
 
-  /**
-   * @see DistanceFunction#infiniteDistance()
-   */
   public D infiniteDistance() {
     return getDistanceFunctionForCurrentRepresentation().infiniteDistance();
   }
 
-  /**
-   * @see DistanceFunction#nullDistance()
-   */
   public D nullDistance() {
     return getDistanceFunctionForCurrentRepresentation().nullDistance();
   }
 
-  /**
-   * @see DistanceFunction#undefinedDistance()
-   */
   public D undefinedDistance() {
     return getDistanceFunctionForCurrentRepresentation().undefinedDistance();
   }
 
-  /**
-   * @see DistanceFunction#distance(DatabaseObject, DatabaseObject)
-   */
   public D distance(M o1, M o2) {
     O object1 = o1.getRepresentation(currentRepresentationIndex);
     O object2 = o2.getRepresentation(currentRepresentationIndex);
@@ -121,17 +106,11 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
     return getDistanceFunctionForCurrentRepresentation().distance(object1, object2);
   }
 
-  /**
-   * @see DistanceFunction#parameterDescription()
-   */
   public String parameterDescription() {
     return "Distance function for multirepresented objects that selects one represenation and " +
            "computes the distances only within the selected representation.";
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 

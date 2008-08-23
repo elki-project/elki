@@ -11,7 +11,14 @@ import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 
 import java.io.File;
 import java.util.List;
@@ -178,8 +185,6 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
 
     /**
      * Returns a description for printing on command line interface.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */
     public String parameterDescription() {
         return optionHandler.usage("");
@@ -210,11 +215,6 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
         return usage.toString();
     }
 
-    /**
-     * Sets the options accordingly to the specified list of parameters.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
     public String[] setParameters(String[] args) throws ParameterException {
         if (args.length == 0) {
             throw new AbortException("No options specified. Try flag -h to gain more information.");

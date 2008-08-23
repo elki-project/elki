@@ -52,8 +52,8 @@ public class Bit extends Number {
     /**
      * Provides a new bit according to the specified integer value. The bit
      * value is 1 for true and 0 for false.
-     * @param bit 1 for true and 0 for false
      *
+     * @param bit 1 for true and 0 for false
      * @throws IllegalArgumentException if the specified value is neither 0 nor 1.
      */
     public Bit(int bit) throws IllegalArgumentException {
@@ -68,7 +68,6 @@ public class Bit extends Number {
      * Provides an integer representation of the bit.
      *
      * @return 1 if the bit is set, 0 otherwise
-     * @see java.lang.Number#intValue()
      */
     @Override
     public int intValue() {
@@ -78,8 +77,6 @@ public class Bit extends Number {
     /**
      * Provides a long value for the integer representation of this Bit as given
      * by {@link #intValue() intValue()}.
-     *
-     * @see java.lang.Number#longValue()
      */
     @Override
     public long longValue() {
@@ -89,8 +86,6 @@ public class Bit extends Number {
     /**
      * Provides a float value for the integer representation of this Bit as
      * given by {@link #intValue() intValue()}.
-     *
-     * @see java.lang.Number#floatValue()
      */
     @Override
     public float floatValue() {
@@ -100,8 +95,6 @@ public class Bit extends Number {
     /**
      * Provides a double value for the integer representation of this Bit as
      * given by {@link #intValue() intValue()}.
-     *
-     * @see java.lang.Number#doubleValue()
      */
     @Override
     public double doubleValue() {

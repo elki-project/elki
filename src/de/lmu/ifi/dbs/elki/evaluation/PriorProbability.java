@@ -10,11 +10,10 @@ import java.io.PrintStream;
 /**
  * The prior probability reflects the apriori probability of
  * all classes as their relative abundance in the database.
- * 
+ *
  * @author Arthur Zimek
  */
-public class PriorProbability<O extends DatabaseObject, L extends ClassLabel<L>,C extends Classifier<O, L>> extends NullModel<O,L,C>
-{
+public class PriorProbability<O extends DatabaseObject, L extends ClassLabel<L>, C extends Classifier<O, L>> extends NullModel<O, L, C> {
     /**
      * Holds the prior probability.
      */
@@ -22,32 +21,24 @@ public class PriorProbability<O extends DatabaseObject, L extends ClassLabel<L>,
 
     /**
      * Provides an evaluation simply reflecting the prior probability.
-     * 
-     * @param db the database the apriori probability is based on
-     * @param classifier the classifier related to this evaluation
-     * @param labels the class labels
+     *
+     * @param db               the database the apriori probability is based on
+     * @param classifier       the classifier related to this evaluation
+     * @param labels           the class labels
      * @param priorProbability the relative abundance of all classes
      */
-    public PriorProbability(Database<O> db, Database<O> testset, C classifier, L[] labels, double[] priorProbability)
-    {
+    public PriorProbability(Database<O> db, Database<O> testset, C classifier, L[] labels, double[] priorProbability) {
         super(db, testset, classifier, labels);
         this.priorProbability = new double[priorProbability.length];
-        System.arraycopy(priorProbability,0,this.priorProbability,0,priorProbability.length);
+        System.arraycopy(priorProbability, 0, this.priorProbability, 0, priorProbability.length);
     }
-    
-    /**
-     * 
-     * 
-     * @see de.lmu.ifi.dbs.elki.evaluation.Evaluation#outputEvaluationResult(java.io.PrintStream)
-     */
-    public void outputEvaluationResult(PrintStream output)
-    {
+
+    public void outputEvaluationResult(PrintStream output) {
         output.print("### prior probabilities for classes:\n### ");
-        for(int i = 0; i < priorProbability.length; i++)
-        {
+        for (int i = 0; i < priorProbability.length; i++) {
             output.print(labels.get(i));
             output.print(" : ");
-            output.println(priorProbability[i]);            
+            output.println(priorProbability[i]);
         }
         output.println();
     }

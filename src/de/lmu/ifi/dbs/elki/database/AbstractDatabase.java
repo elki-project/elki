@@ -72,9 +72,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
         reusableIDs = new ArrayList<Integer>();
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.database.Database#insert(java.util.List)
-     */
     public void insert(List<ObjectAndAssociations<O>> objectsAndAssociationsList) throws UnableToComplyException {
         for (ObjectAndAssociations<O> objectAndAssociations : objectsAndAssociationsList) {
             insert(objectAndAssociations);
@@ -83,7 +80,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
 
     /**
      * @throws UnableToComplyException if database reached limit of storage capacity
-     * @see Database#insert(ObjectAndAssociations)
      */
     public Integer insert(ObjectAndAssociations<O> objectAndAssociations) throws UnableToComplyException {
         O object = objectAndAssociations.getObject();
@@ -99,9 +95,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
         return id;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.database.Database#delete(de.lmu.ifi.dbs.elki.data.DatabaseObject)
-     */
     public void delete(O object) {
         for (Integer id : content.keySet()) {
             if (content.get(id).equals(object)) {
@@ -110,9 +103,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
         }
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.database.Database#delete(java.lang.Integer)
-     */
     public O delete(Integer id) {
         O object = content.remove(id);
         restoreID(id);
@@ -123,16 +113,10 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
         return object;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.database.Database#size()
-     */
     public final int size() {
         return content.size();
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.database.Database#get(java.lang.Integer)
-     */
     public final O get(Integer id) {
         return content.get(id);
     }
@@ -146,9 +130,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
         return content.keySet().iterator();
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.database.Database#associate(AssociationID,Integer,Object)
-     */
     public <T> void associate(final AssociationID<T> associationID, final Integer objectID, final T association) {
         try {
             associationID.getType().cast(association);
@@ -182,10 +163,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
         globalAssociations.put(associationID, association);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.database.Database#getAssociation(AssociationID,
-     *Integer)
-     */
     public <T> T getAssociation(final AssociationID<T> associationID, final Integer objectID) {
         if (associations.containsKey(associationID)) {
             return associations.get(associationID).get(objectID);
@@ -305,17 +282,11 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
         }
     }
 
-    /**
-     * @see Database#partition(java.util.Map)
-     */
     public Map<Integer, Database<O>> partition(Map<Integer, List<Integer>> partitions) throws UnableToComplyException {
         return partition(partitions, null, null);
     }
 
-    /**
-     * @see Database#partition(java.util.Map,Class,String[])
-     */
-    @SuppressWarnings("unchecked")    
+    @SuppressWarnings("unchecked")
     public Map<Integer, Database<O>> partition(Map<Integer, List<Integer>> partitions,
                                                Class<? extends Database<O>> dbClass, String[] dbParameters) throws UnableToComplyException {
         if (dbClass == null) {
@@ -348,26 +319,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
         return databases;
     }
 
-//  /**
-//   * Sets the difference of the first array minus the second array
-//   * as the currently set parameter array.
-//   *
-//   * @param complete the complete array
-//   * @param part     an array that contains only elements of the first array
-//   */
-//  protected void setParameters(String[] complete, String[] part) {
-//    currentParameterArray = Util.parameterDifference(complete, part);
-//  }
-
-//  /**
-//   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#getParameters()
-//   */
-//  public String[] getParameters() {
-//    String[] param = new String[currentParameterArray.length];
-//    System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
-//    return param;
-//  }
-
     /**
      * Checks whether an association is set for every id in the database.
      *
@@ -398,16 +349,10 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
         return false;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.database.Database#isSetGlobally(de.lmu.ifi.dbs.elki.database.AssociationID)
-     */
     public boolean isSetGlobally(AssociationID<?> associationID) {
         return this.getGlobalAssociation(associationID) != null;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.database.Database#randomSample(int,long)
-     */
     public final Set<Integer> randomSample(int k, long seed) {
         if (k < 0) {
             throw new IllegalArgumentException("Illegal value for size of random sample: " + k);
@@ -422,9 +367,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
         return sample;
     }
 
-    /**
-     * @see Database#getIDs()
-     */
     public List<Integer> getIDs() {
         List<Integer> ids = new ArrayList<Integer>(this.size());
         for (Iterator<Integer> dbIter = this.iterator(); dbIter.hasNext();) {
@@ -433,9 +375,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
         return ids;
     }
 
-    /**
-     * @see Database#dimensionality()
-     */
     public int dimensionality() throws UnsupportedOperationException {
         Iterator<Integer> iter = this.iterator();
         if (iter.hasNext()) {

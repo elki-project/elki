@@ -103,9 +103,6 @@ class MkAppTreeNode<O extends DatabaseObject, D extends NumberDistance<D, N>, N 
 //    entry.setKnnDistanceApproximation(knnDistanceApproximation());
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode#test(de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry,de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode,int,de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree)
-     */
     protected void test(MkAppEntry<D, N> parentEntry, MkAppTreeNode<O, D, N> parent, int index,
                         AbstractMTree<O, D, MkAppTreeNode<O, D, N>, MkAppEntry<D, N>> mTree) {
         super.test(parentEntry, parent, index, mTree);

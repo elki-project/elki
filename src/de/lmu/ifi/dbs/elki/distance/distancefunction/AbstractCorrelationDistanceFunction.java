@@ -39,15 +39,11 @@ public abstract class AbstractCorrelationDistanceFunction<V extends RealVector<V
      *
      * @return the Correlation distance between the given two vectors as an
      *         instance of {@link CorrelationDistance CorrelationDistance}.
-     * @see DistanceFunction#distance(de.lmu.ifi.dbs.elki.data.DatabaseObject,de.lmu.ifi.dbs.elki.data.DatabaseObject)
      */
     public final D distance(V v1, V v2) {
         return correlationDistance(v1, v2);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
-     */
     @Override
     public String parameterDescription() {
         return "Correlation distance for real vectors. " + super.parameterDescription();

@@ -97,9 +97,6 @@ public class KernelBasedLocallyWeightedDistanceFunction<V extends RealVector<V, 
         return new DoubleDistance(value);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
@@ -172,9 +169,6 @@ public class KernelBasedLocallyWeightedDistanceFunction<V extends RealVector<V, 
         return distW;
     }
 
-    /**
-     * @see DistanceFunction#setDatabase(de.lmu.ifi.dbs.elki.database.Database,boolean,boolean)
-     */
     @Override
     public void setDatabase(Database<V> database, boolean verbose, boolean time) {
         //precompute kernelMatrix and store it in the database
@@ -189,7 +183,6 @@ public class KernelBasedLocallyWeightedDistanceFunction<V extends RealVector<V, 
      *
      * @return the assocoiation ID for the association to be set by the preprocessor,
      *         which is {@link de.lmu.ifi.dbs.elki.database.AssociationID#STRONG_EIGENVECTOR_MATRIX}.
-     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getAssociationID()
      */
     public AssociationID getAssociationID() {
         return AssociationID.STRONG_EIGENVECTOR_MATRIX;

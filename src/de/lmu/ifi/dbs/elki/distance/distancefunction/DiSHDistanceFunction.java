@@ -45,11 +45,11 @@ public class DiSHDistanceFunction<V extends RealVector<V, ?>, P extends Preproce
                 if (this.debug) {
                     StringBuffer msg = new StringBuffer();
                     msg.append("\n");
-                    msg.append("\nd " + d);
-                    msg.append("\nv1 " + getDatabase().getAssociation(AssociationID.LABEL, v1.getID()));
-                    msg.append("\nv2 " + getDatabase().getAssociation(AssociationID.LABEL, v2.getID()));
-                    msg.append("\nsubspaceDim " + subspaceDim);
-                    msg.append("\ncommon pv " + Util.format(dim, commonPreferenceVector));
+                    msg.append("\nd ").append(d);
+                    msg.append("\nv1 ").append(getDatabase().getAssociation(AssociationID.LABEL, v1.getID()));
+                    msg.append("\nv2 ").append(getDatabase().getAssociation(AssociationID.LABEL, v2.getID()));
+                    msg.append("\nsubspaceDim ").append(subspaceDim);
+                    msg.append("\ncommon pv ").append(Util.format(dim, commonPreferenceVector));
                     debugFine(msg.toString());
                 }
             }
@@ -67,11 +67,8 @@ public class DiSHDistanceFunction<V extends RealVector<V, ?>, P extends Preproce
     }
 
     /**
-     * Returns the name of the default preprocessor.
-     *
      * @return the name of the default preprocessor,
      * which is {@link DiSHPreprocessor}
-     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getDefaultPreprocessorClassName()
      */
     public String getDefaultPreprocessorClassName() {
         return DiSHPreprocessor.class.getName();

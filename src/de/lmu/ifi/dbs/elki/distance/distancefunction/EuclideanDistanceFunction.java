@@ -28,7 +28,6 @@ public class EuclideanDistanceFunction<V extends NumberVector<V, ?>>
      *
      * @return the Euclidean distance between the given two vectors as an
      *         instance of {@link DoubleDistance DoubleDistance}.
-     * @see de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction#distance(de.lmu.ifi.dbs.elki.data.DatabaseObject,de.lmu.ifi.dbs.elki.data.DatabaseObject)
      */
     public DoubleDistance distance(V v1, V v2) {
         if (v1.getDimensionality() != v2.getDimensionality()) {
@@ -44,17 +43,11 @@ public class EuclideanDistanceFunction<V extends NumberVector<V, ?>>
         return new DoubleDistance(Math.sqrt(sqrDist));
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
-     */
     @Override
     public String parameterDescription() {
         return "Euclidean distance for FeatureVectors. No parameters required. Pattern for defining a range: \"" + requiredInputPattern() + "\".";
     }
 
-    /**
-     * @see SpatialDistanceFunction#minDist(de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox,de.lmu.ifi.dbs.elki.data.FeatureVector)
-     */
     public DoubleDistance minDist(HyperBoundingBox mbr, V v) {
         if (mbr.getDimensionality() != v.getDimensionality()) {
             throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + v.toString());
@@ -77,16 +70,10 @@ public class EuclideanDistanceFunction<V extends NumberVector<V, ?>>
         return new DoubleDistance(Math.sqrt(sqrDist));
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction#minDist(de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox,Integer)
-     */
     public DoubleDistance minDist(HyperBoundingBox mbr, Integer id) {
         return minDist(mbr, getDatabase().get(id));
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction#distance(de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox,de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox)
-     */
     public DoubleDistance distance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
         if (mbr1.getDimensionality() != mbr2.getDimensionality()) {
             throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
@@ -113,9 +100,6 @@ public class EuclideanDistanceFunction<V extends NumberVector<V, ?>>
         return new DoubleDistance(Math.sqrt(sqrDist));
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction#centerDistance(de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox,de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox)
-     */
     public DoubleDistance centerDistance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
         if (mbr1.getDimensionality() != mbr2.getDimensionality()) {
             throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());

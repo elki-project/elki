@@ -59,8 +59,6 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
 
     /**
      * Calls the super method and afterwards inserts the specified object into the underlying index structure.
-     *
-     * @see Database#insert(ObjectAndAssociations)
      */
     @Override
     public Integer insert(ObjectAndAssociations<O> objectAndAssociations) throws UnableToComplyException {
@@ -74,8 +72,6 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
      * Calls the super method and afterwards inserts the specified objects into the underlying index structure.
      * If the option bulk load is enabled and the index structure is empty, a bulk load will be performed.
      * Otherwise the objects will be inserted sequentially.
-     *
-     * @see Database#insert(java.util.List)
      */
     @Override
     public void insert(List<ObjectAndAssociations<O>> objectsAndAssociationsList) throws UnableToComplyException {
@@ -85,9 +81,6 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
         index.insert(getObjects(objectsAndAssociationsList));
     }
 
-    /**
-     * @see Database#rangeQuery(Integer,String,de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction)
-     */
     public <D extends Distance<D>> List<QueryResult<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, D> distanceFunction) {
         if (distanceFunction.isInfiniteDistance(distanceFunction.valueOf(epsilon))) {
             final List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
@@ -116,9 +109,6 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
         return index.rangeQuery(get(id), epsilon, distanceFunction);
     }
 
-    /**
-     * @see Database#kNNQueryForObject(de.lmu.ifi.dbs.elki.data.DatabaseObject,int,de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction)
-     */
     public <D extends Distance<D>> List<QueryResult<D>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, D> distanceFunction) {
         if (!(distanceFunction instanceof SpatialDistanceFunction))
             throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
@@ -126,9 +116,6 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
         return index.kNNQuery(queryObject, k, distanceFunction);
     }
 
-    /**
-     * @see Database#kNNQueryForID(Integer,int,de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction)
-     */
     public <D extends Distance<D>> List<QueryResult<D>> kNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
         if (!(distanceFunction instanceof SpatialDistanceFunction))
             throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
@@ -136,9 +123,6 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
         return index.kNNQuery(get(id), k, distanceFunction);
     }
 
-    /**
-     * @see Database#bulkKNNQueryForID(java.util.List,int,de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction)
-     */
     public <D extends Distance<D>> List<List<QueryResult<D>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
         if (!(distanceFunction instanceof SpatialDistanceFunction))
             throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
@@ -192,8 +176,6 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
     /**
      * Sets the values for the parameter bulk.
      * If the parameters is not specified the default value is set.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

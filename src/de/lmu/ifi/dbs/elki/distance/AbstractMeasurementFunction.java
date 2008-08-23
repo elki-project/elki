@@ -52,16 +52,10 @@ public abstract class AbstractMeasurementFunction<O extends DatabaseObject, D ex
         this(null);
     }
 
-    /**
-     * @see MeasurementFunction#requiredInputPattern()
-     */
     public final String requiredInputPattern() {
         return this.pattern.pattern();
     }
 
-    /**
-     * @see MeasurementFunction#setDatabase(de.lmu.ifi.dbs.elki.database.Database,boolean,boolean)
-     */
     public void setDatabase(Database<O> database, boolean verbose, boolean time) {
         this.database = database;
     }
@@ -101,8 +95,6 @@ public abstract class AbstractMeasurementFunction<O extends DatabaseObject, D ex
 
     /**
      * Returns the required input pattern.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
      */
     public String parameterDescription() {
         StringBuffer description = new StringBuffer(super.parameterDescription());

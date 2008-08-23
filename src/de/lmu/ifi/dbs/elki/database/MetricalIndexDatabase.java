@@ -57,8 +57,6 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
     /**
      * Calls the super method and afterwards inserts the specified object into
      * the underlying index structure.
-     *
-     * @see Database#insert(ObjectAndAssociations)
      */
     public Integer insert(ObjectAndAssociations<O> objectAndAssociations) throws UnableToComplyException {
         Integer id = super.insert(objectAndAssociations);
@@ -72,8 +70,6 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
      * the underlying index structure. If the option bulk load is enabled and
      * the index structure is empty, a bulk load will be performed. Otherwise
      * the objects will be inserted sequentially.
-     *
-     * @see Database#insert(java.util.List)
      */
     public void insert(List<ObjectAndAssociations<O>> objectsAndAssociationsList) throws UnableToComplyException {
         for (ObjectAndAssociations<O> objectAndAssociations : objectsAndAssociationsList) {
@@ -82,9 +78,6 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
         this.index.insert(getObjects(objectsAndAssociationsList));
     }
 
-    /**
-     * @see Database#rangeQuery(Integer,String,de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction)
-     */
     public <T extends Distance<T>> List<QueryResult<T>> rangeQuery(Integer id,
                                                                    String epsilon,
                                                                    DistanceFunction<O, T> distanceFunction) {
@@ -103,9 +96,6 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
         return result;
     }
 
-    /**
-     * @see Database#kNNQueryForObject(DatabaseObject,int,de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction)
-     */
     public <T extends Distance<T>> List<QueryResult<T>> kNNQueryForObject(
         O queryObject, int k, DistanceFunction<O, T> distanceFunction) {
         if (!distanceFunction.getClass().equals(index.getDistanceFunction().getClass()))
@@ -123,10 +113,6 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
         return result;
     }
 
-    /**
-     * @see Database#kNNQueryForID(Integer,int,
-     *de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction)
-     */
     public <T extends Distance<T>> List<QueryResult<T>> kNNQueryForID(Integer id, int k, DistanceFunction<O, T> distanceFunction) {
 
         if (!distanceFunction.getClass().equals(index.getDistanceFunction().getClass()))
@@ -144,20 +130,12 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
         return result;
     }
 
-    /**
-     * @see Database#bulkKNNQueryForID(java.util.List,int,de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction)
-     */
     public <D extends Distance<D>> List<List<QueryResult<D>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
         throw new UnsupportedOperationException("Not yet supported!");
     }
 
 
-    /**
-     * @see Database#reverseKNNQuery(Integer,int,
-     *de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction)
-     */
     public <T extends Distance<T>> List<QueryResult<T>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, T> distanceFunction) {
-
         if (!distanceFunction.getClass().equals(index.getDistanceFunction().getClass()))
             throw new IllegalArgumentException("Parameter distanceFunction must be an instance of "
                 + index.getDistanceFunction().getClass() +
@@ -197,7 +175,6 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
      * Sets the values for the parameter bulk.
      * If the parameters is not specified the default value is set.
      *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

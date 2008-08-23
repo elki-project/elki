@@ -78,9 +78,6 @@ public class DeLiCluNode extends AbstractRStarTreeNode<DeLiCluNode, DeLiCluEntry
     return new DeLiCluNode(getFile(), capacity, false);
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode#adjustEntry(de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry)
-   */
   public void adjustEntry(DeLiCluEntry entry) {
     super.adjustEntry(entry);
     // adjust hasHandled and hasUnhandled flag
@@ -89,7 +86,6 @@ public class DeLiCluNode extends AbstractRStarTreeNode<DeLiCluNode, DeLiCluEntry
     entry.setHasHandled(hasHandled);
     entry.setHasUnhandled(hasUnhandled);
   }
-
 
   /**
    * Tests, if the parameters of the entry representinmg this node, are correctly set.

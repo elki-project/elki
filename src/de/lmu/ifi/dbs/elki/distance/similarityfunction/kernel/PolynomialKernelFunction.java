@@ -45,9 +45,6 @@ public class PolynomialKernelFunction<O extends FeatureVector<O, ? >> extends Ab
     optionHandler.put(deg);
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
-   */
   @Override
   public String parameterDescription() {
     StringBuffer description = new StringBuffer();
@@ -56,10 +53,6 @@ public class PolynomialKernelFunction<O extends FeatureVector<O, ? >> extends Ab
     return description.toString();
   }
 
-  /**
-   * @throws ParameterException
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-   */
   @Override
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);

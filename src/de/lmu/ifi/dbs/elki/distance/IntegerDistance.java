@@ -24,31 +24,20 @@ public class IntegerDistance extends NumberDistance<IntegerDistance, Integer> {
         super(value);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.Distance#description()
-     */
     public String description() {
         return "IntegerDistance.intValue";
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.Distance#minus(de.lmu.ifi.dbs.elki.distance.Distance)
-     */
     public IntegerDistance minus(IntegerDistance distance) {
         return new IntegerDistance(this.getValue() - distance.getValue());
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.Distance#plus(de.lmu.ifi.dbs.elki.distance.Distance)
-     */
     public IntegerDistance plus(IntegerDistance distance) {
         return new IntegerDistance(this.getValue() + distance.getValue());
     }
 
     /**
      * Writes the integer value of this IntegerDistance to the specified stream.
-     *
-     * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
      */
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeInt(getValue());
@@ -56,8 +45,6 @@ public class IntegerDistance extends NumberDistance<IntegerDistance, Integer> {
 
     /**
      * Reads the integer value of this IntegerDistance from the specified stream.
-     *
-     * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
      */
     public void readExternal(ObjectInput in) throws IOException {
         setValue(in.readInt());
@@ -68,7 +55,6 @@ public class IntegerDistance extends NumberDistance<IntegerDistance, Integer> {
      * external file.
      *
      * @return 4 (4 Byte for an integer value)
-     * @see Distance#externalizableSize()
      */
     public int externalizableSize() {
         return 4;

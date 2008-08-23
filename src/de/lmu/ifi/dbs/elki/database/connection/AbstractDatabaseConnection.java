@@ -161,14 +161,12 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters(String[]) AbstractParameterizable#setParameters(args)}
+     * Calls the super method
      * and sets additionally the value of the parameters
      * {@link #CLASS_LABEL_INDEX_PARAM}, {@link #CLASS_LABEL_CLASS_PARAM}, and {@link #EXTERNAL_ID_INDEX_PARAM}
      * and instantiates {@link #database} according to the value of parameter
      * {@link #DATABASE_PARAM}.
      * The remaining parameters are passed to the {@link #database}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

@@ -35,19 +35,13 @@ public class SubspaceDistanceFunction<V extends RealVector<V, ?>, P extends Prep
     }
 
     /**
-     * Returns the name of the default preprocessor.
-     *
      * @return the name of the default preprocessor,
      *         which is {@link de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor}
-     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getDefaultPreprocessorClassName()
      */
     public String getDefaultPreprocessorClassName() {
         return KnnQueryBasedHiCOPreprocessor.class.getName();
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getPreprocessorSuperClass()
-     */
     public final String getPreprocessorDescription() {
         return "Classname of the preprocessor to determine the correlation dimension of each object "
             + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(getPreprocessorSuperClass()) +
@@ -55,30 +49,21 @@ public class SubspaceDistanceFunction<V extends RealVector<V, ?>, P extends Prep
     }
 
     /**
-     * Returns the super class for the preprocessor.
-     *
      * @return the super class for the preprocessor,
      *         which is {@link de.lmu.ifi.dbs.elki.preprocessing.Preprocessor}
-     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getPreprocessorSuperClass()
      */
     public Class<Preprocessor> getPreprocessorSuperClass() {
         return Preprocessor.class;
     }
 
     /**
-     * Returns the assocoiation ID for the association to be set by the preprocessor.
-     *
      * @return the assocoiation ID for the association to be set by the preprocessor,
      *         which is {@link AssociationID#LOCAL_PCA}
-     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getAssociationID()
      */
     public AssociationID getAssociationID() {
         return AssociationID.LOCAL_PCA;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.MeasurementFunction#valueOf(String)
-     */
     public SubspaceDistance valueOf(String pattern) throws IllegalArgumentException {
         if (pattern.equals(INFINITY_PATTERN)) {
             return infiniteDistance();
@@ -95,23 +80,14 @@ public class SubspaceDistanceFunction<V extends RealVector<V, ?>, P extends Prep
         }
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.MeasurementFunction#infiniteDistance()
-     */
     public SubspaceDistance infiniteDistance() {
         return new SubspaceDistance(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.MeasurementFunction#nullDistance()
-     */
     public SubspaceDistance nullDistance() {
         return new SubspaceDistance(0, 0);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.MeasurementFunction#undefinedDistance()
-     */
     public SubspaceDistance undefinedDistance() {
         return new SubspaceDistance(Double.NaN, Double.NaN);
     }
@@ -120,7 +96,6 @@ public class SubspaceDistanceFunction<V extends RealVector<V, ?>, P extends Prep
      * Note, that the pca of o1 must have equal ore more strong
      * eigenvectors than the pca of o2.
      *
-     * @see de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction#distance(de.lmu.ifi.dbs.elki.data.DatabaseObject,de.lmu.ifi.dbs.elki.data.DatabaseObject)
      */
     public SubspaceDistance distance(V o1, V o2) {
         // noinspection unchecked
@@ -161,9 +136,6 @@ public class SubspaceDistanceFunction<V extends RealVector<V, ?>, P extends Prep
         return new SubspaceDistance(d1, affineDistance);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
-     */
     @Override
     public String parameterDescription() {
         return "Subspace distance for real vectors. " + super.parameterDescription();

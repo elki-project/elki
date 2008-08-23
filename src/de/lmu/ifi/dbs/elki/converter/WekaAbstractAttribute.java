@@ -61,38 +61,24 @@ public abstract class WekaAbstractAttribute<W extends WekaAbstractAttribute<W>>
         }
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.converter.WekaAttribute#getType()
-     */
     public String getType() {
         return TYPES[TYPE];
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.converter.WekaAttribute#isNominal()
-     */
     public boolean isNominal() {
         return TYPE == NOMINAL_INDEX;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.converter.WekaAttribute#isNumeric()
-     */
     public boolean isNumeric() {
         return TYPE == NUMERIC_INDEX;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.converter.WekaAttribute#isString()
-     */
     public boolean isString() {
         return TYPE == STRING_INDEX;
     }
 
     /**
      * Returns the value of the attribute.
-     *
-     * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
@@ -102,7 +88,6 @@ public abstract class WekaAbstractAttribute<W extends WekaAbstractAttribute<W>>
     /**
      * This equals <code>o</code>, if both are of the same type and
      * <code>this.compareTo((W) o)</code> returns 0.
-     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @SuppressWarnings("unchecked")

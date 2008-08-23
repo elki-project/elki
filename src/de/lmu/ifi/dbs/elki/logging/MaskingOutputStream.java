@@ -13,46 +13,40 @@ import java.io.OutputStream;
  * Thus, setting <code>System.err</code> or <code>System.out</code> as
  * underlying OutputStream does not put those System OutputStreams
  * at risk of being closed.
- * 
- * 
+ *
  * @author Arthur Zimek
  */
-public class MaskingOutputStream extends FilterOutputStream
-{
+public class MaskingOutputStream extends FilterOutputStream {
 
     /**
      * Keeps the given OutputStream as underlying OutputStream,
      * passing calls to the underlying OutputStream,
      * but preventing it from being closed.
-     * 
+     *
      * @param out an OutputStream to pass methodcalls to
      */
-    public MaskingOutputStream(OutputStream out)
-    {
+    public MaskingOutputStream(OutputStream out) {
         super(out);
     }
-    
+
     /**
-     * Closes this output stream and releases any system resources 
-     * associated with the stream. 
-     * <p>
-     * The <code>close</code> method of <code>MaskingOutputStream</code> 
+     * Closes this output stream and releases any system resources
+     * associated with the stream.
+     * <p/>
+     * The <code>close</code> method of <code>MaskingOutputStream</code>
      * calls the {@link FilterOutputStream#flush() flush()} method of
-     * {@link FilterOutputStream FilterOutputStream}, and then sets 
+     * {@link FilterOutputStream FilterOutputStream}, and then sets
      * its underlying output stream to <code>null</code>.
      * Thus any subsequent calls of methods to this OutputStream
-     * will result in a NullPointerException. 
+     * will result in a NullPointerException.
      *
-     * @exception  IOException  if an I/O error occurs.
-     * @see        java.io.FilterOutputStream#flush()
+     * @throws IOException if an I/O error occurs.
      */
     @Override
-    public void close() throws IOException
-    {
+    public void close() throws IOException {
         flush();
         out = null;
     }
-    
-    
+
 
 }

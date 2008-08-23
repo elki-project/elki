@@ -5,11 +5,10 @@ import java.util.regex.Pattern;
 /**
  * A HierarchicalClassLabel is a ClassLabel to reflect a hierarchical structure
  * of classes.
- * 
- * @author Arthur Zimek 
+ *
+ * @author Arthur Zimek
  */
-public class HierarchicalClassLabel extends ClassLabel<HierarchicalClassLabel>
-{
+public class HierarchicalClassLabel extends ClassLabel<HierarchicalClassLabel> {
     /**
      * The default separator pattern, a point ('.').
      */
@@ -38,10 +37,8 @@ public class HierarchicalClassLabel extends ClassLabel<HierarchicalClassLabel>
 
     /**
      * @see ClassLabel#ClassLabel()
-     *
      */
-    public HierarchicalClassLabel()
-    {
+    public HierarchicalClassLabel() {
         super();
     }
 
@@ -50,29 +47,23 @@ public class HierarchicalClassLabel extends ClassLabel<HierarchicalClassLabel>
      * given Pattern to match separators of different levels in the given name,
      * and setting the given separator-String to separate different levels in
      * String representations of this HierarchicalClassLabel.
-     * 
-     * @param name
-     *            a String describing a hierarchical class label
-     * @param regex
-     *            a Pattern to match separators of different levels in the given
-     *            name
-     * @param separator
-     *            a separator String to separate different levels in the
-     *            String-representation of this HierarchicalClassLabel
+     *
+     * @param name      a String describing a hierarchical class label
+     * @param regex     a Pattern to match separators of different levels in the given
+     *                  name
+     * @param separator a separator String to separate different levels in the
+     *                  String-representation of this HierarchicalClassLabel
      */
-    public void init(String name, Pattern regex, String separator)
-    {
+    public void init(String name, Pattern regex, String separator) {
         this.separatorPattern = regex;
         this.separatorString = separator;
         String[] levelwiseStrings = separatorPattern.split(name);
         this.levelwiseNames = new Comparable[levelwiseStrings.length];
-        for (int i = 0; i < levelwiseStrings.length; i++)
-        {
-            try
-            {
+        for (int i = 0; i < levelwiseStrings.length; i++) {
+            try {
                 levelwiseNames[i] = new Integer(levelwiseStrings[i]);
-            } catch (NumberFormatException e)
-            {
+            }
+            catch (NumberFormatException e) {
                 levelwiseNames[i] = levelwiseStrings[i];
             }
         }
@@ -84,15 +75,12 @@ public class HierarchicalClassLabel extends ClassLabel<HierarchicalClassLabel>
      * {@link #DEFAULT_SEPARATOR DEFAULT_SEPARATOR}. Also, in a
      * String-representation of this HierarchicalClassLabel, different levels
      * get separated by '.'.
-     * 
-     * @param label
-     *            a String describing a hierarchical class label
-     * 
-     * @see de.lmu.ifi.dbs.elki.data.ClassLabel#init(java.lang.String)
+     *
+     * @param label a String describing a hierarchical class label
+     * @see #init(String, java.util.regex.Pattern, String)
      */
     @Override
-    public void init(String label)
-    {
+    public void init(String label) {
         init(label, DEFAULT_SEPARATOR, DEFAULT_SEPARATOR_STRING);
     }
 
@@ -101,96 +89,82 @@ public class HierarchicalClassLabel extends ClassLabel<HierarchicalClassLabel>
      * first. Names at a lower level are compared only if their parent-names are
      * equal. Names at a level are tried to be compared as integer values. If
      * this does not succeed, both names are compared as Strings.
-     * 
-     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     *
      */
-    public int compareTo(HierarchicalClassLabel h)
-    {
+    public int compareTo(HierarchicalClassLabel h) {
         for (int i = 0; i < this.levelwiseNames.length
-                && i < h.levelwiseNames.length; i++)
-        {
+            && i < h.levelwiseNames.length; i++) {
             int comp = 0;
-            try
-            {
+            try {
                 comp = this.levelwiseNames[i].compareTo(h.levelwiseNames[i]);
-            } catch (RuntimeException e)
-            {
+            }
+            catch (RuntimeException e) {
                 String h1 = (String) (this.levelwiseNames[i] instanceof Integer ? this.levelwiseNames[i]
-                        .toString()
-                        : this.levelwiseNames[i]);
+                    .toString()
+                    : this.levelwiseNames[i]);
                 String h2 = (String) (h.levelwiseNames[i] instanceof Integer ? h.levelwiseNames[i]
-                        .toString()
-                        : h.levelwiseNames[i]);
+                    .toString()
+                    : h.levelwiseNames[i]);
                 comp = h1.compareTo(h2);
             }
-            if (comp != 0)
-            {
+            if (comp != 0) {
                 return comp;
             }
         }
         return new Integer(this.levelwiseNames.length).compareTo(new Integer(
-                h.levelwiseNames.length));
+            h.levelwiseNames.length));
     }
 
     /**
      * The length of the hierarchy of names.
-     * 
+     *
      * @return length of the hierarchy of names
      */
-    public int depth()
-    {
+    public int depth() {
         return levelwiseNames.length - 1;
     }
 
     /**
      * Returns the name at the given level as a String.
-     * 
-     * @param level
-     *            the level to return the name at
+     *
+     * @param level the level to return the name at
      * @return the name at the given level as a String
      */
-    public String getNameAt(int level)
-    {
+    public String getNameAt(int level) {
         return this.levelwiseNames[level] instanceof Integer ? this.levelwiseNames[level]
-                .toString()
-                : (String) this.levelwiseNames[level];
+            .toString()
+            : (String) this.levelwiseNames[level];
     }
 
     /**
      * Returns a String representation of this HierarchicalClassLabel using
      * {@link #separatorString separatorString} to separate levels.
-     * 
-     * @see ClassLabel#toString()
+     *
+     * @see #toString(int)
      */
     @Override
-    public String toString()
-    {
+    public String toString() {
         return toString(levelwiseNames.length);
     }
 
     /**
      * Provides a String representation of this ClassLabel comprising only the
      * first <code>level</code> levels.
-     * 
-     * @param level
-     *            the lowest level to include in the String representation.
+     *
+     * @param level the lowest level to include in the String representation.
      * @return a String representation of this ClassLabel comprising only the
      *         first <code>level</code> levels
      */
-    public String toString(int level)
-    {
-        if (level > levelwiseNames.length)
-        {
+    public String toString(int level) {
+        if (level > levelwiseNames.length) {
             throw new IllegalArgumentException(
-                    "Specified level exceeds depth of hierarchy.");
+                "Specified level exceeds depth of hierarchy.");
         }
 
         StringBuffer name = new StringBuffer();
-        for (int i = 0; i < level; i++)
-        {
+        for (int i = 0; i < level; i++) {
             name.append(this.getNameAt(i));
-            if (i < level - 1)
-            {
+            if (i < level - 1) {
                 name.append(this.separatorString);
             }
         }

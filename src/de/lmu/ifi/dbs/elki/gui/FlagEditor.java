@@ -70,11 +70,6 @@ public class FlagEditor extends ParameterEditor {
 		return "";
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.lmu.ifi.dbs.elki.gui.ParameterEditor#parameterToValue()
-	 */
 	public String[] parameterToValue() {
 		if (getValue().equals(Flag.SET)) {
 			return new String[] { "-" + option.getName() };

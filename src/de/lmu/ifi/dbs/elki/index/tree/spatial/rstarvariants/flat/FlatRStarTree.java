@@ -105,9 +105,6 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
     }
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.index.tree.TreeIndex#createEmptyRoot(de.lmu.ifi.dbs.elki.data.DatabaseObject)
-   */
   protected void createEmptyRoot(O object) {
     root = createNewDirectoryNode(dirCapacity);
     root.setID(getRootEntry().getID());
@@ -171,23 +168,14 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
     return new FlatRStarTreeNode(file, capacity, false);
   }
 
-  /**
-   * @see AbstractRStarTree#createNewLeafEntry(NumberVector o)
-   */
   protected SpatialEntry createNewLeafEntry(O o) {
     return new SpatialLeafEntry(o.getID(), getValues(o));
   }
 
-  /**
-   * @see AbstractRStarTree#createNewDirectoryEntry(AbstractRStarTreeNode node)
-   */
   protected SpatialEntry createNewDirectoryEntry(FlatRStarTreeNode node) {
     return new SpatialDirectoryEntry(node.getID(), node.mbr());
   }
 
-  /**
-   * @see AbstractRStarTree#createRootEntry()
-   */
   protected SpatialEntry createRootEntry() {
     return new SpatialDirectoryEntry(0, null);
   }

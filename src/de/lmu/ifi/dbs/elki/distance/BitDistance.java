@@ -33,23 +33,14 @@ public class BitDistance extends NumberDistance<BitDistance, Bit> {
         super(new Bit(bit));
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.Distance#description()
-     */
     public String description() {
         return "BitDistance.bitValue";
     }
 
-    /**
-     * @see Distance#plus(Distance)
-     */
     public BitDistance plus(BitDistance distance) {
         return new BitDistance(this.bitValue() || distance.bitValue());
     }
 
-    /**
-     * @see Distance#minus(Distance)
-     */
     public BitDistance minus(BitDistance distance) {
         return new BitDistance(this.bitValue() ^ distance.bitValue());
     }
@@ -66,8 +57,6 @@ public class BitDistance extends NumberDistance<BitDistance, Bit> {
 
     /**
      * Writes the bit value of this BitDistance to the specified stream.
-     *
-     * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
      */
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeBoolean(this.bitValue());
@@ -75,8 +64,6 @@ public class BitDistance extends NumberDistance<BitDistance, Bit> {
 
     /**
      * Reads the bit value of this BitDistance from the specified stream.
-     *
-     * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
      */
     public void readExternal(ObjectInput in) throws IOException {
         setValue(new Bit(in.readBoolean()));
@@ -87,7 +74,6 @@ public class BitDistance extends NumberDistance<BitDistance, Bit> {
      * external file.
      *
      * @return 1 (1 Byte for a boolean value)
-     * @see Distance#externalizableSize()
      */
     public int externalizableSize() {
         return 1;

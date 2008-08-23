@@ -409,9 +409,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
         }
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
+    // todo comment
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 

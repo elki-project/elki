@@ -61,9 +61,6 @@ public class PreferenceVectorBasedCorrelationDistance
         return commonPreferenceVector;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.Distance#description()
-     */
     public String description() {
         return "PreferenceVectorBasedCorrelationDistance.correlationValue, " +
             "PreferenceVectorBasedCorrelationDistance.euclideanValue, " +
@@ -83,7 +80,6 @@ public class PreferenceVectorBasedCorrelationDistance
     /**
      * @throws IllegalArgumentException if the dimensionality values and common preference vectors
      *                                  of this distance and the specified distance are not equal
-     * @see Distance#plus(Distance)
      */
     public PreferenceVectorBasedCorrelationDistance plus(PreferenceVectorBasedCorrelationDistance distance) {
         if (this.dimensionality != distance.dimensionality) {
@@ -112,7 +108,6 @@ public class PreferenceVectorBasedCorrelationDistance
     /**
      * @throws IllegalArgumentException if the dimensionality values and common preference vectors
      *                                  of this distance and the specified distance are not equal
-     * @see Distance#minus(Distance)
      */
     public PreferenceVectorBasedCorrelationDistance minus(PreferenceVectorBasedCorrelationDistance distance) {
         if (this.dimensionality != distance.dimensionality) {
@@ -148,7 +143,6 @@ public class PreferenceVectorBasedCorrelationDistance
      * @return the value of {@link CorrelationDistance#compareTo(CorrelationDistance) CorrelationDistance#compareTo(distance)}
      * @throws IllegalArgumentException if the dimensionality values
      *                                  of this distance and the specified distance are not equal
-     * @see Comparable#compareTo(Object)
      */
     public int compareTo(PreferenceVectorBasedCorrelationDistance distance) {
         if (this.dimensionality != distance.dimensionality) {
@@ -166,8 +160,6 @@ public class PreferenceVectorBasedCorrelationDistance
      * Calls {@link de.lmu.ifi.dbs.elki.distance.CorrelationDistance#writeExternal(java.io.ObjectOutput)}
      * and writes additionally the dimensionality and each Byte of the common preference vector
      * to the specified stream.
-     *
-     * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
      */
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
@@ -182,8 +174,6 @@ public class PreferenceVectorBasedCorrelationDistance
      * Calls {@link de.lmu.ifi.dbs.elki.distance.CorrelationDistance#readExternal(java.io.ObjectInput)}
      * and reads additionally the dimensionality and each Byte of the common preference vector
      * from the specified stream..
-     *
-     * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
      */
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);

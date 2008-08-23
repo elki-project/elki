@@ -141,8 +141,6 @@ public class TreeIndexHeader extends DefaultPageHeader {
     /**
      * Returns {@link de.lmu.ifi.dbs.elki.persistent.DefaultPageHeader#size()}
      * plus the value of {@link #SIZE}).
-     *
-     * @see de.lmu.ifi.dbs.elki.persistent.PageHeader#size()
      */
     @Override
     public int size() {

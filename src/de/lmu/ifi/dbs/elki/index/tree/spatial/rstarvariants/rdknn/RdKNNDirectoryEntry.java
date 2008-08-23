@@ -41,16 +41,10 @@ public class RdKNNDirectoryEntry<D extends NumberDistance<D, N>, N extends Numbe
         this.knnDistance = knnDistance;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rdknn.RdKNNEntry#getKnnDistance()
-     */
     public D getKnnDistance() {
         return knnDistance;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rdknn.RdKNNEntry#setKnnDistance(de.lmu.ifi.dbs.elki.distance.NumberDistance)
-     */
     public void setKnnDistance(D knnDistance) {
         this.knnDistance = knnDistance;
     }

@@ -28,7 +28,6 @@ public class LinearKernelFunction<O extends FeatureVector<O, ? >> extends Abstra
    * @param o2  second feature vector
    * @return the linear kernel similarity between the given two vectors as an
    *         instance of {@link DoubleDistance DoubleDistance}.
-   * @see DistanceFunction#distance(de.lmu.ifi.dbs.elki.data.DatabaseObject, de.lmu.ifi.dbs.elki.data.DatabaseObject)
    */
   public DoubleDistance similarity(final O o1, final O o2) {
     if (o1.getDimensionality() != o2.getDimensionality()) {
@@ -43,9 +42,6 @@ public class LinearKernelFunction<O extends FeatureVector<O, ? >> extends Abstra
     return new DoubleDistance(sim);
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
-   */
   @Override
   public String parameterDescription() {
     StringBuffer description = new StringBuffer();

@@ -51,27 +51,18 @@ public class SubspaceDistance extends AbstractDistance<SubspaceDistance> {
         this.affineDistance = affineDistance;
     }
 
-    /**
-     * @see Distance#plus(de.lmu.ifi.dbs.elki.distance.Distance)
-     */
     public SubspaceDistance plus(SubspaceDistance distance) {
         return new SubspaceDistance(
             this.subspaceDistance + distance.subspaceDistance,
             this.affineDistance + distance.affineDistance);
     }
 
-    /**
-     * @see Distance#minus(de.lmu.ifi.dbs.elki.distance.Distance)
-     */
     public SubspaceDistance minus(SubspaceDistance distance) {
         return new SubspaceDistance(
             this.subspaceDistance - distance.subspaceDistance,
             this.affineDistance - distance.affineDistance);
     }
 
-    /**
-     * @see Distance#description()
-     */
     public String description() {
         return "SubspaceDistance.subspaceDistance SubspaceDistance.affineDistance";
     }
@@ -95,7 +86,6 @@ public class SubspaceDistance extends AbstractDistance<SubspaceDistance> {
      *         if it is a non zero value,
      *         the value of {@link Double#compare(double,double) Double.compare(this.affineDistance, other.affineDistance)}
      *         otherwise
-     * @see Comparable#compareTo(Object)
      */
     public int compareTo(SubspaceDistance other) {
         int compare = Double.compare(this.subspaceDistance, other.subspaceDistance);
@@ -107,9 +97,6 @@ public class SubspaceDistance extends AbstractDistance<SubspaceDistance> {
         }
     }
 
-    /**
-     * @see Object#hashCode()
-     */
     public int hashCode() {
         int result;
         long temp;
@@ -141,8 +128,6 @@ public class SubspaceDistance extends AbstractDistance<SubspaceDistance> {
     /**
      * Writes the subspace distance value and the affine distance value
      * of this SubspaceDistance to the specified stream.
-     *
-     * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
      */
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeDouble(subspaceDistance);
@@ -152,8 +137,6 @@ public class SubspaceDistance extends AbstractDistance<SubspaceDistance> {
     /**
      * Reads the subspace distance value and the affine distance value
      * of this SubspaceDistance from the specified stream.
-     *
-     * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
      */
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         subspaceDistance = in.readDouble();
@@ -165,7 +148,6 @@ public class SubspaceDistance extends AbstractDistance<SubspaceDistance> {
      * external file.
      *
      * @return 16 (2 * 8 Byte for two double values)
-     * @see Distance#externalizableSize()
      */
     public int externalizableSize() {
         return 16;

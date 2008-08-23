@@ -69,9 +69,6 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
         addOption(PARSER_PARAM);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection#getDatabase(Normalization)
-     */
     @SuppressWarnings("unchecked")
     public Database<O> getDatabase(Normalization<O> normalization) {
         try {
@@ -112,9 +109,6 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
         }
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
-     */
     public String parameterDescription() {
         StringBuffer description = new StringBuffer();
         description.append(optionHandler.usage("", false));
@@ -153,12 +147,10 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
     }
 
     /**
-     * Calls {@link AbstractDatabaseConnection#setParameters(String[]) AbstractDatabaseConnection#setParameters(args)}
+     * Calls the super method
      * and instantiates {@link #parser} according to the value of parameter
      * {@link #PARSER_PARAM}.
      * The remaining parameters are passed to the {@link #parser}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

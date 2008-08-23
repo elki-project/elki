@@ -21,10 +21,6 @@ public class WekaNumericAttribute extends WekaAbstractAttribute<WekaNumericAttri
         this.value = value;
     }
 
-
-    /**
-     * @see de.lmu.ifi.dbs.elki.converter.WekaAttribute#getValue()
-     */
     public String getValue() {
         return Double.toString(value);
     }

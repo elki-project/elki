@@ -66,10 +66,6 @@ public class LocallyWeightedDistanceFunction<V extends RealVector<V, ?>, P exten
         return new DoubleDistance(Math.max(Math.sqrt(dist1), Math.sqrt(dist2)));
     }
 
-
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction#minDist(de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox,de.lmu.ifi.dbs.elki.data.FeatureVector)
-     */
     public DoubleDistance minDist(HyperBoundingBox mbr, V v) {
         if (mbr.getDimensionality() != v.getDimensionality()) {
             throw new IllegalArgumentException("Different dimensionality of objects\n  first argument: " + mbr.toString() + "\n  second argument: " + v.toString());
@@ -95,16 +91,10 @@ public class LocallyWeightedDistanceFunction<V extends RealVector<V, ?>, P exten
         return new DoubleDistance(Math.sqrt(dist));
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction#minDist(de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox,Integer)
-     */
     public DoubleDistance minDist(HyperBoundingBox mbr, Integer id) {
         return minDist(mbr, getDatabase().get(id));
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction#distance(de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox,de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox)
-     */
     public DoubleDistance distance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
         if (mbr1.getDimensionality() != mbr2.getDimensionality()) {
             throw new IllegalArgumentException("Different dimensionality of objects\n  first argument: " + mbr1.toString() + "\n  second argument: " + mbr2.toString());
@@ -131,9 +121,6 @@ public class LocallyWeightedDistanceFunction<V extends RealVector<V, ?>, P exten
         return new DoubleDistance(Math.sqrt(sqrDist));
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction#centerDistance(de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox,de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox)
-     */
     public DoubleDistance centerDistance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
         if (mbr1.getDimensionality() != mbr2.getDimensionality()) {
             throw new IllegalArgumentException("Different dimensionality of objects" +
@@ -153,11 +140,8 @@ public class LocallyWeightedDistanceFunction<V extends RealVector<V, ?>, P exten
     }
 
     /**
-     * Returns the assocoiation ID for the association to be set by the preprocessor.
-     *
      * @return the assocoiation ID for the association to be set by the preprocessor,
      *         which is {@link de.lmu.ifi.dbs.elki.database.AssociationID#LOCALLY_WEIGHTED_MATRIX}.
-     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getAssociationID()
      */
     public AssociationID getAssociationID() {
         return AssociationID.LOCALLY_WEIGHTED_MATRIX;

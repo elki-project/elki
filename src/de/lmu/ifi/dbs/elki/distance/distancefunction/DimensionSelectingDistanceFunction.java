@@ -78,9 +78,6 @@ public class DimensionSelectingDistanceFunction<N extends Number, V extends Feat
         return description.toString();
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction#minDist(de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox,de.lmu.ifi.dbs.elki.data.FeatureVector)
-     */
     public DoubleDistance minDist(HyperBoundingBox mbr, V v) {
         if (dim > mbr.getDimensionality() || dim > v.getDimensionality()) {
             throw new IllegalArgumentException("Specified dimension to be considered " +
@@ -103,16 +100,10 @@ public class DimensionSelectingDistanceFunction<N extends Number, V extends Feat
         return new DoubleDistance(Math.abs(manhattan));
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction#minDist(de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox,Integer)
-     */
     public DoubleDistance minDist(HyperBoundingBox mbr, Integer id) {
         return minDist(mbr, getDatabase().get(id));
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction#distance(de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox,de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox)
-     */
     public DoubleDistance distance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
         if (dim > mbr1.getDimensionality() || dim > mbr2.getDimensionality()) {
             throw new IllegalArgumentException("Specified dimension to be considered " +
@@ -140,9 +131,6 @@ public class DimensionSelectingDistanceFunction<N extends Number, V extends Feat
         return new DoubleDistance(Math.abs(manhattan));
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction#centerDistance(de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox,de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox)
-     */
     public DoubleDistance centerDistance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
         if (dim > mbr1.getDimensionality() || dim > mbr2.getDimensionality()) {
             throw new IllegalArgumentException("Specified dimension to be considered " +
@@ -160,9 +148,6 @@ public class DimensionSelectingDistanceFunction<N extends Number, V extends Feat
         return new DoubleDistance(Math.abs(manhattan));
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 

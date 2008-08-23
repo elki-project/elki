@@ -8,11 +8,10 @@ import java.util.Random;
 
 /**
  * Provides a BitVector wrapping a BitSet.
- * 
- * @author Arthur Zimek 
+ *
+ * @author Arthur Zimek
  */
-public class BitVector extends NumberVector<BitVector,Bit>
-{
+public class BitVector extends NumberVector<BitVector, Bit> {
     /**
      * Storing the bits.
      */
@@ -26,24 +25,19 @@ public class BitVector extends NumberVector<BitVector,Bit>
     /**
      * Provides a new BitVector corresponding to the specified bits and of the
      * specified dimensionality.
-     * 
-     * @param bits
-     *            the bits to be set in this BitVector
-     * @param dimensionality
-     *            the dimensionality of this BitVector
-     * @throws IllegalArgumentException
-     *             if the specified dimensionality is to small to match the
-     *             given BitSet
+     *
+     * @param bits           the bits to be set in this BitVector
+     * @param dimensionality the dimensionality of this BitVector
+     * @throws IllegalArgumentException if the specified dimensionality is to small to match the
+     *                                  given BitSet
      */
     public BitVector(BitSet bits, int dimensionality)
-            throws IllegalArgumentException
-    {
-        if (dimensionality < bits.length())
-        {
+        throws IllegalArgumentException {
+        if (dimensionality < bits.length()) {
             throw new IllegalArgumentException("Specified dimensionality "
-                                               + dimensionality
-                                               + " is to low for specified BitSet of length "
-                                               + bits.length());
+                + dimensionality
+                + " is to low for specified BitSet of length "
+                + bits.length());
         }
         this.bits = bits;
         this.dimensionality = dimensionality;
@@ -51,37 +45,32 @@ public class BitVector extends NumberVector<BitVector,Bit>
 
     /**
      * Provides a new BitVector corresponding to the bits in the given array.
-     * 
-     * @param bits
-     *            an array of bits specifiying the bits in this bit vector
+     *
+     * @param bits an array of bits specifiying the bits in this bit vector
      */
-    public BitVector(Bit[] bits)
-    {
+    public BitVector(Bit[] bits) {
         this.bits = new BitSet(bits.length);
-        for (int i = 0; i < bits.length; i++)
-        {
+        for (int i = 0; i < bits.length; i++) {
             this.bits.set(i, bits[i].bitValue());
         }
         this.dimensionality = bits.length;
     }
 
     /**
-     * @see FeatureVector#newInstance(Number[])
+     * @return a new instance of this BitVector with the specified values
      */
     @Override
-    public BitVector newInstance(Bit[] values)
-    {
+    public BitVector newInstance(Bit[] values) {
         return new BitVector(values);
     }
 
     /**
-     * @see FeatureVector#randomInstance(Random)
+     * @return a new instance of this BitVector with
+     *         uniformly distributed random values
      */
-    public BitVector randomInstance(Random random)
-    {
+    public BitVector randomInstance(Random random) {
         Bit[] randomBits = new Bit[getDimensionality()];
-        for (int i = 0; i < randomBits.length; i++)
-        {
+        for (int i = 0; i < randomBits.length; i++) {
             randomBits[i] = new Bit(random.nextBoolean());
         }
         return new BitVector(randomBits);
@@ -89,86 +78,57 @@ public class BitVector extends NumberVector<BitVector,Bit>
 
     /**
      * Returns the same as
-     * {@link BitVector#randomInstance(Random) randomInstance(Random)}.
-     * 
-     * @see FeatureVector#randomInstance(Number, Number, Random)
+     * {@link BitVector#randomInstance(Random) randomInstance(random)}.
      */
-    public BitVector randomInstance(Bit min, Bit max, Random random)
-    {
+    public BitVector randomInstance(Bit min, Bit max, Random random) {
         return randomInstance(random);
     }
 
-    /**
-     * @see FeatureVector#getDimensionality()
-     */
-    public int getDimensionality()
-    {
+    public int getDimensionality() {
         return dimensionality;
     }
 
-    /**
-     * @see FeatureVector#getValue(int)
-     */
-    public Bit getValue(int dimension)
-    {
-        if (dimension < 1 || dimension > dimensionality)
-        {
+    public Bit getValue(int dimension) {
+        if (dimension < 1 || dimension > dimensionality) {
             throw new IllegalArgumentException("illegal dimension: "
-                                               + dimension);
+                + dimension);
         }
         return new Bit(bits.get(dimension));
     }
 
-    /**
-     * @see FeatureVector#getColumnVector()
-     */
-    public Vector getColumnVector()
-    {
+    public Vector getColumnVector() {
         double[] values = new double[dimensionality];
-        for (int i = 0; i < dimensionality; i++)
-        {
+        for (int i = 0; i < dimensionality; i++) {
             values[i] = bits.get(i) ? 1 : 0;
         }
         return new Vector(values);
     }
 
-    /**
-     * @see FeatureVector#getRowVector()
-     */
-    public Matrix getRowVector()
-    {
+    public Matrix getRowVector() {
         double[] values = new double[dimensionality];
-        for (int i = 0; i < dimensionality; i++)
-        {
+        for (int i = 0; i < dimensionality; i++) {
             values[i] = bits.get(i) ? 1 : 0;
         }
-        return new Matrix(new double[][] { values.clone() });
+        return new Matrix(new double[][]{values.clone()});
     }
 
     /**
      * Returns a bit vector equal to this bit vector, if k is not 0, a bit
      * vector with all components equal to zero otherwise.
-     * 
-     * @see FeatureVector#multiplicate(double)
      */
-    public BitVector multiplicate(double k)
-    {
-        if (k == 0)
-        {
+    public BitVector multiplicate(double k) {
+        if (k == 0) {
             return nullVector();
-        } else
-        {
+        }
+        else {
             return new BitVector(bits, dimensionality);
         }
     }
 
     /**
      * Returns the inverse of the bit vector.
-     * 
-     * @see FeatureVector#negativeVector()
      */
-    public BitVector negativeVector()
-    {
+    public BitVector negativeVector() {
         BitSet newBits = (BitSet) bits.clone();
         newBits.flip(0, dimensionality);
         return new BitVector(newBits, dimensionality);
@@ -176,25 +136,18 @@ public class BitVector extends NumberVector<BitVector,Bit>
 
     /**
      * Returns a bit vector of equal dimensionality but containing 0 only.
-     * 
-     * @see FeatureVector#nullVector()
      */
-    public BitVector nullVector()
-    {
+    public BitVector nullVector() {
         return new BitVector(new BitSet(), dimensionality);
     }
 
     /**
      * Returns a bit vector corresponding to an XOR operation on this and the
      * specified bit vector.
-     * 
-     * @see FeatureVector#plus(FeatureVector)
      */
-    public BitVector plus(BitVector fv)
-    {
+    public BitVector plus(BitVector fv) {
         Bit[] fv_bits = new Bit[fv.getDimensionality()];
-        for (int i = 0; i < fv.getDimensionality(); i++)
-        {
+        for (int i = 0; i < fv.getDimensionality(); i++) {
             fv_bits[i] = fv.getValue(i);
         }
 
@@ -205,30 +158,25 @@ public class BitVector extends NumberVector<BitVector,Bit>
 
     /**
      * Returns whether the bit at specified index is set.
-     * 
-     * @param index
-     *            the index of the bit to inspect
+     *
+     * @param index the index of the bit to inspect
      * @return true if the bit at index <code>index</code> is set, false
      *         otherwise.
      */
-    public boolean isSet(int index)
-    {
+    public boolean isSet(int index) {
         return bits.get(index);
     }
 
     /**
      * Returns whether the bits at all of the specified indices are set.
-     * 
-     * @param indices
-     *            the indices to inspect
+     *
+     * @param indices the indices to inspect
      * @return true if the bits at all of the specified indices are set, false
      *         otherwise
      */
-    public boolean areSet(int[] indices)
-    {
+    public boolean areSet(int[] indices) {
         boolean set = true;
-        for (int i = 0; i < indices.length && set; i++)
-        {
+        for (int i = 0; i < indices.length && set; i++) {
             // noinspection ConstantConditions
             set &= bits.get(i);
         }
@@ -237,15 +185,13 @@ public class BitVector extends NumberVector<BitVector,Bit>
 
     /**
      * Returns the indices of all set bits.
-     * 
+     *
      * @return the indices of all set bits
      */
-    public int[] setBits()
-    {
+    public int[] setBits() {
         int[] setBits = new int[bits.size()];
         int index = 0;
-        for (int i = bits.nextSetBit(0); i >= 0; i = bits.nextSetBit(i + 1))
-        {
+        for (int i = bits.nextSetBit(0); i >= 0; i = bits.nextSetBit(i + 1)) {
             setBits[index++] = i;
         }
         return setBits;
@@ -254,18 +200,15 @@ public class BitVector extends NumberVector<BitVector,Bit>
     /**
      * Returns whether this BitVector contains all bits that are set to true in
      * the specified BitSet.
-     * 
-     * @param bitset
-     *            the bits to inspect in this BitVector
+     *
+     * @param bitset the bits to inspect in this BitVector
      * @return true if this BitVector contains all bits that are set to true in
      *         the specified BitSet, false otherwise
      */
-    public boolean contains(BitSet bitset)
-    {
+    public boolean contains(BitSet bitset) {
         boolean contains = true;
         for (int i = bitset.nextSetBit(0); i >= 0 && contains; i = bitset
-                .nextSetBit(i + 1))
-        {
+            .nextSetBit(i + 1)) {
             // noinspection ConstantConditions
             contains &= bits.get(i);
         }
@@ -274,11 +217,10 @@ public class BitVector extends NumberVector<BitVector,Bit>
 
     /**
      * Returns a copy of the bits currently set in this BitVector.
-     * 
+     *
      * @return a copy of the bits currently set in this BitVector
      */
-    public BitSet getBits()
-    {
+    public BitSet getBits() {
         return (BitSet) bits.clone();
     }
 
@@ -286,22 +228,18 @@ public class BitVector extends NumberVector<BitVector,Bit>
      * Returns a String representation of this BitVector. The representation is
      * suitable to be parsed by
      * {@link de.lmu.ifi.dbs.elki.parser.BitVectorLabelParser BitVectorLabelParser}.
-     * 
+     *
      * @see Object#toString()
      */
     @Override
-    public String toString()
-    {
+    public String toString() {
         Bit[] bitArray = new Bit[dimensionality];
-        for (int i = 0; i < dimensionality; i++)
-        {
+        for (int i = 0; i < dimensionality; i++) {
             bitArray[i] = new Bit(bits.get(i));
         }
         StringBuffer representation = new StringBuffer();
-        for (Bit bit : bitArray)
-        {
-            if (representation.length() > 0)
-            {
+        for (Bit bit : bitArray) {
+            if (representation.length() > 0) {
                 representation.append(ATTRIBUTE_SEPARATOR);
             }
             representation.append(bit.toString());
@@ -310,22 +248,21 @@ public class BitVector extends NumberVector<BitVector,Bit>
     }
 
     /**
-     * This BitVector is equal to a given Object, if the Object is a BitVector
+     * Indicates whether some other object is "equal to" this BitVector.
+     * This BitVector is equal to the given object, if the object is a BitVector
      * of same dimensionality and with identical bits set.
-     * 
+     *
      * @see DatabaseObject#equals(Object)
      */
     @Override
-    public boolean equals(Object obj)
-    {
-        if (obj instanceof BitVector)
-        {
+    public boolean equals(Object obj) {
+        if (obj instanceof BitVector) {
             BitVector bv = (BitVector) obj;
             return this.getDimensionality() == bv.getDimensionality()
-                   && this.getBits().equals(bv.getBits());
+                && this.getBits().equals(bv.getBits());
 
-        } else
-        {
+        }
+        else {
             return false;
         }
     }

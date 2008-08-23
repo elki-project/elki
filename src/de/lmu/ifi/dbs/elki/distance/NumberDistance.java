@@ -28,7 +28,6 @@ public abstract class NumberDistance<D extends NumberDistance<D, N>, N extends N
      * Returns the hash code for this NumberDistance, which is the hash code of its value.
      *
      * @return the hash code of the value
-     * @see AbstractDistance#hashCode()
      */
     public final int hashCode() {
         return value.hashCode();
@@ -43,7 +42,6 @@ public abstract class NumberDistance<D extends NumberDistance<D, N>, N extends N
      *
      * @return a negative integer, zero, or a positive integer as the value of this NumberDistance
      *         is less than, equal to, or greater than the value of the specified NumberDistance.
-     * @see Comparable#compareTo(Object)
      */
     public int compareTo(D other) {
         return Double.compare(this.value.doubleValue(), other.value.doubleValue());

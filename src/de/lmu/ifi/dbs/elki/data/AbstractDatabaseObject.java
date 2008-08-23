@@ -6,37 +6,27 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 /**
  * Abstract super class for all database objects. Provides the required access
  * methods for the unique object id.
- * 
- * @author Elke Achtert 
+ *
+ * @author Elke Achtert
  */
-public abstract class AbstractDatabaseObject extends AbstractLoggable implements DatabaseObject
-{
+public abstract class AbstractDatabaseObject extends AbstractLoggable implements DatabaseObject {
     /**
      * The unique id of this object.
      */
     private Integer id;
 
-  /**
-   * Initializes the logger and sets the debug status to false.
-   *
-   */
-  protected AbstractDatabaseObject() {
-    super(LoggingConfiguration.DEBUG);
-  }
-
-  /**
-     * @see DatabaseObject#getID()
+    /**
+     * Initializes the logger and sets the debug status to false.
      */
-    public final Integer getID()
-    {
+    protected AbstractDatabaseObject() {
+        super(LoggingConfiguration.DEBUG);
+    }
+
+    public final Integer getID() {
         return id;
     }
 
-    /**
-     * @see DatabaseObject#setID(Integer)
-     */
-    public void setID(Integer id)
-    {
+    public void setID(Integer id) {
         this.id = id;
     }
 

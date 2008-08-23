@@ -103,12 +103,10 @@ public class ERiCDistanceFunction<V extends RealVector<V, ?>, P extends Preproce
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction#setParameters(String[])
+     * Calls the super method
      * AbstractPreprocessorBasedDistanceFunction#setParameters(args)}
      * and sets additionally the values of the parameters
      * {@link #DELTA_PARAM} and {#TAU_PARAM}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
@@ -126,15 +124,11 @@ public class ERiCDistanceFunction<V extends RealVector<V, ?>, P extends Preproce
      *
      * @return the name of the default preprocessor,
      *         which is {@link de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor}
-     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getDefaultPreprocessorClassName()
      */
     public String getDefaultPreprocessorClassName() {
         return KnnQueryBasedHiCOPreprocessor.class.getName();
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getPreprocessorSuperClass()
-     */
     public String getPreprocessorDescription() {
         return "Classname of the preprocessor to determine the correlation dimension of each object " +
             Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Preprocessor.class) +
@@ -142,30 +136,21 @@ public class ERiCDistanceFunction<V extends RealVector<V, ?>, P extends Preproce
     }
 
     /**
-     * Returns the super class for the preprocessor parameter.
-     *
      * @return the super class for the preprocessor parameter,
      *         which is {@link de.lmu.ifi.dbs.elki.preprocessing.Preprocessor}
-     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getPreprocessorSuperClass()
      */
     public Class<Preprocessor> getPreprocessorSuperClass() {
         return Preprocessor.class;
     }
 
     /**
-     * Returns the assocoiation ID for the association to be set by the preprocessor.
-     *
      * @return the assocoiation ID for the association to be set by the preprocessor,
      *         which is {@link AssociationID#LOCAL_PCA}
-     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getAssociationID()
      */
     public AssociationID getAssociationID() {
         return AssociationID.LOCAL_PCA;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.MeasurementFunction#valueOf(String)
-     */
     public BitDistance valueOf(String pattern) throws IllegalArgumentException {
         if (matches(pattern)) {
             return new BitDistance(Bit.valueOf(pattern).bitValue());
@@ -177,23 +162,14 @@ public class ERiCDistanceFunction<V extends RealVector<V, ?>, P extends Preproce
         }
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.MeasurementFunction#infiniteDistance()
-     */
     public BitDistance infiniteDistance() {
         return new BitDistance(true);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.MeasurementFunction#nullDistance()
-     */
     public BitDistance nullDistance() {
         return new BitDistance(false);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.distance.MeasurementFunction#undefinedDistance()
-     */
     public BitDistance undefinedDistance() {
         throw new UnsupportedOperationException("Undefinded distance not supported!");
     }
@@ -202,7 +178,6 @@ public class ERiCDistanceFunction<V extends RealVector<V, ?>, P extends Preproce
      * Note, that the pca of o1 must have equal ore more strong
      * eigenvectors than the pca of o2.
      *
-     * @see DistanceFunction#distance(de.lmu.ifi.dbs.elki.data.DatabaseObject,de.lmu.ifi.dbs.elki.data.DatabaseObject)
      */
     @SuppressWarnings("unchecked")
     public BitDistance distance(V v1, V v2) {

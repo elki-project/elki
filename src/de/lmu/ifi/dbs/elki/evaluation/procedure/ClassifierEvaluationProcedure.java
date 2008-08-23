@@ -89,10 +89,6 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
         optionHandler.put(new Flag(TIME_F, TIME_D));
     }
 
-    /**
-     * @see EvaluationProcedure#set(de.lmu.ifi.dbs.elki.database.Database,
-     *de.lmu.ifi.dbs.elki.database.Database)
-     */
     public void set(Database<O> training, Database<O> test) {
         SortedSet<ClassLabel<?>> labels = Util.getClassLabels(training);
         labels.addAll(Util.getClassLabels(test));
@@ -106,10 +102,6 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
         this.partition[0] = new TrainingAndTestSet<O, L>(training, test, this.labels);
     }
 
-    /**
-     * @see EvaluationProcedure#set(de.lmu.ifi.dbs.elki.database.Database,
-     *de.lmu.ifi.dbs.elki.evaluation.holdout.Holdout)
-     */
     public void set(Database<O> data, Holdout<O, L> holdout) {
         SortedSet<ClassLabel<?>> labels = Util.getClassLabels(data);
         this.labels = labels.toArray((L[]) new Object[labels.size()]);
@@ -121,9 +113,6 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
         this.partition = holdout.partition(data);
     }
 
-    /**
-     * @see EvaluationProcedure#evaluate(de.lmu.ifi.dbs.elki.algorithm.Algorithm)
-     */
     public Evaluation<O, C> evaluate(C algorithm) throws IllegalStateException {
         if (partition == null || partition.length < 1) {
             throw new IllegalStateException(ILLEGAL_STATE + " No dataset partition specified.");
@@ -177,23 +166,14 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
         }
     }
 
-    /**
-     * @see EvaluationProcedure#setTime(boolean)
-     */
     public void setTime(boolean time) {
         this.time = time;
     }
 
-    /**
-     * @see EvaluationProcedure#setVerbose(boolean)
-     */
     public void setVerbose(boolean verbose) {
         this.verbose = verbose;
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#parameterDescription()
-     */
     public String parameterDescription() {
         return this.getClass().getName() + " performs a confusion matrix based evaluation.";
     }
@@ -215,8 +195,6 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
     /**
      * Sets parameters time and verbose, if given. Otherwise, the current
      * setting remains unchanged.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = optionHandler.grabOptions(args);

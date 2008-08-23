@@ -31,16 +31,10 @@ public class RStarTree<O extends NumberVector<O,? >> extends NonFlatRStarTree<O,
     return new SpatialDirectoryEntry(0, null);
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree#createNewLeafEntry(NumberVector o)
-   */
   protected SpatialEntry createNewLeafEntry(O o) {
     return new SpatialLeafEntry(o.getID(), getValues(o));
   }
 
-  /**
-   * @see de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree#createNewDirectoryEntry(de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode)
-   */
   protected SpatialEntry createNewDirectoryEntry(RStarTreeNode node) {
     return new SpatialDirectoryEntry(node.getID(), node.mbr());
   }

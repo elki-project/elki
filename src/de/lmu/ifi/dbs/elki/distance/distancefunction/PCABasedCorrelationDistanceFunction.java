@@ -63,12 +63,10 @@ public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P e
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction#setParameters(String[])
+     * Calls the super method
      * AbstractPreprocessorBasedDistanceFunction#setParameters(args)}
      * and sets additionally the value of the parameter
      * {@link #DELTA_PARAM}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
      */
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
@@ -139,9 +137,6 @@ public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P e
         return (D) new CorrelationDistance<D>(-1, Double.NaN);
     }
 
-    /**
-     * @see AbstractCorrelationDistanceFunction#correlationDistance(de.lmu.ifi.dbs.elki.data.RealVector,de.lmu.ifi.dbs.elki.data.RealVector)
-     */
     @SuppressWarnings("unchecked")
     D correlationDistance(V dv1, V dv2) {
         PCAFilteredResult pca1 = getDatabase().getAssociation(AssociationID.LOCAL_PCA, dv1.getID());
@@ -277,19 +272,13 @@ public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P e
     }
 
     /**
-     * Returns the name of the default preprocessor.
-     *
      * @return the name of the default preprocessor,
      *         which is {@link de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor}
-     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getDefaultPreprocessorClassName()
      */
     public String getDefaultPreprocessorClassName() {
         return KnnQueryBasedHiCOPreprocessor.class.getName();
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getPreprocessorSuperClass()
-     */
     public String getPreprocessorDescription() {
         return "Classname of the preprocessor to determine the correlation dimension of each object "
             + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(getPreprocessorSuperClass())
@@ -297,22 +286,16 @@ public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P e
     }
 
     /**
-     * Returns the super class for the preprocessor parameter.
-     *
      * @return the super class for the preprocessor parameter,
      *         which is {@link HiCOPreprocessor}
-     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getPreprocessorSuperClass()
      */
     public Class<HiCOPreprocessor> getPreprocessorSuperClass() {
         return HiCOPreprocessor.class;
     }
 
     /**
-     * Returns the assocoiation ID for the association to be set by the preprocessor.
-     *
      * @return the assocoiation ID for the association to be set by the preprocessor,
      *         which is {@link de.lmu.ifi.dbs.elki.database.AssociationID#LOCAL_PCA}
-     * @see de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient#getAssociationID()
      */
     public AssociationID getAssociationID() {
         return AssociationID.LOCAL_PCA;

@@ -2,11 +2,10 @@ package de.lmu.ifi.dbs.elki.data;
 
 /**
  * A simple class label casting a String as it is as label.
- * 
- * @author Arthur Zimek 
+ *
+ * @author Arthur Zimek
  */
-public class SimpleClassLabel extends ClassLabel<SimpleClassLabel>
-{
+public class SimpleClassLabel extends ClassLabel<SimpleClassLabel> {
     /**
      * Holds the String designating the label.
      */
@@ -14,23 +13,18 @@ public class SimpleClassLabel extends ClassLabel<SimpleClassLabel>
 
     /**
      * @see ClassLabel#ClassLabel()
-     *
      */
-    public SimpleClassLabel()
-    {
+    public SimpleClassLabel() {
         super();
     }
-    
+
     /**
      * Provides a simple class label covering the given String.
-     * 
-     * @param label
-     *            the String to be cast as label
-     * @see ClassLabel#init(String)
+     *
+     * @param label the String to be cast as label
      */
     @Override
-    public void init(String label)
-    {
+    public void init(String label) {
         this.label = label;
     }
 
@@ -38,23 +32,17 @@ public class SimpleClassLabel extends ClassLabel<SimpleClassLabel>
      * The ordering of two SimpleClassLabels is given by the ordering on the
      * Strings they represent. <p/> That is, the result equals
      * <code>this.label.compareTo(o.label)</code>.
-     * 
-     * @see Comparable#compareTo(Object)
      */
-    public int compareTo(SimpleClassLabel o)
-    {
+    public int compareTo(SimpleClassLabel o) {
         return this.label.compareTo(o.label);
     }
 
     /**
      * The hash code of a simple class label is the hash code of the String
      * represented by the ClassLabel.
-     * 
-     * @see Object#hashCode()
      */
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return label.hashCode();
     }
 
@@ -62,25 +50,20 @@ public class SimpleClassLabel extends ClassLabel<SimpleClassLabel>
      * Any ClassLabel should ensure a natural ordering that is consistent with
      * equals. Thus, if <code>this.compareTo(o)==0</code>, then
      * <code>this.equals(o)</code> should be <code>true</code>.
-     * 
-     * @param o
-     *            an object to test for equality w.r.t. this ClassLabel
+     *
+     * @param o an object to test for equality w.r.t. this ClassLabel
      * @return true, if <code>this==obj || this.compareTo(o)==0</code>, false
      *         otherwise
      */
     @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass())
-        {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        if (!super.equals(o))
-        {
+        if (!super.equals(o)) {
             return false;
         }
         final SimpleClassLabel that = (SimpleClassLabel) o;
@@ -90,13 +73,11 @@ public class SimpleClassLabel extends ClassLabel<SimpleClassLabel>
 
     /**
      * Returns a new instance of the String covered by this SimpleClassLabel.
-     * 
+     *
      * @return a new instance of the String covered by this SimpleClassLabel
-     * @see ClassLabel#toString()
      */
     @Override
-    public String toString()
-    {
+    public String toString() {
         return label;
     }
 

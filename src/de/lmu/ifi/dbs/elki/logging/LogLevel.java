@@ -11,9 +11,6 @@ import java.util.logging.Level;
  *
  */
 public class LogLevel extends Level {
-
-	
-
 	/**
 	 * Constructs a log level with the given name and the given integer value.
 	 * 

@@ -210,16 +210,10 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
 
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.tree.TreeIndex#createHeader()
-     */
     protected TreeIndexHeader createHeader() {
         return new RdKNNTreeHeader(pageSize, dirCapacity, leafCapacity, dirMinimum, leafCapacity, k_max);
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.index.tree.TreeIndex#initializeCapacities(de.lmu.ifi.dbs.elki.data.DatabaseObject,boolean)
-     */
     protected void initializeCapacities(O object, boolean verbose) {
         int dimensionality = object.getDimensionality();
         D dummyDistance = distanceFunction.nullDistance();
@@ -275,9 +269,6 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
         }
     }
 
-    /**
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable#setParameters(String[])
-     */
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
