@@ -114,9 +114,9 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDimensionsSelectingDoubleD
 # #######################################################
 # MetricalIndex - default package: de.lmu.ifi.dbs.elki.index.tree.metrical
 de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex=de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTree,\
-           de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mkcop.MkCoPTree,\
-           de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mkmax.MkMaxTree,\
-           de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktab.MkTabTree
+           de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkcop.MkCoPTree,\
+           de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkmax.MkMaxTree,\
+           de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mktab.MkTabTree
 # #######################################################
 # SpatialIndex - default package: de.lmu.ifi.dbs.elki.index.tree.spatial
 de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex=de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTree,\
