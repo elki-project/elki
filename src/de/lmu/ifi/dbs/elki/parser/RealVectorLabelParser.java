@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.database.connection.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 import java.io.BufferedReader;
@@ -35,17 +36,14 @@ import java.util.List;
  * @param <V> the type of RealVector expected in the {@link ParsingResult}
  */
 public class RealVectorLabelParser<V extends RealVector<V, ?>> extends AbstractParser<V> {
-
   /**
-   * Option string for parameter float.
+   * OptionID for {@link #FLOAT_PARAM}
    */
-  public static final String FLOAT_F = "float";
+  private static final OptionID FLOAT_ID = OptionID.getOrCreateOptionID("parser.float",
+      "Flag to specify parsing the real values as floats (default is double).");
 
-  /**
-   * Description for parameter float.
-   */
-  public static final String FLOAT_D = "flag to specify parsing the real values as floats (default is double)";
-
+  private static final Flag FLOAT_FLAG = new Flag(FLOAT_ID);
+  
   /**
    * If true, the real values are parsed as floats.
    */
@@ -57,15 +55,16 @@ public class RealVectorLabelParser<V extends RealVector<V, ?>> extends AbstractP
   public static final String CLASS_LABEL_INDEX_P = "numericalClassLabelIndex";
 
   /**
-   * Description for the parameter numerical class label.
+   * OptionID for {@link #CLASS_LABEL_INDEX_PARAM}
    */
-  public static final String CLASS_LABEL_INDEX_D = "(optional) index of a class label (may be numeric), " +
+  private static final OptionID CLASS_LABEL_INDEX_ID = OptionID.getOrCreateOptionID("parser.classLabelIndex",
+      "Index of a class label (may be numeric), " +
       "counting whitespace separated entries in a line starting with 0 - " +
       "the corresponding entry will be treated as a label. " +
       "To actually set this label as class label, use also the parametrization of " +
       AbstractDatabaseConnection.class.getCanonicalName() + " -" +
       AbstractDatabaseConnection.CLASS_LABEL_INDEX_ID.getName() + " -" +
-      AbstractDatabaseConnection.CLASS_LABEL_CLASS_ID.getName();
+      AbstractDatabaseConnection.CLASS_LABEL_CLASS_ID.getName());
 
   /**
    * The parameter for an index of a numerical class label.
@@ -77,18 +76,12 @@ public class RealVectorLabelParser<V extends RealVector<V, ?>> extends AbstractP
    * <p/>
    * The parameter is optional and the default value is set to -1.
    */
-  public static final IntParameter CLASS_LABEL_INDEX_PARAM = new IntParameter(CLASS_LABEL_INDEX_P, CLASS_LABEL_INDEX_D);
-
-  static {
-    CLASS_LABEL_INDEX_PARAM.setDefaultValue(-1);
-    CLASS_LABEL_INDEX_PARAM.setOptional(true);
-  }
+  public static final IntParameter CLASS_LABEL_INDEX_PARAM = new IntParameter(CLASS_LABEL_INDEX_ID, null, -1);
 
   /**
    * Keeps the index of an attribute to be treated as a string label.
    */
   private int classLabelIndex;
-
 
   /**
    * Provides a parser for parsing one point per line, attributes separated by
@@ -99,8 +92,8 @@ public class RealVectorLabelParser<V extends RealVector<V, ?>> extends AbstractP
   public RealVectorLabelParser() {
     super();
     debug = true;
-    optionHandler.put(new Flag(FLOAT_F, FLOAT_D));
-    optionHandler.put(CLASS_LABEL_INDEX_PARAM);
+    addOption(FLOAT_FLAG);
+    addOption(CLASS_LABEL_INDEX_PARAM);
   }
 
   public ParsingResult<V> parse(InputStream in) {
@@ -165,7 +158,7 @@ public class RealVectorLabelParser<V extends RealVector<V, ?>> extends AbstractP
     description.append(" expects following format of parsed lines:\n");
     description.append("A single line provides a single point. Attributes are separated by whitespace (");
     description.append(WHITESPACE_PATTERN.pattern() + "). ");
-    description.append("If parameter " + FLOAT_F + " is set, the real values will be parsed as floats (resulting in a set of FloatVectors), " + "otherwise the real values will be parsed as as doubles (resulting in a set of DoubleVectors -- default).");
+    description.append("If parameter " + FLOAT_FLAG.getName() + " is set, the real values will be parsed as floats (resulting in a set of FloatVectors), " + "otherwise the real values will be parsed as as doubles (resulting in a set of DoubleVectors -- default).");
     description.append("Any substring not containing whitespace is tried to be read as double (or float). " + "If this fails, it will be appended to a label. (Thus, any label must not be parseable " + "as double nor as float.) Empty lines and lines beginning with \"");
     description.append(COMMENT);
     description.append("\" will be ignored. If any point differs in its dimensionality from other points, " + "the parse method will fail with an Exception.\n");
@@ -176,7 +169,7 @@ public class RealVectorLabelParser<V extends RealVector<V, ?>> extends AbstractP
   @Override
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParams = super.setParameters(args);
-    parseFloat = optionHandler.isSet(FLOAT_F);
+    parseFloat = FLOAT_FLAG.isSet();
     if (optionHandler.isSet(CLASS_LABEL_INDEX_PARAM)) {
       classLabelIndex = getParameterValue(CLASS_LABEL_INDEX_PARAM);
     }
