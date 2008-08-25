@@ -77,7 +77,7 @@ public class AffineTransformation {
    * @param v translation vector
    */
   public void addTranslation(Vector v) {
-    assert(v.length() == dim);
+    assert(v.getRowDimensionality() == dim);
 
     // reset inverse transformation - needs recomputation.
     inv = null;
@@ -172,7 +172,7 @@ public class AffineTransformation {
    * @return vector of dim+1, with new column having the value 1.0
    */
   public Vector homogeneVector(Vector v) {
-    assert(v.length() == dim);
+    assert(v.getRowDimensionality() == dim);
     double[] dv = new double[dim+1];
     for (int i=0; i<dim; i++)
       dv[i] = v.get(i);
@@ -186,7 +186,7 @@ public class AffineTransformation {
    * @return vector of dimension dim
    */
   public Vector unhomogeneVector(Vector v) {
-    assert(v.length() == dim+1);
+    assert(v.getRowDimensionality() == dim+1);
     double[] dv = new double[dim];
     double scale = v.get(dim);
     assert(Math.abs(scale) > 0.0);
