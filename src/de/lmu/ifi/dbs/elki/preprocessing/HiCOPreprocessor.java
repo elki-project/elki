@@ -1,26 +1,23 @@
 package de.lmu.ifi.dbs.elki.preprocessing;
 
+import java.util.Iterator;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
-import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredRunner;
-
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Abstract superclass for preprocessors for HiCO correlation dimension
@@ -35,15 +32,20 @@ public abstract class HiCOPreprocessor<V extends RealVector<V, ?>> extends Abstr
     public static final String DEFAULT_PCA_DISTANCE_FUNCTION = EuclideanDistanceFunction.class.getName();
 
     /**
-     * Parameter for pca distance function.
+     * OptionID for {@link #PCA_DISTANCE_PARAM}
      */
-    public static final String PCA_DISTANCE_FUNCTION_P = "pcaDistancefunction";
-
+    public static final OptionID PCA_DISTANCE_ID = OptionID.getOrCreateOptionID("hico.pca.distance",
+        "The distance function used to select object for running PCA.");
+    
     /**
-     * Description for parameter pca distance function.
+     * Parameter to specify the distance function used for running PCA.
+     * 
+     * Key: {@code -hico.pca.distance}
      */
-    public static final String PCA_DISTANCE_FUNCTION_D = "the distance function for the PCA to determine the distance between database objects " + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) + ". Default: " + DEFAULT_PCA_DISTANCE_FUNCTION;
-
+    // FIXME: find out how to use generics fully here.
+    protected final ClassParameter<DistanceFunction<V, DoubleDistance>> PCA_DISTANCE_PARAM = new ClassParameter(PCA_DISTANCE_ID,
+        DoubleDistance.class, DEFAULT_PCA_DISTANCE_FUNCTION );
+    
     /**
      * The distance function for the PCA.
      */
@@ -61,9 +63,7 @@ public abstract class HiCOPreprocessor<V extends RealVector<V, ?>> extends Abstr
     public HiCOPreprocessor() {
         super();
         // parameter pca distance function
-        ClassParameter<DistanceFunction<V, DoubleDistance>> pcaDist = new ClassParameter(PCA_DISTANCE_FUNCTION_P, PCA_DISTANCE_FUNCTION_D, DistanceFunction.class);
-        pcaDist.setDefaultValue(DEFAULT_PCA_DISTANCE_FUNCTION);
-        optionHandler.put(pcaDist);
+        addOption(PCA_DISTANCE_PARAM);
     }
 
     /**
@@ -118,18 +118,8 @@ public abstract class HiCOPreprocessor<V extends RealVector<V, ?>> extends Abstr
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
-        // pca distance function
-        String pcaDistanceFunctionClassName = (String) optionHandler.getOptionValue(PCA_DISTANCE_FUNCTION_P);
-        try {
-            // noinspection unchecked
-            // todo
-            pcaDistanceFunction = Util.instantiate(DistanceFunction.class, pcaDistanceFunctionClassName);
-        }
-        catch (UnableToComplyException e) {
-            throw new WrongParameterValueException(PCA_DISTANCE_FUNCTION_P, pcaDistanceFunctionClassName, PCA_DISTANCE_FUNCTION_D);
-        }
+        pcaDistanceFunction = PCA_DISTANCE_PARAM.instantiateClass();
         remainingParameters = pcaDistanceFunction.setParameters(remainingParameters);
-
         remainingParameters = pca.setParameters(remainingParameters);
 
         setParameters(args, remainingParameters);
