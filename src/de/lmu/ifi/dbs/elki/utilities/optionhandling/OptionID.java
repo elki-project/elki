@@ -101,6 +101,12 @@ public final class OptionID extends ConstantObject<OptionID> {
         "Flag to request output of performance time.");
 
     /**
+     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#TRACE_FLAG}
+     */
+    public static final OptionID TRACE_DEBUG = new OptionID("stack-trace",
+        "Print a stack trace on errors.");
+
+    /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator#RANDOM_SAMPLE_FLAG}
      */
     public static final OptionID DEPENDENCY_DERIVATOR_RANDOM_SAMPLE = new OptionID("derivator.randomSample",

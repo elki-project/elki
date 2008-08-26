@@ -39,14 +39,7 @@ public class CASHWrapper extends FileBasedDatabaseConnectionWrapper {
      * @param args the arguments to run this wrapper
      */
     public static void main(String[] args) {
-        CASHWrapper wrapper = new CASHWrapper();
-        try {
-            wrapper.setParameters(args);
-            wrapper.run();
-        }
-        catch (Exception e) {
-            wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
-        }
+        new CASHWrapper().runCLIWrapper(args);
     }
 
     /**

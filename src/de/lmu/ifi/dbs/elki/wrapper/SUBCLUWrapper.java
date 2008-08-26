@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import experimentalcode.erich.GoldenGeneratorXML;
 
 import java.util.List;
 
@@ -42,21 +43,7 @@ public class SUBCLUWrapper extends NormalizationWrapper {
      * @param args the arguments to run this wrapper
      */
     public static void main(String[] args) {
-        SUBCLUWrapper wrapper = new SUBCLUWrapper();
-        try {
-            wrapper.setParameters(args);
-            wrapper.run();
-        }
-        catch (ParameterException e) {
-            Throwable cause = e.getCause() != null ? e.getCause() : e;
-            wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
-        }
-        catch (AbortException e) {
-            wrapper.verbose(e.getMessage());
-        }
-        catch (Exception e) {
-            wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
-        }
+      new SUBCLUWrapper().runCLIWrapper(args);
     }
 
     /**

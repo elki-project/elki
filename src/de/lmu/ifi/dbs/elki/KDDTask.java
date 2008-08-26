@@ -69,6 +69,12 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
      * <p>Key: {@code -help} </p>
      */
     private final Flag HELP_LONG_FLAG = new Flag(OptionID.HELP_LONG);
+    
+    /**
+     * Print backtraces on exceptions.
+     * <p>Key: {@code -stack-trace} </p>
+     */
+    private final Flag TRACE_FLAG = new Flag(OptionID.TRACE_DEBUG);
 
     /**
      * Parameter to specify the algorithm to be applied,
@@ -167,6 +173,9 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
         // help flag
         addOption(HELP_FLAG);
         addOption(HELP_LONG_FLAG);
+        
+        // stack trace flag
+        addOption(TRACE_FLAG);
 
         // decription parameter
         addOption(DESCRIPTION_PARAM);
@@ -262,7 +271,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
         }
 
         String[] remainingParameters = super.setParameters(args);
-
+        
         // algorithm
         algorithm = ALGORITHM_PARAM.instantiateClass();
         remainingParameters = algorithm.setParameters(remainingParameters);
@@ -363,18 +372,25 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
             kddTask.run();
         }
         catch (AbortException e) {
-            //e.printStackTrace();
+            if (kddTask.wantTrace())
+                e.printStackTrace(System.err);
             kddTask.verbose(kddTask.usage(e.getMessage() + "\n\nUSAGE:"));
         }
         catch (ParameterException e) {
-            //e.printStackTrace();
+            if (kddTask.wantTrace())
+                e.printStackTrace(System.err);
             kddTask.warning(kddTask.usage(e.getMessage() + "\n\nUSAGE:\n"));
         }
         // any other exception
         catch (Exception e) {
-//            e.printStackTrace();
+            if (kddTask.wantTrace())
+                e.printStackTrace(System.err);
             kddTask.exception(e.getMessage(), e);
         }
     }
 
+    public boolean wantTrace() {
+      // stack trace flag
+      return TRACE_FLAG.isSet();
+    }
 }

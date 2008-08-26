@@ -56,21 +56,7 @@ public class CODECWrapper extends NormalizationWrapper {
      * @param args the arguments to run this wrapper
      */
     public static void main(String[] args) {
-        CODECWrapper wrapper = new CODECWrapper();
-        try {
-            wrapper.setParameters(args);
-            wrapper.run();
-        }
-        catch (ParameterException e) {
-            Throwable cause = e.getCause() != null ? e.getCause() : e;
-            wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
-        }
-        catch (AbortException e) {
-            wrapper.verbose(e.getMessage());
-        }
-        catch (Exception e) {
-            wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
-        }
+        new CODECWrapper().runCLIWrapper(args);
     }
 
     /**

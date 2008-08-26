@@ -33,21 +33,7 @@ public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
      * @param args the arguments to run this wrapper
      */
     public static void main(String[] args) {
-        LOFWrapper wrapper = new LOFWrapper();
-        try {
-            wrapper.setParameters(args);
-            wrapper.run();
-        }
-        catch (ParameterException e) {
-            Throwable cause = e.getCause() != null ? e.getCause() : e;
-            wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
-        }
-        catch (AbortException e) {
-            wrapper.verbose(e.getMessage());
-        }
-        catch (Exception e) {
-            wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
-        }
+        new LOFWrapper().runCLIWrapper(args);
     }
 
     /**

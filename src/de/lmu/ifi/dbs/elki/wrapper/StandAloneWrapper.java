@@ -1,8 +1,10 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import experimentalcode.erich.GoldenGeneratorXML;
 
 import java.io.File;
 
@@ -79,4 +81,5 @@ public abstract class StandAloneWrapper extends AbstractWrapper {
      * @return the description for the output parameter
      */
     public abstract String getOutputDescription();
+    
 }

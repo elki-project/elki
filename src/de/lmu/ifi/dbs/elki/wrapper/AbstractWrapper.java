@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -32,9 +33,20 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
     private final Flag VERBOSE_FLAG;
 
     /**
+     * Print backtraces on exceptions.
+     * <p>Key: {@code -stack-trace} </p>
+     */
+    private final Flag TRACE_FLAG;
+
+    /**
      * Value of verbose flag.
      */
     private boolean verbose;
+    
+    /**
+     * Value of trace flag.
+     */
+    private boolean trace;
 
     /**
      * The remaining parameters after the option handler grabbed the options for
@@ -57,6 +69,11 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
         HELP_FLAG = new Flag(OptionID.HELP);
         HELP_FLAG.setShortDescription("Flag to obtain help-message. Causes immediate stop of the program.");
         optionHandler.put(HELP_FLAG);
+        
+        // trace
+        TRACE_FLAG = new Flag(OptionID.TRACE_DEBUG);
+        TRACE_FLAG.setShortDescription("Print stack trace on exceptions. Useful for development within the framework.");
+        optionHandler.put(TRACE_FLAG);
     }
 
      /**
@@ -74,12 +91,14 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
         }
 
         // help
-        if (isSet(HELP_FLAG)) {
+        if (HELP_FLAG.isSet())
             throw new AbortException(optionHandler.usage(""));
-        }
 
         // verbose
-        verbose = isSet(VERBOSE_FLAG);
+        verbose = VERBOSE_FLAG.isSet();
+        
+        // stack trace
+        trace = TRACE_FLAG.isSet();
 
         setParameters(args, new String[0]);
         return new String[0];
@@ -94,6 +113,15 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
      */
     public final boolean isVerbose() {
         return verbose;
+    }
+
+    /**
+     * Returns whether a stack trace should be printed on error.
+     *
+     * @return whether stack trace should be printed on error.
+     */
+    public final boolean wantStackTrace() {
+        return trace;
     }
 
     /**
@@ -112,4 +140,33 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
         return result;
     }
 
+    /**
+     * Generic command line invocation.
+     * Refactored to have a central place for outermost exception handling.
+     * 
+     * @param args the arguments to run this wrapper
+     */
+    public void runCLIWrapper(String[] args) {
+      LoggingConfiguration.configureRoot(LoggingConfiguration.CLI);
+      try {
+        setParameters(args);
+        run();
+      }
+      catch(AbortException e) {
+        if (wantStackTrace())
+          e.printStackTrace(System.err);
+        verbose(e.toString());
+      }
+      catch(ParameterException e) {
+        if (wantStackTrace())
+          e.printStackTrace(System.err);
+        warning(e.toString());
+      }
+      catch(Exception e) {
+        if (wantStackTrace())
+          e.printStackTrace(System.err);
+        Throwable cause = e.getCause() != null ? e.getCause() : e;
+        exception(optionHandler.usage(e.toString()), cause);
+      }
+    }
 }

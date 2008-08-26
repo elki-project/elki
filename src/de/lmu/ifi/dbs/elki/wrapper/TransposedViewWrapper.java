@@ -48,21 +48,7 @@ public class TransposedViewWrapper<V extends RealVector<V, ?>> extends StandAlon
      * @param args the arguments to run this wrapper
      */
     public static void main(String[] args) {
-        TransposedViewWrapper<?> wrapper = new TransposedViewWrapper();
-        try {
-            wrapper.setParameters(args);
-            wrapper.run();
-        }
-        catch (ParameterException e) {
-            Throwable cause = e.getCause() != null ? e.getCause() : e;
-            wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
-        }
-        catch (AbortException e) {
-            wrapper.verbose(e.getMessage());
-        }
-        catch (Exception e) {
-            wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
-        }
+        new TransposedViewWrapper().runCLIWrapper(args);
     }
 
     /**
