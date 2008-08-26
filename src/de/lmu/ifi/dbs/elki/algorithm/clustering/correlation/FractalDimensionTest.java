@@ -87,11 +87,10 @@ public class FractalDimensionTest<V extends RealVector<V, ?>> extends AbstractAl
         //optionHandler.put(supporters);
     }
 
-    @SuppressWarnings("unchecked")
     protected void runInTime(Database<V> database) throws IllegalStateException {
         distanceFunction.setDatabase(database, true, false);
-        List<Integer> suppID1 = (List<Integer>) database.getAssociation(AssociationID.NEIGHBORS, id1);
-        List<Integer> suppID2 = (List<Integer>) database.getAssociation(AssociationID.NEIGHBORS, id2);
+        List<Integer> suppID1 = database.getAssociation(AssociationID.NEIGHBOR_IDS, id1);
+        List<Integer> suppID2 = database.getAssociation(AssociationID.NEIGHBOR_IDS, id2);
         V o1 = database.get(id1);
         V o2 = database.get(id2);
         V centroid = o1.plus(o2).multiplicate(0.5);

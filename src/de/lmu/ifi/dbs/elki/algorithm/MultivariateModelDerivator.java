@@ -180,7 +180,6 @@ public class MultivariateModelDerivator<V extends RealVector<V, ?>, D extends Di
      * The remaining parameters are passed to the {@link #pca}.
      */
     @Override
-    @SuppressWarnings("unchecked")
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 

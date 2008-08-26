@@ -44,7 +44,8 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
      * Parameter to specify the spatial index to use.
      * <p>Key: {@code -spatialindexdb.index} </p>
      */
-    private final ClassParameter<SpatialIndex> INDEX_PARAM = new ClassParameter<SpatialIndex>(
+    private final ClassParameter<SpatialIndex<O, N, E>> INDEX_PARAM =
+      new ClassParameter<SpatialIndex<O, N, E>>(
         INDEX_ID, SpatialIndex.class);
 
     /**
@@ -181,7 +182,6 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
-        //noinspection unchecked
         index = INDEX_PARAM.instantiateClass();
 
         remainingParameters = index.setParameters(remainingParameters);

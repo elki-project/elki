@@ -34,7 +34,7 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
     /**
      * The association id for the class label.
      */
-    protected static final AssociationID CLASS = AssociationID.CLASS;
+    protected static final AssociationID<ClassLabel<?>> CLASS = AssociationID.CLASS;
 
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.classifier.AbstractClassifier#EVALUATION_PROCEDURE_PARAM}
@@ -51,8 +51,8 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
      * <p>Key: {@code -classifier.eval} </p>
      * <p>Default value: {@link ClassifierEvaluationProcedure} </p>
      */
-    private final ClassParameter<EvaluationProcedure> EVALUATION_PROCEDURE_PARAM =
-        new ClassParameter<EvaluationProcedure>(EVALUATION_PROCEDURE_ID,
+    private final ClassParameter<EvaluationProcedure<O, Classifier<O, L>, L>> EVALUATION_PROCEDURE_PARAM =
+        new ClassParameter<EvaluationProcedure<O, Classifier<O, L>, L>>(EVALUATION_PROCEDURE_ID,
             EvaluationProcedure.class, ClassifierEvaluationProcedure.class.getName());
 
     /**
@@ -75,7 +75,7 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
      * <p>Key: {@code -classifier.holdout} </p>
      * <p>Default value: {@link StratifiedCrossValidation} </p>
      */
-    private final ClassParameter<Holdout> HOLDOUT_PARAM = new ClassParameter<Holdout>(
+    private final ClassParameter<Holdout<O, L>> HOLDOUT_PARAM = new ClassParameter<Holdout<O, L>>(
         HOLDOUT_ID,
         Holdout.class,
         StratifiedCrossValidation.class.getName());
@@ -95,6 +95,7 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
      * {@link Classifier#buildClassifier(de.lmu.ifi.dbs.elki.database.Database,de.lmu.ifi.dbs.elki.data.ClassLabel[])}
      */
     @SuppressWarnings("unchecked")
+    // FIXME: this cast sounds dangerous.
     private L[] labels = (L[]) new ClassLabel[0];
 
     /**
@@ -180,14 +181,12 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
         String[] remainingParameters = super.setParameters(args);
 
         // parameter evaluation procedure
-        // noinspection unchecked
         evaluationProcedure = EVALUATION_PROCEDURE_PARAM.instantiateClass();
         evaluationProcedure.setTime(isTime());
         evaluationProcedure.setVerbose(isVerbose());
         remainingParameters = evaluationProcedure.setParameters(remainingParameters);
 
         // parameter holdout
-        // noinspection unchecked
         holdout = HOLDOUT_PARAM.instantiateClass();
         remainingParameters = holdout.setParameters(remainingParameters);
 

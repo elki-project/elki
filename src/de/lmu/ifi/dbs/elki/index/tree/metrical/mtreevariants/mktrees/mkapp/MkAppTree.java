@@ -245,7 +245,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     private List<QueryResult<D>> doReverseKNNQuery(int k, Integer q) {
 
         List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
-        final Heap<D, Identifiable> pq = new DefaultHeap<D, Identifiable>();
+        final Heap<D, Identifiable<?>> pq = new DefaultHeap<D, Identifiable<?>>();
 
         // push root
         pq.addNode(new PQNode<D>(getDistanceFunction().nullDistance(), getRootEntry().getID(), null));

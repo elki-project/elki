@@ -56,7 +56,7 @@ public class ProvidedTestSet<O extends DatabaseObject, L extends ClassLabel<L>> 
     public ProvidedTestSet() {
         super();
 
-        ClassParameter<DatabaseConnection<O>> dbCon = new ClassParameter(TESTSET_DATABASE_CONNECTION_P, TESTSET_DATABASE_CONNECTION_D, DatabaseConnection.class);
+        ClassParameter<DatabaseConnection<O>> dbCon = new ClassParameter<DatabaseConnection<O>>(TESTSET_DATABASE_CONNECTION_P, TESTSET_DATABASE_CONNECTION_D, DatabaseConnection.class);
         dbCon.setDefaultValue(DEFAULT_DATABASE_CONNECTION);
         optionHandler.put(dbCon);
     }
@@ -67,15 +67,16 @@ public class ProvidedTestSet<O extends DatabaseObject, L extends ClassLabel<L>> 
      * as comprised by the given database,
      * the test data set is given via a database connection.
      */
+    @SuppressWarnings("unchecked")
     public TrainingAndTestSet<O, L>[] partition(Database<O> database) {
         this.database = database;
         setClassLabels(database);
-        //noinspection unchecked
         TrainingAndTestSet<O, L>[] split = new TrainingAndTestSet[1];
         Set<ClassLabel<?>> joinedLabels = Util.getClassLabels(testset);
         for (L label : this.labels) {
             joinedLabels.add(label);
         }
+        // FIXME: this is a dangerous cast.
         this.labels = joinedLabels.toArray((L[]) new ClassLabel[joinedLabels.size()]);
         Arrays.sort(this.labels);
         split[0] = new TrainingAndTestSet(this.database, testset, labels);
@@ -90,12 +91,12 @@ public class ProvidedTestSet<O extends DatabaseObject, L extends ClassLabel<L>> 
         return description.toString();
     }
 
+    @SuppressWarnings("unchecked")
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
         String dbcClassName = (String) optionHandler.getOptionValue(TESTSET_DATABASE_CONNECTION_P);
         try {
-            //noinspection unchecked
             // todo
             dbc = Util.instantiate(DatabaseConnection.class, dbcClassName);
         }

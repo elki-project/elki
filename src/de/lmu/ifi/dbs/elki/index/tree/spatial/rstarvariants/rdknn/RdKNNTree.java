@@ -161,6 +161,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
      * @param k      the number of nearest neighbors to be returned
      * @return a List of the query results
      */
+    @SuppressWarnings("unchecked")
     public <T extends Distance<T>> List<QueryResult<T>> reverseKNNQuery(O object, int k, DistanceFunction<O, T> distanceFunction) {
         if (!distanceFunction.getClass().equals(this.distanceFunction.getClass())) {
             throw new IllegalArgumentException("Wrong distancefuction!");
@@ -177,10 +178,8 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
         if (k == k_max) {
             Collections.sort(candidates);
             List<QueryResult<T>> result = new ArrayList<QueryResult<T>>();
-            for (QueryResult<D> qr : candidates) {
-                //noinspection unchecked
+            for (QueryResult<D> qr : candidates)
                 result.add((QueryResult<T>) qr);
-            }
             return result;
         }
 
@@ -269,13 +268,13 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
         }
     }
 
+    @SuppressWarnings("unchecked")
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
         // distance function
         String className = (String) optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
         try {
-            // noinspection unchecked
             // todo
             distanceFunction = Util.instantiate(SpatialDistanceFunction.class, className);
         }

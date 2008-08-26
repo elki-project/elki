@@ -59,7 +59,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
      */
     public NumberDistanceParser() {
         super();
-        ClassParameter<DistanceFunction<ExternalObject, D>> distFunc = new ClassParameter(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D, DistanceFunction.class);
+        ClassParameter<DistanceFunction<ExternalObject, D>> distFunc = new ClassParameter<DistanceFunction<ExternalObject, D>>(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D, DistanceFunction.class);
         optionHandler.put(distFunc);
     }
 
@@ -171,12 +171,12 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
         return usage(description.toString());
     }
 
+    @SuppressWarnings("unchecked")
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
         String className = (String) optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
         try {
-            // noinspection unchecked
             // todo
             distanceFunction = Util.instantiate(DistanceFunction.class, className);
         }

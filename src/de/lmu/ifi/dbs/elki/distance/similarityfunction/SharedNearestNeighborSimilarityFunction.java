@@ -112,10 +112,10 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
     }
 
     /**
-     * @return the assocoiation ID for the association to be set by the preprocessor,
+     * @return the association ID for the association to be set by the preprocessor,
      *         which is {@link AssociationID#SHARED_NEAREST_NEIGHBORS_SET}
      */
-    public AssociationID<SortedSet> getAssociationID() {
+    public AssociationID<SortedSet<?>> getAssociationID() {
         return AssociationID.SHARED_NEAREST_NEIGHBORS_SET;
     }
 

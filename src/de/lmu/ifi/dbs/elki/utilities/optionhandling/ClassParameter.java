@@ -22,9 +22,15 @@ public class ClassParameter<C> extends Parameter<String, String> {
      * @param optionID         the unique id of the option
      * @param restrictionClass the restriction class of this class parameter
      */
-    public ClassParameter(OptionID optionID, Class<C> restrictionClass) {
+    @SuppressWarnings("unchecked")
+    public ClassParameter(OptionID optionID, Class<?> restrictionClass) {
+        // It would be nice to be able to use Class<C> here, but this won't work with
+        // nested Generics:
+        // * ClassParameter<Foo<Bar>>(optionID, Foo.class) doesn't satisfy Class<C>
+        // * ClassParameter<Foo<Bar>>(optionID, Foo<Bar>.class) isn't valid
+        // * ClassParameter<Foo<Bar>>(optionID, (Class<Foo<Bar>>) Foo.class) is an invalid cast.
         super(optionID);
-        this.restrictionClass = restrictionClass;
+        this.restrictionClass = (Class<C>) restrictionClass;
     }
 
     /**
@@ -35,7 +41,7 @@ public class ClassParameter<C> extends Parameter<String, String> {
      * @param restrictionClass the restriction class of this class parameter
      * @param optional         specifies if this parameter is an optional parameter
      */
-    public ClassParameter(OptionID optionID, Class<C> restrictionClass, boolean optional) {
+    public ClassParameter(OptionID optionID, Class<?> restrictionClass, boolean optional) {
         this(optionID, restrictionClass);
         setOptional(optional);
     }
@@ -48,7 +54,7 @@ public class ClassParameter<C> extends Parameter<String, String> {
      * @param restrictionClass the restriction class of this class parameter
      * @param defaultValue     the default value of this class parameter
      */
-    public ClassParameter(OptionID optionID, Class<C> restrictionClass, String defaultValue) {
+    public ClassParameter(OptionID optionID, Class<?> restrictionClass, String defaultValue) {
         this(optionID, restrictionClass);
         setDefaultValue(defaultValue);
     }
@@ -62,10 +68,11 @@ public class ClassParameter<C> extends Parameter<String, String> {
      * @param restrictionClass the restriction class of this class parameter
      * @deprecated
      */
+    @SuppressWarnings("unchecked")
     @Deprecated
-    public ClassParameter(String name, String description, Class<C> restrictionClass) {
+    public ClassParameter(String name, String description, Class<?> restrictionClass) {
         super(name, description);
-        this.restrictionClass = restrictionClass;
+        this.restrictionClass = (Class<C>) restrictionClass;
     }
 
     /**
@@ -79,7 +86,7 @@ public class ClassParameter<C> extends Parameter<String, String> {
      * @deprecated
      */
     @Deprecated
-    public ClassParameter(String name, String description, Class<C> restrictionClass, String defaultValue) {
+    public ClassParameter(String name, String description, Class<?> restrictionClass, String defaultValue) {
         this(name, description, restrictionClass);
         setDefaultValue(defaultValue);
     }

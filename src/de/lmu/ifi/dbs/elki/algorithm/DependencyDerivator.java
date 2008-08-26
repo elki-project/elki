@@ -293,7 +293,6 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
      * {@link #OUTPUT_ACCURACY_PARAM} and {@link #SAMPLE_SIZE_PARAM}. The
      * remaining parameters are passed to the {@link #pca}.
      */
-    @SuppressWarnings("unchecked")
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);

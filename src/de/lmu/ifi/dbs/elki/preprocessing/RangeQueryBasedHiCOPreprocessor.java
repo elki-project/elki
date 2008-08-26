@@ -6,6 +6,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -46,7 +47,7 @@ public class RangeQueryBasedHiCOPreprocessor<V extends RealVector<V, ?>> extends
     super();
     addOption(EPSILON_PARAM);
 
-    GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint(EPSILON_PARAM, (ClassParameter) PCA_DISTANCE_PARAM);
+    GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint<DistanceFunction<V, DoubleDistance>>(EPSILON_PARAM, PCA_DISTANCE_PARAM);
     optionHandler.setGlobalParameterConstraint(gpc);
   }
 

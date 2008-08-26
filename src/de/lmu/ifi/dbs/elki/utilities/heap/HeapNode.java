@@ -9,7 +9,7 @@ import java.io.Serializable;
  * 
  * @author Elke Achtert 
  */
-public interface HeapNode<K extends Comparable<K>, V extends Identifiable>
+public interface HeapNode<K extends Comparable<K>, V extends Identifiable<?>>
         extends Comparable<HeapNode<K, V>>, Serializable
 {
 

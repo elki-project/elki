@@ -46,7 +46,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
      * <p>Default value: {@link RealVectorLabelParser} </p>
      * <p>Key: {@code -dbc.parser} </p>
      */
-    private final ClassParameter<Parser> PARSER_PARAM = new ClassParameter<Parser>(
+    private final ClassParameter<Parser<O>> PARSER_PARAM = new ClassParameter<Parser<O>>(
         PARSER_ID, Parser.class, RealVectorLabelParser.class.getName());
 
     /**
@@ -84,10 +84,10 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
 
             // add precomputed distances
             if (parser instanceof DistanceParser) {
-                Map<Integer, Map<Integer, Distance>> distanceCache = ((DistanceParsingResult) parsingResult)
+                Map<Integer, Map<Integer, Distance<?>>> distanceCache = ((DistanceParsingResult) parsingResult)
                     .getDistanceCache();
                 for (ObjectAndAssociations<O> objectAndAssociations : objectAndAssociationsList) {
-                    Map<Integer, Distance> distances = distanceCache.remove(objectAndAssociations.getObject().getID());
+                    Map<Integer, Distance<?>> distances = distanceCache.remove(objectAndAssociations.getObject().getID());
                     objectAndAssociations.addAssociation(AssociationID.CACHED_DISTANCES, distances);
                 }
             }
@@ -157,7 +157,6 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
         String[] remainingParameters = super.setParameters(args);
 
         // parser
-        // noinspection unchecked
         parser = PARSER_PARAM.instantiateClass();
         remainingParameters = parser.setParameters(remainingParameters);
         setParameters(args, remainingParameters);

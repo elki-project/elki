@@ -37,8 +37,8 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
      * <p>Key: {@code -algorithm.distancefunction} </p>
      * <p>Default value: {@link de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction} </p>
      */
-    protected final ClassParameter<DistanceFunction> DISTANCE_FUNCTION_PARAM =
-        new ClassParameter<DistanceFunction>(
+    protected final ClassParameter<DistanceFunction<O, D>> DISTANCE_FUNCTION_PARAM =
+        new ClassParameter<DistanceFunction<O, D>>(
             DISTANCE_FUNCTION_ID,
             DistanceFunction.class,
             EuclideanDistanceFunction.class.getName());
@@ -70,7 +70,6 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
         String[] remainingParameters = super.setParameters(args);
 
         // distance function
-        // noinspection unchecked
         distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
         remainingParameters = distanceFunction.setParameters(remainingParameters);
         setParameters(args, remainingParameters);

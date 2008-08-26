@@ -59,8 +59,8 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
      * <p>Key: {@code -mtree.distancefunction} </p>
      * <p>Default value: {@link de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction} </p>
      */
-    protected final ClassParameter<DistanceFunction> DISTANCE_FUNCTION_PARAM =
-        new ClassParameter<DistanceFunction>(
+    protected final ClassParameter<DistanceFunction<O, D>> DISTANCE_FUNCTION_PARAM =
+        new ClassParameter<DistanceFunction<O, D>>(
             DISTANCE_FUNCTION_ID,
             DistanceFunction.class,
             EuclideanDistanceFunction.class.getName());
@@ -201,7 +201,6 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
-        // noinspection unchecked
         distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
         remainingParameters = distanceFunction.setParameters(remainingParameters);
         setParameters(args, remainingParameters);
@@ -287,7 +286,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
      * @param knnList the query result list
      */
     protected final void doKNNQuery(Integer q, KNNList<D> knnList) {
-        final Heap<D, Identifiable> pq = new DefaultHeap<D, Identifiable>();
+        final Heap<D, Identifiable<?>> pq = new DefaultHeap<D, Identifiable<?>>();
 
         // push root
         pq.addNode(new PQNode<D>(distanceFunction.nullDistance(), getRootEntry().getID(), null));

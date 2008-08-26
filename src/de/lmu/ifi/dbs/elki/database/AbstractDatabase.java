@@ -275,7 +275,6 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
      * @param id             the id which is to associate with specified associations
      * @param idAssociations the associations to be associated with the specified id
      */
-    @SuppressWarnings("unchecked")
     protected <T> void setAssociations(final Integer id, final Associations idAssociations) {
         for (AssociationID<T> associationID : idAssociations.keySet()) {
             associate(associationID, id, idAssociations.get(associationID));

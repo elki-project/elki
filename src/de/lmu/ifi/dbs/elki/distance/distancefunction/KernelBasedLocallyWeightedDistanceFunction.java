@@ -131,7 +131,7 @@ public class KernelBasedLocallyWeightedDistanceFunction<V extends RealVector<V, 
      */
     private double computeDistance(final V v1, final V v2) {
         //get list of neighbor objects
-        final List<Integer> neighbors = (List<Integer>) getDatabase().getAssociation(AssociationID.NEIGHBORS, v1.getID());
+        final List<Integer> neighbors = getDatabase().getAssociation(AssociationID.NEIGHBOR_IDS, v1.getID());
 
         //the colums in the kernel matrix corresponding to the two objects o1 and o2
         //maybe kernel_o1 column has already been computed
@@ -184,7 +184,7 @@ public class KernelBasedLocallyWeightedDistanceFunction<V extends RealVector<V, 
      * @return the assocoiation ID for the association to be set by the preprocessor,
      *         which is {@link de.lmu.ifi.dbs.elki.database.AssociationID#STRONG_EIGENVECTOR_MATRIX}.
      */
-    public AssociationID getAssociationID() {
+    public AssociationID<Matrix> getAssociationID() {
         return AssociationID.STRONG_EIGENVECTOR_MATRIX;
     }
 }

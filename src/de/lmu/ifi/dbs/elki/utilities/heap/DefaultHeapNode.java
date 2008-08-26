@@ -7,7 +7,7 @@ import de.lmu.ifi.dbs.elki.utilities.Identifiable;
  *
  * @author Elke Achtert 
  */
-public class DefaultHeapNode<K extends Comparable<K>, V extends Identifiable> implements HeapNode<K, V> {
+public class DefaultHeapNode<K extends Comparable<K>, V extends Identifiable<?>> implements HeapNode<K, V> {
 
   /**
    * The key of this heap node.

@@ -131,7 +131,7 @@ public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector
         }
         database.associate(AssociationID.LOCAL_DIMENSIONALITY, id, pcares.getCorrelationDimension());
         database.associate(AssociationID.STRONG_EIGENVECTOR_MATRIX, id, pcares.getStrongEigenvectors());
-        database.associate(AssociationID.NEIGHBORS, id, ids);
+        database.associate(AssociationID.NEIGHBOR_IDS, id, ids);
     }
 
     /**

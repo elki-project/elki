@@ -40,7 +40,8 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
      * Parameter to specify the metrical index to use.
      * <p>Key: {@code -metricalindexdb.index} </p>
      */
-    private final ClassParameter<MetricalIndex> INDEX_PARAM = new ClassParameter<MetricalIndex>(
+    private final ClassParameter<MetricalIndex<O, D, N, E>> INDEX_PARAM =
+      new ClassParameter<MetricalIndex<O, D, N, E>>(
         INDEX_ID, MetricalIndex.class);
 
 
@@ -78,6 +79,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
         this.index.insert(getObjects(objectsAndAssociationsList));
     }
 
+    @SuppressWarnings("unchecked")
     public <T extends Distance<T>> List<QueryResult<T>> rangeQuery(Integer id,
                                                                    String epsilon,
                                                                    DistanceFunction<O, T> distanceFunction) {
@@ -88,14 +90,13 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
         List<QueryResult<D>> rangeQuery = index.rangeQuery(get(id), epsilon);
 
         List<QueryResult<T>> result = new ArrayList<QueryResult<T>>();
-        for (QueryResult<D> qr : rangeQuery) {
-            // noinspection unchecked
+        for (QueryResult<D> qr : rangeQuery)
             result.add((QueryResult<T>) qr);
-        }
 
         return result;
     }
 
+    @SuppressWarnings("unchecked")
     public <T extends Distance<T>> List<QueryResult<T>> kNNQueryForObject(
         O queryObject, int k, DistanceFunction<O, T> distanceFunction) {
         if (!distanceFunction.getClass().equals(index.getDistanceFunction().getClass()))
@@ -105,14 +106,13 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
         List<QueryResult<D>> knnQuery = index.kNNQuery(queryObject, k);
 
         List<QueryResult<T>> result = new ArrayList<QueryResult<T>>();
-        for (QueryResult<D> qr : knnQuery) {
-            // noinspection unchecked
+        for (QueryResult<D> qr : knnQuery)
             result.add((QueryResult<T>) qr);
-        }
 
         return result;
     }
 
+    @SuppressWarnings("unchecked")
     public <T extends Distance<T>> List<QueryResult<T>> kNNQueryForID(Integer id, int k, DistanceFunction<O, T> distanceFunction) {
 
         if (!distanceFunction.getClass().equals(index.getDistanceFunction().getClass()))
@@ -122,19 +122,17 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
         List<QueryResult<D>> knnQuery = index.kNNQuery(get(id), k);
 
         List<QueryResult<T>> result = new ArrayList<QueryResult<T>>();
-        for (QueryResult<D> qr : knnQuery) {
-            // noinspection unchecked
+        for (QueryResult<D> qr : knnQuery)
             result.add((QueryResult<T>) qr);
-        }
 
         return result;
     }
 
-    public <D extends Distance<D>> List<List<QueryResult<D>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
+    public <T extends Distance<T>> List<List<QueryResult<T>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, T> distanceFunction) {
         throw new UnsupportedOperationException("Not yet supported!");
     }
 
-
+    @SuppressWarnings("unchecked")
     public <T extends Distance<T>> List<QueryResult<T>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, T> distanceFunction) {
         if (!distanceFunction.getClass().equals(index.getDistanceFunction().getClass()))
             throw new IllegalArgumentException("Parameter distanceFunction must be an instance of "
@@ -144,10 +142,8 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
         List<QueryResult<D>> rknnQuery = index.reverseKNNQuery(get(id), k);
 
         List<QueryResult<T>> result = new ArrayList<QueryResult<T>>();
-        for (QueryResult<D> qr : rknnQuery) {
-            // noinspection unchecked
+        for (QueryResult<D> qr : rknnQuery)
             result.add((QueryResult<T>) qr);
-        }
 
         return result;
     }
@@ -180,7 +176,6 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
-        //noinspection unchecked
         index = INDEX_PARAM.instantiateClass();
 
         remainingParameters = index.setParameters(remainingParameters);

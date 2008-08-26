@@ -149,7 +149,6 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
    * Calls the super method
    * and sets additionally the value of the parameter {@link #ALPHA_PARAM}.
    */
-  @SuppressWarnings("unchecked")
   @Override
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);

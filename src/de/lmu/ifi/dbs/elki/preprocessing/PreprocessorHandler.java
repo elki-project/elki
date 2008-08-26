@@ -68,7 +68,7 @@ public class PreprocessorHandler<O extends DatabaseObject, P extends Preprocesso
     /**
      * The assocoiation ID for the association to be set by the preprocessor.
      */
-    private AssociationID associationID;
+    private AssociationID<?> associationID;
 
     /**
      * Indicates if the verbose flag is set for preprocessing.
@@ -96,8 +96,7 @@ public class PreprocessorHandler<O extends DatabaseObject, P extends Preprocesso
     public PreprocessorHandler(PreprocessorClient preprocessorClient) {
 
         // preprocessor
-        // noinspection unchecked
-        PREPROCESSOR_PARAM = new ClassParameter(
+        PREPROCESSOR_PARAM = new ClassParameter<P>(
             PREPROCESSOR_ID,
             preprocessorClient.getPreprocessorSuperClass(),
             preprocessorClient.getDefaultPreprocessorClassName());
@@ -125,7 +124,6 @@ public class PreprocessorHandler<O extends DatabaseObject, P extends Preprocesso
         omit = isSet(OMIT_PREPROCESSING_FLAG);
 
         // preprocessor
-        // noinspection unchecked
         preprocessor = PREPROCESSOR_PARAM.instantiateClass();
         remainingParameters = preprocessor.setParameters(remainingParameters);
         setParameters(args, remainingParameters);

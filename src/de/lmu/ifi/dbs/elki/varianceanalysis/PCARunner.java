@@ -23,8 +23,8 @@ public class PCARunner<V extends RealVector<V, ?>> extends AbstractParameterizab
      * <p>Default value: {@link CovarianceMatrixBuilder}</p>
      * <p>Key: {@code -pca.covariance} </p>
      */
-    private ClassParameter<CovarianceMatrixBuilder> COVARIANCE_PARAM =
-        new ClassParameter<CovarianceMatrixBuilder>(
+    private ClassParameter<CovarianceMatrixBuilder<V>> COVARIANCE_PARAM =
+        new ClassParameter<CovarianceMatrixBuilder<V>>(
             OptionID.PCA_COVARIANCE_MATRIX,
             CovarianceMatrixBuilder.class,
             PlainCovarianceMatrixBuilder.class.getName());
@@ -44,7 +44,6 @@ public class PCARunner<V extends RealVector<V, ?>> extends AbstractParameterizab
     }
 
     // todo comment
-    @SuppressWarnings("unchecked")
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
         // small value

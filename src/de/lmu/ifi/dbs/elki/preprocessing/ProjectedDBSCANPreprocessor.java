@@ -104,8 +104,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
         addOption(MINPTS_PARAM);
 
         // parameter range query distance function
-        // noinspection unchecked
-        ClassParameter<DistanceFunction<V, D>> distance = new ClassParameter(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D, DistanceFunction.class);
+        ClassParameter<DistanceFunction<V, D>> distance = new ClassParameter<DistanceFunction<V, D>>(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D, DistanceFunction.class);
         distance.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
         optionHandler.put(distance);
 
@@ -171,13 +170,13 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
      */
     protected abstract void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<V> database);
 
+    @SuppressWarnings("unchecked")
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
         // range query distance function
         String className = (String) optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
         try {
-            // noinspection unchecked
             // todo
             rangeQueryDistanceFunction = Util.instantiate(DistanceFunction.class, className);
         }

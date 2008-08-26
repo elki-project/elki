@@ -53,8 +53,8 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
      * must extend {@link de.lmu.ifi.dbs.elki.preprocessing.HiCOPreprocessor}.
      * <p>Key: {@code -copac.preprocessor} </p>
      */
-    private final ClassParameter<HiCOPreprocessor> PREPROCESSOR_PARAM =
-        new ClassParameter<HiCOPreprocessor>(PREPROCESSOR_ID, HiCOPreprocessor.class);
+    private final ClassParameter<HiCOPreprocessor<V>> PREPROCESSOR_PARAM =
+        new ClassParameter<HiCOPreprocessor<V>>(PREPROCESSOR_ID, HiCOPreprocessor.class);
 
     /**
      * Holds the instance of preprocessor specified by {@link #PREPROCESSOR_PARAM}.
@@ -75,8 +75,8 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
      * must extend {@link de.lmu.ifi.dbs.elki.algorithm.clustering.Clustering}.
      * <p>Key: {@code -copac.partitionAlgorithm} </p>
      */
-    protected final ClassParameter<Clustering> PARTITION_ALGORITHM_PARAM =
-        new ClassParameter<Clustering>(PARTITION_ALGORITHM_ID, Clustering.class);
+    protected final ClassParameter<Clustering<V>> PARTITION_ALGORITHM_PARAM =
+        new ClassParameter<Clustering<V>>(PARTITION_ALGORITHM_ID, Clustering.class);
 
     /**
      * Holds the instance of the partitioning algorithm specified by {@link #PARTITION_ALGORITHM_PARAM}.
@@ -99,8 +99,8 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
      * must extend {@link de.lmu.ifi.dbs.elki.database.Database}.
      * <p>Key: {@code -copac.partitionDB} </p>
      */
-    private final ClassParameter<Database> PARTITION_DB_PARAM =
-        new ClassParameter<Database>(PARTITION_DB_ID, Database.class, true);
+    private final ClassParameter<Database<V>> PARTITION_DB_PARAM =
+        new ClassParameter<Database<V>>(PARTITION_DB_ID, Database.class, true);
 
     /**
      * Holds the instance of the partition database specified by {@link #PARTITION_DB_PARAM}.
@@ -206,25 +206,23 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
      * The remaining parameters are passed to the {@link #partitionAlgorithm},
      * then to the {@link #partitionDatabase} and afterwards to the {@link #preprocessor}.
      */
+    @SuppressWarnings("unchecked")
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
         // partition algorithm
-        // noinspection unchecked
         partitionAlgorithm = PARTITION_ALGORITHM_PARAM.instantiateClass();
 
         // partition db
         if (optionHandler.isSet(PARTITION_DB_PARAM)) {
-            Database tmpDB = PARTITION_DB_PARAM.instantiateClass();
+            Database<V> tmpDB = PARTITION_DB_PARAM.instantiateClass();
             remainingParameters = tmpDB.setParameters(remainingParameters);
             partitionDatabaseParameters = tmpDB.getParameters();
-            // noinspection unchecked
             partitionDatabase = (Class<Database<V>>) tmpDB.getClass();
         }
 
         // preprocessor
-        // noinspection unchecked
         preprocessor = PREPROCESSOR_PARAM.instantiateClass();
         remainingParameters = preprocessor.setParameters(remainingParameters);
 
@@ -244,6 +242,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
      * and adds to the returned attribute settings the attribute settings of
      * the {@link #preprocessor}, the {@link #partitionAlgorithm}, and {@link #partitionDatabase}.
      */
+    @SuppressWarnings("unchecked")
     @Override
     public List<AttributeSettings> getAttributeSettings() {
         List<AttributeSettings> result = super.getAttributeSettings();
@@ -252,7 +251,6 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
         result.addAll(partitionAlgorithm.getAttributeSettings());
         if (optionHandler.isSet(PARTITION_DB_PARAM)) {
             try {
-                // noinspection unchecked
                 Database<V> tmpDB = (Database<V>) Util.instantiate(Database.class, partitionDatabase.getName());
                 result.addAll(tmpDB.getAttributeSettings());
             }
@@ -271,6 +269,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
      * the {@link #preprocessor}, the {@link #partitionAlgorithm},
      * and {@link #partitionDatabase} (if they are already initialized).
      */
+    @SuppressWarnings("unchecked")
     @Override
     public String parameterDescription() {
         StringBuilder description = new StringBuilder();
@@ -289,7 +288,6 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
         // partition database
         if (optionHandler.isSet(PARTITION_DB_PARAM)) {
             try {
-                // noinspection unchecked
                 Database<V> tmpDB = (Database<V>) Util.instantiate(Database.class, partitionDatabase.getName());
                 description.append(Description.NEWLINE);
                 description.append(tmpDB.parameterDescription());

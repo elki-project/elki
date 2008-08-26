@@ -54,7 +54,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
      * <p>Default value: {@link SequentialDatabase} </p>
      * <p>Key: {@code -dbc.database} </p>
      */
-    private final ClassParameter<Database> DATABASE_PARAM = new ClassParameter<Database>(
+    private final ClassParameter<Database<O>> DATABASE_PARAM = new ClassParameter<Database<O>>(
         DATABASE_ID, Database.class, SequentialDatabase.class.getName());
 
     /**
@@ -99,7 +99,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
      * <p>Default value: {@link SimpleClassLabel} </p>
      * <p>Key: {@code -dbc.classLabelClass} </p>
      */
-    private final ClassParameter<ClassLabel> CLASS_LABEL_CLASS_PARAM = new ClassParameter<ClassLabel>(
+    private final ClassParameter<ClassLabel<?>> CLASS_LABEL_CLASS_PARAM = new ClassParameter<ClassLabel<?>>(
         CLASS_LABEL_CLASS_ID, ClassLabel.class, SimpleClassLabel.class.getName());
 
     /**
@@ -190,7 +190,6 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
         }
 
         // database
-        // noinspection unchecked
         database = DATABASE_PARAM.instantiateClass();
         remainingParameters = database.setParameters(remainingParameters);
         setParameters(args, remainingParameters);
@@ -282,7 +281,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
 
             if (classLabel != null) {
                 try {
-                    ClassLabel classLabelAssociation = (ClassLabel) Class.forName(classLabelClass).newInstance();
+                    ClassLabel<?> classLabelAssociation = (ClassLabel<?>) Class.forName(classLabelClass).newInstance();
                     classLabelAssociation.init(classLabel);
                     associationMap.put(AssociationID.CLASS, classLabelAssociation);
                 }

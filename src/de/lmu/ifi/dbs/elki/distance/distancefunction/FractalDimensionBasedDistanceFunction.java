@@ -74,11 +74,11 @@ public class FractalDimensionBasedDistanceFunction<V extends RealVector<V, ?>>
     }
 
     /**
-     * @return the assocoiation ID for the association to be set by the preprocessor,
-     *         which is {@link AssociationID#NEIGHBORS}
+     * @return the association ID for the association to be set by the preprocessor,
+     *         which is {@link AssociationID#NEIGHBOR_IDS}
      */
-    public AssociationID getAssociationID() {
-        return AssociationID.NEIGHBORS;
+    public AssociationID<List<Integer>> getAssociationID() {
+        return AssociationID.NEIGHBOR_IDS;
     }
 
     /**

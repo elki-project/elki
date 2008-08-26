@@ -96,8 +96,8 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
      * <p>Key: {@code -onlinelof.parser} </p>
      * <p>Default value: {@link RealVectorLabelParser} </p>
      */
-    protected final ClassParameter<Parser> PARSER_PARAM =
-        new ClassParameter<Parser>(PARSER_ID,
+    protected final ClassParameter<Parser<O>> PARSER_PARAM =
+        new ClassParameter<Parser<O>>(PARSER_ID,
             Parser.class,
             RealVectorLabelParser.class.getName());
 
@@ -191,7 +191,6 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
         }
 
         // parser for insertions
-        //noinspection unchecked
         Parser<O> parser = PARSER_PARAM.instantiateClass();
 
         // insertions

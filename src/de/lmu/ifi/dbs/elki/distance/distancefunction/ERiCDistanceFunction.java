@@ -179,7 +179,6 @@ public class ERiCDistanceFunction<V extends RealVector<V, ?>, P extends Preproce
      * eigenvectors than the pca of o2.
      *
      */
-    @SuppressWarnings("unchecked")
     public BitDistance distance(V v1, V v2) {
         PCAFilteredResult pca1 = getDatabase().getAssociation(AssociationID.LOCAL_PCA, v1.getID());
         PCAFilteredResult pca2 = getDatabase().getAssociation(AssociationID.LOCAL_PCA, v2.getID());

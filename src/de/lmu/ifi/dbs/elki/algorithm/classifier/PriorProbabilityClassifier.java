@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.algorithm.classifier;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Util;
@@ -54,8 +55,9 @@ public class PriorProbabilityClassifier<O extends DatabaseObject, L extends Clas
         distribution = new double[getLabels().length];
         int[] occurences = new int[getLabels().length];
         for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
-            // noinspection unchecked
-            String label = (String) database.getAssociation(CLASS, iter.next());
+            // FIXME: I replaced AbstractClassifier.CLASS with AssociationID.LABEL
+            // because the latter one actually is a String. Correct replacement? -- erich
+            String label = database.getAssociation(AssociationID.LABEL, iter.next());
             int index = Arrays.binarySearch(getLabels(), label);
             if (index > -1) {
                 occurences[index]++;

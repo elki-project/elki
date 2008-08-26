@@ -64,8 +64,8 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
      * <p>Default value: {@link DimensionsSelectingEuclideanDistanceFunction} </p>
      * <p>Key: {@code -subclu.distancefunction} </p>
      */
-    private final ClassParameter<AbstractDimensionsSelectingDoubleDistanceFunction> DISTANCE_FUNCTION_PARAM =
-        new ClassParameter<AbstractDimensionsSelectingDoubleDistanceFunction>(
+    private final ClassParameter<AbstractDimensionsSelectingDoubleDistanceFunction<V>> DISTANCE_FUNCTION_PARAM =
+        new ClassParameter<AbstractDimensionsSelectingDoubleDistanceFunction<V>>(
             DISTANCE_FUNCTION_ID,
             AbstractDimensionsSelectingDoubleDistanceFunction.class,
             DimensionsSelectingEuclideanDistanceFunction.class.getName());
@@ -143,9 +143,8 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
         addOption(DISTANCE_FUNCTION_PARAM);
 
         // global constraint epsilon <-> distance function
-        // noinspection unchecked
         optionHandler.setGlobalParameterConstraint(
-            new GlobalDistanceFunctionPatternConstraint(EPSILON_PARAM, DISTANCE_FUNCTION_PARAM));
+            new GlobalDistanceFunctionPatternConstraint<AbstractDimensionsSelectingDoubleDistanceFunction<V>>(EPSILON_PARAM, DISTANCE_FUNCTION_PARAM));
     }
 
 
@@ -219,7 +218,6 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
         minpts = getParameterValue(MINPTS_PARAM);
 
         // distance function
-        // noinspection unchecked
         distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
         remainingParameters = distanceFunction.setParameters(remainingParameters);
         setParameters(args, remainingParameters);

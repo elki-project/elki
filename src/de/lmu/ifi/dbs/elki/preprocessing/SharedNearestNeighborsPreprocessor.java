@@ -51,12 +51,10 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
      * <p>Default value: {@link EuclideanDistanceFunction}</p>
      * <p>Key: {@code SNNDistanceFunction}</p>
      */
-    @SuppressWarnings("unchecked")
-    public static final ClassParameter<DistanceFunction> DISTANCE_FUNCTION_PARAM = new ClassParameter("SNNDistanceFunction", "the distance function to asses the nearest neighbors", DistanceFunction.class);
-
-    static {
-        DISTANCE_FUNCTION_PARAM.setDefaultValue(EuclideanDistanceFunction.class.getName());
-    }
+    public final ClassParameter<DistanceFunction<O,D>> DISTANCE_FUNCTION_PARAM =
+      new ClassParameter<DistanceFunction<O,D>>("SNNDistanceFunction",
+          "the distance function to asses the nearest neighbors", DistanceFunction.class,
+        EuclideanDistanceFunction.class.getName());
 
     /**
      * Holds the number of nearest neighbors to be used.
@@ -64,7 +62,7 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
     private int numberOfNeighbors;
 
     /**
-     * Hold the distance funciton to be used.
+     * Hold the distance function to be used.
      */
     private DistanceFunction<O, D> distanceFunction;
 
@@ -115,7 +113,6 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
      * to {@link #numberOfNeighbors} and
      * {@link #distanceFunction}, respectively.
      */
-    @SuppressWarnings("unchecked")
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
@@ -135,8 +132,7 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
      *
      * @return the association id used for annotation of the nearest neighbors ({@link AssociationID#SHARED_NEAREST_NEIGHBORS_SET})
      */
-    @SuppressWarnings("unchecked")
-    public AssociationID<SortedSet> getAssociationID() {
+    public AssociationID<SortedSet<?>> getAssociationID() {
         return AssociationID.SHARED_NEAREST_NEIGHBORS_SET;
     }
 

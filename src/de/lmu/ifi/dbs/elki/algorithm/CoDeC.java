@@ -48,8 +48,8 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
      * <p>Key: {@code -codec.classlabel} </p>
      * <p>Default value: {@link HierarchicalClassLabel} </p>
      */
-    private final ClassParameter<ClassLabel> CLASSLABEL_PARAM =
-        new ClassParameter<ClassLabel>(
+    private final ClassParameter<L> CLASSLABEL_PARAM =
+        new ClassParameter<L>(
             CLASSLABEL_ID,
             ClassLabel.class,
             HierarchicalClassLabel.class.getName());
@@ -75,8 +75,8 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
      * <p>Key: {@code -codec.clusteringAlgorithm} </p>
      * <p>Default value: {@link COPAC} </p>
      */
-    private final ClassParameter<Clustering> CLUSTERING_ALGORITHM_PARAM =
-        new ClassParameter<Clustering>(
+    private final ClassParameter<Clustering<V>> CLUSTERING_ALGORITHM_PARAM =
+        new ClassParameter<Clustering<V>>(
             CLUSTERING_ALGORITHM_ID,
             Clustering.class,
             COPAC.class.getName());
@@ -125,7 +125,6 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
      * {@link #CLUSTERING_ALGORITHM_PARAM} to the option handler
      * to the option handler additionally to parameters of super class.
      */
-    @SuppressWarnings("unchecked")
     public CoDeC() {
         super();
 
@@ -214,7 +213,6 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
      * The remaining parameters are passed to the {@link #classifier} or {@link #dependencyDerivator}
      * dependent on the value of {@link #EVALUATE_AS_CLASSIFIER_FLAG}.
      */
-    @SuppressWarnings("unchecked")
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
@@ -223,7 +221,7 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
         evaluateAsClassifier = isSet(EVALUATE_AS_CLASSIFIER_FLAG);
 
         // classlabel
-        classLabel = (L) CLASSLABEL_PARAM.instantiateClass();
+        classLabel = CLASSLABEL_PARAM.instantiateClass();
 
         // clusteringAlgorithm
         clusteringAlgorithm = CLUSTERING_ALGORITHM_PARAM.instantiateClass();

@@ -269,7 +269,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
                                    List<QueryResult<D>> result,
                                    List<Integer> candidates) {
 
-        final Heap<D, Identifiable> pq = new DefaultHeap<D, Identifiable>();
+        final Heap<D, Identifiable<?>> pq = new DefaultHeap<D, Identifiable<?>>();
 
         // push root
         pq.addNode(new PQNode<D>(getDistanceFunction().nullDistance(), getRootEntry().getID(), null));

@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.utilities.heap.DefaultIdentifiable;
  * @author Elke Achtert
  * @param <D> the type of Distance used in the M-Tree
  */
-public class PQNode<D extends Distance<D>> extends DefaultHeapNode<D, Identifiable> {
+public class PQNode<D extends Distance<D>> extends DefaultHeapNode<D, Identifiable<?>> {
     /**
      * Generated serialVersionUID.
      */

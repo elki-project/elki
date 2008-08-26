@@ -54,8 +54,8 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
      * <p>Key: {@code -projdbscan.distancefunction} </p>
      * <p>Default value: {@link de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction} </p>
      */
-    protected final ClassParameter<AbstractLocallyWeightedDistanceFunction> DISTANCE_FUNCTION_PARAM =
-        new ClassParameter<AbstractLocallyWeightedDistanceFunction>(
+    protected final ClassParameter<AbstractLocallyWeightedDistanceFunction<V, ?>> DISTANCE_FUNCTION_PARAM =
+        new ClassParameter<AbstractLocallyWeightedDistanceFunction<V, ?>>(
             DISTANCE_FUNCTION_ID,
             AbstractLocallyWeightedDistanceFunction.class,
             LocallyWeightedDistanceFunction.class.getName());
@@ -173,8 +173,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
         addOption(DISTANCE_FUNCTION_PARAM);
 
         // global parameter constraint epsilon <-> distance function
-        // noinspection unchecked
-        GlobalParameterConstraint con = new GlobalDistanceFunctionPatternConstraint(EPSILON_PARAM, DISTANCE_FUNCTION_PARAM);
+        GlobalParameterConstraint con = new GlobalDistanceFunctionPatternConstraint<AbstractLocallyWeightedDistanceFunction<V, ?>>(EPSILON_PARAM, DISTANCE_FUNCTION_PARAM);
         optionHandler.setGlobalParameterConstraint(con);
     }
 
@@ -370,7 +369,6 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
      * The remaining parameters are passed to the {@link #distanceFunction}.
      */
     @Override
-    @SuppressWarnings("unchecked")
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 

@@ -45,8 +45,8 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
      * <p>Default value: {@link EuclideanDistanceFunction} </p>
      * <p>Key: {@code -genlof.reachdistfunction} </p>
      */
-    private final ClassParameter<DistanceFunction> REACHABILITY_DISTANCE_FUNCTION_PARAM =
-        new ClassParameter<DistanceFunction>(
+    private final ClassParameter<DistanceFunction<O, DoubleDistance>> REACHABILITY_DISTANCE_FUNCTION_PARAM =
+        new ClassParameter<DistanceFunction<O, DoubleDistance>>(
             REACHABILITY_DISTANCE_FUNCTION_ID,
             DistanceFunction.class,
             EuclideanDistanceFunction.class.getName());
@@ -156,10 +156,8 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
                 Integer id = iter.next();
                 double sum = 0;
-                //noinspection unchecked
                 List<QueryResult<DoubleDistance>> neighbors = (List<QueryResult<DoubleDistance>>) database.getAssociation(AssociationID.NEIGHBORS_2, id);
                 for (QueryResult<DoubleDistance> neighbor : neighbors) {
-                    //noinspection unchecked
                     List<QueryResult<DoubleDistance>> neighborsNeighbors = (List<QueryResult<DoubleDistance>>) database.getAssociation(AssociationID.NEIGHBORS_2, neighbor.getID());
                     sum += Math.max(neighbor.getDistance().getValue(),
                         neighborsNeighbors.get(neighborsNeighbors.size() - 1).getDistance().getValue());
@@ -187,8 +185,7 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
                 Integer id = iter.next();
                 //computeLOF(database, id);
                 Double lrd = database.getAssociation(AssociationID.LRD, id);
-                // noinspection unchecked
-                List<QueryResult<DoubleDistance>> neighbors = (List<QueryResult<DoubleDistance>>) database.getAssociation(AssociationID.NEIGHBORS, id);
+                List<QueryResult<DoubleDistance>> neighbors = database.getAssociation(AssociationID.NEIGHBORS, id);
                 double sum = 0;
                 for (QueryResult<DoubleDistance> neighbor1 : neighbors) {
                     sum += database.getAssociation(AssociationID.LRD, neighbor1.getID()) / lrd;
@@ -232,7 +229,6 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
         k = getParameterValue(K_PARAM);
 
         // reachabilityDistanceFunction
-        // noinspection unchecked
         reachabilityDistanceFunction = REACHABILITY_DISTANCE_FUNCTION_PARAM.instantiateClass();
         remainingParameters = reachabilityDistanceFunction.setParameters(remainingParameters);
         setParameters(args, remainingParameters);

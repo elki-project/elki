@@ -81,8 +81,8 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
      * must extend {@link de.lmu.ifi.dbs.elki.algorithm.Algorithm}.
      * <p>Key: {@code -algorithm} </p>
      */
-    private final ClassParameter<Algorithm> ALGORITHM_PARAM =
-        new ClassParameter<Algorithm>(OptionID.ALGORITHM, Algorithm.class);
+    private final ClassParameter<Algorithm<O>> ALGORITHM_PARAM =
+        new ClassParameter<Algorithm<O>>(OptionID.ALGORITHM, Algorithm.class);
 
     /**
      * Optional Parameter to specify a class to obtain a description for,
@@ -98,8 +98,8 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
      * <p>Key: {@code -dbc} </p>
      * <p>Default value: {@link FileBasedDatabaseConnection} </p>
      */
-    private final ClassParameter<DatabaseConnection> DATABASE_CONNECTION_PARAM =
-        new ClassParameter<DatabaseConnection>(OptionID.DATABASE_CONNECTION,
+    private final ClassParameter<DatabaseConnection<O>> DATABASE_CONNECTION_PARAM =
+        new ClassParameter<DatabaseConnection<O>>(OptionID.DATABASE_CONNECTION,
             DatabaseConnection.class, FileBasedDatabaseConnection.class.getName());
 
     /**
@@ -114,8 +114,8 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
      * Optional Parameter to specify a normalization in order to use a database with normalized values.
      * <p>Key: {@code -norm} </p>
      */
-    private final ClassParameter<Normalization> NORMALIZATION_PARAM =
-        new ClassParameter<Normalization>(OptionID.NORMALIZATION, Normalization.class, true);
+    private final ClassParameter<Normalization<O>> NORMALIZATION_PARAM =
+        new ClassParameter<Normalization<O>>(OptionID.NORMALIZATION, Normalization.class, true);
 
     /**
      * Flag to revert result to original values -
@@ -232,7 +232,6 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public String[] setParameters(String[] args) throws ParameterException {
         if (args.length == 0) {
             throw new AbortException("No options specified. Try flag -h to gain more information.");

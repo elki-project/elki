@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.ConstantObject;
+import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredResult;
 
 import java.util.BitSet;
@@ -35,8 +36,7 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
     /**
      * The association id to associate a class (class label) to an object.
      */
-    @SuppressWarnings("unchecked")
-    public static final AssociationID<ClassLabel> CLASS = new AssociationID<ClassLabel>("class", ClassLabel.class);
+    public static final AssociationID<ClassLabel<?>> CLASS = new AssociationID<ClassLabel<?>>("class", ClassLabel.class);
 
     /**
      * The association id to associate an external id to an object.
@@ -51,7 +51,6 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
     /**
      * The association id to associate a correlation pca to an object.
      */
-    @SuppressWarnings("unchecked")
     public static final AssociationID<PCAFilteredResult> LOCAL_PCA = new AssociationID<PCAFilteredResult>("pca", PCAFilteredResult.class);
 
     /**
@@ -63,21 +62,23 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
     /**
      * The association id to associate the neighbors of an object.
      */
-    @SuppressWarnings("unchecked")
-    public static final AssociationID<List> NEIGHBORS = new AssociationID<List>("neighbors", List.class);
+    public static final AssociationID<List<Integer>> NEIGHBOR_IDS = new AssociationID<List<Integer>>("neighborids", List.class);
+
+    /**
+     * The association id to associate the neighbors of an object.
+     */
+    public static final AssociationID<List<QueryResult<DoubleDistance>>> NEIGHBORS = new AssociationID<List<QueryResult<DoubleDistance>>>("neighbors", List.class);
 
     /**
      * The association id to associate another set of neighbors of an object.
      */
-    @SuppressWarnings("unchecked")
-    public static final AssociationID<List> NEIGHBORS_2 = new AssociationID<List>("neighbors2", List.class);
+    public static final AssociationID<List<QueryResult<DoubleDistance>>> NEIGHBORS_2 = new AssociationID<List<QueryResult<DoubleDistance>>>("neighbors2", List.class);
 
     /**
      * The association id to associate a set of neighbors for use of the shared
      * nearest neighbor similarity function.
      */
-    @SuppressWarnings("unchecked")
-    public static final AssociationID<SortedSet> SHARED_NEAREST_NEIGHBORS_SET = new AssociationID<SortedSet>("sharedNearestNeighborList", SortedSet.class);
+    public static final AssociationID<SortedSet<?>> SHARED_NEAREST_NEIGHBORS_SET = new AssociationID<SortedSet<?>>("sharedNearestNeighborList", SortedSet.class);
 
     /**
      * The association id to associate a DoubleDistance to an object.
@@ -212,7 +213,9 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
      *             AssociationID
      */
     @SuppressWarnings("unchecked")
-    private AssociationID(final String name, final Class<C> type) {
+    private AssociationID(final String name, final Class<?> type) {
+        // It's more useful to use Class<?> here to allow the use of nested
+        // Generics such as List<Foo<Bar>>
         super(name);
         try {
             this.type = (Class<C>) Class.forName(type.getName());
@@ -255,6 +258,7 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
      * @param type the type of the association
      * @return the AssociationID for the given name
      */
+    @SuppressWarnings("unchecked")
     public static <C> AssociationID<C> getOrCreateAssociationID(final String name, final Class<C> type) {
         AssociationID<C> associationID = (AssociationID<C>) getAssociationID(name);
         if (associationID == null) {

@@ -27,7 +27,7 @@ public class ArffFileParser<O extends DatabaseObject & WekaObject<W>, W extends 
     /**
      * The default base parser ({@link RealVectorLabelParser}).
      */
-    public static final Parser DEFAULT_PARSER = new RealVectorLabelParser();
+    public static final Parser<?> DEFAULT_PARSER = new RealVectorLabelParser();
     
     /**
      * Parameter name for the base parser.
@@ -43,7 +43,7 @@ public class ArffFileParser<O extends DatabaseObject & WekaObject<W>, W extends 
      * Parameter for the base parser.
      * Default base parser is set to {@link #DEFAULT_PARSER}.
      */
-    public static final ClassParameter<Parser> BASE_PARSER_PARAM = new ClassParameter<Parser>(BASE_PARSER_P, BASE_PARSER_P, Parser.class);
+    public static final ClassParameter<Parser<?>> BASE_PARSER_PARAM = new ClassParameter<Parser<?>>(BASE_PARSER_P, BASE_PARSER_P, Parser.class);
     
     static
     {
@@ -89,6 +89,7 @@ public class ArffFileParser<O extends DatabaseObject & WekaObject<W>, W extends 
      * {@link #DEFAULT_PARSER}.
      * 
      */
+    @SuppressWarnings("unchecked")
     @Override
     public String[] setParameters(String[] args) throws ParameterException
     {

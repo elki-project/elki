@@ -89,7 +89,6 @@ public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Di
      * @param sigma    the standard deviation of the underlying distribution
      * @return the density for the given distance and sigma
      */
-    @SuppressWarnings("unchecked")
     protected double density(double distance, double sigma) {
         double distanceDivSigma = distance / sigma;
         double density = StrictMath.pow(Math.E, (distanceDivSigma * distanceDivSigma * -0.5))

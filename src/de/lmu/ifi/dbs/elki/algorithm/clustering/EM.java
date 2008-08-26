@@ -271,7 +271,6 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impleme
      * @param invCovMatr      the inverse covariance matrices
      * @param clusterWeights  the weights of the current clusters
      */
-    @SuppressWarnings("unchecked")
     protected void assignProbabilitiesToInstances(Database<V> database, List<Double> normDistrFactor, List<V> means, List<Matrix> invCovMatr, List<Double> clusterWeights) {
         Iterator<Integer> databaseIterator = database.iterator();
         while (databaseIterator.hasNext()) {
