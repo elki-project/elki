@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Provides the COPAC algorthm, an algorithm to partition a database according to the correlation dimension of
+ * Provides the COPAC algorithm, an algorithm to partition a database according to the correlation dimension of
  * its objects and to then perform an arbitrary clustering algorithm over the partitions.
  * <p>Reference:
  * Achtert E., Boehm C., Kriegel H.-P., Kroeger P., Zimek A.:
