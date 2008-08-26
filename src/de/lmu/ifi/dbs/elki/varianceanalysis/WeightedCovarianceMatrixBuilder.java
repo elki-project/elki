@@ -34,7 +34,7 @@ public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends
   /**
    * Holds the weight function.
    */
-  public WeightFunction<V> weightfunction;
+  public WeightFunction weightfunction;
 
   /**
    * 
@@ -44,7 +44,6 @@ public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends
     addOption(WEIGHT_PARAM);
   }
 
-  @SuppressWarnings("unchecked")
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     weightfunction = WEIGHT_PARAM.instantiateClass();

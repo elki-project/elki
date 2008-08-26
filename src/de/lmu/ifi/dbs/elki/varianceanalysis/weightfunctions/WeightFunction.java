@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions;
 
-public interface WeightFunction<V> {
+public interface WeightFunction {
   /**
    * WeightFunction interface that allows the use of various distance-based
    * weight functions. In addition to the distance parameter, the maximum
