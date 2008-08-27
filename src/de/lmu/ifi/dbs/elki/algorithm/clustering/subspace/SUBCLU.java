@@ -270,10 +270,10 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
         Util.addParameter(parameters, DISTANCE_FUNCTION_PARAM, distanceFunction.getClass().getName());
 
         // selected dimensions for distance function
-        parameters.add(OptionHandler.OPTION_PREFIX + AbstractDimensionsSelectingDoubleDistanceFunction.DIMS_P);
+        parameters.add(OptionHandler.OPTION_PREFIX + AbstractDimensionsSelectingDoubleDistanceFunction.DIMS_ID.getName());
         parameters.add(Util.parseSelectedBits(selectedDimensions, ","));
 
-        // aditional distance function paramaters
+        // aditional distance function parameters
         String[] distanceFunctionParams = distanceFunction.getParameters();
         for (String param : distanceFunctionParams) {
             parameters.add(param);

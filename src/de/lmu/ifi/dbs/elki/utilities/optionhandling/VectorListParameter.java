@@ -42,48 +42,6 @@ public class VectorListParameter extends ListParameter<List<Double>> {
     super(optionID, constraint, optional, defaultValue);
   }
 
-  /**
-   * Constructs a vector list parameter with the given name and description.
-   * 
-   * @param name the parameter name
-   * @param description the parameter description
-   * @deprecated
-   */
-  @Deprecated
-  public VectorListParameter(String name, String description) {
-    super(name, description);
-  }
-
-  /**
-   * Constructs a vector list parameter with the given name, description, and
-   * parameter constraint.
-   * 
-   * @param name the parameter name
-   * @param description the parameter description
-   * @param con a parameter constraint
-   * @deprecated
-   */
-  @Deprecated
-  public VectorListParameter(String name, String description, ParameterConstraint<List<List<Double>>> con) {
-    this(name, description);
-    addConstraint(con);
-    this.constraints.add(con);
-  }
-
-  /**
-   * Constructs a vector list parameter with the given name, description, and
-   * list of parameter constraints.
-   * 
-   * @param name the parameter name
-   * @param description the parameter description
-   * @param cons a list of parameter constraints
-   */
-  public VectorListParameter(String name, String description, List<ParameterConstraint<List<List<Double>>>> cons) {
-    this(name, description);
-    addConstraintList(cons);
-
-  }
-
   public void setValue(String value) throws ParameterException {
     if(isValid(value)) {
       String[] vectors = VECTOR_SPLIT.split(value);

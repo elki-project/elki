@@ -55,18 +55,6 @@ public abstract class ListParameter<T> extends Parameter<List<T>, List<T>> {
     }
 
     /**
-     * Constructs a list parameter with the given name and description.
-     *
-     * @param name        the parameter name
-     * @param description the parameter description
-     * @deprecated
-     */
-    @Deprecated
-    public ListParameter(String name, String description) {
-        super(name, description);
-    }
-
-    /**
      * Returns the size of this list parameter.
      *
      * @return the size of this list parameter.

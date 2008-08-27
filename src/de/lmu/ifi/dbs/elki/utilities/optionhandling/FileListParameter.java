@@ -35,20 +35,6 @@ public class FileListParameter extends ListParameter<File> {
         this.filesType = filesType;
     }
 
-    /**
-     * Constructs a file list parameter with the given name, description, and file type
-     *
-     * @param name        the parameter name
-     * @param description the parameter description
-     * @param filesType   the file type of this file list parameter
-     * @deprecated
-     */
-    @Deprecated
-    public FileListParameter(String name, String description, FilesType filesType) {
-        super(name, description);
-        this.filesType = filesType;
-    }
-
     public void setValue(String value) throws ParameterException {
         if (isValid(value)) {
             String[] files = SPLIT.split(value);

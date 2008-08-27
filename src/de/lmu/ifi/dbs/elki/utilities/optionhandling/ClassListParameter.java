@@ -46,22 +46,6 @@ public class ClassListParameter<C> extends ListParameter<String> {
         this.restrictionClass = (Class<C>) restrictionClass;
     }
 
-    /**
-     * Constructs a class list parameter with the given name, description, and
-     * restriction class.
-     *
-     * @param name             the parameter name
-     * @param description      the parameter description
-     * @param restrictionClass the restriction class of the list of class names
-     * @deprecated
-     */
-    @SuppressWarnings("unchecked")
-    @Deprecated
-    public ClassListParameter(String name, String description, Class<?> restrictionClass) {
-        super(name, description);
-        this.restrictionClass = (Class<C>) restrictionClass;
-    }
-
     public void setValue(String value) throws ParameterException {
         if (isValid(value)) {
             String[] classes = SPLIT.split(value);

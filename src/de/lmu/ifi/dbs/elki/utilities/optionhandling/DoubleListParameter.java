@@ -43,33 +43,6 @@ public class DoubleListParameter extends ListParameter<Double> {
     super(optionID, constraint);
   }
 
-  /**
-   * Constructs a double list parameter with the given name and description.
-   * 
-   * @param name the parameter name
-   * @param description the parameter description
-   * @deprecated
-   */
-  @Deprecated
-  public DoubleListParameter(String name, String description) {
-    super(name, description);
-  }
-
-  /**
-   * Constructs a double list parameter with the given name, description, and
-   * parameter constraint.
-   * 
-   * @param name the parameter name
-   * @param description the parameter description
-   * @param con the parameter constraint of this double list parameter
-   * @deprecated
-   */
-  @Deprecated
-  public DoubleListParameter(String name, String description, ParameterConstraint<List<Double>> con) {
-    this(name, description);
-    addConstraint(con);
-  }
-
   public void setValue(String value) throws ParameterException {
     if(isValid(value)) {
       String[] values = SPLIT.split(value);
