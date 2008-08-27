@@ -117,7 +117,7 @@ public class CASHInterval extends HyperBoundingBox implements Identifiable<CASHI
      *
      * @param ids the set of ids to be removed
      */
-    public void removeIDs(Set ids) {
+    public void removeIDs(Set<Integer> ids) {
         this.ids.removeAll(ids);
     }
 

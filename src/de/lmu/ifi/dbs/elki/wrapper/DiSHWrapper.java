@@ -1,19 +1,20 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.DiSH;
 import de.lmu.ifi.dbs.elki.preprocessing.DiSHPreprocessor;
+import de.lmu.ifi.dbs.elki.preprocessing.DiSHPreprocessor.Strategy;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.StringParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualStringConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-
-import java.util.List;
 
 /**
  * todo parameter
@@ -49,6 +50,16 @@ public class DiSHWrapper extends NormalizationWrapper {
         10);
 
     /**
+     * DiSH strategy parameter
+     */
+    private final PatternParameter STRATEGY_PARAM = new PatternParameter(DiSHPreprocessor.STRATEGY_ID,
+        new EqualStringConstraint(new String[]{
+            Strategy.APRIORI.toString(),
+            Strategy.MAX_INTERSECTION.toString()}),
+            DiSHPreprocessor.DEFAULT_STRATEGY.toString()
+        );
+
+    /**
      * The strategy for determination of the preference vector.
      */
     private String strategy;
@@ -78,9 +89,7 @@ public class DiSHWrapper extends NormalizationWrapper {
         addOption(EPSILON_PARAM);
 
         // parameter strategy
-        StringParameter strat = new StringParameter(DiSHPreprocessor.STRATEGY_P, DiSHPreprocessor.STRATEGY_D);
-        strat.setOptional(true);
-        optionHandler.put(strat);
+        addOption(STRATEGY_PARAM);
     }
 
     @Override
@@ -98,7 +107,7 @@ public class DiSHWrapper extends NormalizationWrapper {
 
         // strategy for preprocessor
         if (strategy != null) {
-            parameters.add(OptionHandler.OPTION_PREFIX + DiSHPreprocessor.STRATEGY_P);
+            parameters.add(OptionHandler.OPTION_PREFIX + DiSHPreprocessor.STRATEGY_ID.toString());
             parameters.add(strategy);
         }
 
@@ -109,8 +118,8 @@ public class DiSHWrapper extends NormalizationWrapper {
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
-        if (optionHandler.isSet(DiSHPreprocessor.STRATEGY_P)) {
-            strategy = (String) optionHandler.getOptionValue(DiSHPreprocessor.STRATEGY_P);
+        if (STRATEGY_PARAM.isSet()) {
+            strategy = STRATEGY_PARAM.getValue();
         }
 
         return remainingParameters;

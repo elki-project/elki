@@ -28,7 +28,7 @@ import java.util.*;
  */
 public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> extends AbstractParameterizable implements PreferenceVectorPreprocessor<V> {
     /**
-     * Available strategies for determination of the preference vecrtor.
+     * Available strategies for determination of the preference vector.
      */
     public enum Strategy {
         APRIORI, MAX_INTERSECTION
@@ -40,26 +40,22 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
     public static final DoubleDistance DEFAULT_EPSILON = new DoubleDistance(0.001);
 
     /**
-     * Option string for parameter epsilon.
+     * OptionID for {@link #EPSILON_PARAM}
      */
-    public static final String EPSILON_P = "epsilon";
-
-    /**
-     * Description for parameter epsilon.
-     */
-    public static String EPSILON_D = "a comma separated list of positive doubles specifying the " +
+    public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID(
+        "dish.epsilon", "a comma separated list of positive doubles specifying the " +
         "maximum radius of the neighborhood to be " +
         "considered in each dimension for determination of " +
         "the preference vector " +
         "(default is " + DEFAULT_EPSILON + " in each dimension). " +
         "If only one value is specified, this value " +
-        "will be used for each dimension.";
+        "will be used for each dimension.");
 
     /**
-     * Parameter minimum points.
+     * Option name
      */
-    public static final String MINPTS_P = "minpts";
-
+    public static final String MINPTS_P = "dish.minpts";
+    
     /**
      * Description for the determination of the preference vector.
      */
@@ -69,15 +65,11 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
         + "for all dimensions d_j: " + "|neighbors(d_i) intersection neighbors(d_j)| >= " + MINPTS_P + ".";
 
     /**
-     * Description for parameter minimum points.
+     * OptionID for {@link #MINPTS_PARAM}
      */
-    public static final String MINPTS_D = "positive threshold for minumum numbers of points in the epsilon-" + "neighborhood of a point. "
-        + CONDITION;
-
-    /**
-     * Parameter strategy.
-     */
-    public static final String STRATEGY_P = "strategy";
+    public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID(
+        MINPTS_P, "positive threshold for minumum numbers of points in the epsilon-"
+        + "neighborhood of a point. " + CONDITION);
 
     /**
      * Default strategy.
@@ -85,10 +77,16 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
     public static Strategy DEFAULT_STRATEGY = Strategy.MAX_INTERSECTION;
 
     /**
-     * Description for parameter strategy.
+     * OptionID for {@link #STRATEGY_PARAM}
      */
-    public static final String STRATEGY_D = "the strategy for determination of the preference vector, " + "available strategies are: ["
-        + Strategy.APRIORI + "| " + Strategy.MAX_INTERSECTION + "]" + "(default is " + DEFAULT_STRATEGY + ")";
+    public static final OptionID STRATEGY_ID = OptionID.getOrCreateOptionID(
+        "dish.strategy", "the strategy for determination of the preference vector, " + "available strategies are: ["
+        + Strategy.APRIORI + "| " + Strategy.MAX_INTERSECTION + "]" + "(default is " + DEFAULT_STRATEGY + ")");
+
+    /**
+     * Parameter Epsilon.
+     */
+    protected final DoubleListParameter EPSILON_PARAM = new DoubleListParameter(EPSILON_ID, null, true, null);
 
     /**
      * The epsilon value for each dimension;
@@ -96,9 +94,24 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
     private DoubleDistance[] epsilon;
 
     /**
+     * Parameter Minpts.
+     */
+    protected final IntParameter MINPTS_PARAM = new IntParameter(MINPTS_ID, new GreaterConstraint(0));
+
+    /**
      * Threshold for minimum number of points in the neighborhood.
      */
     private int minpts;
+
+    /**
+     * Parameter Strategy.
+     */
+    private final PatternParameter STRATEGY_PARAM = new PatternParameter(STRATEGY_ID,
+        new EqualStringConstraint(new String[]{
+        Strategy.APRIORI.toString(),
+        Strategy.MAX_INTERSECTION.toString()}),
+        DEFAULT_STRATEGY.toString()
+    );
 
     /**
      * The strategy to determine the preference vector.
@@ -112,23 +125,17 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
     public DiSHPreprocessor() {
         super();
         // parameter min points
-        optionHandler.put(new IntParameter(MINPTS_P, MINPTS_D, new GreaterConstraint(0)));
+        addOption(MINPTS_PARAM);
 
         // parameter epsilon
         // todo: constraint auf positive werte
-        DoubleListParameter eps = new DoubleListParameter(EPSILON_P, EPSILON_D);
         List<Double> defaultEps = new ArrayList<Double>();
         defaultEps.add(DEFAULT_EPSILON.getValue());
-        eps.setDefaultValue(defaultEps);
-        optionHandler.put(eps);
+        EPSILON_PARAM.setDefaultValue(defaultEps);
+        addOption(EPSILON_PARAM);
 
         // parameter strategy
-        StringParameter strat = new StringParameter(STRATEGY_P, STRATEGY_D,
-            new EqualStringConstraint(new String[]{
-                Strategy.APRIORI.toString(),
-                Strategy.MAX_INTERSECTION.toString()}));
-        strat.setDefaultValue(DEFAULT_STRATEGY.toString());
-        optionHandler.put(strat);
+        addOption(STRATEGY_PARAM);
     }
 
     @SuppressWarnings("unchecked")
@@ -228,24 +235,23 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
         String[] remainingParameters = super.setParameters(args);
 
         // minpts
-        minpts = (Integer) optionHandler.getOptionValue(MINPTS_P);
+        minpts = MINPTS_PARAM.getValue();
 
         // epsilon
-        if (optionHandler.isSet(EPSILON_P)) {
-            List<Double> eps_list = (List<Double>) optionHandler.getOptionValue(EPSILON_P);
-            // String[] epsValues = COMMA_SPLIT.split(epsString);
+        if (EPSILON_PARAM.isSet()) {
+            List<Double> eps_list = EPSILON_PARAM.getValue();
             epsilon = new DoubleDistance[eps_list.size()];
 
             for (int d = 0; d < eps_list.size(); d++) {
                 epsilon[d] = new DoubleDistance(eps_list.get(d));
                 if (epsilon[d].getValue() < 0) {
-                    throw new WrongParameterValueException(EPSILON_P, eps_list.toString(), EPSILON_D);
+                    throw new WrongParameterValueException(EPSILON_PARAM, eps_list.toString(), null);
                 }
             }
 
         }
 
-        String strategyString = (String) optionHandler.getOptionValue(STRATEGY_P);
+        String strategyString = STRATEGY_PARAM.getValue();
         if (strategyString.equals(Strategy.APRIORI.toString())) {
             strategy = Strategy.APRIORI;
         }
@@ -253,7 +259,7 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
             strategy = Strategy.MAX_INTERSECTION;
         }
         else
-            throw new WrongParameterValueException(STRATEGY_P, strategyString, STRATEGY_D);
+            throw new WrongParameterValueException(STRATEGY_PARAM, strategyString, null);
 
         return remainingParameters;
     }
@@ -470,9 +476,9 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
      *         preference vectors
      * @throws ParameterException
      */
+    @SuppressWarnings("unchecked")
     private DimensionSelectingDistanceFunction<N, V>[] initDistanceFunctions(Database<V> database, int dimensionality, boolean verbose,
                                                                              boolean time) throws ParameterException {
-        //noinspection unchecked
         DimensionSelectingDistanceFunction<N, V>[] distanceFunctions = new DimensionSelectingDistanceFunction[dimensionality];
         for (int d = 0; d < dimensionality; d++) {
             String[] parameters = new String[2];

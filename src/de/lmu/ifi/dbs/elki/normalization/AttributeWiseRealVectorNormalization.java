@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ListParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.AllOrNoneMustBeSetGlobalConstraint;
@@ -25,29 +26,33 @@ import java.util.List;
  */
 public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ? >> extends AbstractNormalization<V> {
   /**
-   * Parameter for minima.
+   * OptionID for {@link #MINIMA_PARAM}
    */
-  public static final String MINIMA_P = "min";
+  public static final OptionID MINIMA_ID = OptionID.getOrCreateOptionID(
+      "normalize.min", "a comma separated concatenation "
+      + "of the minimum values in each dimension that are mapped to 0. "
+      + "If no value is specified, the minimum value of the attribute "
+      + "range in this dimension will be taken.");
 
   /**
-   * Description for parameter minima.
+   * OptionID for {@link #MAXIMA_PARAM}
    */
-  public static final String MINIMA_D = "<min_1, ..., min_d>a comma separated concatenation "
-                                        + "of the minimum values in each dimension that are mapped to 0. "
-                                        + "If no value is specified, the minimum value of the attribute " + "range in this dimension will be taken.";
+  public static final OptionID MAXIMA_ID = OptionID.getOrCreateOptionID(
+      "normalize.max", "a comma separated concatenation "
+      + "of the maximum values in each dimension that are mapped to 1 "
+      + "If no value is specified, the maximum value of the attribute "
+      + "range in this dimension will be taken.");
 
   /**
-   * Parameter for maxima.
+   * Parameter for minimum.
    */
-  public static final String MAXIMA_P = "max";
-
+  private final DoubleListParameter MINIMA_PARAM = new DoubleListParameter(MINIMA_ID, null, true, null);
+  
   /**
-   * Description for parameter minima.
+   * Parameter for maximum.
    */
-  public static final String MAXIMA_D = "<max_1, ..., max_d>a comma separated concatenation "
-                                        + "of the maximum values in each dimension that are mapped to 1 "
-                                        + "If no value is specified, the maximum value of the attribute " + "range in this dimension will be taken.";
-
+  private final DoubleListParameter MAXIMA_PARAM = new DoubleListParameter(MAXIMA_ID, null, true, null);
+  
   /**
    * Stores the maximum in each dimension.
    */
@@ -62,22 +67,17 @@ public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ? >> e
    * Sets minima and maxima parameter to the optionhandler.
    */
   public AttributeWiseRealVectorNormalization() {
-    DoubleListParameter min = new DoubleListParameter(MINIMA_P, MINIMA_D);
-    min.setOptional(true);
-    optionHandler.put(min);
-
-    DoubleListParameter max = new DoubleListParameter(MAXIMA_P, MAXIMA_D);
-    max.setOptional(true);
-    optionHandler.put(max);
+    addOption(MINIMA_PARAM);
+    addOption(MAXIMA_PARAM);
 
     ArrayList<Parameter<?,?>> global_1 = new ArrayList<Parameter<?,?>>();
-    global_1.add(min);
-    global_1.add(max);
+    global_1.add(MINIMA_PARAM);
+    global_1.add(MAXIMA_PARAM);
     optionHandler.setGlobalParameterConstraint(new AllOrNoneMustBeSetGlobalConstraint(global_1));
 
     ArrayList<ListParameter<?>> global = new ArrayList<ListParameter<?>>();
-    global.add(min);
-    global.add(max);
+    global.add(MINIMA_PARAM);
+    global.add(MAXIMA_PARAM);
     optionHandler.setGlobalParameterConstraint(new EqualSizeGlobalConstraint(global));
   }
 
@@ -113,6 +113,7 @@ public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ? >> e
     }
   }
 
+  @SuppressWarnings("unchecked")
   public List<V> normalize(List<V> featureVectors) throws NonNumericFeaturesException {
     if (featureVectors.size() == 0)
       return new ArrayList<V>();
@@ -231,13 +232,12 @@ public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ? >> e
    * @return String[] an array containing the unused parameters
    * @throws IllegalArgumentException in case of wrong parameter-setting
    */
-  @SuppressWarnings("unchecked")
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
-    if (optionHandler.isSet(MINIMA_P) || optionHandler.isSet(MAXIMA_P)) {
-      List<Double> min_list = (List<Double>) optionHandler.getOptionValue(MINIMA_P);
-      List<Double> max_list = (List<Double>) optionHandler.getOptionValue(MAXIMA_P);
+    if (MINIMA_PARAM.isSet() || MAXIMA_PARAM.isSet()) {
+      List<Double> min_list = MINIMA_PARAM.getValue();
+      List<Double> max_list = MAXIMA_PARAM.getValue();
 
       minima = Util.unbox(min_list.toArray(new Double[min_list.size()]));
 

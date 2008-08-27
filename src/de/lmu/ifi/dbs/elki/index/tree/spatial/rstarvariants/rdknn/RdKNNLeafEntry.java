@@ -69,10 +69,10 @@ public class RdKNNLeafEntry<D extends NumberDistance<D,N>, N extends Number>
    * @throws java.io.IOException    if I/O errors occur
    * @throws ClassNotFoundException If the class for an object being restored cannot be found.
    */
+  @SuppressWarnings("unchecked")
   public void readExternal(ObjectInput in) throws IOException,
                                                   ClassNotFoundException {
     super.readExternal(in);
-    //noinspection unchecked
     this.knnDistance = (D) in.readObject();
   }
 
@@ -89,7 +89,7 @@ public class RdKNNLeafEntry<D extends NumberDistance<D,N>, N extends Number>
     if (o == null || getClass() != o.getClass()) return false;
     if (!super.equals(o)) return false;
 
-    final RdKNNLeafEntry that = (RdKNNLeafEntry) o;
+    final RdKNNLeafEntry<?,?> that = (RdKNNLeafEntry<?,?>) o;
 
     return knnDistance.equals(that.knnDistance);
   }

@@ -108,31 +108,31 @@ public class ICADataGenerator {
         ArrayList<String> parameters = new ArrayList<String>();
 
         // numberOfPoints
-        parameters.add(OptionHandler.OPTION_PREFIX + AxesParallelCorrelationGenerator.NUMBER_P);
+        parameters.add(OptionHandler.OPTION_PREFIX + AxesParallelCorrelationGenerator.NUMBER_ID.getName());
         parameters.add(Integer.toString(numberOfPoints));
 
         // corrDim
-        parameters.add(OptionHandler.OPTION_PREFIX + AxesParallelCorrelationGenerator.CORRDIM_P);
+        parameters.add(OptionHandler.OPTION_PREFIX + AxesParallelCorrelationGenerator.CORRDIM_ID.getName());
         parameters.add(Integer.toString(basis.length));
 
         // dataDim
-        parameters.add(OptionHandler.OPTION_PREFIX + AxesParallelCorrelationGenerator.DIM_P);
+        parameters.add(OptionHandler.OPTION_PREFIX + AxesParallelCorrelationGenerator.DIM_ID.getName());
         parameters.add(Integer.toString(basis[0].length));
 
         // model point
-        parameters.add(OptionHandler.OPTION_PREFIX + ArbitraryCorrelationGenerator.POINT_P);
+        parameters.add(OptionHandler.OPTION_PREFIX + ArbitraryCorrelationGenerator.POINT_ID.getName());
         parameters.add(Util.format(point, ",", 8));
 
         // basis
-        parameters.add(OptionHandler.OPTION_PREFIX + ArbitraryCorrelationGenerator.BASIS_P);
+        parameters.add(OptionHandler.OPTION_PREFIX + ArbitraryCorrelationGenerator.BASIS_ID.getName());
         parameters.add(Util.format(basis, ":", ",", 8));
 
         // label
-        parameters.add(OptionHandler.OPTION_PREFIX + AxesParallelCorrelationGenerator.LABEL_P);
+        parameters.add(OptionHandler.OPTION_PREFIX + AxesParallelCorrelationGenerator.LABEL_ID.getName());
         parameters.add(label);
 
         // minima
-        parameters.add(OptionHandler.OPTION_PREFIX + AxesParallelCorrelationGenerator.MIN_P);
+        parameters.add(OptionHandler.OPTION_PREFIX + AxesParallelCorrelationGenerator.MIN_ID.getName());
         String minParameter = "";
         for (int i = 0; i < min.length; i++) {
             if (i > 0) minParameter += ",";
@@ -141,7 +141,7 @@ public class ICADataGenerator {
         parameters.add(minParameter);
 
         // maxima
-        parameters.add(OptionHandler.OPTION_PREFIX + AxesParallelCorrelationGenerator.MAX_P);
+        parameters.add(OptionHandler.OPTION_PREFIX + AxesParallelCorrelationGenerator.MAX_ID.getName());
         String maxParameter = "";
         for (int i = 0; i < max.length; i++) {
             if (i > 0) maxParameter += ",";
@@ -150,7 +150,7 @@ public class ICADataGenerator {
         parameters.add(maxParameter);
 
         // jitter
-        parameters.add(OptionHandler.OPTION_PREFIX + AxesParallelCorrelationGenerator.JITTER_P);
+        parameters.add(OptionHandler.OPTION_PREFIX + AxesParallelCorrelationGenerator.JITTER_ID.getName());
         parameters.add(Double.toString(jitter));
 
         // output

@@ -60,15 +60,16 @@ public class PartitionClusteringResults<O extends DatabaseObject>
         this.noise = noise;
     }
 
-    public Cluster[] getClusters() {
-        List<Cluster> resultList = new ArrayList<Cluster>();
+    @SuppressWarnings("unchecked")
+    public Cluster<O>[] getClusters() {
+        List<Cluster<O>> resultList = new ArrayList<Cluster<O>>();
         for (Iterator<Integer> partitionIter = partitionsIterator(); partitionIter.hasNext();) {
-            Cluster[] partitionResult = getResult(partitionIter.next()).getClusters();
+            Cluster<O>[] partitionResult = getResult(partitionIter.next()).getClusters();
             for (int i = 0; i < partitionResult.length; i++) {
                 resultList.add(partitionResult[i]);
             }
         }
-        Cluster[] clusters = new Cluster[resultList.size()];
+        Cluster<O>[] clusters = new Cluster[resultList.size()];
         resultList.toArray(clusters);
         return clusters;
     }
@@ -214,11 +215,11 @@ public class PartitionClusteringResults<O extends DatabaseObject>
         }
     }
 
+    @SuppressWarnings("unchecked")
     public <L extends ClassLabel<L>> void appendModel(L clusterID, Result<O> model) {
         try {
             String[] labels = HierarchicalClassLabel.DEFAULT_SEPARATOR.split(clusterID.toString());
             Integer partitionID = Integer.parseInt(labels[0].substring(PARTITION_LABEL_PREFIX.length()));
-            // noinspection unchecked
             L subclusterID = Util.instantiate((Class<L>) clusterID.getClass(), clusterID.getClass().getName());
             StringBuilder label = new StringBuilder();
             for (int i = 1; i < labels.length; i++) {

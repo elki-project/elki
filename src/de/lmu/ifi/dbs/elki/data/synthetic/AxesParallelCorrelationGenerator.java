@@ -8,7 +8,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.*;
 import de.lmu.ifi.dbs.elki.wrapper.StandAloneWrapper;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -36,35 +35,22 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
     public static final Pattern VECTOR_SPLIT = Pattern.compile(":");
 
     /**
-     * Label for parameter dimensionality.
+     * OptionID for {@link #DIM_PARAM}
      */
-    public static final String DIM_P = "dim";
+    public static final OptionID DIM_ID = OptionID.getOrCreateOptionID(
+        "apcg.dim", "the dimensionality of the feature space.");
 
     /**
-     * Description for parameter dim.
+     * OptionID for {@link #CORRDIM_PARAM}
      */
-    public static final String DIM_D = "the dimensionality of the feature space.";
+    public static final OptionID CORRDIM_ID = OptionID.getOrCreateOptionID(
+        "apcg.corrdim", "the correlation dimensionality of the correlation hyperplane.");
 
     /**
-     * Label for parameter correlation dimensionality.
+     * OptionID for {@link #DEPENDENT_VALUES_PARAM}
      */
-    public static final String CORRDIM_P = "corrdim";
-
-    /**
-     * Description for parameter corrdim.
-     */
-    // todo "correlation" <-> axes parallel???
-    public static final String CORRDIM_D = "the correlation dimensionality of the correlation hyperplane.";
-
-    /**
-     * Label for parameter for dep.
-     */
-    public static final String DEPENDENT_VALUES_P = "dep";
-
-    /**
-     * Description for parameter dep.
-     */
-    public static final String DEPENDENT_VALUES_D = "<p_1,...,p_d>a vector specifying " +
+    public static final OptionID DEPENDENT_VALUES_ID = OptionID.getOrCreateOptionID(
+        "apcg.dep", "a vector specifying " +
         "the dependent and independent variables of the correlation hyperplane, " +
         "where d denotes the dimensionality of the feature space. " +
         "p_i = 0 specifies an independent variable, any other value of p_i " +
@@ -75,32 +61,19 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
         "If no vector is specified, the " +
         "first dataDim - corrDim variables are the dependent variables " +
         "(the values will be randomized), " +
-        "the last corrDim variables are the independent variables.";
+        "the last corrDim variables are the independent variables.");
 
     /**
-     * Label for parameter for number of points.
+     * OptionID for {@link #NUMBER_PARAM}
      */
-    public static final String NUMBER_P = "number";
+    public static final OptionID NUMBER_ID = OptionID.getOrCreateOptionID(
+        "apcg.number", "the (positive) number of points in the correlation hyperplane.");
 
     /**
-     * Description for parameter number.
+     * OptionID for {@link #LABEL_PARAM}
      */
-    public static final String NUMBER_D = "the (positive) number of points in the correlation hyperplane.";
-
-    /**
-     * Label for parameter for label.
-     */
-    public static final String LABEL_P = "label";
-
-    /**
-     * Description for parameter label.
-     */
-    public static final String LABEL_D = "a label specifiying the correlation hyperplane, " + "default is no label.";
-
-    /**
-     * Label for parameter minimum values.
-     */
-    public static final String MIN_P = "minima";
+    public static final OptionID LABEL_ID = OptionID.getOrCreateOptionID(
+        "apcg.label", "a label specifiying the correlation hyperplane, " + "default is no label.");
 
     /**
      * The default value for minima.
@@ -108,15 +81,11 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
     public static final double MIN_DEFAULT = 0;
 
     /**
-     * Description for parameter minima.
+     * OptionID for {@link #MIN_PARAM}
      */
-    public static final String MIN_D = "<min_1,...,min_d>a comma separated list of the coordinates of the minimum "
-        + "value in each dimension, default is " + MIN_DEFAULT + " in each dimension";
-
-    /**
-     * Label for parameter maximum values.
-     */
-    public static final String MAX_P = "maxima";
+    public static final OptionID MIN_ID = OptionID.getOrCreateOptionID(
+        "apcg.minima", "a comma separated list of the coordinates of the minimum "
+        + "value in each dimension, default is " + MIN_DEFAULT + " in each dimension");
 
     /**
      * The default value for maxima.
@@ -124,15 +93,11 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
     public static final double MAX_DEFAULT = 1;
 
     /**
-     * Description for parameter maxima.
+     * OptionID for {@link #MAX_PARAM}
      */
-    public static final String MAX_D = "<max_1,...,max_d>a comma separated list of the coordinates of the maximum "
-        + "value in each dimension, default is " + MAX_DEFAULT + " in each dimension";
-
-    /**
-     * Label for parameter jitter.
-     */
-    public static final String JITTER_P = "jitter";
+    public static final OptionID MAX_ID = OptionID.getOrCreateOptionID(
+        "apcg.maxima", "a comma separated list of the coordinates of the maximum "
+        + "value in each dimension, default is " + MAX_DEFAULT + " in each dimension");
 
     /**
      * The default value for jitter.
@@ -140,14 +105,15 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
     public static final double JITTER_DEFAULT = 0;
 
     /**
-     * Description for parameter jitter.
+     * OptionID for {@link #JITTER_PARAM}
      */
-    public static final String JITTER_D = "maximum percentage [0..1] of jitter in each dimension, " + "default is " + JITTER_DEFAULT + ".";
+    public static final OptionID JITTER_ID = OptionID.getOrCreateOptionID(
+        "apcg.jitter", "maximum percentage [0..1] of jitter in each dimension, " + "default is " + JITTER_DEFAULT + ".");
 
     /**
      * The parameter dim.
      */
-    IntParameter corrDimParameter;
+    protected final IntParameter CORRDIM_PARAM = new IntParameter(CORRDIM_ID, new GreaterConstraint(0));;
 
     /**
      * The dimensionality of the correlation to be generated.
@@ -157,7 +123,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
     /**
      * The parameter dim.
      */
-    IntParameter dimParameter;
+    protected final IntParameter DIM_PARAM = new IntParameter(DIM_ID, new GreaterConstraint(0));
 
     /**
      * The dimensionality of the data points to be generated.
@@ -167,7 +133,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
     /**
      * Parameter minima.
      */
-    DoubleListParameter minParameter;
+    protected final DoubleListParameter MIN_PARAM = new DoubleListParameter(MIN_ID, null, true, null);
 
     /**
      * The minimum value in each dimension.
@@ -177,7 +143,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
     /**
      * Parameter maxima.
      */
-    DoubleListParameter maxParameter;
+    protected final DoubleListParameter MAX_PARAM = new DoubleListParameter(MAX_ID, null, true, null);
 
     /**
      * The maximum value in each dimension.
@@ -187,7 +153,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
     /**
      * Parameter dep.
      */
-    DoubleListParameter depParameter;
+    protected final DoubleListParameter depParameter = new DoubleListParameter(DEPENDENT_VALUES_ID, null, true, null);
 
     /**
      * Specifies dependent and independent variables.
@@ -197,7 +163,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
     /**
      * Parameter number.
      */
-    IntParameter numberParameter;
+    protected final IntParameter NUMBER_PARAM = new IntParameter(NUMBER_ID, new GreaterConstraint(0));
 
     /**
      * The number of points to be generated.
@@ -207,7 +173,9 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
     /**
      * Parameter jitter.
      */
-    DoubleParameter jitterParameter;
+    protected final DoubleParameter JITTER_PARAM = new DoubleParameter(JITTER_ID,
+        new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.CLOSE, 1.0, IntervalConstraint.IntervalBoundary.CLOSE),
+        JITTER_DEFAULT);
 
     /**
      * The maximum percentage of jitter in each dimension.
@@ -217,10 +185,10 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
     /**
      * Parameter label.
      */
-    StringParameter labelParameter;
+    protected final PatternParameter LABEL_PARAM = new PatternParameter(LABEL_ID, "");
 
     /**
-     * Label for outpout.
+     * Label for output.
      */
     String label;
 
@@ -236,55 +204,38 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
     public AxesParallelCorrelationGenerator() {
         super();
         // data dimension
-        dimParameter = new IntParameter(DIM_P, DIM_D, new GreaterConstraint(0));
-        optionHandler.put(dimParameter);
-
+        addOption(DIM_PARAM);
         // correlation dimension
-        corrDimParameter = new IntParameter(CORRDIM_P, CORRDIM_D, new GreaterConstraint(0));
-        optionHandler.put(corrDimParameter);
+        addOption(CORRDIM_PARAM);
 
         // minima
-        minParameter = new DoubleListParameter(MIN_P, MIN_D);
-        minParameter.setOptional(true);
+        addOption(MIN_PARAM);
         // TODO default value
 //    minParameter.setDefaultValue(MIN_DEFAULT);
-        optionHandler.put(minParameter);
 
         // maxima
-        maxParameter = new DoubleListParameter(MAX_P, MAX_D);
-        maxParameter.setOptional(true);
+        addOption(MAX_PARAM);
         // TODO default value
 //    maxParameter.setDefaultValue(MAX_DEFAULT);
-        optionHandler.put(maxParameter);
 
         // dependent values
-        depParameter = new DoubleListParameter(DEPENDENT_VALUES_P, DEPENDENT_VALUES_D);
-        depParameter.setOptional(true);
+        addOption(depParameter);
         // TODO default value
-        optionHandler.put(depParameter);
 
         // parameter number
-        numberParameter = new IntParameter(NUMBER_P, NUMBER_D, new GreaterConstraint(0));
-        optionHandler.put(numberParameter);
+        addOption(NUMBER_PARAM);
 
         // parameter jitter
-        ArrayList<ParameterConstraint<Number>> jitterCons = new ArrayList<ParameterConstraint<Number>>();
-        jitterCons.add(new GreaterEqualConstraint(0));
-        jitterCons.add(new LessEqualConstraint(1));
-        jitterParameter = new DoubleParameter(JITTER_P, JITTER_D, jitterCons);
-        jitterParameter.setDefaultValue(JITTER_DEFAULT);
-        optionHandler.put(jitterParameter);
+        addOption(JITTER_PARAM);
 
         // parameter label
-        labelParameter = new StringParameter(LABEL_P, LABEL_D);
-        labelParameter.setDefaultValue("");
-        optionHandler.put(labelParameter);
+        addOption(LABEL_PARAM);
 
         // global constraints
-        optionHandler.setGlobalParameterConstraint(new LessEqualGlobalConstraint<Integer>(corrDimParameter, dimParameter));
-        optionHandler.setGlobalParameterConstraint(new GlobalListSizeConstraint(minParameter, dimParameter));
-        optionHandler.setGlobalParameterConstraint(new GlobalListSizeConstraint(maxParameter, dimParameter));
-        optionHandler.setGlobalParameterConstraint(new GlobalListSizeConstraint(depParameter, dimParameter));
+        optionHandler.setGlobalParameterConstraint(new LessEqualGlobalConstraint<Integer>(CORRDIM_PARAM, DIM_PARAM));
+        optionHandler.setGlobalParameterConstraint(new GlobalListSizeConstraint(MIN_PARAM, DIM_PARAM));
+        optionHandler.setGlobalParameterConstraint(new GlobalListSizeConstraint(MAX_PARAM, DIM_PARAM));
+        optionHandler.setGlobalParameterConstraint(new GlobalListSizeConstraint(depParameter, DIM_PARAM));
         // todo global constraint fuer min < max
     }
 
@@ -414,15 +365,15 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
         String[] remainingParameters = super.setParameters(args);
 
         // dataDim
-        dataDim = getParameterValue(dimParameter);
+        dataDim = DIM_PARAM.getValue();
 
         // corrDim
-        corrDim = getParameterValue(corrDimParameter);
+        corrDim = CORRDIM_PARAM.getValue();
 
         // minima
         min = new double[dataDim];
-        if (optionHandler.isSet(MIN_P)) {
-            List<Double> min_list = getParameterValue(minParameter);
+        if (MIN_PARAM.isSet()) {
+            List<Double> min_list = MIN_PARAM.getValue();
             for (int i = 0; i < dataDim; i++) {
                 min[i] = (min_list.get(i));
             }
@@ -433,8 +384,8 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
 
         // maxima
         max = new double[dataDim];
-        if (optionHandler.isSet(MAX_P)) {
-            List<Double> max_list = getParameterValue(maxParameter);
+        if (MAX_PARAM.isSet()) {
+            List<Double> max_list = MAX_PARAM.getValue();
             for (int i = 0; i < dataDim; i++) {
                 max[i] = max_list.get(i);
             }
@@ -446,7 +397,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
         // min < max?
         for (int i = 0; i < dataDim; i++) {
             if (min[i] >= max[i]) {
-                throw new WrongParameterValueException("Parameter " + MIN_P + " > " + MAX_P + "!");
+                throw new WrongParameterValueException("Parameter " + MIN_PARAM.getName() + " > " + MAX_PARAM.getName() + "!");
             }
         }
 
@@ -463,15 +414,15 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
                         c++;
                     }
                     else if (dv[d] < min[d] || dv[d] > max[d]) {
-                        throw new WrongParameterValueException(DEPENDENT_VALUES_P, dep_list.toString(), DEPENDENT_VALUES_D);
+                        throw new WrongParameterValueException(depParameter, dep_list.toString(), null);
                     }
                 }
                 catch (NumberFormatException e) {
-                    throw new WrongParameterValueException(DEPENDENT_VALUES_P, dep_list.toString(), DEPENDENT_VALUES_D, e);
+                    throw new WrongParameterValueException(depParameter, dep_list.toString(), e);
                 }
             }
             if (c != corrDim) {
-                throw new WrongParameterValueException("Value of parameter " + DEPENDENT_VALUES_P
+                throw new WrongParameterValueException("Value of parameter " + DEPENDENT_VALUES_ID.getName()
                     + " does not correspond with the specified correlation dimensionality  " + "Numbber of zero values " + c + " != "
                     + corrDim);
             }
@@ -485,14 +436,13 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
         }
 
         // number of points
-        number = (Integer) optionHandler.getOptionValue(NUMBER_P);
+        number = NUMBER_PARAM.getValue();
 
         // jitter
-        jitter = (Double) optionHandler.getOptionValue(JITTER_P);
+        jitter = JITTER_PARAM.getValue();
 
         // label
-
-        label = (String) optionHandler.getOptionValue(LABEL_P);
+        label = LABEL_PARAM.getValue();
 
         return remainingParameters;
     }

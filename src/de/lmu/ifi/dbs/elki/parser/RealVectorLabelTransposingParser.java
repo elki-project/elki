@@ -26,6 +26,7 @@ public class RealVectorLabelTransposingParser extends RealVectorLabelParser {
     super();
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public ParsingResult<RealVector> parse(InputStream in) {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
@@ -48,12 +49,10 @@ public class RealVectorLabelTransposingParser extends RealVectorLabelParser {
           }
 
           if (data == null) {
-            //noinspection unchecked
             data = new ArrayList[dimensionality];
             for (int i = 0; i < data.length; i++) {
               data[i] = new ArrayList<Double>();
             }
-            //noinspection unchecked
             labels = new ArrayList[dimensionality];
             for (int i = 0; i < labels.length; i++) {
               labels[i] = new ArrayList<String>();

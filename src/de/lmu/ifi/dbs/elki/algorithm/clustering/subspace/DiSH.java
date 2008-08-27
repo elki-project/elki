@@ -38,7 +38,7 @@ import java.util.Map;
  * Algorithm for detecting subspace hierarchies.
  * <p/>
  * <p>Reference:
- * <br>E. Achtert, C. Boehm, H.-P. Kriegel, P. Kröger, I. Mueller-Gorman, A. Zimek:
+ * <br>E. Achtert, C. Boehm, H.-P. Kriegel, P. Krï¿½ger, I. Mueller-Gorman, A. Zimek:
  * Detection and Visualization of Subspace Cluster Hierarchies.
  * <br>In Proc. DASFAA Conference, Bangkok, Thailand, 2007.
  * </p>
@@ -146,7 +146,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
             "DiSH",
             "Detecting Subspace cluster Hierarchies",
             "Algorithm to find hierarchical correlation clusters in subspaces.",
-            "E. Achtert, C. Boehm, H.-P. Kriegel, P. Kröger, I. Mueller-Gorman, A. Zimek: " +
+            "E. Achtert, C. Boehm, H.-P. Kriegel, P. Krï¿½ger, I. Mueller-Gorman, A. Zimek: " +
                 "Detection and Visualization of Subspace Cluster Hierarchies. " +
                 "In Proc. DASFAA Conference, Bangkok, Thailand, 2007."
         );
@@ -196,11 +196,11 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         Util.addParameter(opticsParameters, PreprocessorHandler.PREPROCESSOR_ID, DiSHPreprocessor.class.getName());
 
         // preprocessor epsilon
-        opticsParameters.add(OptionHandler.OPTION_PREFIX + DiSHPreprocessor.EPSILON_P);
+        opticsParameters.add(OptionHandler.OPTION_PREFIX + DiSHPreprocessor.EPSILON_ID.getName());
         opticsParameters.add(Double.toString(epsilon));
 
         // preprocessor minpts
-        opticsParameters.add(OptionHandler.OPTION_PREFIX + DiSHPreprocessor.MINPTS_P);
+        opticsParameters.add(OptionHandler.OPTION_PREFIX + DiSHPreprocessor.MINPTS_ID.getName());
         opticsParameters.add(Integer.toString(minpts));
 
         // remaining parameters

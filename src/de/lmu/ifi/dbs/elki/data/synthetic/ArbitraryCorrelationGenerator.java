@@ -1,5 +1,10 @@
 package de.lmu.ifi.dbs.elki.data.synthetic;
 
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
@@ -8,19 +13,13 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.VectorListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalListSizeConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalVectorListElementSizeConstraint;
 import de.lmu.ifi.dbs.elki.utilities.output.Format;
-
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Provides automatic generation of arbitrary oriented hyperplanes of arbitrary
@@ -29,47 +28,44 @@ import java.util.List;
  * @author Elke Achtert
  */
 public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenerator {
-
     /**
-     * Label for paremeter model point.
+     * OptionID for {@link #POINT_PARAM}
      */
-    public static final String POINT_P = "point";
-
-    /**
-     * Description for parameter point.
-     */
-    public static final String POINT_D = "<p_1,...,p_d>a comma separated list of " +
+    public static final OptionID POINT_ID = OptionID.getOrCreateOptionID(
+        "acg.point", "a comma separated list of " +
         "the coordinates of the model point, " +
-        "default is the centroid of the defined feature space.";
+        "default is the centroid of the defined feature space.");
 
     /**
-     * Label for parameter basis.
+     * OptionID for {@link #BASIC_PARAM}
      */
-    public static final String BASIS_P = "basis";
-
-    /**
-     * Description for parameter basis.
-     */
-    public static final String BASIS_D = "<b_11,...,b_1d:...:b_c1,...,b_cd>a list of basis vectors of the correlation hyperplane, "
+    public static final OptionID BASIS_ID = OptionID.getOrCreateOptionID(
+        "acg.basis", "a list of basis vectors of the correlation hyperplane, "
         + "where c denotes the correlation dimensionality and d the dimensionality of the "
         + "feature space. Each basis vector is separated by :, the coordinates within "
-        + "the basis vectors are separated by a comma. If no basis is specified, the basis vectors are generated randomly.";
+        + "the basis vectors are separated by a comma. If no basis is specified, the basis vectors are generated randomly.");
 
     /**
-     * Label for flag for gaussian distribution.
+     * OptionID for {@link #GAUSSIAN_FLAG}
      */
-    public static final String GAUSSIAN_F = "gaussian";
-
-    /**
-     * Description for flag gaussian.
-     */
-    public static final String GAUSSIAN_D = "flag to indicate gaussian distribution, default is an equal distribution.";
+    public static final OptionID GAUSSIAN_ID = OptionID.getOrCreateOptionID(
+        "acg.gaussian", "flag to indicate gaussian distribution, default is an equal distribution.");
 
     /**
      * Parameter point.
      */
-    private DoubleListParameter pointParameter;
+    private final DoubleListParameter POINT_PARAM = new DoubleListParameter(POINT_ID, null, true, null);
 
+    /**
+     * Parameter basis vectors
+     */
+    private final VectorListParameter BASIS_PARAM = new VectorListParameter(BASIS_ID, null, true, null);
+    
+    /**
+     * Flag for gaussian distribution.
+     */
+    private final Flag GAUSSIAN_FLAG = new Flag(GAUSSIAN_ID);
+    
     /**
      * The model point.
      */
@@ -98,37 +94,20 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
     public ArbitraryCorrelationGenerator() {
         super();
         // parameter point
-        pointParameter = new DoubleListParameter(POINT_P, POINT_D);
-        pointParameter.setOptional(true);
-        optionHandler.put(pointParameter);
-        // global constraint
-        try {
-            GlobalParameterConstraint gpc = new GlobalListSizeConstraint(pointParameter,
-                (IntParameter) optionHandler.getOption(DIM_P));
-            optionHandler.setGlobalParameterConstraint(gpc);
-        }
-        catch (UnusedParameterException e) {
-            this.verbose("Could not instantiate global parameter constraint: " + e.getMessage());
-        }
+        addOption(POINT_PARAM);
+        
+        GlobalParameterConstraint gpc = new GlobalListSizeConstraint(POINT_PARAM, DIM_PARAM);
+        optionHandler.setGlobalParameterConstraint(gpc);
 
         // parameter basis vectors
-        VectorListParameter basis = new VectorListParameter(BASIS_P, BASIS_D);
-        basis.setOptional(true);
-        optionHandler.put(basis);
-        // global constraints
-        try {
-            GlobalParameterConstraint gpc = new GlobalListSizeConstraint(basis, (IntParameter) optionHandler.getOption(CORRDIM_P));
-            optionHandler.setGlobalParameterConstraint(gpc);
+        addOption(BASIS_PARAM);
+        
+        GlobalParameterConstraint gpc2 = new GlobalListSizeConstraint(BASIS_PARAM, CORRDIM_PARAM);
+        optionHandler.setGlobalParameterConstraint(gpc2);
+        GlobalParameterConstraint gpc3 = new GlobalVectorListElementSizeConstraint(BASIS_PARAM, DIM_PARAM);
+        optionHandler.setGlobalParameterConstraint(gpc3);
 
-            gpc = new GlobalVectorListElementSizeConstraint(basis, (IntParameter) optionHandler.getOption(DIM_P));
-            optionHandler.setGlobalParameterConstraint(gpc);
-        }
-        catch (UnusedParameterException e) {
-            verbose("Could not instantiate global parameter constraint: " + e.getMessage());
-        }
-
-        optionHandler.put(new Flag(GAUSSIAN_F, GAUSSIAN_D));
-
+        addOption(GAUSSIAN_FLAG);
     }
 
     /**
@@ -158,25 +137,22 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
         String[] remainingParameters = super.setParameters(args);
 
         // model point
-        if (optionHandler.isSet(POINT_P)) {
-            // noinspection unchecked
-            List<Double> pointList = (List<Double>) optionHandler.getOptionValue(POINT_P);
+        if (POINT_PARAM.isSet()) {
+            List<Double> pointList = POINT_PARAM.getValue();
             double[] p = new double[dataDim];
             for (int i = 0; i < dataDim; i++) {
 
                 p[i] = pointList.get(i);
             }
             point = new Vector(p);
-
         }
         else {
             point = centroid(dataDim);
         }
 
         // basis
-        if (optionHandler.isSet(BASIS_P)) {
-            // noinspection unchecked
-            List<List<Double>> basis_lists = (List<List<Double>>) optionHandler.getOptionValue(BASIS_P);
+        if (BASIS_PARAM.isSet()) {
+            List<List<Double>> basis_lists = BASIS_PARAM.getValue();
 
             double[][] b = new double[dataDim][corrDim];
             for (int c = 0; c < corrDim; c++) {
@@ -200,7 +176,7 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
         }
 
         // gaussian distribution
-        gaussianDistribution = optionHandler.isSet(GAUSSIAN_F);
+        gaussianDistribution = GAUSSIAN_FLAG.isSet();
 
         return remainingParameters;
     }
@@ -427,11 +403,11 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
     private void output(OutputStreamWriter outStream, List<DoubleVector> featureVectors, LinearEquationSystem dependency, double std)
         throws IOException {
         outStream.write("########################################################" + LINE_SEPARATOR);
-        outStream.write("### " + MIN_P + " [" + Util.format(min, ",", Format.NF4) + "]" + LINE_SEPARATOR);
-        outStream.write("### " + MAX_P + " [" + Util.format(max, ",", Format.NF4) + "]" + LINE_SEPARATOR);
-        outStream.write("### " + NUMBER_P + " " + number + LINE_SEPARATOR);
-        outStream.write("### " + POINT_P + " [" + Util.format(point.getColumnPackedCopy(), Format.NF4) + "]" + LINE_SEPARATOR);
-        outStream.write("### " + BASIS_P + " ");
+        outStream.write("### " + MIN_ID.getName() + " [" + Util.format(min, ",", Format.NF4) + "]" + LINE_SEPARATOR);
+        outStream.write("### " + MAX_ID.getName() + " [" + Util.format(max, ",", Format.NF4) + "]" + LINE_SEPARATOR);
+        outStream.write("### " + NUMBER_ID.getName() + " " + number + LINE_SEPARATOR);
+        outStream.write("### " + POINT_ID.getName() + " [" + Util.format(point.getColumnPackedCopy(), Format.NF4) + "]" + LINE_SEPARATOR);
+        outStream.write("### " + BASIS_ID.getName() + " ");
         for (int i = 0; i < basis.getColumnDimensionality(); i++) {
             outStream.write("[" + Util.format(basis.getColumn(i).getColumnPackedCopy(), Format.NF4) + "]");
             if (i < basis.getColumnDimensionality() - 1) {

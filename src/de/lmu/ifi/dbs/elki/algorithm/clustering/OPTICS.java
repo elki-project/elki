@@ -1,12 +1,18 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
-import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.result.Result;
 import de.lmu.ifi.dbs.elki.algorithm.result.clustering.ClusterOrder;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
@@ -23,12 +29,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 
 /**
  * OPTICS provides the OPTICS algorithm.
@@ -117,8 +117,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
         addOption(MINPTS_PARAM);
 
         // global constraint epsilon <-> distance function
-        // noinspection unchecked
-        GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint(EPSILON_PARAM, DISTANCE_FUNCTION_PARAM);
+        GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint<DistanceFunction<O, D>>(EPSILON_PARAM, DISTANCE_FUNCTION_PARAM);
         optionHandler.setGlobalParameterConstraint(gpc);
     }
 

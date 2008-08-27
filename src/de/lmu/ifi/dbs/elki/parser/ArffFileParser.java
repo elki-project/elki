@@ -27,6 +27,7 @@ public class ArffFileParser<O extends DatabaseObject & WekaObject<W>, W extends 
     /**
      * The default base parser ({@link RealVectorLabelParser}).
      */
+    @SuppressWarnings("unchecked")
     public static final Parser<?> DEFAULT_PARSER = new RealVectorLabelParser();
     
     /**

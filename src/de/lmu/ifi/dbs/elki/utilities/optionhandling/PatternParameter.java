@@ -33,6 +33,18 @@ public class PatternParameter extends Parameter<String, String> {
     }
 
     /**
+     * Constructs a pattern parameter with the given optionID, constraints and default value.
+     *
+     * @param optionID the unique id of the parameter
+     * @param constraints parameters constraints
+     * @param defaultValue the default value of the parameter
+     */
+    public PatternParameter(OptionID optionID, ParameterConstraint<String> constraint, String defaultValue) {
+        this(optionID, defaultValue);
+        addConstraint(constraint);
+    }
+
+    /**
      * Constructs a pattern parameter with the given name and description.
      *
      * @param name        the parameter name
