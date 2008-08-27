@@ -5,13 +5,11 @@ import de.lmu.ifi.dbs.elki.data.MultiRepresentedObject;
 import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
-import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassListParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassListParameter;import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,22 +32,24 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
   /**
    * Keyword for no normalization.
    */
-  public final static String NO_NORMALIZATION = "noNorm";
+  // TODO: support for this was removed below.
+  // Instead the user can just give DummyNormalization.class.getName(), right?
+  //public final static String NO_NORMALIZATION = "noNorm";
 
   /**
-   * Label for parameter normalizations.
+   * Option ID for normalizations
    */
-  public final static String NORMALIZATION_P = "normalizations";
+  public final OptionID NORMALIZATION_ID = OptionID.getOrCreateOptionID("normalizations", "A comma separated list of normalizations for each representation. " +
+  		"If in one representation no normalization is desired, please use the class '" + DummyNormalization.class.getName() + "' in the list.");
 
   /**
-   * Description of parameter parser.
+   * Normalization class parameter
    */
-  public final static String NORMALIZATION_D = "A comma separated list of normalizations for each representation " +
-                                               Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Normalization.class) +
-                                               ". Default: " + DEFAULT_NORMALIZATION +
-                                               ". If in one representation no normalization is desired, please use the keyword '" +
-                                               NO_NORMALIZATION + "' in the list.";
-
+  private final ClassListParameter<Normalization<O>> NORMALIZATION_PARAM =
+    new ClassListParameter<Normalization<O>>(
+      NORMALIZATION_ID,
+      Normalization.class);
+  
   /**
    * A pattern defining a comma.
    */
@@ -64,9 +64,9 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
    * Sets normalization parameter to the optionhandler.
    */
   public MultiRepresentedObjectNormalization() {
-	  
-	  // TODO default value
-    optionHandler.put(new ClassListParameter(NORMALIZATION_P,NORMALIZATION_D,Normalization.class));
+    // The default value will be initialized on-demand, since we don't know
+    // the number of representations beforehand.
+    addOption(NORMALIZATION_PARAM);
   }
 
   /**
@@ -92,20 +92,8 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
     // init default normalizations
     // must be done here, because at setParameters() the number of
     // representations is unknown
-    if (normalizations == null) {
-      normalizations = new ArrayList<Normalization<O>>(
-      numberOfRepresentations);
-      for (int r = 0; r < numberOfRepresentations; r++) {
-        try {
-          // noinspection unchecked
-          normalizations.add(Util.instantiate(Normalization.class,
-                                              DEFAULT_NORMALIZATION));
-        }
-        catch (UnableToComplyException e) {
-          throw new RuntimeException("This should never happen!");
-        }
-      }
-    }
+    if (normalizations == null)
+      initDefaultNormalizations(numberOfRepresentations);
 
     // normalize each representation
     List<List<O>> objects = new ArrayList<List<O>>();
@@ -151,21 +139,8 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
     int numberOfRepresentations = normalizations != null ? normalizations
     .size() : featureVectors.get(0).getNumberOfRepresentations();
 
-    // init default normalizations
-    if (normalizations == null) {
-      normalizations = new ArrayList<Normalization<O>>(
-      numberOfRepresentations);
-      for (int r = 0; r < numberOfRepresentations; r++) {
-        try {
-          // noinspection unchecked
-          normalizations.add(Util.instantiate(Normalization.class,
-                                              DEFAULT_NORMALIZATION));
-        }
-        catch (UnableToComplyException e) {
-          throw new RuntimeException("This should never happen!");
-        }
-      }
-    }
+    if (normalizations == null)
+      initDefaultNormalizations(numberOfRepresentations);
 
     // normalize each representation
     List<List<O>> objects = new ArrayList<List<O>>();
@@ -197,6 +172,26 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
     }
 
     return normalized;
+  }
+
+  /**
+   * Init default normalizations for a given number of representations.
+   * 
+   * @param numberOfRepresentations
+   */
+  @SuppressWarnings("unchecked")
+  private void initDefaultNormalizations(int numberOfRepresentations) {
+    normalizations = new ArrayList<Normalization<O>>(
+    numberOfRepresentations);
+    for (int r = 0; r < numberOfRepresentations; r++) {
+      try {
+        normalizations.add(Util.instantiate(Normalization.class,
+                                            DEFAULT_NORMALIZATION));
+      }
+      catch (UnableToComplyException e) {
+        throw new RuntimeException("This should never happen!");
+      }
+    }
   }
 
   /**
@@ -300,31 +295,10 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
     String[] remainingOptions = super.setParameters(args);
 
     // normalizations
-    if (optionHandler.isSet(NORMALIZATION_P)) {
-      List<String> norm_list= (List<String>)optionHandler.getOptionValue(NORMALIZATION_P);
-//      String[] normalizationClasses = SPLIT.split(normalizationsString);
-      if (norm_list.isEmpty()) {
-        throw new WrongParameterValueException(NORMALIZATION_P,
-                                               norm_list.toString(), NORMALIZATION_D);
-      }
-      this.normalizations = new ArrayList<Normalization<O>>(norm_list.size());
-      for (String normalizationClass : norm_list) {
-        if (normalizationClass.equals(NO_NORMALIZATION)) {
-          this.normalizations.add(new DummyNormalization<O>());
-        }
-        else {
-          try {
-            // noinspection unchecked
-            Normalization<O> n = Util.instantiate(Normalization.class, normalizationClass);
-            n.setParameters(args);
-            this.normalizations.add(n);
-          }
-          catch (UnableToComplyException e) {
-            throw new WrongParameterValueException(NORMALIZATION_P,
-                                                   norm_list.toString(), NORMALIZATION_D, e);
-          }
-        }
-      }
+    if (NORMALIZATION_PARAM.isSet()) {
+      // FIXME: add support back for NO_NORMALIZATION keyword?
+      // Right now, the user needs to specify DummyNormalization.class.getName()
+      this.normalizations = NORMALIZATION_PARAM.instantiateClasses();
     }
 
     return remainingOptions;

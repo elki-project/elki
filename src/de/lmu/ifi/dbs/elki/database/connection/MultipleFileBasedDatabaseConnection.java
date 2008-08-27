@@ -54,13 +54,13 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
      * {@link RealVectorLabelParser} is used as parser for all input files.
      * <p>Key: {@code -multipledbc.parsers} </p>
      */
-    private final ClassListParameter<Parser> PARSERS_PARAM = new ClassListParameter<Parser>(
+    private final ClassListParameter<Parser<O>> PARSERS_PARAM = new ClassListParameter<Parser<O>>(
         PARSERS_ID, Parser.class, true);
 
     /**
      * Holds the instances of the parsers specified by {@link #PARSERS_PARAM}.
      */
-    private List<Parser> parsers;
+    private List<Parser<O>> parsers;
 
     /**
      * OptionID for {@link #INPUT_PARAM}
@@ -120,7 +120,6 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
                 numberOfRepresentations);
             int numberOfObjects = 0;
             for (int r = 0; r < numberOfRepresentations; r++) {
-                // noinspection unchecked
                 ParsingResult<O> parsingResult = parsers.get(r).parse(inputStreams.get(r));
                 parsingResults.add(parsingResult);
                 numberOfObjects = Math.max(parsingResult.getObjectAndLabelList().size(), numberOfObjects);
@@ -170,6 +169,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
      * and {@link #parsers} according to the value of parameter {@link #PARSERS_PARAM} .
      * The remaining parameters are passed to all instances of {@link #parsers}.
      */
+    @SuppressWarnings("unchecked")
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
@@ -188,7 +188,6 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
 
         // parsers
         if (optionHandler.isSet(PARSERS_PARAM)) {
-            // noinspection unchecked
             parsers = PARSERS_PARAM.instantiateClasses();
 
             if (parsers.size() != inputStreams.size()) {
@@ -198,10 +197,9 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
             }
         }
         else {
-            this.parsers = new ArrayList<Parser>(inputStreams.size());
+            this.parsers = new ArrayList<Parser<O>>(inputStreams.size());
             for (int i = 0; i < inputStreams.size(); i++) {
                 try {
-                    // noinspection unchecked
                     this.parsers.add(i, Util.instantiate(Parser.class, RealVectorLabelParser.class.getName()));
                 }
                 catch (UnableToComplyException e) {
@@ -211,7 +209,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
         }
 
         // set parameters of parsers
-        for (Parser parser : this.parsers) {
+        for (Parser<O> parser : this.parsers) {
             remainingParameters = parser.setParameters(remainingParameters);
         }
         setParameters(args, remainingParameters);
@@ -227,7 +225,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
     @Override
     public List<AttributeSettings> getAttributeSettings() {
         List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-        for (Parser parser : parsers) {
+        for (Parser<O> parser : parsers) {
             attributeSettings.addAll(parser.getAttributeSettings());
         }
         return attributeSettings;

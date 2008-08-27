@@ -26,9 +26,10 @@ public class ClassListParameter<C> extends ListParameter<String> {
      * @param optionID         the unique id of this parameter
      * @param restrictionClass the restriction class of the list of class names
      */
-    public ClassListParameter(OptionID optionID, Class<C> restrictionClass) {
+    @SuppressWarnings("unchecked")
+    public ClassListParameter(OptionID optionID, Class<?> restrictionClass) {
         super(optionID);
-        this.restrictionClass = restrictionClass;
+        this.restrictionClass = (Class<C>) restrictionClass;
     }
 
     /**
@@ -39,9 +40,10 @@ public class ClassListParameter<C> extends ListParameter<String> {
      * @param restrictionClass the restriction class of the list of class names
      * @param optional         specifies if this parameter is an optional parameter
      */
-    public ClassListParameter(OptionID optionID, Class<C> restrictionClass, boolean optional) {
+    @SuppressWarnings("unchecked")
+    public ClassListParameter(OptionID optionID, Class<?> restrictionClass, boolean optional) {
         super(optionID, null, optional, null);
-        this.restrictionClass = restrictionClass;
+        this.restrictionClass = (Class<C>) restrictionClass;
     }
 
     /**
@@ -53,10 +55,11 @@ public class ClassListParameter<C> extends ListParameter<String> {
      * @param restrictionClass the restriction class of the list of class names
      * @deprecated
      */
+    @SuppressWarnings("unchecked")
     @Deprecated
-    public ClassListParameter(String name, String description, Class<C> restrictionClass) {
+    public ClassListParameter(String name, String description, Class<?> restrictionClass) {
         super(name, description);
-        this.restrictionClass = restrictionClass;
+        this.restrictionClass = (Class<C>) restrictionClass;
     }
 
     public void setValue(String value) throws ParameterException {

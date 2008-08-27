@@ -167,7 +167,7 @@ public final class Properties extends AbstractLoggable {
                 if (propertyInstance instanceof Algorithm) {
                     // TODO: description -- check whether this provides the
                     // desired result
-                    desc = ((Algorithm) propertyInstance).getDescription().toString();
+                    desc = ((Algorithm<?>) propertyInstance).getDescription().toString();
                 }
                 else if (propertyInstance instanceof Parameterizable) {
                     desc = ((Parameterizable) propertyInstance).parameterDescription();
@@ -199,8 +199,8 @@ public final class Properties extends AbstractLoggable {
      *         superclass or interface as specified in the properties
      */
     @SuppressWarnings("unchecked")
-    public List<Class> subclasses(Class superclass) {
-        List<Class> subclasses = new ArrayList<Class>();
+    public List<Class<?>> subclasses(Class superclass) {
+        List<Class<?>> subclasses = new ArrayList<Class<?>>();
         PropertyName propertyName = PropertyName.getOrCreatePropertyName(superclass);
         if (propertyName == null) {
             warning("Could not create PropertyName for " + superclass.toString() + "\n");

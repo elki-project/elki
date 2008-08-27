@@ -148,7 +148,7 @@ public class EditObject {
 	 */
 	public String getAlgorithmInfo() {
 		if (isAlgorithm()) {
-			return ((Algorithm) editObject).getDescription().toString();
+			return ((Algorithm<?>) editObject).getDescription().toString();
 		}
 		return "";
 	}

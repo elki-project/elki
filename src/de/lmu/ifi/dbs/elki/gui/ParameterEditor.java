@@ -154,7 +154,7 @@ public abstract class ParameterEditor {
 		}
 
 		if (p instanceof ClassListParameter) {
-			return new ClassListEditor((ClassListParameter) p, owner, l);
+			return new ClassListEditor((ClassListParameter<?>) p, owner, l);
 		}
 
 		if (p instanceof DoubleParameter) {

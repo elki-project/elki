@@ -111,6 +111,7 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
            "computes the distances only within the selected representation.";
   }
 
+  @SuppressWarnings("unchecked")
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
@@ -124,7 +125,6 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
       this.distanceFunctions = new ArrayList<DistanceFunction<O, D>>(distanceFunctions.size());
       for (String distanceFunctionClass : distanceFunctions) {
         try {
-          //noinspection unchecked
             // todo
           this.distanceFunctions.add(Util.instantiate(DistanceFunction.class, distanceFunctionClass));
         }
@@ -141,7 +141,6 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
     }
     else {
       try {
-        //noinspection unchecked
           // todo
         defaultDistanceFunction = Util.instantiate(DistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
       }

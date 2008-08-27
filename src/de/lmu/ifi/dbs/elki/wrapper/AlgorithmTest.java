@@ -39,7 +39,7 @@ public class AlgorithmTest extends AbstractParameterizable {
      * as specified in the property file are used.
      * <p>Key: {@code -test.algorithms} </p>
      */
-    private final ClassListParameter<Algorithm> ALGORITHMS_PARAM = new ClassListParameter<Algorithm>(
+    private final ClassListParameter<Algorithm<?>> ALGORITHMS_PARAM = new ClassListParameter<Algorithm<?>>(
         ALGORITHMS_ID,
         Algorithm.class,
         true);
@@ -47,7 +47,7 @@ public class AlgorithmTest extends AbstractParameterizable {
     /**
      * Holds the instances of the algorithms specified by {@link #ALGORITHMS_PARAM}.
      */
-    private List<Algorithm> algorithms;
+    private List<Algorithm<?>> algorithms;
 
     /**
      * OptionID for {@link #INPUT_PARAM}
@@ -156,15 +156,13 @@ public class AlgorithmTest extends AbstractParameterizable {
 
         // algorithms
         if (optionHandler.isSet(ALGORITHMS_PARAM)) {
-            // noinspection unchecked
             algorithms = ALGORITHMS_PARAM.instantiateClasses();
         }
         else {
-            List<Class> subclasses = Properties.KDD_FRAMEWORK_PROPERTIES.subclasses(Algorithm.class);
-            this.algorithms = new ArrayList<Algorithm>(subclasses.size());
-            for (Class subclass : subclasses) {
+            List<Class<?>> subclasses = Properties.KDD_FRAMEWORK_PROPERTIES.subclasses(Algorithm.class);
+            this.algorithms = new ArrayList<Algorithm<?>>(subclasses.size());
+            for (Class<?> subclass : subclasses) {
                 try {
-                    // noinspection unchecked
                     this.algorithms.add(Util.instantiate(Algorithm.class, subclass.getName()));
                 }
                 catch (UnableToComplyException e) {
@@ -184,7 +182,7 @@ public class AlgorithmTest extends AbstractParameterizable {
     @Override
     public List<AttributeSettings> getAttributeSettings() {
         List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-        for (Algorithm algorithm : algorithms) {
+        for (Algorithm<?> algorithm : algorithms) {
             attributeSettings.addAll(algorithm.getAttributeSettings());
         }
         return attributeSettings;
@@ -194,7 +192,7 @@ public class AlgorithmTest extends AbstractParameterizable {
      * Runs the specified algorithms with default parametrization.
      */
     private void run() {
-        for (Algorithm algorithm : algorithms) {
+        for (Algorithm<?> algorithm : algorithms) {
             // fehler drin
             if (!algorithm.getClass().getSimpleName().startsWith("Dependency")) {
                 continue;
@@ -240,7 +238,7 @@ public class AlgorithmTest extends AbstractParameterizable {
      * @param algorithm the algorithm object
      * @return the array of parameters for the specified algorithm
      */
-    private String[] buildParameters(Algorithm algorithm) {
+    private String[] buildParameters(Algorithm<?> algorithm) {
         List<String> parameters = new ArrayList<String>();
 
         // in

@@ -17,7 +17,7 @@ import javax.swing.JTextField;
 
 public class ClassListEditor extends TextFieldParameterEditor {
 
-	public ClassListEditor(ClassListParameter option, JFrame owner, ParameterChangeListener l) {
+	public ClassListEditor(ClassListParameter<?> option, JFrame owner, ParameterChangeListener l) {
 		super(option, owner,l);
 	}
 
@@ -63,7 +63,7 @@ public class ClassListEditor extends TextFieldParameterEditor {
 
 		addInputVerifier();
 
-		if (((ClassListParameter) option).hasDefaultValue()) {
+		if (((ClassListParameter<?>) option).hasDefaultValue()) {
 			List<String> defaultValues = ((ClassListParameter<?>) option).getDefaultValue();
 			for (String s : defaultValues) {
 				this.textField.setText(s);
@@ -80,7 +80,7 @@ public class ClassListEditor extends TextFieldParameterEditor {
 		inputField.add(scroller);
 
 		JComboBox classSelector = new JComboBox();
-		classSelector.setModel(new DefaultComboBoxModel(((ClassListParameter) option).getRestrictionClasses()));
+		classSelector.setModel(new DefaultComboBoxModel(((ClassListParameter<?>) option).getRestrictionClasses()));
 
 		classSelector.addActionListener(new ActionListener() {
 
