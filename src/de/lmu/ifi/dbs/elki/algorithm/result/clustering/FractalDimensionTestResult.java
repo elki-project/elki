@@ -49,9 +49,8 @@ public class FractalDimensionTestResult<V extends RealVector<V, ?>> extends Abst
         this.distanceFunction.setDatabase(database, false, false);
     }
 
-    public void output(PrintStream outStream, Normalization normalization, List settings) throws UnableToComplyException {
+    public void output(PrintStream outStream, Normalization<V> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         throw new UnsupportedOperationException("Specification of output file required.");
-
     }
 
     @Override

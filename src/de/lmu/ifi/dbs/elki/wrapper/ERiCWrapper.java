@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.COPAC;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.ERiC;
@@ -11,13 +12,10 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.DefaultValueGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-
-import java.util.List;
 
 /**
  * Wrapper class for hierarchical COPAC algorithm. Performs an attribute wise normalization on
@@ -91,8 +89,7 @@ public class ERiCWrapper extends NormalizationWrapper {
         addOption(K_PARAM);
 
         // global constraint k <-> minpts
-        // noinspection unchecked
-        GlobalParameterConstraint gpc = new DefaultValueGlobalConstraint(K_PARAM, MINPTS_PARAM);
+        GlobalParameterConstraint gpc = new DefaultValueGlobalConstraint<Integer>(K_PARAM, MINPTS_PARAM);
         optionHandler.setGlobalParameterConstraint(gpc);
 
         // parameter delta

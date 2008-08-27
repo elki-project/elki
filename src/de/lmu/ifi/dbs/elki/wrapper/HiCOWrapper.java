@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PCABasedCorrelationDistanceFunction;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
@@ -10,15 +11,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.DefaultValueGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.varianceanalysis.PercentageEigenPairFilter;
-
-import java.util.List;
 
 /**
  * Wrapper class for HiCO algorithm. Performs an attribute wise normalization on
@@ -98,8 +96,7 @@ public class HiCOWrapper extends NormalizationWrapper {
         optionHandler.put(K_PARAM);
 
         // global constraint k <-> minpts
-        // noinspection unchecked
-        GlobalParameterConstraint gpc = new DefaultValueGlobalConstraint(K_PARAM, MINPTS_PARAM);
+        GlobalParameterConstraint gpc = new DefaultValueGlobalConstraint<Integer>(K_PARAM, MINPTS_PARAM);
         optionHandler.setGlobalParameterConstraint(gpc);
 
         // parameter delta

@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 
-import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ProjectedDBSCAN;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.KernelBasedLocallyWeightedDistanceFunction;
@@ -24,7 +23,7 @@ public class KernelFourC<V extends RealVector<V, ?>> extends ProjectedDBSCAN<V> 
             "n/a");
     }
 
-    public Class<KernelFourCPreprocessor> preprocessorClass() {
+    public Class<?> preprocessorClass() {
         return KernelFourCPreprocessor.class;
     }
 

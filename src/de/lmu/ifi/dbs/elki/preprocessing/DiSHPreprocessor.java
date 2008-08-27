@@ -131,6 +131,7 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
         optionHandler.put(strat);
     }
 
+    @SuppressWarnings("unchecked")
     public void run(Database<V> database, boolean verbose, boolean time) {
         if (database == null) {
             throw new IllegalArgumentException("Database must not be null!");
@@ -157,11 +158,9 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
             for (int d = 0; d < dim; d++) {
                 epsString[d] = epsilon[d].toString();
             }
-            //noinspection unchecked
             DimensionSelectingDistanceFunction<N, V>[] distanceFunctions = initDistanceFunctions(database, dim, verbose, time);
 
-            // noinspection unchecked
-            final DistanceFunction<V, DoubleDistance> euclideanDistanceFunction = new EuclideanDistanceFunction();
+            final DistanceFunction<V, DoubleDistance> euclideanDistanceFunction = new EuclideanDistanceFunction<V>();
             euclideanDistanceFunction.setDatabase(database, false, false);
 
             int processed = 1;
@@ -176,10 +175,8 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
                 }
 
                 // determine neighbors in each dimension
-                // noinspection unchecked
                 Set<Integer>[] allNeighbors = new Set[dim];
                 for (int d = 0; d < dim; d++) {
-                    //noinspection unchecked
                     List<QueryResult<DoubleDistance>> qrList = database.rangeQuery(id, epsString[d], distanceFunctions[d]);
                     allNeighbors[d] = new HashSet<Integer>(qrList.size());
                     for (QueryResult<DoubleDistance> qr : qrList) {

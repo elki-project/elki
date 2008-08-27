@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.statistics.LinearRegression;
 import de.lmu.ifi.dbs.elki.preprocessing.FracClusPreprocessor;
+import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.utilities.DoublePair;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
@@ -97,8 +98,9 @@ public class FractalDimensionBasedDistanceFunction<V extends RealVector<V, ?>>
      * @return the super class for the preprocessor parameter,
      *         which is {@link de.lmu.ifi.dbs.elki.preprocessing.FracClusPreprocessor}
      */
-    public Class<FracClusPreprocessor> getPreprocessorSuperClass() {
-        return FracClusPreprocessor.class;
+    @SuppressWarnings("unchecked")
+    public Class<? extends Preprocessor<?>> getPreprocessorSuperClass() {
+        return (Class<? extends Preprocessor<?>>) FracClusPreprocessor.class;
     }
 
     @Override

@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.algorithm.result.outlier;
 import de.lmu.ifi.dbs.elki.algorithm.result.AbstractResult;
 import de.lmu.ifi.dbs.elki.algorithm.result.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
@@ -27,7 +27,7 @@ import java.util.List;
  * @author Erich Schubert
  */
 
-public class COPVerboseResult<O extends DatabaseObject> extends AbstractResult<O> {
+public class COPVerboseResult<O extends RealVector<O,?>> extends AbstractResult<O> {
 
     /**
      * Marker for a file name containing lofs.
@@ -78,6 +78,7 @@ public class COPVerboseResult<O extends DatabaseObject> extends AbstractResult<O
      * @param settings      the settings to be written into the header, if this
      *                      parameter is <code>null</code>, no header will be written
      */
+    @SuppressWarnings("unchecked")
     private void outputCOP(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
 
         writeHeader(outStream, settings, null);
@@ -134,7 +135,7 @@ public class COPVerboseResult<O extends DatabaseObject> extends AbstractResult<O
                     }
                 }
 
-                CorrelationAnalysisSolution sol = (CorrelationAnalysisSolution) db.getAssociation(AssociationID.COP_SOL, id);
+                CorrelationAnalysisSolution<O> sol = (CorrelationAnalysisSolution<O>) db.getAssociation(AssociationID.COP_SOL, id);
                 if (sol != null) {
                     LinearEquationSystem lq = sol.getNormalizedLinearEquationSystem(normalization);
                     if (lq != null) {

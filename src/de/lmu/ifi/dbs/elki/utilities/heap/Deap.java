@@ -15,7 +15,7 @@ import java.util.Vector;
  * 
  * @author Elke Achtert 
  */
-class Deap<K extends Comparable<K> & Serializable, V extends Identifiable & Serializable>
+class Deap<K extends Comparable<K> & Serializable, V extends Identifiable<?> & Serializable>
         extends MinMaxHeap<K, V> implements Page<Deap<K,V>>
 {
 
@@ -199,6 +199,7 @@ class Deap<K extends Comparable<K> & Serializable, V extends Identifiable & Seri
      * @throws ClassNotFoundException
      *             If the class for an object being restored cannot be found.
      */
+    @SuppressWarnings("unchecked")
     public void readExternal(ObjectInput in) throws IOException,
             ClassNotFoundException
     {

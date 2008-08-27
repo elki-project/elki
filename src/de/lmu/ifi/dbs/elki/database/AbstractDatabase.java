@@ -275,9 +275,11 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
      * @param id             the id which is to associate with specified associations
      * @param idAssociations the associations to be associated with the specified id
      */
+    @SuppressWarnings("unchecked")
     protected <T> void setAssociations(final Integer id, final Associations idAssociations) {
-        for (AssociationID<T> associationID : idAssociations.keySet()) {
-            associate(associationID, id, idAssociations.get(associationID));
+        for (AssociationID<?> associationID : idAssociations.keySet()) {
+            AssociationID<T> aID = (AssociationID<T>) associationID;
+            associate(aID, id, idAssociations.get(aID));
         }
     }
 
@@ -379,8 +381,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
         if (iter.hasNext()) {
             O entry = this.get(iter.next());
             if (entry instanceof FeatureVector) {
-                // noinspection unchecked
-                return ((FeatureVector) entry).getDimensionality();
+                return ((FeatureVector<?,?>) entry).getDimensionality();
             }
             else {
                 throw new UnsupportedOperationException("Database entries are not implementing interface " + FeatureVector.class.getName() + ".");

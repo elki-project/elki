@@ -147,8 +147,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
     public KDDTask() {
 
         // parameter algorithm
-        // noinspection unchecked
-        ClassParameter<Algorithm<O>> algParam = new ClassParameter(ALGORITHM_P, ALGORITHM_D, Algorithm.class);
+        ClassParameter<Algorithm<O>> algParam = new ClassParameter<Algorithm<O>>(ALGORITHM_P, ALGORITHM_D, Algorithm.class);
         optionHandler.put(algParam);
 
         // help flag
@@ -157,20 +156,18 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
         // help flag
         optionHandler.put(new Flag(HELPLONG_F, HELP_D));
 
-        // decription parameter
+        // description parameter
         ClassParameter<Parameterizable> desc = new ClassParameter<Parameterizable>(DESCRIPTION_P, DESCRIPTION_D, Parameterizable.class);
         desc.setOptional(true);
         optionHandler.put(desc);
 
         // parameter database connection
-        // noinspection unchecked
-        ClassParameter<DatabaseConnection<O>> dbCon = new ClassParameter(DATABASE_CONNECTION_P, DATABASE_CONNECTION_D, DatabaseConnection.class);
+        ClassParameter<DatabaseConnection<O>> dbCon = new ClassParameter<DatabaseConnection<O>>(DATABASE_CONNECTION_P, DATABASE_CONNECTION_D, DatabaseConnection.class);
         dbCon.setDefaultValue(DEFAULT_DATABASE_CONNECTION);
         optionHandler.put(dbCon);
 
         // parameter normalization
-        // noinspection unchecked
-        ClassParameter<Normalization<O>> norm = new ClassParameter(NORMALIZATION_P, NORMALIZATION_D, Normalization.class);
+        ClassParameter<Normalization<O>> norm = new ClassParameter<Normalization<O>>(NORMALIZATION_P, NORMALIZATION_D, Normalization.class);
         norm.setOptional(true);
         optionHandler.put(norm);
 
@@ -215,6 +212,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
         return usage.toString();
     }
 
+    @SuppressWarnings("unchecked")
     public String[] setParameters(String[] args) throws ParameterException {
         if (args.length == 0) {
             throw new AbortException("No options specified. Try flag -h to gain more information.");
@@ -253,7 +251,6 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
         // algorithm
         String algorithmName = (String) optionHandler.getOptionValue(ALGORITHM_P);
         try {
-            // noinspection unchecked
             // todo
             algorithm = Util.instantiate(Algorithm.class, algorithmName);
         }
@@ -266,7 +263,6 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
         String databaseConnectionName = (String) optionHandler.getOptionValue(DATABASE_CONNECTION_P);
 
         try {
-            // noinspection unchecked
             // todo
             databaseConnection = Util.instantiate(DatabaseConnection.class, databaseConnectionName);
         }
@@ -280,7 +276,6 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
             String normalizationName = (String) optionHandler.getOptionValue(NORMALIZATION_P);
             try {
                 // todo
-                // noinspection unchecked
                 normalization = Util.instantiate(Normalization.class, normalizationName);
             }
             catch (UnableToComplyException e) {
@@ -359,9 +354,9 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
      *
      * @param args parameter list according to description
      */
+    @SuppressWarnings("unchecked")
     public static void main(String[] args) {
         LoggingConfiguration.configureRootFinally(LoggingConfiguration.CLI);
-        // noinspection unchecked
         KDDTask<? extends DatabaseObject> kddTask = new KDDTask();
         try {
             kddTask.setParameters(args);

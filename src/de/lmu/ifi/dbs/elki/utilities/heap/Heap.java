@@ -9,7 +9,7 @@ import java.io.Serializable;
  *
  * @author Elke Achtert 
  */
-public interface Heap<K extends Comparable<K>, V extends Identifiable> extends Serializable {
+public interface Heap<K extends Comparable<K>, V extends Identifiable<?>> extends Serializable {
 
   /**
    * Adds a node to this heap.

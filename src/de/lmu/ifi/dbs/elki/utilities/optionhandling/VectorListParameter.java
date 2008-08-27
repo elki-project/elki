@@ -78,7 +78,7 @@ public class VectorListParameter extends ListParameter<List<Double>> {
         int[] sizes = new int[getListSize()];
 
         int i = 0;
-        for (List vecs : value) {
+        for (List<?> vecs : value) {
             sizes[i] = vecs.size();
             i++;
         }

@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 
-import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ProjectedDBSCAN;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.preprocessing.FourCPreprocessor;
@@ -30,7 +29,7 @@ public class FourC<O extends RealVector<O, ?>> extends ProjectedDBSCAN<O> {
     }
 
 
-    public Class<FourCPreprocessor> preprocessorClass() {
+    public Class<?> preprocessorClass() {
         return FourCPreprocessor.class;
     }
 }

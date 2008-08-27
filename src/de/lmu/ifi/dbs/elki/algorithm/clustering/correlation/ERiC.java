@@ -310,13 +310,14 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         return parameters.toArray(new String[parameters.size()]);
     }
 
+    @SuppressWarnings("unchecked")
     private void buildHierarchy(int dimensionality,
                                 SortedMap<Integer, List<HierarchicalCorrelationCluster<V>>> clusterMap) {
 
         StringBuffer msg = new StringBuffer();
 
-        DBSCAN dbscan = (DBSCAN) copacAlgorithm.getPartitionAlgorithm();
-        ERiCDistanceFunction distanceFunction = (ERiCDistanceFunction) dbscan.getDistanceFunction();
+        DBSCAN<V,?> dbscan = (DBSCAN<V, ?>) copacAlgorithm.getPartitionAlgorithm();
+        ERiCDistanceFunction<V,?> distanceFunction = (ERiCDistanceFunction<V, ?>) dbscan.getDistanceFunction();
         Integer lambda_max = clusterMap.lastKey();
 
         for (Integer childCorrDim : clusterMap.keySet()) {
@@ -370,7 +371,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
      * @return true, if the specified parent cluster is a parent of one child of the children clusters,
      *         false otherwise
      */
-    private boolean isParent(ERiCDistanceFunction distanceFunction,
+    private boolean isParent(ERiCDistanceFunction<V,?> distanceFunction,
                              HierarchicalCorrelationCluster<V> parent,
                              List<HierarchicalCorrelationCluster<V>> children) {
 
@@ -380,7 +381,6 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
             if (parent.getPCA().getCorrelationDimension() == child.getPCA().getCorrelationDimension())
                 return false;
 
-            //noinspection unchecked
             BitDistance dist = distanceFunction.distance(parent.getCentroid(), child.getCentroid(), parent.getPCA(), child.getPCA());
             if (debug) {
                 msg.append("\ndist(").append(child).append(" - ").append(parent).append(") = ").append(dist);

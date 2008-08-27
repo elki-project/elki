@@ -76,13 +76,13 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
         clusterToModel = new HashMap<Integer, Result<O>>();
     }
 
+    @SuppressWarnings("unchecked")
     public Cluster<O>[] getClusters() {
-        Cluster[] clusters = new Cluster[clustersAndNoise.length - 1];
+        Cluster<O>[] clusters = new Cluster[clustersAndNoise.length - 1];
         for (int i = 0; i < clustersAndNoise.length - 1; i++) {
-            clusters[i] = new Cluster(clustersAndNoise[i]);
+            clusters[i] = new Cluster<O>(clustersAndNoise[i]);
             System.arraycopy(clustersAndNoise[i], 0, clusters[i], 0, clustersAndNoise[i].length);
         }
-        // noinspection unchecked
         return clusters;
     }
 
@@ -175,7 +175,7 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
             }
             out.print(mo.toString());
             Associations associations = db.getAssociations(clustersAndNoise[clusterIndex][i]);
-            List<AssociationID> keys = new ArrayList<AssociationID>(associations.keySet());
+            List<AssociationID<?>> keys = new ArrayList<AssociationID<?>>(associations.keySet());
             Collections.sort(keys);
             for (AssociationID<?> id : keys) {
                 if (id == AssociationID.CLASS || id == AssociationID.LABEL || id == AssociationID.LOCAL_DIMENSIONALITY) {

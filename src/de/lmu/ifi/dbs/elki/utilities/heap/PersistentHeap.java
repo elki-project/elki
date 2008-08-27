@@ -22,7 +22,7 @@ import java.util.Arrays;
  *
  * @author Elke Achtert
  */
-public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Identifiable & Serializable>
+public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Identifiable<?> & Serializable>
     extends AbstractLoggable implements Heap<K, V> {
 
     /**
@@ -94,6 +94,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
      * @param cacheSize the size of the cache in Bytes
      * @param nodeSize  the size of a node in Bytes
      */
+    @SuppressWarnings("unchecked")
     public PersistentHeap(String fileName, int pageSize, int cacheSize,
                           int nodeSize) {
         super(LoggingConfiguration.DEBUG);
@@ -114,7 +115,6 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
                 + " Bytes is choosen too small for a" + " pagesize of "
                 + pageSize + " Bytes!");
 
-        // noinspection unchecked
         this.cachePath = new Deap[maxCacheSize];
 
         // maximum index of a deap

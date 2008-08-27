@@ -33,6 +33,7 @@ public class HierarchicalClassLabel extends ClassLabel<HierarchicalClassLabel> {
     /**
      * Holds the names on the different levels.
      */
+    // TODO: fix generics warnings.
     private Comparable[] levelwiseNames;
 
     /**

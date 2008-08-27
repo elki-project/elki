@@ -13,7 +13,7 @@ import java.util.Vector;
  *
  * @author Elke Achtert 
  */
-public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implements Heap<K, V> {
+public class DefaultHeap<K extends Comparable<K>, V extends Identifiable<?>> implements Heap<K, V> {
   /**
    * Indicates the index null.
    */
@@ -147,8 +147,8 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
    * Returns a copy of the vector holding this heap.
    * @return a copy of the vector holding this heap
    */
+  @SuppressWarnings("unchecked")
   public Vector<HeapNode<K,V>> copy() {
-      // noinspection unchecked
     return (Vector<HeapNode<K,V>>) heap.clone();
   }
 

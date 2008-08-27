@@ -13,7 +13,7 @@ import java.util.Vector;
  *
  * @author Elke Achtert 
  */
-public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable> implements Heap<K, V> {
+public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable<?>> implements Heap<K, V> {
   /**
    * Indicates the index null.
    */

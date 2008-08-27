@@ -10,7 +10,6 @@ import de.lmu.ifi.dbs.elki.algorithm.result.clustering.CASHResult;
 import de.lmu.ifi.dbs.elki.algorithm.result.clustering.SubspaceClusterMap;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.ParameterizationFunction;
-import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ObjectAndAssociations;
@@ -315,7 +314,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
      *
      * @param database the current database to run the CASH algorithm on
      * @param progress the progress object for verbose messages
-     * @return a mapping of subspace dimensionalites to clusters
+     * @return a mapping of subspace dimensionalities to clusters
      * @throws UnableToComplyException     if an error according to the database occurs
      * @throws ParameterException          if the parameter setting is wrong
      * @throws NonNumericFeaturesException if non numeric feature vectors are used
@@ -537,7 +536,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
      * @param dim      the dimensionality of the database
      * @param basis    the basis defining the subspace
      * @param ids      the ids for the new database
-     * @param database the database storing the paramterization functions
+     * @param database the database storing the parameterization functions
      * @return a dim-1 dimensional database where the objects are projected into the specified subspace
      * @throws UnableToComplyException if an error according to the database occurs
      */
@@ -568,12 +567,12 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
     }
 
     /**
-     * Projects the specified parametrization function into the subspace
+     * Projects the specified parameterization function into the subspace
      * described by the given basis.
      *
      * @param basis the basis defining he subspace
-     * @param f     the parametrization function to be projected
-     * @return the projected parametrization function
+     * @param f     the parameterization function to be projected
+     * @return the projected parameterization function
      */
     private ParameterizationFunction project(Matrix basis, ParameterizationFunction f) {
 //    Matrix m = new Matrix(new double[][]{f.getPointCoordinates()}).times(basis);
@@ -699,7 +698,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
     /**
      * Returns the set of ids belonging to the specified database.
      *
-     * @param database the database containing the parametrization functions.
+     * @param database the database containing the parameterization functions.
      * @return the set of ids belonging to the specified database
      */
     private Set<Integer> getDatabaseIDs(Database<ParameterizationFunction> database) {
@@ -711,12 +710,12 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
     }
 
     /**
-     * Determines the minimum and maximum function value of all parametrization functions
+     * Determines the minimum and maximum function value of all parameterization functions
      * stored in the specified database.
      *
-     * @param database       the database containing the parametrization functions.
+     * @param database       the database containing the parameterization functions.
      * @param dimensionality the dimensionality of the database
-     * @return an array containing the minimum and maximum function value of all parametrization functions
+     * @return an array containing the minimum and maximum function value of all parameterization functions
      *         stored in the specified database
      */
     private double[] determineMinMaxDistance(Database<ParameterizationFunction> database, int dimensionality) {
@@ -741,13 +740,13 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
     }
 
     /**
-     * Runs the derivator on the specified inerval and assigns all points
+     * Runs the derivator on the specified interval and assigns all points
      * having a distance less then the standard deviation of the derivator model
      * to the model to this model.
      *
-     * @param database the database containing the parametrization functions
+     * @param database the database containing the parameterization functions
      * @param interval the interval to build the model
-     * @param dim      the dimensinality of the database
+     * @param dim      the dimensionality of the database
      * @param ids      an empty set to assign the ids
      * @return a basis of the found subspace
      * @throws UnableToComplyException if an error according to the database occurs
@@ -758,29 +757,27 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
                                 CASHInterval interval,
                                 Set<Integer> ids) throws UnableToComplyException, ParameterException {
         // build database for derivator
-        Database<RealVector> derivatorDB = buildDerivatorDB(database, interval);
+        Database<DoubleVector> derivatorDB = buildDerivatorDB(database, interval);
 
-        DependencyDerivator derivator = new DependencyDerivator();
+        DependencyDerivator<DoubleVector, DoubleDistance> derivator = new DependencyDerivator<DoubleVector, DoubleDistance>();
         // set the parameters
         List<String> parameters = new ArrayList<String>();
         Util.addParameter(parameters, OptionID.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
         Util.addParameter(parameters, OptionID.EIGENPAIR_FILTER_N, Integer.toString(dim - 1));
         derivator.setParameters(parameters.toArray(new String[parameters.size()]));
 
-        //noinspection unchecked
         derivator.run(derivatorDB);
-        CorrelationAnalysisSolution model = derivator.getResult();
+        CorrelationAnalysisSolution<DoubleVector> model = derivator.getResult();
 
         Matrix weightMatrix = model.getSimilarityMatrix();
-        RealVector centroid = new DoubleVector(model.getCentroid());
-        //noinspection unchecked
-        DistanceFunction<RealVector, DoubleDistance> df = new WeightedDistanceFunction(weightMatrix);
+        DoubleVector centroid = new DoubleVector(model.getCentroid());
+        DistanceFunction<DoubleVector, DoubleDistance> df = new WeightedDistanceFunction<DoubleVector>(weightMatrix);
         DoubleDistance eps = df.valueOf("0.25");
 
         ids.addAll(interval.getIDs());
         for (Iterator<Integer> it = database.iterator(); it.hasNext();) {
             Integer id = it.next();
-            RealVector v = new DoubleVector(database.get(id).getRowVector().getRowPackedCopy());
+            DoubleVector v = new DoubleVector(database.get(id).getRowVector().getRowPackedCopy());
             DoubleDistance d = df.distance(v, centroid);
             if (d.compareTo(eps) < 0) {
                 ids.add(id);
@@ -795,26 +792,26 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
      * Builds a database for the derivator consisting of the ids
      * in the specified interval.
      *
-     * @param database the database storing the paramterization functions
+     * @param database the database storing the parameterization functions
      * @param interval the interval to build the database from
      * @return a database for the derivator consisting of the ids
      *         in the specified interval
      * @throws UnableToComplyException if an error according to the database occurs
      */
-    private Database<RealVector> buildDerivatorDB(Database<ParameterizationFunction> database,
+    private Database<DoubleVector> buildDerivatorDB(Database<ParameterizationFunction> database,
                                                   CASHInterval interval) throws UnableToComplyException {
         // build objects and associations
-        List<ObjectAndAssociations<RealVector>> oaas = new ArrayList<ObjectAndAssociations<RealVector>>(database.size());
+        List<ObjectAndAssociations<DoubleVector>> oaas = new ArrayList<ObjectAndAssociations<DoubleVector>>(database.size());
 
         for (Integer id : interval.getIDs()) {
             Associations associations = database.getAssociations(id);
-            RealVector v = new DoubleVector(database.get(id).getRowVector().getRowPackedCopy());
-            ObjectAndAssociations<RealVector> oaa = new ObjectAndAssociations<RealVector>(v, associations);
+            DoubleVector v = new DoubleVector(database.get(id).getRowVector().getRowPackedCopy());
+            ObjectAndAssociations<DoubleVector> oaa = new ObjectAndAssociations<DoubleVector>(v, associations);
             oaas.add(oaa);
         }
 
         // insert into db
-        Database<RealVector> result = new SequentialDatabase<RealVector>();
+        Database<DoubleVector> result = new SequentialDatabase<DoubleVector>();
         result.insert(oaas);
 
         if (debug) {

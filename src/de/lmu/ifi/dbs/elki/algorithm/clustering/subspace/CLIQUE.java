@@ -544,9 +544,10 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
      * @return the mean of the cover fractions, the first value is the mean of the
      *         selected set I, the second value is the mean of the pruned set P.
      */
+    @SuppressWarnings("unchecked")
     private int[][] computeMeans(SortedSet<CLIQUESubspace<V>> denseSubspaces) {
         int n = denseSubspaces.size() - 1;
-        CLIQUESubspace[] subspaces = denseSubspaces.toArray(new CLIQUESubspace[n + 1]);
+        CLIQUESubspace<V>[] subspaces = denseSubspaces.toArray(new CLIQUESubspace[n + 1]);
 
         int[] mi = new int[n + 1];
         int[] mp = new int[n + 1];
@@ -583,9 +584,10 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
      *         difference from the mean of the selected set I,
      *         the second value is the difference from the mean of the pruned set P.
      */
+    @SuppressWarnings("unchecked")
     private double[][] computeDiffs(SortedSet<CLIQUESubspace<V>> denseSubspaces, int[] mi, int[] mp) {
         int n = denseSubspaces.size() - 1;
-        CLIQUESubspace[] subspaces = denseSubspaces.toArray(new CLIQUESubspace[n + 1]);
+        CLIQUESubspace<V>[] subspaces = denseSubspaces.toArray(new CLIQUESubspace[n + 1]);
 
         double[] diff_mi = new double[n + 1];
         double[] diff_mp = new double[n + 1];

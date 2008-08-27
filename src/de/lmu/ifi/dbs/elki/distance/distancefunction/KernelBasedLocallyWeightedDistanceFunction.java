@@ -72,7 +72,7 @@ public class KernelBasedLocallyWeightedDistanceFunction<V extends RealVector<V, 
     public KernelBasedLocallyWeightedDistanceFunction() {
         super();
         //kernel function
-        ClassParameter<KernelFunction<V, DoubleDistance>> kernelFunctionClass = new ClassParameter(KERNEL_FUNCTION_CLASS_P, KERNEL_FUNCTION_CLASS_D, KernelFunction.class);
+        ClassParameter<KernelFunction<V, DoubleDistance>> kernelFunctionClass = new ClassParameter<KernelFunction<V, DoubleDistance>>(KERNEL_FUNCTION_CLASS_P, KERNEL_FUNCTION_CLASS_D, KernelFunction.class);
         kernelFunctionClass.setDefaultValue(DEFAULT_KERNEL_FUNCTION_CLASS);
         optionHandler.put(kernelFunctionClass);
     }
@@ -102,6 +102,7 @@ public class KernelBasedLocallyWeightedDistanceFunction<V extends RealVector<V, 
 
         // kernel function
         String kernelFunctionClass = (String) optionHandler.getOptionValue(KERNEL_FUNCTION_CLASS_P);
+        // FIXME: should kernelFunction be instantiated from kernelFunctionClass parameter?
         remainingParameters = kernelFunction.setParameters(remainingParameters);
         setParameters(args, remainingParameters);
 

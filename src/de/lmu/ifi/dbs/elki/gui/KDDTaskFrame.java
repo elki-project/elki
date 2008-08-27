@@ -178,6 +178,7 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
 
     }
 
+    @SuppressWarnings("unchecked")
     private void runKDDTask(String[] args) {
         task = new KDDTask();
         try {

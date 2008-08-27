@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
 
-import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ProjectedDBSCAN;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.preprocessing.PreDeConPreprocessor;
@@ -34,7 +33,7 @@ public class PreDeCon<V extends RealVector<V, ?>> extends ProjectedDBSCAN<V> {
                 "In Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04), Brighton, UK, 2004.");
     }
 
-    public Class<PreDeConPreprocessor> preprocessorClass() {
+    public Class<?> preprocessorClass() {
         return PreDeConPreprocessor.class;
     }
 

@@ -1,14 +1,21 @@
 package de.lmu.ifi.dbs.elki.algorithm.result.clustering;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator;
 import de.lmu.ifi.dbs.elki.algorithm.result.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.ParameterizationFunction;
-import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.elki.database.SequentialDatabase;
+import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
@@ -16,13 +23,6 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.varianceanalysis.FirstNEigenPairFilter;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Encapsulates a mapping of subspace dimensionalities to a list of set of ids forming a cluster
@@ -163,19 +163,17 @@ public class SubspaceClusterMap {
                                               Set<Integer> ids) {
         try {
             // build database for derivator
-            Database<RealVector> derivatorDB = buildDerivatorDB(database, ids);
+            Database<DoubleVector> derivatorDB = buildDerivatorDB(database, ids);
 
-            DependencyDerivator derivator = new DependencyDerivator();
+            DependencyDerivator<DoubleVector, DoubleDistance> derivator = new DependencyDerivator<DoubleVector, DoubleDistance>();
 
             List<String> parameters = new ArrayList<String>();
             Util.addParameter(parameters, OptionID.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
             Util.addParameter(parameters, OptionID.EIGENPAIR_FILTER_N, Integer.toString(dimensionality));
             derivator.setParameters(parameters.toArray(new String[parameters.size()]));
 
-            //noinspection unchecked
             derivator.run(derivatorDB);
-            CorrelationAnalysisSolution model = derivator.getResult();
-            // noinspection unchecked
+            CorrelationAnalysisSolution<DoubleVector> model = derivator.getResult();
             LinearEquationSystem les = model.getNormalizedLinearEquationSystem(null);
             return les;
         }
@@ -200,20 +198,20 @@ public class SubspaceClusterMap {
      *         in the specified interval
      * @throws UnableToComplyException if initialization of the database is not possible
      */
-    private Database<RealVector> buildDerivatorDB(Database<ParameterizationFunction> database,
+    private Database<DoubleVector> buildDerivatorDB(Database<ParameterizationFunction> database,
                                                   Set<Integer> ids) throws UnableToComplyException {
         // build objects and associations
-        List<ObjectAndAssociations<RealVector>> oaas = new ArrayList<ObjectAndAssociations<RealVector>>(database.size());
+        List<ObjectAndAssociations<DoubleVector>> oaas = new ArrayList<ObjectAndAssociations<DoubleVector>>(database.size());
 
         for (Integer id : ids) {
             Associations associations = database.getAssociations(id);
-            RealVector v = new DoubleVector(database.get(id).getRowVector().getRowPackedCopy());
-            ObjectAndAssociations<RealVector> oaa = new ObjectAndAssociations<RealVector>(v, associations);
+            DoubleVector v = new DoubleVector(database.get(id).getRowVector().getRowPackedCopy());
+            ObjectAndAssociations<DoubleVector> oaa = new ObjectAndAssociations<DoubleVector>(v, associations);
             oaas.add(oaa);
         }
 
         // insert into db
-        Database<RealVector> result = new SequentialDatabase<RealVector>();
+        Database<DoubleVector> result = new SequentialDatabase<DoubleVector>();
         result.insert(oaas);
 
         return result;

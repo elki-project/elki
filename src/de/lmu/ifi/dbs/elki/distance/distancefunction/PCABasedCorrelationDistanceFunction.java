@@ -22,6 +22,7 @@ import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredResult;
  * @param <P> the type of Preprocessor used
  * @param <D> the type of CorrelationDistance used
  */
+// TODO: can we spec D differently so we don't get the unchecked warnings below?
 public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P extends Preprocessor<V>, D extends CorrelationDistance<D>>
     extends AbstractCorrelationDistanceFunction<V, P, D> {
 
@@ -89,6 +90,7 @@ public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P e
      * @throws IllegalArgumentException if the given pattern is not compatible with the requirements
      *                                  of this DistanceFunction
      */
+    @SuppressWarnings("unchecked")
     public D valueOf(String pattern)
         throws IllegalArgumentException {
         if (pattern.equals(INFINITY_PATTERN)) {
@@ -96,7 +98,6 @@ public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P e
         }
         if (matches(pattern)) {
             String[] values = AbstractCorrelationDistanceFunction.SEPARATOR.split(pattern);
-            // noinspection unchecked
             return (D) new CorrelationDistance<D>(Integer.parseInt(values[0]), Double.parseDouble(values[1]));
         }
         else {
@@ -112,9 +113,9 @@ public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P e
      *
      * @return an infinite distance
      */
+    @SuppressWarnings("unchecked")
     public D infiniteDistance() {
-        // noinspection unchecked
-        return (D) new CorrelationDistance<D>(Integer.MAX_VALUE, Double.POSITIVE_INFINITY);
+      return (D) new CorrelationDistance<D>(Integer.MAX_VALUE, Double.POSITIVE_INFINITY);
     }
 
     /**
@@ -122,9 +123,9 @@ public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P e
      *
      * @return a null distance
      */
+    @SuppressWarnings("unchecked")
     public D nullDistance() {
-        // noinspection unchecked
-        return (D) new CorrelationDistance<D>(0, 0);
+      return (D) new CorrelationDistance<D>(0, 0);
     }
 
     /**
@@ -132,9 +133,9 @@ public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P e
      *
      * @return an undefined distance
      */
+    @SuppressWarnings("unchecked")
     public D undefinedDistance() {
-        // noinspection unchecked
-        return (D) new CorrelationDistance<D>(-1, Double.NaN);
+      return (D) new CorrelationDistance<D>(-1, Double.NaN);
     }
 
     @SuppressWarnings("unchecked")
@@ -289,15 +290,16 @@ public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P e
      * @return the super class for the preprocessor parameter,
      *         which is {@link HiCOPreprocessor}
      */
-    public Class<HiCOPreprocessor> getPreprocessorSuperClass() {
-        return HiCOPreprocessor.class;
+    @SuppressWarnings("unchecked")
+    public Class<? extends Preprocessor<?>> getPreprocessorSuperClass() {
+        return (Class<? extends Preprocessor<?>>) HiCOPreprocessor.class;
     }
 
     /**
      * @return the assocoiation ID for the association to be set by the preprocessor,
      *         which is {@link de.lmu.ifi.dbs.elki.database.AssociationID#LOCAL_PCA}
      */
-    public AssociationID getAssociationID() {
+    public AssociationID<?> getAssociationID() {
         return AssociationID.LOCAL_PCA;
     }
 }

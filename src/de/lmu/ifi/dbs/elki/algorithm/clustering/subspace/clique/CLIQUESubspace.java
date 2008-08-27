@@ -156,7 +156,7 @@ public class CLIQUESubspace<V extends RealVector<V, ?>> extends Subspace<V> impl
      * @param dim  the dimension
      * @return the left neighbor of the given unit in the specified dimension
      */
-    public CLIQUEUnit<V> leftNeighbour(CLIQUEUnit unit, Integer dim) {
+    public CLIQUEUnit<V> leftNeighbour(CLIQUEUnit<V> unit, Integer dim) {
         Interval i = unit.getInterval(dim);
 
         for (CLIQUEUnit<V> u : denseUnits) {
@@ -173,7 +173,7 @@ public class CLIQUESubspace<V extends RealVector<V, ?>> extends Subspace<V> impl
      * @param dim  the dimension
      * @return the right neighbor of the given unit in the specified dimension
      */
-    public CLIQUEUnit<V> rightNeighbour(CLIQUEUnit unit, Integer dim) {
+    public CLIQUEUnit<V> rightNeighbour(CLIQUEUnit<V> unit, Integer dim) {
         Interval i = unit.getInterval(dim);
 
         for (CLIQUEUnit<V> u : denseUnits) {

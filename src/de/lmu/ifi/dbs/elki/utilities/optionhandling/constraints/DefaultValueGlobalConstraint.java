@@ -26,7 +26,7 @@ public class DefaultValueGlobalConstraint<T extends Comparable<T>> extends Abstr
 
     /**
      * Creates a global parameter constraint for specifying the default value of a parameter
-     * dependent on the value of an another paramter.
+     * dependent on the value of an another parameter.
      *
      * @param needsValue the parameter whose default value is to be set
      * @param hasValue   the parameter providing the value

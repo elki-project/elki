@@ -6,7 +6,6 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
-import de.lmu.ifi.dbs.elki.index.tree.TreeIndex;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit;
@@ -237,15 +236,15 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
 
     D range = distanceFunction.valueOf(epsilon);
     final List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
-    final Heap<D, Identifiable> pq = new DefaultHeap<D, Identifiable>();
+    final Heap<D, Identifiable<?>> pq = new DefaultHeap<D, Identifiable<?>>();
 
     // push root
-    pq.addNode(new DefaultHeapNode<D, Identifiable>(distanceFunction.nullDistance(),
+    pq.addNode(new DefaultHeapNode<D, Identifiable<?>>(distanceFunction.nullDistance(),
                                                     new DefaultIdentifiable(getRootEntry().getID())));
 
     // search in tree
     while (!pq.isEmpty()) {
-      HeapNode<D, Identifiable> pqNode = pq.getMinNode();
+      HeapNode<D, Identifiable<?>> pqNode = pq.getMinNode();
       if (pqNode.getKey().compareTo(range) > 0) {
         break;
       }
@@ -261,7 +260,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
             result.add(new QueryResult<D>(entry.getID(), distance));
           }
           else {
-            pq.addNode(new DefaultHeapNode<D, Identifiable>(distance, new DefaultIdentifiable(entry.getID())));
+            pq.addNode(new DefaultHeapNode<D, Identifiable<?>>(distance, new DefaultIdentifiable(entry.getID())));
           }
         }
       }
@@ -497,6 +496,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
    * @param distanceFunction the distance function that computes the distances beween the objects
    * @param knnList          the knn list containing the result
    */
+  @SuppressWarnings("unchecked")
   protected <D extends Distance<D>> void doKNNQuery(Object object,
                                                     DistanceFunction<O, D> distanceFunction,
                                                     KNNList<D> knnList) {
@@ -507,15 +507,15 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
     SpatialDistanceFunction<O, D> df = (SpatialDistanceFunction<O, D>) distanceFunction;
 
     // variables
-    final Heap<D, Identifiable> pq = new DefaultHeap<D, Identifiable>();
+    final Heap<D, Identifiable<?>> pq = new DefaultHeap<D, Identifiable<?>>();
 
     // push root
-    pq.addNode(new DefaultHeapNode<D, Identifiable>(distanceFunction.nullDistance(), new DefaultIdentifiable(getRootEntry().getID())));
+    pq.addNode(new DefaultHeapNode<D, Identifiable<?>>(distanceFunction.nullDistance(), new DefaultIdentifiable(getRootEntry().getID())));
     D maxDist = distanceFunction.infiniteDistance();
 
     // search in tree
     while (!pq.isEmpty()) {
-      HeapNode<D, Identifiable> pqNode = pq.getMinNode();
+      HeapNode<D, Identifiable<?>> pqNode = pq.getMinNode();
 
       if (pqNode.getKey().compareTo(maxDist) > 0) {
         return;
@@ -526,7 +526,6 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
       if (node.isLeaf()) {
         for (int i = 0; i < node.getNumEntries(); i++) {
           E entry = node.getEntry(i);
-          //noinspection unchecked
           D distance = object instanceof Integer ?
                        df.minDist(entry.getMBR(), (Integer) object) :
                        df.minDist(entry.getMBR(), (O) object);
@@ -541,12 +540,11 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
       else {
         for (int i = 0; i < node.getNumEntries(); i++) {
           E entry = node.getEntry(i);
-          //noinspection unchecked
           D distance = object instanceof Integer ?
                        df.minDist(entry.getMBR(), (Integer) object) :
                        df.minDist(entry.getMBR(), (O) object);
           if (distance.compareTo(maxDist) <= 0) {
-            pq.addNode(new DefaultHeapNode<D, Identifiable>(distance, new DefaultIdentifiable(entry.getID())));
+            pq.addNode(new DefaultHeapNode<D, Identifiable<?>>(distance, new DefaultIdentifiable(entry.getID())));
           }
         }
       }
@@ -636,6 +634,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
    * @param objects the objects to be inserted
    * @return the array of leaf nodes containing the objects
    */
+  @SuppressWarnings("unchecked")
   protected List<N> createLeafNodes(List<O> objects) {
     int minEntries = leafMinimum;
     int maxEntries = leafCapacity - 1;
@@ -658,7 +657,6 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
 
       // insert data
       for (SpatialObject o : partition) {
-        //noinspection unchecked
         leafNode.addLeafEntry(createNewLeafEntry((O) o));
       }
 
@@ -1015,10 +1013,10 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
    * @param level the level of the node
    * @param path  the path to the node
    */
+  @SuppressWarnings("unchecked")
   private void reInsert(N node, int level, TreeIndexPath<E> path) {
     HyperBoundingBox mbr = node.mbr();
     EuclideanDistanceFunction<O> distFunction = new EuclideanDistanceFunction<O>();
-    //noinspection unchecked
     DistanceEntry<DoubleDistance, E>[] reInsertEntries = new DistanceEntry[node.getNumEntries()];
 
     // compute the center distances of entries to the node and sort it

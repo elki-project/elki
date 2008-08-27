@@ -121,12 +121,12 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
   /**
    * The association id to associate the COP correlation solution
    */
-  public static final AssociationID<CorrelationAnalysisSolution> COP_SOL = new AssociationID<CorrelationAnalysisSolution>("cop sol", CorrelationAnalysisSolution.class);
+  public static final AssociationID<CorrelationAnalysisSolution<?>> COP_SOL = new AssociationID<CorrelationAnalysisSolution<?>>("cop sol", CorrelationAnalysisSolution.class);
   
   /**
    * The association id to associate the Multivariate Correlation Outlier Probability of an object
    */
-  public static final AssociationID<MultivariateModel> LOCAL_MODEL = new AssociationID<MultivariateModel>("multivariate model", MultivariateModel.class);
+  public static final AssociationID<MultivariateModel<?>> LOCAL_MODEL = new AssociationID<MultivariateModel<?>>("multivariate model", MultivariateModel.class);
   
   /**
    * The association id to associate the Multivariate Correlation Outlier Probability of an object

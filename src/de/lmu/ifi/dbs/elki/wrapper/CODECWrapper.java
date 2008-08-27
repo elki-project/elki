@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.CoDeC;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS;
@@ -9,12 +10,12 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunc
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.DefaultValueGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-
-import java.util.List;
 
 /**
  * Wrapper class for the CoDeC algorithm. Performs an attribute wise
@@ -82,8 +83,7 @@ public class CODECWrapper extends NormalizationWrapper {
         addOption(K_PARAM);
 
         // global constraint k <-> minpts
-        // noinspection unchecked
-        GlobalParameterConstraint gpc = new DefaultValueGlobalConstraint(K_PARAM, MINPTS_PARAM);
+        GlobalParameterConstraint gpc = new DefaultValueGlobalConstraint<Integer>(K_PARAM, MINPTS_PARAM);
         optionHandler.setGlobalParameterConstraint(gpc);
     }
 

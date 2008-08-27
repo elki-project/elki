@@ -139,15 +139,16 @@ public class ERiCDistanceFunction<V extends RealVector<V, ?>, P extends Preproce
      * @return the super class for the preprocessor parameter,
      *         which is {@link de.lmu.ifi.dbs.elki.preprocessing.Preprocessor}
      */
-    public Class<Preprocessor> getPreprocessorSuperClass() {
-        return Preprocessor.class;
+    @SuppressWarnings("unchecked")
+    public Class<? extends Preprocessor<?>> getPreprocessorSuperClass() {
+        return (Class<? extends Preprocessor<?>>) Preprocessor.class;
     }
 
     /**
      * @return the assocoiation ID for the association to be set by the preprocessor,
      *         which is {@link AssociationID#LOCAL_PCA}
      */
-    public AssociationID getAssociationID() {
+    public AssociationID<?> getAssociationID() {
         return AssociationID.LOCAL_PCA;
     }
 

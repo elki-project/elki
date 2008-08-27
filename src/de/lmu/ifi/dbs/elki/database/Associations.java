@@ -16,18 +16,16 @@ public class Associations extends AbstractLoggable {
   /**
    * Holds the objects associated under given association ids.
    */
-    @SuppressWarnings("unchecked")
-    private Map<AssociationID, Object> associations;
+    private Map<AssociationID<?>, Object> associations;
 
     /**
      * Provides an Associations object ready to set and get
      * Objects for association.
      *
      */
-    @SuppressWarnings("unchecked")
     public Associations() {
         super(LoggingConfiguration.DEBUG);
-        associations = new Hashtable<AssociationID, Object>();
+        associations = new Hashtable<AssociationID<?>, Object>();
     }
 
     /**
@@ -61,8 +59,7 @@ public class Associations extends AbstractLoggable {
      * 
      * @return the set of all association ids pointing to objects within this Associations
      */
-    @SuppressWarnings("unchecked")
-    public Set<AssociationID> keySet() {
+    public Set<AssociationID<?>> keySet() {
         return this.associations.keySet();
     }
 

@@ -3,10 +3,13 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.MultiRepresentedObject;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.parser.Parser;
+import de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassListParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 
@@ -36,17 +39,20 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
   public static final String DEFAULT_DISTANCE_FUNCTION = EuclideanDistanceFunction.class.getName();
 
   /**
-   * Parameter for distance functions.
+   * OptionID for {@link #DISTANCE_FUNCTIONS_PARAM}
    */
-  public static final String DISTANCE_FUNCTIONS_P = "distancefunctions";
+  public static final OptionID DISTANCE_FUNCTIONS_ID = OptionID.getOrCreateOptionID(
+      "distancefunctions",
+      "A comma separated list of the distance functions to " +
+      "determine the distance between objects within one representation."
+  );
 
   /**
-   * Description for parameter distance functions.
+   * Parameter to specify the distance functions
    */
-  public static final String DISTANCE_FUNCTIONS_D = "A comma separated list of the distance functions to " +
-                                                    "determine the distance between objects within one representation " +
-                                                    Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) +
-                                                    ". Default: " + DEFAULT_DISTANCE_FUNCTION;
+  private final ClassListParameter<DistanceFunction<O, D>> DISTANCE_FUNCTIONS_PARAM =
+    new ClassListParameter<DistanceFunction<O, D>>(
+      DISTANCE_FUNCTIONS_ID, DistanceFunction.class, true);
 
   /**
    * The index of the current representation.
@@ -70,8 +76,7 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
   public RepresentationSelectingDistanceFunction() {
     super();
     // TODO default values!!!
-    // parameter eigentlich liste, bei default aber nur eine DistanceFunction!!
-    optionHandler.put(new ClassListParameter(DISTANCE_FUNCTIONS_P, DISTANCE_FUNCTIONS_D, DistanceFunction.class));
+    addOption(DISTANCE_FUNCTIONS_PARAM);
   }
 
   /**
@@ -116,23 +121,10 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
     String[] remainingParameters = super.setParameters(args);
 
     // distance functions
-    if (optionHandler.isSet(DISTANCE_FUNCTIONS_P)) {
-      List<String> distanceFunctions = (List<String>)optionHandler.getOptionValue(DISTANCE_FUNCTIONS_P);
-//      String[] distanceFunctionsClasses = SPLIT.split(distanceFunctions);
-      if (distanceFunctions.isEmpty()) {
-        throw new WrongParameterValueException(DISTANCE_FUNCTIONS_P, distanceFunctions.toString(), DISTANCE_FUNCTIONS_D);
-      }
-      this.distanceFunctions = new ArrayList<DistanceFunction<O, D>>(distanceFunctions.size());
-      for (String distanceFunctionClass : distanceFunctions) {
-        try {
-            // todo
-          this.distanceFunctions.add(Util.instantiate(DistanceFunction.class, distanceFunctionClass));
-        }
-        catch (UnableToComplyException e) {
-          throw new WrongParameterValueException(DISTANCE_FUNCTIONS_P, distanceFunctions.toString(), DISTANCE_FUNCTIONS_D, e);
-        }
-      }
+    if (DISTANCE_FUNCTIONS_PARAM.isSet()) {
+      distanceFunctions = DISTANCE_FUNCTIONS_PARAM.instantiateClasses();
 
+      // TODO: do we still need this, or will it be done automatically?
       for (DistanceFunction<O, D> distanceFunction : this.distanceFunctions) {
         remainingParameters = distanceFunction.setParameters(remainingParameters);
       }
@@ -145,7 +137,7 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
         defaultDistanceFunction = Util.instantiate(DistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
       }
       catch (UnableToComplyException e) {
-        throw new WrongParameterValueException(DISTANCE_FUNCTIONS_P, DEFAULT_DISTANCE_FUNCTION, DISTANCE_FUNCTIONS_D, e);
+        throw new WrongParameterValueException(DISTANCE_FUNCTIONS_PARAM, DEFAULT_DISTANCE_FUNCTION, e);
       }
       remainingParameters = defaultDistanceFunction.setParameters(remainingParameters);
       setParameters(args, remainingParameters);

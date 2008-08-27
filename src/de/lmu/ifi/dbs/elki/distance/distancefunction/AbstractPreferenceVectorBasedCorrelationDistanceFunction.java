@@ -220,7 +220,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
      * @return the assocoiation ID for the association to be set by the preprocessor,
      *         which is {@link AssociationID#PREFERENCE_VECTOR}
      */
-    public final AssociationID getAssociationID() {
+    public final AssociationID<?> getAssociationID() {
         return AssociationID.PREFERENCE_VECTOR;
     }
 
@@ -228,8 +228,9 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
      * @return the super class for the preprocessor parameter,
      *         which is {@link PreferenceVectorPreprocessor}
      */
-    public final Class<PreferenceVectorPreprocessor> getPreprocessorSuperClass() {
-        return PreferenceVectorPreprocessor.class;
+    @SuppressWarnings("unchecked")
+    public final Class<? extends Preprocessor<?>> getPreprocessorSuperClass() {
+        return (Class<? extends Preprocessor<?>>) PreferenceVectorPreprocessor.class;
     }
 
     public final String getPreprocessorDescription() {
