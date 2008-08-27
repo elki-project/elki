@@ -207,8 +207,11 @@ public class CustomizerPanel extends JDialog implements
         try {
             if (editObject.isValid()) {
                 this.parameterValuesAsString = editObject.parameterValuesAsString();
+                return true;
+            } else {
+              KDDDialog.showMessage(owner, "Invalid parameters specified or required parameters are missing.");
+              return false;
             }
-            return true;
         }
         catch (ParameterException e) {
             KDDDialog.showParameterMessage(owner, e.getMessage(), e);

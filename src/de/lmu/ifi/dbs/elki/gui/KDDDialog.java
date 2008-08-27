@@ -131,9 +131,11 @@ public class KDDDialog extends JDialog implements ActionListener {
 			base.add(detail, gbc);
 
 			StringBuffer buffer = new StringBuffer();
-
-			for (StackTraceElement el : exception.getStackTrace()) {
-				buffer.append(el.toString() + "\n");
+			
+			if (exception != null) {
+			  for (StackTraceElement el : exception.getStackTrace()) {
+			    buffer.append(el.toString() + "\n");
+			  }
 			}
 
 			JTextArea detailArea = new JTextArea(buffer.toString());

@@ -284,7 +284,10 @@ public class EditObject {
 				}
 				if (o instanceof Parameter) {
 					// bob.append(" " + o.getValue().toString());
-					p.add(optionToValue.get(o.getName()));
+          // p.add(optionToValue.get(o.getName()));
+				  String[] temp = optionToValue.get(o.getName()).split(" ");
+				  for (String e : temp)
+				    p.add(e);
 				}
 			}
 		}

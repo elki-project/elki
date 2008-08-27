@@ -130,7 +130,7 @@ public class PopUpTree extends JPopupMenu {
 
                 if (((LeafObject) current.getUserObject()).nodePath().equals(preSelectedLeaf)) {
                     tree.setSelectionPath(path);
-
+                    tree.scrollPathToVisible(path);
                 }
             }
         }
@@ -143,7 +143,7 @@ public class PopUpTree extends JPopupMenu {
 
         JScrollPane scroller = new JScrollPane(treePane);
 
-        scroller.setPreferredSize(new Dimension(230, 180));
+        scroller.setPreferredSize(new Dimension(430, 280));
 
         tree.scrollRowToVisible(row);
         return scroller;

@@ -1,11 +1,13 @@
 package de.lmu.ifi.dbs.elki.gui;
 
+import de.lmu.ifi.dbs.elki.KDDTask;
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.properties.PropertyName;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 import javax.swing.*;
@@ -157,19 +159,21 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
 
     public void propertyChange(PropertyChangeEvent evt) {
 
-        if (evt.getPropertyName().equals(KDDTask.DATABASE_CONNECTION_P)) {
-            if (evt.getSource() instanceof CustomizerPanel) {
-                dbConnection = ((CustomizerPanel) evt.getSource()).parameterValuesToArray();
+        if (evt.getPropertyName().equals(OptionID.DATABASE_CONNECTION.getName())) {
+            if (evt.getSource() instanceof SelectionPanel) {
+                dbConnection = ((SelectionPanel) evt.getSource()).parameterValuesToArray();
+                if (dbConnection == null) dbConnection = new String[0];
             }
             else {
-                KDDDialog.showMessage(this, "Error while fetching parameters for KDD TaskFrame, exit.");
+                KDDDialog.showMessage(this, "Error while fetching parameters for KDD TaskFrame, exit. Got event from: " + evt.getSource().toString());
             }
 //			dbConnection = ((String) evt.getNewValue()).split(" ");
             algorithmPanel.setEnabled(true);
 
         }
-        else if (evt.getPropertyName().equals(KDDTask.ALGORITHM_P)) {
+        else if (evt.getPropertyName().equals(OptionID.ALGORITHM.getName())) {
             algorithm = ((String) evt.getNewValue()).split(" ");
+            if (algorithm == null) algorithm = new String[0];
             completeParameters = new String[dbConnection.length + algorithm.length];
             System.arraycopy(algorithm, 0, completeParameters, 0, algorithm.length);
             System.arraycopy(dbConnection, 0, completeParameters, algorithm.length, dbConnection.length);
@@ -201,12 +205,12 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
         dbConnectionPanel = new SelectionPanel("Select a database connection", "Database Connection", FileBasedDatabaseConnection.class.getName(), DatabaseConnection.class);
         dbConnectionPanel.select.setEnabled(true);
         dbConnectionPanel.addPropertyChangeListener(this);
-        dbConnectionPanel.propName = KDDTask.DATABASE_CONNECTION_P;
+        dbConnectionPanel.propName = OptionID.DATABASE_CONNECTION.getName();
 
         // algorithm panel
         algorithmPanel = new SelectionPanel("Select an algorithm", "Algorithm", "", Algorithm.class);
         algorithmPanel.addPropertyChangeListener(this);
-        algorithmPanel.propName = KDDTask.ALGORITHM_P;
+        algorithmPanel.propName = OptionID.ALGORITHM.getName();
         algorithmPanel.setEnabled(false);
 
         gbc.insets = new Insets(0, 10, 10, 10);
@@ -317,7 +321,6 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
     }
 
     private void updateParameterField() {
-        parameterField.setText(null);
         parameterField.setText(printArray(completeParameters));
         parameterField.setCaretPosition(0);
         runPanel.revalidate();
@@ -329,9 +332,9 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
     private String printArray(String[] args) {
         StringBuilder bob = new StringBuilder();
         int i = 0;
-        for (String s : completeParameters) {
+        for (String s : args) {
             bob.append(s);
-            if (i != completeParameters.length - 1) {
+            if (i != args.length - 1) {
                 bob.append(" ");
             }
         }
@@ -367,7 +370,6 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
 
     private class SelectionPanel extends JPanel implements PopUpTreeListener,
         EditObjectChangeListener {
-
 
         /**
          *
@@ -466,7 +468,7 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
             textField = new JTextField(20) {
 
                 public void setText(String text) {
-                    if (text != null || !(text.equals(""))) {
+                    if (text != null && !(text.equals(""))) {
                         super.setText(text);
                         this.setToolTipText("Click for details");
                         this.setCaretPosition(0);
@@ -521,6 +523,10 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
             this.nameLabel.setEnabled(e);
             this.textField.setEnabled(e);
             this.select.setEnabled(e);
+        }
+        
+        public String[] parameterValuesToArray() {
+          return editObjectCustomizer.parameterValuesToArray();
         }
     }
 }

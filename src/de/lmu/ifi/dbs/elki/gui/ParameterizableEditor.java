@@ -46,7 +46,7 @@ public class ParameterizableEditor extends ParameterEditor implements PopUpTreeL
         else {
             treeMenu = new PopUpTree(getPropertyFileInfo(option.getRestrictionClass()), "");
         }
-
+        
         treeMenu.addPopUpTreeListener(this);
 //		createInputField();
 
@@ -261,7 +261,7 @@ public class ParameterizableEditor extends ParameterEditor implements PopUpTreeL
         catch (ClassNotFoundException e) {
             KDDDialog.showMessage(owner, e.getMessage());
         }
-        if (parameters.isEmpty()) {
+        if (parameters == null || parameters.isEmpty()) {
             setValue(editObjectName);
         }
         else {
