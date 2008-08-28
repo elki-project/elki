@@ -2,8 +2,6 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 
-import java.util.List;
-
 /**
  * Parameter class for a parameter specifying a long value.
  *
@@ -32,43 +30,15 @@ public class LongParameter extends NumberParameter<Long> {
     }
 
     /**
-     * Constructs a long parameter with the given name and description.
+     * Constructs a long parameter with the given optionID,
+     * parameter constraint and default value.
      *
-     * @param name        the parameter name
-     * @param description the parameter description
-     * @deprecated
+     * @param optionID   the unique OptionID for this parameter
+     * @param constraint the parameter constraint for this long parameter
+     * @param def        the default value
      */
-    @Deprecated
-    public LongParameter(String name, String description) {
-        super(name, description);
-    }
-
-    /**
-     * Constructs a long parameter with the given name, description, and parameter constraint.
-     *
-     * @param name        the parameter name
-     * @param description the parameter description
-     * @param cons        the parameter constraint for this long parameter
-     * @deprecated
-     */
-    @Deprecated
-    public LongParameter(String name, String description, ParameterConstraint<Number> cons) {
-        this(name, description);
-        addConstraint(cons);
-    }
-
-    /**
-     * Constructs a long parameter with the given name, description, and a list of parameter constraints.
-     *
-     * @param name        the parameter name
-     * @param description the parameter description
-     * @param cons        a list of parameter constraints for this long parameter
-     * @deprecated
-     */
-    @Deprecated
-    public LongParameter(String name, String description, List<ParameterConstraint<Number>> cons) {
-        this(name, description);
-        addConstraintList(cons);
+    public LongParameter(OptionID optionID, ParameterConstraint<Number> constraint, long def) {
+        super(optionID, constraint, true, def);
     }
 
     public boolean isValid(String value) throws ParameterException {

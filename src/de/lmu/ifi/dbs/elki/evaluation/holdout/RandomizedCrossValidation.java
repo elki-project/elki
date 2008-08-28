@@ -1,17 +1,18 @@
 package de.lmu.ifi.dbs.elki.evaluation.holdout;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
 /**
  * RandomizedCrossValidationHoldout provides a set of partitions of a database
@@ -21,10 +22,6 @@ import java.util.Map;
  */
 public class RandomizedCrossValidation<O extends DatabaseObject, L extends ClassLabel<L>> extends
     RandomizedHoldout<O, L> {
-    /**
-     * Parameter n for the number of folds.
-     */
-    public static final String N_P = "nfold";
 
     /**
      * Default number of folds.
@@ -32,10 +29,16 @@ public class RandomizedCrossValidation<O extends DatabaseObject, L extends Class
     public static final int N_DEFAULT = 10;
 
     /**
-     * Description of the parameter n.
+     * OptionID for {@link #NFOLD_PARAM}
      */
-    public static final String N_D = "number of folds for cross-validation";
+    public static final OptionID NFOLD_ID = OptionID.getOrCreateOptionID(
+        "nfold", "positive number of folds for cross-validation");
 
+    /**
+     * Parameter for number of folds.
+     */
+    private final IntParameter NFOLD_PARAM = new IntParameter(NFOLD_ID, new GreaterConstraint(0), N_DEFAULT);
+    
     /**
      * Holds the number of folds.
      */
@@ -47,9 +50,7 @@ public class RandomizedCrossValidation<O extends DatabaseObject, L extends Class
      */
     public RandomizedCrossValidation() {
         super();
-        IntParameter n = new IntParameter(N_P, N_D, new GreaterEqualConstraint(1));
-        n.setDefaultValue(N_DEFAULT);
-        optionHandler.put(n);
+        addOption(NFOLD_PARAM);
     }
 
     /**
@@ -59,8 +60,7 @@ public class RandomizedCrossValidation<O extends DatabaseObject, L extends Class
     public TrainingAndTestSet<O, L>[] partition(Database<O> database) {
         this.database = database;
         setClassLabels(database);
-        // noinspection unchecked
-        TrainingAndTestSet<O, L>[] partitions = new TrainingAndTestSet[nfold];
+        TrainingAndTestSet<O, L>[] partitions = TrainingAndTestSet.newArray(nfold);
         List<Integer> ids = database.getIDs();
         for (int i = 0; i < nfold; i++) {
             List<Integer> training = new ArrayList<Integer>();
@@ -100,7 +100,7 @@ public class RandomizedCrossValidation<O extends DatabaseObject, L extends Class
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
-        nfold = (Integer) optionHandler.getOptionValue(N_P);
+        nfold = NFOLD_PARAM.getValue();
 
         return remainingParameters;
     }

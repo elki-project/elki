@@ -12,7 +12,7 @@ import java.util.Map;
 
 /**
  * A leave-one-out-holdout is to provide a set of partitions of a database
- * where each instanceis once hold out as a test instance while the respectively remaining
+ * where each instances once hold out as a test instance while the respectively remaining
  * instances are training instances.
  *
  * @author Arthur Zimek
@@ -29,14 +29,14 @@ public class LeaveOneOut<O extends DatabaseObject, L extends ClassLabel<L>> exte
 
     /**
      * Provides a set of partitions of the database, where each element is once
-     * hold out as test instance, the remainng instances are given in the
+     * hold out as test instance, the remaining instances are given in the
      * training set.
      */
     public TrainingAndTestSet<O, L>[] partition(Database<O> database) {
         this.database = database;
         setClassLabels(database);
         int size = database.size();
-        TrainingAndTestSet<O, L>[] partitions = new TrainingAndTestSet[size];
+        TrainingAndTestSet<O, L>[] partitions = TrainingAndTestSet.newArray(size);
         List<Integer> ids = database.getIDs();
         for (int i = 0; i < size; i++) {
             Map<Integer, List<Integer>> partition = new HashMap<Integer, List<Integer>>();

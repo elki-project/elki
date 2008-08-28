@@ -1,32 +1,31 @@
 package de.lmu.ifi.dbs.elki.evaluation.holdout;
 
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.properties.Properties;
-import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
 
 /**
- * Puts all data into the training set and requests a testset via a database connection.
+ * Puts all data into the training set and requests a test set via a database connection.
  *
  * @author Arthur Zimek
  */
 public class ProvidedTestSet<O extends DatabaseObject, L extends ClassLabel<L>> extends AbstractHoldout<O, L> {
 
     /**
-     * Holds the testset.
+     * Holds the test set.
      */
     private Database<O> testset;
 
@@ -36,29 +35,27 @@ public class ProvidedTestSet<O extends DatabaseObject, L extends ClassLabel<L>> 
     private static final String DEFAULT_DATABASE_CONNECTION = FileBasedDatabaseConnection.class.getName();
 
     /**
-     * The parameter for the database connection to the testset.
+     * OptionID for {@link #TESTSET_DATABASE_CONNECTION_PARAM}
      */
-    public static final String TESTSET_DATABASE_CONNECTION_P = "testdbc";
-
-    /**
-     * The description for parameter testdbc.
-     */
-    public static final String TESTSET_DATABASE_CONNECTION_D = "<class>connection to testset database " +
+    public static final OptionID TESTSET_DATABASE_CONNECTION_ID = OptionID.getOrCreateOptionID(
+        "testdbc", "connection to testset database " +
         Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DatabaseConnection.class) +
-        ". Default: " + DEFAULT_DATABASE_CONNECTION;
+        ".");
 
     /**
-     * Holds the database connection to testset.
+     * Parameter for test set database connection
+     */
+    private final ClassParameter<DatabaseConnection<O>> TESTSET_DATABASE_CONNECTION_PARAM =
+      new ClassParameter<DatabaseConnection<O>>(TESTSET_DATABASE_CONNECTION_ID, DatabaseConnection.class, DEFAULT_DATABASE_CONNECTION);
+    
+    /**
+     * Holds the database connection to test set.
      */
     private DatabaseConnection<O> dbc;
 
-
     public ProvidedTestSet() {
         super();
-
-        ClassParameter<DatabaseConnection<O>> dbCon = new ClassParameter<DatabaseConnection<O>>(TESTSET_DATABASE_CONNECTION_P, TESTSET_DATABASE_CONNECTION_D, DatabaseConnection.class);
-        dbCon.setDefaultValue(DEFAULT_DATABASE_CONNECTION);
-        optionHandler.put(dbCon);
+        addOption(TESTSET_DATABASE_CONNECTION_PARAM);
     }
 
     /**
@@ -91,18 +88,10 @@ public class ProvidedTestSet<O extends DatabaseObject, L extends ClassLabel<L>> 
         return description.toString();
     }
 
-    @SuppressWarnings("unchecked")
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
-        String dbcClassName = (String) optionHandler.getOptionValue(TESTSET_DATABASE_CONNECTION_P);
-        try {
-            // todo
-            dbc = Util.instantiate(DatabaseConnection.class, dbcClassName);
-        }
-        catch (UnableToComplyException e) {
-            throw new WrongParameterValueException(TESTSET_DATABASE_CONNECTION_P, dbcClassName, TESTSET_DATABASE_CONNECTION_D);
-        }
+        dbc = TESTSET_DATABASE_CONNECTION_PARAM.instantiateClass();
 
         remainingParameters = dbc.setParameters(remainingParameters);
         testset = dbc.getDatabase(null);
