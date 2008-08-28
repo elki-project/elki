@@ -195,7 +195,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
             Integer[][] hardClustering = hardClustering(database);
             for (int i = 0; i < k; i++) {
                 for (Integer id : hardClustering[i]) {
-                    double clusterProbability = ((List<Double>) database.getAssociation(AssociationID.PROBABILITY_CLUSTER_I_GIVEN_X, id)).get(i);
+                    double clusterProbability = database.getAssociation(AssociationID.PROBABILITY_CLUSTER_I_GIVEN_X, id).get(i);
                     sumOfClusterProbabilities[i] += clusterProbability;
                     V summand = database.get(id).multiplicate(clusterProbability);
                     V currentMeanSum = meanSums.get(i).plus(summand);
@@ -298,7 +298,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
         }
         for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
             Integer id = iter.next();
-            List<Double> clusterProbabilities = (List<Double>) database.getAssociation(AssociationID.PROBABILITY_CLUSTER_I_GIVEN_X, id);
+            List<Double> clusterProbabilities = database.getAssociation(AssociationID.PROBABILITY_CLUSTER_I_GIVEN_X, id);
             int maxIndex = 0;
             double currentMax = 0.0;
             for (int i = 0; i < k; i++) {

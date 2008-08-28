@@ -1,21 +1,17 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
+import java.util.List;
+import java.util.regex.Pattern;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.MultiRepresentedObject;
 import de.lmu.ifi.dbs.elki.distance.Distance;
-import de.lmu.ifi.dbs.elki.parser.Parser;
-import de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser;
-import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * Distance function for multirepresented objects that selects one representation and
@@ -71,7 +67,7 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
 
   /**
    * Provides a Distance function for multirepresented objects that selects one
-   * represenation and computes the distances only within the selected representation.
+   * representation and computes the distances only within the selected representation.
    */
   public RepresentationSelectingDistanceFunction() {
     super();
@@ -116,7 +112,6 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
            "computes the distances only within the selected representation.";
   }
 
-  @SuppressWarnings("unchecked")
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
@@ -134,7 +129,7 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
     else {
       try {
           // todo
-        defaultDistanceFunction = Util.instantiate(DistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
+        defaultDistanceFunction = Util.instantiateGenerics(DistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
       }
       catch (UnableToComplyException e) {
         throw new WrongParameterValueException(DISTANCE_FUNCTIONS_PARAM, DEFAULT_DISTANCE_FUNCTION, e);

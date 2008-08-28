@@ -90,7 +90,6 @@ public class ArffFileParser<O extends DatabaseObject & WekaObject<W>, W extends 
      * {@link #DEFAULT_PARSER}.
      * 
      */
-    @SuppressWarnings("unchecked")
     @Override
     public String[] setParameters(String[] args) throws ParameterException
     {
@@ -100,8 +99,7 @@ public class ArffFileParser<O extends DatabaseObject & WekaObject<W>, W extends 
             String parserClass = getParameterValue(BASE_PARSER_PARAM);
             try
             {
-                // todo
-                this.parser = Util.instantiate(Parser.class,parserClass);
+                this.parser = Util.instantiateGenerics(Parser.class,parserClass);
             }
             catch(UnableToComplyException e)
             {
@@ -113,7 +111,7 @@ public class ArffFileParser<O extends DatabaseObject & WekaObject<W>, W extends 
             try
             {
                 // todo
-                this.parser = Util.instantiate(Parser.class,DEFAULT_PARSER.getClass().getCanonicalName());
+                this.parser = Util.instantiateGenerics(Parser.class,DEFAULT_PARSER.getClass().getCanonicalName());
             }
             catch(UnableToComplyException e)
             {

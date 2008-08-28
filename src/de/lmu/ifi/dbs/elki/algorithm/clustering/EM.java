@@ -120,7 +120,6 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impleme
      * exhibiting the highest probability to belong to this cluster. But still, the database objects hold
      * associated the complete probability-vector for all models.
      */
-    @SuppressWarnings("unchecked")
     @Override
     protected void runInTime(Database<V> database) throws IllegalStateException {
         if (database.size() == 0) {

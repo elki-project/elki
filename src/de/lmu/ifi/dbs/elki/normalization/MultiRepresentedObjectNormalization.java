@@ -179,14 +179,14 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
    * 
    * @param numberOfRepresentations
    */
-  @SuppressWarnings("unchecked")
   private void initDefaultNormalizations(int numberOfRepresentations) {
     normalizations = new ArrayList<Normalization<O>>(
     numberOfRepresentations);
     for (int r = 0; r < numberOfRepresentations; r++) {
       try {
-        normalizations.add(Util.instantiate(Normalization.class,
-                                            DEFAULT_NORMALIZATION));
+        Normalization<O> norm = Util.instantiateGenerics(Normalization.class,
+            DEFAULT_NORMALIZATION);
+        normalizations.add(norm);
       }
       catch (UnableToComplyException e) {
         throw new RuntimeException("This should never happen!");
@@ -195,7 +195,7 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
   }
 
   /**
-   * Transforms a set of feature vectores to the original attribute ranges.
+   * Transforms a set of feature vectors to the original attribute ranges.
    *
    * @param featureVectors a set of feature vectors to be transformed into original space
    * @return a set of feature vectors transformed into original space

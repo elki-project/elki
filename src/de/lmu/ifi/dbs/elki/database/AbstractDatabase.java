@@ -291,7 +291,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     public Map<Integer, Database<O>> partition(Map<Integer, List<Integer>> partitions,
                                                Class<? extends Database<O>> dbClass, String[] dbParameters) throws UnableToComplyException {
         if (dbClass == null) {
-            dbClass = (Class<? extends AbstractDatabase<O>>) this.getClass();
+            dbClass = (Class<? extends Database<O>>) this.getClass();
             dbParameters = getParameters();
         }
 
@@ -307,8 +307,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
 
             Database<O> database;
             try {
-                //noinspection unchecked
-                database = Util.instantiate(Database.class, dbClass.getName());
+                database = Util.instantiateGenerics(Database.class, dbClass.getName());
                 database.setParameters(dbParameters);
                 database.insert(objectAndAssociationsList);
                 databases.put(partitionID, database);

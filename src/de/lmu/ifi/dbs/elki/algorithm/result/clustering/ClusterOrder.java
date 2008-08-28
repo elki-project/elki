@@ -16,7 +16,6 @@ import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -142,7 +141,9 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>>
      */
     @Override
     public final String toString() {
-        return Arrays.asList(co).toString();
+        //return Arrays.asList(co).toString();
+        // FIXME: does this produce the same result? co already should be an ArrayList?
+        return co.toString();
     }
 
     /**
@@ -152,6 +153,7 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>>
      * @return <code>true</code> if this object has the same attribute values
      *         as the o argument; <code>false</code> otherwise.
      */
+    @SuppressWarnings("unchecked")
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -159,7 +161,6 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>>
         if (o == null || getClass() != o.getClass())
             return false;
 
-        // noinspection unchecked
         final ClusterOrder<O, D> other = (ClusterOrder<O, D>) o;
         if (this.size() != other.size()) {
             return false;

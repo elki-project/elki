@@ -242,7 +242,6 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
      * and adds to the returned attribute settings the attribute settings of
      * the {@link #preprocessor}, the {@link #partitionAlgorithm}, and {@link #partitionDatabase}.
      */
-    @SuppressWarnings("unchecked")
     @Override
     public List<AttributeSettings> getAttributeSettings() {
         List<AttributeSettings> result = super.getAttributeSettings();
@@ -251,7 +250,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
         result.addAll(partitionAlgorithm.getAttributeSettings());
         if (optionHandler.isSet(PARTITION_DB_PARAM)) {
             try {
-                Database<V> tmpDB = (Database<V>) Util.instantiate(Database.class, partitionDatabase.getName());
+                Database<V> tmpDB = Util.instantiateGenerics(Database.class, partitionDatabase.getName());
                 result.addAll(tmpDB.getAttributeSettings());
             }
             catch (UnableToComplyException e) {
@@ -269,7 +268,6 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
      * the {@link #preprocessor}, the {@link #partitionAlgorithm},
      * and {@link #partitionDatabase} (if they are already initialized).
      */
-    @SuppressWarnings("unchecked")
     @Override
     public String parameterDescription() {
         StringBuilder description = new StringBuilder();
@@ -288,7 +286,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
         // partition database
         if (optionHandler.isSet(PARTITION_DB_PARAM)) {
             try {
-                Database<V> tmpDB = (Database<V>) Util.instantiate(Database.class, partitionDatabase.getName());
+                Database<V> tmpDB = Util.instantiateGenerics(Database.class, partitionDatabase.getName());
                 description.append(Description.NEWLINE);
                 description.append(tmpDB.parameterDescription());
             }

@@ -138,7 +138,7 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
         addOption(STRATEGY_PARAM);
     }
 
-    @SuppressWarnings("unchecked")
+//    @SuppressWarnings("unchecked")
     public void run(Database<V> database, boolean verbose, boolean time) {
         if (database == null) {
             throw new IllegalArgumentException("Database must not be null!");
@@ -182,7 +182,7 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
                 }
 
                 // determine neighbors in each dimension
-                Set<Integer>[] allNeighbors = new Set[dim];
+                Set<Integer>[] allNeighbors = Util.newArrayOfSet(dim);
                 for (int d = 0; d < dim; d++) {
                     List<QueryResult<DoubleDistance>> qrList = database.rangeQuery(id, epsString[d], distanceFunctions[d]);
                     allNeighbors[d] = new HashSet<Integer>(qrList.size());

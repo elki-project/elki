@@ -27,7 +27,6 @@ public final class WekaAttributeFactory// implements Parameterizable
      * @param value the value of the new attribute.
      * @return a new weka attribute for the given value
      */
-    @SuppressWarnings("unchecked")
     public WekaAttribute getAttribute(String value) {
         try {
             Double dvalue = Double.parseDouble(value);
@@ -36,7 +35,7 @@ public final class WekaAttributeFactory// implements Parameterizable
         catch (NumberFormatException e) {
             ClassLabel<HierarchicalClassLabel> classLabel;
             try {
-                classLabel = Util.instantiate(ClassLabel.class, classLabelClass.getName());
+                classLabel = Util.instantiateGenerics(ClassLabel.class, classLabelClass.getName());
             }
             catch (UnableToComplyException e1) {
                 throw new RuntimeException("This should never happen!", e);

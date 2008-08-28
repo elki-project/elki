@@ -268,7 +268,6 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
         }
     }
 
-    @SuppressWarnings("unchecked")
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
@@ -276,7 +275,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
         String className = (String) optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
         try {
             // todo
-            distanceFunction = Util.instantiate(SpatialDistanceFunction.class, className);
+            distanceFunction = Util.instantiateGenerics(SpatialDistanceFunction.class, className);
         }
         catch (UnableToComplyException e) {
             throw new WrongParameterValueException(DISTANCE_FUNCTION_P,

@@ -171,14 +171,12 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
         return usage(description.toString());
     }
 
-    @SuppressWarnings("unchecked")
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
         String className = (String) optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
         try {
-            // todo
-            distanceFunction = Util.instantiate(DistanceFunction.class, className);
+            distanceFunction = Util.instantiateGenerics(DistanceFunction.class, className);
         }
         catch (UnableToComplyException e) {
             throw new WrongParameterValueException(DISTANCE_FUNCTION_P, className, DISTANCE_FUNCTION_D, e);

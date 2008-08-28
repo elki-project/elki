@@ -169,7 +169,6 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
      * and {@link #parsers} according to the value of parameter {@link #PARSERS_PARAM} .
      * The remaining parameters are passed to all instances of {@link #parsers}.
      */
-    @SuppressWarnings("unchecked")
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
@@ -200,7 +199,8 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
             this.parsers = new ArrayList<Parser<O>>(inputStreams.size());
             for (int i = 0; i < inputStreams.size(); i++) {
                 try {
-                    this.parsers.add(i, Util.instantiate(Parser.class, RealVectorLabelParser.class.getName()));
+                    Parser<O> parser = Util.instantiateGenerics(Parser.class, RealVectorLabelParser.class.getName());
+                    this.parsers.add(i, parser);
                 }
                 catch (UnableToComplyException e) {
                     throw new RuntimeException("This should never happen!");

@@ -137,8 +137,7 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
      * AssociationID to associate the probabilities for an instance given a (set
      * of) distribution(s).
      */
-    @SuppressWarnings("unchecked")
-    public static final AssociationID<List> PROBABILITY_X_GIVEN_CLUSTER_I = new AssociationID<List>("P(x|C_i)", List.class);
+    public static final AssociationID<List<Double>> PROBABILITY_X_GIVEN_CLUSTER_I = new AssociationID<List<Double>>("P(x|C_i)", List.class);
 
     /**
      * AssociationID to associate the prior probability for an instance.
@@ -149,8 +148,7 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
      * AssociationID to associate the probabilities for the clusters for a single
      * instance.
      */
-    @SuppressWarnings("unchecked")
-    public static final AssociationID<List> PROBABILITY_CLUSTER_I_GIVEN_X = new AssociationID<List>("P(C_i|x)", List.class);
+    public static final AssociationID<List<Double>> PROBABILITY_CLUSTER_I_GIVEN_X = new AssociationID<List<Double>>("P(C_i|x)", List.class);
 
     /**
      * The association id to associate the locally weighted matrix of an object

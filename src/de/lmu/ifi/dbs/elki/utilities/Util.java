@@ -975,6 +975,47 @@ public final class Util extends AbstractLoggable {
     }
 
     /**
+     * Returns a new instance of the given type for the specified className.
+     * <p/> If the Class for className is not found, the instantiation is tried
+     * using the package of the given type as package of the given className.
+     * 
+     * This is a weaker type checked version of "instantiate" for use with generics.
+     *
+     * @param type      desired Class type of the Object to retrieve
+     * @param className name of the class to instantiate
+     * @return a new instance of the given type for the specified className
+     * @throws UnableToComplyException if the instantiation cannot be performed successfully
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T instantiateGenerics(Class<?> type, String className) throws UnableToComplyException {
+      T instance;
+      // TODO: can we do a verification that type conforms to T somehow?
+      // (probably not because generics are implemented via erasure.
+      try {
+          try {
+              instance = ((Class<T>) type).cast(Class.forName(className).newInstance());
+          }
+          catch (ClassNotFoundException e) {
+              // try package of type
+              instance = ((Class<T>) type).cast(Class.forName(type.getPackage().getName() + "." + className).newInstance());
+          }
+      }
+      catch (InstantiationException e) {
+          throw new UnableToComplyException("InstantiationException: " + e.getMessage(), e);
+      }
+      catch (IllegalAccessException e) {
+          throw new UnableToComplyException("IllegalAccessException: " + e.getMessage(), e);
+      }
+      catch (ClassNotFoundException e) {
+          throw new UnableToComplyException("ClassNotFoundException: " + e.getMessage(), e);
+      }
+      catch (ClassCastException e) {
+          throw new UnableToComplyException("ClassCastException: " + e.getMessage(), e);
+      }
+      return instance;
+    }
+
+    /**
      * Provides a status report line with leading carriage return. Suitable for
      * density based algorithms, since the number of found clusters is counted.
      *
@@ -1625,5 +1666,19 @@ public final class Util extends AbstractLoggable {
     public static <T> ArrayList<T>[] newArrayOfArrayList(int len) {
       ArrayList<?>[] result = new ArrayList<?>[len];
       return (ArrayList<T>[]) result;
-    }    
+    }
+    
+    /**
+     * Create an array of sets.
+     * This is a common cast we have to do due to Java generics limitations.
+     * 
+     * @param <T> Type the list elements have
+     * @param len array size
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> Set<T>[] newArrayOfSet(int len) {
+      Set<?>[] result = new Set<?>[len];
+      return (Set<T>[]) result;
+    }
 }
