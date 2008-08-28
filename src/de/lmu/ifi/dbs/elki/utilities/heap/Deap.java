@@ -137,7 +137,7 @@ class Deap<K extends Comparable<K> & Serializable, V extends Identifiable<?> & S
      * @param file
      *            the page file to be set
      */
-    public void setFile(PageFile file)
+    public void setFile(PageFile<Deap<K,V>> file)
     {
     	// TODO do nothing?
     }

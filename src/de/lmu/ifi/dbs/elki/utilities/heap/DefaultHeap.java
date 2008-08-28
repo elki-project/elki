@@ -13,6 +13,7 @@ import java.util.Vector;
  *
  * @author Elke Achtert 
  */
+@SuppressWarnings("serial")
 public class DefaultHeap<K extends Comparable<K>, V extends Identifiable<?>> implements Heap<K, V> {
   /**
    * Indicates the index null.

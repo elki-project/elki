@@ -181,6 +181,7 @@ public class KNNList<D extends Distance<D>> extends AbstractLoggable {
      * @return <code>true</code> if this object is the same as the obj
      *         argument; <code>false</code> otherwise.
      */
+    @SuppressWarnings("unchecked")
     @Override
     public boolean equals(Object o) {
         if (this == o) {

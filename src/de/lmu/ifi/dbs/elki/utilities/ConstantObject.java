@@ -13,6 +13,7 @@ import java.util.Map;
  * 
  * @author Arthur Zimek
  */
+@SuppressWarnings("serial")
 public abstract class ConstantObject<D extends ConstantObject<D>> extends AbstractLoggable implements Comparable<D>, Serializable {
   /**
    * Index of constant objects.

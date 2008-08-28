@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.preprocessing;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -7,14 +9,11 @@ import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
 import de.lmu.ifi.dbs.elki.utilities.output.Format;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Preprocessor for PreDeCon local dimensionality and locally weighted matrix
@@ -29,15 +28,18 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends RealVector<V,
   public static final double DEFAULT_DELTA = 0.01;
 
   /**
-   * Option string for parameter delta.
+   * OptionID for {@link #DELTA_PARAM}
    */
-  public static final String DELTA_P = "delta";
-
+  public static final OptionID DELTA_ID = OptionID.getOrCreateOptionID("predecon.delta",
+      "a double between 0 and 1 specifying the threshold for small Eigenvalues (default is delta = "
+      + DEFAULT_DELTA + ").");
+  
   /**
-   * Description for parameter delta.
+   * Parameter for Delta
    */
-  public static final String DELTA_D = "a double between 0 and 1 specifying the threshold for small Eigenvalues (default is delta = "
-                                       + DEFAULT_DELTA + ").";
+  private final DoubleParameter DELTA_PARAM = new DoubleParameter(DELTA_ID,
+      new IntervalConstraint(0.0,IntervalBoundary.OPEN,1.0,IntervalBoundary.OPEN),
+      DEFAULT_DELTA);
 
   /**
    * The threshold for small eigenvalues.
@@ -57,12 +59,7 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends RealVector<V,
     super();
 //    this.debug = true;
 
-    ArrayList<ParameterConstraint<Number>> deltaCons = new ArrayList<ParameterConstraint<Number>>();
-    deltaCons.add(new GreaterEqualConstraint(0));
-    deltaCons.add(new LessEqualConstraint(1));
-    DoubleParameter delta = new DoubleParameter(DELTA_P, DELTA_D, deltaCons);
-    delta.setDefaultValue(DEFAULT_DELTA);
-    addOption(delta);
+    addOption(DELTA_PARAM);
   }
 
   /**
@@ -146,7 +143,7 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends RealVector<V,
 
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
-    delta = (Double) optionHandler.getOptionValue(DELTA_P);
+    delta = DELTA_PARAM.getValue();
     return remainingParameters;
   }
 

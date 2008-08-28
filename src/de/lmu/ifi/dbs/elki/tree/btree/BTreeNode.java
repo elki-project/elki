@@ -60,6 +60,7 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
      * @param parentID the ID of the parent of this new node
      * @param file     the page file that stores the pages
      */
+    @SuppressWarnings("unchecked")
     BTreeNode(int m, Integer parentID, PageFile<BTreeNode<K, V>> file) {
         super(file);
         if (m <= 0) throw new IllegalArgumentException("Parameter m must be greater than zero, read m=" + m);
@@ -202,6 +203,7 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
      * @throws ClassNotFoundException If the class for an object being
      *                                restored cannot be found.
      */
+    @SuppressWarnings("unchecked")
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
         m = in.readInt();

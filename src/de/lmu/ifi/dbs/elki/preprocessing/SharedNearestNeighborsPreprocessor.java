@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 
@@ -32,6 +33,11 @@ import java.util.TreeSet;
  * @param <D> the type of distance the used distance function will return
  */
 public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D extends Distance<D>> extends AbstractParameterizable implements Preprocessor<O> {
+    /**
+     * OptionID for {@link #NUMBER_OF_NEIGHBORS_PARAM}
+     */
+    public static final OptionID NUMBER_OF_NEIGHBORS_ID = OptionID.getOrCreateOptionID(
+        "sharedNearestNeighbors", "number of nearest neighbors to consider (at least 1)");
 
     /**
      * Parameter to indicate the number of neighbors to be taken into account for the shared-nearest-neighbor similarity.
@@ -39,11 +45,14 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
      * <p>Default value: 1</p>
      * <p>Key: {@code sharedNearestNeighbors}</p>
      */
-    public static final IntParameter NUMBER_OF_NEIGHBORS_PARAM = new IntParameter("sharedNearestNeighbors", "number of nearest neighbors to consider (at least 1)", new GreaterEqualConstraint(1));
+    private static final IntParameter NUMBER_OF_NEIGHBORS_PARAM = new IntParameter(NUMBER_OF_NEIGHBORS_ID, new GreaterEqualConstraint(1), 1);
 
-    static {
-        NUMBER_OF_NEIGHBORS_PARAM.setDefaultValue(1);
-    }
+    /**
+     * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
+     */
+    public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID(
+        "SNNDistanceFunction",
+        "the distance function to asses the nearest neighbors");
 
     /**
      * Parameter to indicate the distance function to be used to ascertain the nearest neighbors.
@@ -52,8 +61,7 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
      * <p>Key: {@code SNNDistanceFunction}</p>
      */
     public final ClassParameter<DistanceFunction<O,D>> DISTANCE_FUNCTION_PARAM =
-      new ClassParameter<DistanceFunction<O,D>>("SNNDistanceFunction",
-          "the distance function to asses the nearest neighbors", DistanceFunction.class,
+      new ClassParameter<DistanceFunction<O,D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class,
         EuclideanDistanceFunction.class.getName());
 
     /**

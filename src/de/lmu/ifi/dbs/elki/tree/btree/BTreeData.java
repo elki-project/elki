@@ -80,6 +80,7 @@ public class BTreeData<K extends Comparable<K> & Externalizable, V extends Exter
    * @throws ClassNotFoundException If the class for an object being
    *                                restored cannot be found.
    */
+  @SuppressWarnings("unchecked")
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     //noinspection unchecked
     value = (V) in.readObject();

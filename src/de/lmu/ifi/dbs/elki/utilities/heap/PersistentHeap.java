@@ -10,7 +10,7 @@ import java.util.Arrays;
 
 /**
  * Persistent implementation of a heap-based priority queue. The heap is
- * organised according to the natural order of the stored objects. Elements
+ * organized according to the natural order of the stored objects. Elements
  * stored in this heap must be instances of <code>PersistentHeapNode<\code>
  * (@see PersistentHeapNode).
  * <p/>
@@ -22,6 +22,7 @@ import java.util.Arrays;
  *
  * @author Elke Achtert
  */
+@SuppressWarnings("serial")
 public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Identifiable<?> & Serializable>
     extends AbstractLoggable implements Heap<K, V> {
 

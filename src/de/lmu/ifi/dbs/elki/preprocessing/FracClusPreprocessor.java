@@ -1,5 +1,9 @@
 package de.lmu.ifi.dbs.elki.preprocessing;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -9,30 +13,29 @@ import de.lmu.ifi.dbs.elki.math.statistics.LinearRegression;
 import de.lmu.ifi.dbs.elki.utilities.DoublePair;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * @author Arthur Zimek
  */
 public class FracClusPreprocessor<V extends RealVector<V, ?>> extends AbstractParameterizable implements Preprocessor<V> {
-    public static final String NUMBER_OF_SUPPORTERS_P = "supporters";
-
-    public static final String NUMBER_OF_SUPPORTERS_D = "number of supporters (at least 2)";
-
     private int k;
 
-    private IntParameter kParameter = new IntParameter(NUMBER_OF_SUPPORTERS_P, NUMBER_OF_SUPPORTERS_D, new GreaterEqualConstraint(2));
+    /**
+     * OptionID for {@link #NUMBER_OF_SUPPORTERS_PARAM}
+     */
+    public static final OptionID NUMBER_OF_SUPPORTERS_ID = OptionID.getOrCreateOptionID("supporters",
+        "number of supporters (at least 2)");
+
+    private IntParameter NUMBER_OF_SUPPORTERS_PARAM = new IntParameter(NUMBER_OF_SUPPORTERS_ID,
+        new GreaterEqualConstraint(2));
 
     public FracClusPreprocessor() {
         super();
-        addOption(kParameter);
+        addOption(NUMBER_OF_SUPPORTERS_PARAM);
     }
 
     public void run(Database<V> database, boolean verbose, boolean time) {
@@ -64,7 +67,7 @@ public class FracClusPreprocessor<V extends RealVector<V, ?>> extends AbstractPa
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
-        k = kParameter.getValue();
+        k = NUMBER_OF_SUPPORTERS_PARAM.getValue();
         return remainingParameters;
     }
 
