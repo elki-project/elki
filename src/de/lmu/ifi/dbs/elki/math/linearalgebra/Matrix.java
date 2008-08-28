@@ -21,6 +21,7 @@ import java.util.Locale;
  * For a Matrix {@code M} we have therefore {@code M &isin;$real;<sup>m &times; n</sup>},
  * where {@code m} and {@code n} are the number of rows and columns, respectively.
  */
+@SuppressWarnings("serial")
 public class Matrix extends AbstractLoggable implements Cloneable, java.io.Serializable {
 
     /**

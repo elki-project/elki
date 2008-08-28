@@ -1,5 +1,10 @@
 package de.lmu.ifi.dbs.elki.parser;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 import de.lmu.ifi.dbs.elki.converter.Arff2Txt;
 import de.lmu.ifi.dbs.elki.converter.WekaAttribute;
 import de.lmu.ifi.dbs.elki.converter.WekaObject;
@@ -8,16 +13,10 @@ import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * Parser to translate an arff formated file to the whitespace separated format
- * used by most parsers in the framework and to pass the translatin to a specified
+ * used by most parsers in the framework and to pass the translation to a specified
  * base parser.
  * 
  * @author Arthur Zimek

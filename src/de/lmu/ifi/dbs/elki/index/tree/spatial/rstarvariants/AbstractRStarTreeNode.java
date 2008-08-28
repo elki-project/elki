@@ -1,15 +1,14 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.AbstractNode;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
-
-import java.util.List;
 
 /**
  * Abstract superclass for nodes in a R*-Tree.

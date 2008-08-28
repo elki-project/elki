@@ -21,7 +21,8 @@ public class ClassListEditor extends TextFieldParameterEditor {
 		super(option, owner,l);
 	}
 
-	@Override
+	@SuppressWarnings("serial")
+  @Override
 	protected void createInputField() {
 
 		inputField = new JPanel();

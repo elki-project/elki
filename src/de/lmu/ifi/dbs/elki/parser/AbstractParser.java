@@ -1,10 +1,9 @@
 package de.lmu.ifi.dbs.elki.parser;
 
+import java.util.regex.Pattern;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-
-import java.util.regex.Pattern;
 
 /**
  * Abstract superclass for all parsers providing the option handler for

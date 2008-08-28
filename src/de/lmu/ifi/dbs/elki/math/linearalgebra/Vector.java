@@ -9,6 +9,7 @@ import java.text.NumberFormat;
  *
  * @author Elke Achtert 
  */
+@SuppressWarnings("serial")
 public class Vector extends Matrix {
   /**
    * Construct a vector from a given array.

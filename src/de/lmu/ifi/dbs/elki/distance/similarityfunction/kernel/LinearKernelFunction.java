@@ -2,11 +2,10 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 
 /**
  * Provides a linear Kernel function that computes
-   * a similarity between the two feature vectors V1 and V2 definded by V1^T*V2.
+ * a similarity between the two feature vectors V1 and V2 defined by V1^T*V2.
  *
  * @author Simon Paradies
  */
@@ -14,7 +13,7 @@ public class LinearKernelFunction<O extends FeatureVector<O, ? >> extends Abstra
 
   /**
    * Provides a linear Kernel function that computes
-   * a similarity between the two vectors V1 and V2 definded by V1^T*V2.
+   * a similarity between the two vectors V1 and V2 defined by V1^T*V2.
    */
   public LinearKernelFunction() {
     super();

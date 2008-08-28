@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 // todo steffi comment all
+@SuppressWarnings("serial")
 public class KDDStartFrame extends JFrame {
 
     private JPanel base;
@@ -57,7 +58,7 @@ public class KDDStartFrame extends JFrame {
     }
 
     private JComponent createNewTask() {
-        JPanel newTask = new JPanel();
+//        JPanel newTask = new JPanel();
 
 
         JButton newButton = new JButton("New Task");
@@ -65,7 +66,7 @@ public class KDDStartFrame extends JFrame {
 
             public void actionPerformed(ActionEvent e) {
 //				KDDGui workbench = new KDDGui();
-                JFrame frame = new KDDTaskFrame();
+                /*JFrame frame = */ new KDDTaskFrame();
             }
         });
 

@@ -217,22 +217,22 @@ public class ParameterizableEditor extends ParameterEditor implements PopUpTreeL
         setValue(editObjectName, parameters);
     }
 
-    private boolean isEmpty() {
-        return (displayField.getText().equals("") || displayField.getText() == null);
-    }
+//    private boolean isEmpty() {
+//        return (displayField.getText().equals("") || displayField.getText() == null);
+//    }
 
-    private String getDisplayableParameters(String[] parametersToValue) {
-        StringBuilder bob = new StringBuilder();
-        int counter = 0;
-        for (String n : parametersToValue) {
-            bob.append(n);
-            if (counter != parametersToValue.length - 1) {
-                bob.append(" ");
-            }
-            counter++;
-        }
-        return bob.toString();
-    }
+//    private String getDisplayableParameters(String[] parametersToValue) {
+//        StringBuilder bob = new StringBuilder();
+//        int counter = 0;
+//        for (String n : parametersToValue) {
+//            bob.append(n);
+//            if (counter != parametersToValue.length - 1) {
+//                bob.append(" ");
+//            }
+//            counter++;
+//        }
+//        return bob.toString();
+//    }
 
     public String[] parameterToValue() {
         String[] temp = getValue().split(" ");

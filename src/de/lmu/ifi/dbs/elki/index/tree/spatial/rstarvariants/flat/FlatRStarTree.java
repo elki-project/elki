@@ -1,14 +1,13 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.flat;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
-
-import java.util.List;
 
 /**
  * FlatRTree is a spatial index structure based on a R*-Tree

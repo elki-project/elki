@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
@@ -12,7 +11,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  *
  * @author Simon Paradies
  */
-public class FooKernelFunction<O extends FeatureVector> extends AbstractDoubleKernelFunction<O>{
+public class FooKernelFunction<O extends FeatureVector<?,?>> extends AbstractDoubleKernelFunction<O>{
 
 	/**
 	 * The default max_degree.
