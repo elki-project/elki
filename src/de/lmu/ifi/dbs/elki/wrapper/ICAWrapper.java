@@ -6,7 +6,6 @@ import de.lmu.ifi.dbs.elki.algorithm.ICA;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.varianceanalysis.ica.FastICA;
 import de.lmu.ifi.dbs.elki.varianceanalysis.ica.KurtosisBasedContrastFunction;
@@ -48,30 +47,24 @@ public class ICAWrapper<O extends DatabaseObject> extends FileBasedDatabaseConne
 //    parameters.add(RealVectorLabelTransposingParser.class.getName());
 
         // approach
-        parameters.add(OptionHandler.OPTION_PREFIX + FastICA.APPROACH_P);
-//    parameters.add(FastICA.Approach.SYMMETRIC.toString());
-        parameters.add(FastICA.Approach.DEFLATION.toString());
+        Util.addParameter(parameters, FastICA.APPROACH_ID, FastICA.Approach.DEFLATION.toString());
 
         // epsilon
-        parameters.add(OptionHandler.OPTION_PREFIX + FastICA.EPSILON_P);
-        parameters.add("0.01");
+        Util.addParameter(parameters, FastICA.EPSILON_ID, "0.01");
 
         // contrast function
-        parameters.add(OptionHandler.OPTION_PREFIX + FastICA.G_P);
-        parameters.add(KurtosisBasedContrastFunction.class.getName());
+        Util.addParameter(parameters, FastICA.G_ID, KurtosisBasedContrastFunction.class.getName());
 //    parameters.add(TanhContrastFunction.class.getName());
 //    parameters.add(ExponentialContrastFunction.class.getName());
 
         // number ics
-        parameters.add(OptionHandler.OPTION_PREFIX + FastICA.IC_P);
-        parameters.add("2");
+        Util.addParameter(parameters, FastICA.IC_ID, "2");
 
         // initial matrix
-        parameters.add(OptionHandler.OPTION_PREFIX + FastICA.UNIT_F);
+        Util.addFlag(parameters, FastICA.UNIT_ID);
 
         // max iterations
-        parameters.add(OptionHandler.OPTION_PREFIX + FastICA.MAX_ITERATIONS_P);
-        parameters.add("1000");
+        Util.addParameter(parameters, FastICA.MAX_ITERATIONS_ID, "1000");
 
         // epsilon
         Util.addParameter(parameters, OptionID.EIGENPAIR_FILTER_ALPHA, "0.95");

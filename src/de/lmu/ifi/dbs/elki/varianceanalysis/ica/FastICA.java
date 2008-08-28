@@ -1,5 +1,14 @@
 package de.lmu.ifi.dbs.elki.varianceanalysis.ica;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.text.NumberFormat;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Locale;
+
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.LogLevel;
@@ -9,24 +18,18 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
-import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualStringConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
-import de.lmu.ifi.dbs.elki.varianceanalysis.PercentageEigenPairFilter;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Locale;
 
 /**
  * Implementation of the FastICA algorithm.
@@ -52,62 +55,69 @@ public class FastICA<V extends RealVector<V, ?>> extends AbstractParameterizable
     }
 
     /**
-     * Parameter for ic.
+     * OptionID for {@link #IC_PARAM}
      */
-    public static final String IC_P = "ic";
+    public static final OptionID IC_ID = OptionID.getOrCreateOptionID("fastica.ic",
+        "the maximum number of independent components (ics) to be found. "
+        + "The number of ics to be found must be less to or equal than "
+        + "the dimensionality of the feature space.");
 
     /**
-     * Description for parameter ic.
+     * Parameter for the number of independent components.
      */
-    public static final String IC_D = "the maximum number of independent components (ics) to be found. "
-        + "The number of ics to be found must be less to or equal than " + "the dimensionality of the feature space.";
+    private final IntParameter IC_PARAM = new IntParameter(IC_ID, new GreaterConstraint(0), true);
+    
+    /**
+     * OptionID for {@link #UNIT_PARAM}
+     */
+    public static final OptionID UNIT_ID = OptionID.getOrCreateOptionID("fastica.unit",
+        "Flag that indicates that the unit matrix "
+        + "is used as initial weight matrix. If this flag "
+        + "is not set, the initial weight matrix will be "
+        + "generated randomly.");
 
     /**
-     * Parameter for initial unit matrix.
+     * Flag for initial unit matrix
      */
-    public static final String UNIT_F = "unit";
-
-    /**
-     * Description for parameter initial unit matrix.
-     */
-    public static final String UNIT_D = "flag that indicates that the unit matrix " + "is used as initial weight matrix. If this flag "
-        + "is not set, the initial weight matrix will be " + "generated randomly.";
-
-    /**
-     * Parameter for maxIter.
-     */
-    public static final String MAX_ITERATIONS_P = "maxIter";
-
+    private final Flag UNIT_FLAG = new Flag(UNIT_ID);
+    
     /**
      * The default value for parameter maxIter.
      */
     public static final int DEFAULT_MAX_ITERATIONS = 1000;
 
     /**
-     * Description for parameter maxIter.
+     * OptionID for {@link #MAX_ITERATIONS_PARAM}
      */
-    public static final String MAX_ITERATIONS_D = "the number of maximum iterations. " + "Default: " + DEFAULT_MAX_ITERATIONS;
+    public static final OptionID MAX_ITERATIONS_ID = OptionID.getOrCreateOptionID("fastica.maxIter",
+        "the number of maximum iterations. " + "Default: " + DEFAULT_MAX_ITERATIONS);
 
     /**
-     * Parameter for approach.
+     * Parameter for the number of independent components.
      */
-    public static final String APPROACH_P = "app";
-
+    private final IntParameter MAX_ITERATIONS_PARAM = new IntParameter(MAX_ITERATIONS_ID,
+        new GreaterConstraint(0), DEFAULT_MAX_ITERATIONS);
+    
     /**
      * The default approach.
      */
     public static final Approach DEFAULT_APPROACH = Approach.DEFLATION;
 
     /**
-     * Description for parameter approach.
+     * OptionID for {@link #APPROACH_PARAM}
      */
-    public static final String APPROACH_D = "the approach to be used, available approaches are: [" + Approach.DEFLATION + "| "
-        + Approach.SYMMETRIC + "]" + ". Default: " + DEFAULT_APPROACH + ")";
+    public static final OptionID APPROACH_ID = OptionID.getOrCreateOptionID("fastica.app",
+        "the approach to be used, available approaches are: [" + Approach.DEFLATION + "| "
+        + Approach.SYMMETRIC + "]" + ". Default: " + DEFAULT_APPROACH + ")");
 
     /**
-     * Parameter for contrastfunction g.
+     * Parameter for approach
      */
-    public static final String G_P = "g";
+    private final PatternParameter APPROACH_PARAM = new PatternParameter(APPROACH_ID,
+        new EqualStringConstraint(new String[]{
+            Approach.DEFLATION.toString(),
+            Approach.SYMMETRIC.toString()}),
+            DEFAULT_APPROACH.getClass().getName());
 
     /**
      * The default g.
@@ -115,40 +125,54 @@ public class FastICA<V extends RealVector<V, ?>> extends AbstractParameterizable
     public static final String DEFAULT_G = KurtosisBasedContrastFunction.class.getName();
 
     /**
-     * Description for parameter g.
+     * OptionID for {@link #G_PARAM}
      */
-    public static final String G_D = "the contrast function to be used to estimate negentropy "
-        + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(ContrastFunction.class) + ". Default: " + DEFAULT_G;
+    public static final OptionID G_ID = OptionID.getOrCreateOptionID("fastica.g",
+        "the contrast function to be used to estimate negentropy "
+        + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(ContrastFunction.class) + ". Default: " + DEFAULT_G);
 
     /**
-     * Parameter for epsilon.
+     * Parameter for contrast function g
      */
-    public static final String EPSILON_P = "epsilon";
-
+    private final ClassParameter<ContrastFunction> G_PARAM = new ClassParameter<ContrastFunction>(G_ID,
+        ContrastFunction.class, DEFAULT_G);
+    
     /**
      * The default epsilon.
      */
     public static final double DEFAULT_EPSILON = 0.001;
 
     /**
-     * Description for parameter epsilon.
+     * OptionID for {@link #EPSILON_PARAM}
      */
-    public static final String EPSILON_D = "a positive value defining the criterion for convergence of weight vector w_p: "
+    public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID("fastica.epsilon",
+        "a positive value defining the criterion for convergence of weight vector w_p: "
         + "if the difference of the values of w_p after two iterations " + "is less than or equal to epsilon. " + "Default: "
-        + DEFAULT_EPSILON;
+        + DEFAULT_EPSILON);
 
     /**
-     * Option string for parameter alpha.
+     * Parameter for epsilon
      */
-    public static final String ALPHA_P = "alpha";
-
-    /**
-     * Description for parameter alpha.
-     */
-    public static final String ALPHA_D = "a double between 0 and 1 specifying " + "the threshold for strong eigenvectors of the pca "
-        + "performed as a preprocessing step: " + "the strong eigenvectors explain a "
-        + "portion of at least alpha of the total variance " + "Default: " + PercentageEigenPairFilter.DEFAULT_ALPHA + ")";
-
+    private final DoubleParameter EPSILON_PARAM = new DoubleParameter(EPSILON_ID,
+        new GreaterConstraint(0), DEFAULT_EPSILON);
+    
+//    /**
+//     * OptionID for {@link #ALPHA_PARAM}
+//     */
+//    public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("fastica.alpha",
+//        "a double between 0 and 1 specifying "
+//        + "the threshold for strong eigenvectors of the pca "
+//        + "performed as a preprocessing step: "
+//        + "the strong eigenvectors explain a "
+//        + "portion of at least alpha of the total variance "
+//        + "Default: " + PercentageEigenPairFilter.DEFAULT_ALPHA + ")");
+//
+//    /**
+//     * Parameter for epsilon
+//     */
+//    private final DoubleParameter ALPHA_PARAM = new DoubleParameter(ALPHA_ID,
+//        new IntervalConstraint(0,IntervalBoundary.CLOSE,1,IntervalBoundary.OPEN), PercentageEigenPairFilter.DEFAULT_ALPHA);
+    
     /**
      * The input data.
      */
@@ -230,52 +254,36 @@ public class FastICA<V extends RealVector<V, ?>> extends AbstractParameterizable
      */
     private boolean initialUnitWeightMatrix;
 
-    /**
-     * The alpha parameter for the preprocessing pca.
-     * todo: necessary?
-     */
-    private double alpha;
+//    /**
+//     * The alpha parameter for the preprocessing pca.
+//     * todo: necessary?
+//     */
+//    private double alpha;
 
     /**
      * Provides the fast ica algorithm.
      */
     public FastICA() {
         super();
-        optionHandler.put(new Flag(UNIT_F, UNIT_D));
+        addOption(UNIT_FLAG);
 
         // parameter ics
-        IntParameter ic = new IntParameter(IC_P, IC_D, new GreaterConstraint(0));
-        ic.setOptional(true);
-        optionHandler.put(ic);
+        addOption(IC_PARAM);
 
         // parameter max iteration
-        IntParameter maxIt = new IntParameter(MAX_ITERATIONS_P, MAX_ITERATIONS_D, new GreaterConstraint(0));
-        maxIt.setDefaultValue(DEFAULT_MAX_ITERATIONS);
-        optionHandler.put(maxIt);
+        addOption(MAX_ITERATIONS_PARAM);
 
         // parameter approach
-        StringParameter app = new StringParameter(APPROACH_P, APPROACH_D, new EqualStringConstraint(new String[]{
-            Approach.DEFLATION.toString(), Approach.SYMMETRIC.toString()}));
-        app.setDefaultValue(DEFAULT_APPROACH.getClass().getName());
-        optionHandler.put(app);
+        addOption(APPROACH_PARAM);
 
-        // parameter constrast function
-        ClassParameter<ContrastFunction> contFunc = new ClassParameter<ContrastFunction>(G_P, G_D, ContrastFunction.class);
-        contFunc.setDefaultValue(DEFAULT_G);
-        optionHandler.put(contFunc);
+        // parameter contrast function
+        addOption(G_PARAM);
 
         // parameter epsilon
-        DoubleParameter eps = new DoubleParameter(EPSILON_P, EPSILON_D, new GreaterConstraint(0));
-        eps.setDefaultValue(DEFAULT_EPSILON);
-        optionHandler.put(eps);
+        addOption(EPSILON_PARAM);
 
-        // parameter alpha
-        ArrayList<ParameterConstraint<Number>> alphaCons = new ArrayList<ParameterConstraint<Number>>();
-        alphaCons.add(new GreaterConstraint(0));
-        alphaCons.add(new LessEqualConstraint(1));
-        DoubleParameter alpha = new DoubleParameter(ALPHA_P, ALPHA_D, alphaCons);
-        alpha.setDefaultValue(PercentageEigenPairFilter.DEFAULT_ALPHA);
-        optionHandler.put(alpha);
+//        // parameter alpha
+//        addOption(ALPHA_PARAM);
 
         this.debug = true;
     }
@@ -284,19 +292,19 @@ public class FastICA<V extends RealVector<V, ?>> extends AbstractParameterizable
         String[] remainingParameters = super.setParameters(args);
 
         // initial mixing matrix
-        initialUnitWeightMatrix = optionHandler.isSet(UNIT_F);
+        initialUnitWeightMatrix = UNIT_FLAG.isSet();
 
         // ics
-        if (optionHandler.isSet(IC_P)) {
-            numICs = (Integer) optionHandler.getOptionValue(IC_P);
+        if (IC_PARAM.isSet()) {
+            numICs =IC_PARAM.getValue();
         }
 
         // maximum iterations
-        maximumIterations = (Integer) optionHandler.getOptionValue(MAX_ITERATIONS_P);
+        maximumIterations = MAX_ITERATIONS_PARAM.getValue();
 
         // approach
 
-        String approachString = (String) optionHandler.getOptionValue(APPROACH_P);
+        String approachString = APPROACH_PARAM.getValue();
         if (approachString.equals(Approach.DEFLATION.toString())) {
             approach = Approach.DEFLATION;
         }
@@ -304,25 +312,18 @@ public class FastICA<V extends RealVector<V, ?>> extends AbstractParameterizable
             approach = Approach.SYMMETRIC;
         }
         else
-            throw new WrongParameterValueException(APPROACH_P, approachString, APPROACH_P);
+            throw new WrongParameterValueException(APPROACH_PARAM, approachString, null);
 
         // contrast function
-        String className = (String) optionHandler.getOptionValue(G_P);
-        try {
-            // todo
-            contrastFunction = Util.instantiate(ContrastFunction.class, className);
-        }
-        catch (UnableToComplyException e) {
-            throw new WrongParameterValueException(G_P, className, G_D, e);
-        }
+        contrastFunction = G_PARAM.instantiateClass();
         remainingParameters = contrastFunction.setParameters(remainingParameters);
         setParameters(args, remainingParameters);
 
         // epsilon
-        epsilon = (Double) optionHandler.getOptionValue(EPSILON_P);
+        epsilon = EPSILON_PARAM.getValue();
 
-        // alpha
-        alpha = (Double) optionHandler.getOptionValue(ALPHA_P);
+//        // alpha
+//        alpha = ALPHA_PARAM.getValue();
 
         return remainingParameters;
     }

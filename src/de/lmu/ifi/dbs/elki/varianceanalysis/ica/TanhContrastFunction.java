@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.varianceanalysis.ica;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
@@ -13,20 +14,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  */
 public class TanhContrastFunction extends AbstractParameterizable implements ContrastFunction {
   /**
-   * Parameter for a.
-   */
-  public static final String A_P = "a";
-
-  /**
    * The default a.
    */
   public static final double DEFAULT_A = 1.0;
 
   /**
-   * Description for parameter a.
+   * OptionID for {@link #A_PARAM}
    */
-  public static final String A_D = "the parameter a of this function g(x) = tanh(a * x). " +
-                                   "Default: " + DEFAULT_A;
+  public static final OptionID A_ID = OptionID.getOrCreateOptionID("tanh.a",
+      "the parameter a of this function g(x) = tanh(a * x). " +
+      "Default: " + DEFAULT_A);
+  
+  /**
+   * Parameter for a
+   */
+  private final DoubleParameter A_PARAM = new DoubleParameter(A_ID, DEFAULT_A);
 
   /**
    * Parameter a.
@@ -36,9 +38,7 @@ public class TanhContrastFunction extends AbstractParameterizable implements Con
   public TanhContrastFunction() {
     super();
 
-    DoubleParameter a = new DoubleParameter(A_P, A_D);
-    a.setDefaultValue(DEFAULT_A);
-    optionHandler.put(a);
+    addOption(A_PARAM);
   }
 
   public double function(double x) {
@@ -54,7 +54,7 @@ public class TanhContrastFunction extends AbstractParameterizable implements Con
     String[] remainingParameters = super.setParameters(args);
 
     // a
-    a = (Double)optionHandler.getOptionValue(A_P);
+    a = A_PARAM.getValue();
 
     return remainingParameters;
   }

@@ -15,6 +15,7 @@ import java.util.ArrayList;
  * @author Elke Achtert
  */
 public class ICADataGenerator {
+    @SuppressWarnings("unused")
     private static String prefix;
 
     static {
@@ -29,6 +30,7 @@ public class ICADataGenerator {
     //  public final static String DIRECTORY = ICADataGenerator.prefix + "/nfs/infdbs/Publication/ICDM06-HiSC/experiments/synthetic/";
     public final static String DIRECTORY = "";
 
+    @SuppressWarnings("unused")
     private static double JITTER = 0.005;
 
     public static void main(String[] args) {
@@ -76,6 +78,7 @@ public class ICADataGenerator {
 
     }
 
+    @SuppressWarnings("unused")
     private void synthetic2() {
         String output = ICADataGenerator.DIRECTORY + "ica_2.txt";
         File file = new File(output);

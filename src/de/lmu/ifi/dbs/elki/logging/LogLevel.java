@@ -11,11 +11,13 @@ import java.util.logging.Level;
  *
  */
 public class LogLevel extends Level {
-	/**
+  private static final long serialVersionUID = -6365081499958413027L;
+
+  /**
 	 * Constructs a log level with the given name and the given integer value.
 	 * 
 	 * @param name the name of the level.
-	 * @param value the value of the leve.
+	 * @param value the value of the level.
 	 */
 	public LogLevel(String name, int value){
 	

@@ -1,12 +1,10 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import java.io.File;
+
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import experimentalcode.erich.GoldenGeneratorXML;
-
-import java.io.File;
 
 /**
  * StandAloneWrapper sets additionally to the flags set by AbstractWrapper

@@ -105,8 +105,8 @@ public abstract class Parameter<T, C> extends Option<T> {
      *
      * @param optionID the unique id of the option
      */
+    @SuppressWarnings("unchecked")
     public Parameter(OptionID optionID) {
-        // noinspection unchecked
         this(optionID, Collections.EMPTY_LIST);
     }
 

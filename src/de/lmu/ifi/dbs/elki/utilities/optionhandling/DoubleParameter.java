@@ -93,6 +93,18 @@ public class DoubleParameter extends NumberParameter<Double> {
     }
 
     /**
+     * Constructs a double parameter with the given optionID
+     * and default value.
+     *
+     * @param optionID     the unique optionID
+     * @param defaultValue the default value for this double parameter
+     */
+    public DoubleParameter(OptionID optionID, Double defaultValue) {
+        this(optionID);
+        setDefaultValue(defaultValue);
+    }
+
+    /**
      * Constructs a double parameter with the given name and description
      *
      * @param name        the parameter name

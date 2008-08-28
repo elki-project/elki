@@ -1,13 +1,12 @@
 package de.lmu.ifi.dbs.elki.varianceanalysis;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The NormalizingEigenPairFilter normalizes all eigenvectors s.t.
@@ -29,7 +28,7 @@ public class NormalizingEigenPairFilter extends AbstractParameterizable
 
 	public FilteredEigenPairs filter(final SortedEigenPairs eigenPairs) {
 		final StringBuffer msg = new StringBuffer();
-		// init strong and weak eigenpairs
+		// initialize strong and weak eigenpairs
 		// all normalized eigenpairs are regarded as strong
 		final List<EigenPair> strongEigenPairs = new ArrayList<EigenPair>();
 		final List<EigenPair> weakEigenPairs = new ArrayList<EigenPair>();
@@ -48,7 +47,7 @@ public class NormalizingEigenPairFilter extends AbstractParameterizable
 	}
 
 	/**
-	 * Normalizes an eingenpair consisting of eigenvector v and eigenvalue e s.t. <v,v> * e = 1
+	 * Normalizes an eigenpair consisting of eigenvector v and eigenvalue e s.t. <v,v> * e = 1
 	 * @param eigenPair the eigenpair to be normalized
 	 *
 	 */
