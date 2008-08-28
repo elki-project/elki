@@ -10,9 +10,8 @@ import java.util.logging.Level;
  * @author Steffi Wanka
  *
  */
+@SuppressWarnings("serial")
 public class LogLevel extends Level {
-  private static final long serialVersionUID = -6365081499958413027L;
-
   /**
 	 * Constructs a log level with the given name and the given integer value.
 	 * 

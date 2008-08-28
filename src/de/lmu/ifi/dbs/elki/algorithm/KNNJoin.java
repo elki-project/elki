@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.util.ArrayList;
@@ -70,13 +71,19 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
         super();
         addOption(K_PARAM);
     }
+    
+    /**
+     * The k parameter
+     */
+    int k;
 
     /**
      * Joins in the given spatial database to each object its k-nearest neighbors.
      *
-     * @throws IllegalStateException if the specifiied database is not an instance of {@link SpatialIndexDatabase}
+     * @throws IllegalStateException if the specified database is not an instance of {@link SpatialIndexDatabase}
      *                               or the specified distance function is not an instance of {@link SpatialDistanceFunction}.
      */
+    @SuppressWarnings("unchecked")
     protected void runInTime(Database<V> database) throws IllegalStateException {
         if (!(database instanceof SpatialIndexDatabase)) {
             throw new IllegalStateException(
@@ -88,7 +95,6 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
                 "Distance Function must be an instance of "
                     + SpatialDistanceFunction.class.getName());
         }
-        int k = getParameterValue(K_PARAM);
         SpatialIndexDatabase<V, N, E> db = (SpatialIndexDatabase<V, N, E>) database;
         SpatialDistanceFunction<V, D> distFunction = (SpatialDistanceFunction<V, D>) getDistanceFunction();
         distFunction.setDatabase(db, isVerbose(), isTime());
@@ -207,6 +213,14 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
             }
         }
         return pr_knn_distance;
+    }
+
+    public String[] setParameters(String[] args) throws ParameterException {
+      String[] remainingParameters = super.setParameters(args);
+      k = K_PARAM.getValue();
+      
+      setParameters(args, remainingParameters);
+      return super.setParameters(remainingParameters);
     }
 
     /**

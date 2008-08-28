@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
 /**
@@ -60,17 +61,17 @@ public class SUBCLUWrapper<O extends DatabaseObject> extends NormalizationWrappe
     }
 
    @Override
-    public List<String> getKDDTaskParameters() {
+    public List<String> getKDDTaskParameters() throws UnusedParameterException {
         List<String> parameters = super.getKDDTaskParameters();
 
         // algorithm SUBCLU
         Util.addParameter(parameters, OptionID.ALGORITHM, SUBCLU.class.getName());
 
         // epsilon
-        Util.addParameter(parameters, EPSILON_PARAM, getParameterValue(EPSILON_PARAM));
+        Util.addParameter(parameters, EPSILON_PARAM, EPSILON_PARAM.getValue());
 
         // minpts
-        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(getParameterValue(MINPTS_PARAM)));
+        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(MINPTS_PARAM.getValue()));
 
         return parameters;
     }

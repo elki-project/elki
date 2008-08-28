@@ -62,7 +62,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
      */
     public MkCoPTree() {
         super();
-        optionHandler.put(new IntParameter(K_P, K_D, new GreaterConstraint(0)));
+        addOption(new IntParameter(K_P, K_D, new GreaterConstraint(0)));
 //    this.debug = true;
     }
 

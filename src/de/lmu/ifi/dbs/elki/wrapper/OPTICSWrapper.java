@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
 /**
@@ -57,24 +58,24 @@ public class OPTICSWrapper<O extends DatabaseObject> extends NormalizationWrappe
         EPSILON_PARAM.setShortDescription("The maximum radius of the neighborhood " +
             "to be considered, must be suitable to " +
             EuclideanDistanceFunction.class.getName());
-        optionHandler.put(EPSILON_PARAM);
+        addOption(EPSILON_PARAM);
 
         //parameter min points
-        optionHandler.put(MINPTS_PARAM);
+        addOption(MINPTS_PARAM);
     }
 
     @Override
-    public List<String> getKDDTaskParameters() {
+    public List<String> getKDDTaskParameters() throws UnusedParameterException {
         List<String> parameters = super.getKDDTaskParameters();
 
         // algorithm OPTICS
         Util.addParameter(parameters, OptionID.ALGORITHM, OPTICS.class.getName());
 
         // epsilon
-        Util.addParameter(parameters, EPSILON_PARAM, getParameterValue(EPSILON_PARAM));
+        Util.addParameter(parameters, EPSILON_PARAM, EPSILON_PARAM.getValue());
 
         // minpts
-        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(getParameterValue(MINPTS_PARAM)));
+        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(MINPTS_PARAM.getValue()));
 
         // distance function
         Util.addParameter(parameters, OPTICS.DISTANCE_FUNCTION_ID, EuclideanDistanceFunction.class.getName());

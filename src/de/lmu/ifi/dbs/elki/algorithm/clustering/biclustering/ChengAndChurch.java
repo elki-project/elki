@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.algorithm.result.clustering.biclustering.Bicluster;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.utilities.Description;
@@ -15,6 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.LongParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 
 /**
@@ -316,18 +318,18 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 	@Override
 	public String[] setParameters(String[] args) throws ParameterException {
 		String[] remainingParameters = super.setParameters(args);
-		long seed = this.getParameterValue(SEED_PARAM);
+		long seed = SEED_PARAM.getValue();
 		random = new Random(seed);
-		sigma = this.getParameterValue(SIGMA_PARAM);
-		alpha = this.getParameterValue(ALPHA_PARAM);
-		n = this.getParameterValue(N_PARAM);
-		begin = this.getParameterValue(BEGIN_PARAM);
-		end = this.getParameterValue(END_PARAM) - begin;
+		sigma = SIGMA_PARAM.getValue();
+		alpha = ALPHA_PARAM.getValue();
+		n = N_PARAM.getValue();
+		begin = BEGIN_PARAM.getValue();
+		end = END_PARAM.getValue() - begin;
 		if (MISSING_PARAM.isSet()) {
-			missing = this.getParameterValue(MISSING_PARAM);
+			missing = MISSING_PARAM.getValue();
 		}
 		if (MULTIPLE_ADDITION_PARAM.isSet()) {
-			multipleAddition = this.getParameterValue(MULTIPLE_ADDITION_PARAM);
+			multipleAddition = MULTIPLE_ADDITION_PARAM.getValue();
 		}
 		return remainingParameters;
 	}
@@ -795,7 +797,13 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 				// if the parameter is not set, the previous if-clause will
 				// never be entered and
 				// therefore the parameter will remain unchanged.
-				multipleAddition = getParameterValue(MULTIPLE_ADDITION_PARAM);
+				try {
+          multipleAddition = MULTIPLE_ADDITION_PARAM.getValue();
+        }
+        catch(UnusedParameterException e) {
+          // We tested for isSet(), thus this should not be reachable.
+          throw new AbortException("Should not be possible." + e.toString());
+        }
 
 			}
 

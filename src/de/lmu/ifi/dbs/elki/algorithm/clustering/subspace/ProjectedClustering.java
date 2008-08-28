@@ -126,13 +126,13 @@ public abstract class ProjectedClustering<V extends RealVector<V, ?>>
         String[] remainingParameters = super.setParameters(args);
 
         // k
-        k = getParameterValue(K_PARAM);
+        k = K_PARAM.getValue();
 
         // l
-        l = getParameterValue(L_PARAM);
+        l = L_PARAM.getValue();
 
         // k_i
-        k_i = getParameterValue(K_I_PARAM);
+        k_i = K_I_PARAM.getValue();
 
         return remainingParameters;
     }

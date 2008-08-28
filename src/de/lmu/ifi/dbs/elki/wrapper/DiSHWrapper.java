@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualStringConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -95,17 +96,17 @@ public class DiSHWrapper<O extends DatabaseObject> extends NormalizationWrapper<
     }
 
     @Override
-    public List<String> getKDDTaskParameters() {
+    public List<String> getKDDTaskParameters() throws UnusedParameterException {
         List<String> parameters = super.getKDDTaskParameters();
 
         // DiSH algorithm
         Util.addParameter(parameters, OptionID.ALGORITHM, DiSH.class.getName());
 
         // epsilon
-        Util.addParameter(parameters, DiSH.EPSILON_ID, Double.toString(getParameterValue(EPSILON_PARAM)));
+        Util.addParameter(parameters, DiSH.EPSILON_ID, Double.toString(EPSILON_PARAM.getValue()));
 
         // minpts
-        Util.addParameter(parameters, DiSH.MU_ID, Integer.toString(getParameterValue(MU_PARAM)));
+        Util.addParameter(parameters, DiSH.MU_ID, Integer.toString(MU_PARAM.getValue()));
 
         // strategy for preprocessor
         if (strategy != null) {

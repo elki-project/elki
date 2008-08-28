@@ -127,8 +127,8 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
         String[] remainingParameters = super.setParameters(args);
 
         //k and percentage
-        k = getParameterValue(K_PARAM);
-        percentage = getParameterValue(PERCENTAGE_PARAM);
+        k = K_PARAM.getValue();
+        percentage = PERCENTAGE_PARAM.getValue();
 
         return remainingParameters;
     }

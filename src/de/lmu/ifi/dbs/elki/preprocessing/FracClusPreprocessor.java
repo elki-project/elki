@@ -32,7 +32,7 @@ public class FracClusPreprocessor<V extends RealVector<V, ?>> extends AbstractPa
 
     public FracClusPreprocessor() {
         super();
-        optionHandler.put(kParameter);
+        addOption(kParameter);
     }
 
     public void run(Database<V> database, boolean verbose, boolean time) {
@@ -64,7 +64,7 @@ public class FracClusPreprocessor<V extends RealVector<V, ?>> extends AbstractPa
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
-        k = getParameterValue(kParameter);
+        k = kParameter.getValue();
         return remainingParameters;
     }
 

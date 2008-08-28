@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.DefaultValueGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -89,27 +90,27 @@ public class HiCOWrapper<O extends DatabaseObject> extends NormalizationWrapper<
         super();
 
         // parameter minpts
-        optionHandler.put(MINPTS_PARAM);
+        addOption(MINPTS_PARAM);
 
         // parameter k
         K_PARAM.setShortDescription("The number of nearest neighbors considered in the PCA. " +
             "If this parameter is not set, k ist set to the value of " +
             MINPTS_PARAM.getName());
-        optionHandler.put(K_PARAM);
+        addOption(K_PARAM);
 
         // global constraint k <-> minpts
         GlobalParameterConstraint gpc = new DefaultValueGlobalConstraint<Integer>(K_PARAM, MINPTS_PARAM);
         optionHandler.setGlobalParameterConstraint(gpc);
 
         // parameter delta
-        optionHandler.put(DELTA_PARAM);
+        addOption(DELTA_PARAM);
 
         // parameter alpha
-        optionHandler.put(ALPHA_PARAM);
+        addOption(ALPHA_PARAM);
     }
 
     @Override
-    public List<String> getKDDTaskParameters() {
+    public List<String> getKDDTaskParameters() throws UnusedParameterException {
         List<String> parameters = super.getKDDTaskParameters();
 
         // OPTICS algorithm
@@ -125,21 +126,21 @@ public class HiCOWrapper<O extends DatabaseObject> extends NormalizationWrapper<
         Util.addParameter(parameters, OPTICS.EPSILON_ID, PCABasedCorrelationDistanceFunction.INFINITY_PATTERN);
 
         // minpts
-        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(getParameterValue(MINPTS_PARAM)));
+        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(MINPTS_PARAM.getValue()));
 
         // preprocessor
         Util.addParameter(parameters, PreprocessorHandler.PREPROCESSOR_ID, KnnQueryBasedHiCOPreprocessor.class.getName());
 
         // k for preprocessor
-        Util.addParameter(parameters, K_PARAM, Integer.toString(getParameterValue(K_PARAM)));
+        Util.addParameter(parameters, K_PARAM, Integer.toString(K_PARAM.getValue()));
 
         // alpha
         parameters.add(OptionHandler.OPTION_PREFIX + ALPHA_PARAM.getName());
-        parameters.add(Double.toString(getParameterValue(ALPHA_PARAM)));
+        parameters.add(Double.toString(ALPHA_PARAM.getValue()));
 
         // delta
         parameters.add(OptionHandler.OPTION_PREFIX + DELTA_PARAM.getName());
-        parameters.add(Double.toString(getParameterValue(DELTA_PARAM)));
+        parameters.add(Double.toString(DELTA_PARAM.getValue()));
 
         return parameters;
     }

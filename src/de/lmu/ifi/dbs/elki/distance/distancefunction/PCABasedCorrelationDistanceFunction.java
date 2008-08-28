@@ -74,7 +74,7 @@ public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P e
         String[] remainingParameters = super.setParameters(args);
 
         // delta
-        delta = getParameterValue(DELTA_PARAM);
+        delta = DELTA_PARAM.getValue();
 
         return remainingParameters;
     }

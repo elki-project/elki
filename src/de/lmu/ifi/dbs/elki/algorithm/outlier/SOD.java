@@ -176,8 +176,8 @@ public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
-        knn = getParameterValue(KNN_PARAM);
-        alpha = getParameterValue(ALPHA_PARAM);
+        knn = KNN_PARAM.getValue();
+        alpha = ALPHA_PARAM.getValue();
 
         remainingParameters = similarityFunction.setParameters(remainingParameters);
         setParameters(args, remainingParameters);

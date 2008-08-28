@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
 /**
@@ -72,20 +73,20 @@ public class PreDeConWrapper<O extends DatabaseObject> extends NormalizationWrap
     }
 
     @Override
-    public List<String> getKDDTaskParameters() {
+    public List<String> getKDDTaskParameters() throws UnusedParameterException {
         List<String> parameters = super.getKDDTaskParameters();
 
         // PreDeCon algorithm
         Util.addParameter(parameters, OptionID.ALGORITHM, PreDeCon.class.getName());
 
         // epsilon for PreDeCon
-        Util.addParameter(parameters, EPSILON_PARAM, getParameterValue(EPSILON_PARAM));
+        Util.addParameter(parameters, EPSILON_PARAM, EPSILON_PARAM.getValue());
 
         // minpts for PreDeCon
-        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(getParameterValue(MINPTS_PARAM)));
+        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(MINPTS_PARAM.getValue()));
 
         // lambda for PreDeCon
-        Util.addParameter(parameters, LAMBDA_PARAM, Integer.toString(getParameterValue(LAMBDA_PARAM)));
+        Util.addParameter(parameters, LAMBDA_PARAM, Integer.toString(LAMBDA_PARAM.getValue()));
 
         return parameters;
     }

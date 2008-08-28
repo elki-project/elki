@@ -204,7 +204,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
         String[] remainingParameters = super.setParameters(args);
 
         // minpts
-        int minpts = getParameterValue(MINPTS_PARAM);
+        int minpts = MINPTS_PARAM.getValue();
 
         // knn join
         List<String> kNNJoinParameters = new ArrayList<String>();

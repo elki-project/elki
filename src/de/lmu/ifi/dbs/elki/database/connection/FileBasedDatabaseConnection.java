@@ -53,10 +53,10 @@ public class FileBasedDatabaseConnection<O extends DatabaseObject> extends Input
         String[] remainingParameters = super.setParameters(args);
 
         try {
-            in = new FileInputStream(getParameterValue(INPUT_PARAM));
+            in = new FileInputStream(INPUT_PARAM.getValue());
         }
         catch (FileNotFoundException e) {
-            throw new WrongParameterValueException(INPUT_PARAM, getParameterValue(INPUT_PARAM).getPath(), e);
+            throw new WrongParameterValueException(INPUT_PARAM, INPUT_PARAM.getValue().getPath(), e);
         }
 
         return remainingParameters;

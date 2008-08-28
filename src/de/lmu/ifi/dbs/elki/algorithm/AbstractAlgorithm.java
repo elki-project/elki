@@ -74,8 +74,8 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends Abstra
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
-        verbose = isSet(VERBOSE_FLAG);
-        time = isSet(TIME_FLAG);
+        verbose = VERBOSE_FLAG.isSet();
+        time = TIME_FLAG.isSet();
         setParameters(args, remainingParameters);
         return remainingParameters;
     }

@@ -41,7 +41,7 @@ public class KnnQueryBasedHiCOPreprocessor<V extends RealVector<V, ?>> extends H
    */
   public KnnQueryBasedHiCOPreprocessor() {
     super();
-    optionHandler.put(K_PARAM);
+    addOption(K_PARAM);
   }
 
   protected List<Integer> objectIDsForPCA(Integer id, Database<V> database, boolean verbose, boolean time) {
@@ -79,8 +79,8 @@ public class KnnQueryBasedHiCOPreprocessor<V extends RealVector<V, ?>> extends H
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
-    if(optionHandler.isSet(K_PARAM)) {
-      k = getParameterValue(K_PARAM);
+    if(K_PARAM.isSet()) {
+      k = K_PARAM.getValue();
     }
 
     setParameters(args, remainingParameters);

@@ -172,21 +172,21 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = optionHandler.grabOptions(args);
 
-        if (isSet(CLASS_LABEL_INDEX_PARAM)) {
-            classLabelIndex = getParameterValue(CLASS_LABEL_INDEX_PARAM);
-            classLabelClass = getParameterValue(CLASS_LABEL_CLASS_PARAM);
+        if (CLASS_LABEL_INDEX_PARAM.isSet()) {
+            classLabelIndex = CLASS_LABEL_INDEX_PARAM.getValue();
+            classLabelClass = CLASS_LABEL_CLASS_PARAM.getValue();
         }
         else if (!CLASS_LABEL_CLASS_PARAM.tookDefaultValue()) {
             // throws an exception if the class label class is set but no class
             // label index!
-            classLabelIndex = getParameterValue(CLASS_LABEL_INDEX_PARAM);
-            classLabelClass = getParameterValue(CLASS_LABEL_CLASS_PARAM);
+            classLabelIndex = CLASS_LABEL_INDEX_PARAM.getValue();
+            classLabelClass = CLASS_LABEL_CLASS_PARAM.getValue();
         }
 
-        if (isSet(EXTERNAL_ID_INDEX_PARAM) || forceExternalID) {
+        if (EXTERNAL_ID_INDEX_PARAM.isSet() || forceExternalID) {
             // throws an exception if forceExternalID is true but
             // externalIDIndex is not set!
-            externalIDIndex = getParameterValue(EXTERNAL_ID_INDEX_PARAM);
+            externalIDIndex = EXTERNAL_ID_INDEX_PARAM.getValue();
         }
 
         // database

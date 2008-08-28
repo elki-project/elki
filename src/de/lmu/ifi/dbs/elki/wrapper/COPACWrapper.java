@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.DefaultValueGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -88,7 +89,7 @@ public class COPACWrapper<O extends DatabaseObject> extends NormalizationWrapper
         optionHandler.setGlobalParameterConstraint(gpc);
     }
 
-    public List<String> getKDDTaskParameters() {
+    public List<String> getKDDTaskParameters() throws UnusedParameterException {
         List<String> parameters = super.getKDDTaskParameters();
 
         // algorithm COPAC
@@ -98,10 +99,10 @@ public class COPACWrapper<O extends DatabaseObject> extends NormalizationWrapper
         Util.addParameter(parameters, COPAC.PARTITION_ALGORITHM_ID, DBSCAN.class.getName());
 
         // epsilon
-        Util.addParameter(parameters, EPSILON_PARAM, getParameterValue(EPSILON_PARAM));
+        Util.addParameter(parameters, EPSILON_PARAM, EPSILON_PARAM.getValue());
 
         // minpts
-        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(getParameterValue(MINPTS_PARAM)));
+        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(MINPTS_PARAM.getValue()));
 
         // distance function
         Util.addParameter(parameters, DBSCAN.DISTANCE_FUNCTION_ID, LocallyWeightedDistanceFunction.class.getName());
@@ -114,7 +115,7 @@ public class COPACWrapper<O extends DatabaseObject> extends NormalizationWrapper
         Util.addParameter(parameters, COPAC.PREPROCESSOR_ID, KnnQueryBasedHiCOPreprocessor.class.getName());
 
         // k
-        Util.addParameter(parameters, K_PARAM, Integer.toString(getParameterValue(K_PARAM)));
+        Util.addParameter(parameters, K_PARAM, Integer.toString(K_PARAM.getValue()));
 
         return parameters;
     }

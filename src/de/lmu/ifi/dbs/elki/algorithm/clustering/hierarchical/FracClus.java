@@ -126,7 +126,7 @@ public class FracClus<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
-        k = getParameterValue(NUMBER_OF_SUPPORTERS_PARAM);
+        k = NUMBER_OF_SUPPORTERS_PARAM.getValue();
         return remainingParameters;
     }
 

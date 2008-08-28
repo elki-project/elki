@@ -19,7 +19,6 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -163,10 +162,10 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         String[] remainingParameters = super.setParameters(args);
 
         // epsilon
-        epsilon = getParameterValue(EPSILON_PARAM);
+        epsilon = EPSILON_PARAM.getValue();
 
         // mu
-        int minpts = getParameterValue(MU_PARAM);
+        int minpts = MU_PARAM.getValue();
 
         // OPTICS
         // verbose and time
@@ -196,12 +195,10 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         Util.addParameter(opticsParameters, PreprocessorHandler.PREPROCESSOR_ID, DiSHPreprocessor.class.getName());
 
         // preprocessor epsilon
-        opticsParameters.add(OptionHandler.OPTION_PREFIX + DiSHPreprocessor.EPSILON_ID.getName());
-        opticsParameters.add(Double.toString(epsilon));
+        Util.addParameter(opticsParameters, DiSHPreprocessor.EPSILON_ID, Double.toString(epsilon));
 
         // preprocessor minpts
-        opticsParameters.add(OptionHandler.OPTION_PREFIX + DiSHPreprocessor.MINPTS_ID.getName());
-        opticsParameters.add(Integer.toString(minpts));
+        Util.addParameter(opticsParameters, DiSHPreprocessor.MINPTS_ID, Integer.toString(minpts));
 
         // remaining parameters
         for (String parameter : remainingParameters) {

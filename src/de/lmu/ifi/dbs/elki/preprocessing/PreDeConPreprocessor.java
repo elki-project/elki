@@ -62,7 +62,7 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends RealVector<V,
     deltaCons.add(new LessEqualConstraint(1));
     DoubleParameter delta = new DoubleParameter(DELTA_P, DELTA_D, deltaCons);
     delta.setDefaultValue(DEFAULT_DELTA);
-    optionHandler.put(delta);
+    addOption(delta);
   }
 
   /**

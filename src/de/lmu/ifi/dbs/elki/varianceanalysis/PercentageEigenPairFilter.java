@@ -115,7 +115,7 @@ public class PercentageEigenPairFilter extends AbstractParameterizable implement
         String[] remainingParameters = super.setParameters(args);
 
         //alpha
-        alpha = getParameterValue(ALPHA_PARAM);
+        alpha = ALPHA_PARAM.getValue();
 
         return remainingParameters;
     }

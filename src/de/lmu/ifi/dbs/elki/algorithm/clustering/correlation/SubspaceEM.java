@@ -507,8 +507,8 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
         // k and delta
-        k = getParameterValue(K_PARAM);
-        delta = getParameterValue(DELTA_PARAM);
+        k = K_PARAM.getValue();
+        delta = DELTA_PARAM.getValue();
 
         return remainingParameters;
     }

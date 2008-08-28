@@ -138,7 +138,7 @@ public class LimitEigenPairFilter extends AbstractParameterizable implements Eig
 		String[] remainingParameters = super.setParameters(args);
 
 		// absolute
-		absolute = isSet(ABSOLUTE_FLAG);
+		absolute = ABSOLUTE_FLAG.isSet();
 
 		// delta
 		delta = DELTA_PARAM.getValue();

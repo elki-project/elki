@@ -117,7 +117,7 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
         // number of neighbors
-        numberOfNeighbors = getParameterValue(NUMBER_OF_NEIGHBORS_PARAM);
+        numberOfNeighbors = NUMBER_OF_NEIGHBORS_PARAM.getValue();
 
         // distance function
         distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();

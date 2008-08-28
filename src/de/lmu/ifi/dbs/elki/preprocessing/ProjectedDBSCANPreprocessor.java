@@ -174,10 +174,10 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
         setParameters(args, remainingParameters);
 
         // epsilon
-        epsilon = getParameterValue(EPSILON_PARAM);
+        epsilon = EPSILON_PARAM.getValue();
 
         // minpts
-        minpts = getParameterValue(MINPTS_PARAM);
+        minpts = MINPTS_PARAM.getValue();
 
         return remainingParameters;
     }

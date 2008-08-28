@@ -113,8 +113,8 @@ public class ERiCDistanceFunction<V extends RealVector<V, ?>, P extends Preproce
         String[] remainingParameters = super.setParameters(args);
 
         // delta, tau
-        delta = getParameterValue(DELTA_PARAM);
-        tau = getParameterValue(TAU_PARAM);
+        delta = DELTA_PARAM.getValue();
+        tau = TAU_PARAM.getValue();
 
         return remainingParameters;
     }

@@ -174,7 +174,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
         String[] remainingParameters = super.setParameters(args);
 
         // input files
-        List<File> inputFiles = getParameterValue(INPUT_PARAM);
+        List<File> inputFiles = INPUT_PARAM.getValue();
         inputStreams = new ArrayList<FileInputStream>(inputFiles.size());
         for (File inputFile : inputFiles) {
             try {

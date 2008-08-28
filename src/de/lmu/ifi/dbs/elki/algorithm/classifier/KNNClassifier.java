@@ -130,7 +130,7 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
         String[] remainingParameters = super.setParameters(args);
 
         // parameter k
-        k = getParameterValue(K_PARAM);
+        k = K_PARAM.getValue();
 
         return remainingParameters;
     }

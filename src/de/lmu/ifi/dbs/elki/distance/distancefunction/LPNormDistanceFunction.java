@@ -28,7 +28,7 @@ public class LPNormDistanceFunction<V extends FeatureVector<V, N>, N extends Num
     public static final String P_D = "the degree of the L-P-Norm (positive number)";
 
     /**
-     * Keeps the curerntly set p.
+     * Keeps the currently set p.
      */
     private double p;
 
@@ -38,7 +38,7 @@ public class LPNormDistanceFunction<V extends FeatureVector<V, N>, N extends Num
     public LPNormDistanceFunction() {
         super();
 
-        optionHandler.put(new DoubleParameter(P_P, P_D, new GreaterConstraint(0)));
+        addOption(new DoubleParameter(P_P, P_D, new GreaterConstraint(0)));
     }
 
     /**

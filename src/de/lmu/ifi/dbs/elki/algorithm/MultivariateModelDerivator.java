@@ -112,7 +112,7 @@ public class MultivariateModelDerivator<V extends RealVector<V, ?>, D extends Di
         V centroidDV = Util.centroid(db, dbIDs);
         Set<Integer> ids;
         if (this.sampleSize != null) {
-            if (isSet(RANDOM_SAMPLE_FLAG)) {
+            if (RANDOM_SAMPLE_FLAG.isSet()) {
                 ids = db.randomSample(this.sampleSize, 1);
             }
             else {
@@ -184,8 +184,8 @@ public class MultivariateModelDerivator<V extends RealVector<V, ?>, D extends Di
         String[] remainingParameters = super.setParameters(args);
 
         // sample size
-        if (isSet(SAMPLE_SIZE_PARAM)) {
-            sampleSize = getParameterValue(SAMPLE_SIZE_PARAM);
+        if (SAMPLE_SIZE_PARAM.isSet()) {
+            sampleSize = SAMPLE_SIZE_PARAM.getValue();
         }
 
         // pca

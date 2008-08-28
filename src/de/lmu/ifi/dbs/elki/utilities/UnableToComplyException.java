@@ -5,9 +5,8 @@ package de.lmu.ifi.dbs.elki.utilities;
  * 
  * @author Arthur Zimek
  */
+@SuppressWarnings("serial")
 public class UnableToComplyException extends Exception {
-  private static final long serialVersionUID = -5382132162693018191L;
-
   /**
    * Exception to state inability to execute an operation.
    * 

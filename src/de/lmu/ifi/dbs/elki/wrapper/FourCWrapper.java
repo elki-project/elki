@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
@@ -96,34 +97,34 @@ public class FourCWrapper<O extends DatabaseObject> extends NormalizationWrapper
         cons.add(new LessEqualConstraint(1));
         delta = new DoubleParameter(OptionID.EIGENPAIR_FILTER_DELTA, cons);
         delta.setDefaultValue(LimitEigenPairFilter.DEFAULT_DELTA);
-        optionHandler.put(delta);
+        addOption(delta);
 
         // absolute flag
         absolute = new Flag(OptionID.EIGENPAIR_FILTER_ABSOLUTE);
-        optionHandler.put(absolute);
+        addOption(absolute);
     }
 
     @Override
-    public List<String> getKDDTaskParameters() {
+    public List<String> getKDDTaskParameters() throws UnusedParameterException {
         List<String> parameters = super.getKDDTaskParameters();
 
         // 4C algorithm
         Util.addParameter(parameters, OptionID.ALGORITHM, FourC.class.getName());
 
         // epsilon
-        Util.addParameter(parameters, EPSILON_PARAM, getParameterValue(EPSILON_PARAM));
+        Util.addParameter(parameters, EPSILON_PARAM, EPSILON_PARAM.getValue());
 
         // minpts
-        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(getParameterValue(MINPTS_PARAM)));
+        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(MINPTS_PARAM.getValue()));
 
         // lambda
-        Util.addParameter(parameters, LAMBDA_PARAM, Integer.toString(getParameterValue(LAMBDA_PARAM)));
+        Util.addParameter(parameters, LAMBDA_PARAM, Integer.toString(LAMBDA_PARAM.getValue()));
 
         // delta
-        Util.addParameter(parameters, delta, getParameterValue(delta).toString());
+        Util.addParameter(parameters, delta, delta.getValue().toString());
 
         // absolute flag
-        if (optionHandler.isSet(absolute))
+        if (absolute.isSet())
             Util.addFlag(parameters, absolute);
 
         return parameters;

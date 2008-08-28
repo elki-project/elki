@@ -173,7 +173,7 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
         String[] remainingParameters = super.setParameters(args);
 
         // m_i
-        m_i = getParameterValue(M_I_PARAM);
+        m_i = M_I_PARAM.getValue();
 
         return remainingParameters;
     }

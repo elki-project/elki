@@ -298,13 +298,13 @@ public class LOF<O extends DatabaseObject> extends
         String[] remainingParameters = super.setParameters(args);
 
         // pagesize
-        pageSize = getParameterValue(PAGE_SIZE_PARAM);
+        pageSize = PAGE_SIZE_PARAM.getValue();
 
         // cachesize
-        cacheSize = getParameterValue(CACHE_SIZE_PARAM);
+        cacheSize = CACHE_SIZE_PARAM.getValue();
 
         // minpts
-        minpts = getParameterValue(MINPTS_PARAM);
+        minpts = MINPTS_PARAM.getValue();
 
         return remainingParameters;
     }

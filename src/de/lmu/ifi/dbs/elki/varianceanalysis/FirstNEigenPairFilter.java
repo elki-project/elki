@@ -93,7 +93,7 @@ public class FirstNEigenPairFilter extends AbstractParameterizable implements Ei
         String[] remainingParameters = super.setParameters(args);
 
         //n
-        n = getParameterValue(N_PARAM);
+        n = N_PARAM.getValue();
 
         return remainingParameters;
     }

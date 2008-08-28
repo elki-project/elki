@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.varianceanalysis.ica.FastICA;
 import de.lmu.ifi.dbs.elki.varianceanalysis.ica.KurtosisBasedContrastFunction;
 
@@ -36,7 +37,7 @@ public class ICAWrapper<O extends DatabaseObject> extends FileBasedDatabaseConne
     }
 
     @Override
-    public List<String> getKDDTaskParameters() {
+    public List<String> getKDDTaskParameters() throws UnusedParameterException {
         List<String> parameters = super.getKDDTaskParameters();
 
         // algorithm ICA

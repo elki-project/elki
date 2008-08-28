@@ -247,9 +247,9 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
         String[] remainingParameters = super.setParameters(args);
 
         // parameters xsi, tau and flag prune
-        xsi = getParameterValue(XSI_PARAM);
-        tau = getParameterValue(TAU_PARAM);
-        prune = isSet(PRUNE_FLAG);
+        xsi = XSI_PARAM.getValue();
+        tau = TAU_PARAM.getValue();
+        prune = PRUNE_FLAG.isSet();
 
         return remainingParameters;
     }

@@ -165,7 +165,7 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
         V centroidDV = Util.centroid(db, dbIDs);
         Set<Integer> ids;
         if (this.sampleSize != null) {
-            if (isSet(RANDOM_SAMPLE_FLAG)) {
+            if (RANDOM_SAMPLE_FLAG.isSet()) {
                 ids = db.randomSample(this.sampleSize, 1);
             }
             else {
@@ -298,13 +298,13 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
         String[] remainingParameters = super.setParameters(args);
 
         // accuracy
-        int accuracy = getParameterValue(OUTPUT_ACCURACY_PARAM);
+        int accuracy = OUTPUT_ACCURACY_PARAM.getValue();
         NF.setMaximumFractionDigits(accuracy);
         NF.setMinimumFractionDigits(accuracy);
 
         // sample size
-        if (isSet(SAMPLE_SIZE_PARAM)) {
-            sampleSize = getParameterValue(SAMPLE_SIZE_PARAM);
+        if (SAMPLE_SIZE_PARAM.isSet()) {
+            sampleSize = SAMPLE_SIZE_PARAM.getValue();
         }
 
         remainingParameters = pca.setParameters(remainingParameters);

@@ -314,7 +314,7 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
-        k = getParameterValue(K_PARAM);
+        k = K_PARAM.getValue();
 
         return remainingParameters;
     }

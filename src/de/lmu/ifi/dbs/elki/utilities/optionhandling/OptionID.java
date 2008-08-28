@@ -15,9 +15,8 @@ import de.lmu.ifi.dbs.elki.varianceanalysis.EigenPairFilter;
  *
  * @author Elke Achtert
  */
+@SuppressWarnings("serial")
 public final class OptionID extends ConstantObject<OptionID> {
-    private static final long serialVersionUID = -6100642356680808282L;
-
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#HELP_FLAG}
      */

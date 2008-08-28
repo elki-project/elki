@@ -121,7 +121,7 @@ public class PreprocessorHandler<O extends DatabaseObject, P extends Preprocesso
         String[] remainingParameters = super.setParameters(args);
 
         // omit
-        omit = isSet(OMIT_PREPROCESSING_FLAG);
+        omit = OMIT_PREPROCESSING_FLAG.isSet();
 
         // preprocessor
         preprocessor = PREPROCESSOR_PARAM.instantiateClass();

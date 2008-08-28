@@ -177,6 +177,8 @@ public abstract class AbstractParameterizable extends AbstractLoggable
      *         otherwise
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Option#isSet()
      */
+    @Deprecated
+    // Deprecated: use option.isSet() instead
     protected boolean isSet(Option<?> option) {
         return option.isSet();
     }
@@ -192,6 +194,8 @@ public abstract class AbstractParameterizable extends AbstractLoggable
      *                               to be called).
      * @see Parameter#getValue()
      */
+    @Deprecated
+    // Deprecated: use option.getValue() instead
     protected <T> T getParameterValue(Parameter<T, ?> parameter) throws IllegalStateException {
         try {
             return parameter.getValue();

@@ -204,9 +204,9 @@ public class MaPle<V extends RealVector<V, Double>> extends
 	@Override
 	public String[] setParameters(String[] args) throws ParameterException {
 		String[] remainingParameters = super.setParameters(args);
-		nc = this.getParameterValue(NUMBER_COLS_PARAM);
-		nr = this.getParameterValue(NUMBER_ROWS_PARAM);
-		sigma = this.getParameterValue(SIGMA_PARAM);
+		nc = NUMBER_COLS_PARAM.getValue();
+		nr = NUMBER_ROWS_PARAM.getValue();
+		sigma = SIGMA_PARAM.getValue();
 		return remainingParameters;
 	}
 

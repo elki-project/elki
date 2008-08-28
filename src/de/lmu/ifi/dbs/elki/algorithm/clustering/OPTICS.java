@@ -224,10 +224,10 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
         String[] remainingParameters = super.setParameters(args);
 
         // epsilon
-        epsilon = getParameterValue(EPSILON_PARAM);
+        epsilon = EPSILON_PARAM.getValue();
 
         // minpts
-        minpts = getParameterValue(MINPTS_PARAM);
+        minpts = MINPTS_PARAM.getValue();
 
         return remainingParameters;
     }

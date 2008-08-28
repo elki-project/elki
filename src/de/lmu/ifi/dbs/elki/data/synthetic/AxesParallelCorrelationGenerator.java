@@ -402,8 +402,8 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
         }
 
         // dependent values
-        if (optionHandler.isSet(depParameter)) {
-            List<Double> dep_list = getParameterValue(depParameter);
+        if (depParameter.isSet()) {
+            List<Double> dep_list = depParameter.getValue();
 
             double[] dv = new double[dataDim];
             int c = 0;

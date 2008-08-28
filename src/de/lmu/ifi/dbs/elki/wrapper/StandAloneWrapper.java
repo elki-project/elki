@@ -59,7 +59,7 @@ public abstract class StandAloneWrapper extends AbstractWrapper {
         String[] remainingParameters = super.setParameters(args);
 
         // output
-        output = getParameterValue(OUTPUT_PARAM);
+        output = OUTPUT_PARAM.getValue();
 
         return remainingParameters;
     }

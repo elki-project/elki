@@ -56,11 +56,11 @@ public abstract class KDDTaskWrapper<O extends DatabaseObject> extends AbstractW
     protected KDDTaskWrapper() {
         super();
 
-        // outpout
-        optionHandler.put(OUTPUT_PARAM);
+        // output
+        addOption(OUTPUT_PARAM);
 
         // time
-        optionHandler.put(TIME_FLAG);
+        addOption(TIME_FLAG);
     }
 
     public final void run() throws UnableToComplyException {
@@ -115,8 +115,8 @@ public abstract class KDDTaskWrapper<O extends DatabaseObject> extends AbstractW
         String[] remainingParameters = super.setParameters(args);
 
         // output
-        if (optionHandler.isSet(OUTPUT_PARAM)) {
-            output = getParameterValue(OUTPUT_PARAM);
+        if (OUTPUT_PARAM.isSet()) {
+            output = OUTPUT_PARAM.getValue();
         }
 
         // time
@@ -131,7 +131,7 @@ public abstract class KDDTaskWrapper<O extends DatabaseObject> extends AbstractW
      * @return the array containing the parameter setting that is necessary to
      *         run the kdd task correctly
      */
-    public List<String> getKDDTaskParameters() {
+    public List<String> getKDDTaskParameters() throws UnusedParameterException {
         List<String> parameters = getRemainingParameters();
 
         // verbose

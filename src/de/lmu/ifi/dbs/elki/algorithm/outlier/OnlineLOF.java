@@ -176,18 +176,18 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
 
         // lofTable
         try {
-            lofTable = new LOFTable(getParameterValue(LOF_PARAM), pageSize, cacheSize, minpts);
+            lofTable = new LOFTable(LOF_PARAM.getValue(), pageSize, cacheSize, minpts);
         }
         catch (IOException e) {
-            throw new WrongParameterValueException(LOF_PARAM, getParameterValue(LOF_PARAM).getName(), e);
+            throw new WrongParameterValueException(LOF_PARAM, LOF_PARAM.getValue().getName(), e);
         }
 
         // nnTable
         try {
-            nnTable = new NNTable(getParameterValue(NN_PARAM), pageSize, cacheSize, minpts);
+            nnTable = new NNTable(NN_PARAM.getValue(), pageSize, cacheSize, minpts);
         }
         catch (IOException e) {
-            throw new WrongParameterValueException(NN_PARAM, getParameterValue(NN_PARAM).getName(), e);
+            throw new WrongParameterValueException(NN_PARAM, NN_PARAM.getValue().getName(), e);
         }
 
         // parser for insertions
@@ -195,12 +195,12 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
 
         // insertions
         try {
-            InputStream in = new FileInputStream(getParameterValue(INSERTIONS_PARAM));
+            InputStream in = new FileInputStream(INSERTIONS_PARAM.getValue());
             ParsingResult<O> parsingResult = parser.parse(in);
             insertions = transformObjectAndLabels(parsingResult.getObjectAndLabelList());
         }
         catch (FileNotFoundException e) {
-            throw new WrongParameterValueException(INSERTIONS_PARAM, getParameterValue(INSERTIONS_PARAM).getName(), e);
+            throw new WrongParameterValueException(INSERTIONS_PARAM, INSERTIONS_PARAM.getValue().getName(), e);
         }
 
         return remainingParameters;

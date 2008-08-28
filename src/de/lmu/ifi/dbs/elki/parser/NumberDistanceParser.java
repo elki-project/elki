@@ -60,7 +60,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
     public NumberDistanceParser() {
         super();
         ClassParameter<DistanceFunction<ExternalObject, D>> distFunc = new ClassParameter<DistanceFunction<ExternalObject, D>>(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D, DistanceFunction.class);
-        optionHandler.put(distFunc);
+        addOption(distFunc);
     }
 
     public ParsingResult<ExternalObject> parse(InputStream in) {

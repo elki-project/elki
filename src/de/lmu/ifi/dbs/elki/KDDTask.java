@@ -292,17 +292,17 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
     remainingParameters = databaseConnection.setParameters(remainingParameters);
 
     // output
-    if(isSet(OUTPUT_PARAM)) {
-      out = getParameterValue(OUTPUT_PARAM);
+    if(OUTPUT_PARAM.isSet()) {
+      out = OUTPUT_PARAM.getValue();
     }
 
     // normalization
-    if(isSet(NORMALIZATION_PARAM)) {
+    if(NORMALIZATION_PARAM.isSet()) {
       normalization = NORMALIZATION_PARAM.instantiateClass();
-      normalizationUndo = isSet(NORMALIZATION_UNDO_FLAG);
+      normalizationUndo = NORMALIZATION_UNDO_FLAG.isSet();
       remainingParameters = normalization.setParameters(remainingParameters);
     }
-    else if(isSet(NORMALIZATION_UNDO_FLAG)) {
+    else if(NORMALIZATION_UNDO_FLAG.isSet()) {
       throw new WrongParameterValueException("Illegal parameter setting: Flag " + NORMALIZATION_UNDO_FLAG + " is set, but no normalization is specified.");
     }
 

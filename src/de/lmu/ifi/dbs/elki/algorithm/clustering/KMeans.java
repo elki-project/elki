@@ -224,7 +224,7 @@ public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends D
         String[] remainingParameters = super.setParameters(args);
 
         // k
-        k = getParameterValue(K_PARAM);
+        k = K_PARAM.getValue();
 
         return remainingParameters;
     }

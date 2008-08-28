@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 
 import java.util.List;
 
@@ -18,7 +19,7 @@ import java.util.List;
 public abstract class NormalizationWrapper<O extends DatabaseObject> extends FileBasedDatabaseConnectionWrapper<O> {
 
     @Override
-    public List<String> getKDDTaskParameters() {
+    public List<String> getKDDTaskParameters() throws UnusedParameterException {
         List<String> parameters = super.getKDDTaskParameters();
 
         // normalization

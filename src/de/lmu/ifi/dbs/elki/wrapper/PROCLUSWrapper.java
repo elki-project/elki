@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
 /**
@@ -72,20 +73,20 @@ public class PROCLUSWrapper<O extends DatabaseObject> extends FileBasedDatabaseC
     }
 
     @Override
-    public List<String> getKDDTaskParameters() {
+    public List<String> getKDDTaskParameters() throws UnusedParameterException {
         List<String> parameters = super.getKDDTaskParameters();
 
         // PROCLUS algorithm
         Util.addParameter(parameters, OptionID.ALGORITHM, PROCLUS.class.getName());
 
         // l
-        Util.addParameter(parameters, L_PARAM, Integer.toString(getParameterValue(L_PARAM)));
+        Util.addParameter(parameters, L_PARAM, Integer.toString(L_PARAM.getValue()));
 
         // k
-        Util.addParameter(parameters, K_PARAM, Integer.toString(getParameterValue(K_PARAM)));
+        Util.addParameter(parameters, K_PARAM, Integer.toString(K_PARAM.getValue()));
 
         // k_i
-        Util.addParameter(parameters, K_I_PARAM, Integer.toString(getParameterValue(K_I_PARAM)));
+        Util.addParameter(parameters, K_I_PARAM, Integer.toString(K_I_PARAM.getValue()));
 
 
         return parameters;

@@ -39,7 +39,7 @@ public class DimensionSelectingDistanceFunction<N extends Number, V extends Feat
     public DimensionSelectingDistanceFunction() {
         super();
 
-        optionHandler.put(new IntParameter(DIM_P, DIM_D, new GreaterEqualConstraint(1)));
+        addOption(new IntParameter(DIM_P, DIM_D, new GreaterEqualConstraint(1)));
     }
 
     /**

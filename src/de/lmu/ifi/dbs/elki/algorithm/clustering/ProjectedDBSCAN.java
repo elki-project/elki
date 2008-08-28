@@ -376,13 +376,13 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
         distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
 
         // epsilon
-        epsilon = getParameterValue(EPSILON_PARAM);
+        epsilon = EPSILON_PARAM.getValue();
 
         // minpts
-        minpts = getParameterValue(MINPTS_PARAM);
+        minpts = MINPTS_PARAM.getValue();
 
         // lambda
-        lambda = getParameterValue(LAMBDA_PARAM);
+        lambda = LAMBDA_PARAM.getValue();
 
         // parameters for the distance function
         // todo provide setters

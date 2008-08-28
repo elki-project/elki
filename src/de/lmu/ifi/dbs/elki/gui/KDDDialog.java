@@ -26,13 +26,8 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
+@SuppressWarnings("serial")
 public class KDDDialog extends JDialog implements ActionListener {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -4372635919330261128L;
-
 	public static final String CLOSE_COMMAND = "CLOSE";
 
 	public static final String DETAILS = "DETAILS";
@@ -177,7 +172,7 @@ public class KDDDialog extends JDialog implements ActionListener {
 		pack();
 	}
 
-	private void createAboutPanel(EditObject editObject) {
+  private void createAboutPanel(EditObject editObject) {
 
 		JPanel base = new JPanel(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -186,11 +181,6 @@ public class KDDDialog extends JDialog implements ActionListener {
 		gbc.gridy = 0;
 
 		JTextPane area = new JTextPane() {
-
-			/**
-       * 
-       */
-      private static final long serialVersionUID = 6890857097984319040L;
 
       public Dimension getPreferredScrollableViewportSize() {
 				Dimension dim = getPreferredSize();

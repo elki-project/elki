@@ -213,9 +213,9 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
         String[] remainingParameters = super.setParameters(args);
 
         // epsilon
-        epsilon = getParameterValue(EPSILON_PARAM);
+        epsilon = EPSILON_PARAM.getValue();
         // minpts
-        minpts = getParameterValue(MINPTS_PARAM);
+        minpts = MINPTS_PARAM.getValue();
 
         // distance function
         distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();

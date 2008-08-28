@@ -61,7 +61,7 @@ public class ArffFileParser<O extends DatabaseObject & WekaObject<W>, W extends 
      */
     public ArffFileParser()
     {
-        optionHandler.put(BASE_PARSER_PARAM);
+        addOption(BASE_PARSER_PARAM);
     }
 
     /**
@@ -90,21 +90,14 @@ public class ArffFileParser<O extends DatabaseObject & WekaObject<W>, W extends 
      * {@link #DEFAULT_PARSER}.
      * 
      */
+    @SuppressWarnings("unchecked")
     @Override
     public String[] setParameters(String[] args) throws ParameterException
     {
         String[] params = super.setParameters(args);
-        if(optionHandler.isSet(BASE_PARSER_PARAM))
+        if (BASE_PARSER_PARAM.isSet())
         {
-            String parserClass = getParameterValue(BASE_PARSER_PARAM);
-            try
-            {
-                this.parser = Util.instantiateGenerics(Parser.class,parserClass);
-            }
-            catch(UnableToComplyException e)
-            {
-                throw new WrongParameterValueException(BASE_PARSER_PARAM.getName(), parserClass, BASE_PARSER_PARAM.getDescription());
-            }
+          this.parser = (Parser<O>) BASE_PARSER_PARAM.instantiateClass();
         }
         else
         {

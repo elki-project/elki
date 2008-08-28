@@ -114,8 +114,8 @@ public class FractalDimensionTest<V extends RealVector<V, ?>> extends AbstractAl
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
-        id1 = getParameterValue(ID1_PARAM);
-        id2 = getParameterValue(ID2_PARAM);
+        id1 = ID1_PARAM.getValue();
+        id2 = ID2_PARAM.getValue();
         //k = getParameterValue(supporters);
 
         remainingParameters = distanceFunction.setParameters(remainingParameters);

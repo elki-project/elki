@@ -55,7 +55,7 @@ public abstract class StandAloneInputWrapper extends StandAloneWrapper {
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
         // input
-        input = getParameterValue(INPUT_PARAM);
+        input = INPUT_PARAM.getValue();
         return remainingParameters;
     }
 

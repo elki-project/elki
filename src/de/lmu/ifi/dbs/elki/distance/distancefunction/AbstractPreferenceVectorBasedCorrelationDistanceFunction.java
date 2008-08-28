@@ -200,7 +200,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
         String[] remainingParameters = super.setParameters(args);
 
         // epsilon
-        epsilon = getParameterValue(EPSILON_PARAM);
+        epsilon = EPSILON_PARAM.getValue();
 
         return remainingParameters;
     }

@@ -160,18 +160,18 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
         String[] remainingParameters = optionHandler.grabOptions(args);
 
         // filename
-        if (optionHandler.isSet(FILE_PARAM)) {
-            fileName = getParameterValue(FILE_PARAM).getPath();
+        if (FILE_PARAM.isSet()) {
+            fileName = FILE_PARAM.getValue().getPath();
         }
         else {
             fileName = null;
         }
 
         // pagesize
-        pageSize = getParameterValue(PAGE_SIZE_PARAM);
+        pageSize = PAGE_SIZE_PARAM.getValue();
 
         // cachesize
-        cacheSize = getParameterValue(CACHE_SIZE_PARAM);
+        cacheSize = CACHE_SIZE_PARAM.getValue();
 
         return remainingParameters;
     }

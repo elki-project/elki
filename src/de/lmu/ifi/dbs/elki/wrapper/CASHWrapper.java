@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.parser.ParameterizationFunctionLabelParser;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
 import java.util.List;
@@ -59,7 +60,7 @@ public class CASHWrapper<O extends DatabaseObject> extends FileBasedDatabaseConn
     }
 
     @Override
-    public List<String> getKDDTaskParameters() {
+    public List<String> getKDDTaskParameters() throws UnusedParameterException {
         List<String> parameters = super.getKDDTaskParameters();
 
         // algorithm CASH
@@ -69,10 +70,10 @@ public class CASHWrapper<O extends DatabaseObject> extends FileBasedDatabaseConn
         Util.addParameter(parameters, FileBasedDatabaseConnection.PARSER_ID, ParameterizationFunctionLabelParser.class.getName());
 
         // minpts
-        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(getParameterValue(MINPTS_PARAM)));
-
+        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(MINPTS_PARAM.getValue()));
+ 
         // maxLevel
-        Util.addParameter(parameters, MAXLEVEL_PARAM, Integer.toString(getParameterValue(MAXLEVEL_PARAM)));
+        Util.addParameter(parameters, MAXLEVEL_PARAM, Integer.toString(MAXLEVEL_PARAM.getValue()));
 
         return parameters;
     }

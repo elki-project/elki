@@ -125,7 +125,7 @@ public class MultivariateCorrelationOutlierProbability<V extends RealVector<V, ?
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
-        k = getParameterValue(K_PARAM);
+        k = K_PARAM.getValue();
 
         remainingParameters = modelDerivator.setParameters(remainingParameters);
 

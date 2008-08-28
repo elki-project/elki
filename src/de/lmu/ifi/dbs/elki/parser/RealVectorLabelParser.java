@@ -171,8 +171,8 @@ public class RealVectorLabelParser<V extends RealVector<V, ?>> extends AbstractP
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParams = super.setParameters(args);
     parseFloat = FLOAT_FLAG.isSet();
-    if (optionHandler.isSet(CLASS_LABEL_INDEX_PARAM)) {
-      classLabelIndex = getParameterValue(CLASS_LABEL_INDEX_PARAM);
+    if (CLASS_LABEL_INDEX_PARAM.isSet()) {
+      classLabelIndex = CLASS_LABEL_INDEX_PARAM.getValue();
     }
     else {
       classLabelIndex = CLASS_LABEL_INDEX_PARAM.getDefaultValue();

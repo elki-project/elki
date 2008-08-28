@@ -40,7 +40,7 @@ public class FooKernelFunction<O extends FeatureVector> extends AbstractDoubleKe
 		//parameter max_degree
 		IntParameter maxDeg = new IntParameter(MAX_DEGREE_P, MAX_DEGREE_D);
 		maxDeg.setDefaultValue(DEFAULT_MAX_DEGREE);
-		optionHandler.put(maxDeg);
+		addOption(maxDeg);
 	}
 
 	@Override

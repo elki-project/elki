@@ -145,17 +145,17 @@ public class AlgorithmTest extends AbstractParameterizable {
         String[] remainingParameters = super.setParameters(args);
 
         // input
-        input = getParameterValue(INPUT_PARAM);
+        input = INPUT_PARAM.getValue();
 
         // output
-        output = getParameterValue(OUTPUT_PARAM);
+        output = OUTPUT_PARAM.getValue();
         if (!output.isDirectory()) {
             throw new WrongParameterValueException("Required parameter " +
                 OUTPUT_PARAM.getName() + " is no (valid) directory!");
         }
 
         // algorithms
-        if (optionHandler.isSet(ALGORITHMS_PARAM)) {
+        if (ALGORITHMS_PARAM.isSet()) {
             algorithms = ALGORITHMS_PARAM.instantiateClasses();
         }
         else {

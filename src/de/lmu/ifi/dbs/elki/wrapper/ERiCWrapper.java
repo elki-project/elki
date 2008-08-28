@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.DefaultValueGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -99,7 +100,7 @@ public class ERiCWrapper<O extends DatabaseObject> extends NormalizationWrapper<
     }
 
     @Override
-    public List<String> getKDDTaskParameters() {
+    public List<String> getKDDTaskParameters() throws UnusedParameterException {
         List<String> parameters = super.getKDDTaskParameters();
 
         // algorithm ERiC
@@ -112,7 +113,7 @@ public class ERiCWrapper<O extends DatabaseObject> extends NormalizationWrapper<
         Util.addParameter(parameters, DBSCAN.EPSILON_ID, "0");
 
         // minpts
-        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(getParameterValue(MINPTS_PARAM)));
+        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(MINPTS_PARAM.getValue()));
 
         // distance function
         Util.addParameter(parameters, DBSCAN.DISTANCE_FUNCTION_ID, ERiCDistanceFunction.class.getName());
@@ -124,13 +125,13 @@ public class ERiCWrapper<O extends DatabaseObject> extends NormalizationWrapper<
         Util.addParameter(parameters, COPAC.PREPROCESSOR_ID, KnnQueryBasedHiCOPreprocessor.class.getName());
 
         // k
-        Util.addParameter(parameters, K_PARAM, Integer.toString(getParameterValue(K_PARAM)));
+        Util.addParameter(parameters, K_PARAM, Integer.toString(K_PARAM.getValue()));
 
         // delta
-        Util.addParameter(parameters, ERiCDistanceFunction.DELTA_ID, Double.toString(getParameterValue(DELTA_PARAM)));
+        Util.addParameter(parameters, ERiCDistanceFunction.DELTA_ID, Double.toString(DELTA_PARAM.getValue()));
 
         // tau
-        Util.addParameter(parameters, ERiCDistanceFunction.TAU_ID, Double.toString(getParameterValue(DELTA_PARAM)));
+        Util.addParameter(parameters, ERiCDistanceFunction.TAU_ID, Double.toString(DELTA_PARAM.getValue()));
 
         return parameters;
     }

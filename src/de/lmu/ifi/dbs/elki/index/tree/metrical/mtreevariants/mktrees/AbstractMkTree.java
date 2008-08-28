@@ -72,7 +72,7 @@ public abstract class AbstractMkTree<O extends DatabaseObject, D extends Distanc
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
-        k_max = getParameterValue(K_MAX_PARAM);
+        k_max = K_MAX_PARAM.getValue();
         return remainingParameters;
     }
 

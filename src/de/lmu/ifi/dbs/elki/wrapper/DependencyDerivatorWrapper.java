@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 
 /**
  * Wrapper class for the dependency derivator.
@@ -25,7 +26,7 @@ public class DependencyDerivatorWrapper<O extends DatabaseObject> extends FileBa
     }
 
     @Override
-    public List<String> getKDDTaskParameters() {
+    public List<String> getKDDTaskParameters() throws UnusedParameterException {
         List<String> parameters = super.getKDDTaskParameters();
 
         // algorithm DependencyDerivator

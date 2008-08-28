@@ -291,19 +291,19 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
         // minpts
-        minPts = getParameterValue(MINPTS_PARAM);
+        minPts = MINPTS_PARAM.getValue();
 
         // maxlevel
-        maxLevel = getParameterValue(MAXLEVEL_PARAM);
+        maxLevel = MAXLEVEL_PARAM.getValue();
 
         // mindim
-        minDim = getParameterValue(MINDIM_PARAM);
+        minDim = MINDIM_PARAM.getValue();
 
         // jitter
-        jitter = getParameterValue(JITTER_PARAM);
+        jitter = JITTER_PARAM.getValue();
 
         // adjust
-        adjust = isSet(ADJUST_FLAG);
+        adjust = ADJUST_FLAG.isSet();
 
         return remainingParameters;
     }

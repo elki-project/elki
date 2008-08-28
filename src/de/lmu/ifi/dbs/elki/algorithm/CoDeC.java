@@ -218,7 +218,7 @@ public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends 
         String[] remainingParameters = super.setParameters(args);
 
         // evaluateAsClassifier
-        evaluateAsClassifier = isSet(EVALUATE_AS_CLASSIFIER_FLAG);
+        evaluateAsClassifier = EVALUATE_AS_CLASSIFIER_FLAG.isSet();
 
         // classlabel
         classLabel = CLASSLABEL_PARAM.instantiateClass();

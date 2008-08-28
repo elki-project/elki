@@ -275,11 +275,11 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
-        if (optionHandler.isSet(MINFREQ_PARAM)) {
-            minfreq = getParameterValue(MINFREQ_PARAM);
+        if (MINFREQ_PARAM.isSet()) {
+            minfreq = MINFREQ_PARAM.getValue();
         }
         else {
-            minsupp = getParameterValue(MINSUPP_PARAM);
+            minsupp = MINSUPP_PARAM.getValue();
         }
 
         return remainingParameters;

@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 
@@ -84,14 +85,14 @@ public class DeLiCluWrapper<O extends DatabaseObject> extends NormalizationWrapp
         addOption(CACHE_SIZE_PARAM);
     }
 
-    public List<String> getKDDTaskParameters() {
+    public List<String> getKDDTaskParameters() throws UnusedParameterException {
         List<String> parameters = super.getKDDTaskParameters();
 
         // deliclu algorithm
         Util.addParameter(parameters, OptionID.ALGORITHM, DeLiClu.class.getName());
 
         // minpts
-        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(getParameterValue(MINPTS_PARAM)));
+        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(MINPTS_PARAM.getValue()));
 
         // database
         Util.addParameter(parameters, AbstractDatabaseConnection.DATABASE_ID, SpatialIndexDatabase.class.getName());
@@ -103,10 +104,10 @@ public class DeLiCluWrapper<O extends DatabaseObject> extends NormalizationWrapp
         parameters.add(OptionHandler.OPTION_PREFIX + SpatialIndex.BULK_LOAD_F);
 
         // page size
-        Util.addParameter(parameters, PAGE_SIZE_PARAM, Integer.toString(getParameterValue(PAGE_SIZE_PARAM)));
+        Util.addParameter(parameters, PAGE_SIZE_PARAM, Integer.toString(PAGE_SIZE_PARAM.getValue()));
 
         // cache size
-        Util.addParameter(parameters, CACHE_SIZE_PARAM, Integer.toString(getParameterValue(CACHE_SIZE_PARAM)));
+        Util.addParameter(parameters, CACHE_SIZE_PARAM, Integer.toString(CACHE_SIZE_PARAM.getValue()));
 
         return parameters;
     }

@@ -329,16 +329,16 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	@Override
 	public String[] setParameters(String[] args) throws ParameterException {
 		String[] remainingParameters = super.setParameters(args);
-		k = this.getParameterValue(K_PARAM);
-		initialRowDim = this.getParameterValue(INITIAL_ROW_DIM_PARAM);
-		initialColDim = this.getParameterValue(INITIAL_COL_DIM_PARAM);
-		int seed = this.getParameterValue(SEED_PARAM);
+		k = K_PARAM.getValue();
+		initialRowDim = INITIAL_ROW_DIM_PARAM.getValue();
+		initialColDim = INITIAL_COL_DIM_PARAM.getValue();
+		int seed = SEED_PARAM.getValue();
 		r = new Random(seed);
 		if (MISSING_PARAM.isSet()) {
-			missing = this.getParameterValue(MISSING_PARAM);
+			missing = MISSING_PARAM.getValue();
 		}
 		if (ACTION_ORDER_PARAM.isSet()) {
-			actionOrder = this.getParameterValue(ACTION_ORDER_PARAM);
+			actionOrder = ACTION_ORDER_PARAM.getValue();
 		}
 		if (actionOrder == 0) {
 			gainMap = new HashMap<Integer, Double>();

@@ -153,7 +153,7 @@ public class CorrelationOutlierProbability<V extends RealVector<V, ?>> extends D
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
-        k = getParameterValue(K_PARAM);
+        k = K_PARAM.getValue();
 
         // dependency derivator (currently hardcoded)
         dependencyDerivator = new DependencyDerivator<V, DoubleDistance>();

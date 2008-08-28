@@ -290,10 +290,10 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
-        epsilon = new IntegerDistance(getParameterValue(EPSILON_PARAM));
+        epsilon = new IntegerDistance(EPSILON_PARAM.getValue());
 
         // minpts
-        minpts = getParameterValue(MINPTS_PARAM);
+        minpts = MINPTS_PARAM.getValue();
 
         remainingParameters = similarityFunction.setParameters(remainingParameters);
         setParameters(args, remainingParameters);

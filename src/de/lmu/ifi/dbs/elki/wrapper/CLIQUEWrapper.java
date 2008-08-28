@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 
@@ -71,20 +72,20 @@ public class CLIQUEWrapper<O extends DatabaseObject> extends FileBasedDatabaseCo
         addOption(PRUNE_FLAG);
     }
 
-    public List<String> getKDDTaskParameters() {
+    public List<String> getKDDTaskParameters() throws UnusedParameterException {
         List<String> parameters = super.getKDDTaskParameters();
 
         // algorithm CLIQUE
         Util.addParameter(parameters, OptionID.ALGORITHM, CLIQUE.class.getName());
 
         // xsi
-        Util.addParameter(parameters, XSI_PARAM, Integer.toString(getParameterValue(XSI_PARAM)));
+        Util.addParameter(parameters, XSI_PARAM, Integer.toString(XSI_PARAM.getValue()));
 
         // tau
-        Util.addParameter(parameters, TAU_PARAM, Double.toString(getParameterValue(TAU_PARAM)));
+        Util.addParameter(parameters, TAU_PARAM, Double.toString(TAU_PARAM.getValue()));
 
         // prune
-        if (isSet(PRUNE_FLAG)) {
+        if (PRUNE_FLAG.isSet()) {
             Util.addFlag(parameters, PRUNE_FLAG);
         }
 
