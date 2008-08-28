@@ -39,7 +39,7 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
      * OptionID for {@link #VERBOSE_FLAG}
      */
     public static final OptionID TIME_ID = OptionID.getOrCreateOptionID(
-        "time", "flag whether to assess time");
+        "eval.time", "flag whether to assess time");
 
     /**
      * Flag to request verbose information.
@@ -50,7 +50,7 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
      * OptionID for {@link #VERBOSE_FLAG}
      */
     public static final OptionID VERBOSE_ID = OptionID.getOrCreateOptionID(
-        "verbose", "flag to request verbose messages during evaluation");
+        "eval.verbose", "flag to request verbose messages during evaluation");
 
     /**
      * Flag to request verbose information.
