@@ -1,23 +1,5 @@
 package de.lmu.ifi.dbs.elki.utilities;
 
-import de.lmu.ifi.dbs.elki.data.ClassLabel;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.data.RealVector;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.distance.Distance;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.logging.StaticLogger;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.NumberParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
-
 import java.io.PrintStream;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -33,6 +15,23 @@ import java.util.StringTokenizer;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
+import de.lmu.ifi.dbs.elki.data.ClassLabel;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.database.AssociationID;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.NumberParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
+
 /**
  * @version 0.1
  */
@@ -41,7 +40,7 @@ public final class Util extends AbstractLoggable {
     /**
      * The logger of this class.
      */
-    private static StaticLogger logger = new StaticLogger(Util.class.getName());
+//    private static StaticLogger logger = new StaticLogger(Util.class.getName());
 
     static {
         if (LoggingConfiguration.isChangeable()) {
@@ -1599,4 +1598,32 @@ public final class Util extends AbstractLoggable {
             list.add(object);
         }
     }
+
+    /**
+     * Create an array of lists.
+     * This is a common cast we have to do due to Java generics limitations.
+     * 
+     * @param <T> Type the list elements have
+     * @param len array size
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> List<T>[] newArrayOfList(int len) {
+      List<?>[] result = new List<?>[len];
+      return (List<T>[]) result;
+    }
+    
+    /**
+     * Create an array of ArrayLists.
+     * This is a common cast we have to do due to Java generics limitations.
+     * 
+     * @param <T> Type the list elements have
+     * @param len array size
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> ArrayList<T>[] newArrayOfArrayList(int len) {
+      ArrayList<?>[] result = new ArrayList<?>[len];
+      return (ArrayList<T>[]) result;
+    }    
 }

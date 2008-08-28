@@ -187,7 +187,12 @@ public class KDDDialog extends JDialog implements ActionListener {
 
 		JTextPane area = new JTextPane() {
 
-			public Dimension getPreferredScrollableViewportSize() {
+			/**
+       * 
+       */
+      private static final long serialVersionUID = 6890857097984319040L;
+
+      public Dimension getPreferredScrollableViewportSize() {
 				Dimension dim = getPreferredSize();
 				dim.width = 400;
 				dim.height = 300;
@@ -297,12 +302,12 @@ public class KDDDialog extends JDialog implements ActionListener {
 		setResizable(false);
 	}
 	
-	private void createSaveSettingsDialog(){
-		JPanel base = new JPanel(new GridBagLayout());
-		GridBagConstraints gbc = new GridBagConstraints();
-		
-		
-	}
+//	private void createSaveSettingsDialog(){
+//		JPanel base = new JPanel(new GridBagLayout());
+//		GridBagConstraints gbc = new GridBagConstraints();
+//		
+//		
+//	}
 
 	public static void showParameterMessage(Window owner, String message, ParameterException e) {
 

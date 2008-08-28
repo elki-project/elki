@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 import java.util.Arrays;
@@ -35,24 +36,26 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
     private boolean testSetProvided = false;
 
     /**
-     * Flag for time assessment.
+     * OptionID for {@link #VERBOSE_FLAG}
      */
-    public static final String TIME_F = "time";
+    public static final OptionID TIME_ID = OptionID.getOrCreateOptionID(
+        "time", "flag whether to assess time");
 
     /**
-     * Description for flag time.
+     * Flag to request verbose information.
      */
-    public static final String TIME_D = "flag whether to assess time";
+    private final Flag TIME_FLAG = new Flag(TIME_ID);
 
     /**
-     * Flag for request of verbose messages.
+     * OptionID for {@link #VERBOSE_FLAG}
      */
-    public static final String VERBOSE_F = "verbose";
+    public static final OptionID VERBOSE_ID = OptionID.getOrCreateOptionID(
+        "verbose", "flag to request verbose messages during evaluation");
 
     /**
-     * Description for flag verbose.
+     * Flag to request verbose information.
      */
-    public static final String VERBOSE_D = "flag to request verbose messages during evaluation";
+    private final Flag VERBOSE_FLAG = new Flag(VERBOSE_ID);
 
     /**
      * Holds whether to assess runtime during the evaluation.
@@ -85,28 +88,27 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
      */
     public ClassifierEvaluationProcedure() {
         super();
-        optionHandler.put(new Flag(VERBOSE_F, VERBOSE_D));
-        optionHandler.put(new Flag(TIME_F, TIME_D));
+        addOption(VERBOSE_FLAG);
+        addOption(TIME_FLAG);
     }
 
+    @SuppressWarnings("unchecked")
     public void set(Database<O> training, Database<O> test) {
         SortedSet<ClassLabel<?>> labels = Util.getClassLabels(training);
         labels.addAll(Util.getClassLabels(test));
+        // TODO: ugly cast.
         this.labels = labels.toArray((L[]) new Object[labels.size()]);
-        // not necessary, since Util uses a sorted set now
-        // Arrays.sort(this.labels);
         this.holdout = null;
         this.testSetProvided = true;
-        // noinspection unchecked
         this.partition = new TrainingAndTestSet[1];
         this.partition[0] = new TrainingAndTestSet<O, L>(training, test, this.labels);
     }
 
+    @SuppressWarnings("unchecked")
     public void set(Database<O> data, Holdout<O, L> holdout) {
         SortedSet<ClassLabel<?>> labels = Util.getClassLabels(data);
+        // TODO: ugly cast.
         this.labels = labels.toArray((L[]) new Object[labels.size()]);
-        // not necessary, since Util uses a sorted set now
-        // Arrays.sort(this.labels);
 
         this.holdout = holdout;
         this.testSetProvided = false;
@@ -146,13 +148,11 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
             }
         }
         if (testSetProvided) {
-            //noinspection unchecked
-            return new ConfusionMatrixBasedEvaluation(new ConfusionMatrix(labels, confusion), algorithm, partition[0].getTraining(), partition[0].getTest(), this);
+            return new ConfusionMatrixBasedEvaluation<O, L, C>(new ConfusionMatrix(labels, confusion), algorithm, partition[0].getTraining(), partition[0].getTest(), this);
         }
         else {
             algorithm.buildClassifier(holdout.completeData(), labels);
-            //noinspection unchecked
-            return new ConfusionMatrixBasedEvaluation(new ConfusionMatrix(labels, confusion), algorithm, holdout.completeData(), null, this);
+            return new ConfusionMatrixBasedEvaluation<O, L, C>(new ConfusionMatrix(labels, confusion), algorithm, holdout.completeData(), null, this);
         }
 
     }
@@ -199,12 +199,10 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = optionHandler.grabOptions(args);
 
-        if (optionHandler.isSet(TIME_F)) {
+        if (TIME_FLAG.isSet())
             time = true;
-        }
-        if (optionHandler.isSet(VERBOSE_F)) {
+        if (VERBOSE_FLAG.isSet())
             verbose = true;
-        }
 
         return remainingParameters;
     }

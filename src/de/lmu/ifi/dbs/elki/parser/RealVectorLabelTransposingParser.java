@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @author Arthur Zimek
  */
-public class RealVectorLabelTransposingParser extends RealVectorLabelParser {
+public class RealVectorLabelTransposingParser<V extends RealVector<V, ?>> extends RealVectorLabelParser<V> {
 
   /**
    * Provides a parser to read points transposed (per column).
@@ -28,7 +28,7 @@ public class RealVectorLabelTransposingParser extends RealVectorLabelParser {
 
   @SuppressWarnings("unchecked")
   @Override
-  public ParsingResult<RealVector> parse(InputStream in) {
+  public ParsingResult<V> parse(InputStream in) {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 0;
     List<Double>[] data = null;
@@ -49,11 +49,11 @@ public class RealVectorLabelTransposingParser extends RealVectorLabelParser {
           }
 
           if (data == null) {
-            data = new ArrayList[dimensionality];
+            data = Util.newArrayOfArrayList(dimensionality);
             for (int i = 0; i < data.length; i++) {
               data[i] = new ArrayList<Double>();
             }
-            labels = new ArrayList[dimensionality];
+            labels = Util.newArrayOfArrayList(dimensionality);
             for (int i = 0; i < labels.length; i++) {
               labels[i] = new ArrayList<String>();
             }
@@ -75,22 +75,22 @@ public class RealVectorLabelTransposingParser extends RealVectorLabelParser {
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
 
-    List<ObjectAndLabels<RealVector>> objectAndLabelList = new ArrayList<ObjectAndLabels<RealVector>>(data.length);
+    List<ObjectAndLabels<V>> objectAndLabelList = new ArrayList<ObjectAndLabels<V>>(data.length);
     for (int i = 0; i < data.length; i++) {
       List<String> label = new ArrayList<String>();
       label.add(labels[i].toString());
 
-      RealVector featureVector;
+      V featureVector;
       if (parseFloat) {
-        featureVector = new FloatVector(Util.convertToFloat(data[i]));
+        featureVector = (V) new FloatVector(Util.convertToFloat(data[i]));
       }
       else {
-        featureVector = new DoubleVector(data[i]);
+        featureVector = (V) new DoubleVector(data[i]);
       }
-      ObjectAndLabels<RealVector> objectAndLabels = new ObjectAndLabels<RealVector>(featureVector, label);
+      ObjectAndLabels<V> objectAndLabels = new ObjectAndLabels<V>(featureVector, label);
       objectAndLabelList.add(objectAndLabels);
     }
 
-    return new ParsingResult<RealVector>(objectAndLabelList);
+    return new ParsingResult<V>(objectAndLabelList);
   }
 }

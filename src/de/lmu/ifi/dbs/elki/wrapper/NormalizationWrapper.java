@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -14,7 +15,7 @@ import java.util.List;
  *
  * @author Elke Achtert
  */
-public abstract class NormalizationWrapper extends FileBasedDatabaseConnectionWrapper {
+public abstract class NormalizationWrapper<O extends DatabaseObject> extends FileBasedDatabaseConnectionWrapper<O> {
 
     @Override
     public List<String> getKDDTaskParameters() {

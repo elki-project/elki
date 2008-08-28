@@ -1,5 +1,10 @@
 package de.lmu.ifi.dbs.elki.preprocessing;
 
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Iterator;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -12,16 +17,10 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
-
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Iterator;
-import java.util.List;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 
 /**
  * Preprocessor for HiSC preference vector assignment to objects of a certain
@@ -37,28 +36,32 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
   public static final double DEFAULT_ALPHA = 0.01;
 
   /**
-   * Option string for parameter alpha.
+   * OptionID for {@link #ALPHA_PARAM}
    */
-  public static final String ALPHA_P = "alpha";
+  public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID(
+      "hisc.alpha", "a double between 0 and 1 specifying the "
+      + "maximum absolute variance along a coordinate axis.");
 
   /**
-   * Description for parameter alpha.
+   * Alpha parameter
    */
-  public static String ALPHA_D = "a double between 0 and 1 specifying the " + "maximum absolute variance along a coordinate axis "
-                                 + "(default is " + ALPHA_P + " = " + DEFAULT_ALPHA + ").";
+  private final DoubleParameter ALPHA_PARAM = new DoubleParameter(ALPHA_ID,
+      new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.OPEN,
+          1.0, IntervalConstraint.IntervalBoundary.OPEN), DEFAULT_ALPHA);
 
   /**
-   * Option string for parameter k.
+   * OptionID for {@link #K_PARAM}
    */
-  public static final String K_P = "k";
+  public static final OptionID K_ID = OptionID.getOrCreateOptionID(
+      "hisc.k", "a positive integer specifying the number of "
+      + "nearest neighbors considered to determine the preference vector. " 
+      + "If this value is not defined, k ist set to three "
+      + "times of the dimensionality of the database objects.");
 
   /**
-   * Description for parameter k.
+   * k Parameter
    */
-  public static final String K_D = "a positive integer specifying the number of "+
-                                   "nearest neighbors considered to determine the preference vector. " +
-                                   "If this value is not defined, k ist set to three "+
-                                   "times of the dimensionality of the database objects.";
+  private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(0), true);
 
   /**
    * The maximum allowed variance along a coordinate axis.
@@ -80,17 +83,10 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
 //    this.debug = true;
 
     // parameter alpha
-    ArrayList<ParameterConstraint<Number>> alphaCons = new ArrayList<ParameterConstraint<Number>>();
-    alphaCons.add(new GreaterEqualConstraint(0));
-    alphaCons.add(new LessEqualConstraint(1));
-    DoubleParameter alpha = new DoubleParameter(ALPHA_P, ALPHA_D, alphaCons);
-    alpha.setDefaultValue(DEFAULT_ALPHA);
-    optionHandler.put(alpha);
+    addOption(ALPHA_PARAM);
 
     // parameter k
-    IntParameter kParam = new IntParameter(K_P, K_D, new GreaterConstraint(0));
-    kParam.setOptional(true);
-    optionHandler.put(kParam);
+    addOption(K_PARAM);
   }
 
   public void run(Database<V> database, boolean verbose, boolean time) {
@@ -171,12 +167,11 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
     String[] remainingParameters = super.setParameters(args);
 
     // alpha
-    alpha = (Double) optionHandler.getOptionValue(ALPHA_P);
+    alpha = ALPHA_PARAM.getValue();
 
     // k
-    if (optionHandler.isSet(K_P)) {
-      k = (Integer) optionHandler.getOptionValue(K_P);
-    }
+    if (K_PARAM.isSet())
+      k = K_PARAM.getValue();
 
     return remainingParameters;
   }

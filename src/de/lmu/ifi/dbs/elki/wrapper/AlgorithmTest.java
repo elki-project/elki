@@ -205,7 +205,7 @@ public class AlgorithmTest extends AbstractParameterizable {
             verbose("\n*******************************************************************" +
                 "\nRunning " + algorithm.getClass().getName());
 
-            FileBasedDatabaseConnectionWrapper wrapper;
+            FileBasedDatabaseConnectionWrapper<?> wrapper;
             try {
                 wrapper = Util.instantiate(FileBasedDatabaseConnectionWrapper.class, algorithm.getClass().getSimpleName() + "Wrapper");
             }

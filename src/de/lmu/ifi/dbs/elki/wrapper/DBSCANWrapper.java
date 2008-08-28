@@ -1,23 +1,22 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-
-import java.util.List;
 
 /**
  * Wrapper class for the {@link DBSCAN} algorithm with default parametrization.
  *
  * @author Elke Achtert
  */
-public class DBSCANWrapper extends NormalizationWrapper {
+public class DBSCANWrapper<O extends DatabaseObject> extends NormalizationWrapper<O> {
 
     /**
      * Parameter to specify the maximum radius of the neighborhood to be considered,
@@ -47,6 +46,7 @@ public class DBSCANWrapper extends NormalizationWrapper {
      *
      * @param args the arguments to run this wrapper
      */
+    @SuppressWarnings("unchecked")
     public static void main(String[] args) {
         new DBSCANWrapper().runCLIWrapper(args);
     }

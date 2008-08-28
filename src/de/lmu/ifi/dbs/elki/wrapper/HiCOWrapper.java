@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.wrapper;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PCABasedCorrelationDistanceFunction;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
@@ -25,7 +26,7 @@ import de.lmu.ifi.dbs.elki.varianceanalysis.PercentageEigenPairFilter;
  * @author Elke Achtert
  *         todo parameter
  */
-public class HiCOWrapper extends NormalizationWrapper {
+public class HiCOWrapper<O extends DatabaseObject> extends NormalizationWrapper<O> {
 
     /**
      * Parameter to specify the threshold for minimum number of points in
@@ -74,6 +75,7 @@ public class HiCOWrapper extends NormalizationWrapper {
      *
      * @param args the arguments to run this wrapper
      */
+    @SuppressWarnings("unchecked")
     public static void main(String[] args) {
         new HiCOWrapper().runCLIWrapper(args);
     }

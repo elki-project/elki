@@ -1,6 +1,11 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
-import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.KNNJoin;
 import de.lmu.ifi.dbs.elki.algorithm.result.KNNJoinResult;
@@ -29,12 +34,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 
 /**
  * DeLiClu provides the DeLiClu algorithm, a hierachical algorithm to find density-connected sets in a database.
@@ -102,6 +101,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
      * Performs the DeLiClu algorithm on the given database.
      *
      */
+    @SuppressWarnings("unchecked")
     protected void runInTime(Database<O> database) throws IllegalStateException {
         if (!(database instanceof SpatialIndexDatabase)) {
             throw new IllegalArgumentException(

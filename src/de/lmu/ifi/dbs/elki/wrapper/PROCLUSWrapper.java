@@ -1,22 +1,21 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbortException;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.ProjectedClustering;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PROCLUS;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.ProjectedClustering;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-
-import java.util.List;
 
 /**
  * Wrapper class for PROCLUS algorithm.
  *
  * @author Elke Achtert
  */
-public class PROCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
+public class PROCLUSWrapper<O extends DatabaseObject> extends FileBasedDatabaseConnectionWrapper<O> {
 
     /**
      * Parameter to specify the number of clusters to find,
@@ -52,6 +51,7 @@ public class PROCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
      *
      * @param args the arguments to run this wrapper
      */
+    @SuppressWarnings("unchecked")
     public static void main(String[] args) {
         new PROCLUSWrapper().runCLIWrapper(args);
     }

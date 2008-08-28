@@ -1,15 +1,14 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PreDeCon;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-
-import java.util.List;
 
 /**
  * A wrapper for the PreDeCon algorithm. Performs an attribute wise normalization on
@@ -17,7 +16,7 @@ import java.util.List;
  *
  * @author Elke Achtert
  */
-public class PreDeConWrapper extends NormalizationWrapper {
+public class PreDeConWrapper<O extends DatabaseObject> extends NormalizationWrapper<O> {
 
     /**
      * Parameter to specify the maximum radius of the neighborhood to be considered,
@@ -50,6 +49,7 @@ public class PreDeConWrapper extends NormalizationWrapper {
      *
      * @param args the arguments to run this wrapper
      */
+    @SuppressWarnings("unchecked")
     public static void main(String[] args) {
         new PreDeConWrapper().runCLIWrapper(args);
     }

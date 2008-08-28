@@ -4,7 +4,6 @@ import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 
 /**
  * Provides a wrapper for arbitrary kernel functions whose kernel matrix has been precomputed.
@@ -65,9 +64,9 @@ public class ArbitraryKernelFunctionWrapper<O extends RealVector<O, ? >> extends
 		return "Arbitrary kernel function wrapper for FeatureVectors. No parameters required.";
 	}
 
+  @SuppressWarnings("unchecked")
   public void setDatabase(Database<O> database, boolean verbose, boolean time) {
     super.setDatabase(database, verbose, time);
-    //noinspection unchecked
-    kernelMatrix = (KernelMatrix) getDatabase().getGlobalAssociation(AssociationID.KERNEL_MATRIX);
+    kernelMatrix = (KernelMatrix<O>) getDatabase().getGlobalAssociation(AssociationID.KERNEL_MATRIX);
   }
 }

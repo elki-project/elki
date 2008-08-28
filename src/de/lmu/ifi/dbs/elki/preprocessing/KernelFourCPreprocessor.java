@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.elki.preprocessing;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -13,7 +16,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
@@ -23,12 +25,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterFlagGlobalConstraint;
 import de.lmu.ifi.dbs.elki.varianceanalysis.CompositeEigenPairFilter;
 import de.lmu.ifi.dbs.elki.varianceanalysis.LimitEigenPairFilter;
+import de.lmu.ifi.dbs.elki.varianceanalysis.NormalizingEigenPairFilter;
 import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredRunner;
-import de.lmu.ifi.dbs.elki.varianceanalysis.NormalizingEigenPairFilter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Preprocessor for kernel 4C local dimensionality, neighbor objects and strong
@@ -141,10 +140,10 @@ public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector
      */
     @Override
     public String[] setParameters(final String[] args) throws ParameterException {
-        // add the kernel fucntion wrapper for the distance function
+        // add the kernel function wrapper for the distance function
         String[] preprocessorParameters = new String[args.length + 2];
         System.arraycopy(args, 0, preprocessorParameters, 2, args.length);
-        preprocessorParameters[0] = OptionHandler.OPTION_PREFIX + ProjectedDBSCANPreprocessor.DISTANCE_FUNCTION_P;
+        preprocessorParameters[0] = OptionHandler.OPTION_PREFIX + ProjectedDBSCANPreprocessor.DISTANCE_FUNCTION_ID.getName();
         preprocessorParameters[1] = ArbitraryKernelFunctionWrapper.class.getName();
         final String[] remainingParameters = super.setParameters(preprocessorParameters);
         // absolute

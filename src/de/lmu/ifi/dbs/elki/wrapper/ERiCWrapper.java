@@ -5,6 +5,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.COPAC;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.ERiC;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ERiCDistanceFunction;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
@@ -23,7 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
  *
  * @author Elke Achtert
  */
-public class ERiCWrapper extends NormalizationWrapper {
+public class ERiCWrapper<O extends DatabaseObject> extends NormalizationWrapper<O> {
 
     /**
      * Parameter to specify the threshold for minimum number of points in
@@ -67,6 +68,7 @@ public class ERiCWrapper extends NormalizationWrapper {
      *
      * @param args the arguments to run this wrapper
      */
+    @SuppressWarnings("unchecked")
     public static void main(String[] args) {
         new ERiCWrapper().runCLIWrapper(args);
     }

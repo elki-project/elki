@@ -161,7 +161,7 @@ public class CASHResult extends AbstractResult<ParameterizationFunction> {
             }
             out.print(Format.format(f.getRowVector().getRowPackedCopy(), SEPARATOR));
             Associations associations = db.getAssociations(id);
-            List<AssociationID> keys = new ArrayList<AssociationID>(associations.keySet());
+            List<AssociationID<?>> keys = new ArrayList<AssociationID<?>>(associations.keySet());
             Collections.sort(keys);
             for (AssociationID<?> associationID : keys) {
                 if (associationID == AssociationID.CLASS || associationID == AssociationID.LABEL || associationID == AssociationID.LOCAL_DIMENSIONALITY) {

@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.wrapper;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.DiSH;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.DiSHPreprocessor.Strategy;
 import de.lmu.ifi.dbs.elki.utilities.Util;
@@ -23,7 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
  *
  * @author Elke Achtert
  */
-public class DiSHWrapper extends NormalizationWrapper {
+public class DiSHWrapper<O extends DatabaseObject> extends NormalizationWrapper<O> {
 
     /**
      * Parameter that specifies the maximum radius of the neighborhood to be
@@ -70,6 +71,7 @@ public class DiSHWrapper extends NormalizationWrapper {
      *
      * @param args the arguments to run this wrapper
      */
+    @SuppressWarnings("unchecked")
     public static void main(String[] args) {
         new DiSHWrapper().runCLIWrapper(args);
     }

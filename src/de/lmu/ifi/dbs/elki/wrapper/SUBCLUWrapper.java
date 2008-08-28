@@ -1,16 +1,14 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.SUBCLU;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import experimentalcode.erich.GoldenGeneratorXML;
-
-import java.util.List;
 
 /**
  * Wrapper class for SUBCLU algorithm. Performs an attribute wise normalization on
@@ -18,7 +16,7 @@ import java.util.List;
  *
  * @author Elke Achtert
  */
-public class SUBCLUWrapper extends NormalizationWrapper {
+public class SUBCLUWrapper<O extends DatabaseObject> extends NormalizationWrapper<O> {
 
     /**
      * Parameter to specify the maximum radius of the neighborhood to be considered,
@@ -42,6 +40,7 @@ public class SUBCLUWrapper extends NormalizationWrapper {
      *
      * @param args the arguments to run this wrapper
      */
+    @SuppressWarnings("unchecked")
     public static void main(String[] args) {
       new SUBCLUWrapper().runCLIWrapper(args);
     }

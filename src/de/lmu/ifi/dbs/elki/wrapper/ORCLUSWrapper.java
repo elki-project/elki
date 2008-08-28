@@ -1,22 +1,21 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbortException;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.ProjectedClustering;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.ORCLUS;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.ProjectedClustering;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-
-import java.util.List;
 
 /**
  * Wrapper class for ORCLUS algorithm.
  *
  * @author Elke Achtert
  */
-public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
+public class ORCLUSWrapper<O extends DatabaseObject> extends FileBasedDatabaseConnectionWrapper<O> {
     /**
      * Parameter to specify the number of clusters to find,
      * must be an integer greater than 0.
@@ -51,6 +50,7 @@ public class ORCLUSWrapper extends FileBasedDatabaseConnectionWrapper {
      *
      * @param args the arguments to run this wrapper
      */
+    @SuppressWarnings("unchecked")
     public static void main(String[] args) {
         new ORCLUSWrapper().runCLIWrapper(args);
     }

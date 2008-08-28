@@ -183,8 +183,7 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
     /**
      * The association id to associate a kernel matrix.
      */
-    @SuppressWarnings("unchecked")
-    public static final AssociationID<KernelMatrix> KERNEL_MATRIX = new AssociationID<KernelMatrix>("kernelMatrix", KernelMatrix.class);
+    public static final AssociationID<KernelMatrix<?>> KERNEL_MATRIX = new AssociationID<KernelMatrix<?>>("kernelMatrix", KernelMatrix.class);
 
     /**
      * The association id to associate any arbitrary object.

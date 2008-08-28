@@ -1,22 +1,22 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.biclustering.Bicluster;
-import de.lmu.ifi.dbs.elki.data.RealVector;
-import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
-
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
+import de.lmu.ifi.dbs.elki.algorithm.result.clustering.biclustering.Bicluster;
+import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
 
 /**
  * Provides a BiclusteringAlgorithm which deletes or inserts rows/columns in an
@@ -966,9 +966,9 @@ public class FLOC<V extends RealVector<V, Double>> extends
 	 * 
 	 * @return the new average residue of the clustering
 	 */
-	private double calculateAverageResidue() {
-		rowClusterMeans = new List[k];
-		colClusterMeans = new List[k];
+  private double calculateAverageResidue() {
+		rowClusterMeans = Util.newArrayOfList(k);
+		colClusterMeans = Util.newArrayOfList(k);
 		biclusterMeans = new double[k];
 		valueHClusters = new double[k];
 		double averageResidue = 0;

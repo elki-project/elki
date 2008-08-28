@@ -17,7 +17,7 @@ public abstract class AbstractHoldout<O extends DatabaseObject, L extends ClassL
   /**
    * The association id for the class label.
    */
-  public static final AssociationID CLASS = AssociationID.CLASS;
+  public static final AssociationID<ClassLabel<?>> CLASS = AssociationID.CLASS;
 
   protected Database<O> database;
 
@@ -28,7 +28,9 @@ public abstract class AbstractHoldout<O extends DatabaseObject, L extends ClassL
    *
    * @param database the database to collect classes from
    */
+  @SuppressWarnings("unchecked")
   public void setClassLabels(Database<O> database) {
+    // TODO: ugly hack?
     this.labels = Util.getClassLabels(database).toArray((L[]) new Object[]{});
     Arrays.sort(this.labels);
   }

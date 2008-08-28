@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
@@ -12,7 +13,7 @@ import java.util.List;
  *
  * @author Elke Achtert
  */
-public abstract class FileBasedDatabaseConnectionWrapper extends KDDTaskWrapper {
+public abstract class FileBasedDatabaseConnectionWrapper<O extends DatabaseObject> extends KDDTaskWrapper<O> {
     /**
      * Parameter that specifies the name of the input file to be parsed.
      * <p>Key: {@code -dbc.in} </p>

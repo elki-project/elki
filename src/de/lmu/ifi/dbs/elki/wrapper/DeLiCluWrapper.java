@@ -1,7 +1,9 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.clustering.DeLiClu;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.elki.database.connection.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndex;
@@ -11,11 +13,8 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-
-import java.util.List;
 
 /**
  * Wrapper class for the {@link DeLiClu} algorithm.
@@ -23,7 +22,7 @@ import java.util.List;
  * @author Elke Achtert
  */
 
-public class DeLiCluWrapper extends NormalizationWrapper {
+public class DeLiCluWrapper<O extends DatabaseObject> extends NormalizationWrapper<O> {
     /**
      * Parameter to specify the threshold for minimum number of points in
      * the epsilon-neighborhood of a point,
@@ -63,6 +62,7 @@ public class DeLiCluWrapper extends NormalizationWrapper {
      *
      * @param args the arguments to run this wrapper
      */
+    @SuppressWarnings("unchecked")
     public static void main(String[] args) {
         new DeLiCluWrapper().runCLIWrapper(args);
     }

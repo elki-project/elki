@@ -1,22 +1,21 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.outlier.LOF;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-
-import java.util.List;
 
 /**
  * Wrapper class for LOF algorithm.
  *
  * @author Elke Achtert
  */
-public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
+public class LOFWrapper<O extends DatabaseObject> extends FileBasedDatabaseConnectionWrapper<O> {
 
     /**
      * Parameter to specify the number of nearest neighbors of an object to be considered for computing its LOF,
@@ -32,6 +31,7 @@ public class LOFWrapper extends FileBasedDatabaseConnectionWrapper {
      *
      * @param args the arguments to run this wrapper
      */
+    @SuppressWarnings("unchecked")
     public static void main(String[] args) {
         new LOFWrapper().runCLIWrapper(args);
     }

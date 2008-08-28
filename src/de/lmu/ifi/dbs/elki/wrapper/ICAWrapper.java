@@ -1,17 +1,15 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.ICA;
-import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.varianceanalysis.PercentageEigenPairFilter;
 import de.lmu.ifi.dbs.elki.varianceanalysis.ica.FastICA;
 import de.lmu.ifi.dbs.elki.varianceanalysis.ica.KurtosisBasedContrastFunction;
-
-import java.util.List;
 
 /**
  * Wrapper class for ICA algorithm.
@@ -19,7 +17,7 @@ import java.util.List;
  * @author Elke Achtert
  *         todo parameter
  */
-public class ICAWrapper extends FileBasedDatabaseConnectionWrapper {
+public class ICAWrapper<O extends DatabaseObject> extends FileBasedDatabaseConnectionWrapper<O> {
     /**
      * Description for parameter epsilon.
      */
@@ -33,6 +31,7 @@ public class ICAWrapper extends FileBasedDatabaseConnectionWrapper {
      *
      * @param args the arguments to run this wrapper
      */
+    @SuppressWarnings("unchecked")
     public static void main(String[] args) {
         new ICAWrapper().runCLIWrapper(args);
     }

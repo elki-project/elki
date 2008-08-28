@@ -71,4 +71,16 @@ public class TrainingAndTestSet<O extends DatabaseObject, L extends ClassLabel<L
         return labels;
     }
 
+    /**
+     * Array constructor helper.
+     * 
+     * @param <O> Database object class
+     * @param <L> Class label class
+     * @param len array length
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public static <O extends DatabaseObject, L extends ClassLabel<L>> TrainingAndTestSet<O,L>[] newArray(int len) {
+      return (TrainingAndTestSet<O, L>[]) new TrainingAndTestSet<?,?>[len];
+    }
 }

@@ -1,20 +1,10 @@
 package de.lmu.ifi.dbs.elki.gui;
 
-import de.lmu.ifi.dbs.elki.KDDTask;
-import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
-import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.elki.properties.Properties;
-import de.lmu.ifi.dbs.elki.properties.PropertyName;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-
-import javax.swing.*;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.Border;
-import javax.swing.border.EtchedBorder;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -26,6 +16,29 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.JTextPane;
+import javax.swing.border.Border;
+import javax.swing.border.EtchedBorder;
+
+import de.lmu.ifi.dbs.elki.KDDTask;
+import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
+import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.properties.Properties;
+import de.lmu.ifi.dbs.elki.properties.PropertyName;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 // todo steffi comment all
 public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
@@ -68,11 +81,11 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
     // borders
     private Border loweredEtched = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
 
-    private Border raisedEtched = BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
+//    private Border raisedEtched = BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
 
-    private Border loweredBevel = BorderFactory.createBevelBorder(BevelBorder.LOWERED);
+//    private Border loweredBevel = BorderFactory.createBevelBorder(BevelBorder.LOWERED);
 
-    private Border raisedBevel = BorderFactory.createBevelBorder(BevelBorder.RAISED);
+//    private Border raisedBevel = BorderFactory.createBevelBorder(BevelBorder.RAISED);
 
     public KDDTaskFrame() {
         setTitle("KDD Task");
@@ -270,17 +283,22 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
         return base;
     }
 
-    private JPanel createKDDTaskParameterPanel() {
-
-        JPanel parameterPanel = new JPanel(new GridBagLayout());
-
-        return parameterPanel;
-    }
+//    private JPanel createKDDTaskParameterPanel() {
+//
+//        JPanel parameterPanel = new JPanel(new GridBagLayout());
+//
+//        return parameterPanel;
+//    }
 
     private JComponent runPanel() {
 
         runPanel = new JPanel();
         parameterField = new JTextPane() {
+
+            /**
+           * 
+           */
+          private static final long serialVersionUID = -8391444656542286134L;
 
             public Dimension getPreferredScrollableViewportSize() {
                 Dimension dim = getPreferredSize();
@@ -467,6 +485,11 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
 
             textField = new JTextField(20) {
 
+                /**
+               * 
+               */
+              private static final long serialVersionUID = 7641527597255200000L;
+
                 public void setText(String text) {
                     if (text != null && !(text.equals(""))) {
                         super.setText(text);
@@ -509,7 +532,7 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
             textField.setCaretPosition(editObjectName.length());
 
             // update TaskFrame
-            String[] customizerParameters = this.editObjectCustomizer.parameterValuesToArray();
+//            String[] customizerParameters = this.editObjectCustomizer.parameterValuesToArray();
 //			String[]
 //			completeParams[0] = "-" + propName;
 //			completeParams[1] = editObjectName;

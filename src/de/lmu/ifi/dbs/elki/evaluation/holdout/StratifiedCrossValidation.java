@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -61,8 +62,7 @@ public class StratifiedCrossValidation<O extends DatabaseObject, L extends Class
         this.database = database;
         setClassLabels(database);
 
-        // noinspection unchecked
-        List<Integer>[] classBuckets = new ArrayList[this.labels.length];
+        List<Integer>[] classBuckets = Util.newArrayOfArrayList(this.labels.length);
         for (int i = 0; i < classBuckets.length; i++) {
             classBuckets[i] = new ArrayList<Integer>();
         }
@@ -71,8 +71,7 @@ public class StratifiedCrossValidation<O extends DatabaseObject, L extends Class
             int classIndex = Arrays.binarySearch(labels, database.getAssociation(CLASS, id));
             classBuckets[classIndex].add(id);
         }
-        // noinspection unchecked
-        List<Integer>[] folds = new ArrayList[nfold];
+        List<Integer>[] folds = Util.newArrayOfArrayList(nfold);
         for (int i = 0; i < folds.length; i++) {
             folds[i] = new ArrayList<Integer>();
         }
@@ -81,8 +80,7 @@ public class StratifiedCrossValidation<O extends DatabaseObject, L extends Class
                 folds[i % nfold].add(bucket.get(i));
             }
         }
-        // noinspection unchecked
-        TrainingAndTestSet<O, L>[] partitions = new TrainingAndTestSet[nfold];
+        TrainingAndTestSet<O, L>[] partitions = TrainingAndTestSet.newArray(nfold);;
         for (int i = 0; i < nfold; i++) {
             Map<Integer, List<Integer>> partition = new HashMap<Integer, List<Integer>>();
             List<Integer> training = new ArrayList<Integer>();

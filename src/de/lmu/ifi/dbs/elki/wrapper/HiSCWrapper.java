@@ -1,7 +1,9 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.HiSCDistanceFunction;
 import de.lmu.ifi.dbs.elki.preprocessing.HiSCPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
@@ -12,8 +14,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-
-import java.util.List;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 
 /**
  * Wrapper class for HiSC algorithm.
@@ -21,7 +22,20 @@ import java.util.List;
  * @author Elke Achtert
  *         todo parameter
  */
-public class HiSCWrapper extends FileBasedDatabaseConnectionWrapper {
+public class HiSCWrapper<O extends DatabaseObject> extends FileBasedDatabaseConnectionWrapper<O> {
+  /**
+   * Alpha parameter
+   */
+  private final DoubleParameter ALPHA_PARAM = new DoubleParameter(HiSCPreprocessor.ALPHA_ID,
+      new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.OPEN,
+          1.0, IntervalConstraint.IntervalBoundary.OPEN), HiSCPreprocessor.DEFAULT_ALPHA);
+
+  /**
+   * k Parameter
+   */
+  private final IntParameter K_PARAM = new IntParameter(HiSCPreprocessor.K_ID,
+      new GreaterConstraint(0), true);
+
 
     /**
      * The value of the k parameter.
@@ -38,6 +52,7 @@ public class HiSCWrapper extends FileBasedDatabaseConnectionWrapper {
      *
      * @param args the arguments to run this wrapper
      */
+    @SuppressWarnings("unchecked")
     public static void main(String[] args) {
         new HiSCWrapper().runCLIWrapper(args);
     }
@@ -50,13 +65,10 @@ public class HiSCWrapper extends FileBasedDatabaseConnectionWrapper {
     public HiSCWrapper() {
         super();
         // parameter k
-        IntParameter k = new IntParameter(HiSCPreprocessor.K_P, HiSCPreprocessor.K_D, new GreaterConstraint(0));
-        k.setOptional(true);
-        optionHandler.put(k);
+        addOption(K_PARAM);
 
         // parameter alpha
-        DoubleParameter alpha = new DoubleParameter(HiSCPreprocessor.ALPHA_P, HiSCPreprocessor.ALPHA_D, new GreaterConstraint(0));
-        optionHandler.put(alpha);
+        addOption(ALPHA_PARAM);
     }
 
     @Override
@@ -83,12 +95,12 @@ public class HiSCWrapper extends FileBasedDatabaseConnectionWrapper {
 
         // k for preprocessor
         if (k != null) {
-            parameters.add(OptionHandler.OPTION_PREFIX + HiSCPreprocessor.K_P);
+            parameters.add(OptionHandler.OPTION_PREFIX + HiSCPreprocessor.K_ID.getName());
             parameters.add(Integer.toString(k));
         }
 
         // alpha for preprocessor
-        parameters.add(OptionHandler.OPTION_PREFIX + HiSCPreprocessor.ALPHA_P);
+        parameters.add(OptionHandler.OPTION_PREFIX + HiSCPreprocessor.ALPHA_ID.getName());
         parameters.add(Double.toString(alpha));
 
         // epsilon for distance function
@@ -101,15 +113,14 @@ public class HiSCWrapper extends FileBasedDatabaseConnectionWrapper {
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
-        if (optionHandler.isSet(HiSCPreprocessor.K_P)) {
-            k = (Integer) optionHandler.getOptionValue(HiSCPreprocessor.K_P);
+        if (K_PARAM.isSet()) {
+            k = K_PARAM.getValue();
         }
         else {
             k = null;
         }
 
-        alpha = (Double) optionHandler.getOptionValue(HiSCPreprocessor.ALPHA_P);
-
+        alpha = ALPHA_PARAM.getValue();
 
         return remainingParameters;
     }

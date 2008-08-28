@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.CASH;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.parser.ParameterizationFunctionLabelParser;
 import de.lmu.ifi.dbs.elki.utilities.Util;
@@ -15,7 +16,7 @@ import java.util.List;
  *
  * @author Elke Achtert
  */
-public class CASHWrapper extends FileBasedDatabaseConnectionWrapper {
+public class CASHWrapper<O extends DatabaseObject> extends FileBasedDatabaseConnectionWrapper<O> {
 
     /**
      * Parameter to specify the threshold for minimum number of points in a cluster,
@@ -38,6 +39,7 @@ public class CASHWrapper extends FileBasedDatabaseConnectionWrapper {
      *
      * @param args the arguments to run this wrapper
      */
+    @SuppressWarnings("unchecked")
     public static void main(String[] args) {
         new CASHWrapper().runCLIWrapper(args);
     }

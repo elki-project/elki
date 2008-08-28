@@ -1,24 +1,23 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.CLIQUE;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
-
-import java.util.List;
 
 /**
  * Wrapper class for CLIQUE algorithm.
  *
  * @author Elke Achtert
  */
-public class CLIQUEWrapper extends FileBasedDatabaseConnectionWrapper {
+public class CLIQUEWrapper<O extends DatabaseObject> extends FileBasedDatabaseConnectionWrapper<O> {
 
     /**
      * Parameter to specify the number of intervals (units) in each dimension,
@@ -50,6 +49,7 @@ public class CLIQUEWrapper extends FileBasedDatabaseConnectionWrapper {
      *
      * @param args the arguments to run this wrapper
      */
+    @SuppressWarnings("unchecked")
     public static void main(String[] args) {
         new CLIQUEWrapper().runCLIWrapper(args);
     }

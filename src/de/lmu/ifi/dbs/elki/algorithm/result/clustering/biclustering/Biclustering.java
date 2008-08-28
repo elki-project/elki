@@ -131,7 +131,7 @@ public class Biclustering<V extends RealVector<V, Double>> extends AbstractResul
             }
             out.print(mo.toString());
             Associations associations = db.getAssociations(mo.getID());
-            List<AssociationID> keys = new ArrayList<AssociationID>(associations.keySet());
+            List<AssociationID<?>> keys = new ArrayList<AssociationID<?>>(associations.keySet());
             Collections.sort(keys);
             for (AssociationID<?> id : keys) {
                 if (id == AssociationID.CLASS || id == AssociationID.LABEL || id == AssociationID.LOCAL_DIMENSIONALITY) {

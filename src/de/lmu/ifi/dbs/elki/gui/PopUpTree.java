@@ -53,6 +53,7 @@ public class PopUpTree extends JPopupMenu {
         setVisible(false);
     }
 
+    @SuppressWarnings("unchecked")
     private Component getTreePane() {
 
         JPanel treePane = new JPanel();
@@ -210,7 +211,7 @@ public class PopUpTree extends JPopupMenu {
             return null;
         }
 
-        for (Enumeration e = root.breadthFirstEnumeration(); e.hasMoreElements();) {
+        for (Enumeration<?> e = root.breadthFirstEnumeration(); e.hasMoreElements();) {
             DefaultMutableTreeNode current = (DefaultMutableTreeNode) e.nextElement();
 
             if (current.getUserObject().toString().equals(nodeObject)) {

@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -60,11 +61,9 @@ public class DisjointCrossValidation<O extends DatabaseObject, L extends ClassLa
   public TrainingAndTestSet<O,L>[] partition(Database<O> database) {
     this.database = database;
     setClassLabels(database);
-    //noinspection unchecked
-    TrainingAndTestSet<O,L>[] partitions = new TrainingAndTestSet[nfold];
+    TrainingAndTestSet<O,L>[] partitions = TrainingAndTestSet.newArray(nfold);
     List<Integer> ids = database.getIDs();
-    //noinspection unchecked
-    List<Integer>[] parts = new List[nfold];
+    List<Integer>[] parts = Util.newArrayOfList(nfold);
     for (int i = 0; i < nfold; i++) {
       parts[i] = new ArrayList<Integer>();
     }

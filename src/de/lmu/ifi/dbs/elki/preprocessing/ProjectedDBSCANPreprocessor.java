@@ -1,5 +1,10 @@
 package de.lmu.ifi.dbs.elki.preprocessing;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ProjectedDBSCAN;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -10,22 +15,16 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunc
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
-import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Abstract superclass for preprocessor of algorithms extending
@@ -41,11 +40,10 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
      * must be suitable to {@link LocallyWeightedDistanceFunction LocallyWeightedDistanceFunction}.
      * <p>Key: {@code -epsilon} </p>
      */
-    public static final PatternParameter EPSILON_PARAM = new PatternParameter("epsilon",
+    public static final PatternParameter EPSILON_PARAM = new PatternParameter(DBSCAN.EPSILON_ID,
         "the maximum radius of the neighborhood " +
             "to be considered, must be suitable to " +
             LocallyWeightedDistanceFunction.class.getName());
-
 
     /**
      * Parameter to specify the threshold for minimum number of points in
@@ -57,24 +55,24 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
         ProjectedDBSCAN.MINPTS_ID,
         new GreaterConstraint(0));
 
-
     /**
      * The default range query distance function.
      */
     public static final String DEFAULT_DISTANCE_FUNCTION = EuclideanDistanceFunction.class.getName();
 
     /**
-     * Parameter for range query distance function.
+     * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
      */
-    public static final String DISTANCE_FUNCTION_P = "distancefunction";
-
-    /**
-     * Description for parameter range query distance function.
-     */
-    public static final String DISTANCE_FUNCTION_D = "the distance function to determine the neighbors for variance analysis "
+    public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID(
+        "projdbscan.distancefunction", "the distance function to determine the neighbors for variance analysis "
         + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class)
-        + ". Default: "
-        + DEFAULT_DISTANCE_FUNCTION;
+        + ".");
+    
+    /**
+     * Parameter distance function
+     */
+    private final ClassParameter<DistanceFunction<V, D>> DISTANCE_FUNCTION_PARAM =
+      new ClassParameter<DistanceFunction<V, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
 
     /**
      * Contains the value of parameter epsilon;
@@ -104,12 +102,10 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
         addOption(MINPTS_PARAM);
 
         // parameter range query distance function
-        ClassParameter<DistanceFunction<V, D>> distance = new ClassParameter<DistanceFunction<V, D>>(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D, DistanceFunction.class);
-        distance.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
-        optionHandler.put(distance);
+        addOption(DISTANCE_FUNCTION_PARAM);
 
         // global constraint epsilon <-> distancefunction
-        GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint<DistanceFunction<V, D>>(EPSILON_PARAM, distance);
+        GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint<DistanceFunction<V, D>>(EPSILON_PARAM, DISTANCE_FUNCTION_PARAM);
         optionHandler.setGlobalParameterConstraint(gpc);
     }
 
@@ -170,20 +166,10 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
      */
     protected abstract void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<V> database);
 
-    @SuppressWarnings("unchecked")
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
-        // range query distance function
-        String className = (String) optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
-        try {
-            // todo
-            rangeQueryDistanceFunction = Util.instantiate(DistanceFunction.class, className);
-        }
-        catch (UnableToComplyException e) {
-            throw new WrongParameterValueException(DISTANCE_FUNCTION_P, className, DISTANCE_FUNCTION_D, e);
-        }
-
+        rangeQueryDistanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
         remainingParameters = rangeQueryDistanceFunction.setParameters(remainingParameters);
         setParameters(args, remainingParameters);
 

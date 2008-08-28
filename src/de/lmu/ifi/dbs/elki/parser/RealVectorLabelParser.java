@@ -96,6 +96,7 @@ public class RealVectorLabelParser<V extends RealVector<V, ?>> extends AbstractP
     addOption(CLASS_LABEL_INDEX_PARAM);
   }
 
+  @SuppressWarnings("unchecked")
   public ParsingResult<V> parse(InputStream in) {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 1;
@@ -133,11 +134,11 @@ public class RealVectorLabelParser<V extends RealVector<V, ?>> extends AbstractP
           ObjectAndLabels<V> objectAndLabel;
           if (parseFloat) {
             //featureVector = (V) new FloatVector(Util.convertToFloat(attributes));
-            objectAndLabel = new ObjectAndLabels(new FloatVector(Util.convertToFloat(attributes)), labels);
+            objectAndLabel = new ObjectAndLabels<V>((V) new FloatVector(Util.convertToFloat(attributes)), labels);
           }
           else {
             //featureVector = (V) new DoubleVector(attributes);
-            objectAndLabel = new ObjectAndLabels(new DoubleVector(attributes), labels);
+            objectAndLabel = new ObjectAndLabels<V>((V) new DoubleVector(attributes), labels);
           }
           //ObjectAndLabels<V> objectAndLabel = new ObjectAndLabels<V>(featureVector, labels);
           objectAndLabelsList.add(objectAndLabel);

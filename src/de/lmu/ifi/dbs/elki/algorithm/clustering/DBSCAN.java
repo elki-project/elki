@@ -1,6 +1,11 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
-import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.result.clustering.ClustersPlusNoise;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
@@ -16,8 +21,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-
-import java.util.*;
 
 /**
  * DBSCAN provides the DBSCAN algorithm,

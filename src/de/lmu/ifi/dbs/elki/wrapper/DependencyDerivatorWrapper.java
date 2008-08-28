@@ -1,25 +1,25 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-
-import java.util.List;
 
 /**
  * Wrapper class for the dependency derivator.
  *
  * @author Elke Achtert
  */
-public class DependencyDerivatorWrapper extends FileBasedDatabaseConnectionWrapper {
+public class DependencyDerivatorWrapper<O extends DatabaseObject> extends FileBasedDatabaseConnectionWrapper<O> {
 
     /**
      * Main method to run this wrapper.
      *
      * @param args the arguments to run this wrapper
      */
+    @SuppressWarnings("unchecked")
     public static void main(String[] args) {
         new DependencyDerivatorWrapper().runCLIWrapper(args);
     }

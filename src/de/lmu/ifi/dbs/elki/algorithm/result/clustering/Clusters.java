@@ -174,7 +174,7 @@ public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implem
             }
             out.print(mo.toString());
             Associations associations = db.getAssociations(clusters[clusterIndex][i]);
-            List<AssociationID> keys = new ArrayList<AssociationID>(associations.keySet());
+            List<AssociationID<?>> keys = new ArrayList<AssociationID<?>>(associations.keySet());
             Collections.sort(keys);
             for (AssociationID<?> id : keys) {
                 if (isRequiredAssociation(id)) {
