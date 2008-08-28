@@ -43,7 +43,7 @@ public abstract class HiCOPreprocessor<V extends RealVector<V, ?>> extends Abstr
      * Key: {@code -hico.pca.distance}
      */
     protected final ClassParameter<DistanceFunction<V, DoubleDistance>> PCA_DISTANCE_PARAM = new ClassParameter<DistanceFunction<V, DoubleDistance>>(PCA_DISTANCE_ID,
-        DoubleDistance.class, DEFAULT_PCA_DISTANCE_FUNCTION );
+        DistanceFunction.class, DEFAULT_PCA_DISTANCE_FUNCTION );
     
     /**
      * The distance function for the PCA.
