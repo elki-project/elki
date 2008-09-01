@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
  *
  * @author Arthur Zimek
  */
-public class HierarchicalClassLabel extends ClassLabel<HierarchicalClassLabel> {
+public class HierarchicalClassLabel extends ClassLabel {
     /**
      * The default separator pattern, a point ('.').
      */
@@ -34,7 +34,7 @@ public class HierarchicalClassLabel extends ClassLabel<HierarchicalClassLabel> {
      * Holds the names on the different levels.
      */
     // TODO: fix generics warnings.
-    private Comparable[] levelwiseNames;
+    private Comparable<?>[] levelwiseNames;
 
     /**
      * @see ClassLabel#ClassLabel()
@@ -92,12 +92,16 @@ public class HierarchicalClassLabel extends ClassLabel<HierarchicalClassLabel> {
      * this does not succeed, both names are compared as Strings.
      *
      */
-    public int compareTo(HierarchicalClassLabel h) {
+    @SuppressWarnings("unchecked")
+    public int compareTo(ClassLabel o) {
+        HierarchicalClassLabel h = (HierarchicalClassLabel) o;
         for (int i = 0; i < this.levelwiseNames.length
             && i < h.levelwiseNames.length; i++) {
             int comp = 0;
             try {
-                comp = this.levelwiseNames[i].compareTo(h.levelwiseNames[i]);
+                Comparable first = this.levelwiseNames[i];
+                Comparable second = h.levelwiseNames[i];
+                comp = first.compareTo(second);
             }
             catch (RuntimeException e) {
                 String h1 = (String) (this.levelwiseNames[i] instanceof Integer ? this.levelwiseNames[i]
@@ -171,5 +175,4 @@ public class HierarchicalClassLabel extends ClassLabel<HierarchicalClassLabel> {
         }
         return name.toString();
     }
-
 }

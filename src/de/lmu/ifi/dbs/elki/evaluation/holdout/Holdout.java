@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @author Arthur Zimek
  */
-public interface Holdout<O extends DatabaseObject,L extends ClassLabel<L>> extends Parameterizable
+public interface Holdout<O extends DatabaseObject,L extends ClassLabel> extends Parameterizable
 {
     /**
      * Provides a range of partitions of

@@ -36,7 +36,7 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
     /**
      * The association id to associate a class (class label) to an object.
      */
-    public static final AssociationID<ClassLabel<?>> CLASS = new AssociationID<ClassLabel<?>>("class", ClassLabel.class);
+    public static final AssociationID<ClassLabel> CLASS = new AssociationID<ClassLabel>("class", ClassLabel.class);
 
     /**
      * The association id to associate an external id to an object.

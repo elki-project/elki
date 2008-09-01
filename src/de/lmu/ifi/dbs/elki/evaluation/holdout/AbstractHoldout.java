@@ -12,12 +12,12 @@ import java.util.Arrays;
 /**
  * @author Arthur Zimek
  */
-public abstract class AbstractHoldout<O extends DatabaseObject, L extends ClassLabel<L>> extends AbstractParameterizable implements Holdout<O, L> {
+public abstract class AbstractHoldout<O extends DatabaseObject, L extends ClassLabel> extends AbstractParameterizable implements Holdout<O, L> {
 
   /**
    * The association id for the class label.
    */
-  public static final AssociationID<ClassLabel<?>> CLASS = AssociationID.CLASS;
+  public static final AssociationID<ClassLabel> CLASS = AssociationID.CLASS;
 
   protected Database<O> database;
 

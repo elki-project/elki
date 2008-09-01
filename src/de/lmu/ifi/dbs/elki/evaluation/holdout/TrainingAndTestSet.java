@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
  * 
  * @author Arthur Zimek
  */
-public class TrainingAndTestSet<O extends DatabaseObject, L extends ClassLabel<L>>
+public class TrainingAndTestSet<O extends DatabaseObject, L extends ClassLabel>
 {
     /**
      * The overall labels.
@@ -80,7 +80,7 @@ public class TrainingAndTestSet<O extends DatabaseObject, L extends ClassLabel<L
      * @return
      */
     @SuppressWarnings("unchecked")
-    public static <O extends DatabaseObject, L extends ClassLabel<L>> TrainingAndTestSet<O,L>[] newArray(int len) {
+    public static <O extends DatabaseObject, L extends ClassLabel> TrainingAndTestSet<O,L>[] newArray(int len) {
       return (TrainingAndTestSet<O, L>[]) new TrainingAndTestSet<?,?>[len];
     }
 }

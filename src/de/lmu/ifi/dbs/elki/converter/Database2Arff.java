@@ -94,7 +94,7 @@ public class Database2Arff<D extends DatabaseObject & WekaObject<W>, W extends W
             out.print("@attribute class ");
             out.print("{");
             Util.print(
-                new ArrayList<ClassLabel<?>>(Util.getClassLabels(database)),
+                new ArrayList<ClassLabel>(Util.getClassLabels(database)),
                 SEPARATOR, out);
             out.print("}");
             out.println();

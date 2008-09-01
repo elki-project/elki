@@ -37,7 +37,7 @@ public interface ClusteringResult<O extends DatabaseObject> extends Result<O> {
      *         comprising a separate database for each cluster
      *         without noise.
      */
-    public <L extends ClassLabel<L>> Map<L, Database<O>> clustering(Class<L> classLabel);
+    public <L extends ClassLabel> Map<L, Database<O>> clustering(Class<L> classLabel);
 
     /**
      * Returns a new Database containing only
@@ -47,7 +47,7 @@ public interface ClusteringResult<O extends DatabaseObject> extends Result<O> {
      * @param classLabel the class to be used as ClassLabel
      * @return a new Database of only non-noise objects
      */
-    public <L extends ClassLabel<L>> Database<O> associate(Class<L> classLabel);
+    public <L extends ClassLabel> Database<O> associate(Class<L> classLabel);
 
     /**
      * Appends a model the designated cluster.
@@ -55,7 +55,7 @@ public interface ClusteringResult<O extends DatabaseObject> extends Result<O> {
      * @param clusterID ClassLabel assigned to the cluster a model should be appended to
      * @param model     the model describing the designated cluster
      */
-    public <L extends ClassLabel<L>> void appendModel(L clusterID, Result<O> model);
+    public <L extends ClassLabel> void appendModel(L clusterID, Result<O> model);
 
 
     /**

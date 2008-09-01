@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  *
  * @author Arthur Zimek
  */
-public abstract class RandomizedHoldout<O extends DatabaseObject, L extends ClassLabel<L>> extends AbstractHoldout<O, L> {
+public abstract class RandomizedHoldout<O extends DatabaseObject, L extends ClassLabel> extends AbstractHoldout<O, L> {
     /**
      * Default seed.
      */

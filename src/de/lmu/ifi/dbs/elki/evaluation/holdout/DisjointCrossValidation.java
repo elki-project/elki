@@ -22,7 +22,7 @@ import java.util.Map;
  *
  * @author Arthur Zimek
  */
-public class DisjointCrossValidation<O extends DatabaseObject, L extends ClassLabel<L>> extends RandomizedHoldout<O,L> {
+public class DisjointCrossValidation<O extends DatabaseObject, L extends ClassLabel> extends RandomizedHoldout<O,L> {
   /**
    * Default number of folds.
    */

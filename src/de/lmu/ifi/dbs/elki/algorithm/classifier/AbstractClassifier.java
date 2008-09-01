@@ -30,11 +30,11 @@ import java.util.List;
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <L> the type of the ClassLabel the Classifier is assigning
  */
-public abstract class AbstractClassifier<O extends DatabaseObject, L extends ClassLabel<L>> extends AbstractAlgorithm<O> implements Classifier<O, L> {
+public abstract class AbstractClassifier<O extends DatabaseObject, L extends ClassLabel> extends AbstractAlgorithm<O> implements Classifier<O, L> {
     /**
      * The association id for the class label.
      */
-    protected static final AssociationID<ClassLabel<?>> CLASS = AssociationID.CLASS;
+    protected static final AssociationID<ClassLabel> CLASS = AssociationID.CLASS;
 
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.classifier.AbstractClassifier#EVALUATION_PROCEDURE_PARAM}

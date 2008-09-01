@@ -28,7 +28,7 @@ import java.util.Map;
  * @param <L> the type of the ClassLabel the Classifier is assigning
  */
 // todo arthur comment class
-public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Distance<D>, L extends ClassLabel<L>>
+public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Distance<D>, L extends ClassLabel>
     extends AbstractClassifier<V, L> {
 
     /**

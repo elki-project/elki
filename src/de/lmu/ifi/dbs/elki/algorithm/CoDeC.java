@@ -31,7 +31,7 @@ import java.util.Map;
  * @param <D> the type of Distance used by this Algorithm
  */
 // todo arthur comment class and constructor
-public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends ClassLabel<L>> extends AbstractAlgorithm<V> {
+public class CoDeC<V extends RealVector<V, ?>, D extends Distance<D>, L extends ClassLabel> extends AbstractAlgorithm<V> {
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.CoDeC#CLASSLABEL_PARAM}
      */

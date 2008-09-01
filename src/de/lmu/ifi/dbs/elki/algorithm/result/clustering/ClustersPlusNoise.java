@@ -199,7 +199,7 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
         return clustersAndNoise;
     }
 
-    public <L extends ClassLabel<L>> Database<O> associate(Class<L> classLabel) {
+    public <L extends ClassLabel> Database<O> associate(Class<L> classLabel) {
         List<Integer> nonNoiseObjects = new ArrayList<Integer>();
         for (int clusterID = 0; clusterID < clustersAndNoise.length - 1; clusterID++) {
             nonNoiseObjects.addAll(Arrays.asList(clustersAndNoise[clusterID]));
@@ -227,7 +227,7 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
         return clusterDB;
     }
 
-    public <L extends ClassLabel<L>> Map<L, Database<O>> clustering(Class<L> classLabel) {
+    public <L extends ClassLabel> Map<L, Database<O>> clustering(Class<L> classLabel) {
         Map<Integer, List<Integer>> partitions = new HashMap<Integer, List<Integer>>();
         for (int clusterID = 0; clusterID < clustersAndNoise.length - 1; clusterID++) {
             List<Integer> ids = Arrays.asList(clustersAndNoise[clusterID]);
@@ -268,20 +268,20 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
         }
     }
 
-    public <L extends ClassLabel<L>> void appendModel(L clusterID, Result<O> model) {
+    public <L extends ClassLabel> void appendModel(L clusterID, Result<O> model) {
         clusterToModel.put(classLabelToClusterID(clusterID), model);
     }
 
 
     /**
-     * todo coment
+     * todo comment
      */
-    protected <L extends ClassLabel<L>> Integer classLabelToClusterID(L classLabel) {
+    protected <L extends ClassLabel> Integer classLabelToClusterID(L classLabel) {
         return Integer.parseInt(classLabel.toString().substring(CLUSTER_LABEL_PREFIX.length())) - 1;
     }
 
     /**
-     * todo coment
+     * todo comment
      */
     protected String canonicalClusterLabel(int clusterID) {
         return CLUSTER_LABEL_PREFIX + Integer.toString(clusterID + 1);

@@ -28,7 +28,7 @@ import java.util.SortedSet;
  *
  * @author Arthur Zimek
  */
-public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends ClassLabel<L>, C extends Classifier<O, L>> extends AbstractParameterizable implements EvaluationProcedure<O, C, L> {
+public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends ClassLabel, C extends Classifier<O, L>> extends AbstractParameterizable implements EvaluationProcedure<O, C, L> {
 
     /**
      * Holds whether a test set hs been provided.
@@ -94,7 +94,7 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
 
     @SuppressWarnings("unchecked")
     public void set(Database<O> training, Database<O> test) {
-        SortedSet<ClassLabel<?>> labels = Util.getClassLabels(training);
+        SortedSet<ClassLabel> labels = Util.getClassLabels(training);
         labels.addAll(Util.getClassLabels(test));
         // TODO: ugly cast.
         this.labels = labels.toArray((L[]) new Object[labels.size()]);
@@ -106,7 +106,7 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
 
     @SuppressWarnings("unchecked")
     public void set(Database<O> data, Holdout<O, L> holdout) {
-        SortedSet<ClassLabel<?>> labels = Util.getClassLabels(data);
+        SortedSet<ClassLabel> labels = Util.getClassLabels(data);
         // TODO: ugly cast.
         this.labels = labels.toArray((L[]) new Object[labels.size()]);
 

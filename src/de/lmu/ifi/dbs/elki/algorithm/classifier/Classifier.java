@@ -15,7 +15,7 @@ import java.io.Serializable;
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <L> the type of the ClassLabel the Classifier is assigning
  */
-public interface Classifier<O extends DatabaseObject, L extends ClassLabel<L>>
+public interface Classifier<O extends DatabaseObject, L extends ClassLabel>
     extends Algorithm<O>, Serializable {
     /**
      * Performs the training. Sets available labels.

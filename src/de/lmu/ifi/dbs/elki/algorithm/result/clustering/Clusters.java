@@ -208,7 +208,7 @@ public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implem
         return clusters;
     }
 
-    public <L extends ClassLabel<L>> Database<O> associate(Class<L> classLabel) {
+    public <L extends ClassLabel> Database<O> associate(Class<L> classLabel) {
         try {
             for (int clusterID = 0; clusterID < clusters.length; clusterID++) {
                 L label = Util.instantiate(classLabel, classLabel.getName());
@@ -228,7 +228,7 @@ public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implem
 
     }
 
-    public <L extends ClassLabel<L>> Map<L, Database<O>> clustering(Class<L> classLabel) {
+    public <L extends ClassLabel> Map<L, Database<O>> clustering(Class<L> classLabel) {
         Map<Integer, List<Integer>> partitions = new HashMap<Integer, List<Integer>>();
         for (int clusterID = 0; clusterID < clusters.length; clusterID++) {
             List<Integer> ids = Arrays.asList(clusters[clusterID]);
@@ -252,7 +252,7 @@ public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implem
         return map;
     }
 
-    public <L extends ClassLabel<L>> void appendModel(L clusterID, Result<O> model) {
+    public <L extends ClassLabel> void appendModel(L clusterID, Result<O> model) {
         clusterToModel.put(classLabelToClusterID(clusterID), model);
     }
 
@@ -271,7 +271,7 @@ public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implem
     /**
      * todo comment
      */
-    protected <L extends ClassLabel<L>> Integer classLabelToClusterID(L classLabel) {
+    protected <L extends ClassLabel> Integer classLabelToClusterID(L classLabel) {
         return Integer.parseInt(classLabel.toString().substring(CLUSTER_LABEL_PREFIX.length())) - 1;
     }
 

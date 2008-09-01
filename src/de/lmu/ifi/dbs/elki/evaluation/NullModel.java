@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @author Arthur Zimek
  */
-public class NullModel<O extends DatabaseObject, L extends ClassLabel<L>, C extends Classifier<O, L>>
+public class NullModel<O extends DatabaseObject, L extends ClassLabel, C extends Classifier<O, L>>
     extends AbstractClassifierEvaluation<O, L, C> {
     /**
      * The labels available for classification.

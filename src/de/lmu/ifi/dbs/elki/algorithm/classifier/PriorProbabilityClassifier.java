@@ -11,13 +11,13 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 /**
- * Classifier to classifiy instances based on the prior probability of classes in the database.
+ * Classifier to classify instances based on the prior probability of classes in the database.
  *
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <L> the type of the ClassLabel the Classifier is assigning
  */
-public class PriorProbabilityClassifier<O extends DatabaseObject, L extends ClassLabel<L>>
+public class PriorProbabilityClassifier<O extends DatabaseObject, L extends ClassLabel>
     extends AbstractClassifier<O, L> {
     /**
      * The generated serial version UID.

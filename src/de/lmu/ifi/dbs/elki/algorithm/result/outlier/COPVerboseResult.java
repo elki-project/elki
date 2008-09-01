@@ -108,7 +108,7 @@ public class COPVerboseResult<O extends RealVector<O,?>> extends AbstractResult<
                     outStream.print(" ");
                 }
 
-                ClassLabel<?> classLabel = (ClassLabel<?>) db.getAssociation(AssociationID.CLASS, id);
+                ClassLabel classLabel = db.getAssociation(AssociationID.CLASS, id);
                 if (classLabel != null) {
                     outStream.print(classLabel);
                     outStream.print(" ");

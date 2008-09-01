@@ -25,7 +25,7 @@ import java.util.List;
  * @param <D> the type of Distance used by this Algorithm
  * @param <L> the type of the ClassLabel the Classifier is assigning
  */
-public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extends Distance<D>, L extends ClassLabel<L>>
+public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extends Distance<D>, L extends ClassLabel>
     extends AbstractClassifier<O, L> {
 
     /**

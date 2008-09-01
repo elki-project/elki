@@ -82,17 +82,17 @@ public class SODResult<O extends RealVector<O, Double>> extends AbstractResult<O
      * @throws de.lmu.ifi.dbs.elki.utilities.UnableToComplyException
      *          if an exception during normalization occurs
      */
+    @SuppressWarnings("unchecked")
     private void outputSOD(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
 
         writeHeader(outStream, settings, null);
 
         try {
-            // sort ascendingly according to sod
+            // sort in ascending order according to sod
             List<IDDoublePair> list = new LinkedList<IDDoublePair>();
             for (Iterator<Integer> it = db.iterator(); it.hasNext();) {
                 Integer id = it.next();
-                // noinspection unchecked
-                SODModel<O> sodModel = db.getAssociation(SOD.SOD_MODEL, id);
+                SODModel<O> sodModel = (SODModel<O>) db.getAssociation(SOD.SOD_MODEL, id);
                 list.add(new IDDoublePair(id, sodModel.getSod()));
             }
             Collections.sort(list);
@@ -120,15 +120,14 @@ public class SODResult<O extends RealVector<O, Double>> extends AbstractResult<O
                     outStream.print(" ");
                 }
 
-                ClassLabel<?> classLabel = db.getAssociation(AssociationID.CLASS, id);
+                ClassLabel classLabel = db.getAssociation(AssociationID.CLASS, id);
                 if (classLabel != null) {
                     outStream.print(classLabel);
                     outStream.print(" ");
                 }
 
                 outStream.println("SOD=" + iddoublepair.getValue());
-                // noinspection unchecked
-                SODModel<O> sodModel = db.getAssociation(SOD.SOD_MODEL, id);
+                SODModel<O> sodModel = (SODModel<O>) db.getAssociation(SOD.SOD_MODEL, id);
                 sodModel.output(outStream, normalization, settings);
 
             }

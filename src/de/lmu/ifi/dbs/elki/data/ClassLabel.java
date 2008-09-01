@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
  *
  * @author Arthur Zimek
  */
-public abstract class ClassLabel<L extends ClassLabel<L>> extends AbstractLoggable implements Comparable<L> {
+public abstract class ClassLabel extends AbstractLoggable implements Comparable<ClassLabel> {
 
     /**
      * ClassLabels need an empty constructor
@@ -39,13 +39,10 @@ public abstract class ClassLabel<L extends ClassLabel<L>> extends AbstractLoggab
      * @return true, if <code>this==obj || this.compareTo(o)==0</code>, false
      *         otherwise
      */
-    @SuppressWarnings("unchecked")
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof ClassLabel) {
-            return false;
-        }
-        return this == obj || this.compareTo((L) obj) == 0;
+        if (!(obj instanceof ClassLabel)) return false;
+        return this == obj || this.compareTo((ClassLabel) obj) == 0;
     }
 
     /**

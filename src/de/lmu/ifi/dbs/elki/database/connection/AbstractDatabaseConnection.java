@@ -99,7 +99,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
      * <p>Default value: {@link SimpleClassLabel} </p>
      * <p>Key: {@code -dbc.classLabelClass} </p>
      */
-    private final ClassParameter<ClassLabel<?>> CLASS_LABEL_CLASS_PARAM = new ClassParameter<ClassLabel<?>>(
+    private final ClassParameter<ClassLabel> CLASS_LABEL_CLASS_PARAM = new ClassParameter<ClassLabel>(
         CLASS_LABEL_CLASS_ID, ClassLabel.class, SimpleClassLabel.class.getName());
 
     /**
@@ -281,7 +281,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
 
             if (classLabel != null) {
                 try {
-                    ClassLabel<?> classLabelAssociation = (ClassLabel<?>) Class.forName(classLabelClass).newInstance();
+                    ClassLabel classLabelAssociation = (ClassLabel) Class.forName(classLabelClass).newInstance();
                     classLabelAssociation.init(classLabel);
                     associationMap.put(AssociationID.CLASS, classLabelAssociation);
                 }

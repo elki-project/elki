@@ -1093,11 +1093,11 @@ public final class Util extends AbstractLoggable {
      * @return a set comprising all class labels that are currently set in the
      *         database
      */
-    public static SortedSet<ClassLabel<?>> getClassLabels(Database<?> database) {
+    public static SortedSet<ClassLabel> getClassLabels(Database<?> database) {
         if (!database.isSetForAllObjects(AssociationID.CLASS)) {
             throw new IllegalStateException("AssociationID " + AssociationID.CLASS.getName() + " is not set.");
         }
-        SortedSet<ClassLabel<?>> labels = new TreeSet<ClassLabel<?>>();
+        SortedSet<ClassLabel> labels = new TreeSet<ClassLabel>();
         for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
             //noinspection unchecked
             labels.add(database.getAssociation(AssociationID.CLASS, iter.next()));

@@ -17,7 +17,7 @@ import java.util.Map;
  *
  * @author Arthur Zimek
  */
-public class LeaveOneOut<O extends DatabaseObject, L extends ClassLabel<L>> extends AbstractHoldout<O, L> {
+public class LeaveOneOut<O extends DatabaseObject, L extends ClassLabel> extends AbstractHoldout<O, L> {
 
 
     /**

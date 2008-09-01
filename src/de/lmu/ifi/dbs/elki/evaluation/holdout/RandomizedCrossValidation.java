@@ -20,7 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  *
  * @author Arthur Zimek
  */
-public class RandomizedCrossValidation<O extends DatabaseObject, L extends ClassLabel<L>> extends
+public class RandomizedCrossValidation<O extends DatabaseObject, L extends ClassLabel> extends
     RandomizedHoldout<O, L> {
 
     /**

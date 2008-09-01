@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.elki.data.ClassLabel;
  *
  * @author Arthur Zimek
  */
-public class WekaNominalAttribute<L extends ClassLabel<L>> extends WekaAbstractAttribute {
+public class WekaNominalAttribute<L extends ClassLabel> extends WekaAbstractAttribute {
     /**
      * Holds the value.
      */

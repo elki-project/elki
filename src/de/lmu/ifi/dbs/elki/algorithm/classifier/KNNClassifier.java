@@ -23,7 +23,7 @@ import java.util.List;
  * @param <D> the type of Distance used by this Algorithm
  * @param <L> the type of the ClassLabel the Classifier is assigning
  */
-public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L extends ClassLabel<L>>
+public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L extends ClassLabel>
     extends DistanceBasedClassifier<O, D, L> {
 
     /**

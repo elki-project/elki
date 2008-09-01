@@ -25,7 +25,7 @@ import java.util.Map;
  *
  * @author Arthur Zimek
  */
-public class StratifiedCrossValidation<O extends DatabaseObject, L extends ClassLabel<L>> extends
+public class StratifiedCrossValidation<O extends DatabaseObject, L extends ClassLabel> extends
     AbstractHoldout<O, L> {
     /**
      * Default number of folds.

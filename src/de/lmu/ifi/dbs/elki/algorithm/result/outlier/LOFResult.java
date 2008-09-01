@@ -167,7 +167,7 @@ public class LOFResult<O extends DatabaseObject> extends AbstractResult<O> {
                     outStream.print(" ");
                 }
 
-                ClassLabel<?> classLabel = (ClassLabel<?>) db.getAssociation(AssociationID.CLASS, objectID);
+                ClassLabel classLabel = db.getAssociation(AssociationID.CLASS, objectID);
                 if (classLabel != null) {
                     outStream.print(classLabel);
                     outStream.print(" ");

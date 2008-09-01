@@ -129,7 +129,7 @@ public class PartitionClusteringResults<O extends DatabaseObject>
      *                   the {@link HierarchicalClassLabel HierarchicalClassLabel}, that
      *                   would have as top-level label the partition id.
      */
-    public <L extends ClassLabel<L>> Database<O> associate(Class<L> classLabel) {
+    public <L extends ClassLabel> Database<O> associate(Class<L> classLabel) {
         try {
             Map<Integer, List<Integer>> partitions = new HashMap<Integer, List<Integer>>();
             Integer zero = 0;
@@ -194,7 +194,7 @@ public class PartitionClusteringResults<O extends DatabaseObject>
      *                   the {@link HierarchicalClassLabel HierarchicalClassLabel}, that
      *                   would have as top-level label the partition id.
      */
-    public <L extends ClassLabel<L>> Map<L, Database<O>> clustering(Class<L> classLabel) {
+    public <L extends ClassLabel> Map<L, Database<O>> clustering(Class<L> classLabel) {
         try {
             Map<L, Database<O>> result = new HashMap<L, Database<O>>();
             for (Integer partitionID : partitionResults.keySet()) {
@@ -215,7 +215,7 @@ public class PartitionClusteringResults<O extends DatabaseObject>
         }
     }
 
-    public <L extends ClassLabel<L>> void appendModel(L clusterID, Result<O> model) {
+    public <L extends ClassLabel> void appendModel(L clusterID, Result<O> model) {
         try {
             String[] labels = HierarchicalClassLabel.DEFAULT_SEPARATOR.split(clusterID.toString());
             Integer partitionID = Integer.parseInt(labels[0].substring(PARTITION_LABEL_PREFIX.length()));

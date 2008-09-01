@@ -25,7 +25,7 @@ public class ConfusionMatrix
     /**
      * Holds the class labels.
      */
-    private ClassLabel<?>[] labels;
+    private ClassLabel[] labels;
 
     /**
      * Provides a confusion matrix for the given values.
@@ -40,7 +40,7 @@ public class ConfusionMatrix
      * @throws IllegalArgumentException if the confusion matrix is not square or not complete
      * or if the length of class labels does not conform the length of the confusion matrix
      */
-    public ConfusionMatrix(ClassLabel<?>[] labels, int[][] confusion) throws IllegalArgumentException
+    public ConfusionMatrix(ClassLabel[] labels, int[][] confusion) throws IllegalArgumentException
     {
         for(int i = 0; i < confusion.length; i++)
         {

@@ -5,7 +5,7 @@ package de.lmu.ifi.dbs.elki.data;
  *
  * @author Arthur Zimek
  */
-public class SimpleClassLabel extends ClassLabel<SimpleClassLabel> {
+public class SimpleClassLabel extends ClassLabel {
     /**
      * Holds the String designating the label.
      */
@@ -33,8 +33,9 @@ public class SimpleClassLabel extends ClassLabel<SimpleClassLabel> {
      * Strings they represent. <p/> That is, the result equals
      * <code>this.label.compareTo(o.label)</code>.
      */
-    public int compareTo(SimpleClassLabel o) {
-        return this.label.compareTo(o.label);
+    public int compareTo(ClassLabel o) {
+        SimpleClassLabel other = (SimpleClassLabel) o; 
+        return this.label.compareTo(other.label);
     }
 
     /**

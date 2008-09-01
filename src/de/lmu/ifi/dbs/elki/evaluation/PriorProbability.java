@@ -13,7 +13,7 @@ import java.io.PrintStream;
  *
  * @author Arthur Zimek
  */
-public class PriorProbability<O extends DatabaseObject, L extends ClassLabel<L>, C extends Classifier<O, L>> extends NullModel<O, L, C> {
+public class PriorProbability<O extends DatabaseObject, L extends ClassLabel, C extends Classifier<O, L>> extends NullModel<O, L, C> {
     /**
      * Holds the prior probability.
      */

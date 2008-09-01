@@ -21,7 +21,7 @@ import java.util.List;
  *
  * @author Arthur Zimek
  */
-public abstract class AbstractClassifierEvaluation<O extends DatabaseObject, L extends ClassLabel<L>, C extends Classifier<O, L>> extends AbstractResult<O> implements Evaluation<O, C> {
+public abstract class AbstractClassifierEvaluation<O extends DatabaseObject, L extends ClassLabel, C extends Classifier<O, L>> extends AbstractResult<O> implements Evaluation<O, C> {
 
     /**
      * Holds the used classifier.

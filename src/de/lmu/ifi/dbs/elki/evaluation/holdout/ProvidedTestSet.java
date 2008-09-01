@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  *
  * @author Arthur Zimek
  */
-public class ProvidedTestSet<O extends DatabaseObject, L extends ClassLabel<L>> extends AbstractHoldout<O, L> {
+public class ProvidedTestSet<O extends DatabaseObject, L extends ClassLabel> extends AbstractHoldout<O, L> {
 
     /**
      * Holds the test set.
@@ -69,7 +69,7 @@ public class ProvidedTestSet<O extends DatabaseObject, L extends ClassLabel<L>> 
         this.database = database;
         setClassLabels(database);
         TrainingAndTestSet<O, L>[] split = new TrainingAndTestSet[1];
-        Set<ClassLabel<?>> joinedLabels = Util.getClassLabels(testset);
+        Set<ClassLabel> joinedLabels = Util.getClassLabels(testset);
         for (L label : this.labels) {
             joinedLabels.add(label);
         }
