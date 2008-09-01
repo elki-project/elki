@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
@@ -18,14 +19,15 @@ public class LPNormDistanceFunction<V extends FeatureVector<V, N>, N extends Num
     extends AbstractDoubleDistanceFunction<V> {
 
     /**
-     * Parameter P.
+     * OptionID for {@link #P_PARAM}
      */
-    public static final String P_P = "P";
+    public static final OptionID P_ID = OptionID.getOrCreateOptionID("lpnorm.p",
+        "the degree of the L-P-Norm (positive number)");
 
     /**
-     * Description for parameter P.
+     * P parameter
      */
-    public static final String P_D = "the degree of the L-P-Norm (positive number)";
+    private final DoubleParameter P_PARAM = new DoubleParameter(P_ID, new GreaterConstraint(0));
 
     /**
      * Keeps the currently set p.
@@ -37,8 +39,7 @@ public class LPNormDistanceFunction<V extends FeatureVector<V, N>, N extends Num
      */
     public LPNormDistanceFunction() {
         super();
-
-        addOption(new DoubleParameter(P_P, P_D, new GreaterConstraint(0)));
+        addOption(P_PARAM);
     }
 
     /**
@@ -73,7 +74,7 @@ public class LPNormDistanceFunction<V extends FeatureVector<V, N>, N extends Num
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingOptions = super.setParameters(args);
 
-        p = (Integer) optionHandler.getOptionValue(P_P);
+        p = P_PARAM.getValue();
 
         return remainingOptions;
     }

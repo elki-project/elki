@@ -481,12 +481,10 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
                                                                              boolean time) throws ParameterException {
         DimensionSelectingDistanceFunction<N, V>[] distanceFunctions = new DimensionSelectingDistanceFunction[dimensionality];
         for (int d = 0; d < dimensionality; d++) {
-            String[] parameters = new String[2];
-            parameters[0] = OptionHandler.OPTION_PREFIX + DimensionSelectingDistanceFunction.DIM_P;
-            parameters[1] = Integer.toString(d + 1);
+            String[] parameters = new String[0];
+            Util.addParameter(parameters, DimensionSelectingDistanceFunction.DIM_ID, Integer.toString(d + 1));
             distanceFunctions[d] = new DimensionSelectingDistanceFunction<N, V>();
             distanceFunctions[d].setParameters(parameters);
-            //noinspection unchecked
             distanceFunctions[d].setDatabase(database, verbose, time);
         }
         return distanceFunctions;

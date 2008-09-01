@@ -1,5 +1,11 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rdknn;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
@@ -13,20 +19,13 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
-import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * RDkNNTree is a spatial index structure based on the concepts of the R*-Tree
@@ -41,32 +40,36 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
     extends NonFlatRStarTree<O, RdKNNNode<D, N>, RdKNNEntry<D, N>> {
 
     /**
-     * Parameter k.
+     * OptionID for {@link #K_PARAM}
      */
-    public static final String K_P = "k";
+    public static final OptionID K_ID = OptionID.getOrCreateOptionID("rdknn.k",
+      "positive integer specifying the maximal number k of reverse " +
+      "k nearest neighbors to be supported.");
 
     /**
-     * Description for parameter k.
+     * Parameter for k
      */
-    public static final String K_D = "positive integer specifying the maximal number k of reverse " +
-        "k nearest neighbors to be supported.";
-
+    private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(0));
+  
     /**
      * The default distance function.
      */
     public static final String DEFAULT_DISTANCE_FUNCTION = EuclideanDistanceFunction.class.getName();
 
     /**
-     * Parameter for distance function.
+     * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
      */
-    public static final String DISTANCE_FUNCTION_P = "distancefunction";
+    public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("rdknn.distancefunction",
+      "the distance function to determine the distance between database objects " +
+      Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) +
+      ". Default: " + DEFAULT_DISTANCE_FUNCTION);
 
     /**
-     * Description for parameter distance function.
+     * Parameter for distance function
      */
-    public static final String DISTANCE_FUNCTION_D = "the distance function to determine the distance between database objects " +
-        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) +
-        ". Default: " + DEFAULT_DISTANCE_FUNCTION;
+    private final ClassParameter<SpatialDistanceFunction<O, D>> DISTANCE_FUNCTION_PARAM =
+      new ClassParameter<SpatialDistanceFunction<O, D>>(DISTANCE_FUNCTION_ID,
+          SpatialDistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
 
     /**
      * Parameter k.
@@ -85,13 +88,8 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
         super();
         this.debug = true;
 
-        addOption(new IntParameter(K_P, K_D, new GreaterConstraint(0)));
-
-        ClassParameter<DistanceFunction<O, D>> distFunction = new ClassParameter<DistanceFunction<O, D>>(DISTANCE_FUNCTION_P,
-            DISTANCE_FUNCTION_D,
-            DistanceFunction.class);
-        distFunction.setDefaultValue(DEFAULT_DISTANCE_FUNCTION);
-        addOption(distFunction);
+        addOption(K_PARAM);
+        addOption(DISTANCE_FUNCTION_PARAM);
     }
 
     /**
@@ -132,7 +130,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
 
     /**
      * Performs a bulk load on this RTree with the specified data. Is called by
-     * the constructur and should be overwritten by subclasses if necessary.
+     * the constructor and should be overwritten by subclasses if necessary.
      *
      * @param objects the data objects to be indexed
      */
@@ -272,21 +270,12 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
         String[] remainingParameters = super.setParameters(args);
 
         // distance function
-        String className = (String) optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
-        try {
-            // todo
-            distanceFunction = Util.instantiateGenerics(SpatialDistanceFunction.class, className);
-        }
-        catch (UnableToComplyException e) {
-            throw new WrongParameterValueException(DISTANCE_FUNCTION_P,
-                className, DISTANCE_FUNCTION_D, e);
-        }
-
+        distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
         remainingParameters = distanceFunction.setParameters(remainingParameters);
         setParameters(args, remainingParameters);
 
         // k_max
-        k_max = (Integer) optionHandler.getOptionValue(K_P);
+        k_max = K_PARAM.getValue();
 
         return remainingParameters;
     }

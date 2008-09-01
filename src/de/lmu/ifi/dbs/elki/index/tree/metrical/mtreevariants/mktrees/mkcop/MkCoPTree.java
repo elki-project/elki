@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
@@ -30,18 +31,18 @@ import java.util.Map;
  */
 public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>, N extends Number>
     extends AbstractMTree<O, D, MkCoPTreeNode<O, D, N>, MkCoPEntry<D, N>> {
+    /**
+     * OptionID for {@link #K_PARAM}
+     */
+    public static final OptionID K_ID = OptionID.getOrCreateOptionID("mkcop.k", 
+        "positive integer specifying the maximal number k of reverse" +
+        "k nearest neighbors to be supported.");
 
     /**
-     * Parameter k.
+     * Parameter for k
      */
-    public static final String K_P = "k";
-
-    /**
-     * Description for parameter k.
-     */
-    public static final String K_D = "positive integer specifying the maximal number k of reverse" +
-        "k nearest neighbors to be supported.";
-
+    private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(0));
+  
     /**
      * Parameter k.
      */
@@ -62,8 +63,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
      */
     public MkCoPTree() {
         super();
-        addOption(new IntParameter(K_P, K_D, new GreaterConstraint(0)));
-//    this.debug = true;
+        addOption(K_PARAM);
     }
 
     /**
@@ -199,7 +199,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
-        k_max = (Integer) optionHandler.getOptionValue(K_P);
+        k_max = K_PARAM.getValue();
 
         // init log k
         log_k = new double[k_max];

@@ -9,9 +9,8 @@ import de.lmu.ifi.dbs.elki.converter.Arff2Txt;
 import de.lmu.ifi.dbs.elki.converter.WekaAttribute;
 import de.lmu.ifi.dbs.elki.converter.WekaObject;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
@@ -26,29 +25,20 @@ public class ArffFileParser<O extends DatabaseObject & WekaObject<W>, W extends 
     /**
      * The default base parser ({@link RealVectorLabelParser}).
      */
-    @SuppressWarnings("unchecked")
-    public static final Parser<?> DEFAULT_PARSER = new RealVectorLabelParser();
+    public static final String DEFAULT_PARSER = RealVectorLabelParser.class.getCanonicalName();
     
     /**
-     * Parameter name for the base parser.
+     * OptionID for {@link #BASE_PARSER_PARAM}
      */
-    public static final String BASE_PARSER_P = "baseparser";
-    
-    /**
-     * Parameter description for the base parser.
-     */
-    public static final String BASE_PARSER_D = "parser getting the input translated from arff format to whitespace separated format";
+    public static final OptionID BASE_PARSER_ID = OptionID.getOrCreateOptionID("arff.baseparser",
+        "parser getting the input translated from arff format to whitespace separated format");
     
     /**
      * Parameter for the base parser.
      * Default base parser is set to {@link #DEFAULT_PARSER}.
      */
-    public static final ClassParameter<Parser<?>> BASE_PARSER_PARAM = new ClassParameter<Parser<?>>(BASE_PARSER_P, BASE_PARSER_P, Parser.class);
-    
-    static
-    {
-        BASE_PARSER_PARAM.setDefaultValue(DEFAULT_PARSER.getClass().getCanonicalName());
-    }
+    public final ClassParameter<Parser<O>> BASE_PARSER_PARAM =
+      new ClassParameter<Parser<O>>(BASE_PARSER_ID, Parser.class, DEFAULT_PARSER);
     
     /**
      * Keeps the currently set base parser.
@@ -89,28 +79,12 @@ public class ArffFileParser<O extends DatabaseObject & WekaObject<W>, W extends 
      * {@link #DEFAULT_PARSER}.
      * 
      */
-    @SuppressWarnings("unchecked")
     @Override
     public String[] setParameters(String[] args) throws ParameterException
     {
         String[] params = super.setParameters(args);
-        if (BASE_PARSER_PARAM.isSet())
-        {
-          this.parser = (Parser<O>) BASE_PARSER_PARAM.instantiateClass();
-        }
-        else
-        {
-            try
-            {
-                // todo
-                this.parser = Util.instantiateGenerics(Parser.class,DEFAULT_PARSER.getClass().getCanonicalName());
-            }
-            catch(UnableToComplyException e)
-            {
-                exception(e.getMessage(),e);
-            }
-        }
-        return this.parser.setParameters(params);
+        parser = BASE_PARSER_PARAM.instantiateClass();
+        return parser.setParameters(params);
     }
 
     

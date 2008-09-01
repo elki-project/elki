@@ -53,6 +53,9 @@ public class IntParameter extends NumberParameter<Integer> {
         super(optionID, constraint, false, defaultValue);
     }
 
+    // FIXME: IntParameter and DoubleParameter have different APIs.
+    // DoubleParameter takes (optionID, default), IntParameter takes (optionID, null, default)
+    
     /**
      * Constructs an integer parameter with the given name and description.
      *

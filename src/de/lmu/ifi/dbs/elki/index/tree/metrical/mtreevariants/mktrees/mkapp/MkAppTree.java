@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
@@ -35,37 +36,40 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     extends AbstractMTree<O, D, MkAppTreeNode<O, D, N>, MkAppEntry<D, N>> {
 
     /**
-     * Flag nolog.
+     * OptionID for {@link #NOLOG_PARAM}
      */
-    public static final String NOLOG_F = "nolog";
+    public static final OptionID NOLOG_ID = OptionID.getOrCreateOptionID("mkapp.nolog",
+        "Flag to indicate that the approximation is done in " +
+        "the ''normal'' space instead of the log-log space (which is default).");
 
     /**
-     * Description for parameter nolog.
+     * Parameter for nolog
      */
-    public static final String NOLOG_D = " flag to indicate that the approximation is done in " +
-        "the ''normal'' space instead of the log-log space (which is default).";
+    private final Flag NOLOG_PARAM = new Flag(NOLOG_ID);
+    
+    /**
+     * OptionID for {@link #K_PARAM}
+     */
+    public static final OptionID K_ID = OptionID.getOrCreateOptionID("mkapp.k",
+        "positive integer specifying the maximal number k of reverse" +
+        "k nearest neighbors to be supported.");
 
     /**
-     * Parameter k.
+     * Parameter for k
      */
-    public static final String K_P = "k";
+    private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(0));
+    
+    /**
+     * OptionID for {@link #P_PARAM}
+     */
+    public static final OptionID P_ID = OptionID.getOrCreateOptionID("mkapp.p",
+        "positive integer specifying the order of the polynomial approximation.");
 
     /**
-     * Description for parameter k.
+     * Parameter for p
      */
-    public static final String K_D = "positive integer specifying the maximal number k of reverse" +
-        "k nearest neighbors to be supported.";
-
-    /**
-     * Parameter p.
-     */
-    public static final String P_P = "p";
-
-    /**
-     * Description for parameter p.
-     */
-    public static final String P_D = "positive integer specifying the order of the polynomial approximation.";
-
+    private final IntParameter P_PARAM = new IntParameter(P_ID, new GreaterConstraint(0));
+    
     /**
      * Parameter k.
      */
@@ -87,11 +91,9 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     public MkAppTree() {
         super();
 
-        addOption(new IntParameter(K_P, K_D, new GreaterConstraint(0)));
-        addOption(new IntParameter(P_P, P_D, new GreaterConstraint(0)));
-        addOption(new Flag(NOLOG_F, NOLOG_D));
-
-//    this.debug = true;
+        addOption(K_PARAM);
+        addOption(P_PARAM);
+        addOption(NOLOG_PARAM);
     }
 
     /**
@@ -177,9 +179,9 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
-        k_max = (Integer) optionHandler.getOptionValue(K_P);
-        p = (Integer) optionHandler.getOptionValue(P_P);
-        log = !optionHandler.isSet(NOLOG_F);
+        k_max = K_PARAM.getValue();
+        p = P_PARAM.getValue();
+        log = ! NOLOG_PARAM.isSet();
 
         return remainingParameters;
     }

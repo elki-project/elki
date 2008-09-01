@@ -7,8 +7,9 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndex;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.StringParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualStringConstraint;
 
@@ -21,26 +22,32 @@ import java.util.List;
  */
 public abstract class SpatialIndex<O extends NumberVector<O,?>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends TreeIndex<O, N, E> {
   /**
-   * Option string for parameter bulk.
+   * OptionID for {@link #BULK_PARAM}
    */
-  public static final String BULK_LOAD_F = "bulk";
+  public static final OptionID BULK_LOAD_ID = OptionID.getOrCreateOptionID("spatial.bulk",
+      "flag to specify bulk load (default is no bulk load)");
 
   /**
-   * Description for parameter bulk.
+   * Parameter for bulk loading
    */
-  public static final String BULK_LOAD_D = "flag to specify bulk load (default is no bulk load)";
+  private final Flag BULK_LOAD_FLAG = new Flag(BULK_LOAD_ID);
+  
+  /**
+   * OptionID for {@link #BULK_LOAD_STRATEGY_PARAM}
+   */
+  public static final OptionID BULK_LOAD_STRATEGY_ID = OptionID.getOrCreateOptionID("spatial.bulkstrategy",
+      "the strategy for bulk load, available strategies are: ["
+      + BulkSplit.Strategy.MAX_EXTENSION + "| " + BulkSplit.Strategy.ZCURVE + "]" + "(default is " + BulkSplit.Strategy.ZCURVE + ")");
 
   /**
-   * Option string for parameter bulkstrategy.
+   * Parameter for bulk strategy
    */
-  public static final String BULK_LOAD_STRATEGY_P = "bulkstrategy";
-
-  /**
-   * Description for parameter bulkstrategy.
-   */
-  public static final String BULK_LOAD_STRATEGY_D = "the strategy for bulk load, available strategies are: ["
-                                                    + BulkSplit.Strategy.MAX_EXTENSION + "| " + BulkSplit.Strategy.ZCURVE + "]" + "(default is " + BulkSplit.Strategy.ZCURVE + ")";
-
+  private final PatternParameter BULK_LOAD_STRATEGY_PARAM = new PatternParameter(BULK_LOAD_STRATEGY_ID,
+      new EqualStringConstraint(new String[]{
+          BulkSplit.Strategy.MAX_EXTENSION.toString(),
+          BulkSplit.Strategy.ZCURVE.toString()}),
+          BulkSplit.Strategy.ZCURVE.toString());
+  
   /**
    * If true, a bulk load will be performed.
    */
@@ -53,15 +60,8 @@ public abstract class SpatialIndex<O extends NumberVector<O,?>, N extends Spatia
 
   public SpatialIndex() {
     super();
-    addOption(new Flag(BULK_LOAD_F, BULK_LOAD_D));
-
-    StringParameter bulk = new StringParameter(BULK_LOAD_STRATEGY_P,
-                                               BULK_LOAD_STRATEGY_D,
-                                               new EqualStringConstraint(new String[]{
-                                                   BulkSplit.Strategy.MAX_EXTENSION.toString(),
-                                                   BulkSplit.Strategy.ZCURVE.toString()}));
-    bulk.setDefaultValue(BulkSplit.Strategy.ZCURVE.toString());
-    addOption(bulk);
+    addOption(BULK_LOAD_FLAG);
+    addOption(BULK_LOAD_STRATEGY_PARAM);
   }
 
   /**
@@ -70,10 +70,10 @@ public abstract class SpatialIndex<O extends NumberVector<O,?>, N extends Spatia
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
-    bulk = optionHandler.isSet(BULK_LOAD_F);
+    bulk = BULK_LOAD_FLAG.isSet();
 
     if (bulk) {
-      String strategy = (String) optionHandler.getOptionValue(BULK_LOAD_STRATEGY_P);
+      String strategy = BULK_LOAD_STRATEGY_PARAM.getValue();
 
       if (strategy.equals(BulkSplit.Strategy.MAX_EXTENSION.toString())) {
         bulkLoadStrategy = BulkSplit.Strategy.MAX_EXTENSION;
@@ -82,14 +82,14 @@ public abstract class SpatialIndex<O extends NumberVector<O,?>, N extends Spatia
         bulkLoadStrategy = BulkSplit.Strategy.ZCURVE;
       }
       else
-        throw new WrongParameterValueException(BULK_LOAD_STRATEGY_P, strategy, BULK_LOAD_STRATEGY_D);
+        throw new WrongParameterValueException(BULK_LOAD_STRATEGY_PARAM, strategy, null);
     }
 
     return remainingParameters;
   }
 
   /**
-   * Sets the databse in the distance function of this index (if existing).
+   * Sets the database in the distance function of this index (if existing).
    * Subclasses may need to overwrite this method.
    *
    * @param database the database

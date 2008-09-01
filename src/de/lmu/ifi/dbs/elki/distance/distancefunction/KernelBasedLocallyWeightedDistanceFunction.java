@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 import java.util.List;
@@ -46,16 +47,19 @@ public class KernelBasedLocallyWeightedDistanceFunction<V extends RealVector<V, 
     public static final String DEFAULT_KERNEL_FUNCTION_CLASS = LinearKernelFunction.class.getName();
 
     /**
-     * Description for parameter kernel.
+     * OptionID for {@link #KERNEL_FUNCTION_PARAM}
      */
-    public static final String KERNEL_FUNCTION_CLASS_D = "the kernel function which is used to compute the similarity." +
-        "Default: " + DEFAULT_KERNEL_FUNCTION_CLASS;
+    public static final OptionID KERNEL_FUNCTION_ID = OptionID.getOrCreateOptionID("kernel",
+        "the kernel function which is used to compute the similarity." +
+        "Default: " + DEFAULT_KERNEL_FUNCTION_CLASS);
 
     /**
-     * Parameter for kernel.
+     * Parameter for the kernel function
      */
-    public static final String KERNEL_FUNCTION_CLASS_P = "kernel";
-
+    ClassParameter<KernelFunction<V, DoubleDistance>> KERNEL_FUNCTION_PARAM =
+      new ClassParameter<KernelFunction<V, DoubleDistance>>(KERNEL_FUNCTION_ID,
+          KernelFunction.class, DEFAULT_KERNEL_FUNCTION_CLASS);    
+    
     /**
      * The kernel function that is used.
      */
@@ -72,9 +76,7 @@ public class KernelBasedLocallyWeightedDistanceFunction<V extends RealVector<V, 
     public KernelBasedLocallyWeightedDistanceFunction() {
         super();
         //kernel function
-        ClassParameter<KernelFunction<V, DoubleDistance>> kernelFunctionClass = new ClassParameter<KernelFunction<V, DoubleDistance>>(KERNEL_FUNCTION_CLASS_P, KERNEL_FUNCTION_CLASS_D, KernelFunction.class);
-        kernelFunctionClass.setDefaultValue(DEFAULT_KERNEL_FUNCTION_CLASS);
-        addOption(kernelFunctionClass);
+        addOption(KERNEL_FUNCTION_PARAM);
     }
 
     /**
@@ -101,8 +103,7 @@ public class KernelBasedLocallyWeightedDistanceFunction<V extends RealVector<V, 
         String[] remainingParameters = super.setParameters(args);
 
         // kernel function
-        String kernelFunctionClass = (String) optionHandler.getOptionValue(KERNEL_FUNCTION_CLASS_P);
-        // FIXME: should kernelFunction be instantiated from kernelFunctionClass parameter?
+        kernelFunction = KERNEL_FUNCTION_PARAM.instantiateClass();
         remainingParameters = kernelFunction.setParameters(remainingParameters);
         setParameters(args, remainingParameters);
 
@@ -134,7 +135,7 @@ public class KernelBasedLocallyWeightedDistanceFunction<V extends RealVector<V, 
         //get list of neighbor objects
         final List<Integer> neighbors = getDatabase().getAssociation(AssociationID.NEIGHBOR_IDS, v1.getID());
 
-        //the colums in the kernel matrix corresponding to the two objects o1 and o2
+        //the columns in the kernel matrix corresponding to the two objects o1 and o2
         //maybe kernel_o1 column has already been computed
         Matrix kernel_o1 = (Matrix) getDatabase().getAssociation(AssociationID.CACHED_MATRIX, v1.getID());
         Matrix kernel_o2;
@@ -180,9 +181,9 @@ public class KernelBasedLocallyWeightedDistanceFunction<V extends RealVector<V, 
     }
 
     /**
-     * Returns the assocoiation ID for the association to be set by the preprocessor.
+     * Returns the association ID for the association to be set by the preprocessor.
      *
-     * @return the assocoiation ID for the association to be set by the preprocessor,
+     * @return the association ID for the association to be set by the preprocessor,
      *         which is {@link de.lmu.ifi.dbs.elki.database.AssociationID#STRONG_EIGENVECTOR_MATRIX}.
      */
     public AssociationID<Matrix> getAssociationID() {

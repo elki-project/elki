@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 
@@ -19,18 +20,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
  */
 public class DimensionSelectingDistanceFunction<N extends Number, V extends FeatureVector<V, N>>
     extends AbstractDoubleDistanceFunction<V> implements SpatialDistanceFunction<V, DoubleDistance> {
-
     /**
-     * Option string for parameter dim.
+     * OptionID for {@link #DIM_PARAM}
      */
-    public static final String DIM_P = "dim";
-
-    /**
-     * Description for parameter dim.
-     */
-    public static final String DIM_D = "a integer between 1 and the dimensionality of the " +
+    public static final OptionID DIM_ID = OptionID.getOrCreateOptionID("dim",
+        "a integer between 1 and the dimensionality of the " +
         "feature space 1 specifying the dimension to be considered " +
-        "for distance computation.";
+        "for distance computation.");
+
+    /**
+     * Parameter for dimensionality.
+     */
+    private final IntParameter DIM_PARAM = new IntParameter(DIM_ID, new GreaterEqualConstraint(1));
+
     /**
      * The dimension to be considered for distance computation.
      */
@@ -39,7 +41,7 @@ public class DimensionSelectingDistanceFunction<N extends Number, V extends Feat
     public DimensionSelectingDistanceFunction() {
         super();
 
-        addOption(new IntParameter(DIM_P, DIM_D, new GreaterEqualConstraint(1)));
+        addOption(DIM_PARAM);
     }
 
     /**
@@ -152,7 +154,7 @@ public class DimensionSelectingDistanceFunction<N extends Number, V extends Feat
         String[] remainingParameters = super.setParameters(args);
 
         // dim
-        dim = (Integer) optionHandler.getOptionValue(DIM_P);
+        dim = DIM_PARAM.getValue();
 
         return remainingParameters;
     }

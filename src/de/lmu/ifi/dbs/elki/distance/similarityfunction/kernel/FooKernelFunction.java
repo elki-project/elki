@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
@@ -17,19 +18,25 @@ public class FooKernelFunction<O extends FeatureVector<?,?>> extends AbstractDou
 	 * The default max_degree.
 	 */
 	public static final int DEFAULT_MAX_DEGREE = 2;
-	/**
-	 * Description for parameter max_degree.
-	 */
-	public static final String MAX_DEGREE_D = "The max degree of the"+ FooKernelFunction.class.getSimpleName()+". Default: "
-		+ DEFAULT_MAX_DEGREE;
-	/**
-	 * Parameter for max_degree.
-	 */
-	public static final String MAX_DEGREE_P = "max_degree";
-	/**
+	
+  /**
+   * OptionID for {@link #MAX_DEGREE_PARAM}
+   */
+  public static final OptionID MAX_DEGREE_ID = OptionID.getOrCreateOptionID("fookernel.max_degree",
+      "The max degree of the"+ FooKernelFunction.class.getSimpleName()+". Default: "
+      + DEFAULT_MAX_DEGREE);
+
+  /**
+   * Parameter for the maximum degree
+   */
+  private final IntParameter MAX_DEGREE_PARAM = new IntParameter(MAX_DEGREE_ID, null,
+      DEFAULT_MAX_DEGREE);
+
+  /**
 	 * Degree of the polynomial kernel function
 	 */
 	private int max_degree;
+
 	/**
 	 * Provides a polynomial Kernel function that computes
 	 * a similarity between the two vectors V1 and V2 definded by (V1^T*V2)^max_degree
@@ -37,9 +44,7 @@ public class FooKernelFunction<O extends FeatureVector<?,?>> extends AbstractDou
 	public FooKernelFunction() {
 		super();
 		//parameter max_degree
-		IntParameter maxDeg = new IntParameter(MAX_DEGREE_P, MAX_DEGREE_D);
-		maxDeg.setDefaultValue(DEFAULT_MAX_DEGREE);
-		addOption(maxDeg);
+		addOption(MAX_DEGREE_PARAM);
 	}
 
 	@Override
@@ -51,7 +56,7 @@ public class FooKernelFunction<O extends FeatureVector<?,?>> extends AbstractDou
 	public String[] setParameters(final String[] args) throws ParameterException{
 		final String[] remainingParameters = super.setParameters(args);
 		// max_degree
-		max_degree = (Integer)optionHandler.getOptionValue(MAX_DEGREE_P);
+		max_degree = MAX_DEGREE_PARAM.getValue();
 		
 		return remainingParameters;
 	}

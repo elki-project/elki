@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.data.synthetic;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
@@ -12,29 +13,48 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * todo parameter
  */
 public class PartiallySimilarVoxelObjectsCreator extends AbstractParameterizable{
-  public static final String CUBE_SIZE_MIN_P = "cubesizemin";
+  /**
+   * OptionID for {@link #CUBE_SIZE_MIN_PARAM}
+   */
+  public static final OptionID CUBE_SIZE_MIN_ID = OptionID.getOrCreateOptionID("cubesizemin",
+      "minimum size of cube (number of voxels per dimension)");
 
-  public static final String CUBE_SIZE_MIN_D = "minimum size of cube (number of voxels per dimension)";
+  /**
+   * Option for minimum cube size
+   */
+  // TODO: constraints
+  private final IntParameter CUBE_SIZE_MIN_PARAM = new IntParameter(CUBE_SIZE_MIN_ID);
 
-  public static final String CUBE_SIZE_MAX_P = "cubesizemax";
+  /**
+   * OptionID for {@link #CUBE_SIZE_MAX_PARAM}
+   */
+  public static final OptionID CUBE_SIZE_MAX_ID = OptionID.getOrCreateOptionID("cubesizemax",
+      "maximum size of cube (number of voxels per dimension)");
 
-  public static final String CUBE_SIZE_MAX_D = "maximum size of cube (number of voxels per dimension)";
+  /**
+   * Option for maximum cube size
+   */
+  // TODO: constraints
+  private final IntParameter CUBE_SIZE_MAX_PARAM = new IntParameter(CUBE_SIZE_MAX_ID);
 
-  public static final String SIMILARITY_SIZE_P = "simsize";
+  /**
+   * OptionID for {@link #SIMILARITY_SIZE_PARAM}
+   */
+  public static final OptionID SIMILARITY_SIZE_ID = OptionID.getOrCreateOptionID("simsize",
+      "size of similar region");
 
-  public static final String SIMILARITY_SIZE_D = "size of similar region";
-
+  /**
+   * Option for similarity size
+   */
+  // TODO: constraints
+  private final IntParameter SIMILARITY_SIZE_PARAM = new IntParameter(SIMILARITY_SIZE_ID);
 
   public PartiallySimilarVoxelObjectsCreator(String[] parameters) throws ParameterException {
-   
-	  // TODO constraints ??
+    addOption(CUBE_SIZE_MIN_PARAM);
+    addOption(CUBE_SIZE_MAX_PARAM);
+    addOption(SIMILARITY_SIZE_PARAM);
 
-    addOption(new IntParameter(CUBE_SIZE_MIN_P,CUBE_SIZE_MIN_D));
-    
-    addOption(new IntParameter(CUBE_SIZE_MAX_P,CUBE_SIZE_MAX_D));
-    
-    addOption(new IntParameter(SIMILARITY_SIZE_P,SIMILARITY_SIZE_D));
-
+    // FIXME: deprecated API use?
     optionHandler.grabOptions(parameters);
   }
 
@@ -42,12 +62,13 @@ public class PartiallySimilarVoxelObjectsCreator extends AbstractParameterizable
     return optionHandler.usage(message);
   }
 
+  // FIXME: unify main method with other wrappers?
   public static void main(String[] args) {
     try {
       new PartiallySimilarVoxelObjectsCreator(args);
     }
     catch (ParameterException e) {
-        // todo exception werfen
+      // todo exception werfen
       e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
     }    
   }

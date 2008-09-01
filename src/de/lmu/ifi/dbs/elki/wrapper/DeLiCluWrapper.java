@@ -11,7 +11,6 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTree;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -101,7 +100,7 @@ public class DeLiCluWrapper<O extends DatabaseObject> extends NormalizationWrapp
         Util.addParameter(parameters, SpatialIndexDatabase.INDEX_ID, DeLiCluTree.class.getName());
 
         // bulk load
-        parameters.add(OptionHandler.OPTION_PREFIX + SpatialIndex.BULK_LOAD_F);
+        Util.addFlag(parameters, SpatialIndex.BULK_LOAD_ID);
 
         // page size
         Util.addParameter(parameters, PAGE_SIZE_PARAM, Integer.toString(PAGE_SIZE_PARAM.getValue()));

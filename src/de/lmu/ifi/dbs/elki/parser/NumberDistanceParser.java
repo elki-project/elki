@@ -1,16 +1,5 @@
 package de.lmu.ifi.dbs.elki.parser;
 
-import de.lmu.ifi.dbs.elki.data.ExternalObject;
-import de.lmu.ifi.dbs.elki.distance.NumberDistance;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.properties.Properties;
-import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,6 +10,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import de.lmu.ifi.dbs.elki.data.ExternalObject;
+import de.lmu.ifi.dbs.elki.distance.NumberDistance;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.properties.Properties;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
  * Provides a parser for parsing one distance value per line. <p/> A line must
@@ -34,17 +32,21 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
     extends AbstractParser<ExternalObject> implements DistanceParser<ExternalObject, D> {
 
     /**
-     * Parameter for distance function.
+     * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
      */
-    public static final String DISTANCE_FUNCTION_P = "distancefunction";
+    public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID(
+        "parser.distancefunction",
+        "the distance function " +
+        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) +
+        ".");
 
     /**
-     * Description for parameter distance function.
+     * Parameter for distance function.
      */
-    public static final String DISTANCE_FUNCTION_D = "the distance function " +
-        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) +
-        ".";
-
+    ClassParameter<DistanceFunction<ExternalObject, D>> DISTANCE_FUNCTION_PARAM =
+      new ClassParameter<DistanceFunction<ExternalObject, D>>(DISTANCE_FUNCTION_ID,
+          DistanceFunction.class);
+    
     /**
      * The distance function.
      */
@@ -52,15 +54,14 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
 
     /**
      * Provides a parser for parsing one double distance per line. A line must
-     * have the follwing format: id1 id2 distanceValue, where id1 and is2 are
+     * have the following format: id1 id2 distanceValue, where id1 and is2 are
      * integers representing the two ids belonging to the distance value, the
      * distance value is a double value. Lines starting with &quot;#&quot; will
      * be ignored.
      */
     public NumberDistanceParser() {
         super();
-        ClassParameter<DistanceFunction<ExternalObject, D>> distFunc = new ClassParameter<DistanceFunction<ExternalObject, D>>(DISTANCE_FUNCTION_P, DISTANCE_FUNCTION_D, DistanceFunction.class);
-        addOption(distFunc);
+        addOption(DISTANCE_FUNCTION_PARAM);
     }
 
     public ParsingResult<ExternalObject> parse(InputStream in) {
@@ -174,14 +175,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
-        String className = (String) optionHandler.getOptionValue(DISTANCE_FUNCTION_P);
-        try {
-            distanceFunction = Util.instantiateGenerics(DistanceFunction.class, className);
-        }
-        catch (UnableToComplyException e) {
-            throw new WrongParameterValueException(DISTANCE_FUNCTION_P, className, DISTANCE_FUNCTION_D, e);
-        }
-
+        distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
         remainingParameters = distanceFunction.setParameters(remainingParameters);
         setParameters(args, remainingParameters);
 
