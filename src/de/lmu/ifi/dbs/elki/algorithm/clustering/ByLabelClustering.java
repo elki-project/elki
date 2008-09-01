@@ -20,6 +20,10 @@ import de.lmu.ifi.dbs.elki.utilities.Description;
  * I.e. it just uses a predefined clustering, and is mostly useful for testing and evaluation
  * (e.g. comparing the result of a real algorithm to a reference result / golden standard).
  * 
+ * TODO: allow hierarchical clusterings by splitting label into words?
+ * TODO: handling of data sets with no labels?
+ * TODO: Noise handling (e.g. allow the user to specify a noise label pattern?)
+ * 
  * @author Erich Schubert
  *
  * @param <O>
