@@ -94,7 +94,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
     );
 
     /**
-     * Parameter to specify the association of occuring class labels,
+     * Parameter to specify the association of occurring class labels,
      * must extend {@link ClassLabel}.
      * <p>Default value: {@link SimpleClassLabel} </p>
      * <p>Key: {@code -dbc.classLabelClass} </p>
@@ -211,7 +211,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
 
     /**
      * Normalizes and transforms the specified list of objects and their labels
-     * into a list of objects and their associtaions.
+     * into a list of objects and their associations.
      *
      * @param objectAndLabelsList the list of object and their labels to be transformed
      * @param normalization       the normalization to be applied
@@ -232,7 +232,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
 
     /**
      * Transforms the specified list of objects and their labels into a list of
-     * objects and their associtaions.
+     * objects and their associations.
      *
      * @param objectAndLabelsList the list of object and their labels to be transformed
      * @return a list of objects and their associations
