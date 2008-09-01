@@ -17,11 +17,11 @@ public interface FeatureVector<V extends FeatureVector<V,N>,N extends Number> ex
 {
 
     /**
-     * Returns a new FeatureVector of T for the given values.
+     * Returns a new FeatureVector of V for the given values.
      * 
      * @param values
      *            the values of the featureVector
-     * @return a new FeatureVector of T for the given values
+     * @return a new FeatureVector of V for the given values
      * @throws NoSuchMethodException
      * @throws SecurityException
      * @throws InvocationTargetException
@@ -35,16 +35,16 @@ public interface FeatureVector<V extends FeatureVector<V,N>,N extends Number> ex
             InvocationTargetException;
 
     /**
-     * Returns a FeatureVector of T with uniformly distributed (0-1) random values.
+     * Returns a FeatureVector of V with uniformly distributed (0-1) random values.
      * 
      * @param random
      *            a Random instance
-     * @return a FeatureVector of T with random values
+     * @return a FeatureVector of V with random values
      */
     V randomInstance(Random random);
 
     /**
-     * Returns a FeatureVector of T with random values between min and max.
+     * Returns a FeatureVector of V with random values between min and max.
      * 
      * @param min
      *            minimum of random value
@@ -52,7 +52,7 @@ public interface FeatureVector<V extends FeatureVector<V,N>,N extends Number> ex
      *            maximu of random value
      * @param random
      *            a random instance
-     * @return a FeatureVector of T with random values between min and max
+     * @return a FeatureVector of V with random values between min and max
      */
     V randomInstance(N min, N max, Random random);
 
