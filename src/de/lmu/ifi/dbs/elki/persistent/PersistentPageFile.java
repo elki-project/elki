@@ -226,6 +226,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
    * @param array the byte array from which the object should be reconstructed
    * @return a serialized object from the specified byte array
    */
+  @SuppressWarnings("unchecked")
   private P byteArrayToPage(byte[] array) {
     try {
       ByteArrayInputStream bais = new ByteArrayInputStream(array);
@@ -234,19 +235,18 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
       if (type == EMPTY_PAGE)
         return null;
       else if (type == FILLED_PAGE) {
-        // noinspection unchecked
         return (P) ois.readObject();
       }
       else
         throw new IllegalArgumentException("Unknown type: " + type);
     }
     catch (IOException e) {
-        // todo exception handling
+        // TODO exception handling
       e.printStackTrace();
       return null;
     }
     catch (ClassNotFoundException e) {
-        // todo exception handling
+        // TODO exception handling
       e.printStackTrace();
       return null;
     }

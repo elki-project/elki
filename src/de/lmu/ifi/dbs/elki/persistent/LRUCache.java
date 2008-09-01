@@ -50,6 +50,7 @@ public class LRUCache<P extends Page<P>> implements Cache<P> {
    * @param file      the underlying file of this cache, if a page is dropped
    *                  it is written to the file
    */
+  @SuppressWarnings("serial")
   public void initialize(int cacheSize, CachedFile<P> file) {
     this.file = file;
     this.cacheSize = cacheSize;

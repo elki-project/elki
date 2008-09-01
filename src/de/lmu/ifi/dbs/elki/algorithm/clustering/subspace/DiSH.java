@@ -128,7 +128,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         if (isVerbose()) {
             verbose("\n\nCompute Clusters.");
         }
-        computeClusters(database, (ClusterOrder<V, PreferenceVectorBasedCorrelationDistance>) optics.getResult());
+        computeClusters(database, optics.getResultClusterOrder());
     }
 
     /**

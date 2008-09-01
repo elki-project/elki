@@ -155,6 +155,7 @@ public class AbstractPage<P extends AbstractPage<P>> extends AbstractLoggable im
      * @return true, if o is an AbstractNode and has the same
      *         id and the same entries as this node.
      */
+    @SuppressWarnings("unchecked")
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

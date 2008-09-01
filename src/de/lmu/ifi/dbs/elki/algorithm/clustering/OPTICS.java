@@ -235,6 +235,10 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
     public Result<O> getResult() {
         return clusterOrder;
     }
+    
+    public ClusterOrder<O, D> getResultClusterOrder() {
+        return clusterOrder;
+    }
 
     /**
      * Adds the specified entry with the specified key tp the heap. If the
