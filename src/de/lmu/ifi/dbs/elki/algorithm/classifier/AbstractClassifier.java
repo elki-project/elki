@@ -95,7 +95,6 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
      * {@link Classifier#buildClassifier(de.lmu.ifi.dbs.elki.database.Database,de.lmu.ifi.dbs.elki.data.ClassLabel[])}
      */
     @SuppressWarnings("unchecked")
-    // FIXME: this cast sounds dangerous.
     private L[] labels = (L[]) new ClassLabel[0];
 
     /**

@@ -73,7 +73,6 @@ public class ProvidedTestSet<O extends DatabaseObject, L extends ClassLabel> ext
         for (L label : this.labels) {
             joinedLabels.add(label);
         }
-        // FIXME: this is a dangerous cast.
         this.labels = joinedLabels.toArray((L[]) new ClassLabel[joinedLabels.size()]);
         Arrays.sort(this.labels);
         split[0] = new TrainingAndTestSet(this.database, testset, labels);
