@@ -32,7 +32,7 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
     private E[] entries;
 
     /**
-     * Indicates wether this node is a leaf node.
+     * Indicates whether this node is a leaf node.
      */
     private boolean isLeaf;
 
@@ -49,7 +49,7 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
      * @param file     the file storing the index
      * @param capacity the capacity (maximum number of entries plus 1 for overflow)
      *                 of this node
-     * @param isLeaf   indicates wether this node is a leaf node
+     * @param isLeaf   indicates whether this node is a leaf node
      */
     @SuppressWarnings("unchecked")
     public AbstractNode(PageFile<N> file, int capacity, boolean isLeaf) {
@@ -110,10 +110,10 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
      * @throws ClassNotFoundException If the class for an object being
      *                                restored cannot be found.
      */
+    @SuppressWarnings("unchecked")
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
         numEntries = in.readInt();
-        // noinspection unchecked
         entries = (E[]) in.readObject();
     }
 
@@ -130,6 +130,7 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
      * @see de.lmu.ifi.dbs.elki.index.tree.Entry#equals(Object)
      * @see de.lmu.ifi.dbs.elki.persistent.AbstractPage#equals(Object)
      */
+    @SuppressWarnings("unchecked")
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -143,7 +144,6 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
             return false;
         }
 
-        // noinspection unchecked
         final N that = (N) o;
 
         return isLeaf == that.isLeaf &&
@@ -229,8 +229,8 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
     /**
      * Deletes all  entries in this node.
      */
+    @SuppressWarnings("unchecked")
     protected final void deleteAllEntries() {
-        //noinspection unchecked
         this.entries = (E[]) new Entry[entries.length];
         this.numEntries = 0;
     }
@@ -238,9 +238,9 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
     /**
      * Increases the length of the entries array to entries.length + 1.
      */
+    @SuppressWarnings("unchecked")
     public final void increaseEntries() {
         E[] tmp = entries;
-        //noinspection unchecked
         entries = (E[]) new Entry[tmp.length + 1];
         System.arraycopy(tmp, 0, entries, 0, tmp.length);
     }
