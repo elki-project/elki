@@ -25,12 +25,6 @@ import java.util.List;
  */
 public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L extends ClassLabel>
     extends DistanceBasedClassifier<O, D, L> {
-
-    /**
-     * Generated serial version UID.
-     */
-    private static final long serialVersionUID = 5467968122892109545L;
-
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.classifier.KNNClassifier#K_PARAM}
      */

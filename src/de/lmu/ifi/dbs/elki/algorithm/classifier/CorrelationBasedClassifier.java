@@ -31,11 +31,6 @@ import java.util.Map;
 public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Distance<D>, L extends ClassLabel>
     extends AbstractClassifier<V, L> {
 
-    /**
-     * Generated serial version UID.
-     */
-    private static final long serialVersionUID = -6786297567169490313L;
-
     // todo arthur comment
     private DependencyDerivator<V, D> dependencyDerivator = new DependencyDerivator<V, D>();
 

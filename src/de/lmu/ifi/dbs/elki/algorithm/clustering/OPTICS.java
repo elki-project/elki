@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -273,7 +272,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
     /**
      * Encapsulates an entry in the cluster order.
      */
-    public class COEntry implements Identifiable<COEntry>, Serializable {
+    public class COEntry implements Identifiable<COEntry> {
         /**
          * The id of the entry.
          */

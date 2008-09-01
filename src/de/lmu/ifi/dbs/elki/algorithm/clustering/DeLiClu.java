@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -443,7 +442,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
     /**
      * Encapsulates an entry in the cluster order.
      */
-    public class SpatialObjectPair implements Identifiable<SpatialObjectPair>, Serializable {
+    public class SpatialObjectPair implements Identifiable<SpatialObjectPair> {
         /**
          * The first entry of this pair.
          */

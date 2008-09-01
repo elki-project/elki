@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.utilities;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,8 +12,7 @@ import java.util.Map;
  * 
  * @author Arthur Zimek
  */
-@SuppressWarnings("serial")
-public abstract class ConstantObject<D extends ConstantObject<D>> extends AbstractLoggable implements Comparable<D>, Serializable {
+public abstract class ConstantObject<D extends ConstantObject<D>> extends AbstractLoggable implements Comparable<D> {
   /**
    * Index of constant objects.
    */

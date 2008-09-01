@@ -13,6 +13,11 @@ import java.util.List;
  */
 public class DatabaseEvent extends EventObject {
   /**
+   * Serialization ID since Java EventObjects are expected to be serializable. 
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * The ids of the database object that have been changed, i.e. updated, inserted or deleted.
    */
   private List<Integer> objectIDs;

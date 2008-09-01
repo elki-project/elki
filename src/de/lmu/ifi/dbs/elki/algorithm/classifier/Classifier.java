@@ -5,8 +5,6 @@ import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 
-import java.io.Serializable;
-
 /**
  * A Classifier is to hold a model that is built based on a database, and to
  * classify a new instance of the same type.
@@ -16,7 +14,7 @@ import java.io.Serializable;
  * @param <L> the type of the ClassLabel the Classifier is assigning
  */
 public interface Classifier<O extends DatabaseObject, L extends ClassLabel>
-    extends Algorithm<O>, Serializable {
+    extends Algorithm<O> {
     /**
      * Performs the training. Sets available labels.
      *
