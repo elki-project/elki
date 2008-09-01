@@ -17,6 +17,9 @@ de.lmu.ifi.dbs.elki.algorithm.Algorithm=de.lmu.ifi.dbs.elki.algorithm.APRIORI,\
            de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS,\
            de.lmu.ifi.dbs.elki.algorithm.clustering.SLINK,\
            de.lmu.ifi.dbs.elki.algorithm.clustering.SNNClustering,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.TrivialAllInOne,\
+           de.lmu.ifi.dbs.elki.algorithm.clustering.TrivialAllNoise,\
            de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.CASH,\
            de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.COPAC,\
            de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.ERiC,\
