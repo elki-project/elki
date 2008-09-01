@@ -20,7 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * 
  * @author Arthur Zimek
  */
-public class ArffFileParser<O extends DatabaseObject & WekaObject<W>, W extends WekaAttribute<W>> extends AbstractParser<O>
+public class ArffFileParser<O extends DatabaseObject & WekaObject<W>, W extends WekaAttribute> extends AbstractParser<O>
 {
     /**
      * The default base parser ({@link RealVectorLabelParser}).

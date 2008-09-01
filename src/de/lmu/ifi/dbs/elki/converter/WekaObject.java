@@ -6,7 +6,7 @@ package de.lmu.ifi.dbs.elki.converter;
  *
  * @author Arthur Zimek
  */
-public interface WekaObject<W extends WekaAttribute<W>> {
+public interface WekaObject<W extends WekaAttribute> {
     /**
      * Provides the attributes of this object as array of type WekaAttribute.
      *

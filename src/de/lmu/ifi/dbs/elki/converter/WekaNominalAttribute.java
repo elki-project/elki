@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.elki.data.ClassLabel;
  *
  * @author Arthur Zimek
  */
-public class WekaNominalAttribute<L extends ClassLabel<L>> extends WekaAbstractAttribute<WekaNominalAttribute<L>> {
+public class WekaNominalAttribute<L extends ClassLabel<L>> extends WekaAbstractAttribute {
     /**
      * Holds the value.
      */
@@ -33,8 +33,10 @@ public class WekaNominalAttribute<L extends ClassLabel<L>> extends WekaAbstractA
      *
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
-    public int compareTo(WekaNominalAttribute<L> o) {
-        return this.value.compareTo(o.value);
+    @SuppressWarnings("unchecked")
+    public int compareTo(WekaAttribute o) {
+      WekaNominalAttribute<L> w = (WekaNominalAttribute<L>) o;
+      return this.value.compareTo(w.value);
     }
 
 }

@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.converter;
 
-import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.HierarchicalClassLabel;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
@@ -11,7 +10,7 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
  *
  * @author Arthur Zimek
  */
-public final class WekaAttributeFactory// implements Parameterizable
+public final class WekaAttributeFactory // implements Parameterizable
 {
     /**
      * The classLabel class for nominal attributes.
@@ -33,15 +32,15 @@ public final class WekaAttributeFactory// implements Parameterizable
             return new WekaNumericAttribute(dvalue);
         }
         catch (NumberFormatException e) {
-            ClassLabel<HierarchicalClassLabel> classLabel;
+            HierarchicalClassLabel classLabel;
             try {
-                classLabel = Util.instantiateGenerics(ClassLabel.class, classLabelClass.getName());
+                classLabel = Util.instantiateGenerics(HierarchicalClassLabel.class, classLabelClass.getName());
             }
             catch (UnableToComplyException e1) {
                 throw new RuntimeException("This should never happen!", e);
             }
             classLabel.init(value);
-            return new WekaNominalAttribute(classLabel);
+            return new WekaNominalAttribute<HierarchicalClassLabel>(classLabel);
         }
     }
 

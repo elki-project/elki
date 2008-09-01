@@ -7,7 +7,7 @@ package de.lmu.ifi.dbs.elki.converter;
  *
  * @author Arthur Zimek
  */
-public interface WekaAttribute<W extends WekaAttribute<W>> extends Comparable<W> {
+public interface WekaAttribute extends Comparable<WekaAttribute> {
     /**
      * Key word for a nominal attribute.
      */

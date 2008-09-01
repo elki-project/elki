@@ -22,7 +22,7 @@ import java.util.TreeSet;
  * @author Arthur Zimek
  */
 //  TODO arthur comment all
-public class Database2Arff<D extends DatabaseObject & WekaObject<W>, W extends WekaAttribute<W>> {
+public class Database2Arff<D extends DatabaseObject & WekaObject<W>, W extends WekaAttribute> {
 
     private static final String SEPARATOR = ",";
 

@@ -7,8 +7,7 @@ import java.util.Arrays;
  *
  * @author Arthur Zimek
  */
-public abstract class WekaAbstractAttribute<W extends WekaAbstractAttribute<W>>
-    implements WekaAttribute<W> {
+public abstract class WekaAbstractAttribute implements WekaAttribute {
     /**
      * Collects the possible types of attributes.
      */
@@ -90,11 +89,10 @@ public abstract class WekaAbstractAttribute<W extends WekaAbstractAttribute<W>>
      * <code>this.compareTo((W) o)</code> returns 0.
      * @see java.lang.Object#equals(java.lang.Object)
      */
-    @SuppressWarnings("unchecked")
     @Override
     public boolean equals(Object o) {
         try {
-            W a = (W) o;
+            WekaAttribute a = (WekaAttribute) o;
             return this.compareTo(a) == 0;
 
         }

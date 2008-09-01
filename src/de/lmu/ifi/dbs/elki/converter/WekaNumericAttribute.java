@@ -5,7 +5,7 @@ package de.lmu.ifi.dbs.elki.converter;
  *
  * @author Arthur Zimek
  */
-public class WekaNumericAttribute extends WekaAbstractAttribute<WekaNumericAttribute> {
+public class WekaNumericAttribute extends WekaAbstractAttribute {
     /**
      * Holds the value.
      */
@@ -30,8 +30,9 @@ public class WekaNumericAttribute extends WekaAbstractAttribute<WekaNumericAttri
      *
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
-    public int compareTo(WekaNumericAttribute o) {
-        return this.value.compareTo(o.value);
+    public int compareTo(WekaAttribute o) {
+      WekaNumericAttribute w = (WekaNumericAttribute) o;
+      return this.value.compareTo(w.value);
     }
 
 }

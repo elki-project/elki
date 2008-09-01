@@ -31,7 +31,7 @@ import java.util.Set;
  * as nominal attributes. The values for a nominal attribute are sorted.
  * @author Arthur Zimek
  */
-public class Txt2Arff<W extends WekaAttribute<W>> extends StandAloneInputWrapper {
+public class Txt2Arff<W extends WekaAttribute> extends StandAloneInputWrapper {
 
   /**
    * Main method to run this wrapper.
