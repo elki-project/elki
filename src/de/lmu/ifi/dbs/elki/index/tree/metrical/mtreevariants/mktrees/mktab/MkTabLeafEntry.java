@@ -92,12 +92,12 @@ class MkTabLeafEntry<D extends Distance<D>> extends MTreeLeafEntry<D> implements
    * @throws java.io.IOException    if I/O errors occur
    * @throws ClassNotFoundException If the class for an object being restored cannot be found.
    */
+  @SuppressWarnings("unchecked")
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     super.readExternal(in);
     k_max = in.readInt();
     knnDistances = new ArrayList<D>();
     for (int i = 0; i < k_max; i++) {
-      //noinspection unchecked
       knnDistances.add((D) in.readObject());
     }
   }
@@ -110,6 +110,7 @@ class MkTabLeafEntry<D extends Distance<D>> extends MTreeLeafEntry<D> implements
    *         o is an MkTabLeafEntry and has the same parameter k_max and
    *         knnDistances as this entry.
    */
+  @SuppressWarnings("unchecked")
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;

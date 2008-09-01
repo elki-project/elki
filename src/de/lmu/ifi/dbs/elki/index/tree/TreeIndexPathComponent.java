@@ -59,13 +59,13 @@ public class TreeIndexPathComponent<E extends Entry> {
      *
      * @see Entry#equals(Object)
      */
+    @SuppressWarnings("unchecked")
     public boolean equals(Object o) {
         if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())
             return false;
 
-        // noinspection unchecked
         final TreeIndexPathComponent<E> that = (TreeIndexPathComponent<E>) o;
         return (this.entry.equals(that.entry));
     }

@@ -17,7 +17,7 @@ import java.util.Map;
  *
  * @author Elke Achtert 
  */
-public class BulkSplit extends AbstractLoggable {
+public class BulkSplit<N extends SpatialObject> extends AbstractLoggable {
   /**
    * Available strategies for bulk loading.
    */
@@ -39,7 +39,7 @@ public class BulkSplit extends AbstractLoggable {
    * @param strategy       the bulk load strategy
    * @return the partition of the specified spatial objects according to the chosen strategy
    */
-  public List<List<SpatialObject>> partition(List<SpatialObject> spatialObjects, int minEntries, int maxEntries,
+  public List<List<N>> partition(List<N> spatialObjects, int minEntries, int maxEntries,
                                              Strategy strategy) {
     if (strategy == Strategy.MAX_EXTENSION) {
       return maximalExtensionPartition(spatialObjects, minEntries, maxEntries);
@@ -56,15 +56,15 @@ public class BulkSplit extends AbstractLoggable {
    * Partitions the specified feature vectors where the split axes are the
    * dimensions with maximum extension
    *
-   * @param spatialObjects the spatial objects to be partioned
+   * @param spatialObjects the spatial objects to be partitioned
    * @param minEntries     the minimum number of entries in a partition
    * @param maxEntries     the maximum number of entries in a partition
    * @return the partition of the specified spatial objects
    */
-  private List<List<SpatialObject>> maximalExtensionPartition(List<SpatialObject> spatialObjects,
+  private List<List<N>> maximalExtensionPartition(List<N> spatialObjects,
                                                               int minEntries, int maxEntries) {
-    List<List<SpatialObject>> partitions = new ArrayList<List<SpatialObject>>();
-    List<SpatialObject> objects = new ArrayList<SpatialObject>(spatialObjects);
+    List<List<N>> partitions = new ArrayList<List<N>>();
+    List<N> objects = new ArrayList<N>(spatialObjects);
 
     while (objects.size() > 0) {
       StringBuffer msg = new StringBuffer();
@@ -81,9 +81,9 @@ public class BulkSplit extends AbstractLoggable {
       Collections.sort(objects, new SpatialComparator(splitAxis, SpatialComparator.MIN));
 
       // insert into partition
-      List<SpatialObject> partition = new ArrayList<SpatialObject>();
+      List<N> partition = new ArrayList<N>();
       for (int i = 0; i < splitPoint; i++) {
-        SpatialObject o = objects.remove(0);
+        N o = objects.remove(0);
         partition.add(o);
       }
       partitions.add(partition);
@@ -110,9 +110,9 @@ public class BulkSplit extends AbstractLoggable {
    * @param maxEntries     the maximum number of entries in a partition
    * @return A partition of the spatial objects according to their z-values
    */
-  private List<List<SpatialObject>> zValuePartition(List<SpatialObject> spatialObjects, int minEntries, int maxEntries) {
-    List<List<SpatialObject>> partitions = new ArrayList<List<SpatialObject>>();
-    List<SpatialObject> objects = new ArrayList<SpatialObject>(spatialObjects);
+  private List<List<N>> zValuePartition(List<N> spatialObjects, int minEntries, int maxEntries) {
+    List<List<N>> partitions = new ArrayList<List<N>>();
+    List<N> objects = new ArrayList<N>(spatialObjects);
 
     // get z-values
     List<double[]> valuesList = new ArrayList<double[]>();
@@ -157,9 +157,9 @@ public class BulkSplit extends AbstractLoggable {
     while (objects.size() > 0) {
       StringBuffer msg = new StringBuffer();
       int splitPoint = chooseBulkSplitPoint(objects.size(), minEntries, maxEntries);
-      List<SpatialObject> partition = new ArrayList<SpatialObject>();
+      List<N> partition = new ArrayList<N>();
       for (int i = 0; i < splitPoint; i++) {
-        SpatialObject o = objects.remove(0);
+        N o = objects.remove(0);
         partition.add(o);
       }
       partitions.add(partition);
@@ -185,7 +185,7 @@ public class BulkSplit extends AbstractLoggable {
    * @param objects the spatial objects to be splitted
    * @return the best split axis
    */
-  private int chooseMaximalExtendedSplitAxis(List<SpatialObject> objects) {
+  private int chooseMaximalExtendedSplitAxis(List<N> objects) {
     // maximum and minimum value for the extension
     int dimension = objects.get(0).getDimensionality();
     double[] maxExtension = new double[dimension];

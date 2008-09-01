@@ -63,10 +63,10 @@ class MkMaxDirectoryEntry<D extends Distance<D>> extends MTreeDirectoryEntry<D> 
      * Calls the super method and reads the knn distance of this entry from the specified
      * input stream.
      */
+    @SuppressWarnings("unchecked")
     public void readExternal(ObjectInput in) throws IOException,
                                                     ClassNotFoundException {
         super.readExternal(in);
-        //noinspection unchecked
         this.knnDistance = (D) in.readObject();
     }
 
@@ -78,12 +78,12 @@ class MkMaxDirectoryEntry<D extends Distance<D>> extends MTreeDirectoryEntry<D> 
      *         o is an MkMaxDirectoryEntry and has the same
      *         knnDistance as this entry.
      */
+    @SuppressWarnings("unchecked")
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
 
-        // noinspection unchecked
         final MkMaxDirectoryEntry<D> that = (MkMaxDirectoryEntry<D>) o;
 
         return !(knnDistance != null ? !knnDistance.equals(that.knnDistance) : that.knnDistance != null);

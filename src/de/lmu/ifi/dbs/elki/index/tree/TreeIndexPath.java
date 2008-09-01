@@ -151,13 +151,13 @@ public class TreeIndexPath<E extends Entry> {
      *
      * @see de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent#equals(Object)
      */
+    @SuppressWarnings("unchecked")
     public boolean equals(Object o) {
         if (o == this)
             return true;
         if (o == null || getClass() != o.getClass())
             return false;
 
-        // noinspection unchecked
         TreeIndexPath<E> other = (TreeIndexPath<E>) o;
 
         if (getPathCount() != other.getPathCount())

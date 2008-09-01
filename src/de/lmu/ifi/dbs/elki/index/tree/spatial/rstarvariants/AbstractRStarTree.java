@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialComparator;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialObject;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.Enlargement;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.utilities.Identifiable;
@@ -634,20 +633,18 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
    * @param objects the objects to be inserted
    * @return the array of leaf nodes containing the objects
    */
-  @SuppressWarnings("unchecked")
   protected List<N> createLeafNodes(List<O> objects) {
     int minEntries = leafMinimum;
     int maxEntries = leafCapacity - 1;
 
     ArrayList<N> result = new ArrayList<N>();
-    BulkSplit split = new BulkSplit();
-    List<SpatialObject> spatialObjects = new ArrayList<SpatialObject>(objects);
-    List<List<SpatialObject>> partitions = split.partition(spatialObjects,
+    BulkSplit<O> split = new BulkSplit<O>();
+    List<List<O>> partitions = split.partition(objects,
                                                            minEntries,
                                                            maxEntries,
                                                            bulkLoadStrategy);
 
-    for (List<SpatialObject> partition : partitions) {
+    for (List<O> partition : partitions) {
       StringBuffer msg = new StringBuffer();
 
       // create leaf node
@@ -656,8 +653,8 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
       result.add(leafNode);
 
       // insert data
-      for (SpatialObject o : partition) {
-        leafNode.addLeafEntry(createNewLeafEntry((O) o));
+      for (O o : partition) {
+        leafNode.addLeafEntry(createNewLeafEntry(o));
       }
 
       // write to file

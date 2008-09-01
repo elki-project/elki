@@ -167,6 +167,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
   /**
    * Tests this node (for debugging purposes).
    */
+  @SuppressWarnings("unchecked")
   public final void test() {
     // leaf node
     if (isLeaf()) {

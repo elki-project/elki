@@ -45,12 +45,12 @@ public class ClusterOrderEntry<D extends Distance<D>> implements Identifiable<Cl
      * @return <code>true</code> if this object has the same attribute
      *         values as the o argument; <code>false</code> otherwise.
      */
+    @SuppressWarnings("unchecked")
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        // noinspection unchecked
         final ClusterOrderEntry<D> that = (ClusterOrderEntry<D>) o;
 
         if (!objectID.equals(that.objectID)) return false;

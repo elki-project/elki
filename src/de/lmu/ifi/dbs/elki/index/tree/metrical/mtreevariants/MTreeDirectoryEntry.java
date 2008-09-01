@@ -158,12 +158,12 @@ public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractEntry im
      *         coveringRadius, parentDistance and routingObjectID
      *         as this entry.
      */
+    @SuppressWarnings("unchecked")
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
 
-        // noinspection unchecked
         final MTreeDirectoryEntry<D> that = (MTreeDirectoryEntry<D>) o;
 
         if (coveringRadius != null ? !coveringRadius.equals(that.coveringRadius) : that.coveringRadius != null)

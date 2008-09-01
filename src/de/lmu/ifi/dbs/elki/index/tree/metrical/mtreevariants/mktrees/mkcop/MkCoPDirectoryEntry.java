@@ -110,12 +110,12 @@ class MkCoPDirectoryEntry<D extends NumberDistance<D, N>, N extends Number>
      *         o is an MkCoPLeafEntry and has the same
      *         conservative approximation as this entry.
      */
+    @SuppressWarnings("unchecked")
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
 
-        // noinspection unchecked
         final MkCoPDirectoryEntry<D, N> that = (MkCoPDirectoryEntry<D, N>) o;
 
         return !(conservativeApproximation != null ? !conservativeApproximation.equals(that.conservativeApproximation) : that.conservativeApproximation != null);

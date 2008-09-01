@@ -69,10 +69,10 @@ public class RdKNNDirectoryEntry<D extends NumberDistance<D, N>, N extends Numbe
      * @throws java.io.IOException    if I/O errors occur
      * @throws ClassNotFoundException If the class for an object being restored cannot be found.
      */
+    @SuppressWarnings("unchecked")
     public void readExternal(ObjectInput in) throws IOException,
                                                     ClassNotFoundException {
         super.readExternal(in);
-        //noinspection unchecked
         this.knnDistance = (D) in.readObject();
     }
 
@@ -84,12 +84,12 @@ public class RdKNNDirectoryEntry<D extends NumberDistance<D, N>, N extends Numbe
      *         o is an RDkNNDirectoryEntry and has the same
      *         knnDistance as this entry.
      */
+    @SuppressWarnings("unchecked")
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
 
-        // noinspection unchecked
         final RdKNNDirectoryEntry<D, N> that = (RdKNNDirectoryEntry<D, N>) o;
 
         return knnDistance.equals(that.knnDistance);

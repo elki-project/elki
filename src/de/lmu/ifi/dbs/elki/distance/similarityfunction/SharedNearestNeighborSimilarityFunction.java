@@ -135,6 +135,7 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
      * @return the super class for the preprocessor,
      *         which is {@link SharedNearestNeighborsPreprocessor}
      */
+    @SuppressWarnings("unchecked")
     public Class<? extends Preprocessor<?>> getPreprocessorSuperClass() {
         return (Class<? extends Preprocessor<?>>) SharedNearestNeighborsPreprocessor.class;
     }

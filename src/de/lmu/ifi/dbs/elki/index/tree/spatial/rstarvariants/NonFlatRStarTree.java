@@ -149,17 +149,16 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends Ab
 	 *            the nodes to be inserted
 	 * @return the directory nodes containing the nodes
 	 */
-	private List<N> createDirectoryNodes(List<N> nodes) {
+  private List<N> createDirectoryNodes(List<N> nodes) {
 		int minEntries = dirMinimum;
 		int maxEntries = dirCapacity - 1;
 
 		ArrayList<N> result = new ArrayList<N>();
-		BulkSplit split = new BulkSplit();
-		List<SpatialObject> spatialObjects = new ArrayList<SpatialObject>(nodes);
-		List<List<SpatialObject>> partitions = split.partition(spatialObjects,
+		BulkSplit<N> split = new BulkSplit<N>();
+		List<List<N>> partitions = split.partition(nodes,
 				minEntries, maxEntries, bulkLoadStrategy);
 
-		for (List<SpatialObject> partition : partitions) {
+		for (List<N> partition : partitions) {
 			StringBuffer msg = new StringBuffer();
 
 			// create node
@@ -168,10 +167,8 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends Ab
 			result.add(dirNode);
 
 			// insert nodes
-			for (SpatialObject o : partition) {
-				// noinspection unchecked
-				N node = (N) o;
-				dirNode.addDirectoryEntry(createNewDirectoryEntry(node));
+			for (N o : partition) {
+				dirNode.addDirectoryEntry(createNewDirectoryEntry(o));
 			}
 
 			// write to file
@@ -196,16 +193,14 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends Ab
 	 *            the spatial objects to be inserted
 	 * @return the root node
 	 */
-	private N createRoot(N root, List<SpatialObject> objects) {
+  @SuppressWarnings("unchecked")
+  private N createRoot(N root, List<SpatialObject> objects) {
 		// insert data
 		for (SpatialObject object : objects) {
 			if (object instanceof NumberVector) {
-				// noinspection unchecked
 				root.addLeafEntry(createNewLeafEntry((O) object));
 			} else {
-				// noinspection unchecked
-				N node = (N) object;
-				root.addDirectoryEntry(createNewDirectoryEntry(node));
+				root.addDirectoryEntry(createNewDirectoryEntry((N) object));
 			}
 		}
 

@@ -152,6 +152,7 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
      * @param mTree the M-Tree holding this node
      * @param entry the entry representing this node
      */
+    @SuppressWarnings("unchecked")
     public final void test(AbstractMTree<O, D, N, E> mTree, E entry) {
         // leaf node
         if (isLeaf()) {

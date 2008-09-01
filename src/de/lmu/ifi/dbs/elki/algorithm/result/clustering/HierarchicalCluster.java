@@ -245,6 +245,7 @@ public class HierarchicalCluster<C extends HierarchicalCluster<C>> extends Abstr
      * @return <code>true</code> if this object is the same as the obj
      *         argument; <code>false</code> otherwise.
      */
+    @SuppressWarnings("unchecked")
     @Override
     public final boolean equals(Object o) {
         if (this == o) {

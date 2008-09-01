@@ -145,12 +145,12 @@ class MkCoPLeafEntry<D extends NumberDistance<D, N>, N extends Number> extends M
      *         o is an MkCoPLeafEntry and has the same
      *         conservative and progressive approximation as this entry.
      */
+    @SuppressWarnings("unchecked")
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
 
-        // noinspection unchecked
         final MkCoPLeafEntry<D, N> that = (MkCoPLeafEntry<D, N>) o;
 
         if (conservativeApproximation != null ?

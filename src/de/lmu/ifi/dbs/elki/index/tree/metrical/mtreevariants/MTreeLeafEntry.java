@@ -116,10 +116,10 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractEntry impleme
      * Calls the super method and reads the parentDistance of this entry from the specified
      * input stream.
      */
+    @SuppressWarnings("unchecked")
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
-        //noinspection unchecked
         this.parentDistance = (D) in.readObject();
     }
 
@@ -131,12 +131,12 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractEntry impleme
      *         o is an MTreeLeafEntry and has the same
      *         parentDistance as this entry.
      */
+    @SuppressWarnings("unchecked")
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
 
-        // noinspection unchecked
         final MTreeLeafEntry<D> that = (MTreeLeafEntry<D>) o;
 
         return !(parentDistance != null ?

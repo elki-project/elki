@@ -62,10 +62,10 @@ class MkMaxLeafEntry<D extends Distance<D>> extends MTreeLeafEntry<D> implements
      * Calls the super method and reads the knn distance of this entry from the specified
      * input stream.
      */
+    @SuppressWarnings("unchecked")
     public void readExternal(ObjectInput in) throws IOException,
                                                     ClassNotFoundException {
         super.readExternal(in);
-        //noinspection unchecked
         this.knnDistance = (D) in.readObject();
     }
 
@@ -77,12 +77,12 @@ class MkMaxLeafEntry<D extends Distance<D>> extends MTreeLeafEntry<D> implements
      *         o is an MkMaxLeafEntry and has the same
      *         knnDistance as this entry.
      */
+    @SuppressWarnings("unchecked")
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
 
-        // noinspection unchecked
         final MkMaxLeafEntry<D> that = (MkMaxLeafEntry<D>) o;
 
         return !(knnDistance != null ? !knnDistance.equals(that.knnDistance) : that.knnDistance != null);
