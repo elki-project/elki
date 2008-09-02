@@ -30,7 +30,8 @@ public class Cluster<O extends DatabaseObject> extends AbstractLoggable implemen
     public Cluster(Integer[] clusterIDs) {
         super(LoggingConfiguration.DEBUG);
         this.clusterIDs = new int[clusterIDs.length];
-        System.arraycopy(clusterIDs, 0, this.clusterIDs, 0, clusterIDs.length);
+        for (int i = 0; i < clusterIDs.length; i++)
+          this.clusterIDs[i] = clusterIDs[i];
         Arrays.sort(this.clusterIDs);
     }
 
