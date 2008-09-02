@@ -36,26 +36,14 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
     private boolean testSetProvided = false;
 
     /**
-     * OptionID for {@link #VERBOSE_FLAG}
+     * Flag to request verbose information.
      */
-    public static final OptionID TIME_ID = OptionID.getOrCreateOptionID(
-        "eval.time", "flag whether to assess time");
+    private final Flag TIME_FLAG = new Flag(OptionID.ALGORITHM_TIME);
 
     /**
      * Flag to request verbose information.
      */
-    private final Flag TIME_FLAG = new Flag(TIME_ID);
-
-    /**
-     * OptionID for {@link #VERBOSE_FLAG}
-     */
-    public static final OptionID VERBOSE_ID = OptionID.getOrCreateOptionID(
-        "eval.verbose", "flag to request verbose messages during evaluation");
-
-    /**
-     * Flag to request verbose information.
-     */
-    private final Flag VERBOSE_FLAG = new Flag(VERBOSE_ID);
+    private final Flag VERBOSE_FLAG = new Flag(OptionID.ALGORITHM_VERBOSE);
 
     /**
      * Holds whether to assess runtime during the evaluation.

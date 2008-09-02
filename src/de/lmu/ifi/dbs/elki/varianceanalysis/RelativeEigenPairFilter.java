@@ -26,6 +26,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
 
 public class RelativeEigenPairFilter extends AbstractParameterizable implements EigenPairFilter {
   /**
+   * OptionID for {@link #RALPHA_PARAM}
+   */
+  public static final OptionID EIGENPAIR_FILTER_RALPHA = OptionID.getOrCreateOptionID("pca.filter.relativealpha",
+      "The sensitivity niveau for weak eigenvectors: An eigenvector which is at less than " + 
+      "the given share of the statistical average variance is considered weak."
+  );
+
+  /**
    * The default value for ralpha.
    */
   public static final double DEFAULT_RALPHA = 1.1;
@@ -33,7 +41,7 @@ public class RelativeEigenPairFilter extends AbstractParameterizable implements 
   /**
    * Parameter relative alpha.
    */
-  private final DoubleParameter RALPHA_PARAM = new DoubleParameter(OptionID.EIGENPAIR_FILTER_RALPHA,
+  private final DoubleParameter RALPHA_PARAM = new DoubleParameter(EIGENPAIR_FILTER_RALPHA,
       new GreaterEqualConstraint(0.0), DEFAULT_RALPHA);
 
   /**

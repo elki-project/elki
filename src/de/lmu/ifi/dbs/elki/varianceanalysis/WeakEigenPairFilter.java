@@ -18,6 +18,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
 
 public class WeakEigenPairFilter extends AbstractParameterizable implements EigenPairFilter {
   /**
+   * OptionID for {@link #WALPHA_PARAM}
+   * and {@link de.lmu.ifi.dbs.elki.varianceanalysis.ProgressiveEigenPairFilter#WALPHA_PARAM}
+   * and {@link de.lmu.ifi.dbs.elki.varianceanalysis.SignificantEigenPairFilter#WALPHA_PARAM}
+   */
+  public static final OptionID EIGENPAIR_FILTER_WALPHA = OptionID.getOrCreateOptionID("pca.filter.weakalpha",
+      "The minimum strength of the statistically expected variance (1/n) share an eigenvector " +
+      "needs to have to be considered 'strong'."
+  );
+
+  /**
    * The default value for walpha.
    */
   public static final double DEFAULT_WALPHA = 0.95;
@@ -25,7 +35,7 @@ public class WeakEigenPairFilter extends AbstractParameterizable implements Eige
   /**
    * Parameter weak alpha.
    */
-  private final DoubleParameter WALPHA_PARAM = new DoubleParameter(OptionID.EIGENPAIR_FILTER_WALPHA,
+  private final DoubleParameter WALPHA_PARAM = new DoubleParameter(EIGENPAIR_FILTER_WALPHA,
       new GreaterEqualConstraint(0.0), DEFAULT_WALPHA);
 
   /**

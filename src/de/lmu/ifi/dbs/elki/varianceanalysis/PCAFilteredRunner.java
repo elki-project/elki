@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
+import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
@@ -21,166 +22,168 @@ import java.util.List;
 
 /**
  * todo erich comment class
+ * 
  * @author erich
  */
 public class PCAFilteredRunner<V extends RealVector<V, ?>> extends PCARunner<V> {
-    /**
-     * Parameter to specify the filter for determination of the strong and weak
-     * eigenvectors, must be a subclass of {@link EigenPairFilter}.
-     * <p/>
-     * Default value: {@link PercentageEigenPairFilter}
-     * </p>
-     * <p/>
-     * Key: {@code -pca.filter}
-     * </p>
-     */
-    private ClassParameter<EigenPairFilter> EIGENPAIR_FILTER_PARAM = new ClassParameter<EigenPairFilter>(OptionID.PCA_EIGENPAIR_FILTER, EigenPairFilter.class, PercentageEigenPairFilter.class.getName());
+  /**
+   * OptionID for
+   * {@link #EIGENPAIR_FILTER_PARAM}
+   */
+  public static final OptionID PCA_EIGENPAIR_FILTER = OptionID.getOrCreateOptionID("pca.filter",
+      "Classname of the filter to determine the strong and weak eigenvectors "
+      + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(EigenPairFilter.class) + ".");
 
-    /**
-     * Holds the instance of the EigenPairFilter specified by {@link #EIGENPAIR_FILTER_PARAM}.
-     */
-    private EigenPairFilter eigenPairFilter;
+  /**
+   * Parameter to specify the filter for determination of the strong and weak
+   * eigenvectors, must be a subclass of {@link EigenPairFilter}. <p/> Default
+   * value: {@link PercentageEigenPairFilter} </p> <p/> Key: {@code -pca.filter}
+   * </p>
+   */
+  private ClassParameter<EigenPairFilter> EIGENPAIR_FILTER_PARAM =
+    new ClassParameter<EigenPairFilter>(PCA_EIGENPAIR_FILTER,
+        EigenPairFilter.class, PercentageEigenPairFilter.class.getName());
 
-    /**
-     * OptionID for {@link #BIG_PARAM}
-     */
-    public static final OptionID BIG_ID = OptionID.getOrCreateOptionID(
-        "localpca.big",
-        "A constant big value to reset high eigenvalues."
-    );
+  /**
+   * Holds the instance of the EigenPairFilter specified by
+   * {@link #EIGENPAIR_FILTER_PARAM}.
+   */
+  private EigenPairFilter eigenPairFilter;
 
-    /**
-     * OptionID for {@link #SMALL_PARAM}
-     */
-    public static final OptionID SMALL_ID = OptionID.getOrCreateOptionID(
-        "localpca.small",
-        "A constant small value to reset low eigenvalues."
-    );
+  /**
+   * OptionID for {@link #BIG_PARAM}
+   */
+  public static final OptionID BIG_ID = OptionID.getOrCreateOptionID("localpca.big", "A constant big value to reset high eigenvalues.");
 
-    /**
-     * Parameter to specify a constant big value to reset high eigenvalues,
-     * must be a double greater than 0.
-     * <p>Default value: {@code 1.0} </p>
-     * <p>Key: {@code -localpca.big} </p>
-     */
-    private final DoubleParameter BIG_PARAM = new DoubleParameter(
-        BIG_ID,
-        new GreaterConstraint(0),
-        1.0);
+  /**
+   * OptionID for {@link #SMALL_PARAM}
+   */
+  public static final OptionID SMALL_ID = OptionID.getOrCreateOptionID("localpca.small", "A constant small value to reset low eigenvalues.");
 
-    /**
-     * Parameter to specify a constant small value to reset low eigenvalues,
-     * must be a double greater than 0.
-     * <p>Default value: {@code 0.0} </p>
-     * <p>Key: {@code -localpca.small} </p>
-     * <p/>
-     * FIXME: why is the default of 0.0 ok when it must be > 0?
-     */
-    private final DoubleParameter SMALL_PARAM = new DoubleParameter(
-        SMALL_ID,
-        new GreaterEqualConstraint(0),
-        0.0);
+  /**
+   * Parameter to specify a constant big value to reset high eigenvalues, must
+   * be a double greater than 0.
+   * <p>
+   * Default value: {@code 1.0}
+   * </p>
+   * <p>
+   * Key: {@code -localpca.big}
+   * </p>
+   */
+  private final DoubleParameter BIG_PARAM = new DoubleParameter(BIG_ID, new GreaterConstraint(0), 1.0);
 
-    /**
-     * Holds the value of {@link #BIG_PARAM}.
-     */
-    private double big;
+  /**
+   * Parameter to specify a constant small value to reset low eigenvalues, must
+   * be a double greater than 0.
+   * <p>
+   * Default value: {@code 0.0}
+   * </p>
+   * <p>
+   * Key: {@code -localpca.small}
+   * </p>
+   * <p/> FIXME: why is the default of 0.0 ok when it must be > 0?
+   */
+  private final DoubleParameter SMALL_PARAM = new DoubleParameter(SMALL_ID, new GreaterEqualConstraint(0), 0.0);
 
-    /**
-     * Holds the value of {@link #SMALL_PARAM}.
-     */
-    private double small;
+  /**
+   * Holds the value of {@link #BIG_PARAM}.
+   */
+  private double big;
 
-    /**
-     * todo comment
-     */
-    public PCAFilteredRunner() {
-        addOption(EIGENPAIR_FILTER_PARAM);
-        addOption(BIG_PARAM);
-        addOption(SMALL_PARAM);
+  /**
+   * Holds the value of {@link #SMALL_PARAM}.
+   */
+  private double small;
 
-        // global constraint small <--> big
-        optionHandler.setGlobalParameterConstraint(new LessGlobalConstraint<Double>(SMALL_PARAM, BIG_PARAM));
-    }
+  /**
+   * todo comment
+   */
+  public PCAFilteredRunner() {
+    addOption(EIGENPAIR_FILTER_PARAM);
+    addOption(BIG_PARAM);
+    addOption(SMALL_PARAM);
 
-    // todo comment
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    // global constraint small <--> big
+    optionHandler.setGlobalParameterConstraint(new LessGlobalConstraint<Double>(SMALL_PARAM, BIG_PARAM));
+  }
 
-        // big and small params
-        big = BIG_PARAM.getValue();
-        small = SMALL_PARAM.getValue();
+  // todo comment
+  public String[] setParameters(String[] args) throws ParameterException {
+    String[] remainingParameters = super.setParameters(args);
 
-        // eigenPair filter
-        eigenPairFilter = EIGENPAIR_FILTER_PARAM.instantiateClass();
-        remainingParameters = eigenPairFilter.setParameters(remainingParameters);
-        setParameters(args, remainingParameters);
+    // big and small params
+    big = BIG_PARAM.getValue();
+    small = SMALL_PARAM.getValue();
 
-        return remainingParameters;
-    }
+    // eigenPair filter
+    eigenPairFilter = EIGENPAIR_FILTER_PARAM.instantiateClass();
+    remainingParameters = eigenPairFilter.setParameters(remainingParameters);
+    setParameters(args, remainingParameters);
 
-    /**
-     * Calls the super method
-     * and adds to the returned attribute settings the attribute settings of
-     * the {@link #eigenPairFilter}.
-     */
-    @Override
-    public List<AttributeSettings> getAttributeSettings() {
-        List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-        attributeSettings.addAll(eigenPairFilter.getAttributeSettings());
-        return attributeSettings;
-    }
+    return remainingParameters;
+  }
 
-    /**
-     * Run PCA on a collection of database IDs
-     *
-     * @param ids      a colleciton of ids
-     * @param database the database used
-     * @return PCA result
-     */
-    public PCAFilteredResult processIds(Collection<Integer> ids, Database<V> database) {
-        return processCovarMatrix(covarianceBuilder.processIds(ids, database));
-    }
+  /**
+   * Calls the super method and adds to the returned attribute settings the
+   * attribute settings of the {@link #eigenPairFilter}.
+   */
+  @Override
+  public List<AttributeSettings> getAttributeSettings() {
+    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
+    attributeSettings.addAll(eigenPairFilter.getAttributeSettings());
+    return attributeSettings;
+  }
 
-    /**
-     * Run PCA on a QueryResult Collection
-     *
-     * @param results  a collection of QueryResults
-     * @param database the database used
-     * @return PCA result
-     */
-    public PCAFilteredResult processQueryResult(Collection<QueryResult<DoubleDistance>> results, Database<V> database) {
-        return processCovarMatrix(covarianceBuilder.processQueryResults(results, database));
-    }
+  /**
+   * Run PCA on a collection of database IDs
+   * 
+   * @param ids a colleciton of ids
+   * @param database the database used
+   * @return PCA result
+   */
+  public PCAFilteredResult processIds(Collection<Integer> ids, Database<V> database) {
+    return processCovarMatrix(covarianceBuilder.processIds(ids, database));
+  }
 
-    /**
-     * Process an existing covariance Matrix
-     *
-     * @param covarMatrix the matrix used for performing pca
-     */
-    public PCAFilteredResult processCovarMatrix(Matrix covarMatrix) {
-        // TODO: add support for a different implementation to do EVD?
-        EigenvalueDecomposition evd = covarMatrix.eig();
-        return processEVD(evd);
-    }
+  /**
+   * Run PCA on a QueryResult Collection
+   * 
+   * @param results a collection of QueryResults
+   * @param database the database used
+   * @return PCA result
+   */
+  public PCAFilteredResult processQueryResult(Collection<QueryResult<DoubleDistance>> results, Database<V> database) {
+    return processCovarMatrix(covarianceBuilder.processQueryResults(results, database));
+  }
 
-    /**
-     * Process an existing eigenvalue decomposition
-     *
-     * @param evd eigenvalue decomposition to use
-     */
-    public PCAFilteredResult processEVD(EigenvalueDecomposition evd) {
-        SortedEigenPairs eigenPairs = new SortedEigenPairs(evd, false);
-        FilteredEigenPairs filteredEigenPairs = eigenPairFilter.filter(eigenPairs);
-        return new PCAFilteredResult(eigenPairs, filteredEigenPairs, big, small);
-    }
+  /**
+   * Process an existing covariance Matrix
+   * 
+   * @param covarMatrix the matrix used for performing pca
+   */
+  public PCAFilteredResult processCovarMatrix(Matrix covarMatrix) {
+    // TODO: add support for a different implementation to do EVD?
+    EigenvalueDecomposition evd = covarMatrix.eig();
+    return processEVD(evd);
+  }
 
-    /**
-     * Retrieve the EigenPairFilter to be used. For derived PCA Runners
-     *
-     * @return eigen pair filter configured.
-     */
-    protected EigenPairFilter getEigenPairFilter() {
-        return eigenPairFilter;
-    }
+  /**
+   * Process an existing eigenvalue decomposition
+   * 
+   * @param evd eigenvalue decomposition to use
+   */
+  public PCAFilteredResult processEVD(EigenvalueDecomposition evd) {
+    SortedEigenPairs eigenPairs = new SortedEigenPairs(evd, false);
+    FilteredEigenPairs filteredEigenPairs = eigenPairFilter.filter(eigenPairs);
+    return new PCAFilteredResult(eigenPairs, filteredEigenPairs, big, small);
+  }
+
+  /**
+   * Retrieve the EigenPairFilter to be used. For derived PCA Runners
+   * 
+   * @return eigen pair filter configured.
+   */
+  protected EigenPairFilter getEigenPairFilter() {
+    return eigenPairFilter;
+  }
 }

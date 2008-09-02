@@ -64,7 +64,7 @@ public class MultivariateModelDerivator<V extends RealVector<V, ?>, D extends Di
      * Key: {@code -derivator.randomSample}
      * </p>
      */
-    private final Flag RANDOM_SAMPLE_FLAG = new Flag(OptionID.DEPENDENCY_DERIVATOR_RANDOM_SAMPLE);
+    private final Flag RANDOM_SAMPLE_FLAG = new Flag(DependencyDerivator.DEPENDENCY_DERIVATOR_RANDOM_SAMPLE);
 
     /**
      * The PCA utility object.

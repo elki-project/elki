@@ -5,7 +5,6 @@ import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.ConstantObject;
-import de.lmu.ifi.dbs.elki.varianceanalysis.EigenPairFilter;
 
 /**
  * An OptionID is used by option handlers as a unique identifier for specific
@@ -89,12 +88,14 @@ public final class OptionID extends ConstantObject<OptionID> {
 
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#VERBOSE_FLAG}
+     * and {@link de.lmu.ifi.dbs.elki.evaluation.procedure.ClassifierEvaluationProcedure#VERBOSE_FLAG}
      */
     public static final OptionID ALGORITHM_VERBOSE = new OptionID("verbose",
         "Flag to allow verbose messages while performing the algorithm.");
 
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#TIME_FLAG}
+     * and {@link de.lmu.ifi.dbs.elki.evaluation.procedure.ClassifierEvaluationProcedure#TIME_FLAG}
      */
     public static final OptionID ALGORITHM_TIME = new OptionID("time",
         "Flag to request output of performance time.");
@@ -105,106 +106,6 @@ public final class OptionID extends ConstantObject<OptionID> {
     public static final OptionID TRACE_DEBUG = new OptionID("stack-trace",
         "Print a stack trace on errors.");
 
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator#RANDOM_SAMPLE_FLAG}
-     */
-    public static final OptionID DEPENDENCY_DERIVATOR_RANDOM_SAMPLE = new OptionID("derivator.randomSample",
-        "Flag to use random sample (use knn query around centroid, if flag is not set)."
-    );
-    
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor#K_PARAM}
-     */
-    public static final OptionID KNN_HICO_PREPROCESSOR_K = new OptionID("hicopreprocessor.k",
-        "The number of nearest neighbors considered in the PCA. " +
-        "If this parameter is not set, k ist set to three " +
-        "times of the dimensionality of the database objects."
-    );
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.varianceanalysis.PCARunner#COVARIANCE_PARAM}
-     */
-    public static final OptionID PCA_COVARIANCE_MATRIX = new OptionID("pca.covariance",
-      "Class used to compute the covariance matrix.");
-    
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredRunner#EIGENPAIR_FILTER_PARAM}
-     */
-    public static final OptionID PCA_EIGENPAIR_FILTER = new OptionID("pca.filter",
-        "Classname of the filter to determine the strong and weak eigenvectors " +
-        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(EigenPairFilter.class) +
-        "."
-    );
-    
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.varianceanalysis.PercentageEigenPairFilter#ALPHA_PARAM}
-     * and {@link de.lmu.ifi.dbs.elki.varianceanalysis.ProgressiveEigenPairFilter#ALPHA_PARAM}
-     */
-    public static final OptionID EIGENPAIR_FILTER_ALPHA = new OptionID("pca.filter.alpha",
-        "The share (0.0 to 1.0) of variance that needs to be explained by the 'strong' eigenvectors." +
-        "The filter class will choose the number of strong eigenvectors by this share."
-    );
-    
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.varianceanalysis.ProgressiveEigenPairFilter#PALPHA_PARAM}
-     */
-    public static final OptionID EIGENPAIR_FILTER_PALPHA = new OptionID("pca.filter.progressivealpha",
-        "The share (0.0 to 1.0) of variance that needs to be explained by the 'strong' eigenvectors." +
-        "The filter class will choose the number of strong eigenvectors by this share."
-    );
-    
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.varianceanalysis.WeakEigenPairFilter#WALPHA_PARAM}
-     * and {@link de.lmu.ifi.dbs.elki.varianceanalysis.ProgressiveEigenPairFilter#WALPHA_PARAM}
-     */
-    public static final OptionID EIGENPAIR_FILTER_WALPHA = new OptionID("pca.filter.weakalpha",
-        "The minimum strength of the statistically expected variance (1/n) share an eigenvector " +
-        "needs to have to be considered 'strong'."
-    );
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.varianceanalysis.RelativeEigenPairFilter#RALPHA_PARAM}
-     */
-    public static final OptionID EIGENPAIR_FILTER_RALPHA = new OptionID("pca.filter.relativealpha",
-        "The sensitivity niveau for weak eigenvectors: An eigenvector which is at less than " + 
-        "the given share of the statistical average variance is considered weak."
-    );
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.varianceanalysis.LimitEigenPairFilter#ABSOLUTE_FLAG}
-     */
-    public static final OptionID EIGENPAIR_FILTER_ABSOLUTE = new OptionID("pca.filter.absolute",
-        "Flag to mark delta as an absolute value."
-    );
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.varianceanalysis.LimitEigenPairFilter#DELTA_PARAM}
-     */
-    public static final OptionID EIGENPAIR_FILTER_DELTA = new OptionID("pca.filter.delta",
-        "The threshold for strong Eigenvalues. If not otherwise specified, delta " +
-        "is a relative value w.r.t. the (absolute) highest Eigenvalues and has to be " +
-        "a double between 0 and 1. To mark delta as an absolute value, use " +
-        "the option -" + EIGENPAIR_FILTER_ABSOLUTE.getName() + "."
-    );
-
-    
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.varianceanalysis.CompositeEigenPairFilter#FILTERS_PARAM}
-     */
-    public static final OptionID EIGENPAIR_FILTER_COMPOSITE_LIST = new OptionID("pca.filter.composite.list",
-        "A comma separated list of the class names of the filters to be used. " +
-        "The specified filters will be applied sequentially in the given order."
-    );
-    
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.varianceanalysis.FirstNEigenPairFilter#N_PARAM}
-     */
-    public static final OptionID EIGENPAIR_FILTER_N = new OptionID("pca.filter.n",
-        "The number of strong eigenvectors: n eigenvectors with the n highest" +
-        "eigenvalues are marked as strong eigenvectors."
-    );
-
-    
     /**
      * The description of the OptionID.
      */

@@ -95,12 +95,12 @@ public class FourCWrapper<O extends DatabaseObject> extends NormalizationWrapper
         List<ParameterConstraint<Number>> cons = new Vector<ParameterConstraint<Number>>();
         cons.add(new GreaterEqualConstraint(0));
         cons.add(new LessEqualConstraint(1));
-        delta = new DoubleParameter(OptionID.EIGENPAIR_FILTER_DELTA, cons);
+        delta = new DoubleParameter(LimitEigenPairFilter.EIGENPAIR_FILTER_DELTA, cons);
         delta.setDefaultValue(LimitEigenPairFilter.DEFAULT_DELTA);
         addOption(delta);
 
         // absolute flag
-        absolute = new Flag(OptionID.EIGENPAIR_FILTER_ABSOLUTE);
+        absolute = new Flag(LimitEigenPairFilter.EIGENPAIR_FILTER_ABSOLUTE);
         addOption(absolute);
     }
 

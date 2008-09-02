@@ -15,7 +15,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.ERiCDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.varianceanalysis.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredResult;
@@ -302,10 +301,10 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         List<String> parameters = new ArrayList<String>();
 
         // eigenpair filter
-        Util.addParameter(parameters, OptionID.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
+        Util.addParameter(parameters, PCAFilteredRunner.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
 
         // n
-        Util.addParameter(parameters, OptionID.EIGENPAIR_FILTER_N, Integer.toString(correlationDimension));
+        Util.addParameter(parameters, FirstNEigenPairFilter.EIGENPAIR_FILTER_N, Integer.toString(correlationDimension));
 
         return parameters.toArray(new String[parameters.size()]);
     }

@@ -57,6 +57,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstrai
 
 public class ProgressiveEigenPairFilter extends AbstractParameterizable implements EigenPairFilter {
   /**
+   * OptionID for {@link #PALPHA_PARAM}
+   */
+  public static final OptionID EIGENPAIR_FILTER_PALPHA = OptionID.getOrCreateOptionID("pca.filter.progressivealpha",
+      "The share (0.0 to 1.0) of variance that needs to be explained by the 'strong' eigenvectors." +
+      "The filter class will choose the number of strong eigenvectors by this share."
+  );
+
+  /**
    * The default value for alpha.
    */
   public static final double DEFAULT_PALPHA = 0.5;
@@ -64,7 +72,7 @@ public class ProgressiveEigenPairFilter extends AbstractParameterizable implemen
   /**
    * Parameter progressive alpha.
    */
-  private final DoubleParameter PALPHA_PARAM = new DoubleParameter(OptionID.EIGENPAIR_FILTER_PALPHA,
+  private final DoubleParameter PALPHA_PARAM = new DoubleParameter(EIGENPAIR_FILTER_PALPHA,
       new IntervalConstraint(0.0,IntervalConstraint.IntervalBoundary.OPEN,1.0,
           IntervalConstraint.IntervalBoundary.OPEN), DEFAULT_PALPHA);
 
@@ -82,7 +90,7 @@ public class ProgressiveEigenPairFilter extends AbstractParameterizable implemen
   /**
    * Parameter weak alpha.
    */
-  private final DoubleParameter WALPHA_PARAM = new DoubleParameter(OptionID.EIGENPAIR_FILTER_WALPHA,
+  private final DoubleParameter WALPHA_PARAM = new DoubleParameter(WeakEigenPairFilter.EIGENPAIR_FILTER_WALPHA,
       new GreaterEqualConstraint(0.0), DEFAULT_WALPHA);
 
   /**

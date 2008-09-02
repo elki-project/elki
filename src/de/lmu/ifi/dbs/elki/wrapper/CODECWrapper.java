@@ -50,7 +50,8 @@ public class CODECWrapper<O extends DatabaseObject> extends NormalizationWrapper
      * <p>Key: {@code -hicopreprocessor.k} </p>
      * <p>Default value: {@link CODECWrapper#MINPTS_PARAM} </p>
      */
-    private final IntParameter K_PARAM = new IntParameter(OptionID.KNN_HICO_PREPROCESSOR_K,
+    private final IntParameter K_PARAM = new IntParameter(
+        KnnQueryBasedHiCOPreprocessor.KNN_HICO_PREPROCESSOR_K,
         new GreaterConstraint(0), true);
 
     /**

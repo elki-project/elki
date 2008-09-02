@@ -20,9 +20,9 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.varianceanalysis.FirstNEigenPairFilter;
+import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredRunner;
 
 /**
  * Encapsulates a mapping of subspace dimensionalities to a list of set of ids forming a cluster
@@ -149,11 +149,11 @@ public class SubspaceClusterMap {
     }
 
     /**
-     * Runs the derivator on the specified inerval and assigns all points
+     * Runs the derivator on the specified interval and assigns all points
      * having a distance less then the standard deviation of the derivator model
      * to the model to this model.
      *
-     * @param database       the database containing the parametrization functions
+     * @param database       the database containing the parameterization functions
      * @param ids            the ids to build the model
      * @param dimensionality the dimensionality of the subspace
      * @return a basis of the found subspace
@@ -168,8 +168,8 @@ public class SubspaceClusterMap {
             DependencyDerivator<DoubleVector, DoubleDistance> derivator = new DependencyDerivator<DoubleVector, DoubleDistance>();
 
             List<String> parameters = new ArrayList<String>();
-            Util.addParameter(parameters, OptionID.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
-            Util.addParameter(parameters, OptionID.EIGENPAIR_FILTER_N, Integer.toString(dimensionality));
+            Util.addParameter(parameters, PCAFilteredRunner.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
+            Util.addParameter(parameters, FirstNEigenPairFilter.EIGENPAIR_FILTER_N, Integer.toString(dimensionality));
             derivator.setParameters(parameters.toArray(new String[parameters.size()]));
 
             derivator.run(derivatorDB);
@@ -192,7 +192,7 @@ public class SubspaceClusterMap {
      * Builds a database for the derivator consisting of the ids
      * in the specified interval.
      *
-     * @param database the database storing the paramterization functions
+     * @param database the database storing the parameterization functions
      * @param ids      the ids to build the database from
      * @return a database for the derivator consisting of the ids
      *         in the specified interval

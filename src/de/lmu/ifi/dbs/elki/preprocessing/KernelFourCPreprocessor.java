@@ -15,7 +15,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
@@ -56,12 +55,12 @@ public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector
     /**
      * Flag for marking parameter delta as an absolute value.
      */
-    private final Flag ABSOLUTE_PARAM = new Flag(OptionID.EIGENPAIR_FILTER_ABSOLUTE);
+    private final Flag ABSOLUTE_PARAM = new Flag(LimitEigenPairFilter.EIGENPAIR_FILTER_ABSOLUTE);
 
     /**
      * Option string for parameter delta.
      */
-    private final DoubleParameter DELTA_PARAM = new DoubleParameter(OptionID.EIGENPAIR_FILTER_DELTA,
+    private final DoubleParameter DELTA_PARAM = new DoubleParameter(LimitEigenPairFilter.EIGENPAIR_FILTER_DELTA,
         new GreaterEqualConstraint(0), DEFAULT_DELTA);
 
     /**
@@ -159,8 +158,8 @@ public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector
         // save parameters for pca
         final List<String> tmpPCAParameters = new ArrayList<String>();
         // eigen pair filter
-        Util.addParameter(tmpPCAParameters, OptionID.PCA_EIGENPAIR_FILTER, CompositeEigenPairFilter.class.getName());
-        Util.addParameter(tmpPCAParameters, OptionID.EIGENPAIR_FILTER_COMPOSITE_LIST,
+        Util.addParameter(tmpPCAParameters, PCAFilteredRunner.PCA_EIGENPAIR_FILTER, CompositeEigenPairFilter.class.getName());
+        Util.addParameter(tmpPCAParameters, CompositeEigenPairFilter.EIGENPAIR_FILTER_COMPOSITE_LIST,
             LimitEigenPairFilter.class.getName() + ListParameter.SPLIT
             + NormalizingEigenPairFilter.class.getName() + ListParameter.SPLIT
             + LimitEigenPairFilter.class.getName());
@@ -169,10 +168,10 @@ public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector
         //        Then set absolute again and the new value for delta. I've removed this. -- erich
         // abs
         if (absolute) {
-          Util.addFlag(tmpPCAParameters, OptionID.EIGENPAIR_FILTER_ABSOLUTE);
+          Util.addFlag(tmpPCAParameters, LimitEigenPairFilter.EIGENPAIR_FILTER_ABSOLUTE);
         }
         // delta
-        Util.addParameter(tmpPCAParameters, OptionID.EIGENPAIR_FILTER_DELTA, Double.toString(delta));
+        Util.addParameter(tmpPCAParameters, LimitEigenPairFilter.EIGENPAIR_FILTER_DELTA, Double.toString(delta));
 
         // Big and small are not used in this version of KernelFourC
         // as they implicitly take the values 1 (big) and 0 (small),

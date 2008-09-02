@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
@@ -34,12 +33,12 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
     /**
      * Flag for marking parameter delta as an absolute value.
      */
-    private final Flag ABSOLUTE_PARAM = new Flag(OptionID.EIGENPAIR_FILTER_ABSOLUTE);
+    private final Flag ABSOLUTE_PARAM = new Flag(LimitEigenPairFilter.EIGENPAIR_FILTER_ABSOLUTE);
 
     /**
      * Option string for parameter delta.
      */
-    private final DoubleParameter DELTA_PARAM = new DoubleParameter(OptionID.EIGENPAIR_FILTER_DELTA,
+    private final DoubleParameter DELTA_PARAM = new DoubleParameter(LimitEigenPairFilter.EIGENPAIR_FILTER_DELTA,
         new GreaterEqualConstraint(0), DEFAULT_DELTA);
 
     /**
@@ -53,7 +52,7 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
     private double delta;
 
     /**
-     * Indicates wether delta is an absolute or a relative value.
+     * Indicates whether delta is an absolute or a relative value.
      */
     private boolean absolute;
 
@@ -150,13 +149,13 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
         // save parameters for pca
         List<String> tmpPCAParameters = new ArrayList<String>();
         // eigen pair filter
-        Util.addParameter(tmpPCAParameters, OptionID.PCA_EIGENPAIR_FILTER, LimitEigenPairFilter.class.getName());
+        Util.addParameter(tmpPCAParameters, PCAFilteredRunner.PCA_EIGENPAIR_FILTER, LimitEigenPairFilter.class.getName());
         // abs
         if (absolute) {
-            Util.addFlag(tmpPCAParameters, OptionID.EIGENPAIR_FILTER_ABSOLUTE);
+            Util.addFlag(tmpPCAParameters, LimitEigenPairFilter.EIGENPAIR_FILTER_ABSOLUTE);
         }
         // delta
-        Util.addParameter(tmpPCAParameters, OptionID.EIGENPAIR_FILTER_DELTA, Double.toString(delta));
+        Util.addParameter(tmpPCAParameters, LimitEigenPairFilter.EIGENPAIR_FILTER_DELTA, Double.toString(delta));
 
         // big value
         Util.addParameter(tmpPCAParameters, PCAFilteredRunner.BIG_ID, "50");

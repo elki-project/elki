@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.varianceanalysis.FirstNEigenPairFilter;
+import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredRunner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -762,8 +763,8 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
         DependencyDerivator<DoubleVector, DoubleDistance> derivator = new DependencyDerivator<DoubleVector, DoubleDistance>();
         // set the parameters
         List<String> parameters = new ArrayList<String>();
-        Util.addParameter(parameters, OptionID.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
-        Util.addParameter(parameters, OptionID.EIGENPAIR_FILTER_N, Integer.toString(dim - 1));
+        Util.addParameter(parameters, PCAFilteredRunner.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
+        Util.addParameter(parameters, FirstNEigenPairFilter.EIGENPAIR_FILTER_N, Integer.toString(dim - 1));
         derivator.setParameters(parameters.toArray(new String[parameters.size()]));
 
         derivator.run(derivatorDB);

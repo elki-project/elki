@@ -47,14 +47,14 @@ public class HiCOWrapper<O extends DatabaseObject> extends NormalizationWrapper<
      * <p>Default value: {@link HiCOWrapper#MINPTS_PARAM} </p>
      */
     private final IntParameter K_PARAM = new IntParameter(
-        OptionID.KNN_HICO_PREPROCESSOR_K,
+        KnnQueryBasedHiCOPreprocessor.KNN_HICO_PREPROCESSOR_K,
         new GreaterConstraint(0),
         true);
 
     /**
      * The alpha parameter.
      */
-    private DoubleParameter ALPHA_PARAM = new DoubleParameter(OptionID.EIGENPAIR_FILTER_ALPHA,
+    private DoubleParameter ALPHA_PARAM = new DoubleParameter(PercentageEigenPairFilter.EIGENPAIR_FILTER_ALPHA,
         new IntervalConstraint(0.0,IntervalConstraint.IntervalBoundary.OPEN,1.0,
             IntervalConstraint.IntervalBoundary.OPEN), PercentageEigenPairFilter.DEFAULT_ALPHA);
 

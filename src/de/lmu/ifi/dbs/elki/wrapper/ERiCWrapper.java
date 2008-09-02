@@ -45,7 +45,7 @@ public class ERiCWrapper<O extends DatabaseObject> extends NormalizationWrapper<
      * <p>Default value: {@link ERiCWrapper#MINPTS_PARAM} </p>
      */
     private final IntParameter K_PARAM = new IntParameter(
-        OptionID.KNN_HICO_PREPROCESSOR_K,
+        KnnQueryBasedHiCOPreprocessor.KNN_HICO_PREPROCESSOR_K,
         new GreaterConstraint(0), true);
 
     /**

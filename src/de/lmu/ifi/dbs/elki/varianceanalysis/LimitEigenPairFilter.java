@@ -28,9 +28,26 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterFlagGlo
 // todo parameter comments
 public class LimitEigenPairFilter extends AbstractParameterizable implements EigenPairFilter {
   /**
+   * OptionID for {@link #ABSOLUTE_FLAG}
+   */
+  public static final OptionID EIGENPAIR_FILTER_ABSOLUTE = OptionID.getOrCreateOptionID("pca.filter.absolute",
+      "Flag to mark delta as an absolute value."
+  );
+
+  /**
+   * OptionID for {@link #DELTA_PARAM}
+   */
+  public static final OptionID EIGENPAIR_FILTER_DELTA = OptionID.getOrCreateOptionID("pca.filter.delta",
+      "The threshold for strong Eigenvalues. If not otherwise specified, delta " +
+      "is a relative value w.r.t. the (absolute) highest Eigenvalues and has to be " +
+      "a double between 0 and 1. To mark delta as an absolute value, use " +
+      "the option -" + EIGENPAIR_FILTER_ABSOLUTE.getName() + "."
+  );
+
+  /**
    * "absolute" Flag
    */
-  private final Flag ABSOLUTE_FLAG = new Flag(OptionID.EIGENPAIR_FILTER_ABSOLUTE);
+  private final Flag ABSOLUTE_FLAG = new Flag(EIGENPAIR_FILTER_ABSOLUTE);
 
 	/**
 	 * The default value for delta.
@@ -40,7 +57,7 @@ public class LimitEigenPairFilter extends AbstractParameterizable implements Eig
   /**
    * Parameter delta
    */
-  private final DoubleParameter DELTA_PARAM = new DoubleParameter(OptionID.EIGENPAIR_FILTER_DELTA,
+  private final DoubleParameter DELTA_PARAM = new DoubleParameter(EIGENPAIR_FILTER_DELTA,
       new GreaterEqualConstraint(0), DEFAULT_DELTA);
 
 	/**

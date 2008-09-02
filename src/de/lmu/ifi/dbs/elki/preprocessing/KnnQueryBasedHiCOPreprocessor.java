@@ -19,6 +19,16 @@ import java.util.List;
  * @author Elke Achtert
  */
 public class KnnQueryBasedHiCOPreprocessor<V extends RealVector<V, ?>> extends HiCOPreprocessor<V> {
+  /**
+   * OptionID for {@link #K_PARAM}
+   */
+  public static final OptionID KNN_HICO_PREPROCESSOR_K = OptionID.getOrCreateOptionID(
+    "hicopreprocessor.k",
+    "The number of nearest neighbors considered in the PCA. " +
+    "If this parameter is not set, k ist set to three " +
+    "times of the dimensionality of the database objects."
+  );
+
 
   /**
    * Optional parameter to specify the number of nearest neighbors considered in the PCA,
@@ -27,7 +37,7 @@ public class KnnQueryBasedHiCOPreprocessor<V extends RealVector<V, ?>> extends H
    * <p>Key: {@code -hicopreprocessor.k} </p>
    * <p>Default value: three times of the dimensionality of the database objects </p>
    */
-  private final IntParameter K_PARAM = new IntParameter(OptionID.KNN_HICO_PREPROCESSOR_K,
+  private final IntParameter K_PARAM = new IntParameter(KNN_HICO_PREPROCESSOR_K,
     new GreaterConstraint(0), true);
 
   /**
