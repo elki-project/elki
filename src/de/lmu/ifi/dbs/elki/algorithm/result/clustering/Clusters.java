@@ -76,7 +76,8 @@ public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implem
         Cluster<O>[] clusters = new Cluster[this.clusters.length];
         for (int i = 0; i < this.clusters.length; i++) {
             clusters[i] = new Cluster(this.clusters[i]);
-            System.arraycopy(this.clusters[i], 0, clusters[i], 0, this.clusters[i].length);
+            // FIXME: this arraycopy doesn't make sense to me, I removed it for debug -- erich
+            //System.arraycopy(this.clusters[i], 0, clusters[i], 0, this.clusters[i].length);
             Result<O> model = clusterToModel.get(i);
             clusters[i].setModel(model);
         }
