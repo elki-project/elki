@@ -60,11 +60,11 @@ public class RealVectorLabelParser<V extends RealVector<V, ?>> extends AbstractP
   private static final OptionID CLASS_LABEL_INDEX_ID = OptionID.getOrCreateOptionID("parser.classLabelIndex",
       "Index of a class label (may be numeric), " +
       "counting whitespace separated entries in a line starting with 0 - " +
-      "the corresponding entry will be treated as a label. " +
+      "the corresponding entry will be treated as a label. " /* +
       "To actually set this label as class label, use also the parametrization of " +
       AbstractDatabaseConnection.class.getCanonicalName() + " -" +
       AbstractDatabaseConnection.CLASS_LABEL_INDEX_ID.getName() + " -" +
-      AbstractDatabaseConnection.CLASS_LABEL_CLASS_ID.getName());
+      AbstractDatabaseConnection.CLASS_LABEL_CLASS_ID.getName()*/);
 
   /**
    * The parameter for an index of a numerical class label.
