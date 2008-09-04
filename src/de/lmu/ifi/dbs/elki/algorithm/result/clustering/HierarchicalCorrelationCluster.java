@@ -100,7 +100,7 @@ public class HierarchicalCorrelationCluster<V extends RealVector<V, ?>>
     /**
      * Returns the centroid of this cluster.
      *
-     * @return the centroid of this clusterx
+     * @return the centroid of this cluster.
      */
     public V getCentroid() {
         return centroid;
