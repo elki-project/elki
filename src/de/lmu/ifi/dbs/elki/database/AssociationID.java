@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.utilities.ComparablePair;
 import de.lmu.ifi.dbs.elki.utilities.ConstantObject;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredResult;
@@ -132,6 +133,21 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
    * The association id to associate the Multivariate Correlation Outlier Probability of an object
    */
   public static final AssociationID<Double> MCOP = new AssociationID<Double>("mcop", Double.class);
+  
+  /**
+   * The LOCI critical distances of an object.
+   */
+  public static final AssociationID<List<ComparablePair<Double,Integer>>> LOCI_CRITICALDIST = new AssociationID<List<ComparablePair<Double,Integer>>>("loci-cdist", List.class);
+  
+  /**
+   * The LOCI MDEF value.
+   */
+  public static final AssociationID<Double> LOCI_MDEF = new AssociationID<Double>("loci.mdef", Double.class);
+  
+  /**
+   * The LOCI MDEF / SigmaMDEF value (normalized MDEF)
+   */
+  public static final AssociationID<Double> LOCI_MDEF_NORM = new AssociationID<Double>("loci.mdefnorm", Double.class);
   
   /**
      * AssociationID to associate the probabilities for an instance given a (set
