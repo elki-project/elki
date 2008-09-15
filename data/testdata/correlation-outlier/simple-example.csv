@@ -1,0 +1,16 @@
+# This is a simple example with 7 points on a dense (axis-parallel) line,
+# one point which is an outlier on the line ('correlated') and one point
+# which is close to the dense line, but not on the actual correlation.
+#
+# Usual outlier detections will give 'Correlated' a high score
+# While a correlation outlier algorithm should give 'Outlier' the highest score.
+#
+0.4 0.5 Base
+0.5 0.5 Base
+0.6 0.5 Base
+0.7 0.5 Base
+0.8 0.5 Base
+0.9 0.5 Base
+1.0 0.5 Base
+0.0 0.5 Correlated
+0.7 0.6 Outlier
