@@ -10,7 +10,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  * 
  * {@link: http://en.wikipedia.org/wiki/Homogeneous_coordinates}
  * 
- * @author erich
+ * @author Erich Schubert
  *
  */
 public class AffineTransformation {
@@ -103,7 +103,7 @@ public class AffineTransformation {
 
     // reset inverse transformation - needs recomputation.
     inv = null;
-    // extrend the matrix with an extra row and column
+    // extend the matrix with an extra row and column
     double[][] ht = new double[dim+1][dim+1];
     for (int i=0; i < dim; i++)
       for (int j=0; j < dim; j++)
@@ -214,7 +214,7 @@ public class AffineTransformation {
   /**
    * Apply the transformation onto a vector
    * @param v vector of dimensionality dim
-   * @return transformed vector of dimensionalty dim
+   * @return transformed vector of dimensionality dim
    */
   public Vector apply(Vector v) {
     return unhomogeneVector(trans.times(homogeneVector(v)));
@@ -223,7 +223,7 @@ public class AffineTransformation {
   /**
    * Apply the inverse transformation onto a vector
    * @param v vector of dimensionality dim
-   * @return transformed vector of dimensionalty dim
+   * @return transformed vector of dimensionality dim
    */
   public Vector applyInverse(Vector v) {
     if (inv == null) updateInverse();
