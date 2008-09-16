@@ -1,0 +1,39 @@
+<!DOCTYPE dataset PUBLIC "GeneratorByModel.dtd">
+<dataset>
+	<cluster name="0Noise" size="20" density-correction="0.1">
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+	</cluster>
+	<cluster name="1Line" size="80">
+		<normal stddev="0.20"/>
+		<normal stddev="0.005"/>
+		<translate vector="0.1 0.0" />
+		<rotate axis2="2" axis1="1" angle="-60" />
+		<translate vector="0.5 0.5" />
+		<clip min="0.0 0.0" max="1.0 1.0" />
+	</cluster>
+	<cluster name="2FalseOutlier" size="4">
+		<normal stddev="0.02"/>
+		<normal stddev="0.01"/>
+		<translate vector="-.5 0" />
+		<rotate axis2="2" axis1="1" angle="-60" />
+		<translate vector="0.5 0.5" />
+		<clip min="0.0 0.0" max="1.0 1.0" />
+	</cluster>
+	<cluster name="3TrueOutlier1" size="3">
+		<normal stddev="0.01"/>
+		<normal stddev="0.01"/>
+		<translate vector=".10 .06" />
+		<rotate axis2="2" axis1="1" angle="-60" />
+		<translate vector="0.5 0.5" />
+		<clip min="0.0 0.0" max="1.0 1.0" />
+	</cluster>
+	<cluster name="3TrueOutlier2" size="3">
+		<normal stddev="0.01"/>
+		<normal stddev="0.01"/>
+		<translate vector=".25 -.08" />
+		<rotate axis2="2" axis1="1" angle="-60" />
+		<translate vector="0.5 0.5" />
+		<clip min="0.0 0.0" max="1.0 1.0" />
+	</cluster>
+</dataset>
