@@ -87,7 +87,7 @@ public class AffineTransformation {
     for (int i=0; i < dim; i++)
       ht[i][dim] = v.get(i);
     Matrix homTrans = new Matrix(ht);
-    trans = trans.times(homTrans);
+    trans = homTrans.times(trans);
   }
 
   /**
@@ -111,7 +111,7 @@ public class AffineTransformation {
     // the other cells default to identity matrix
     ht[dim][dim] = 1.0;
     Matrix homTrans = new Matrix(ht);
-    trans = trans.times(homTrans);
+    trans = homTrans.times(trans);
   }
 
   /**
@@ -139,7 +139,7 @@ public class AffineTransformation {
     ht[axis2][axis2] = + Math.cos(angle);
     // apply
     Matrix homTrans = new Matrix(ht);
-    trans = trans.times(homTrans);    
+    trans = homTrans.times(trans);    
   }
 
   /**
