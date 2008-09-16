@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
  * Provides a polynomial Kernel function that computes
- * a similarity between the two feature vectors V1 and V2 definded by (V1^T*V2)^degree.
+ * a similarity between the two feature vectors V1 and V2 defined by (V1^T*V2)^degree.
  *
  * @author Simon Paradies
  */
@@ -29,16 +29,6 @@ public class PolynomialKernelFunction<O extends FeatureVector<O, ? >> extends Ab
    * 
    */
   private final DoubleParameter DEGREE_PARAM = new DoubleParameter(DEGREE_ID, DEFAULT_DEGREE);
-
-  /**
-   * Description for parameter degree.
-   */
-  public static final String DEGREE_D = "The degree of the polynomial kernel function. Default: "
-                                        + DEFAULT_DEGREE;
-  /**
-   * Parameter for degree.
-   */
-  public static final String DEGREE_P = "degree";
 
   /**
    * Degree of the polynomial kernel function
