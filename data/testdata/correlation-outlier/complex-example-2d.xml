@@ -1,4 +1,4 @@
-<!DOCTYPE dataset PUBLIC "GeneratorByModel.dtd">
+<!DOCTYPE dataset PUBLIC "GeneratorByModel.dtd" "GeneratorByModel.dtd">
 <dataset>
 	<cluster name="0Noise" size="20" density-correction="0.1">
 		<uniform min="0.0" max="1.0" />

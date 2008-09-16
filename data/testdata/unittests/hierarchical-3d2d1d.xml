@@ -1,4 +1,4 @@
-<!DOCTYPE dataset PUBLIC "GeneratorByModel.dtd">
+<!DOCTYPE dataset PUBLIC "GeneratorByModel.dtd" "GeneratorByModel.dtd">
 <dataset>
   <cluster name="Noise_Plane" size="200" density-correction="1.06">
     <uniform min="-.7" max=".7" />
