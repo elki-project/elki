@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -14,6 +16,8 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
+import de.lmu.ifi.dbs.elki.utilities.ComparablePair;
+import de.lmu.ifi.dbs.elki.utilities.Pair;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 
@@ -78,9 +82,18 @@ public class LOCIResult<O extends DatabaseObject> extends AbstractResult<O> {
     writeHeader(outStream, settings, null);
 
     try {
-      Iterator<Integer> it = db.iterator();
-      while(it.hasNext()) {
+      // build a list for sorting
+      ArrayList<ComparablePair<Double,Integer>> l = new ArrayList<ComparablePair<Double,Integer>>(db.size());
+      for (Iterator<Integer> it = db.iterator(); it.hasNext(); ) {
         Integer id = it.next();
+        // TODO: allow using MDEF for sorting?
+        Double locimdef_norm = db.getAssociation(AssociationID.LOCI_MDEF_NORM, id);
+        l.add(new ComparablePair<Double, Integer>(locimdef_norm, id));
+      }
+      Collections.sort(l, Collections.reverseOrder());
+
+      for (Pair<Double, Integer> p : l) {
+        Integer id = p.getSecond();
 
         outStream.print("ID=");
         outStream.print(id);
