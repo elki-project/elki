@@ -14,6 +14,8 @@ import java.io.ObjectOutput;
  * @author Elke Achtert 
  */
 public class PolynomialApproximation implements Externalizable {
+  private static final long serialVersionUID = 1;
+
   /**
    * The parameters b0, ..., bp.
    */

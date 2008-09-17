@@ -7,13 +7,15 @@ import java.util.Set;
 
 /**
  * Provides a unique interval represented by its id,
- * a hyper bounding box reppresenting the alpha intervals,
- * an interval of the correspinding distance,
+ * a hyper bounding box representing the alpha intervals,
+ * an interval of the corresponding distance,
  * and a set of objects ids associated with this interval.
  *
  * @author Elke Achtert
  */
 public class CASHInterval extends HyperBoundingBox implements Identifiable<CASHInterval> {
+    private static final long serialVersionUID = 1;
+
     /**
      * Used for id assignment.
      */

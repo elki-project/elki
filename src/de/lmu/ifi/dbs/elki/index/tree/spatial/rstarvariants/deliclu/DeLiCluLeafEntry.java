@@ -10,6 +10,8 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
  * @author Elke Achtert 
  */
 public class DeLiCluLeafEntry extends SpatialLeafEntry implements DeLiCluEntry {
+  private static final long serialVersionUID = 1;
+
   /**
    * Indicates that the node (or its child nodes) which is represented by this entry
    * contains handled data objects.

@@ -14,6 +14,7 @@ import java.util.BitSet;
  */
 public class PreferenceVectorBasedCorrelationDistance
     extends CorrelationDistance<PreferenceVectorBasedCorrelationDistance> {
+    private static final long serialVersionUID = 1;
 
     /**
      * The dimensionality of the feature space (needed for serialization).

@@ -8,13 +8,15 @@ import java.util.regex.Pattern;
 /**
  * The subspace distance is a special distance that indicates the
  * dissimilarity between subspaces of equal dimensionality. The subspace distance
- * beween two points is a pair consisting of the distance between the two subspaces
+ * between two points is a pair consisting of the distance between the two subspaces
  * spanned by the strong eigenvectors of the two points and the affine distance
  * between the two subspaces.
  *
  * @author Elke Achtert
  */
 public class SubspaceDistance extends AbstractDistance<SubspaceDistance> {
+    private static final long serialVersionUID = 1;
+
     /**
      * Indicates a separator.
      */

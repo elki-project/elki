@@ -17,6 +17,8 @@ import java.io.ObjectOutput;
  * @param <D> the type of Distance used in the M-Tree
  */
 public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractEntry implements MTreeEntry<D> {
+    private static final long serialVersionUID = 1;
+
     /**
      * The id of routing object of this entry.
      */

@@ -18,6 +18,8 @@ import java.io.ObjectOutput;
  */
 class MkCoPDirectoryEntry<D extends NumberDistance<D, N>, N extends Number>
     extends MTreeDirectoryEntry<D> implements MkCoPEntry<D, N> {
+    private static final long serialVersionUID = 1;
+
     /**
      * The conservative approximation.
      */

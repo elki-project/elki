@@ -17,6 +17,8 @@ import java.util.List;
  * @author Elke Achtert
  */
 class MkTabTreeNode<O extends DatabaseObject, D extends Distance<D>> extends AbstractMTreeNode<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> {
+    private static final long serialVersionUID = 1;
+
     /**
      * Empty constructor for Externalizable interface.
      */

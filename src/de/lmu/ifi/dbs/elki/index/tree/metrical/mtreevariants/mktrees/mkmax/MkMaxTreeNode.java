@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
  */
 class MkMaxTreeNode<O extends DatabaseObject, D extends Distance<D>>
     extends AbstractMTreeNode<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> {
-
+    private static final long serialVersionUID = 1;
 
     /**
      * Empty constructor for Externalizable interface.

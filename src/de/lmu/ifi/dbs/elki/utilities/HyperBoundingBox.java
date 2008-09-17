@@ -16,6 +16,8 @@ import java.text.NumberFormat;
  * @author Elke Achtert
  */
 public class HyperBoundingBox extends AbstractLoggable implements Externalizable {
+  private static final long serialVersionUID = 1;
+
   /**
    * The coordinates of the 'lower left' (= minimum) hyper point.
    */

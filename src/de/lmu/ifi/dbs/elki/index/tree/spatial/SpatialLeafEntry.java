@@ -15,6 +15,8 @@ import java.io.ObjectOutput;
  * @author Elke Achtert 
  */
 public class SpatialLeafEntry extends AbstractEntry implements SpatialEntry {
+  private static final long serialVersionUID = 1;
+
   /**
    * The values of the underlying data object.
    */

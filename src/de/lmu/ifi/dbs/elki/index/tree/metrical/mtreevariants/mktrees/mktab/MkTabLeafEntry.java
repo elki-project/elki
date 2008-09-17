@@ -17,6 +17,8 @@ import java.util.List;
  * @author Elke Achtert 
  */
 class MkTabLeafEntry<D extends Distance<D>> extends MTreeLeafEntry<D> implements MkTabEntry<D> {
+  private static final long serialVersionUID = 1;
+
   /**
    * The maximal number of knn distances to be stored.
    */

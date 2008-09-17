@@ -10,12 +10,14 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Encapsulates a list of neighors and implements additionally
+ * Encapsulates a list of neighbors and implements additionally
  * the Externalizable interface.
  *
  * @author Elke Achtert
  */
 public class NeighborList implements Externalizable, Iterable<Neighbor> {
+    private static final long serialVersionUID = 1;
+
     /**
      * The list containing the neighbors.
      */

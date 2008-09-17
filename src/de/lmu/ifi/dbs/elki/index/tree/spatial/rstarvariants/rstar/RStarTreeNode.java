@@ -10,6 +10,8 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * @author Elke Achtert 
  */
 public class RStarTreeNode extends AbstractRStarTreeNode<RStarTreeNode, SpatialEntry> {
+  private static final long serialVersionUID = 1;
+
   /**
    * Empty constructor for Externalizable interface.
    */

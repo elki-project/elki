@@ -16,6 +16,7 @@ import java.io.ObjectOutput;
  */
 class MkAppDirectoryEntry<D extends NumberDistance<D, N>, N extends Number>
     extends MTreeDirectoryEntry<D> implements MkAppEntry<D, N> {
+    private static final long serialVersionUID = 1;
 
     /**
      * The polynomial approximation.

@@ -9,6 +9,8 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * @author Elke Achtert 
  */
 public class DeLiCluNode extends AbstractRStarTreeNode<DeLiCluNode, DeLiCluEntry> {
+  private static final long serialVersionUID = 1;
+
   /**
    * Empty constructor for Externalizable interface.
    */

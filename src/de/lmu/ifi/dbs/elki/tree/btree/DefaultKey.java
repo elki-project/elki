@@ -11,6 +11,8 @@ import java.io.ObjectOutput;
  * @author Elke Achtert
  */
 public class DefaultKey implements Comparable<DefaultKey>, Externalizable {
+  private static final long serialVersionUID = 1;
+
   /**
    * The key.
    */

@@ -15,6 +15,7 @@ import java.util.Arrays;
  * @author Elke Achtert
  */
 public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Externalizable> extends AbstractPage<BTreeNode<K, V>> {
+    private static final long serialVersionUID = 1;
 
     /**
      * The order of the BTree: determines the maximum number of entries (2*m)

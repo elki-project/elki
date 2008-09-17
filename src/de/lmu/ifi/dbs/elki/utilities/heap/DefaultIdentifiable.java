@@ -13,6 +13,7 @@ import java.io.ObjectOutput;
  * @author Elke Achtert 
  */
 public class DefaultIdentifiable implements Identifiable<DefaultIdentifiable>, Comparable<DefaultIdentifiable>, Externalizable {
+  private static final long serialVersionUID = 1;
   /**
    * The unique id of this Identifiable.
    */

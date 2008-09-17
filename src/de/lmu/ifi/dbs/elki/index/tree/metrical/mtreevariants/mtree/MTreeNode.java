@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * @author Elke Achtert
  */
 public class MTreeNode<O extends DatabaseObject, D extends Distance<D>> extends AbstractMTreeNode<O, D, MTreeNode<O, D>, MTreeEntry<D>> {
+    private static final long serialVersionUID = 1;
 
     /**
      * Empty constructor for Externalizable interface.

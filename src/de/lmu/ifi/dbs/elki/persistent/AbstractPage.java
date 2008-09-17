@@ -13,7 +13,8 @@ import java.io.ObjectOutput;
  * @author Elke Achtert
  */
 // todo elke revise comments
-public class AbstractPage<P extends AbstractPage<P>> extends AbstractLoggable implements Page<P> {
+public abstract class AbstractPage<P extends AbstractPage<P>> extends AbstractLoggable implements Page<P> {
+    private static final long serialVersionUID = 1;
 
     /**
      * The unique id if this page.

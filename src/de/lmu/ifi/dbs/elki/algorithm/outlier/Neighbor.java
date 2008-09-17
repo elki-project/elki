@@ -11,6 +11,8 @@ import java.io.ObjectOutput;
  * @author Elke Achtert
  */
 public class Neighbor implements Externalizable, Comparable<Neighbor> {
+    private static final long serialVersionUID = 1;
+
     /**
      * The object id;
      */

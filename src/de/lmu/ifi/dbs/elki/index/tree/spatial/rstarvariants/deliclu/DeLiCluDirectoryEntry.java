@@ -11,6 +11,8 @@ import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
  * @author Elke Achtert 
  */
 public class DeLiCluDirectoryEntry extends SpatialDirectoryEntry implements DeLiCluEntry {
+  private static final long serialVersionUID = 1;
+
   /**
    * Indicates that the node (or its child nodes) which is represented by this entry
    * contains handled data objects.

@@ -16,6 +16,7 @@ import java.io.ObjectOutput;
  */
 public class RdKNNLeafEntry<D extends NumberDistance<D,N>, N extends Number>
     extends SpatialLeafEntry implements RdKNNEntry<D,N> {
+  private static final long serialVersionUID = 1;
     
   /**
    * The knn distance of the underlying data object.

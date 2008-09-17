@@ -11,6 +11,8 @@ import java.io.ObjectOutput;
  * @author Elke Achtert
  */
 public class LOFEntry implements Externalizable {
+    private static final long serialVersionUID = 1;
+
     /**
      * The sum of the reachability distances between o and its neighbors.
      */

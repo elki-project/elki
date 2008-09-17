@@ -12,6 +12,8 @@ import java.io.ObjectOutput;
  * @author Elke Achtert 
  */
 public class BTreeData<K extends Comparable<K> & Externalizable, V extends Externalizable> implements Externalizable {
+  private static final long serialVersionUID = 1;
+
   /**
    * The underlying object.
    */

@@ -16,6 +16,8 @@ import java.io.ObjectOutput;
  * @author Elke Achtert 
  */
 public class SpatialDirectoryEntry extends AbstractEntry implements SpatialEntry {
+  private static final long serialVersionUID = 1;
+
   /**
    * The minmum bounding rectangle of the underlying spatial node.
    */

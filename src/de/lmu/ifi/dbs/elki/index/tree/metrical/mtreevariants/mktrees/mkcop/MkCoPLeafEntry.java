@@ -18,6 +18,8 @@ import java.io.ObjectOutput;
  */
 class MkCoPLeafEntry<D extends NumberDistance<D, N>, N extends Number> extends MTreeLeafEntry<D>
     implements MkCoPEntry<D, N> {
+    private static final long serialVersionUID = 1;
+
     /**
      * The conservative approximation.
      */

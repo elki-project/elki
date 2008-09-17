@@ -18,6 +18,8 @@ import java.util.List;
  *  
  */
 class MkTabDirectoryEntry<D extends Distance<D>> extends MTreeDirectoryEntry<D> implements MkTabEntry<D> {
+  private static final long serialVersionUID = 1;
+
   /**
    * The maximal number of knn distances to be stored.
    */

@@ -16,6 +16,8 @@ import java.io.ObjectOutput;
  * @author Elke Achtert 
  */
 public class ApproximationLine implements Externalizable {
+  private static final long serialVersionUID = 1;
+
   /**
    * The incline.
    */

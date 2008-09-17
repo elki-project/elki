@@ -16,6 +16,8 @@ import java.io.ObjectOutput;
  * @param <D> the type of Distance used in the MkMaxTree
  */
 class MkMaxDirectoryEntry<D extends Distance<D>> extends MTreeDirectoryEntry<D> implements MkMaxEntry<D> {
+    private static final long serialVersionUID = 1;
+    
     /**
      * The aggregated k-nearest neighbor distance of the underlying MkMax-Tree node.
      */

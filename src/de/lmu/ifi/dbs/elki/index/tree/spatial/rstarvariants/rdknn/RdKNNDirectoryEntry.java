@@ -17,6 +17,8 @@ import java.io.ObjectOutput;
  */
 public class RdKNNDirectoryEntry<D extends NumberDistance<D, N>, N extends Number>
     extends SpatialDirectoryEntry implements RdKNNEntry<D, N> {
+    private static final long serialVersionUID = 1;
+    
     /**
      * The aggregated knn distance of this entry.
      */

@@ -11,6 +11,8 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
  * @author Elke Achtert 
  */
 public class RdKNNNode<D extends NumberDistance<D,N>, N extends Number> extends AbstractRStarTreeNode<RdKNNNode<D,N>, RdKNNEntry<D,N>> {
+  private static final long serialVersionUID = 1;
+
   /**
    * Empty constructor for Externalizable interface.
    */

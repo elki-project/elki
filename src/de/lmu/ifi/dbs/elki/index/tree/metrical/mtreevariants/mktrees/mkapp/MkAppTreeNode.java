@@ -16,6 +16,8 @@ import java.util.Arrays;
  */
 class MkAppTreeNode<O extends DatabaseObject, D extends NumberDistance<D, N>, N extends Number>
     extends AbstractMTreeNode<O, D, MkAppTreeNode<O, D, N>, MkAppEntry<D, N>> {
+    private static final long serialVersionUID = 1;
+
     /**
      * Empty constructor for Externalizable interface.
      */
