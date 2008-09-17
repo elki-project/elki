@@ -291,8 +291,8 @@ public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P e
      *         which is {@link HiCOPreprocessor}
      */
     @SuppressWarnings("unchecked")
-    public Class<? extends Preprocessor<?>> getPreprocessorSuperClass() {
-        return (Class<? extends Preprocessor<?>>) HiCOPreprocessor.class;
+    public Class<? extends Preprocessor> getPreprocessorSuperClass() {
+        return (Class<? extends Preprocessor>) HiCOPreprocessor.class;
     }
 
     /**

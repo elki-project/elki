@@ -82,7 +82,7 @@ public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorit
     Integer[][] rarray = new Integer[labelmap.size()][];
     int i = 0;
     for (Collection<Integer> ids : labelmap.values()) {
-      rarray[i] = (Integer[]) ids.toArray(new Integer[0]);
+      rarray[i] = ids.toArray(new Integer[0]);
       i++;
     }
     result = new Clusters<O>(rarray, database);

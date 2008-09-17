@@ -98,7 +98,7 @@ public abstract class AbstractLocallyWeightedDistanceFunction<O extends RealVect
      *         which is {@link de.lmu.ifi.dbs.elki.preprocessing.Preprocessor}
      */
     @SuppressWarnings("unchecked")
-    public Class<? extends Preprocessor<?>> getPreprocessorSuperClass() {
-        return (Class<? extends Preprocessor<?>>) Preprocessor.class;
+    public Class<? extends Preprocessor> getPreprocessorSuperClass() {
+        return Preprocessor.class;
     }
 }

@@ -315,7 +315,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
 
         StringBuffer msg = new StringBuffer();
 
-        DBSCAN<V,?> dbscan = (DBSCAN<V, ?>) copacAlgorithm.getPartitionAlgorithm();
+        DBSCAN dbscan = (DBSCAN) copacAlgorithm.getPartitionAlgorithm();
         ERiCDistanceFunction<V,?> distanceFunction = (ERiCDistanceFunction<V, ?>) dbscan.getDistanceFunction();
         Integer lambda_max = clusterMap.lastKey();
 

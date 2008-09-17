@@ -181,7 +181,7 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impleme
             // weights and means
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
                 Integer id = iter.next();
-                List<Double> clusterProbabilities = (List<Double>) database.getAssociation(AssociationID.PROBABILITY_CLUSTER_I_GIVEN_X, id);
+                List<Double> clusterProbabilities = database.getAssociation(AssociationID.PROBABILITY_CLUSTER_I_GIVEN_X, id);
 
                 for (int i = 0; i < k; i++) {
                     sumOfClusterProbabilities[i] += clusterProbabilities.get(i);
@@ -199,7 +199,7 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impleme
             // covariance matrices
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
                 Integer id = iter.next();
-                List<Double> clusterProbabilities = (List<Double>) database.getAssociation(AssociationID.PROBABILITY_CLUSTER_I_GIVEN_X, id);
+                List<Double> clusterProbabilities = database.getAssociation(AssociationID.PROBABILITY_CLUSTER_I_GIVEN_X, id);
                 V instance = database.get(id);
                 for (int i = 0; i < k; i++) {
                     V difference = instance.plus(means.get(i).negativeVector());
@@ -236,7 +236,7 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impleme
         // provide a hard clustering
         for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
             Integer id = iter.next();
-            List<Double> clusterProbabilities = (List<Double>) database.getAssociation(AssociationID.PROBABILITY_CLUSTER_I_GIVEN_X, id);
+            List<Double> clusterProbabilities = database.getAssociation(AssociationID.PROBABILITY_CLUSTER_I_GIVEN_X, id);
             int maxIndex = 0;
             double currentMax = 0.0;
             for (int i = 0; i < k; i++) {

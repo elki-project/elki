@@ -215,11 +215,12 @@ public class PartitionClusteringResults<O extends DatabaseObject>
         }
     }
 
+    @SuppressWarnings("unchecked")
     public <L extends ClassLabel> void appendModel(L clusterID, Result<O> model) {
         try {
             String[] labels = HierarchicalClassLabel.DEFAULT_SEPARATOR.split(clusterID.toString());
             Integer partitionID = Integer.parseInt(labels[0].substring(PARTITION_LABEL_PREFIX.length()));
-            L subclusterID = Util.instantiateGenerics(clusterID.getClass(), clusterID.getClass().getName());
+            L subclusterID = (L) Util.instantiate(clusterID.getClass(), clusterID.getClass().getName());
             StringBuilder label = new StringBuilder();
             for (int i = 1; i < labels.length; i++) {
                 label.append(labels[i]);

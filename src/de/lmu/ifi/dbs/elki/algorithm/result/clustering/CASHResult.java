@@ -137,6 +137,7 @@ public class CASHResult extends AbstractResult<ParameterizationFunction> {
      * @throws NonNumericFeaturesException if feature vector is not compatible with values initialized
      *                                     during normalization
      */
+    @SuppressWarnings("unchecked")
     private void write(int clusterDimensionality, Set<Integer> clusterIDs, LinearEquationSystem clusterDependency,
                        PrintStream out, Normalization<ParameterizationFunction> normalization, List<AttributeSettings> settings) throws NonNumericFeaturesException {
         List<String> header = new ArrayList<String>();
@@ -162,7 +163,8 @@ public class CASHResult extends AbstractResult<ParameterizationFunction> {
             out.print(Format.format(f.getRowVector().getRowPackedCopy(), SEPARATOR));
             Associations associations = db.getAssociations(id);
             List<AssociationID<?>> keys = new ArrayList<AssociationID<?>>(associations.keySet());
-            Collections.sort(keys);
+            // Collections.sort does't like AssociationID<?>
+            Collections.sort((List) keys);
             for (AssociationID<?> associationID : keys) {
                 if (associationID == AssociationID.CLASS || associationID == AssociationID.LABEL || associationID == AssociationID.LOCAL_DIMENSIONALITY) {
                     out.print(SEPARATOR);

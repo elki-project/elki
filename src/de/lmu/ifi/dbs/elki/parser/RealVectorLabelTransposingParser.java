@@ -75,22 +75,22 @@ public class RealVectorLabelTransposingParser<V extends RealVector<V, ?>> extend
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
 
-    List<ObjectAndLabels<V>> objectAndLabelList = new ArrayList<ObjectAndLabels<V>>(data.length);
+    List<ObjectAndLabels> objectAndLabelList = new ArrayList<ObjectAndLabels>(data.length);
     for (int i = 0; i < data.length; i++) {
       List<String> label = new ArrayList<String>();
       label.add(labels[i].toString());
 
-      V featureVector;
+      RealVector featureVector;
       if (parseFloat) {
-        featureVector = (V) new FloatVector(Util.convertToFloat(data[i]));
+        featureVector = new FloatVector(Util.convertToFloat(data[i]));
       }
       else {
-        featureVector = (V) new DoubleVector(data[i]);
+        featureVector = new DoubleVector(data[i]);
       }
-      ObjectAndLabels<V> objectAndLabels = new ObjectAndLabels<V>(featureVector, label);
+      ObjectAndLabels<RealVector> objectAndLabels = new ObjectAndLabels<RealVector>(featureVector, label);
       objectAndLabelList.add(objectAndLabels);
     }
 
-    return new ParsingResult<V>(objectAndLabelList);
+    return new ParsingResult(objectAndLabelList);
   }
 }

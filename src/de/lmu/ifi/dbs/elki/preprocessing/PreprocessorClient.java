@@ -31,12 +31,13 @@ public interface PreprocessorClient extends Parameterizable {
      *
      * @return the super class for the preprocessor parameter
      */
-    Class<? extends Preprocessor<?>> getPreprocessorSuperClass();
+    @SuppressWarnings("unchecked")
+    Class<? extends Preprocessor> getPreprocessorSuperClass();
 
     /**
-     * Returns the assocoiation ID for the association to be set by the preprocessor.
+     * Returns the association ID for the association to be set by the preprocessor.
      *
-     * @return the assocoiation ID for the association to be set by the preprocessor
+     * @return the association ID for the association to be set by the preprocessor
      */
     AssociationID<?> getAssociationID();
 }

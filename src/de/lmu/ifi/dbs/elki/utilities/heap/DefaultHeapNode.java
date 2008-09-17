@@ -50,8 +50,7 @@ public class DefaultHeapNode<K extends Comparable<K>, V extends Identifiable<?>>
     if (comp != 0)
       return comp;
 
-    //noinspection unchecked
-    return this.value.compareTo(heapNode.getValue());
+    return this.value.getID().compareTo(heapNode.getValue().getID());
   }
 
   /**

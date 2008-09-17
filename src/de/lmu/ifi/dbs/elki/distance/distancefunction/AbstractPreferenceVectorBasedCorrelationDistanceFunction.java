@@ -229,8 +229,8 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
      *         which is {@link PreferenceVectorPreprocessor}
      */
     @SuppressWarnings("unchecked")
-    public final Class<? extends Preprocessor<?>> getPreprocessorSuperClass() {
-        return (Class<? extends Preprocessor<?>>) PreferenceVectorPreprocessor.class;
+    public final Class<? extends Preprocessor> getPreprocessorSuperClass() {
+        return (Class<? extends Preprocessor>) PreferenceVectorPreprocessor.class;
     }
 
     public final String getPreprocessorDescription() {

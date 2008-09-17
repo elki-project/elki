@@ -110,6 +110,7 @@ public class Biclustering<V extends RealVector<V, Double>> extends AbstractResul
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void write(Bicluster<V> bicluster, PrintStream out, Normalization<V> normalization, List<AttributeSettings> settings) throws NonNumericFeaturesException {
         bicluster.sortIDs();
         writeHeader(out, settings, bicluster.headerInformation());
@@ -132,7 +133,8 @@ public class Biclustering<V extends RealVector<V, Double>> extends AbstractResul
             out.print(mo.toString());
             Associations associations = db.getAssociations(mo.getID());
             List<AssociationID<?>> keys = new ArrayList<AssociationID<?>>(associations.keySet());
-            Collections.sort(keys);
+            // Collections.sort does't like AssociationID<?>
+            Collections.sort((List) keys);
             for (AssociationID<?> id : keys) {
                 if (id == AssociationID.CLASS || id == AssociationID.LABEL || id == AssociationID.LOCAL_DIMENSIONALITY) {
                     out.print(SEPARATOR);

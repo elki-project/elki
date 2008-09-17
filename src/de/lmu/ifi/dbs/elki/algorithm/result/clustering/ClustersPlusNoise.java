@@ -148,6 +148,7 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
      * @throws NonNumericFeaturesException if feature vector is not compatible
      *                                     with values initialized during normalization
      */
+    @SuppressWarnings("unchecked")
     private void write(int clusterIndex, PrintStream out, Normalization<O> normalization, List<AttributeSettings> settings) throws NonNumericFeaturesException {
         List<String> header = new ArrayList<String>();
         if (clusterIndex < clustersAndNoise.length - 1) {
@@ -176,7 +177,8 @@ public class ClustersPlusNoise<O extends DatabaseObject> extends AbstractResult<
             out.print(mo.toString());
             Associations associations = db.getAssociations(clustersAndNoise[clusterIndex][i]);
             List<AssociationID<?>> keys = new ArrayList<AssociationID<?>>(associations.keySet());
-            Collections.sort(keys);
+            // Collections.sort doesn't like AssociationID<?>
+            Collections.sort((List) keys);
             for (AssociationID<?> id : keys) {
                 if (id == AssociationID.CLASS || id == AssociationID.LABEL || id == AssociationID.LOCAL_DIMENSIONALITY) {
                     out.print(SEPARATOR);

@@ -5,7 +5,7 @@ package de.lmu.ifi.dbs.elki.utilities;
  *
  * @author Elke Achtert 
  */
-public interface Identifiable<O> extends Comparable<Identifiable<O>> {
+public interface Identifiable<O> {
   /**
    * Returns the unique id of this object.
    *

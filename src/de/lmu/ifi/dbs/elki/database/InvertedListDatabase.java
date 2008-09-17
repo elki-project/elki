@@ -89,7 +89,7 @@ public class InvertedListDatabase<N extends Number, O extends FeatureVector<O, N
         List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
 
         if (distanceFunction instanceof DimensionSelectingDistanceFunction) {
-            DimensionSelectingDistanceFunction<N, O> df = (DimensionSelectingDistanceFunction<N,O>) distanceFunction;
+            DimensionSelectingDistanceFunction df = (DimensionSelectingDistanceFunction) distanceFunction;
             double eps = df.valueOf(epsilon).getValue();
             int dim = df.getSelectedDimension();
             SortedMap<Double, List<Integer>> invertedList = invertedLists.get(dim);

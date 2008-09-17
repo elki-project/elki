@@ -99,8 +99,8 @@ public class FractalDimensionBasedDistanceFunction<V extends RealVector<V, ?>>
      *         which is {@link de.lmu.ifi.dbs.elki.preprocessing.FracClusPreprocessor}
      */
     @SuppressWarnings("unchecked")
-    public Class<? extends Preprocessor<?>> getPreprocessorSuperClass() {
-        return (Class<? extends Preprocessor<?>>) FracClusPreprocessor.class;
+    public Class<? extends Preprocessor> getPreprocessorSuperClass() {
+        return (Class<? extends Preprocessor>) FracClusPreprocessor.class;
     }
 
     @Override

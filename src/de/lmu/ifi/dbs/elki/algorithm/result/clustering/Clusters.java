@@ -153,6 +153,7 @@ public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implem
      * @throws NonNumericFeaturesException if feature vector is not compatible
      *                                     with values initialized during normalization
      */
+    @SuppressWarnings("unchecked")
     private void write(int clusterIndex, PrintStream out, Normalization<O> normalization, List<AttributeSettings> settings) throws NonNumericFeaturesException {
         List<String> header = new ArrayList<String>();
         header.add("cluster size = " + clusters[clusterIndex].length);
@@ -176,7 +177,8 @@ public class Clusters<O extends DatabaseObject> extends AbstractResult<O> implem
             out.print(mo.toString());
             Associations associations = db.getAssociations(clusters[clusterIndex][i]);
             List<AssociationID<?>> keys = new ArrayList<AssociationID<?>>(associations.keySet());
-            Collections.sort(keys);
+            // Collections.sort doesn't like AssociationID<?>
+            Collections.sort((List) keys);
             for (AssociationID<?> id : keys) {
                 if (isRequiredAssociation(id)) {
                     out.print(SEPARATOR);
