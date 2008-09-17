@@ -13,8 +13,12 @@ import java.util.Vector;
  *
  * @author Elke Achtert 
  */
-@SuppressWarnings("serial")
 public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable<?>> implements Heap<K, V> {
+  /**
+   * Serial version number. 
+   */
+  private static final long serialVersionUID = 7075663809362359575L;
+
   /**
    * Indicates the index null.
    */

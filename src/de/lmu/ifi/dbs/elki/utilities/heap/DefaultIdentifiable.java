@@ -12,7 +12,7 @@ import java.io.ObjectOutput;
  *
  * @author Elke Achtert 
  */
-public class DefaultIdentifiable implements Identifiable<DefaultIdentifiable>, Externalizable {
+public class DefaultIdentifiable implements Identifiable<DefaultIdentifiable>, Comparable<DefaultIdentifiable>, Externalizable {
   /**
    * The unique id of this Identifiable.
    */
@@ -52,7 +52,7 @@ public class DefaultIdentifiable implements Identifiable<DefaultIdentifiable>, E
    * @return a negative integer, zero, or a positive integer as this object is
    *         less than, equal to, or greater than the specified object.
    */
-  public int compareTo(Identifiable<DefaultIdentifiable> o) {
+  public int compareTo(DefaultIdentifiable o) {
     return id - o.getID();
   }
 

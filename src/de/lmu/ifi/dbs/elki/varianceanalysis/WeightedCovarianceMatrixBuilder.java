@@ -66,7 +66,7 @@ public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends
     // for collecting weights
     double weightsum = 0.0;
     // get centroid
-    V centroid = Util.centroid((Database<V>) database, ids);
+    V centroid = Util.centroid(database, ids);
 
     // find maximum distance
     double maxdist = 0.0;

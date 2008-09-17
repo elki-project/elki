@@ -13,8 +13,12 @@ import java.util.Vector;
  *
  * @author Elke Achtert 
  */
-@SuppressWarnings("serial")
 public class DefaultHeap<K extends Comparable<K>, V extends Identifiable<?>> implements Heap<K, V> {
+  /**
+   * Serial version number. 
+   */
+  private static final long serialVersionUID = 499701873654975438L;
+
   /**
    * Indicates the index null.
    */

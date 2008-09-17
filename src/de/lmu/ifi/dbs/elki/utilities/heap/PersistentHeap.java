@@ -22,9 +22,12 @@ import java.util.Arrays;
  *
  * @author Elke Achtert
  */
-@SuppressWarnings("serial")
 public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Identifiable<?> & Serializable>
     extends AbstractLoggable implements Heap<K, V> {
+    /**
+     * Serial version number. 
+     */
+    private static final long serialVersionUID = -8099124402895872945L;
 
     /**
      * The file storing the elements of this heap.

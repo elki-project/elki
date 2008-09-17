@@ -18,7 +18,6 @@ import java.util.Vector;
 class Deap<K extends Comparable<K> & Serializable, V extends Identifiable<?> & Serializable>
         extends MinMaxHeap<K, V> implements Page<Deap<K,V>>
 {
-
     /**
      * The index of this Deap in the persistent heap.
      */
