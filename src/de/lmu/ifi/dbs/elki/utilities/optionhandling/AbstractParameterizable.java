@@ -100,8 +100,7 @@ public abstract class AbstractParameterizable extends AbstractLoggable
 
     public final String[] getParameters() {
         String[] param = new String[currentParameterArray.length];
-        System.arraycopy(currentParameterArray, 0, param, 0,
-            currentParameterArray.length);
+        System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
         return param;
     }
 
