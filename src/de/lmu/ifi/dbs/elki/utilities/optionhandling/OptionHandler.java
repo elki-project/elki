@@ -196,6 +196,7 @@ public class OptionHandler extends AbstractLoggable {
      *                                   no value
      * @deprecated use <code>getParameterValue(parameter)</code> instead.
      */
+    @Deprecated
     @SuppressWarnings("unchecked")
     public <T> T getOptionValue(String option) throws UnusedParameterException, NoParameterValueException {
 
