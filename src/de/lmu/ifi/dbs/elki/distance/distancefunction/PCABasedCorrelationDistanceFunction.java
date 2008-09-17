@@ -292,11 +292,11 @@ public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P e
      */
     @SuppressWarnings("unchecked")
     public Class<? extends Preprocessor> getPreprocessorSuperClass() {
-        return (Class<? extends Preprocessor>) HiCOPreprocessor.class;
+        return HiCOPreprocessor.class;
     }
 
     /**
-     * @return the assocoiation ID for the association to be set by the preprocessor,
+     * @return the association ID for the association to be set by the preprocessor,
      *         which is {@link de.lmu.ifi.dbs.elki.database.AssociationID#LOCAL_PCA}
      */
     public AssociationID<?> getAssociationID() {

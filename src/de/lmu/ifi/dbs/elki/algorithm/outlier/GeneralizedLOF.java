@@ -156,9 +156,9 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
                 Integer id = iter.next();
                 double sum = 0;
-                List<QueryResult<DoubleDistance>> neighbors = (List<QueryResult<DoubleDistance>>) database.getAssociation(AssociationID.NEIGHBORS_2, id);
+                List<QueryResult<DoubleDistance>> neighbors = database.getAssociation(AssociationID.NEIGHBORS_2, id);
                 for (QueryResult<DoubleDistance> neighbor : neighbors) {
-                    List<QueryResult<DoubleDistance>> neighborsNeighbors = (List<QueryResult<DoubleDistance>>) database.getAssociation(AssociationID.NEIGHBORS_2, neighbor.getID());
+                    List<QueryResult<DoubleDistance>> neighborsNeighbors = database.getAssociation(AssociationID.NEIGHBORS_2, neighbor.getID());
                     sum += Math.max(neighbor.getDistance().getValue(),
                         neighborsNeighbors.get(neighborsNeighbors.size() - 1).getDistance().getValue());
                 }

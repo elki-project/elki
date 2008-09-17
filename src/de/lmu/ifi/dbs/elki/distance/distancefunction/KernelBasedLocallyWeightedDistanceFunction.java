@@ -137,7 +137,7 @@ public class KernelBasedLocallyWeightedDistanceFunction<V extends RealVector<V, 
 
         //the columns in the kernel matrix corresponding to the two objects o1 and o2
         //maybe kernel_o1 column has already been computed
-        Matrix kernel_o1 = (Matrix) getDatabase().getAssociation(AssociationID.CACHED_MATRIX, v1.getID());
+        Matrix kernel_o1 = getDatabase().getAssociation(AssociationID.CACHED_MATRIX, v1.getID());
         Matrix kernel_o2;
         //has kernel_o1 column been computed yet
         if (kernel_o1 == null) {
@@ -151,7 +151,7 @@ public class KernelBasedLocallyWeightedDistanceFunction<V extends RealVector<V, 
         }
 
         //get the strong eigenvector matrix of object o1
-        final Matrix strongEigenvectorMatrix = (Matrix) getDatabase().getAssociation(AssociationID.STRONG_EIGENVECTOR_MATRIX, v1.getID());
+        final Matrix strongEigenvectorMatrix = getDatabase().getAssociation(AssociationID.STRONG_EIGENVECTOR_MATRIX, v1.getID());
 
         //compute the delta vector
         final Matrix delta = kernel_o1.minus(kernel_o2);

@@ -99,7 +99,7 @@ public class ConfusionMatrix
         {
             fpr += falsePositiveRate(i) * colSum(i);
         }
-        return fpr / (double) totalInstances();
+        return fpr / totalInstances();
     }
     
     /**
@@ -129,7 +129,7 @@ public class ConfusionMatrix
         {
             ppv += positivePredictedValue(i) * colSum(i);
         }
-        return ppv / (double) totalInstances();
+        return ppv / totalInstances();
     }
     
     /**

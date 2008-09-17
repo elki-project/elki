@@ -271,16 +271,17 @@ public class HyperBoundingBox extends AbstractLoggable implements Externalizable
   }
 
   /**
-   * Retuns a String representation of the HyperBoundingBox.
+   * Returns a String representation of the HyperBoundingBox.
    *
    * @return a string representation of this hyper bounding box
    */
+  @Override
   public String toString() {
     return "[Min(" + Util.format(min, ",", 10) + "), Max(" + Util.format(max, ",", 10) + ")]";
   }
 
   /**
-   * Retuns a String representation of the HyperBoundingBox.
+   * Returns a String representation of the HyperBoundingBox.
    *
    * @param nf  number format for output accuracy
    * @param pre the prefix of each line
@@ -293,6 +294,7 @@ public class HyperBoundingBox extends AbstractLoggable implements Externalizable
   /**
    * @see Object#equals(Object)
    */
+  @Override
   public boolean equals(Object obj) {
     HyperBoundingBox box = (HyperBoundingBox) obj;
     return Arrays.equals(min, box.min) && Arrays.equals(max, box.max);
@@ -301,6 +303,7 @@ public class HyperBoundingBox extends AbstractLoggable implements Externalizable
   /**
    * @see Object#hashCode()
    */
+  @Override
   public int hashCode() {
     return 29 * Arrays.hashCode(min) + Arrays.hashCode(max);
   }

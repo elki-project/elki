@@ -40,7 +40,7 @@ public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Di
     @SuppressWarnings("unchecked")
     public void buildClassifier(Database<V> database, L[] classLabels) throws IllegalStateException {
         setLabels(classLabels);
-        model = (CorrelationAnalysisSolution<V>[]) new CorrelationAnalysisSolution[classLabels.length];
+        model = new CorrelationAnalysisSolution[classLabels.length];
 
         // init partitions
         Map<Integer, List<Integer>> partitions = new Hashtable<Integer, List<Integer>>();

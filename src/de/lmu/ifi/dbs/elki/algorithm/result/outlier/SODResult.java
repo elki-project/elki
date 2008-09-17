@@ -90,7 +90,7 @@ public class SODResult<O extends RealVector<O, Double>> extends AbstractResult<O
       ArrayList<ComparablePair<Double, Integer>> l = new ArrayList<ComparablePair<Double, Integer>>(db.size());
       for(Iterator<Integer> it = db.iterator(); it.hasNext();) {
         Integer id = it.next();
-        SODModel<O> sodModel = (SODModel<O>) db.getAssociation(SOD.SOD_MODEL, id);
+        SODModel<O> sodModel = db.getAssociation(SOD.SOD_MODEL, id);
         l.add(new ComparablePair<Double, Integer>(sodModel.getSod(), id));
       }
       Collections.sort(l, Collections.reverseOrder());
@@ -125,7 +125,7 @@ public class SODResult<O extends RealVector<O, Double>> extends AbstractResult<O
         }
 
         outStream.println("SOD=" + iddoublepair.getFirst());
-        SODModel<O> sodModel = (SODModel<O>) db.getAssociation(SOD.SOD_MODEL, id);
+        SODModel<O> sodModel = db.getAssociation(SOD.SOD_MODEL, id);
         sodModel.output(outStream, normalization, settings);
 
       }

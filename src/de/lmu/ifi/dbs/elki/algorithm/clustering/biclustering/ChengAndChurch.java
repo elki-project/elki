@@ -643,7 +643,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 					Map<Integer, Double> delRows = reductionValuesRows();
 					for (int i = rows.nextSetBit(0); i >= 0; i = rows
 							.nextSetBit(i + 1)) {
-						if ((Double) delRows.get(i) > alpha * valueH) {
+						if (delRows.get(i) > alpha * valueH) {
 							rows.clear(i);
 							removed = true;
 						}
@@ -657,7 +657,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 					Map<Integer, Double> delCols = reductionValuesCols();
 					for (int j = cols.nextSetBit(0); j >= 0; j = cols
 							.nextSetBit(j + 1)) {
-						if ((Double) delCols.get(j) > alpha * valueH) {
+						if (delCols.get(j) > alpha * valueH) {
 							cols.clear(j);
 							removed = true;
 						}
@@ -691,8 +691,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 				maxDelColumn = chooseMax(delCols);
 			}
 
-			if ((Double) delRows.get(maxDelRow) >= (Double) delCols
-					.get(maxDelColumn)) {
+			if (delRows.get(maxDelRow) >= delCols.get(maxDelColumn)) {
 				rows.clear(maxDelRow);
 			} else {
 				cols.clear(maxDelColumn);
@@ -714,7 +713,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 			Integer max = iter.next();
 			for (int i = 1; i < a.size(); i++) {
 				Integer potentialMax = iter.next();
-				if ((Double) a.get(potentialMax) > (Double) a.get(max)) {
+				if (a.get(potentialMax) > a.get(max)) {
 					max = potentialMax;
 				}
 			}
@@ -748,7 +747,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 				if (j >= colDim) {
 					break;
 				}
-				if ((Double) colAdds.get(j) <= valueH) {
+				if (colAdds.get(j) <= valueH) {
 					added = true;
 					cols.set(j);
 				}
@@ -765,7 +764,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 				if (i >= rowDim) {
 					break;
 				}
-				if ((Double) rowAdds.get(i) <= valueH) {
+				if (rowAdds.get(i) <= valueH) {
 					added = true;
 					rows.set(i);
 				}
@@ -779,7 +778,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends
 				if (i >= rowDim) {
 					break;
 				}
-				if ((Double) rowAddsInv.get(i) <= valueH) {
+				if (rowAddsInv.get(i) <= valueH) {
 					added = true;
 					rows.set(i);
 					invertedRows.set(i);

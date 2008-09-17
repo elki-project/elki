@@ -111,7 +111,7 @@ public class COPVerboseResult<O extends RealVector<O, ?>> extends AbstractResult
         }
         outStream.print(" ");
 
-        String label = (String) db.getAssociation(AssociationID.LABEL, id);
+        String label = db.getAssociation(AssociationID.LABEL, id);
         if(label != null) {
           outStream.print(label);
           outStream.print(" ");
@@ -126,16 +126,16 @@ public class COPVerboseResult<O extends RealVector<O, ?>> extends AbstractResult
         outStream.print(db.getAssociation(AssociationID.COP, id));
         outStream.print(" ");
 
-        outStream.print((Integer) db.getAssociation(AssociationID.COP_DIM, id));
+        outStream.print(db.getAssociation(AssociationID.COP_DIM, id));
         outStream.print(" ");
 
-        Vector errv = (Vector) db.getAssociation(AssociationID.COP_ERROR_VECTOR, id);
+        Vector errv = db.getAssociation(AssociationID.COP_ERROR_VECTOR, id);
         for(int i = 0; i < errv.getDimensionality(); i++) {
           outStream.print(errv.get(i));
           outStream.print(" ");
         }
 
-        Matrix datavs = (Matrix) db.getAssociation(AssociationID.COP_DATA_VECTORS, id);
+        Matrix datavs = db.getAssociation(AssociationID.COP_DATA_VECTORS, id);
         for(int j = 0; j < datavs.getColumnDimensionality(); j++) {
           Vector datav = datavs.getColumnVector(j);
           for(int i = 0; i < datav.getDimensionality(); i++) {

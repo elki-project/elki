@@ -68,8 +68,7 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
         this.parentID = parentID;
 
         // one more for overflow
-        //noinspection unchecked
-        this.data = (BTreeData<K, V>[]) new BTreeData[2 * m + 1];
+        this.data = new BTreeData[2 * m + 1];
         this.childIDs = new Integer[2 * m + 2];
 
         // default is true
@@ -213,12 +212,9 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
         if (parentID == -1) parentID = null;
         this.setDirty(false);
 
-        //noinspection unchecked
-        this.data = (BTreeData<K, V>[]) new BTreeData[2 * m + 1];
-        for (int i = 0; i < numKeys; i++) {
-            // noinspection unchecked
+        this.data = new BTreeData[2 * m + 1];
+        for (int i = 0; i < numKeys; i++)
             data[i] = (BTreeData<K, V>) in.readObject();
-        }
 
         this.childIDs = new Integer[2 * m + 2];
         if (!isLeaf) {

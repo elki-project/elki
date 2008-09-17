@@ -97,7 +97,7 @@ public class MCOPResult<O extends DatabaseObject> extends AbstractResult<O> {
                 }
                 outStream.print(" ");
 
-                String label = (String) db.getAssociation(AssociationID.LABEL, id);
+                String label = db.getAssociation(AssociationID.LABEL, id);
                 if (label != null) {
                     outStream.print(label);
                     outStream.print(" ");

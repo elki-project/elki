@@ -62,9 +62,8 @@ public class PriorProbabilityClassifier<O extends DatabaseObject, L extends Clas
             }
         }
         double size = database.size();
-        for (int i = 0; i < distribution.length; i++) {
-            distribution[i] = ((double) occurences[i] / size);
-        }
+        for (int i = 0; i < distribution.length; i++)
+            distribution[i] = occurences[i] / size;
         prediction = Util.getIndexOfMaximum(distribution);
     }
 

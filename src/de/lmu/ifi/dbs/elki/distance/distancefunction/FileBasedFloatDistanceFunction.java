@@ -33,21 +33,21 @@ public class FileBasedFloatDistanceFunction extends
    *
    * @param id1 first object id
    * @param o2  second DatabaseObject
-   * @return the distance between the two objcts specified by their obejct ids
+   * @return the distance between the two objects specified by their object ids
    */
   public FloatDistance distance(Integer id1, ExternalObject o2) {
     return distance(id1, o2.getID());
   }
 
   /**
-   * Returns the distance between the two objcts specified by their obejct
+   * Returns the distance between the two objects specified by their object
    * ids. If a cache is used, the distance value is looked up in the cache. If
    * the distance does not yet exists in cache, it will be computed an put to
    * cache. If no cache is used, the distance is computed.
    *
    * @param id1 first object id
    * @param id2 second object id
-   * @return the distance between the two objcts specified by their obejct ids
+   * @return the distance between the two objects specified by their object ids
    */
   @SuppressWarnings("unchecked")
   public FloatDistance distance(Integer id1, Integer id2) {
@@ -56,7 +56,7 @@ public class FileBasedFloatDistanceFunction extends
       return distance(id2, id1);
     }
 
-    Map<Integer, FloatDistance> distances = (Map<Integer, FloatDistance>) getDatabase().getAssociation(AssociationID.CACHED_DISTANCES, id1);
+    Map<Integer, FloatDistance> distances = getDatabase().getAssociation(AssociationID.CACHED_DISTANCES, id1);
     return distances.get(id2);
   }
 

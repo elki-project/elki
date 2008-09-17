@@ -54,11 +54,11 @@ public class SubspaceDistanceFunction<V extends RealVector<V, ?>, P extends Prep
      */
     @SuppressWarnings("unchecked")
     public Class<? extends Preprocessor> getPreprocessorSuperClass() {
-        return (Class<? extends Preprocessor>) Preprocessor.class;
+        return Preprocessor.class;
     }
 
     /**
-     * @return the assocoiation ID for the association to be set by the preprocessor,
+     * @return the association ID for the association to be set by the preprocessor,
      *         which is {@link AssociationID#LOCAL_PCA}
      */
     public AssociationID<?> getAssociationID() {

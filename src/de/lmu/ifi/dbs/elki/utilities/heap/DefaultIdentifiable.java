@@ -61,6 +61,7 @@ public class DefaultIdentifiable implements Identifiable<DefaultIdentifiable>, C
    *
    * @return a string representation of the object.
    */
+  @Override
   public String toString() {
     return id.toString();
   }
@@ -70,6 +71,7 @@ public class DefaultIdentifiable implements Identifiable<DefaultIdentifiable>, C
    *
    * @param o the reference object with which to compare.
    */
+  @Override
   public boolean equals(Object o) {
     if (this == o)
       return true;
@@ -86,6 +88,7 @@ public class DefaultIdentifiable implements Identifiable<DefaultIdentifiable>, C
    *
    * @return a hash code value for the object
    */
+  @Override
   public int hashCode() {
     return id.hashCode();
   }

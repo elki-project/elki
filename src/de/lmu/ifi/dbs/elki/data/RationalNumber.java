@@ -406,11 +406,11 @@ public class RationalNumber extends Number implements Arithmetic<RationalNumber>
         for (int i = 0; i < n; i++) {
             if ((int) doubles[i] != testNumbers1[i]) {
                 accuracyDouble--;
-                deviationDouble += ((double) testNumbers1[i] - doubles[i]);
+                deviationDouble += testNumbers1[i] - doubles[i];
             }
             if (rationalNumbers[i].intValue() != testNumbers1[i]) {
                 accuracyRN--;
-                deviationRN += ((double) testNumbers1[i] - rationalNumbers[i].doubleValue());
+                deviationRN += testNumbers1[i] - rationalNumbers[i].doubleValue();
             }
         }
         out.println("\nAccuracy: ");

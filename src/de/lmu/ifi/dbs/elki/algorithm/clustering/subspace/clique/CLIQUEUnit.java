@@ -125,7 +125,7 @@ public class CLIQUEUnit<V extends RealVector<V, ?>> {
      * @return the selectivity of this unit
      */
     public double selectivity(double total) {
-        return ((double) ids.size()) / total;
+        return ids.size() / total;
     }
 
     /**

@@ -56,7 +56,7 @@ public class FileBasedDoubleDistanceFunction
             return distance(id2, id1);
         }
 
-        Map<Integer, DoubleDistance> distances = (Map<Integer, DoubleDistance>) getDatabase().getAssociation(AssociationID.CACHED_DISTANCES, id1);
+        Map<Integer, DoubleDistance> distances = getDatabase().getAssociation(AssociationID.CACHED_DISTANCES, id1);
         return distances.get(id2);
     }
 

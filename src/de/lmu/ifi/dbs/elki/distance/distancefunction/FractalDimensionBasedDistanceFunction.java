@@ -31,8 +31,8 @@ public class FractalDimensionBasedDistanceFunction<V extends RealVector<V, ?>>
     }
 
     public DoubleDistance distance(V v1, V v2) {
-        List<Integer> neighbors1 = (List<Integer>) this.getDatabase().getAssociation(this.getAssociationID(), v1.getID());
-        List<Integer> neighbors2 = (List<Integer>) this.getDatabase().getAssociation(this.getAssociationID(), v2.getID());
+        List<Integer> neighbors1 = this.getDatabase().getAssociation(this.getAssociationID(), v1.getID());
+        List<Integer> neighbors2 = this.getDatabase().getAssociation(this.getAssociationID(), v2.getID());
 
         Set<Integer> supporters = new HashSet<Integer>();
         supporters.addAll(neighbors1);
@@ -100,7 +100,7 @@ public class FractalDimensionBasedDistanceFunction<V extends RealVector<V, ?>>
      */
     @SuppressWarnings("unchecked")
     public Class<? extends Preprocessor> getPreprocessorSuperClass() {
-        return (Class<? extends Preprocessor>) FracClusPreprocessor.class;
+        return FracClusPreprocessor.class;
     }
 
     @Override

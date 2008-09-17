@@ -1026,7 +1026,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
     Arrays.sort(reInsertEntries);
 
     // define, how many entries will be reinserted
-    int start = (int) (0.3 * (double) node.getNumEntries());
+    int start = (int) (0.3 * node.getNumEntries());
 
     // initialize the reinsertion operation: move the remaining entries forward
     node.initReInsert(start, reInsertEntries);

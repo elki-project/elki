@@ -22,7 +22,7 @@ public class DeLiCluNode extends AbstractRStarTreeNode<DeLiCluNode, DeLiCluEntry
    * @param file     the file storing the DeLiClu-Tree
    * @param capacity the capacity (maximum number of entries plus 1 for overflow)
    *                 of this node
-   * @param isLeaf   indicates wether this node is a leaf node
+   * @param isLeaf   indicates whether this node is a leaf node
    */
   public DeLiCluNode(PageFile<DeLiCluNode> file, int capacity, boolean isLeaf) {
     super(file, capacity, isLeaf);
