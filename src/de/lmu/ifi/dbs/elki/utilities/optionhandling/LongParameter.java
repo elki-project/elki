@@ -33,12 +33,24 @@ public class LongParameter extends NumberParameter<Long> {
      * Constructs a long parameter with the given optionID,
      * parameter constraint and default value.
      *
-     * @param optionID   the unique OptionID for this parameter
-     * @param constraint the parameter constraint for this long parameter
-     * @param def        the default value
+     * @param optionID     the unique OptionID for this parameter
+     * @param constraint   the parameter constraint for this long parameter
+     * @param defaultValue the default value
      */
-    public LongParameter(OptionID optionID, ParameterConstraint<Number> constraint, long def) {
-        super(optionID, constraint, true, def);
+    public LongParameter(OptionID optionID, ParameterConstraint<Number> constraint, long defaultValue) {
+        super(optionID, constraint, true, defaultValue);
+    }
+
+    /**
+     * Constructs a long parameter with the given optionID,
+     * parameter constraint and default value.
+     *
+     * @param optionID     the unique OptionID for this parameter
+     * @param optional     specifies if this parameter is an optional parameter
+     * @param defaultValue the default value
+     */
+    public LongParameter(OptionID optionID, boolean optional, long defaultValue) {
+        super(optionID, null, optional, defaultValue);
     }
 
     public boolean isValid(String value) throws ParameterException {
