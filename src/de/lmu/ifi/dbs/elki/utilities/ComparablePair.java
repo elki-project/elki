@@ -83,6 +83,14 @@ public final class ComparablePair<FIRST extends Comparable<FIRST>,SECOND extends
     return this.second.compareTo(other.second);
   }
   
+  /**
+   * Array constructor for generics
+   */
+  @SuppressWarnings("unchecked")
+  public static final <F extends Comparable<F>,S extends Comparable<S>> ComparablePair<F,S>[] newArray(int size) {
+    return new ComparablePair[size];
+  }
+  
   @SuppressWarnings("unchecked")
   @Override
   public boolean equals(Object obj) {
