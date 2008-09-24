@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 
 /**
- * The SignificantEigenPairFilter sorts the eigenpairs in decending order of
+ * The SignificantEigenPairFilter sorts the eigenpairs in descending order of
  * their eigenvalues and chooses the contrast of an Eigenvalue to the remaining
  * Eigenvalues is maximal.
  * 
