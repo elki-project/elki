@@ -189,7 +189,7 @@ public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ? >> e
         rhs[row[r]] = rhs[row[r]] + sum;
       }
 
-    LinearEquationSystem lq = new LinearEquationSystem(coeff, rhs, col, row);
+    LinearEquationSystem lq = new LinearEquationSystem(coeff, rhs, row, col);
     return lq;
   }
 
