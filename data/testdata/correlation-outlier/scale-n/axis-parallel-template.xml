@@ -1,0 +1,42 @@
+<!DOCTYPE dataset PUBLIC "GeneratorByModel.dtd" "GeneratorByModel.dtd">
+<dataset>
+	<cluster name="0Noise" size="100" density-correction="0.00001">
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<!-- INSERTION MARK -->
+	</cluster>
+	<cluster name="1Line" size="4900">
+		<normal mean="0.33" stddev="0.1"/>
+		<normal mean="0.33" stddev="0.1"/>
+		<normal mean="0.33" stddev="0.1"/>
+		<normal mean="0.33" stddev="0.1"/>
+		<normal mean="0.33" stddev="0.1"/>
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<!-- INSERTION MARK -->
+	</cluster>
+	<cluster name="2Line" size="5000">
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<normal mean="0.33" stddev="0.1"/>
+		<normal mean="0.33" stddev="0.1"/>
+		<normal mean="0.33" stddev="0.1"/>
+		<normal mean="0.33" stddev="0.1"/>
+		<normal mean="0.33" stddev="0.1"/>
+		<!-- INSERTION MARK -->
+	</cluster>
+</dataset>

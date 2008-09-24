@@ -1,0 +1,80 @@
+<!DOCTYPE dataset PUBLIC "GeneratorByModel.dtd" "GeneratorByModel.dtd">
+<dataset>
+	<cluster name="0Noise" size="20" density-correction="0.00001">
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+	</cluster>
+	<cluster name="1Line" size="80">
+		<normal mean="0.45" stddev="0.2"/>
+		<normal mean="0.15" stddev="0.005"/>
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<clip min="0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0" max="1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0" />
+	</cluster>
+	<cluster name="2Line" size="50">
+		<normal mean="0.55" stddev="0.005"/>
+		<normal mean="0.65" stddev="0.17"/>
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<clip min="0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0" max="1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0" />
+	</cluster>
+	<cluster name="3FalseOutlier" size="3">
+		<normal mean="0.95" stddev="0.01"/>
+		<normal mean="0.15" stddev="0.005"/>
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<clip min="0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0" max="1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0" />
+	</cluster>
+	<cluster name="4TrueOutlier1" size="2">
+		<normal mean="0.5" stddev="0.01"/>
+		<normal mean="0.5" stddev="0.01"/>
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<clip min="0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0" max="1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0" />
+	</cluster>
+	<cluster name="5TrueOutlier2" size="3">
+		<normal mean="0.7" stddev="0.01"/>
+		<normal mean="0.25" stddev="0.01"/>
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" />
+		<clip min="0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0" max="1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0" />
+	</cluster>
+</dataset>

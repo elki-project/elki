@@ -1,32 +1,32 @@
 <!DOCTYPE dataset PUBLIC "GeneratorByModel.dtd" "GeneratorByModel.dtd">
 <dataset>
-	<cluster name="0Noise" size="20" density-correction="0.00001">
+	<cluster name="0Noise" size="19" density-correction="0.000001">
 		<uniform min="0.0" max="1.0" />
 		<uniform min="0.0" max="1.0" />
 	</cluster>
 	<cluster name="1Line" size="80">
-		<normal mean="0.37" stddev="0.2"/>
-		<normal mean="0.15" stddev="0.005"/>
+		<normal mean="0.43" stddev="0.22"/>
+		<normal mean="0.12" stddev="0.003"/>
 		<clip min="0.0 0.0" max="1.0 1.0" />
 	</cluster>
-	<cluster name="2Line" size="50">
-		<normal mean="0.6" stddev="0.005"/>
-		<normal mean="0.6" stddev="0.17"/>
+	<cluster name="2Line" size="70">
+		<normal mean="0.68" stddev="0.003"/>
+		<normal mean="0.59" stddev="0.14"/>
 		<clip min="0.0 0.0" max="1.0 1.0" />
 	</cluster>
 	<cluster name="3FalseOutlier" size="3">
-		<normal mean="0.95" stddev="0.01"/>
-		<normal mean="0.15" stddev="0.005"/>
+		<normal mean="0.90" stddev="0.01"/>
+		<normal mean="0.12" stddev="0.003"/>
 		<clip min="0.0 0.0" max="1.0 1.0" />
 	</cluster>
-	<cluster name="4TrueOutlier1" size="2">
-		<normal mean="0.5" stddev="0.01"/>
-		<normal mean="0.5" stddev="0.01"/>
+	<cluster name="4TrueOutlier1" size="3">
+		<normal mean="0.45" stddev="0.012"/>
+		<normal mean="0.5" stddev="0.012"/>
 		<clip min="0.0 0.0" max="1.0 1.0" />
 	</cluster>
 	<cluster name="5TrueOutlier2" size="3">
-		<normal mean="0.7" stddev="0.01"/>
-		<normal mean="0.25" stddev="0.01"/>
+		<normal mean="0.87" stddev="0.012"/>
+		<normal mean="0.37" stddev="0.012"/>
 		<clip min="0.0 0.0" max="1.0 1.0" />
 	</cluster>
 </dataset>
