@@ -146,8 +146,9 @@ public class COPVerboseResult<O extends RealVector<O, ?>> extends AbstractResult
 
         CorrelationAnalysisSolution<O> sol = (CorrelationAnalysisSolution<O>) db.getAssociation(AssociationID.COP_SOL, id);
         if(sol != null) {
-          LinearEquationSystem lq = sol.getNormalizedLinearEquationSystem(normalization);
-          if(lq != null) {
+          // test first if we actually have an equation system.
+          if(sol.getNormalizedLinearEquationSystem(null) != null) {
+            LinearEquationSystem lq = sol.getNormalizedLinearEquationSystem(normalization);
             String solution = lq.equationsToString(2);
             solution = solution.replace("\n", "\" \"");
             outStream.print('"' + solution + '"');
