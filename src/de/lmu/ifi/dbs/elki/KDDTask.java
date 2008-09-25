@@ -130,7 +130,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
 
   /**
    * Flag to revert result to original values - invalid option if no
-   * normalization has been performed..
+   * normalization has been performed.
    * <p>
    * Key: {@code -normUndo}
    * </p>

@@ -131,7 +131,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
         processedIDs = new HashSet<Integer>(database.size());
         getDistanceFunction().setDatabase(database, isVerbose(), isTime());
         if (isVerbose()) {
-            verbose("Clustering:");
+            verbose("\nClustering:");
         }
         if (database.size() >= minpts) {
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
