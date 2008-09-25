@@ -356,7 +356,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
      * object.
      *
      * @param subtree  the subtree to be tested for insertion
-     * @param objectID the id of the obbject to be inserted
+     * @param objectID the id of the object to be inserted
      * @return the path of the appropriate subtree to insert the given object
      */
     private TreeIndexPath<E> choosePath(Integer objectID, TreeIndexPath<E> subtree) {
@@ -590,7 +590,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     /**
      * Performs a range query on the specified subtree. It recursively
      * traverses all paths from the specified node, which cannot be excluded from leading to
-     * qualififying objects.
+     * qualifying objects.
      *
      * @param o_p    the routing object of the specified node
      * @param node   the root of the subtree to be traversed
@@ -712,11 +712,11 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
 
     /**
-     * Returns true if in the specified node an overflow has occured, false
+     * Returns true if in the specified node an overflow has occurred, false
      * otherwise.
      *
      * @param node the node to be tested for overflow
-     * @return true if in the specified node an overflow has occured, false
+     * @return true if in the specified node an overflow has occurred, false
      *         otherwise
      */
     private boolean hasOverflow(N node) {
