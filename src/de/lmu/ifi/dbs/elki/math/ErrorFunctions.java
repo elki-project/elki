@@ -5,6 +5,8 @@ package de.lmu.ifi.dbs.elki.math;
  * 
  * Currently, this class contains the erf and erfc error functions (Gaussian = normal distribution)
  * 
+ * {@see <a href="http://en.wikipedia.org/wiki/Error_function">Wikipedia on Error functions</a>}
+ * 
  * @author Erich Schubert <schube@dbs.ifi.lmu.de>
  *
  */
@@ -27,12 +29,12 @@ public final class ErrorFunctions {
   /**
    * Complementary error function for Gaussian distributions = Normal distributions.
    * 
-   * See {@link http://en.wikipedia.org/wiki/Error_function} for discussion.
+   * {@see <a href="http://en.wikipedia.org/wiki/Error_function">Wikipedia on Error functions</a>}
    * 
    * Numerical approximation using taylor series.
    * Implementation loosely based on http://www.netlib.org/specfun/erf
    * 
-   * @param x
+   * @param x parameter value
    * @return erfc(x)
    */
   public static final double erfc(double x) {
@@ -75,18 +77,16 @@ public final class ErrorFunctions {
   /**
    * Error function for Gaussian distributions = Normal distributions.
    * 
-   * See {@link http://en.wikipedia.org/wiki/Error_function} for discussion.
+   * {@see <a href="http://en.wikipedia.org/wiki/Error_function">Wikipedia on Error functions</a>}
    * 
    * Numerical approximation using taylor series.
    * Implementation loosely based on http://www.netlib.org/specfun/erf
    * 
-   * @param x
+   * @param x parameter value
    * @return erf(x)
    */
-  public static final double erf(double z) {
-    if(z >= 0)
-      return 1 - erfc(z);
-    else
-      return erfc(z) - 1;
+  public static final double erf(double x) {
+    if (x >= 0) return 1 - erfc(x);
+    else        return erfc(x) - 1;
   };
 }

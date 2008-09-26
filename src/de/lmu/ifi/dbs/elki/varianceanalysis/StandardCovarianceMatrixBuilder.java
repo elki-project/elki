@@ -13,13 +13,12 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
  * 
  * @author Erich Schubert <schube@dbs.ifi.lmu.de>
  *
- * @param <V>
+ * @param <V> Vector class to use.
  */
 public class StandardCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends CovarianceMatrixBuilder<V> {
   /**
    * Compute Covariance Matrix for a complete database
    * 
-   * @param ids a collection of ids
    * @param database the database used
    * @return Covariance Matrix
    */

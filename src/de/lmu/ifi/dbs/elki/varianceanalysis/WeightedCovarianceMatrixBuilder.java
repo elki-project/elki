@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.WeightFunction;
  * 
  * @author Erich Schubert <schube@dbs.ifi.lmu.de>
  *
- * @param <V>
+ * @param <V> Vector class to use
  */
 public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends CovarianceMatrixBuilder<V> {
   /**
@@ -196,7 +196,6 @@ public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends
   /**
    * Finish the Covariance matrix in array "squares".
    * 
-   * @param dim Dimensionality.
    * @param sums Sums of values.
    * @param squares Sums of squares. Contents are destroyed and replaced with Covariance Matrix!
    * @param weightsum Sum of weights.

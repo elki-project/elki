@@ -24,7 +24,6 @@ public abstract class CovarianceMatrixBuilder<V extends RealVector<V, ?>> extend
   /**
    * Compute Covariance Matrix for a complete database
    * 
-   * @param ids a collection of ids
    * @param database the database used
    * @return Covariance Matrix
    * @throws UnableToComplyException

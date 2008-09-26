@@ -2043,7 +2043,7 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * 
      * @param obj other object to compare with
      * @param maxdelta maximum delta allowed
-     * @return
+     * @return true if delta smaller than maximum
      */
     public boolean almostEquals(Object obj, double maxdelta) {
         if (this == obj)
@@ -2069,7 +2069,7 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
      * errors into account.
      * 
      * @param obj other object to compare with
-     * @return
+     * @return almost equals with delta {@link #DELTA}
      */
     public boolean almostEquals(Object obj) {
       return almostEquals(obj, DELTA);

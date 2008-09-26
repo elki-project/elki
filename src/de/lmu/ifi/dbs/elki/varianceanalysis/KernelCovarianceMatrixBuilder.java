@@ -11,12 +11,12 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 /**
  * Kernel Covariance Matrix Builder.
  * 
- * To use this, you NEED to run an appropriate prepocessor that sets {@link AssociationID.KERNEL_MATRIX}
+ * To use this, you NEED to run an appropriate prepocessor that sets {@link AssociationID#KERNEL_MATRIX}
  * for all objects that you are going to use.
  * 
  * @author Erich Schubert <schube@dbs.ifi.lmu.de>
  *
- * @param <V>
+ * @param <V> Vector class to use.
  */
 public class KernelCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends CovarianceMatrixBuilder<V> {
   /**

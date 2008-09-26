@@ -64,18 +64,11 @@ public class MultivariateModel<V extends RealVector<V, ?>> extends AbstractResul
      * Provides a new CorrelationAnalysisSolution holding the specified matrix and
      * number format.
      *
-     * @param solution           the linear equation system describing the solution
-     *                           equations
      * @param db                 the database containing the objects
-     * @param strongEigenvectors the strong eigenvectors of the hyperplane induced
-     *                           by the correlation
-     * @param weakEigenvectors   the weak eigenvectors of the hyperplane induced by
-     *                           the correlation
-     * @param similarityMatrix   the similarity matrix of the underlying distance
-     *                           computations
+     * @param ids                the object IDs being processed
      * @param centroid           the centroid if the objects belonging to the hyperplane
      *                           induced by the correlation
-     * @param nf                 the number format for output accuracy
+     * @param pca                the PCA result
      */
     public MultivariateModel(Database<V> db, Collection<Integer> ids, Vector centroid, PCAFilteredResult pca) {
         super(db);

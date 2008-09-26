@@ -8,9 +8,9 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  * into a single matrix operation (of dimensionality dim+1), and also
  * the construction of an inverse transformation.
  * 
- * {@link: http://en.wikipedia.org/wiki/Homogeneous_coordinates}
+ * {@see <a href="http://en.wikipedia.org/wiki/Homogeneous_coordinates">Wikipedia on Homogeneous Coordinates</a>}
  * 
- * @author Erich Schubert
+ * @author Erich Schubert <schube@dbs.ifi.lmu.de>
  *
  */
 public class AffineTransformation {

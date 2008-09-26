@@ -1646,7 +1646,7 @@ public final class Util extends AbstractLoggable {
      * 
      * @param <T> Type the list elements have
      * @param len array size
-     * @return
+     * @return new array of lists
      */
     @SuppressWarnings("unchecked")
     public static <T> List<T>[] newArrayOfList(int len) {
@@ -1660,7 +1660,7 @@ public final class Util extends AbstractLoggable {
      * 
      * @param <T> Type the list elements have
      * @param len array size
-     * @return
+     * @return new array of arraylists
      */
     @SuppressWarnings("unchecked")
     public static <T> ArrayList<T>[] newArrayOfArrayList(int len) {
@@ -1674,7 +1674,7 @@ public final class Util extends AbstractLoggable {
      * 
      * @param <T> Type the list elements have
      * @param len array size
-     * @return
+     * @return new array of sets
      */
     @SuppressWarnings("unchecked")
     public static <T> Set<T>[] newArrayOfSet(int len) {

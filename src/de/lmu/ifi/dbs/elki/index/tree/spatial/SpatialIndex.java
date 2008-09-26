@@ -22,7 +22,7 @@ import java.util.List;
  */
 public abstract class SpatialIndex<O extends NumberVector<O,?>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends TreeIndex<O, N, E> {
   /**
-   * OptionID for {@link #BULK_PARAM}
+   * OptionID for {@link #BULK_LOAD_FLAG}
    */
   public static final OptionID BULK_LOAD_ID = OptionID.getOrCreateOptionID("spatial.bulk",
       "flag to specify bulk load (default is no bulk load)");

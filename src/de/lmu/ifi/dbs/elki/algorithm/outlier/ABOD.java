@@ -130,7 +130,7 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
    * Main part of the algorithm. Exact version.
    * 
    * @param database Database to use
-   * @param k
+   * @param k k for kNN queries
    */
   public void getRanking(Database<V> database, int k) {
     KernelMatrix<V> kernelMatrix = new KernelMatrix<V>(kernelFunction, database);
@@ -173,20 +173,21 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
    * Main part of the algorithm. Fast version.
    * 
    * @param database Database to use
-   * @param k
+   * @param k k for kNN queries
+   * @param sampleSize Sample size
    */
-  public void getFastRanking(Database<V> data, int k, int sampleSize) {
-    KernelMatrix<V> kernelMatrix = new KernelMatrix<V>(kernelFunction, data);
+  public void getFastRanking(Database<V> database, int k, int sampleSize) {
+    KernelMatrix<V> kernelMatrix = new KernelMatrix<V>(kernelFunction, database);
 
-    PriorityQueue<ComparablePair<Double, Integer>> pq = new PriorityQueue<ComparablePair<Double, Integer>>(data.size(), Collections.reverseOrder());
+    PriorityQueue<ComparablePair<Double, Integer>> pq = new PriorityQueue<ComparablePair<Double, Integer>>(database.size(), Collections.reverseOrder());
     // get Candidate Ranking
-    for(Integer aKey : data.getIDs()) {
-      HashMap<Integer, Double> dists = new HashMap<Integer, Double>(data.size());
+    for(Integer aKey : database.getIDs()) {
+      HashMap<Integer, Double> dists = new HashMap<Integer, Double>(database.size());
       // determine kNearestNeighbors and pairwise distances
-      PriorityQueue<ComparablePair<Double, Integer>> nn = calcDistsandNN(data, kernelMatrix, sampleSize, aKey, dists);
+      PriorityQueue<ComparablePair<Double, Integer>> nn = calcDistsandNN(database, kernelMatrix, sampleSize, aKey, dists);
       if(false) {
         // alternative:
-        PriorityQueue<ComparablePair<Double, Integer>> nn2 = calcDistsandRNDSample(data, kernelMatrix, sampleSize, aKey, dists);
+        PriorityQueue<ComparablePair<Double, Integer>> nn2 = calcDistsandRNDSample(database, kernelMatrix, sampleSize, aKey, dists);
       }
 
       // get normalization
@@ -219,10 +220,10 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
       // + " worst result: " + Double.MAX_VALUE);
       v++;
       MeanVariance s = new MeanVariance();
-      for(Integer bKey : data.getIDs()) {
+      for(Integer bKey : database.getIDs()) {
         if(bKey.equals(aKey))
           continue;
-        for(Integer cKey : data.getIDs()) {
+        for(Integer cKey : database.getIDs()) {
           if(cKey.equals(aKey))
             continue;
           // double nenner = dists[y]*dists[z];
@@ -253,7 +254,7 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
     ComparablePair<Double, Integer>[] reslist = ComparablePair.newArray(0);
     reslist = pq.toArray(reslist);
     Arrays.sort(reslist);
-    this.result = new ABODResult<V>(data, reslist);
+    this.result = new ABODResult<V>(database, reslist);
   }
 
   // TODO: remove?
@@ -342,7 +343,7 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
    * @param kernelMatrix
    * @param aKey
    * @param bKey
-   * @return
+   * @return cosinus value
    */
   private double calcCos(KernelMatrix<V> kernelMatrix, Integer aKey, Integer bKey) {
     return kernelMatrix.getDistance(aKey, aKey) + kernelMatrix.getDistance(bKey, bKey) - 2 * kernelMatrix.getDistance(aKey, bKey);
@@ -509,7 +510,7 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
 
   /**
    * Calls the super method and adds to the returned attribute settings the
-   * attribute settings of the {@link #dependencyDerivator}.
+   * attribute settings of the {@link #kernelFunction}.
    */
   @Override
   public List<AttributeSettings> getAttributeSettings() {
@@ -519,8 +520,8 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
   }
 
   /**
-   * Calls the super method and sets parameters {@link FAST_FLAG},
-   * {@link FAST_SAMPLE_PARAM} and {@link KERNEL_FUNCTION_PARAM}. The remaining
+   * Calls the super method and sets parameters {@link #FAST_FLAG},
+   * {@link #FAST_SAMPLE_PARAM} and {@link #KERNEL_FUNCTION_PARAM}. The remaining
    * parameters are then passed to the {@link #kernelFunction}.
    */
   @Override

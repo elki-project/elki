@@ -23,7 +23,7 @@ import java.util.List;
 public class PercentageEigenPairFilter extends AbstractParameterizable implements EigenPairFilter {
   /**
    * OptionID for
-   * {@link ALPHA_PARAM}
+   * {@link #ALPHA_PARAM}
    */
   public static final OptionID EIGENPAIR_FILTER_ALPHA = OptionID.getOrCreateOptionID("pca.filter.alpha",
       "The share (0.0 to 1.0) of variance that needs to be explained by the 'strong' eigenvectors."
@@ -46,7 +46,7 @@ public class PercentageEigenPairFilter extends AbstractParameterizable implement
   private double alpha;
 
   /**
-   * Provides a new EigenPairFilter that sorts the eigenpairs in decending order
+   * Provides a new EigenPairFilter that sorts the eigenpairs in descending order
    * of their eigenvalues and marks the first eigenpairs, whose sum of
    * eigenvalues is higher than the given percentage of the sum of all
    * eigenvalues as string eigenpairs.
