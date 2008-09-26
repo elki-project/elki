@@ -1,8 +1,20 @@
 package de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions;
 
-public class ExponentialStddevWeight implements WeightFunction {
+/**
+ * Exponential Weight function, scaled such that the result it 0.1 at distance == max
+ * 
+ * stddev * exp(-.5 * distance/stddev)
+ * 
+ * This is similar to the Gaussian weight function, except distance/stddev is not squared.
+ * 
+ * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ */
+public final class ExponentialStddevWeight implements WeightFunction {
+  /**
+   * Get exponential weight, max is ignored.
+   */
   public double getWeight(double distance, double max, double stddev) {
-    assert (stddev > 0);
+    if (stddev <= 0) return 1;
     double scaleddistance = distance / stddev;
     return stddev * java.lang.Math.exp(-.5 * scaleddistance);
   }
