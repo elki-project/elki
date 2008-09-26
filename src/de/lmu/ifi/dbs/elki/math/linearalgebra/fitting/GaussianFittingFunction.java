@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra.fitting;
 
-
 /**
  * Gaussian function for parameter fitting
  * 
@@ -20,7 +19,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.fitting;
  * The function also can use a mixture of gaussians, just use an appropriate number
  * of parameters (which obviously needs to be a multiple of 3)
  * 
- * @author Erich Schubert
+ * @author Erich Schubert <schube@dbs.ifi.lmu.de>
  */
 public class GaussianFittingFunction implements FittingFunction {
   /**

@@ -1,12 +1,14 @@
 package de.lmu.ifi.dbs.elki.math;
 
+/**
+ * Some mathematical error functions. Numerical approximations.
+ * 
+ * Currently, this class contains the erf and erfc error functions (Gaussian = normal distribution)
+ * 
+ * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ *
+ */
 public final class ErrorFunctions {
-  /**
-   * Error functions from statistics
-   * 
-   * In particular: Gaussian error function "erfc" implemented as numerical approximation using
-   * taylor series. The coefficients used here allow a quite good approximation.
-   */
   // Loosely based on http://www.netlib.org/specfun/erf
   static final double a[] = { 1.85777706184603153e-1, 3.16112374387056560e+0, 1.13864154151050156E+2, 3.77485237685302021e+2, 3.20937758913846947e+3 };
 
@@ -22,6 +24,17 @@ public final class ErrorFunctions {
 
   static final double onebysqrtpi = 1 / Math.sqrt(Math.PI);
 
+  /**
+   * Complementary error function for Gaussian distributions = Normal distributions.
+   * 
+   * See {@link http://en.wikipedia.org/wiki/Error_function} for discussion.
+   * 
+   * Numerical approximation using taylor series.
+   * Implementation loosely based on http://www.netlib.org/specfun/erf
+   * 
+   * @param x
+   * @return erfc(x)
+   */
   public static final double erfc(double x) {
     if(Double.isNaN(x))
       return Double.NaN;
@@ -59,36 +72,21 @@ public final class ErrorFunctions {
     return result;
   }
 
+  /**
+   * Error function for Gaussian distributions = Normal distributions.
+   * 
+   * See {@link http://en.wikipedia.org/wiki/Error_function} for discussion.
+   * 
+   * Numerical approximation using taylor series.
+   * Implementation loosely based on http://www.netlib.org/specfun/erf
+   * 
+   * @param x
+   * @return erf(x)
+   */
   public static final double erf(double z) {
     if(z >= 0)
       return 1 - erfc(z);
     else
       return erfc(z) - 1;
-  };
-
-  /* OLD IMPLEMENTATION, LESS ACCURATE: (especially for large z) */
-  static final double a0 = -1.26551223;
-
-  static final double a1 = 1.00002368;
-
-  static final double a2 = 0.37409196;
-
-  static final double a3 = 0.09678418;
-
-  static final double a4 = -0.18628806;
-
-  static final double a5 = 0.27886807;
-
-  static final double a6 = -1.13520398;
-
-  static final double a7 = 1.48851587;
-
-  static final double a8 = -0.82215223;
-
-  static final double a9 = 0.17087277;
-
-  static final double olderfc(double z) {
-    double t = 2. / (2. + z);
-    return t * Math.exp(-z * z + a0 + t * (a1 + t * (a2 + t * (a3 + t * (a4 + t * (a5 + t * (a6 + t * (a7 + t * (a8 + t * a9)))))))));
   };
 }

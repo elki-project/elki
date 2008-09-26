@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.fitting;
 /**
  * Result returned by a fitting function.
  * 
- * @author Erich Schubert
+ * @author Erich Schubert <schube@dbs.ifi.lmu.de>
  */
 public class FittingFunctionResult {
   /**
@@ -11,7 +11,7 @@ public class FittingFunctionResult {
    */
   public double y;
   /**
-   * Parameter gradients at the givencoordinate
+   * Parameter gradients at the given coordinate
    */
   public double[] gradients;
   
