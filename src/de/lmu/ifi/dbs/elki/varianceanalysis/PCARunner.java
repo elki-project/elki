@@ -16,6 +16,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Class to run PCA on given data.
+ * 
+ * The various methods will start PCA at different places (e.g. with database IDs,
+ * database query results, a precomputed covariance matrix or eigenvalue decomposition).
+ * 
+ * The runner can be parametrized by setting a covariance matrix builder (e.g. to
+ * a weighted covariance matrix builder) 
+ * 
+ * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ *
+ * @param <V>
+ */
 public class PCARunner<V extends RealVector<V, ?>> extends AbstractParameterizable {
   /**
    * OptionID for {@link #COVARIANCE_PARAM}
@@ -40,7 +53,7 @@ public class PCARunner<V extends RealVector<V, ?>> extends AbstractParameterizab
   /**
    * The covariance computation class.
    */
-  protected CovarianceMatrixBuilder<V> covarianceBuilder;
+  protected CovarianceMatrixBuilder<V> covarianceMatrixBuilder;
 
   /**
    * Constructor for the covariance runner.
@@ -51,12 +64,14 @@ public class PCARunner<V extends RealVector<V, ?>> extends AbstractParameterizab
     addOption(COVARIANCE_PARAM);
   }
 
-  // todo comment
+  /**
+   * Parameter handling.
+   */
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     // small value
-    covarianceBuilder = COVARIANCE_PARAM.instantiateClass();
-    remainingParameters = covarianceBuilder.setParameters(remainingParameters);
+    covarianceMatrixBuilder = COVARIANCE_PARAM.instantiateClass();
+    remainingParameters = covarianceMatrixBuilder.setParameters(remainingParameters);
     setParameters(args, remainingParameters);
 
     return remainingParameters;
@@ -64,12 +79,12 @@ public class PCARunner<V extends RealVector<V, ?>> extends AbstractParameterizab
 
   /**
    * Calls the super method and adds to the returned attribute settings the
-   * attribute settings of the {@link #covarianceBuilder}.
+   * attribute settings of the {@link #covarianceMatrixBuilder}.
    */
   @Override
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-    attributeSettings.addAll(covarianceBuilder.getAttributeSettings());
+    attributeSettings.addAll(covarianceMatrixBuilder.getAttributeSettings());
     return attributeSettings;
   }
 
@@ -80,7 +95,7 @@ public class PCARunner<V extends RealVector<V, ?>> extends AbstractParameterizab
    * @return PCA result
    */
   public PCAResult processDatabase(Database<V> database) {
-    return processCovarMatrix(covarianceBuilder.processDatabase(database));
+    return processCovarMatrix(covarianceMatrixBuilder.processDatabase(database));
   }
 
   /**
@@ -91,7 +106,7 @@ public class PCARunner<V extends RealVector<V, ?>> extends AbstractParameterizab
    * @return PCA result
    */
   public PCAResult processIds(Collection<Integer> ids, Database<V> database) {
-    return processCovarMatrix(covarianceBuilder.processIds(ids, database));
+    return processCovarMatrix(covarianceMatrixBuilder.processIds(ids, database));
   }
 
   /**
@@ -102,7 +117,7 @@ public class PCARunner<V extends RealVector<V, ?>> extends AbstractParameterizab
    * @return PCA result
    */
   public PCAResult processQueryResult(Collection<QueryResult<DoubleDistance>> results, Database<V> database) {
-    return processCovarMatrix(covarianceBuilder.processQueryResults(results, database));
+    return processCovarMatrix(covarianceMatrixBuilder.processQueryResults(results, database));
   }
 
   /**
@@ -124,5 +139,23 @@ public class PCARunner<V extends RealVector<V, ?>> extends AbstractParameterizab
   public PCAResult processEVD(EigenvalueDecomposition evd) {
     SortedEigenPairs eigenPairs = new SortedEigenPairs(evd, false);
     return new PCAResult(eigenPairs);
+  }
+
+  /**
+   * Get covariance matrix builder
+   * 
+   * @return covariance matrix builder in use
+   */
+  public CovarianceMatrixBuilder<V> getCovarianceMatrixBuilder() {
+    return covarianceMatrixBuilder;
+  }
+
+  /**
+   * Set covariance matrix builder.
+   * 
+   * @param covarianceBuilder New covariance matrix builder.
+   */
+  public void setCovarianceMatrixBuilder(CovarianceMatrixBuilder<V> covarianceBuilder) {
+    this.covarianceMatrixBuilder = covarianceBuilder;
   }
 }

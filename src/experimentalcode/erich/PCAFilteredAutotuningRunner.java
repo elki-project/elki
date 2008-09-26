@@ -75,7 +75,7 @@ public class PCAFilteredAutotuningRunner<V extends RealVector<V, ?>> extends PCA
     // TODO: add smoothing options, handle border cases better.
     for(int k = startk; k < results.size(); k++) {
       // sorted eigenpairs, eigenvectors, eigenvalues
-      Matrix covMat = covarianceBuilder.processQueryResults(results, database);
+      Matrix covMat = covarianceMatrixBuilder.processQueryResults(results, database);
       EigenvalueDecomposition evd = covMat.eig();
       SortedEigenPairs eigenPairs = new SortedEigenPairs(evd, false);
       FilteredEigenPairs filteredEigenPairs = getEigenPairFilter().filter(eigenPairs);
@@ -137,7 +137,7 @@ public class PCAFilteredAutotuningRunner<V extends RealVector<V, ?>> extends PCA
     // the last
     // run of the loop above. I.e. PCA on the full dataset. That is intended.
     
-    return processCovarMatrix(covarianceBuilder.processQueryResults(results, database));
+    return processCovarMatrix(covarianceMatrixBuilder.processQueryResults(results, database));
   }
 
   /**

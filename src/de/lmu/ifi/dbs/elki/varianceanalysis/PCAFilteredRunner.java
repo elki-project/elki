@@ -21,9 +21,13 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * todo erich comment class
+ * PCA runner that will do dimensionality reduction.
+ * PCA is computed as with the regular runner, but afterwards, an
+ * {@link EigenPairFilter} is applied. 
  * 
- * @author erich
+ * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ *
+ * @param <V> Vector class to use
  */
 public class PCAFilteredRunner<V extends RealVector<V, ?>> extends PCARunner<V> {
   /**
@@ -81,7 +85,6 @@ public class PCAFilteredRunner<V extends RealVector<V, ?>> extends PCARunner<V> 
    * <p>
    * Key: {@code -localpca.small}
    * </p>
-   * <p/> FIXME: why is the default of 0.0 ok when it must be > 0?
    */
   private final DoubleParameter SMALL_PARAM = new DoubleParameter(SMALL_ID, new GreaterEqualConstraint(0), 0.0);
 
@@ -96,7 +99,7 @@ public class PCAFilteredRunner<V extends RealVector<V, ?>> extends PCARunner<V> 
   private double small;
 
   /**
-   * todo comment
+   * Initialize class with parameters
    */
   public PCAFilteredRunner() {
     addOption(EIGENPAIR_FILTER_PARAM);
@@ -107,7 +110,9 @@ public class PCAFilteredRunner<V extends RealVector<V, ?>> extends PCARunner<V> 
     optionHandler.setGlobalParameterConstraint(new LessGlobalConstraint<Double>(SMALL_PARAM, BIG_PARAM));
   }
 
-  // todo comment
+  /**
+   * Set Parameters.
+   */
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
@@ -142,7 +147,7 @@ public class PCAFilteredRunner<V extends RealVector<V, ?>> extends PCARunner<V> 
    * @return PCA result
    */
   public PCAFilteredResult processIds(Collection<Integer> ids, Database<V> database) {
-    return processCovarMatrix(covarianceBuilder.processIds(ids, database));
+    return processCovarMatrix(covarianceMatrixBuilder.processIds(ids, database));
   }
 
   /**
@@ -153,13 +158,13 @@ public class PCAFilteredRunner<V extends RealVector<V, ?>> extends PCARunner<V> 
    * @return PCA result
    */
   public PCAFilteredResult processQueryResult(Collection<QueryResult<DoubleDistance>> results, Database<V> database) {
-    return processCovarMatrix(covarianceBuilder.processQueryResults(results, database));
+    return processCovarMatrix(covarianceMatrixBuilder.processQueryResults(results, database));
   }
 
   /**
-   * Process an existing covariance Matrix
+   * Process an existing Covariance Matrix
    * 
-   * @param covarMatrix the matrix used for performing pca
+   * @param covarMatrix the matrix used for performing PCA
    */
   public PCAFilteredResult processCovarMatrix(Matrix covarMatrix) {
     // TODO: add support for a different implementation to do EVD?
@@ -179,9 +184,9 @@ public class PCAFilteredRunner<V extends RealVector<V, ?>> extends PCARunner<V> 
   }
 
   /**
-   * Retrieve the EigenPairFilter to be used. For derived PCA Runners
+   * Retrieve the {@link EigenPairFilter} to be used. For derived PCA Runners
    * 
-   * @return eigen pair filter configured.
+   * @return eigenpair filter configured.
    */
   protected EigenPairFilter getEigenPairFilter() {
     return eigenPairFilter;
