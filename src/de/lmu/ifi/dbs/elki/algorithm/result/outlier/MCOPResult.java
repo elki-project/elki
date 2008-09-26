@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Provides the short result of Multivariate Correlation Outlier Probability.
  *
- * @author Erich Schubert
+ * @author Erich Schubert <schube@dbs.ifi.lmu.de>
  */
 
 public class MCOPResult<O extends DatabaseObject> extends AbstractResult<O> {

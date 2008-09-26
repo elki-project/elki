@@ -20,7 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 /**
  * Result wrapper for ABOD results.
  * 
- * @author Erich Schubert
+ * @author Erich Schubert <schube@dbs.ifi.lmu.de>
  *
  * @param <V> Vector type to use
  */

@@ -24,11 +24,11 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Derive a multivariate local model, using PCA to decorreltate data. This is
+ * Derive a multivariate local model, using PCA to decorrelate data. This is
  * not a full model generation like DependencyDerivator, for example it does not
  * compute a linear equation system.
  *
- * @author Erich Schubert
+ * @author Erich Schubert <schube@dbs.ifi.lmu.de>
  * @param <V> the type of RealVector handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  */
@@ -41,10 +41,10 @@ public class MultivariateModelDerivator<V extends RealVector<V, ?>, D extends Di
     public static final OptionID SAMPLE_SIZE_ID = OptionID.getOrCreateOptionID("derivator.sampleSize", "Threshold for the size of the random sample to use. " + "Default value is size of the complete dataset.");
 
     /**
-     * Optional parameter to specify the treshold for the size of the random
+     * Optional parameter to specify the threshold for the size of the random
      * sample to use, must be an integer greater than 0.
      * <p/>
-     * Default value: the size of the complete dataset
+     * Default value: the size of the complete data set
      * </p>
      * <p/>
      * Key: {@code -derivator.sampleSize}
@@ -131,7 +131,7 @@ public class MultivariateModelDerivator<V extends RealVector<V, ?>, D extends Di
     }
 
     /**
-     * Runs the pca on the given set of IDs. The centroid is computed from the
+     * Runs the PCA on the given set of IDs. The centroid is computed from the
      * given ids.
      *
      * @param db  the database
@@ -143,7 +143,7 @@ public class MultivariateModelDerivator<V extends RealVector<V, ?>, D extends Di
     }
 
     /**
-     * Runs the pca on the given set of IDs and for the given centroid
+     * Runs the PCA on the given set of IDs and for the given centroid
      *
      * @param db         the database
      * @param ids        the set of ids

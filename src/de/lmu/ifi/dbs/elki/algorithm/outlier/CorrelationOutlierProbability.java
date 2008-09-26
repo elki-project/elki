@@ -30,7 +30,7 @@ import java.util.List;
  * <p/>
  * Publication pending
  *
- * @author Erich Schubert
+ * @author Erich Schubert <schube@dbs.ifi.lmu.de>
  * @param <V> the type of Realvector handled by this Algorithm
  */
 public class CorrelationOutlierProbability<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, DoubleDistance> {

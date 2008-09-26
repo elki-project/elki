@@ -20,6 +20,20 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 
+/**
+ * Fast Outlier Detection Using the Local Correlation Integral
+ * 
+ * Outlier detection using multiple epsilon neighborhoods.
+ * 
+ * Based on:
+ * S. Papadimitriou, H. Kitagawa, P. B. Gibbons and C. Faloutsos:
+ * LOCI: Fast Outlier Detection Using the Local Correlation Integral.
+ * In: Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03), Bangalore, India, 2003.
+ * 
+ * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ *
+ * @param <O>
+ */
 public class LOCI<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, DoubleDistance> {
   /**
    * OptionID for {@link #RMAX_PARAM}
@@ -84,6 +98,9 @@ public class LOCI<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
    */
   LOCIResult<O> result;
 
+  /**
+   * Constructor, adding options to option handler.
+   */
   public LOCI() {
     super();
     // maximum query range
@@ -115,6 +132,9 @@ public class LOCI<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
       return remainingParameters;
   }
 
+  /**
+   * Runs the algorithm in the timed evaluation part.
+   */
   @Override
   protected void runInTime(Database<O> database) throws IllegalStateException {
     getDistanceFunction().setDatabase(database, isVerbose(), isTime());
@@ -189,6 +209,9 @@ public class LOCI<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
     result = new LOCIResult<O>(database);
   }
 
+  /**
+   * Get algorithm description.
+   */
   public Description getDescription() {
     return new Description(
         "LOCI",
@@ -199,8 +222,10 @@ public class LOCI<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
             "In: Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03), Bangalore, India, 2003.");
   }
 
+  /**
+   * Return result.
+   */
   public Result<O> getResult() {
     return result;
   }
-
 }

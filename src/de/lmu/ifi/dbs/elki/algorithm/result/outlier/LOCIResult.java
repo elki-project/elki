@@ -22,9 +22,9 @@ import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 
 /**
- * Provides the result of the LOCI algorithm.
+ * Provides the result of the LOCI algorithm {@link de.lmu.ifi.dbs.elki.algorithm.outlier.LOCI}.
  * 
- * @author Erich Schubert
+ * @author Erich Schubert <schube@dbs.ifi.lmu.de>
  * @param <O> the type of DatabaseObjects handled by this Result
  */
 
@@ -45,6 +45,9 @@ public class LOCIResult<O extends DatabaseObject> extends AbstractResult<O> {
     this.db = db;
   }
 
+  /**
+   * Write output to a file named {@link #LOCI_MARKER} + {@link AbstractResult#FILE_EXTENSION}
+   */
   public void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     PrintStream outStream;
     try {

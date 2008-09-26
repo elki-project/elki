@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * Provides the verbose result of the correlation outlier probability algorithm.
  * 
- * @author Erich Schubert
+ * @author Erich Schubert <schube@dbs.ifi.lmu.de>
  */
 
 public class COPVerboseResult<O extends RealVector<O, ?>> extends AbstractResult<O> {

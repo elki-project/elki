@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.utilities.Description;
  * 
  * Useful for evaluation and testing.
  * 
- * @author Erich Schubert
+ * @author Erich Schubert <schube@dbs.ifi.lmu.de>
  *
  * @param <O>
  */

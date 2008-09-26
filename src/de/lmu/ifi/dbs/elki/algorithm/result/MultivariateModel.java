@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * A multivariate data model.
  *
- * @author Erich Schubert
+ * @author Erich Schubert <schube@dbs.ifi.lmu.de>
  */
 public class MultivariateModel<V extends RealVector<V, ?>> extends AbstractResult<V> {
     /**

@@ -40,10 +40,26 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
  * In: Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining (KDD '08), Las Vegas, NV, 2008.
  * 
  * @author Matthias Schubert (Original Code)
- * @author Erich Schubert (ELKIfication)
+ * @author Erich Schubert <schube@dbs.ifi.lmu.de> (ELKIfication)
  * 
  */
 public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, DoubleDistance> {
+  /**
+   * OptionID for {@link #K_PARAM}
+   */
+  public static final OptionID K_ID = OptionID.getOrCreateOptionID("abod.k", 
+      "Parameter k for kNN queries.");
+
+  /**
+   * Parameter for k
+   */
+  private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterEqualConstraint(1), 30);
+
+  /**
+   * k parameter
+   */
+  private int k;
+  
   /**
    * OptionID for {@link #FAST_FLAG}
    */
@@ -104,20 +120,27 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
    * Constructor
    **************************************************************************/
   public ABOD() {
+    addOption(K_PARAM);
     addOption(FAST_FLAG);
     addOption(FAST_SAMPLE_PARAM);
     addOption(KERNEL_FUNCTION_PARAM);
   }
 
-  public void getRanking(Database<V> data, int k) {
-    KernelMatrix<V> kernelMatrix = new KernelMatrix<V>(kernelFunction, data);
-    PriorityQueue<ComparablePair<Double, Integer>> pq = new PriorityQueue<ComparablePair<Double, Integer>>(data.size(), Collections.reverseOrder());
+  /**
+   * Main part of the algorithm. Exact version.
+   * 
+   * @param database Database to use
+   * @param k
+   */
+  public void getRanking(Database<V> database, int k) {
+    KernelMatrix<V> kernelMatrix = new KernelMatrix<V>(kernelFunction, database);
+    PriorityQueue<ComparablePair<Double, Integer>> pq = new PriorityQueue<ComparablePair<Double, Integer>>(database.size(), Collections.reverseOrder());
 
-    for(Integer objKey : data.getIDs()) {
+    for(Integer objKey : database.getIDs()) {
       MeanVariance s = new MeanVariance();
 
       // System.out.println("Processing: " +objKey);
-      List<QueryResult<DoubleDistance>> neighbors = data.kNNQueryForID(objKey, k, getDistanceFunction());
+      List<QueryResult<DoubleDistance>> neighbors = database.kNNQueryForID(objKey, k, getDistanceFunction());
       Iterator<QueryResult<DoubleDistance>> iter = neighbors.iterator();
       while(iter.hasNext()) {
         Integer key1 = iter.next().getID();
@@ -143,9 +166,15 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
     ComparablePair<Double, Integer>[] reslist = ComparablePair.newArray(0);
     reslist = pq.toArray(reslist);
     Arrays.sort(reslist);
-    result = new ABODResult<V>(data, reslist);
+    result = new ABODResult<V>(database, reslist);
   }
 
+  /**
+   * Main part of the algorithm. Fast version.
+   * 
+   * @param database Database to use
+   * @param k
+   */
   public void getFastRanking(Database<V> data, int k, int sampleSize) {
     KernelMatrix<V> kernelMatrix = new KernelMatrix<V>(kernelFunction, data);
 
@@ -452,12 +481,10 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
   @Override
   protected void runInTime(Database<V> database) throws IllegalStateException {
     this.kernelFunction.setDatabase(database, false, false);
-    if(fast) {
-      getFastRanking(database, 30, sampleSize);
-    }
-    else {
-      getRanking(database, 30);
-    }
+    if (fast)
+      getFastRanking(database, k, sampleSize);
+    else
+      getRanking(database, k);
   }
 
   /**
@@ -500,6 +527,8 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
+    k = K_PARAM.getValue();
+    
     fast = FAST_FLAG.getValue();
 
     if(fast)
