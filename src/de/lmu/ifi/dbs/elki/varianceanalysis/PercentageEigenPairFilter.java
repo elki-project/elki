@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The PercentageEigenPairFilter sorts the eigenpairs in decending order of
+ * The PercentageEigenPairFilter sorts the eigenpairs in descending order of
  * their eigenvalues and marks the first eigenpairs, whose sum of eigenvalues is
  * higher than the given percentage of the sum of all eigenvalues as strong
  * eigenpairs.

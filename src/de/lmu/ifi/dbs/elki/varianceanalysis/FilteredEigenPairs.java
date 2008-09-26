@@ -5,7 +5,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import java.util.List;
 
 /**
- * Encapsulates weak and stromg eigenpairs that have been filtered out
+ * Encapsulates weak and strong eigenpairs that have been filtered out
  * by an eigenpair filter.
  *
  * @author Elke Achtert 
@@ -22,7 +22,7 @@ public class FilteredEigenPairs {
   private final List<EigenPair> strongEigenPairs;
 
   /**
-   * Creates a new object that encapsulates weak and stromg eigenpairs
+   * Creates a new object that encapsulates weak and strong eigenpairs
    * that have been filtered out by an eigenpair filter
    *
    * @param weakEigenPairs the weak eigenpairs

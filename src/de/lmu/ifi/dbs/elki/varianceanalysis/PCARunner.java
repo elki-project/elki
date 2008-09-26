@@ -48,7 +48,7 @@ public class PCARunner<V extends RealVector<V, ?>> extends AbstractParameterizab
    */
   private ClassParameter<CovarianceMatrixBuilder<V>> COVARIANCE_PARAM = 
     new ClassParameter<CovarianceMatrixBuilder<V>>(PCA_COVARIANCE_MATRIX, 
-        CovarianceMatrixBuilder.class, PlainCovarianceMatrixBuilder.class.getName());
+        CovarianceMatrixBuilder.class, StandardCovarianceMatrixBuilder.class.getName());
 
   /**
    * The covariance computation class.

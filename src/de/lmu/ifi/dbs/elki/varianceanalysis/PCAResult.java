@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
  */
 public class PCAResult {
   /**
-   * The eigenpaiss in decreasing order.
+   * The eigenpairs in decreasing order.
    */
   private SortedEigenPairs eigenPairs;
   

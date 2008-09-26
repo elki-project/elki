@@ -8,6 +8,16 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 
+/**
+ * Kernel Covariance Matrix Builder.
+ * 
+ * To use this, you NEED to run an appropriate prepocessor that sets {@link AssociationID.KERNEL_MATRIX}
+ * for all objects that you are going to use.
+ * 
+ * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ *
+ * @param <V>
+ */
 public class KernelCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends CovarianceMatrixBuilder<V> {
   /**
    * Returns the local kernel matrix of the specified ids.

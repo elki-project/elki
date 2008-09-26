@@ -7,11 +7,19 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 
-public class PlainCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends CovarianceMatrixBuilder<V> {
+/**
+ * Class for building a "traditional" covariance matrix.
+ * Reasonable default choice for a {@link CovarianceMatrixBuilder}
+ * 
+ * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ *
+ * @param <V>
+ */
+public class StandardCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends CovarianceMatrixBuilder<V> {
   /**
    * Compute Covariance Matrix for a complete database
    * 
-   * @param ids a colleciton of ids
+   * @param ids a collection of ids
    * @param database the database used
    * @return Covariance Matrix
    */
@@ -22,7 +30,7 @@ public class PlainCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends Co
   /**
    * Compute Covariance Matrix for a collection of database IDs
    * 
-   * @param ids a colleciton of ids
+   * @param ids a collection of ids
    * @param database the database used
    * @return Covariance Matrix
    */

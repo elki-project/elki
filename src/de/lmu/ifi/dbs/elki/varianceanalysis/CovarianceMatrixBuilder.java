@@ -12,11 +12,19 @@ import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 
+/**
+ * Abstract class with the task of computing a Covariance matrix to be used in PCA.
+ * Mostly the specification of an interface.
+ * 
+ * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ *
+ * @param <V> Vector class in use
+ */
 public abstract class CovarianceMatrixBuilder<V extends RealVector<V, ?>> extends AbstractParameterizable {
   /**
    * Compute Covariance Matrix for a complete database
    * 
-   * @param ids a colleciton of ids
+   * @param ids a collection of ids
    * @param database the database used
    * @return Covariance Matrix
    * @throws UnableToComplyException
@@ -28,7 +36,7 @@ public abstract class CovarianceMatrixBuilder<V extends RealVector<V, ?>> extend
   /**
    * Compute Covariance Matrix for a collection of database IDs
    * 
-   * @param ids a colleciton of ids
+   * @param ids a collection of ids
    * @param database the database used
    * @return Covariance Matrix
    */

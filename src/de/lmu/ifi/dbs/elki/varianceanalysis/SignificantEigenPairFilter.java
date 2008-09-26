@@ -23,7 +23,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
  * not too interesting. These benefits usually only make a difference at higher
  * dimensionalities.
  * 
- * @author Erich Schubert
+ * @author Erich Schubert <schube@dbs.ifi.lmu.de>
  */
 
 public class SignificantEigenPairFilter extends AbstractParameterizable implements EigenPairFilter {
@@ -40,7 +40,7 @@ public class SignificantEigenPairFilter extends AbstractParameterizable implemen
       new GreaterEqualConstraint(0.0), DEFAULT_WALPHA);
 
   /**
-   * The noise tolerance niveau for weak eigenvectors
+   * The noise tolerance level for weak eigenvectors
    */
   private double walpha;
 
@@ -55,6 +55,9 @@ public class SignificantEigenPairFilter extends AbstractParameterizable implemen
     addOption(WALPHA_PARAM);
   }
 
+  /**
+   * Filter eigenpairs
+   */
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
     // init strong and weak eigenpairs
     List<EigenPair> strongEigenPairs = new ArrayList<EigenPair>();
@@ -97,6 +100,9 @@ public class SignificantEigenPairFilter extends AbstractParameterizable implemen
     return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);
   }
 
+  /**
+   * Get parameter description
+   */
   public String parameterDescription() {
     StringBuffer description = new StringBuffer();
     description.append(SignificantEigenPairFilter.class.getName());
@@ -105,6 +111,9 @@ public class SignificantEigenPairFilter extends AbstractParameterizable implemen
     return description.toString();
   }
 
+  /**
+   * Set parameters
+   */
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 

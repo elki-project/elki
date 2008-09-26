@@ -66,7 +66,7 @@ public class LimitEigenPairFilter extends AbstractParameterizable implements Eig
 	private double delta;
 
 	/**
-	 * Indicates wether delta is an absolute or a relative value.
+	 * Indicates whether delta is an absolute or a relative value.
 	 */
 	private boolean absolute;
 
@@ -167,7 +167,7 @@ public class LimitEigenPairFilter extends AbstractParameterizable implements Eig
 		return remainingParameters;
 	}
 
-    public String parameterDescription() {
+  public String parameterDescription() {
 		StringBuffer description = new StringBuffer();
 		description.append(PercentageEigenPairFilter.class.getName());
 		description.append(" filters all eigenpairs, " + " which are lower than a given value.\n");

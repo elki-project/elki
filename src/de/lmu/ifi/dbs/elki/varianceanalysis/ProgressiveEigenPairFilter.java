@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 
 /**
- * The ProgressiveEigenPairFilter sorts the eigenpairs in decending order of
+ * The ProgressiveEigenPairFilter sorts the eigenpairs in descending order of
  * their eigenvalues and marks the first eigenpairs, whose sum of eigenvalues is
  * higher than the given percentage of the sum of all eigenvalues as strong
  * eigenpairs. In contrast to the PercentageEigenPairFilter, it will use a
@@ -23,7 +23,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstrai
  * different percentage alpha levels might be appropriate for different
  * dimensionalities.
  * 
- * @author Erich Schubert
+ * @author Erich Schubert <schube@dbs.ifi.lmu.de>
  * 
  * Example calculations of alpha levels:
  * 
@@ -94,12 +94,12 @@ public class ProgressiveEigenPairFilter extends AbstractParameterizable implemen
       new GreaterEqualConstraint(0.0), DEFAULT_WALPHA);
 
   /**
-   * The noise tolerance niveau for weak eigenvectors
+   * The noise tolerance level for weak eigenvectors
    */
   private double walpha;
 
   /**
-   * Provides a new EigenPairFilter that sorts the eigenpairs in decending order
+   * Provides a new EigenPairFilter that sorts the eigenpairs in descending order
    * of their eigenvalues and marks the first eigenpairs, whose sum of
    * eigenvalues is higher than the given percentage of the sum of all
    * eigenvalues as string eigenpairs.
@@ -111,6 +111,9 @@ public class ProgressiveEigenPairFilter extends AbstractParameterizable implemen
     addOption(WALPHA_PARAM);    
   }
 
+  /**
+   * Filter eigenpairs.
+   */
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
     // init strong and weak eigenpairs
     List<EigenPair> strongEigenPairs = new ArrayList<EigenPair>();
@@ -161,6 +164,9 @@ public class ProgressiveEigenPairFilter extends AbstractParameterizable implemen
     return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);
   }
 
+  /**
+   * Parameter description.
+   */
   public String parameterDescription() {
     StringBuffer description = new StringBuffer();
     description.append(ProgressiveEigenPairFilter.class.getName());
@@ -169,6 +175,9 @@ public class ProgressiveEigenPairFilter extends AbstractParameterizable implemen
     return description.toString();
   }
 
+  /**
+   * Set parameters
+   */
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 

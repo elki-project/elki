@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 
 /**
- * The RelativeEigenPairFilter sorts the eigenpairs in decending order of their
+ * The RelativeEigenPairFilter sorts the eigenpairs in descending order of their
  * eigenvalues and marks the first eigenpairs who are a certain factor above the
  * average of the remaining eigenvalues.
  * 
@@ -21,7 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
  * not too interesting. These benefits usually only make a difference at higher
  * dimensionalities.
  * 
- * @author Erich Schubert
+ * @author Erich Schubert <schube@dbs.ifi.lmu.de>
  */
 
 public class RelativeEigenPairFilter extends AbstractParameterizable implements EigenPairFilter {
@@ -45,12 +45,12 @@ public class RelativeEigenPairFilter extends AbstractParameterizable implements 
       new GreaterEqualConstraint(0.0), DEFAULT_RALPHA);
 
   /**
-   * The noise tolerance niveau for weak eigenvectors
+   * The noise tolerance level for weak eigenvectors
    */
   private double ralpha;
 
   /**
-   * Provides a new EigenPairFilter that sorts the eigenpairs in decending order
+   * Provides a new EigenPairFilter that sorts the eigenpairs in descending order
    * of their eigenvalues and marks the first eigenpairs, whose sum of
    * eigenvalues is higher than the given percentage of the sum of all
    * eigenvalues as string eigenpairs.
@@ -61,6 +61,9 @@ public class RelativeEigenPairFilter extends AbstractParameterizable implements 
     addOption(RALPHA_PARAM);
   }
 
+  /**
+   * Filter eigenpairs
+   */
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
     // init strong and weak eigenpairs
     List<EigenPair> strongEigenPairs = new ArrayList<EigenPair>();
@@ -93,6 +96,9 @@ public class RelativeEigenPairFilter extends AbstractParameterizable implements 
     return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);
   }
 
+  /**
+   * Get parameter description.
+   */
   public String parameterDescription() {
     StringBuffer description = new StringBuffer();
     description.append(RelativeEigenPairFilter.class.getName());
@@ -101,6 +107,9 @@ public class RelativeEigenPairFilter extends AbstractParameterizable implements 
     return description.toString();
   }
 
+  /**
+   * Set parameters
+   */
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 

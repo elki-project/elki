@@ -16,20 +16,39 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.ConstantWeight;
 import de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.WeightFunction;
 
+/**
+ * {@link CovarianceMatrixBuilder} with weights.
+ * 
+ * This builder uses a weight function to weight points differently duing build a covariance matrix.
+ * Covariance can be canonically extended with weights, as shown in the article
+ * 
+ * A General Framework for Increasing the Robustness of PCA-Based Correlation Clustering Algorithms
+ * Hans-Peter Kriegel and Peer Kröger and Erich Schubert and Arthur Zimek
+ * In: Proc. 20th Int. Conf. on Scientific and Statistical Database Management (SSDBM), 2008, Hong Kong
+ * Lecture Notes in Computer Science 5069, Springer
+ * 
+ * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ *
+ * @param <V>
+ */
 public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends CovarianceMatrixBuilder<V> {
   /**
    * OptionID for {@link #WEIGHT_PARAM}
    */
-  public static final OptionID WEIGHT_ID = OptionID.getOrCreateOptionID("pca.weight", "Classname of the weight function to use in PCA " + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(WeightFunction.class) + ".");
+  public static final OptionID WEIGHT_ID = OptionID.getOrCreateOptionID("pca.weight", 
+      "Classname of the weight function to use in PCA " 
+      + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(WeightFunction.class) + ".");
 
   /**
    * Parameter to specify the weight function to use in weighted PCA, must
-   * extend {@link de.lmu.ifi.dbs.elki.varianceanalysis.weightfunction}.
+   * implement {@link de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.WeightFunction}.
    * <p>
    * Key: {@code -pca.weight}
    * </p>
    */
-  private final ClassParameter<WeightFunction> WEIGHT_PARAM = new ClassParameter<WeightFunction>(WEIGHT_ID, WeightFunction.class, ConstantWeight.class.getName());
+  private final ClassParameter<WeightFunction> WEIGHT_PARAM = 
+    new ClassParameter<WeightFunction>(WEIGHT_ID, WeightFunction.class, 
+        ConstantWeight.class.getName());
 
   /**
    * Holds the weight function.
@@ -37,13 +56,16 @@ public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends
   public WeightFunction weightfunction;
 
   /**
-   * 
+   * Constructor, setting up parameter.
    */
   public WeightedCovarianceMatrixBuilder() {
     super();
     addOption(WEIGHT_PARAM);
   }
 
+  /**
+   * Parse parameters.
+   */
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     weightfunction = WEIGHT_PARAM.instantiateClass();
@@ -54,7 +76,7 @@ public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends
   /**
    * Weighted Covariance Matrix for a set of IDs. Since we are not supplied any
    * distance information, we'll need to compute it ourselves. Covariance is
-   * tied to Euklidean distance, so it probably does not make much sense to add
+   * tied to Euclidean distance, so it probably does not make much sense to add
    * support for other distance functions?
    */
   public Matrix processIds(Collection<Integer> ids, Database<V> database) {
@@ -75,7 +97,7 @@ public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends
       for(Iterator<Integer> it = ids.iterator(); it.hasNext();) {
         V obj = database.get(it.next());
         double distance = 0.0;
-        // TODO: this is a hardcoded Euklidean distance.
+        // TODO: this is a hardcoded Euclidean distance.
         for(int d = 0; d < dim; d++) {
           double delta = centroid.getValue(d + 1).doubleValue() - obj.getValue(d + 1).doubleValue();
           distance += delta * delta;
@@ -111,19 +133,7 @@ public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends
       }
       weightsum += weight;
     }
-    // TODO: if weightsum == 0.0, the matrix will be empty,
-    // do we need to manually default to identity matrix then?
-    assert (weightsum > 0.0);
-    for(int d1 = 0; d1 < dim; d1++) {
-      for(int d2 = d1; d2 < dim; d2++) {
-        // squares[d1][d2] = squares[d1][d2] / weightsum - (sums[d1] /
-        // weightsum) * (sums[d2] / weightsum);
-        squares[d1][d2] = squares[d1][d2] - sums[d1] * sums[d2] / weightsum;
-        // use symmetry
-        squares[d2][d1] = squares[d1][d2];
-      }
-    }
-    return new Matrix(squares);
+    return new Matrix(finishCovarianceMatrix(sums, squares, weightsum));
   }
 
   /**
@@ -180,15 +190,37 @@ public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends
       }
       weightsum += weight;
     }
-    for(int d1 = 0; d1 < dim; d1++) {
-      for(int d2 = d1; d2 < dim; d2++) {
-        // squares[d1][d2] = squares[d1][d2] / weightsum - (sums[d1] /
-        // weightsum) * (sums[d2] / weightsum);
-        squares[d1][d2] = squares[d1][d2] - sums[d1] * sums[d2] / weightsum;
-        // use symmetry
-        squares[d2][d1] = squares[d1][d2];
+    return new Matrix(finishCovarianceMatrix(sums, squares, weightsum));
+  }
+
+  /**
+   * Finish the Covariance matrix in array "squares".
+   * 
+   * @param dim Dimensionality.
+   * @param sums Sums of values.
+   * @param squares Sums of squares. Contents are destroyed and replaced with Covariance Matrix!
+   * @param weightsum Sum of weights.
+   * @return modified squares array
+   */
+  private double[][] finishCovarianceMatrix(double[] sums, double[][] squares, double weightsum) {
+    if (weightsum > 0) {
+      // reasonable weights - finish up matrix.
+      for(int d1 = 0; d1 < sums.length; d1++) {
+        for(int d2 = d1; d2 < sums.length; d2++) {
+          squares[d1][d2] = squares[d1][d2] - sums[d1] * sums[d2] / weightsum;
+          // use symmetry
+          squares[d2][d1] = squares[d1][d2];
+        }
+      }
+    } else {
+      // No weights = no data. Use identity.
+      // TODO: Warn about a bad weight function? Fail?
+      for(int d1 = 0; d1 < sums.length; d1++) {
+        for(int d2 = d1 + 1; d2 < sums.length; d2++)
+          squares[d1][d2] = 0;
+        squares[d1][d1] = 1;
       }
     }
-    return new Matrix(squares);
+    return squares;
   }
 }

@@ -40,7 +40,7 @@ public class FirstNEigenPairFilter extends AbstractParameterizable implements Ei
   private double n;
 
   /**
-   * Provides a new EigenPairFilter that sorts the eigenpairs in decending order
+   * Provides a new EigenPairFilter that sorts the eigenpairs in descending order
    * of their eigenvalues and marks the first n eigenpairs as strong eigenpairs.
    */
   public FirstNEigenPairFilter() {

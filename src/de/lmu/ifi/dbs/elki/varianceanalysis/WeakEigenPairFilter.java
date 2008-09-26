@@ -9,11 +9,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 
 /**
- * The WeakEigenPairFilter sorts the eigenpairs in decending order of their
+ * The WeakEigenPairFilter sorts the eigenpairs in descending order of their
  * eigenvalues and returns the first eigenpairs who are above the average mark
  * as "strong", the others as "weak".
  * 
- * @author Erich Schubert
+ * @author Erich Schubert <schube@dbs.ifi.lmu.de>
  */
 
 public class WeakEigenPairFilter extends AbstractParameterizable implements EigenPairFilter {
@@ -39,12 +39,12 @@ public class WeakEigenPairFilter extends AbstractParameterizable implements Eige
       new GreaterEqualConstraint(0.0), DEFAULT_WALPHA);
 
   /**
-   * The noise tolerance niveau for weak eigenvectors
+   * The noise tolerance level for weak eigenvectors
    */
   private double walpha;
 
   /**
-   * Provides a new EigenPairFilter that sorts the eigenpairs in decending order
+   * Provides a new EigenPairFilter that sorts the eigenpairs in descending order
    * of their eigenvalues and marks the first eigenpairs, whose sum of
    * eigenvalues is higher than the given percentage of the sum of all
    * eigenvalues as string eigenpairs.
@@ -54,6 +54,9 @@ public class WeakEigenPairFilter extends AbstractParameterizable implements Eige
     addOption(WALPHA_PARAM);
   }
 
+  /**
+   * Filter eigenpairs
+   */
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
     // init strong and weak eigenpairs
     List<EigenPair> strongEigenPairs = new ArrayList<EigenPair>();
@@ -86,6 +89,9 @@ public class WeakEigenPairFilter extends AbstractParameterizable implements Eige
     return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);
   }
 
+  /**
+   * Get parameter description
+   */
   public String parameterDescription() {
     StringBuffer description = new StringBuffer();
     description.append(WeakEigenPairFilter.class.getName());
@@ -94,6 +100,9 @@ public class WeakEigenPairFilter extends AbstractParameterizable implements Eige
     return description.toString();
   }
 
+  /**
+   * Set parameters
+   */
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
