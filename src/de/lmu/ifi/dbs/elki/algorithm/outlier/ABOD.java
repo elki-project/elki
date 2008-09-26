@@ -11,7 +11,7 @@ import java.util.PriorityQueue;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.result.Result;
-import de.lmu.ifi.dbs.elki.algorithm.result.outlier.AbodResult;
+import de.lmu.ifi.dbs.elki.algorithm.result.outlier.ABODResult;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
@@ -31,17 +31,24 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 
 /**
- * Angle-based Outlier Detection
+ * Angle-Based Outlier Detection
+ * 
+ * Outlier detection using variance analysis on angles, especially for high dimensional data sets.
+ * 
+ * H.-P. Kriegel, M. Schubert, and A. Zimek:
+ * Angle-Based Outlier Detection in High-dimensional Data.
+ * In: Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining (KDD '08), Las Vegas, NV, 2008.
  * 
  * @author Matthias Schubert (Original Code)
  * @author Erich Schubert (ELKIfication)
  * 
  */
-public class Abod<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, DoubleDistance> {
+public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, DoubleDistance> {
   /**
    * OptionID for {@link #FAST_FLAG}
    */
-  public static final OptionID FAST_ID = OptionID.getOrCreateOptionID("abod.fast", "Flag to indicate that the algorithm should run the fast/approximative version.");
+  public static final OptionID FAST_ID = OptionID.getOrCreateOptionID("abod.fast", 
+      "Flag to indicate that the algorithm should run the fast/approximative version.");
 
   /**
    * Flag for fast mode
@@ -56,7 +63,8 @@ public class Abod<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
   /**
    * OptionID for {@link #FAST_SAMPLE_PARAM}
    */
-  public static final OptionID FAST_SAMPLE_ID = OptionID.getOrCreateOptionID("abod.samplesize", "Sample size to use in fast mode.");
+  public static final OptionID FAST_SAMPLE_ID = OptionID.getOrCreateOptionID("abod.samplesize", 
+      "Sample size to use in fast mode.");
 
   /**
    * Parameter for sample size
@@ -71,12 +79,16 @@ public class Abod<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
   /**
    * OptionID for {@link #KERNEL_FUNCTION_PARAM}
    */
-  public static final OptionID KERNEL_FUNCTION_ID = OptionID.getOrCreateOptionID("abod.kernelfunction", "Kernel function to use.");
+  public static final OptionID KERNEL_FUNCTION_ID = OptionID.getOrCreateOptionID("abod.kernelfunction", 
+      "Kernel function to use.");
 
   /**
    * Parameter for Kernel Function
    */
-  private final ClassParameter<KernelFunction<V, DoubleDistance>> KERNEL_FUNCTION_PARAM = new ClassParameter<KernelFunction<V, DoubleDistance>>(KERNEL_FUNCTION_ID, KernelFunction.class, PolynomialKernelFunction.class.getCanonicalName());
+  // TODO: is a Polynomial Kernel the best default?
+  private final ClassParameter<KernelFunction<V, DoubleDistance>> KERNEL_FUNCTION_PARAM =
+    new ClassParameter<KernelFunction<V, DoubleDistance>>(KERNEL_FUNCTION_ID,
+        KernelFunction.class, PolynomialKernelFunction.class.getCanonicalName());
 
   /**
    * Store the configured Kernel version
@@ -86,12 +98,12 @@ public class Abod<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
   /**
    * Result storage.
    */
-  AbodResult<V> result = null;
+  ABODResult<V> result = null;
 
   /***************************************************************************
    * Constructor
    **************************************************************************/
-  public Abod() {
+  public ABOD() {
     addOption(FAST_FLAG);
     addOption(FAST_SAMPLE_PARAM);
     addOption(KERNEL_FUNCTION_PARAM);
@@ -131,7 +143,7 @@ public class Abod<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
     ComparablePair<Double, Integer>[] reslist = ComparablePair.newArray(0);
     reslist = pq.toArray(reslist);
     Arrays.sort(reslist);
-    result = new AbodResult<V>(data, reslist);
+    result = new ABODResult<V>(data, reslist);
   }
 
   public void getFastRanking(Database<V> data, int k, int sampleSize) {
@@ -212,7 +224,7 @@ public class Abod<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
     ComparablePair<Double, Integer>[] reslist = ComparablePair.newArray(0);
     reslist = pq.toArray(reslist);
     Arrays.sort(reslist);
-    this.result = new AbodResult<V>(data, reslist);
+    this.result = new ABODResult<V>(data, reslist);
   }
 
   // TODO: remove?
@@ -296,7 +308,7 @@ public class Abod<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
   }
 
   /**
-   * Compute the Cosinus value between vectors aKey and bKey.
+   * Compute the cosinus value between vectors aKey and bKey.
    * 
    * @param kernelMatrix
    * @param aKey
@@ -347,6 +359,7 @@ public class Abod<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
     return nn;
   }
 
+  // TODO: this should be done by the result classes.
   public void getExplanations(Database<V> data) {
     KernelMatrix<V> kernelMatrix = new KernelMatrix<V>(kernelFunction, data);
     // PQ for Outlier Ranking
@@ -452,8 +465,11 @@ public class Abod<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
    */
   @Override
   public Description getDescription() {
-    // TODO: Add publication information
-    return new Description("Abod", "Angle-based outlier detection", "Outlier detection using variance analysis on angles, especially for high dimensional data sets.", "H.-P. Kriegel, M. Schubert, and A. Zimek: " + "Angle-Based Outlier Detection in High-dimensional Data. " + "In: Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining (KDD '08), Las Vegas, NV, 2008.");
+    return new Description("ABOD", "Angle-Based Outlier Detection",
+        "Outlier detection using variance analysis on angles, especially for high dimensional data sets.",
+        "H.-P. Kriegel, M. Schubert, and A. Zimek: "
+        + "Angle-Based Outlier Detection in High-dimensional Data. "
+        + "In: Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining (KDD '08), Las Vegas, NV, 2008.");
   }
 
   /**
@@ -488,8 +504,6 @@ public class Abod<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
 
     if(fast)
       sampleSize = FAST_SAMPLE_PARAM.getValue();
-
-    // TODO: The Polynomial Kernel Function defaults to a degree of 0.0
 
     kernelFunction = KERNEL_FUNCTION_PARAM.instantiateClass();
     remainingParameters = kernelFunction.setParameters(remainingParameters);

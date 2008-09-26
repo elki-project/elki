@@ -1,6 +1,3 @@
-/**
- * 
- */
 package de.lmu.ifi.dbs.elki.algorithm.result.outlier;
 
 import java.io.File;
@@ -20,19 +17,38 @@ import de.lmu.ifi.dbs.elki.utilities.ComparablePair;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 
-public class AbodResult<V extends RealVector<V, ?>> extends AbstractResult<V> {
+/**
+ * Result wrapper for ABOD results.
+ * 
+ * @author Erich Schubert
+ *
+ * @param <V> Vector type to use
+ */
+public class ABODResult<V extends RealVector<V, ?>> extends AbstractResult<V> {
   /**
    * Marker for a file name containing abod values.
    */
   public static final String ABOD_MARKER = "abod";
 
-  ComparablePair<Double, Integer>[] result;
+  /**
+   * The actual result
+   */
+  private ComparablePair<Double, Integer>[] result;
 
-  public AbodResult(Database<V> data, ComparablePair<Double, Integer>[] result) {
-    super(data);
+  /**
+   * Constructor for result object
+   * 
+   * @param database Database being used
+   * @param result The actual results, sorted by their ranking.
+   */
+  public ABODResult(Database<V> database, ComparablePair<Double, Integer>[] result) {
+    super(database);
     this.result = result;
   }
 
+  /**
+   * Output the ABOD results into a file named {@link #ABOD_MARKER} + {@link AbstractResult#FILE_EXTENSION}
+   */
   @Override
   public void output(File out, Normalization<V> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     PrintStream outStream;
@@ -50,7 +66,10 @@ public class AbodResult<V extends RealVector<V, ?>> extends AbstractResult<V> {
     }
   }
 
-  @Override
+  /**
+   * Output ABOD results to an output stream.
+   */
+  @Override  
   public void output(PrintStream outStream, Normalization<V> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     writeHeader(outStream, settings, null);
 
