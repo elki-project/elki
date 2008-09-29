@@ -1,0 +1,168 @@
+<!DOCTYPE dataset PUBLIC "GeneratorByModel.dtd" "GeneratorByModel.dtd">
+<dataset>
+	<cluster name="1Cluster" size="430">
+		<normal mean="0.33" stddev="0.08"/>
+		<normal mean="0.33" stddev="0.08"/>
+		<normal mean="0.33" stddev="0.08"/>
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<clip min="0.0" max="1.0" />
+	</cluster>
+	<cluster name="2Outlier" size="3">
+		<normal mean="0.63" stddev="0.01"/>
+		<normal mean="0.83" stddev="0.01"/>
+		<normal mean="0.03" stddev="0.01"/>
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<clip min="0.0" max="1.0" />
+	</cluster>
+	<cluster name="3Outlier" size="2">
+		<normal mean="0.13" stddev="0.01"/>
+		<normal mean="0.93" stddev="0.01"/>
+		<normal mean="0.23" stddev="0.01"/>
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<clip min="0.0" max="1.0" />
+	</cluster>
+	<cluster name="4Outlier" size="2">
+		<normal mean="0.83" stddev="0.01"/>
+		<normal mean="0.13" stddev="0.01"/>
+		<normal mean="0.23" stddev="0.01"/>
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<clip min="0.0" max="1.0" />
+	</cluster>
+	<cluster name="5Outlier" size="2">
+		<normal mean="0.83" stddev="0.01"/>
+		<normal mean="0.23" stddev="0.01"/>
+		<normal mean="0.53" stddev="0.01"/>
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<clip min="0.0" max="1.0" />
+	</cluster>
+	<cluster name="6Outlier" size="2">
+		<normal mean="0.83" stddev="0.01"/>
+		<normal mean="0.73" stddev="0.01"/>
+		<normal mean="0.23" stddev="0.01"/>
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<clip min="0.0" max="1.0" />
+	</cluster>
+	<cluster name="7Outlier" size="1">
+		<normal mean="0.83" stddev="0.01"/>
+		<normal mean="0.33" stddev="0.01"/>
+		<normal mean="0.03" stddev="0.01"/>
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<clip min="0.0" max="1.0" />
+	</cluster>
+	<cluster name="8Outlier" size="1">
+		<normal mean="0.77" stddev="0.01"/>
+		<normal mean="0.33" stddev="0.01"/>
+		<normal mean="0.73" stddev="0.01"/>
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<clip min="0.0" max="1.0" />
+	</cluster>
+	<cluster name="9Outlier" size="1">
+		<normal mean="0.53" stddev="0.01"/>
+		<normal mean="0.63" stddev="0.01"/>
+		<normal mean="0.63" stddev="0.01"/>
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<clip min="0.0" max="1.0" />
+	</cluster>
+	<cluster name="10Outlier" size="1">
+		<normal mean="0.13" stddev="0.01"/>
+		<normal mean="0.83" stddev="0.01"/>
+		<normal mean="0.77" stddev="0.01"/>
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<clip min="0.0" max="1.0" />
+	</cluster>
+	<cluster name="11Outlier" size="1">
+		<normal mean="0.03" stddev="0.01"/>
+		<normal mean="0.03" stddev="0.01"/>
+		<normal mean="0.07" stddev="0.01"/>
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<clip min="0.0" max="1.0" />
+	</cluster>
+	<cluster name="12Outlier" size="1">
+		<normal mean="0.93" stddev="0.01"/>
+		<normal mean="0.93" stddev="0.01"/>
+		<normal mean="0.97" stddev="0.01"/>
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<clip min="0.0" max="1.0" />
+	</cluster>
+	<cluster name="13Outlier" size="1">
+		<normal mean="0.03" stddev="0.01"/>
+		<normal mean="0.93" stddev="0.01"/>
+		<normal mean="0.97" stddev="0.01"/>
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<clip min="0.0" max="1.0" />
+	</cluster>
+	<cluster name="14Outlier" size="1">
+		<normal mean="0.93" stddev="0.01"/>
+		<normal mean="0.83" stddev="0.01"/>
+		<normal mean="0.07" stddev="0.01"/>
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<clip min="0.0" max="1.0" />
+	</cluster>
+	<cluster name="15Outlier" size="1">
+		<normal mean="0.03" stddev="0.01"/>
+		<normal mean="0.03" stddev="0.01"/>
+		<normal mean="0.97" stddev="0.01"/>
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" /><uniform min="0.0" max="1.0" />
+		<clip min="0.0" max="1.0" />
+	</cluster>
+</dataset>
