@@ -4,9 +4,9 @@ import de.lmu.ifi.dbs.elki.algorithm.result.AbstractResult;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionsSelectingEuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 
 import java.io.PrintStream;
@@ -25,6 +25,8 @@ public class SODModel<O extends RealVector<O, Double>> extends AbstractResult<O>
 
     private double[] centerValues;
 
+    private O center;
+
     private double[] variances;
 
     private double expectationOfVariance;
@@ -32,7 +34,7 @@ public class SODModel<O extends RealVector<O, Double>> extends AbstractResult<O>
     private BitSet weightVector;
 
     private double sod;
-
+    
     public SODModel(Database<O> database, List<Integer> neighborhood, double alpha, O queryObject) {
         super(database);
         centerValues = new double[database.dimensionality()];
@@ -45,7 +47,7 @@ public class SODModel<O extends RealVector<O, Double>> extends AbstractResult<O>
         }
         for (int d = 0; d < centerValues.length; d++) {
             centerValues[d] /= neighborhood.size();
-        }
+        }        
         for (Integer id : neighborhood) {
             O databaseObject = database.get(id);
             for (int d = 0; d < centerValues.length; d++) {
@@ -68,11 +70,11 @@ public class SODModel<O extends RealVector<O, Double>> extends AbstractResult<O>
             }
         }
         DISTANCE_FUNCTION.setSelectedDimensions(weightVector);
-        sod = subspaceOutlierDegree(queryObject);
+        center = queryObject.newInstance(centerValues);
+        sod = subspaceOutlierDegree(queryObject, center);
     }
 
-    public double subspaceOutlierDegree(O queryObject) {
-        O center = queryObject.newInstance(centerValues);
+    public double subspaceOutlierDegree(O queryObject, O center) {
         double distance = DISTANCE_FUNCTION.distance(queryObject, center).getValue();
         distance /= weightVector.cardinality();
         return distance;
@@ -81,7 +83,12 @@ public class SODModel<O extends RealVector<O, Double>> extends AbstractResult<O>
     public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         outStream.println("### " + this.getClass().getSimpleName() + ":");
         outStream.println("### relevant attributes (counting starts with 0): " + this.weightVector.toString());
-        outStream.println("### center of neighborhood: " + Util.format(centerValues));
+        try {
+          outStream.println("### center of neighborhood: " + normalization.restore(center).toString());
+        }
+        catch(NonNumericFeaturesException e) {
+          e.printStackTrace();
+        }
         outStream.println("### subspace outlier degree: " + this.sod);
         outStream.println("################################################################################");
         outStream.flush();
