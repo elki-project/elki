@@ -190,7 +190,7 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
                 for (QueryResult<DoubleDistance> neighbor1 : neighbors) {
                     sum += database.getAssociation(AssociationID.LRD, neighbor1.getID()) / lrd;
                 }
-                Double lof = neighbors.size() / sum;
+                Double lof = sum / neighbors.size();
                 database.associate(AssociationID.LOF, id, lof);
                 if (isVerbose()) {
                     progressLOFs.setProcessed(counter);

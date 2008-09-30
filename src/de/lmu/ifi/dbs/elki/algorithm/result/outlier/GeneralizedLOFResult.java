@@ -92,7 +92,7 @@ public class GeneralizedLOFResult<O extends DatabaseObject> extends AbstractResu
                 Integer id = it.next();
                 lofs.add(new IDDoublePair(id, db.getAssociation(AssociationID.LOF, id)));
             }
-            Collections.sort(lofs);
+            Collections.sort(lofs, Collections.reverseOrder());
 
             // write lofs
             for (IDDoublePair pair : lofs) {
