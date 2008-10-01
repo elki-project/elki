@@ -6,7 +6,7 @@ package de.lmu.ifi.dbs.elki.utilities;
  * @author Elke Achtert 
  */
 
-public class IDIDDoubleTriple implements Comparable<IDIDDoubleTriple> {
+public final class IDIDDoubleTriple implements Comparable<IDIDDoubleTriple> {
 
   /**
    * The first id.

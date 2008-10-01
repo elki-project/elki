@@ -3,12 +3,12 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering;
 import de.lmu.ifi.dbs.elki.algorithm.result.clustering.biclustering.Bicluster;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.IntegerTriple;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparableTriple;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -131,7 +131,7 @@ public class PClustering<V extends RealVector<V, Double>> extends
 	 * rows. The third value enumerates the MDS, in case the same two rows form
 	 * more then one MDS.
 	 */
-	private Map<IntegerTriple, BitSet> rowMDS;
+	private Map<ComparableTriple<Integer,Integer,Integer>, BitSet> rowMDS;
 
 	/**
 	 * Matches three integer-values with the corresponding rows, forming a
@@ -141,7 +141,7 @@ public class PClustering<V extends RealVector<V, Double>> extends
 	 * columns. The third value enumerates the MDS, in case the same two columns
 	 * form more then one MDS.
 	 */
-	private Map<IntegerTriple, BitSet> colMDS;
+	private Map<ComparableTriple<Integer,Integer,Integer>, BitSet> colMDS;
 
 	/**
 	 * Keeps the rowMDSs after pruning, and joins row-keys mapped to the same
@@ -182,7 +182,7 @@ public class PClustering<V extends RealVector<V, Double>> extends
 	/**
 	 * Keeps the rows/columns to be pruned in the current pruning-step.
 	 */
-	private ArrayList<IntegerTriple> pruningKeys;
+	private ArrayList<ComparableTriple<Integer,Integer,Integer>> pruningKeys;
 
 	/**
 	 * Matches every row appearing in a columnMDS to the total number of
@@ -226,8 +226,8 @@ public class PClustering<V extends RealVector<V, Double>> extends
 	 */
 	private void initiatePClustering() {
 		pruning = true;
-		rowMDS = new HashMap<IntegerTriple, BitSet>();
-		colMDS = new HashMap<IntegerTriple, BitSet>();
+		rowMDS = new HashMap<ComparableTriple<Integer,Integer,Integer>, BitSet>();
+		colMDS = new HashMap<ComparableTriple<Integer,Integer,Integer>, BitSet>();
 		rowDim = super.getRowDim();
 		colDim = super.getColDim();
 		rows = new BitSet();
@@ -249,7 +249,7 @@ public class PClustering<V extends RealVector<V, Double>> extends
 				ArrayList<BitSet> mds = pairCluster(a, b, rows, nr, false);
 				int size = mds.size();
 				for (int i = 0; i < size; i++) {
-					IntegerTriple cols = new IntegerTriple(a, b, i);
+					ComparableTriple<Integer,Integer,Integer> cols = new ComparableTriple<Integer,Integer,Integer>(a, b, i);
 					colMDS.put(cols, mds.get(i));
 				}
 			}
@@ -266,7 +266,7 @@ public class PClustering<V extends RealVector<V, Double>> extends
 				ArrayList<BitSet> mds = pairCluster(x, y, cols, nc, true);
 				int size = mds.size();
 				for (int i = 0; i < size; i++) {
-					IntegerTriple rows = new IntegerTriple(x, y, i);
+					ComparableTriple<Integer,Integer,Integer> rows = new ComparableTriple<Integer,Integer,Integer>(x, y, i);
 					rowMDS.put(rows, mds.get(i));
 				}
 			}
@@ -278,10 +278,10 @@ public class PClustering<V extends RealVector<V, Double>> extends
 	 */
 	private void fillTree() {
 		tree = new BiclusteringTree();
-		Set<IntegerTriple> keys = rowMDS.keySet();
-		Iterator<IntegerTriple> iterator = keys.iterator();
+		Set<ComparableTriple<Integer,Integer,Integer>> keys = rowMDS.keySet();
+		Iterator<ComparableTriple<Integer,Integer,Integer>> iterator = keys.iterator();
 		for (int zaehler = 0; zaehler < keys.size(); zaehler++) {
-			IntegerTriple iter = iterator.next();
+			ComparableTriple<Integer,Integer,Integer> iter = iterator.next();
 			BitSet i = new BitSet();
 			i.set(iter.getFirst());
 			i.set(iter.getSecond());
@@ -422,7 +422,7 @@ public class PClustering<V extends RealVector<V, Double>> extends
 		for (int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
 			Integer occurrence = clusterOccurrences.get(i);
 			if (occurrence == null || occurrence < nr - 1) {
-//				Iterator<IntegerTriple> iterator = colMDS.keySet().iterator();
+//				Iterator<ComparableTriple<Integer,Integer,Integer>> iterator = colMDS.keySet().iterator();
 //				for (int j = 0; j < colMDS.size(); j++) {
 //					colMDS.get(iterator.next()).clear(i);
 //				}
@@ -441,15 +441,15 @@ public class PClustering<V extends RealVector<V, Double>> extends
 	 * @param mds
 	 *            rowMDS or colMDS
 	 */
-	private void countOccurrences(Map<IntegerTriple, BitSet> mds) {
+	private void countOccurrences(Map<ComparableTriple<Integer,Integer,Integer>, BitSet> mds) {
 		clusterOccurrences = new HashMap<Integer, Integer>();
 
 		pairOccurrences = new HashMap<Integer, Integer>();
 
-		Set<IntegerTriple> colkeys = mds.keySet();
-		Iterator<IntegerTriple> iterator = colkeys.iterator();
+		Set<ComparableTriple<Integer,Integer,Integer>> colkeys = mds.keySet();
+		Iterator<ComparableTriple<Integer,Integer,Integer>> iterator = colkeys.iterator();
 		for (int zaehler = 0; zaehler < colkeys.size(); zaehler++) {
-			IntegerTriple iter = iterator.next();
+			ComparableTriple<Integer,Integer,Integer> iter = iterator.next();
 			int newAttrValue = 1;
 			if (pairOccurrences.containsKey(iter.getFirst())) {
 				newAttrValue = pairOccurrences.get(iter.getFirst()) + 1;
@@ -486,22 +486,22 @@ public class PClustering<V extends RealVector<V, Double>> extends
 		while (pruning) {
 			// rowPruning
 			pruning = false;
-			pruningKeys = new ArrayList<IntegerTriple>();
-			Set<IntegerTriple> keys = rowMDS.keySet();
-			Iterator<IntegerTriple> iterator = keys.iterator();
+			pruningKeys = new ArrayList<ComparableTriple<Integer,Integer,Integer>>();
+			Set<ComparableTriple<Integer,Integer,Integer>> keys = rowMDS.keySet();
+			Iterator<ComparableTriple<Integer,Integer,Integer>> iterator = keys.iterator();
 			for (int zaehler = 0; zaehler < keys.size(); zaehler++) {
-				IntegerTriple i = iterator.next();
+				ComparableTriple<Integer,Integer,Integer> i = iterator.next();
 				pruneRowMDS(i);
 			}
 
 			removeAndUpdate(rowMDS, pruningKeys);
 
 			// columnPruning
-			pruningKeys = new ArrayList<IntegerTriple>();
+			pruningKeys = new ArrayList<ComparableTriple<Integer,Integer,Integer>>();
 			keys = colMDS.keySet();
 			iterator = keys.iterator();
 			for (int counter = 0; counter < keys.size(); counter++) {
-				IntegerTriple i = iterator.next();
+				ComparableTriple<Integer,Integer,Integer> i = iterator.next();
 				pruneColMDS(i);
 			}
 
@@ -511,19 +511,19 @@ public class PClustering<V extends RealVector<V, Double>> extends
 		postOrder(tree);
 	}
 
-	private void removeAndUpdate(Map<IntegerTriple, BitSet> pair,
-			ArrayList<IntegerTriple> toremove) {
+	private void removeAndUpdate(Map<ComparableTriple<Integer,Integer,Integer>, BitSet> pair,
+			ArrayList<ComparableTriple<Integer,Integer,Integer>> toremove) {
 		for (int i = 0; i < toremove.size(); i++) {
-			IntegerTriple key = toremove.get(i);
+			ComparableTriple<Integer,Integer,Integer> key = toremove.get(i);
 			pair.remove(key);
-			for (int j = key.getLast() + 1; true; j++) {
-				key.setLast(j);
+			for (int j = key.getThird() + 1; true; j++) {
+				key.setThird(j);
 				if (!pair.containsKey(key)) {
 					break;
 				}
 				BitSet updateKeySet = (BitSet) pair.get(key).clone();
 				pair.remove(key);
-				IntegerTriple newKey = new IntegerTriple(key.getFirst(), key
+				ComparableTriple<Integer,Integer,Integer> newKey = new ComparableTriple<Integer,Integer,Integer>(key.getFirst(), key
 						.getSecond(), j - 1);
 				pair.put(newKey, updateKeySet);
 			}
@@ -591,17 +591,17 @@ public class PClustering<V extends RealVector<V, Double>> extends
 	 * @param rowkey
 	 *            key of the rowMDS currently worked at
 	 */
-	private void pruneRowMDS(IntegerTriple rowkey) {
+	private void pruneRowMDS(ComparableTriple<Integer,Integer,Integer> rowkey) {
 		int counter = 0;
 		int x = rowkey.getFirst();
 		int y = rowkey.getSecond();
 		BitSet mdsRows = rowMDS.get(rowkey);// Columns assigned to rows "rowkey"
 		for (int i = mdsRows.nextSetBit(0); i >= 0; i = mdsRows
 				.nextSetBit(i + 1)) {
-			Set<IntegerTriple> keys = colMDS.keySet();
-			Iterator<IntegerTriple> iterator = keys.iterator();
+			Set<ComparableTriple<Integer,Integer,Integer>> keys = colMDS.keySet();
+			Iterator<ComparableTriple<Integer,Integer,Integer>> iterator = keys.iterator();
 			for (int zaehler = 0; zaehler < keys.size(); zaehler++) {
-				IntegerTriple colkey = iterator.next();
+				ComparableTriple<Integer,Integer,Integer> colkey = iterator.next();
 				if (colkey.getFirst() == i || colkey.getSecond() == i) {
 					BitSet mdsCols = colMDS.get(colkey);
 					if (mdsCols.get(x) && mdsCols.get(y)) {
@@ -633,17 +633,17 @@ public class PClustering<V extends RealVector<V, Double>> extends
 	 * @param colkey
 	 *            key of the colMDS currently worked at
 	 */
-	private void pruneColMDS(IntegerTriple colkey) {
+	private void pruneColMDS(ComparableTriple<Integer,Integer,Integer> colkey) {
 		int counter = 0;
 		int x = colkey.getFirst();
 		int y = colkey.getSecond();
 		BitSet mdsCols = colMDS.get(colkey);// Rows assigned to columns "colkey"
 		for (int i = mdsCols.nextSetBit(0); i >= 0; i = mdsCols
 				.nextSetBit(i + 1)) {
-			Set<IntegerTriple> keys = rowMDS.keySet();
-			Iterator<IntegerTriple> iterator = keys.iterator();
+			Set<ComparableTriple<Integer,Integer,Integer>> keys = rowMDS.keySet();
+			Iterator<ComparableTriple<Integer,Integer,Integer>> iterator = keys.iterator();
 			for (int zaehler = 0; zaehler < keys.size(); zaehler++) {
-				IntegerTriple rowkey = iterator.next();
+				ComparableTriple<Integer,Integer,Integer> rowkey = iterator.next();
 				if (rowkey.getFirst() == i || rowkey.getSecond() == i) {
 					BitSet mdsRows = rowMDS.get(rowkey);
 					if (mdsRows.get(x) && mdsRows.get(y)) {

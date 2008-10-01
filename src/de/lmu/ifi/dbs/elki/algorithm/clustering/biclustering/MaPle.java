@@ -3,12 +3,12 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering;
 import de.lmu.ifi.dbs.elki.algorithm.result.clustering.biclustering.Bicluster;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.IntegerTriple;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparableTriple;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -133,7 +133,7 @@ public class MaPle<V extends RealVector<V, Double>> extends
 	 * rows. The third value enumerates the MDS, in case the same two rows form
 	 * more then one MDS.
 	 */
-	private Map<IntegerTriple, BitSet> rowMDS;
+	private Map<ComparableTriple<Integer,Integer,Integer>, BitSet> rowMDS;
 
 	/**
 	 * Matches three integer-values with the corresponding rows, forming a
@@ -143,7 +143,7 @@ public class MaPle<V extends RealVector<V, Double>> extends
 	 * columns. The third value enumerates the MDS, in case the same two columns
 	 * form more then one MDS.
 	 */
-	private Map<IntegerTriple, BitSet> colMDS;
+	private Map<ComparableTriple<Integer,Integer,Integer>, BitSet> colMDS;
 
 	/**
 	 * Threshold value to determine the maximal acceptable score of a bicluster.
@@ -214,8 +214,8 @@ public class MaPle<V extends RealVector<V, Double>> extends
 	 * Initiates the necessary structures for the following algorithm
 	 */
 	private void initiateMaple() {
-		rowMDS = new HashMap<IntegerTriple, BitSet>();
-		colMDS = new HashMap<IntegerTriple, BitSet>();
+		rowMDS = new HashMap<ComparableTriple<Integer,Integer,Integer>, BitSet>();
+		colMDS = new HashMap<ComparableTriple<Integer,Integer,Integer>, BitSet>();
 		int rowDim = super.getRowDim();
 		int colDim = super.getColDim();
 		rows = new BitSet();
@@ -245,7 +245,7 @@ public class MaPle<V extends RealVector<V, Double>> extends
 					colmdss++;
 				}
 				for (int i = 0; i < size; i++) {
-					IntegerTriple cols = new IntegerTriple(a, b, i);
+					ComparableTriple<Integer,Integer,Integer> cols = new ComparableTriple<Integer,Integer,Integer>(a, b, i);
 					colMDS.put(cols, mds.get(i));
 				}
 			}
@@ -269,7 +269,7 @@ public class MaPle<V extends RealVector<V, Double>> extends
 						rowmdss++;
 					}
 					for (int i = 0; i < size; i++) {
-						IntegerTriple rows = new IntegerTriple(x, y, i);
+						ComparableTriple<Integer,Integer,Integer> rows = new ComparableTriple<Integer,Integer,Integer>(x, y, i);
 						rowMDS.put(rows, mds.get(i));
 					}
 				}
@@ -286,10 +286,10 @@ public class MaPle<V extends RealVector<V, Double>> extends
 	private void makeAttributeList() {
 		// Making AttributeRanks
 		Map<Integer, BitSet> attributeRanks = new HashMap<Integer, BitSet>();
-		Set<IntegerTriple> keySet = colMDS.keySet();
-		Iterator<IntegerTriple> iterator = keySet.iterator();
+		Set<ComparableTriple<Integer,Integer,Integer>> keySet = colMDS.keySet();
+		Iterator<ComparableTriple<Integer,Integer,Integer>> iterator = keySet.iterator();
 		for (int i = 0; i < keySet.size(); i++) {
-			IntegerTriple key = iterator.next();
+			ComparableTriple<Integer,Integer,Integer> key = iterator.next();
 			BitSet newSet = (BitSet) colMDS.get(key).clone();
 
 			BitSet oldSet = attributeRanks.get(key.getFirst());
@@ -363,13 +363,13 @@ public class MaPle<V extends RealVector<V, Double>> extends
 			int a) {
 		ArrayList<BitSet> rowsSet = new ArrayList<BitSet>();
 		if (a < 0) {
-			IntegerTriple mdsKey = new IntegerTriple();
+			ComparableTriple<Integer,Integer,Integer> mdsKey = new ComparableTriple<Integer,Integer,Integer>(0,0,0);
 			mdsKey.setFirst(attributes.nextSetBit(0));
 			mdsKey.setSecond(attributes.nextSetBit(mdsKey.getFirst() + 1));
 			boolean exists = true;
 			int counter = 0;
 			while (exists) {
-				mdsKey.setLast(counter);
+				mdsKey.setThird(counter);
 				if (colMDS.containsKey(mdsKey)) {
 					rowsSet.add(colMDS.get(mdsKey));
 					counter++;
@@ -402,7 +402,7 @@ public class MaPle<V extends RealVector<V, Double>> extends
 	 */
 	private ArrayList<BitSet> makeAllPermutations(BitSet oldRows,
 			BitSet attributes, int a, ArrayList<BitSet> rowsSet) {
-		IntegerTriple mdsKey = new IntegerTriple();
+		ComparableTriple<Integer,Integer,Integer> mdsKey = new ComparableTriple<Integer,Integer,Integer>(0,0,0);
 		int i = attributes.nextSetBit(0);
 		if (i < 0) {
 
@@ -412,7 +412,7 @@ public class MaPle<V extends RealVector<V, Double>> extends
 		mdsKey.setFirst(Math.min(i, a));
 		mdsKey.setSecond(Math.max(i, a));
 		int var = 0;
-		mdsKey.setLast(var);
+		mdsKey.setThird(var);
 		while (colMDS.containsKey(mdsKey)) {
 			BitSet mds = colMDS.get(mdsKey);
 			BitSet newRows = (BitSet) oldRows.clone();
@@ -423,7 +423,7 @@ public class MaPle<V extends RealVector<V, Double>> extends
 				makeAllPermutations(newRows, newAttributes, a, rowsSet);
 			}
 			var++;
-			mdsKey.setLast(var);
+			mdsKey.setThird(var);
 		}
 		return rowsSet;
 	}
@@ -474,7 +474,7 @@ public class MaPle<V extends RealVector<V, Double>> extends
 						.nextSetBit(j + 1)) {
 
 					for (int counter = 0; true; counter++) {
-						IntegerTriple key = new IntegerTriple(i, j, counter);
+						ComparableTriple<Integer,Integer,Integer> key = new ComparableTriple<Integer,Integer,Integer>(i, j, counter);
 						BitSet mds = rowMDS.get(key);
 						if (mds == null) {
 							break;
@@ -578,7 +578,7 @@ public class MaPle<V extends RealVector<V, Double>> extends
 			for (int j = rows.nextSetBit(i + 1); j >= 0; j = rows
 					.nextSetBit(j + 1)) {
 				for (int counter = 0; true; counter++) {
-					IntegerTriple key = new IntegerTriple(i, j, counter);
+					ComparableTriple<Integer,Integer,Integer> key = new ComparableTriple<Integer,Integer,Integer>(i, j, counter);
 					BitSet currCols = rowMDS.get(key);
 					if (currCols == null) {
 						break;
@@ -608,7 +608,7 @@ public class MaPle<V extends RealVector<V, Double>> extends
 					.nextSetBit(j + 1)) {
 				contains = false;
 				for (int counter = 0; true; counter++) {
-					IntegerTriple key = new IntegerTriple(i, j, counter);
+					ComparableTriple<Integer,Integer,Integer> key = new ComparableTriple<Integer,Integer,Integer>(i, j, counter);
 					BitSet currCols = rowMDS.get(key);
 					if (currCols == null) {
 						break;
@@ -637,15 +637,15 @@ public class MaPle<V extends RealVector<V, Double>> extends
 	 * @param mds
 	 *            rowMDS or colMDS
 	 */
-	private void countOccurrences(Map<IntegerTriple, BitSet> mds) {
+	private void countOccurrences(Map<ComparableTriple<Integer,Integer,Integer>, BitSet> mds) {
 		clusterOccurrences = new HashMap<Integer, Integer>();
 
 		pairOccurrences = new HashMap<Integer, Integer>();
 
-		Set<IntegerTriple> colkeys = mds.keySet();
-		Iterator<IntegerTriple> iterator = colkeys.iterator();
+		Set<ComparableTriple<Integer,Integer,Integer>> colkeys = mds.keySet();
+		Iterator<ComparableTriple<Integer,Integer,Integer>> iterator = colkeys.iterator();
 		for (int zaehler = 0; zaehler < colkeys.size(); zaehler++) {
-			IntegerTriple iter = iterator.next();
+			ComparableTriple<Integer,Integer,Integer> iter = iterator.next();
 			int newAttrValue = 1;
 			if (pairOccurrences.containsKey(iter.getFirst())) {
 				newAttrValue = pairOccurrences.get(iter.getFirst()) + 1;
@@ -677,11 +677,11 @@ public class MaPle<V extends RealVector<V, Double>> extends
 	 * @param pair
 	 *            rowMDS or columnMDS
 	 */
-	private void removeFromMDS(int what, Map<IntegerTriple, BitSet> pair) {
-		Iterator<IntegerTriple> iterator = pair.keySet().iterator();
-		ArrayList<IntegerTriple> toremove = new ArrayList<IntegerTriple>();
+	private void removeFromMDS(int what, Map<ComparableTriple<Integer,Integer,Integer>, BitSet> pair) {
+		Iterator<ComparableTriple<Integer,Integer,Integer>> iterator = pair.keySet().iterator();
+		ArrayList<ComparableTriple<Integer,Integer,Integer>> toremove = new ArrayList<ComparableTriple<Integer,Integer,Integer>>();
 		for (int i = 0; i < pair.size(); i++) {
-			IntegerTriple key = iterator.next();
+			ComparableTriple<Integer,Integer,Integer> key = iterator.next();
 			if (key.getFirst() == what || key.getSecond() == what) {
 				toremove.add(key);
 			}
@@ -700,19 +700,19 @@ public class MaPle<V extends RealVector<V, Double>> extends
 	 * @param toremove
 	 *            list of keys to the MDSs in mds
 	 */
-	private void removeAndUpdate(Map<IntegerTriple, BitSet> mds,
-			ArrayList<IntegerTriple> toremove) {
+	private void removeAndUpdate(Map<ComparableTriple<Integer,Integer,Integer>, BitSet> mds,
+			ArrayList<ComparableTriple<Integer,Integer,Integer>> toremove) {
 		for (int i = 0; i < toremove.size(); i++) {
-			IntegerTriple key = toremove.get(i);
+			ComparableTriple<Integer,Integer,Integer> key = toremove.get(i);
 			mds.remove(key);
-			for (int j = key.getLast() + 1; true; j++) {
-				key.setLast(j);
+			for (int j = key.getThird() + 1; true; j++) {
+				key.setThird(j);
 				if (!mds.containsKey(key)) {
 					break;
 				}
 				BitSet updateKeySet = (BitSet) mds.get(key).clone();
 				mds.remove(key);
-				IntegerTriple newKey = new IntegerTriple(key.getFirst(), key
+				ComparableTriple<Integer,Integer,Integer> newKey = new ComparableTriple<Integer,Integer,Integer>(key.getFirst(), key
 						.getSecond(), j - 1);
 				mds.put(newKey, updateKeySet);
 			}
@@ -729,11 +729,11 @@ public class MaPle<V extends RealVector<V, Double>> extends
 	 *            minimal number of rows/columns which a bicluster must contain.
 	 *            Is set to nr if mds is a rowCluster, nc otherwise.
 	 */
-	private void removeMDS(Map<IntegerTriple, BitSet> mds, int min) {
-		ArrayList<IntegerTriple> toRemove = new ArrayList<IntegerTriple>();
-		Iterator<IntegerTriple> iterator = mds.keySet().iterator();
+	private void removeMDS(Map<ComparableTriple<Integer,Integer,Integer>, BitSet> mds, int min) {
+		ArrayList<ComparableTriple<Integer,Integer,Integer>> toRemove = new ArrayList<ComparableTriple<Integer,Integer,Integer>>();
+		Iterator<ComparableTriple<Integer,Integer,Integer>> iterator = mds.keySet().iterator();
 		for (int i = 0; i < mds.size(); i++) {
-			IntegerTriple key = iterator.next();
+			ComparableTriple<Integer,Integer,Integer> key = iterator.next();
 			BitSet cluster = mds.get(key);
 			if (cluster.cardinality() < min) {
 				toRemove.add(key);
@@ -768,9 +768,9 @@ public class MaPle<V extends RealVector<V, Double>> extends
 			}
 		}
 
-		Iterator<IntegerTriple> iter = colMDS.keySet().iterator();
+		Iterator<ComparableTriple<Integer,Integer,Integer>> iter = colMDS.keySet().iterator();
 		for (int i = 0; i < colMDS.size(); i++) {
-			IntegerTriple key = iter.next();
+			ComparableTriple<Integer,Integer,Integer> key = iter.next();
 			colMDS.get(key).andNot(rowsToRemove);
 		}
 
@@ -810,9 +810,9 @@ public class MaPle<V extends RealVector<V, Double>> extends
 				}
 			}
 
-			Iterator<IntegerTriple> iter = rowMDS.keySet().iterator();
+			Iterator<ComparableTriple<Integer,Integer,Integer>> iter = rowMDS.keySet().iterator();
 			for (int i = 0; i < rowMDS.size(); i++) {
-				IntegerTriple key = iter.next();
+				ComparableTriple<Integer,Integer,Integer> key = iter.next();
 				rowMDS.get(key).andNot(colsToRemove);
 			}
 
@@ -843,7 +843,7 @@ public class MaPle<V extends RealVector<V, Double>> extends
 
 			iter = colMDS.keySet().iterator();
 			for (int i = 0; i < colMDS.size(); i++) {
-				IntegerTriple key = iter.next();
+				ComparableTriple<Integer,Integer,Integer> key = iter.next();
 				colMDS.get(key).andNot(rowsToRemove);
 			}
 

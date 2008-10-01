@@ -90,6 +90,10 @@ public final class SimplePair<FIRST, SECOND> implements PairInterface<FIRST, SEC
   public int hashCode() {
     // primitive hash function mixing the two integers.
     // this number does supposedly not have any factors in common with 2^32
-    return (int) (this.first.hashCode() * 2654435761L + second.hashCode());
+    final long prime = 2654435761L;
+    long result = 1;
+    result = prime * result + ((first == null) ? 0 : first.hashCode());
+    result = prime * result + ((second == null) ? 0 : second.hashCode());
+    return (int) result;
   }
 }
