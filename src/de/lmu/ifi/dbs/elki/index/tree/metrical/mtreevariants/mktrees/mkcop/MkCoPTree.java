@@ -81,6 +81,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
      *
      * @param entry the entry to be inserted
      */
+    @Override
     protected void preInsert(MkCoPEntry<D, N> entry) {
         throw new UnsupportedOperationException("Insertion of single objects is not supported!");
     }
@@ -131,6 +132,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
      * @param k      the number of nearest neighbors to be returned
      * @return a List of the query results
      */
+    @Override
     public List<QueryResult<D>> reverseKNNQuery(O object, int k) {
         if (k > this.k_max) {
             throw new IllegalArgumentException("Parameter k has to be less or equal than "
@@ -196,6 +198,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
         return k_max;
     }
 
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
@@ -213,6 +216,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     /**
      * Determines the maximum and minimum number of entries in a node.
      */
+    @Override
     protected void initializeCapacities(O object, boolean verbose) {
         D dummyDistance = getDistanceFunction().nullDistance();
         int distanceSize = dummyDistance.externalizableSize();
@@ -785,6 +789,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
      * @param capacity the capacity of the new node
      * @return a new leaf node
      */
+    @Override
     protected MkCoPTreeNode<O, D, N> createNewLeafNode(int capacity) {
         return new MkCoPTreeNode<O, D, N>(file, capacity, true);
     }
@@ -795,6 +800,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
      * @param capacity the capacity of the new node
      * @return a new directory node
      */
+    @Override
     protected MkCoPTreeNode<O, D, N> createNewDirectoryNode(int capacity) {
         return new MkCoPTreeNode<O, D, N>(file, capacity, false);
     }
@@ -806,6 +812,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
      * @param object         the data object to be represented by the new entry
      * @param parentDistance the distance from the object to the routing object of the parent node
      */
+    @Override
     protected MkCoPEntry<D, N> createNewLeafEntry(O object, D parentDistance) {
         MkCoPLeafEntry<D, N> leafEntry = new MkCoPLeafEntry<D, N>(object.getID(), parentDistance, null, null);
         return leafEntry;
@@ -818,6 +825,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
      * @param routingObjectID the id of the routing object of the node
      * @param parentDistance  the distance from the routing object of the node to the routing object of the parent node
      */
+    @Override
     protected MkCoPEntry<D, N> createNewDirectoryEntry(MkCoPTreeNode<O, D, N> node, Integer routingObjectID,
                                                        D parentDistance) {
         return new MkCoPDirectoryEntry<D, N>(routingObjectID, parentDistance, node.getID(),
@@ -831,6 +839,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
      *
      * @return an entry representing the root node
      */
+    @Override
     protected MkCoPEntry<D, N> createRootEntry() {
         return new MkCoPDirectoryEntry<D, N>(null, null, 0, null, null);
     }

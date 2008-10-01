@@ -34,6 +34,7 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
   /**
    * Initializes the flat RTree from an existing persistent file.
    */
+  @Override
   protected void initializeFromFile() {
     super.initializeFromFile();
 
@@ -55,6 +56,7 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
    *
    * @return the root node of this RTree
    */
+  @Override
   public FlatRStarTreeNode getRoot() {
     return root;
   }
@@ -64,6 +66,7 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
    *
    * @return 2
    */
+  @Override
   protected int computeHeight() {
     return 2;
   }
@@ -75,6 +78,7 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
    *
    * @param objects the data objects to be indexed
    */
+  @Override
   protected void bulkLoad(List<O> objects) {
     // create leaf nodes
     //noinspection PointlessArithmeticExpression
@@ -104,6 +108,7 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
     }
   }
 
+  @Override
   protected void createEmptyRoot(O object) {
     root = createNewDirectoryNode(dirCapacity);
     root.setID(getRootEntry().getID());
@@ -125,6 +130,7 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
    * @param node the node to be tested for overflow
    * @return true if in the specified node an overflow occured, false otherwise
    */
+  @Override
   protected boolean hasOverflow(FlatRStarTreeNode node) {
     if (node.isLeaf())
       return node.getNumEntries() == leafCapacity;
@@ -140,6 +146,7 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
    * @param node the node to be tested for underflow
    * @return true if in the specified node an underflow occured, false otherwise
    */
+  @Override
   protected boolean hasUnderflow(FlatRStarTreeNode node) {
     if (node.isLeaf()) {
       return node.getNumEntries() < leafMinimum;
@@ -153,6 +160,7 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
    * @param capacity the capacity of the new node
    * @return a new leaf node
    */
+  @Override
   protected FlatRStarTreeNode createNewLeafNode(int capacity) {
     return new FlatRStarTreeNode(file, capacity, true);
   }
@@ -163,18 +171,22 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
    * @param capacity the capacity of the new node
    * @return a new directory node
    */
+  @Override
   protected FlatRStarTreeNode createNewDirectoryNode(int capacity) {
     return new FlatRStarTreeNode(file, capacity, false);
   }
 
+  @Override
   protected SpatialEntry createNewLeafEntry(O o) {
     return new SpatialLeafEntry(o.getID(), getValues(o));
   }
 
+  @Override
   protected SpatialEntry createNewDirectoryEntry(FlatRStarTreeNode node) {
     return new SpatialDirectoryEntry(node.getID(), node.mbr());
   }
 
+  @Override
   protected SpatialEntry createRootEntry() {
     return new SpatialDirectoryEntry(0, null);
   }
@@ -184,6 +196,7 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
    *
    * @param entry the entry to be inserted
    */
+  @Override
   protected void preInsert(SpatialEntry entry) {
     // do nothing
   }
@@ -193,6 +206,7 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
    *
    * @param o the object to be deleted
    */
+  @Override
   protected void postDelete(O o) {
     // do nothing
   }

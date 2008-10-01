@@ -98,10 +98,12 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
      *
      * @throws UnsupportedOperationException
      */
+    @Override
     protected final void postDelete(O o) {
         throw new UnsupportedOperationException("Deletion of objects is not yet supported by an M-Tree!");
     }
 
+    @Override
     public final List<QueryResult<D>> rangeQuery(O object, String epsilon) {
         D range = distanceFunction.valueOf(epsilon);
         final List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
@@ -113,6 +115,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
         return result;
     }
 
+    @Override
     public final List<QueryResult<D>> kNNQuery(O object, int k) {
         if (k < 1) {
             throw new IllegalArgumentException("At least one object has to be requested!");
@@ -123,6 +126,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
         return knnList.toList();
     }
 
+    @Override
     public final DistanceFunction<O, D> getDistanceFunction() {
         return distanceFunction;
     }
@@ -272,6 +276,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
         }
     }
 
+    @Override
     protected final void createEmptyRoot(O object) {
         N root = createNewLeafNode(leafCapacity);
         file.writePage(root);

@@ -42,6 +42,7 @@ class MkAppTreeNode<O extends DatabaseObject, D extends NumberDistance<D, N>, N 
      * @param capacity the capacity of the new node
      * @return a new leaf node
      */
+    @Override
     protected MkAppTreeNode<O, D, N> createNewLeafNode(int capacity) {
         return new MkAppTreeNode<O, D, N>(getFile(), capacity, true);
     }
@@ -52,6 +53,7 @@ class MkAppTreeNode<O extends DatabaseObject, D extends NumberDistance<D, N>, N 
      * @param capacity the capacity of the new node
      * @return a new directory node
      */
+    @Override
     protected MkAppTreeNode<O, D, N> createNewDirectoryNode(int capacity) {
         return new MkAppTreeNode<O, D, N>(getFile(), capacity, false);
     }
@@ -99,12 +101,14 @@ class MkAppTreeNode<O extends DatabaseObject, D extends NumberDistance<D, N>, N 
      *                        to the routing object of the parent node
      * @param mTree           the M-Tree object holding this node
      */
+    @Override
     public void adjustEntry(MkAppEntry<D, N> entry, Integer routingObjectID, D parentDistance,
                             AbstractMTree<O, D, MkAppTreeNode<O, D, N>, MkAppEntry<D, N>> mTree) {
         super.adjustEntry(entry, routingObjectID, parentDistance, mTree);
 //    entry.setKnnDistanceApproximation(knnDistanceApproximation());
     }
 
+    @Override
     protected void test(MkAppEntry<D, N> parentEntry, MkAppTreeNode<O, D, N> parent, int index,
                         AbstractMTree<O, D, MkAppTreeNode<O, D, N>, MkAppEntry<D, N>> mTree) {
         super.test(parentEntry, parent, index, mTree);

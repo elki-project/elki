@@ -151,6 +151,7 @@ public class TreeIndexPath<E extends Entry> {
      *
      * @see de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent#equals(Object)
      */
+    @Override
     @SuppressWarnings("unchecked")
     public boolean equals(Object o) {
         if (o == this)
@@ -178,6 +179,7 @@ public class TreeIndexPath<E extends Entry> {
      *
      * @return the hash code of the last component in the index path
      */
+    @Override
     public int hashCode() {
         return lastPathComponent.hashCode();
     }
@@ -249,6 +251,7 @@ public class TreeIndexPath<E extends Entry> {
      *
      * @return a string representation of the components of this index path
      */
+    @Override
     public String toString() {
         StringBuffer buffer = new StringBuffer("[");
 

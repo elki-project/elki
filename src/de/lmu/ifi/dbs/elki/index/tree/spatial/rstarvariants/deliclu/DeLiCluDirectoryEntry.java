@@ -68,6 +68,7 @@ public class DeLiCluDirectoryEntry extends SpatialDirectoryEntry implements DeLi
    *
    * @return a string representation of this entry
    */
+  @Override
   public String toString() {
     return super.toString() + "[" + hasHandled + "-" + hasUnhandled + "]";
   }

@@ -57,6 +57,7 @@ public class RdKNNLeafEntry<D extends NumberDistance<D,N>, N extends Number>
    * @param out the stream to write the object to
    * @throws java.io.IOException Includes any I/O exceptions that may occur
    */
+  @Override
   public void writeExternal(ObjectOutput out) throws IOException {
     super.writeExternal(out);
     out.writeObject(knnDistance);
@@ -70,6 +71,7 @@ public class RdKNNLeafEntry<D extends NumberDistance<D,N>, N extends Number>
    * @throws java.io.IOException    if I/O errors occur
    * @throws ClassNotFoundException If the class for an object being restored cannot be found.
    */
+  @Override
   @SuppressWarnings("unchecked")
   public void readExternal(ObjectInput in) throws IOException,
                                                   ClassNotFoundException {
@@ -85,6 +87,7 @@ public class RdKNNLeafEntry<D extends NumberDistance<D,N>, N extends Number>
    *         o is an RDkNNLeafEntry and has the same
    *         knnDistance as this entry.
    */
+  @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;

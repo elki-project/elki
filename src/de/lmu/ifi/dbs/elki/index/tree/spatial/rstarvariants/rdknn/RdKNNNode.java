@@ -52,6 +52,7 @@ public class RdKNNNode<D extends NumberDistance<D,N>, N extends Number> extends 
    * @param capacity the capacity of the new node
    * @return a new leaf node
    */
+  @Override
   protected RdKNNNode<D,N> createNewLeafNode(int capacity) {
     return new RdKNNNode<D,N>(getFile(), capacity, true);
   }
@@ -62,10 +63,12 @@ public class RdKNNNode<D extends NumberDistance<D,N>, N extends Number> extends 
    * @param capacity the capacity of the new node
    * @return a new directory node
    */
+  @Override
   protected RdKNNNode<D,N> createNewDirectoryNode(int capacity) {
     return new RdKNNNode<D,N>(getFile(), capacity, false);
   }
 
+  @Override
   public void adjustEntry(RdKNNEntry<D,N> entry) {
     super.adjustEntry(entry);
     entry.setKnnDistance(kNNDistance());
@@ -78,6 +81,7 @@ public class RdKNNNode<D extends NumberDistance<D,N>, N extends Number> extends 
    * @param parent the parent holding the entry representing this node
    * @param index  the index of the entry in the parents child arry
    */
+  @Override
   protected void testEntry(RdKNNNode<D,N> parent, int index) {
     super.testEntry(parent, index);
     // test if knn distance is correctly set

@@ -78,6 +78,7 @@ class MkTabLeafEntry<D extends Distance<D>> extends MTreeLeafEntry<D> implements
    * @param out the stream to write the object to
    * @throws java.io.IOException Includes any I/O exceptions that may occur
    */
+  @Override
   public void writeExternal(ObjectOutput out) throws IOException {
     super.writeExternal(out);
     out.writeInt(k_max);
@@ -94,6 +95,7 @@ class MkTabLeafEntry<D extends Distance<D>> extends MTreeLeafEntry<D> implements
    * @throws java.io.IOException    if I/O errors occur
    * @throws ClassNotFoundException If the class for an object being restored cannot be found.
    */
+  @Override
   @SuppressWarnings("unchecked")
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     super.readExternal(in);
@@ -112,6 +114,7 @@ class MkTabLeafEntry<D extends Distance<D>> extends MTreeLeafEntry<D> implements
    *         o is an MkTabLeafEntry and has the same parameter k_max and
    *         knnDistances as this entry.
    */
+  @Override
   @SuppressWarnings("unchecked")
   public boolean equals(Object o) {
     if (this == o) return true;

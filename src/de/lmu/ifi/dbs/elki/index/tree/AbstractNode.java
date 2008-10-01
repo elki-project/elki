@@ -95,6 +95,7 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
      * Calls the super method and writes the id of this node, the numEntries and the entries array to the
      * specified stream.
      */
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
         out.writeInt(numEntries);
@@ -110,6 +111,7 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
      * @throws ClassNotFoundException If the class for an object being
      *                                restored cannot be found.
      */
+    @Override
     @SuppressWarnings("unchecked")
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);

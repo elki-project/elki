@@ -97,6 +97,7 @@ public class SpatialLeafEntry extends AbstractEntry implements SpatialEntry {
    * @param out the stream to write the object to
    * @throws java.io.IOException Includes any I/O exceptions that may occur
    */
+  @Override
   public void writeExternal(ObjectOutput out) throws IOException {
     super.writeExternal(out);
     out.writeObject(values);
@@ -110,6 +111,7 @@ public class SpatialLeafEntry extends AbstractEntry implements SpatialEntry {
    * @throws java.io.IOException    if I/O errors occur
    * @throws ClassNotFoundException If the class for an object being restored cannot be found.
    */
+  @Override
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     super.readExternal(in);
     this.values = (double[]) in.readObject();

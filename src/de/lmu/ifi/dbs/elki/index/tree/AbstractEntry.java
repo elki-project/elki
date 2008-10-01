@@ -72,6 +72,7 @@ public abstract class AbstractEntry implements Entry {
      * @return true, if o is an AbstractEntry and has the same
      *         id as this entry.
      */
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -86,6 +87,7 @@ public abstract class AbstractEntry implements Entry {
      *
      * @return the id of the entry
      */
+    @Override
     public int hashCode() {
         return id;
     }
@@ -95,6 +97,7 @@ public abstract class AbstractEntry implements Entry {
      *
      * @return a string representation of this entry
      */
+    @Override
     public String toString() {
         if (isLeafEntry())
             return "o_" + id;

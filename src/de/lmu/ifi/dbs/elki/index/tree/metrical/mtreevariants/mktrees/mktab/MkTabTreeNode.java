@@ -44,6 +44,7 @@ class MkTabTreeNode<O extends DatabaseObject, D extends Distance<D>> extends Abs
      * @param capacity the capacity of the new node
      * @return a new leaf node
      */
+    @Override
     protected MkTabTreeNode<O, D> createNewLeafNode(int capacity) {
         return new MkTabTreeNode<O, D>(getFile(), capacity, true);
     }
@@ -54,6 +55,7 @@ class MkTabTreeNode<O extends DatabaseObject, D extends Distance<D>> extends Abs
      * @param capacity the capacity of the new node
      * @return a new directory node
      */
+    @Override
     protected MkTabTreeNode<O, D> createNewDirectoryNode(int capacity) {
         return new MkTabTreeNode<O, D>(getFile(), capacity, false);
     }
@@ -84,6 +86,7 @@ class MkTabTreeNode<O extends DatabaseObject, D extends Distance<D>> extends Abs
         return result;
     }
 
+    @Override
     public void adjustEntry(MkTabEntry<D> entry, Integer routingObjectID, D parentDistance, AbstractMTree<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> mTree) {
         super.adjustEntry(entry, routingObjectID, parentDistance, mTree);
         // adjust knn distances
@@ -98,6 +101,7 @@ class MkTabTreeNode<O extends DatabaseObject, D extends Distance<D>> extends Abs
      * @param index  the index of the entry in the parents child arry
      * @param mTree  the underlying M-Tree
      */
+    @Override
     protected void test(MkTabEntry<D> parentEntry, MkTabTreeNode<O, D> parent, int index, AbstractMTree<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> mTree) {
         super.test(parentEntry, parent, index, mTree);
         // test knn distances

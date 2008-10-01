@@ -62,6 +62,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>>
     /**
      * Does nothing because no operations are necessary before inserting an entry.
      */
+    @Override
     protected void preInsert(MTreeEntry<D> entry) {
         // do nothing
     }
@@ -72,10 +73,12 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>>
      *
      * @throws UnsupportedOperationException
      */
+    @Override
     public List<QueryResult<D>> reverseKNNQuery(O object, int k) {
         throw new UnsupportedOperationException("Reverse knn-queries are not yet supported!");
     }
 
+    @Override
     protected void initializeCapacities(O object, boolean verbose) {
         D dummyDistance = getDistanceFunction().nullDistance();
         int distanceSize = dummyDistance.externalizableSize();
@@ -117,6 +120,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>>
     /**
      * @return a new MTreeLeafEntry representing the specified data object
      */
+    @Override
     protected MTreeEntry<D> createNewLeafEntry(O object, D parentDistance) {
         return new MTreeLeafEntry<D>(object.getID(), parentDistance);
     }
@@ -124,6 +128,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>>
     /**
      * @return a new MTreeDirectoryEntry representing the specified node
      */
+    @Override
     protected MTreeEntry<D> createNewDirectoryEntry(MTreeNode<O, D> node, Integer routingObjectID, D parentDistance) {
         return new MTreeDirectoryEntry<D>(routingObjectID, parentDistance, node.getID(),
             node.coveringRadius(routingObjectID, this));
@@ -133,6 +138,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>>
      * @return a new MTreeDirectoryEntry by calling
      *         <code>new MTreeDirectoryEntry<D>(null, null, 0, null)</code>
      */
+    @Override
     protected MTreeEntry<D> createRootEntry() {
         return new MTreeDirectoryEntry<D>(null, null, 0, null);
     }
@@ -140,6 +146,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>>
     /**
      * @return a new MTreeNode which is a leaf node
      */
+    @Override
     protected MTreeNode<O, D> createNewLeafNode(int capacity) {
         return new MTreeNode<O, D>(file, capacity, true);
     }
@@ -147,6 +154,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>>
     /**
      * @return a new MTreeNode which is a directory node
      */
+    @Override
     protected MTreeNode<O, D> createNewDirectoryNode(int capacity) {
         return new MTreeNode<O, D>(file, capacity, false);
     }

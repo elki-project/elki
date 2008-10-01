@@ -225,6 +225,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
    * @param distanceFunction the distance function that computes the distances beween the objects
    * @return a List of the query results
    */
+  @Override
   public <D extends Distance<D>> List<QueryResult<D>> rangeQuery(O object, String epsilon,
                                                                  DistanceFunction<O, D> distanceFunction) {
 
@@ -281,6 +282,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
    * @param distanceFunction the distance function that computes the distances beween the objects
    * @return a List of the query results
    */
+  @Override
   public <D extends Distance<D>> List<QueryResult<D>> kNNQuery(O object, int k,
                                                                DistanceFunction<O, D> distanceFunction) {
     if (k < 1) {
@@ -301,6 +303,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
    * @param distanceFunction the distance function that computes the distances beween the objects
    * @return a List of the query results
    */
+  @Override
   public <D extends Distance<D>> List<List<QueryResult<D>>> bulkKNNQueryForIDs(List<Integer> ids, int k, SpatialDistanceFunction<O, D> distanceFunction) {
     if (k < 1) {
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
@@ -329,6 +332,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
    * @param distanceFunction the distance function that computes the distances beween the objects
    * @return a List of the query results
    */
+  @Override
   public <D extends Distance<D>> List<QueryResult<D>> reverseKNNQuery(O object, int k, DistanceFunction<O, D> distanceFunction) {
     throw new UnsupportedOperationException("Not yet supported!");
   }
@@ -338,6 +342,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
    *
    * @return a list of entries pointing to the leaf nodes of this spatial index
    */
+  @Override
   public final List<E> getLeaves() {
     List<E> result = new ArrayList<E>();
 
@@ -364,6 +369,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
    *
    * @return a string representation of this RTree
    */
+  @Override
   public String toString() {
     StringBuffer result = new StringBuffer();
     int dirNodes = 0;
@@ -419,6 +425,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
   /**
    * Initializes this R*-Tree from an existing persistent file.
    */
+  @Override
   protected void initializeFromFile() {
     super.initializeFromFile();
     // compute height
@@ -432,6 +439,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
     }
   }
 
+  @Override
   protected void initializeCapacities(O object, boolean verbose) {
     int dimensionality = object.getDimensionality();
 

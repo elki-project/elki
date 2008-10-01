@@ -111,6 +111,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
      *
      * @param entry the entry to be inserted
      */
+    @Override
     protected void preInsert(MkAppEntry<D, N> entry) {
         throw new UnsupportedOperationException("Insertion of single objects is not supported!");
     }
@@ -161,6 +162,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
      * @param k      the number of nearest neighbors to be returned
      * @return a List of the query results
      */
+    @Override
     public List<QueryResult<D>> reverseKNNQuery(O object, int k) {
         List<QueryResult<D>> result = doReverseKNNQuery(k, object.getID());
         Collections.sort(result);
@@ -176,6 +178,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
         return k_max;
     }
 
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
@@ -189,6 +192,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     /**
      * Determines the maximum and minimum number of entries in a node.
      */
+    @Override
     protected void initializeCapacities(O object, boolean verbose) {
         D dummyDistance = getDistanceFunction().nullDistance();
         int distanceSize = dummyDistance.externalizableSize();
@@ -432,6 +436,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
      * @param capacity the capacity of the new node
      * @return a new leaf node
      */
+    @Override
     protected MkAppTreeNode<O, D, N> createNewLeafNode(int capacity) {
         return new MkAppTreeNode<O, D, N>(file, capacity, true);
     }
@@ -442,6 +447,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
      * @param capacity the capacity of the new node
      * @return a new directory node
      */
+    @Override
     protected MkAppTreeNode<O, D, N> createNewDirectoryNode(int capacity) {
         return new MkAppTreeNode<O, D, N>(file, capacity, false);
     }
@@ -453,6 +459,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
      * @param object         the data object to be represented by the new entry
      * @param parentDistance the distance from the object to the routing object of the parent node
      */
+    @Override
     protected MkAppEntry<D, N> createNewLeafEntry(O object, D parentDistance) {
         return new MkAppLeafEntry<D, N>(object.getID(), parentDistance, null);
     }
@@ -464,6 +471,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
      * @param routingObjectID the id of the routing object of the node
      * @param parentDistance  the distance from the routing object of the node to the routing object of the parent node
      */
+    @Override
     protected MkAppEntry<D, N> createNewDirectoryEntry(MkAppTreeNode<O, D, N> node, Integer routingObjectID,
                                                        D parentDistance) {
         return new MkAppDirectoryEntry<D, N>(routingObjectID, parentDistance, node.getID(),
@@ -476,6 +484,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
      *
      * @return an entry representing the root node
      */
+    @Override
     protected MkAppEntry<D, N> createRootEntry() {
         return new MkAppDirectoryEntry<D, N>(null, null, 0, null, null);
     }

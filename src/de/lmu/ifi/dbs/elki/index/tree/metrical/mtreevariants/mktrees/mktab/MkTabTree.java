@@ -35,6 +35,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>>
      * @throws UnsupportedOperationException since insertion of single
      *                                       objects is not supported
      */
+    @Override
     protected void preInsert(MkTabEntry<D> entry) {
         throw new UnsupportedOperationException("Insertion of single objects is not supported!");
     }
@@ -47,6 +48,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>>
         throw new UnsupportedOperationException("Insertion of single objects is not supported!");
     }
 
+    @Override
     public List<QueryResult<D>> reverseKNNQuery(O object, int k) {
         if (k > this.k_max) {
             throw new IllegalArgumentException("Parameter k has to be less or equal than " +
@@ -60,6 +62,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>>
         return result;
     }
 
+    @Override
     protected void initializeCapacities(O object, boolean verbose) {
         D dummyDistance = getDistanceFunction().nullDistance();
         int distanceSize = dummyDistance.externalizableSize();
@@ -96,6 +99,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>>
 
     }
 
+    @Override
     protected void kNNdistanceAdjustment(MkTabEntry<D> entry, Map<Integer, KNNList<D>> knnLists) {
         MkTabTreeNode<O, D> node = file.readPage(entry.getID());
         List<D> knnDistances_node = initKnnDistanceList();
@@ -116,6 +120,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>>
         entry.setKnnDistances(knnDistances_node);
     }
 
+    @Override
     protected MkTabTreeNode<O, D> createNewLeafNode(int capacity) {
         return new MkTabTreeNode<O, D>(file, capacity, true);
     }
@@ -126,6 +131,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>>
      * @param capacity the capacity of the new node
      * @return a new directory node
      */
+    @Override
     protected MkTabTreeNode<O, D> createNewDirectoryNode(int capacity) {
         return new MkTabTreeNode<O, D>(file, capacity, false);
     }
@@ -138,6 +144,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>>
      * @param parentDistance the distance from the object to the routing object of the
      *                       parent node
      */
+    @Override
     protected MkTabEntry<D> createNewLeafEntry(O object, D parentDistance) {
         return new MkTabLeafEntry<D>(object.getID(), parentDistance, knnDistances(object.getID()));
     }
@@ -150,6 +157,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>>
      * @param parentDistance  the distance from the routing object of the node to the
      *                        routing object of the parent node
      */
+    @Override
     protected MkTabEntry<D> createNewDirectoryEntry(MkTabTreeNode<O, D> node, Integer routingObjectID, D parentDistance) {
         return new MkTabDirectoryEntry<D>(routingObjectID, parentDistance, node.getID(), node.coveringRadius(routingObjectID, this), node
             .kNNDistances(getDistanceFunction()));
@@ -160,6 +168,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>>
      *
      * @return an entry representing the root node
      */
+    @Override
     protected MkTabEntry<D> createRootEntry() {
         return new MkTabDirectoryEntry<D>(null, null, 0, null, initKnnDistanceList());
     }

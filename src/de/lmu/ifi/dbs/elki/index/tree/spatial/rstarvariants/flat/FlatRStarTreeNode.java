@@ -25,6 +25,7 @@ public class FlatRStarTreeNode extends AbstractRStarTreeNode<FlatRStarTreeNode, 
    *
    * @param index the index at which the entry is to be deketed
    */
+  @Override
   public boolean deleteEntry(int index) {
     if (this.getID() == 0 && index == 0 && getNumEntries()==1) return false;
     return super.deleteEntry(index);
@@ -42,10 +43,12 @@ public class FlatRStarTreeNode extends AbstractRStarTreeNode<FlatRStarTreeNode, 
     super(file, capacity, isLeaf);
   }
 
+  @Override
   protected FlatRStarTreeNode createNewLeafNode(int capacity) {
     return new FlatRStarTreeNode(getFile(), capacity, true);
   }
 
+  @Override
   protected FlatRStarTreeNode createNewDirectoryNode(int capacity) {
     return new FlatRStarTreeNode(getFile(), capacity, false);
   }

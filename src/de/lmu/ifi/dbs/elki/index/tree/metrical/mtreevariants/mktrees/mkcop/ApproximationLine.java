@@ -142,6 +142,7 @@ public class ApproximationLine implements Externalizable {
    * @return <code>true</code> if this object is the same as the obj
    *         argument; <code>false</code> otherwise.
    */
+  @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
@@ -157,6 +158,7 @@ public class ApproximationLine implements Externalizable {
    *
    * @return a hash code value for this object.
    */
+  @Override
   public int hashCode() {
     int result;
     long temp;
@@ -172,6 +174,7 @@ public class ApproximationLine implements Externalizable {
    *
    * @return a string representation of the object.
    */
+  @Override
   public String toString() {
     return "m = " + m + ", t = " + t + " k_0 " + k_0;
   }

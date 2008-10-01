@@ -27,14 +27,17 @@ public class RStarTree<O extends NumberVector<O,? >> extends NonFlatRStarTree<O,
   /**
    * Creates an entry representing the root node.
    */
+  @Override
   protected SpatialEntry createRootEntry() {
     return new SpatialDirectoryEntry(0, null);
   }
 
+  @Override
   protected SpatialEntry createNewLeafEntry(O o) {
     return new SpatialLeafEntry(o.getID(), getValues(o));
   }
 
+  @Override
   protected SpatialEntry createNewDirectoryEntry(RStarTreeNode node) {
     return new SpatialDirectoryEntry(node.getID(), node.mbr());
   }
@@ -45,6 +48,7 @@ public class RStarTree<O extends NumberVector<O,? >> extends NonFlatRStarTree<O,
    * @param capacity the capacity of the new node
    * @return a new leaf node
    */
+  @Override
   protected RStarTreeNode createNewLeafNode(int capacity) {
     return new RStarTreeNode(file, capacity, true);
   }
@@ -55,6 +59,7 @@ public class RStarTree<O extends NumberVector<O,? >> extends NonFlatRStarTree<O,
    * @param capacity the capacity of the new node
    * @return a new directory node
    */
+  @Override
   protected RStarTreeNode createNewDirectoryNode(int capacity) {
     return new RStarTreeNode(file, capacity, false);
   }
@@ -64,6 +69,7 @@ public class RStarTree<O extends NumberVector<O,? >> extends NonFlatRStarTree<O,
    *
    * @param entry the entry to be inserted
    */
+  @Override
   protected void preInsert(SpatialEntry entry) {
     // do nothing
   }
@@ -73,6 +79,7 @@ public class RStarTree<O extends NumberVector<O,? >> extends NonFlatRStarTree<O,
    *
    * @param o the object to be deleted
    */
+  @Override
   protected void postDelete(O o) {
     // do nothing
   }

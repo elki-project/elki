@@ -120,6 +120,7 @@ public class PolynomialApproximation implements Externalizable {
    *
    * @return a string representation of the object.
    */
+  @Override
   public String toString() {
     return Format.format(b, 4);
   }

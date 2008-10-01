@@ -58,6 +58,7 @@ public class RdKNNDirectoryEntry<D extends NumberDistance<D, N>, N extends Numbe
      * @param out the stream to write the object to
      * @throws java.io.IOException Includes any I/O exceptions that may occur
      */
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
         out.writeObject(knnDistance);
@@ -71,6 +72,7 @@ public class RdKNNDirectoryEntry<D extends NumberDistance<D, N>, N extends Numbe
      * @throws java.io.IOException    if I/O errors occur
      * @throws ClassNotFoundException If the class for an object being restored cannot be found.
      */
+    @Override
     @SuppressWarnings("unchecked")
     public void readExternal(ObjectInput in) throws IOException,
                                                     ClassNotFoundException {
@@ -86,6 +88,7 @@ public class RdKNNDirectoryEntry<D extends NumberDistance<D, N>, N extends Numbe
      *         o is an RDkNNDirectoryEntry and has the same
      *         knnDistance as this entry.
      */
+    @Override
     @SuppressWarnings("unchecked")
     public boolean equals(Object o) {
         if (this == o) return true;

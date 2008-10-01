@@ -39,6 +39,7 @@ public class PCAFilteredAutotuningRunner<V extends RealVector<V, ?>> extends PCA
    * @param database the database used
    * @return PCA result
    */
+  @Override
   public PCAFilteredResult processIds(Collection<Integer> ids, Database<V> database) {
     // FIXME: We're only supporting QueryResults for now, add compatibility
     // wrapper?
@@ -52,6 +53,7 @@ public class PCAFilteredAutotuningRunner<V extends RealVector<V, ?>> extends PCA
    * @param database the database used
    * @return PCA result
    */
+  @Override
   public PCAFilteredResult processQueryResult(Collection<QueryResult<DoubleDistance>> results, Database<V> database) {
     assertSortedByDistance(results);
     int dim = database.dimensionality();

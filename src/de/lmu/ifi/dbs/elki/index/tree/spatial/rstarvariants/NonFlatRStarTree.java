@@ -49,7 +49,8 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends Ab
 	 * @return true if in the specified node an underflow occured, false
 	 *         otherwise
 	 */
-	protected boolean hasUnderflow(N node) {
+	@Override
+  protected boolean hasUnderflow(N node) {
 		if (node.isLeaf())
 			return node.getNumEntries() < leafMinimum;
 		else
@@ -62,7 +63,8 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends Ab
 	 * 
 	 * @return the height of this RTree
 	 */
-	protected int computeHeight() {
+	@Override
+  protected int computeHeight() {
 		N node = getRoot();
 		int height = 1;
 
@@ -75,7 +77,8 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends Ab
 		return height;
 	}
 
-	protected void createEmptyRoot(O object) {
+	@Override
+  protected void createEmptyRoot(O object) {
 		N root = createNewLeafNode(leafCapacity);
 		file.writePage(root);
     setHeight(1);
@@ -88,7 +91,8 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends Ab
 	 * @param objects
 	 *            the data objects to be indexed
 	 */
-	protected void bulkLoad(List<O> objects) {
+	@Override
+  protected void bulkLoad(List<O> objects) {
 		StringBuffer msg = new StringBuffer();
 		List<SpatialObject> spatialObjects = new ArrayList<SpatialObject>(objects);
 

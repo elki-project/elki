@@ -59,6 +59,7 @@ public class TreeIndexPathComponent<E extends Entry> {
      *
      * @see Entry#equals(Object)
      */
+    @Override
     @SuppressWarnings("unchecked")
     public boolean equals(Object o) {
         if (this == o)
@@ -76,6 +77,7 @@ public class TreeIndexPathComponent<E extends Entry> {
      *
      * @return the hash code of the entry of this component
      */
+    @Override
     public int hashCode() {
         return entry.hashCode();
     }
@@ -86,6 +88,7 @@ public class TreeIndexPathComponent<E extends Entry> {
      * @return a string representation of the entry of this component
      *         followd by the index of this component in its parent
      */
+    @Override
     public String toString() {
         return entry.toString() + " [" + index + "]";
     }

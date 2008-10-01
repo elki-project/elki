@@ -38,6 +38,7 @@ public class RStarTreeNode extends AbstractRStarTreeNode<RStarTreeNode, SpatialE
    * @param capacity the capacity of the new node
    * @return a new leaf node
    */
+  @Override
   protected RStarTreeNode createNewLeafNode(int capacity) {
     return new RStarTreeNode(getFile(), capacity, true);
   }
@@ -49,6 +50,7 @@ public class RStarTreeNode extends AbstractRStarTreeNode<RStarTreeNode, SpatialE
    * @param capacity the capacity of the new node
    * @return a new directory node
    */
+  @Override
   protected RStarTreeNode createNewDirectoryNode(int capacity) {
     return new RStarTreeNode(getFile(), capacity, false);
   }

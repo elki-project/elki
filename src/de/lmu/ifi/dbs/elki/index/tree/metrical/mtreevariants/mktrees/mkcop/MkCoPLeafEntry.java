@@ -119,6 +119,7 @@ class MkCoPLeafEntry<D extends NumberDistance<D, N>, N extends Number> extends M
      * @param out the stream to write the object to
      * @throws java.io.IOException Includes any I/O exceptions that may occur
      */
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
         out.writeObject(conservativeApproximation);
@@ -133,6 +134,7 @@ class MkCoPLeafEntry<D extends NumberDistance<D, N>, N extends Number> extends M
      * @throws java.io.IOException    if I/O errors occur
      * @throws ClassNotFoundException If the class for an object being restored cannot be found.
      */
+    @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
         conservativeApproximation = (ApproximationLine) in.readObject();
@@ -147,6 +149,7 @@ class MkCoPLeafEntry<D extends NumberDistance<D, N>, N extends Number> extends M
      *         o is an MkCoPLeafEntry and has the same
      *         conservative and progressive approximation as this entry.
      */
+    @Override
     @SuppressWarnings("unchecked")
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -170,6 +173,7 @@ class MkCoPLeafEntry<D extends NumberDistance<D, N>, N extends Number> extends M
      *
      * @return a string representation of this entry
      */
+    @Override
     public String toString() {
         return super.toString() +
             "\ncons " + conservativeApproximation + "\n";

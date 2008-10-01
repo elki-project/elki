@@ -146,6 +146,7 @@ public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<
      * @param capacity the capacity of the new node
      * @return a new leaf node
      */
+    @Override
     protected DeLiCluNode createNewLeafNode(int capacity) {
         return new DeLiCluNode(file, capacity, true);
     }
@@ -156,6 +157,7 @@ public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<
      * @param capacity the capacity of the new node
      * @return a new directory node
      */
+    @Override
     protected DeLiCluNode createNewDirectoryNode(int capacity) {
         return new DeLiCluNode(file, capacity, false);
     }
@@ -165,6 +167,7 @@ public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<
      *
      * @param object the data object to be represented by the new entry
      */
+    @Override
     protected DeLiCluEntry createNewLeafEntry(O object) {
         return new DeLiCluLeafEntry(object.getID(), getValues(object));
     }
@@ -174,6 +177,7 @@ public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<
      *
      * @param node the node to be represented by the new entry
      */
+    @Override
     protected DeLiCluEntry createNewDirectoryEntry(DeLiCluNode node) {
         return new DeLiCluDirectoryEntry(node.getID(), node.mbr(), node.hasHandled(), node.hasUnhandled());
     }
@@ -183,6 +187,7 @@ public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<
      *
      * @return an entry representing the root node
      */
+    @Override
     protected DeLiCluEntry createRootEntry() {
         return new DeLiCluDirectoryEntry(0, null, false, true);
     }
@@ -192,6 +197,7 @@ public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<
      *
      * @param entry the entry to be inserted
      */
+    @Override
     protected void preInsert(DeLiCluEntry entry) {
         // do nothing
     }
@@ -201,6 +207,7 @@ public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<
      *
      * @param o the object to be deleted
      */
+    @Override
     protected void postDelete(O o) {
         // do nothing
     }

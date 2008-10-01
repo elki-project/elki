@@ -41,6 +41,7 @@ class MkMaxTreeNode<O extends DatabaseObject, D extends Distance<D>>
     /**
      * @return a new MkMaxTreeNode which is a leaf node
      */
+    @Override
     protected MkMaxTreeNode<O, D> createNewLeafNode(int capacity) {
         return new MkMaxTreeNode<O, D>(getFile(), capacity, true);
     }
@@ -48,6 +49,7 @@ class MkMaxTreeNode<O extends DatabaseObject, D extends Distance<D>>
     /**
      * @return a new MkMaxTreeNode which is a directory node
      */
+    @Override
     protected MkMaxTreeNode<O, D> createNewDirectoryNode(int capacity) {
         return new MkMaxTreeNode<O, D>(getFile(), capacity, false);
     }

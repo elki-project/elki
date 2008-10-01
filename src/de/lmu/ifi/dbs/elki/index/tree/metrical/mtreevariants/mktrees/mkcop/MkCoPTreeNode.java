@@ -39,6 +39,7 @@ class MkCoPTreeNode<O extends DatabaseObject, D extends NumberDistance<D, N>, N 
      * @param capacity the capacity of the new node
      * @return a new leaf node
      */
+    @Override
     protected MkCoPTreeNode<O, D, N> createNewLeafNode(int capacity) {
         return new MkCoPTreeNode<O, D, N>(getFile(), capacity, true);
     }
@@ -49,6 +50,7 @@ class MkCoPTreeNode<O extends DatabaseObject, D extends NumberDistance<D, N>, N 
      * @param capacity the capacity of the new node
      * @return a new directory node
      */
+    @Override
     protected MkCoPTreeNode<O, D, N> createNewDirectoryNode(int capacity) {
         return new MkCoPTreeNode<O, D, N>(getFile(), capacity, false);
     }
@@ -140,6 +142,7 @@ class MkCoPTreeNode<O extends DatabaseObject, D extends NumberDistance<D, N>, N 
         return new ApproximationLine(k_0, m, t);
     }
 
+    @Override
     public void adjustEntry(MkCoPEntry<D, N> entry, Integer routingObjectID, D parentDistance,
                             AbstractMTree<O, D, MkCoPTreeNode<O, D, N>, MkCoPEntry<D, N>> mTree) {
         super.adjustEntry(entry, routingObjectID, parentDistance, mTree);
@@ -148,6 +151,7 @@ class MkCoPTreeNode<O extends DatabaseObject, D extends NumberDistance<D, N>, N 
 //    entry.setConservativeKnnDistanceApproximation(conservativeKnnDistanceApproximation(k_max));
     }
 
+    @Override
     protected void test(MkCoPEntry<D, N> parentEntry, MkCoPTreeNode<O, D, N> parent, int index,
                         AbstractMTree<O, D, MkCoPTreeNode<O, D, N>, MkCoPEntry<D, N>> mTree) {
         super.test(parentEntry, parent, index, mTree);

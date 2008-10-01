@@ -58,6 +58,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
      * a reverse k-nearest neighbor query with k = {@link #k_max}. Then
      * these candidates are refined in a second step.
      */
+    @Override
     public List<QueryResult<D>> reverseKNNQuery(O object, int k) {
         if (k > this.k_max) {
             throw new IllegalArgumentException("Parameter k has to be equal or less than " + "parameter k of the MkMax-Tree!");
@@ -121,6 +122,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
      * Adapts the knn distances before insertion of the specified entry.
      *
      */
+    @Override
     protected void preInsert(MkMaxEntry<D> entry) {
         KNNList<D> knns_o = new KNNList<D>(k_max, getDistanceFunction().infiniteDistance());
         preInsert(entry, getRootEntry(), knns_o);
@@ -129,6 +131,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
     /**
      * Adjusts the knn distance in the subtree of the specified root entry.
      */
+    @Override
     protected void kNNdistanceAdjustment(MkMaxEntry<D> entry, Map<Integer, KNNList<D>> knnLists) {
         MkMaxTreeNode<O, D> node = file.readPage(entry.getID());
         D knnDist_node = getDistanceFunction().nullDistance();
@@ -266,6 +269,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
         nodeEntry.setKnnDistance(knnDist_node);
     }
 
+    @Override
     protected void initializeCapacities(O object, boolean verbose) {
         D dummyDistance = getDistanceFunction().nullDistance();
         int distanceSize = dummyDistance.externalizableSize();
@@ -304,6 +308,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
     /**
      * @return a new MkMaxTreeNode which is a leaf node
      */
+    @Override
     protected MkMaxTreeNode<O, D> createNewLeafNode(int capacity) {
         return new MkMaxTreeNode<O, D>(file, capacity, true);
     }
@@ -311,6 +316,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
     /**
      * @return a new MkMaxTreeNode which is a directory node
      */
+    @Override
     protected MkMaxTreeNode<O, D> createNewDirectoryNode(int capacity) {
         return new MkMaxTreeNode<O, D>(file, capacity, false);
     }
@@ -318,6 +324,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
     /**
      * @return a new MkMaxLeafEntry representing the specified data object
      */
+    @Override
     protected MkMaxEntry<D> createNewLeafEntry(O object, D parentDistance) {
         KNNList<D> knns = new KNNList<D>(k_max - 1, getDistanceFunction().infiniteDistance());
         doKNNQuery(object.getID(), knns);
@@ -328,6 +335,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
     /**
      * @return a new MkMaxDirectoryEntry representing the specified node
      */
+    @Override
     protected MkMaxEntry<D> createNewDirectoryEntry(MkMaxTreeNode<O, D> node, Integer routingObjectID, D parentDistance) {
         return new MkMaxDirectoryEntry<D>(
             routingObjectID,
@@ -341,6 +349,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
      * @return a new MkMaxDirectoryEntry by calling
      *         <code>new MkMaxDirectoryEntry<D>(null, null, 0, null)</code>
      */
+    @Override
     protected MkMaxEntry<D> createRootEntry() {
         return new MkMaxDirectoryEntry<D>(null, null, 0, null, null);
     }

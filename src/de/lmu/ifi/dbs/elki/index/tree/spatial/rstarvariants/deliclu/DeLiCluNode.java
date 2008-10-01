@@ -66,6 +66,7 @@ public class DeLiCluNode extends AbstractRStarTreeNode<DeLiCluNode, DeLiCluEntry
    * @param capacity the capacity of the new node
    * @return a new leaf node
    */
+  @Override
   protected DeLiCluNode createNewLeafNode(int capacity) {
     return new DeLiCluNode(getFile(), capacity, true);
   }
@@ -76,10 +77,12 @@ public class DeLiCluNode extends AbstractRStarTreeNode<DeLiCluNode, DeLiCluEntry
    * @param capacity the capacity of the new node
    * @return a new directory node
    */
+  @Override
   protected DeLiCluNode createNewDirectoryNode(int capacity) {
     return new DeLiCluNode(getFile(), capacity, false);
   }
 
+  @Override
   public void adjustEntry(DeLiCluEntry entry) {
     super.adjustEntry(entry);
     // adjust hasHandled and hasUnhandled flag
@@ -96,6 +99,7 @@ public class DeLiCluNode extends AbstractRStarTreeNode<DeLiCluNode, DeLiCluEntry
    * @param parent the parent holding the entry representing this node
    * @param index  the index of the entry in the parents child arry
    */
+  @Override
   protected void testEntry(DeLiCluNode parent, int index) {
     super.testEntry(parent, index);
     // test if hasHandled and hasUnhandled flag are correctly set

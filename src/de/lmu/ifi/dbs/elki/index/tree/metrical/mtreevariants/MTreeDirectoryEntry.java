@@ -123,6 +123,7 @@ public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractEntry im
      * Calls the super method and writes the routingObjectID, the parentDistance
      * and the coveringRadius of this entry to the specified stream.
      */
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
         out.writeInt(routingObjectID);
@@ -134,6 +135,7 @@ public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractEntry im
      * Calls the super method and reads the routingObjectID, the parentDistance
      * and the coveringRadius of this entry from the specified input stream.
      */
+    @Override
     @SuppressWarnings({"unchecked"})
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
@@ -147,6 +149,7 @@ public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractEntry im
      *
      * @return a string representation of this entry
      */
+    @Override
     public String toString() {
         return super.toString() + " (o.id = " + getRoutingObjectID() + ")";
     }
@@ -160,6 +163,7 @@ public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractEntry im
      *         coveringRadius, parentDistance and routingObjectID
      *         as this entry.
      */
+    @Override
     @SuppressWarnings("unchecked")
     public boolean equals(Object o) {
         if (this == o) return true;

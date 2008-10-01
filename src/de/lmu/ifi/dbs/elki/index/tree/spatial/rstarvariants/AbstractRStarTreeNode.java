@@ -249,6 +249,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
    * @param capacity the capacity of the new node
    * @return a new leaf node
    */
+  @Override
   abstract protected N createNewLeafNode(int capacity);
 
   /**
@@ -257,5 +258,6 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
    * @param capacity the capacity of the new node
    * @return a new directory node
    */
+  @Override
   abstract protected N createNewDirectoryNode(int capacity);
 }

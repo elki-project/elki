@@ -83,6 +83,7 @@ class MkAppDirectoryEntry<D extends NumberDistance<D, N>, N extends Number>
      * @param out the stream to write the object to
      * @throws java.io.IOException Includes any I/O exceptions that may occur
      */
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
         out.writeObject(approximation);
@@ -96,6 +97,7 @@ class MkAppDirectoryEntry<D extends NumberDistance<D, N>, N extends Number>
      * @throws java.io.IOException    if I/O errors occur
      * @throws ClassNotFoundException If the class for an object being restored cannot be found.
      */
+    @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
         approximation = (PolynomialApproximation) in.readObject();

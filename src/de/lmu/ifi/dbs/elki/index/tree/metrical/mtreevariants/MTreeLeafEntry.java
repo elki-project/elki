@@ -133,6 +133,7 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractEntry impleme
      *         o is an MTreeLeafEntry and has the same
      *         parentDistance as this entry.
      */
+    @Override
     @SuppressWarnings("unchecked")
     public boolean equals(Object o) {
         if (this == o) return true;

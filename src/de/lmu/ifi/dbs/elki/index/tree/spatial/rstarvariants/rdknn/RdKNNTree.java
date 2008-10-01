@@ -97,6 +97,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
      *
      * @param entry the entry to be inserted
      */
+    @Override
     protected void preInsert(RdKNNEntry<D, N> entry) {
         KNNList<D> knns_o = new KNNList<D>(k_max, distanceFunction.infiniteDistance());
         preInsert(entry, getRootEntry(), knns_o);
@@ -107,6 +108,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
      *
      * @param o the object to be deleted
      */
+    @Override
     protected void postDelete(O o) {
         // reverse knn of o
         List<QueryResult<D>> rnns = new ArrayList<QueryResult<D>>();
@@ -134,6 +136,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
      *
      * @param objects the data objects to be indexed
      */
+    @Override
     protected void bulkLoad(List<O> objects) {
         super.bulkLoad(objects);
 
@@ -159,6 +162,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
      * @param k      the number of nearest neighbors to be returned
      * @return a List of the query results
      */
+    @Override
     @SuppressWarnings("unchecked")
     public <T extends Distance<T>> List<QueryResult<T>> reverseKNNQuery(O object, int k, DistanceFunction<O, T> distanceFunction) {
         if (!distanceFunction.getClass().equals(this.distanceFunction.getClass())) {
@@ -207,10 +211,12 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
 
     }
 
+    @Override
     protected TreeIndexHeader createHeader() {
         return new RdKNNTreeHeader(pageSize, dirCapacity, leafCapacity, dirMinimum, leafCapacity, k_max);
     }
 
+    @Override
     protected void initializeCapacities(O object, boolean verbose) {
         int dimensionality = object.getDimensionality();
         D dummyDistance = distanceFunction.nullDistance();
@@ -266,6 +272,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
         }
     }
 
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
@@ -297,6 +304,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
      *
      * @param database the database
      */
+    @Override
     public void setDatabase(Database<O> database) {
         super.setDatabase(database);
         distanceFunction.setDatabase(database, false, false);
@@ -431,6 +439,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
      * @param capacity the capacity of the new node
      * @return a new leaf node
      */
+    @Override
     protected RdKNNNode<D, N> createNewLeafNode(int capacity) {
         return new RdKNNNode<D, N>(file, capacity, true);
     }
@@ -441,6 +450,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
      * @param capacity the capacity of the new node
      * @return a new directory node
      */
+    @Override
     protected RdKNNNode<D, N> createNewDirectoryNode(int capacity) {
         return new RdKNNNode<D, N>(file, capacity, false);
     }
@@ -450,6 +460,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
      *
      * @param object the data object to be represented by the new entry
      */
+    @Override
     protected RdKNNEntry<D, N> createNewLeafEntry(O object) {
         return new RdKNNLeafEntry<D, N>(object.getID(), getValues(object), distanceFunction.undefinedDistance());
     }
@@ -459,6 +470,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
      *
      * @param node the node to be represented by the new entry
      */
+    @Override
     protected RdKNNEntry<D, N> createNewDirectoryEntry(RdKNNNode<D, N> node) {
         return new RdKNNDirectoryEntry<D, N>(node.getID(), node.mbr(), node.kNNDistance());
     }
@@ -468,6 +480,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
      *
      * @return an entry representing the root node
      */
+    @Override
     protected RdKNNEntry<D, N> createRootEntry() {
         return new RdKNNDirectoryEntry<D, N>(0, null, null);
     }

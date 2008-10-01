@@ -64,6 +64,7 @@ public class DeLiCluLeafEntry extends SpatialLeafEntry implements DeLiCluEntry {
    *
    * @return a string representation of this entry
    */
+  @Override
   public String toString() {
     return super.toString() + "[" + hasHandled + "-" + hasUnhandled + "]";
   }

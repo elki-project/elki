@@ -89,6 +89,7 @@ public class DistanceEntry<D extends Distance<D>, E extends Entry> implements Co
      *
      * @return a string representation of the object.
      */
+    @Override
     public String toString() {
         return "" + entry.getID() + "(" + distance + ")";
     }
