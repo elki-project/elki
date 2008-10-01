@@ -35,12 +35,12 @@ public class PCAFilteredAutotuningRunner<V extends RealVector<V, ?>> extends PCA
   /**
    * Run PCA on a collection of database IDs
    * 
-   * @param ids a colleciton of ids
+   * @param ids a collection of ids
    * @param database the database used
    * @return PCA result
    */
   public PCAFilteredResult processIds(Collection<Integer> ids, Database<V> database) {
-    // FIXME: We're only supporting QueryResults for now, add compability
+    // FIXME: We're only supporting QueryResults for now, add compatibility
     // wrapper?
     return null;
   }
@@ -135,7 +135,7 @@ public class PCAFilteredAutotuningRunner<V extends RealVector<V, ?>> extends PCA
       }
     // NOTE: if we didn't get a 'maximum' anywhere, we end up with the data from
     // the last
-    // run of the loop above. I.e. PCA on the full dataset. That is intended.
+    // run of the loop above. I.e. PCA on the full data set. That is intended.
     
     return processCovarMatrix(covarianceMatrixBuilder.processQueryResults(results, database));
   }
