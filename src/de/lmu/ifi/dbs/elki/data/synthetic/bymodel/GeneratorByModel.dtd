@@ -1,0 +1,55 @@
+<!-- DTD for golden data set generator -->
+<!-- data set -->
+<!ELEMENT dataset (cluster+)>
+<!ATTLIST dataset
+	random-seed	CDATA		#IMPLIED
+>
+
+<!-- cluster -->
+<!ELEMENT cluster ((uniform | normal)+, (translate | rotate)*, clip?)>
+<!ATTLIST cluster
+	name		CDATA		#REQUIRED
+	size		CDATA		#REQUIRED
+	density-correction	CDATA	#IMPLIED
+>
+<!-- uniform distribution -->
+<!ELEMENT uniform EMPTY>
+<!ATTLIST uniform
+	min			CDATA		#IMPLIED
+	max			CDATA		#IMPLIED
+>
+<!-- normal distribution -->
+<!ELEMENT normal EMPTY>
+<!ATTLIST normal
+	mean		CDATA		#IMPLIED
+	stddev		CDATA		#IMPLIED
+>
+<!-- rotation statement -->
+<!ELEMENT rotate EMPTY>
+<!ATTLIST rotate
+	axis1		CDATA		#REQUIRED
+	axis2		CDATA		#REQUIRED
+	angle		CDATA		#REQUIRED
+>
+<!-- translation statement -->
+<!ELEMENT translate EMPTY>
+<!ATTLIST translate
+	vector		CDATA		#REQUIRED
+>
+<!-- clipping statement -->
+<!ELEMENT clip EMPTY>
+<!ATTLIST clip
+	min			CDATA		#REQUIRED
+	max			CDATA		#REQUIRED
+>
+<!-- Static cluster -->
+<!ELEMENT static (point)+>
+<!ATTLIST static
+	name		CDATA		#REQUIRED
+>
+<!-- static cluster point -->
+<!ELEMENT point EMPTY>
+<!ATTLIST point
+	vector		CDATA		#IMPLIED
+>
+ 
