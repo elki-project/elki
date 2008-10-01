@@ -6,8 +6,8 @@ import de.lmu.ifi.dbs.elki.algorithm.result.clustering.biclustering.Bicluster;
 import de.lmu.ifi.dbs.elki.algorithm.result.clustering.biclustering.Biclustering;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.IDPropertyPair;
-import de.lmu.ifi.dbs.elki.utilities.PropertyPermutationComparator;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparatorBySecond;
+import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
 
 import java.util.*;
 
@@ -228,14 +228,14 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>> exte
         if (properties.size() != to - from) {
             throw new IllegalArgumentException("Length of properties (=" + properties.size() + ") does not conform specified length (=" + (to - from) + ")");
         }
-        List<IDPropertyPair<P>> pairs = new ArrayList<IDPropertyPair<P>>(to - from);
+        List<SimplePair<Integer,P>> pairs = new ArrayList<SimplePair<Integer,P>>(to - from);
         for (int i = 0; i < properties.size(); i++) {
-            pairs.add(new IDPropertyPair<P>(ids[i + from], properties.get(i)));
+            pairs.add(new SimplePair<Integer,P>(ids[i + from], properties.get(i)));
         }
-        Collections.sort(pairs, new PropertyPermutationComparator<P>(comp));
+        Collections.sort(pairs, new ComparatorBySecond<P>(comp));
 
         for (int i = from; i < to; i++) {
-            ids[i] = pairs.get(i - from).getId();
+            ids[i] = pairs.get(i - from).getFirst();
         }
     }
 
