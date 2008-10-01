@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.evaluation.paircounting.generator;
 
-import de.lmu.ifi.dbs.elki.utilities.IntIntPair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 
 /**
  * Implement the common functionality of caching the current result in a base class.

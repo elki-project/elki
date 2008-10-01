@@ -8,9 +8,9 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.ComparablePair;
 import de.lmu.ifi.dbs.elki.utilities.ConstantObject;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredResult;
 
 import java.util.BitSet;

@@ -1,22 +1,28 @@
-package de.lmu.ifi.dbs.elki.utilities;
+package de.lmu.ifi.dbs.elki.utilities.pairs;
+
 
 /**
- * Pair with canonical comparison function.
+ * Generic SimplePair<FIRST,SECOND> class.
  * 
- * This class cannot be derived from SimplePair (although it should be)
- * Because SimplePair has been declared as "final" for performance reasons.
+ * Does not implement any "special" interfaces such as Comparable
  * 
  * @author Erich Schubert <schube@dbs.ifi.lmu.de>
  *
  * @param <FIRST> first type
  * @param <SECOND> second type
  */
-public final class ComparablePair<FIRST extends Comparable<FIRST>,SECOND extends Comparable<SECOND>> implements Pair<FIRST,SECOND>, Comparable<ComparablePair<FIRST,SECOND>> {
+public final class SimplePair<FIRST, SECOND> implements PairInterface<FIRST, SECOND> {
   /* these are public by intention, Pair<> is supposed to be a simple wrapper */
   public FIRST first;
   public SECOND second;
 
-  public ComparablePair(FIRST first, SECOND second) {
+  /**
+   * Initialize pair
+   * 
+   * @param first first parameter
+   * @param second second parameter
+   */
+  public SimplePair(FIRST first, SECOND second) {
     this.first = first;
     this.second = second;
   }
@@ -63,39 +69,12 @@ public final class ComparablePair<FIRST extends Comparable<FIRST>,SECOND extends
   public void setSecond(SECOND second) {
     this.second = second;
   }
-
-  /**
-   * Generic derived compare function.
-   */
-  public int compareTo(ComparablePair<FIRST, SECOND> other) {
-    if (this.first == null) {
-      if (other.first != null) return +1;
-      if (this.second == null) {
-        if (other.second != null) return +1;
-        else return 0;
-      }
-    } else {
-      if (other.first == null) return -1;
-      int delta1 = this.first.compareTo(other.first);
-      if (delta1 != 0) return delta1;
-    }
-    if (other.second == null) return -1;
-    return this.second.compareTo(other.second);
-  }
-  
-  /**
-   * Array constructor for generics
-   */
-  @SuppressWarnings("unchecked")
-  public static final <F extends Comparable<F>,S extends Comparable<S>> ComparablePair<F,S>[] newArray(int size) {
-    return new ComparablePair[size];
-  }
   
   @SuppressWarnings("unchecked")
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof Pair)) return false;
-    Pair<FIRST,SECOND> other = (Pair<FIRST,SECOND>) obj;
+    if (!(obj instanceof PairInterface)) return false;
+    PairInterface<FIRST,SECOND> other = (PairInterface<FIRST,SECOND>) obj;
     return (this.first.equals(other.getFirst())) && (this.second.equals(other.getSecond()));
   }
 

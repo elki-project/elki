@@ -6,9 +6,9 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.statistics.LinearRegression;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
-import de.lmu.ifi.dbs.elki.utilities.DoublePair;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -85,18 +85,18 @@ public class FractalDimensionTestResult<V extends RealVector<V, ?>> extends Abst
 
             pout = new PrintStream(new FileOutputStream(out.getAbsolutePath() + File.separator + "id1FractalDimension" + FILE_EXTENSION));
             pout.println("# id1 fractal dimension");
-            List<DoublePair> points = new ArrayList<DoublePair>(this.id1Supporter.size());
+            List<DoubleDoublePair> points = new ArrayList<DoubleDoublePair>(this.id1Supporter.size());
             for (int i = 1; i <= id1Supporter.size(); i++) {
-                points.add(new DoublePair(StrictMath.log(distanceFunction.distance(this.id1Supporter.get(i - 1), this.id1).getValue()),
+                points.add(new DoubleDoublePair(StrictMath.log(distanceFunction.distance(this.id1Supporter.get(i - 1), this.id1).getValue()),
                     StrictMath.log(i)));
             }
             LinearRegression id1FC = new LinearRegression(points);
             pout.println("# m=" + id1FC.getM());
             pout.println("# t=" + id1FC.getT());
-            for (DoublePair p : points) {
-                pout.print(p.getX());
+            for (DoubleDoublePair p : points) {
+                pout.print(p.getFirst());
                 pout.print(" ");
-                pout.println(p.getY());
+                pout.println(p.getSecond());
             }
             pout.flush();
             pout.close();
@@ -117,18 +117,18 @@ public class FractalDimensionTestResult<V extends RealVector<V, ?>> extends Abst
 
             pout = new PrintStream(new FileOutputStream(out.getAbsolutePath() + File.separator + "id2FractalDimension" + FILE_EXTENSION));
             pout.println("# id2 fractal dimension");
-            points = new ArrayList<DoublePair>(this.id2Supporter.size());
+            points = new ArrayList<DoubleDoublePair>(this.id2Supporter.size());
             for (int i = 1; i <= id2Supporter.size(); i++) {
-                points.add(new DoublePair(StrictMath.log(distanceFunction.distance(this.id2Supporter.get(i - 1), this.id2).getValue()),
+                points.add(new DoubleDoublePair(StrictMath.log(distanceFunction.distance(this.id2Supporter.get(i - 1), this.id2).getValue()),
                     StrictMath.log(i)));
             }
             LinearRegression id2FC = new LinearRegression(points);
             pout.println("# m=" + id2FC.getM());
             pout.println("# t=" + id2FC.getT());
-            for (DoublePair p : points) {
-                pout.print(p.getX());
+            for (DoubleDoublePair p : points) {
+                pout.print(p.getFirst());
                 pout.print(" ");
-                pout.println(p.getY());
+                pout.println(p.getSecond());
             }
             pout.flush();
             pout.close();
@@ -149,18 +149,18 @@ public class FractalDimensionTestResult<V extends RealVector<V, ?>> extends Abst
 
             pout = new PrintStream(new FileOutputStream(out.getAbsolutePath() + File.separator + "centroidFractalDimension" + FILE_EXTENSION));
             pout.println("# centroid fractal dimension");
-            points = new ArrayList<DoublePair>(this.centroidSupporter.size());
+            points = new ArrayList<DoubleDoublePair>(this.centroidSupporter.size());
             for (int i = 1; i <= centroidSupporter.size(); i++) {
-                points.add(new DoublePair(StrictMath.log(distanceFunction.distance(this.centroidSupporter.get(i - 1), this.centroid).getValue()),
+                points.add(new DoubleDoublePair(StrictMath.log(distanceFunction.distance(this.centroidSupporter.get(i - 1), this.centroid).getValue()),
                     StrictMath.log(i)));
             }
             LinearRegression centroidFC = new LinearRegression(points);
             pout.println("# m=" + centroidFC.getM());
             pout.println("# t=" + centroidFC.getT());
-            for (DoublePair p : points) {
-                pout.print(p.getX());
+            for (DoubleDoublePair p : points) {
+                pout.print(p.getFirst());
                 pout.print(" ");
-                pout.println(p.getY());
+                pout.println(p.getSecond());
             }
             pout.flush();
             pout.close();

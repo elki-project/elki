@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.math.statistics;
 
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.utilities.DoublePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ public class LinearRegression extends AbstractLoggable
     
     private double m;
     
-    public LinearRegression(List<DoublePair> points)
+    public LinearRegression(List<DoubleDoublePair> points)
     {
         super(LoggingConfiguration.DEBUG);
         double sumy = 0.0;
@@ -24,14 +24,14 @@ public class LinearRegression extends AbstractLoggable
         double sumxx = 0.0;
         double sumxy = 0.0;
         int gap = 0;
-        for(DoublePair point : points)
+        for(DoubleDoublePair point : points)
         {
-            sumy += point.getY();
-            sumyy += point.getY()*point.getY();
+            sumy += point.getSecond();
+            sumyy += point.getSecond()*point.getSecond();
             gap++;
-            sumx += point.getX();
-            sumxx += point.getX()*point.getX();
-            sumxy += point.getX()*point.getY(); 
+            sumx += point.getFirst();
+            sumxx += point.getFirst()*point.getFirst();
+            sumxy += point.getFirst()*point.getSecond(); 
         }
         double Sxy = sumxy - sumx * sumy / gap;
         double Sxx = sumxx - sumx * sumx / gap;

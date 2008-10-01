@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.result.clustering.HierarchicalCluster;
-import de.lmu.ifi.dbs.elki.utilities.IntIntPair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 
 /**
  * Generate sorted {@link IntIntPair}s for a {@link HierarchicalCluster}.

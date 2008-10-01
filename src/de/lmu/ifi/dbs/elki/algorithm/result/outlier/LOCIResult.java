@@ -16,10 +16,10 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
-import de.lmu.ifi.dbs.elki.utilities.ComparablePair;
-import de.lmu.ifi.dbs.elki.utilities.Pair;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.PairInterface;
 
 /**
  * Provides the result of the LOCI algorithm {@link de.lmu.ifi.dbs.elki.algorithm.outlier.LOCI}.
@@ -95,7 +95,7 @@ public class LOCIResult<O extends DatabaseObject> extends AbstractResult<O> {
       }
       Collections.sort(l, Collections.reverseOrder());
 
-      for (Pair<Double, Integer> p : l) {
+      for (PairInterface<Double, Integer> p : l) {
         Integer id = p.getSecond();
 
         outStream.print("ID=");

@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.utilities;
+package de.lmu.ifi.dbs.elki.utilities.pairs;
 
 /**
  * Generic Pair<FIRST,SECOND> interface
@@ -9,7 +9,7 @@ package de.lmu.ifi.dbs.elki.utilities;
  * @param <FIRST> first type
  * @param <SECOND> second type
  */
-public interface Pair<FIRST, SECOND> {
+public interface PairInterface<FIRST, SECOND> {
   public FIRST getFirst();
   public void setFirst(FIRST first);
   public SECOND getSecond();

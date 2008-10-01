@@ -5,7 +5,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.statistics.LinearRegression;
-import de.lmu.ifi.dbs.elki.utilities.DoublePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 
@@ -88,9 +88,9 @@ public class HierarchicalFractalDimensionCluster<V extends RealVector<V, ?>>
     }
 
     private double computeFractalDimension() {
-        List<DoublePair> points = new ArrayList<DoublePair>(this.getSupporters().size());
+        List<DoubleDoublePair> points = new ArrayList<DoubleDoublePair>(this.getSupporters().size());
         for (int i = 1; i <= this.supporters.size(); i++) {
-            points.add(new DoublePair(StrictMath.log(distanceFunction.distance(this.supporters.get(i - 1), this.representant).getValue()), StrictMath.log(i)));
+            points.add(new DoubleDoublePair(StrictMath.log(distanceFunction.distance(this.supporters.get(i - 1), this.representant).getValue()), StrictMath.log(i)));
         }
         return new LinearRegression(points).getM();
     }

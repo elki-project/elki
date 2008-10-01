@@ -7,7 +7,7 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.statistics.LinearRegression;
 import de.lmu.ifi.dbs.elki.preprocessing.FracClusPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
-import de.lmu.ifi.dbs.elki.utilities.DoublePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 
@@ -51,9 +51,9 @@ public class FractalDimensionBasedDistanceFunction<V extends RealVector<V, ?>>
             distances.add(qr.getDistance());
         }
 
-        List<DoublePair> points = new ArrayList<DoublePair>(distances.size());
+        List<DoubleDoublePair> points = new ArrayList<DoubleDoublePair>(distances.size());
         for (int i = 0; i < distances.size(); i++) {
-            points.add(new DoublePair(Math.log(distances.get(i).getValue()), Math.log(i + 1)));
+            points.add(new DoubleDoublePair(Math.log(distances.get(i).getValue()), Math.log(i + 1)));
         }
         return new DoubleDistance(new LinearRegression(points).getM());
     }
