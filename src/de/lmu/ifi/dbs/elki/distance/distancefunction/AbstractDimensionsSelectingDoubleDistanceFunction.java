@@ -51,6 +51,7 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
     addOption(DIMS_PARAM);
   }
 
+  @Override
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 

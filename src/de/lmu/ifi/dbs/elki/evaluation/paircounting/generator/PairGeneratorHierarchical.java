@@ -74,6 +74,7 @@ public class PairGeneratorHierarchical<C extends HierarchicalCluster<C>> extends
   /**
    * Advance iterator
    */
+  @Override
   protected IntIntPair advance() {
     if (current() == null) return null;
     pos2++;

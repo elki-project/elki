@@ -28,7 +28,8 @@ public class ClassListEditor extends TextFieldParameterEditor {
 		inputField = new JPanel();
 
 		textField = new JTextField() {
-			public void setText(String t) {
+			@Override
+      public void setText(String t) {
 				String text = getText();
 				if (text == null || text.equals("")) {
 					super.setText(t);
@@ -39,14 +40,16 @@ public class ClassListEditor extends TextFieldParameterEditor {
 				inputField.revalidate();
 			}
 
-			public Dimension getPreferredScrollableViewportSize() {
+			@Override
+      public Dimension getPreferredScrollableViewportSize() {
 				Dimension dim = getPreferredSize();
 				dim.width = 340;
 
 				return dim;
 			}
 
-			public void setSize(Dimension d) {
+			@Override
+      public void setSize(Dimension d) {
 
 				if (d.width < getParent().getSize().width) {
 					d.width = getParent().getSize().width;
@@ -56,7 +59,8 @@ public class ClassListEditor extends TextFieldParameterEditor {
 				super.setSize(d);
 			}
 
-			public boolean getScrollableTracksViewportWidth() {
+			@Override
+      public boolean getScrollableTracksViewportWidth() {
 
 				return false;
 			}

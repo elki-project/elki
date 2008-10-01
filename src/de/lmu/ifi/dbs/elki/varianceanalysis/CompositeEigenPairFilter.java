@@ -61,6 +61,7 @@ public class CompositeEigenPairFilter extends AbstractParameterizable implements
     return result;
   }
 
+  @Override
   public String parameterDescription() {
     StringBuffer description = new StringBuffer();
     description.append(this.getClass().getName());

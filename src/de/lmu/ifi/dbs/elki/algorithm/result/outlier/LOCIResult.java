@@ -48,6 +48,7 @@ public class LOCIResult<O extends DatabaseObject> extends AbstractResult<O> {
   /**
    * Write output to a file named {@link #LOCI_MARKER} + {@link AbstractResult#FILE_EXTENSION}
    */
+  @Override
   public void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     PrintStream outStream;
     try {

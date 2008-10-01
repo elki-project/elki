@@ -57,6 +57,7 @@ public class AffineTransformation {
    * Return a clone of the affine transformation
    * @return cloned affine transformation
    */
+  @Override
   public AffineTransformation clone() {
     // Note that we're NOT using copied matrices here, since this class
     // supposedly never modifies it's matrixes but replaces them with new

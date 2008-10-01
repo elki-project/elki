@@ -74,6 +74,7 @@ public class SubspaceDistance extends AbstractDistance<SubspaceDistance> {
      *
      * @return the values of the subspace distance and the affine distance separated by blank
      */
+    @Override
     public String toString() {
         return Double.toString(subspaceDistance) + " " + Double.toString(affineDistance);
     }
@@ -99,6 +100,7 @@ public class SubspaceDistance extends AbstractDistance<SubspaceDistance> {
         }
     }
 
+    @Override
     public int hashCode() {
         int result;
         long temp;

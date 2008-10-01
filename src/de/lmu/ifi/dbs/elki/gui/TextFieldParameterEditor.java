@@ -25,7 +25,8 @@ public abstract class TextFieldParameterEditor extends ParameterEditor {
 		super(option, owner,l);
 	}
 
-	public boolean isOptional(){
+	@Override
+  public boolean isOptional(){
 		return ((Parameter<?,?>)this.option).isOptional();
 	}
 	
@@ -41,7 +42,8 @@ public abstract class TextFieldParameterEditor extends ParameterEditor {
 //		return true;
 //	}
 
-	public String getValue() {
+	@Override
+  public String getValue() {
 		if (((Parameter<?, ?>) this.option).isOptional() && this.value == null) {
 			return "";
 		}
@@ -50,11 +52,13 @@ public abstract class TextFieldParameterEditor extends ParameterEditor {
 
 	protected void addInputVerifier() {
 		this.textField.setInputVerifier(new InputVerifier() {
-			public boolean verify(JComponent input) {
+			@Override
+      public boolean verify(JComponent input) {
 				return checkInput();
 			}
 
-			public boolean shouldYieldFocus(JComponent input) {
+			@Override
+      public boolean shouldYieldFocus(JComponent input) {
 				return verify(input);
 			}
 
@@ -121,7 +125,8 @@ public abstract class TextFieldParameterEditor extends ParameterEditor {
 		return paramToValue;
 	}
 
-	public void setValue(String value) {
+	@Override
+  public void setValue(String value) {
 
 		if (value == null) {
 			((Parameter<?, ?>) option).reset();

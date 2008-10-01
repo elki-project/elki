@@ -91,6 +91,7 @@ public class CODECWrapper<O extends DatabaseObject> extends NormalizationWrapper
         optionHandler.setGlobalParameterConstraint(gpc);
     }
 
+    @Override
     public List<String> getKDDTaskParameters() throws UnusedParameterException {
         List<String> parameters = super.getKDDTaskParameters();
 

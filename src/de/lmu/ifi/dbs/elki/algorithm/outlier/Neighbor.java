@@ -70,6 +70,7 @@ public class Neighbor implements Externalizable, Comparable<Neighbor> {
      *
      * @return a string representation of this object
      */
+    @Override
     public String toString() {
         return "(" + objectID + ", " + index + ", " + neighborID +
             ", " + reachabilityDistance + ", " + distance + ")";
@@ -128,6 +129,7 @@ public class Neighbor implements Externalizable, Comparable<Neighbor> {
      * @return <code>true</code> if this object is the same as the o argument,
      *         <code>false</code> otherwise.
      */
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -145,6 +147,7 @@ public class Neighbor implements Externalizable, Comparable<Neighbor> {
      *
      * @return a hash code value for this object.
      */
+    @Override
     public int hashCode() {
         int result;
         long temp;

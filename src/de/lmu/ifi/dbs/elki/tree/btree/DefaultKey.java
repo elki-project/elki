@@ -79,6 +79,7 @@ public class DefaultKey implements Comparable<DefaultKey>, Externalizable {
    * @return <code>true</code> if this object has the same key as the obj
    *         argument; <code>false</code> otherwise.
    */
+  @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
@@ -92,6 +93,7 @@ public class DefaultKey implements Comparable<DefaultKey>, Externalizable {
    *
    * @return a hash code value for the object
    */
+  @Override
   public int hashCode() {
     return key.hashCode();
   }
@@ -109,6 +111,7 @@ public class DefaultKey implements Comparable<DefaultKey>, Externalizable {
    *
    * @return a string representation of the object.
    */
+  @Override
   public String toString() {
     return key.toString();
   }

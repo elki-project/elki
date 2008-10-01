@@ -35,6 +35,7 @@ public class FileBasedDoubleDistanceFunction
      * @param o2  second DatabaseObject
      * @return the distance between the two objcts specified by their obejct ids
      */
+    @Override
     public DoubleDistance distance(Integer id1, ExternalObject o2) {
         return distance(id1, o2.getID());
     }
@@ -49,6 +50,7 @@ public class FileBasedDoubleDistanceFunction
      * @param id2 second object id
      * @return the distance between the two objcts specified by their obejct ids
      */
+    @Override
     @SuppressWarnings("unchecked")
     public DoubleDistance distance(Integer id1, Integer id2) {
         // the smaller id is the first key
@@ -66,6 +68,7 @@ public class FileBasedDoubleDistanceFunction
      *
      * @return String a description of the class and the required parameters
      */
+    @Override
     public String parameterDescription() {
         return "File based double distance for database objects. No parameters required. " +
             "Pattern for defining a range: \"" + requiredInputPattern() + "\".";

@@ -126,6 +126,7 @@ public class Arff2Txt extends StandAloneInputWrapper {
      *
      * @return the description for the output parameter
      */
+    @Override
     public String getOutputDescription() {
         return "the txt-file to write the converted arff-file in.";
     }
@@ -136,6 +137,7 @@ public class Arff2Txt extends StandAloneInputWrapper {
      *
      * @return the description for the input parameter
      */
+    @Override
     public String getInputDescription() {
         return "The name of the arff-file to convert.";
     }

@@ -70,6 +70,7 @@ public class FilteredEigenPairs {
    *
    * @return a string representation of the object.
    */
+  @Override
   public String toString() {
     return "weak EP: " + weakEigenPairs + "\nstrong EP: " + strongEigenPairs;
   }

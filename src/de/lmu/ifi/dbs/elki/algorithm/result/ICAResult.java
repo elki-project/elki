@@ -55,6 +55,7 @@ public class ICAResult<V extends RealVector<V, ?>> extends AbstractResult<V> {
      *
      * @return a string representation of the object.
      */
+    @Override
     public String toString() {
         StringBuffer msg = new StringBuffer();
 

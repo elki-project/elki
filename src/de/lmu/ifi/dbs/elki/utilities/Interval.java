@@ -70,6 +70,7 @@ public class Interval implements Comparable<Interval> {
    *
    * @return a string representation of this interval
    */
+  @Override
   public String toString() {
     return "d" + dimension + "-[" + Util.format(min, 2) + "; " + Util.format(max, 2) + "[";
   }

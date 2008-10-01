@@ -133,6 +133,7 @@ public abstract class AbstractPage<P extends AbstractPage<P>> extends AbstractLo
      *
      * @return a string representation of the object
      */
+    @Override
     public String toString() {
         if (id != null)
             return Integer.toString(id);
@@ -156,6 +157,7 @@ public abstract class AbstractPage<P extends AbstractPage<P>> extends AbstractLo
      * @return true, if o is an AbstractNode and has the same
      *         id and the same entries as this node.
      */
+    @Override
     @SuppressWarnings("unchecked")
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -171,6 +173,7 @@ public abstract class AbstractPage<P extends AbstractPage<P>> extends AbstractLo
      *
      * @return the id of this node
      */
+    @Override
     public int hashCode() {
         return id.hashCode();
     }

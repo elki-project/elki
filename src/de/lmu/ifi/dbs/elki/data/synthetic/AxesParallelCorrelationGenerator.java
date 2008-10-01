@@ -361,6 +361,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
     }
 
     // todo comment
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
@@ -453,6 +454,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
      *
      * @return the description for the output parameter
      */
+    @Override
     public String getOutputDescription() {
         return "the file to write the generated correlation hyperplane in, "
             + "if the file already exists, the generated points will be appended to this file.";

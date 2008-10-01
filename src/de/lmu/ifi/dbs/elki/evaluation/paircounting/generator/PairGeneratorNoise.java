@@ -40,6 +40,7 @@ public class PairGeneratorNoise extends PairSortedGenerator {
   /**
    * Advance iterator and return new pair.
    */
+  @Override
   protected IntIntPair advance() {
     if (current() == null) return null;
     pos++;

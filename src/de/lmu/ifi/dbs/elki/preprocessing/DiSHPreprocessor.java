@@ -223,6 +223,7 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
 
     }
 
+    @Override
     public String parameterDescription() {
         StringBuffer description = new StringBuffer();
         description.append(DiSHPreprocessor.class.getName());
@@ -231,6 +232,7 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
         return description.toString();
     }
 
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 

@@ -106,6 +106,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
             new BitSet());
     }
 
+    @Override
     protected PreferenceVectorBasedCorrelationDistance correlationDistance(V v1, V v2) {
         BitSet preferenceVector1 = getDatabase().getAssociation(AssociationID.PREFERENCE_VECTOR, v1.getID());
         BitSet preferenceVector2 = getDatabase().getAssociation(AssociationID.PREFERENCE_VECTOR, v2.getID());

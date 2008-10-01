@@ -46,6 +46,7 @@ public class FIRES<V extends RealVector<V, Double>> extends AbstractAlgorithm<V>
      * Performs the FIRES algorithm on the given database.
      *
      */
+    @Override
     protected void runInTime(Database<V> database) throws IllegalStateException {
         if (database.size() == 0) {
             throw new IllegalArgumentException("database empty: must contain elements");

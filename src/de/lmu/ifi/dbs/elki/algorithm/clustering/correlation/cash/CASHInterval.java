@@ -147,6 +147,7 @@ public class CASHInterval extends HyperBoundingBox implements Identifiable<CASHI
      *
      * @return String
      */
+    @Override
     public String toString() {
         return super.toString() + ", ids: " + ids.size() + ", d_min: " + d_min + ", d_max " + d_max;
     }
@@ -250,6 +251,7 @@ public class CASHInterval extends HyperBoundingBox implements Identifiable<CASHI
     /**
      * @see Object#equals(Object)
      */
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -262,6 +264,7 @@ public class CASHInterval extends HyperBoundingBox implements Identifiable<CASHI
     /**
      * Returns the unique id of this interval as hash code.
      */
+    @Override
     public int hashCode() {
         return intervalID;
     }

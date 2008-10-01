@@ -22,6 +22,7 @@ public class StandardCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends
    * @param database the database used
    * @return Covariance Matrix
    */
+  @Override
   public Matrix processDatabase(Database<V> database) {
     return Util.covarianceMatrix(database);
   }
@@ -33,6 +34,7 @@ public class StandardCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends
    * @param database the database used
    * @return Covariance Matrix
    */
+  @Override
   public Matrix processIds(Collection<Integer> ids, Database<V> database) {
     return Util.covarianceMatrix(database, ids);
   }

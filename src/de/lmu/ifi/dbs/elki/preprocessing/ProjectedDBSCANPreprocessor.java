@@ -166,6 +166,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
      */
     protected abstract void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<V> database);
 
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 

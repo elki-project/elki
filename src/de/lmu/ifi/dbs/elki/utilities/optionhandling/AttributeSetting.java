@@ -45,6 +45,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling;
      *
      * @return a string representation of the object.
      */
+    @Override
     public String toString() {
      return OptionHandler.OPTION_PREFIX + name + " " + value;
     }

@@ -79,6 +79,7 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
      * Performs the PROCLUS algorithm on the given database.
      *
      */
+    @Override
     protected void runInTime(Database<V> database) throws IllegalStateException {
 
         try {
@@ -169,6 +170,7 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
      * and sets additionally the value of the parameter
      * {@link #M_I_PARAM}.
      */
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 

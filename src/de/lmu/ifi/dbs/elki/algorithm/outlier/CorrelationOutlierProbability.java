@@ -74,6 +74,7 @@ public class CorrelationOutlierProbability<V extends RealVector<V, ?>> extends D
         addOption(K_PARAM);
     }
 
+    @Override
     protected void runInTime(Database<V> database) throws IllegalStateException {
         getDistanceFunction().setDatabase(database, isVerbose(), isTime());
         if (isVerbose()) {

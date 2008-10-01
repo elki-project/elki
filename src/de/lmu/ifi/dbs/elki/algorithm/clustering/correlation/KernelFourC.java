@@ -23,6 +23,7 @@ public class KernelFourC<V extends RealVector<V, ?>> extends ProjectedDBSCAN<V> 
             "n/a");
     }
 
+    @Override
     public Class<?> preprocessorClass() {
         return KernelFourCPreprocessor.class;
     }

@@ -66,6 +66,7 @@ public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends
   /**
    * Parse parameters.
    */
+  @Override
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     weightfunction = WEIGHT_PARAM.instantiateClass();
@@ -79,6 +80,7 @@ public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends
    * tied to Euclidean distance, so it probably does not make much sense to add
    * support for other distance functions?
    */
+  @Override
   public Matrix processIds(Collection<Integer> ids, Database<V> database) {
     int dim = database.dimensionality();
     // collecting the sums in each dimension
@@ -146,6 +148,7 @@ public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends
    * @param k number of elements to process
    * @return Covariance Matrix
    */
+  @Override
   public Matrix processQueryResults(Collection<QueryResult<DoubleDistance>> results, Database<V> database, int k) {
     int dim = database.dimensionality();
     // collecting the sums in each dimension

@@ -113,6 +113,7 @@ public class PCAFilteredRunner<V extends RealVector<V, ?>> extends PCARunner<V> 
   /**
    * Set Parameters.
    */
+  @Override
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
@@ -146,6 +147,7 @@ public class PCAFilteredRunner<V extends RealVector<V, ?>> extends PCARunner<V> 
    * @param database the database used
    * @return PCA result
    */
+  @Override
   public PCAFilteredResult processIds(Collection<Integer> ids, Database<V> database) {
     return processCovarMatrix(covarianceMatrixBuilder.processIds(ids, database));
   }
@@ -157,6 +159,7 @@ public class PCAFilteredRunner<V extends RealVector<V, ?>> extends PCARunner<V> 
    * @param database the database used
    * @return PCA result
    */
+  @Override
   public PCAFilteredResult processQueryResult(Collection<QueryResult<DoubleDistance>> results, Database<V> database) {
     return processCovarMatrix(covarianceMatrixBuilder.processQueryResults(results, database));
   }
@@ -166,6 +169,7 @@ public class PCAFilteredRunner<V extends RealVector<V, ?>> extends PCARunner<V> 
    * 
    * @param covarMatrix the matrix used for performing PCA
    */
+  @Override
   public PCAFilteredResult processCovarMatrix(Matrix covarMatrix) {
     // TODO: add support for a different implementation to do EVD?
     EigenvalueDecomposition evd = covarMatrix.eig();
@@ -177,6 +181,7 @@ public class PCAFilteredRunner<V extends RealVector<V, ?>> extends PCARunner<V> 
    * 
    * @param evd eigenvalue decomposition to use
    */
+  @Override
   public PCAFilteredResult processEVD(EigenvalueDecomposition evd) {
     SortedEigenPairs eigenPairs = new SortedEigenPairs(evd, false);
     FilteredEigenPairs filteredEigenPairs = eigenPairFilter.filter(eigenPairs);

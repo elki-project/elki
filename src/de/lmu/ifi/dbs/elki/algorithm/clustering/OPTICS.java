@@ -124,6 +124,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
      * Performs the OPTICS algorithm on the given database.
      *
      */
+    @Override
     protected void runInTime(Database<O> database) {
         Progress progress = new Progress("Clustering", database.size());
 

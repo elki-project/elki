@@ -160,6 +160,7 @@ public class Txt2Arff<W extends WekaAttribute> extends StandAloneInputWrapper {
    *
    * @return the description for the output parameter
    */
+  @Override
   public String getOutputDescription() {
     return "the arff-file to write the converted txt-file in.";
   }
@@ -169,6 +170,7 @@ public class Txt2Arff<W extends WekaAttribute> extends StandAloneInputWrapper {
      *
      * @return the description for the input parameter
      */
+    @Override
     public String getInputDescription() {
         return "The name of the txt-file to convert.";
     }

@@ -61,12 +61,14 @@ public class FileParameter extends Parameter<File, Object> {
         this.fileType = fileType;
     }
 
+    @Override
     public void setValue(String value) throws ParameterException {
         if (isValid(value)) {
             this.value = new File(value);
         }
     }
 
+    @Override
     public boolean isValid(String value) throws ParameterException {
         if (value == null) {
             throw new WrongParameterValueException("Parameter \"" + getName()
@@ -94,6 +96,7 @@ public class FileParameter extends Parameter<File, Object> {
      *
      * @return &quot;&lt;file_&gt;&quot;
      */
+    @Override
     protected String getParameterType() {
         return "<file>";
     }

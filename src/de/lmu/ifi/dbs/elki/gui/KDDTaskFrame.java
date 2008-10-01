@@ -300,6 +300,7 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
            */
           private static final long serialVersionUID = -8391444656542286134L;
 
+            @Override
             public Dimension getPreferredScrollableViewportSize() {
                 Dimension dim = getPreferredSize();
                 dim.width = 500;
@@ -307,6 +308,7 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
                 return dim;
             }
 
+            @Override
             public void setSize(Dimension d) {
 
                 if (d.width < getParent().getSize().width) {
@@ -317,6 +319,7 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
                 super.setSize(d);
             }
 
+            @Override
             public boolean getScrollableTracksViewportWidth() {
 
                 return false;
@@ -490,6 +493,7 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
                */
               private static final long serialVersionUID = 7641527597255200000L;
 
+                @Override
                 public void setText(String text) {
                     if (text != null && !(text.equals(""))) {
                         super.setText(text);
@@ -507,12 +511,14 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
             textField.setBackground(Color.white);
             textField.addMouseListener(new MouseAdapter() {
 
+                @Override
                 public void mouseClicked(MouseEvent e) {
                     if (editObjectCustomizer != null && editObjectCustomizer.getSelectedClass() != null && !textField.getText().equals("")) {
                         editObjectCustomizer.setVisible(true, nameLabel.getLocationOnScreen());
                     }
                 }
 
+                @Override
                 public void mousePressed(MouseEvent e) {
                     if (editObjectCustomizer != null && editObjectCustomizer.getSelectedClass() != null && !textField.getText().equals("")) {
                         editObjectCustomizer.setVisible(true, nameLabel.getLocationOnScreen());
@@ -542,6 +548,7 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
             firePropertyChange(propName, "", completeParams);
         }
 
+        @Override
         public void setEnabled(boolean e) {
             this.nameLabel.setEnabled(e);
             this.textField.setEnabled(e);

@@ -71,6 +71,7 @@ public class MultivariateCorrelationOutlierProbability<V extends RealVector<V, ?
         addOption(K_PARAM);
     }
 
+    @Override
     protected void runInTime(Database<V> database) throws IllegalStateException {
         getDistanceFunction().setDatabase(database, isVerbose(), isTime());
         if (isVerbose()) {
@@ -142,6 +143,7 @@ public class MultivariateCorrelationOutlierProbability<V extends RealVector<V, ?
      * and adds to the returned attribute settings the attribute settings of
      * the {@link #modelDerivator}.
      */
+    @Override
     public List<AttributeSettings> getAttributeSettings() {
         List<AttributeSettings> attributeSettings = super.getAttributeSettings();
         attributeSettings.addAll(modelDerivator.getAttributeSettings());

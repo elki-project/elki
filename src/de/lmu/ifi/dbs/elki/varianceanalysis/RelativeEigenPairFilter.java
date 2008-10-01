@@ -99,6 +99,7 @@ public class RelativeEigenPairFilter extends AbstractParameterizable implements 
   /**
    * Get parameter description.
    */
+  @Override
   public String parameterDescription() {
     StringBuffer description = new StringBuffer();
     description.append(RelativeEigenPairFilter.class.getName());
@@ -110,6 +111,7 @@ public class RelativeEigenPairFilter extends AbstractParameterizable implements 
   /**
    * Set parameters
    */
+  @Override
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 

@@ -23,6 +23,7 @@ public abstract class AbstractDistance<D extends AbstractDistance<D>> extends Ab
     /**
      * Any extending class should implement a proper hashCode method.
      */
+    @Override
     public abstract int hashCode();
 
     /**

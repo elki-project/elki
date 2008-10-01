@@ -54,6 +54,7 @@ public class DummyNormalization<O extends DatabaseObject> extends AbstractParame
         return pre + toString();
     }
 
+    @Override
     public String parameterDescription() {
         return "Dummy normalization that does nothing. This class is used at normalization of multi-represented " +
             "objects if one representation needs no normalization.";
@@ -64,6 +65,7 @@ public class DummyNormalization<O extends DatabaseObject> extends AbstractParame
      *
      * @return a string representation of this object
      */
+    @Override
     public String toString() {
         return this.getClass().getName();
     }

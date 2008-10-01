@@ -84,6 +84,7 @@ public class ClusterOrder<O extends DatabaseObject, D extends Distance<D>>
         return co.size();
     }
 
+    @Override
     public void output(File out,
                        Normalization<O> normalization,
                        List<AttributeSettings> settings) throws UnableToComplyException {

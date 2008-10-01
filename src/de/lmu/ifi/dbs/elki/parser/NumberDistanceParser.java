@@ -156,6 +156,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
         return distanceFunction;
     }
 
+    @Override
     public String parameterDescription() {
         StringBuffer description = new StringBuffer();
         description.append(NumberDistanceParser.class.getName());
@@ -172,6 +173,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
         return usage(description.toString());
     }
 
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 

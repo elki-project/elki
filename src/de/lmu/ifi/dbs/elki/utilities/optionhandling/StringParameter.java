@@ -51,12 +51,14 @@ public class StringParameter extends Parameter<String, String> {
         addConstraintList(cons);
     }
 
+    @Override
     public void setValue(String value) throws ParameterException {
         if (isValid(value)) {
             this.value = value;
         }
     }
 
+    @Override
     public boolean isValid(String value) throws ParameterException {
         try {
             for (ParameterConstraint<String> cons : this.constraints) {
@@ -76,6 +78,7 @@ public class StringParameter extends Parameter<String, String> {
      *
      * @return &quot;&lt;string&gt;&quot;
      */
+    @Override
     protected String getParameterType() {
         return "<string>";
     }

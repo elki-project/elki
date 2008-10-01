@@ -30,6 +30,7 @@ public final class SimplePair<FIRST, SECOND> implements PairInterface<FIRST, SEC
   /**
    * Canonical toString operator
    */
+  @Override
   public String toString() {
     return "Pair(" + first.toString() + ", " + second.toString() + ")";
   }

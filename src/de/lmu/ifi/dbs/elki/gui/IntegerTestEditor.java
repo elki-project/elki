@@ -33,7 +33,8 @@ public class IntegerTestEditor extends ParameterEditor{
 		inputField.add(helpLabel);
 	}
 
-	public boolean isOptional(){
+	@Override
+  public boolean isOptional(){
 		return ((Parameter<?, ?>)this.option).isOptional();
 	}
 

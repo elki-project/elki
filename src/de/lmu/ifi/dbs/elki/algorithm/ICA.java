@@ -43,6 +43,7 @@ public class ICA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
     /**
      * Performs the ICA algorithm on the given database.
      */
+    @Override
     protected void runInTime(Database<V> database) throws IllegalStateException {
         ica.run(database, isVerbose());
         result = new ICAResult<V>(database, ica);
@@ -66,6 +67,7 @@ public class ICA<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
      * Calls the super method
      * The remaining parameters are passed to the {@link #ica}.
      */
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 

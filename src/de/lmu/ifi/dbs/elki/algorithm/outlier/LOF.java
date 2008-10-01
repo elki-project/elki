@@ -137,6 +137,7 @@ public class LOF<O extends DatabaseObject> extends
     /**
      * Performs the LOF algorithm on the given database.
      */
+    @Override
     protected void runInTime(Database<O> database) throws IllegalStateException {
         getDistanceFunction().setDatabase(database, isVerbose(), isTime());
         if (isVerbose()) {

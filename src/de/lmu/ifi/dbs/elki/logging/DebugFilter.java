@@ -42,6 +42,7 @@ public class DebugFilter extends SelectiveFilter {
      *              {@link LogLevel#DEBUG_FINER DEBUG_FINER},
      *              or {@link LogLevel#DEBUG_FINEST DEBUG_FINEST}.
      */
+    @Override
     public void setLevel(Level level) {
         if (level.intValue() > LogLevel.DEBUG_FINE.intValue()) {
             warning("debug level set to " + level.toString() + " - no debug messages will be logged.\n");

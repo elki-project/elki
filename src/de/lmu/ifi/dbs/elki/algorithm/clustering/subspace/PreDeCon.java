@@ -33,6 +33,7 @@ public class PreDeCon<V extends RealVector<V, ?>> extends ProjectedDBSCAN<V> {
                 "In Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04), Brighton, UK, 2004.");
     }
 
+    @Override
     public Class<?> preprocessorClass() {
         return PreDeConPreprocessor.class;
     }

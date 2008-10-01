@@ -91,6 +91,7 @@ public class CASHResult extends AbstractResult<ParameterizationFunction> {
         }
     }
 
+    @Override
     public void output(File out, Normalization<ParameterizationFunction> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         for (Integer d : clusterMap.subspaceDimensionalities()) {
             List<Set<Integer>> ids_d = clusterMap.getCluster(d);

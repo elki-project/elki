@@ -71,12 +71,14 @@ public class PatternParameter extends Parameter<String, String> {
         addConstraint(con);
     }
 
+    @Override
     public void setValue(String value) throws ParameterException {
         if (isValid(value)) {
             this.value = value;
         }
     }
 
+    @Override
     public boolean isValid(String value) throws ParameterException {
         try {
             Pattern.compile(value);
@@ -102,6 +104,7 @@ public class PatternParameter extends Parameter<String, String> {
      *
      * @return &quot;&lt;pattern&gt;&quot;
      */
+    @Override
     protected String getParameterType() {
         return "<pattern>";
     }

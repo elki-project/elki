@@ -88,6 +88,7 @@ public class RandomizedCrossValidation<O extends DatabaseObject, L extends Class
         return partitions;
     }
 
+    @Override
     public String parameterDescription() {
         return "Provides an n-fold cross-validation holdout.";
     }

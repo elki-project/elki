@@ -93,6 +93,7 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
      * @param neighbors the neighbors as query results of the given point
      * @param database  the database for which the preprocessing is performed
      */
+    @Override
     protected void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<V> database) {
         List<Integer> ids = new ArrayList<Integer>(neighbors.size());
         for (QueryResult<D> neighbor : neighbors) {
@@ -114,6 +115,7 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
      * Sets the values for the parameters alpha, pca and pcaDistancefunction if
      * specified. If the parameters are not specified default values are set.
      */
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
@@ -182,6 +184,7 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
         return attributeSettings;
     }
 
+    @Override
     public String parameterDescription() {
         StringBuffer description = new StringBuffer();
         description.append(FourCPreprocessor.class.getName());

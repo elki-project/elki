@@ -162,6 +162,7 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
         this.verbose = verbose;
     }
 
+    @Override
     public String parameterDescription() {
         return this.getClass().getName() + " performs a confusion matrix based evaluation.";
     }
@@ -184,6 +185,7 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
      * Sets parameters time and verbose, if given. Otherwise, the current
      * setting remains unchanged.
      */
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = optionHandler.grabOptions(args);
 

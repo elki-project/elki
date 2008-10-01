@@ -44,6 +44,7 @@ public class MemoryPageFile<P extends Page<P>> extends PageFile<P> {
      * @param pageID the id of the page to be returned
      * @return the page with the given pageId
      */
+    @Override
     public synchronized P readPage(int pageID) {
         // try to get from cache
         P page = super.readPage(pageID);
@@ -65,6 +66,7 @@ public class MemoryPageFile<P extends Page<P>> extends PageFile<P> {
      *
      * @param pageID the id of the node to be deleted
      */
+    @Override
     public synchronized void deletePage(int pageID) {
         // put id to empty nodes and
         // delete from cache
@@ -78,6 +80,7 @@ public class MemoryPageFile<P extends Page<P>> extends PageFile<P> {
     /**
      * Clears this PageFile.
      */
+    @Override
     public void clear() {
         super.clear();
         file.clear();

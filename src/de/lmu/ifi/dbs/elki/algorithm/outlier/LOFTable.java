@@ -213,6 +213,7 @@ public class LOFTable extends AbstractLoggable {
      * @return <code>true</code> if this object is the same as the obj
      *         argument; <code>false</code> otherwise.
      */
+    @Override
     public boolean equals(Object obj) {
         return obj instanceof LOFTable && super.equals(obj);
     }

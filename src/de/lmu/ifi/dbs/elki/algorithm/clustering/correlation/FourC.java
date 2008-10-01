@@ -29,6 +29,7 @@ public class FourC<O extends RealVector<O, ?>> extends ProjectedDBSCAN<O> {
     }
 
 
+    @Override
     public Class<?> preprocessorClass() {
         return FourCPreprocessor.class;
     }

@@ -22,6 +22,7 @@ public class KernelCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends C
   /**
    * Returns the local kernel matrix of the specified ids.
    */
+  @Override
   @SuppressWarnings("unchecked")
   public Matrix processIds(Collection<Integer> ids, Database<V> database) {
     //get global kernel Matrix

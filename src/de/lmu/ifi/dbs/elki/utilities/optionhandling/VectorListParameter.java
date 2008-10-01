@@ -42,6 +42,7 @@ public class VectorListParameter extends ListParameter<List<Double>> {
     super(optionID, constraint, optional, defaultValue);
   }
 
+  @Override
   public void setValue(String value) throws ParameterException {
     if(isValid(value)) {
       String[] vectors = VECTOR_SPLIT.split(value);
@@ -78,6 +79,7 @@ public class VectorListParameter extends ListParameter<List<Double>> {
     return sizes;
   }
 
+  @Override
   public boolean isValid(String value) throws ParameterException {
 
     String[] vectors = VECTOR_SPLIT.split(value);
@@ -117,6 +119,7 @@ public class VectorListParameter extends ListParameter<List<Double>> {
    *         &quot;&lt;double_11,...,double_1n:...:double_m1,...,double_mn&gt;&quot
    *         ;
    */
+  @Override
   protected String getParameterType() {
     return "<double_11,...,double_1n:...:double_m1,...,double_mn>";
   }

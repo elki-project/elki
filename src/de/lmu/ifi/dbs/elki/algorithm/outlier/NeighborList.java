@@ -154,6 +154,7 @@ public class NeighborList implements Externalizable, Iterable<Neighbor> {
      *
      * @return a string representation of the object.
      */
+    @Override
     public String toString() {
         return neighbors.toString();
     }
@@ -165,6 +166,7 @@ public class NeighborList implements Externalizable, Iterable<Neighbor> {
      * @return <code>true</code> if this object is the same as the obj
      *         argument; <code>false</code> otherwise.
      */
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -184,6 +186,7 @@ public class NeighborList implements Externalizable, Iterable<Neighbor> {
      *
      * @return a hash code value for this object
      */
+    @Override
     public int hashCode() {
         return neighbors.hashCode();
     }

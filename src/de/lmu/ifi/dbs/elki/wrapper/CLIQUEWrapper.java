@@ -72,6 +72,7 @@ public class CLIQUEWrapper<O extends DatabaseObject> extends FileBasedDatabaseCo
         addOption(PRUNE_FLAG);
     }
 
+    @Override
     public List<String> getKDDTaskParameters() throws UnusedParameterException {
         List<String> parameters = super.getKDDTaskParameters();
 

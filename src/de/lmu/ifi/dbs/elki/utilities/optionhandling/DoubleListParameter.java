@@ -43,6 +43,7 @@ public class DoubleListParameter extends ListParameter<Double> {
     super(optionID, constraint);
   }
 
+  @Override
   public void setValue(String value) throws ParameterException {
     if(isValid(value)) {
       String[] values = SPLIT.split(value);
@@ -54,6 +55,7 @@ public class DoubleListParameter extends ListParameter<Double> {
     }
   }
 
+  @Override
   public boolean isValid(String value) throws ParameterException {
     String[] values = SPLIT.split(value);
     if(values.length == 0) {
@@ -97,6 +99,7 @@ public class DoubleListParameter extends ListParameter<Double> {
    * 
    * @return &quot;&lt;double_1,...,double_n&gt;&quot;
    */
+  @Override
   protected String getParameterType() {
     return "<double_1,...,double_n>";
   }

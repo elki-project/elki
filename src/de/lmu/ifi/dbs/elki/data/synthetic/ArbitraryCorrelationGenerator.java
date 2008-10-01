@@ -133,6 +133,7 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
     }
 
     // todo comment
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
@@ -187,6 +188,7 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
      *
      * @param outStream the output stream to write into
      */
+    @Override
     void generateCorrelation(OutputStreamWriter outStream) throws IOException {
         if (this.debug) {
             StringBuffer msg = new StringBuffer();
@@ -567,6 +569,7 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
          *
          * @return a string representation of the object.
          */
+        @Override
         public String toString() {
             return
                 // "basisVectors : " + basisVectors.toString(NF) +

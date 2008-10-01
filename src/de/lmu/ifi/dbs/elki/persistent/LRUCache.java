@@ -60,6 +60,7 @@ public class LRUCache<P extends Page<P>> implements Cache<P> {
     int hashTableCapacity = (int) Math.ceil(cacheSize / hashTableLoadFactor) + 1;
 
     this.map = new LinkedHashMap<Integer, P>(hashTableCapacity, hashTableLoadFactor, true) {
+      @Override
       protected boolean removeEldestEntry(Map.Entry<Integer, P> eldest) {
         if (size() > LRUCache.this.cacheSize) {
           LRUCache.this.file.objectRemoved(eldest.getValue());
@@ -132,6 +133,7 @@ public class LRUCache<P extends Page<P>> implements Cache<P> {
    *
    * @return a string representation of this cache
    */
+  @Override
   public String toString() {
     return map.toString();
   }

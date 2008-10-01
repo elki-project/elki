@@ -35,6 +35,7 @@ public class FileBasedFloatDistanceFunction extends
    * @param o2  second DatabaseObject
    * @return the distance between the two objects specified by their object ids
    */
+  @Override
   public FloatDistance distance(Integer id1, ExternalObject o2) {
     return distance(id1, o2.getID());
   }
@@ -49,6 +50,7 @@ public class FileBasedFloatDistanceFunction extends
    * @param id2 second object id
    * @return the distance between the two objects specified by their object ids
    */
+  @Override
   @SuppressWarnings("unchecked")
   public FloatDistance distance(Integer id1, Integer id2) {
     // the smaller id is the first key
@@ -66,6 +68,7 @@ public class FileBasedFloatDistanceFunction extends
    *
    * @return String a description of the class and the required parameters
    */
+  @Override
   public String parameterDescription() {
     return "File based double distance for database objects. No parameters required. "
            + "Pattern for defining a range: \""

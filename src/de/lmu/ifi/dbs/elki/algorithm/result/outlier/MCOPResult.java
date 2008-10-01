@@ -44,6 +44,7 @@ public class MCOPResult<O extends DatabaseObject> extends AbstractResult<O> {
         this.db = db;
     }
 
+    @Override
     public void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         PrintStream outStream;
         try {

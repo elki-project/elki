@@ -106,6 +106,7 @@ public class Subspace<V extends RealVector<V, ?>> {
    *
    * @return a string representation of this subspace
    */
+  @Override
   public String toString() {
     return toString("");
   }

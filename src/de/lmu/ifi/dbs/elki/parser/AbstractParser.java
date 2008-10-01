@@ -48,6 +48,7 @@ public abstract class AbstractParser<O extends DatabaseObject> extends AbstractP
    * Returns a string representation of the object.
    * @return a string representation of the object.
    */
+  @Override
   public String toString() {
     return getClass().getName();
   }

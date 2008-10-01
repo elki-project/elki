@@ -20,6 +20,7 @@ public class ClassEditor extends ParameterEditor {
     }
 
 
+    @Override
     public boolean isOptional() {
         return ((ClassParameter<?>) this.option).isOptional();
     }
@@ -55,11 +56,13 @@ public class ClassEditor extends ParameterEditor {
         inputField.add(helpLabel);
         inputField.setInputVerifier(new InputVerifier() {
 
+            @Override
             public boolean verify(JComponent input) {
 
                 return checkInput();
             }
 
+            @Override
             public boolean shouldYieldFocus(JComponent input) {
                 return verify(input);
             }

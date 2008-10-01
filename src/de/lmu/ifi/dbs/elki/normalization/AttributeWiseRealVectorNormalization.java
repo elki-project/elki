@@ -219,6 +219,7 @@ public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ? >> e
    *
    * @return String a description of the class and the required parameters
    */
+  @Override
   public String parameterDescription() {
     return optionHandler.usage("", false);
   }
@@ -232,6 +233,7 @@ public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ? >> e
    * @return String[] an array containing the unused parameters
    * @throws IllegalArgumentException in case of wrong parameter-setting
    */
+  @Override
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
@@ -247,6 +249,7 @@ public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ? >> e
   }
 
   // todo minima und maxima doppelt drin?
+  @Override
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> settings = super.getAttributeSettings();
     AttributeSettings mySettings = settings.get(0);

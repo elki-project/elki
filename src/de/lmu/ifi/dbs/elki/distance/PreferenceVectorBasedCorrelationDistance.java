@@ -62,6 +62,7 @@ public class PreferenceVectorBasedCorrelationDistance
         return commonPreferenceVector;
     }
 
+    @Override
     public String description() {
         return "PreferenceVectorBasedCorrelationDistance.correlationValue, " +
             "PreferenceVectorBasedCorrelationDistance.euclideanValue, " +
@@ -74,6 +75,7 @@ public class PreferenceVectorBasedCorrelationDistance
      * @return the correlation value, the euclidean value and the common preference vector
      *         separated by blanks
      */
+    @Override
     public String toString() {
         return super.toString() + " " + commonPreferenceVector.toString();
     }
@@ -82,6 +84,7 @@ public class PreferenceVectorBasedCorrelationDistance
      * @throws IllegalArgumentException if the dimensionality values and common preference vectors
      *                                  of this distance and the specified distance are not equal
      */
+    @Override
     public PreferenceVectorBasedCorrelationDistance plus(PreferenceVectorBasedCorrelationDistance distance) {
         if (this.dimensionality != distance.dimensionality) {
             throw new IllegalArgumentException("The dimensionality values of this distance " +
@@ -110,6 +113,7 @@ public class PreferenceVectorBasedCorrelationDistance
      * @throws IllegalArgumentException if the dimensionality values and common preference vectors
      *                                  of this distance and the specified distance are not equal
      */
+    @Override
     public PreferenceVectorBasedCorrelationDistance minus(PreferenceVectorBasedCorrelationDistance distance) {
         if (this.dimensionality != distance.dimensionality) {
             throw new IllegalArgumentException("The dimensionality values of this distance " +
@@ -145,6 +149,7 @@ public class PreferenceVectorBasedCorrelationDistance
      * @throws IllegalArgumentException if the dimensionality values
      *                                  of this distance and the specified distance are not equal
      */
+    @Override
     public int compareTo(PreferenceVectorBasedCorrelationDistance distance) {
         if (this.dimensionality != distance.dimensionality) {
             throw new IllegalArgumentException("The dimensionality values of this distance " +
@@ -176,6 +181,7 @@ public class PreferenceVectorBasedCorrelationDistance
      * and reads additionally the dimensionality and each Byte of the common preference vector
      * from the specified stream..
      */
+    @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
         dimensionality = in.readInt();
@@ -192,6 +198,7 @@ public class PreferenceVectorBasedCorrelationDistance
      * @return 16 + 4 * dimensionality (8 Byte for two integer, 8 Byte for a double value,
      *         and 4 * dimensionality for the bit set)
      */
+    @Override
     public int externalizableSize() {
         return super.externalizableSize() + 4 + dimensionality * 4;
     }

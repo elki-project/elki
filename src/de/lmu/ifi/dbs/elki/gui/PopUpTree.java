@@ -63,6 +63,7 @@ public class PopUpTree extends JPopupMenu {
 
         tree.addMouseListener(new MouseAdapter() {
 
+            @Override
             public void mouseClicked(MouseEvent e) {
 
                 if (e.getButton() == MouseEvent.BUTTON1) {
@@ -86,6 +87,7 @@ public class PopUpTree extends JPopupMenu {
                 }
             }
 
+            @Override
             public void mousePressed(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON1) {
 
@@ -307,6 +309,7 @@ public class PopUpTree extends JPopupMenu {
             return path;
         }
 
+        @Override
         public String toString() {
             return nodeLabel;
         }

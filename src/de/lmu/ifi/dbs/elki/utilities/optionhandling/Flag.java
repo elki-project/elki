@@ -50,6 +50,7 @@ public class Flag extends Option<Boolean> {
      *
      * @return the short description of this flag
      */
+    @Override
     public String getDescription() {
         return shortDescription;
     }
@@ -57,6 +58,7 @@ public class Flag extends Option<Boolean> {
     /**
      * Returns true if the flag is set, false otherwise.
      */
+    @Override
     public boolean isSet() {
         return value;
     }
@@ -65,6 +67,7 @@ public class Flag extends Option<Boolean> {
      * Specifies if the flag is set or not. <p/> The given value should be
      * either {@link #SET} or {@link #NOT_SET}.
      */
+    @Override
     public void setValue(String value) throws ParameterException {
         if (isValid(value)) {
             this.value = value.equals(SET);
@@ -80,6 +83,7 @@ public class Flag extends Option<Boolean> {
         this.value = value;
     }
 
+    @Override
     public boolean isValid(String value) throws ParameterException {
         if (value.equals(SET) || value.equals(NOT_SET)) {
             return true;

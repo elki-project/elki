@@ -100,6 +100,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
      * Performs the DeLiClu algorithm on the given database.
      *
      */
+    @Override
     @SuppressWarnings("unchecked")
     protected void runInTime(Database<O> database) throws IllegalStateException {
         if (!(database instanceof SpatialIndexDatabase)) {
@@ -506,6 +507,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
          *
          * @return a string representation of the object.
          */
+        @Override
         public String toString() {
             if (!isExpandable) {
                 return entry1.getID() + " - " + entry2.getID();

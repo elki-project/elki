@@ -84,6 +84,7 @@ public class DeLiCluWrapper<O extends DatabaseObject> extends NormalizationWrapp
         addOption(CACHE_SIZE_PARAM);
     }
 
+    @Override
     public List<String> getKDDTaskParameters() throws UnusedParameterException {
         List<String> parameters = super.getKDDTaskParameters();
 

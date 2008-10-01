@@ -80,6 +80,7 @@ public class FirstNEigenPairFilter extends AbstractParameterizable implements Ei
     return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);
   }
 
+  @Override
   public String parameterDescription() {
     StringBuffer description = new StringBuffer();
     description.append(FirstNEigenPairFilter.class.getName());

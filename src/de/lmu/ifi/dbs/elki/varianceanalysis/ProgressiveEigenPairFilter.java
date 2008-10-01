@@ -167,6 +167,7 @@ public class ProgressiveEigenPairFilter extends AbstractParameterizable implemen
   /**
    * Parameter description.
    */
+  @Override
   public String parameterDescription() {
     StringBuffer description = new StringBuffer();
     description.append(ProgressiveEigenPairFilter.class.getName());
@@ -178,6 +179,7 @@ public class ProgressiveEigenPairFilter extends AbstractParameterizable implemen
   /**
    * Set parameters
    */
+  @Override
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 

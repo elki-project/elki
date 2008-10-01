@@ -294,6 +294,7 @@ public class CustomizerPanel extends JDialog implements
         return about;
     }
 
+    @Override
     public void setVisible(boolean v) {
         super.setVisible(v);
     }

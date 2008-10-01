@@ -62,6 +62,7 @@ public class ParameterizationFunction extends DoubleVector {
     /**
      * @return a new DoubleVector with the specified values
      */
+    @Override
     public DoubleVector newInstance(double[] values) {
         return new ParameterizationFunction(values);
     }
@@ -373,6 +374,7 @@ public class ParameterizationFunction extends DoubleVector {
      *
      * @return a string representation of the object.
      */
+    @Override
     public String toString() {
         return toString(0);
     }

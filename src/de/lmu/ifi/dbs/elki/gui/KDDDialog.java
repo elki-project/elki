@@ -182,6 +182,7 @@ public class KDDDialog extends JDialog implements ActionListener {
 
 		JTextPane area = new JTextPane() {
 
+      @Override
       public Dimension getPreferredScrollableViewportSize() {
 				Dimension dim = getPreferredSize();
 				dim.width = 400;
@@ -189,7 +190,8 @@ public class KDDDialog extends JDialog implements ActionListener {
 				return dim;
 			}
 
-			public void setSize(Dimension d) {
+			@Override
+      public void setSize(Dimension d) {
 
 				if (d.width < getParent().getSize().width) {
 					d.width = getParent().getSize().width;
@@ -199,7 +201,8 @@ public class KDDDialog extends JDialog implements ActionListener {
 				super.setSize(d);
 			}
 
-			public boolean getScrollableTracksViewportWidth() {
+			@Override
+      public boolean getScrollableTracksViewportWidth() {
 
 				return false;
 			}

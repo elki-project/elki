@@ -64,6 +64,7 @@ public class FracClus<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
         return result;
     }
 
+    @Override
     protected void runInTime(Database<V> database) throws IllegalStateException {
         List<HierarchicalFractalDimensionCluster<V>> clusters = new ArrayList<HierarchicalFractalDimensionCluster<V>>();
         if (this.isVerbose()) {

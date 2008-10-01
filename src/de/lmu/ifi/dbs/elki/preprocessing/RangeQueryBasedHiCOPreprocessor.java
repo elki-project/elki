@@ -50,6 +50,7 @@ public class RangeQueryBasedHiCOPreprocessor<V extends RealVector<V, ?>> extends
     optionHandler.setGlobalParameterConstraint(gpc);
   }
 
+  @Override
   protected List<Integer> objectIDsForPCA(Integer id, Database<V> database, boolean verbose, boolean time) {
     pcaDistanceFunction.setDatabase(database, verbose, time);
 
@@ -63,6 +64,7 @@ public class RangeQueryBasedHiCOPreprocessor<V extends RealVector<V, ?>> extends
     return ids;
   }
 
+  @Override
   protected List<QueryResult<DoubleDistance>> resultsForPCA(Integer id, Database<V> database, boolean verbose, boolean time) {
     pcaDistanceFunction.setDatabase(database, verbose, time);
 
@@ -72,6 +74,7 @@ public class RangeQueryBasedHiCOPreprocessor<V extends RealVector<V, ?>> extends
   /**
    * Sets the value for the required parameter k.
    */
+  @Override
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
@@ -87,6 +90,7 @@ public class RangeQueryBasedHiCOPreprocessor<V extends RealVector<V, ?>> extends
    * 
    * @return String a description of the class and the required parameters
    */
+  @Override
   public String parameterDescription() {
     StringBuffer description = new StringBuffer();
     description.append(RangeQueryBasedHiCOPreprocessor.class.getName());

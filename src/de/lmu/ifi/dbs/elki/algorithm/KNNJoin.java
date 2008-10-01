@@ -83,6 +83,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
      * @throws IllegalStateException if the specified database is not an instance of {@link SpatialIndexDatabase}
      *                               or the specified distance function is not an instance of {@link SpatialDistanceFunction}.
      */
+    @Override
     @SuppressWarnings("unchecked")
     protected void runInTime(Database<V> database) throws IllegalStateException {
         if (!(database instanceof SpatialIndexDatabase)) {
@@ -215,6 +216,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
         return pr_knn_distance;
     }
 
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
       String[] remainingParameters = super.setParameters(args);
       k = K_PARAM.getValue();

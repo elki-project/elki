@@ -82,6 +82,7 @@ public class Progress
      * 
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString()
     {
         String processedString = Integer.toString(processed);

@@ -107,11 +107,13 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
     return getDistanceFunctionForCurrentRepresentation().distance(object1, object2);
   }
 
+  @Override
   public String parameterDescription() {
     return "Distance function for multirepresented objects that selects one represenation and " +
            "computes the distances only within the selected representation.";
   }
 
+  @Override
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 

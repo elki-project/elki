@@ -22,6 +22,7 @@ public abstract class AbstractNormalization<O extends DatabaseObject> extends Ab
    *
    * @return a string representation of the object.
    */
+  @Override
   public String toString() {
     return getClass().getName();
   }

@@ -214,6 +214,7 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable<?>> impl
    *
    * @return a string representation of the object.
    */
+  @Override
   public String toString() {
     return heap.toString();
   }

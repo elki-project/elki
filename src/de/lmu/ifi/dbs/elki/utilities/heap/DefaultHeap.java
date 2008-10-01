@@ -359,6 +359,7 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable<?>> imp
    *
    * @return a string representation of this heap
    */
+  @Override
   public String toString() {
     return heap.toString();
   }

@@ -46,6 +46,7 @@ public class ClassListParameter<C> extends ListParameter<String> {
         this.restrictionClass = (Class<C>) restrictionClass;
     }
 
+    @Override
     public void setValue(String value) throws ParameterException {
         if (isValid(value)) {
             String[] classes = SPLIT.split(value);
@@ -66,6 +67,7 @@ public class ClassListParameter<C> extends ListParameter<String> {
         return new String[]{};
     }
 
+    @Override
     public boolean isValid(String value) throws ParameterException {
         String[] classes = SPLIT.split(value);
         if (classes.length == 0) {
@@ -91,6 +93,7 @@ public class ClassListParameter<C> extends ListParameter<String> {
      *
      * @return &quot;&lt;class_1,...,class_n&gt;&quot;
      */
+    @Override
     protected String getParameterType() {
         return "<class_1,...,class_n>";
     }

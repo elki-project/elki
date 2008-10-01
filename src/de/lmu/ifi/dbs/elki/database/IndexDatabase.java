@@ -16,6 +16,7 @@ public abstract class IndexDatabase<O extends DatabaseObject> extends AbstractDa
      * Calls the super method and afterwards deletes the specified object from
      * the underlying index structure.
      */
+    @Override
     public O delete(Integer id) {
         O object = super.delete(id);
         getIndex().delete(object);
@@ -26,6 +27,7 @@ public abstract class IndexDatabase<O extends DatabaseObject> extends AbstractDa
      * Calls the super method and afterwards deletes the specified object from
      * the underlying index structure.
      */
+    @Override
     public void delete(O object) {
         super.delete(object);
         getIndex().delete(object);

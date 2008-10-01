@@ -175,12 +175,14 @@ public class DoubleParameter extends NumberParameter<Double> {
         addConstraintList(cons);
     }
 
+    @Override
     public void setValue(String value) throws ParameterException {
         if (isValid(value)) {
             this.value = Double.parseDouble(value);
         }
     }
 
+    @Override
     public boolean isValid(String value) throws ParameterException {
         try {
             Double.parseDouble(value);
@@ -227,6 +229,7 @@ public class DoubleParameter extends NumberParameter<Double> {
      *
      * @return &quot;&lt;double&gt;&quot;
      */
+    @Override
     protected String getParameterType() {
         return "<double>";
     }

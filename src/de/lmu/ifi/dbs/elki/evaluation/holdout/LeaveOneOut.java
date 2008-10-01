@@ -57,6 +57,7 @@ public class LeaveOneOut<O extends DatabaseObject, L extends ClassLabel> extends
         return partitions;
     }
 
+    @Override
     public String parameterDescription() {
         return "Provides a leave-one-out (jackknife) holdout.";
     }

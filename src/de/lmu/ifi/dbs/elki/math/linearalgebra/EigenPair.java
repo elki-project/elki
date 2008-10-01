@@ -70,6 +70,7 @@ public class EigenPair implements Comparable<EigenPair> {
    *
    * @return a string representation of this EigenPair
    */
+  @Override
   public String toString() {
     return "(ew = " + Util.format(eigenvalue) + ", ev = ["
            + Util.format(eigenvector.getColumnPackedCopy()) + "])";

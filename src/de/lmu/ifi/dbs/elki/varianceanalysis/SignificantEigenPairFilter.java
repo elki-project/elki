@@ -103,6 +103,7 @@ public class SignificantEigenPairFilter extends AbstractParameterizable implemen
   /**
    * Get parameter description
    */
+  @Override
   public String parameterDescription() {
     StringBuffer description = new StringBuffer();
     description.append(SignificantEigenPairFilter.class.getName());
@@ -114,6 +115,7 @@ public class SignificantEigenPairFilter extends AbstractParameterizable implemen
   /**
    * Set parameters
    */
+  @Override
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 

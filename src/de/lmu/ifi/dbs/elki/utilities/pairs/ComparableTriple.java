@@ -31,6 +31,7 @@ public final class ComparableTriple<FIRST extends Comparable<FIRST>,SECOND exten
   /**
    * Canonical toString operator
    */
+  @Override
   public String toString() {
     return "Triple(" + first.toString() + ", " + second.toString() + ", " + third.toString() + ")";
   }

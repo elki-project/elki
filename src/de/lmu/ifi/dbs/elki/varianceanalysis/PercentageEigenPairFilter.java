@@ -105,6 +105,7 @@ public class PercentageEigenPairFilter extends AbstractParameterizable implement
     return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);
   }
 
+  @Override
   public String parameterDescription() {
     StringBuffer description = new StringBuffer();
     description.append(PercentageEigenPairFilter.class.getName());
@@ -114,6 +115,7 @@ public class PercentageEigenPairFilter extends AbstractParameterizable implement
   }
 
   // todo comment
+  @Override
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 

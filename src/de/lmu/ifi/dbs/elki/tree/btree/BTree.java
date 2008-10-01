@@ -260,6 +260,7 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
    *
    * @return a string representation of this BTree
    */
+  @Override
   public String toString() {
     StringBuffer result = new StringBuffer();
     print(getRoot(), result);
@@ -534,6 +535,7 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
      *
      * @return a string representation of the object.
      */
+    @Override
     public String toString() {
       return "Node: " + node + ", keyIndex: " + keyIndex;
     }

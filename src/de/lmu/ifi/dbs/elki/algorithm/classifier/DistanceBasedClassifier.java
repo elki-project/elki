@@ -80,6 +80,7 @@ public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extend
      * @throws IllegalStateException if the Classifier has not been initialized
      *                               or properly trained
      */
+    @Override
     public int classify(O instance) throws IllegalStateException {
         return Util.getIndexOfMaximum(classDistribution(instance));
     }

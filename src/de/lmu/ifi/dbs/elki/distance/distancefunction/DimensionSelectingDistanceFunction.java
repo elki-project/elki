@@ -73,6 +73,7 @@ public class DimensionSelectingDistanceFunction<N extends Number, V extends Feat
      *
      * @return String a description of the class and the required parameters
      */
+    @Override
     public String parameterDescription() {
         StringBuffer description = new StringBuffer();
         description.append(optionHandler.usage("Distance within one specified dimension for NumberVectors. "));
@@ -150,6 +151,7 @@ public class DimensionSelectingDistanceFunction<N extends Number, V extends Feat
         return new DoubleDistance(Math.abs(manhattan));
     }
 
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 

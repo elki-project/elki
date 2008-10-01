@@ -64,6 +64,7 @@ public class QueryStatistic {
      *
      * @return a string representation of this query statistic
      */
+    @Override
     public String toString() {
         return
             "# candidates = " + candidates +

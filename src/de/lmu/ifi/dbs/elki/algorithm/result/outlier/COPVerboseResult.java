@@ -49,6 +49,7 @@ public class COPVerboseResult<O extends RealVector<O, ?>> extends AbstractResult
     this.db = db;
   }
 
+  @Override
   public void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
     PrintStream outStream;
     try {

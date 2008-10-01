@@ -78,6 +78,7 @@ public class SparseBitVectorLabelParser extends AbstractParser<BitVector> {
     return new ParsingResult<BitVector>(objectAndLabelsList);
   }
 
+  @Override
   public String parameterDescription() {
     StringBuffer description = new StringBuffer();
     description.append(SparseBitVectorLabelParser.class.getName());

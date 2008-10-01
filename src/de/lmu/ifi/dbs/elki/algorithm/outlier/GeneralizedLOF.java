@@ -99,6 +99,7 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
     /**
      * Performs the Generalized LOF algorithm on the given database.
      */
+    @Override
     protected void runInTime(Database<O> database) throws IllegalStateException {
         getDistanceFunction().setDatabase(database, isVerbose(), isTime());
         reachabilityDistanceFunction.setDatabase(database, isVerbose(), isTime());

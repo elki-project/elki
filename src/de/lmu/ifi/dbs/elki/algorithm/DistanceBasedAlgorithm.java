@@ -102,6 +102,7 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
      * Calls the super method
      * and appends the parameter description of {@link #distanceFunction} if it is already initialized.
      */
+    @Override
     public String parameterDescription() {
         StringBuilder description = new StringBuilder();
         description.append(super.parameterDescription());

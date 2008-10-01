@@ -138,6 +138,7 @@ public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P e
       return (D) new CorrelationDistance<D>(-1, Double.NaN);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     D correlationDistance(V dv1, V dv2) {
         PCAFilteredResult pca1 = getDatabase().getAssociation(AssociationID.LOCAL_PCA, dv1.getID());

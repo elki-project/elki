@@ -94,6 +94,7 @@ public class DefaultHeapNode<K extends Comparable<K>, V extends Identifiable<?>>
    *
    * @return a string representation of this heap node
    */
+  @Override
   public String toString() {
     return key + ":" + value;
   }

@@ -54,6 +54,7 @@ public class KnnQueryBasedHiCOPreprocessor<V extends RealVector<V, ?>> extends H
     addOption(K_PARAM);
   }
 
+  @Override
   protected List<Integer> objectIDsForPCA(Integer id, Database<V> database, boolean verbose, boolean time) {
     if(k == null) {
       V obj = database.get(id);
@@ -71,6 +72,7 @@ public class KnnQueryBasedHiCOPreprocessor<V extends RealVector<V, ?>> extends H
     return ids;
   }
 
+  @Override
   protected List<QueryResult<DoubleDistance>> resultsForPCA(Integer id, Database<V> database, boolean verbose, boolean time) {
     if(k == null) {
       V obj = database.get(id);
@@ -86,6 +88,7 @@ public class KnnQueryBasedHiCOPreprocessor<V extends RealVector<V, ?>> extends H
    * value is used.
    * 
    */
+  @Override
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
@@ -97,6 +100,7 @@ public class KnnQueryBasedHiCOPreprocessor<V extends RealVector<V, ?>> extends H
     return remainingParameters;
   }
 
+  @Override
   public String parameterDescription() {
     StringBuffer description = new StringBuffer();
     description.append(KnnQueryBasedHiCOPreprocessor.class.getName());

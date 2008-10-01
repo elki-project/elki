@@ -44,6 +44,7 @@ public class DirectSupportDependentItemsetDistanceFunction
     return new DoubleDistance(support * Math.max(1.0 - ratio(i, card1), 1.0 - ratio(i, card2)));
   }
 
+  @Override
   public String parameterDescription() {
     return "Distance is support(%) * max{1-ratio(i,o1),1-ratio(i,o2)}, where i is the number of bits shared by both BitVectors, o is the number of bits in the respective BitVector, and ratio(i,o) is 1 if o is 0, i/o otherwise.";
   }

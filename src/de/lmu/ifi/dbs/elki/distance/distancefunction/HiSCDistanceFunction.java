@@ -29,6 +29,7 @@ public class HiSCDistanceFunction<V extends RealVector<V, ?>, P extends Preproce
      * @param pv2 the second preference vector
      * @return the correlation distance between the two specified vectors
      */
+    @Override
     public PreferenceVectorBasedCorrelationDistance correlationDistance(V v1, V v2, BitSet pv1, BitSet pv2) {
         BitSet commonPreferenceVector = (BitSet) pv1.clone();
         commonPreferenceVector.and(pv2);

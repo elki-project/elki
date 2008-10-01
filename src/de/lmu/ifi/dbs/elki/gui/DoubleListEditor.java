@@ -21,7 +21,8 @@ public class DoubleListEditor extends TextFieldParameterEditor {
 		
 		inputField = new JPanel();
 		textField = new JTextField() {
-			public void setText(String t) {
+			@Override
+      public void setText(String t) {
 				String text = getText();
 				if (text == null || text.equals("")) {
 					super.setText(t);

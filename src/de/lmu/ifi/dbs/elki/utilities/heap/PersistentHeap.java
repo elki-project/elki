@@ -342,6 +342,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
      *
      * @return a string representation of this heap
      */
+    @Override
     public String toString() {
         StringBuffer buffer = new StringBuffer();
         buffer.append("*****************\n");

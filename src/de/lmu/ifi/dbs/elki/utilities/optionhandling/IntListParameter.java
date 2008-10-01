@@ -43,6 +43,7 @@ public class IntListParameter extends ListParameter<Integer> {
     super(optionID);
   }
 
+  @Override
   public void setValue(String value) throws ParameterException {
     if(isValid(value)) {
       String[] values = SPLIT.split(value);
@@ -54,6 +55,7 @@ public class IntListParameter extends ListParameter<Integer> {
     }
   }
 
+  @Override
   public boolean isValid(String value) throws ParameterException {
     String[] values = SPLIT.split(value);
     if(values.length == 0) {
@@ -95,6 +97,7 @@ public class IntListParameter extends ListParameter<Integer> {
    * 
    * @return &quot;&lt;int_1,...,int_n&gt;&quot;
    */
+  @Override
   protected String getParameterType() {
     return "<int_1,...,int_n>";
   }

@@ -46,6 +46,7 @@ public class ParsingResult<O extends DatabaseObject>
      * 
      * @return a string representation of the object.
      */
+    @Override
     public String toString()
     {
         return objectAndLabelList.toString();

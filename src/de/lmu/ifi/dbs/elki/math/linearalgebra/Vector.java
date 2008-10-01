@@ -150,6 +150,7 @@ public class Vector extends Matrix {
    * @param s the scalar to be multiplied
    * @return the resulting vector
    */
+  @Override
   public Vector times(double s) {
     Vector v = new Vector(getDimensionality());
     for (int i = 0; i < getDimensionality(); i++) {
@@ -192,6 +193,7 @@ public class Vector extends Matrix {
    *
    * @return a copy of this vector
    */
+  @Override
   public Vector copy() {
     return new Vector(this.getRowPackedCopy().clone());
   }
@@ -201,6 +203,7 @@ public class Vector extends Matrix {
    *
    * @return a string representation of this vector.
    */
+  @Override
   public String toString() {
     return "[" + Util.format(getColumnPackedCopy()) + "]";
   }
@@ -211,6 +214,7 @@ public class Vector extends Matrix {
    * @param nf a NumberFormat to specify the output precision
    * @return a string representation of this vector.
    */
+  @Override
   public String toString(NumberFormat nf) {
     return "[" + Util.format(getColumnPackedCopy(), nf) + "]";
   }

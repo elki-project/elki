@@ -115,6 +115,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
    * @param pageID the id of the page to be returned
    * @return the page with the given pageId
    */
+  @Override
   public P readPage(int pageID) {
     try {
       // try to get from cache
@@ -150,6 +151,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
    *
    * @param pageID the id of the node to be deleted
    */
+  @Override
   public void deletePage(int pageID) {
     try {
       // / put id to empty nodes and
@@ -195,6 +197,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
   /**
    * Closes this file.
    */
+  @Override
   public void close() {
     try {
       super.close();
@@ -209,6 +212,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
   /**
    * Clears this PageFile.
    */
+  @Override
   public void clear() {
     try {
       super.clear();

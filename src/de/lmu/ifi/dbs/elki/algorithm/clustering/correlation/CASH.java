@@ -213,6 +213,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
      * Performs the CASH algorithm on the given database.
      *
      */
+    @Override
     protected void runInTime(Database<ParameterizationFunction> database) throws IllegalStateException {
         this.database = database;
         if (isVerbose()) {
@@ -289,6 +290,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
      * {@link #MINPTS_PARAM}, {@link #MAXLEVEL_PARAM}, {@link #MINDIM_PARAM}, {@link #JITTER_PARAM},
      * and the flag {@link #ADJUST_FLAG}.
      */
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
         // minpts

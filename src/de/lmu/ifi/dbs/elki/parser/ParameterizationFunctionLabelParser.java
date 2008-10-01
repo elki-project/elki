@@ -75,6 +75,7 @@ public class ParameterizationFunctionLabelParser extends AbstractParser<Paramete
         return new ParsingResult<ParameterizationFunction>(objectAndLabelsList);
     }
 
+    @Override
     public String parameterDescription() {
         StringBuffer description = new StringBuffer();
         description.append(ParameterizationFunctionLabelParser.class.getName());

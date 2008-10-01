@@ -99,6 +99,7 @@ public class KernelBasedLocallyWeightedDistanceFunction<V extends RealVector<V, 
         return new DoubleDistance(value);
     }
 
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 

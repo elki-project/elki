@@ -61,6 +61,7 @@ public class PointerRepresentation<O extends DatabaseObject, D extends Distance<
         this.distanceFunction = distanceFunction;
     }
 
+    @Override
     public void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
         PrintStream outStream;
         try {
@@ -85,6 +86,7 @@ public class PointerRepresentation<O extends DatabaseObject, D extends Distance<
      *
      * @return a string representation of this pointer representation
      */
+    @Override
     public String toString() {
         StringBuffer result = new StringBuffer();
 

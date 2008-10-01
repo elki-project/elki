@@ -42,7 +42,8 @@ public class FlagEditor extends ParameterEditor {
 		inputField.add(helpLabel);
 	}
 	
-	public boolean isOptional(){
+	@Override
+  public boolean isOptional(){
 		return false;
 	}
 

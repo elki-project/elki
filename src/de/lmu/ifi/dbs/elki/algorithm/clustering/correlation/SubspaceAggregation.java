@@ -84,6 +84,7 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
         return new Description("SubspaceAggregation", "SubspaceAggregation", "", "");
     }
 
+    @Override
     public void runInTime(Database<V> database) throws IllegalStateException {
         if (database.size() == 0) {
             throw new IllegalArgumentException("database empty: must contain elements");

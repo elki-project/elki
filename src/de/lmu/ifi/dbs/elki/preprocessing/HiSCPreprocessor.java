@@ -155,6 +155,7 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
 
   }
 
+  @Override
   public String parameterDescription() {
     StringBuffer description = new StringBuffer();
     description.append(HiSCPreprocessor.class.getName());
@@ -163,6 +164,7 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
     return description.toString();
   }
 
+  @Override
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 

@@ -79,6 +79,7 @@ public class ProvidedTestSet<O extends DatabaseObject, L extends ClassLabel> ext
         return split;
     }
 
+    @Override
     public String parameterDescription() {
         StringBuffer description = new StringBuffer();
         description.append(optionHandler.usage("AllTraining puts the complete database in the training set. A testset is expected via a database connection.", false));
@@ -87,6 +88,7 @@ public class ProvidedTestSet<O extends DatabaseObject, L extends ClassLabel> ext
         return description.toString();
     }
 
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 

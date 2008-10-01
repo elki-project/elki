@@ -28,6 +28,7 @@ public class DummyAlgorithm<V extends NumberVector<V,?>> extends AbstractAlgorit
   /**
    * Iterates over all points in the database.
    */
+  @Override
   protected void runInTime(Database<V> database) throws IllegalStateException {
     DistanceFunction<V,DoubleDistance> distFunc = new EuclideanDistanceFunction<V>();
     for(Iterator<Integer> iter = database.iterator(); iter.hasNext(); ) {

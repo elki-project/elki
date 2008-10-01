@@ -233,6 +233,7 @@ public class CLIQUESubspace<V extends RealVector<V, ?>> extends Subspace<V> impl
      * @param pre a string prefix
      * @return a string representation of this subspace
      */
+    @Override
     public String toString(String pre) {
         StringBuffer result = new StringBuffer();
         result.append(super.toString(pre));

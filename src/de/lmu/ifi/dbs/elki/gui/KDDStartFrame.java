@@ -91,6 +91,7 @@ public class KDDStartFrame extends JFrame {
         return panel;
     }
 
+    @Override
     public Dimension getMinimumSize() {
         return new Dimension(500, 200);
     }

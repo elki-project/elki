@@ -29,6 +29,7 @@ public class PairGeneratorMerge extends PairSortedGenerator {
    * 
    * This will return the smallest of all the "merged" generator results. 
    */
+  @Override
   protected IntIntPair advance() {
     IntIntPair min = null;
     PairSortedGeneratorInterface best = null;

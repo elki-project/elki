@@ -154,6 +154,7 @@ public class SortedEigenPairs {
    *
    * @return a string representation of this EigenPair
    */
+  @Override
   public String toString() {
     StringBuffer result = new StringBuffer();
     for(EigenPair eigenPair: eigenPairs) {

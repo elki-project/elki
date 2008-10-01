@@ -35,6 +35,7 @@ public abstract class AbstractLocallyWeightedDistanceFunction<O extends RealVect
         preprocessorHandler = new PreprocessorHandler<O, P>(this);
     }
 
+    @Override
     public void setDatabase(Database<O> database, boolean verbose, boolean time) {
         super.setDatabase(database, verbose, time);
         preprocessorHandler.runPreprocessor(database, verbose, time);
@@ -67,6 +68,7 @@ public abstract class AbstractLocallyWeightedDistanceFunction<O extends RealVect
         return mySettings;
     }
 
+    @Override
     public String parameterDescription() {
         StringBuilder description = new StringBuilder();
         description.append(super.parameterDescription());

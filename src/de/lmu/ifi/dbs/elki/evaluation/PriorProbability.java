@@ -33,6 +33,7 @@ public class PriorProbability<O extends DatabaseObject, L extends ClassLabel, C 
         System.arraycopy(priorProbability, 0, this.priorProbability, 0, priorProbability.length);
     }
 
+    @Override
     public void outputEvaluationResult(PrintStream output) {
         output.print("### prior probabilities for classes:\n### ");
         for (int i = 0; i < priorProbability.length; i++) {

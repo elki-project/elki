@@ -48,6 +48,7 @@ public class LOFEntry implements Externalizable {
      *
      * @return a string representation of this object
      */
+    @Override
     public String toString() {
         StringBuffer result = new StringBuffer();
         result.append(sum1);
@@ -185,6 +186,7 @@ public class LOFEntry implements Externalizable {
      * @return <code>true</code> if this object is the same as the o argument,
      *         <code>false</code> otherwise.
      */
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -209,6 +211,7 @@ public class LOFEntry implements Externalizable {
      *
      * @return a hash code value for this object.
      */
+    @Override
     public int hashCode() {
         final long temp = sum1 != 0.0d ? Double.doubleToLongBits(sum1) : 0L;
         return (int) (temp ^ (temp >>> 32));

@@ -121,6 +121,7 @@ public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends
     /**
      * Performs the PROCLUS algorithm on the given database.
      */
+    @Override
     protected void runInTime(Database<V> database) throws IllegalStateException {
         Progress progress = new Progress("assigning SOD", database.size());
         int processed = 0;

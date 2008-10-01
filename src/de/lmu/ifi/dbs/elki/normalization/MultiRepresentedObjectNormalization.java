@@ -291,6 +291,7 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
    * @return String[] an array containing the unused parameters
    * @throws IllegalArgumentException in case of wrong parameter-setting
    */
+  @Override
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingOptions = super.setParameters(args);
 

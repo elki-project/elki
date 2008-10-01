@@ -74,6 +74,7 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends RealVector<V,
    * @param neighbors the neighbors as query results of the given point
    * @param database  the database for which the preprocessing is performed
    */
+  @Override
   protected void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<V> database) {
     StringBuffer msg = new StringBuffer();
 
@@ -141,12 +142,14 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends RealVector<V,
     database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, simMatrix);
   }
 
+  @Override
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     delta = DELTA_PARAM.getValue();
     return remainingParameters;
   }
 
+  @Override
   public String parameterDescription() {
     StringBuffer description = new StringBuffer();
     description.append(PreDeConPreprocessor.class.getName());

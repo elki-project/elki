@@ -64,6 +64,7 @@ public class ArbitraryKernelFunctionWrapper<O extends RealVector<O, ? >> extends
 		return "Arbitrary kernel function wrapper for FeatureVectors. No parameters required.";
 	}
 
+  @Override
   @SuppressWarnings("unchecked")
   public void setDatabase(Database<O> database, boolean verbose, boolean time) {
     super.setDatabase(database, verbose, time);

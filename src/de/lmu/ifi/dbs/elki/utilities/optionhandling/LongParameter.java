@@ -53,6 +53,7 @@ public class LongParameter extends NumberParameter<Long> {
         super(optionID, null, optional, defaultValue);
     }
 
+    @Override
     public boolean isValid(String value) throws ParameterException {
         try {
             Long.parseLong(value);
@@ -75,6 +76,7 @@ public class LongParameter extends NumberParameter<Long> {
         return true;
     }
 
+    @Override
     public void setValue(String value) throws ParameterException {
         if (isValid(value)) {
             this.value = Long.parseLong(value);
@@ -86,6 +88,7 @@ public class LongParameter extends NumberParameter<Long> {
      *
      * @return &quot;&lt;long&gt;&quot;
      */
+    @Override
     protected String getParameterType() {
         return "<long>";
     }

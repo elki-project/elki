@@ -78,6 +78,7 @@ public class ParameterizableEditor extends ParameterEditor implements PopUpTreeL
     }
 
 
+    @Override
     public boolean isOptional() {
         return ((ClassParameter<?>) this.option).isOptional();
     }
@@ -87,6 +88,7 @@ public class ParameterizableEditor extends ParameterEditor implements PopUpTreeL
 
         this.displayField = new JTextPane() {
 
+            @Override
             public Dimension getPreferredScrollableViewportSize() {
                 Dimension dim = getPreferredSize();
                 dim.width = VIEWPORT_WIDTH;
@@ -94,6 +96,7 @@ public class ParameterizableEditor extends ParameterEditor implements PopUpTreeL
                 return dim;
             }
 
+            @Override
             public void setSize(Dimension d) {
 
                 if (d.width < getParent().getSize().width) {
@@ -104,6 +107,7 @@ public class ParameterizableEditor extends ParameterEditor implements PopUpTreeL
                 super.setSize(d);
             }
 
+            @Override
             public boolean getScrollableTracksViewportWidth() {
 
                 return false;
@@ -122,6 +126,7 @@ public class ParameterizableEditor extends ParameterEditor implements PopUpTreeL
         this.pane.setViewportView(displayField);
 
         this.displayField.addMouseListener(new MouseAdapter() {
+            @Override
             public void mouseClicked(MouseEvent e) {
 
                 if (customizer != null && customizer.getSelectedClass() != null && ParameterizableEditor.this.value != null) {
@@ -243,6 +248,7 @@ public class ParameterizableEditor extends ParameterEditor implements PopUpTreeL
         return paramToValue;
     }
 
+    @Override
     public void setValue(String value) {
 
         this.value = value;

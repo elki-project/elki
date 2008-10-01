@@ -64,6 +64,7 @@ public class LPNormDistanceFunction<V extends FeatureVector<V, N>, N extends Num
         return new DoubleDistance(Math.pow(sqrDist, 1.0 / p));
     }
 
+    @Override
     public String parameterDescription() {
         StringBuffer description = new StringBuffer();
         description.append(optionHandler.usage("LP-Norm for FeatureVectors.", false));
@@ -71,6 +72,7 @@ public class LPNormDistanceFunction<V extends FeatureVector<V, N>, N extends Num
         return description.toString();
     }
 
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingOptions = super.setParameters(args);
 

@@ -53,6 +53,7 @@ public abstract class RandomizedHoldout<O extends DatabaseObject, L extends Clas
     /**
      * Sets the parameter seed.
      */
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 

@@ -102,6 +102,7 @@ public class StratifiedCrossValidation<O extends DatabaseObject, L extends Class
         return partitions;
     }
 
+    @Override
     public String parameterDescription() {
         return "Provides a stratified n-fold cross-validation holdout.";
     }

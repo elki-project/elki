@@ -119,6 +119,7 @@ public class MultipleLinearRegression extends AbstractLoggable {
      *
      * @return a string representation of the object.
      */
+    @Override
     public String toString() {
         StringBuffer msg = new StringBuffer();
         msg.append("\nx = ");

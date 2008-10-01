@@ -181,6 +181,7 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
      * Performs the CLIQUE algorithm on the given database.
      *
      */
+    @Override
     protected void runInTime(Database<V> database) throws IllegalStateException {
         Map<CLIQUEModel<V>, Set<Integer>> modelsAndClusters = new HashMap<CLIQUEModel<V>, Set<Integer>>();
 

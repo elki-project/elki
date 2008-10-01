@@ -288,6 +288,7 @@ public class FastICA<V extends RealVector<V, ?>> extends AbstractParameterizable
         this.debug = true;
     }
 
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 

@@ -79,6 +79,7 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
   /**
    * Performs the ORCLUS algorithm on the given database.
    */
+  @Override
   protected void runInTime(Database<V> database) throws IllegalStateException {
 
     try {

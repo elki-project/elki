@@ -232,6 +232,7 @@ public abstract class Parameter<T, C> extends Option<T> {
     /**
      * @return the option's description.
      */
+    @Override
     public final String getDescription() {
         StringBuffer description = new StringBuffer();
         description.append(getParameterType()).append(" ");

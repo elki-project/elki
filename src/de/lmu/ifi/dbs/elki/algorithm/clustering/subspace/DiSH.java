@@ -119,6 +119,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> {
      * Performs the DiSH algorithm on the given database.
      *
      */
+    @Override
     protected void runInTime(Database<V> database) throws IllegalStateException {
         if (isVerbose()) {
             verbose("\nRun OPTICS algorithm.");

@@ -69,6 +69,7 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
      *
      * @return the correlation value and the euclidean value separated by blank
      */
+    @Override
     public String toString() {
         return Integer.toString(correlationValue) + " " + Double.toString(euclideanValue);
     }
@@ -95,6 +96,7 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
         }
     }
 
+    @Override
     public int hashCode() {
         int result;
         long temp;

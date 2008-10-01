@@ -245,6 +245,7 @@ public class CLIQUEUnit<V extends RealVector<V, ?>> {
      *
      * @return a string representation of this unit
      */
+    @Override
     public String toString() {
         StringBuffer result = new StringBuffer();
         for (Interval interval : intervals)

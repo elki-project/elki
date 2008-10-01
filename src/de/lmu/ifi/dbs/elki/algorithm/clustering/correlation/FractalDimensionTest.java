@@ -87,6 +87,7 @@ public class FractalDimensionTest<V extends RealVector<V, ?>> extends AbstractAl
         //optionHandler.put(supporters);
     }
 
+    @Override
     protected void runInTime(Database<V> database) throws IllegalStateException {
         distanceFunction.setDatabase(database, true, false);
         List<Integer> suppID1 = database.getAssociation(AssociationID.NEIGHBOR_IDS, id1);

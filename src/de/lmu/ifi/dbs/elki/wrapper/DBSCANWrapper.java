@@ -70,6 +70,7 @@ public class DBSCANWrapper<O extends DatabaseObject> extends NormalizationWrappe
         addOption(MINPTS_PARAM);
     }
 
+    @Override
     public List<String> getKDDTaskParameters() throws UnusedParameterException {
         List<String> parameters = super.getKDDTaskParameters();
 

@@ -50,6 +50,7 @@ public class TanhContrastFunction extends AbstractParameterizable implements Con
     return (a * (1 - tanha1x * tanha1x));
   }
 
+  @Override
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 

@@ -92,6 +92,7 @@ public class WeakEigenPairFilter extends AbstractParameterizable implements Eige
   /**
    * Get parameter description
    */
+  @Override
   public String parameterDescription() {
     StringBuffer description = new StringBuffer();
     description.append(WeakEigenPairFilter.class.getName());
@@ -103,6 +104,7 @@ public class WeakEigenPairFilter extends AbstractParameterizable implements Eige
   /**
    * Set parameters
    */
+  @Override
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 

@@ -104,6 +104,7 @@ public class DirectoryTask extends StandAloneInputWrapper {
      *
      * @return the description for the input parameter
      */
+    @Override
     public String getInputDescription() {
         return "The name of the directory to run the wrapper on.";
     }
@@ -113,6 +114,7 @@ public class DirectoryTask extends StandAloneInputWrapper {
      *
      * @return the description for the output parameter
      */
+    @Override
     public String getOutputDescription() {
         return "The name of the output file.";
     }

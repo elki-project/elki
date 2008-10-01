@@ -59,6 +59,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
      * Calls the super method and afterwards inserts the specified object into
      * the underlying index structure.
      */
+    @Override
     public Integer insert(ObjectAndAssociations<O> objectAndAssociations) throws UnableToComplyException {
         Integer id = super.insert(objectAndAssociations);
         O object = objectAndAssociations.getObject();
@@ -72,6 +73,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
      * the index structure is empty, a bulk load will be performed. Otherwise
      * the objects will be inserted sequentially.
      */
+    @Override
     public void insert(List<ObjectAndAssociations<O>> objectsAndAssociationsList) throws UnableToComplyException {
         for (ObjectAndAssociations<O> objectAndAssociations : objectsAndAssociationsList) {
             super.insert(objectAndAssociations);
@@ -163,6 +165,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
      *
      * @return the index of this database
      */
+    @Override
     public MetricalIndex<O, D, N, E> getIndex() {
         return index;
     }

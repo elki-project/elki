@@ -131,12 +131,14 @@ public class IntParameter extends NumberParameter<Integer> {
         addConstraintList(constraints);
     }
 
+    @Override
     public void setValue(String value) throws ParameterException {
         if (isValid(value)) {
             this.value = Integer.parseInt(value);
         }
     }
 
+    @Override
     public boolean isValid(String value) throws ParameterException {
         try {
             Integer.parseInt(value);
@@ -163,6 +165,7 @@ public class IntParameter extends NumberParameter<Integer> {
      *
      * @return &quot;&lt;int&gt;&quot;
      */
+    @Override
     protected String getParameterType() {
         return "<int>";
     }

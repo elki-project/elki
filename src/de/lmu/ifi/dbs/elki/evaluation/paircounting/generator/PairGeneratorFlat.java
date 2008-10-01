@@ -46,6 +46,7 @@ public class PairGeneratorFlat extends PairSortedGenerator {
   /**
    * Advance iterator.
    */
+  @Override
   protected IntIntPair advance() {
     if (current() == null) return null;
     pos2++;

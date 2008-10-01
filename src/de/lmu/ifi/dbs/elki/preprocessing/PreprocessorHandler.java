@@ -117,6 +117,7 @@ public class PreprocessorHandler<O extends DatabaseObject, P extends Preprocesso
      * and instantiates {@link #preprocessor} according to the value of parameter {@link #PREPROCESSOR_PARAM}
      * The remaining parameters are passed to the {@link #preprocessor}.
      */
+    @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 

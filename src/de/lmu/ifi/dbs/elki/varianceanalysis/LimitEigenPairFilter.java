@@ -167,6 +167,7 @@ public class LimitEigenPairFilter extends AbstractParameterizable implements Eig
 		return remainingParameters;
 	}
 
+  @Override
   public String parameterDescription() {
 		StringBuffer description = new StringBuffer();
 		description.append(PercentageEigenPairFilter.class.getName());

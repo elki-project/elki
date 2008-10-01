@@ -92,6 +92,7 @@ public class DisjointCrossValidation<O extends DatabaseObject, L extends ClassLa
     return partitions;
   }
 
+  @Override
   public String parameterDescription() {
     return "Provides an n-fold cross-validation holdout with disjoint test sets.";
   }
@@ -100,6 +101,7 @@ public class DisjointCrossValidation<O extends DatabaseObject, L extends ClassLa
    * Sets the parameter n.
    *
    */
+  @Override
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 

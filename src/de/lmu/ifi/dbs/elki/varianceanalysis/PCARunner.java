@@ -67,6 +67,7 @@ public class PCARunner<V extends RealVector<V, ?>> extends AbstractParameterizab
   /**
    * Parameter handling.
    */
+  @Override
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     // small value

@@ -124,6 +124,7 @@ public class TransposedViewWrapper<V extends RealVector<V, ?>> extends StandAlon
    * 
    * @return the description for the input parameter
    */
+  @Override
   public String getInputDescription() {
     return "The name of the input file.";
   }
@@ -133,6 +134,7 @@ public class TransposedViewWrapper<V extends RealVector<V, ?>> extends StandAlon
    * 
    * @return the description for the output parameter
    */
+  @Override
   public String getOutputDescription() {
     return "The name of the output file.";
   }

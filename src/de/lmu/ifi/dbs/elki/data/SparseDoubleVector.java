@@ -72,6 +72,7 @@ public class SparseDoubleVector extends RealVector<SparseDoubleVector, Double> {
     /**
      * @see RealVector#newInstance(double[])
      */
+    @Override
     public SparseDoubleVector newInstance(double[] values) {
         return new SparseDoubleVector(values);
     }

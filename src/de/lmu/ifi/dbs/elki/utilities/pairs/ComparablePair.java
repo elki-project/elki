@@ -24,6 +24,7 @@ public final class ComparablePair<FIRST extends Comparable<FIRST>,SECOND extends
   /**
    * Canonical toString operator
    */
+  @Override
   public String toString() {
     return "Pair(" + first.toString() + ", " + second.toString() + ")";
   }

@@ -72,6 +72,7 @@ public class BitVectorLabelParser extends AbstractParser<BitVector> {
     return new ParsingResult<BitVector>(objectAndLabelsList);
   }
 
+  @Override
   public String parameterDescription() {
     StringBuffer description = new StringBuffer();
     description.append(BitVectorLabelParser.class.getName());
