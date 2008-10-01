@@ -8,9 +8,9 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
-import de.lmu.ifi.dbs.elki.utilities.IDDoublePair;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.elki.utilities.pairs.IntDoublePair;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -87,16 +87,16 @@ public class GeneralizedLOFResult<O extends DatabaseObject> extends AbstractResu
         writeHeader(outStream, settings, null);
 
         try {
-            List<IDDoublePair> lofs = new ArrayList<IDDoublePair>(db.size());
+            List<IntDoublePair> lofs = new ArrayList<IntDoublePair>(db.size());
             for (Iterator<Integer> it = db.iterator(); it.hasNext();) {
                 Integer id = it.next();
-                lofs.add(new IDDoublePair(id, db.getAssociation(AssociationID.LOF, id)));
+                lofs.add(new IntDoublePair(id, db.getAssociation(AssociationID.LOF, id)));
             }
             Collections.sort(lofs, Collections.reverseOrder());
 
             // write lofs
-            for (IDDoublePair pair : lofs) {
-                Integer id = pair.getID();
+            for (IntDoublePair pair : lofs) {
+                Integer id = pair.getFirst();
 
                 outStream.print("ID=");
                 outStream.print(id);
@@ -125,7 +125,7 @@ public class GeneralizedLOFResult<O extends DatabaseObject> extends AbstractResu
                 }
 
                 outStream.print("LOF=");
-                outStream.println(pair.getValue());
+                outStream.println(pair.getSecond());
             }
         }
         catch (NonNumericFeaturesException e) {

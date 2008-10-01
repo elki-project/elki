@@ -9,10 +9,10 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
-import de.lmu.ifi.dbs.elki.utilities.IDDoublePair;
-import de.lmu.ifi.dbs.elki.utilities.IDDoublePairComparatorDescDouble;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.elki.utilities.pairs.CompareSwappedDescending;
+import de.lmu.ifi.dbs.elki.utilities.pairs.IntDoublePair;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -131,21 +131,21 @@ public class LOFResult<O extends DatabaseObject> extends AbstractResult<O> {
 
         try {
             // build lofs
-            List<IDDoublePair> lofs = new ArrayList<IDDoublePair>(db.size());
+            List<IntDoublePair> lofs = new ArrayList<IntDoublePair>(db.size());
             Iterator<Integer> it = db.iterator();
             while (it.hasNext()) {
                 Integer id = it.next();
                 double lof = lofTable.getLOFEntry(id).getLOF();
-                lofs.add(new IDDoublePair(id, lof));
+                lofs.add(new IntDoublePair(id, lof));
             }
 
             // sort lofs
-            Collections.sort(lofs, new IDDoublePairComparatorDescDouble());
+            Collections.sort(lofs, new CompareSwappedDescending<IntDoublePair>());
 
             // write lofs
-            for (IDDoublePair idDoublePair : lofs) {
-                double lof = idDoublePair.getValue();
-                int objectID = idDoublePair.getID();
+            for (IntDoublePair idDoublePair : lofs) {
+                double lof = idDoublePair.getSecond();
+                int objectID = idDoublePair.getFirst();
 
                 outStream.print("ID=");
                 outStream.print(objectID);

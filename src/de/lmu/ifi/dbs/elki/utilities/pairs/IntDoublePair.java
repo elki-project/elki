@@ -1,18 +1,18 @@
 package de.lmu.ifi.dbs.elki.utilities.pairs;
 
 /**
- * Pair storing two doubles. For efficiency reasons this class is made final
+ * Pair storing an integer and a double. For efficiency reasons this class is made final
  * and it thus is also sane to allow direct (public) access to the values.
  * 
- * Since double is a native type, this can't be done via the {@link ComparablePair} generic.
+ * Since double and int are native types, this can't be done via the {@link ComparablePair} generic.
  * 
  * @author Erich Schubert <schube@dbs.ifi.lmu.de>
  */
-public final class DoubleDoublePair implements Comparable<DoubleDoublePair>, ComparableSwapped<DoubleDoublePair> {
+public final class IntDoublePair implements Comparable<IntDoublePair>, ComparableSwapped<IntDoublePair> {
   /**
    * first value
    */
-  public double first;
+  public int first;
   /**
    * second value
    */
@@ -24,7 +24,7 @@ public final class DoubleDoublePair implements Comparable<DoubleDoublePair>, Com
    * @param first
    * @param second
    */
-  public DoubleDoublePair(double first, double second) {
+  public IntDoublePair(int first, double second) {
     super();
     this.first = first;
     this.second = second;
@@ -39,7 +39,7 @@ public final class DoubleDoublePair implements Comparable<DoubleDoublePair>, Com
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
 
-    DoubleDoublePair other = (DoubleDoublePair) obj;
+    IntDoublePair other = (IntDoublePair) obj;
     return (this.first == other.first) && (this.second == other.second);
   }
 
@@ -48,21 +48,18 @@ public final class DoubleDoublePair implements Comparable<DoubleDoublePair>, Com
    */
   @Override
   public int hashCode() {
-    // convert to longs
-    long firsthash = Double.doubleToLongBits(first);
-    firsthash = firsthash ^ (firsthash >> 32); 
     long secondhash = Double.doubleToLongBits(second);
     secondhash = secondhash ^ (secondhash >> 32); 
     // primitive hash function mixing the two integers.
     // this number does supposedly not have any factors in common with 2^32
-    return (int) (firsthash * 2654435761L + secondhash);
+    return (int) (first * 2654435761L + secondhash);
   }
 
   /**
    * Implementation of comparable interface, sorting by first then second.
    */
-  public int compareTo(DoubleDoublePair other) {
-    int fdiff = Double.compare(this.first, other.first);
+  public int compareTo(IntDoublePair other) {
+    int fdiff = this.first - other.first;
     if (fdiff != 0) return fdiff;
     return Double.compare(this.second, other.second);
   }
@@ -70,10 +67,10 @@ public final class DoubleDoublePair implements Comparable<DoubleDoublePair>, Com
   /**
    * Implementation of comparableSwapped interface, sorting by second then first.
    */
-  public int compareSwappedTo(DoubleDoublePair other) {
+  public int compareSwappedTo(IntDoublePair other) {
     int fdiff = Double.compare(this.second, other.second);
     if (fdiff != 0) return fdiff;
-    return Double.compare(this.first, other.first);
+    return this.first - other.first;
   }
 
   /**
@@ -81,7 +78,7 @@ public final class DoubleDoublePair implements Comparable<DoubleDoublePair>, Com
    * 
    * @return first value
    */
-  public double getFirst() {
+  public int getFirst() {
     return first;
   }
 
@@ -90,7 +87,7 @@ public final class DoubleDoublePair implements Comparable<DoubleDoublePair>, Com
    * 
    * @param second
    */
-  public void setFirst(double first) {
+  public void setFirst(int first) {
     this.first = first;
   }
 

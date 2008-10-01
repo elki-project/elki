@@ -5,7 +5,6 @@ import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.IDDoublePair;
 import de.lmu.ifi.dbs.elki.utilities.IDIDDoubleTriple;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.Util;
@@ -13,6 +12,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.pairs.IntDoublePair;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -195,19 +195,19 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
         medoids.add(m_i);
 
         // compute distances between each point in S and m_i
-        Map<Integer, IDDoublePair> distances = new HashMap<Integer, IDDoublePair>();
+        Map<Integer, IntDoublePair> distances = new HashMap<Integer, IntDoublePair>();
         for (Integer id : s) {
             DoubleDistance dist = getDistanceFunction().distance(id, m_i);
-            distances.put(id, new IDDoublePair(id, dist.getValue()));
+            distances.put(id, new IntDoublePair(id, dist.getValue()));
         }
 
 
         for (int i = 1; i < m; i++) {
             // choose medoid m_i to be far from prevois medoids
-            List<IDDoublePair> d = new ArrayList<IDDoublePair>(distances.values());
+            List<IntDoublePair> d = new ArrayList<IntDoublePair>(distances.values());
             Collections.sort(d);
 
-            m_i = d.get(d.size() - 1).getID();
+            m_i = d.get(d.size() - 1).getFirst();
             medoids.add(m_i);
             s.remove(m_i);
             distances.remove(m_i);
@@ -215,9 +215,9 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
             // compute distances of each point to closest medoid
             for (Integer id : s) {
                 DoubleDistance dist_new = getDistanceFunction().distance(id, m_i);
-                double dist_old = distances.get(id).getValue();
+                double dist_old = distances.get(id).getSecond();
                 double dist = Math.min(dist_new.getValue(), dist_old);
-                distances.put(id, new IDDoublePair(id, dist));
+                distances.put(id, new IntDoublePair(id, dist));
             }
         }
 
@@ -285,18 +285,18 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
         Map<Integer, List<QueryResult<DoubleDistance>>> result = new HashMap<Integer, List<QueryResult<DoubleDistance>>>();
         for (Integer m : m_c) {
             // determine minimum distance between each point in m_c and m
-            IDDoublePair minDist = null;
+            IntDoublePair minDist = null;
             for (Integer m_i : m_c) {
                 if (m_i == m) continue;
                 DoubleDistance dist = getDistanceFunction().distance(m, m_i);
-                IDDoublePair currentDist = new IDDoublePair(m_i, dist.getValue());
+                IntDoublePair currentDist = new IntDoublePair(m_i, dist.getValue());
                 if (minDist == null || currentDist.compareTo(minDist) < 0)
                     minDist = currentDist;
             }
 
             // determine points in sphere centered at m with radius minDist
             assert minDist != null;
-            List<QueryResult<DoubleDistance>> qr = database.rangeQuery(m, Double.toString(minDist.getValue()), getDistanceFunction());
+            List<QueryResult<DoubleDistance>> qr = database.rangeQuery(m, Double.toString(minDist.getSecond()), getDistanceFunction());
             result.put(m, qr);
         }
         return result;
@@ -391,18 +391,18 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
         for (Iterator<Integer> it = database.iterator(); it.hasNext();) {
             Integer p_id = it.next();
             V p = database.get(p_id);
-            IDDoublePair minDist = null;
+            IntDoublePair minDist = null;
             for (Integer m_i : dimensions.keySet()) {
                 V m = database.get(m_i);
                 double d_i = manhattanSegmentalDistance(p, m, dimensions.get(m_i));
-                IDDoublePair currentDist = new IDDoublePair(m_i, d_i);
+                IntDoublePair currentDist = new IntDoublePair(m_i, d_i);
                 if (minDist == null || currentDist.compareTo(minDist) < 0) {
                     minDist = currentDist;
                 }
             }
             // add p to cluster with mindist
             assert minDist != null;
-            Set<Integer> ids = clusterIDs.get(minDist.getID());
+            Set<Integer> ids = clusterIDs.get(minDist.getFirst());
             ids.add(p_id);
         }
 

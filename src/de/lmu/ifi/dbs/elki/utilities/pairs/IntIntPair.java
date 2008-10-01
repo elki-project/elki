@@ -8,7 +8,7 @@ package de.lmu.ifi.dbs.elki.utilities.pairs;
  * 
  * @author Erich Schubert <schube@dbs.ifi.lmu.de>
  */
-public final class IntIntPair implements Comparable<IntIntPair> {
+public final class IntIntPair implements Comparable<IntIntPair>, ComparableSwapped<IntIntPair> {
   /**
    * first value
    */
@@ -60,6 +60,15 @@ public final class IntIntPair implements Comparable<IntIntPair> {
     int fdiff = this.first - other.first;
     if (fdiff != 0) return fdiff;
     return this.second - other.second;
+  }
+
+  /**
+   * Implementation of comparableSwapped interface, sorting by second then first.
+   */
+  public int compareSwappedTo(IntIntPair other) {
+    int fdiff = this.second - other.second;
+    if (fdiff != 0) return fdiff;
+    return this.first - other.first;
   }
 
   /**

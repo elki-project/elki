@@ -70,14 +70,22 @@ public final class SimplePair<FIRST, SECOND> implements PairInterface<FIRST, SEC
     this.second = second;
   }
   
+  /**
+   * Simple equals statement
+   */
   @SuppressWarnings("unchecked")
   @Override
   public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
     if (!(obj instanceof PairInterface)) return false;
     PairInterface<FIRST,SECOND> other = (PairInterface<FIRST,SECOND>) obj;
     return (this.first.equals(other.getFirst())) && (this.second.equals(other.getSecond()));
   }
 
+  /**
+   * Canonical hash function, mixing the two hash values.
+   */
   @Override
   public int hashCode() {
     // primitive hash function mixing the two integers.

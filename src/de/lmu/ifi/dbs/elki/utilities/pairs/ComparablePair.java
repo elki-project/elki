@@ -11,7 +11,7 @@ package de.lmu.ifi.dbs.elki.utilities.pairs;
  * @param <FIRST> first type
  * @param <SECOND> second type
  */
-public final class ComparablePair<FIRST extends Comparable<FIRST>,SECOND extends Comparable<SECOND>> implements PairInterface<FIRST,SECOND>, Comparable<ComparablePair<FIRST,SECOND>> {
+public final class ComparablePair<FIRST extends Comparable<FIRST>,SECOND extends Comparable<SECOND>> implements PairInterface<FIRST,SECOND>, Comparable<ComparablePair<FIRST,SECOND>>, ComparableSwapped<ComparablePair<FIRST,SECOND>> {
   /* these are public by intention, Pair<> is supposed to be a simple wrapper */
   public FIRST first;
   public SECOND second;
@@ -81,6 +81,25 @@ public final class ComparablePair<FIRST extends Comparable<FIRST>,SECOND extends
     }
     if (other.second == null) return -1;
     return this.second.compareTo(other.second);
+  }
+  
+  /**
+   * Generic derived compare function, with swapped components.
+   */
+  public int compareSwappedTo(ComparablePair<FIRST, SECOND> other) {
+    if (this.second == null) {
+      if (other.second != null) return +1;
+      if (this.first == null) {
+        if (other.first != null) return +1;
+        else return 0;
+      }
+    } else {
+      if (other.second == null) return -1;
+      int delta1 = this.second.compareTo(other.second);
+      if (delta1 != 0) return delta1;
+    }
+    if (other.first == null) return -1;
+    return this.first.compareTo(other.first);
   }
   
   /**
