@@ -4,7 +4,7 @@ import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.algorithm.result.clustering.biclustering.Bicluster;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.IntegerIntegerPair;
+import de.lmu.ifi.dbs.elki.utilities.IntIntPair;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.LongParameter;
@@ -217,7 +217,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends AbstractBic
     /**
      * A list of all masked values mapped to their row and column.
      */
-    private Map<IntegerIntegerPair, Double> maskedVals;
+    private Map<IntIntPair, Double> maskedVals;
 
     /**
      * Mean of the current bicluster.
@@ -523,7 +523,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends AbstractBic
      *         otherwise.
      */
     protected double maskedValueAt(int row, int col) {
-        IntegerIntegerPair key = new IntegerIntegerPair(row, col);
+        IntIntPair key = new IntIntPair(row, col);
         if (maskedVals.containsKey(key)) {
             return maskedVals.get(key);
         }
@@ -534,7 +534,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends AbstractBic
      * Initiates the necessary structures for the following algorithm.
      */
     public void initiateChengAndChurch() {
-        maskedVals = new LinkedHashMap<IntegerIntegerPair, Double>();
+        maskedVals = new LinkedHashMap<IntIntPair, Double>();
         this.rowDim = super.getRowDim();
         this.colDim = super.getColDim();
         missingRowsToMask = new BitSet();
@@ -555,7 +555,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends AbstractBic
                 if (super.valueAt(i, j) == missing) {
                     missingRowsToMask.set(i);
                     missingColsToMask.set(j);
-                    IntegerIntegerPair key = new IntegerIntegerPair(i, j);
+                    IntIntPair key = new IntIntPair(i, j);
                     maskedVals.put(key, (double) random.nextInt(end) + begin);
                 }
             }
@@ -568,7 +568,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends AbstractBic
     private void maskMatrix() {
         for (int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
             for (int j = cols.nextSetBit(0); j >= 0; j = cols.nextSetBit(j + 1)) {
-                IntegerIntegerPair key = new IntegerIntegerPair(i, j);
+                IntIntPair key = new IntIntPair(i, j);
                 maskedVals.put(key, (double) random.nextInt(end) + begin);
             }
         }

@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.elki.database.SequentialDatabase;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.IntegerIntegerPair;
+import de.lmu.ifi.dbs.elki.utilities.IntIntPair;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 
 import java.util.BitSet;
@@ -33,7 +33,7 @@ public class NaivePatternBased extends AbstractBiclustering<DoubleVector> {
         return firstCol * (firstCol + 1) / 2 + firstCol * (getColDim() - firstCol - 1) + (secondCol - firstCol - 1);
     }
 
-    private IntegerIntegerPair oldColumns(int newColumn) {
+    private IntIntPair oldColumns(int newColumn) {
         int firstColumn = 0;
         int secondColumn = 0;
         boolean unequal = true;
@@ -47,7 +47,7 @@ public class NaivePatternBased extends AbstractBiclustering<DoubleVector> {
                 unequal = false;
             }
         }
-        return new IntegerIntegerPair(firstColumn, secondColumn);
+        return new IntIntPair(firstColumn, secondColumn);
     }
 
     @Override
@@ -98,9 +98,9 @@ public class NaivePatternBased extends AbstractBiclustering<DoubleVector> {
             SubspaceClusterModel<DoubleVector> model = (SubspaceClusterModel<DoubleVector>) inflatedCluster.getModel();
             BitSet inflatedAttributes = model.getAttributes();
             for (int i = inflatedAttributes.nextSetBit(0); i >= 0; i = inflatedAttributes.nextSetBit(i + 1)) {
-                IntegerIntegerPair oldColumns = oldColumns(i);
-                columns.set(oldColumns.getFirstInteger());
-                columns.set(oldColumns.getSecondInteger());
+                IntIntPair oldColumns = oldColumns(i);
+                columns.set(oldColumns.getFirst());
+                columns.set(oldColumns.getSecond());
             }
             Bicluster<DoubleVector> bicluster = defineBicluster(rows, columns);
             addBiclusterToResult(bicluster);
