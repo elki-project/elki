@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.utilities;
 
 /**
- * A progress object for a given overal number of items to process.
+ * A progress object for a given overall number of items to process.
  * The number of already processed items at a point in time can be updated.
  * 
  * The main feature of this class is to provide a String representation of the progress
