@@ -214,7 +214,7 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
   /**
    * Returns the object with the minimum key.
    *
-   * @return the object with twith the minimum key
+   * @return the object with the minimum key
    */
   public BTreeData<K, V> getMinimum() {
     BTreeNode<K, V> node = getRoot();
@@ -411,7 +411,7 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
   }
 
   /**
-   * Writes a string represenation of the subtree with the specified root
+   * Writes a string representation of the subtree with the specified root
    * in the given StringBuffer.
    *
    * @param node   the root of the subtree
@@ -440,7 +440,7 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
   }
 
   /**
-   * Writes a string represenation of the hierarchy of the subtree with the specified root
+   * Writes a string representation of the hierarchy of the subtree with the specified root
    * in the given StringBuffer.
    *
    * @param node   the root of the subtree
