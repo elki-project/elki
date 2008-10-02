@@ -35,7 +35,7 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable<?>> impl
   Hashtable<Integer, Integer> indices;
 
   /**
-   * Constructs and initialises a new min-max-heap.
+   * Constructs and initializes a new min-max-heap.
    */
   public MinMaxHeap() {
     this.heap = new Vector<HeapNode<K, V>>();
@@ -61,7 +61,7 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable<?>> impl
    * Retrieves and removes the minimum node of this heap.
    * If the heap is empty, null will be returned.
    *
-   * @return the minimum node of this heap, null in case of emptyness
+   * @return the minimum node of this heap, null in case of emptiness
    */
   public synchronized HeapNode<K, V> getMinNode() {
     if (isEmpty()) {
@@ -83,10 +83,10 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable<?>> impl
   }
 
   /**
-   * Retrieves, but does not remove, the minmum node of
+   * Retrieves, but does not remove, the minimum node of
    * this heap. If the heap is empty, null will be returned.
    *
-   * @return The minimum node of this heap, null in case of emptyness.
+   * @return The minimum node of this heap, null in case of emptiness.
    */
   public synchronized final HeapNode<K, V> minNode() {
     if (isEmpty()) return null;
@@ -97,7 +97,7 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable<?>> impl
    * Retrieves and removes the maximum node of this heap.
    * If the heap is empty, null will be returned.
    *
-   * @return The maximum node of this heap, null in case of emptyness.
+   * @return The maximum node of this heap, null in case of emptiness.
    */
   public synchronized HeapNode<K, V> getMaxNode() {
     if (heap.size() < 1) {
@@ -123,7 +123,7 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable<?>> impl
    * Retrieves, but does not remove, the maximum node of
    * this heap. If the heap is empty, null will be returned.
    *
-   * @return The maximum node of this heap, null in case of emptyness.
+   * @return The maximum node of this heap, null in case of emptiness.
    */
   public synchronized final HeapNode<K, V> maxNode() {
     if (isEmpty()) return null;
@@ -158,7 +158,7 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable<?>> impl
   }
 
   /**
-   * Moves up a node at the specified index until it satisfies the heaporder.
+   * Moves up a node at the specified index until it satisfies the heap order.
    *
    * @param index the index of the node to be moved up.
    */
@@ -201,7 +201,7 @@ public class MinMaxHeap<K extends Comparable<K>, V extends Identifiable<?>> impl
   }
 
   /**
-   * Indicates wether this heap ist empty.
+   * Indicates whether this heap is empty.
    *
    * @return true if this heap is empty, false otherwise
    */
