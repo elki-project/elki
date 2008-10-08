@@ -124,35 +124,50 @@ public class COPVerboseResult<O extends RealVector<O, ?>> extends AbstractResult
           outStream.print(" ");
         }
 
+        outStream.print("COP=");
         outStream.print(db.getAssociation(AssociationID.COP, id));
         outStream.print(" ");
 
         outStream.print(db.getAssociation(AssociationID.COP_DIM, id));
         outStream.print(" ");
 
-        Vector errv = db.getAssociation(AssociationID.COP_ERROR_VECTOR, id);
-        for(int i = 0; i < errv.getDimensionality(); i++) {
-          outStream.print(errv.get(i));
-          outStream.print(" ");
-        }
-
-        Matrix datavs = db.getAssociation(AssociationID.COP_DATA_VECTORS, id);
-        for(int j = 0; j < datavs.getColumnDimensionality(); j++) {
-          Vector datav = datavs.getColumnVector(j);
-          for(int i = 0; i < datav.getDimensionality(); i++) {
-            outStream.print(datav.get(i));
-            outStream.print(" ");
+        if (true) {
+          Vector errv = db.getAssociation(AssociationID.COP_ERROR_VECTOR, id);
+          if(normalization != null) {
+            O ev = object.newInstance(errv.getRowPackedCopy());
+            O restored = normalization.restore(ev);
+            outStream.print(restored.toString());
+          }
+          else {
+            outStream.print(errv.toString());
           }
         }
 
-        CorrelationAnalysisSolution<O> sol = (CorrelationAnalysisSolution<O>) db.getAssociation(AssociationID.COP_SOL, id);
-        if(sol != null) {
-          // test first if we actually have an equation system.
-          if(sol.getNormalizedLinearEquationSystem(null) != null) {
-            LinearEquationSystem lq = sol.getNormalizedLinearEquationSystem(normalization);
-            String solution = lq.equationsToString(2);
-            solution = solution.replace("\n", "\" \"");
-            outStream.print('"' + solution + '"');
+        if (false) {
+          Matrix datavs = db.getAssociation(AssociationID.COP_DATA_VECTORS, id);
+          for(int j = 0; j < datavs.getColumnDimensionality(); j++) {
+            Vector datav = datavs.getColumnVector(j);
+            if(normalization != null) {
+              O dv = object.newInstance(datav.getRowPackedCopy());
+              O restored = normalization.restore(dv);
+              outStream.print(restored.toString());
+            }
+            else {
+              outStream.print(datav.toString());
+            }
+          }
+        }
+
+        if (false) {
+          CorrelationAnalysisSolution<O> sol = (CorrelationAnalysisSolution<O>) db.getAssociation(AssociationID.COP_SOL, id);
+          if(sol != null) {
+            // test first if we actually have an equation system.
+            if(sol.getNormalizedLinearEquationSystem(null) != null) {
+              LinearEquationSystem lq = sol.getNormalizedLinearEquationSystem(normalization);
+              String solution = lq.equationsToString(2);
+              solution = solution.replace("\n", "\" \"");
+              outStream.print('"' + solution + '"');
+            }
           }
         }
 
