@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.elki.utilities.pairs.CompareSwappedDescending;
 import de.lmu.ifi.dbs.elki.utilities.pairs.IntDoublePair;
 
 import java.io.File;
@@ -92,7 +93,7 @@ public class GeneralizedLOFResult<O extends DatabaseObject> extends AbstractResu
                 Integer id = it.next();
                 lofs.add(new IntDoublePair(id, db.getAssociation(AssociationID.LOF, id)));
             }
-            Collections.sort(lofs, Collections.reverseOrder());
+            Collections.sort(lofs, new CompareSwappedDescending<IntDoublePair>());
 
             // write lofs
             for (IntDoublePair pair : lofs) {
