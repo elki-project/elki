@@ -6,6 +6,8 @@ import java.util.Iterator;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
@@ -54,6 +56,12 @@ public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends
    * Holds the weight function.
    */
   public WeightFunction weightfunction;
+  
+  /**
+   * Holds the distance function used for weight calculation
+   */
+  // TODO: make configureable
+  private DistanceFunction<V, DoubleDistance> weightDistance = new EuclideanDistanceFunction<V>();
 
   /**
    * Constructor, setting up parameter.
@@ -98,16 +106,9 @@ public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends
     {
       for(Iterator<Integer> it = ids.iterator(); it.hasNext();) {
         V obj = database.get(it.next());
-        double distance = 0.0;
-        // TODO: this is a hardcoded Euclidean distance.
-        for(int d = 0; d < dim; d++) {
-          double delta = centroid.getValue(d + 1).doubleValue() - obj.getValue(d + 1).doubleValue();
-          distance += delta * delta;
-        }
-        stddev += distance; // still squared distance!
-        distance = java.lang.Math.sqrt(distance);
-        if(distance > maxdist)
-          maxdist = distance;
+        double distance = weightDistance.distance(centroid, obj).getValue();
+        stddev += distance * distance;
+        if(distance > maxdist) maxdist = distance;
       }
       if(maxdist == 0.0)
         maxdist = 1.0;
