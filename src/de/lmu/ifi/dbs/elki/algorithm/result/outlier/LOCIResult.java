@@ -84,6 +84,11 @@ public class LOCIResult<O extends DatabaseObject> extends AbstractResult<O> {
   private void outputLOCI(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
 
     writeHeader(outStream, settings, null);
+    if (normalization != null) {
+      outStream.println("################################################################################");
+      outStream.println("## WARNING: MDEFRAD values are not denormalized.");
+      outStream.println("################################################################################");
+    }
 
     try {
       // build a list for sorting
@@ -131,13 +136,13 @@ public class LOCIResult<O extends DatabaseObject> extends AbstractResult<O> {
           outStream.print(" ");
         }
 
-        double locimdef = db.getAssociation(AssociationID.LOCI_MDEF, id);
         double locimdef_norm = db.getAssociation(AssociationID.LOCI_MDEF_NORM, id);
-        outStream.print("MDEF=");
-        outStream.print(locimdef);
-        outStream.print(" ");
         outStream.print("MDEFNORM=");
         outStream.print(locimdef_norm);
+        outStream.print(" ");
+        double locirad = db.getAssociation(AssociationID.LOCI_MDEF_CRITICAL_RADIUS, id);
+        outStream.print("MDEFRAD=");
+        outStream.print(locirad);
         outStream.println();
       }
     }

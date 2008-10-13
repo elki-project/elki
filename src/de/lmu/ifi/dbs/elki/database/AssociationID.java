@@ -140,12 +140,12 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
   public static final AssociationID<List<ComparablePair<Double,Integer>>> LOCI_CRITICALDIST = new AssociationID<List<ComparablePair<Double,Integer>>>("loci-cdist", List.class);
   
   /**
-   * The LOCI MDEF value.
+   * The LOCI MDEF / SigmaMDEF maximum values radius
    */
-  public static final AssociationID<Double> LOCI_MDEF = new AssociationID<Double>("loci.mdef", Double.class);
+  public static final AssociationID<Double> LOCI_MDEF_CRITICAL_RADIUS = new AssociationID<Double>("loci.mdefrad", Double.class);
   
   /**
-   * The LOCI MDEF / SigmaMDEF value (normalized MDEF)
+   * The LOCI MDEF / SigmaMDEF maximum value (normalized MDEF)
    */
   public static final AssociationID<Double> LOCI_MDEF_NORM = new AssociationID<Double>("loci.mdefnorm", Double.class);
   

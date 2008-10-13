@@ -21,7 +21,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
- * Fast Outlier Detection Using the Local Correlation Integral
+ * Fast Outlier Detection Using the "Local Correlation Integral"
+ * 
+ * Exact implementation only, not aLOCI.
  * 
  * Outlier detection using multiple epsilon neighborhoods.
  * 
@@ -165,8 +167,8 @@ public class LOCI<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
     }
     // LOCI main step
     for (Integer id : database.getIDs()) {
-      double maxmdef = 0.0;
       double maxmdefnorm = 0.0;
+      double maxnormr = 0;
       List<ComparablePair<Double,Integer>> cdist = database.getAssociation(AssociationID.LOCI_CRITICALDIST, id);
       for (ComparablePair<Double,Integer> c : cdist) {
         double alpha_r = alpha * c.first;
@@ -199,12 +201,14 @@ public class LOCI<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
         double sigmamdef = sigma_nhat_r_alpha / nhat_r_alpha;
         double mdefnorm = mdef / sigmamdef;
         
-        if (mdef > maxmdef) maxmdef = mdef;
-        if (mdefnorm > maxmdefnorm) maxmdefnorm = mdefnorm;
+        if (mdefnorm > maxmdefnorm) {
+          maxmdefnorm = mdefnorm;
+          maxnormr = c.first;
+        }
       }
       // TODO: when nmin was never fulfilled, the values will remain 0.
-      database.associate(AssociationID.LOCI_MDEF, id, maxmdef);
       database.associate(AssociationID.LOCI_MDEF_NORM, id, maxmdefnorm);
+      database.associate(AssociationID.LOCI_MDEF_CRITICAL_RADIUS, id, maxnormr);
     }
     result = new LOCIResult<O>(database);
   }
