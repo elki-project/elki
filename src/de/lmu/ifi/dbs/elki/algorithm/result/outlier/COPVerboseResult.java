@@ -99,16 +99,17 @@ public class COPVerboseResult<O extends RealVector<O, ?>> extends AbstractResult
       for(ComparablePair<Double, Integer> p : l) {
         Integer id = p.getSecond();
 
+        outStream.print("ID=");
         outStream.print(id);
         outStream.print(" ");
 
-        O object = db.get(id);
+        O origobj = db.get(id);
         if(normalization != null) {
-          O restored = normalization.restore(object);
+          O restored = normalization.restore(origobj);
           outStream.print(restored.toString());
         }
         else {
-          outStream.print(object.toString());
+          outStream.print(origobj.toString());
         }
         outStream.print(" ");
 
@@ -128,18 +129,20 @@ public class COPVerboseResult<O extends RealVector<O, ?>> extends AbstractResult
         outStream.print(db.getAssociation(AssociationID.COP, id));
         outStream.print(" ");
 
+        outStream.print("COPDIM=");
         outStream.print(db.getAssociation(AssociationID.COP_DIM, id));
         outStream.print(" ");
 
         if (true) {
-          Vector errv = db.getAssociation(AssociationID.COP_ERROR_VECTOR, id);
+          outStream.print("ERRORVECTOR=");
+          Vector errv = db.getAssociation(AssociationID.COP_ERROR_VECTOR, id).times(-1.0);
+          O ev = origobj.newInstance(errv.getRowPackedCopy());
           if(normalization != null) {
-            O ev = object.newInstance(errv.getRowPackedCopy());
             O restored = normalization.restore(ev);
             outStream.print(restored.toString());
           }
           else {
-            outStream.print(errv.toString());
+            outStream.print(ev.toString());
           }
         }
 
@@ -148,7 +151,7 @@ public class COPVerboseResult<O extends RealVector<O, ?>> extends AbstractResult
           for(int j = 0; j < datavs.getColumnDimensionality(); j++) {
             Vector datav = datavs.getColumnVector(j);
             if(normalization != null) {
-              O dv = object.newInstance(datav.getRowPackedCopy());
+              O dv = origobj.newInstance(datav.getRowPackedCopy());
               O restored = normalization.restore(dv);
               outStream.print(restored.toString());
             }
