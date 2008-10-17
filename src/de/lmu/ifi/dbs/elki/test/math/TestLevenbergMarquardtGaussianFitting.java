@@ -22,7 +22,7 @@ public class TestLevenbergMarquardtGaussianFitting {
       s[i] = 1.0;
     double[] params = { mean, stddevq, 1 };
     boolean[] dofit = { true, true, false };
-    LevenbergMarquardtMethod fit = new LevenbergMarquardtMethod(new GaussianFittingFunction(), testx, testy, s, params, dofit);
+    LevenbergMarquardtMethod fit = new LevenbergMarquardtMethod(new GaussianFittingFunction(), params, dofit, testx, testy, s);
     for(int i = 0; i < 50; i++) {
       fit.iterate();
       //double[] ps = fit.getParams();
@@ -46,7 +46,7 @@ public class TestLevenbergMarquardtGaussianFitting {
       s[i] = 1.0;
     double[] params = { mean, stddevq, 1 };
     boolean[] dofit = { true, true, false };
-    LevenbergMarquardtMethod fit = new LevenbergMarquardtMethod(new GaussianFittingFunction(), testx, testy, s, params, dofit);
+    LevenbergMarquardtMethod fit = new LevenbergMarquardtMethod(new GaussianFittingFunction(), params, dofit, testx, testy, s);
     for(int i = 0; i < 50; i++) {
       fit.iterate();
       //double[] ps = fit.getParams();
