@@ -45,14 +45,13 @@ public class GaussianFittingFunction implements FittingFunction {
       double stdpar = (x - params[i]) / params[i+1];
       double e = Math.exp(-.5 * stdpar * stdpar);
       double localy = params[i+2]/(params[i+1] * Sqrt2PI) * e;
-      double fac = localy * 2.0 * stdpar;
       
       y += localy;
       //// 1+ offsets at the beginning since we use [0] to return the y value!
       // mean gradient
       gradients[i] = localy * stdpar;
       // stddev gradient
-      gradients[i+1] = ((x-params[i])*(x-params[i])-params[i+1]*params[i+1]) * localy / (params[i+1] * params[i+1]);
+      gradients[i+1] = (stdpar*stdpar - 1.0) * localy;
       // amplitude gradient
       gradients[i+2] = e / (params[i+1] * Sqrt2PI);
     }
