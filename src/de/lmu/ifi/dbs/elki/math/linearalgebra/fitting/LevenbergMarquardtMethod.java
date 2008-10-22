@@ -74,6 +74,19 @@ public class LevenbergMarquardtMethod {
   private double[] deltaparams;
   
   /**
+   * Maximum number of iterations in run()
+   */
+  public int maxruns = 1000;
+  /**
+   * Maximum number of small improvements (stopping condition)
+   */
+  public int maxsmall = 3;
+  /**
+   * "Small value" condition for stopping
+   */
+  public double small = 0.01;
+  
+  /**
    * Function fitting using Levenberg-Marquardt Method.
    * 
    * @param func Function to fit to
@@ -265,5 +278,23 @@ public class LevenbergMarquardtMethod {
    */
   public double getChiSq() {
     return chisq;
+  }
+  
+  /**
+   * Iterate until convergence, at most 100 times.
+   */
+  public void run() {    
+    while (maxruns > 0) {
+      double oldchi = getChiSq();
+      iterate();
+      maxruns--;
+      double newchi = getChiSq();
+      // stop condition: only a small improvement in Chi. 
+      double deltachi = newchi - oldchi;
+      if (deltachi < 0 && deltachi > -small) {
+        maxsmall--;
+        if (maxsmall < 0) break;
+      }
+    }
   }
 }
