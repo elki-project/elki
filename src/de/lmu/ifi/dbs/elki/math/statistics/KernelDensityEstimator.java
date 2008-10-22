@@ -1,5 +1,14 @@
 package de.lmu.ifi.dbs.elki.math.statistics;
 
+/**
+ * Estimate density given an array of points.
+ * 
+ * Estimates a density using a kernel density estimator.
+ * Multiple common Kernel functions are supported.
+ * 
+ * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ *
+ */
 public class KernelDensityEstimator {
   /**
    * Supported kernel functions
@@ -24,7 +33,7 @@ public class KernelDensityEstimator {
   private double[] var;
 
   /**
-   * Process a new array
+   * Initialize and execute kernel density estimation.
    * 
    * @param data data to use
    * @param min minimum value
@@ -36,6 +45,15 @@ public class KernelDensityEstimator {
     process(data, min, max, kernel, windows);
   }
   
+  /**
+   * Process a new array
+   * 
+   * @param data data to use
+   * @param min minimum value
+   * @param max maximum value
+   * @param kernel Kernel function to use
+   * @param windows window size
+   */
   private void process(double[] data, double min, double max, Kernel kernel, int windows) {
     dens = new double[data.length];
     var = new double[data.length];
