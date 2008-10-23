@@ -63,7 +63,7 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
   /**
    * Parameter to give the configuration file
    */
-  private final IntParameter RANDOMSEED_PARAM = new IntParameter(RANDOMSEED_ID);
+  private final IntParameter RANDOMSEED_PARAM = new IntParameter(RANDOMSEED_ID, null, true);
 
   /**
    * OptionID for {@link #SIZE_SCALE_PARAM}
