@@ -1,0 +1,6 @@
+<!DOCTYPE dataset PUBLIC "GeneratorByModel.dtd" "GeneratorByModel.dtd">
+<dataset>
+  <cluster name="Gaussian" size="100">
+    <normal mean="0.5" stddev="1.5" />
+  </cluster>
+</dataset>
