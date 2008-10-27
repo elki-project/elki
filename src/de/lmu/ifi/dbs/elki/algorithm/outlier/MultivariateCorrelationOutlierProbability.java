@@ -28,7 +28,7 @@ import java.util.List;
  * Publication pending
  *
  * @author Erich Schubert <schube@dbs.ifi.lmu.de>
- * @param <V> the type of Realvector handled by this Algorithm
+ * @param <V> the type of RealVector handled by this Algorithm
  */
 public class MultivariateCorrelationOutlierProbability<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, DoubleDistance> {
     /**
@@ -63,7 +63,7 @@ public class MultivariateCorrelationOutlierProbability<V extends RealVector<V, ?
     MCOPResult<V> result;
 
     /**
-     * Sets minimum points to the optionhandler additionally to the parameters
+     * Sets minimum points to the OptionHandler additionally to the parameters
      * provided by super-classes.
      */
     public MultivariateCorrelationOutlierProbability() {
@@ -75,7 +75,7 @@ public class MultivariateCorrelationOutlierProbability<V extends RealVector<V, ?
     protected void runInTime(Database<V> database) throws IllegalStateException {
         getDistanceFunction().setDatabase(database, isVerbose(), isTime());
         if (isVerbose()) {
-            verbose("\nMultiavariateCorrelationOutlierProbability ");
+            verbose("\nMultivariateCorrelationOutlierProbability ");
         }
 
         {// compute neighbors of each db object
@@ -96,8 +96,9 @@ public class MultivariateCorrelationOutlierProbability<V extends RealVector<V, ?
 
                 // TODO: do we want to use the query point as centroid?
                 MultivariateModel<V> model = modelDerivator.generateModel(database, ids);
+                database.associate(AssociationID.LOCAL_MODEL, id, model);
 
-                double prob = 1.0 - model.boostedProbability(database.get(id));
+                double prob = 1.0 - model.probability(database.get(id));
                 database.associate(AssociationID.MCOP, id, prob);
 
                 if (isVerbose()) {

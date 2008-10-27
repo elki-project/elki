@@ -226,15 +226,16 @@ public class MultivariateModel<V extends RealVector<V, ?>> extends AbstractResul
      */
     private double probability(Matrix p, boolean boost) {
         Matrix proj = unprojectionMatrix.times(p.minus(centroid));
-        double probability = 1.0;
-        int start = 0;
-        if (boost && (correlationDimensionality < dbdimensionality))
-            start = correlationDimensionality;
-        for (int i = start; i < dbdimensionality; i++)
-            probability = probability * ErrorFunctions.erf(Math.abs(proj.get(i, 0)) / Math.sqrt(2));
-        // probability = probability * ErrorFunctions.erfc(proj.get(i,0) /
-        // (standardDeviations[i] * Math.sqrt(2)));
-        return 1.0 - probability;
+        double len = proj.euclideanNorm(0) / Math.sqrt(dbdimensionality);
+        return ErrorFunctions.erfc(len / Math.sqrt(2));
+        //double probability = 1.0;
+        //int start = 0;
+        //if (boost && (correlationDimensionality < dbdimensionality))
+        //    start = correlationDimensionality;
+        //for (int i = start; i < dbdimensionality; i++)
+        //    probability = probability * ErrorFunctions.erf(Math.abs(proj.get(i, 0)) / Math.sqrt(2));
+        // probability = probability * ErrorFunctions.erfc(proj.get(i,0) / (standardDeviations[i] * Math.sqrt(2)));
+        //return 1.0 - probability;
     }
 
     /**
@@ -294,7 +295,7 @@ public class MultivariateModel<V extends RealVector<V, ?>> extends AbstractResul
     /**
      * Returns a normalized copy of the eigenvalues-roots
      *
-     * @return the unprojection matrix
+     * @return normalized copy of the eigenvalue roots
      */
     public double[] getNormalizedRoots() {
         double[] normdevs = new double[dbdimensionality];
@@ -306,7 +307,7 @@ public class MultivariateModel<V extends RealVector<V, ?>> extends AbstractResul
     /**
      * Returns a copy of the eigenvalues-roots
      *
-     * @return the unprojection matrix
+     * @return copy of the eigenvalue roots
      */
     public double[] getRoots() {
         double[] normdevs = new double[dbdimensionality];
