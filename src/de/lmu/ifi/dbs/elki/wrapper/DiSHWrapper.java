@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.preprocessing.DiSHPreprocessor.Strategy;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
@@ -110,8 +109,7 @@ public class DiSHWrapper<O extends DatabaseObject> extends NormalizationWrapper<
 
         // strategy for preprocessor
         if (strategy != null) {
-            parameters.add(OptionHandler.OPTION_PREFIX + DiSHPreprocessor.STRATEGY_ID.toString());
-            parameters.add(strategy);
+            Util.addParameter(parameters, DiSHPreprocessor.STRATEGY_ID, strategy);
         }
 
         return parameters;
