@@ -549,6 +549,48 @@ public final class Util extends AbstractLoggable {
     }
 
     /**
+     * Returns the centroid w.r.t. the dimensions specified
+     * by the given BitSet as a RealVector object of the specified objects
+     * stored in the given database. The objects belonging to the specified ids
+     * must be instance of <code>RealVector</code>.
+     *
+     * @param database the database storing the objects
+     * @param iter     iterator over the identifiable objects
+     * @param bitSet   the bitSet specifiying the dimensions to be considered
+     * @return the centroid of the specified objects stored in the given
+     *         database
+     * @throws IllegalArgumentException if the id list is empty
+     */
+    public static <V extends RealVector<V, ?>> V centroid(Database<V> database, Iterator<Integer> iter, BitSet bitSet) {
+        if (! iter.hasNext()) {
+            throw new IllegalArgumentException("Cannot compute a centroid, because of empty list of ids!");
+        }
+
+        int dim = database.dimensionality();
+        double[] centroid = new double[dim];
+
+        int size = 0;
+        // we need to "cache" one o for the newInstance method, since we can't clone the iterator.
+        V o = null;
+        while (iter.hasNext()) {
+            Integer id = iter.next();
+            size++;
+            o = database.get(id);
+            for (int j = 1; j <= dim; j++) {
+                if (bitSet.get(j - 1)) {
+                    centroid[j - 1] += o.getValue(j).doubleValue();
+                }
+            }
+        }
+
+        for (int i = 0; i < dim; i++) {
+            centroid[i] /= size;
+        }
+
+        return o.newInstance(centroid);
+    }
+
+    /**
      * Returns the centroid as a RealVector object of the specified database.
      * The objects must be instance of <code>RealVector</code>.
      *
