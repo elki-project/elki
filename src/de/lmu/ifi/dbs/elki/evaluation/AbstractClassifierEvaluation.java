@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
 
@@ -46,9 +47,10 @@ public abstract class AbstractClassifierEvaluation<O extends DatabaseObject, L e
 
     /**
      * @param normalization normalization is unused
+     * @throws IOException 
      */
     @Override
-    public final void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
+    public final void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException, IOException {
         PrintStream output;
         try {
             out.getParentFile().mkdirs();
@@ -65,7 +67,7 @@ public abstract class AbstractClassifierEvaluation<O extends DatabaseObject, L e
         output(output, normalization, settings);
     }
 
-    public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException {
+    public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException, IOException {
         writeHeader(outStream, settings, null);
         outStream.print("Evaluating ");
         outStream.println(classifier.getClass().getName());

@@ -25,7 +25,7 @@ public class ConfusionMatrixBasedEvaluation<O extends DatabaseObject, L extends 
     /**
      * Holds the used EvaluationProcedure.
      */
-    private EvaluationProcedure<O, C, L> evaluationProcedure;
+    private EvaluationProcedure<O, L, C> evaluationProcedure;
 
     /**
      * Provides an evaluation based on the given confusion matrix.
@@ -37,7 +37,7 @@ public class ConfusionMatrixBasedEvaluation<O extends DatabaseObject, L extends 
      * @param testset             the test set this evaluation is based on
      * @param evaluationProcedure the evaluation procedure used
      */
-    public ConfusionMatrixBasedEvaluation(ConfusionMatrix confusionmatrix, C classifier, Database<O> database, Database<O> testset, EvaluationProcedure<O, C, L> evaluationProcedure) {
+    public ConfusionMatrixBasedEvaluation(ConfusionMatrix confusionmatrix, C classifier, Database<O> database, Database<O> testset, EvaluationProcedure<O, L, C> evaluationProcedure) {
         super(database, testset, classifier);
         this.confusionmatrix = confusionmatrix;
         this.evaluationProcedure = evaluationProcedure;

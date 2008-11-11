@@ -28,10 +28,10 @@ import java.util.SortedSet;
  *
  * @author Arthur Zimek
  */
-public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends ClassLabel, C extends Classifier<O, L>> extends AbstractParameterizable implements EvaluationProcedure<O, C, L> {
+public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends ClassLabel, C extends Classifier<O, L>> extends AbstractParameterizable implements EvaluationProcedure<O, L, C> {
 
     /**
-     * Holds whether a test set hs been provided.
+     * Holds whether a test set has been provided.
      */
     private boolean testSetProvided = false;
 

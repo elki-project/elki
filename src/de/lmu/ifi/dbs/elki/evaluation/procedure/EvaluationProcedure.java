@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @author Arthur Zimek
  */
-public interface EvaluationProcedure<O extends DatabaseObject,A extends Algorithm<O>,L extends ClassLabel> extends Parameterizable
+public interface EvaluationProcedure<O extends DatabaseObject, L extends ClassLabel, A extends Algorithm<O>> extends Parameterizable
 {
     /**
      * Message to indicate failure to call either {@link #set(Database, Database) set(trainingset, testset)}
