@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering;
 
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.biclustering.Bicluster;
 import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.model.Bicluster;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;

@@ -1,10 +1,23 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.Clustering;
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.ClusteringResult;
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.Clusters;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
+import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
+import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
+import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.normalization.AttributeWiseRealVectorNormalization;
@@ -16,21 +29,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-
 /**
  * @author Arthur Zimek
  * @param <V> the type of Realvector handled by this Algorithm
  */
 // todo arthur comment class
-public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> implements Clustering<V> {
+public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Cluster<Model>>> implements ClusteringAlgorithm<Clustering<Cluster<Model>>, V> {
 
     /**
      * Small value to increment diagonally of a matrix
@@ -63,7 +67,7 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
     /**
      * Stores the result.
      */
-    private Clusters<V> result;
+    private Clustering<Cluster<Model>> result;
 
     /**
      * Adds parameter
@@ -76,7 +80,7 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
         addOption(K_PARAM);
     }
 
-    public ClusteringResult<V> getResult() {
+    public Clustering<Cluster<Model>> getResult() {
         return result;
     }
 
@@ -85,7 +89,7 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
     }
 
     @Override
-    public void runInTime(Database<V> database) throws IllegalStateException {
+    public Clustering<Cluster<Model>> runInTime(Database<V> database) throws IllegalStateException {
         if (database.size() == 0) {
             throw new IllegalArgumentException("database empty: must contain elements");
         }
@@ -161,13 +165,14 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
             }
         }
         while (!means.equals(newMeans) || !Arrays.equals(eigensystems, newEigensystems));
-
-        Integer[][] resultClusters = new Integer[clusters.size()][];
+        
+        result = new Clustering<Cluster<Model>>();
         for (int i = 0; i < clusters.size(); i++) {
-            List<Integer> cluster = clusters.get(i);
-            resultClusters[i] = cluster.toArray(new Integer[cluster.size()]);
+          DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(database, clusters.get(i));
+          result.addCluster(new Cluster<Model>(group, ClusterModel.CLUSTER));
         }
-        result = new Clusters<V>(resultClusters, database);
+        
+        return result;
     }
 
     //todo arthur comment

@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
 import de.lmu.ifi.dbs.elki.KDDTask;
-import de.lmu.ifi.dbs.elki.algorithm.result.Result;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
@@ -41,7 +41,7 @@ public abstract class KDDTaskWrapper<O extends DatabaseObject> extends AbstractW
     /**
      * The result of the kdd task.
      */
-    private Result<O> result;
+    private Result result;
 
     /**
      * The value of the time flag.
@@ -88,7 +88,7 @@ public abstract class KDDTaskWrapper<O extends DatabaseObject> extends AbstractW
      *
      * @return the result of the kdd task
      */
-    public final Result<O> getResult() {
+    public final Result getResult() {
         return result;
     }
 

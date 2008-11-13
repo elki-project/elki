@@ -1,18 +1,18 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
-import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.result.PointerRepresentation;
-import de.lmu.ifi.dbs.elki.algorithm.result.Result;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.distance.Distance;
-import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.Progress;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+
+import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.result.AnnotationsFromHashMap;
+import de.lmu.ifi.dbs.elki.result.MultiResult;
+import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.Progress;
 
 /**
  * Efficient implementation of the Single-Link Algorithm SLINK of R. Sibson.
@@ -26,7 +26,7 @@ import java.util.Iterator;
  * @param <D> the type of Distance used
  */
 public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends
-    DistanceBasedAlgorithm<O, D> {
+    DistanceBasedAlgorithm<O, D, MultiResult> {
 
     /**
      * The values of the function Pi of the pointer representation.
@@ -36,21 +36,21 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends
     /**
      * The values of the function Lambda of the pointer representation.
      */
-    private HashMap<Integer, SLinkDistance> lambda = new HashMap<Integer, SLinkDistance>();
+    private HashMap<Integer, D> lambda = new HashMap<Integer, D>();
 
     /**
      * The values of the helper function m to determine the pointer
      * representation.
      */
-    private HashMap<Integer, SLinkDistance> m = new HashMap<Integer, SLinkDistance>();
+    private HashMap<Integer, D> m = new HashMap<Integer, D>();
 
     /**
      * Provides the result of the algorithm.
      */
-    protected Result<O> result;
+    protected MultiResult result;
 
     /**
-     * Craetes a new instance of a single link algorithm. Since SLINK is a non
+     * Creates a new instance of a single link algorithm. Since SLINK is a non
      * abstract class the option handler is initialized.
      */
     public SLINK() {
@@ -62,7 +62,7 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends
      */
     @SuppressWarnings("unchecked")
     @Override
-    protected void runInTime(Database<O> database) throws IllegalStateException {
+    protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
 
         try {
             Progress progress = new Progress("Clustering", database.size());
@@ -97,13 +97,20 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends
         }
 
         HashMap<Integer, Integer> piClone = (HashMap<Integer, Integer>) pi.clone();
-        HashMap<Integer, SLinkDistance> lambdaClone = (HashMap<Integer, SLinkDistance>) lambda.clone();
+        HashMap<Integer, D> lambdaClone = (HashMap<Integer, D>) lambda.clone();
 
         if (isVerbose()) {
             verbose("");
         }
-        result = new PointerRepresentation<O, D>(piClone, lambdaClone,
-            getDistanceFunction(), database);
+        result = new MultiResult();
+        AnnotationsFromHashMap<Integer> ann1 = new AnnotationsFromHashMap<Integer>();
+        ann1.addMap("PI", piClone);
+        AnnotationsFromHashMap<D> ann2 = new AnnotationsFromHashMap<D>();
+        ann2.addMap("LAMBDA", lambdaClone);
+        result.addResult(ann1);
+        result.addResult(ann2);
+        // TODO: ensure that the object ID itself is also output. using AssociationID? 
+        return result;
     }
 
     /**
@@ -111,7 +118,7 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends
      *
      * @return the result of the algorithm
      */
-    public Result<O> getResult() {
+    public MultiResult getResult() {
         return result;
     }
 
@@ -139,8 +146,7 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends
         // P(n+1) = n+1:
         pi.put(newID, newID);
         // L(n+1) = infinity
-        lambda.put(newID, new SLinkDistance(getDistanceFunction()
-            .infiniteDistance(), null, null));
+        lambda.put(newID, getDistanceFunction().infiniteDistance());
     }
 
     /**
@@ -154,8 +160,7 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends
     private void step2(int newID, ArrayList<Integer> processedIDs) {
         // M(i) = dist(i, n+1)
         for (Integer id : processedIDs) {
-            SLinkDistance distance = new SLinkDistance(getDistanceFunction()
-                .distance(newID, id), newID, id);
+            D distance = getDistanceFunction().distance(newID, id);
             m.put(id, distance);
         }
     }
@@ -170,14 +175,14 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends
     private void step3(int newID, ArrayList<Integer> processedIDs) {
         // for i = 1..n
         for (Integer id : processedIDs) {
-            SLinkDistance l = lambda.get(id);
-            SLinkDistance m = this.m.get(id);
+            D l = lambda.get(id);
+            D m = this.m.get(id);
             Integer p = pi.get(id);
-            SLinkDistance mp = this.m.get(p);
+            D mp = this.m.get(p);
 
             // if L(i) >= M(i)
             if (l.compareTo(m) >= 0) {
-                SLinkDistance min = min(mp, l);
+                D min = mp.compareTo(l) <= 0 ? mp : l;
                 // M(P(i)) = min { M(P(i)), L(i) }
                 this.m.put(p, min);
 
@@ -189,7 +194,7 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends
             }
 
             else {
-                SLinkDistance min = min(mp, m);
+                D min = mp.compareTo(m) <= 0 ? mp : m;
                 // M(P(i)) = min { M(P(i)), M(i) }
                 this.m.put(p, min);
             }
@@ -208,9 +213,9 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends
             if (id == newID)
                 continue;
 
-            SLinkDistance l = lambda.get(id);
+            D l = lambda.get(id);
             Integer p = pi.get(id);
-            SLinkDistance lp = lambda.get(p);
+            D lp = lambda.get(p);
 
             // if L(i) >= L(P(i))
             if (l.compareTo(lp) >= 0) {
@@ -219,103 +224,4 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends
             }
         }
     }
-
-    /**
-     * Returns the minimum distance of the two given distances.
-     *
-     * @param d1 the first distance
-     * @param d2 the second distance
-     * @return the minimum distance of the two given distances
-     */
-    private SLinkDistance min(SLinkDistance d1, SLinkDistance d2) {
-        int comp = d1.distance.compareTo(d2.distance);
-        if (comp >= 0)
-            return d1;
-        return d2;
-    }
-
-    /**
-     * Encapsulates the distance between two objects and their ids.
-     */
-    public class SLinkDistance implements Comparable<SLinkDistance> {
-        /**
-         * The distance between the two objects.
-         */
-        D distance;
-
-        /**
-         * The id of the first object.
-         */
-        Integer id1;
-
-        /**
-         * The id of the second object.
-         */
-        Integer id2;
-
-        /**
-         * Provides a new distance between two objects.
-         * @param distance the distance between the two objects
-         * @param id1 the id of the first object
-         * @param id2 the id of the second object
-         */
-        public SLinkDistance(D distance, Integer id1, Integer id2) {
-            this.distance = distance;
-            this.id1 = id1;
-            this.id2 = id2;
-        }
-
-        /**
-         * <p>Compares this object with the specified object for order.
-         * Returns a negative integer, zero, or a positive integer as this object is less
-         * than, equal to, or greater than the specified object. </p>
-         * <p>This object is less (or greater) than the specified object if the
-         * distance of this objects is less (or greater) than the distance of the specified object.
-         * If both distance values are the same, the first ids and then the second ids are compared.
-         *
-         * @param o the Object to be compared.
-         * @return a negative integer, zero, or a positive integer as this
-         *         object is less than, equal to, or greater than the specified
-         *         object.
-         */
-        public int compareTo(SLinkDistance o) {
-            int compare = this.distance.compareTo(o.distance);
-            if (compare != 0)
-                return compare;
-
-            if (this.id1 < (o.id1))
-                return -1;
-
-            if (this.id1 > (o.id1))
-                return 1;
-
-            if (this.id2 < (o.id2))
-                return -1;
-
-            if (this.id2 > (o.id2))
-                return 1;
-
-            return 0;
-        }
-
-        /**
-         * Returns the distance value.
-         *
-         * @return the distance value
-         */
-        public D getDistance() {
-            return distance;
-        }
-
-        /**
-         * Returns a string representation of the object.
-         *
-         * @return a string representation of the object.
-         */
-        @Override
-        public String toString() {
-            return distance.toString() + " (" + id1 + ", " + id2 + ")";
-        }
-    }
-
 }

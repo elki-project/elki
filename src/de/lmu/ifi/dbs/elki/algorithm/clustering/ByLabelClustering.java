@@ -5,10 +5,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.ClusteringResult;
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.Clusters;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
+import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
+import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
+import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
+import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.Description;
@@ -27,16 +31,16 @@ import de.lmu.ifi.dbs.elki.utilities.Description;
  *
  * @param <O>
  */
-public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorithm<O> implements Clustering<O> {
+public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorithm<O, Clustering<Cluster<Model>>> implements ClusteringAlgorithm<Clustering<Cluster<Model>>,O> {
   /**
    * Holds the result of the algorithm.
    */
-  private ClusteringResult<O> result;
+  private Clustering<Cluster<Model>> result;
 
   /**
    * Return clustering result
    */
-  public ClusteringResult<O> getResult() {
+  public Clustering<Cluster<Model>> getResult() {
     return result;
   }
 
@@ -54,7 +58,7 @@ public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorit
    * @param database The database to process
    */
   @Override
-  protected void runInTime(Database<O> database) throws IllegalStateException {
+  protected Clustering<Cluster<Model>> runInTime(Database<O> database) throws IllegalStateException {
     HashMap<String, Collection<Integer>> labelmap = new HashMap<String, Collection<Integer>>(); 
     
     for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
@@ -63,27 +67,30 @@ public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorit
       
       // try class label first
       ClassLabel classlabel = database.getAssociation(AssociationID.CLASS, id);
-      if (classlabel != null) label = classlabel.toString();
+      if (classlabel != null) { 
+        label = classlabel.toString();
+      }
       
       // fall back to other labels
-      if (label == null)
+      if (label == null) {
         label = database.getAssociation(AssociationID.LABEL, id);
+      }
       
-      if (labelmap.containsKey(label))
+      if (labelmap.containsKey(label)) {
         labelmap.get(label).add(id);
-      else {
+      } else {
         Collection<Integer> n = new java.util.Vector<Integer>();
         n.add(id);
         labelmap.put(label,n);
       }
     }
 
-    Integer[][] rarray = new Integer[labelmap.size()][];
-    int i = 0;
+    result = new Clustering<Cluster<Model>>();
     for (Collection<Integer> ids : labelmap.values()) {
-      rarray[i] = ids.toArray(new Integer[0]);
-      i++;
+      DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Collection<Integer>>(database, ids);
+      Cluster<Model> c = new Cluster<Model>(group, ClusterModel.CLUSTER);
+      result.addCluster(c);
     }
-    result = new Clusters<O>(rarray, database);
+    return result;
   }
 }

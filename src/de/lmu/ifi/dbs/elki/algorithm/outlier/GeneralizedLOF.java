@@ -1,8 +1,9 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
+import java.util.Iterator;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.result.Result;
-import de.lmu.ifi.dbs.elki.algorithm.result.outlier.GeneralizedLOFResult;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -10,6 +11,9 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.properties.Properties;
+import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
+import de.lmu.ifi.dbs.elki.result.MultiResult;
+import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
@@ -20,9 +24,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
-import java.util.Iterator;
-import java.util.List;
-
 /**
  * Algorithm to compute density-based local outlier factors in a database based
  * on a specified parameter minpts.
@@ -30,7 +31,7 @@ import java.util.List;
  * @author Peer Kr&ouml;ger
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  */
-public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, DoubleDistance> {
+public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, DoubleDistance, MultiResult> {
     /**
      * OptionID for {@link #REACHABILITY_DISTANCE_FUNCTION_PARAM}
      */
@@ -80,7 +81,7 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
     /**
      * Provides the result of the algorithm.
      */
-    GeneralizedLOFResult<O> result;
+    MultiResult result;
 
     /**
      * Provides the Generalized LOF algorithm,
@@ -100,7 +101,7 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
      * Performs the Generalized LOF algorithm on the given database.
      */
     @Override
-    protected void runInTime(Database<O> database) throws IllegalStateException {
+    protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
         getDistanceFunction().setDatabase(database, isVerbose(), isTime());
         reachabilityDistanceFunction.setDatabase(database, isVerbose(), isTime());
         if (isVerbose()) {
@@ -201,9 +202,17 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
             if (isVerbose()) {
                 verbose("");
             }
-
-            result = new GeneralizedLOFResult<O>(database);
         }
+        AnnotationsFromDatabase<O, Double> res1 = new AnnotationsFromDatabase<O, Double>(database);
+        res1.addAssociation("LOF", AssociationID.LOF);
+        // Ordering
+        OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database, AssociationID.LOF, true); 
+        // combine results.
+        result = new MultiResult();
+        result.addResult(res1);
+        result.addResult(res2);
+
+        return result;
     }
 
     public Description getDescription() {
@@ -268,7 +277,7 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
         return description.toString();
     }
 
-    public Result<O> getResult() {
+    public MultiResult getResult() {
         return result;
     }
 }

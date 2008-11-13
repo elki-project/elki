@@ -1,15 +1,21 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering;
 
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.result.Result;
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.biclustering.Bicluster;
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.biclustering.Biclustering;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
+import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
+import de.lmu.ifi.dbs.elki.data.model.Bicluster;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.pairs.ComparatorBySecond;
 import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
-
-import java.util.*;
 
 /**
  * Abstract class as a convenience for different biclustering approaches.
@@ -28,7 +34,7 @@ import java.util.*;
  * is supposed to consist of rows where each row relates to an object of type V
  * and the columns relate to the attribute values of these objects
  */
-public abstract class AbstractBiclustering<V extends RealVector<V, Double>> extends AbstractAlgorithm<V> {
+public abstract class AbstractBiclustering<V extends RealVector<V, Double>> extends AbstractAlgorithm<V,Clustering<Cluster<Bicluster<V>>>> implements ClusteringAlgorithm<Clustering<Cluster<Bicluster<V>>>,V> {
     /**
      * Keeps the currently set database.
      */
@@ -48,7 +54,7 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>> exte
      * Keeps the result. A new ResultObject is assigned when the method
      * {@link #runInTime(Database)} is called.
      */
-    private Biclustering<V> result;
+    private Clustering<Cluster<Bicluster<V>>> result;
 
     /**
      * Prepares the algorithm for running on a specific database.
@@ -61,12 +67,12 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>> exte
      *
      */
     @Override
-    protected final void runInTime(Database<V> database) throws IllegalStateException {
+    protected final Clustering<Cluster<Bicluster<V>>> runInTime(Database<V> database) throws IllegalStateException {
         if (database.size() == 0) {
             throw new IllegalArgumentException("database empty: must contain elements");
         }
         this.database = database;
-        this.result = new Biclustering<V>(database);
+        this.result = new Clustering<Cluster<Bicluster<V>>>();
         colIDs = new int[this.database.dimensionality()];
         for (int i = 0; i < colIDs.length; i++) {
             colIDs[i] = i + 1;
@@ -80,6 +86,7 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>> exte
             }
         }
         biclustering();
+        return result;
     }
 
     /**
@@ -151,7 +158,7 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>> exte
      * @param bicluster the bicluster to add to the result
      */
     protected void addBiclusterToResult(Bicluster<V> bicluster) {
-        result.appendBicluster(bicluster);
+        result.addCluster(new Cluster<Bicluster<V>>(null, bicluster));
     }
 
     /**
@@ -302,7 +309,7 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>> exte
         return sum / rows.cardinality();
     }
 
-    public Result<V> getResult() {
+    public Clustering<Cluster<Bicluster<V>>> getResult() {
         return result;
     }
 

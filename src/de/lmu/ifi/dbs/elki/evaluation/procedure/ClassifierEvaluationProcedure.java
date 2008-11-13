@@ -7,9 +7,10 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.evaluation.ConfusionMatrix;
 import de.lmu.ifi.dbs.elki.evaluation.ConfusionMatrixBasedEvaluation;
-import de.lmu.ifi.dbs.elki.evaluation.Evaluation;
+import de.lmu.ifi.dbs.elki.evaluation.EvaluationResult;
 import de.lmu.ifi.dbs.elki.evaluation.holdout.Holdout;
 import de.lmu.ifi.dbs.elki.evaluation.holdout.TrainingAndTestSet;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
@@ -28,7 +29,7 @@ import java.util.SortedSet;
  *
  * @author Arthur Zimek
  */
-public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends ClassLabel, C extends Classifier<O, L>> extends AbstractParameterizable implements EvaluationProcedure<O, L, C> {
+public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends ClassLabel, C extends Classifier<O, L, Result>> extends AbstractParameterizable implements EvaluationProcedure<O, L, C> {
 
     /**
      * Holds whether a test set has been provided.
@@ -103,7 +104,7 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
         this.partition = holdout.partition(data);
     }
 
-    public Evaluation<O, C> evaluate(C algorithm) throws IllegalStateException {
+    public EvaluationResult<O, C> evaluate(C algorithm) throws IllegalStateException {
         if (partition == null || partition.length < 1) {
             throw new IllegalStateException(ILLEGAL_STATE + " No dataset partition specified.");
         }

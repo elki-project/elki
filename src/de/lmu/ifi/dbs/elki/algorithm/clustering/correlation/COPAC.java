@@ -1,11 +1,22 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.Clustering;
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.ClusteringResult;
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.ClustersPlusNoise;
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.PartitionClusteringResults;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
+import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
+import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
+import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.model.DimensionModel;
+import de.lmu.ifi.dbs.elki.data.model.NoiseModel;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.preprocessing.HiCOPreprocessor;
@@ -19,12 +30,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 /**
  * Provides the COPAC algorithm, an algorithm to partition a database according to the correlation dimension of
  * its objects and to then perform an arbitrary clustering algorithm over the partitions.
@@ -37,7 +42,7 @@ import java.util.Map;
  * @author Arthur Zimek
  * @param <V> the type of RealVector handled by this Algorithm
  */
-public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> implements Clustering<V> {
+public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Cluster<Model>>> implements ClusteringAlgorithm<Clustering<Cluster<Model>>,V> {
 
     /**
      * OptionID for {@link #PREPROCESSOR_PARAM}
@@ -67,21 +72,21 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
     public static final OptionID PARTITION_ALGORITHM_ID = OptionID.getOrCreateOptionID(
         "copac.partitionAlgorithm",
         "Classname of the clustering algorithm to apply to each partition " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Clustering.class) +
+            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(ClusteringAlgorithm.class) +
             ".");
 
     /**
      * Parameter to specify the clustering algorithm to apply to each partition,
-     * must extend {@link de.lmu.ifi.dbs.elki.algorithm.clustering.Clustering}.
+     * must extend {@link de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm}.
      * <p>Key: {@code -copac.partitionAlgorithm} </p>
      */
-    protected final ClassParameter<Clustering<V>> PARTITION_ALGORITHM_PARAM =
-        new ClassParameter<Clustering<V>>(PARTITION_ALGORITHM_ID, Clustering.class);
+    protected final ClassParameter<ClusteringAlgorithm<Clustering<Cluster<Model>>,V>> PARTITION_ALGORITHM_PARAM =
+        new ClassParameter<ClusteringAlgorithm<Clustering<Cluster<Model>>,V>>(PARTITION_ALGORITHM_ID, ClusteringAlgorithm.class);
 
     /**
      * Holds the instance of the partitioning algorithm specified by {@link #PARTITION_ALGORITHM_PARAM}.
      */
-    private Clustering<V> partitionAlgorithm;
+    private ClusteringAlgorithm<Clustering<Cluster<Model>>,V> partitionAlgorithm;
 
     /**
      * OptionID for {#PARTITION_DB_PARAM}
@@ -115,7 +120,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
     /**
      * Holds the result.
      */
-    private PartitionClusteringResults<V> result;
+    private Clustering<Cluster<Model>> result;
 
 
     /**
@@ -137,7 +142,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
      * Performs the COPAC algorithm on the given database.
      */
     @Override
-    protected void runInTime(Database<V> database) throws IllegalStateException {
+    protected Clustering<Cluster<Model>> runInTime(Database<V> database) throws IllegalStateException {
         // preprocessing
         if (isVerbose()) {
             verbose("\ndb size = " + database.size());
@@ -179,9 +184,10 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
 
         // running partition algorithm
         runPartitionAlgorithm(database, partitionMap);
+        return result;
     }
 
-    public ClusteringResult<V> getResult() {
+    public Clustering<Cluster<Model>> getResult() {
         return result;
     }
 
@@ -310,18 +316,15 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
             Map<Integer, Database<V>> databasePartitions =
                 database.partition(partitionMap, partitionDatabase, partitionDatabaseParameters);
 
-            Map<Integer, ClusteringResult<V>> results = new Hashtable<Integer, ClusteringResult<V>>();
+            result = new Clustering<Cluster<Model>>();
+
             for (Integer partitionID : databasePartitions.keySet()) {
                 // noise partition
                 if (partitionID == database.dimensionality()) {
                     Database<V> noiseDB = databasePartitions.get(partitionID);
-                    Integer[][] noise = new Integer[1][noiseDB.size()];
-                    int i = 0;
-                    for (Iterator<Integer> it = noiseDB.iterator(); it.hasNext();) {
-                        noise[0][i++] = it.next();
-                    }
-                    ClusteringResult<V> r = new ClustersPlusNoise<V>(noise, noiseDB);
-                    results.put(partitionID, r);
+                    DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(database, noiseDB.getIDs());
+                    // Make a Noise cluster
+                    result.addCluster(new Cluster<Model>(group, NoiseModel.NOISE));
                 }
                 else {
                     if (isVerbose()) {
@@ -330,11 +333,18 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
                             " on partition " +
                             partitionID);
                     }
-                    partitionAlgorithm.run(databasePartitions.get(partitionID));
-                    results.put(partitionID, partitionAlgorithm.getResult());
+                    Clustering<Cluster<Model>> p = partitionAlgorithm.run(databasePartitions.get(partitionID));
+                    // Re-Wrap resulting Clusters as DimensionModel clusters.
+                    for (Cluster<Model> clus : p.getAllClusters()) {
+                      DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Collection<Integer>>(database, clus.getIDs());
+                      if (clus.getModel() instanceof NoiseModel) {
+                        result.addCluster(new Cluster<Model>(group, NoiseModel.NOISE));
+                      } else {
+                        result.addCluster(new Cluster<Model>(group, new DimensionModel(partitionID)));                      
+                      }
+                    }
                 }
             }
-            result = new PartitionClusteringResults<V>(database, results, database.dimensionality());
         }
         catch (UnableToComplyException e) {
             throw new IllegalStateException(e);
@@ -346,7 +356,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impl
      *
      * @return the specified partition algorithm
      */
-    public Clustering<V> getPartitionAlgorithm() {
+    public ClusteringAlgorithm<Clustering<Cluster<Model>>,V> getPartitionAlgorithm() {
         return partitionAlgorithm;
     }
 }

@@ -1,8 +1,16 @@
 package de.lmu.ifi.dbs.elki.algorithm;
 
-import de.lmu.ifi.dbs.elki.algorithm.result.AprioriResult;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.result.AprioriResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
@@ -14,14 +22,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstrai
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.OneMustBeSetGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.OnlyOneIsAllowedToBeSetGlobalConstraint;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 /**
  * Provides the APRIORI algorithm for Mining Association Rules.
  * <p>Reference:
@@ -31,7 +31,7 @@ import java.util.Map;
  *
  * @author Arthur Zimek
  */
-public class APRIORI extends AbstractAlgorithm<BitVector> {
+public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
 
     /**
      * OptionID for {@link #MINFREQ_PARAM}
@@ -123,7 +123,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
      * Performs the APRIORI algorithm on the given database.
      */
     @Override
-    protected void runInTime(Database<BitVector> database)
+    protected AprioriResult runInTime(Database<BitVector> database)
         throws IllegalStateException {
         support = new Hashtable<BitSet, Integer>();
         List<BitSet> solution = new ArrayList<BitSet>();
@@ -160,7 +160,8 @@ public class APRIORI extends AbstractAlgorithm<BitVector> {
                 }
             }
         }
-        result = new AprioriResult(solution, support, database);
+        result = new AprioriResult(solution, support);
+        return result;
     }
 
     /**

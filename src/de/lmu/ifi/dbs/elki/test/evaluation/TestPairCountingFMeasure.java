@@ -7,8 +7,10 @@ import org.junit.Test;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.TrivialAllInOne;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.TrivialAllNoise;
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.ClusteringResult;
+import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
+import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure;
@@ -39,28 +41,26 @@ public class TestPairCountingFMeasure {
     // run all-in-one
     TrivialAllInOne<DoubleVector> allinone = new TrivialAllInOne<DoubleVector>();
     allinone.run(db);
-    ClusteringResult<DoubleVector> rai = allinone.getResult();
+    Clustering<Cluster<Model>> rai = allinone.getResult();
     
     // run all-in-noise
     TrivialAllNoise<DoubleVector> allinnoise = new TrivialAllNoise<DoubleVector>();
     allinnoise.run(db);
-    ClusteringResult<DoubleVector> ran = allinnoise.getResult();
+    Clustering<Cluster<Model>> ran = allinnoise.getResult();
     
     // run by-label
     ByLabelClustering<DoubleVector> bylabel = new ByLabelClustering<DoubleVector>();
     bylabel.run(db);
-    ClusteringResult<DoubleVector> rbl = bylabel.getResult();
+    Clustering<Cluster<Model>> rbl = bylabel.getResult();
     
-    PairCountingFMeasure<DoubleVector> measurer = new PairCountingFMeasure<DoubleVector>();
+    assertEquals(1.0, PairCountingFMeasure.compareDatabases(rai, rai), Double.MIN_VALUE);
+    assertEquals(1.0, PairCountingFMeasure.compareDatabases(ran, ran), Double.MIN_VALUE);
+    assertEquals(1.0, PairCountingFMeasure.compareDatabases(rbl, rbl), Double.MIN_VALUE);
     
-    assertEquals(1.0, measurer.compareDatabases(rai, rai), Double.MIN_VALUE);
-    assertEquals(1.0, measurer.compareDatabases(ran, ran), Double.MIN_VALUE);
-    assertEquals(1.0, measurer.compareDatabases(rbl, rbl), Double.MIN_VALUE);
-    
-    assertEquals(0.009950248756218905, measurer.compareDatabases(ran, rbl), Double.MIN_VALUE);
-    assertEquals(0.0033277870216306157, measurer.compareDatabases(rai, ran), Double.MIN_VALUE);
+    assertEquals(0.009950248756218905, PairCountingFMeasure.compareDatabases(ran, rbl), Double.MIN_VALUE);
+    assertEquals(0.0033277870216306157, PairCountingFMeasure.compareDatabases(rai, ran), Double.MIN_VALUE);
 
-    assertEquals(0.5 /* 0.3834296724470135 */, measurer.compareDatabases(rai, rbl), Double.MIN_VALUE);
+    assertEquals(0.5 /* 0.3834296724470135 */, PairCountingFMeasure.compareDatabases(rai, rbl), Double.MIN_VALUE);
 }
 
 }

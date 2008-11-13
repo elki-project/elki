@@ -4,8 +4,9 @@ import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.evaluation.Evaluation;
+import de.lmu.ifi.dbs.elki.evaluation.EvaluationResult;
 import de.lmu.ifi.dbs.elki.evaluation.holdout.Holdout;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
@@ -16,7 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @author Arthur Zimek
  */
-public interface EvaluationProcedure<O extends DatabaseObject, L extends ClassLabel, A extends Algorithm<O>> extends Parameterizable
+public interface EvaluationProcedure<O extends DatabaseObject, L extends ClassLabel, A extends Algorithm<O, Result>> extends Parameterizable
 {
     /**
      * Message to indicate failure to call either {@link #set(Database, Database) set(trainingset, testset)}
@@ -72,7 +73,7 @@ public interface EvaluationProcedure<O extends DatabaseObject, L extends ClassLa
      * @throws IllegalStateException if a holdout is required to set
      * before calling this method
      */
-    public Evaluation<O,A> evaluate(A algorithm) throws IllegalStateException;
+    public EvaluationResult<O,A> evaluate(A algorithm) throws IllegalStateException;
     
     /**
      * Provides a description of the used holdout.

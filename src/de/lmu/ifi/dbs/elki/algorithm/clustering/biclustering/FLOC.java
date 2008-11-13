@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.biclustering.Bicluster;
 import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.model.Bicluster;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;

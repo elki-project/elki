@@ -1,11 +1,18 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.Clusters;
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.EMClusters;
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.EMModel;
+import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
+import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.RealVector;
-import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
+import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
+import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -18,12 +25,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
 
 /**
  * Provides the EM algorithm (clustering by expectation maximization).
@@ -42,10 +43,10 @@ import java.util.Random;
  * @author Arthur Zimek
  * @param <V> a type of {@link RealVector} as a suitable datatype for this algorithm
  */
-public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> implements Clustering<V> {
+public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Cluster<EMModel<V>>>> implements ClusteringAlgorithm<Clustering<Cluster<EMModel<V>>>,V> {
     /**
      * Small value to increment diagonally of a matrix
-     * in order to avoid singularity befor building the inverse.
+     * in order to avoid singularity before building the inverse.
      */
     private static final double SINGULARITY_CHEAT = 1E-9;
 
@@ -98,7 +99,7 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impleme
     /**
      * Keeps the result.
      */
-    private EMClusters<V> result;
+    private Clustering<Cluster<EMModel<V>>> result;
 
     /**
      * Provides the EM algorithm (clustering by expectation maximization),
@@ -121,7 +122,7 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impleme
      * associated the complete probability-vector for all models.
      */
     @Override
-    protected void runInTime(Database<V> database) throws IllegalStateException {
+    protected Clustering<Cluster<EMModel<V>>> runInTime(Database<V> database) throws IllegalStateException {
         if (database.size() == 0) {
             throw new IllegalArgumentException("database empty: must contain elements");
         }
@@ -251,14 +252,18 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impleme
         for (int i = 0; i < k; i++) {
             resultClusters[i] = hardClusters.get(i).toArray(new Integer[hardClusters.get(i).size()]);
         }
-        result = new EMClusters<V>(resultClusters, database);
-        result.associate(SimpleClassLabel.class);
+        result = new Clustering<Cluster<EMModel<V>>>();
+        //result.associate(SimpleClassLabel.class);
         // provide models within the result
         for (int i = 0; i < k; i++) {
-            SimpleClassLabel label = new SimpleClassLabel();
-            label.init(result.canonicalClusterLabel(i));
-            result.appendModel(label, new EMModel<V>(database, means.get(i), covarianceMatrices.get(i)));
+          // TODO: re-do labeling.
+          //SimpleClassLabel label = new SimpleClassLabel();
+          //label.init(result.canonicalClusterLabel(i));
+          DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(database, hardClusters.get(i));
+          Cluster<EMModel<V>> model = new Cluster<EMModel<V>>(group, new EMModel<V>(means.get(i), covarianceMatrices.get(i)));
+          result.addCluster(model);
         }
+        return result;
     }
 
     /**
@@ -392,7 +397,7 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> impleme
                 "In Journal of the Royal Statistical Society, Series B, 39(1), 1977, pp. 1-31");
     }
 
-    public Clusters<V> getResult() {
+    public Clustering<Cluster<EMModel<V>>> getResult() {
         return this.result;
     }
 

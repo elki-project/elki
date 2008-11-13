@@ -1,9 +1,15 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.ClusteringResult;
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.ClustersPlusNoise;
+import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
+import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
+import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
+import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.model.NoiseModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 
@@ -16,16 +22,16 @@ import de.lmu.ifi.dbs.elki.utilities.Description;
  *
  * @param <O>
  */
-public class TrivialAllNoise<O extends DatabaseObject> extends AbstractAlgorithm<O> implements Clustering<O> {
+public class TrivialAllNoise<O extends DatabaseObject> extends AbstractAlgorithm<O,Clustering<Cluster<Model>>> implements ClusteringAlgorithm<Clustering<Cluster<Model>>,O> {
   /**
    * Holds the result of the algorithm.
    */
-  private ClusteringResult<O> result;
+  private Clustering<Cluster<Model>> result;
 
   /**
    * Return clustering result
    */
-  public ClusteringResult<O> getResult() {
+  public Clustering<Cluster<Model>> getResult() {
     return result;
   }
 
@@ -43,9 +49,11 @@ public class TrivialAllNoise<O extends DatabaseObject> extends AbstractAlgorithm
    * @param database The database to process
    */
   @Override
-  protected void runInTime(Database<O> database) throws IllegalStateException {
-    Integer[][] rarray = new Integer[1][];
-    rarray[0] = database.getIDs().toArray(new Integer[0]);
-    result = new ClustersPlusNoise<O>(rarray, database);
+  protected Clustering<Cluster<Model>> runInTime(Database<O> database) throws IllegalStateException {
+    result = new Clustering<Cluster<Model>>();
+    DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(database, database.getIDs());
+    Cluster<Model> c = new Cluster<Model>(group, NoiseModel.NOISE);
+    result.addCluster(c);
+    return result;
   }
 }

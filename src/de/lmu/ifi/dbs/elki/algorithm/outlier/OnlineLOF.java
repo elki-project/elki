@@ -1,6 +1,14 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
-import de.lmu.ifi.dbs.elki.algorithm.result.outlier.LOFResult;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Associations;
@@ -13,6 +21,9 @@ import de.lmu.ifi.dbs.elki.parser.Parser;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
 import de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.elki.properties.Properties;
+import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
+import de.lmu.ifi.dbs.elki.result.MultiResult;
+import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
@@ -21,15 +32,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Online algorithm to efficiently update density-based local
@@ -132,7 +134,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
      * Performs the Online LOF algorithm on the given database.
      */
     @Override
-    protected void runInTime(Database<O> database) throws IllegalStateException {
+    protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
         lofTable.resetPageAccess();
         nnTable.resetPageAccess();
         getDistanceFunction().setDatabase(database, isVerbose(), isTime());
@@ -145,16 +147,26 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
             throw new IllegalStateException(e);
         }
 
-        result = new LOFResult<O>(database, lofTable, nnTable);
-
         if (isTime()) {
             verbose("\nPhysical read Access LOF-Table: " + lofTable.getPhysicalReadAccess());
             verbose("Physical write Access LOF-Table: " + lofTable.getPhysicalWriteAccess());
             verbose("Logical page Access LOF-Table:  " + lofTable.getLogicalPageAccess());
             verbose("Physical read Access NN-Table:  " + nnTable.getPhysicalReadAccess());
             verbose("Physical write Access NN-Table:  " + nnTable.getPhysicalWriteAccess());
-            verbose("nLogical page Access NN-Table:   " + nnTable.getLogicalPageAccess());
+            verbose("Logical page Access NN-Table:   " + nnTable.getLogicalPageAccess());
         }
+        
+        AnnotationsFromDatabase<O, Double> res1 = new AnnotationsFromDatabase<O, Double>(database);
+        //result = new LOFResult<O>(database, lofTable, nnTable);
+        res1.addAssociation("LOF", AssociationID.LOF);
+        // TODO: re-add lof and nn tables.
+        // Ordering
+        OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database, AssociationID.LOF, true); 
+        // combine results.
+        result = new MultiResult();
+        result.addResult(res1);
+        result.addResult(res2);
+        return result;
     }
 
     @Override

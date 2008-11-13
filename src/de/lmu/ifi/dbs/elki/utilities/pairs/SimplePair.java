@@ -72,6 +72,17 @@ public final class SimplePair<FIRST, SECOND> implements PairInterface<FIRST, SEC
   }
   
   /**
+   * Create a new array of the given size (for generics)
+   * 
+   * @param size array size
+   * @return empty array of the new type.
+   */
+  @SuppressWarnings("unchecked")
+  public static final <F,S> SimplePair<F,S>[] newArray(int size) {
+    return new SimplePair[size];
+  }
+
+  /**
    * Simple equals statement
    */
   @SuppressWarnings("unchecked")

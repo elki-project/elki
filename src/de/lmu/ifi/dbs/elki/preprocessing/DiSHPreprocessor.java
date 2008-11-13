@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.preprocessing;
 
 import de.lmu.ifi.dbs.elki.algorithm.APRIORI;
-import de.lmu.ifi.dbs.elki.algorithm.result.AprioriResult;
+import de.lmu.ifi.dbs.elki.result.AprioriResult;
 import de.lmu.ifi.dbs.elki.data.Bit;
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.RealVector;
@@ -484,7 +484,7 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
         DimensionSelectingDistanceFunction<N, V>[] distanceFunctions = new DimensionSelectingDistanceFunction[dimensionality];
         for (int d = 0; d < dimensionality; d++) {
             String[] parameters = new String[0];
-            Util.addParameter(parameters, DimensionSelectingDistanceFunction.DIM_ID, Integer.toString(d + 1));
+            parameters = Util.addParameter(parameters, DimensionSelectingDistanceFunction.DIM_ID, Integer.toString(d + 1));
             distanceFunctions[d] = new DimensionSelectingDistanceFunction<N, V>();
             distanceFunctions[d].setParameters(parameters);
             distanceFunctions[d].setDatabase(database, verbose, time);

@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -10,8 +9,6 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.result.Result;
-import de.lmu.ifi.dbs.elki.algorithm.result.outlier.ABODResult;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
@@ -19,12 +16,16 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.PolynomialKernelFunction;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.result.AnnotationsFromHashMap;
+import de.lmu.ifi.dbs.elki.result.MultiResult;
+import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -43,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
  * @author Erich Schubert <schube@dbs.ifi.lmu.de> (ELKIfication)
  * 
  */
-public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, DoubleDistance> {
+public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, DoubleDistance, MultiResult> {
   /**
    * OptionID for {@link #K_PARAM}
    */
@@ -114,7 +115,7 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
   /**
    * Result storage.
    */
-  ABODResult<V> result = null;
+  MultiResult result = null;
 
   /***************************************************************************
    * Constructor
@@ -132,7 +133,7 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
    * @param database Database to use
    * @param k k for kNN queries
    */
-  public void getRanking(Database<V> database, int k) {
+  public MultiResult getRanking(Database<V> database, int k) {
     KernelMatrix<V> kernelMatrix = new KernelMatrix<V>(kernelFunction, database);
     PriorityQueue<ComparablePair<Double, Integer>> pq = new PriorityQueue<ComparablePair<Double, Integer>>(database.size(), Collections.reverseOrder());
 
@@ -163,10 +164,19 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
       }
       pq.add(new ComparablePair<Double, Integer>(s.getVariance(), objKey));
     }
-    ComparablePair<Double, Integer>[] reslist = ComparablePair.newArray(0);
-    reslist = pq.toArray(reslist);
-    Arrays.sort(reslist);
-    result = new ABODResult<V>(database, reslist);
+    HashMap<Integer,Double> abodvalues = new HashMap<Integer,Double>();
+    for (ComparablePair<Double, Integer> pair : pq)
+      abodvalues.put(pair.getSecond(), pair.getFirst());
+    // ABOD values as result
+    AnnotationsFromHashMap<Double> res1 = new AnnotationsFromHashMap<Double>();
+    res1.addMap("ABOD", abodvalues);
+    // resulting ordering
+    OrderingFromHashMap<Double> res2 = new OrderingFromHashMap<Double>(abodvalues, true);
+    // combine results.
+    result = new MultiResult();
+    result.addResult(res1);
+    result.addResult(res2);
+    return result;
   }
 
   /**
@@ -176,7 +186,7 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
    * @param k k for kNN queries
    * @param sampleSize Sample size
    */
-  public void getFastRanking(Database<V> database, int k, int sampleSize) {
+  public MultiResult getFastRanking(Database<V> database, int k, int sampleSize) {
     KernelMatrix<V> kernelMatrix = new KernelMatrix<V>(kernelFunction, database);
 
     PriorityQueue<ComparablePair<Double, Integer>> pq = new PriorityQueue<ComparablePair<Double, Integer>>(database.size(), Collections.reverseOrder());
@@ -251,10 +261,19 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
 
     }
     // System.out.println(v + " Punkte von " + data.size() + " verfeinert !!");
-    ComparablePair<Double, Integer>[] reslist = ComparablePair.newArray(0);
-    reslist = pq.toArray(reslist);
-    Arrays.sort(reslist);
-    this.result = new ABODResult<V>(database, reslist);
+    HashMap<Integer,Double> abodvalues = new HashMap<Integer,Double>();
+    for (ComparablePair<Double, Integer> pair : pq)
+      abodvalues.put(pair.getSecond(), pair.getFirst());
+    // ABOD values as result
+    AnnotationsFromHashMap<Double> res1 = new AnnotationsFromHashMap<Double>();
+    res1.addMap("ABOD", abodvalues);
+    // resulting ordering
+    OrderingFromHashMap<Double> res2 = new OrderingFromHashMap<Double>(abodvalues, true);
+    // combine results.
+    result = new MultiResult();
+    result.addResult(res1);
+    result.addResult(res2);
+    return result;
   }
 
   // TODO: remove?
@@ -480,12 +499,12 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
   }
 
   @Override
-  protected void runInTime(Database<V> database) throws IllegalStateException {
+  protected MultiResult runInTime(Database<V> database) throws IllegalStateException {
     this.kernelFunction.setDatabase(database, false, false);
     if (fast)
-      getFastRanking(database, k, sampleSize);
+      return getFastRanking(database, k, sampleSize);
     else
-      getRanking(database, k);
+      return getRanking(database, k);
   }
 
   /**
@@ -504,7 +523,7 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
    * Return the results of the last run.
    */
   @Override
-  public Result<V> getResult() {
+  public MultiResult getResult() {
     return result;
   }
 
@@ -532,8 +551,11 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
     
     fast = FAST_FLAG.getValue();
 
-    if(fast)
+    if(fast) {
+      if (! FAST_SAMPLE_PARAM.isSet())
+        throw new NoParameterValueException("If you set a fast mode, you also need to set a sample size.");
       sampleSize = FAST_SAMPLE_PARAM.getValue();
+    }
 
     kernelFunction = KERNEL_FUNCTION_PARAM.instantiateClass();
     remainingParameters = kernelFunction.setParameters(remainingParameters);

@@ -1,7 +1,22 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
 
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.Clusters;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+
+import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
+import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
+import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.Description;
@@ -13,16 +28,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.pairs.IntDoublePair;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
 
 /**
  * <p/>
@@ -80,7 +85,7 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
      *
      */
     @Override
-    protected void runInTime(Database<V> database) throws IllegalStateException {
+    protected Clustering<Cluster<Model>> runInTime(Database<V> database) throws IllegalStateException {
 
         try {
             getDistanceFunction().setDatabase(database, false, false);
@@ -113,7 +118,7 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
                 debugFine("m_c " + m_current);
             }
 
-            Map<Integer, Cluster> clusters = null;
+            Map<Integer, PROCLUSCluster> clusters = null;
             int loops = 0;
             while (loops < 10) {
                 Map<Integer, Set<Integer>> dimensions = findDimensions(m_current, database);
@@ -139,20 +144,19 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
             }
 
             //todo refinement phase ?
-
-            // get the result
-            Integer[][] ids = new Integer[clusters.size()][];
-            int i = 0;
+            
+            Clustering<Cluster<Model>> res = new Clustering<Cluster<Model>>();
             for (Integer m_i : clusters.keySet()) {
-                Cluster c = clusters.get(m_i);
-                ids[i++] = c.objectIDs.toArray(new Integer[c.objectIDs.size()]);
+                PROCLUSCluster c = clusters.get(m_i);
+                DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(database, c.objectIDs);
+                res.addCluster(new Cluster<Model>(group, ClusterModel.CLUSTER));
             }
-            setResult(new Clusters<V>(ids, database));
+            setResult(res);
         }
         catch (Exception e) {
             throw new IllegalStateException(e);
         }
-
+        return getResult();
     }
 
     public Description getDescription() {
@@ -384,7 +388,7 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
      * @param database   the database containing the objects
      * @return the assignments of the object to the clusters
      */
-    private Map<Integer, Cluster> assignPoints(Map<Integer, Set<Integer>> dimensions, Database<V> database) {
+    private Map<Integer, PROCLUSCluster> assignPoints(Map<Integer, Set<Integer>> dimensions, Database<V> database) {
         Map<Integer, Set<Integer>> clusterIDs = new HashMap<Integer, Set<Integer>>();
         for (Integer m_i : dimensions.keySet()) {
             clusterIDs.put(m_i, new HashSet<Integer>());
@@ -408,13 +412,13 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
             ids.add(p_id);
         }
 
-        Map<Integer, Cluster> clusters = new HashMap<Integer, Cluster>();
+        Map<Integer, PROCLUSCluster> clusters = new HashMap<Integer, PROCLUSCluster>();
         for (Integer m_i : dimensions.keySet()) {
             Set<Integer> objectIDs = clusterIDs.get(m_i);
             if (!objectIDs.isEmpty()) {
                 Set<Integer> clusterDimensions = dimensions.get(m_i);
                 V centroid = Util.centroid(database, objectIDs);
-                clusters.put(m_i, new Cluster(objectIDs, clusterDimensions, centroid));
+                clusters.put(m_i, new PROCLUSCluster(objectIDs, clusterDimensions, centroid));
             }
         }
         return clusters;
@@ -445,10 +449,10 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
      * @param database   the database holding the objects
      * @return a measure for the cluster quality
      */
-    private double evaluateClusters(Map<Integer, Cluster> clusters, Map<Integer, Set<Integer>> dimensions, Database<V> database) {
+    private double evaluateClusters(Map<Integer, PROCLUSCluster> clusters, Map<Integer, Set<Integer>> dimensions, Database<V> database) {
         double result = 0;
         for (Integer m_i : clusters.keySet()) {
-            Cluster c_i = clusters.get(m_i);
+            PROCLUSCluster c_i = clusters.get(m_i);
             V centroid_i = c_i.centroid;
 
             Set<Integer> dims_i = dimensions.get(m_i);
@@ -490,10 +494,10 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
      * @param threshold the threshold
      * @return the bad medoids
      */
-    private Set<Integer> computeBadMedoids(Map<Integer, Cluster> clusters, int threshold) {
+    private Set<Integer> computeBadMedoids(Map<Integer, PROCLUSCluster> clusters, int threshold) {
         Set<Integer> badMedoids = new HashSet<Integer>();
         for (Integer m_i : clusters.keySet()) {
-            Cluster c_i = clusters.get(m_i);
+            PROCLUSCluster c_i = clusters.get(m_i);
             if (c_i.objectIDs.size() < threshold) {
                 badMedoids.add(m_i);
             }
@@ -504,7 +508,7 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
     /**
      * Encapsulates the attributes of a cluster.
      */
-    private class Cluster {
+    private class PROCLUSCluster {
         /**
          * The ids of the objects belonging to this cluster.
          */
@@ -527,7 +531,7 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
          * @param dimensions the correlated dimensions of this cluster
          * @param centroid   the centroid of this cluster
          */
-        public Cluster(Set<Integer> objectIDs, Set<Integer> dimensions, V centroid) {
+        public PROCLUSCluster(Set<Integer> objectIDs, Set<Integer> dimensions, V centroid) {
             this.objectIDs = objectIDs;
             this.dimensions = dimensions;
             this.centroid = centroid;

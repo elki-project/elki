@@ -1,7 +1,15 @@
 package de.lmu.ifi.dbs.elki.algorithm;
 
-import de.lmu.ifi.dbs.elki.algorithm.result.CorrelationAnalysisSolution;
+import java.text.NumberFormat;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+
 import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
@@ -20,16 +28,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
 import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredRunner;
 
-import java.text.NumberFormat;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-
 /**
- * Dependency derivator computes quantitativly linear dependencies among
+ * Dependency derivator computes quantitatively linear dependencies among
  * attributes of a given dataset based on a linear correlation PCA. <p/>
  * Reference: <br>
  * E. Achtert, C. Boehm, H.-P. Kriegel, P. Kroeger, A. Zimek: Deriving
@@ -41,7 +41,7 @@ import java.util.Set;
  * @param <V> the type of RealVector handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  */
-public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<D>> extends DistanceBasedAlgorithm<V, D> {
+public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<D>> extends DistanceBasedAlgorithm<V, D, CorrelationAnalysisSolution<V>> {
   /**
    * OptionID for {@link #RANDOM_SAMPLE_FLAG}
    */
@@ -136,7 +136,7 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
    * given database based on a linear correlation PCA.
    */
   @Override
-  public void runInTime(Database<V> db) throws IllegalStateException {
+  public CorrelationAnalysisSolution<V> runInTime(Database<V> db) throws IllegalStateException {
     if(isVerbose()) {
       verbose("retrieving database objects...");
     }
@@ -163,6 +163,7 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
     }
 
     this.solution = generateModel(db, ids, centroidDV);
+    return this.solution;
   }
 
   /**
@@ -267,7 +268,7 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
   public CorrelationAnalysisSolution<V> getResult() {
     return solution;
   }
-
+  
   /**
    * Calls the super method and sets additionally the values of the parameters
    * {@link #OUTPUT_ACCURACY_PARAM} and {@link #SAMPLE_SIZE_PARAM}. The

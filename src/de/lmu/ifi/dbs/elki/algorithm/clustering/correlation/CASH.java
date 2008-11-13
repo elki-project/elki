@@ -1,15 +1,27 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.Vector;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.cash.CASHInterval;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.cash.CASHIntervalSplit;
-import de.lmu.ifi.dbs.elki.algorithm.result.CorrelationAnalysisSolution;
-import de.lmu.ifi.dbs.elki.algorithm.result.Result;
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.CASHResult;
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.SubspaceClusterMap;
+import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.ParameterizationFunction;
+import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
+import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
+import de.lmu.ifi.dbs.elki.data.model.LinearEquationModel;
+import de.lmu.ifi.dbs.elki.data.model.NoiseModel;
 import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ObjectAndAssociations;
@@ -17,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.SequentialDatabase;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.utilities.Description;
@@ -36,26 +49,18 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
 import de.lmu.ifi.dbs.elki.varianceanalysis.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredRunner;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.Vector;
-
 /**
  * Provides the CASH algorithm, an subspace clustering algorithm based on the hough transform.
  * <p>Reference:
  * E. Achtert, C. Boehm, J. David, P. Kroeger, A. Zimek:
- * Robust clustering in arbitraily oriented subspaces.
+ * Robust clustering in arbitrarily oriented subspaces.
  * <br>In Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008
  * </p>
  *
  * @author Elke Achtert
  */
 //todo elke hierarchy (later)
-public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
+public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering<Cluster<Model>>> implements ClusteringAlgorithm<Clustering<Cluster<Model>>,ParameterizationFunction>{
 
     /**
      * OptionID for {@link #MINPTS_PARAM}
@@ -166,7 +171,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
     /**
      * The result.
      */
-    private CASHResult result;
+    private Clustering<Cluster<Model>> result;
 
     /**
      * Holds the dimensionality for noise.
@@ -214,7 +219,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
      *
      */
     @Override
-    protected void runInTime(Database<ParameterizationFunction> database) throws IllegalStateException {
+    protected Clustering<Cluster<Model>> runInTime(Database<ParameterizationFunction> database) throws IllegalStateException {
         this.database = database;
         if (isVerbose()) {
             StringBuffer msg = new StringBuffer();
@@ -233,22 +238,20 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
                 progress(progress);
             }
 
-            SubspaceClusterMap clusters = doRun(database, progress);
+            result = doRun(database, progress);
+            
             if (isVerbose()) {
                 StringBuffer msg = new StringBuffer();
-                msg.append("\n\nclusters: ").append(clusters.subspaceDimensionalities());
-                for (Integer id : clusters.subspaceDimensionalities()) {
-                    msg.append("\n         subspaceDim = ").append(id).append(": ").append(clusters.getCluster(id).size()).append(" cluster(s)");
-                    msg.append(" [");
-                    for (Set<Integer> c : clusters.getCluster(id)) {
-                        msg.append(c.size()).append(" ");
-                    }
-                    msg.append("objects]");
+                for (Cluster<Model> c : result.getAllClusters()) {
+                  if (c.getModel() instanceof LinearEquationModel) {
+                    LinearEquationModel s = (LinearEquationModel) c.getModel();
+                    msg.append("\n Cluster: Dim: "+s.getLes().subspacedim()+" size: "+c.size());
+                  } else {
+                    msg.append("\n Cluster: "+c.getModel().getClass().getName()+" size: "+c.size());
+                  }
                 }
                 verbose(msg.toString());
             }
-
-            result = new CASHResult(database, clusters, noiseDim);
         }
         catch (UnableToComplyException e) {
             throw new IllegalStateException(e);
@@ -259,6 +262,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
         catch (NonNumericFeaturesException e) {
             throw new IllegalStateException(e);
         }
+        return result;
     }
 
     /**
@@ -266,7 +270,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
      *
      * @return the result of the algorithm
      */
-    public Result<ParameterizationFunction> getResult() {
+    public Clustering<Cluster<Model>> getResult() {
         return result;
     }
 
@@ -322,12 +326,14 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
      * @throws ParameterException          if the parameter setting is wrong
      * @throws NonNumericFeaturesException if non numeric feature vectors are used
      */
-    private SubspaceClusterMap doRun(Database<ParameterizationFunction> database,
+    private Clustering<Cluster<Model>> doRun(Database<ParameterizationFunction> database,
                                      Progress progress) throws UnableToComplyException, ParameterException, NonNumericFeaturesException {
+
+      
+      Clustering<Cluster<Model>> res = new Clustering<Cluster<Model>>();
 
 
         int dim = database.get(database.iterator().next()).getDimensionality();
-        SubspaceClusterMap clusterMap = new SubspaceClusterMap(dim);
 
         // init heap
         DefaultHeap<Integer, CASHInterval> heap = new DefaultHeap<Integer, CASHInterval>(false);
@@ -379,23 +385,22 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
 
                 Database<ParameterizationFunction> db = buildDB(dim, basis_dim_minus_1, ids, database);
                 if (db.size() != 0) {
-                    SubspaceClusterMap clusterMap_dim_minus_1 = doRun(db, progress);
-
-                    // add result of dim-1 to this result
-                    for (Integer d : clusterMap_dim_minus_1.subspaceDimensionalities()) {
-                        List<Set<Integer>> clusters_d = clusterMap_dim_minus_1.getCluster(d);
-                        for (Set<Integer> clusters : clusters_d) {
-                            clusterMap.add(d, clusters, this.database);
-                            noiseIDs.removeAll(clusters);
-                            clusterIDs.addAll(clusters);
-                            processedIDs.addAll(clusters);
-                        }
-                    }
+                  // add result of dim-1 to this result
+                  Clustering<Cluster<Model>> res_dim_minus_1 = doRun(db, progress);
+                  for (Cluster<Model> cluster : res_dim_minus_1.getAllClusters()) {
+                    res.addCluster(cluster);
+                    noiseIDs.removeAll(cluster.getGroup().getIDs());
+                    clusterIDs.addAll(cluster.getGroup().getIDs());
+                    processedIDs.addAll(cluster.getGroup().getIDs());
+                  }
                 }
             }
             // dim == minDim
             else {
-                clusterMap.add(dim - 1, interval.getIDs(), this.database);
+                DatabaseObjectGroupCollection<Set<Integer>> group = new DatabaseObjectGroupCollection<Set<Integer>>(this.database, interval.getIDs());
+                LinearEquationSystem les = runDerivator(this.database, dim - 1, interval.getIDs());
+                Cluster<Model> c = new Cluster<Model>(group, new LinearEquationModel(les));
+                res.addCluster(c);
                 noiseIDs.removeAll(interval.getIDs());
                 clusterIDs.addAll(interval.getIDs());
                 processedIDs.addAll(interval.getIDs());
@@ -421,11 +426,17 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
         // put noise to clusters
         if (!noiseIDs.isEmpty()) {
             if (dim == noiseDim) {
-                clusterMap.addToNoise(noiseIDs);
+                DatabaseObjectGroupCollection<Set<Integer>> group = new DatabaseObjectGroupCollection<Set<Integer>>(this.database, noiseIDs);
+                Cluster<Model> c = new Cluster<Model>(group, NoiseModel.NOISE);
+                res.addCluster(c);
                 processedIDs.addAll(noiseIDs);
             }
             else if (noiseIDs.size() >= minPts) {
-                clusterMap.add(dim, noiseIDs, this.database);
+                // TODO: use different class/model for noise, even when LES was computed?
+                DatabaseObjectGroupCollection<Set<Integer>> group = new DatabaseObjectGroupCollection<Set<Integer>>(this.database, noiseIDs);
+                LinearEquationSystem les = runDerivator(this.database, dim - 1, noiseIDs);
+                Cluster<Model> c = new Cluster<Model>(group, new LinearEquationModel(les));
+                res.addCluster(c);
                 processedIDs.addAll(noiseIDs);
             }
         }
@@ -433,18 +444,14 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
         if (debug) {
             StringBuffer msg = new StringBuffer();
             msg.append("\nnoise fuer dim ").append(dim).append(": ").append(noiseIDs.size());
-            msg.append("\nclusters fuer dim= ").append(dim).append(": ").append(clusterMap.subspaceDimensionalities());
-            for (Integer id : clusterMap.subspaceDimensionalities()) {
-                msg.append("         corrDim = ");
-                msg.append(id);
-                msg.append(": ");
-                msg.append(clusterMap.getCluster(id).size());
-                msg.append(" cluster(s)");
-                msg.append(" [");
-                for (Set<Integer> c : clusterMap.getCluster(id)) {
-                    msg.append(c.size()).append(" ");
-                }
-                msg.append("\nobjects]");
+            
+            for (Cluster<Model> c : result.getAllClusters()) {
+              if (c.getModel() instanceof LinearEquationModel) {
+                LinearEquationModel s = (LinearEquationModel) c.getModel();
+                msg.append("\n Cluster: Dim: "+s.getLes().subspacedim()+" size: "+c.size());
+              } else {
+                msg.append("\n Cluster: "+c.getModel().getClass().getName()+" size: "+c.size());
+              }
             }
             debugFine(msg.toString());
         }
@@ -455,7 +462,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
         }
 
 
-        return clusterMap;
+        return res;
     }
 
     /**
@@ -621,7 +628,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
 
     /**
      * Determines the next ''best'' interval at maximum level, i.e. the next interval containing the
-     * most unprocessed obejcts.
+     * most unprocessed objects.
      *
      * @param heap the heap storing the intervals
      * @return the next ''best'' interval at maximum level
@@ -641,7 +648,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
 
     /**
      * Recursive helper method to determine the next ''best'' interval at maximum level,
-     * i.e. the next interval containing the most unprocessed obejcts
+     * i.e. the next interval containing the most unprocessed objects
      *
      * @param heap the heap storing the intervals
      * @return the next ''best'' interval at maximum level
@@ -820,6 +827,75 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction> {
         if (debug) {
             debugFine("\ndb fuer derivator : " + result.size());
         }
+
+        return result;
+    }
+    
+    /**
+     * Runs the derivator on the specified interval and assigns all points
+     * having a distance less then the standard deviation of the derivator model
+     * to the model to this model.
+     *
+     * @param database       the database containing the parameterization functions
+     * @param ids            the ids to build the model
+     * @param dimensionality the dimensionality of the subspace
+     * @return a basis of the found subspace
+     */
+    private LinearEquationSystem runDerivator(Database<ParameterizationFunction> database,
+                                              int dimensionality,
+                                              Set<Integer> ids) {
+        try {
+            // build database for derivator
+            Database<DoubleVector> derivatorDB = buildDerivatorDB(database, ids);
+
+            DependencyDerivator<DoubleVector, DoubleDistance> derivator = new DependencyDerivator<DoubleVector, DoubleDistance>();
+
+            List<String> parameters = new ArrayList<String>();
+            Util.addParameter(parameters, PCAFilteredRunner.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
+            Util.addParameter(parameters, FirstNEigenPairFilter.EIGENPAIR_FILTER_N, Integer.toString(dimensionality));
+            derivator.setParameters(parameters.toArray(new String[parameters.size()]));
+
+            derivator.run(derivatorDB);
+            CorrelationAnalysisSolution<DoubleVector> model = derivator.getResult();
+            LinearEquationSystem les = model.getNormalizedLinearEquationSystem(null);
+            return les;
+        }
+        catch (ParameterException e) {
+            throw new IllegalStateException("Wrong parameter-setting for the derivator: " + e);
+        }
+        catch (UnableToComplyException e) {
+            throw new IllegalStateException("Initialization of the database for the derivator failed: " + e);
+        }
+        catch (NonNumericFeaturesException e) {
+            throw new IllegalStateException("Error during normalization" + e);
+        }
+    }
+
+    /**
+     * Builds a database for the derivator consisting of the ids
+     * in the specified interval.
+     *
+     * @param database the database storing the parameterization functions
+     * @param ids      the ids to build the database from
+     * @return a database for the derivator consisting of the ids
+     *         in the specified interval
+     * @throws UnableToComplyException if initialization of the database is not possible
+     */
+    private Database<DoubleVector> buildDerivatorDB(Database<ParameterizationFunction> database,
+                                                  Set<Integer> ids) throws UnableToComplyException {
+        // build objects and associations
+        List<ObjectAndAssociations<DoubleVector>> oaas = new ArrayList<ObjectAndAssociations<DoubleVector>>(database.size());
+
+        for (Integer id : ids) {
+            Associations associations = database.getAssociations(id);
+            DoubleVector v = new DoubleVector(database.get(id).getRowVector().getRowPackedCopy());
+            ObjectAndAssociations<DoubleVector> oaa = new ObjectAndAssociations<DoubleVector>(v, associations);
+            oaas.add(oaa);
+        }
+
+        // insert into db
+        Database<DoubleVector> result = new SequentialDatabase<DoubleVector>();
+        result.insert(oaas);
 
         return result;
     }

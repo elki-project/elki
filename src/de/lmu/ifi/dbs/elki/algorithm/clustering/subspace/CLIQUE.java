@@ -1,27 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.Clustering;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.clique.CLIQUESubspace;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.clique.CLIQUEUnit;
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.CLIQUEModel;
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.ClusteringResult;
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.Clusters;
-import de.lmu.ifi.dbs.elki.data.RealVector;
-import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.Interval;
-import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -35,6 +13,29 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.Map.Entry;
+
+import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.clique.CLIQUESubspace;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.clique.CLIQUEUnit;
+import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
+import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
+import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.Interval;
+import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 
 
 /**
@@ -60,7 +61,7 @@ import java.util.TreeSet;
  * @author Elke Achtert
  * @param <V> the type of RealVector handled by this Algorithm
  */
-public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> implements Clustering<V> {
+public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Cluster<CLIQUESubspace<V>>>> implements ClusteringAlgorithm<Clustering<Cluster<CLIQUESubspace<V>>>,V> {
     /**
      * OptionID for {@link #XSI_PARAM}
      */
@@ -132,7 +133,7 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
     /**
      * The result of the algorithm;
      */
-    private Clusters<V> result;
+    private Clustering<Cluster<CLIQUESubspace<V>>> result;
 
     /**
      * Provides the CLIQUE algorithm,
@@ -159,7 +160,7 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
      *
      * @return the result of the algorithm
      */
-    public ClusteringResult<V> getResult() {
+    public Clustering<Cluster<CLIQUESubspace<V>>> getResult() {
         return result;
     }
 
@@ -182,8 +183,8 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
      *
      */
     @Override
-    protected void runInTime(Database<V> database) throws IllegalStateException {
-        Map<CLIQUEModel<V>, Set<Integer>> modelsAndClusters = new HashMap<CLIQUEModel<V>, Set<Integer>>();
+    protected Clustering<Cluster<CLIQUESubspace<V>>> runInTime(Database<V> database) throws IllegalStateException {
+        Map<CLIQUESubspace<V>, Set<Integer>> modelsAndClusters = new HashMap<CLIQUESubspace<V>, Set<Integer>>();
 
         // 1. Identification of subspaces that contain clusters
         if (isVerbose()) {
@@ -211,7 +212,7 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
 
         for (Integer dim : dimensionToDenseSubspaces.keySet()) {
             SortedSet<CLIQUESubspace<V>> subspaces = dimensionToDenseSubspaces.get(dim);
-            Map<CLIQUEModel<V>, Set<Integer>> modelsToClusters = determineClusters(database, subspaces);
+            Map<CLIQUESubspace<V>, Set<Integer>> modelsToClusters = determineClusters(database, subspaces);
             modelsAndClusters.putAll(modelsToClusters);
 
             if (isVerbose()) {
@@ -219,23 +220,14 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
             }
         }
 
-        Integer[][] clusters = new Integer[modelsAndClusters.size()][0];
-        Iterator<Set<Integer>> valuesIt = modelsAndClusters.values().iterator();
-        for (int i = 0; i < clusters.length; i++) {
-            Set<Integer> ids = valuesIt.next();
-            clusters[i] = ids.toArray(new Integer[ids.size()]);
+        result = new Clustering<Cluster<CLIQUESubspace<V>>>();
+
+        for (Entry<CLIQUESubspace<V>, Set<Integer>> e : modelsAndClusters.entrySet()) {
+          DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(database, e.getValue());
+          result.addCluster(new Cluster<CLIQUESubspace<V>>(group, e.getKey()));
         }
-
-        result = new Clusters<V>(clusters, database);
-
-        // append model
-        Iterator<CLIQUEModel<V>> keysIt = modelsAndClusters.keySet().iterator();
-        for (int i = 0; i < clusters.length; i++) {
-            SimpleClassLabel label = new SimpleClassLabel();
-            label.init(result.canonicalClusterLabel(i));
-            result.appendModel(label, keysIt.next());
-        }
-
+        
+        return result;
     }
 
     /**
@@ -263,12 +255,12 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> imp
      * @return the clusters in the specified dense subspaces and the corresponding
      *         cluster models
      */
-    private Map<CLIQUEModel<V>, Set<Integer>> determineClusters(Database<V> database,
+    private Map<CLIQUESubspace<V>, Set<Integer>> determineClusters(Database<V> database,
                                                                 SortedSet<CLIQUESubspace<V>> denseSubspaces) {
-        Map<CLIQUEModel<V>, Set<Integer>> result = new HashMap<CLIQUEModel<V>, Set<Integer>>();
+        Map<CLIQUESubspace<V>, Set<Integer>> result = new HashMap<CLIQUESubspace<V>, Set<Integer>>();
 
         for (CLIQUESubspace<V> subspace : denseSubspaces) {
-            Map<CLIQUEModel<V>, Set<Integer>> clusters = subspace.determineClusters(database);
+            Map<CLIQUESubspace<V>, Set<Integer>> clusters = subspace.determineClusters(database);
             if (debug) {
                 debugFine("Subspace " + subspace + " clusters " + clusters.size());
             }

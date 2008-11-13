@@ -5,7 +5,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 /**
  * Merge the output of multiple generators.
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  */
 public class PairGeneratorMerge extends PairSortedGenerator {
   /**
@@ -41,7 +41,9 @@ public class PairGeneratorMerge extends PairSortedGenerator {
       }
     }
     // advance best generator
-    if (best != null) best.next();
+    if (best != null) {
+      best.next();
+    }
     return min;
   }
 }

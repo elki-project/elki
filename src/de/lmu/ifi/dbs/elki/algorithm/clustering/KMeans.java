@@ -1,8 +1,20 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.Clusters;
+import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
+import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
+import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.normalization.AttributeWiseRealVectorNormalization;
@@ -12,13 +24,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
 
 /**
  * Provides the k-means algorithm.
@@ -31,7 +36,7 @@ import java.util.Random;
  * @param <D> a type of {@link Distance} as returned by the used distance function
  * @param <V> a type of {@link RealVector} as a suitable datatype for this algorithm
  */
-public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, D> implements Clustering<V> {
+public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, D, Clustering<Cluster<Model>>> implements ClusteringAlgorithm<Clustering<Cluster<Model>>,V> {
 
     /**
      * OptionID for {@link #K_PARAM}
@@ -56,7 +61,7 @@ public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends D
     /**
      * Keeps the result.
      */
-    private Clusters<V> result;
+    private Clustering<Cluster<Model>> result;
 
     /**
      * Provides the k-means algorithm,
@@ -78,7 +83,7 @@ public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends D
                 "In 5th Berkeley Symp. Math. Statist. Prob., Vol. 1, 1967, pp 281-297");
     }
 
-    public Clusters<V> getResult() {
+    public Clustering<Cluster<Model>> getResult() {
         return result;
     }
 
@@ -86,7 +91,7 @@ public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends D
      * Performs the k-means algorithm on the given database.
      */
     @Override
-    protected void runInTime(Database<V> database) throws IllegalStateException {
+    protected Clustering<Cluster<Model>> runInTime(Database<V> database) throws IllegalStateException {
         Random random = new Random();
         if (database.size() > 0) {
             // needs normalization to ensure the randomly generated means
@@ -134,16 +139,16 @@ public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends D
                 changed = !means.equals(oldMeans);
                 iteration++;
             }
-            Integer[][] resultClusters = new Integer[clusters.size()][];
+            result = new Clustering<Cluster<Model>>();
             for (int i = 0; i < clusters.size(); i++) {
-                List<Integer> cluster = clusters.get(i);
-                resultClusters[i] = cluster.toArray(new Integer[cluster.size()]);
+              DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(database, clusters.get(i));
+              result.addCluster(new Cluster<Model>(group, ClusterModel.CLUSTER));
             }
-            result = new Clusters<V>(resultClusters, database);
         }
         else {
-            result = new Clusters<V>(new Integer[0][0], database);
+            result = new Clustering<Cluster<Model>>();
         }
+        return result;
     }
 
     /**

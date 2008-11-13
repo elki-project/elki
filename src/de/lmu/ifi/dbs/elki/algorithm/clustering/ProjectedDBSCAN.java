@@ -1,8 +1,20 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.ClustersPlusNoise;
+import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
+import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
+import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
+import de.lmu.ifi.dbs.elki.data.model.NoiseModel;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
@@ -25,19 +37,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalDistanceFu
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
 /**
  * Provides an abstract algorithm requiring a VarianceAnalysisPreprocessor.
  *
  * @author Arthur Zimek
  * @param <V> the type of Realvector handled by this Algorithm
  */
-public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> implements Clustering<V> {
+public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Cluster<Model>>> implements ClusteringAlgorithm<Clustering<Cluster<Model>>,V> {
 
     /**
      * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
@@ -139,7 +145,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
     /**
      * Provides the result of the algorithm.
      */
-    private ClustersPlusNoise<V> result;
+    private Clustering<Cluster<Model>> result;
 
     /**
      * Holds a set of noise.
@@ -178,7 +184,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
     }
 
     @Override
-    protected void runInTime(Database<V> database) throws IllegalStateException {
+    protected Clustering<Cluster<Model>> runInTime(Database<V> database) throws IllegalStateException {
         if (isVerbose()) {
             verbose("");
         }
@@ -222,14 +228,17 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
                 progress(progress, resultList.size());
             }
 
-            Integer[][] resultArray = new Integer[resultList.size() + 1][];
-            int i = 0;
-            for (Iterator<List<Integer>> resultListIter = resultList.iterator(); resultListIter.hasNext(); i++) {
-                resultArray[i] = resultListIter.next().toArray(new Integer[0]);
+            result = new Clustering<Cluster<Model>>();
+            for (Iterator<List<Integer>> resultListIter = resultList.iterator(); resultListIter.hasNext(); ) {
+              DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(database, resultListIter.next());
+              Cluster<Model> c = new Cluster<Model>(group, ClusterModel.CLUSTER);
+              result.addCluster(c);
             }
 
-            resultArray[resultArray.length - 1] = noise.toArray(new Integer[0]);
-            result = new ClustersPlusNoise<V>(resultArray, database);
+            DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(database, noise);
+            Cluster<Model> n = new Cluster<Model>(group, NoiseModel.NOISE);        
+            result.addCluster(n);
+
             if (isVerbose()) {
                 progress.setProcessed(processedIDs.size());
                 progress(progress, resultList.size());
@@ -238,6 +247,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
         catch (Exception e) {
             throw new IllegalStateException(e);
         }
+        return result;
     }
 
     /**
@@ -428,7 +438,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
      */
     public abstract Class<?> preprocessorClass();
 
-    public ClustersPlusNoise<V> getResult() {
+    public Clustering<Cluster<Model>> getResult() {
         return result;
     }
 }

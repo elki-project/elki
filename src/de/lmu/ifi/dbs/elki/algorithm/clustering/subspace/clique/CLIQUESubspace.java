@@ -1,11 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.clique;
 
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.CLIQUEModel;
-import de.lmu.ifi.dbs.elki.data.RealVector;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.Interval;
-import de.lmu.ifi.dbs.elki.utilities.Subspace;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -16,13 +10,21 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
+import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
+import de.lmu.ifi.dbs.elki.utilities.Interval;
+import de.lmu.ifi.dbs.elki.utilities.Subspace;
+
 /**
  * Represents a subspace of the original dataspace in the CLIQUE algorithm.
  *
  * @author Elke Achtert
  * @param <V> the type of RealVector handled by this Algorithm
  */
-public class CLIQUESubspace<V extends RealVector<V, ?>> extends Subspace<V> implements Comparable<CLIQUESubspace<V>> {
+public class CLIQUESubspace<V extends RealVector<V, ?>> extends Subspace<V> implements Comparable<CLIQUESubspace<V>>, Model, TextWriteable {
     /**
      * The dense units belonging to this subspace.
      */
@@ -111,14 +113,13 @@ public class CLIQUESubspace<V extends RealVector<V, ?>> extends Subspace<V> impl
      * @param database the database containing the feature vectors
      * @return the clusters in this subspace and the corresponding cluster models
      */
-    public Map<CLIQUEModel<V>, Set<Integer>> determineClusters(Database<V> database) {
-        Map<CLIQUEModel<V>, Set<Integer>> clusters = new HashMap<CLIQUEModel<V>, Set<Integer>>();
+    public Map<CLIQUESubspace<V>, Set<Integer>> determineClusters(Database<V> database) {
+        Map<CLIQUESubspace<V>, Set<Integer>> clusters = new HashMap<CLIQUESubspace<V>, Set<Integer>>();
 
         for (CLIQUEUnit<V> unit : denseUnits) {
             if (!unit.isAssigned()) {
                 Set<Integer> cluster = new HashSet<Integer>();
-                CLIQUEModel<V> model = new CLIQUEModel<V>(database, this);
-                clusters.put(model, cluster);
+                clusters.put(this, cluster);
                 dfs(unit, cluster);
             }
         }
@@ -196,12 +197,12 @@ public class CLIQUESubspace<V extends RealVector<V, ?>> extends Subspace<V> impl
 
     /**
      * Joins this subspace with the specified subspace.
-     * The join is only sucessful if
+     * The join is only successful if
      * both subspaces have the first k-1 dimensions in common
      * (where k is the number of dimensions).
      *
      * @param other the subspace to join
-     * @param all   the overall number of featuer vectors
+     * @param all   the overall number of feature vectors
      * @param tau   the density threshold for the selectivity of a unit
      * @return the join of this subspace with the specified subspace
      *         if the join condition is fulfilled,
@@ -244,5 +245,22 @@ public class CLIQUESubspace<V extends RealVector<V, ?>> extends Subspace<V> impl
                 .append(denseUnit.getIds().size()).append(" objects\n");
         }
         return result.toString();
+    }
+
+    /**
+  	 * Serialize using above toString method
+     */
+    @Override
+    public void writeToText(TextWriterStream out) {
+      out.commentPrintLn(this.toString());
+    }
+
+    /**
+     * Implementation of {@link Model} interface.
+     * @return
+     */
+    @Override
+    public String getSuggestedLabel() {
+      return "CLIQUESubspace";
     }
 }

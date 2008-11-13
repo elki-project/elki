@@ -2,8 +2,10 @@ package de.lmu.ifi.dbs.elki.algorithm.classifier;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
@@ -88,7 +90,7 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
             for (QueryResult<D> neighbor : query) {
                 // noinspection unchecked
                 int index = Arrays.binarySearch(getLabels(),
-                    (CLASS.getType().cast(database.getAssociation(CLASS, neighbor.getID()))));
+                    (AssociationID.CLASS.getType().cast(database.getAssociation(AssociationID.CLASS, neighbor.getID()))));
                 if (index >= 0) {
                     occurences[index]++;
                 }
@@ -131,6 +133,18 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
 
     public String model() {
         return "lazy learner - provides no model";
+    }
+
+    @Override
+    protected Result runInTime(Database<O> database) throws IllegalStateException {
+      // TODO Implement sensible default behavior.
+      return null;
+    }
+
+    @Override
+    public Result getResult() {
+      // TODO Add when runInTime was implemented.
+      return null;
     }
 
 }

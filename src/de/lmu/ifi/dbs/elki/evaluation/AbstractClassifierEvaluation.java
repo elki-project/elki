@@ -1,29 +1,30 @@
 package de.lmu.ifi.dbs.elki.evaluation;
 
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.classifier.Classifier;
-import de.lmu.ifi.dbs.elki.algorithm.result.AbstractResult;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
-
-import java.io.File;
-import java.io.FileDescriptor;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.List;
 
 /**
  * TODO comment
  *
  * @author Arthur Zimek
  */
-public abstract class AbstractClassifierEvaluation<O extends DatabaseObject, L extends ClassLabel, C extends Classifier<O, L>> extends AbstractResult<O> implements Evaluation<O, C> {
-
+public abstract class AbstractClassifierEvaluation<O extends DatabaseObject, L extends ClassLabel, C extends Classifier<O, L, Result>> implements EvaluationResult<O, C> {
+    /**
+     * The referenced main database.
+     */
+    //TODO: used?
+    protected Database<O> database;
+  
     /**
      * Holds the used classifier.
      */
@@ -40,35 +41,14 @@ public abstract class AbstractClassifierEvaluation<O extends DatabaseObject, L e
      * @param testset
      */
     public AbstractClassifierEvaluation(Database<O> database, Database<O> testset, C classifier) {
-        super(database);
+        this.database = database;
         this.testset = testset;
         this.classifier = classifier;
     }
 
-    /**
-     * @param normalization normalization is unused
-     * @throws IOException 
-     */
-    @Override
-    public final void output(File out, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException, IOException {
-        PrintStream output;
-        try {
-            out.getParentFile().mkdirs();
-            output = new PrintStream(new FileOutputStream(out));
-        }
-        catch (FileNotFoundException e) {
-            //System.err.println("designated output file \"" + out.getAbsolutePath() + "\" cannot be created or is not writtable. Output is given to STDOUT.");
-            warning("designated output file \"" + out.getAbsolutePath() + "\" cannot be created or is not writtable. Output is given to STDOUT.");
-            output = new PrintStream(new FileOutputStream(FileDescriptor.out));
-        }
-        catch (Exception e) {
-            output = new PrintStream(new FileOutputStream(FileDescriptor.out));
-        }
-        output(output, normalization, settings);
-    }
-
+    // TODO: Remove/Rewrite
     public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException, IOException {
-        writeHeader(outStream, settings, null);
+        //writeHeader(outStream, settings, null);
         outStream.print("Evaluating ");
         outStream.println(classifier.getClass().getName());
         outStream.println(classifier.getAttributeSettings());

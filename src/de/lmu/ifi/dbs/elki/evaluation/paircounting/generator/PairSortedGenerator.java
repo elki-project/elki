@@ -5,7 +5,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 /**
  * Implement the common functionality of caching the current result in a base class.
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  *
  */
 public abstract class PairSortedGenerator implements PairSortedGeneratorInterface {

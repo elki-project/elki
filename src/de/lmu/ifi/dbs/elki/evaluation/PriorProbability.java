@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.elki.algorithm.classifier.Classifier;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.result.Result;
 
 import java.io.PrintStream;
 
@@ -13,7 +14,7 @@ import java.io.PrintStream;
  *
  * @author Arthur Zimek
  */
-public class PriorProbability<O extends DatabaseObject, L extends ClassLabel, C extends Classifier<O, L>> extends NullModel<O, L, C> {
+public class PriorProbability<O extends DatabaseObject, L extends ClassLabel, C extends Classifier<O, L, Result>> extends NullModel<O, L, C> {
     /**
      * Holds the prior probability.
      */

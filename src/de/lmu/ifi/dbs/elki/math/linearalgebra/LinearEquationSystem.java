@@ -692,4 +692,13 @@ public class LinearEquationSystem extends AbstractLoggable {
         for (int d = 0; d < digits; d++) buffer.append(" ");
         buffer.append(nf.format(value));
     }
+    
+    /**
+     * Return dimensionality of spanned subspace.
+     * 
+     * @return dim
+     */
+    public int subspacedim() {
+      return coeff[0].length - coeff.length;
+    }
 }

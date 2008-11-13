@@ -1,9 +1,13 @@
 package de.lmu.ifi.dbs.elki.database;
 
 
-import de.lmu.ifi.dbs.elki.algorithm.result.CorrelationAnalysisSolution;
-import de.lmu.ifi.dbs.elki.algorithm.result.MultivariateModel;
+import java.util.BitSet;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
+
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
+import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -12,11 +16,6 @@ import de.lmu.ifi.dbs.elki.utilities.ConstantObject;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredResult;
-
-import java.util.BitSet;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedSet;
 
 /**
  * An AssociationID is used by databases as a unique identifier for specific
@@ -123,16 +122,6 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
    * The association id to associate the COP correlation solution
    */
   public static final AssociationID<CorrelationAnalysisSolution<?>> COP_SOL = new AssociationID<CorrelationAnalysisSolution<?>>("cop sol", CorrelationAnalysisSolution.class);
-  
-  /**
-   * The association id to associate the Multivariate Correlation Outlier Probability of an object
-   */
-  public static final AssociationID<MultivariateModel<?>> LOCAL_MODEL = new AssociationID<MultivariateModel<?>>("multivariate model", MultivariateModel.class);
-  
-  /**
-   * The association id to associate the Multivariate Correlation Outlier Probability of an object
-   */
-  public static final AssociationID<Double> MCOP = new AssociationID<Double>("mcop", Double.class);
   
   /**
    * The LOCI critical distances of an object.
@@ -280,4 +269,20 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
         return associationID;
     }
 
+    /**
+     * Gets or creates the AssociationID for the given name and given type.
+     * Generics version, with relaxed typechecking.
+     *
+     * @param name the name
+     * @param type the type of the association
+     * @return the AssociationID for the given name
+     */
+    @SuppressWarnings("unchecked")
+    public static <C> AssociationID<C> getOrCreateAssociationIDGenerics(final String name, final Class<?> type) {
+        AssociationID<C> associationID = (AssociationID<C>) getAssociationID(name);
+        if (associationID == null) {
+            associationID = new AssociationID<C>(name, type);
+        }
+        return associationID;
+    }
 }

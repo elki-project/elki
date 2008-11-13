@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.elki.algorithm.classifier.Classifier;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 
 import java.io.PrintStream;
@@ -17,7 +18,7 @@ import java.util.List;
  *
  * @author Arthur Zimek
  */
-public class NullModel<O extends DatabaseObject, L extends ClassLabel, C extends Classifier<O, L>>
+public class NullModel<O extends DatabaseObject, L extends ClassLabel, C extends Classifier<O, L, Result>>
     extends AbstractClassifierEvaluation<O, L, C> {
     /**
      * The labels available for classification.

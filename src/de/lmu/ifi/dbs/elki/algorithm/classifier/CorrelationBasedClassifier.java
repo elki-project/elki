@@ -1,17 +1,7 @@
 package de.lmu.ifi.dbs.elki.algorithm.classifier;
 
-import de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator;
-import de.lmu.ifi.dbs.elki.algorithm.result.CorrelationAnalysisSolution;
-import de.lmu.ifi.dbs.elki.data.ClassLabel;
-import de.lmu.ifi.dbs.elki.data.RealVector;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.distance.Distance;
-import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,6 +11,19 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator;
+import de.lmu.ifi.dbs.elki.data.ClassLabel;
+import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
+import de.lmu.ifi.dbs.elki.database.AssociationID;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+
 /**
  * @author Arthur Zimek
  * @param <V> the type of RealVector handled by this Algorithm
@@ -29,7 +32,7 @@ import java.util.Map;
  */
 // todo arthur comment class
 public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Distance<D>, L extends ClassLabel>
-    extends AbstractClassifier<V, L> {
+    extends AbstractClassifier<V, L, Result> {
 
     // todo arthur comment
     private DependencyDerivator<V, D> dependencyDerivator = new DependencyDerivator<V, D>();
@@ -50,7 +53,7 @@ public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Di
         // add each db object to its class
         for (Iterator<Integer> it = database.iterator(); it.hasNext();) {
             Integer id = it.next();
-            Integer classID = Arrays.binarySearch(getLabels(), database.getAssociation(CLASS, id));
+            Integer classID = Arrays.binarySearch(getLabels(), database.getAssociation(AssociationID.CLASS, id));
             partitions.get(classID).add(id);
         }
 
@@ -118,6 +121,9 @@ public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Di
             catch (UnableToComplyException e) {
                 warning(e.getMessage() + "\n");
             }
+            catch(IOException e) {
+                warning(e.getMessage() + "\n");
+            }
         }
         return stream.toString();
     }
@@ -168,6 +174,18 @@ public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Di
         description.append(super.parameterDescription());
         description.append(dependencyDerivator.parameterDescription());
         return description.toString();
+    }
+
+    @Override
+    protected CorrelationAnalysisSolution<V> runInTime(Database<V> database) throws IllegalStateException {
+      // TODO Add sensible result.
+      return null;
+    }
+
+    @Override
+    public CorrelationAnalysisSolution<V> getResult() {
+      // TODO: add when runInTime was implemented. 
+      return null;
     }
 
 }

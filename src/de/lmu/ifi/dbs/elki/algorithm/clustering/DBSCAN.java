@@ -7,8 +7,14 @@ import java.util.List;
 import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.ClustersPlusNoise;
+import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
+import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
+import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
+import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
+import de.lmu.ifi.dbs.elki.data.model.NoiseModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.utilities.Description;
@@ -35,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * @param <O> the type of DatabaseObject the algorithm is applied on
  * @param <D> the type of Distance used
  */
-public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D> implements Clustering<O> {
+public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D, Clustering<Cluster<Model>>> implements ClusteringAlgorithm<Clustering<Cluster<Model>>,O> {
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN#EPSILON_PARAM}
      */
@@ -86,7 +92,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
     /**
      * Provides the result of the algorithm.
      */
-    protected ClustersPlusNoise<O> result;
+    protected Clustering<Cluster<Model>> result;
 
     /**
      * Holds a set of noise.
@@ -124,7 +130,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
      *
      */
     @Override
-    protected void runInTime(Database<O> database) throws IllegalStateException {
+    protected Clustering<Cluster<Model>> runInTime(Database<O> database) throws IllegalStateException {
         Progress progress = new Progress("Clustering", database.size());
         resultList = new ArrayList<List<Integer>>();
         noise = new HashSet<Integer>();
@@ -159,17 +165,21 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
             }
         }
 
-        Integer[][] resultArray = new Integer[resultList.size() + 1][];
-        int i = 0;
-        for (Iterator<List<Integer>> resultListIter = resultList.iterator(); resultListIter.hasNext(); i++) {
-            resultArray[i] = resultListIter.next().toArray(new Integer[0]);
+        result = new Clustering<Cluster<Model>>();
+        for (Iterator<List<Integer>> resultListIter = resultList.iterator(); resultListIter.hasNext();) {
+          DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(database, resultListIter.next());
+          Cluster<Model> c = new Cluster<Model>(group, ClusterModel.CLUSTER);
+          result.addCluster(c);
         }
 
-        resultArray[resultArray.length - 1] = noise.toArray(new Integer[0]);
-        result = new ClustersPlusNoise<O>(resultArray, database);
+        DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(database, noise);
+        Cluster<Model> n = new Cluster<Model>(group, NoiseModel.NOISE);        
+        result.addCluster(n);
+
         if (isVerbose()) {
             verbose("");
         }
+        return result;
     }
 
     /**
@@ -279,7 +289,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
         return remainingParameters;
     }
 
-    public ClustersPlusNoise<O> getResult() {
+    public Clustering<Cluster<Model>> getResult() {
         return result;
     }
 }

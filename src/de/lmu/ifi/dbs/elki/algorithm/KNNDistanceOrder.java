@@ -1,10 +1,15 @@
 package de.lmu.ifi.dbs.elki.algorithm;
 
-import de.lmu.ifi.dbs.elki.algorithm.result.KNNDistanceOrderResult;
-import de.lmu.ifi.dbs.elki.algorithm.result.Result;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.result.KNNDistanceOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
@@ -12,12 +17,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
 
 /**
  * Provides an order of the kNN-distances for all objects within the database.
@@ -27,7 +26,7 @@ import java.util.Random;
  * @param <D> the type of Distance used by this Algorithm
  */
 public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
-    extends DistanceBasedAlgorithm<O, D> {
+    extends DistanceBasedAlgorithm<O, D, KNNDistanceOrderResult<D>> {
 
     /**
      * OptionID for {@link #K_PARAM}
@@ -78,7 +77,7 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
     /**
      * Holds the result.
      */
-    private KNNDistanceOrderResult<O, D> result;
+    private KNNDistanceOrderResult<D> result;
 
     /**
      * Provides an algorithm to order the kNN-distances for all objects of the
@@ -100,7 +99,7 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
      * Provides an order of the kNN-distances for all objects within the specified database.
      */
     @Override
-    protected void runInTime(Database<O> database) throws IllegalStateException {
+    protected KNNDistanceOrderResult<D> runInTime(Database<O> database) throws IllegalStateException {
         Random random = new Random();
         List<D> knnDistances = new ArrayList<D>();
         for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
@@ -110,10 +109,11 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
             }
         }
         Collections.sort(knnDistances, Collections.reverseOrder());
-        result = new KNNDistanceOrderResult<O, D>(database, knnDistances);
+        result = new KNNDistanceOrderResult<D>(knnDistances);
+        return result;
     }
 
-    public Result<O> getResult() {
+    public KNNDistanceOrderResult<D> getResult() {
         return result;
     }
 

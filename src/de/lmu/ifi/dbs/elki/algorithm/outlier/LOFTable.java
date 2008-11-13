@@ -1,13 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.parser.AbstractParser;
-import de.lmu.ifi.dbs.elki.tree.btree.BTree;
-import de.lmu.ifi.dbs.elki.tree.btree.BTreeData;
-import de.lmu.ifi.dbs.elki.tree.btree.DefaultKey;
-import de.lmu.ifi.dbs.elki.utilities.output.ObjectPrinter;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,6 +8,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.regex.Pattern;
+
+import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.parser.AbstractParser;
+import de.lmu.ifi.dbs.elki.tree.btree.BTree;
+import de.lmu.ifi.dbs.elki.tree.btree.BTreeData;
+import de.lmu.ifi.dbs.elki.tree.btree.DefaultKey;
+import de.lmu.ifi.dbs.elki.utilities.output.ObjectPrinter;
 
 /**
  * Holds the lof values of the lof algorithm in a B-Tree structure.

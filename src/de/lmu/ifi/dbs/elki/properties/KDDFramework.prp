@@ -2,11 +2,15 @@
 DEBUG_LEVEL=DEBUG_FINE
 # #######################################################
 # algorithms - default package: de.lmu.ifi.dbs.elki.algorithm
-de.lmu.ifi.dbs.elki.algorithm.Algorithm=de.lmu.ifi.dbs.elki.algorithm.APRIORI,\
+de.lmu.ifi.dbs.elki.algorithm.Algorithm=\
+		   de.lmu.ifi.dbs.elki.algorithm.outlier.CorrelationOutlierProbability,\
+		   de.lmu.ifi.dbs.elki.algorithm.outlier.GeneralizedLOF,\
+		   de.lmu.ifi.dbs.elki.algorithm.outlier.LOF,\
+		   de.lmu.ifi.dbs.elki.algorithm.outlier.OnlineLOF
+		   de.lmu.ifi.dbs.elki.algorithm.APRIORI,\
            de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator,\
            de.lmu.ifi.dbs.elki.algorithm.KNNDistanceOrder,\
            de.lmu.ifi.dbs.elki.algorithm.KNNJoin,\
-           de.lmu.ifi.dbs.elki.algorithm.MultivariateModelDerivator,\
            de.lmu.ifi.dbs.elki.algorithm.classifier.CorrelationBasedClassifier,\
            de.lmu.ifi.dbs.elki.algorithm.classifier.KNNClassifier,\
            de.lmu.ifi.dbs.elki.algorithm.classifier.PriorProbabilityClassifier,\
@@ -28,13 +32,8 @@ de.lmu.ifi.dbs.elki.algorithm.Algorithm=de.lmu.ifi.dbs.elki.algorithm.APRIORI,\
            de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.CLIQUE,\
            de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.DiSH,\
 		   de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PreDeCon,\
-		   de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PROCLUS,\
-		   de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.SUBCLU,\
-		   de.lmu.ifi.dbs.elki.algorithm.outlier.CorrelationOutlierProbability,\
-		   de.lmu.ifi.dbs.elki.algorithm.outlier.GeneralizedLOF,\
-		   de.lmu.ifi.dbs.elki.algorithm.outlier.LOF,\
-		   de.lmu.ifi.dbs.elki.algorithm.outlier.MultivariateCorrelationOutlierProbability,\
-		   de.lmu.ifi.dbs.elki.algorithm.outlier.OnlineLOF
+		   de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PROCLUS
+#		   de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.SUBCLU,\
 #		   
 #           de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering.ChengAndChurch,\
 #           de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering.FLOC,\
@@ -51,7 +50,7 @@ de.lmu.ifi.dbs.elki.algorithm.Algorithm=de.lmu.ifi.dbs.elki.algorithm.APRIORI,\
 #           de.lmu.ifi.dbs.elki.algorithm.outlier.SOD
 # #######################################################
 # clustering - default package: de.lmu.ifi.dbs.elki.algorithm.clustering
-de.lmu.ifi.dbs.elki.algorithm.clustering.Clustering=de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.COPAC,\
+de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm=de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.COPAC,\
            de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN,\
            de.lmu.ifi.dbs.elki.algorithm.clustering.EM,\
            de.lmu.ifi.dbs.elki.algorithm.clustering.KMeans,\

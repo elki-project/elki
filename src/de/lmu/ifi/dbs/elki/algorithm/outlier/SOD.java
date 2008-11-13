@@ -1,14 +1,18 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
+import java.util.Iterator;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.result.outlier.SODModel;
-import de.lmu.ifi.dbs.elki.algorithm.result.outlier.SODResult;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SharedNearestNeighborSimilarityFunction;
+import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
+import de.lmu.ifi.dbs.elki.result.MultiResult;
+import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
@@ -20,16 +24,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
-import java.util.Iterator;
-import java.util.List;
-
 /**
  * @author Arthur Zimek
  * @param <<V> the type of RealVector handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  */
 // todo arthur comment
-public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends AbstractAlgorithm<V> {
+public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends AbstractAlgorithm<V, MultiResult> {
 
     /**
      * The association id to associate a subspace outlier degree.
@@ -88,7 +89,7 @@ public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends
     /**
      * Holds the result.
      */
-    private SODResult<V> sodResult;
+    private MultiResult sodResult;
 
     /**
      * Provides the SOD algorithm,
@@ -121,8 +122,9 @@ public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends
     /**
      * Performs the PROCLUS algorithm on the given database.
      */
+    @SuppressWarnings("unchecked")
     @Override
-    protected void runInTime(Database<V> database) throws IllegalStateException {
+    protected MultiResult runInTime(Database<V> database) throws IllegalStateException {
         Progress progress = new Progress("assigning SOD", database.size());
         int processed = 0;
         similarityFunction.setDatabase(database, isVerbose(), isTime());
@@ -143,7 +145,16 @@ public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends
         if (isVerbose()) {
             verbose("");
         }
-        sodResult = new SODResult<V>(database);
+        AnnotationsFromDatabase<V, SODModel> res1 = new AnnotationsFromDatabase<V, SODModel>(database);
+        res1.addAssociation("SOD", SOD_MODEL);
+        // TODO: Add SOD value directly to allow ranking?
+        // Ordering
+        OrderingFromAssociation<?, V> res2 = new OrderingFromAssociation(database, SOD_MODEL, true); 
+        // combine results.
+        sodResult = new MultiResult();
+        sodResult.addResult(res1);
+        sodResult.addResult(res2);
+        return sodResult;
     }
 
     /**
@@ -189,7 +200,7 @@ public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends
         return new Description("SOD", "Subspace outlier degree", "", "");
     }
 
-    public SODResult<V> getResult() {
+    public MultiResult getResult() {
         return sodResult;
     }
 

@@ -8,8 +8,14 @@ import java.util.List;
 import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.ClustersPlusNoise;
+import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
+import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
+import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
+import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
+import de.lmu.ifi.dbs.elki.data.model.NoiseModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.IntegerDistance;
@@ -33,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * @param <O> the type of DatabaseObject the algorithm is applied on
  * @param <D> the type of Distance used for the preprocessing of the shared nearest neighbors neighborhood lists
  */
-public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> extends AbstractAlgorithm<O> implements Clustering<O> {
+public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> extends AbstractAlgorithm<O, Clustering<Cluster<Model>>> implements ClusteringAlgorithm<Clustering<Cluster<Model>>,O> {
 
     /**
      * OptionID for {@link #EPSILON_PARAM}
@@ -89,7 +95,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
     /**
      * Provides the result of the algorithm.
      */
-    protected ClustersPlusNoise<O> result;
+    protected Clustering<Cluster<Model>> result;
 
     /**
      * Holds a set of noise.
@@ -123,7 +129,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
      * Performs the SNN clustering algorithm on the given database.
      */
     @Override
-    protected void runInTime(Database<O> database) {
+    protected Clustering<Cluster<Model>> runInTime(Database<O> database) {
         Progress progress = new Progress("Clustering", database.size());
         resultList = new ArrayList<List<Integer>>();
         noise = new HashSet<Integer>();
@@ -158,17 +164,18 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
             }
         }
 
-        Integer[][] resultArray = new Integer[resultList.size() + 1][];
-        int i = 0;
-        for (Iterator<List<Integer>> resultListIter = resultList.iterator(); resultListIter.hasNext(); i++) {
-            resultArray[i] = resultListIter.next().toArray(new Integer[0]);
+        result = new Clustering<Cluster<Model>>();
+        for (Iterator<List<Integer>> resultListIter = resultList.iterator(); resultListIter.hasNext();) {
+          DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(database, resultListIter.next());
+          result.addCluster(new Cluster<Model>(group, ClusterModel.CLUSTER));
         }
-
-        resultArray[resultArray.length - 1] = noise.toArray(new Integer[0]);
-        result = new ClustersPlusNoise<O>(resultArray, database);
+        DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(database, noise);
+        result.addCluster(new Cluster<Model>(group, NoiseModel.NOISE));
+        
         if (isVerbose()) {
             verbose("");
         }
+        return result;
     }
 
     /**
@@ -301,7 +308,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
         return remainingParameters;
     }
 
-    public ClustersPlusNoise<O> getResult() {
+    public Clustering<Cluster<Model>> getResult() {
         return result;
     }
 

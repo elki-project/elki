@@ -1,17 +1,22 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator;
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.result.CorrelationAnalysisSolution;
-import de.lmu.ifi.dbs.elki.algorithm.result.Result;
-import de.lmu.ifi.dbs.elki.algorithm.result.outlier.COPVerboseResult;
 import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
+import de.lmu.ifi.dbs.elki.result.MultiResult;
+import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
@@ -21,10 +26,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 /**
  * Algorithm to compute local correlation outlier probability.
  * <p/>
@@ -33,7 +34,7 @@ import java.util.List;
  * @author Erich Schubert <schube@dbs.ifi.lmu.de>
  * @param <V> the type of Realvector handled by this Algorithm
  */
-public class CorrelationOutlierProbability<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, DoubleDistance> {
+public class CorrelationOutlierProbability<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, DoubleDistance, MultiResult> {
     /**
      * OptionID for {@link #K_PARAM}
      */
@@ -63,7 +64,7 @@ public class CorrelationOutlierProbability<V extends RealVector<V, ?>> extends D
     /**
      * Provides the result of the algorithm.
      */
-    COPVerboseResult<V> result;
+    MultiResult result;
 
     /**
      * Sets minimum points to the optionhandler additionally to the parameters
@@ -75,7 +76,7 @@ public class CorrelationOutlierProbability<V extends RealVector<V, ?>> extends D
     }
 
     @Override
-    protected void runInTime(Database<V> database) throws IllegalStateException {
+    protected MultiResult runInTime(Database<V> database) throws IllegalStateException {
         getDistanceFunction().setDatabase(database, isVerbose(), isTime());
         if (isVerbose()) {
             verbose("\nCorrelationOutlierDetection ");
@@ -137,7 +138,18 @@ public class CorrelationOutlierProbability<V extends RealVector<V, ?>> extends D
                 verbose("");
             }
         }
-        result = new COPVerboseResult<V>(database);
+        AnnotationsFromDatabase<V,?> res1 = new AnnotationsFromDatabase<V,Object>(database);
+        res1.addAssociationGenerics("COP", AssociationID.COP);
+        res1.addAssociationGenerics("COPDIM", AssociationID.COP_DIM);
+        res1.addAssociationGenerics("ERRORVECTOR", AssociationID.COP_ERROR_VECTOR);
+        res1.addAssociationGenerics("COP SOL", AssociationID.COP_SOL);
+        // Ordering
+        OrderingFromAssociation<Double, V> res2 = new OrderingFromAssociation<Double, V>(database, AssociationID.COP, true); 
+        // combine results.
+        result = new MultiResult();
+        result.addResult(res1);
+        result.addResult(res2);
+        return result;
     }
 
     public Description getDescription() {
@@ -164,7 +176,7 @@ public class CorrelationOutlierProbability<V extends RealVector<V, ?>> extends D
         return remainingParameters;
     }
 
-    public Result<V> getResult() {
+    public MultiResult getResult() {
         return result;
     }
 

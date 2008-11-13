@@ -1,11 +1,16 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
+import java.util.Iterator;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.result.Result;
-import de.lmu.ifi.dbs.elki.algorithm.result.outlier.LOFResult;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
+import de.lmu.ifi.dbs.elki.result.MultiResult;
+import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
@@ -13,9 +18,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * <p/>
@@ -34,7 +36,7 @@ import java.util.List;
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  */
 public class LOF<O extends DatabaseObject> extends
-    DistanceBasedAlgorithm<O, DoubleDistance> {
+    DistanceBasedAlgorithm<O, DoubleDistance, MultiResult> {
 
     /**
      * OptionID for {@link #PAGE_SIZE_PARAM}
@@ -104,7 +106,7 @@ public class LOF<O extends DatabaseObject> extends
     /**
      * Provides the result of the algorithm.
      */
-    LOFResult<O> result;
+    MultiResult result;
 
     /**
      * The table for nearest and reverse nearest neighbors.
@@ -138,7 +140,7 @@ public class LOF<O extends DatabaseObject> extends
      * Performs the LOF algorithm on the given database.
      */
     @Override
-    protected void runInTime(Database<O> database) throws IllegalStateException {
+    protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
         getDistanceFunction().setDatabase(database, isVerbose(), isTime());
         if (isVerbose()) {
             verbose("\n##### Computing LOFs:");
@@ -205,7 +207,6 @@ public class LOF<O extends DatabaseObject> extends
                     verbose("");
                 }
             }
-            result = new LOFResult<O>(database, lofTable, nnTable);
 
             if (isTime()) {
                 verbose("\nPhysical read Access LOF-Table: "
@@ -226,7 +227,17 @@ public class LOF<O extends DatabaseObject> extends
                 verbose("Logical page Access NN-Table:   "
                     + nnTable.getLogicalPageAccess());
             }
+            AnnotationsFromDatabase<O, Double> res1 = new AnnotationsFromDatabase<O, Double>(database);
+            res1.addAssociation("LOF", AssociationID.LOF);
+            // TODO: re-add lof and nn tables.
+            // Ordering
+            OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database, AssociationID.LOF, true); 
+            // combine results.
+            result = new MultiResult();
+            result.addResult(res1);
+            result.addResult(res2);
         }
+        return result;
     }
 
     /**
@@ -310,7 +321,7 @@ public class LOF<O extends DatabaseObject> extends
         return remainingParameters;
     }
 
-    public Result<O> getResult() {
+    public MultiResult getResult() {
         return result;
     }
 }

@@ -7,10 +7,14 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.HierarchicalClusters;
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.HierarchicalPlainCluster;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
+import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
+import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
+import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
+import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.Description;
@@ -30,16 +34,16 @@ import de.lmu.ifi.dbs.elki.utilities.Description;
  *
  * @param <O>
  */
-public class ByLabelHierarchicalClustering<O extends DatabaseObject> extends AbstractAlgorithm<O> {
+public class ByLabelHierarchicalClustering<O extends DatabaseObject> extends AbstractAlgorithm<O,Clustering<Cluster<Model>>> implements ClusteringAlgorithm<Clustering<Cluster<Model>>,O> {
   /**
    * Holds the result of the algorithm.
    */
-  private HierarchicalClusters<HierarchicalPlainCluster<O>,O> result;
+  private Clustering<Cluster<Model>> result;
 
   /**
    * Return clustering result
    */
-  public HierarchicalClusters<HierarchicalPlainCluster<O>,O> getResult() {
+  public Clustering<Cluster<Model>> getResult() {
     return result;
   }
 
@@ -47,7 +51,7 @@ public class ByLabelHierarchicalClustering<O extends DatabaseObject> extends Abs
    * Obtain a description of the algorithm
    */
   public Description getDescription() {
-    return new Description("ByLabelClustering", "Clustering by label",
+    return new Description("ByLabelHierarchicalClustering", "hierarchical clustering by label",
         "Cluster points by a (pre-assigned!) label. For comparing results with a reference clustering.", "");
   }
 
@@ -57,7 +61,7 @@ public class ByLabelHierarchicalClustering<O extends DatabaseObject> extends Abs
    * @param database The database to process
    */
   @Override
-  protected void runInTime(Database<O> database) throws IllegalStateException {
+  protected Clustering<Cluster<Model>> runInTime(Database<O> database) throws IllegalStateException {
     HashMap<String, Set<Integer>> labelmap = new HashMap<String, Set<Integer>>(); 
     
     for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
@@ -66,43 +70,54 @@ public class ByLabelHierarchicalClustering<O extends DatabaseObject> extends Abs
       
       // try class label first
       ClassLabel classlabel = database.getAssociation(AssociationID.CLASS, id);
-      if (classlabel != null) label = classlabel.toString();
+      if (classlabel != null) {
+        label = classlabel.toString();
+      }
       
       // fall back to other labels
-      if (label == null)
+      if (label == null) {
         label = database.getAssociation(AssociationID.LABEL, id);
+      }
       
-      if (labelmap.containsKey(label))
+      if (labelmap.containsKey(label)) {
         labelmap.get(label).add(id);
-      else {
+      } else {
         Set<Integer> n = new java.util.HashSet<Integer>();
         n.add(id);
         labelmap.put(label,n);
       }
     }
 
-    ArrayList<HierarchicalPlainCluster<O>> clusters = new ArrayList<HierarchicalPlainCluster<O>>(labelmap.size());
+    ArrayList<Cluster<Model>> clusters = new ArrayList<Cluster<Model>>(labelmap.size());
     int i = 0;
     for (Entry<String, Set<Integer>> entry : labelmap.entrySet()) {
-      clusters.add(new HierarchicalPlainCluster<O>(entry.getValue(), new ArrayList<HierarchicalPlainCluster<O>>(), new ArrayList<HierarchicalPlainCluster<O>>(), entry.getKey(), 0, 0));
+      DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(database, entry.getValue());
+      Cluster<Model> clus = new Cluster<Model>(entry.getKey(), group, ClusterModel.CLUSTER, new ArrayList<Cluster<Model>>(), new ArrayList<Cluster<Model>>());
+      clusters.add(clus);
       i++;
     }
-    for (HierarchicalPlainCluster<O> cur : clusters) {
-      for (HierarchicalPlainCluster<O> oth : clusters)
+
+    for (Cluster<Model> cur : clusters) {
+      for (Cluster<Model> oth : clusters) {
         if (oth != cur) {
-          if (oth.getLabel().startsWith(cur.getLabel())) {
-            oth.addParent(cur);
-            cur.addChild(oth);
+          if (oth.getName().startsWith(cur.getName())) {
+            oth.getParents().add(cur);
+            cur.getChildren().add(oth);
             //System.err.println(oth.getLabel() + " is a child of " + cur.getLabel());
           }
         }
-      // TODO: levels
+      }
     }
-    ArrayList<HierarchicalPlainCluster<O>> rootclusters = new ArrayList<HierarchicalPlainCluster<O>>();
-    for (HierarchicalPlainCluster<O> cur : clusters)
-      if (cur.getParents().size() == 0)
+    ArrayList<Cluster<Model>> rootclusters = new ArrayList<Cluster<Model>>();
+    for (Cluster<Model> cur : clusters) {
+      if (cur.getParents().size() == 0) {
         rootclusters.add(cur);
+      }
+    }
     assert(rootclusters.size() > 0);
-    result = new HierarchicalClusters<HierarchicalPlainCluster<O>,O>(rootclusters, database);
+
+    result = new Clustering<Cluster<Model>>(rootclusters);
+
+    return result;
   }
 }

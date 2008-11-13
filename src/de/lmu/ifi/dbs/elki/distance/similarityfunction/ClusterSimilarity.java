@@ -1,46 +1,38 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.Cluster;
-import de.lmu.ifi.dbs.elki.distance.IntegerDistance;
+import java.util.Collection;
 
-import java.util.Arrays;
+import de.lmu.ifi.dbs.elki.data.cluster.BaseCluster;
+import de.lmu.ifi.dbs.elki.distance.IntegerDistance;
 
 /**
  * @author Arthur Zimek
  */
-public class ClusterSimilarity extends AbstractIntegerSimilarityFunction<Cluster<?>>
-{
+public class ClusterSimilarity extends AbstractIntegerSimilarityFunction<BaseCluster<?, ?>> {
 
-    public IntegerDistance similarity(Integer id1, Integer id2)
-    {
-        Cluster<?> cluster1 = getDatabase().get(id1);
-        Cluster<?> cluster2 = getDatabase().get(id2);
-        return similarity(cluster1,cluster2);
-    }
+  public IntegerDistance similarity(Integer id1, Integer id2) {
+    BaseCluster<?, ?> cluster1 = getDatabase().get(id1);
+    BaseCluster<?, ?> cluster2 = getDatabase().get(id2);
+    return similarity(cluster1, cluster2);
+  }
 
-    @Override
-    public IntegerDistance similarity(Cluster<?> o1, Cluster<?> o2)
-    {
-        int[] ids1 = o1.getClusterIDs();
-        int[] ids2 = o2.getClusterIDs();
-        int intersection = 0;
-        for(int i : ids1)
-        {
-            if(Arrays.binarySearch(ids2, i) >= 0)
-            {
-                intersection++;
-            }
-        }
-        return new IntegerDistance(intersection);
+  @Override
+  public IntegerDistance similarity(BaseCluster<?, ?> o1, BaseCluster<?, ?> o2) {
+    Collection<Integer> ids1 = o1.getIDs();
+    Collection<Integer> ids2 = o2.getIDs();
+    int intersection = 0;
+    for(Integer i : ids1) {
+      if(ids2.contains(i)) {
+        intersection++;
+      }
     }
+    return new IntegerDistance(intersection);
+  }
 
-    @Override
-    public IntegerDistance similarity(Integer id1, Cluster<?> cluster2)
-    {
-        Cluster<?> cluster1 = getDatabase().get(id1);
-        return super.similarity(cluster1, cluster2);
-    }
-    
-    
+  @Override
+  public IntegerDistance similarity(Integer id1, BaseCluster<?, ?> cluster2) {
+    BaseCluster<?, ?> cluster1 = getDatabase().get(id1);
+    return super.similarity(cluster1, cluster2);
+  }
 
 }

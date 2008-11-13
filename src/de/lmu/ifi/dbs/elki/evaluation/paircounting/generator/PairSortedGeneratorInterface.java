@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
  * Basically this is an Iterator interface, but it deliberately has a current() method,
  * that is useful e.g. for merging.
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  */
 public interface PairSortedGeneratorInterface {
   /**

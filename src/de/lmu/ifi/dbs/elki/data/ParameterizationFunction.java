@@ -1,18 +1,20 @@
 package de.lmu.ifi.dbs.elki.data;
 
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.output.Format;
 
 /**
- * A parameterization function decribes all lines in a
+ * A parameterization function describes all lines in a
  * d-dimensional feature space intersecting in one point p.
  * A single line in d-dimensional space is uniquely determined by a
  * translation vector p and (d-1) angles alpha_i belonging to the normal vector n.
  *
  * @author Elke Achtert
  */
-public class ParameterizationFunction extends DoubleVector {
+public class ParameterizationFunction extends DoubleVector implements TextWriteable {
     /**
      * Available types for the global extremum.
      */
@@ -506,5 +508,13 @@ public class ParameterizationFunction extends DoubleVector {
             alpha_n = Math.PI + alpha_n;
         }
         return alpha_n;
+    }
+
+    /**
+     * Serialize to text for printing.
+     */
+    @Override
+    public void writeToText(TextWriterStream out) {
+      out.inlinePrintNoQuotes(super.toString());
     }
 }

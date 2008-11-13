@@ -5,12 +5,13 @@ import java.util.Collections;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.result.Result;
-import de.lmu.ifi.dbs.elki.algorithm.result.outlier.LOCIResult;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
+import de.lmu.ifi.dbs.elki.result.MultiResult;
+import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
@@ -36,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
  *
  * @param <O>
  */
-public class LOCI<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, DoubleDistance> {
+public class LOCI<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, DoubleDistance, MultiResult> {
   /**
    * OptionID for {@link #RMAX_PARAM}
    */
@@ -98,7 +99,7 @@ public class LOCI<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
   /**
    * Provides the result of the algorithm.
    */
-  LOCIResult<O> result;
+  MultiResult result;
 
   /**
    * Constructor, adding options to option handler.
@@ -138,7 +139,7 @@ public class LOCI<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
    * Runs the algorithm in the timed evaluation part.
    */
   @Override
-  protected void runInTime(Database<O> database) throws IllegalStateException {
+  protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
     getDistanceFunction().setDatabase(database, isVerbose(), isTime());
     // LOCI preprocessing step
     for (Integer id : database.getIDs()) {
@@ -210,7 +211,14 @@ public class LOCI<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
       database.associate(AssociationID.LOCI_MDEF_NORM, id, maxmdefnorm);
       database.associate(AssociationID.LOCI_MDEF_CRITICAL_RADIUS, id, maxnormr);
     }
-    result = new LOCIResult<O>(database);
+    AnnotationsFromDatabase<O, Double> res1 = new AnnotationsFromDatabase<O, Double>(database);
+    res1.addAssociation("MDEF_NORM", AssociationID.LOCI_MDEF_NORM);
+    res1.addAssociation("LOCI_RADIUS", AssociationID.LOCI_MDEF_CRITICAL_RADIUS);
+    OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database, AssociationID.LOCI_MDEF_NORM, true);
+    result = new MultiResult();
+    result.addResult(res1);
+    result.addResult(res2);
+    return result;
   }
 
   /**
@@ -229,7 +237,7 @@ public class LOCI<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
   /**
    * Return result.
    */
-  public Result<O> getResult() {
+  public MultiResult getResult() {
     return result;
   }
 }

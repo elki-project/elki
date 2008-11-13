@@ -1,145 +1,28 @@
 package de.lmu.ifi.dbs.elki.algorithm.classifier;
 
+import java.util.Arrays;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.result.Result;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.evaluation.Evaluation;
-import de.lmu.ifi.dbs.elki.evaluation.holdout.Holdout;
-import de.lmu.ifi.dbs.elki.evaluation.holdout.StratifiedCrossValidation;
-import de.lmu.ifi.dbs.elki.evaluation.procedure.ClassifierEvaluationProcedure;
-import de.lmu.ifi.dbs.elki.evaluation.procedure.EvaluationProcedure;
-import de.lmu.ifi.dbs.elki.properties.Properties;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * An abstract classifier already based on AbstractAlgorithm making use of
- * settings for time and verbose. Furthermore, any classifier is given an
- * evaluation procedure.
+ * settings for time and verbose.
  *
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <L> the type of the ClassLabel the Classifier is assigning
  */
-public abstract class AbstractClassifier<O extends DatabaseObject, L extends ClassLabel> extends AbstractAlgorithm<O> implements Classifier<O, L> {
-    /**
-     * The association id for the class label.
-     */
-    protected static final AssociationID<ClassLabel> CLASS = AssociationID.CLASS;
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.classifier.AbstractClassifier#EVALUATION_PROCEDURE_PARAM}
-     */
-    public static final OptionID EVALUATION_PROCEDURE_ID = OptionID.getOrCreateOptionID(
-        "classifier.eval",
-        "Classname of the evaluation-procedure to use for evaluation " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(EvaluationProcedure.class) + "."
-    );
-
-    /**
-     * Parameter to specify the evaluation-procedure to use for evaluation,
-     * must extend {@link EvaluationProcedure}.
-     * <p>Key: {@code -classifier.eval} </p>
-     * <p>Default value: {@link ClassifierEvaluationProcedure} </p>
-     */
-    private final ClassParameter<EvaluationProcedure<O, Classifier<O, L>, L>> EVALUATION_PROCEDURE_PARAM =
-        new ClassParameter<EvaluationProcedure<O, Classifier<O, L>, L>>(EVALUATION_PROCEDURE_ID,
-            EvaluationProcedure.class, ClassifierEvaluationProcedure.class.getName());
-
-    /**
-     * Holds the value of {@link #EVALUATION_PROCEDURE_PARAM}.
-     */
-    protected EvaluationProcedure<O, Classifier<O, L>, L> evaluationProcedure;
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.classifier.AbstractClassifier#HOLDOUT_PARAM}
-     */
-    public static final OptionID HOLDOUT_ID = OptionID.getOrCreateOptionID(
-        "classifier.holdout",
-        "<Classname of the holdout for evaluation " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Holdout.class) + "."
-    );
-
-    /**
-     * Parameter to specify the holdout for evaluation,
-     * must extend {@link de.lmu.ifi.dbs.elki.evaluation.holdout.Holdout}.
-     * <p>Key: {@code -classifier.holdout} </p>
-     * <p>Default value: {@link StratifiedCrossValidation} </p>
-     */
-    private final ClassParameter<Holdout<O, L>> HOLDOUT_PARAM = new ClassParameter<Holdout<O, L>>(
-        HOLDOUT_ID,
-        Holdout.class,
-        StratifiedCrossValidation.class.getName());
-
-    /**
-     * Holds the value of {@link #HOLDOUT_PARAM}.
-     */
-    protected Holdout<O, L> holdout;
-
-    /**
-     * The result.
-     */
-    private Evaluation<O, Classifier<O, L>> evaluationResult;
-
+public abstract class AbstractClassifier<O extends DatabaseObject, L extends ClassLabel, R extends Result> extends AbstractAlgorithm<O,R> implements Classifier<O, L, R> {
     /**
      * Holds the available labels. Should be set by the training method
      * {@link Classifier#buildClassifier(de.lmu.ifi.dbs.elki.database.Database,de.lmu.ifi.dbs.elki.data.ClassLabel[])}
      */
     @SuppressWarnings("unchecked")
     private L[] labels = (L[]) new ClassLabel[0];
-
-    /**
-     * Adds parameters {@link #EVALUATION_PROCEDURE_PARAM} and {@link #HOLDOUT_PARAM}
-     * to the option handler additionally to parameters of super class.
-     */
-    protected AbstractClassifier() {
-        super();
-
-        // parameter evaluation procedure
-        addOption(EVALUATION_PROCEDURE_PARAM);
-
-        // parameter holdout
-        addOption(HOLDOUT_PARAM);
-    }
-
-    /**
-     * Evaluates this algorithm on the given database using the currently set
-     * evaluation procedure and holdout. The result of the evaluation procedure
-     * is provided as result of this algorithm. The time for the complete
-     * evaluation is given if the flag time is set. Whether to assess time and
-     * give verbose comments in single evaluation steps is passed to the
-     * evaluation procedure matching the setting of the flags time and verbose.
-     *
-     * @param database the database to build the model on
-     * @throws IllegalStateException if the classifier is not properly initiated (e.g. parameters
-     *                               are not set)
-     */
-    @Override
-    protected final void runInTime(Database<O> database) throws IllegalStateException {
-        evaluationProcedure.setTime(this.isTime());
-        evaluationProcedure.setVerbose(this.isVerbose());
-        evaluationProcedure.set(database, holdout);
-
-        long starteval = System.currentTimeMillis();
-        evaluationResult = evaluationProcedure.evaluate(this);
-        long endeval = System.currentTimeMillis();
-        if (this.isTime()) {
-            verbose("time required for evaluation: " + (endeval - starteval) + " msec.");
-        }
-    }
-
-    public final Result<O> getResult() {
-        return evaluationResult;
-    }
 
     /**
      * Provides a classification for a given instance. The classification is the
@@ -157,6 +40,12 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
         return Util.getIndexOfMaximum(classDistribution(instance));
     }
 
+    /**
+     * Return ith class label.
+     * 
+     * @param index index
+     * @return class label with index index
+     */
     public final L getClassLabel(int index) throws IllegalArgumentException {
         try {
             return labels[index];
@@ -166,68 +55,6 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
             iae.fillInStackTrace();
             throw iae;
         }
-    }
-
-    /**
-     * Calls the super method
-     * and instantiates {@link #evaluationProcedure} according to the value of parameter {@link #EVALUATION_PROCEDURE_PARAM}
-     * and {@link #holdout} according to the value of parameter {@link #HOLDOUT_PARAM}.
-     * The remaining parameters are passed to the {@link #evaluationProcedure}
-     * and, then, to the {@link #holdout}.
-     */
-    @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
-
-        // parameter evaluation procedure
-        evaluationProcedure = EVALUATION_PROCEDURE_PARAM.instantiateClass();
-        evaluationProcedure.setTime(isTime());
-        evaluationProcedure.setVerbose(isVerbose());
-        remainingParameters = evaluationProcedure.setParameters(remainingParameters);
-
-        // parameter holdout
-        holdout = HOLDOUT_PARAM.instantiateClass();
-        remainingParameters = holdout.setParameters(remainingParameters);
-
-        setParameters(args, remainingParameters);
-        return remainingParameters;
-    }
-
-    /**
-     * Calls the super method
-     * and adds to the returned attribute settings the attribute settings of
-     * {@link #evaluationProcedure} and {@link #holdout}.
-     *
-     */
-    @Override
-    public List<AttributeSettings> getAttributeSettings() {
-        List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-
-        attributeSettings.addAll(evaluationProcedure.getAttributeSettings());
-        attributeSettings.addAll(holdout.getAttributeSettings());
-
-        return attributeSettings;
-    }
-
-    /**
-     * Calls the super method
-     * and appends the parameter description of
-     * {@link #evaluationProcedure} and {@link #holdout} if they are already initialized.
-     */
-    @Override
-    public String parameterDescription() {
-        StringBuilder description = new StringBuilder();
-        description.append(super.parameterDescription());
-        // evaluationProcedure
-        if (evaluationProcedure != null) {
-            description.append(evaluationProcedure.parameterDescription());
-        }
-        // holdout
-        if (holdout != null) {
-            description.append(holdout.parameterDescription());
-        }
-
-        return description.toString();
     }
 
     /**

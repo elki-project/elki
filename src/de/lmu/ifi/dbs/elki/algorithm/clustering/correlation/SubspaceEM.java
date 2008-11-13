@@ -1,13 +1,22 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.Clustering;
-import de.lmu.ifi.dbs.elki.algorithm.result.CorrelationAnalysisSolution;
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.ClusteringResult;
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.Clusters;
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.EMClusters;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
+import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
+import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.RealVector;
-import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
+import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
+import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
@@ -22,21 +31,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-
 /**
  * @author Arthur Zimek
  * @param <V> the type of Realvector handled by this Algorithm
  */
 //todo arthur comment
-public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V> implements Clustering<V> {
+public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Cluster<CorrelationAnalysisSolution<V>>>> implements ClusteringAlgorithm<Clustering<Cluster<CorrelationAnalysisSolution<V>>>,V> {
 
     /**
      * Small value to increment diagonally of a matrix
@@ -94,7 +94,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
     /**
      * Stores the result.
      */
-    private Clusters<V> result;
+    private Clustering<Cluster<CorrelationAnalysisSolution<V>>> result;
 
     /**
      * Adds parameters
@@ -108,7 +108,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
         addOption(DELTA_PARAM);
     }
 
-    public ClusteringResult<V> getResult() {
+    public Clustering<Cluster<CorrelationAnalysisSolution<V>>> getResult() {
         return result;
     }
 
@@ -117,7 +117,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
     }
 
     @Override
-    public void runInTime(Database<V> database) throws IllegalStateException {
+    public Clustering<Cluster<CorrelationAnalysisSolution<V>>> runInTime(Database<V> database) throws IllegalStateException {
         if (database.size() == 0) {
             throw new IllegalArgumentException("database empty: must contain elements");
         }
@@ -192,16 +192,16 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
 //                V newMean = meanSums.get(i).multiplicate(1 / sumOfClusterProbabilities[i]);
 //                means.set(i, newMean);
 //            }
-            Integer[][] hardClustering = hardClustering(database);
+            List<List<Integer>> hardClustering = hardClustering(database);
             for (int i = 0; i < k; i++) {
-                for (Integer id : hardClustering[i]) {
+                for (Integer id : hardClustering.get(i)) {
                     double clusterProbability = database.getAssociation(AssociationID.PROBABILITY_CLUSTER_I_GIVEN_X, id).get(i);
                     sumOfClusterProbabilities[i] += clusterProbability;
                     V summand = database.get(id).multiplicate(clusterProbability);
                     V currentMeanSum = meanSums.get(i).plus(summand);
                     meanSums.set(i, currentMeanSum);
                 }
-                clusterWeight[i] = hardClustering[i].length == 0 ? 0 : sumOfClusterProbabilities[i] / hardClustering[i].length;
+                clusterWeight[i] = hardClustering.get(i).size() == 0 ? 0 : sumOfClusterProbabilities[i] / hardClustering.get(i).size();
                 V newMean = meanSums.get(i).multiplicate(1 / sumOfClusterProbabilities[i]);
                 means.set(i, newMean);
             }
@@ -220,7 +220,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
 //            }
 
             for (int i = 0; i < k; i++) {
-                for (Integer id : hardClustering[i]) {
+                for (Integer id : hardClustering.get(i)) {
                     V instance = database.get(id);
                     //List<Double> clusterProbabilities = (List<Double>) database.getAssociation(AssociationID.PROBABILITY_CLUSTER_I_GIVEN_X, id);
                     V difference = instance.plus(means.get(i).negativeVector());
@@ -241,11 +241,11 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
 //                    double distance = SubspaceEM.distance(database.get(id),means.get(i),eigensystems[i].times(selectionStrong));
 //                    variance += distance * distance;// * clusterProbabilities.get(i);
 //                }
-                for (Integer id : hardClustering[i]) {
+                for (Integer id : hardClustering.get(i)) {
                     double distance = SubspaceEM.distance(database.get(id), means.get(i), eigensystems[i].times(selectionStrong));
                     variance += distance * distance;
                 }
-                standardDeviation[i] = hardClustering[i].length == 0 ? 1 : Math.sqrt(variance / hardClustering[i].length);
+                standardDeviation[i] = hardClustering.get(i).size() == 0 ? 1 : Math.sqrt(variance / hardClustering.get(i).size());
                 if (debug) {
                     if (standardDeviation[i] == 0) {
                         debugFine(i + ": " + standardDeviation[i]);
@@ -269,12 +269,14 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
         if (isVerbose()) {
             verbose("\nassigning clusters");
         }
-        result = new EMClusters<V>(hardClustering(database), database);
-        result.associate(SimpleClassLabel.class);
+        List<List<Integer>> hardClusters = hardClustering(database);
+        result = new Clustering<Cluster<CorrelationAnalysisSolution<V>>>();
         // provide models within the result
         for (int i = 0; i < k; i++) {
-            SimpleClassLabel label = new SimpleClassLabel();
-            label.init(result.canonicalClusterLabel(i));
+            DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(database, hardClusters.get(i));
+            // TODO: re-add label support?
+            //SimpleClassLabel label = new SimpleClassLabel();
+            //label.init(result.canonicalClusterLabel(i));
             Matrix transposedWeakEigenvectors = eigensystems[i].times(selectionWeak).transpose();
             Matrix vTimesMean = transposedWeakEigenvectors.times(means.get(i).getColumnVector());
             double[][] a = new double[transposedWeakEigenvectors.getRowDimensionality()][transposedWeakEigenvectors.getColumnDimensionality()];
@@ -284,14 +286,17 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
             LinearEquationSystem lq = new LinearEquationSystem(a, b);
             lq.solveByTotalPivotSearch();
             CorrelationAnalysisSolution<V> solution = new CorrelationAnalysisSolution<V>(lq, database, eigensystems[i].times(selectionStrong), eigensystems[i].times(selectionWeak), eigensystems[i].times(selectionWeak).times(eigensystems[i].transpose()), means.get(i).getColumnVector());
-            result.appendModel(label, solution);
+            
+            Cluster<CorrelationAnalysisSolution<V>> clus = new Cluster<CorrelationAnalysisSolution<V>>(group, solution);
+            result.addCluster(clus);
         }
         // TODO: instead of hard clustering: overlapping subspace clusters assigned with dist < 3*sigma
-
+        
+        return result;
     }
 
     //todo arthur comment
-    protected Integer[][] hardClustering(Database<V> database) {
+    protected List<List<Integer>> hardClustering(Database<V> database) {
         List<List<Integer>> hardClusters = new ArrayList<List<Integer>>(k);
         for (int i = 0; i < k; i++) {
             hardClusters.add(new LinkedList<Integer>());
@@ -309,11 +314,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V>
             }
             hardClusters.get(maxIndex).add(id);
         }
-        Integer[][] resultClusters = new Integer[k][];
-        for (int i = 0; i < k; i++) {
-            resultClusters[i] = hardClusters.get(i).toArray(new Integer[hardClusters.get(i).size()]);
-        }
-        return resultClusters;
+        return hardClusters;
     }
 
     /**

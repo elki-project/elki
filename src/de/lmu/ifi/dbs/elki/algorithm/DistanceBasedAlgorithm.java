@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.properties.Properties;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -19,8 +20,8 @@ import java.util.List;
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  */
-public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends Distance<D>>
-    extends AbstractAlgorithm<O> {
+public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends Distance<D>, R extends Result>
+    extends AbstractAlgorithm<O, R> {
 
     /**
      * OptionID for {@link #DISTANCE_FUNCTION_PARAM}

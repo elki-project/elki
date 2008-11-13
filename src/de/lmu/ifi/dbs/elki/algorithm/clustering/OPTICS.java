@@ -6,12 +6,11 @@ import java.util.List;
 import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.result.Result;
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.ClusterOrder;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
@@ -41,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * @param <O> the type of DatabaseObjects handled by the algorithm
  * @param <D> the type of Distance used to discern objects
  */
-public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D> {
+public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D, ClusterOrderResult<D>> {
 
     /**
      * OptionID for {@link #EPSILON_PARAM}
@@ -89,7 +88,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
     /**
      * Provides the result of the algorithm.
      */
-    private ClusterOrder<O, D> clusterOrder;
+    private ClusterOrderResult<D> clusterOrder;
 
     /**
      * Holds a set of processed ids.
@@ -125,12 +124,12 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
      *
      */
     @Override
-    protected void runInTime(Database<O> database) {
+    protected ClusterOrderResult<D> runInTime(Database<O> database) {
         Progress progress = new Progress("Clustering", database.size());
 
         int size = database.size();
         processedIDs = new HashSet<Integer>(size);
-        clusterOrder = new ClusterOrder<O, D>(database, getDistanceFunction());
+        clusterOrder = new ClusterOrderResult<D>();
         heap = new DefaultHeap<D, COEntry>();
         getDistanceFunction().setDatabase(database, isVerbose(), isTime());
 
@@ -143,6 +142,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
         if (isVerbose()) {
             verbose("");
         }
+        return clusterOrder;
     }
 
     /**
@@ -232,14 +232,10 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
         return remainingParameters;
     }
 
-    public Result<O> getResult() {
+    public ClusterOrderResult<D> getResult() {
         return clusterOrder;
     }
     
-    public ClusterOrder<O, D> getResultClusterOrder() {
-        return clusterOrder;
-    }
-
     /**
      * Adds the specified entry with the specified key tp the heap. If the
      * entry's object is already in the heap, it will only be updated.

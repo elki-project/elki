@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.algorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.IndexDatabase;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -19,7 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  */
-public abstract class AbstractAlgorithm<O extends DatabaseObject> extends AbstractParameterizable implements Algorithm<O> {
+public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Result> extends AbstractParameterizable implements Algorithm<O, R> {
 
     /**
      * Flag to allow verbose messages while performing the algorithm.
@@ -115,9 +116,9 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends Abstra
      * the runtime and, in case of an index based database,
      * the I/O costs of this method.
      */
-    public final void run(Database<O> database) throws IllegalStateException {
+    public final R run(Database<O> database) throws IllegalStateException {
         long start = System.currentTimeMillis();
-        runInTime(database);
+        R res = runInTime(database);
         long end = System.currentTimeMillis();
         if (isTime()) {
             long elapsedTime = end - start;
@@ -132,6 +133,7 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends Abstra
             msg.append(getClass().getName()).append(" logical page access : ").append(db.getLogicalPageAccess()).append("\n");
             verbose(msg.toString());
         }
+        return res;
     }
 
     /**
@@ -143,6 +145,6 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject> extends Abstra
      *                               properly (e.g. the setParameters(String[]) method has been failed
      *                               to be called).
      */
-    protected abstract void runInTime(Database<O> database) throws IllegalStateException;
+    protected abstract R runInTime(Database<O> database) throws IllegalStateException;
 
 }

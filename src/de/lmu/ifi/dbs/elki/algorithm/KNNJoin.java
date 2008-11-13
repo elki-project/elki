@@ -1,7 +1,9 @@
 package de.lmu.ifi.dbs.elki.algorithm;
 
-import de.lmu.ifi.dbs.elki.algorithm.result.KNNJoinResult;
-import de.lmu.ifi.dbs.elki.algorithm.result.Result;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.SpatialIndexDatabase;
@@ -11,6 +13,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
 import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.logging.ProgressLogRecord;
+import de.lmu.ifi.dbs.elki.result.AnnotationsFromHashMap;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
@@ -21,10 +24,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * Joins in a given spatial database to each object its k-nearest neighbors.
@@ -38,7 +37,7 @@ import java.util.List;
  * @param <E> the type of entry used in the spatial node
  */
 public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry>
-    extends DistanceBasedAlgorithm<V, D> {
+    extends DistanceBasedAlgorithm<V, D, AnnotationsFromHashMap<KNNList<D>>> {
 
     /**
      * OptionID for {@link #K_PARAM}
@@ -60,7 +59,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
     /**
      * The knn lists for each object.
      */
-    private KNNJoinResult<V, D> result;
+    private AnnotationsFromHashMap<KNNList<D>> result;
 
     /**
      * Provides a KNN-Join,
@@ -85,7 +84,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
      */
     @Override
     @SuppressWarnings("unchecked")
-    protected void runInTime(Database<V> database) throws IllegalStateException {
+    protected AnnotationsFromHashMap runInTime(Database<V> database) throws IllegalStateException {
         if (!(database instanceof SpatialIndexDatabase)) {
             throw new IllegalStateException(
                 "Database must be an instance of "
@@ -169,12 +168,14 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
                         progress.getTask(), progress.status()));
                 }
             }
-            result = new KNNJoinResult<V, D>(knnLists);
+            result = new AnnotationsFromHashMap();
+            result.addMap("KNNS", knnLists);
         }
 
         catch (Exception e) {
             throw new IllegalStateException(e);
         }
+        return result;
     }
 
     /**
@@ -230,7 +231,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
      *
      * @return the result of the algorithm
      */
-    public Result<V> getResult() {
+    public AnnotationsFromHashMap<KNNList<D>> getResult() {
         return result;
     }
 

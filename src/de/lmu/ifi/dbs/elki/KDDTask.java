@@ -1,13 +1,28 @@
 package de.lmu.ifi.dbs.elki;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.TreeMap;
+import java.util.logging.Logger;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
-import de.lmu.ifi.dbs.elki.algorithm.result.Result;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.AssociationID;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
+import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
+import de.lmu.ifi.dbs.elki.result.MultiResult;
+import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.textwriter.MultipleFilesOutput;
+import de.lmu.ifi.dbs.elki.result.textwriter.SingleStreamOutput;
+import de.lmu.ifi.dbs.elki.result.textwriter.StreamFactory;
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriter;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
@@ -21,12 +36,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
-import java.util.TreeMap;
-import java.util.logging.Logger;
 
 /**
  * Provides a KDDTask that can be used to perform any algorithm implementing
@@ -85,7 +94,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
    * Key: {@code -algorithm}
    * </p>
    */
-  private final ClassParameter<Algorithm<O>> ALGORITHM_PARAM = new ClassParameter<Algorithm<O>>(OptionID.ALGORITHM, Algorithm.class);
+  private final ClassParameter<Algorithm<O,Result>> ALGORITHM_PARAM = new ClassParameter<Algorithm<O,Result>>(OptionID.ALGORITHM, Algorithm.class);
 
   /**
    * Optional Parameter to specify a class to obtain a description for, must
@@ -140,7 +149,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
   /**
    * Holds the algorithm to run.
    */
-  private Algorithm<O> algorithm;
+  private Algorithm<O,Result> algorithm;
 
   /**
    * Holds the database connection to have the algorithm run with.
@@ -273,7 +282,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
         throw new WrongParameterValueException(DESCRIPTION_PARAM.getName(), descriptionClass, DESCRIPTION_PARAM.getDescription(), e);
       }
       if(p instanceof Algorithm) {
-        Algorithm<?> a = (Algorithm<?>) p;
+        Algorithm<?,?> a = (Algorithm<?,?>) p;
         throw new AbortException(a.getDescription().toString() + '\n' + a.parameterDescription());
       }
       else {
@@ -338,25 +347,63 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
    *         (i.e. {@link #setParameters(String[]) setParameters(String[])} has
    *         not been called before calling this method)
    */
-  public Result<O> run() throws IllegalStateException {
+  public Result run() throws IllegalStateException {
     if(initialized) {
-      algorithm.run(databaseConnection.getDatabase(normalization));
+      Database<O> db = databaseConnection.getDatabase(normalization); 
+      algorithm.run(db);
       try {
-        Result<O> result = algorithm.getResult();
+        Result result = algorithm.getResult();
+
+        // standard annotations from the source file
+        // TODO: get them via databaseConnection!
+        // adding them here will make the output writer think
+        // that they were an part of the actual result.
+        AnnotationsFromDatabase<O, ?> ar = new AnnotationsFromDatabase<O, Object>(db);
+        ar.addAssociationGenerics(null, AssociationID.LABEL);
+        ar.addAssociationGenerics(null, AssociationID.CLASS);
+
+        // insert standard annotations when we have a MultiResult
+        if (result instanceof MultiResult) {
+          MultiResult mr = (MultiResult) result;
+          mr.prependResult(ar);
+        } else {
+          // TODO: can we always wrap them in a MultiResult safely?
+          MultiResult mr = new MultiResult();        
+          mr.addResult(ar);
+          mr.addResult(result);
+          result = mr;
+        }
 
         if(result != null) {
           List<AttributeSettings> settings = getAttributeSettings();
-          if(normalizationUndo) {
-            result.output(out, normalization, settings);
+          TextWriter<O> writer = new TextWriter<O>();
+          if (normalizationUndo)
+            writer.setNormalization(normalization);
+          StreamFactory output;
+          if (out == null) {
+            output = new SingleStreamOutput();
+          } else if (out.exists()) {
+            if (out.isDirectory()) {
+              if (out.listFiles().length > 0)
+                warning("Output directory specified is not empty. Files will be overwritten and old files may be left over.");
+              output = new MultipleFilesOutput(out);
+            } else {
+              warning("Output file exists and will be overwritten!");
+              output = new SingleStreamOutput(out);
+            }
+          } else {
+            output = new MultipleFilesOutput(out);
           }
-          else {
-            result.output(out, null, settings);
-          }
+          writer.output(db, result, output, settings);
         }
         return result;
       }
       catch(UnableToComplyException e) {
+        // FIXME: don't lose the original exception message?
         throw new IllegalStateException("Error in restoring result to original values.", e);
+      }
+      catch(IOException e) {
+        throw new IllegalStateException("Input/Output error writing result.", e);
       }
     }
     else {

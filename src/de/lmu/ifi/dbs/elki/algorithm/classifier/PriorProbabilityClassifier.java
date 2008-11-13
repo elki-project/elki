@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 
@@ -18,7 +19,7 @@ import java.util.Iterator;
  * @param <L> the type of the ClassLabel the Classifier is assigning
  */
 public class PriorProbabilityClassifier<O extends DatabaseObject, L extends ClassLabel>
-    extends AbstractClassifier<O, L> {
+    extends AbstractClassifier<O, L, Result> {
     /**
      * Holds the prior probabilities.
      */
@@ -97,5 +98,17 @@ public class PriorProbabilityClassifier<O extends DatabaseObject, L extends Clas
             output.append('\n');
         }
         return output.toString();
+    }
+
+    @Override
+    protected Result runInTime(Database<O> database) throws IllegalStateException {
+      // TODO Implement sensible default behavior. 
+      return null;
+    }
+
+    @Override
+    public Result getResult() {
+      // TODO Add when runInTime was implemented.
+      return null;
     }
 }

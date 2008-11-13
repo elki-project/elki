@@ -7,9 +7,6 @@ import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.KNNJoin;
-import de.lmu.ifi.dbs.elki.algorithm.result.KNNJoinResult;
-import de.lmu.ifi.dbs.elki.algorithm.result.Result;
-import de.lmu.ifi.dbs.elki.algorithm.result.clustering.ClusterOrder;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.SpatialIndexDatabase;
@@ -20,8 +17,12 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluNode;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTree;
+import de.lmu.ifi.dbs.elki.result.AnnotationResult;
+import de.lmu.ifi.dbs.elki.result.AnnotationsFromHashMap;
+import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Identifiable;
+import de.lmu.ifi.dbs.elki.utilities.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
@@ -35,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
 /**
- * DeLiClu provides the DeLiClu algorithm, a hierachical algorithm to find density-connected sets in a database.
+ * DeLiClu provides the DeLiClu algorithm, a hierarchical algorithm to find density-connected sets in a database.
  * <p>Reference:
  * <br>E. Achtert, C. Boehm, P. Kroeger:
  * DeLiClu: Boosting Robustness, Completeness, Usability, and Efficiency of Hierarchical Clustering by a Closest Pair Ranking.
@@ -47,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * @param <D> the type of Distance used
  */
 public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extends
-    DistanceBasedAlgorithm<O, D> {
+    DistanceBasedAlgorithm<O, D, ClusterOrderResult<D>> {
 
     /**
      * OptionID for {@link #MINPTS_PARAM}
@@ -68,7 +69,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
     /**
      * Provides the result of the algorithm.
      */
-    private ClusterOrder<O, D> clusterOrder;
+    private ClusterOrderResult<D> clusterOrder;
 
     /**
      * The priority queue for the algorithm.
@@ -102,7 +103,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
      */
     @Override
     @SuppressWarnings("unchecked")
-    protected void runInTime(Database<O> database) throws IllegalStateException {
+    protected ClusterOrderResult<D> runInTime(Database<O> database) throws IllegalStateException {
         if (!(database instanceof SpatialIndexDatabase)) {
             throw new IllegalArgumentException(
                 "Database must be an instance of "
@@ -130,7 +131,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
             verbose("\nknnJoin...");
         }
         knnJoin.run(database);
-        KNNJoinResult<O, D> knns = (KNNJoinResult<O, D>) knnJoin.getResult();
+        AnnotationsFromHashMap knns = knnJoin.getResult();
 
         Progress progress = new Progress("Clustering", database.size());
         int size = database.size();
@@ -139,7 +140,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
             verbose("\nDeLiClu...");
         }
 
-        clusterOrder = new ClusterOrder<O, D>(database, getDistanceFunction());
+        clusterOrder = new ClusterOrderResult<D>();
         heap = new DefaultHeap<D, SpatialObjectPair>();
 
         // add start object to cluster order and (root, root) to priority queue
@@ -179,6 +180,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
                 }
             }
         }
+        return clusterOrder;
     }
 
     public Description getDescription() {
@@ -230,7 +232,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
         return attributeSettings;
     }
 
-    public Result<O> getResult() {
+    public ClusterOrderResult<D> getResult() {
         return clusterOrder;
     }
 
@@ -296,7 +298,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
      */
     private void expandNodes(DeLiCluTree<O> index,
                              SpatialDistanceFunction<O, D> distFunction,
-                             SpatialObjectPair nodePair, KNNJoinResult<O, D> knns) {
+                             SpatialObjectPair nodePair, AnnotationResult<KNNList<D>> knns) {
 
         DeLiCluNode node1 = index.getNode(nodePair.entry1.getID());
         DeLiCluNode node2 = index.getNode(nodePair.entry2.getID());
@@ -354,7 +356,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
      * @param knns         the knn list
      */
     private void expandLeafNodes(SpatialDistanceFunction<O, D> distFunction,
-                                 DeLiCluNode node1, DeLiCluNode node2, KNNJoinResult<O, D> knns) {
+                                 DeLiCluNode node1, DeLiCluNode node2, AnnotationResult<KNNList<D>> knns) {
 
         int numEntries_1 = node1.getNumEntries();
         int numEntries_2 = node2.getNumEntries();
@@ -373,7 +375,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
                 }
 
                 D distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
-                D reach = Util.max(distance, knns.getKNNDistance(entry2.getID()));
+                D reach = Util.max(distance, knns.getAnnotations(entry2.getID())[0].getSecond().getKNNDistance());
                 SpatialObjectPair dataPair = new SpatialObjectPair(entry1, entry2, false);
                 updateHeap(reach, dataPair);
             }
@@ -391,7 +393,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
      */
     private void reinsertExpanded(SpatialDistanceFunction<O, D> distFunction,
                                   DeLiCluTree<O> index, List<TreeIndexPathComponent<DeLiCluEntry>> path,
-                                  KNNJoinResult<O, D> knns) {
+                                  AnnotationResult<KNNList<D>> knns) {
 
         SpatialEntry rootEntry = path.remove(0).getEntry();
         reinsertExpanded(distFunction, index, path, 0, rootEntry, knns);
@@ -399,7 +401,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
 
     private void reinsertExpanded(SpatialDistanceFunction<O, D> distFunction,
                                   DeLiCluTree<O> index, List<TreeIndexPathComponent<DeLiCluEntry>> path,
-                                  int pos, SpatialEntry parentEntry, KNNJoinResult<O, D> knns) {
+                                  int pos, SpatialEntry parentEntry, AnnotationResult<KNNList<D>> knns) {
 
         DeLiCluNode parentNode = index.getNode(parentEntry.getID());
         SpatialEntry entry2 = path.get(pos).getEntry();
@@ -411,7 +413,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
                     continue;
                 }
                 D distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
-                D reach = Util.max(distance, knns.getKNNDistance(entry2.getID()));
+                D reach = Util.max(distance, knns.getAnnotations(entry2.getID())[0].getSecond().getKNNDistance());
                 SpatialObjectPair dataPair = new SpatialObjectPair(entry1, entry2, false);
                 updateHeap(reach, dataPair);
             }

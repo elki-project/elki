@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.properties.Properties;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
@@ -26,7 +27,7 @@ import java.util.List;
  * @param <L> the type of the ClassLabel the Classifier is assigning
  */
 public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extends Distance<D>, L extends ClassLabel>
-    extends AbstractClassifier<O, L> {
+    extends AbstractClassifier<O, L, Result> {
 
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.classifier.DistanceBasedClassifier#DISTANCE_FUNCTION_PARAM}
