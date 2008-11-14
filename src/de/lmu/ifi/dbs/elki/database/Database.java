@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.database;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
@@ -20,7 +21,7 @@ import java.util.Set;
  * @author Elke Achtert
  * @param <O> the type of DatabaseObject as element of the database
  */
-public interface Database<O extends DatabaseObject> extends Parameterizable {
+public interface Database<O extends DatabaseObject> extends Parameterizable, Result {
   /**
    * Initializes the database by inserting the specified objects and their associations
    * into the database.
