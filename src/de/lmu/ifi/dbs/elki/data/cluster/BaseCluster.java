@@ -54,22 +54,27 @@ public abstract class BaseCluster<C extends BaseCluster<C,M>, M extends Model> i
    * Cluster model.
    */
   private M model = null;
+  
+  /**
+   * Noise?
+   */
+  private boolean noise = false;
 
   /**
    * Full constructor
    * 
    * @param name Cluster name. May be null.
    * @param group Group data
+   * @param noise Noise flag
    * @param model Model. May be null.
    * @param hierarchy Hierarchy object. May be null.
    */
-  public BaseCluster(String name, DatabaseObjectGroup group, M model, HierarchyImplementation<C> hierarchy) {
+  public BaseCluster(String name, DatabaseObjectGroup group, boolean noise, M model, HierarchyImplementation<C> hierarchy) {
     super();
     // TODO: any way to check that this is a C? (see asC() method)
-    // TODO: allow group == null? Throw exception otherwise?
-    //assert(group != null);
     this.name = name;
     this.group = group;
+    this.noise = noise;
     this.model = model;
     this.hierarchy = hierarchy;
   }
@@ -80,13 +85,25 @@ public abstract class BaseCluster<C extends BaseCluster<C,M>, M extends Model> i
    * 
    * @param name Cluster name. May be null.
    * @param group Group data
+   * @param noise Noise flag
    * @param model Model. May be null.
    * @param children Children. Will NOT be copied.
    * @param parents Parents. Will NOT be copied.
    */
-  public BaseCluster(String name, DatabaseObjectGroup group, M model, List<C> children, List<C> parents) {
-    this(name, group, model, null);
+  public BaseCluster(String name, DatabaseObjectGroup group, boolean noise, M model, List<C> children, List<C> parents) {
+    this(name, group, noise, model, null);
     this.setHierarchy(new SimpleHierarchy<C>(this.asC(), children, parents));
+  }
+
+  /**
+   * Constructor without hierarchy information. 
+   * 
+   * @param name
+   * @param group
+   * @param noise Noise flag
+   */
+  public BaseCluster(String name, DatabaseObjectGroup group, boolean noise, M model) {
+    this(name, group, noise, model, null);
   }
 
   /**
@@ -96,7 +113,18 @@ public abstract class BaseCluster<C extends BaseCluster<C,M>, M extends Model> i
    * @param group
    */
   public BaseCluster(String name, DatabaseObjectGroup group, M model) {
-    this(name, group, model, null);
+    this(name, group, false, model, null);
+  }
+
+  /**
+   * Constructor without hierarchy information and name 
+   * 
+   * @param group
+   * @param noise Noise flag
+   * @param model Model
+   */
+  public BaseCluster(DatabaseObjectGroup group, boolean noise, M model) {
+    this(null, group, noise, model, null);
   }
 
   /**
@@ -105,25 +133,47 @@ public abstract class BaseCluster<C extends BaseCluster<C,M>, M extends Model> i
    * @param group
    */
   public BaseCluster(DatabaseObjectGroup group, M model) {
-    this(null, group, model, null);
+    this(null, group, false, model, null);
   }
 
   /**
    * Constructor without hierarchy information and model 
    * 
+   * @param name name
+   * @param group
+   * @param noise Noise flag
+   */
+  public BaseCluster(String name, DatabaseObjectGroup group, boolean noise) {
+    this(name, group, noise, null, null);
+  }
+
+  /**
+   * Constructor without hierarchy information and model 
+   * 
+   * @param name
    * @param group
    */
   public BaseCluster(String name, DatabaseObjectGroup group) {
-    this(name, group, null, null);
+    this(name, group, false, null, null);
   }
 
   /**
    * Constructor without hierarchy information and name and model 
    * 
    * @param group
+   * @param noise Noise flag
+   */
+  public BaseCluster(DatabaseObjectGroup group, boolean noise) {
+    this(null, group, noise, null, null);
+  }
+  
+  /**
+   * Constructor without hierarchy information and name and model 
+   * 
+   * @param group
    */
   public BaseCluster(DatabaseObjectGroup group) {
-    this(null, group, null, null);
+    this(null, group, false, null, null);
   }
   
   /**
@@ -272,24 +322,17 @@ public abstract class BaseCluster<C extends BaseCluster<C,M>, M extends Model> i
   }
   
   /**
-   * Get suggested label.
-   */
-  public String getSuggestedLabel() {
-    if (getModel() != null) {
-      return getModel().getSuggestedLabel();
-    }
-    // TODO: return null instead?
-    return "Cluster";
-  }
-  
-  /**
    * Return either the assigned name or the suggested label
    * 
    * @return a name for the cluster
    */
-  public String getNameOrLabel() {
+  public String getNameAutomatic() {
     if (name != null) return name;
-    return getSuggestedLabel();
+    if (isNoise()) {
+      return "Noise";
+    } else {
+      return "Cluster";
+    }
   }
 
   /**
@@ -374,7 +417,7 @@ public abstract class BaseCluster<C extends BaseCluster<C,M>, M extends Model> i
    * @param out
    */
   public void writeToText(TextWriterStream out) {
-    String name = getNameOrLabel();
+    String name = getNameAutomatic();
     if (name != null) {
       out.commentPrintLn("Cluster: "+name);
     }
@@ -387,7 +430,7 @@ public abstract class BaseCluster<C extends BaseCluster<C,M>, M extends Model> i
         if (i > 0) {
           out.commentPrint(", ");
         }
-        out.commentPrint(getParents().get(i).getNameOrLabel());
+        out.commentPrint(getParents().get(i).getNameAutomatic());
       }
       out.commentPrintLn();
       out.commentPrint("Children: ");
@@ -395,7 +438,7 @@ public abstract class BaseCluster<C extends BaseCluster<C,M>, M extends Model> i
         if (i > 0) {
           out.commentPrint(", ");
         }
-        out.commentPrint(getChildren().get(i).getNameOrLabel());
+        out.commentPrint(getChildren().get(i).getNameAutomatic());
       }
       out.commentPrintLn();
     }
@@ -419,5 +462,23 @@ public abstract class BaseCluster<C extends BaseCluster<C,M>, M extends Model> i
   @Override
   public void setID(Integer id) {
     this.id = id;
+  }
+
+  /**
+   * Getter for noise flag.
+   * 
+   * @return
+   */
+  public boolean isNoise() {
+    return noise;
+  }
+
+  /**
+   * Setter for noise flag.
+   * 
+   * @param noise
+   */
+  public void setNoise(boolean noise) {
+    this.noise = noise;
   }
 }

@@ -14,9 +14,9 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
-import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.DimensionModel;
-import de.lmu.ifi.dbs.elki.data.model.NoiseModel;
+import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.preprocessing.HiCOPreprocessor;
@@ -324,7 +324,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
                     Database<V> noiseDB = databasePartitions.get(partitionID);
                     DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(database, noiseDB.getIDs());
                     // Make a Noise cluster
-                    result.addCluster(new Cluster<Model>(group, NoiseModel.NOISE));
+                    result.addCluster(new Cluster<Model>(group, true, ClusterModel.CLUSTER));
                 }
                 else {
                     if (isVerbose()) {
@@ -337,8 +337,8 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
                     // Re-Wrap resulting Clusters as DimensionModel clusters.
                     for (Cluster<Model> clus : p.getAllClusters()) {
                       DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Collection<Integer>>(database, clus.getIDs());
-                      if (clus.getModel() instanceof NoiseModel) {
-                        result.addCluster(new Cluster<Model>(group, NoiseModel.NOISE));
+                      if (clus.isNoise()) {
+                        result.addCluster(new Cluster<Model>(group, true, ClusterModel.CLUSTER));
                       } else {
                         result.addCluster(new Cluster<Model>(group, new DimensionModel(partitionID)));                      
                       }

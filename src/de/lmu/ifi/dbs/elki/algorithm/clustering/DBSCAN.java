@@ -12,9 +12,8 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
-import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
-import de.lmu.ifi.dbs.elki.data.model.NoiseModel;
+import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.utilities.Description;
@@ -173,7 +172,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
         }
 
         DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(database, noise);
-        Cluster<Model> n = new Cluster<Model>(group, NoiseModel.NOISE);        
+        Cluster<Model> n = new Cluster<Model>(group, true, ClusterModel.CLUSTER);        
         result.addCluster(n);
 
         if (isVerbose()) {

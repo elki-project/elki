@@ -88,12 +88,4 @@ public class CorrelationModel<V extends RealVector<V, ?>> extends BaseModel impl
       e.printStackTrace();
     }
   }
-
-  /**
-   * Implementaion of {@link Model} interface.
-   */
-  @Override
-  public String getSuggestedLabel() {
-    return "CorrelationCluster";
-  }  
 }

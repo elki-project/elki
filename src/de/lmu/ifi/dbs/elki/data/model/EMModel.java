@@ -35,11 +35,6 @@ public class EMModel<V extends RealVector<V, ?>> extends BaseModel {
   }
 
   @Override
-  public String getSuggestedLabel() {
-    return "EMCluster";
-  }
-  
-  @Override
   public void writeToText(TextWriterStream out) {
     try {
       super.writeToText(out);

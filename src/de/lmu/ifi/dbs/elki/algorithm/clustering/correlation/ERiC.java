@@ -14,10 +14,9 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
-import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.model.CorrelationModel;
 import de.lmu.ifi.dbs.elki.data.model.DimensionModel;
-import de.lmu.ifi.dbs.elki.data.model.NoiseModel;
+import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.BitDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ERiCDistanceFunction;
@@ -248,7 +247,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
                 correlationClusters.add(correlationCluster);
               }
               // partition containing noise
-              else if (clus.getModel() != null && clus.getModel() instanceof NoiseModel) {
+              else if (clus.getModel() != null && clus.isNoise()) {
                 if (noise == null)
                   noise = clus;
                 else {

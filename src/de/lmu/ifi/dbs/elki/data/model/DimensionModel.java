@@ -49,12 +49,4 @@ public class DimensionModel extends BaseModel implements TextWriteable {
     out.commentPrintLn("Dimension: "+dimension);
   }
   
-  /**
-   * Implementation of {@link Model} interface.
-   */
-  @Override
-  public String getSuggestedLabel() {    
-    return "Cluster dim("+dimension+")";
-  }
-
 }

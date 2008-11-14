@@ -26,14 +26,6 @@ public class AxesModel extends BaseModel {
   }
 
   /**
-   * Automatic naming of result clusters.
-   */
-  @Override
-  public String getSuggestedLabel() {
-    return "Subspace";
-  }
-
-  /**
    * Access subspaces bitset.
    * 
    * @return

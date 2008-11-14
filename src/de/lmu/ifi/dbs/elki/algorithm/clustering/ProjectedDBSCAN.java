@@ -12,9 +12,8 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
-import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
-import de.lmu.ifi.dbs.elki.data.model.NoiseModel;
+import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
@@ -236,7 +235,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
             }
 
             DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(database, noise);
-            Cluster<Model> n = new Cluster<Model>(group, NoiseModel.NOISE);        
+            Cluster<Model> n = new Cluster<Model>(group, true, ClusterModel.CLUSTER);        
             result.addCluster(n);
 
             if (isVerbose()) {

@@ -52,11 +52,4 @@ public class LinearEquationModel extends BaseModel implements TextWriteable {
     out.commentPrintLn(les.equationsToString(6));
   }
 
-  /**
-   * Implementation of {@link Model} interface
-   */
-  @Override
-  public String getSuggestedLabel() {
-    return "CorrelationCluster";
-  }    
 }

@@ -13,6 +13,8 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.cluster.BaseCluster;
+import de.lmu.ifi.dbs.elki.data.cluster.naming.NamingScheme;
+import de.lmu.ifi.dbs.elki.data.cluster.naming.SimpleEnumeratingScheme;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
@@ -163,11 +165,12 @@ public class TextWriter<O extends DatabaseObject> {
       throw new UnableToComplyException("No printable result found.");
     }
 
+    NamingScheme naming = null;
     // Process groups or all data in a flat manner?
     if(rc != null) {
       groups = (Collection<DatabaseObjectGroup>) rc.getAllClusters();
       // force an update of cluster names.
-      rc.updateLabels();
+      naming = new SimpleEnumeratingScheme(rc);
     }
     else {
       groups = new ArrayList<DatabaseObjectGroup>();
@@ -179,11 +182,8 @@ public class TextWriter<O extends DatabaseObject> {
       // for clusters, use naming.
       if (group instanceof BaseCluster) {
         BaseCluster<?,Model> bc = (BaseCluster<?, Model>) group;
-        if(bc.getName() != null) {
-          filename = filenameFromLabel(bc.getName());
-        }
-        if(filename == null) {
-          filename = filenameFromLabel(bc.getSuggestedLabel());
+        if(naming != null) {
+          filename = filenameFromLabel(naming.getNameForCluster(bc));
         }
       }
 

@@ -382,11 +382,4 @@ public class CorrelationAnalysisSolution<V extends RealVector<V, ?>> implements 
     }
   }
 
-  /**
-   * Implementation of {@link Model} interface
-   */
-  @Override
-  public String getSuggestedLabel() {
-    return "CorrelationCluster";
-  }
 }

@@ -1,11 +1,9 @@
 package de.lmu.ifi.dbs.elki.data;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.data.cluster.BaseCluster;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -74,38 +72,5 @@ public class Clustering<C extends BaseCluster<C, ?>> implements Result {
         clu = rc.getDescendants(clu);
       }
     return clu;
-  }
-
-  /**
-   * Compute labels for the model, based on getSuggestedLabel()
-   */
-  public void updateLabels() {
-    // keep track on how often each label has been used so far.
-    HashMap<String, Integer> labelcount = new HashMap<String, Integer>();
-    for(C clus : getAllClusters()) {
-      if(clus.getName() == null) {
-        String label = clus.getSuggestedLabel();
-        Integer count = labelcount.get(label);
-        if(count == null) {
-          count = new Integer(0);
-        }
-        else {
-          count++;
-        }
-        labelcount.put(label, count);
-
-        clus.setName(label + " " + count);
-      }
-    }
-    // Remove the " 0" postfix for labels that occurred only once.
-    for(Entry<String, Integer> entry : labelcount.entrySet()) {
-      if(entry.getValue().intValue() == 0) {
-        for(C clus : getAllClusters()) {
-          if(clus.getName().equals(entry.getKey() + " " + 0)) {
-            clus.setName(entry.getKey());
-          }
-        }
-      }
-    }
   }
 }

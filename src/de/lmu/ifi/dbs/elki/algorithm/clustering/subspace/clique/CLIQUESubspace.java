@@ -254,13 +254,4 @@ public class CLIQUESubspace<V extends RealVector<V, ?>> extends Subspace<V> impl
     public void writeToText(TextWriterStream out) {
       out.commentPrintLn(this.toString());
     }
-
-    /**
-     * Implementation of {@link Model} interface.
-     * @return
-     */
-    @Override
-    public String getSuggestedLabel() {
-      return "CLIQUESubspace";
-    }
 }

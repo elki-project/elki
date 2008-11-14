@@ -13,9 +13,8 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
-import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
-import de.lmu.ifi.dbs.elki.data.model.NoiseModel;
+import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.IntegerDistance;
@@ -170,7 +169,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
           result.addCluster(new Cluster<Model>(group, ClusterModel.CLUSTER));
         }
         DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(database, noise);
-        result.addCluster(new Cluster<Model>(group, NoiseModel.NOISE));
+        result.addCluster(new Cluster<Model>(group, true, ClusterModel.CLUSTER));
         
         if (isVerbose()) {
             verbose("");

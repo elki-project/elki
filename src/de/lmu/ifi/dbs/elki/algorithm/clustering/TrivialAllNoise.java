@@ -8,8 +8,8 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
+import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.data.model.NoiseModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 
@@ -52,7 +52,7 @@ public class TrivialAllNoise<O extends DatabaseObject> extends AbstractAlgorithm
   protected Clustering<Cluster<Model>> runInTime(Database<O> database) throws IllegalStateException {
     result = new Clustering<Cluster<Model>>();
     DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(database, database.getIDs());
-    Cluster<Model> c = new Cluster<Model>(group, NoiseModel.NOISE);
+    Cluster<Model> c = new Cluster<Model>(group, true, ClusterModel.CLUSTER);
     result.addCluster(c);
     return result;
   }

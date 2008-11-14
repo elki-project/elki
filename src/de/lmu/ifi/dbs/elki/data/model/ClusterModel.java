@@ -9,14 +9,6 @@ package de.lmu.ifi.dbs.elki.data.model;
  */
 public final class ClusterModel extends BaseModel {
   /**
-   * Implementation of {@link Model} interface.
-   */
-  @Override
-  public String getSuggestedLabel() {
-    return "Cluster";
-  }
-
-  /**
    * Static cluster model that can be shared for all clusters (since the object doesn't include meta information.
    */
   public final static ClusterModel CLUSTER = new ClusterModel();

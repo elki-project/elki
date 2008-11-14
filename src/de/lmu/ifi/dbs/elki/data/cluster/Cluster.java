@@ -17,10 +17,31 @@ public class Cluster<M extends Model> extends BaseCluster<Cluster<M>, M> {
    * Constructor with model.
    * 
    * @param group
+   * @param noise
+   * @param model
+   */
+  public Cluster(DatabaseObjectGroup group, boolean noise, M model) {
+    super(group, noise, model);
+  }
+
+  /**
+   * Constructor with model.
+   * 
+   * @param group
    * @param model
    */
   public Cluster(DatabaseObjectGroup group, M model) {
     super(group, model);
+  }
+
+  /**
+   * Constructor without model.
+   * 
+   * @param group
+   * @param noise
+   */
+  public Cluster(DatabaseObjectGroup group, boolean noise) {
+    super(group, noise);
   }
 
   /**
@@ -41,7 +62,20 @@ public class Cluster<M extends Model> extends BaseCluster<Cluster<M>, M> {
    * @param hierarchy
    */
   public Cluster(String name, DatabaseObjectGroup group, M model, HierarchyImplementation<Cluster<M>> hierarchy) {
-    super(name, group, model, hierarchy);
+    super(name, group, false, model, hierarchy);
+  }
+
+  /**
+   * Constructor with model and hierarchy.
+   * 
+   * @param name
+   * @param group
+   * @param noise
+   * @param model
+   * @param hierarchy
+   */
+  public Cluster(String name, DatabaseObjectGroup group, boolean noise, M model, HierarchyImplementation<Cluster<M>> hierarchy) {
+    super(name, group, noise, model, hierarchy);
   }
 
   /**
@@ -54,7 +88,33 @@ public class Cluster<M extends Model> extends BaseCluster<Cluster<M>, M> {
    * @param parents
    */
   public Cluster(String name, DatabaseObjectGroup group, M model, List<Cluster<M>> children, List<Cluster<M>> parents) {
-    super(name, group, model, children, parents);
+    super(name, group, false, model, children, parents);
+  }
+
+  /**
+   * Constructor with model and hierarchy (given as list of children and parents)
+   * 
+   * @param name
+   * @param group
+   * @param noise
+   * @param model
+   * @param children
+   * @param parents
+   */
+  public Cluster(String name, DatabaseObjectGroup group, boolean noise, M model, List<Cluster<M>> children, List<Cluster<M>> parents) {
+    super(name, group, noise, model, children, parents);
+  }
+
+  /**
+   * Constructor with name, group and model.
+   * 
+   * @param name
+   * @param group
+   * @param noise
+   * @param model
+   */
+  public Cluster(String name, DatabaseObjectGroup group, boolean noise, M model) {
+    super(name, group, noise, model);
   }
 
   /**
@@ -66,6 +126,17 @@ public class Cluster<M extends Model> extends BaseCluster<Cluster<M>, M> {
    */
   public Cluster(String name, DatabaseObjectGroup group, M model) {
     super(name, group, model);
+  }
+
+  /**
+   * Constructor with name and group, no model.
+   * 
+   * @param name
+   * @param group
+   * @param noise
+   */
+  public Cluster(String name, DatabaseObjectGroup group, boolean noise) {
+    super(name, group, noise);
   }
 
   /**

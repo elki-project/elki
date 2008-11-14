@@ -18,10 +18,10 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.ParameterizationFunction;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
-import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.elki.data.model.LinearEquationModel;
-import de.lmu.ifi.dbs.elki.data.model.NoiseModel;
+import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ObjectAndAssociations;
@@ -427,7 +427,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
         if (!noiseIDs.isEmpty()) {
             if (dim == noiseDim) {
                 DatabaseObjectGroupCollection<Set<Integer>> group = new DatabaseObjectGroupCollection<Set<Integer>>(this.database, noiseIDs);
-                Cluster<Model> c = new Cluster<Model>(group, NoiseModel.NOISE);
+                Cluster<Model> c = new Cluster<Model>(group, true, ClusterModel.CLUSTER);
                 res.addCluster(c);
                 processedIDs.addAll(noiseIDs);
             }

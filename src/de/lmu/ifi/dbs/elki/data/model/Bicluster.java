@@ -147,11 +147,4 @@ public class Bicluster<V extends RealVector<V, Double>> extends AbstractLoggable
       }      
     }
 
-    /**
-     * Implementation of Model interface.
-     */
-    @Override
-    public String getSuggestedLabel() {
-      return "Bicluster";
-    }
 }
