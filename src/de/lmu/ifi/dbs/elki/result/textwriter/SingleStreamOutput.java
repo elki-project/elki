@@ -63,7 +63,9 @@ public class SingleStreamOutput implements StreamFactory {
   }
 
   /**
-   * Return the objects print stream.
+   * Return the objects shared print stream.
+   * 
+   * @param filename ignored filename for SingleStreamOutput, as the name suggests
    */
   @Override
   public PrintStream openStream(String filename) {

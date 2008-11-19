@@ -25,7 +25,7 @@ import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.combinators.AnnotationCombiner;
-import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterDatabaseObject;
+import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterDatabaseObjectInline;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterObjectComment;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterObjectInline;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterTextWriteable;
@@ -52,7 +52,7 @@ public class TextWriter<O extends DatabaseObject> {
   static {
     TextWriterObjectInline trivialwriter = new TextWriterObjectInline();
     writers.insertHandler(Object.class, new TextWriterObjectComment());
-    writers.insertHandler(DatabaseObject.class, new TextWriterDatabaseObject<DatabaseObject>());
+    writers.insertHandler(DatabaseObject.class, new TextWriterDatabaseObjectInline<DatabaseObject>());
     // these object can be serialized inline with toString()
     writers.insertHandler(String.class, trivialwriter);
     writers.insertHandler(Double.class, trivialwriter);

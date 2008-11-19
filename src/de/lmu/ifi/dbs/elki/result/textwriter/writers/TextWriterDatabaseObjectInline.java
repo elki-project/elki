@@ -13,7 +13,10 @@ import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
  *
  * @param <O>
  */
-public class TextWriterDatabaseObject<O extends DatabaseObject> extends TextWriterWriterInterface<O> {
+public class TextWriterDatabaseObjectInline<O extends DatabaseObject> extends TextWriterWriterInterface<O> {
+  /**
+   * @param label label parameter ignored for this writer. 
+   */
   @Override
   public void write(TextWriterStream out, String label, O object) throws UnableToComplyException {
     try {

@@ -104,7 +104,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
         if (isVerbose()) {
             verbose("\nStep 3: Build hierarchy...");
         }
-        buildHierarchy(dimensionality, clusterMap);
+        buildHierarchy(clusterMap);
         if (this.debug) {
             StringBuffer msg = new StringBuffer("\n\nStep 3: Build hierarchy");
             for (Integer corrDim : clusterMap.keySet()) {
@@ -305,8 +305,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
     }
 
     @SuppressWarnings("unchecked")
-    private void buildHierarchy(int dimensionality,
-                                SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap) {
+    private void buildHierarchy(SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap) {
 
         StringBuffer msg = new StringBuffer();
 

@@ -7,4 +7,5 @@ package de.lmu.ifi.dbs.elki.data.model;
  *
  */
 public interface Model {
+  // currently, there are no requirements on a model.
 }

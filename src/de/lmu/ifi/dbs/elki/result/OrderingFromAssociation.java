@@ -24,15 +24,15 @@ public class OrderingFromAssociation<T extends Comparable<T>,O extends DatabaseO
   /**
    * Database
    */
-  private Database<O> db;
+  protected Database<O> db;
   /**
    * AssocationID to use
    */
-  private AssociationID<T> association;
+  protected AssociationID<T> association;
   /**
    * Internal comparator to use for sorting.
    */
-  private Comparator<T> comparator;
+  protected Comparator<T> comparator;
   /**
    * Factor to signal ascending (+1) / descending (-1) order
    */
@@ -43,7 +43,7 @@ public class OrderingFromAssociation<T extends Comparable<T>,O extends DatabaseO
    * 
    * @author Erich Schubert
    */
-  private class ImpliedComparator implements Comparator<Integer> {
+  protected class ImpliedComparator implements Comparator<Integer> {
     @Override
     public int compare(Integer id1, Integer id2) {
       T k1 = db.getAssociation(association, id1);
@@ -58,7 +58,7 @@ public class OrderingFromAssociation<T extends Comparable<T>,O extends DatabaseO
    * @author Erich Schubert
    *
    */
-  private class DerivedComparator implements Comparator<Integer> {
+  protected class DerivedComparator implements Comparator<Integer> {
     @Override
     public int compare(Integer id1, Integer id2) {
       T k1 = db.getAssociation(association, id1);

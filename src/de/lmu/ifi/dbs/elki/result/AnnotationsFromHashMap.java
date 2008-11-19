@@ -23,6 +23,7 @@ public class AnnotationsFromHashMap<T> implements AnnotationResult<T> {
    * Constructor
    */
   public AnnotationsFromHashMap() {
+    super();
   }
 
   /**

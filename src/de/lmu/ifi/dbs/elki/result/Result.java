@@ -11,4 +11,5 @@ package de.lmu.ifi.dbs.elki.result;
  *
  */
 public interface Result {
+  // no requirements currently.
 }

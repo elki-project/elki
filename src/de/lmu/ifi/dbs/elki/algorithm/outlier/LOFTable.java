@@ -157,7 +157,7 @@ public class LOFTable extends AbstractLoggable {
         lof.resetPageAccess();
     }
 
-    private static class LOFEntryPrinter implements
+    protected static class LOFEntryPrinter implements
         ObjectPrinter<BTreeData<DefaultKey, LOFEntry>> {
         private Pattern split = Pattern.compile(" ");
 
@@ -165,7 +165,7 @@ public class LOFTable extends AbstractLoggable {
          * Get the object's print data.
          *
          * @param o the object to be printed
-         * @return result a string containing the ouput
+         * @return result a string containing the output
          */
         public String getPrintData(BTreeData<DefaultKey, LOFEntry> o) {
             // object-ID sum1 sum2_1 ... sum2_k

@@ -148,10 +148,10 @@ public class NNTable extends AbstractLoggable {
 
     /**
      * Inserts the specified new neighbor into the nnTable, old neighbors will
-     * be moved, the last (old) neigbor will be removed and returned. The
+     * be moved, the last (old) neighbor will be removed and returned. The
      * rnnTable will be updated accordingly.
      *
-     * @param newNeighbor the neigbohr object
+     * @param newNeighbor the neighbor object
      * @return the old neighbor of the specified object
      */
     public Neighbor insertAndMove(Neighbor newNeighbor) {
@@ -263,11 +263,11 @@ public class NNTable extends AbstractLoggable {
     }
 
     /**
-     * Sets the specified reachabilty distance of the given neighbor in the
+     * Sets the specified reachability distance of the given neighbor in the
      * nnTable and rnnTable.
      *
-     * @param neighbor             the neighbor of which the reachabilty distance is to be set
-     * @param reachabilityDistance the reachabilty distance to set
+     * @param neighbor             the neighbor of which the reachability distance is to be set
+     * @param reachabilityDistance the reachability distance to set
      */
     public void setReachabilityDistance(Neighbor neighbor,
                                         double reachabilityDistance) {
@@ -389,7 +389,7 @@ public class NNTable extends AbstractLoggable {
         rnn.resetPageAccess();
     }
 
-    private static class NeighborPrinter implements
+    protected static class NeighborPrinter implements
         ObjectPrinter<BTreeData<DefaultKey, NeighborList>> {
         private Pattern split_blank = Pattern.compile(" ");
 
@@ -399,7 +399,7 @@ public class NNTable extends AbstractLoggable {
          * Get the object's print data.
          *
          * @param o the object to be printed
-         * @return result a string containing the ouput
+         * @return result a string containing the output
          */
         public String getPrintData(BTreeData<DefaultKey, NeighborList> o) {
             // object-ID sum1 sum2_1 ... sum2_k

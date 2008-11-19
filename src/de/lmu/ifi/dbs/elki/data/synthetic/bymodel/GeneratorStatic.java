@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.data.synthetic.bymodel;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -37,9 +38,11 @@ public class GeneratorStatic implements GeneratorInterface {
 
   /**
    * "Generate" new cluster points.
+   * Static generators always return their predefined set of points.
+   * @param count parameter is ignored.
    */
-  public List<Vector> generate(int count) throws UnableToComplyException {
-    return points;
+  public List<Vector> generate(int count) {
+    return new ArrayList<Vector>(points);
   }
 
   /**
@@ -88,7 +91,9 @@ public class GeneratorStatic implements GeneratorInterface {
   }
 
   /**
-   * Notify cluster of discarded points
+   * Notify cluster of discarded points. Not supported for static generators.
+   * 
+   * @param discarded parameter not supported.
    */
   public void setDiscarded(int discarded) throws UnableToComplyException {
     throw new UnableToComplyException("Points in static clusters may never be discarded.");

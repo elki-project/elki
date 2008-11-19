@@ -198,7 +198,7 @@ public class Neighbor implements Externalizable, Comparable<Neighbor> {
      *
      * @param in the stream to read data from in order to restore the object
      */
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+    public void readExternal(ObjectInput in) throws IOException {
         objectID = in.readInt();
         neighborID = in.readInt();
         index = in.readInt();

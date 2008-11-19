@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
-import java.io.IOException;
-import java.io.PrintStream;
 import java.util.BitSet;
 import java.util.List;
 
@@ -9,11 +7,8 @@ import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionsSelectingEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
-import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
-import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 
 /**
  * todo arthur comment
@@ -79,24 +74,6 @@ public class SODModel<O extends RealVector<O, Double>> implements TextWriteable,
         double distance = DISTANCE_FUNCTION.distance(queryObject, center).getValue();
         distance /= weightVector.cardinality();
         return distance;
-    }
-
-    public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException, IOException {
-        outStream.println("### " + this.getClass().getSimpleName() + ":");
-        outStream.println("### relevant attributes (counting starts with 0): " + this.weightVector.toString());
-        try {
-          if (normalization != null) {
-            outStream.println("### center of neighborhood: " + normalization.restore(center).toString());
-          } else {
-            outStream.println("### center of neighborhood: " + center.toString());            
-          }
-        }
-        catch(NonNumericFeaturesException e) {
-          e.printStackTrace();
-        }
-        outStream.println("### subspace outlier degree: " + this.sod);
-        outStream.println("################################################################################");
-        //outStream.flush();
     }
 
     public double getSod() {

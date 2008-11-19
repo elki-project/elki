@@ -18,11 +18,11 @@ public class OrderingFromHashMap<T extends Comparable<T>> implements OrderingRes
   /**
    * HashMap with object values
    */
-  private HashMap<Integer,T> map;
+  protected HashMap<Integer,T> map;
   /**
    * Comparator to use when sorting
    */
-  private Comparator<T> comparator;
+  protected Comparator<T> comparator;
   /**
    * Factor for ascending (+1) and descending (-1) ordering.
    */
@@ -33,7 +33,7 @@ public class OrderingFromHashMap<T extends Comparable<T>> implements OrderingRes
    * 
    * @author Erich Schubert
    */
-  private final class ImpliedComparator implements Comparator<Integer> {
+  protected final class ImpliedComparator implements Comparator<Integer> {
     @Override
     public int compare(Integer id1, Integer id2) {
       T k1 = map.get(id1);
@@ -50,7 +50,7 @@ public class OrderingFromHashMap<T extends Comparable<T>> implements OrderingRes
    * @author Erich Schubert
    *
    */
-  private final class DerivedComparator implements Comparator<Integer> {
+  protected final class DerivedComparator implements Comparator<Integer> {
     @Override
     public int compare(Integer id1, Integer id2) {
       T k1 = map.get(id1);

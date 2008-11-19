@@ -84,7 +84,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
     /**
      * The number of nodes of the DeLiCluTree.
      */
-    private int numNodes;
+    protected int numNodes;
 
     /**
      * Provides the DeLiClu algorithm,

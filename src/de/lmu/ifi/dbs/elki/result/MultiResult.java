@@ -75,6 +75,7 @@ public class MultiResult implements Result {
       try {
         res.add((C) restrictionClass.cast(result));
       } catch (ClassCastException e) {
+        // skip non-matching items
       }
     return res;
   }
