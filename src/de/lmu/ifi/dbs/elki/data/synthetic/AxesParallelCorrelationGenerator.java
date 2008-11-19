@@ -113,7 +113,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
     /**
      * The parameter dim.
      */
-    protected final IntParameter CORRDIM_PARAM = new IntParameter(CORRDIM_ID, new GreaterConstraint(0));;
+    protected final IntParameter CORRDIM_PARAM = new IntParameter(CORRDIM_ID, new GreaterConstraint(0));
 
     /**
      * The dimensionality of the correlation to be generated.

@@ -88,5 +88,5 @@ public final class ErrorFunctions {
   public static final double erf(double x) {
     if (x >= 0) return 1 - erfc(x);
     else        return erfc(x) - 1;
-  };
+  }
 }

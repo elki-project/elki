@@ -79,7 +79,7 @@ public class StratifiedCrossValidation<O extends DatabaseObject, L extends Class
                 folds[i % nfold].add(bucket.get(i));
             }
         }
-        TrainingAndTestSet<O, L>[] partitions = TrainingAndTestSet.newArray(nfold);;
+        TrainingAndTestSet<O, L>[] partitions = TrainingAndTestSet.newArray(nfold);
         for (int i = 0; i < nfold; i++) {
             Map<Integer, List<Integer>> partition = new HashMap<Integer, List<Integer>>();
             List<Integer> training = new ArrayList<Integer>();
