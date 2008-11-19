@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 
 <project name="ELKI" default="preliminary" basedir=".">
-	<property name="RELEASE" value="0.1.1"/>
+	<property name="RELEASE" value="0.2"/>
 	
-	<property name="release.overview" value="release_0_1.html"/>
+	<property name="release.overview" value="release_0_2.html"/>
 	
 	<property name="basepackage" value="de/lmu/ifi/dbs/elki/"/>
 	
