@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Bicluster;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.pairs.ComparatorBySecond;
 import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
 
@@ -69,7 +70,7 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>> exte
     @Override
     protected final Clustering<Cluster<Bicluster<V>>> runInTime(Database<V> database) throws IllegalStateException {
         if (database.size() == 0) {
-            throw new IllegalArgumentException("database empty: must contain elements");
+            throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
         }
         this.database = database;
         this.result = new Clustering<Cluster<Bicluster<V>>>();
