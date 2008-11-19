@@ -39,12 +39,11 @@ public class LabelsFromClustering {
    * @return new database
    * @throws UnableToComplyException
    */
-  public <O extends DatabaseObject, R extends Clustering<C>, C extends BaseCluster<C, M>, M extends Model, L extends ClassLabel> Database<O> makeDatabaseFromClustering(R clustering, Class<L> classLabel) throws UnableToComplyException {
+  public <O extends DatabaseObject, R extends Clustering<C>, C extends BaseCluster<C, M>, M extends Model, L extends ClassLabel> Database<O> makeDatabaseFromClustering(Database<O> olddb, R clustering, Class<L> classLabel) throws UnableToComplyException {
     // we need at least one cluster
     if (clustering.getToplevelClusters().size() <= 0) {
       throw new UnableToComplyException("Clustering doesn't contain any cluster.");
     }
-    Database<O> olddb = clustering.getToplevelClusters().get(0).getDatabase();
     
     // we don't want to keep noise, and we need a cloned database anyway.
     // the easiest way to do this is using the partition() method.
@@ -59,9 +58,6 @@ public class LabelsFromClustering {
     // assign cluster labels
     int clusterID = 1;
     for(C c : clustering.getAllClusters()) {
-      if (c.getDatabase() != olddb) {
-        throw new UnableToComplyException("Clustering contains clusters with different Databases.");
-      }
       L label = Util.instantiate(classLabel, classLabel.getName());
       label.init(label_prefix + Integer.toString(clusterID));
       for(Integer id : c) {

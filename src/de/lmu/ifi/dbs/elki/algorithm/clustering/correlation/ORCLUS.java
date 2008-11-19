@@ -135,7 +135,7 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
       // get the result
       Clustering<Cluster<Model>> r = new Clustering<Cluster<Model>>();
       for(ORCLUSCluster c : clusters) {
-        DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(database, c.objectIDs);
+        DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(c.objectIDs);
         r.addCluster(new Cluster<Model>(group, ClusterModel.CLUSTER));
       }
       setResult(r);

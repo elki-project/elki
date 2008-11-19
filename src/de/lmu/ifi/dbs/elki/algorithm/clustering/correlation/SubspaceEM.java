@@ -273,7 +273,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V,
         result = new Clustering<Cluster<CorrelationAnalysisSolution<V>>>();
         // provide models within the result
         for (int i = 0; i < k; i++) {
-            DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(database, hardClusters.get(i));
+            DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(hardClusters.get(i));
             // TODO: re-add label support?
             //SimpleClassLabel label = new SimpleClassLabel();
             //label.init(result.canonicalClusterLabel(i));

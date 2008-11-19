@@ -91,7 +91,7 @@ public class ByLabelHierarchicalClustering<O extends DatabaseObject> extends Abs
     ArrayList<Cluster<Model>> clusters = new ArrayList<Cluster<Model>>(labelmap.size());
     int i = 0;
     for (Entry<String, Set<Integer>> entry : labelmap.entrySet()) {
-      DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(database, entry.getValue());
+      DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(entry.getValue());
       Cluster<Model> clus = new Cluster<Model>(entry.getKey(), group, ClusterModel.CLUSTER, new ArrayList<Cluster<Model>>(), new ArrayList<Cluster<Model>>());
       clusters.add(clus);
       i++;

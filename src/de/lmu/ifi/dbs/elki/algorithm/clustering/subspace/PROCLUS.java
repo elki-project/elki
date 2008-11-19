@@ -148,7 +148,7 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
             Clustering<Cluster<Model>> res = new Clustering<Cluster<Model>>();
             for (Integer m_i : clusters.keySet()) {
                 PROCLUSCluster c = clusters.get(m_i);
-                DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(database, c.objectIDs);
+                DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(c.objectIDs);
                 res.addCluster(new Cluster<Model>(group, ClusterModel.CLUSTER));
             }
             setResult(res);

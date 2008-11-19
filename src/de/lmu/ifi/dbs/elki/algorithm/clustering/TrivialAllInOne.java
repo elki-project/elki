@@ -52,7 +52,7 @@ public class TrivialAllInOne<O extends DatabaseObject> extends AbstractAlgorithm
   @Override
   protected Clustering<Cluster<Model>> runInTime(Database<O> database) throws IllegalStateException {
     result = new Clustering<Cluster<Model>>();
-    DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(database, database.getIDs());
+    DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(database.getIDs());
     Cluster<Model> c = new Cluster<Model>(group, ClusterModel.CLUSTER);
     result.addCluster(c);
     return result;

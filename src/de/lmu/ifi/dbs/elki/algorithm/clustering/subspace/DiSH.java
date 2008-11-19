@@ -351,7 +351,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
                 }
             }
             if (cluster == null) {
-                cluster = new SimplePair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>(preferenceVector, new DatabaseObjectGroupCollection<List<Integer>>(database, new ArrayList<Integer>()));
+                cluster = new SimplePair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>(preferenceVector, new DatabaseObjectGroupCollection<List<Integer>>(new ArrayList<Integer>()));
                 parallelClusters.add(cluster);
             }
             cluster.second.ids.add(entry.getID());
@@ -446,7 +446,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
         int minpts = distanceFunction.getPreprocessor().getMinpts();
         List<SimplePair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>> notAssigned = new ArrayList<SimplePair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>>();
         Map<BitSet, List<SimplePair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>>> newClustersMap = new HashMap<BitSet, List<SimplePair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>>>();
-        SimplePair<BitSet, DatabaseObjectGroupCollection<List<Integer>>> noise = new SimplePair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>(new BitSet(), new DatabaseObjectGroupCollection<List<Integer>>(database, new ArrayList<Integer>()));
+        SimplePair<BitSet, DatabaseObjectGroupCollection<List<Integer>>> noise = new SimplePair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>(new BitSet(), new DatabaseObjectGroupCollection<List<Integer>>(new ArrayList<Integer>()));
         for (BitSet pv : clustersMap.keySet()) {
             // noise
             if (pv.cardinality() == 0) {

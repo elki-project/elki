@@ -322,7 +322,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
                 // noise partition
                 if (partitionID == database.dimensionality()) {
                     Database<V> noiseDB = databasePartitions.get(partitionID);
-                    DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(database, noiseDB.getIDs());
+                    DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(noiseDB.getIDs());
                     // Make a Noise cluster
                     result.addCluster(new Cluster<Model>(group, true, ClusterModel.CLUSTER));
                 }
@@ -336,7 +336,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
                     Clustering<Cluster<Model>> p = partitionAlgorithm.run(databasePartitions.get(partitionID));
                     // Re-Wrap resulting Clusters as DimensionModel clusters.
                     for (Cluster<Model> clus : p.getAllClusters()) {
-                      DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Collection<Integer>>(database, clus.getIDs());
+                      DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Collection<Integer>>(clus.getIDs());
                       if (clus.isNoise()) {
                         result.addCluster(new Cluster<Model>(group, true, ClusterModel.CLUSTER));
                       } else {

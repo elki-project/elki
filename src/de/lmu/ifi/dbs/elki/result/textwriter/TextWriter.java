@@ -174,7 +174,7 @@ public class TextWriter<O extends DatabaseObject> {
     }
     else {
       groups = new ArrayList<DatabaseObjectGroup>();
-      groups.add(new DatabaseObjectGroupCollection<Collection<Integer>>(db, db.getIDs()));
+      groups.add(new DatabaseObjectGroupCollection<Collection<Integer>>(db.getIDs()));
     }
 
     for(DatabaseObjectGroup group : groups) {
@@ -190,8 +190,7 @@ public class TextWriter<O extends DatabaseObject> {
       PrintStream outStream = streamOpener.openStream(filename);
       TextWriterStream out = new TextWriterStreamNormalizing<O>(outStream, writers, getNormalization());
 
-      Database<O> groupdb = group.getDatabase();
-      printHeader(groupdb, out, settings);
+      printHeader(db, out, settings);
       // print group information...
       if (group instanceof TextWriteable) {
         TextWriterWriterInterface<?> writer = out.getWriterFor(group);
@@ -212,7 +211,7 @@ public class TextWriter<O extends DatabaseObject> {
 
       while (iter.hasNext()) {
         Integer objID = iter.next();
-        O obj = groupdb.get(objID.intValue());
+        O obj = db.get(objID.intValue());
         if(obj == null) {
           continue;
         }

@@ -223,7 +223,7 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clu
         result = new Clustering<Cluster<CLIQUESubspace<V>>>();
 
         for (Entry<CLIQUESubspace<V>, Set<Integer>> e : modelsAndClusters.entrySet()) {
-          DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(database, e.getValue());
+          DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(e.getValue());
           result.addCluster(new Cluster<CLIQUESubspace<V>>(group, e.getKey()));
         }
         

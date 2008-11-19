@@ -165,10 +165,10 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
 
         result = new Clustering<Cluster<Model>>();
         for (Iterator<List<Integer>> resultListIter = resultList.iterator(); resultListIter.hasNext();) {
-          DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(database, resultListIter.next());
+          DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(resultListIter.next());
           result.addCluster(new Cluster<Model>(group, ClusterModel.CLUSTER));
         }
-        DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(database, noise);
+        DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(noise);
         result.addCluster(new Cluster<Model>(group, true, ClusterModel.CLUSTER));
         
         if (isVerbose()) {

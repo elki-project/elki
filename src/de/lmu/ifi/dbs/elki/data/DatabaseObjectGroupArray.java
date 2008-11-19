@@ -4,8 +4,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 
-import de.lmu.ifi.dbs.elki.database.Database;
-
 /**
  * Array backed DatabaseObjectGroup.
  * Stores a list of DatabaseObjectIDs using an array of Integer[].
@@ -13,12 +11,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
  * @author Erich Schubert
  *
  */
-public final class DatabaseObjectGroupArray implements DatabaseObjectGroup {
-  /**
-   * The database referenced.
-   */
-  public Database<?> database;
-  
+public final class DatabaseObjectGroupArray  implements DatabaseObjectGroup {
   /**
    * ID storage.
    */
@@ -30,9 +23,8 @@ public final class DatabaseObjectGroupArray implements DatabaseObjectGroup {
    * @param database
    * @param ids
    */  
-  public DatabaseObjectGroupArray(Database<?> database, Integer[] ids) {
+  public DatabaseObjectGroupArray(Integer[] ids) {
     super();
-    this.database = database;
     this.ids = ids;
   }
 
@@ -59,14 +51,5 @@ public final class DatabaseObjectGroupArray implements DatabaseObjectGroup {
   @Override
   public int size() {
     return ids.length;
-  }
-
-  /**
-   * Retrieve the database used.
-   */
-  // TODO: a bit hackish to not keep the databaseobject type as a generics of the object
-  @SuppressWarnings("unchecked")
-  public <O extends DatabaseObject> Database<O> getDatabase() {
-    return (Database<O>) database;
   }
 }

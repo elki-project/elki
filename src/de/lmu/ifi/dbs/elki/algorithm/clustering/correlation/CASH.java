@@ -397,7 +397,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
             }
             // dim == minDim
             else {
-                DatabaseObjectGroupCollection<Set<Integer>> group = new DatabaseObjectGroupCollection<Set<Integer>>(this.database, interval.getIDs());
+                DatabaseObjectGroupCollection<Set<Integer>> group = new DatabaseObjectGroupCollection<Set<Integer>>(interval.getIDs());
                 LinearEquationSystem les = runDerivator(this.database, dim - 1, interval.getIDs());
                 Cluster<Model> c = new Cluster<Model>(group, new LinearEquationModel(les));
                 res.addCluster(c);
@@ -426,14 +426,14 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
         // put noise to clusters
         if (!noiseIDs.isEmpty()) {
             if (dim == noiseDim) {
-                DatabaseObjectGroupCollection<Set<Integer>> group = new DatabaseObjectGroupCollection<Set<Integer>>(this.database, noiseIDs);
+                DatabaseObjectGroupCollection<Set<Integer>> group = new DatabaseObjectGroupCollection<Set<Integer>>(noiseIDs);
                 Cluster<Model> c = new Cluster<Model>(group, true, ClusterModel.CLUSTER);
                 res.addCluster(c);
                 processedIDs.addAll(noiseIDs);
             }
             else if (noiseIDs.size() >= minPts) {
                 // TODO: use different class/model for noise, even when LES was computed?
-                DatabaseObjectGroupCollection<Set<Integer>> group = new DatabaseObjectGroupCollection<Set<Integer>>(this.database, noiseIDs);
+                DatabaseObjectGroupCollection<Set<Integer>> group = new DatabaseObjectGroupCollection<Set<Integer>>(noiseIDs);
                 LinearEquationSystem les = runDerivator(this.database, dim - 1, noiseIDs);
                 Cluster<Model> c = new Cluster<Model>(group, new LinearEquationModel(les));
                 res.addCluster(c);

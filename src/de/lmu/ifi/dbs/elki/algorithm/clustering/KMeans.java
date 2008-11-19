@@ -141,7 +141,7 @@ public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends D
             }
             result = new Clustering<Cluster<Model>>();
             for (int i = 0; i < clusters.size(); i++) {
-              DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(database, clusters.get(i));
+              DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(clusters.get(i));
               result.addCluster(new Cluster<Model>(group, ClusterModel.CLUSTER));
             }
         }

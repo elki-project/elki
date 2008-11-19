@@ -87,7 +87,7 @@ public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorit
 
     result = new Clustering<Cluster<Model>>();
     for (Collection<Integer> ids : labelmap.values()) {
-      DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Collection<Integer>>(database, ids);
+      DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Collection<Integer>>(ids);
       Cluster<Model> c = new Cluster<Model>(group, ClusterModel.CLUSTER);
       result.addCluster(c);
     }

@@ -37,20 +37,16 @@ public class PartitionsFromClustering {
    * @return map from classlabels to database partitions.
    * @throws UnableToComplyException
    */
-  public <O extends DatabaseObject, R extends Clustering<C>, C extends BaseCluster<C, M>, M extends Model, L extends ClassLabel> Map<L,Database<O>> makeDatabasesFromClustering(R clustering, Class<L> classLabel) throws UnableToComplyException {
+  public <O extends DatabaseObject, R extends Clustering<C>, C extends BaseCluster<C, M>, M extends Model, L extends ClassLabel> Map<L,Database<O>> makeDatabasesFromClustering(Database<O> olddb, R clustering, Class<L> classLabel) throws UnableToComplyException {
     // we need at least one cluster
     if (clustering.getToplevelClusters().size() <= 0) {
       throw new UnableToComplyException("Clustering doesn't contain any cluster.");
     }
-    Database<O> olddb = clustering.getToplevelClusters().get(0).getDatabase();
 
     // prepare a map for the partitioning call.
     Map<Integer, List<Integer>> partitions = new HashMap<Integer, List<Integer>>();
     int clusterID = 1;
     for(C c : clustering.getAllClusters()) {
-      if (c.getDatabase() != olddb) {
-        throw new UnableToComplyException("Clustering contains clusters with different Databases.");
-      }
       Collection<Integer> col = c.getIDs();
       if (col instanceof List) {
         partitions.put(clusterID, (List<Integer>) col);
@@ -84,21 +80,17 @@ public class PartitionsFromClustering {
    * @return map from clusters to database partitions.
    * @throws UnableToComplyException
    */
-  public <O extends DatabaseObject, R extends Clustering<C>, C extends BaseCluster<C, M>, M extends Model> Map<C,Database<O>> makeDatabasesFromClustering(R clustering) throws UnableToComplyException {
+  public <O extends DatabaseObject, R extends Clustering<C>, C extends BaseCluster<C, M>, M extends Model> Map<C,Database<O>> makeDatabasesFromClustering(Database<O> olddb, R clustering) throws UnableToComplyException {
     // we need at least one cluster
     if (clustering.getToplevelClusters().size() <= 0) {
       throw new UnableToComplyException("Clustering doesn't contain any cluster.");
     }
-    Database<O> olddb = clustering.getToplevelClusters().get(0).getDatabase();
 
     // prepare a map for the partitioning call.
     Map<Integer, List<Integer>> partitions = new HashMap<Integer, List<Integer>>();
     Map<Integer, C> clusters = new HashMap<Integer, C>();
     int clusterID = 1;
     for(C c : clustering.getAllClusters()) {
-      if (c.getDatabase() != olddb) {
-        throw new UnableToComplyException("Clustering contains clusters with different Databases.");
-      }
       Collection<Integer> col = c.getIDs();
       if (col instanceof List) {
         partitions.put(clusterID, (List<Integer>) col);

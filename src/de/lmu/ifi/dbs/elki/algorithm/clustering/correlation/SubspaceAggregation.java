@@ -168,7 +168,7 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
         
         result = new Clustering<Cluster<Model>>();
         for (int i = 0; i < clusters.size(); i++) {
-          DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(database, clusters.get(i));
+          DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(clusters.get(i));
           result.addCluster(new Cluster<Model>(group, ClusterModel.CLUSTER));
         }
         

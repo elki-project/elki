@@ -259,7 +259,7 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Cluster
           // TODO: re-do labeling.
           //SimpleClassLabel label = new SimpleClassLabel();
           //label.init(result.canonicalClusterLabel(i));
-          DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(database, hardClusters.get(i));
+          DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(hardClusters.get(i));
           Cluster<EMModel<V>> model = new Cluster<EMModel<V>>(group, new EMModel<V>(means.get(i), covarianceMatrices.get(i)));
           result.addCluster(model);
         }

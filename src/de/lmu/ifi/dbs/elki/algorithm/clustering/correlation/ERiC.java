@@ -253,7 +253,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
                 else {
                   HashSet<Integer> merged = new HashSet<Integer>(noise.getIDs());
                   merged.addAll(clus.getIDs());
-                  noise.setGroup(new DatabaseObjectGroupCollection<HashSet<Integer>>(noise.getDatabase(),merged));
+                  noise.setGroup(new DatabaseObjectGroupCollection<HashSet<Integer>>(merged));
                 }
               } else {
                 throw new IllegalStateException("Unexpected group returned: "+clus.getClass().getName());

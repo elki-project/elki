@@ -3,8 +3,6 @@ package de.lmu.ifi.dbs.elki.data;
 import java.util.Collection;
 import java.util.Iterator;
 
-import de.lmu.ifi.dbs.elki.database.Database;
-
 /**
  * Collection-backed group of database object (references) 
  * 
@@ -14,11 +12,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
  * @param <O> DatabaseObject type used.
  */
 public final class DatabaseObjectGroupCollection<C extends Collection<Integer>> implements DatabaseObjectGroup {
-  /**
-   * The database referenced.
-   */
-  public Database<?> database;
-  
   /**
    * Storage for ids.
    */
@@ -30,9 +23,8 @@ public final class DatabaseObjectGroupCollection<C extends Collection<Integer>> 
    * 
    * @param ids collection to use.
    */
-  public DatabaseObjectGroupCollection(Database<?> db, C ids) {
+  public DatabaseObjectGroupCollection(C ids) {
     super();
-    this.database = db;
     this.ids = ids;
   }
 
@@ -58,14 +50,5 @@ public final class DatabaseObjectGroupCollection<C extends Collection<Integer>> 
   @Override
   public int size() {
     return ids.size();
-  }
-  
-  /**
-   * Retrieve the database used.
-   */
-  // TODO: a bit hackish to not keep the databaseobject type as a generics of the object
-  @SuppressWarnings("unchecked")
-  public <O extends DatabaseObject> Database<O> getDatabase() {
-    return (Database<O>) database;
   }
 }

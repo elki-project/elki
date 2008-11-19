@@ -9,7 +9,6 @@ import java.util.Set;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
@@ -277,14 +276,6 @@ public abstract class BaseCluster<C extends BaseCluster<C,M>, M extends Model> i
    */
   public int size() {
     return group.size();
-  }
-
-  /**
-   * Delegate to group.
-   */
-  @Override
-  public <O extends DatabaseObject> Database<O> getDatabase() {
-    return group.getDatabase();
   }
 
   /**

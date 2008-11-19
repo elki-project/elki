@@ -3,8 +3,6 @@ package de.lmu.ifi.dbs.elki.data;
 import java.util.Collection;
 import java.util.Iterator;
 
-import de.lmu.ifi.dbs.elki.database.Database;
-
 /**
  * Interface for a collection of database references (IDs).
  * The two main implementations are {@link DatabaseObjectGroupCollection}
@@ -16,14 +14,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
  * @param <O>
  */
 public interface DatabaseObjectGroup extends Iterable<Integer> {
-  /**
-   * Get the database the objects live in.
-   * 
-   * @return Database
-   */
-  //TODO: O should be made a generic of the class itself!
-  public <O extends DatabaseObject> Database<O> getDatabase();
-  
   /**
    * Retrieve collection access to the IDs
    * 

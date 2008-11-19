@@ -229,12 +229,12 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
 
             result = new Clustering<Cluster<Model>>();
             for (Iterator<List<Integer>> resultListIter = resultList.iterator(); resultListIter.hasNext(); ) {
-              DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(database, resultListIter.next());
+              DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(resultListIter.next());
               Cluster<Model> c = new Cluster<Model>(group, ClusterModel.CLUSTER);
               result.addCluster(c);
             }
 
-            DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(database, noise);
+            DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(noise);
             Cluster<Model> n = new Cluster<Model>(group, true, ClusterModel.CLUSTER);        
             result.addCluster(n);
 
