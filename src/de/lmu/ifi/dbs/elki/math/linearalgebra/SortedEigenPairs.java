@@ -21,7 +21,8 @@ public class SortedEigenPairs {
    * Creates a new empty SortedEigenPairs object.
    * Can only be called from the copy() method.
    */
-  private SortedEigenPairs() {    
+  private SortedEigenPairs() {
+    // nothing to do here.
   }
 
   /**

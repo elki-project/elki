@@ -130,6 +130,7 @@ public abstract class KDDTaskWrapper<O extends DatabaseObject> extends AbstractW
      *
      * @return the array containing the parameter setting that is necessary to
      *         run the kdd task correctly
+     * @throws UnusedParameterException 
      */
     public List<String> getKDDTaskParameters() throws UnusedParameterException {
         List<String> parameters = getRemainingParameters();

@@ -13,14 +13,25 @@ package de.lmu.ifi.dbs.elki.math;
  *
  */
 public final class MeanVariance {
+  /**
+   * Sum of values
+   */
   public double sum = 0.0;
+  /**
+   * Sum of Squares
+   */
   public double sqrSum = 0.0;
+  /**
+   * Number of Samples.
+   */
   public double count = 0.0;
   
   /**
    * Empty constructor
    */
-  public MeanVariance() { }
+  public MeanVariance() {
+    // nothing to do here, initialization done above.
+  }
 
   /**
    * Constructor from full internal data.
