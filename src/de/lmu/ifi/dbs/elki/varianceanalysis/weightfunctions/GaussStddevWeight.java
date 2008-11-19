@@ -21,7 +21,7 @@ public final class GaussStddevWeight implements WeightFunction {
    * Get Gaussian Weight using standard deviation for scaling.
    * max is ignored. 
    */
-  public double getWeight(double distance, double max, double stddev) {
+  public double getWeight(double distance, @SuppressWarnings("unused") double max, double stddev) {
     if (stddev <= 0) return 1;
     double normdistance = distance / stddev;
     return scaling * java.lang.Math.exp(-.5 * normdistance * normdistance) / stddev;

@@ -88,7 +88,7 @@ public class FileListEditor extends TextFieldParameterEditor {
 
 		label.addActionListener(new ActionListener() {
 
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
 				JFileChooser chooser = new JFileChooser();
 				int returnValue = chooser.showOpenDialog(inputField);
 
@@ -111,10 +111,5 @@ public class FileListEditor extends TextFieldParameterEditor {
 		Dimension dim = inputField.getPreferredSize();
 		dim.height = 50;
 		inputField.setPreferredSize(dim);
-	}
-
-	@Override
-	protected int getColumnNumber() {
-		return StringEditor.COLUMN_NUMBER;
 	}
 }

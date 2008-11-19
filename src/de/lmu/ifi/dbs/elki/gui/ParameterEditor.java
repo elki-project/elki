@@ -11,7 +11,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.StringParameter;
 
 import java.awt.Image;
 import java.awt.Window;
@@ -109,7 +108,7 @@ public abstract class ParameterEditor {
 		helpLabel.setContentAreaFilled(false);
 		helpLabel.setRolloverEnabled(true);
 		helpLabel.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
 				KDDDialog.showMessage(ParameterEditor.this.owner, ParameterEditor.this.option.getName() + ":\n" + ParameterEditor.this.option.getDescription());
 			}
 		});
@@ -181,9 +180,6 @@ public abstract class ParameterEditor {
 			return new IntegerEditor((IntParameter) p, owner, l);
 		}
 
-		if (p instanceof StringParameter) {
-			return new StringEditor((StringParameter) p, owner, l);
-		}
 		// TODO Fehlermeldung
 		return null;
 	}

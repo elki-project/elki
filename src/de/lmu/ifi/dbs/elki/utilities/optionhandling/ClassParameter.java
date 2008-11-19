@@ -59,38 +59,6 @@ public class ClassParameter<C> extends Parameter<String, String> {
         setDefaultValue(defaultValue);
     }
 
-    /**
-     * Constructs a class parameter with the given name, description, and
-     * restriction class.
-     *
-     * @param name             the parameter name
-     * @param description      the parameter description
-     * @param restrictionClass the restriction class of this class parameter
-     * @deprecated
-     */
-    @SuppressWarnings("unchecked")
-    @Deprecated
-    public ClassParameter(String name, String description, Class<?> restrictionClass) {
-        super(name, description);
-        this.restrictionClass = (Class<C>) restrictionClass;
-    }
-
-    /**
-     * Constructs a class parameter with the given name, description,
-     * restriction class, and default value.
-     *
-     * @param name             the parameter name
-     * @param description      the parameter description
-     * @param restrictionClass the restriction class of this class parameter
-     * @param defaultValue     the default value of this class parameter
-     * @deprecated
-     */
-    @Deprecated
-    public ClassParameter(String name, String description, Class<?> restrictionClass, String defaultValue) {
-        this(name, description, restrictionClass);
-        setDefaultValue(defaultValue);
-    }
-
     @Override
     public void setValue(String value) throws ParameterException {
         if (isValid(value)) {

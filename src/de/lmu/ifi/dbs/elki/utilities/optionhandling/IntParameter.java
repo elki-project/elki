@@ -2,8 +2,6 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 
-import java.util.List;
-
 /**
  * Parameter class for a parameter specifying an integer value.
  */
@@ -55,81 +53,6 @@ public class IntParameter extends NumberParameter<Integer> {
 
     // FIXME: IntParameter and DoubleParameter have different APIs.
     // DoubleParameter takes (optionID, default), IntParameter takes (optionID, null, default)
-    
-    /**
-     * Constructs an integer parameter with the given name and description.
-     *
-     * @param name        the parameter name
-     * @param description the parameter description
-     * @deprecated
-     */
-    @Deprecated
-    public IntParameter(String name, String description) {
-        super(name, description);
-    }
-
-    /**
-     * Constructs an integer parameter with the given name, description, and parameter constraint.
-     *
-     * @param name        the parameter name
-     * @param description the parameter description
-     * @param constraint  the constraint for this integer parameter
-     * @deprecated
-     */
-    @Deprecated
-    public IntParameter(String name, String description, ParameterConstraint<Number> constraint) {
-        this(name, description);
-        addConstraint(constraint);
-    }
-
-    /**
-     * Constructs an integer parameter with the given name, description, parameter constraint,
-     * and defualt value.
-     *
-     * @param name         the parameter name
-     * @param description  the parameter description
-     * @param constraint   the constraint for this integer parameter
-     * @param defaultValue the default value
-     * @deprecated
-     */
-    @Deprecated
-    public IntParameter(String name, String description,
-                        ParameterConstraint<Number> constraint, Integer defaultValue) {
-        this(name, description, constraint);
-        setDefaultValue(defaultValue);
-    }
-
-    /**
-     * Constructs an integer parameter with the given name, description, parameter constraint,
-     * and defualt value.
-     *
-     * @param name         the parameter name
-     * @param description  the parameter description
-     * @param constraint   the constraint for this integer parameter
-     * @param defaultValue the default value
-     * @param optional     specifies if this parameter is an optional parameter
-     * @deprecated
-     */
-    @Deprecated
-    public IntParameter(String name, String description,
-                        ParameterConstraint<Number> constraint, Integer defaultValue, boolean optional) {
-        this(name, description, constraint, defaultValue);
-        setOptional(optional);
-    }
-
-    /**
-     * Constructs an integer parameter with the given name, description, and list of parameter constraints.
-     *
-     * @param name        the parameter name
-     * @param description the parameter description
-     * @param constraints a list of parameter constraints for this integer parameter
-     * @deprecated
-     */
-    @Deprecated
-    public IntParameter(String name, String description, List<ParameterConstraint<Number>> constraints) {
-        this(name, description);
-        addConstraintList(constraints);
-    }
 
     @Override
     public void setValue(String value) throws ParameterException {

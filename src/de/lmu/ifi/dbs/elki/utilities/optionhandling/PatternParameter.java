@@ -44,33 +44,6 @@ public class PatternParameter extends Parameter<String, String> {
         addConstraint(constraint);
     }
 
-    /**
-     * Constructs a pattern parameter with the given name and description.
-     *
-     * @param name        the parameter name
-     * @param description the parameter description
-     * @deprecated
-     */
-    @Deprecated
-    public PatternParameter(String name, String description) {
-        super(name, description);
-    }
-
-    /**
-     * Constructs a pattern parameter with the given name, description, and
-     * parameter constraint.
-     *
-     * @param name        the name of this parameter
-     * @param description the description of this parameter
-     * @param con         a parameter constraint for this parameter
-     * @deprecated
-     */
-    @Deprecated
-    public PatternParameter(String name, String description, ParameterConstraint<String> con) {
-        this(name, description);
-        addConstraint(con);
-    }
-
     @Override
     public void setValue(String value) throws ParameterException {
         if (isValid(value)) {

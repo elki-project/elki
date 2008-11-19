@@ -13,7 +13,7 @@ public final class ExponentialStddevWeight implements WeightFunction {
   /**
    * Get exponential weight, max is ignored.
    */
-  public double getWeight(double distance, double max, double stddev) {
+  public double getWeight(double distance, @SuppressWarnings("unused") double max, double stddev) {
     if (stddev <= 0) return 1;
     double scaleddistance = distance / stddev;
     return stddev * java.lang.Math.exp(-.5 * scaleddistance);

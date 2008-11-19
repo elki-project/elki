@@ -21,7 +21,7 @@ public final class ErfcStddevWeight implements WeightFunction {
   /**
    * Return Erfc weight, scaled by standard deviation. max is ignored.
    */
-  public double getWeight(double distance, double max, double stddev) {
+  public double getWeight(double distance, @SuppressWarnings("unused") double max, double stddev) {
     if (stddev <= 0) return 1;
     return ErrorFunctions.erfc(onebysqrt2 * distance / stddev);
   }

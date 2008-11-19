@@ -46,9 +46,4 @@ public class DoubleListEditor extends TextFieldParameterEditor {
 		inputField.add(textField);
 		inputField.add(helpLabel);
 	}
-
-	@Override
-	protected int getColumnNumber() {
-		return StringEditor.COLUMN_NUMBER;
-	}
 }

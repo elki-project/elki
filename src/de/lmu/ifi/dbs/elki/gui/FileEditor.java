@@ -38,7 +38,7 @@ public class FileEditor extends TextFieldParameterEditor {
 		label.setActionCommand("fileLabel");
 		label.addActionListener(new ActionListener() {
 
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
 				JFileChooser chooser = new JFileChooser();
 				int returnValue = chooser.showOpenDialog(inputField);
 
@@ -55,10 +55,5 @@ public class FileEditor extends TextFieldParameterEditor {
 
 		inputField.add(textField);
 		inputField.add(helpLabel);
-	}
-
-	@Override
-	protected int getColumnNumber() {
-		return StringEditor.COLUMN_NUMBER;
 	}
 }

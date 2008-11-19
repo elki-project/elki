@@ -110,7 +110,7 @@ public abstract class TextFieldParameterEditor extends ParameterEditor {
 		inputField.add(helpLabel);
 	}
 
-	protected abstract int getColumnNumber();
+	protected int getColumnNumber() { return 30; }
 
 	public String[] parameterToValue() {
 

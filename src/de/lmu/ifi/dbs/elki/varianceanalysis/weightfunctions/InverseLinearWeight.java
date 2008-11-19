@@ -16,7 +16,7 @@ public final class InverseLinearWeight implements WeightFunction {
    * 
    * NOTE: increasing weights are non-standard, and mostly for testing
    */
-  public double getWeight(double distance, double max, double stddev) {
+  public double getWeight(double distance, double max, @SuppressWarnings("unused") double stddev) {
     if (max <= 0) return 0.1;
     double relativedistance = distance / max;
     return .1 + relativedistance * .9;

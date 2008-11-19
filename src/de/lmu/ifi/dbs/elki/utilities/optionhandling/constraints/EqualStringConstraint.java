@@ -9,7 +9,7 @@ import java.util.Arrays;
 
 /**
  * Represents a parameter constraint for testing if the string value of
- * the string parameter ({@link de.lmu.ifi.dbs.elki.utilities.optionhandling.StringParameter}) to be tested is
+ * the string parameter ({@link de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter}) to be tested is
  * equal to the specified constraint-strings.
  *
  * @author Steffi Wanka

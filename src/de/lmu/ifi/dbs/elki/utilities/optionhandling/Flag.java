@@ -32,20 +32,6 @@ public class Flag extends Option<Boolean> {
     }
 
     /**
-     * Constructs a flag object with the given name and description. <p/> If
-     * flag is not set its value is &quot;false&quot;.
-     *
-     * @param name        the name of the flag.
-     * @param description the description of the flag.
-     * @deprecated
-     */
-    @Deprecated
-    public Flag(String name, String description) {
-        super(name, description);
-        this.value = false;
-    }
-
-    /**
      * Returns the short description of this flag.
      *
      * @return the short description of this flag

@@ -130,7 +130,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
         return result;
     }
 
-    public <T extends Distance<T>> List<List<QueryResult<T>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, T> distanceFunction) {
+    public <T extends Distance<T>> List<List<QueryResult<T>>> bulkKNNQueryForID(@SuppressWarnings("unused") List<Integer> ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") DistanceFunction<O, T> distanceFunction) {
         throw new UnsupportedOperationException("Not yet supported!");
     }
 

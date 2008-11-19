@@ -111,18 +111,6 @@ public abstract class Parameter<T, C> extends Option<T> {
     }
 
     /**
-     * Constructs a parameter with the given name and description.
-     *
-     * @param name        the parameter name
-     * @param description the parameter description
-     * @deprecated
-     */
-    @Deprecated
-    public Parameter(String name, String description) {
-        super(name, description);
-    }
-
-    /**
      * Adds a parameter constraint to the list of parameter constraints.
      *
      * @param constraint the parameter constraint to be added

@@ -54,18 +54,6 @@ public abstract class NumberParameter<T extends Number> extends Parameter<T, Num
     }
 
     /**
-     * Constructs a number parameter with the given name and description.
-     *
-     * @param name        the parameter name
-     * @param description the parameter description
-     * @deprecated
-     */
-    @Deprecated
-    public NumberParameter(String name, String description) {
-        super(name, description);
-    }
-
-    /**
      * Returns the number value of the parameter.
      *
      * @return number value of the parameter.

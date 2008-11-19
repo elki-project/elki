@@ -47,20 +47,6 @@ public class FileParameter extends Parameter<File, Object> {
         setOptional(optional);
     }
 
-    /**
-     * Constructs a file parameter with the given name, description, and file type.
-     *
-     * @param name        the parameter name
-     * @param description the parameter description
-     * @param fileType    the file type of this file parameter
-     * @deprecated
-     */
-    @Deprecated
-    public FileParameter(String name, String description, FileType fileType) {
-        super(name, description);
-        this.fileType = fileType;
-    }
-
     @Override
     public void setValue(String value) throws ParameterException {
         if (isValid(value)) {

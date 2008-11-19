@@ -104,9 +104,4 @@ public class ClassListEditor extends TextFieldParameterEditor {
 		inputField.setPreferredSize(dim);
 	}
 
-	@Override
-	protected int getColumnNumber() {
-		return StringEditor.COLUMN_NUMBER;
-	}
-
 }
