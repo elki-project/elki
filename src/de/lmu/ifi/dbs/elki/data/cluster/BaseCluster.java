@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 // TODO: disallow clusters without a DatabaseObjectGroup?
 // TODO: remove the DatabaseObjectGroup interface to avoid confusion?
 // TODO: add Model interface and delegations consequently since we have the group delegators?
-// TODO: split TextWriteable interface into data writing and metadata writing? 
 public abstract class BaseCluster<C extends BaseCluster<C,M>, M extends Model> implements HierarchyInterface<C>, DatabaseObject, DatabaseObjectGroup, TextWriteable {
   /**
    * To allow storage in a database, we need to keep an ID.

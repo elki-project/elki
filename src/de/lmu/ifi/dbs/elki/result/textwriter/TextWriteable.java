@@ -6,6 +6,7 @@ package de.lmu.ifi.dbs.elki.result.textwriter;
  * 
  * @author Erich Schubert
  */
+//TODO: split TextWriteable interface into data writing and metadata writing?
 public interface TextWriteable {
   /**
    * Write self to the given {@link TextWriterStream}

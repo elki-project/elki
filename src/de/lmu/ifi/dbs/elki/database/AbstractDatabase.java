@@ -188,7 +188,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
      * Provides a new id for the specified database object suitable as key for a
      * new insertion and sets this id in the specified database object.
      *
-     * @param object the object for which a new id should be provieded
+     * @param object the object for which a new id should be provided
      * @return a new id suitable as key for a new insertion
      * @throws UnableToComplyException if the database has reached the limit and, therefore, new
      *                                 insertions are not possible

@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
  * @author Elke Achtert
  * @param <O> the type of FeatureVector as element of the database
  */
-public class ObjectAndAssociations<O extends DatabaseObject> {
+public final class ObjectAndAssociations<O extends DatabaseObject> {
   /**
    * The database object.
    */

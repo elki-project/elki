@@ -68,7 +68,7 @@ public class DefaultKey implements Comparable<DefaultKey>, Externalizable {
    *
    * @param in the stream to read data from in order to restore the object
    */
-  public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+  public void readExternal(ObjectInput in) throws IOException {
     key = in.readInt();
   }
 
