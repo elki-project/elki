@@ -78,7 +78,7 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
     /**
      * Reads the float value of this FloatDistance from the specified stream.
      */
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+    public void readExternal(ObjectInput in) throws IOException {
         setValue(in.readFloat());
     }
 

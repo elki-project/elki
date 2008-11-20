@@ -90,7 +90,7 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
         return distance.equals(new IntegerDistance(0));
     }
 
-    public boolean isUndefinedDistance(IntegerDistance distance) {
+    public boolean isUndefinedDistance(@SuppressWarnings("unused") IntegerDistance distance) {
         throw new UnsupportedOperationException("Undefinded distance not supported!");
     }
 

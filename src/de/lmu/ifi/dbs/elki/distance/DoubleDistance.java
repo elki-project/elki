@@ -79,7 +79,7 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
     /**
      * Reads the double value of this DoubleDistance from the specified stream.
      */
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+    public void readExternal(ObjectInput in) throws IOException {
         setValue(in.readDouble());
     }
 

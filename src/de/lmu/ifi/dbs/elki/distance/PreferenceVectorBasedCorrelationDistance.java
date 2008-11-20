@@ -182,7 +182,7 @@ public class PreferenceVectorBasedCorrelationDistance
      * from the specified stream..
      */
     @Override
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+    public void readExternal(ObjectInput in) throws IOException {
         super.readExternal(in);
         dimensionality = in.readInt();
         commonPreferenceVector = new BitSet();
@@ -192,7 +192,7 @@ public class PreferenceVectorBasedCorrelationDistance
     }
 
     /**
-     * Retuns the number of Bytes this distance uses if it is written to an
+     * Returns the number of Bytes this distance uses if it is written to an
      * external file.
      *
      * @return 16 + 4 * dimensionality (8 Byte for two integer, 8 Byte for a double value,

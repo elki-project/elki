@@ -137,7 +137,7 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
      * Reads the correlation value and the euclidean value
      * of this CorrelationDistance from the specified stream.
      */
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+    public void readExternal(ObjectInput in) throws IOException {
         correlationValue = in.readInt();
         euclideanValue = in.readDouble();
     }

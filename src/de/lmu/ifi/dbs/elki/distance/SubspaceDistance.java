@@ -142,7 +142,7 @@ public class SubspaceDistance extends AbstractDistance<SubspaceDistance> {
      * Reads the subspace distance value and the affine distance value
      * of this SubspaceDistance from the specified stream.
      */
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+    public void readExternal(ObjectInput in) throws IOException {
         subspaceDistance = in.readDouble();
         affineDistance = in.readDouble();
     }
