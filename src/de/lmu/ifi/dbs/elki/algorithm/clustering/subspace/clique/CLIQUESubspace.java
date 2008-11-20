@@ -251,7 +251,10 @@ public class CLIQUESubspace<V extends RealVector<V, ?>> extends Subspace<V> impl
   	 * Serialize using above toString method
      */
     @Override
-    public void writeToText(TextWriterStream out) {
+    public void writeToText(TextWriterStream out, String label) {
+      if (label != null) {
+        out.commentPrintLn(label);
+      }
       out.commentPrintLn(this.toString());
     }
 }
