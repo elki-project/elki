@@ -18,35 +18,35 @@ public class DummyNormalization<O extends DatabaseObject> extends AbstractParame
     /**
      * @return the specified objectAndAssociationsList
      */
-    public List<ObjectAndAssociations<O>> normalizeObjects(List<ObjectAndAssociations<O>> objectAndAssociationsList) throws NonNumericFeaturesException {
+    public List<ObjectAndAssociations<O>> normalizeObjects(List<ObjectAndAssociations<O>> objectAndAssociationsList) {
         return objectAndAssociationsList;
     }
 
     /**
      * @return the specified featureVectors
      */
-    public List<O> normalize(List<O> featureVectors) throws NonNumericFeaturesException {
+    public List<O> normalize(List<O> featureVectors) {
         return featureVectors;
     }
 
     /**
      * @return the specified featureVectors
      */
-    public List<O> restore(List<O> featureVectors) throws NonNumericFeaturesException {
+    public List<O> restore(List<O> featureVectors) {
         return featureVectors;
     }
 
     /**
      * @return the specified featureVector
      */
-    public O restore(O featureVector) throws NonNumericFeaturesException {
+    public O restore(O featureVector) {
         return featureVector;
     }
 
     /**
      * @return the specified linear equation system
      */
-    public LinearEquationSystem transform(LinearEquationSystem linearEquationSystem) throws NonNumericFeaturesException {
+    public LinearEquationSystem transform(LinearEquationSystem linearEquationSystem) {
         return linearEquationSystem;
     }
 

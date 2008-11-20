@@ -242,9 +242,10 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
   }
 
   /**
+   * @param linearEquationSystem ignored
    * @throws UnsupportedOperationException
    */
-  public LinearEquationSystem transform(LinearEquationSystem linearEquationSystem) throws NonNumericFeaturesException {
+  public LinearEquationSystem transform(LinearEquationSystem linearEquationSystem) {
     throw new UnsupportedOperationException("Operation not supported!");
   }
 

@@ -172,7 +172,7 @@ public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ? >> e
     }
   }
 
-  public LinearEquationSystem transform(LinearEquationSystem linearEquationSystem) throws NonNumericFeaturesException {
+  public LinearEquationSystem transform(LinearEquationSystem linearEquationSystem) {
     double[][] coeff = linearEquationSystem.getCoefficents();
     double[] rhs = linearEquationSystem.getRHS();
     int[] row = linearEquationSystem.getRowPermutations();
