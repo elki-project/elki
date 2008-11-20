@@ -79,18 +79,18 @@ public class Queue<O> {
   }
 
   /**
-   * An element in the queue: holds the underlying objcet and the next element in the queue.
+   * An element in the queue: holds the underlying object and the next element in the queue.
    */
-  final class QueueElement {
+  final protected class QueueElement {
     /**
      * Holds the underlying object.
      */
-    private O object;
+    protected O object;
 
     /**
      * Points to the next element in the queue, null if end of queue is reached.
      */
-    private QueueElement next;
+    protected QueueElement next;
 
     /**
      * Provides a new element in the queue.
@@ -98,7 +98,7 @@ public class Queue<O> {
      * @param object the underlying object
      * @param next   the next element in the queue
      */
-    private QueueElement(O object, QueueElement next) {
+    protected QueueElement(O object, QueueElement next) {
       this.object = object;
       this.next = next;
     }
