@@ -64,7 +64,7 @@ public class KDDStartFrame extends JFrame {
         JButton newButton = new JButton("New Task");
         newButton.addActionListener(new ActionListener() {
 
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
 //				KDDGui workbench = new KDDGui();
                 /*JFrame frame = */ new KDDTaskFrame();
             }
@@ -83,8 +83,8 @@ public class KDDStartFrame extends JFrame {
         JButton load = new JButton("Load Task");
         load.addActionListener(new ActionListener() {
 
-            public void actionPerformed(ActionEvent e) {
-
+            public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
+              // not implemented?
             }
         });
         panel.add(load);

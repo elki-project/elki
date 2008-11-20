@@ -22,17 +22,17 @@ public class ParameterizableEditor extends ParameterEditor implements PopUpTreeL
 
     public static final int VIEWPORT_WIDTH = 450;
 
-    private JTextPane displayField;
+    protected JTextPane displayField;
 
-    private JButton chooseButton;
+    protected JButton chooseButton;
 
-    private JScrollPane pane;
+    protected JScrollPane pane;
 
-    private JPanel scrollPanel;
+    protected JPanel scrollPanel;
 
-    private PopUpTree treeMenu;
+    protected PopUpTree treeMenu;
 
-    private CustomizerPanel customizer;
+    protected CustomizerPanel customizer;
 
     public ParameterizableEditor(ClassParameter<?> option, JFrame owner, ParameterChangeListener l) {
         super(option, owner, l);
@@ -57,7 +57,7 @@ public class ParameterizableEditor extends ParameterEditor implements PopUpTreeL
         chooseButton = new JButton("Choose");
         chooseButton.addActionListener(new ActionListener() {
 
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
 
                 treeMenu.show(chooseButton, chooseButton.getLocation().x, chooseButton.getLocation().y);
             }
@@ -127,7 +127,7 @@ public class ParameterizableEditor extends ParameterEditor implements PopUpTreeL
 
         this.displayField.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void mouseClicked(@SuppressWarnings("unused") MouseEvent e) {
 
                 if (customizer != null && customizer.getSelectedClass() != null && ParameterizableEditor.this.value != null) {
                     customizer.setVisible(true, chooseButton.getLocationOnScreen());

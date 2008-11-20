@@ -21,6 +21,7 @@ public class KDDFileChooser {
 	public KDDFileChooser(String directoryPath) {
 
 		cheesy = new JFileChooser();
+		cheesy.setCurrentDirectory(new File(directoryPath));
 		addFileFilters();
 	}
 

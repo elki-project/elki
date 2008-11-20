@@ -332,7 +332,7 @@ public class KDDDialog extends JDialog implements ActionListener {
 		dialog.setVisible(true);
 	}
 
-	public static void showErrorMessage(Window owner, String message, Exception e) {
+	public static void showErrorMessage(Window owner, String message, @SuppressWarnings("unused") Exception e) {
 		KDDDialog dialog = new KDDDialog(owner, message);
 		dialog.setTitle("Error");
 		dialog.createParameterDialog(false);

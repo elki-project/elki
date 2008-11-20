@@ -22,7 +22,7 @@ public class PopUpTree extends JPopupMenu {
 
     private String[] treeData;
 
-    private JTree tree;
+    protected JTree tree;
 
     private String title;
 
@@ -249,7 +249,7 @@ public class PopUpTree extends JPopupMenu {
         return buffer.toString();
     }
 
-    private void setSelectedClass(String newClass) {
+    protected void setSelectedClass(String newClass) {
         this.selectedClass = newClass;
 
         for (PopUpTreeListener l : treeListener) {

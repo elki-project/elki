@@ -47,7 +47,7 @@ public class CustomizerPanel extends JDialog implements
     /**
      * The edit object of this CustomizerPanel
      */
-    private EditObject editObject;
+    protected EditObject editObject;
 
     private String selectedClass;
 
@@ -202,7 +202,7 @@ public class CustomizerPanel extends JDialog implements
      *
      * @return true if all parameter values are valid, false otherwise.
      */
-    private boolean checkParameters() {
+    protected boolean checkParameters() {
 
         try {
             if (editObject.isValid()) {
@@ -227,7 +227,7 @@ public class CustomizerPanel extends JDialog implements
         ok.requestFocusInWindow();
         ok.addActionListener(new ActionListener() {
 
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
                 if (checkParameters()) {
                     setVisible(false);
                     fireEditObjectChanged();
@@ -241,7 +241,7 @@ public class CustomizerPanel extends JDialog implements
         this.cancel = new JButton("Cancel");
         // this.cancel.setSelected(false);
         this.cancel.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
                 // CustomizerPanel.this.selectedClass = null;
                 setVisible(false);
             }
@@ -286,7 +286,7 @@ public class CustomizerPanel extends JDialog implements
         JButton about = new JButton("About");
         about.addActionListener(new ActionListener() {
 
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
                 // show About-Dialog
                 KDDDialog.showAboutMessage(CustomizerPanel.this, editObject);
             }
@@ -309,7 +309,7 @@ public class CustomizerPanel extends JDialog implements
         super.setVisible(v);
     }
 
-    private void fireEditObjectChanged() {
+    protected void fireEditObjectChanged() {
 
         for (EditObjectChangeListener l : listener) {
             l.editObjectChanged(editObject.getClassName(), this.parameterValuesAsString);

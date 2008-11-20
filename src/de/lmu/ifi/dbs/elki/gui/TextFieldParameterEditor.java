@@ -53,7 +53,7 @@ public abstract class TextFieldParameterEditor extends ParameterEditor {
 	protected void addInputVerifier() {
 		this.textField.setInputVerifier(new InputVerifier() {
 			@Override
-      public boolean verify(JComponent input) {
+      public boolean verify(@SuppressWarnings("unused") JComponent input) {
 				return checkInput();
 			}
 
@@ -82,7 +82,7 @@ public abstract class TextFieldParameterEditor extends ParameterEditor {
 		});
 	}
 
-	private void showErrorMessage(ParameterException e) {
+	protected void showErrorMessage(ParameterException e) {
 		Border border = this.textField.getBorder();
 		this.textField.setBorder(BorderFactory.createLineBorder(Color.red));
 		KDDDialog.showParameterMessage(owner, e.getMessage(), e);

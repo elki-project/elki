@@ -60,7 +60,7 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
 
     private String[] algorithm;
 
-    private String[] completeParameters;
+    protected String[] completeParameters;
 
     private SelectionPanel dbConnectionPanel;
 
@@ -79,13 +79,13 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
     private JTextField nameField;
 
     // borders
-    private Border loweredEtched = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
+    protected Border loweredEtched = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
 
-//    private Border raisedEtched = BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
+//    protected Border raisedEtched = BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
 
-//    private Border loweredBevel = BorderFactory.createBevelBorder(BevelBorder.LOWERED);
+//    protected Border loweredBevel = BorderFactory.createBevelBorder(BevelBorder.LOWERED);
 
-//    private Border raisedBevel = BorderFactory.createBevelBorder(BevelBorder.RAISED);
+//    protected Border raisedBevel = BorderFactory.createBevelBorder(BevelBorder.RAISED);
 
     public KDDTaskFrame() {
         setTitle("KDD Task");
@@ -159,7 +159,7 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
         return taskName;
     }
 
-    private String[] getPropertyFileInfo(Class<?> type) {
+    protected String[] getPropertyFileInfo(Class<?> type) {
 
         // check if we got a property file
         if (Properties.KDD_FRAMEWORK_PROPERTIES != null) {
@@ -196,7 +196,7 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
     }
 
     @SuppressWarnings("unchecked")
-    private void runKDDTask(String[] args) {
+    protected void runKDDTask(String[] args) {
         task = new KDDTask();
         try {
             task.setParameters(args);
@@ -247,7 +247,7 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
         runButton = new JButton("Run Task");
         runButton.setEnabled(false);
         runButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
                 runKDDTask(completeParameters);
             }
         });
@@ -261,7 +261,7 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
         saveButton = new JButton("Save Settings");
         saveButton.setEnabled(false);
         saveButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
                 // KDDDialog.showSaveSettingsDialog(KDDTaskFrame.this);
                 KDDFileChooser chooser = new KDDFileChooser(System.getProperty("java.class.path"));
                 if (chooser.showSaveDialog(KDDTaskFrame.this) == JFileChooser.APPROVE_OPTION) {
@@ -363,7 +363,7 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
         return bob.toString();
     }
 
-    private void saveSettings(String path, String type) {
+    protected void saveSettings(String path, String type) {
 
         if (type.equals(KDDFileChooser.TEXT_FORMAT)) {
             try {
@@ -400,29 +400,29 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
         /**
          * the popup menu of this panel
          */
-        private PopUpTree menu;
+        protected PopUpTree menu;
 
         /**
          * the select button
          */
-        private JButton select;
+        protected JButton select;
 
         /**
          * the name label
          */
-        private JLabel nameLabel;
+        protected JLabel nameLabel;
 
         /**
          * the text field
          */
-        private JTextField textField;
+        protected JTextField textField;
 
         /**
          * the panel to customize the edit object
          */
-        private CustomizerPanel editObjectCustomizer;
+        protected CustomizerPanel editObjectCustomizer;
 
-        private String propName;
+        protected String propName;
 
         public SelectionPanel(String buttonToolTip, String labelToolTip, String defaultClassName, Class<?> parentClass) {
 
@@ -475,7 +475,7 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
             select = new JButton("Select");
 
             select.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
+                public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
                     menu.show(select, nameLabel.getLocation().x, select.getLocation().y);
                 }
             });
@@ -512,14 +512,14 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
             textField.addMouseListener(new MouseAdapter() {
 
                 @Override
-                public void mouseClicked(MouseEvent e) {
+                public void mouseClicked(@SuppressWarnings("unused") MouseEvent e) {
                     if (editObjectCustomizer != null && editObjectCustomizer.getSelectedClass() != null && !textField.getText().equals("")) {
                         editObjectCustomizer.setVisible(true, nameLabel.getLocationOnScreen());
                     }
                 }
 
                 @Override
-                public void mousePressed(MouseEvent e) {
+                public void mousePressed(@SuppressWarnings("unused") MouseEvent e) {
                     if (editObjectCustomizer != null && editObjectCustomizer.getSelectedClass() != null && !textField.getText().equals("")) {
                         editObjectCustomizer.setVisible(true, nameLabel.getLocationOnScreen());
                     }

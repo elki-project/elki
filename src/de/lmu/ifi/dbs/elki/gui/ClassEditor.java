@@ -10,7 +10,7 @@ import java.awt.event.ActionListener;
 // todo steffi comment all
 public class ClassEditor extends ParameterEditor {
 
-    private JComboBox comboField;
+    protected JComboBox comboField;
 
     private JTextField textField;
 
@@ -44,7 +44,7 @@ public class ClassEditor extends ParameterEditor {
             setValue((String) comboField.getSelectedItem());
             comboField.addActionListener(new ActionListener() {
 
-                public void actionPerformed(ActionEvent e) {
+                public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
                     setValue((String) comboField.getSelectedItem());
                 }
 
@@ -57,7 +57,7 @@ public class ClassEditor extends ParameterEditor {
         inputField.setInputVerifier(new InputVerifier() {
 
             @Override
-            public boolean verify(JComponent input) {
+            public boolean verify(@SuppressWarnings("unused") JComponent input) {
 
                 return checkInput();
             }
