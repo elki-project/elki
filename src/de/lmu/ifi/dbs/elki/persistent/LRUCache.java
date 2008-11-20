@@ -18,7 +18,7 @@ public class LRUCache<P extends Page<P>> implements Cache<P> {
   /**
    * The maximum number of objects in this cache.
    */
-  private int cacheSize;
+  protected int cacheSize;
 
   /**
    * The map holding the objects of this cache.
@@ -29,7 +29,7 @@ public class LRUCache<P extends Page<P>> implements Cache<P> {
    * The underlying file of this cache. If an object is dropped
    * it is written to the file.
    */
-  private CachedFile<P> file;
+  protected CachedFile<P> file;
 
   /**
    * The number of read accesses
