@@ -69,11 +69,7 @@
 			<fileset dir="src">
 				<exclude name="experimentalcode/**"/>
 				<!-- not yet published & polished: COP/MCOP -->
-				<exclude name="${basepackage}algorithm/MultivariateModelDerivator.*"/>
 				<exclude name="${basepackage}algorithm/outlier/*CorrelationOutlierProbability.*"/>
-				<exclude name="${basepackage}algorithm/result/MultivariateModel.*"/>
-				<exclude name="${basepackage}algorithm/result/outlier/COPVerboseResult.*"/>
-				<exclude name="${basepackage}algorithm/result/outlier/MCOPResult.*"/>
 				<!-- CoDeC requires classifier -->
 				<exclude name="${basepackage}algorithm/CoDeC.*"/>
 				<exclude name="${basepackage}algorithm/ICA.*"/>
