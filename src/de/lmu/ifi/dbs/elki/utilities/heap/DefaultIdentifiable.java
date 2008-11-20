@@ -115,7 +115,7 @@ public class DefaultIdentifiable implements Identifiable<DefaultIdentifiable>, C
    *
    * @param in the stream to read data from in order to restore the object
    */
-  public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+  public void readExternal(ObjectInput in) throws IOException {
     id = in.readInt();
   }
 }
