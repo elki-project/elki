@@ -24,17 +24,17 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
     /**
      * The number of entries in this node.
      */
-    private int numEntries;
+    protected int numEntries;
 
     /**
      * The entries (children) of this node.
      */
-    private E[] entries;
+    protected E[] entries;
 
     /**
      * Indicates whether this node is a leaf node.
      */
-    private boolean isLeaf;
+    protected boolean isLeaf;
 
     /**
      * Empty constructor for Externalizable interface.

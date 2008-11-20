@@ -11,4 +11,5 @@ import de.lmu.ifi.dbs.elki.index.tree.Node;
  * @param <E> the type of MetricalEntry used in the metrical index
  */
 public interface MetricalNode<N extends MetricalNode<N, E>, E extends MetricalEntry> extends Node<N, E> {
+  // no additional interface items
 }

@@ -60,6 +60,7 @@ public abstract class AbstractEntry implements Entry {
     /**
      * Restores the id of the object (node or data object) that is
      * represented by this entry from the specified stream.
+     * @throws ClassNotFoundException If the class for an object being restored cannot be found.
      */
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         this.id = in.readInt();

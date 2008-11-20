@@ -129,7 +129,7 @@ public class ApproximationLine implements Externalizable {
    *
    * @param in the stream to read data from in order to restore the object
    */
-  public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+  public void readExternal(ObjectInput in) throws IOException {
     m = in.readDouble();
     t = in.readDouble();
   }

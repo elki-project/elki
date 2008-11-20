@@ -78,7 +78,7 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends Ab
 	}
 
 	@Override
-  protected void createEmptyRoot(O object) {
+  protected void createEmptyRoot(@SuppressWarnings("unused") O object) {
 		N root = createNewLeafNode(leafCapacity);
 		file.writePage(root);
     setHeight(1);

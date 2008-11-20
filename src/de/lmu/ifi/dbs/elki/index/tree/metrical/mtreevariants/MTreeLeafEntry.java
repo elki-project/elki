@@ -28,6 +28,7 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractEntry impleme
      * Empty constructor for serialization purposes.
      */
     public MTreeLeafEntry() {
+      // empty
     }
 
     /**
@@ -91,7 +92,7 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractEntry impleme
      *
      * @throws UnsupportedOperationException
      */
-    public void setCoveringRadius(D coveringRadius) {
+    public void setCoveringRadius(@SuppressWarnings("unused") D coveringRadius) {
         throw new UnsupportedOperationException("This entry is not a directory entry!");
     }
 

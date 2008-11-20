@@ -88,7 +88,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
      *
      * @throws UnsupportedOperationException
      */
-    public final boolean delete(O o) {
+    public final boolean delete(@SuppressWarnings("unused") O o) {
         throw new UnsupportedOperationException("Deletion of objects is not yet supported by an M-Tree!");
     }
 
@@ -99,7 +99,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
      * @throws UnsupportedOperationException
      */
     @Override
-    protected final void postDelete(O o) {
+    protected final void postDelete(@SuppressWarnings("unused") O o) {
         throw new UnsupportedOperationException("Deletion of objects is not yet supported by an M-Tree!");
     }
 
@@ -277,7 +277,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
 
     @Override
-    protected final void createEmptyRoot(O object) {
+    protected final void createEmptyRoot(@SuppressWarnings("unused") O object) {
         N root = createNewLeafNode(leafCapacity);
         file.writePage(root);
     }
@@ -786,9 +786,9 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
      * Encapsulates a split object and the newly created node.
      */
     private class SplitResult {
-        private MTreeSplit<O, D, N, E> split;
+        protected MTreeSplit<O, D, N, E> split;
 
-        private N newNode;
+        protected N newNode;
 
         public SplitResult(MTreeSplit<O, D, N, E> split, N newNode) {
             this.split = split;

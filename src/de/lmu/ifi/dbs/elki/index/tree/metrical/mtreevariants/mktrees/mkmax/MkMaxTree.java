@@ -270,7 +270,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
     }
 
     @Override
-    protected void initializeCapacities(O object, boolean verbose) {
+    protected void initializeCapacities(@SuppressWarnings("unused") O object, @SuppressWarnings("unused") boolean verbose) {
         D dummyDistance = getDistanceFunction().nullDistance();
         int distanceSize = dummyDistance.externalizableSize();
 

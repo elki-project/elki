@@ -63,7 +63,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>>
      * Does nothing because no operations are necessary before inserting an entry.
      */
     @Override
-    protected void preInsert(MTreeEntry<D> entry) {
+    protected void preInsert(@SuppressWarnings("unused") MTreeEntry<D> entry) {
         // do nothing
     }
 
@@ -74,12 +74,12 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>>
      * @throws UnsupportedOperationException
      */
     @Override
-    public List<QueryResult<D>> reverseKNNQuery(O object, int k) {
+    public List<QueryResult<D>> reverseKNNQuery(@SuppressWarnings("unused") O object, @SuppressWarnings("unused") int k) {
         throw new UnsupportedOperationException("Reverse knn-queries are not yet supported!");
     }
 
     @Override
-    protected void initializeCapacities(O object, boolean verbose) {
+    protected void initializeCapacities(@SuppressWarnings("unused") O object, boolean verbose) {
         D dummyDistance = getDistanceFunction().nullDistance();
         int distanceSize = dummyDistance.externalizableSize();
 

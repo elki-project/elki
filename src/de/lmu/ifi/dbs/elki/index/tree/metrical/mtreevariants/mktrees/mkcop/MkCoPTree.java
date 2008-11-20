@@ -217,7 +217,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
      * Determines the maximum and minimum number of entries in a node.
      */
     @Override
-    protected void initializeCapacities(O object, boolean verbose) {
+    protected void initializeCapacities(@SuppressWarnings("unused") O object, boolean verbose) {
         D dummyDistance = getDistanceFunction().nullDistance();
         int distanceSize = dummyDistance.externalizableSize();
 

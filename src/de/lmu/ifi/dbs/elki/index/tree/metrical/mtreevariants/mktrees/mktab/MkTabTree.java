@@ -36,7 +36,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>>
      *                                       objects is not supported
      */
     @Override
-    protected void preInsert(MkTabEntry<D> entry) {
+    protected void preInsert(@SuppressWarnings("unused") MkTabEntry<D> entry) {
         throw new UnsupportedOperationException("Insertion of single objects is not supported!");
     }
 
@@ -44,7 +44,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>>
      * @throws UnsupportedOperationException since insertion of single
      *                                       objects is not supported
      */
-    public void insert(O object) {
+    public void insert(@SuppressWarnings("unused") O object) {
         throw new UnsupportedOperationException("Insertion of single objects is not supported!");
     }
 
@@ -63,7 +63,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>>
     }
 
     @Override
-    protected void initializeCapacities(O object, boolean verbose) {
+    protected void initializeCapacities(@SuppressWarnings("unused") O object, @SuppressWarnings("unused") boolean verbose) {
         D dummyDistance = getDistanceFunction().nullDistance();
         int distanceSize = dummyDistance.externalizableSize();
 
