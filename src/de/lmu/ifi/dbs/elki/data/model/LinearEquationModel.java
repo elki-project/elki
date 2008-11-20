@@ -47,8 +47,8 @@ public class LinearEquationModel extends BaseModel implements TextWriteable {
    * Implementation of {@link TextWriteable} interface
    */
   @Override
-  public void writeToText(TextWriterStream out) {
-    super.writeToText(out);
+  public void writeToText(TextWriterStream out, String label) {
+    super.writeToText(out, label);
     out.commentPrintLn(les.equationsToString(6));
   }
 

@@ -139,6 +139,7 @@ public class ArffSparseInstanceToSparseBitVector extends StandAloneInputWrapper 
 
             writeHeader(tokenizer, writer);
             while (writeSparseInstances(tokenizer, writer)) {
+              // empty, action happens in while statement.
             }
         }
         catch (FileNotFoundException e) {
@@ -327,6 +328,7 @@ public class ArffSparseInstanceToSparseBitVector extends StandAloneInputWrapper 
     private void getFirstToken(StreamTokenizer tokenizer) throws IOException {
 
         while (tokenizer.nextToken() == StreamTokenizer.TT_EOL) {
+          // skip
         }
 
         if ((tokenizer.ttype == '\'') || (tokenizer.ttype == '"')) {
@@ -387,6 +389,7 @@ public class ArffSparseInstanceToSparseBitVector extends StandAloneInputWrapper 
      */
     private void readTillEOL(StreamTokenizer tokenizer) throws IOException {
         while (tokenizer.nextToken() != StreamTokenizer.TT_EOL) {
+          // skip
         }
         tokenizer.pushBack();
     }

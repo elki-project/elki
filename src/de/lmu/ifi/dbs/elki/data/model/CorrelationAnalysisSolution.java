@@ -363,7 +363,10 @@ public class CorrelationAnalysisSolution<V extends RealVector<V, ?>> implements 
    */
   @SuppressWarnings("unchecked")
   @Override
-  public void writeToText(TextWriterStream out) {
+  public void writeToText(TextWriterStream out, String label) {
+    if (label != null) {
+      out.commentPrintLn(label);
+    }
     out.commentPrintLn("Model class: "+this.getClass().getName());
     try {
       if(getNormalizedLinearEquationSystem(null) != null) {

@@ -73,8 +73,8 @@ public class CorrelationModel<V extends RealVector<V, ?>> extends BaseModel impl
    * Implementation of {@link TextWriteable} interface
    */
   @Override
-  public void writeToText(TextWriterStream out) {
-    super.writeToText(out);
+  public void writeToText(TextWriterStream out, String label) {
+    super.writeToText(out, label);
     try {
       out.commentPrintLn("Centroid: " + out.normalizationRestore(getCentroid()).toString());
       out.commentPrintLn("Strong Eigenvectors:");

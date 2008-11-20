@@ -35,9 +35,9 @@ public class EMModel<V extends RealVector<V, ?>> extends BaseModel {
   }
 
   @Override
-  public void writeToText(TextWriterStream out) {
+  public void writeToText(TextWriterStream out, String label) {
     try {
-      super.writeToText(out);
+      super.writeToText(out, label);
       out.commentPrintLn("Mean: "+out.normalizationRestore(this.mean).toString());
       out.commentPrintLn("Covariance Matrix: "+this.covarianceMatrix.toString());
     }

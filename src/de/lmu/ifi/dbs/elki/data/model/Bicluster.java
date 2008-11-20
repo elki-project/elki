@@ -136,7 +136,10 @@ public class Bicluster<V extends RealVector<V, Double>> extends AbstractLoggable
      * Implementation of {@link TextWriteable} interface.
      */
     @Override
-    public void writeToText(TextWriterStream out) {
+    public void writeToText(TextWriterStream out, String label) {
+      if (label != null) {
+        out.commentPrintLn(label);
+      }
       out.commentPrintLn("Model class: "+this.getClass().getName());
       out.commentPrintLn("cluster size = " + size());
       out.commentPrintLn("cluster dimensions = " + colIDs.length);

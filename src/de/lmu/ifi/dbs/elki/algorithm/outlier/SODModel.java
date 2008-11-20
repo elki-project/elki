@@ -81,8 +81,8 @@ public class SODModel<O extends RealVector<O, Double>> implements TextWriteable,
     }
 
     @Override
-    public void writeToText(TextWriterStream out) {
-      out.inlinePrint("SOD="+this.sod);
+    public void writeToText(TextWriterStream out, String label) {
+      out.inlinePrint(label+"="+this.sod);
       out.commentPrintLn(this.getClass().getSimpleName() + ":");
       out.commentPrintLn("relevant attributes (counting starts with 0): " + this.weightVector.toString());
       try {

@@ -25,7 +25,7 @@ public class DimensionModel extends BaseModel implements TextWriteable {
   }
 
   /**
-   * Accessor
+   * Getter
    * @return
    */
   public int getDimension() {
@@ -33,7 +33,7 @@ public class DimensionModel extends BaseModel implements TextWriteable {
   }
 
   /**
-   * Accessor
+   * Setter
    * @param dimension
    */
   public void setDimension(int dimension) {
@@ -44,8 +44,8 @@ public class DimensionModel extends BaseModel implements TextWriteable {
    * Implementation of {@link TextWriteable} interface
    */
   @Override
-  public void writeToText(TextWriterStream out) {
-    super.writeToText(out);
+  public void writeToText(TextWriterStream out, String label) {
+    super.writeToText(out, label);
     out.commentPrintLn("Dimension: "+dimension);
   }
   

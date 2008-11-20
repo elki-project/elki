@@ -514,7 +514,11 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
      * Serialize to text for printing.
      */
     @Override
-    public void writeToText(TextWriterStream out) {
-      out.inlinePrintNoQuotes(super.toString());
+    public void writeToText(TextWriterStream out, String label) {
+      String pre="";
+      if (label != null) {
+        pre = label+"=";
+      }
+      out.inlinePrintNoQuotes(pre + super.toString());
     }
 }

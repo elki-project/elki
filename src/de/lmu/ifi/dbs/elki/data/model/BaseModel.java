@@ -18,7 +18,10 @@ public abstract class BaseModel implements Model {
    * @param out
    */
   //@Override
-  public void writeToText(TextWriterStream out) {
+  public void writeToText(TextWriterStream out, String label) {
+    if (label != null) {
+      out.commentPrintLn(label);
+    }
     out.commentPrintLn("Model class: "+this.getClass().getName());
   }
 }

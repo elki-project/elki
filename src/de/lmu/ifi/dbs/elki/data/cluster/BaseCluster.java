@@ -407,7 +407,7 @@ public abstract class BaseCluster<C extends BaseCluster<C,M>, M extends Model> i
    *  
    * @param out
    */
-  public void writeToText(TextWriterStream out) {
+  public void writeToText(TextWriterStream out, String label) {
     String name = getNameAutomatic();
     if (name != null) {
       out.commentPrintLn("Cluster: "+name);
@@ -435,7 +435,7 @@ public abstract class BaseCluster<C extends BaseCluster<C,M>, M extends Model> i
     }
     // also print model, if any and printable
     if (getModel() != null && getModel() instanceof TextWriteable) {
-      ((TextWriteable)getModel()).writeToText(out);
+      ((TextWriteable)getModel()).writeToText(out, label);
     }
   }
 

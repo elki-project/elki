@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.result.textwriter.writers;
 
-import java.io.IOException;
-
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterWriterInterface;
@@ -14,7 +12,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterWriterInterface;
  */
 public class TextWriterTextWriteable extends TextWriterWriterInterface<TextWriteable> {
   @Override
-  public void write(TextWriterStream out, String label, TextWriteable obj) throws IOException {
-    obj.writeToText(out);
+  public void write(TextWriterStream out, String label, TextWriteable obj) {
+    obj.writeToText(out, label);
   }
 }
