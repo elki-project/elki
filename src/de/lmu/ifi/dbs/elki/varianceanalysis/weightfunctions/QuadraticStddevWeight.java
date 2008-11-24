@@ -8,7 +8,7 @@ package de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions;
  * 
  * max(0.0, 1.0 - (distance/(3*stddev))^2 
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  */
 public final class QuadraticStddevWeight implements WeightFunction {
   /**

@@ -6,7 +6,7 @@ package de.lmu.ifi.dbs.elki.math.statistics;
  * Estimates a density using a kernel density estimator.
  * Multiple common Kernel functions are supported.
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  *
  */
 public class KernelDensityEstimator {

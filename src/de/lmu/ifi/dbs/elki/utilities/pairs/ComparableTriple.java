@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.utilities.pairs;
 /**
  * Triple with canonical comparison function.
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  *
  * @param <FIRST> first type
  * @param <SECOND> second type

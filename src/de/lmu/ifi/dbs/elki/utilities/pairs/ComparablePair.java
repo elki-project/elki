@@ -6,7 +6,7 @@ package de.lmu.ifi.dbs.elki.utilities.pairs;
  * This class cannot be derived from SimplePair (although it should be)
  * Because SimplePair has been declared as "final" for performance reasons.
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  *
  * @param <FIRST> first type
  * @param <SECOND> second type

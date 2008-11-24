@@ -7,7 +7,7 @@ package de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions;
  * 
  * with factor being 1 / sqrt(2 * PI)
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  */
 public final class GaussStddevWeight implements WeightFunction {
   /**

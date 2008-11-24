@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 /**
  * Interface for cluster generators
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  */
 public interface GeneratorInterface {
   /**

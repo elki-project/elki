@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities.pairs;
  * Generic Pair<FIRST,SECOND> interface
  * Implementations vary when it comes to Comparable etc.
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  *
  * @param <FIRST> first type
  * @param <SECOND> second type

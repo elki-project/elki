@@ -7,7 +7,7 @@ package de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions;
  * 
  * This is similar to the Gaussian weight function, except distance/stddev is not squared.
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  */
 public final class ExponentialStddevWeight implements WeightFunction {
   /**

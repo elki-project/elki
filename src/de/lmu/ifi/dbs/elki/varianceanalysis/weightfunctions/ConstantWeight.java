@@ -5,7 +5,7 @@ package de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions;
  * 
  * The result is always 1.0
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  */
 public final class ConstantWeight implements WeightFunction {
   /**

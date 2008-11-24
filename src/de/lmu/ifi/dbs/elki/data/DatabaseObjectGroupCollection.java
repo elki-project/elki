@@ -6,7 +6,7 @@ import java.util.Iterator;
 /**
  * Collection-backed group of database object (references) 
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  *
  * @param <C> Collection type used.
  * @param <O> DatabaseObject type used.

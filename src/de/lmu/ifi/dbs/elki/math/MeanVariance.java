@@ -9,7 +9,7 @@ package de.lmu.ifi.dbs.elki.math;
  * 
  * Trivial code, but replicated a lot. The class is final so it should come at low cost.
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  *
  */
 public final class MeanVariance {

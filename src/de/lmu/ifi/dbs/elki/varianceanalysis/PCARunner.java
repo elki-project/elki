@@ -25,7 +25,7 @@ import java.util.List;
  * The runner can be parametrized by setting a covariance matrix builder (e.g. to
  * a weighted covariance matrix builder) 
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  *
  * @param <V>
  */

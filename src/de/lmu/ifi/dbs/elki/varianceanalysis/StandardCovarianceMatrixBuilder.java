@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
  * Class for building a "traditional" covariance matrix.
  * Reasonable default choice for a {@link CovarianceMatrixBuilder}
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  *
  * @param <V> Vector class to use.
  */

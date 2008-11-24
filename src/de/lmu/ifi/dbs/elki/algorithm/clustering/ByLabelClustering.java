@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.utilities.Description;
  * TODO: handling of data sets with no labels?
  * TODO: Noise handling (e.g. allow the user to specify a noise label pattern?)
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  *
  * @param <O>
  */

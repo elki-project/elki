@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.wrapper.StandAloneWrapper;
 /**
  * Generate a data set based on a specified model (using an XML specification)
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  */
 public class GeneratorXMLSpec extends StandAloneWrapper {
   /**

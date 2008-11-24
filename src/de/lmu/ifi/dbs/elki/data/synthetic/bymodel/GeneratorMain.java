@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
  * tests on the number of dimensions, although if clusters overlap little enough (so
  * that no rejects happen) the results should be as expected.
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  */
 public class GeneratorMain {
   /**

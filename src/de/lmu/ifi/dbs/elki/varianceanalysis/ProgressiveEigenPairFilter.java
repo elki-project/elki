@@ -23,7 +23,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstrai
  * different percentage alpha levels might be appropriate for different
  * dimensionalities.
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  * 
  * Example calculations of alpha levels:
  * 

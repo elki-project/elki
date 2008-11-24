@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.fitting;
 /**
  * Result returned by a fitting function.
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  */
 public class FittingFunctionResult {
   /**

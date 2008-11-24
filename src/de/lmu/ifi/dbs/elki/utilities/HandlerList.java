@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
  * and when querying, the last added handler will be used where the query object can be cast to
  * the handlers restriction class.
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  *
  * @param <H> Parent class/interface for all handlers
  */

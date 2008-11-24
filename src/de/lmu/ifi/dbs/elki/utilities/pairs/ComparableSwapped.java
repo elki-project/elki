@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.utilities.pairs;
 /**
  * Interface for Comparable pairs that compares by the second component first.
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  *
  * @param <O> Object class.
  */

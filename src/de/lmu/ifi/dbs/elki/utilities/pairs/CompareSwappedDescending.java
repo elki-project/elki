@@ -5,7 +5,7 @@ import java.util.Comparator;
 /**
  * Compare two objects descending by their second component.
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  */
 public final class CompareSwappedDescending<P extends ComparableSwapped<P>> implements Comparator<P> {
   /**

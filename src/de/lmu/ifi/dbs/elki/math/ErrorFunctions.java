@@ -7,7 +7,7 @@ package de.lmu.ifi.dbs.elki.math;
  * 
  * {@see <a href="http://en.wikipedia.org/wiki/Error_function">Wikipedia on Error functions</a>}
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  *
  */
 public final class ErrorFunctions {

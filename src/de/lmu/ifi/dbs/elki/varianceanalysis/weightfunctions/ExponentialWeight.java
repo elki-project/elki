@@ -9,7 +9,7 @@ package de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions;
  * 
  * -2.3025850929940455 is log(-.1) to achieve the intended range of 1.0 - 0.1
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  */
 public final class ExponentialWeight implements WeightFunction {
   /**

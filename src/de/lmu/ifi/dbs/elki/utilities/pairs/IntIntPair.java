@@ -6,7 +6,7 @@ package de.lmu.ifi.dbs.elki.utilities.pairs;
  * 
  * Since int is a native type, this can't be done via the {@link ComparablePair} generic.
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  */
 public final class IntIntPair implements Comparable<IntIntPair>, ComparableSwapped<IntIntPair> {
   /**

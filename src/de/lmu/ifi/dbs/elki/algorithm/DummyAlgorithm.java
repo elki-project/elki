@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.utilities.Description;
  * Dummy Algorithm, which just iterates over all points once, doing a 10NN query each.
  * Useful in testing e.g. index structures and as template for custom algorithms.
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  */
 public class DummyAlgorithm<V extends NumberVector<V,?>> extends AbstractAlgorithm<V,Result> {
 

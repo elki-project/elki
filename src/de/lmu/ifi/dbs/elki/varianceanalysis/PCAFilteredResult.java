@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
  * and thus a dimension. Usually this will be interpreted as having a "data"
  * subspace and an "error" subspace.
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  */
 
 public class PCAFilteredResult extends PCAResult {

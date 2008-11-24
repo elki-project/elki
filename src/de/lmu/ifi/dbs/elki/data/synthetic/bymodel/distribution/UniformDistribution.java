@@ -5,7 +5,7 @@ import java.util.Random;
 /**
  * Simple uniform distribution class
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  */
 public final class UniformDistribution implements Distribution {
   /**

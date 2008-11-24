@@ -8,7 +8,7 @@ package de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions;
  * 
  * This function has increasing weight, from 0.1 to 1.0 at distance == max.
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  */
 public final class InverseLinearWeight implements WeightFunction {
   /**

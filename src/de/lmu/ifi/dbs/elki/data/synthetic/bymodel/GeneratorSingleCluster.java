@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
  * Class to generate a single cluster according to a model as well as getting the density
  * of a given model at that point (to evaluate generated points according to the same model)
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  *
  */
 public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {

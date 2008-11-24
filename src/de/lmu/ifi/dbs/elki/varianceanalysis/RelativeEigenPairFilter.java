@@ -21,7 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
  * not too interesting. These benefits usually only make a difference at higher
  * dimensionalities.
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  */
 
 public class RelativeEigenPairFilter extends AbstractParameterizable implements EigenPairFilter {

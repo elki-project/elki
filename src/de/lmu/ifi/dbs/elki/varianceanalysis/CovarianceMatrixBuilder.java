@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
  * Abstract class with the task of computing a Covariance matrix to be used in PCA.
  * Mostly the specification of an interface.
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  *
  * @param <V> Vector class in use
  */

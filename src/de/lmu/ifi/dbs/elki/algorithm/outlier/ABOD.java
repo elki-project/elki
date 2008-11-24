@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
  * In: Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining (KDD '08), Las Vegas, NV, 2008.
  * 
  * @author Matthias Schubert (Original Code)
- * @author Erich Schubert <schube@dbs.ifi.lmu.de> (ELKIfication)
+ * @author Erich Schubert (ELKIfication)
  * 
  */
 public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, DoubleDistance, MultiResult> {

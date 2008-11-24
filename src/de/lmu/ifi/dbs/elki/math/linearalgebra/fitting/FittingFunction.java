@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.fitting;
 /**
  * Interface for a function used in Levenberg-Marquard-Fitting
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  */
 public interface FittingFunction {
   /**

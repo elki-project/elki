@@ -5,7 +5,7 @@ package de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions;
  * 
  * 1 - 0.9 * (distance/max)
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  */
 public final class LinearWeight implements WeightFunction {
   /**

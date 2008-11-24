@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
  * LOCI: Fast Outlier Detection Using the Local Correlation Integral.
  * In: Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03), Bangalore, India, 2003.
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  *
  * @param <O>
  */

@@ -6,7 +6,7 @@ package de.lmu.ifi.dbs.elki.utilities.pairs;
  * 
  * Does not implement any "special" interfaces such as Comparable
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  *
  * @param <FIRST> first type
  * @param <SECOND> second type

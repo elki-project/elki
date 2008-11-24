@@ -25,7 +25,7 @@ import java.util.List;
  * PCA is computed as with the regular runner, but afterwards, an
  * {@link EigenPairFilter} is applied. 
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  *
  * @param <V> Vector class to use
  */

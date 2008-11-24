@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * <p/>
  * Publication pending
  *
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  * @param <V> the type of Realvector handled by this Algorithm
  */
 public class CorrelationOutlierProbability<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, DoubleDistance, MultiResult> {

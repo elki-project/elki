@@ -5,7 +5,7 @@ package de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions;
  * 
  * exp(-2.3025850929940455 * (distance/max)^2)
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  */
 public final class GaussWeight implements WeightFunction {
   /**

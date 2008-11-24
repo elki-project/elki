@@ -10,7 +10,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  * 
  * {@see <a href="http://en.wikipedia.org/wiki/Homogeneous_coordinates">Wikipedia on Homogeneous Coordinates</a>}
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  *
  */
 public class AffineTransformation {

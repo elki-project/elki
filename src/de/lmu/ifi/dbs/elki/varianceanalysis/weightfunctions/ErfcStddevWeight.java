@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
  * 
  * {@see http://en.wikipedia.org/wiki/Error_function}
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  */
 public final class ErfcStddevWeight implements WeightFunction {
   /**

@@ -6,7 +6,7 @@ package de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions;
  * standard deviation are also given, to allow distance functions to be
  * normalized according to the maximum or standard deviation.
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  */
 public interface WeightFunction {
   /**

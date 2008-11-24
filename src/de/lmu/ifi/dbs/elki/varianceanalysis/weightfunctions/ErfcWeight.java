@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
  * 
  * The value of 1.1630871536766736 is erfcinv(0.1), to achieve the intended scaling.
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  */
 public final class ErfcWeight implements WeightFunction {
   /**

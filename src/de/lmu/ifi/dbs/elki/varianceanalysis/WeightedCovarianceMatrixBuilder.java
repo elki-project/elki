@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.WeightFunction;
  * In: Proc. 20th Int. Conf. on Scientific and Statistical Database Management (SSDBM), 2008, Hong Kong
  * Lecture Notes in Computer Science 5069, Springer
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  *
  * @param <V> Vector class to use
  */

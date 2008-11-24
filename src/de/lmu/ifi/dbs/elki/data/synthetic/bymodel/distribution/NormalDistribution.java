@@ -5,7 +5,7 @@ import java.util.Random;
 /**
  * Simple generator for a Gaussian = Normal Distribution
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  */
 public final class NormalDistribution implements Distribution {
   /**

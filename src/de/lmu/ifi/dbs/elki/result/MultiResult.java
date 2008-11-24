@@ -5,7 +5,7 @@ import java.util.ArrayList;
 /**
  * MultiResult is a result collection class.
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  *
  * @param <O>
  */

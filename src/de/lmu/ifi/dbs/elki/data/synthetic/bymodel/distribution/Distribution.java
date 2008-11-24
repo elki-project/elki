@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution;
  * Interface for a simple distribution generator
  * with a PDF, i.e. it can also compute a density
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  */
 public interface Distribution {
   /**

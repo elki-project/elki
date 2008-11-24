@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
  * 
  * This generator will generate pairs (a,a) for all elements a in the given list.
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  */
 public class PairGeneratorNoise extends PairSortedGenerator {
   /**

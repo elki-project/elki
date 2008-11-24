@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
  *   Press, W.H. and Teukolsky, S.A. and Vetterling, W.T. and Flannery, B.P.
  *   Cambridge University Press, Cambridge, Mass, 1992
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  */
 public class LevenbergMarquardtMethod {
   /**

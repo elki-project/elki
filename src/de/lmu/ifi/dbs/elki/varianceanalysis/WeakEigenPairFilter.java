@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
  * eigenvalues and returns the first eigenpairs who are above the average mark
  * as "strong", the others as "weak".
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  */
 
 public class WeakEigenPairFilter extends AbstractParameterizable implements EigenPairFilter {

@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
  * Class for static clusters, that is an implementation of GeneratorInterface
  * that will return only a given set of points.
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  */
 public class GeneratorStatic implements GeneratorInterface {
   /**

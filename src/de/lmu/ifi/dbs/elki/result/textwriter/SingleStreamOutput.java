@@ -9,7 +9,7 @@ import java.io.PrintStream;
 /**
  * Class to output all result data to a single stream (e.g. Stdout, single file)
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  *
  */
 public class SingleStreamOutput implements StreamFactory {

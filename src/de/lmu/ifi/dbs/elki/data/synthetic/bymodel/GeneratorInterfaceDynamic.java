@@ -6,7 +6,7 @@ package de.lmu.ifi.dbs.elki.data.synthetic.bymodel;
  * A cluster generator is considered dynamic when it allows "rejecting" points
  * and the generation of additional new points.
  * 
- * @author Erich Schubert <schube@dbs.ifi.lmu.de>
+ * @author Erich Schubert
  */
 public interface GeneratorInterfaceDynamic extends GeneratorInterface {
   /**
