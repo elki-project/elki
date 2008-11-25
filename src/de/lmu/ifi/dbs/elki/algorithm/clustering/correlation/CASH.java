@@ -24,7 +24,6 @@ import de.lmu.ifi.dbs.elki.data.model.LinearEquationModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.elki.database.SequentialDatabase;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -46,6 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
 import de.lmu.ifi.dbs.elki.varianceanalysis.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredRunner;
 
@@ -555,13 +555,13 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
                                                        Set<Integer> ids,
                                                        Database<ParameterizationFunction> database) throws UnableToComplyException {
         // build objects and associations
-        List<ObjectAndAssociations<ParameterizationFunction>> oaas = new ArrayList<ObjectAndAssociations<ParameterizationFunction>>(ids.size());
+        List<SimplePair<ParameterizationFunction,Associations>> oaas = new ArrayList<SimplePair<ParameterizationFunction,Associations>>(ids.size());
 
         for (Integer id : ids) {
             ParameterizationFunction f = project(basis, database.get(id));
 
             Associations associations = database.getAssociations(id);
-            ObjectAndAssociations<ParameterizationFunction> oaa = new ObjectAndAssociations<ParameterizationFunction>(f, associations);
+            SimplePair<ParameterizationFunction,Associations> oaa = new SimplePair<ParameterizationFunction,Associations>(f, associations);
             oaas.add(oaa);
         }
 
@@ -811,12 +811,12 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
     private Database<DoubleVector> buildDerivatorDB(Database<ParameterizationFunction> database,
                                                   CASHInterval interval) throws UnableToComplyException {
         // build objects and associations
-        List<ObjectAndAssociations<DoubleVector>> oaas = new ArrayList<ObjectAndAssociations<DoubleVector>>(database.size());
+        List<SimplePair<DoubleVector, Associations>> oaas = new ArrayList<SimplePair<DoubleVector, Associations>>(database.size());
 
         for (Integer id : interval.getIDs()) {
             Associations associations = database.getAssociations(id);
             DoubleVector v = new DoubleVector(database.get(id).getRowVector().getRowPackedCopy());
-            ObjectAndAssociations<DoubleVector> oaa = new ObjectAndAssociations<DoubleVector>(v, associations);
+            SimplePair<DoubleVector, Associations> oaa = new SimplePair<DoubleVector, Associations>(v, associations);
             oaas.add(oaa);
         }
 
@@ -884,12 +884,12 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
     private Database<DoubleVector> buildDerivatorDB(Database<ParameterizationFunction> database,
                                                   Set<Integer> ids) throws UnableToComplyException {
         // build objects and associations
-        List<ObjectAndAssociations<DoubleVector>> oaas = new ArrayList<ObjectAndAssociations<DoubleVector>>(database.size());
+        List<SimplePair<DoubleVector,Associations>> oaas = new ArrayList<SimplePair<DoubleVector,Associations>>(database.size());
 
         for (Integer id : ids) {
             Associations associations = database.getAssociations(id);
             DoubleVector v = new DoubleVector(database.get(id).getRowVector().getRowPackedCopy());
-            ObjectAndAssociations<DoubleVector> oaa = new ObjectAndAssociations<DoubleVector>(v, associations);
+            SimplePair<DoubleVector,Associations> oaa = new SimplePair<DoubleVector,Associations>(v, associations);
             oaas.add(oaa);
         }
 

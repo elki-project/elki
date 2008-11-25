@@ -1,19 +1,20 @@
 package de.lmu.ifi.dbs.elki.normalization;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.MultiRepresentedObject;
 import de.lmu.ifi.dbs.elki.database.Associations;
-import de.lmu.ifi.dbs.elki.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassListParameter;import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassListParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
+import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
 
 /**
  * Class to perform and undo a normalization on multi-represented objects with
@@ -79,15 +80,15 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
    * @throws NonNumericFeaturesException if feature vectors differ in length or values are not
    *                                     suitable to normalization
    */
-  public List<ObjectAndAssociations<MultiRepresentedObject<O>>> normalizeObjects(
-  List<ObjectAndAssociations<MultiRepresentedObject<O>>> objectAndAssociationsList)
+  public List<SimplePair<MultiRepresentedObject<O>,Associations>> normalizeObjects(
+  List<SimplePair<MultiRepresentedObject<O>,Associations>> objectAndAssociationsList)
   throws NonNumericFeaturesException {
     if (objectAndAssociationsList.size() == 0)
-      return new ArrayList<ObjectAndAssociations<MultiRepresentedObject<O>>>();
+      return new ArrayList<SimplePair<MultiRepresentedObject<O>,Associations>>();
 
     // number of representations
     int numberOfRepresentations = objectAndAssociationsList.get(0)
-    .getObject().getNumberOfRepresentations();
+    .getFirst().getNumberOfRepresentations();
 
     // init default normalizations
     // must be done here, because at setParameters() the number of
@@ -100,12 +101,12 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
     for (int r = 0; r < numberOfRepresentations; r++) {
       List<O> objectsInRepresentation = new ArrayList<O>(
       objectAndAssociationsList.size());
-      for (ObjectAndAssociations<MultiRepresentedObject<O>> o : objectAndAssociationsList) {
-        if (numberOfRepresentations != o.getObject()
+      for (SimplePair<MultiRepresentedObject<O>,Associations> o : objectAndAssociationsList) {
+        if (numberOfRepresentations != o.getFirst()
         .getNumberOfRepresentations())
           throw new IllegalArgumentException(
           "Number of representations differs!");
-        objectsInRepresentation.add(o.getObject().getRepresentation(r));
+        objectsInRepresentation.add(o.getFirst().getRepresentation(r));
       }
 
       Normalization<O> normalization = normalizations.get(r);
@@ -113,7 +114,7 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
     }
 
     // build the normalized multi-represented objects
-    List<ObjectAndAssociations<MultiRepresentedObject<O>>> normalized = new ArrayList<ObjectAndAssociations<MultiRepresentedObject<O>>>();
+    List<SimplePair<MultiRepresentedObject<O>,Associations>> normalized = new ArrayList<SimplePair<MultiRepresentedObject<O>,Associations>>();
     for (int i = 0; i < objectAndAssociationsList.size(); i++) {
       List<O> representations = new ArrayList<O>(numberOfRepresentations);
       for (int r = 0; r < numberOfRepresentations; r++) {
@@ -121,9 +122,9 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
       }
       MultiRepresentedObject<O> o = new MultiRepresentedObject<O>(
       representations);
-      o.setID(objectAndAssociationsList.get(i).getObject().getID());
-      Associations associations = objectAndAssociationsList.get(i).getAssociations();
-      normalized.add(new ObjectAndAssociations<MultiRepresentedObject<O>>(o, associations));
+      o.setID(objectAndAssociationsList.get(i).getFirst().getID());
+      Associations associations = objectAndAssociationsList.get(i).getSecond();
+      normalized.add(new SimplePair<MultiRepresentedObject<O>,Associations>(o, associations));
     }
 
     return normalized;

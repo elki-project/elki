@@ -1,8 +1,10 @@
 package de.lmu.ifi.dbs.elki.normalization;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Associations;
-import de.lmu.ifi.dbs.elki.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
@@ -14,9 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.AllOrNoneMustBeSetGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualSizeGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.output.Format;
-
-import java.util.ArrayList;
-import java.util.List;
+import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
 
 /**
  * Class to perform and undo a normalization on real vectors with respect to
@@ -81,30 +81,30 @@ public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ? >> e
     optionHandler.setGlobalParameterConstraint(new EqualSizeGlobalConstraint(global));
   }
 
-  public List<ObjectAndAssociations<V>> normalizeObjects(List<ObjectAndAssociations<V>> objectAndAssociationsList)
+  public List<SimplePair<V, Associations>> normalizeObjects(List<SimplePair<V, Associations>> objectAndAssociationsList)
       throws NonNumericFeaturesException {
     if (objectAndAssociationsList.size() == 0)
-      return new ArrayList<ObjectAndAssociations<V>>();
+      return new ArrayList<SimplePair<V, Associations>>();
 
     if (minima.length == 0 && maxima.length == 0)
       determineMinMax(objectAndAssociationsList);
 
-    int dim = objectAndAssociationsList.get(0).getObject().getDimensionality();
+    int dim = objectAndAssociationsList.get(0).getFirst().getDimensionality();
     if (dim != minima.length || dim != maxima.length)
       throw new IllegalArgumentException("Dimensionalities do not agree!");
 
     try {
-      List<ObjectAndAssociations<V>> normalized = new ArrayList<ObjectAndAssociations<V>>();
-      for (ObjectAndAssociations<V> objectAndAssociations : objectAndAssociationsList) {
-        double[] values = new double[objectAndAssociations.getObject().getDimensionality()];
-        for (int d = 1; d <= objectAndAssociations.getObject().getDimensionality(); d++) {
-          values[d - 1] = (objectAndAssociations.getObject().getValue(d).doubleValue() - minima[d - 1]) / factor(d);
+      List<SimplePair<V, Associations>> normalized = new ArrayList<SimplePair<V, Associations>>();
+      for (SimplePair<V, Associations> objectAndAssociations : objectAndAssociationsList) {
+        double[] values = new double[objectAndAssociations.getFirst().getDimensionality()];
+        for (int d = 1; d <= objectAndAssociations.getFirst().getDimensionality(); d++) {
+          values[d - 1] = (objectAndAssociations.getFirst().getValue(d).doubleValue() - minima[d - 1]) / factor(d);
         }
 
-        V normalizedFeatureVector = objectAndAssociationsList.get(0).getObject().newInstance(values);
-        normalizedFeatureVector.setID(objectAndAssociations.getObject().getID());
-        Associations associations = objectAndAssociations.getAssociations();
-        normalized.add(new ObjectAndAssociations<V>(normalizedFeatureVector, associations));
+        V normalizedFeatureVector = objectAndAssociationsList.get(0).getFirst().newInstance(values);
+        normalizedFeatureVector.setID(objectAndAssociations.getFirst().getID());
+        Associations associations = objectAndAssociations.getSecond();
+        normalized.add(new SimplePair<V, Associations>(normalizedFeatureVector, associations));
       }
       return normalized;
     }
@@ -294,16 +294,16 @@ public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ? >> e
    * Determines the minima and maxima values in each dimension of the given
    * featureVectors.
    *
-   * @param objectAndAssociationsList the list of feature vectors and their associtions
+   * @param objectAndAssociationsList the list of feature vectors and their associations
    */
-  private void determineMinMax(List<ObjectAndAssociations<V>> objectAndAssociationsList) {
+  private void determineMinMax(List<SimplePair<V, Associations>> objectAndAssociationsList) {
     if (objectAndAssociationsList.isEmpty())
       return;
-    int dimensionality = objectAndAssociationsList.get(0).getObject().getDimensionality();
+    int dimensionality = objectAndAssociationsList.get(0).getFirst().getDimensionality();
     initMinMax(dimensionality);
 
-    for (ObjectAndAssociations<V> objectAndAssociations : objectAndAssociationsList) {
-      updateMinMax(objectAndAssociations.getObject());
+    for (SimplePair<V, Associations> objectAndAssociations : objectAndAssociationsList) {
+      updateMinMax(objectAndAssociations.getFirst());
     }
   }
 

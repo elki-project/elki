@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
 
 import java.util.Iterator;
 import java.util.List;
@@ -29,7 +30,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
    * @param objectsAndAssociationsList the list of objects and their associations to be inserted
    * @throws UnableToComplyException if initialization is not possible
    */
-  void insert(List<ObjectAndAssociations<O>> objectsAndAssociationsList) throws UnableToComplyException;
+  void insert(List<SimplePair<O, Associations>> objectsAndAssociationsList) throws UnableToComplyException;
 
   /**
    * Inserts the given object into the database.
@@ -38,7 +39,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
    * @return the ID assigned to the inserted object
    * @throws UnableToComplyException if insertion is not possible
    */
-  Integer insert(ObjectAndAssociations<O> objectAndAssociations) throws UnableToComplyException;
+  Integer insert(SimplePair<O, Associations> objectAndAssociations) throws UnableToComplyException;
 
   /**
    * Removes all objects from the database that are equal to the given object.

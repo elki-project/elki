@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -62,9 +63,9 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
      * Calls the super method and afterwards inserts the specified object into the underlying index structure.
      */
     @Override
-    public Integer insert(ObjectAndAssociations<O> objectAndAssociations) throws UnableToComplyException {
+    public Integer insert(SimplePair<O, Associations> objectAndAssociations) throws UnableToComplyException {
         Integer id = super.insert(objectAndAssociations);
-        O object = objectAndAssociations.getObject();
+        O object = objectAndAssociations.getFirst();
         index.insert(object);
         return id;
     }
@@ -75,8 +76,8 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
      * Otherwise the objects will be inserted sequentially.
      */
     @Override
-    public void insert(List<ObjectAndAssociations<O>> objectsAndAssociationsList) throws UnableToComplyException {
-        for (ObjectAndAssociations<O> objectAndAssociations : objectsAndAssociationsList) {
+    public void insert(List<SimplePair<O, Associations>> objectsAndAssociationsList) throws UnableToComplyException {
+        for (SimplePair<O, Associations> objectAndAssociations : objectsAndAssociationsList) {
             super.insert(objectAndAssociations);
         }
         index.insert(getObjects(objectsAndAssociationsList));

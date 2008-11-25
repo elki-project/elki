@@ -1,11 +1,12 @@
 package de.lmu.ifi.dbs.elki.normalization;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.ObjectAndAssociations;
+import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-
-import java.util.List;
+import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
 
 /**
  * Dummy normalization that does nothing. This class is used at normalization of multi-represented objects
@@ -18,7 +19,7 @@ public class DummyNormalization<O extends DatabaseObject> extends AbstractParame
     /**
      * @return the specified objectAndAssociationsList
      */
-    public List<ObjectAndAssociations<O>> normalizeObjects(List<ObjectAndAssociations<O>> objectAndAssociationsList) {
+    public List<SimplePair<O,Associations>> normalizeObjects(List<SimplePair<O,Associations>> objectAndAssociationsList) {
         return objectAndAssociationsList;
     }
 

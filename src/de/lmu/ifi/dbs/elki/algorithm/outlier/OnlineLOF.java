@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.elki.database.connection.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.parser.ObjectAndLabels;
@@ -32,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
 
 /**
  * Online algorithm to efficiently update density-based local
@@ -106,7 +106,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
     /**
      * The objects to be inserted.
      */
-    private List<ObjectAndAssociations<O>> insertions;
+    private List<SimplePair<O, Associations>> insertions;
 
     /**
      * Provides the Online LOF algorithm,
@@ -139,7 +139,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
         nnTable.resetPageAccess();
         getDistanceFunction().setDatabase(database, isVerbose(), isTime());
         try {
-            for (ObjectAndAssociations<O> objectAndAssociations : insertions) {
+            for (SimplePair<O, Associations> objectAndAssociations : insertions) {
                 insert(database, objectAndAssociations);
             }
         }
@@ -226,7 +226,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
      * @param objectAndAssociation the objects and their associations to be inserted
      * @throws UnableToComplyException if insertion is not possible
      */
-    private void insert(Database<O> database, ObjectAndAssociations<O> objectAndAssociation) throws UnableToComplyException {
+    private void insert(Database<O> database, SimplePair<O, Associations> objectAndAssociation) throws UnableToComplyException {
         // insert o into db
         Integer o = database.insert(objectAndAssociation);
         if (isVerbose()) {
@@ -354,7 +354,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
     }
 
     /**
-     * Auxiliary method for {@link #insert(de.lmu.ifi.dbs.elki.database.Database,de.lmu.ifi.dbs.elki.database.ObjectAndAssociations)}:
+     * Auxiliary method for {@link #insert(de.lmu.ifi.dbs.elki.database.Database)}:
      * inserts the objects with the specified id into the the {@link #nnTable} and {@link #lofTable}.
      *
      * @param id        the id of the object to be inserted
@@ -401,8 +401,8 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
      * @param objectAndLabelsList the list of object and their labels to be transformed
      * @return a list of objects and their associations
      */
-    private List<ObjectAndAssociations<O>> transformObjectAndLabels(List<ObjectAndLabels<O>> objectAndLabelsList) {
-        List<ObjectAndAssociations<O>> result = new ArrayList<ObjectAndAssociations<O>>();
+    private List<SimplePair<O, Associations>> transformObjectAndLabels(List<ObjectAndLabels<O>> objectAndLabelsList) {
+        List<SimplePair<O, Associations>> result = new ArrayList<SimplePair<O, Associations>>();
 
         for (ObjectAndLabels<O> objectAndLabels : objectAndLabelsList) {
             List<String> labels = objectAndLabels.getLabels();
@@ -425,7 +425,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
             if (labelBuffer.length() != 0)
                 associationMap.put(AssociationID.LABEL, labelBuffer.toString());
 
-            result.add(new ObjectAndAssociations<O>(objectAndLabels.getObject(), associationMap));
+            result.add(new SimplePair<O, Associations>(objectAndLabels.getObject(), associationMap));
         }
         return result;
     }

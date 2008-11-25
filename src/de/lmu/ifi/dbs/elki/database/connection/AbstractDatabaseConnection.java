@@ -1,12 +1,14 @@
 package de.lmu.ifi.dbs.elki.database.connection;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.elki.database.SequentialDatabase;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
@@ -21,9 +23,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.NotEqualValueGlobalConstraint;
-
-import java.util.ArrayList;
-import java.util.List;
+import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
 
 /**
  * Abstract super class for all database connections. AbstractDatabaseConnection
@@ -218,9 +218,9 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
      * @return a list of normalized objects and their associations
      * @throws NonNumericFeaturesException if any exception occurs during normalization
      */
-    protected List<ObjectAndAssociations<O>> normalizeAndTransformLabels(List<ObjectAndLabels<O>> objectAndLabelsList,
+    protected List<SimplePair<O, Associations>> normalizeAndTransformLabels(List<ObjectAndLabels<O>> objectAndLabelsList,
                                                                          Normalization<O> normalization) throws NonNumericFeaturesException {
-        List<ObjectAndAssociations<O>> objectAndAssociationsList = transformLabels(objectAndLabelsList);
+        List<SimplePair<O, Associations>> objectAndAssociationsList = transformLabels(objectAndLabelsList);
 
         if (normalization == null) {
             return objectAndAssociationsList;
@@ -237,8 +237,8 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
      * @param objectAndLabelsList the list of object and their labels to be transformed
      * @return a list of objects and their associations
      */
-    private List<ObjectAndAssociations<O>> transformLabels(List<ObjectAndLabels<O>> objectAndLabelsList) {
-        List<ObjectAndAssociations<O>> result = new ArrayList<ObjectAndAssociations<O>>();
+    private List<SimplePair<O, Associations>> transformLabels(List<ObjectAndLabels<O>> objectAndLabelsList) {
+        List<SimplePair<O, Associations>> result = new ArrayList<SimplePair<O, Associations>>();
 
         for (ObjectAndLabels<O> objectAndLabels : objectAndLabelsList) {
             List<String> labels = objectAndLabels.getLabels();
@@ -306,7 +306,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
                 associationMap.put(AssociationID.EXTERNAL_ID, externalIDLabel);
             }
 
-            result.add(new ObjectAndAssociations<O>(objectAndLabels.getObject(), associationMap));
+            result.add(new SimplePair<O, Associations>(objectAndLabels.getObject(), associationMap));
         }
         return result;
     }

@@ -1,9 +1,13 @@
 package de.lmu.ifi.dbs.elki.database.connection;
 
+import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
+import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
@@ -18,10 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-
-import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
+import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
 
 /**
  * Provides a database connection expecting input from standard in.
@@ -79,16 +80,16 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
             // parse
             ParsingResult<O> parsingResult = parser.parse(in);
             // normalize objects and transform labels
-            List<ObjectAndAssociations<O>> objectAndAssociationsList = normalizeAndTransformLabels(parsingResult.getObjectAndLabelList(),
+            List<SimplePair<O, Associations>> objectAndAssociationsList = normalizeAndTransformLabels(parsingResult.getObjectAndLabelList(),
                 normalization);
 
             // add precomputed distances
             if (parser instanceof DistanceParser) {
                 Map<Integer, Map<Integer, Distance<?>>> distanceCache = ((DistanceParsingResult) parsingResult)
                     .getDistanceCache();
-                for (ObjectAndAssociations<O> objectAndAssociations : objectAndAssociationsList) {
-                    Map<Integer, Distance<?>> distances = distanceCache.remove(objectAndAssociations.getObject().getID());
-                    objectAndAssociations.addAssociation(AssociationID.CACHED_DISTANCES, distances);
+                for (SimplePair<O, Associations> objectAndAssociations : objectAndAssociationsList) {
+                    Map<Integer, Distance<?>> distances = distanceCache.remove(objectAndAssociations.getFirst().getID());
+                    objectAndAssociations.getSecond().put(AssociationID.CACHED_DISTANCES, distances);
                 }
             }
 

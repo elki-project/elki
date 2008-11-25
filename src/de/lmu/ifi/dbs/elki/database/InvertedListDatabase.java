@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionSelectingDistanceF
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,9 +34,9 @@ public class InvertedListDatabase<N extends Number, O extends FeatureVector<O, N
      *          if database reached limit of storage capacity
      */
     @Override
-    public Integer insert(ObjectAndAssociations<O> objectAndAssociations) throws UnableToComplyException {
+    public Integer insert(SimplePair<O, Associations> objectAndAssociations) throws UnableToComplyException {
         Integer id = super.insert(objectAndAssociations);
-        O object = objectAndAssociations.getObject();
+        O object = objectAndAssociations.getFirst();
 
         for (int d = 1; d <= object.getDimensionality(); d++) {
             SortedMap<Double, List<Integer>> invertedList = invertedLists.get(d);

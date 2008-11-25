@@ -1,9 +1,17 @@
 package de.lmu.ifi.dbs.elki.database.connection;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.MultiRepresentedObject;
+import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ObjectAndAssociations;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.parser.ObjectAndLabels;
@@ -19,14 +27,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
 
 /**
  * Provides a database connection based on multiple files and parsers to be set.
@@ -147,7 +148,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
             }
 
             // normalize objects and transform labels
-            List<ObjectAndAssociations<MultiRepresentedObject<O>>> objectAndAssociationList = normalizeAndTransformLabels(objectAndLabelsList, normalization);
+            List<SimplePair<MultiRepresentedObject<O>,Associations>> objectAndAssociationList = normalizeAndTransformLabels(objectAndLabelsList, normalization);
 
             // insert into database
             database.insert(objectAndAssociationList);
