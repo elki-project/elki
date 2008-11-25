@@ -80,14 +80,32 @@ public class BitVector extends NumberVector<BitVector, Bit> {
      * Returns the same as
      * {@link BitVector#randomInstance(Random) randomInstance(random)}.
      */
-    public BitVector randomInstance(Bit min, Bit max, Random random) {
+    public BitVector randomInstance(@SuppressWarnings("unused")
+    Bit min, @SuppressWarnings("unused")
+    Bit max, Random random) {
         return randomInstance(random);
     }
 
+    /**
+     * The dimensionality of the binary vector space whereof this BitVector is an
+     * element.
+     * 
+     * @see de.lmu.ifi.dbs.elki.data.FeatureVector#getDimensionality()
+     */
     public int getDimensionality() {
         return dimensionality;
     }
 
+    /**
+     * Returns the value in the specified dimension.
+     * 
+     * @param dimension
+     *            the desired dimension, where 1 &le; dimension &le;
+     *            <code>this.getDimensionality()</code>
+     * @return the value in the specified dimension
+     * 
+     * @see de.lmu.ifi.dbs.elki.data.FeatureVector#getValue(int)
+     */
     public Bit getValue(int dimension) {
         if (dimension < 1 || dimension > dimensionality) {
             throw new IllegalArgumentException("illegal dimension: "
@@ -96,6 +114,16 @@ public class BitVector extends NumberVector<BitVector, Bit> {
         return new Bit(bits.get(dimension));
     }
 
+    /**
+     * Returns a Vector representing in one column and
+     * <code>getDimensionality()</code> rows the values of this BitVector as double values.
+     * 
+     * @return a Matrix representing in one column and
+     *         <code>getDimensionality()</code> rows the values of this
+     *         BitVector as double values
+     * 
+     * @see de.lmu.ifi.dbs.elki.data.FeatureVector#getColumnVector()
+     */
     public Vector getColumnVector() {
         double[] values = new double[dimensionality];
         for (int i = 0; i < dimensionality; i++) {
@@ -104,6 +132,17 @@ public class BitVector extends NumberVector<BitVector, Bit> {
         return new Vector(values);
     }
 
+    /**
+     * Returns a Matrix representing in one row and
+     * <code>getDimensionality()</code> columns the values of this
+     * BitVector as double values.
+     * 
+     * @return a Matrix representing in one row and
+     *         <code>getDimensionality()</code> columns the values of this
+     *         BitVector as double values
+     * 
+     * @see de.lmu.ifi.dbs.elki.data.FeatureVector#getRowVector()
+     */
     public Matrix getRowVector() {
         double[] values = new double[dimensionality];
         for (int i = 0; i < dimensionality; i++) {
