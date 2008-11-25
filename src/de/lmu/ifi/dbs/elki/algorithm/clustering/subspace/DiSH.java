@@ -295,10 +295,10 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
             debugFine(msg.toString());
         }
 
-        int lambda_max = dimensionality - clusters.get(clusters.size() - 1).getModel().getSubspaces().cardinality();
+        int lambdaMax = dimensionality - clusters.get(clusters.size() - 1).getModel().getSubspaces().cardinality();
         result = new Clustering<Cluster<AxesModel>>();
         for (Cluster<AxesModel> c : clusters) {
-            if (dimensionality - c.getModel().getSubspaces().cardinality() == lambda_max) {
+            if (dimensionality - c.getModel().getSubspaces().cardinality() == lambdaMax) {
                 result.addCluster(c);
             }
         }

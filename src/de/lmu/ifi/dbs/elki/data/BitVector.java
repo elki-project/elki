@@ -57,7 +57,11 @@ public class BitVector extends NumberVector<BitVector, Bit> {
     }
 
     /**
+     * Creates and returns a new BitVector based on the passed values.
+     * 
      * @return a new instance of this BitVector with the specified values
+     * 
+     * @see de.lmu.ifi.dbs.elki.data.NumberVector#newInstance(N[])
      */
     @Override
     public BitVector newInstance(Bit[] values) {
@@ -65,8 +69,13 @@ public class BitVector extends NumberVector<BitVector, Bit> {
     }
 
     /**
+     * Returns a BitVector with random values.
+     * 
+     * @param random an instance of random to facilitate random values
      * @return a new instance of this BitVector with
-     *         uniformly distributed random values
+     *         random values
+     * 
+     * @see de.lmu.ifi.dbs.elki.data.FeatureVector#randomInstance(java.util.Random)
      */
     public BitVector randomInstance(Random random) {
         Bit[] randomBits = new Bit[getDimensionality()];
@@ -79,10 +88,12 @@ public class BitVector extends NumberVector<BitVector, Bit> {
     /**
      * Returns the same as
      * {@link BitVector#randomInstance(Random) randomInstance(random)}.
+     * 
+     * @param min unused
+     * @param max unused
+     * @param random as in {@link BitVector#randomInstance(Random) randomInstance(random)}
      */
-    public BitVector randomInstance(@SuppressWarnings("unused")
-    Bit min, @SuppressWarnings("unused")
-    Bit max, Random random) {
+    public BitVector randomInstance(Bit min, Bit max, Random random) {
         return randomInstance(random);
     }
 
@@ -154,6 +165,11 @@ public class BitVector extends NumberVector<BitVector, Bit> {
     /**
      * Returns a bit vector equal to this bit vector, if k is not 0, a bit
      * vector with all components equal to zero otherwise.
+     * 
+     * @param k used as multiplier 1 if k &ne; 0,
+     * otherwise the resulting bit vector will have all values equal to zero
+     * @return a bit vector equal to this bit vector, if k is not 0, a bit
+     * vector with all components equal to zero otherwise
      */
     public BitVector multiplicate(double k) {
         if (k == 0) {
@@ -166,6 +182,11 @@ public class BitVector extends NumberVector<BitVector, Bit> {
 
     /**
      * Returns the inverse of the bit vector.
+     * 
+     * The result is the same as obtained by flipping all bits in the underlying BitSet.
+     * 
+     * @return the inverse of the bit vector
+     * @see BitSet#flip(int,int)
      */
     public BitVector negativeVector() {
         BitSet newBits = (BitSet) bits.clone();
@@ -175,6 +196,8 @@ public class BitVector extends NumberVector<BitVector, Bit> {
 
     /**
      * Returns a bit vector of equal dimensionality but containing 0 only.
+     * 
+     * @return a bit vector of equal dimensionality but containing 0 only
      */
     public BitVector nullVector() {
         return new BitVector(new BitSet(), dimensionality);
@@ -183,6 +206,10 @@ public class BitVector extends NumberVector<BitVector, Bit> {
     /**
      * Returns a bit vector corresponding to an XOR operation on this and the
      * specified bit vector.
+     * 
+     * @param fv the bit vector to add
+     * @return a new bit vector corresponding to an XOR operation on this and the
+     * specified bit vector
      */
     public BitVector plus(BitVector fv) {
         Bit[] fv_bits = new Bit[fv.getDimensionality()];

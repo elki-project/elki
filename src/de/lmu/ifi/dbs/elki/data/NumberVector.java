@@ -27,6 +27,11 @@ public abstract class NumberVector<V extends NumberVector<V, N>, N extends Numbe
      */
     public final static String ATTRIBUTE_SEPARATOR = " ";
 
+    /**
+     * Creates and returns a new instance of V based on the passed values.
+     * 
+     * @see de.lmu.ifi.dbs.elki.data.FeatureVector#newInstance(N[])
+     */
     @SuppressWarnings("unchecked")
     public V newInstance(N[] values) throws SecurityException,
                                             NoSuchMethodException, IllegalArgumentException,
