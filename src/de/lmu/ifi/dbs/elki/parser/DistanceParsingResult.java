@@ -1,10 +1,11 @@
 package de.lmu.ifi.dbs.elki.parser;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.distance.Distance;
-
 import java.util.List;
 import java.util.Map;
+
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
 
 /**
  * Provides a list of database objects and labels associated with these objects
@@ -27,7 +28,7 @@ public class DistanceParsingResult<O extends DatabaseObject, D extends Distance<
    * @param distanceCache      the cache of precomputed distances between the database
    *                           objects
    */
-  public DistanceParsingResult(List<ObjectAndLabels<O>> objectAndLabelList,
+  public DistanceParsingResult(List<SimplePair<O,List<String>>> objectAndLabelList,
                                Map<Integer, Map<Integer, D>> distanceCache) {
     super(objectAndLabelList);
     this.distanceCache = distanceCache;

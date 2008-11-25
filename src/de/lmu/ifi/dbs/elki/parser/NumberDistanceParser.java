@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
 
 /**
  * Provides a parser for parsing one distance value per line. <p/> A line must
@@ -67,7 +68,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
     public ParsingResult<ExternalObject> parse(InputStream in) {
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         int lineNumber = 0;
-        List<ObjectAndLabels<ExternalObject>> objectAndLabelsList = new ArrayList<ObjectAndLabels<ExternalObject>>();
+        List<SimplePair<ExternalObject,List<String>>> objectAndLabelsList = new ArrayList<SimplePair<ExternalObject,List<String>>>();
 
         Set<Integer> ids = new HashSet<Integer>();
         Map<Integer, Map<Integer, D>> distanceCache = new HashMap<Integer, Map<Integer, D>>();
@@ -141,7 +142,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
             debugFine("add to objectAndLabelsList");
         }
         for (Integer id : ids) {
-            objectAndLabelsList.add(new ObjectAndLabels<ExternalObject>(new ExternalObject(id), new ArrayList<String>()));
+            objectAndLabelsList.add(new SimplePair<ExternalObject,List<String>>(new ExternalObject(id), new ArrayList<String>()));
         }
 
         return new DistanceParsingResult<ExternalObject, D>(objectAndLabelsList, distanceCache);

@@ -1,14 +1,15 @@
 package de.lmu.ifi.dbs.elki.parser;
 
-import de.lmu.ifi.dbs.elki.data.Bit;
-import de.lmu.ifi.dbs.elki.data.BitVector;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import de.lmu.ifi.dbs.elki.data.Bit;
+import de.lmu.ifi.dbs.elki.data.BitVector;
+import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
 
 
 /**
@@ -36,7 +37,7 @@ public class BitVectorLabelParser extends AbstractParser<BitVector> {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 0;
     int dimensionality = -1;
-    List<ObjectAndLabels<BitVector>> objectAndLabelsList = new ArrayList<ObjectAndLabels<BitVector>>();
+    List<SimplePair<BitVector,List<String>>> objectAndLabelsList = new ArrayList<SimplePair<BitVector,List<String>>>();
     try {
       for (String line; (line = reader.readLine()) != null; lineNumber++) {
         if (!line.startsWith(COMMENT) && line.length() > 0) {
@@ -60,7 +61,7 @@ public class BitVectorLabelParser extends AbstractParser<BitVector> {
             throw new IllegalArgumentException("Differing dimensionality in line " + lineNumber + ".");
           }
 
-          ObjectAndLabels<BitVector> objectAndLabels = new ObjectAndLabels<BitVector>(new BitVector(attributes.toArray(new Bit[attributes.size()])), labels);
+          SimplePair<BitVector,List<String>> objectAndLabels = new SimplePair<BitVector,List<String>>(new BitVector(attributes.toArray(new Bit[attributes.size()])), labels);
           objectAndLabelsList.add(objectAndLabels);
         }
       }

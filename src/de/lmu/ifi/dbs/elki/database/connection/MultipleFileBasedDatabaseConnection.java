@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
-import de.lmu.ifi.dbs.elki.parser.ObjectAndLabels;
 import de.lmu.ifi.dbs.elki.parser.Parser;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
 import de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser;
@@ -108,10 +107,10 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
 
             // comparator to sort the ObjectAndLabels lists provided by the
             // parsers.
-            Comparator<ObjectAndLabels<O>> comparator = new Comparator<ObjectAndLabels<O>>() {
-                public int compare(ObjectAndLabels<O> o1, ObjectAndLabels<O> o2) {
-                    String classLabel1 = o1.getLabels().get(classLabelIndex);
-                    String classLabel2 = o2.getLabels().get(classLabelIndex);
+            Comparator<SimplePair<O,List<String>>> comparator = new Comparator<SimplePair<O,List<String>>>() {
+                public int compare(SimplePair<O,List<String>> o1, SimplePair<O,List<String>> o2) {
+                    String classLabel1 = o1.getSecond().get(classLabelIndex);
+                    String classLabel2 = o2.getSecond().get(classLabelIndex);
                     return classLabel1.compareTo(classLabel2);
                 }
             };
@@ -125,25 +124,25 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
                 parsingResults.add(parsingResult);
                 numberOfObjects = Math.max(parsingResult.getObjectAndLabelList().size(), numberOfObjects);
                 // sort the representations according to the external ids
-                List<ObjectAndLabels<O>> objectAndLabelsList = parsingResult.getObjectAndLabelList();
+                List<SimplePair<O,List<String>>> objectAndLabelsList = parsingResult.getObjectAndLabelList();
                 Collections.sort(objectAndLabelsList, comparator);
             }
 
             // build the multi-represented objects and their labels
-            List<ObjectAndLabels<MultiRepresentedObject<O>>> objectAndLabelsList = new ArrayList<ObjectAndLabels<MultiRepresentedObject<O>>>();
+            List<SimplePair<MultiRepresentedObject<O>,List<String>>> objectAndLabelsList = new ArrayList<SimplePair<MultiRepresentedObject<O>,List<String>>>();
             for (int i = 0; i < numberOfObjects; i++) {
                 List<O> representations = new ArrayList<O>(numberOfRepresentations);
                 List<String> labels = new ArrayList<String>();
                 for (int r = 0; r < numberOfRepresentations; r++) {
                     ParsingResult<O> parsingResult = parsingResults.get(r);
-                    representations.add(parsingResult.getObjectAndLabelList().get(i).getObject());
-                    List<String> rep_labels = parsingResult.getObjectAndLabelList().get(i).getLabels();
+                    representations.add(parsingResult.getObjectAndLabelList().get(i).getFirst());
+                    List<String> rep_labels = parsingResult.getObjectAndLabelList().get(i).getSecond();
                     for (String l : rep_labels) {
                         if (!labels.contains(l))
                             labels.add(l);
                     }
                 }
-                objectAndLabelsList.add(new ObjectAndLabels<MultiRepresentedObject<O>>(
+                objectAndLabelsList.add(new SimplePair<MultiRepresentedObject<O>,List<String>>(
                     new MultiRepresentedObject<O>(representations), labels));
             }
 

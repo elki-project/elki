@@ -15,7 +15,6 @@ import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.parser.ObjectAndLabels;
 import de.lmu.ifi.dbs.elki.parser.Parser;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
 import de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser;
@@ -396,16 +395,17 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
 
     /**
      * Transforms the specified list of objects and their labels into a list of
-     * objects and their associtaions.
+     * objects and their associations.
      *
      * @param objectAndLabelsList the list of object and their labels to be transformed
      * @return a list of objects and their associations
      */
-    private List<SimplePair<O, Associations>> transformObjectAndLabels(List<ObjectAndLabels<O>> objectAndLabelsList) {
+    // FIXME: duplicated code, this belongs to the parser classes.
+    private List<SimplePair<O, Associations>> transformObjectAndLabels(List<SimplePair<O, List<String>>> objectAndLabelsList) {
         List<SimplePair<O, Associations>> result = new ArrayList<SimplePair<O, Associations>>();
 
-        for (ObjectAndLabels<O> objectAndLabels : objectAndLabelsList) {
-            List<String> labels = objectAndLabels.getLabels();
+        for (SimplePair<O, List<String>> objectAndLabels : objectAndLabelsList) {
+            List<String> labels = objectAndLabels.getSecond();
 
             StringBuffer labelBuffer = new StringBuffer();
             for (String label : labels) {
@@ -425,7 +425,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
             if (labelBuffer.length() != 0)
                 associationMap.put(AssociationID.LABEL, labelBuffer.toString());
 
-            result.add(new SimplePair<O, Associations>(objectAndLabels.getObject(), associationMap));
+            result.add(new SimplePair<O, Associations>(objectAndLabels.getFirst(), associationMap));
         }
         return result;
     }

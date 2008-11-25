@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -101,7 +102,7 @@ public class RealVectorLabelParser<V extends RealVector<V, ?>> extends AbstractP
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         int lineNumber = 1;
         int dimensionality = -1;
-        List<ObjectAndLabels<V>> objectAndLabelsList = new ArrayList<ObjectAndLabels<V>>();
+        List<SimplePair<V,List<String>>> objectAndLabelsList = new ArrayList<SimplePair<V,List<String>>>();
         try {
             for (String line; (line = reader.readLine()) != null; lineNumber++) {
                 if (!line.startsWith(COMMENT) && line.length() > 0) {
@@ -130,12 +131,12 @@ public class RealVectorLabelParser<V extends RealVector<V, ?>> extends AbstractP
                         throw new IllegalArgumentException("Differing dimensionality in line " + lineNumber + ":" + attributes.size() + " != " + dimensionality);
                     }
 
-                    ObjectAndLabels objectAndLabels;
+                    SimplePair<V,List<String>> objectAndLabels;
                     if (parseFloat) {
-                        objectAndLabels = new ObjectAndLabels(new FloatVector(Util.convertToFloat(attributes)), labels);
+                        objectAndLabels = new SimplePair<V,List<String>>((V) new FloatVector(Util.convertToFloat(attributes)), labels);
                     }
                     else {
-                        objectAndLabels = new ObjectAndLabels(new DoubleVector(attributes), labels);
+                        objectAndLabels = new SimplePair<V,List<String>>((V) new DoubleVector(attributes), labels);
                     }
                     objectAndLabelsList.add(objectAndLabels);
                 }
