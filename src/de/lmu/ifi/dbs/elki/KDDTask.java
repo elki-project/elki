@@ -347,12 +347,13 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
    *         (i.e. {@link #setParameters(String[]) setParameters(String[])} has
    *         not been called before calling this method)
    */
-  public Result run() throws IllegalStateException {
+  public MultiResult run() throws IllegalStateException {
     if(initialized) {
       Database<O> db = databaseConnection.getDatabase(normalization); 
       algorithm.run(db);
       try {
-        Result result = algorithm.getResult();
+        MultiResult result; 
+        Result res = algorithm.getResult();
 
         // standard annotations from the source file
         // TODO: get them via databaseConnection!
@@ -363,15 +364,14 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
         ar.addAssociationGenerics(null, AssociationID.CLASS);
 
         // insert standard annotations when we have a MultiResult
-        if (result instanceof MultiResult) {
-          MultiResult mr = (MultiResult) result;
-          mr.prependResult(ar);
+        if (res instanceof MultiResult) {
+          result = (MultiResult) res;
+          result.prependResult(ar);
         } else {
           // TODO: can we always wrap them in a MultiResult safely?
-          MultiResult mr = new MultiResult();        
-          mr.addResult(ar);
-          mr.addResult(result);
-          result = mr;
+          result = new MultiResult();        
+          result.addResult(ar);
+          result.addResult(res);
         }
 
         if(result != null) {
