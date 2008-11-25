@@ -53,7 +53,7 @@ public class PairCountingFMeasure {
    * @param beta Beta value for the F-Measure
    * @return Pair counting F-Measure result.
    */
-  public static <R extends Clustering<C>, C extends BaseCluster<C,?>, S extends Clustering<D>, D extends BaseCluster<D,?>> double compareDatabases(R result1, S result2, double beta) {
+  public static <R extends Clustering<C>, C extends BaseCluster<C,?>, S extends Clustering<D>, D extends BaseCluster<D,?>> double compareClusterings(R result1, S result2, double beta) {
     PairSortedGeneratorInterface first = getPairGenerator(result1);
     PairSortedGeneratorInterface second = getPairGenerator(result2);
     return countPairs(first, second, beta);
@@ -66,8 +66,8 @@ public class PairCountingFMeasure {
    * @param result2 second result
    * @return Pair counting F-1-Measure result.
    */
-  public static <R extends Clustering<C>, C extends BaseCluster<C,?>, S extends Clustering<D>, D extends BaseCluster<D,?>> double compareDatabases(R result1, S result2) {
-    return compareDatabases(result1, result2, 1.0);
+  public static <R extends Clustering<C>, C extends BaseCluster<C,?>, S extends Clustering<D>, D extends BaseCluster<D,?>> double compareClusterings(R result1, S result2) {
+    return compareClusterings(result1, result2, 1.0);
   }
 
   /**

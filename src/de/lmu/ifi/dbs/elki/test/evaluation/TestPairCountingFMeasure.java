@@ -53,14 +53,14 @@ public class TestPairCountingFMeasure {
     bylabel.run(db);
     Clustering<Cluster<Model>> rbl = bylabel.getResult();
     
-    assertEquals(1.0, PairCountingFMeasure.compareDatabases(rai, rai), Double.MIN_VALUE);
-    assertEquals(1.0, PairCountingFMeasure.compareDatabases(ran, ran), Double.MIN_VALUE);
-    assertEquals(1.0, PairCountingFMeasure.compareDatabases(rbl, rbl), Double.MIN_VALUE);
+    assertEquals(1.0, PairCountingFMeasure.compareClusterings(rai, rai), Double.MIN_VALUE);
+    assertEquals(1.0, PairCountingFMeasure.compareClusterings(ran, ran), Double.MIN_VALUE);
+    assertEquals(1.0, PairCountingFMeasure.compareClusterings(rbl, rbl), Double.MIN_VALUE);
     
-    assertEquals(0.009950248756218905, PairCountingFMeasure.compareDatabases(ran, rbl), Double.MIN_VALUE);
-    assertEquals(0.0033277870216306157, PairCountingFMeasure.compareDatabases(rai, ran), Double.MIN_VALUE);
+    assertEquals(0.009950248756218905, PairCountingFMeasure.compareClusterings(ran, rbl), Double.MIN_VALUE);
+    assertEquals(0.0033277870216306157, PairCountingFMeasure.compareClusterings(rai, ran), Double.MIN_VALUE);
 
-    assertEquals(0.5 /* 0.3834296724470135 */, PairCountingFMeasure.compareDatabases(rai, rbl), Double.MIN_VALUE);
+    assertEquals(0.5 /* 0.3834296724470135 */, PairCountingFMeasure.compareClusterings(rai, rbl), Double.MIN_VALUE);
 }
 
 }

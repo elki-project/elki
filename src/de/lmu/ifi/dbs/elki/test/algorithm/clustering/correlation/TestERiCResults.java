@@ -89,7 +89,7 @@ public class TestERiCResults {
     // Even with not optimized parameters, we easily achieved 0.62
     // So any loss of quality means something isn't quite right with our
     // algorithms.
-    double score = PairCountingFMeasure.compareDatabases(result, rbl, 1.0);
+    double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0);
     assertTrue("ERiC score on test dataset too low: " + score, score > 0.920);
     System.out.println("ERiC score: " + score + " > " + 0.920);
   }
