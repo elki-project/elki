@@ -13,9 +13,9 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.cluster.BaseCluster;
+import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.cluster.naming.NamingScheme;
 import de.lmu.ifi.dbs.elki.data.cluster.naming.SimpleEnumeratingScheme;
-import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -165,7 +165,8 @@ public class TextWriter<O extends DatabaseObject> {
       throw new UnableToComplyException("No printable result found.");
     }
 
-    NamingScheme naming = null;
+    // TODO: generics hack. :-( Could be a different class derived from BaseCluster!
+    NamingScheme<Cluster<?>> naming = null;
     // Process groups or all data in a flat manner?
     if(rc != null) {
       groups = (Collection<DatabaseObjectGroup>) rc.getAllClusters();
@@ -181,7 +182,7 @@ public class TextWriter<O extends DatabaseObject> {
       String filename = null;
       // for clusters, use naming.
       if (group instanceof BaseCluster) {
-        BaseCluster<?,Model> bc = (BaseCluster<?, Model>) group;
+        Cluster<?> bc = (Cluster<?>) group;
         if(naming != null) {
           filename = filenameFromLabel(naming.getNameForCluster(bc));
         }

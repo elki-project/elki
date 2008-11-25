@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
  *
  * @param <M> Base model class allowed in hierarchy.
  */
+// TODO: merge Cluster and BaseCluster into one type? (non-self-referencing...)
 public class Cluster<M extends Model> extends BaseCluster<Cluster<M>, M> {
   /**
    * Constructor with model.
