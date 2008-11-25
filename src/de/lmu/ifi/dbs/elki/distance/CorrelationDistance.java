@@ -7,7 +7,7 @@ import java.io.ObjectOutput;
 /**
  * The correlation distance is a special Distance that indicates the
  * dissimilarity between correlation connected objects. The correlation distance
- * beween two points is a pair consisting of the correlation dimension of two
+ * between two points is a pair consisting of the correlation dimension of two
  * points and the euclidean distance between the two points.
  *
  * @author Elke Achtert

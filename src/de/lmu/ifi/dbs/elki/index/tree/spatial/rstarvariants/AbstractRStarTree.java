@@ -222,7 +222,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
    *
    * @param object           the query object
    * @param epsilon          the string representation of the query range
-   * @param distanceFunction the distance function that computes the distances beween the objects
+   * @param distanceFunction the distance function that computes the distances between the objects
    * @return a List of the query results
    */
   @Override
@@ -279,7 +279,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
    *
    * @param object           the query object
    * @param k                the number of nearest neighbors to be returned
-   * @param distanceFunction the distance function that computes the distances beween the objects
+   * @param distanceFunction the distance function that computes the distances between the objects
    * @return a List of the query results
    */
   @Override
@@ -300,7 +300,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
    *
    * @param ids              the query objects
    * @param k                the number of nearest neighbors to be returned
-   * @param distanceFunction the distance function that computes the distances beween the objects
+   * @param distanceFunction the distance function that computes the distances between the objects
    * @return a List of the query results
    */
   @Override
@@ -329,7 +329,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
    *
    * @param object           the query object
    * @param k                the number of nearest neighbors to be returned
-   * @param distanceFunction the distance function that computes the distances beween the objects
+   * @param distanceFunction the distance function that computes the distances between the objects
    * @return a List of the query results
    */
   @Override

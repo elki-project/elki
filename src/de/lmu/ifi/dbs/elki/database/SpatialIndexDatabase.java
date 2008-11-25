@@ -138,7 +138,7 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
      *
      * @param id               the ID of the query object
      * @param k                the number of nearest neighbors to be returned
-     * @param distanceFunction the distance function that computes the distances beween the
+     * @param distanceFunction the distance function that computes the distances between the
      *                         objects
      * @return a List of the query results
      */

@@ -80,7 +80,7 @@ public class InvertedListDatabase<N extends Number, O extends FeatureVector<O, N
      *
      * @param id               the ID of the query object
      * @param epsilon          the string representation of the query range
-     * @param distanceFunction the distance function that computes the distances beween the
+     * @param distanceFunction the distance function that computes the distances between the
      *                         objects
      * @return a List of the query results
      */
@@ -124,7 +124,7 @@ public class InvertedListDatabase<N extends Number, O extends FeatureVector<O, N
      *
      * @param id               the ID of the query object
      * @param k                the number of nearest neighbors to be returned
-     * @param distanceFunction the distance function that computes the distances beween the
+     * @param distanceFunction the distance function that computes the distances between the
      *                         objects
      * @return a List of the query results
      */
@@ -139,7 +139,7 @@ public class InvertedListDatabase<N extends Number, O extends FeatureVector<O, N
      *
      * @param queryObject      the query object
      * @param k                the number of nearest neighbors to be returned
-     * @param distanceFunction the distance function that computes the distances beween the
+     * @param distanceFunction the distance function that computes the distances between the
      *                         objects
      * @return a List of the query results
      */
@@ -154,7 +154,7 @@ public class InvertedListDatabase<N extends Number, O extends FeatureVector<O, N
      *
      * @param ids              the IDs of the query objects
      * @param k                the number of nearest neighbors to be returned
-     * @param distanceFunction the distance function that computes the distances beween the
+     * @param distanceFunction the distance function that computes the distances between the
      *                         objects
      * @return a List of List of the query results
      */
@@ -169,7 +169,7 @@ public class InvertedListDatabase<N extends Number, O extends FeatureVector<O, N
      *
      * @param id               the ID of the query object
      * @param k                the number of nearest neighbors to be returned
-     * @param distanceFunction the distance function that computes the distances beween the
+     * @param distanceFunction the distance function that computes the distances between the
      *                         objects
      * @return a List of the query results
      */

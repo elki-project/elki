@@ -106,7 +106,7 @@ public abstract class SpatialIndex<O extends NumberVector<O,?>, N extends Spatia
    *
    * @param obj              the query object
    * @param epsilon          the string representation of the query range
-   * @param distanceFunction the distance function that computes the distances beween the
+   * @param distanceFunction the distance function that computes the distances between the
    *                         objects
    * @return a List of the query results
    */
@@ -120,7 +120,7 @@ public abstract class SpatialIndex<O extends NumberVector<O,?>, N extends Spatia
    *
    * @param obj              the query object
    * @param k                the number of nearest neighbors to be returned
-   * @param distanceFunction the distance function that computes the distances beween the
+   * @param distanceFunction the distance function that computes the distances between the
    *                         objects
    * @return a List of the query results
    */
@@ -133,7 +133,7 @@ public abstract class SpatialIndex<O extends NumberVector<O,?>, N extends Spatia
    *
    * @param object           the query object
    * @param k                the number of nearest neighbors to be returned
-   * @param distanceFunction the distance function that computes the distances beween the
+   * @param distanceFunction the distance function that computes the distances between the
    *                         objects
    * @return a List of the query results
    */
@@ -146,7 +146,7 @@ public abstract class SpatialIndex<O extends NumberVector<O,?>, N extends Spatia
    *
    * @param ids              the query objects
    * @param k                the number of nearest neighbors to be returned
-   * @param distanceFunction the distance function that computes the distances beween the
+   * @param distanceFunction the distance function that computes the distances between the
    *                         objects
    * @return a List of the query results
    */
