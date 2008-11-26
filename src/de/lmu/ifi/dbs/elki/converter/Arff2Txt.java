@@ -75,7 +75,7 @@ public class Arff2Txt extends StandAloneInputWrapper {
         }
         catch (IOException e) {
             UnableToComplyException ue = new UnableToComplyException(
-                "I/O Exception occured. " + e.getMessage());
+                "I/O Exception occurred. " + e.getMessage());
             ue.fillInStackTrace();
             throw ue;
         }

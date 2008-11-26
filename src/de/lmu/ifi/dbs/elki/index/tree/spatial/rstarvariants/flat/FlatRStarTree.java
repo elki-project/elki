@@ -73,7 +73,7 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
 
   /**
    * Performs a bulk load on this RTree with the specified data.
-   * Is called by the constructur
+   * Is called by the constructor
    * and should be overwritten by subclasses if necessary.
    *
    * @param objects the data objects to be indexed
@@ -125,10 +125,10 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
   }
 
   /**
-   * Returns true if in the specified node an overflow occured, false otherwise.
+   * Returns true if in the specified node an overflow occurred, false otherwise.
    *
    * @param node the node to be tested for overflow
-   * @return true if in the specified node an overflow occured, false otherwise
+   * @return true if in the specified node an overflow occurred, false otherwise
    */
   @Override
   protected boolean hasOverflow(FlatRStarTreeNode node) {
@@ -141,10 +141,10 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
   }
 
   /**
-   * Returns true if in the specified node an underflow occured, false otherwise.
+   * Returns true if in the specified node an underflow occurred, false otherwise.
    *
    * @param node the node to be tested for underflow
-   * @return true if in the specified node an underflow occured, false otherwise
+   * @return true if in the specified node an underflow occurred, false otherwise
    */
   @Override
   protected boolean hasUnderflow(FlatRStarTreeNode node) {

@@ -146,7 +146,7 @@ public class Txt2Arff<W extends WekaAttribute> extends StandAloneInputWrapper {
 
     }
     catch (IOException e) {
-      throw new UnableToComplyException("I/O Exception occured. " + e.getMessage(), e);
+      throw new UnableToComplyException("I/O Exception occurred. " + e.getMessage(), e);
     }
     catch (ParseException e) {
       throw new UnableToComplyException(e.getMessage(), e);

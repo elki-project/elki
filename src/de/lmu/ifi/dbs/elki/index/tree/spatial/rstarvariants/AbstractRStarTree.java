@@ -158,7 +158,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
   }
 
   /**
-   * Deletes the specified obect from this index.
+   * Deletes the specified object from this index.
    *
    * @param object the object to be deleted
    * @return true if this index did contain the object with the specified id,
@@ -215,7 +215,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
   }
 
   /**
-   * Performs a range query for the given spatial objec with the given
+   * Performs a range query for the given spatial object with the given
    * epsilon range and the according distance function.
    * The query result is in ascending order to the distance to the
    * query object.
@@ -500,7 +500,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
    * query object.
    *
    * @param object           the query object
-   * @param distanceFunction the distance function that computes the distances beween the objects
+   * @param distanceFunction the distance function that computes the distances between the objects
    * @param knnList          the knn list containing the result
    */
   @SuppressWarnings("unchecked")
@@ -563,7 +563,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
    *
    * @param node             the node for which the query should be performed
    * @param distanceFunction the distance function for computing the distances
-   * @param knnLists         a map containing the knn lists for each query objcets
+   * @param knnLists         a map containing the knn lists for each query objects
    */
   protected <D extends Distance<D>> void batchNN(N node,
                                                  SpatialDistanceFunction<O, D> distanceFunction,
@@ -765,18 +765,18 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
   }
 
   /**
-   * Returns true if in the specified node an overflow occured, false otherwise.
+   * Returns true if in the specified node an overflow occurred, false otherwise.
    *
    * @param node the node to be tested for overflow
-   * @return true if in the specified node an overflow occured, false otherwise
+   * @return true if in the specified node an overflow occurred, false otherwise
    */
   abstract protected boolean hasOverflow(N node);
 
   /**
-   * Returns true if in the specified node an underflow occured, false otherwise.
+   * Returns true if in the specified node an underflow occurred, false otherwise.
    *
    * @param node the node to be tested for underflow
-   * @return true if in the specified node an underflow occured, false otherwise
+   * @return true if in the specified node an underflow occurred, false otherwise
    */
   abstract protected boolean hasUnderflow(N node);
 
@@ -948,7 +948,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
    * in the given level during insertion the specified node will be reinserted,
    * otherwise the node will be splitted.
    *
-   * @param node the node where an overflow occured
+   * @param node the node where an overflow occurred
    * @param path the path to the specified node
    * @return the newly created split node in case of split, null in case of reinsertion
    */

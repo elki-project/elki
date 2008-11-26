@@ -105,7 +105,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
       }
     }
     catch (IOException e) {
-      throw new RuntimeException("IOException occured: \n " + e);
+      throw new RuntimeException("IOException occurred: \n " + e);
     }
   }
 
@@ -141,7 +141,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
     catch (IOException e) {
       e.fillInStackTrace();
       throw new RuntimeException(
-      "IOException occured during reading of page " + pageID
+      "IOException occurred during reading of page " + pageID
       + "\n" + e);
     }
   }
@@ -299,7 +299,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
       }
     }
     catch (IOException e) {
-      throw new RuntimeException("IOException occured! ", e);
+      throw new RuntimeException("IOException occurred! ", e);
     }
   }
 }

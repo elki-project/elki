@@ -24,12 +24,12 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends Ab
 	}
 
 	/**
-	 * Returns true if in the specified node an overflow occured, false
+	 * Returns true if in the specified node an overflow occurred, false
 	 * otherwise.
 	 * 
 	 * @param node
 	 *            the node to be tested for overflow
-	 * @return true if in the specified node an overflow occured, false
+	 * @return true if in the specified node an overflow occurred, false
 	 *         otherwise
 	 */
 	@Override
@@ -41,12 +41,12 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends Ab
 	}
 
 	/**
-	 * Returns true if in the specified node an underflow occured, false
+	 * Returns true if in the specified node an underflow occurred, false
 	 * otherwise.
 	 * 
 	 * @param node
 	 *            the node to be tested for underflow
-	 * @return true if in the specified node an underflow occured, false
+	 * @return true if in the specified node an underflow occurred, false
 	 *         otherwise
 	 */
 	@Override
@@ -58,7 +58,7 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends Ab
 	}
 
 	/**
-	 * Computes the height of this RTree. Is called by the constructur. and
+	 * Computes the height of this RTree. Is called by the constructor. and
 	 * should be overwritten by subclasses if necessary.
 	 * 
 	 * @return the height of this RTree
@@ -86,7 +86,7 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends Ab
 
 	/**
 	 * Performs a bulk load on this RTree with the specified data. Is called by
-	 * the constructur and should be overwritten by subclasses if necessary.
+	 * the constructor and should be overwritten by subclasses if necessary.
 	 * 
 	 * @param objects
 	 *            the data objects to be indexed
