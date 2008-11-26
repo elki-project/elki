@@ -164,7 +164,9 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
      */
     @Override
     @SuppressWarnings("unchecked")
-    public <T extends Distance<T>> List<QueryResult<T>> reverseKNNQuery(O object, int k, DistanceFunction<O, T> distanceFunction) {
+    public <T extends Distance<T>> List<QueryResult<T>> reverseKNNQuery(O object, int k, SpatialDistanceFunction<O, T> distanceFunction) {
+        // TODO: at some point we might have different distance functions with the same class
+        // E.g. EuclideanInColumns(1-3) vs. EuclideanInColumns(4-6)
         if (!distanceFunction.getClass().equals(this.distanceFunction.getClass())) {
             throw new IllegalArgumentException("Wrong distancefuction!");
         }
@@ -193,7 +195,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
             knnLists.put(candidate.getID(), knns);
             candidateIDs.add(candidate.getID());
         }
-        batchNN(getRoot(), (SpatialDistanceFunction<O, T>) distanceFunction, knnLists);
+        batchNN(getRoot(), distanceFunction, knnLists);
 
         List<QueryResult<T>> result = new ArrayList<QueryResult<T>>();
         for (Integer id : candidateIDs) {

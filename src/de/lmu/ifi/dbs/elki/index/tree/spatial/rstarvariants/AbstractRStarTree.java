@@ -1,9 +1,17 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPath;
@@ -24,15 +32,6 @@ import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultIdentifiable;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.heap.HeapNode;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
 
 /**
  * Abstract superclass for index structures based on a R*-Tree.
@@ -227,12 +226,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
    */
   @Override
   public <D extends Distance<D>> List<QueryResult<D>> rangeQuery(O object, String epsilon,
-                                                                 DistanceFunction<O, D> distanceFunction) {
-
-    if (!(distanceFunction instanceof SpatialDistanceFunction)) {
-      throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
-    }
-    SpatialDistanceFunction<O, D> df = (SpatialDistanceFunction<O, D>) distanceFunction;
+      SpatialDistanceFunction<O, D> distanceFunction) {
 
     D range = distanceFunction.valueOf(epsilon);
     final List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
@@ -253,7 +247,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
       final int numEntries = node.getNumEntries();
 
       for (int i = 0; i < numEntries; i++) {
-        D distance = df.minDist(node.getEntry(i).getMBR(), object);
+        D distance = distanceFunction.minDist(node.getEntry(i).getMBR(), object);
         if (distance.compareTo(range) <= 0) {
           E entry = node.getEntry(i);
           if (node.isLeaf()) {
@@ -284,7 +278,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
    */
   @Override
   public <D extends Distance<D>> List<QueryResult<D>> kNNQuery(O object, int k,
-                                                               DistanceFunction<O, D> distanceFunction) {
+      SpatialDistanceFunction<O, D> distanceFunction) {
     if (k < 1) {
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
     }
@@ -333,7 +327,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
    * @return a List of the query results
    */
   @Override
-  public <D extends Distance<D>> List<QueryResult<D>> reverseKNNQuery(O object, int k, DistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<QueryResult<D>> reverseKNNQuery(O object, int k, SpatialDistanceFunction<O, D> distanceFunction) {
     throw new UnsupportedOperationException("Not yet supported!");
   }
 
@@ -505,13 +499,8 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
    */
   @SuppressWarnings("unchecked")
   protected <D extends Distance<D>> void doKNNQuery(Object object,
-                                                    DistanceFunction<O, D> distanceFunction,
+      SpatialDistanceFunction<O, D> distanceFunction,
                                                     KNNList<D> knnList) {
-
-    if (!(distanceFunction instanceof SpatialDistanceFunction)) {
-      throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
-    }
-    SpatialDistanceFunction<O, D> df = (SpatialDistanceFunction<O, D>) distanceFunction;
 
     // variables
     final Heap<D, Identifiable<?>> pq = new DefaultHeap<D, Identifiable<?>>();
@@ -534,8 +523,8 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
         for (int i = 0; i < node.getNumEntries(); i++) {
           E entry = node.getEntry(i);
           D distance = object instanceof Integer ?
-                       df.minDist(entry.getMBR(), (Integer) object) :
-                       df.minDist(entry.getMBR(), (O) object);
+              distanceFunction.minDist(entry.getMBR(), (Integer) object) :
+                distanceFunction.minDist(entry.getMBR(), (O) object);
 
           if (distance.compareTo(maxDist) <= 0) {
             knnList.add(new QueryResult<D>(entry.getID(), distance));
@@ -548,8 +537,8 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
         for (int i = 0; i < node.getNumEntries(); i++) {
           E entry = node.getEntry(i);
           D distance = object instanceof Integer ?
-                       df.minDist(entry.getMBR(), (Integer) object) :
-                       df.minDist(entry.getMBR(), (O) object);
+              distanceFunction.minDist(entry.getMBR(), (Integer) object) :
+                distanceFunction.minDist(entry.getMBR(), (O) object);
           if (distance.compareTo(maxDist) <= 0) {
             pq.addNode(new DefaultHeapNode<D, Identifiable<?>>(distance, new DefaultIdentifiable(entry.getID())));
           }
