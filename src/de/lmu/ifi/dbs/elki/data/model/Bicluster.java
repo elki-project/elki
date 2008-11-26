@@ -44,7 +44,7 @@ public class Bicluster<V extends RealVector<V, Double>> extends AbstractLoggable
      * Defines a new bicluster for given parameters.
      *
      * @param rowIDs   the ids of the rows included in the bicluster
-     * @param colIDs   the ids of the rows included in the bicluster
+     * @param colIDs   the ids of the columns included in the bicluster
      * @param database the database this bicluster is defined for
      */
     public Bicluster(int[] rowIDs, int[] colIDs, Database<V> database) {
@@ -113,6 +113,19 @@ public class Bicluster<V extends RealVector<V, Double>> extends AbstractLoggable
             }
 
         };
+    }
+    
+    /**
+     * Provides a copy of the column IDs contributing to the bicluster.
+     * 
+     * 
+     * @return a copy of the columnsIDs
+     */
+    public int[] getColumnIDs()
+    {
+        int[] columnIDs = new int[colIDs.length];
+        System.arraycopy(colIDs, 0, columnIDs, 0, colIDs.length);
+        return columnIDs;
     }
 
     /**
