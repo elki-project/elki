@@ -1,4 +1,4 @@
-package experimentalcode.erich;
+package experimentalcode.erich.visualization;
 
 import java.text.NumberFormat;
 import java.util.BitSet;
@@ -20,12 +20,14 @@ public class SVGPlot {
   static {
     FMT.setMaximumFractionDigits(8);
   }
-  
+
   protected SVGDocument document;
+
   protected Element root;
+
   protected Element defs;
-  
-  BitSet definedMarkers = new BitSet(); 
+
+  BitSet definedMarkers = new BitSet();
 
   public SVGPlot() {
     super();
@@ -38,94 +40,60 @@ public class SVGPlot {
     if(dt.getName() == null) {
       dt = null;
     }
-  
+
     document = (SVGDocument) domImpl.createDocument(SVGConstants.SVG_NAMESPACE_URI, "svg", dt);
-  
+
     root = document.getDocumentElement();
     // setup common SVG namespaces
-    root.setAttribute("xmlns", SVGConstants.SVG_NAMESPACE_URI);    
+    root.setAttribute("xmlns", SVGConstants.SVG_NAMESPACE_URI);
     root.setAttributeNS(SVGConstants.XMLNS_NAMESPACE_URI, SVGConstants.XMLNS_PREFIX + ":" + SVGConstants.XLINK_PREFIX, SVGConstants.XLINK_NAMESPACE_URI);
     // create element for SVG definitions
-    defs = svgElement(document, root, "defs");  
-  }
-  
-  public void drawAxis(Element parent, LinearScale scale, double w, double h) {
-    Element line = svgElement(document, parent, "line");
-    line.setAttribute("x1", FMT.format(0.0));
-    line.setAttribute("y1", FMT.format(1.0));
-    line.setAttribute("x2", FMT.format(0.0 + w));
-    line.setAttribute("y2", FMT.format(1.0 - h));
-    line.setAttribute("style", "stroke:silver; stroke-width:0.2%;");
-  
-    double tx = w;
-    double ty = h;
-    // ticks are orthogonal
-    double tw = ty * 0.01;
-    double th = tx * 0.01;
-    // anchor
-    String anchor = (w < h/2) ? "end" : "middle";
-    // vertical text offset; align approximately with middle instead of baseline.
-    double textvoff = 0.007;
-    
-    // draw ticks on x axis
-    for(double tick = scale.getMin(); tick <= scale.getMax(); tick += scale.getRes()) {
-      Element tickline = svgElement(document, parent, "line");
-      double x = tx * scale.getScaled(tick);
-      double y = ty * scale.getScaled(tick);
-      tickline.setAttribute("x1", FMT.format(x - tw));
-      tickline.setAttribute("y1", FMT.format(1 - y - th));
-      tickline.setAttribute("x2", FMT.format(x + tw));
-      tickline.setAttribute("y2", FMT.format(1 - y + th));
-      tickline.setAttribute("style", "stroke:black; stroke-width:0.1%;");
-      Element text = svgElement(document, parent, "text");
-      text.setAttribute("x", FMT.format(x - tw * 2));
-      text.setAttribute("y", FMT.format(1 - y + th * 3 + textvoff ));
-      text.setAttribute("style", "font-size: 0.2%");
-      text.setAttribute("text-anchor", anchor);
-      text.setTextContent(scale.formatValue(tick));
-    }
+    defs = svgElement(document, root, "defs");
   }
 
-  public void drawAxis(Element parent, LinearScale scale, double x1, double y1, double x2, double y2) {
+  public void drawAxis(Element parent, LinearScale scale, double x1, double y1, double x2, double y2, boolean labels) {
     Element line = svgElement(document, parent, "line");
     line.setAttribute("x1", FMT.format(x1));
-    line.setAttribute("y1", FMT.format(- y1));
+    line.setAttribute("y1", FMT.format(-y1));
     line.setAttribute("x2", FMT.format(x2));
-    line.setAttribute("y2", FMT.format(- y2));
+    line.setAttribute("y2", FMT.format(-y2));
     line.setAttribute("style", "stroke:silver; stroke-width:0.2%;");
-  
-    double tx = x2-x1;
-    double ty = y2-y1;
+
+    double tx = x2 - x1;
+    double ty = y2 - y1;
     // ticks are orthogonal
     double tw = ty * 0.01;
     double th = tx * 0.01;
     // anchor
-    String anchor = (tx < ty/2) ? "end" : "middle";
-    // vertical text offset; align approximately with middle instead of baseline.
+    String anchor = (tx < ty / 2) ? "end" : "middle";
+    // vertical text offset; align approximately with middle instead of
+    // baseline.
     double textvoff = 0.007;
-    
+
     // draw ticks on x axis
     for(double tick = scale.getMin(); tick <= scale.getMax(); tick += scale.getRes()) {
       Element tickline = svgElement(document, parent, "line");
       double x = x1 + tx * scale.getScaled(tick);
       double y = y1 + ty * scale.getScaled(tick);
       tickline.setAttribute("x1", FMT.format(x - tw));
-      tickline.setAttribute("y1", FMT.format(- y - th));
+      tickline.setAttribute("y1", FMT.format(-y - th));
       tickline.setAttribute("x2", FMT.format(x + tw));
-      tickline.setAttribute("y2", FMT.format(- y + th));
+      tickline.setAttribute("y2", FMT.format(-y + th));
       tickline.setAttribute("style", "stroke:black; stroke-width:0.1%;");
-      Element text = svgElement(document, parent, "text");
-      text.setAttribute("x", FMT.format(x - tw * 2));
-      text.setAttribute("y", FMT.format(- y + th * 3 + textvoff ));
-      text.setAttribute("style", "font-size: 0.2%");
-      text.setAttribute("text-anchor", anchor);
-      text.setTextContent(scale.formatValue(tick));
+      if(labels) {
+        Element text = svgElement(document, parent, "text");
+        text.setAttribute("x", FMT.format(x - tw * 2));
+        text.setAttribute("y", FMT.format(-y + th * 3 + textvoff));
+        text.setAttribute("style", "font-size: 0.2%");
+        text.setAttribute("text-anchor", anchor);
+        text.setTextContent(scale.formatValue(tick));
+      }
     }
   }
 
   public static Element svgElement(Document document, Element parent, String name) {
     Element neu = document.createElementNS(SVGConstants.SVG_NAMESPACE_URI, name);
-    if (parent != null) {
+    if(parent != null) {
       parent.appendChild(neu);
     }
     return neu;
@@ -135,7 +103,7 @@ public class SVGPlot {
     // TODO: add more styles.
     String[] colors = { "red", "blue", "green", "orange", "cyan", "magenta", "yellow" };
     String colorstr = colors[style % colors.length];
-  
+
     switch(style % 8){
     case 0: {
       // + cross
@@ -233,7 +201,7 @@ public class SVGPlot {
   }
 
   public void useMarker(Element parent, double x, double y, int style, double size) {
-    if (!definedMarkers.get(style)) {
+    if(!definedMarkers.get(style)) {
       Element symbol = svgElement(document, defs, "symbol");
       symbol.setAttribute("id", "s" + style);
       symbol.setAttribute("viewBox", "-1 -1 2 2");
@@ -244,8 +212,8 @@ public class SVGPlot {
     use.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, "#s" + style);
     use.setAttribute("x", FMT.format(x - size));
     use.setAttribute("y", FMT.format(y - size));
-    use.setAttribute("width", FMT.format(size*2));
-    use.setAttribute("height", FMT.format(size*2));
+    use.setAttribute("width", FMT.format(size * 2));
+    use.setAttribute("height", FMT.format(size * 2));
   }
 
   public SVGDocument getDocument() {
