@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
 
 /**
  * @author Arthur Zimek
- * @param <<V> the type of RealVector handled by this Algorithm
+ * @param <V> the type of RealVector handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  */
 // todo arthur comment
