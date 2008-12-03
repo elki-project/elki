@@ -61,7 +61,7 @@ public class SVGPlot {
     double ty = h;
     // ticks are orthogonal
     double tw = ty * 0.01;
-    double th = -tx * 0.01;
+    double th = tx * 0.01;
     // anchor
     String anchor = (w < h/2) ? "end" : "middle";
     // vertical text offset; align approximately with middle instead of baseline.
@@ -79,7 +79,44 @@ public class SVGPlot {
       tickline.setAttribute("style", "stroke:black; stroke-width:0.1%;");
       Element text = svgElement(document, parent, "text");
       text.setAttribute("x", FMT.format(x - tw * 2));
-      text.setAttribute("y", FMT.format(1 - y - th * 3 + textvoff ));
+      text.setAttribute("y", FMT.format(1 - y + th * 3 + textvoff ));
+      text.setAttribute("style", "font-size: 0.2%");
+      text.setAttribute("text-anchor", anchor);
+      text.setTextContent(scale.formatValue(tick));
+    }
+  }
+
+  public void drawAxis(Element parent, LinearScale scale, double x1, double y1, double x2, double y2) {
+    Element line = svgElement(document, parent, "line");
+    line.setAttribute("x1", FMT.format(x1));
+    line.setAttribute("y1", FMT.format(- y1));
+    line.setAttribute("x2", FMT.format(x2));
+    line.setAttribute("y2", FMT.format(- y2));
+    line.setAttribute("style", "stroke:silver; stroke-width:0.2%;");
+  
+    double tx = x2-x1;
+    double ty = y2-y1;
+    // ticks are orthogonal
+    double tw = ty * 0.01;
+    double th = tx * 0.01;
+    // anchor
+    String anchor = (tx < ty/2) ? "end" : "middle";
+    // vertical text offset; align approximately with middle instead of baseline.
+    double textvoff = 0.007;
+    
+    // draw ticks on x axis
+    for(double tick = scale.getMin(); tick <= scale.getMax(); tick += scale.getRes()) {
+      Element tickline = svgElement(document, parent, "line");
+      double x = x1 + tx * scale.getScaled(tick);
+      double y = y1 + ty * scale.getScaled(tick);
+      tickline.setAttribute("x1", FMT.format(x - tw));
+      tickline.setAttribute("y1", FMT.format(- y - th));
+      tickline.setAttribute("x2", FMT.format(x + tw));
+      tickline.setAttribute("y2", FMT.format(- y + th));
+      tickline.setAttribute("style", "stroke:black; stroke-width:0.1%;");
+      Element text = svgElement(document, parent, "text");
+      text.setAttribute("x", FMT.format(x - tw * 2));
+      text.setAttribute("y", FMT.format(- y + th * 3 + textvoff ));
       text.setAttribute("style", "font-size: 0.2%");
       text.setAttribute("text-anchor", anchor);
       text.setTextContent(scale.formatValue(tick));
@@ -199,16 +236,16 @@ public class SVGPlot {
     if (!definedMarkers.get(style)) {
       Element symbol = svgElement(document, defs, "symbol");
       symbol.setAttribute("id", "s" + style);
-      symbol.setAttribute("viewBox", "0 0 1 1");
-      plotMarker(document, symbol, .5, .5, style, 1);
+      symbol.setAttribute("viewBox", "-1 -1 2 2");
+      plotMarker(document, symbol, 0, 0, style, 2);
       definedMarkers.set(style);
     }
     Element use = svgElement(document, parent, "use");
     use.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, "#s" + style);
-    use.setAttribute("x", FMT.format(x - size / 2));
-    use.setAttribute("y", FMT.format(y - size / 2));
-    use.setAttribute("width", FMT.format(size));
-    use.setAttribute("height", FMT.format(size));
+    use.setAttribute("x", FMT.format(x - size));
+    use.setAttribute("y", FMT.format(y - size));
+    use.setAttribute("width", FMT.format(size*2));
+    use.setAttribute("height", FMT.format(size*2));
   }
 
   public SVGDocument getDocument() {
