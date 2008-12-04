@@ -1,34 +1,41 @@
 package experimentalcode.erich.visualization;
 
-import java.text.NumberFormat;
-import java.util.BitSet;
-import java.util.Locale;
 
 import org.apache.batik.dom.svg.SVGDOMImplementation;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.DOMImplementation;
-import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
 import org.w3c.dom.svg.SVGDocument;
 
 import experimentalcode.erich.scales.LinearScale;
 
+/**
+ * Base class for SVG plots. Provides some basic functionality such as element
+ * creation, axis plotting, markers and number formatting for SVG.
+ * 
+ * @author Erich Schubert
+ * 
+ */
 public class SVGPlot {
-  // format for serializing numbers into SVG
-  public static final NumberFormat FMT = NumberFormat.getInstance(Locale.ROOT);
-  static {
-    FMT.setMaximumFractionDigits(8);
-  }
-
+  /**
+   * SVG document we plot to.
+   */
   protected SVGDocument document;
 
+  /**
+   * Root element of the document.
+   */
   protected Element root;
 
-  protected Element defs;
+  /**
+   * Definitions element of the document.
+   */
+  private Element defs;
 
-  BitSet definedMarkers = new BitSet();
-
+  /**
+   * Create a new plotting document.
+   */
   public SVGPlot() {
     super();
     // Get a DOMImplementation.
@@ -48,175 +55,142 @@ public class SVGPlot {
     root.setAttribute("xmlns", SVGConstants.SVG_NAMESPACE_URI);
     root.setAttributeNS(SVGConstants.XMLNS_NAMESPACE_URI, SVGConstants.XMLNS_PREFIX + ":" + SVGConstants.XLINK_PREFIX, SVGConstants.XLINK_NAMESPACE_URI);
     // create element for SVG definitions
-    defs = svgElement(document, root, "defs");
+    defs = svgElement(root, "defs");
   }
 
+  /**
+   * Flag for axis label position. First char: right-hand or left-hand side of
+   * line. Second char: text alignment
+   * 
+   */
+  private enum POSITION {
+    RL, RC, RR, LL, LC, LR
+  }
+
+  /**
+   * Plot an axis with appropriate scales
+   * 
+   * @param parent Containing element
+   * @param scale axis scale information
+   * @param x1 starting coordinate
+   * @param y1 starting coordinate
+   * @param x2 ending coordinate
+   * @param y2 ending coordinate
+   * @param labels control whether labels are printed.
+   */
   public void drawAxis(Element parent, LinearScale scale, double x1, double y1, double x2, double y2, boolean labels) {
-    Element line = svgElement(document, parent, "line");
-    line.setAttribute("x1", FMT.format(x1));
-    line.setAttribute("y1", FMT.format(-y1));
-    line.setAttribute("x2", FMT.format(x2));
-    line.setAttribute("y2", FMT.format(-y2));
-    line.setAttribute("style", "stroke:silver; stroke-width:0.2%;");
+    Element line = svgElement(parent, "line");
+    SVGUtil.setAtt(line,"x1", x1);
+    SVGUtil.setAtt(line,"y1", -y1);
+    SVGUtil.setAtt(line,"x2", x2);
+    SVGUtil.setAtt(line,"y2", -y2);
+    SVGUtil.setAtt(line,"style", "stroke:silver; stroke-width:0.2%;");
 
     double tx = x2 - x1;
     double ty = y2 - y1;
     // ticks are orthogonal
     double tw = ty * 0.01;
     double th = tx * 0.01;
-    // anchor
-    String anchor = (tx < ty / 2) ? "end" : "middle";
+
+    // choose where to print labels.
+    POSITION pos = POSITION.LR;
+    if(labels) {
+      double angle = Math.atan2(-ty, tx);
+      // System.err.println(tx + " " + (-ty) + " " + angle);
+      if(angle < -2.3) {
+        pos = POSITION.LL;
+      }
+      else if(angle < -0.7) {
+        pos = POSITION.RR;
+      }
+      else if(angle < 0.5) {
+        pos = POSITION.RC;
+      }
+      else if(angle < 1.5) {
+        pos = POSITION.RL;
+      }
+      else if(angle < 2.3) {
+        pos = POSITION.LR;
+      }
+      else {
+        pos = POSITION.LC;
+      }
+    }
     // vertical text offset; align approximately with middle instead of
     // baseline.
     double textvoff = 0.007;
 
     // draw ticks on x axis
     for(double tick = scale.getMin(); tick <= scale.getMax(); tick += scale.getRes()) {
-      Element tickline = svgElement(document, parent, "line");
+      Element tickline = svgElement(parent, "line");
       double x = x1 + tx * scale.getScaled(tick);
       double y = y1 + ty * scale.getScaled(tick);
-      tickline.setAttribute("x1", FMT.format(x - tw));
-      tickline.setAttribute("y1", FMT.format(-y - th));
-      tickline.setAttribute("x2", FMT.format(x + tw));
-      tickline.setAttribute("y2", FMT.format(-y + th));
-      tickline.setAttribute("style", "stroke:black; stroke-width:0.1%;");
+      SVGUtil.setAtt(tickline,"x1", x - tw);
+      SVGUtil.setAtt(tickline,"y1", -y - th);
+      SVGUtil.setAtt(tickline,"x2", x + tw);
+      SVGUtil.setAtt(tickline,"y2", -y + th);
+      SVGUtil.setAtt(tickline,"style", "stroke:black; stroke-width:0.1%;");
+      // draw labels
       if(labels) {
-        Element text = svgElement(document, parent, "text");
-        text.setAttribute("x", FMT.format(x - tw * 2));
-        text.setAttribute("y", FMT.format(-y + th * 3 + textvoff));
-        text.setAttribute("style", "font-size: 0.2%");
-        text.setAttribute("text-anchor", anchor);
+        Element text = svgElement(parent, "text");
+        SVGUtil.setAtt(text,"style", "font-size: 0.2%");
+        switch(pos){
+        case LL:
+        case LC:
+        case LR:
+          SVGUtil.setAtt(text,"x", x - tw * 2);
+          SVGUtil.setAtt(text,"y", -y - th * 3 + textvoff);
+          break;
+        case RL:
+        case RC:
+        case RR:
+          SVGUtil.setAtt(text,"x", x + tw * 2);
+          SVGUtil.setAtt(text,"y", -y + th * 3 + textvoff);
+        }
+        switch(pos){
+        case LL:
+        case RL:
+          SVGUtil.setAtt(text,"text-anchor", "start");
+          break;
+        case LC:
+        case RC:
+          SVGUtil.setAtt(text,"text-anchor", "middle");
+          break;
+        case LR:
+        case RR:
+          SVGUtil.setAtt(text,"text-anchor", "end");
+          break;
+        }
         text.setTextContent(scale.formatValue(tick));
       }
     }
   }
 
-  public static Element svgElement(Document document, Element parent, String name) {
-    Element neu = document.createElementNS(SVGConstants.SVG_NAMESPACE_URI, name);
-    if(parent != null) {
-      parent.appendChild(neu);
-    }
-    return neu;
+  /**
+   * Create a SVG element in the SVG namespace. Non-static version.
+   * 
+   * @param parent parent node
+   * @param name node name
+   * @return
+   */
+  public Element svgElement(Element parent, String name) {
+    return SVGUtil.svgElement(document, parent, name);
   }
 
-  public static void plotMarker(Document document, Element parent, double x, double y, int style, double size) {
-    // TODO: add more styles.
-    String[] colors = { "red", "blue", "green", "orange", "cyan", "magenta", "yellow" };
-    String colorstr = colors[style % colors.length];
-
-    switch(style % 8){
-    case 0: {
-      // + cross
-      Element line1 = svgElement(document, parent, "line");
-      line1.setAttribute("x1", FMT.format(x));
-      line1.setAttribute("y1", FMT.format(y - size / 2));
-      line1.setAttribute("x2", FMT.format(x));
-      line1.setAttribute("y2", FMT.format(y + size / 2));
-      line1.setAttribute("style", "stroke:" + colorstr + "; stroke-width:" + FMT.format(size / 6));
-      Element line2 = svgElement(document, parent, "line");
-      line2.setAttribute("x1", FMT.format(x - size / 2));
-      line2.setAttribute("y1", FMT.format(y));
-      line2.setAttribute("x2", FMT.format(x + size / 2));
-      line2.setAttribute("y2", FMT.format(y));
-      line2.setAttribute("style", "stroke:" + colorstr + "; stroke-width: " + FMT.format(size / 6));
-      break;
-    }
-    case 1: {
-      // X cross
-      Element line1 = svgElement(document, parent, "line");
-      line1.setAttribute("x1", FMT.format(x - size / 2));
-      line1.setAttribute("y1", FMT.format(y - size / 2));
-      line1.setAttribute("x2", FMT.format(x + size / 2));
-      line1.setAttribute("y2", FMT.format(y + size / 2));
-      line1.setAttribute("style", "stroke:" + colorstr + "; stroke-width: " + FMT.format(size / 6));
-      Element line2 = svgElement(document, parent, "line");
-      line2.setAttribute("x1", FMT.format(x - size / 2));
-      line2.setAttribute("y1", FMT.format(y + size / 2));
-      line2.setAttribute("x2", FMT.format(x + size / 2));
-      line2.setAttribute("y2", FMT.format(y - size / 2));
-      line2.setAttribute("style", "stroke:" + colorstr + "; stroke-width: " + FMT.format(size / 6));
-      break;
-    }
-    case 2: {
-      // O filled circle
-      Element circ = svgElement(document, parent, "circle");
-      circ.setAttribute("cx", FMT.format(x));
-      circ.setAttribute("cy", FMT.format(y));
-      circ.setAttribute("r", FMT.format(size / 2));
-      circ.setAttribute("style", "fill:" + colorstr);
-      break;
-    }
-    case 3: {
-      // [] filled rectangle
-      Element rect = svgElement(document, parent, "rect");
-      rect.setAttribute("x", FMT.format(x - size / 2));
-      rect.setAttribute("y", FMT.format(y - size / 2));
-      rect.setAttribute("width", FMT.format(size));
-      rect.setAttribute("height", FMT.format(size));
-      rect.setAttribute("style", "fill:" + colorstr);
-      break;
-    }
-    case 4: {
-      // <> filled diamond
-      Element rect = svgElement(document, parent, "rect");
-      rect.setAttribute("x", FMT.format(x - size / 2));
-      rect.setAttribute("y", FMT.format(y - size / 2));
-      rect.setAttribute("width", FMT.format(size));
-      rect.setAttribute("height", FMT.format(size));
-      rect.setAttribute("style", "fill:" + colorstr);
-      rect.setAttribute("transform", "rotate(45," + FMT.format(x) + "," + FMT.format(y) + ")");
-      break;
-    }
-    case 5: {
-      // O hollow circle
-      Element circ = svgElement(document, parent, "circle");
-      circ.setAttribute("cx", FMT.format(x));
-      circ.setAttribute("cy", FMT.format(y));
-      circ.setAttribute("r", FMT.format(size / 2));
-      circ.setAttribute("style", "fill: none; stroke: " + colorstr + "; stroke-width: " + FMT.format(size / 6));
-      break;
-    }
-    case 6: {
-      // [] hollow rectangle
-      Element rect = svgElement(document, parent, "rect");
-      rect.setAttribute("x", FMT.format(x - size / 2));
-      rect.setAttribute("y", FMT.format(y - size / 2));
-      rect.setAttribute("width", FMT.format(size));
-      rect.setAttribute("height", FMT.format(size));
-      rect.setAttribute("style", "fill: none; stroke: " + colorstr + "; stroke-width: " + FMT.format(size / 6));
-      break;
-    }
-    case 7: {
-      // <> hollow diamond
-      Element rect = svgElement(document, parent, "rect");
-      rect.setAttribute("x", FMT.format(x - size / 2));
-      rect.setAttribute("y", FMT.format(y - size / 2));
-      rect.setAttribute("width", FMT.format(size));
-      rect.setAttribute("height", FMT.format(size));
-      rect.setAttribute("style", "fill: none; stroke: " + colorstr + "; stroke-width: " + FMT.format(size / 6));
-      rect.setAttribute("transform", "rotate(45," + FMT.format(x) + "," + FMT.format(y) + ")");
-      break;
-    }
-    }
-  }
-
-  public void useMarker(Element parent, double x, double y, int style, double size) {
-    if(!definedMarkers.get(style)) {
-      Element symbol = svgElement(document, defs, "symbol");
-      symbol.setAttribute("id", "s" + style);
-      symbol.setAttribute("viewBox", "-1 -1 2 2");
-      plotMarker(document, symbol, 0, 0, style, 2);
-      definedMarkers.set(style);
-    }
-    Element use = svgElement(document, parent, "use");
-    use.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, "#s" + style);
-    use.setAttribute("x", FMT.format(x - size));
-    use.setAttribute("y", FMT.format(y - size));
-    use.setAttribute("width", FMT.format(size * 2));
-    use.setAttribute("height", FMT.format(size * 2));
-  }
-
+  /**
+   * Retrieve the SVG document.
+   * 
+   * @return resulting document.
+   */
   public SVGDocument getDocument() {
     return document;
+  }
+
+  /**
+   * Getter for definitions section
+   * @return DOM element
+   */
+  public Element getDefs() {
+    return defs;
   }
 }
