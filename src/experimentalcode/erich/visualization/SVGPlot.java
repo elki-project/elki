@@ -9,6 +9,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.svg.SVGDocument;
 
 import experimentalcode.erich.scales.LinearScale;
+import experimentalcode.erich.visualization.svg.SVGUtil;
 
 /**
  * Base class for SVG plots. Provides some basic functionality such as element

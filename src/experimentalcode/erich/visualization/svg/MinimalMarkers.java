@@ -1,6 +1,8 @@
-package experimentalcode.erich.visualization;
+package experimentalcode.erich.visualization.svg;
 
 import org.w3c.dom.Element;
+
+import experimentalcode.erich.visualization.SVGPlot;
 
 public class MinimalMarkers implements MarkerLibrary {
   /**

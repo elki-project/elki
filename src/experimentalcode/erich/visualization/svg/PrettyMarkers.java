@@ -1,4 +1,4 @@
-package experimentalcode.erich.visualization;
+package experimentalcode.erich.visualization.svg;
 
 import java.util.BitSet;
 import java.util.HashMap;
@@ -6,6 +6,8 @@ import java.util.HashMap;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import experimentalcode.erich.visualization.SVGPlot;
 
 public class PrettyMarkers extends MinimalMarkers {
   /**
