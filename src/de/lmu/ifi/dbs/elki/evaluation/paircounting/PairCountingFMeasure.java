@@ -4,7 +4,7 @@ import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.cluster.BaseCluster;
-import de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairGeneratorHierarchical;
+import de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairGeneratorSingleCluster;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairGeneratorMerge;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairGeneratorNoise;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairSortedGeneratorInterface;
@@ -37,7 +37,7 @@ public class PairCountingFMeasure {
       if (c.isNoise()) {
         gens[i] = new PairGeneratorNoise(c);
       } else {
-        gens[i] = new PairGeneratorHierarchical<C>(c);
+        gens[i] = new PairGeneratorSingleCluster<C>(c);
       }
       i++;
     }
