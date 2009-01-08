@@ -156,5 +156,12 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
         return description.toString();
     }
 
-
+    /**
+     * Returns the number of nearest neighbors considered
+     * 
+     * @return number of neighbors considered
+     */
+    public int getNumberOfNeighbors() {
+      return numberOfNeighbors;
+    }
 }
