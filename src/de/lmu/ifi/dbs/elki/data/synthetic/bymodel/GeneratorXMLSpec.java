@@ -45,20 +45,17 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
   /**
    * OptionID for {@link #CONFIGFILE_PARAM}
    */
-  public static final OptionID CONFIGFILE_ID = OptionID.getOrCreateOptionID(
-      "bymodel.spec", "The generator specification file.");
+  public static final OptionID CONFIGFILE_ID = OptionID.getOrCreateOptionID("bymodel.spec", "The generator specification file.");
 
   /**
    * Parameter to give the configuration file
    */
-  private final FileParameter CONFIGFILE_PARAM = new FileParameter(CONFIGFILE_ID,
-      FileParameter.FileType.INPUT_FILE);
+  private final FileParameter CONFIGFILE_PARAM = new FileParameter(CONFIGFILE_ID, FileParameter.FileType.INPUT_FILE);
 
   /**
    * OptionID for {@link #RANDOMSEED_PARAM}
    */
-  public static final OptionID RANDOMSEED_ID = OptionID.getOrCreateOptionID(
-      "bymodel.randomseed", "The random generator seed.");
+  public static final OptionID RANDOMSEED_ID = OptionID.getOrCreateOptionID("bymodel.randomseed", "The random generator seed.");
 
   /**
    * Parameter to give the configuration file
@@ -68,8 +65,7 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
   /**
    * OptionID for {@link #SIZE_SCALE_PARAM}
    */
-  public static final OptionID SIZE_SCALE_ID = OptionID.getOrCreateOptionID(
-      "bymodel.sizescale", "Factor for scaling the specified cluster sizes.");
+  public static final OptionID SIZE_SCALE_ID = OptionID.getOrCreateOptionID("bymodel.sizescale", "Factor for scaling the specified cluster sizes.");
 
   /**
    * Parameter to give the configuration file
@@ -85,7 +81,7 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
    * Parameter for scaling the cluster sizes.
    */
   double sizescale = 1.0;
-  
+
   /**
    * The actual generator class
    */
@@ -95,7 +91,12 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
    * Random generator used for initializing cluster generators.
    */
   private Random clusterRandom = new Random();
-  
+
+  /**
+   * Set testAgainstModel flag
+   */
+  private boolean testAgainstModel = true;
+
   /**
    * Generator
    */
@@ -115,9 +116,10 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
 
     specfile = CONFIGFILE_PARAM.getValue();
     sizescale = SIZE_SCALE_PARAM.getValue();
-    
-    if (RANDOMSEED_PARAM.isSet())
+
+    if(RANDOMSEED_PARAM.isSet()) {
       clusterRandom = new Random(RANDOMSEED_PARAM.getValue());
+    }
 
     setParameters(args, remainingParameters);
     return remainingParameters;
@@ -131,10 +133,11 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
   private void loadXMLSpecification(File specfile) throws UnableToComplyException {
     XMLInputFactory inputFactory = XMLInputFactory.newInstance();
     // Use validation if supported.
-    if (inputFactory.isPropertySupported("javax.xml.stream.isValidating"))
+    if(inputFactory.isPropertySupported("javax.xml.stream.isValidating"))
       try {
         inputFactory.setProperty(XMLInputFactory.IS_VALIDATING, Boolean.TRUE);
-      } catch(IllegalArgumentException e) {
+      }
+      catch(IllegalArgumentException e) {
         // probably the parser just doesn't support DTD validation.
         // we can live without.
       }
@@ -149,11 +152,13 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
             processElementDataset(event, eventReader);
             continue;
           }
-          else
+          else {
             warning("Unknown start element in XML specification file: " + event.asStartElement().getName());
+          }
         }
-        else if(event.isEndElement())
+        else if(event.isEndElement()) {
           warning("Unknown end element in XML specification file: " + event.asEndElement().getName());
+        }
       }
     }
     catch(FileNotFoundException e) {
@@ -176,13 +181,17 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
     StartElement se = event.asStartElement();
     for(Iterator<?> i = se.getAttributes(); i.hasNext();) {
       Attribute attr = (Attribute) i.next();
-      
+
       // *** get parameters
-      if(attr.getName().getLocalPart() == "random-seed")
+      if(attr.getName().getLocalPart() == "random-seed") {
         clusterRandom = new Random((int) (Integer.valueOf(attr.getValue()) * sizescale));
-      // ***/
-      else
+      }
+      else if(attr.getName().getLocalPart() == "test-model") {
+        testAgainstModel = (Integer.valueOf(attr.getValue()) == 0);
+      }
+      else {
         warning("Unknown attribute in XML specification file: " + attr.getName());
+      }
     }
     while(eventReader.hasNext()) {
       event = eventReader.nextEvent();
@@ -193,18 +202,22 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
         else if(event.asStartElement().getName().getLocalPart() == "static") {
           processElementStatic(event, eventReader);
         }
-        else
+        else {
           warning("Unknown start element in XML specification file: " + event.asStartElement().getName());
+        }
       }
       else if(event.isEndElement()) {
-        if(event.asEndElement().getName().getLocalPart() == "dataset")
+        if(event.asEndElement().getName().getLocalPart() == "dataset") {
           break;
-        else
+        }
+        else {
           warning("Unknown end element in XML specification file: " + event.asEndElement().getName());
+        }
       }
     }
-    if(!eventReader.hasNext())
+    if(!eventReader.hasNext()) {
       warning("Parsing did not work correctly, didn't exit 'dataset' tag correctly.");
+    }
   }
 
   /**
@@ -222,28 +235,35 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
     String name = null;
     for(Iterator<?> i = se.getAttributes(); i.hasNext();) {
       Attribute attr = (Attribute) i.next();
-      
+
       // *** get parameters
-      if(attr.getName().getLocalPart() == "size")
-        // size can be scaled by a given factor (useful for benchmarking scripts)
+      if(attr.getName().getLocalPart() == "size") {
+        // size can be scaled by a given factor (useful for benchmarking
+        // scripts)
         size = (int) (Integer.valueOf(attr.getValue()) * sizescale);
-      else if(attr.getName().getLocalPart() == "name")
+      }
+      else if(attr.getName().getLocalPart() == "name") {
         name = attr.getValue();
-      else if(attr.getName().getLocalPart() == "density-correction")
+      }
+      else if(attr.getName().getLocalPart() == "density-correction") {
         overweight = Double.valueOf(attr.getValue());
-      // ***/
-      else
+        // ***/
+      }
+      else {
         warning("Unknown attribute in XML specification file: " + attr.getName());
+      }
     }
-    if(size < 0)
+    if(size < 0) {
       throw new UnableToComplyException("No valid cluster size given in specification file.");
-    if(name == null)
+    }
+    if(name == null) {
       throw new UnableToComplyException("No cluster name given in specification file.");
-    
+    }
+
     // *** add new cluster object
     Random newRand = new Random(clusterRandom.nextLong());
     GeneratorSingleCluster cluster = new GeneratorSingleCluster(name, size, overweight, newRand);
-    
+
     while(eventReader.hasNext()) {
       event = eventReader.nextEvent();
       if(event.isStartElement()) {
@@ -262,22 +282,26 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
         else if(event.asStartElement().getName().getLocalPart() == "clip") {
           processElementClipping(cluster, event, eventReader);
         }
-        else
+        else {
           warning("Unknown start element in XML specification file: " + event.asStartElement().getName());
+        }
       }
       else if(event.isEndElement()) {
         if(event.asEndElement().getName().getLocalPart() == "cluster") {
           gen.addCluster(cluster);
-          if(isVerbose())
+          if(isVerbose()) {
             verbose("Loaded cluster " + cluster.getName() + " from specification.");
+          }
           break;
         }
-        else
+        else {
           warning("Unknown end element in XML specification file: " + event.asEndElement().getName());
+        }
       }
     }
-    if(!eventReader.hasNext())
+    if(!eventReader.hasNext()) {
       warning("Parsing did not work correctly, didn't exit 'cluster' tag correctly.");
+    }
   }
 
   /**
@@ -296,18 +320,21 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
     for(Iterator<?> i = se.getAttributes(); i.hasNext();) {
       Attribute attr = (Attribute) i.next();
       // *** Get parameters
-      if(attr.getName().getLocalPart() == "min")
+      if(attr.getName().getLocalPart() == "min") {
         min = Double.valueOf(attr.getValue());
-      else if(attr.getName().getLocalPart() == "max")
+      }
+      else if(attr.getName().getLocalPart() == "max") {
         max = Double.valueOf(attr.getValue());
-      else
+      }
+      else {
         warning("Unknown attribute in XML specification file: " + attr.getName());
+      }
     }
-    
+
     // *** new uniform generator
     Random random = cluster.getNewRandomGenerator();
     Distribution generator = new UniformDistribution(min, max, random);
-    
+
     while(eventReader.hasNext()) {
       event = eventReader.nextEvent();
       if(event.isStartElement()) {
@@ -318,12 +345,14 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
           cluster.addGenerator(generator);
           break;
         }
-        else
+        else {
           warning("Unknown end element in XML specification file: " + event.asEndElement().getName());
+        }
       }
     }
-    if(!eventReader.hasNext())
+    if(!eventReader.hasNext()) {
       warning("Parsing did not work correctly, didn't exit 'uniform' tag correctly.");
+    }
   }
 
   /**
@@ -341,20 +370,23 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
     double stddev = 1.0;
     for(Iterator<?> i = se.getAttributes(); i.hasNext();) {
       Attribute attr = (Attribute) i.next();
-      
+
       // *** Get parameters
-      if(attr.getName().getLocalPart() == "mean")
+      if(attr.getName().getLocalPart() == "mean") {
         mean = Double.valueOf(attr.getValue());
-      else if(attr.getName().getLocalPart() == "stddev")
+      }
+      else if(attr.getName().getLocalPart() == "stddev") {
         stddev = Double.valueOf(attr.getValue());
-      else
+      }
+      else {
         warning("Unknown attribute in XML specification file: " + attr.getName());
+      }
     }
-    
+
     // *** New normal distribution generator
     Random random = cluster.getNewRandomGenerator();
     Distribution generator = new NormalDistribution(mean, stddev, random);
-    
+
     while(eventReader.hasNext()) {
       event = eventReader.nextEvent();
       if(event.isStartElement()) {
@@ -365,12 +397,14 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
           cluster.addGenerator(generator);
           break;
         }
-        else
+        else {
           warning("Unknown end element in XML specification file: " + event.asEndElement().getName());
+        }
       }
     }
-    if(!eventReader.hasNext())
+    if(!eventReader.hasNext()) {
       warning("Parsing did not work correctly, didn't exit 'normal' tag correctly.");
+    }
   }
 
   /**
@@ -390,39 +424,49 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
     for(Iterator<?> i = se.getAttributes(); i.hasNext();) {
       Attribute attr = (Attribute) i.next();
       // Get parameters
-      if(attr.getName().getLocalPart() == "axis1")
+      if(attr.getName().getLocalPart() == "axis1") {
         axis1 = Integer.valueOf(attr.getValue());
-      else if(attr.getName().getLocalPart() == "axis2")
+      }
+      else if(attr.getName().getLocalPart() == "axis2") {
         axis2 = Integer.valueOf(attr.getValue());
-      else if(attr.getName().getLocalPart() == "angle")
+      }
+      else if(attr.getName().getLocalPart() == "angle") {
         angle = Double.valueOf(attr.getValue());
-      else
+      }
+      else {
         warning("Unknown attribute in XML specification file: " + attr.getName());
+      }
     }
-    if(axis1 <= 0 || axis1 > cluster.getDim())
+    if(axis1 <= 0 || axis1 > cluster.getDim()) {
       throw new UnableToComplyException("Invalid axis1 number given in specification file.");
-    if(axis1 <= 0 || axis1 > cluster.getDim())
+    }
+    if(axis1 <= 0 || axis1 > cluster.getDim()) {
       throw new UnableToComplyException("Invalid axis2 number given in specification file.");
-    if(axis1 == axis2)
+    }
+    if(axis1 == axis2) {
       throw new UnableToComplyException("Invalid axis numbers given in specification file.");
-    
+    }
+
     // Add rotation to cluster.
     cluster.addRotation(axis1 - 1, axis2 - 1, Math.toRadians(angle));
-    
+
     while(eventReader.hasNext()) {
       event = eventReader.nextEvent();
       if(event.isStartElement()) {
         warning("Unknown start element in XML specification file: " + event.asStartElement().getName());
       }
       else if(event.isEndElement()) {
-        if(event.asEndElement().getName().getLocalPart() == "rotate")
+        if(event.asEndElement().getName().getLocalPart() == "rotate") {
           break;
-        else
+        }
+        else {
           warning("Unknown end element in XML specification file: " + event.asEndElement().getName());
+        }
       }
     }
-    if(!eventReader.hasNext())
+    if(!eventReader.hasNext()) {
       warning("Parsing did not work correctly, didn't exit 'rotate' tag correctly.");
+    }
   }
 
   /**
@@ -440,31 +484,37 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
     for(Iterator<?> i = se.getAttributes(); i.hasNext();) {
       Attribute attr = (Attribute) i.next();
       // *** get parameters
-      if(attr.getName().getLocalPart() == "vector")
+      if(attr.getName().getLocalPart() == "vector") {
         offset = parseVector(attr.getValue());
-      else
+      }
+      else {
         warning("Unknown attribute in XML specification file: " + attr.getName());
+      }
     }
-    if(offset == null)
+    if(offset == null) {
       throw new UnableToComplyException("No translation vector given.");
-    
+    }
+
     // *** add new translation
     cluster.addTranslation(offset);
-    
+
     while(eventReader.hasNext()) {
       event = eventReader.nextEvent();
       if(event.isStartElement()) {
         warning("Unknown start element in XML specification file: " + event.asStartElement().getName());
       }
       else if(event.isEndElement()) {
-        if(event.asEndElement().getName().getLocalPart() == "translate")
+        if(event.asEndElement().getName().getLocalPart() == "translate") {
           break;
-        else
+        }
+        else {
           warning("Unknown end element in XML specification file: " + event.asEndElement().getName());
+        }
       }
     }
-    if(!eventReader.hasNext())
+    if(!eventReader.hasNext()) {
       warning("Parsing did not work correctly, didn't exit 'translate' tag correctly.");
+    }
   }
 
   /**
@@ -482,34 +532,41 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
     Vector cmax = null;
     for(Iterator<?> i = se.getAttributes(); i.hasNext();) {
       Attribute attr = (Attribute) i.next();
-      // get parameters 
-      if(attr.getName().getLocalPart() == "min")
+      // get parameters
+      if(attr.getName().getLocalPart() == "min") {
         cmin = parseVector(attr.getValue());
-      else if(attr.getName().getLocalPart() == "max")
+      }
+      else if(attr.getName().getLocalPart() == "max") {
         cmax = parseVector(attr.getValue());
-      else
+      }
+      else {
         warning("Unknown attribute in XML specification file: " + attr.getName());
+      }
     }
-    if(cmin == null || cmax == null)
+    if(cmin == null || cmax == null) {
       throw new UnableToComplyException("No or incomplete clipping vectors given.");
-    
+    }
+
     // *** set clipping
     cluster.setClipping(cmin, cmax);
-    
+
     while(eventReader.hasNext()) {
       event = eventReader.nextEvent();
       if(event.isStartElement()) {
         warning("Unknown start element in XML specification file: " + event.asStartElement().getName());
       }
       else if(event.isEndElement()) {
-        if(event.asEndElement().getName().getLocalPart() == "clip")
+        if(event.asEndElement().getName().getLocalPart() == "clip") {
           break;
-        else
+        }
+        else {
           warning("Unknown end element in XML specification file: " + event.asEndElement().getName());
+        }
       }
     }
-    if(!eventReader.hasNext())
+    if(!eventReader.hasNext()) {
       warning("Parsing did not work correctly, didn't exit 'clipping' tag correctly.");
+    }
   }
 
   /**
@@ -525,16 +582,19 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
     String name = null;
     for(Iterator<?> i = se.getAttributes(); i.hasNext();) {
       Attribute attr = (Attribute) i.next();
-      
+
       // *** get parameters
-      if(attr.getName().getLocalPart() == "name")
+      if(attr.getName().getLocalPart() == "name") {
         name = attr.getValue();
-      else
+      }
+      else {
         warning("Unknown attribute in XML specification file: " + attr.getName());
+      }
     }
-    if(name == null)
+    if(name == null) {
       throw new UnableToComplyException("No cluster name given in specification file.");
-    
+    }
+
     LinkedList<Vector> points = new LinkedList<Vector>();
     while(eventReader.hasNext()) {
       event = eventReader.nextEvent();
@@ -542,25 +602,29 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
         if(event.asStartElement().getName().getLocalPart() == "point") {
           processElementPoint(points, event, eventReader);
         }
-        else
+        else {
           warning("Unknown start element in XML specification file: " + event.asStartElement().getName());
+        }
       }
       else if(event.isEndElement()) {
-        if(event.asEndElement().getName().getLocalPart() == "static") {          
+        if(event.asEndElement().getName().getLocalPart() == "static") {
           // *** add new cluster object
           GeneratorStatic cluster = new GeneratorStatic(name, points);
-          
+
           gen.addCluster(cluster);
-          if(isVerbose())
+          if(isVerbose()) {
             verbose("Loaded cluster " + cluster.name + " from specification.");
+          }
           break;
         }
-        else
+        else {
           warning("Unknown end element in XML specification file: " + event.asEndElement().getName());
+        }
       }
     }
-    if(!eventReader.hasNext())
+    if(!eventReader.hasNext()) {
       warning("Parsing did not work correctly, didn't exit 'cluster' tag correctly.");
+    }
   }
 
   /**
@@ -578,31 +642,37 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
     for(Iterator<?> i = se.getAttributes(); i.hasNext();) {
       Attribute attr = (Attribute) i.next();
       // *** get parameters
-      if(attr.getName().getLocalPart() == "vector")
+      if(attr.getName().getLocalPart() == "vector") {
         point = parseVector(attr.getValue());
-      else
+      }
+      else {
         warning("Unknown attribute in XML specification file: " + attr.getName());
+      }
     }
-    if(point == null)
+    if(point == null) {
       throw new UnableToComplyException("No translation vector given.");
-    
+    }
+
     // *** add new point
     points.add(point);
-    
+
     while(eventReader.hasNext()) {
       event = eventReader.nextEvent();
       if(event.isStartElement()) {
         warning("Unknown start element in XML specification file: " + event.asStartElement().getName());
       }
       else if(event.isEndElement()) {
-        if(event.asEndElement().getName().getLocalPart() == "point")
+        if(event.asEndElement().getName().getLocalPart() == "point") {
           break;
-        else
+        }
+        else {
           warning("Unknown end element in XML specification file: " + event.asEndElement().getName());
+        }
       }
     }
-    if(!eventReader.hasNext())
+    if(!eventReader.hasNext()) {
       warning("Parsing did not work correctly, didn't exit 'translate' tag correctly.");
+    }
   }
 
   /**
@@ -641,14 +711,18 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
    * Runs the wrapper with the specified arguments.
    */
   public void run() throws UnableToComplyException {
-    if(isVerbose())
+    if(isVerbose()) {
       verbose("Loading specification ...");
+    }
     loadXMLSpecification(specfile);
-    if(isVerbose())
+    if(isVerbose()) {
       verbose("Generating clusters ...");
+    }
+    gen.setTestAgainstModel(testAgainstModel);
     gen.generate();
-    if(isVerbose())
+    if(isVerbose()) {
       verbose("Writing output ...");
+    }
     try {
       File outputFile = getOutput();
       if(outputFile.exists()) {

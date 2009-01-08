@@ -3,6 +3,7 @@
 <!ELEMENT dataset (cluster+)>
 <!ATTLIST dataset
 	random-seed	CDATA		#IMPLIED
+	test-model  CDATA       #IMPLIED
 >
 
 <!-- cluster -->
