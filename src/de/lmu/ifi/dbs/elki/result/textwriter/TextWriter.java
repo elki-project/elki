@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
+import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -119,7 +120,8 @@ public class TextWriter<O extends DatabaseObject> {
     AnnotationResult ra = null;
     OrderingResult ro = null;
     Clustering<?> rc = null;
-    
+    IterableResult<?> ri = null;
+
     // TODO: add support for ListResults
 
     Collection<DatabaseObjectGroup> groups = null;
@@ -133,6 +135,9 @@ public class TextWriter<O extends DatabaseObject> {
     }
     if(r instanceof Clustering) {
       rc = (Clustering<?>) r;
+    }
+    if(r instanceof IterableResult) {
+      ri = (IterableResult<?>) r;
     }
     // combine MultiResults.
     if(r instanceof MultiResult) {
@@ -159,13 +164,22 @@ public class TextWriter<O extends DatabaseObject> {
           rc = clusterings.get(clusterings.size() - 1);
         }
       }
+      // use LAST iterable result
+      // TODO: COMBINE
+      {
+        List<IterableResult<?>> iters = multi.filterResults(IterableResult.class);
+        if(iters.size() > 0) {
+          ri = iters.get(iters.size() - 1);
+        }
+      }
     }
 
-    if(ra == null && ro == null && rc == null) {
+    if(ra == null && ro == null && rc == null && ri == null) {
       throw new UnableToComplyException("No printable result found.");
     }
 
-    // TODO: generics hack. :-( Could be a different class derived from BaseCluster!
+    // TODO: generics hack. :-( Could be a different class derived from
+    // BaseCluster!
     NamingScheme<Cluster<?>> naming = null;
     // Process groups or all data in a flat manner?
     if(rc != null) {
@@ -173,59 +187,85 @@ public class TextWriter<O extends DatabaseObject> {
       // force an update of cluster names.
       naming = new SimpleEnumeratingScheme(rc);
     }
+    else if(ri != null) {
+      // TODO
+    }
     else {
       groups = new ArrayList<DatabaseObjectGroup>();
       groups.add(new DatabaseObjectGroupCollection<Collection<Integer>>(db.getIDs()));
     }
 
-    for(DatabaseObjectGroup group : groups) {
-      String filename = null;
-      // for clusters, use naming.
-      if (group instanceof BaseCluster) {
-        Cluster<?> bc = (Cluster<?>) group;
-        if(naming != null) {
-          filename = filenameFromLabel(naming.getNameForCluster(bc));
-        }
-      }
-
+    if (ri != null) {
+      String filename = "list";
       PrintStream outStream = streamOpener.openStream(filename);
       TextWriterStream out = new TextWriterStreamNormalizing<O>(outStream, writers, getNormalization());
-
       printHeader(db, out, settings);
-      // print group information...
-      if (group instanceof TextWriteable) {
-        TextWriterWriterInterface<?> writer = out.getWriterFor(group);
+      Iterator<?> i = ri.iter();
+      while (i.hasNext()) {
+        Object o = i.next();
+        TextWriterWriterInterface<?> writer = out.getWriterFor(o);
         if(writer != null) {
-          writer.writeObject(out, null, group);
-          out.commentPrintSeparator();
-          out.flush();
-        }
-      }
-
-      // print ids.
-      Collection<Integer> ids = group.getIDs();
-      Iterator<Integer> iter = ids.iterator();
-      // apply sorting.
-      if(ro != null) {
-        iter = ro.iter(ids);
-      }
-
-      while (iter.hasNext()) {
-        Integer objID = iter.next();
-        O obj = db.get(objID.intValue());
-        if(obj == null) {
-          continue;
-        }
-        // do we have annotations to print?
-        SimplePair<String, Object>[] objs = null;
-        if(ra != null) {
-          objs = ra.getAnnotations(objID);
-        }
-        // print the object with its annotations.
-        printObject(out, obj, objs);
+          writer.writeObject(out, null, o);
+        }        
+        out.flush();
       }
       out.commentPrintSeparator();
       out.flush();
+    }
+    if(groups != null) {
+      for(DatabaseObjectGroup group : groups) {
+        String filename = null;
+        // for clusters, use naming.
+        if(group instanceof BaseCluster) {
+          Cluster<?> bc = (Cluster<?>) group;
+          if(naming != null) {
+            filename = filenameFromLabel(naming.getNameForCluster(bc));
+          }
+        }
+
+        PrintStream outStream = streamOpener.openStream(filename);
+        TextWriterStream out = new TextWriterStreamNormalizing<O>(outStream, writers, getNormalization());
+
+        printHeader(db, out, settings);
+        // print group information...
+        if(group instanceof TextWriteable) {
+          TextWriterWriterInterface<?> writer = out.getWriterFor(group);
+          if(writer != null) {
+            writer.writeObject(out, null, group);
+            out.commentPrintSeparator();
+            out.flush();
+          }
+        }
+
+        // print ids.
+        Collection<Integer> ids = group.getIDs();
+        Iterator<Integer> iter = ids.iterator();
+        // apply sorting.
+        if(ro != null) {
+          iter = ro.iter(ids);
+        }
+
+        while(iter.hasNext()) {
+          Integer objID = iter.next();
+          if (objID == null) {
+            // shoulnd't really happen?
+            continue;
+          }
+          O obj = db.get(objID.intValue());
+          if(obj == null) {
+            continue;
+          }
+          // do we have annotations to print?
+          SimplePair<String, Object>[] objs = null;
+          if(ra != null) {
+            objs = ra.getAnnotations(objID);
+          }
+          // print the object with its annotations.
+          printObject(out, obj, objs);
+        }
+        out.commentPrintSeparator();
+        out.flush();
+      }
     }
   }
 
