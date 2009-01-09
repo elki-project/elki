@@ -30,52 +30,56 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
     public IntegerDistance similarity(Integer id1, Integer id2) {
         SortedSet<Integer> neighbors1 = (SortedSet<Integer>) getDatabase().getAssociation(getAssociationID(), id1);
         SortedSet<Integer> neighbors2 = (SortedSet<Integer>) getDatabase().getAssociation(getAssociationID(), id2);
-        int intersection = 0;
-        Iterator<Integer> iter1 = neighbors1.iterator();
-        Iterator<Integer> iter2 = neighbors2.iterator();
-        Integer neighbors1ID = null;
-        Integer neighbors2ID = null;
-        if (iter1.hasNext()) {
+        return new IntegerDistance(countSharedNeighbors(neighbors1, neighbors2));
+    }
+    
+    static public int countSharedNeighbors(SortedSet<Integer> neighbors1, SortedSet<Integer> neighbors2) {
+      int intersection = 0;
+      Iterator<Integer> iter1 = neighbors1.iterator();
+      Iterator<Integer> iter2 = neighbors2.iterator();
+      Integer neighbors1ID = null;
+      Integer neighbors2ID = null;
+      if(iter1.hasNext()) {
+        neighbors1ID = iter1.next();
+      }
+      if(iter2.hasNext()) {
+        neighbors2ID = iter2.next();
+      }
+      while((iter1.hasNext() || iter2.hasNext()) && neighbors1ID != null && neighbors2ID != null) {
+        if(neighbors1ID.equals(neighbors2ID)) {
+          intersection++;
+          if(iter1.hasNext()) {
             neighbors1ID = iter1.next();
-        }
-        if (iter2.hasNext()) {
+          }
+          else {
+            neighbors1ID = null;
+          }
+          if(iter2.hasNext()) {
             neighbors2ID = iter2.next();
+          }
+          else {
+            neighbors2ID = null;
+          }
         }
-        while ((iter1.hasNext() || iter2.hasNext()) && neighbors1ID != null && neighbors2ID != null) {
-            if (neighbors1ID.equals(neighbors2ID)) {
-                intersection++;
-                if (iter1.hasNext()) {
-                    neighbors1ID = iter1.next();
-                }
-                else {
-                    neighbors1ID = null;
-                }
-                if (iter2.hasNext()) {
-                    neighbors2ID = iter2.next();
-                }
-                else {
-                    neighbors2ID = null;
-                }
-            }
-            else if (neighbors1ID < neighbors2ID) {
-                if (iter1.hasNext()) {
-                    neighbors1ID = iter1.next();
-                }
-                else {
-                    neighbors1ID = null;
-                }
-            }
-            else // neighbors1ID > neighbors2ID
-            {
-                if (iter2.hasNext()) {
-                    neighbors2ID = iter2.next();
-                }
-                else {
-                    neighbors2ID = null;
-                }
-            }
+        else if(neighbors1ID < neighbors2ID) {
+          if(iter1.hasNext()) {
+            neighbors1ID = iter1.next();
+          }
+          else {
+            neighbors1ID = null;
+          }
         }
-        return new IntegerDistance(intersection);
+        else // neighbors1ID > neighbors2ID
+        {
+          if(iter2.hasNext()) {
+            neighbors2ID = iter2.next();
+          }
+          else {
+            neighbors2ID = null;
+          }
+        }
+      }
+      return intersection;
     }
 
     public IntegerDistance infiniteDistance() {
