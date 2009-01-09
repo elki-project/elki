@@ -164,4 +164,13 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
     public int getNumberOfNeighbors() {
       return numberOfNeighbors;
     }
+
+    /**
+     * Returns the distance function used by the preprocessor.
+     * 
+     * @return distance function used.
+     */
+    public DistanceFunction<O, D> getDistanceFunction() {
+      return distanceFunction;
+    }
 }
