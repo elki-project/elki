@@ -90,6 +90,14 @@ public final class MeanVariance {
   }
 
   /**
+   * Get the number of points the average is based on.
+   * @return number of data points
+   */
+  public double getCount() {
+    return count;
+  }
+
+  /**
    * Return mean
    * @return mean
    */
