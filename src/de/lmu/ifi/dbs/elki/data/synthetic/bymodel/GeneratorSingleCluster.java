@@ -203,7 +203,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
       if(trans != null)
         p = trans.apply(p);
       if(testClipping(p)) {
-        retries++;
+        retries--;
         if(retries < 0)
           throw new UnableToComplyException("Maximum retry count in generator exceeded.");
         continue;
