@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
- * Fast Outlier Detection Using the "Local Correlation Integral"
+ * Fast Outlier Detection Using the "Local Correlation Integral".
  * 
  * Exact implementation only, not aLOCI.
  * 
