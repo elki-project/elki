@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.database;
 
 
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +79,13 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
      * The association id to associate a set of neighbors for use of the shared
      * nearest neighbor similarity function.
      */
-    public static final AssociationID<SortedSet<?>> SHARED_NEAREST_NEIGHBORS_SET = new AssociationID<SortedSet<?>>("sharedNearestNeighborList", SortedSet.class);
+    public static final AssociationID<SortedSet<Integer>> SHARED_NEAREST_NEIGHBORS_SET = new AssociationID<SortedSet<Integer>>("sharedNearestNeighborList", SortedSet.class);
+
+    /**
+     * The association id to associate a set of neighbors for use of the shared
+     * nearest neighbor similarity function.
+     */
+    public static final AssociationID<ArrayList<Integer>> RANKING_LIST = new AssociationID<ArrayList<Integer>>("rankingList", ArrayList.class);
 
     /**
      * The association id to associate a DoubleDistance to an object.

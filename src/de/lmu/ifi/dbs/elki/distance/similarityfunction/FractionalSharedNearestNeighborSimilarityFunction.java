@@ -1,7 +1,9 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
@@ -10,14 +12,22 @@ import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.SharedNearestNeighborsPreprocessor;
+import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
 
 /**
  * @author Arthur Zimek
  */
 // todo arthur comment class
 public class FractionalSharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D extends Distance<D>> extends AbstractPreprocessorBasedSimilarityFunction<O, SharedNearestNeighborsPreprocessor<O, D>, DoubleDistance> {
-
+  private int cachesize = 100;
+  
+  /**
+   * Cache for objects not handled by the preprocessor
+   */
+  private ArrayList<SimplePair<O,SortedSet<Integer>>> cache = new ArrayList<SimplePair<O,SortedSet<Integer>>>();
+  
   /**
    * Holds the number of nearest neighbors to be used.
    */
@@ -31,56 +41,54 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
     super(Pattern.compile("\\d+"));
   }
 
-  @SuppressWarnings("unchecked")
   public DoubleDistance similarity(Integer id1, Integer id2) {
-    SortedSet<Integer> neighbors1 = (SortedSet<Integer>) getDatabase().getAssociation(getAssociationID(), id1);
-    SortedSet<Integer> neighbors2 = (SortedSet<Integer>) getDatabase().getAssociation(getAssociationID(), id2);
-    int intersection = 0;
-    Iterator<Integer> iter1 = neighbors1.iterator();
-    Iterator<Integer> iter2 = neighbors2.iterator();
-    Integer neighbors1ID = null;
-    Integer neighbors2ID = null;
-    if(iter1.hasNext()) {
-      neighbors1ID = iter1.next();
-    }
-    if(iter2.hasNext()) {
-      neighbors2ID = iter2.next();
-    }
-    while((iter1.hasNext() || iter2.hasNext()) && neighbors1ID != null && neighbors2ID != null) {
-      if(neighbors1ID.equals(neighbors2ID)) {
-        intersection++;
-        if(iter1.hasNext()) {
-          neighbors1ID = iter1.next();
-        }
-        else {
-          neighbors1ID = null;
-        }
-        if(iter2.hasNext()) {
-          neighbors2ID = iter2.next();
-        }
-        else {
-          neighbors2ID = null;
-        }
-      }
-      else if(neighbors1ID < neighbors2ID) {
-        if(iter1.hasNext()) {
-          neighbors1ID = iter1.next();
-        }
-        else {
-          neighbors1ID = null;
-        }
-      }
-      else // neighbors1ID > neighbors2ID
-      {
-        if(iter2.hasNext()) {
-          neighbors2ID = iter2.next();
-        }
-        else {
-          neighbors2ID = null;
-        }
+    SortedSet<Integer> neighbors1 = getDatabase().getAssociation(getAssociationID(), id1);
+    SortedSet<Integer> neighbors2 = getDatabase().getAssociation(getAssociationID(), id2);
+    int intersection = SharedNearestNeighborSimilarityFunction.countSharedNeighbors(neighbors1, neighbors2);
+    return new DoubleDistance((double)intersection / numberOfNeighbors);
+  }
+
+  /**
+   * Wrapper to handle objects not preprocessed with a cache for performance.
+   * 
+   * @param obj query object
+   * @return neighbors
+   */
+  private SortedSet<Integer> getNeighbors(O obj) {
+    // try preprocessor first
+    if (obj.getID() != null) {
+      SortedSet<Integer> neighbors = getDatabase().getAssociation(getAssociationID(), obj.getID());
+      if (neighbors != null) {
+        return neighbors;
       }
     }
-    return new DoubleDistance(intersection / numberOfNeighbors);
+    // try cache second
+    for (SimplePair<O, SortedSet<Integer>> item : cache) {
+      if (item.getFirst() == obj) {
+        return item.getSecond();
+      }
+    }
+    List<Integer> neighbors = new ArrayList<Integer>(numberOfNeighbors);
+    List<QueryResult<D>> kNN = getDatabase().kNNQueryForObject(obj, numberOfNeighbors, getPreprocessor().getDistanceFunction());
+    for (int i = 1; i < kNN.size(); i++) {
+        neighbors.add(kNN.get(i).getID());
+    }
+    SortedSet<Integer> neighs = new TreeSet<Integer>(neighbors);
+    // store in cache
+    cache.add(0, new SimplePair<O,SortedSet<Integer>>(obj, neighs));
+    // limit cache size
+    while (cache.size() > cachesize) {
+      cache.remove(cachesize);
+    }
+    return neighs;
+  }
+
+  @Override
+  public DoubleDistance similarity(O o1, O o2) {
+    SortedSet<Integer> neighbors1 = getNeighbors(o1);
+    SortedSet<Integer> neighbors2 = getNeighbors(o2);
+    int intersection = SharedNearestNeighborSimilarityFunction.countSharedNeighbors(neighbors1, neighbors2);
+    return new DoubleDistance((double)intersection / numberOfNeighbors);
   }
 
   public DoubleDistance infiniteDistance() {
@@ -121,7 +129,7 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
    *         preprocessor, which is
    *         {@link AssociationID#SHARED_NEAREST_NEIGHBORS_SET}
    */
-  public AssociationID<SortedSet<?>> getAssociationID() {
+  public AssociationID<SortedSet<Integer>> getAssociationID() {
     return AssociationID.SHARED_NEAREST_NEIGHBORS_SET;
   }
 

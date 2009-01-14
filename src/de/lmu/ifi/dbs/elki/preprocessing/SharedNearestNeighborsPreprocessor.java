@@ -140,7 +140,7 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
      *
      * @return the association id used for annotation of the nearest neighbors ({@link AssociationID#SHARED_NEAREST_NEIGHBORS_SET})
      */
-    public AssociationID<SortedSet<?>> getAssociationID() {
+    public AssociationID<SortedSet<Integer>> getAssociationID() {
         return AssociationID.SHARED_NEAREST_NEIGHBORS_SET;
     }
 

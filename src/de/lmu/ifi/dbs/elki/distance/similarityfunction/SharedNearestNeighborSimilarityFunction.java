@@ -26,10 +26,9 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
         super(Pattern.compile("\\d+"));
     }
 
-    @SuppressWarnings("unchecked")
     public IntegerDistance similarity(Integer id1, Integer id2) {
-        SortedSet<Integer> neighbors1 = (SortedSet<Integer>) getDatabase().getAssociation(getAssociationID(), id1);
-        SortedSet<Integer> neighbors2 = (SortedSet<Integer>) getDatabase().getAssociation(getAssociationID(), id2);
+        SortedSet<Integer> neighbors1 = getDatabase().getAssociation(getAssociationID(), id1);
+        SortedSet<Integer> neighbors2 = getDatabase().getAssociation(getAssociationID(), id2);
         return new IntegerDistance(countSharedNeighbors(neighbors1, neighbors2));
     }
     
@@ -119,7 +118,7 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
      * @return the association ID for the association to be set by the preprocessor,
      *         which is {@link AssociationID#SHARED_NEAREST_NEIGHBORS_SET}
      */
-    public AssociationID<SortedSet<?>> getAssociationID() {
+    public AssociationID<SortedSet<Integer>> getAssociationID() {
         return AssociationID.SHARED_NEAREST_NEIGHBORS_SET;
     }
 
