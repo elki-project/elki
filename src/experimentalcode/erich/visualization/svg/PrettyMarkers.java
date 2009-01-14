@@ -140,17 +140,19 @@ public class PrettyMarkers extends MinimalMarkers {
       definedMarkers.put(plot, new BitSet());
     }
     if(!definedMarkers.get(plot).get(style)) {
-      Element symbol = plot.svgElement(plot.getDefs(), "symbol");
+      Element symbol = plot.svgElement(null, "symbol");
       SVGUtil.setAtt(symbol,"id","s" + style);
       SVGUtil.setAtt(symbol,"viewBox","-1 -1 2 2");
       plotMarker(plot.getDocument(), symbol, 0, 0, style, 2);
       definedMarkers.get(plot).set(style);
+      plot.getDefs().appendChild(symbol);
     }
-    Element use = plot.svgElement(parent, "use");
+    Element use = plot.svgElement(null, "use");
     use.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, "#s" + style);
     SVGUtil.setAtt(use,"x",x - size);
     SVGUtil.setAtt(use,"y",y - size);
     SVGUtil.setAtt(use,"width",size * 2);
     SVGUtil.setAtt(use,"height",size * 2);
+    parent.appendChild(use);
   }
 }
