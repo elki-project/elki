@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.result;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -18,12 +19,43 @@ public class CollectionResult<O> implements IterableResult<O> {
   private Collection<O> col;
   
   /**
+   * Meta information (printed into the header)
+   */
+  private Collection<String> header;
+  
+  /**
+   * Constructor
+   * 
+   * @param col Collection represented
+   */
+  public CollectionResult(Collection<O> col, Collection<String> header) {
+    this.col = col;
+    this.header = header;
+  }
+  
+  /**
    * Constructor
    * 
    * @param col Collection represented
    */
   public CollectionResult(Collection<O> col) {
-    this.col = col;
+    this(col, new ArrayList<String>());
+  }
+  
+  /**
+   * Add header information
+   * 
+   * @param header Header information string
+   */
+  public void addHeader(String s) {
+    header.add(s);
+  }
+  
+  /**
+   * Get header information
+   */
+  public Collection<String> getHeader() {
+    return header;
   }
 
   /**

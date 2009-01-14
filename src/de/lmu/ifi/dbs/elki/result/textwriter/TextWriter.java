@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
+import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
@@ -200,6 +201,13 @@ public class TextWriter<O extends DatabaseObject> {
       PrintStream outStream = streamOpener.openStream(filename);
       TextWriterStream out = new TextWriterStreamNormalizing<O>(outStream, writers, getNormalization());
       printHeader(db, out, settings);
+      // hack to print collectionResult header information
+      if (ri instanceof CollectionResult<?>) {
+        for (String header : ((CollectionResult<?>) ri).getHeader()) {
+          out.commentPrintLn(header);
+        }
+        out.flush();
+      }
       Iterator<?> i = ri.iter();
       while (i.hasNext()) {
         Object o = i.next();
