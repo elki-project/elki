@@ -31,7 +31,7 @@ public abstract class BaseCluster<C extends BaseCluster<C,M>, M extends Model> i
   /**
    * To allow storage in a database, we need to keep an ID.
    */
-  private int id;
+  private Integer id;
   
   /**
    * Object that the hierarchy management is delegated to.
