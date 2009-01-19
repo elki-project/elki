@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.AbstractDatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
@@ -27,12 +27,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 // TODO: disallow clusters without a DatabaseObjectGroup?
 // TODO: remove the DatabaseObjectGroup interface to avoid confusion?
 // TODO: add Model interface and delegations consequently since we have the group delegators?
-public abstract class BaseCluster<C extends BaseCluster<C,M>, M extends Model> implements HierarchyInterface<C>, DatabaseObject, DatabaseObjectGroup, TextWriteable {
-  /**
-   * To allow storage in a database, we need to keep an ID.
-   */
-  private Integer id;
-  
+public abstract class BaseCluster<C extends BaseCluster<C,M>, M extends Model> extends AbstractDatabaseObject implements HierarchyInterface<C>, DatabaseObjectGroup, TextWriteable {
   /**
    * Object that the hierarchy management is delegated to.
    */
@@ -436,22 +431,6 @@ public abstract class BaseCluster<C extends BaseCluster<C,M>, M extends Model> i
     if (getModel() != null && getModel() instanceof TextWriteable) {
       ((TextWriteable)getModel()).writeToText(out, label);
     }
-  }
-
-  /**
-   * Implementation of ID storage for DatabaseObject interface
-   */
-  @Override
-  public Integer getID() {
-    return id;
-  }
-
-  /**
-   * Implementation of ID storage for DatabaseObject interface
-   */
-  @Override
-  public void setID(Integer id) {
-    this.id = id;
   }
 
   /**
