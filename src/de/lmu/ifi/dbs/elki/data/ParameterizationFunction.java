@@ -40,7 +40,7 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
     private ExtremumType extremumType;
 
     /**
-     * Provides a new parameterization function decribing all lines in a
+     * Provides a new parameterization function describing all lines in a
      * d-dimensional feature space intersecting in one point p.
      *
      * @param p the values of the point p
@@ -50,15 +50,15 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
 //    this.debug = true;
         determineGlobalExtremum();
 
-        if (debug) {
-            StringBuffer msg = new StringBuffer();
-            msg.append("\np = ").append(Format.format(p));
-            msg.append("\n").append(this.toString());
-            msg.append("\nextremum ").append(Util.format(alphaExtremum)).append(", type ").append(extremumType);
-            msg.append("\nvalue = ").append(function(alphaExtremum));
-            msg.append("\n");
-            this.debugFine(msg.toString());
-        }
+//        if (debug) {
+//            StringBuffer msg = new StringBuffer();
+//            msg.append("\np = ").append(Format.format(p));
+//            msg.append("\n").append(this.toString());
+//            msg.append("\nextremum ").append(Util.format(alphaExtremum)).append(", type ").append(extremumType);
+//            msg.append("\nvalue = ").append(function(alphaExtremum));
+//            msg.append("\n");
+//            this.debugFine(msg.toString());
+//        }
     }
 
     /**
@@ -500,9 +500,9 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
         }
         tan /= getValue(n + 1);
 
-        if (debug) {
-            debugFiner("tan alpha_" + (n + 1) + " = " + tan);
-        }
+//        if (debug) {
+//            debugFiner("tan alpha_" + (n + 1) + " = " + tan);
+//        }
         double alpha_n = Math.atan(tan);
         if (alpha_n < 0) {
             alpha_n = Math.PI + alpha_n;
