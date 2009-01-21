@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  *
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObjects handled by this Algorithm
+ * @param <R> the type of result to retrieve from this Algorithm
  */
 public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Result> extends AbstractParameterizable implements Algorithm<O, R> {
 
@@ -115,6 +116,9 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Resu
      * Calls the runInTime()-method of extending classes. Measures and prints
      * the runtime and, in case of an index based database,
      * the I/O costs of this method.
+     * 
+     * @param database the database to run the algorithm on
+     * @return the Result computed by this algorithm
      */
     public final R run(Database<O> database) throws IllegalStateException {
         long start = System.currentTimeMillis();
@@ -141,6 +145,7 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Resu
      * needs not to take care of runtime itself.
      *
      * @param database the database to run the algorithm on
+     * @return the Result computed by this algorithm
      * @throws IllegalStateException if the algorithm has not been initialized
      *                               properly (e.g. the setParameters(String[]) method has been failed
      *                               to be called).

@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  *
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObjects handled by this Algorithm
+ * @param <R> the type of result to retrieve from this Algorithm
  * @see AbstractAlgorithm
  */
 // TODO: does R need to be a Result? Why not an arbitrary object?
@@ -28,6 +29,7 @@ public interface Algorithm<O extends DatabaseObject, R extends Result> extends P
      * Runs the algorithm.
      *
      * @param database the database to run the algorithm on
+     * @return the Result computed by this algorithm
      * @throws IllegalStateException if the algorithm has not been initialized
      *                               properly (e.g. the setParameters(String[]) method has been failed
      *                               to be called).

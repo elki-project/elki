@@ -121,6 +121,9 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
 
     /**
      * Performs the APRIORI algorithm on the given database.
+     * 
+     * @param database the Database to run APRIORI on
+     * @return the AprioriResult learned by this APRIORI
      */
     @Override
     protected AprioriResult runInTime(Database<BitVector> database)

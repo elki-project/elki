@@ -19,6 +19,7 @@ import java.util.List;
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
+ * @param <R> the type of result to retrieve from this Algorithm
  */
 public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends Distance<D>, R extends Result>
     extends AbstractAlgorithm<O, R> {
