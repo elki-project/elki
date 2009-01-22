@@ -16,7 +16,7 @@ public interface StreamFactory {
    * should be printing to only one stream at a time to avoid mixing outputs.
    * 
    * @param label Output label.
-   * @return
+   * @return stream object for the given label
    * @throws FileNotFoundException
    */
   public PrintStream openStream(String label) throws FileNotFoundException;

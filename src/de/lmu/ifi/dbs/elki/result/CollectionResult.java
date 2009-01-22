@@ -45,7 +45,7 @@ public class CollectionResult<O> implements IterableResult<O> {
   /**
    * Add header information
    * 
-   * @param header Header information string
+   * @param s Header information string
    */
   public void addHeader(String s) {
     header.add(s);
@@ -53,6 +53,8 @@ public class CollectionResult<O> implements IterableResult<O> {
   
   /**
    * Get header information
+   * 
+   * @return header information of the result
    */
   public Collection<String> getHeader() {
     return header;

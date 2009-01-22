@@ -6,8 +6,6 @@ import java.util.ArrayList;
  * MultiResult is a result collection class.
  * 
  * @author Erich Schubert
- *
- * @param <O>
  */
 public class MultiResult implements Result {
   /**
@@ -34,9 +32,9 @@ public class MultiResult implements Result {
   }
 
   /**
-   * Retrieve result array. Accessor.
+   * Retrieve result array.
    * 
-   * @return
+   * @return results list
    */
   public ArrayList<Result> getResults() {
     return results;
@@ -45,7 +43,7 @@ public class MultiResult implements Result {
   /**
    * Add a new result to the object
    * 
-   * @param r
+   * @param r new result
    */
   public void addResult(Result r) {
     this.results.add(r);
@@ -54,7 +52,7 @@ public class MultiResult implements Result {
   /**
    * Insert a new result at the beginning of the results list
    * 
-   * @param r
+   * @param r new result
    */
   public void prependResult(Result r) {
     this.results.add(0, r);
@@ -65,7 +63,7 @@ public class MultiResult implements Result {
    * 
    * @param <C>
    * @param restrictionClass
-   * @return
+   * @return filtered results list
    */
   // We can't ensure that restrictionClass matches C.
   @SuppressWarnings("unchecked")

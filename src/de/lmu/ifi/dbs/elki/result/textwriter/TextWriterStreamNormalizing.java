@@ -33,10 +33,10 @@ public class TextWriterStreamNormalizing<O extends DatabaseObject> extends TextW
   }
   
   /**
-   * Normalize output.
+   * De-Normalize output.
    * 
    * @param v
-   * @return
+   * @return de-normalized vector
    * @throws NonNumericFeaturesException
    */
   public O normalizationRestore(O v) throws NonNumericFeaturesException {
@@ -55,7 +55,7 @@ public class TextWriterStreamNormalizing<O extends DatabaseObject> extends TextW
 
   /**
    * Getter for normalization class.
-   * @return
+   * @return normalization object
    */
   public Normalization<O> getNormalization() {
     return normalization;

@@ -36,9 +36,9 @@ public class AnnotationsFromDatabase<O extends DatabaseObject, T> implements Ann
   }
 
   /**
-   * DB accessor
+   * Return database referenced by annotations
    * 
-   * @return
+   * @return database referenced
    */
   public Database<O> getDatabase() {
     return this.database;

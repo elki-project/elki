@@ -74,11 +74,10 @@ public class TextWriter<O extends DatabaseObject> {
   /**
    * Writes a header providing information concerning the underlying database
    * and the specified parameter-settings.
-   * 
+   *
+   * @param db to retrieve meta information from
    * @param out the print stream where to write
    * @param settings the settings to be written into the header
-   * @param headerInformation additional information to be printed in the
-   *        header, each entry will be printed in one separate line
    */
   protected void printHeader(Database<O> db, TextWriterStream out, List<AttributeSettings> settings) {
     if(settings == null) {
@@ -110,10 +109,10 @@ public class TextWriter<O extends DatabaseObject> {
   /**
    * Stream output.
    * 
-   * @param db
-   * @param r
-   * @param outStream
-   * @param settings
+   * @param db Database object
+   * @param r Result class
+   * @param streamOpener output stream manager
+   * @param settings Settings to output
    * @throws UnableToComplyException
    * @throws IOException
    */
@@ -306,7 +305,7 @@ public class TextWriter<O extends DatabaseObject> {
   /**
    * Setter for normalization
    * 
-   * @param normalization
+   * @param normalization new normalization object
    */
   public void setNormalization(Normalization<O> normalization) {
     this.normalization = normalization;
@@ -315,7 +314,7 @@ public class TextWriter<O extends DatabaseObject> {
   /**
    * Getter for normalization
    * 
-   * @return
+   * @return normalization object
    */
   public Normalization<O> getNormalization() {
     return normalization;

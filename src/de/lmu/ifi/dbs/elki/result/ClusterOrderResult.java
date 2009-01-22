@@ -38,7 +38,7 @@ public class ClusterOrderResult<D extends Distance<D>> implements OrderingResult
   /**
    * Retrieve the complete cluster order.
    * 
-   * @return
+   * @return cluster order
    */
   public List<ClusterOrderEntry<D>> getClusterOrder() {
     return clusterOrder;

@@ -42,7 +42,7 @@ public class MultipleFilesOutput implements StreamFactory {
   /**
    * Retrieve/open the default output stream.
    * 
-   * @return
+   * @return default output stream
    * @throws FileNotFoundException
    */
   private PrintStream getDefaultStream() throws FileNotFoundException {
@@ -56,7 +56,7 @@ public class MultipleFilesOutput implements StreamFactory {
    * Open a new stream of the given name
    * 
    * @param filename file name (which will be appended to the base name)
-   * @return
+   * @return stream object for the given name
    * @throws FileNotFoundException
    */
   private PrintStream newStream(String filename) throws FileNotFoundException {

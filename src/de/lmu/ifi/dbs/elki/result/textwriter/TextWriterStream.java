@@ -44,7 +44,7 @@ public class TextWriterStream {
 
   /**
    * Comment separator line.
-   * Since this will be printed without {@link QUOTE} infront, it should be quoted string itself. 
+   * Since this will be printed without {@link #QUOTE} infront, it should be quoted string itself. 
    */
   public static final String COMMENTSEP = "###############################################################";
 
@@ -87,8 +87,6 @@ public class TextWriterStream {
 
   /**
    * Print a newline into the comments section.
-   * 
-   * @param line
    */
  public void commentPrintLn() {
     comment.append(NEWLINE);
@@ -96,8 +94,6 @@ public class TextWriterStream {
 
  /**
   * Print a separator line in the comments section.
-  * 
-  * @param line
   */
   public void commentPrintSeparator() {
     comment.append(COMMENTSEP + NEWLINE);
@@ -157,7 +153,7 @@ public class TextWriterStream {
   }
 
   /**
-   * Quoted println. All lines written will be prefixed with {@link QUOTE}
+   * Quoted println. All lines written will be prefixed with {@link #QUOTE}
    * 
    * @param outStream output stream to write to
    * @param data data to print

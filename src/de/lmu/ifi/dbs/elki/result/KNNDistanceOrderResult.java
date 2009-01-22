@@ -7,8 +7,9 @@ import de.lmu.ifi.dbs.elki.distance.Distance;
 
 /**
  * @author Arthur Zimek
- * @param <O> the type of DatabaseObjects handled by this Result
- * @param <D> the type of Distance used by this Result todo arthur comment
+ * @param <D> the type of Distance used by this Result
+ * 
+ * TODO: arthur comment
  */
 public class KNNDistanceOrderResult<D extends Distance<D>> implements IterableResult<D> {
   /**
@@ -17,8 +18,9 @@ public class KNNDistanceOrderResult<D extends Distance<D>> implements IterableRe
   private final List<D> knnDistances;
 
   /**
-   * @param db
-   * @param knnDistances
+   * Construct result
+   * 
+   * @param knnDistances distance list to wrap.
    */
   public KNNDistanceOrderResult(final List<D> knnDistances) {
     this.knnDistances = knnDistances;
