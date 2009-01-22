@@ -77,7 +77,7 @@ public class FourCWrapper<O extends DatabaseObject> extends NormalizationWrapper
 
     /**
      * Adds parameters
-     * {@link #EPSILON_PARAM}, {@link #MINPTS_PARAM}, {@link #LAMBDA_PARAM}, {@link } and flag {@link } todo
+     * {@link #EPSILON_PARAM}, {@link #MINPTS_PARAM}, {@link #LAMBDA_PARAM}, {@link #LAMBDA_PARAM} and flag {@link LimitEigenPairFilter#EIGENPAIR_FILTER_ABSOLUTE} todo
      * to the option handler additionally to parameters of super class.
      */
     public FourCWrapper() {

@@ -78,7 +78,7 @@ public class DiSHWrapper<O extends DatabaseObject> extends NormalizationWrapper<
 
      /**
      * Adds parameters
-     * {@link #MU_PARAM}, {@link #EPSILON_PARAM}, and {@link } todo
+     * {@link #MU_PARAM}, {@link #EPSILON_PARAM}, and {@link #STRATEGY_PARAM}
      * to the option handler additionally to parameters of super class.
      */
     public DiSHWrapper() {

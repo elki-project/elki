@@ -60,7 +60,7 @@ public class HiSCWrapper<O extends DatabaseObject> extends FileBasedDatabaseConn
 
     /**
      * Adds parameters
-     * {@link } and {@link } todo
+     * {@link #K_PARAM} and {@link #ALPHA_PARAM}
      * to the option handler additionally to parameters of super class.
      */
     public HiSCWrapper() {
