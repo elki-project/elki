@@ -30,7 +30,7 @@ public abstract class NumberVector<V extends NumberVector<V, N>, N extends Numbe
     /**
      * Creates and returns a new instance of V based on the passed values.
      * 
-     * @see de.lmu.ifi.dbs.elki.data.FeatureVector#newInstance(N[])
+     * @see de.lmu.ifi.dbs.elki.data.FeatureVector#newInstance
      */
     @SuppressWarnings("unchecked")
     public V newInstance(N[] values) throws SecurityException,

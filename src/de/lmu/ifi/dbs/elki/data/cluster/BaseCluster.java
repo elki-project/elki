@@ -22,6 +22,9 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * hierarchy object can be provided, e.g. when there is a single hierarchy object used
  * for keeping all the hierarchy information in one object.
  * 
+ * @param <C> Cluster object type (required for hierarchies)
+ * @param <M> Model object type
+ * 
  * @author Erich Schubert
  */
 // TODO: disallow clusters without a DatabaseObjectGroup?
@@ -264,9 +267,9 @@ public abstract class BaseCluster<C extends BaseCluster<C,M>, M extends Model> e
   }
   
   /**
-   * Delegate to group.
+   * Delegate to database object group.
    * 
-   * @return
+   * @return Cluster size retrieved from object group.
    */
   public int size() {
     return group.size();
@@ -341,7 +344,7 @@ public abstract class BaseCluster<C extends BaseCluster<C,M>, M extends Model> e
   /**
    * Access group object
    * 
-   * @return
+   * @return database object group
    */
   public DatabaseObjectGroup getGroup() {
     return group;
@@ -350,36 +353,16 @@ public abstract class BaseCluster<C extends BaseCluster<C,M>, M extends Model> e
   /**
    * Access group object
    * 
-   * @return
+   * @param g set database object group
    */
   public void setGroup(DatabaseObjectGroup g) {
     group = g;
   }
   
   /**
-   * Access group object
-   * 
-   * @return
-   */
-  @Deprecated
-  public DatabaseObjectGroup getObjectGroup() {
-    return group;
-  }
-  
-  /**
-   * Access group object
-   * 
-   * @return
-   */
-  @Deprecated
-  public void setObjectGroup(DatabaseObjectGroup g) {
-    group = g;
-  }
-  
-  /**
    * Access model object
    * 
-   * @return
+   * @return Cluster model
    */
   public M getModel() {
     return model;
@@ -388,7 +371,7 @@ public abstract class BaseCluster<C extends BaseCluster<C,M>, M extends Model> e
   /**
    * Access model object
    * 
-   * @param model
+   * @param model New cluster model
    */
   public void setModel(M model) {
     this.model = model;
@@ -399,7 +382,8 @@ public abstract class BaseCluster<C extends BaseCluster<C,M>, M extends Model> e
    * Writing the actual group data will be handled by the caller, this
    * is only meant to write the meta information.
    *  
-   * @param out
+   * @param out output writer stream
+   * @param label
    */
   public void writeToText(TextWriterStream out, String label) {
     String name = getNameAutomatic();
@@ -436,7 +420,7 @@ public abstract class BaseCluster<C extends BaseCluster<C,M>, M extends Model> e
   /**
    * Getter for noise flag.
    * 
-   * @return
+   * @return noise flag
    */
   public boolean isNoise() {
     return noise;
@@ -445,7 +429,7 @@ public abstract class BaseCluster<C extends BaseCluster<C,M>, M extends Model> e
   /**
    * Setter for noise flag.
    * 
-   * @param noise
+   * @param noise new noise flag value
    */
   public void setNoise(boolean noise) {
     this.noise = noise;

@@ -46,7 +46,7 @@ public class BitVector extends NumberVector<BitVector, Bit> {
     /**
      * Provides a new BitVector corresponding to the bits in the given array.
      *
-     * @param bits an array of bits specifiying the bits in this bit vector
+     * @param bits an array of bits specifying the bits in this bit vector
      */
     public BitVector(Bit[] bits) {
         this.bits = new BitSet(bits.length);
@@ -61,7 +61,7 @@ public class BitVector extends NumberVector<BitVector, Bit> {
      * 
      * @return a new instance of this BitVector with the specified values
      * 
-     * @see de.lmu.ifi.dbs.elki.data.NumberVector#newInstance(N[])
+     * @see de.lmu.ifi.dbs.elki.data.NumberVector#newInstance
      */
     @Override
     public BitVector newInstance(Bit[] values) {
@@ -98,7 +98,7 @@ public class BitVector extends NumberVector<BitVector, Bit> {
     }
 
     /**
-     * The dimensionality of the binary vector space whereof this BitVector is an
+     * The dimensionality of the binary vector space of which this BitVector is an
      * element.
      * 
      * @see de.lmu.ifi.dbs.elki.data.FeatureVector#getDimensionality()

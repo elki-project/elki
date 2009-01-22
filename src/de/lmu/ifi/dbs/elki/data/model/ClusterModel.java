@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.data.model;
 
 /**
  * Generic cluster model. Does not supply additional meta information except that it is a cluster.
- * Since there is no meta information, you should use the static {@link CLUSTER} object.
+ * Since there is no meta information, you should use the static {@link #CLUSTER} object.
  * 
  * @author Erich Schubert
  *

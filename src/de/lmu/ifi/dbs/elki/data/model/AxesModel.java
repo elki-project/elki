@@ -28,7 +28,7 @@ public class AxesModel extends BaseModel {
   /**
    * Access subspaces bitset.
    * 
-   * @return
+   * @return bit set
    */
   public BitSet getSubspaces() {
     return subspaces;
@@ -37,9 +37,9 @@ public class AxesModel extends BaseModel {
   /**
    * Access subspaces bitset.
    * 
-   * @param subpsaces
+   * @param subspaces
    */
-  public void setSubspaces(BitSet subpsaces) {
-    this.subspaces = subpsaces;
+  public void setSubspaces(BitSet subspaces) {
+    this.subspaces = subspaces;
   }  
 }

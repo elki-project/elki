@@ -38,15 +38,15 @@ public class CorrelationModel<V extends RealVector<V, ?>> extends BaseModel impl
   }
 
   /**
-   * Accessor for PCA result
-   * @return
+   * Get assigned PCA result
+   * @return PCA result
    */
   public PCAFilteredResult getPCAResult() {
     return pcaresult;
   }
 
   /**
-   * Accessor for PCA result
+   * Assign new PCA result
    * @param pcaresult
    */
   public void setPCAResult(PCAFilteredResult pcaresult) {
@@ -54,15 +54,15 @@ public class CorrelationModel<V extends RealVector<V, ?>> extends BaseModel impl
   }
 
   /**
-   * Accessor for Centroid
-   * @return
+   * Get assigned for Centroid
+   * @return centroid
    */
   public V getCentroid() {
     return centroid;
   }
 
   /**
-   * Accessor for Centroid
+   * Assign new Centroid
    * @param centroid
    */
   public void setCentroid(V centroid) {

@@ -20,7 +20,6 @@ public final class DatabaseObjectGroupArray  implements DatabaseObjectGroup {
   /**
    * Constructor.
    * 
-   * @param database
    * @param ids
    */  
   public DatabaseObjectGroupArray(Integer[] ids) {

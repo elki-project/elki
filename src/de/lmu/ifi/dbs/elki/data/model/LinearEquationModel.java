@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  */
 public class LinearEquationModel extends BaseModel implements TextWriteable {
   /**
-   * equation system
+   * Equation system
    */
   private LinearEquationSystem les;
 
@@ -26,18 +26,18 @@ public class LinearEquationModel extends BaseModel implements TextWriteable {
   }
 
   /**
-   * Accessor.
+   * Get assigned Linear Equation System
    * 
-   * @return
+   * @return linear equation system
    */
   public LinearEquationSystem getLes() {
     return les;
   }
 
   /**
-   * Accessor.
+   * Assign new Linear Equation System.
    * 
-   * @param les
+   * @param les new linear equation system
    */
   public void setLes(LinearEquationSystem les) {
     this.les = les;

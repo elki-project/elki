@@ -9,7 +9,6 @@ import java.util.Iterator;
  * @author Erich Schubert
  *
  * @param <C> Collection type used.
- * @param <O> DatabaseObject type used.
  */
 public final class DatabaseObjectGroupCollection<C extends Collection<Integer>> implements DatabaseObjectGroup {
   /**

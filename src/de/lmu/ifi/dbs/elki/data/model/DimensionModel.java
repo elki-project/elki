@@ -25,16 +25,18 @@ public class DimensionModel extends BaseModel implements TextWriteable {
   }
 
   /**
-   * Getter
-   * @return
+   * Get cluster dimensionality
+   * 
+   * @return dimensionality
    */
   public int getDimension() {
     return dimension;
   }
 
   /**
-   * Setter
-   * @param dimension
+   * Set cluster dimensionality
+   *  
+   * @param dimension new dimensionality
    */
   public void setDimension(int dimension) {
     this.dimension = dimension;

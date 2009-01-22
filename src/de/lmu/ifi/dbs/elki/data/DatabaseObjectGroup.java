@@ -10,8 +10,6 @@ import java.util.Iterator;
  * respectively. Performance varies depending on the actual choice.
  * 
  * @author Erich Schubert
- *
- * @param <O>
  */
 public interface DatabaseObjectGroup extends Iterable<Integer> {
   /**
