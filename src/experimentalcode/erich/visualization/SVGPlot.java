@@ -170,12 +170,22 @@ public class SVGPlot {
   /**
    * Create a SVG element in the SVG namespace. Non-static version.
    * 
-   * @param parent parent node
+   * @param parent parent node. May be null.
    * @param name node name
-   * @return
+   * @return new SVG element.
    */
   public Element svgElement(Element parent, String name) {
     return SVGUtil.svgElement(document, parent, name);
+  }
+
+  /**
+   * Create a SVG element in the SVG namespace. Non-static version.
+   * 
+   * @param name node name
+   * @return new SVG element.
+   */
+  public Element svgElement(String name) {
+    return SVGUtil.svgElement(document, null, name);
   }
 
   /**

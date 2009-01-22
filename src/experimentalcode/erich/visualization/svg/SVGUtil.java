@@ -45,6 +45,17 @@ public final class SVGUtil {
   }
 
   /**
+   * Create a SVG element in appropriate namespace
+   * 
+   * @param document containing document
+   * @param name node name
+   * @return new SVG element.
+   */
+  public static Element svgElement(Document document, String name) {
+    return svgElement(document, null, name);
+  }
+
+  /**
    * Set a SVG attribute
    * 
    * @param el element
