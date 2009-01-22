@@ -135,7 +135,7 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
    * Computes quantitatively linear dependencies among the attributes of the
    * given database based on a linear correlation PCA.
    * 
-   * @param database the database to run this DependencyDerivator on
+   * @param db the database to run this DependencyDerivator on
    * @return the CorrelationAnalysisSolution computed by this DependencyDerivator
    */
   @Override
