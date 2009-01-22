@@ -22,12 +22,12 @@ public class SVGPlot {
   /**
    * SVG document we plot to.
    */
-  protected SVGDocument document;
+  private SVGDocument document;
 
   /**
    * Root element of the document.
    */
-  protected Element root;
+  private Element root;
 
   /**
    * Definitions element of the document.
@@ -185,6 +185,14 @@ public class SVGPlot {
    */
   public SVGDocument getDocument() {
     return document;
+  }
+
+  /**
+   * Getter for definitions section
+   * @return DOM element
+   */
+  public Element getRoot() {
+    return root;
   }
 
   /**
