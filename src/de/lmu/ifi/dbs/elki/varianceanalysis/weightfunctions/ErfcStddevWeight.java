@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
  * 
  * erfc(1 / sqrt(2) * distance / stddev)
  * 
- * {@see http://en.wikipedia.org/wiki/Error_function}
+ * {@see <a href="http://en.wikipedia.org/wiki/Error_function">Error Function [wikipedia]</a>}
  * 
  * @author Erich Schubert
  */
