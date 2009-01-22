@@ -8,7 +8,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  * into a single matrix operation (of dimensionality dim+1), and also
  * the construction of an inverse transformation.
  * 
- * {@see <a href="http://en.wikipedia.org/wiki/Homogeneous_coordinates">Wikipedia on Homogeneous Coordinates</a>}
+ * See also: <a href="http://en.wikipedia.org/wiki/Homogeneous_coordinates">Wikipedia on Homogeneous Coordinates</a>
  * 
  * @author Erich Schubert
  *

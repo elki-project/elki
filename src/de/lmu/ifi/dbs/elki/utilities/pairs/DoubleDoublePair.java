@@ -32,6 +32,8 @@ public final class DoubleDoublePair implements Comparable<DoubleDoublePair>, Com
 
   /**
    * Trivial equals implementation
+   * 
+   * @param obj Object to compare to
    */
   @Override
   public boolean equals(Object obj) {
@@ -60,6 +62,8 @@ public final class DoubleDoublePair implements Comparable<DoubleDoublePair>, Com
 
   /**
    * Implementation of comparable interface, sorting by first then second.
+   * 
+   * @param other Object to compare to
    */
   public int compareTo(DoubleDoublePair other) {
     int fdiff = Double.compare(this.first, other.first);
@@ -69,6 +73,8 @@ public final class DoubleDoublePair implements Comparable<DoubleDoublePair>, Com
 
   /**
    * Implementation of comparableSwapped interface, sorting by second then first.
+   * 
+   * @param other Object to compare to
    */
   public int compareSwappedTo(DoubleDoublePair other) {
     int fdiff = Double.compare(this.second, other.second);
@@ -88,7 +94,7 @@ public final class DoubleDoublePair implements Comparable<DoubleDoublePair>, Com
   /**
    * Set first value
    * 
-   * @param second
+   * @param first new value
    */
   public void setFirst(double first) {
     this.first = first;
@@ -106,7 +112,7 @@ public final class DoubleDoublePair implements Comparable<DoubleDoublePair>, Com
   /**
    * Set second value
    * 
-   * @param second
+   * @param second new value
    */
   public void setSecond(double second) {
     this.second = second;

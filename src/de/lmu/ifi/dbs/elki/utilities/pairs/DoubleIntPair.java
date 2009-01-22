@@ -13,6 +13,7 @@ public final class DoubleIntPair implements Comparable<DoubleIntPair>, Comparabl
    * first value
    */
   public double first;
+  
   /**
    * second value
    */
@@ -32,6 +33,8 @@ public final class DoubleIntPair implements Comparable<DoubleIntPair>, Comparabl
 
   /**
    * Trivial equals implementation
+   * 
+   * @param obj Object to compare to
    */
   @Override
   public boolean equals(Object obj) {
@@ -57,6 +60,8 @@ public final class DoubleIntPair implements Comparable<DoubleIntPair>, Comparabl
 
   /**
    * Implementation of comparable interface, sorting by first then second.
+   * 
+   * @param other Object to compare to
    */
   public int compareTo(DoubleIntPair other) {
     int fdiff = Double.compare(this.first, other.first);
@@ -66,6 +71,8 @@ public final class DoubleIntPair implements Comparable<DoubleIntPair>, Comparabl
 
   /**
    * Implementation of comparableSwapped interface, sorting by second then first.
+   * 
+   * @param other Object to compare to
    */
   public int compareSwappedTo(DoubleIntPair other) {
     int fdiff = this.second - other.second;
@@ -85,7 +92,7 @@ public final class DoubleIntPair implements Comparable<DoubleIntPair>, Comparabl
   /**
    * Set first value
    * 
-   * @param second
+   * @param first new value
    */
   public void setFirst(double first) {
     this.first = first;
@@ -103,7 +110,7 @@ public final class DoubleIntPair implements Comparable<DoubleIntPair>, Comparabl
   /**
    * Set second value
    * 
-   * @param second
+   * @param second new value
    */
   public void setSecond(int second) {
     this.second = second;

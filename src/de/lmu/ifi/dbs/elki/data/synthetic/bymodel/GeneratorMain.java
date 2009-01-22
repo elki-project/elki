@@ -171,18 +171,18 @@ public class GeneratorMain {
   }
 
   /**
-   * Return value of the {@link testAgainstModel} flag
+   * Return value of the {@link #testAgainstModel} flag
    * 
-   * @return
+   * @return value of testAgainstModel
    */
   public boolean isTestAgainstModel() {
     return testAgainstModel;
   }
 
   /**
-   * Set the value of the {@link testAgainstModel} flag
+   * Set the value of the {@link #testAgainstModel} flag
    * 
-   * @return
+   * @param testAgainstModel New value
    */
   public void setTestAgainstModel(boolean testAgainstModel) {
     this.testAgainstModel = testAgainstModel;

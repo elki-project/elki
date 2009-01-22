@@ -10,6 +10,9 @@ import java.util.Comparator;
 public final class CompareSwapped<P extends ComparableSwapped<P>> implements Comparator<P> {
   /**
    * Compare by second component, using the ComparableSwapped interface.
+   * 
+   * @param o1 First object
+   * @param o2 Second object
    */
   @Override
   public int compare(P o1, P o2) {

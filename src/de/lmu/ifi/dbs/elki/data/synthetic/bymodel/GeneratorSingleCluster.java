@@ -235,7 +235,8 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
   /**
    * Get axis generators.
    * Used for printing model information
-   * @return
+   * 
+   * @return list of distributions
    */
   public LinkedList<Distribution> getAxes() {
     return axes;
@@ -243,7 +244,8 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
 
   /**
    * Get transformation
-   * @return
+   * 
+   * @return transformation matrix, may be null.
    */
   public AffineTransformation getTrans() {
     return trans;
@@ -251,7 +253,8 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
 
   /**
    * Return a copy of the 'clipping minimum' vector.
-   * @return
+   * 
+   * @return vector with lower clipping bounds. May be null.
    */
   public Vector getClipmin() {
     if (clipmin == null) return null;
@@ -260,7 +263,8 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
   
   /**
    * Return a copy of the 'clipping maximum' vector
-   * @return
+   * 
+   * @return vector with upper clipping bounds. May be null.
    */
   public Vector getClipmax() {
     if (clipmax == null) return null;
@@ -277,7 +281,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
   /**
    * Set the list of points in the cluster
    * 
-   * @param points
+   * @param points New list of points in this cluster.
    */
   public void setPoints(LinkedList<Vector> points) {
     this.points = points;
@@ -285,6 +289,8 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
 
   /**
    * Return the size
+   * 
+   * @return size of this cluster.
    */
   public int getSize() {
     return size;
@@ -292,6 +298,8 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
 
   /**
    * Get cluster name.
+   * 
+   * @return name of this cluster.
    */
   public String getName() {
     return name;
@@ -308,7 +316,8 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
 
   /**
    * Increase number of discarded points
-   * @param discarded
+   * 
+   * @param discarded number of points discarded.
    */
   public void addDiscarded(int discarded) {
     this.discarded += discarded;
@@ -316,6 +325,8 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
 
   /**
    * Return number of remaining retries.
+   * 
+   * @return Number of retries left in this cluster.
    */
   public int getRetries() {
     return retries;
@@ -333,7 +344,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
   /**
    * Set density correction factor.
    * 
-   * @param densitycorrection
+   * @param densitycorrection new density correction factor.
    */
   public void setDensityCorrection(double densitycorrection) {
     this.densitycorrection = densitycorrection;
@@ -341,7 +352,8 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
 
   /**
    * Create a new random generator (reproducible)
-   * @return
+   * 
+   * @return new random generator derived from cluster master random.
    */
   public Random getNewRandomGenerator() {
     return new Random(random.nextLong());

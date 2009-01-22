@@ -12,10 +12,22 @@ package de.lmu.ifi.dbs.elki.utilities.pairs;
  * @param <SECOND> second type
  */
 public final class ComparablePair<FIRST extends Comparable<FIRST>,SECOND extends Comparable<SECOND>> implements PairInterface<FIRST,SECOND>, Comparable<ComparablePair<FIRST,SECOND>>, ComparableSwapped<ComparablePair<FIRST,SECOND>> {
-  /* these are public by intention, Pair<> is supposed to be a simple wrapper */
+  /* these are public by intention, Pair<> is supposed to be a simple wrapper and *final* */
+  /**
+   * First value in pair
+   */
   public FIRST first;
+  /**
+   * Second value in pari
+   */
   public SECOND second;
 
+  /**
+   * Initialize pair
+   * 
+   * @param first first parameter
+   * @param second second parameter
+   */
   public ComparablePair(FIRST first, SECOND second) {
     this.first = first;
     this.second = second;
@@ -67,6 +79,8 @@ public final class ComparablePair<FIRST extends Comparable<FIRST>,SECOND extends
 
   /**
    * Generic derived compare function.
+   * 
+   * @param other Object to compare to
    */
   public int compareTo(ComparablePair<FIRST, SECOND> other) {
     // try comparing by first
@@ -88,6 +102,8 @@ public final class ComparablePair<FIRST extends Comparable<FIRST>,SECOND extends
   
   /**
    * Generic derived compare function, with swapped components.
+   * 
+   * @param other Object to compare to
    */
   public int compareSwappedTo(ComparablePair<FIRST, SECOND> other) {
     // try comparing by second
@@ -109,6 +125,8 @@ public final class ComparablePair<FIRST extends Comparable<FIRST>,SECOND extends
   
   /**
    * Array constructor for generics
+   * 
+   * @param size Size of array to be constructed
    */
   @SuppressWarnings("unchecked")
   public static final <F extends Comparable<F>,S extends Comparable<S>> ComparablePair<F,S>[] newArray(int size) {
@@ -117,6 +135,8 @@ public final class ComparablePair<FIRST extends Comparable<FIRST>,SECOND extends
   
   /**
    * canonical equals implementation
+   * 
+   * @param obj Object to compare to
    */
   @SuppressWarnings("unchecked")
   @Override
@@ -140,7 +160,7 @@ public final class ComparablePair<FIRST extends Comparable<FIRST>,SECOND extends
   }
 
   /**
-   * Canonical Hash function via mixing
+   * canonical Hash function via mixing
    */
   @Override
   public int hashCode() {

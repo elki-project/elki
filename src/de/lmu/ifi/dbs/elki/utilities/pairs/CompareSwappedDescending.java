@@ -12,6 +12,9 @@ public final class CompareSwappedDescending<P extends ComparableSwapped<P>> impl
    * Compare by second component, using the ComparableSwapped interface.
    * 
    * Sort descending by comparing o2 with o1 instead of the other way round.
+   * 
+   * @param o1 First Object
+   * @param o2 Second Object
    */
   @Override
   public int compare(P o1, P o2) {

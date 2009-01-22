@@ -8,5 +8,11 @@ package de.lmu.ifi.dbs.elki.utilities.pairs;
  * @param <O> Object class.
  */
 public interface ComparableSwapped<O> {
+  /**
+   * Swapped comparison function.
+   * 
+   * @param other object to compare to
+   * @return comparison result.
+   */
   public int compareSwappedTo(O other);
 }

@@ -4,7 +4,12 @@ package de.lmu.ifi.dbs.elki.utilities.pairs;
 /**
  * Generic SimplePair<FIRST,SECOND> class.
  * 
- * Does not implement any "special" interfaces such as Comparable
+ * Does not implement any "special" interfaces such as Comparable,
+ * use {@link ComparablePair} if you want comparable pairs. Both implement
+ * {@link PairInterface}, however since we want them to be final, ComparablePair
+ * is not a child class of SimplePair!
+ * Therefore, APIs should use {@link PairInterface} when they do not need (but also
+ * not forbid) Comparability.
  * 
  * @author Erich Schubert
  *
@@ -12,8 +17,14 @@ package de.lmu.ifi.dbs.elki.utilities.pairs;
  * @param <SECOND> second type
  */
 public final class SimplePair<FIRST, SECOND> implements PairInterface<FIRST, SECOND> {
-  /* these are public by intention, Pair<> is supposed to be a simple wrapper */
+  /* these are public by intention, Pair<> is supposed to be a simple wrapper and *final* */
+  /**
+   * First value in pair
+   */
   public FIRST first;
+  /**
+   * Second value in pair
+   */
   public SECOND second;
 
   /**
@@ -84,6 +95,8 @@ public final class SimplePair<FIRST, SECOND> implements PairInterface<FIRST, SEC
 
   /**
    * Simple equals statement
+   * 
+   * @param obj Object to compare to
    */
   @SuppressWarnings("unchecked")
   @Override

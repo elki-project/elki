@@ -5,7 +5,7 @@ package de.lmu.ifi.dbs.elki.math;
  * 
  * Currently, this class contains the erf and erfc error functions (Gaussian = normal distribution)
  * 
- * {@see <a href="http://en.wikipedia.org/wiki/Error_function">Wikipedia on Error functions</a>}
+ * See also: <a href="http://en.wikipedia.org/wiki/Error_function">Wikipedia on Error functions</a>
  * 
  * @author Erich Schubert
  *
@@ -29,7 +29,7 @@ public final class ErrorFunctions {
   /**
    * Complementary error function for Gaussian distributions = Normal distributions.
    * 
-   * {@see <a href="http://en.wikipedia.org/wiki/Error_function">Wikipedia on Error functions</a>}
+   * See also: <a href="http://en.wikipedia.org/wiki/Error_function">Wikipedia on Error functions</a>
    * 
    * Numerical approximation using taylor series.
    * Implementation loosely based on http://www.netlib.org/specfun/erf
@@ -77,7 +77,7 @@ public final class ErrorFunctions {
   /**
    * Error function for Gaussian distributions = Normal distributions.
    * 
-   * {@see <a href="http://en.wikipedia.org/wiki/Error_function">Wikipedia on Error functions</a>}
+   * See also: <a href="http://en.wikipedia.org/wiki/Error_function">Wikipedia on Error functions</a>
    * 
    * Numerical approximation using taylor series.
    * Implementation loosely based on http://www.netlib.org/specfun/erf

@@ -10,17 +10,26 @@ package de.lmu.ifi.dbs.elki.utilities.pairs;
  * @param <THIRD> second type
  */
 public final class ComparableTriple<FIRST extends Comparable<FIRST>,SECOND extends Comparable<SECOND>, THIRD extends Comparable<THIRD>> implements Comparable<ComparableTriple<FIRST,SECOND,THIRD>> {
-  /* these are public by intention, Pair<> is supposed to be a simple wrapper */
+  /* these are public by intention, Pair<> is supposed to be a simple wrapper and *final* */
+  /**
+   * First value
+   */
   public FIRST first;
+  /**
+   * Second value
+   */
   public SECOND second;
+  /**
+   * Third value
+   */
   public THIRD third;
 
   /**
    * Constructor with fields
    * 
-   * @param first
-   * @param second
-   * @param third
+   * @param first Value of first component
+   * @param second Value of second component
+   * @param third Value of third component
    */
   public ComparableTriple(FIRST first, SECOND second, THIRD third) {
     this.first = first;
@@ -39,7 +48,7 @@ public final class ComparableTriple<FIRST extends Comparable<FIRST>,SECOND exten
   /**
    * Getter for first
    * 
-   * @return first element in pair
+   * @return first element in triple
    */
   public FIRST getFirst() {
     return first;
@@ -55,9 +64,9 @@ public final class ComparableTriple<FIRST extends Comparable<FIRST>,SECOND exten
   }
 
   /**
-   * Getter for second element in pair
+   * Getter for second element in triple
    * 
-   * @return second element in pair
+   * @return second element in triple
    */
   public SECOND getSecond() {
     return second;
@@ -75,7 +84,7 @@ public final class ComparableTriple<FIRST extends Comparable<FIRST>,SECOND exten
   /**
    * Getter for third
    * 
-   * @return third element in pair
+   * @return third element in triple
    */
   public THIRD getThird() {
     return third;
@@ -92,6 +101,8 @@ public final class ComparableTriple<FIRST extends Comparable<FIRST>,SECOND exten
 
   /**
    * Generic derived compare function.
+   * 
+   * @param other Object to compare to
    */
   public int compareTo(ComparableTriple<FIRST, SECOND, THIRD> other) {
     // try comparing by first
@@ -120,6 +131,8 @@ public final class ComparableTriple<FIRST extends Comparable<FIRST>,SECOND exten
   
   /**
    * Array constructor for generics
+   * 
+   * @param size Size of array to be constructed.
    */
   @SuppressWarnings("unchecked")
   public static final <F extends Comparable<F>,S extends Comparable<S>, T extends Comparable<T>> ComparableTriple<F,S,T>[] newArray(int size) {
@@ -128,6 +141,8 @@ public final class ComparableTriple<FIRST extends Comparable<FIRST>,SECOND exten
 
   /**
    * Canonical equals function
+   * 
+   * @param obj Object to compare to
    */
   @SuppressWarnings("unchecked")
   @Override

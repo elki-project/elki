@@ -13,6 +13,7 @@ public final class IntIntPair implements Comparable<IntIntPair>, ComparableSwapp
    * first value
    */
   public int first;
+  
   /**
    * second value
    */
@@ -32,6 +33,8 @@ public final class IntIntPair implements Comparable<IntIntPair>, ComparableSwapp
 
   /**
    * Trivial equals implementation
+   * 
+   * @param obj Object to compare to
    */
   @Override
   public boolean equals(Object obj) {
@@ -55,6 +58,8 @@ public final class IntIntPair implements Comparable<IntIntPair>, ComparableSwapp
 
   /**
    * Implementation of comparable interface, sorting by first then second.
+   * 
+   * @param other Object to compare to
    */
   public int compareTo(IntIntPair other) {
     int fdiff = this.first - other.first;
@@ -64,6 +69,8 @@ public final class IntIntPair implements Comparable<IntIntPair>, ComparableSwapp
 
   /**
    * Implementation of comparableSwapped interface, sorting by second then first.
+   * 
+   * @param other Object to compare to
    */
   public int compareSwappedTo(IntIntPair other) {
     int fdiff = this.second - other.second;
@@ -83,7 +90,7 @@ public final class IntIntPair implements Comparable<IntIntPair>, ComparableSwapp
   /**
    * Set first value
    * 
-   * @param second
+   * @param first new value
    */
   public void setFirst(int first) {
     this.first = first;
@@ -101,7 +108,7 @@ public final class IntIntPair implements Comparable<IntIntPair>, ComparableSwapp
   /**
    * Set second value
    * 
-   * @param second
+   * @param second new value
    */
   public void setSecond(int second) {
     this.second = second;

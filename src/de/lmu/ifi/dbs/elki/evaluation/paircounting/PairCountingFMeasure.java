@@ -22,10 +22,16 @@ import de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairSortedGenerator
  * combination -- the F-Measure -- is useful.
  * 
  * @author Erich Schubert
- *
- * @param <O> Object type
  */
 public class PairCountingFMeasure {
+  /**
+   * Get a pair generator for the given Clustering 
+   * 
+   * @param <R> Clustering result class
+   * @param <C> Cluster type
+   * @param clusters Clustering result
+   * @return Sorted pair generator
+   */
   public static <R extends Clustering<C>, C extends BaseCluster<C,?>> PairSortedGeneratorInterface getPairGenerator(R clusters) {
     // collect all clusters into a flat list.
     Set<C> allclusters = clusters.getAllClusters();
