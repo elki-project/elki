@@ -353,7 +353,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
     }
 
     /**
-     * Auxiliary method for {@link #insert(de.lmu.ifi.dbs.elki.database.Database)}:
+     * Auxiliary method for {@link #insert(Database, SimplePair)}:
      * inserts the objects with the specified id into the the {@link #nnTable} and {@link #lofTable}.
      *
      * @param id        the id of the object to be inserted

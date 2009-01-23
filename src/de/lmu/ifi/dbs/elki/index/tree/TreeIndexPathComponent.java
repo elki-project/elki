@@ -56,8 +56,6 @@ public class TreeIndexPathComponent<E extends Entry> {
      * and if the entry of this component equals
      * the entry of the o argument,
      * <code>false</code> otherwise.
-     *
-     * @see Entry#equals(Object)
      */
     @Override
     @SuppressWarnings("unchecked")
