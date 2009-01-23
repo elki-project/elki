@@ -14,7 +14,7 @@ public interface Distance<D extends Distance<D>> extends Comparable<D>, External
     /**
      * Returns a new distance as sum of this distance and the given distance.
      *
-     * @param distance the distancce to be added to this distance
+     * @param distance the distance to be added to this distance
      * @return a new distance as sum of this distance and the given distance
      */
     D plus(D distance);
@@ -44,7 +44,7 @@ public interface Distance<D extends Distance<D>> extends Comparable<D>, External
     String toString();
 
     /**
-     * Retuns the number of Bytes this distance uses if it is written to
+     * Returns the number of Bytes this distance uses if it is written to
      * an external file.
      *
      * @return the number of Bytes this distance uses if it is written to

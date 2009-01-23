@@ -143,7 +143,7 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
     }
 
     /**
-     * Retuns the number of Bytes this distance uses if it is written to an
+     * Returns the number of Bytes this distance uses if it is written to an
      * external file.
      *
      * @return 12 (4 Byte for an integer, 8 Byte for a double value)

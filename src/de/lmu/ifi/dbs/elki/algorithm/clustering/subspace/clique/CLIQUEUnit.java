@@ -76,7 +76,7 @@ public class CLIQUEUnit<V extends RealVector<V, ?>> {
     }
 
     /**
-     * Retuns true, if the intervals of this unit contain the specified
+     * Returns true, if the intervals of this unit contain the specified
      * feature vector.
      *
      * @param vector the feature vector to be tested for containment

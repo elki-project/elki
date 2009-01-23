@@ -51,7 +51,7 @@ public class IntegerDistance extends NumberDistance<IntegerDistance, Integer> {
     }
 
     /**
-     * Retuns the number of Bytes this distance uses if it is written to an
+     * Returns the number of Bytes this distance uses if it is written to an
      * external file.
      *
      * @return 4 (4 Byte for an integer value)

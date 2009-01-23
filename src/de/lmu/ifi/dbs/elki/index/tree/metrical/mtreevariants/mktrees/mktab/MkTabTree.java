@@ -179,7 +179,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>>
      * given parameter k.
      * It recursively
      * traverses all paths from the specified node, which cannot be excluded from leading to
-     * qualififying objects.
+     * qualifying objects.
      *
      * @param k          the parameter k of the knn-query
      * @param q          the id of the query object
@@ -256,7 +256,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>>
     }
 
     /**
-     * Retuns a knn distance list with all distances set to null distance.
+     * Returns a knn distance list with all distances set to null distance.
      *
      * @return a knn distance list with all distances set to null distance
      */

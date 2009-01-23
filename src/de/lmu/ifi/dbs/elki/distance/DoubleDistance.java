@@ -49,7 +49,7 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
      * Returns a new distance as the product of this distance and the given
      * distance.
      *
-     * @param distance the distancce to be multiplied with this distance
+     * @param distance the distance to be multiplied with this distance
      * @return a new distance as the product of this distance and the given
      *         distance
      */
@@ -84,7 +84,7 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
     }
 
     /**
-     * Retuns the number of Bytes this distance uses if it is written to an
+     * Returns the number of Bytes this distance uses if it is written to an
      * external file.
      *
      * @return 8 (8 Byte for a double value)

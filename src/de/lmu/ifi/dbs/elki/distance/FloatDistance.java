@@ -48,7 +48,7 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
      * Returns a new distance as the product of this distance and the given
      * distance.
      *
-     * @param distance the distancce to be multiplied with this distance
+     * @param distance the distance to be multiplied with this distance
      * @return a new distance as the product of this distance and the given
      *         distance
      */
@@ -83,7 +83,7 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
     }
 
     /**
-     * Retuns the number of Bytes this distance uses if it is written to an
+     * Returns the number of Bytes this distance uses if it is written to an
      * external file.
      *
      * @return 4 (4 Byte for a float value)

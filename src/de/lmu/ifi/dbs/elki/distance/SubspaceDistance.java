@@ -148,7 +148,7 @@ public class SubspaceDistance extends AbstractDistance<SubspaceDistance> {
     }
 
     /**
-     * Retuns the number of Bytes this distance uses if it is written to an
+     * Returns the number of Bytes this distance uses if it is written to an
      * external file.
      *
      * @return 16 (2 * 8 Byte for two double values)

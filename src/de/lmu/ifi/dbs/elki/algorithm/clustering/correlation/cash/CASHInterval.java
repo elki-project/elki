@@ -143,7 +143,7 @@ public class CASHInterval extends HyperBoundingBox implements Identifiable<CASHI
     }
 
     /**
-     * Retuns a String representation of the HyperBoundingBox.
+     * Returns a String representation of the HyperBoundingBox.
      *
      * @return String
      */

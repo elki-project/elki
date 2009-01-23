@@ -70,7 +70,7 @@ public class BitDistance extends NumberDistance<BitDistance, Bit> {
     }
 
     /**
-     * Retuns the number of Bytes this distance uses if it is written to an
+     * Returns the number of Bytes this distance uses if it is written to an
      * external file.
      *
      * @return 1 (1 Byte for a boolean value)
