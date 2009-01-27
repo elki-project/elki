@@ -10,14 +10,33 @@ import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.PNGTranscoder;
 
+/**
+ * Class that will render a {@link SVGPlot} into a {@link File} as thumbnail. 
+ * 
+ * @author Erich Schubert
+ *
+ */
 class Thumbnailer {
-  PNGTranscoder t;
+  /**
+   * The actual transcoder to use
+   */
+  private PNGTranscoder t;
 
+  /**
+   * Constructor
+   */
   public Thumbnailer() {
     t = new PNGTranscoder();
   }
 
-  public File thumbnail(SVGPlot plot, int thumbnailsize) {
+  /**
+   * Generate a thumbnail for a given plot.
+   * 
+   * @param plot Plot to use
+   * @param thumbnailsize Size of the thumbnail
+   * @return File object of the thumbnail, which has deleteOnExit set.
+   */
+  public synchronized File thumbnail(SVGPlot plot, int thumbnailsize) {
     t.addTranscodingHint(PNGTranscoder.KEY_WIDTH, new Float(thumbnailsize));
     t.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, new Float(thumbnailsize));
     File temp = null;
