@@ -35,6 +35,11 @@ public class SVGPlot {
   private Element defs;
 
   /**
+   * Primary style information
+   */
+  private Element style;
+  
+  /**
    * Create a new plotting document.
    */
   public SVGPlot() {
@@ -55,8 +60,13 @@ public class SVGPlot {
     // setup common SVG namespaces
     root.setAttribute("xmlns", SVGConstants.SVG_NAMESPACE_URI);
     root.setAttributeNS(SVGConstants.XMLNS_NAMESPACE_URI, SVGConstants.XMLNS_PREFIX + ":" + SVGConstants.XLINK_PREFIX, SVGConstants.XLINK_NAMESPACE_URI);
+    
     // create element for SVG definitions
     defs = svgElement(root, "defs");
+    
+    // create element for Stylesheet information.
+    style = svgElement(root, "style");
+    SVGUtil.setAtt(style, "type", "text/css");
   }
 
   /**
@@ -211,5 +221,13 @@ public class SVGPlot {
    */
   public Element getDefs() {
     return defs;
+  }
+  
+  /**
+   * Getter for style element.
+   * @return Stylesheet DOM element
+   */
+  public Element getStyle() {
+    return style;
   }
 }
