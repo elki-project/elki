@@ -895,7 +895,8 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends AbstractBic
 	public void biclustering() {
 		long t = System.currentTimeMillis();
 		initiateChengAndChurch();
-		System.out.println(System.currentTimeMillis() - t);
+		if(isVerbose()){
+		verbose("Runtime: "+(System.currentTimeMillis() - t));}
 	}
 
 }
