@@ -117,6 +117,12 @@ public class Bicluster<V extends RealVector<V, Double>> extends AbstractLoggable
         };
     }
     
+    /**
+     * Creates a DatabaseObjectGroup for the row IDs included in this Bicluster.
+     * 
+     * 
+     * @return a DatabaseObjectGroup for the row IDs included in this Bicluster
+     */
     public DatabaseObjectGroup getDatabaseObjectGroup()
     {
       Integer[] rowIDsCopy = new Integer[this.size()];
