@@ -1,10 +1,7 @@
 package de.lmu.ifi.dbs.elki.data.model;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
+import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
+import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupArray;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
@@ -12,6 +9,11 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.utilities.Util;
+
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Wrapper class to provide the basic properties of a bicluster.
@@ -113,6 +115,16 @@ public class Bicluster<V extends RealVector<V, Double>> extends AbstractLoggable
             }
 
         };
+    }
+    
+    public DatabaseObjectGroup getDatabaseObjectGroup()
+    {
+      Integer[] rowIDsCopy = new Integer[this.size()];
+      for(int i = 0; i < this.size(); i++)
+      {
+        rowIDsCopy[i] = this.rowIDs[i];
+      }
+      return new DatabaseObjectGroupArray(rowIDsCopy);
     }
     
     /**
