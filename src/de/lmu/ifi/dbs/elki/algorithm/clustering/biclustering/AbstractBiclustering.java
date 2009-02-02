@@ -159,7 +159,7 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>> exte
      * @param bicluster the bicluster to add to the result
      */
     protected void addBiclusterToResult(Bicluster<V> bicluster) {
-        result.addCluster(new Cluster<Bicluster<V>>(null, bicluster));
+        result.addCluster(new Cluster<Bicluster<V>>(bicluster.getDatabaseObjectGroup(), bicluster));
     }
 
     /**
