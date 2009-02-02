@@ -52,8 +52,6 @@ public class DimensionsSelectingEuclideanDistanceFunction<V extends NumberVector
 
 
         double sqrDist = 0;
-        // schneller wenn man nur die set Bits durchgeht und direkt die Dimension anspringt
-        // TODO unten entsprechend
         for (int d = getSelectedDimensions().nextSetBit(0); d >= 0; d = getSelectedDimensions().nextSetBit(d + 1)) {
             double manhattanI = v1.getValue(d + 1).doubleValue() - v2.getValue(d + 1).doubleValue();
             sqrDist += manhattanI * manhattanI;
@@ -81,9 +79,7 @@ public class DimensionsSelectingEuclideanDistanceFunction<V extends NumberVector
         }
 
         double sqrDist = 0;
-        for (int d = 1; d <= v.getDimensionality(); d++) {
-            if (!getSelectedDimensions().get(d - 1)) continue;
-
+        for (int d = getSelectedDimensions().nextSetBit(0); d >= 0; d = getSelectedDimensions().nextSetBit(d + 1)) {
             double value = v.getValue(d).doubleValue();
             double r;
             if (value < mbr.getMin(d))
@@ -116,9 +112,7 @@ public class DimensionsSelectingEuclideanDistanceFunction<V extends NumberVector
         }
 
         double sqrDist = 0;
-        for (int d = 1; d <= mbr1.getDimensionality(); d++) {
-            if (!getSelectedDimensions().get(d - 1)) continue;
-
+        for (int d = getSelectedDimensions().nextSetBit(0); d >= 0; d = getSelectedDimensions().nextSetBit(d + 1)) {
             double m1, m2;
             if (mbr1.getMax(d) < mbr2.getMin(d)) {
                 m1 = mbr1.getMax(d);
@@ -151,9 +145,7 @@ public class DimensionsSelectingEuclideanDistanceFunction<V extends NumberVector
         }
 
         double sqrDist = 0;
-        for (int d = 1; d <= mbr1.getDimensionality(); d++) {
-            if (!getSelectedDimensions().get(d - 1)) continue;
-
+        for (int d = getSelectedDimensions().nextSetBit(0); d >= 0; d = getSelectedDimensions().nextSetBit(d + 1)) {
             double c1 = (mbr1.getMin(d) + mbr1.getMax(d)) / 2;
             double c2 = (mbr2.getMin(d) + mbr2.getMax(d)) / 2;
 
