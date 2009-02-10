@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
  * @param <V> the type of NumberVector to compute the distances in between
  */
 public class ManhattanDistanceFunction<V extends NumberVector<V, ?>>
-    extends AbstractDoubleDistanceFunction<V> {
+    extends AbstractDoubleDistanceFunction<V> implements MetricDistanceFunction<V,DoubleDistance> {
 
     /**
      * Provides a Manhattan distance function that can compute the Manhattan

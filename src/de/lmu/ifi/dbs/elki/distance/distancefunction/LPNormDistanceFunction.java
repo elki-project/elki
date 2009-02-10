@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * todo parameter
  */
 public class LPNormDistanceFunction<V extends FeatureVector<V, N>, N extends Number>
-    extends AbstractDoubleDistanceFunction<V> {
+    extends AbstractDoubleDistanceFunction<V> implements MetricDistanceFunction<V, DoubleDistance> {
 
     /**
      * OptionID for {@link #P_PARAM}
