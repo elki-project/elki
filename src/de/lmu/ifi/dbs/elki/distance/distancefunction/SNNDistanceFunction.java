@@ -21,10 +21,16 @@ public class SNNDistanceFunction<V extends FeatureVector<V,?>> extends AbstractD
    */
   private FractionalSharedNearestNeighborSimilarityFunction<V, DoubleDistance> similarityFunction = new FractionalSharedNearestNeighborSimilarityFunction<V, DoubleDistance>();
 
+  /**
+   * Constructor
+   */
   public SNNDistanceFunction() {
     super();
   }
 
+  /**
+   * Distance implementation
+   */
   public DoubleDistance distance(V v1, V v2) {
     DoubleDistance sim = similarityFunction.similarity(v1, v2);
     return new DoubleDistance(1.0 - sim.getValue());
