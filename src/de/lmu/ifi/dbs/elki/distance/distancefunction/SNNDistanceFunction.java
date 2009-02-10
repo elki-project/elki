@@ -15,6 +15,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * @author Erich Schubert
  * @param <V> the type of FeatureVector to compute the distances in between
  */
+// Deprecated: use SimilarityAdapterLinear instead.
+@Deprecated
 public class SNNDistanceFunction<V extends FeatureVector<V,?>> extends AbstractDoubleDistanceFunction<V> {
   /**
    * The similarity function.
