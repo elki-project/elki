@@ -74,13 +74,21 @@ public class CorrelationModel<V extends RealVector<V, ?>> extends BaseModel impl
    */
   @Override
   public void writeToText(TextWriterStream out, String label) {
-    super.writeToText(out, label);
+    out.commentPrintLn(TextWriterStream.SER_MARKER+" " + CorrelationModel.class.getName());
     try {
       out.commentPrintLn("Centroid: " + out.normalizationRestore(getCentroid()).toString());
       out.commentPrintLn("Strong Eigenvectors:");
-      out.commentPrintLn(getPCAResult().getStrongEigenvectors().toString());
+      String strong = getPCAResult().getStrongEigenvectors().toString();
+      while (strong.endsWith("\n")) {
+        strong = strong.substring(0, strong.length()-1);
+      }
+      out.commentPrintLn(strong);
       out.commentPrintLn("Weak Eigenvectors:");
-      out.commentPrintLn(getPCAResult().getWeakEigenvectors().toString());
+      String weak = getPCAResult().getWeakEigenvectors().toString();
+      while (weak.endsWith("\n")) {
+        weak = weak.substring(0, weak.length()-1);
+      }
+      out.commentPrintLn(weak);
       out.commentPrintLn("Eigenvalues: "+Util.format(getPCAResult().getEigenvalues(), " ", 2));
     }
     catch(NonNumericFeaturesException e) {
