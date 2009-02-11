@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.parser;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
 
 /**
@@ -11,7 +12,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
  *
  * @author Erich Schubert
  */
-public interface LinebasedParser<O extends DatabaseObject> {
+public interface LinebasedParser<O extends DatabaseObject> extends Parameterizable {
   /**
    * Parse a single line into a database object
    * 

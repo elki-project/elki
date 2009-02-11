@@ -32,6 +32,11 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 // TODO: add Model interface and delegations consequently since we have the group delegators?
 public abstract class BaseCluster<C extends BaseCluster<C,M>, M extends Model> extends AbstractDatabaseObject implements HierarchyInterface<C>, DatabaseObjectGroup, TextWriteable {
   /**
+   * Marker used in text serialization (and re-parsing)
+   */
+  final static String CLASS_MARKER = "Cluster class:";
+
+  /**
    * Object that the hierarchy management is delegated to.
    */
   private HierarchyImplementation<C> hierarchy = null;
@@ -387,10 +392,11 @@ public abstract class BaseCluster<C extends BaseCluster<C,M>, M extends Model> e
    */
   public void writeToText(TextWriterStream out, String label) {
     String name = getNameAutomatic();
+    out.commentPrintLn(CLASS_MARKER+" "+this.getClass().getName());
     if (name != null) {
-      out.commentPrintLn("Cluster: "+name);
+      out.commentPrintLn("Name: "+name);
     }
-    out.commentPrintLn("Class: "+this.getClass().getName());
+    out.commentPrintLn("Noise flag: "+isNoise());
     out.commentPrintLn("Size: "+group.size());
     // print hierarchy information.
     if (isHierarchical()) {

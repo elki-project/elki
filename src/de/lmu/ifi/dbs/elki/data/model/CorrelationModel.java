@@ -81,7 +81,7 @@ public class CorrelationModel<V extends RealVector<V, ?>> extends BaseModel impl
       out.commentPrintLn(getPCAResult().getStrongEigenvectors().toString());
       out.commentPrintLn("Weak Eigenvectors:");
       out.commentPrintLn(getPCAResult().getWeakEigenvectors().toString());
-      out.commentPrintLn("Eigenvalues: "+Util.format(getPCAResult().getEigenvalues(), " , ", 2));
+      out.commentPrintLn("Eigenvalues: "+Util.format(getPCAResult().getEigenvalues(), " ", 2));
     }
     catch(NonNumericFeaturesException e) {
       // TODO Auto-generated catch block
