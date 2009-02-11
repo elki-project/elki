@@ -293,6 +293,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends AbstractBic
         END_PARAM.setOptional(false);
 
         this.addOption(SEED_PARAM);
+        this.addOption(ALPHA_PARAM);
         this.addOption(MULTIPLE_ADDITION_PARAM);
         this.addOption(SIGMA_PARAM);
         this.addOption(N_PARAM);
