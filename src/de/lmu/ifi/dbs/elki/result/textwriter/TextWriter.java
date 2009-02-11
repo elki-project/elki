@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.result.textwriter;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -73,7 +74,7 @@ public class TextWriter<O extends DatabaseObject> {
   /**
    * Writes a header providing information concerning the underlying database
    * and the specified parameter-settings.
-   *
+   * 
    * @param db to retrieve meta information from
    * @param out the print stream where to write
    * @param settings the settings to be written into the header
@@ -193,62 +194,12 @@ public class TextWriter<O extends DatabaseObject> {
       groups.add(new DatabaseObjectGroupCollection<Collection<Integer>>(db.getIDs()));
     }
 
-    if (ri != null) {
+    if(ri != null) {
       writeIterableResult(db, streamOpener, ri, settings);
     }
     if(groups != null) {
       for(DatabaseObjectGroup group : groups) {
-        String filename = null;
-        // for clusters, use naming.
-        if(group instanceof BaseCluster) {
-          if(naming != null) {
-            filename = filenameFromLabel(naming.getNameFor(group));
-          }
-        }
-
-        PrintStream outStream = streamOpener.openStream(filename);
-        TextWriterStream out = new TextWriterStreamNormalizing<O>(outStream, writers, getNormalization());
-
-        printHeader(db, out, settings);
-        // print group information...
-        if(group instanceof TextWriteable) {
-          TextWriterWriterInterface<?> writer = out.getWriterFor(group);
-          out.commentPrintLn("Group class: " + group.getClass().getCanonicalName());
-          if(writer != null) {
-            writer.writeObject(out, null, group);
-            out.commentPrintSeparator();
-            out.flush();
-          }
-        }
-
-        // print ids.
-        Collection<Integer> ids = group.getIDs();
-        Iterator<Integer> iter = ids.iterator();
-        // apply sorting.
-        if(ro != null) {
-          iter = ro.iter(ids);
-        }
-
-        while(iter.hasNext()) {
-          Integer objID = iter.next();
-          if (objID == null) {
-            // shoulnd't really happen?
-            continue;
-          }
-          O obj = db.get(objID.intValue());
-          if(obj == null) {
-            continue;
-          }
-          // do we have annotations to print?
-          SimplePair<String, Object>[] objs = null;
-          if(ra != null) {
-            objs = ra.getAnnotations(objID);
-          }
-          // print the object with its annotations.
-          printObject(out, obj, objs);
-        }
-        out.commentPrintSeparator();
-        out.flush();
+        writeGroupResult(db, streamOpener, group, ra, ro, naming, settings);
       }
     }
   }
@@ -257,54 +208,112 @@ public class TextWriter<O extends DatabaseObject> {
     // Write database element itself.
     {
       TextWriterWriterInterface<?> owriter = out.getWriterFor(obj);
-      if(owriter == null)
+      if(owriter == null) {
         throw new UnableToComplyException("No handler for database object itself: " + obj.getClass().getSimpleName());
+      }
       owriter.writeObject(out, null, obj);
     }
 
     // print the annotations
-    if(anns != null)
+    if(anns != null) {
       for(int i = 0; i < anns.length; i++) {
         // skip empty annotations
-        if(anns[i] == null)
+        if(anns[i] == null) {
           continue;
-        if(anns[i].getSecond() == null)
+        }
+        if(anns[i].getSecond() == null) {
           continue;
+        }
         TextWriterWriterInterface<?> writer = out.getWriterFor(anns[i].getSecond());
-        if(writer == null)
+        if(writer == null) {
           throw new UnableToComplyException("No handler for element " + i + " in Output: " + anns[i].getSecond().getClass().getSimpleName());
+        }
 
         writer.writeObject(out, anns[i].getFirst(), anns[i].getSecond());
       }
+    }
     out.flush();
   }
-  
+
+  private void writeGroupResult(Database<O> db, StreamFactory streamOpener, DatabaseObjectGroup group, AnnotationResult ra, OrderingResult ro, NamingScheme naming, List<AttributeSettings> settings) throws FileNotFoundException, UnableToComplyException, IOException {
+    String filename = null;
+    // for clusters, use naming.
+    if(group instanceof BaseCluster) {
+      if(naming != null) {
+        filename = filenameFromLabel(naming.getNameFor(group));
+      }
+    }
+
+    PrintStream outStream = streamOpener.openStream(filename);
+    TextWriterStream out = new TextWriterStreamNormalizing<O>(outStream, writers, getNormalization());
+
+    printHeader(db, out, settings);
+    // print group information...
+    if(group instanceof TextWriteable) {
+      TextWriterWriterInterface<?> writer = out.getWriterFor(group);
+      out.commentPrintLn("Group class: " + group.getClass().getCanonicalName());
+      if(writer != null) {
+        writer.writeObject(out, null, group);
+        out.commentPrintSeparator();
+        out.flush();
+      }
+    }
+
+    // print ids.
+    Collection<Integer> ids = group.getIDs();
+    Iterator<Integer> iter = ids.iterator();
+    // apply sorting.
+    if(ro != null) {
+      iter = ro.iter(ids);
+    }
+
+    while(iter.hasNext()) {
+      Integer objID = iter.next();
+      if(objID == null) {
+        // shoulnd't really happen?
+        continue;
+      }
+      O obj = db.get(objID.intValue());
+      if(obj == null) {
+        continue;
+      }
+      // do we have annotations to print?
+      SimplePair<String, Object>[] objs = null;
+      if(ra != null) {
+        objs = ra.getAnnotations(objID);
+      }
+      // print the object with its annotations.
+      printObject(out, obj, objs);
+    }
+    out.commentPrintSeparator();
+    out.flush();
+  }
+
   private void writeIterableResult(Database<O> db, StreamFactory streamOpener, IterableResult<?> ri, List<AttributeSettings> settings) throws UnableToComplyException, IOException {
     String filename = "list";
     PrintStream outStream = streamOpener.openStream(filename);
     TextWriterStream out = new TextWriterStreamNormalizing<O>(outStream, writers, getNormalization());
     printHeader(db, out, settings);
-    
+
     // hack to print collectionResult header information
-    if (ri instanceof CollectionResult<?>) {
-      for (String header : ((CollectionResult<?>) ri).getHeader()) {
+    if(ri instanceof CollectionResult<?>) {
+      for(String header : ((CollectionResult<?>) ri).getHeader()) {
         out.commentPrintLn(header);
       }
       out.flush();
     }
     Iterator<?> i = ri.iter();
-    while (i.hasNext()) {
+    while(i.hasNext()) {
       Object o = i.next();
       TextWriterWriterInterface<?> writer = out.getWriterFor(o);
       if(writer != null) {
         writer.writeObject(out, null, o);
-      }        
+      }
       out.flush();
     }
     out.commentPrintSeparator();
-    out.flush();    
+    out.flush();
   }
-
 
   /**
    * Setter for normalization
