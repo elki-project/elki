@@ -79,10 +79,7 @@ public class TextWriter<O extends DatabaseObject> {
    * @param out the print stream where to write
    * @param settings the settings to be written into the header
    */
-  protected void printHeader(Database<O> db, TextWriterStream out, List<AttributeSettings> settings) {
-    if(settings == null) {
-      return;
-    }
+  protected void printSettings(Database<O> db, TextWriterStream out, List<AttributeSettings> settings) {
     out.commentPrintSeparator();
     out.commentPrintLn("Settings and meta information:");
     out.commentPrintLn("db size = " + db.size());
@@ -96,10 +93,12 @@ public class TextWriter<O extends DatabaseObject> {
     }
     out.commentPrintLn("");
 
-    for(AttributeSettings setting : settings) {
-      if(!setting.getSettings().isEmpty()) {
-        out.commentPrintLn(setting.toString());
-        out.commentPrintLn("");
+    if(settings != null) {
+      for(AttributeSettings setting : settings) {
+        if(!setting.getSettings().isEmpty()) {
+          out.commentPrintLn(setting.toString());
+          out.commentPrintLn("");
+        }
       }
     }
 
@@ -123,57 +122,12 @@ public class TextWriter<O extends DatabaseObject> {
     Clustering<?> rc = null;
     IterableResult<?> ri = null;
 
-    // TODO: add support for ListResults
-
     Collection<DatabaseObjectGroup> groups = null;
 
-    // do all casts that are appropriate.
-    if(r instanceof AnnotationResult) {
-      ra = (AnnotationResult) r;
-    }
-    if(r instanceof OrderingResult) {
-      ro = (OrderingResult) r;
-    }
-    if(r instanceof Clustering) {
-      rc = (Clustering<?>) r;
-    }
-    if(r instanceof IterableResult) {
-      ri = (IterableResult<?>) r;
-    }
-    // combine MultiResults.
-    if(r instanceof MultiResult) {
-      MultiResult multi = (MultiResult) r;
-      // combine annotations
-      {
-        List<AnnotationResult> anns = multi.filterResults(AnnotationResult.class);
-        if(anns.size() > 0) {
-          ra = new AnnotationCombiner(anns);
-        }
-      }
-      // use LAST ordering
-      {
-        List<OrderingResult> orderings = multi.filterResults(OrderingResult.class);
-        if(orderings.size() > 0) {
-          ro = orderings.get(orderings.size() - 1);
-        }
-      }
-      // use LAST clustering
-      // TODO: COMBINE
-      {
-        List<Clustering<?>> clusterings = multi.filterResults(Clustering.class);
-        if(clusterings.size() > 0) {
-          rc = clusterings.get(clusterings.size() - 1);
-        }
-      }
-      // use LAST iterable result
-      // TODO: COMBINE
-      {
-        List<IterableResult<?>> iters = multi.filterResults(IterableResult.class);
-        if(iters.size() > 0) {
-          ri = iters.get(iters.size() - 1);
-        }
-      }
-    }
+    ra = getAnnotationResults(r);
+    ro = getOrderingResult(r);
+    rc = getClusteringResult(r);
+    ri = getIterableResult(r);
 
     if(ra == null && ro == null && rc == null && ri == null) {
       throw new UnableToComplyException("No printable result found.");
@@ -202,6 +156,67 @@ public class TextWriter<O extends DatabaseObject> {
         writeGroupResult(db, streamOpener, group, ra, ro, naming, settings);
       }
     }
+  }
+
+  private AnnotationResult getAnnotationResults(Result r) {
+    if (r instanceof AnnotationResult) {
+      return (AnnotationResult) r;
+    }
+    if(r instanceof MultiResult) {
+      List<AnnotationResult> anns = ((MultiResult)r).filterResults(AnnotationResult.class);
+      if(anns.size() == 1) {
+        return anns.get(0);
+      }
+      if(anns.size() > 0) {
+        return new AnnotationCombiner(anns);
+      }
+    }
+    return null;
+  }
+
+  private OrderingResult getOrderingResult(Result r) {
+    if (r instanceof OrderingResult) {
+      return (OrderingResult) r;
+    }
+    if(r instanceof MultiResult) {
+      List<OrderingResult> orderings = ((MultiResult)r).filterResults(OrderingResult.class);
+      // return last.
+      // TODO: combine somehow?
+      if(orderings.size() >= 1) {
+        return orderings.get(orderings.size() - 1);
+      }
+    }
+    return null;
+  }
+
+  private Clustering<?> getClusteringResult(Result r) {
+    if (r instanceof Clustering) {
+      return (Clustering<?>) r;
+    }
+    if(r instanceof MultiResult) {
+      List<Clustering<?>> clusterings = ((MultiResult)r).filterResults(Clustering.class);
+      // return last.
+      // TODO: combine somehow?
+      if(clusterings.size() >= 1) {
+        return clusterings.get(clusterings.size() - 1);
+      }
+    }
+    return null;
+  }
+
+  private IterableResult<?> getIterableResult(Result r) {
+    if (r instanceof IterableResult) {
+      return (IterableResult<?>) r;
+    }
+    if(r instanceof MultiResult) {
+      List<IterableResult<?>> iters = ((MultiResult)r).filterResults(IterableResult.class);
+      // return last.
+      // TODO: combine somehow?
+      if(iters.size() >= 1) {
+        return iters.get(iters.size() - 1);
+      }
+    }
+    return null;
   }
 
   private void printObject(TextWriterStream out, O obj, SimplePair<String, Object>[] anns) throws UnableToComplyException, IOException {
@@ -247,7 +262,7 @@ public class TextWriter<O extends DatabaseObject> {
     PrintStream outStream = streamOpener.openStream(filename);
     TextWriterStream out = new TextWriterStreamNormalizing<O>(outStream, writers, getNormalization());
 
-    printHeader(db, out, settings);
+    printSettings(db, out, settings);
     // print group information...
     if(group instanceof TextWriteable) {
       TextWriterWriterInterface<?> writer = out.getWriterFor(group);
@@ -293,7 +308,7 @@ public class TextWriter<O extends DatabaseObject> {
     String filename = "list";
     PrintStream outStream = streamOpener.openStream(filename);
     TextWriterStream out = new TextWriterStreamNormalizing<O>(outStream, writers, getNormalization());
-    printHeader(db, out, settings);
+    printSettings(db, out, settings);
 
     // hack to print collectionResult header information
     if(ri instanceof CollectionResult<?>) {
