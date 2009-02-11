@@ -43,7 +43,7 @@ import java.util.List;
  * @author Arthur Zimek
  * @param <V> the type of RealVector expected in the {@link ParsingResult}
  */
-public class RealVectorLabelParser<V extends RealVector<V, ?>> extends AbstractParser<V> {
+public class RealVectorLabelParser<V extends RealVector<V, ?>> extends AbstractParser<V> implements LinebasedParser<V> {
   /**
    * OptionID for {@link #FLOAT_FLAG}
    */
@@ -64,38 +64,15 @@ public class RealVectorLabelParser<V extends RealVector<V, ?>> extends AbstractP
   /**
    * OptionID for {@link #CLASS_LABEL_INDEX_PARAM}
    */
-  private static final OptionID CLASS_LABEL_INDEX_ID = OptionID.getOrCreateOptionID("parser.classLabelIndex", "Index of a class label (may be numeric), " + "counting whitespace separated entries in a line starting with 0 - " + "the corresponding entry will be treated as a label. " /*
-                                                                                                                                                                                                                                                                                           * +
-                                                                                                                                                                                                                                                                                           * "To actually set this label as class label, use also the parametrization of "
-                                                                                                                                                                                                                                                                                           * +
-                                                                                                                                                                                                                                                                                           * AbstractDatabaseConnection
-                                                                                                                                                                                                                                                                                           * .
-                                                                                                                                                                                                                                                                                           * class
-                                                                                                                                                                                                                                                                                           * .
-                                                                                                                                                                                                                                                                                           * getCanonicalName
-                                                                                                                                                                                                                                                                                           * (
-                                                                                                                                                                                                                                                                                           * )
-                                                                                                                                                                                                                                                                                           * +
-                                                                                                                                                                                                                                                                                           * " -"
-                                                                                                                                                                                                                                                                                           * +
-                                                                                                                                                                                                                                                                                           * AbstractDatabaseConnection
-                                                                                                                                                                                                                                                                                           * .
-                                                                                                                                                                                                                                                                                           * CLASS_LABEL_INDEX_ID
-                                                                                                                                                                                                                                                                                           * .
-                                                                                                                                                                                                                                                                                           * getName
-                                                                                                                                                                                                                                                                                           * (
-                                                                                                                                                                                                                                                                                           * )
-                                                                                                                                                                                                                                                                                           * +
-                                                                                                                                                                                                                                                                                           * " -"
-                                                                                                                                                                                                                                                                                           * +
-                                                                                                                                                                                                                                                                                           * AbstractDatabaseConnection
-                                                                                                                                                                                                                                                                                           * .
-                                                                                                                                                                                                                                                                                           * CLASS_LABEL_CLASS_ID
-                                                                                                                                                                                                                                                                                           * .
-                                                                                                                                                                                                                                                                                           * getName
-                                                                                                                                                                                                                                                                                           * (
-                                                                                                                                                                                                                                                                                           * )
-                                                                                                                                                                                                                                                                                           */);
+  private static final OptionID CLASS_LABEL_INDEX_ID = OptionID.getOrCreateOptionID("parser.classLabelIndex", "Index of a class label (may be numeric), " + "counting whitespace separated entries in a line starting with 0 - " + "the corresponding entry will be treated as a label. ");
+
+  /*
+   * +
+   * "To actually set this label as class label, use also the parametrization of "
+   * + AbstractDatabaseConnection . class . getCanonicalName ( ) + " -" +
+   * AbstractDatabaseConnection . CLASS_LABEL_INDEX_ID . getName ( ) + " -" +
+   * AbstractDatabaseConnection . CLASS_LABEL_CLASS_ID . getName ( )
+   */
 
   /**
    * The parameter for an index of a numerical class label. The corresponding
@@ -154,10 +131,10 @@ public class RealVectorLabelParser<V extends RealVector<V, ?>> extends AbstractP
     return new ParsingResult<V>(objectAndLabelsList);
   }
 
-  @SuppressWarnings("unchecked")
   /*
    * Parse a single line into an object and labels
    */
+  @SuppressWarnings("unchecked")
   public SimplePair<V, List<String>> parseLine(String line) {
     String[] entries = WHITESPACE_PATTERN.split(line);
     List<Double> attributes = new ArrayList<Double>();
