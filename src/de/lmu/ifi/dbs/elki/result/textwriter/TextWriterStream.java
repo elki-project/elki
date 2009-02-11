@@ -54,6 +54,11 @@ public class TextWriterStream {
   private final static String NEWLINE = System.getProperty("line.separator");
 
   /**
+   * Marker used in text serialization (and re-parsing)
+   */
+  public final static String SER_MARKER = "Serialization class:";
+
+  /**
    * Constructor.
    * 
    * @param out Actual stream to write to

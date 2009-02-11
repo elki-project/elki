@@ -11,11 +11,6 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  */
 public abstract class BaseModel implements Model {
   /**
-   * Marker used in text serialization (and re-parsing)
-   */
-  final static String CLASS_MARKER = "Model class:";
-
-  /**
    * Implement writeToText as per {@link TextWriteable} interface.
    * However BaseModel is not given the interface directly, since
    * it is meant as signal to make Models printable. 
@@ -27,6 +22,6 @@ public abstract class BaseModel implements Model {
     if (label != null) {
       out.commentPrintLn(label);
     }
-    out.commentPrintLn(CLASS_MARKER+" "+this.getClass().getName());
+    out.commentPrintLn(TextWriterStream.SER_MARKER+" " + BaseModel.class.getName());
   }
 }

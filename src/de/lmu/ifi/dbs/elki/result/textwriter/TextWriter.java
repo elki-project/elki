@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.cluster.BaseCluster;
-import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.cluster.naming.NamingScheme;
 import de.lmu.ifi.dbs.elki.data.cluster.naming.SimpleEnumeratingScheme;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -84,6 +83,7 @@ public class TextWriter<O extends DatabaseObject> {
       return;
     }
     out.commentPrintSeparator();
+    out.commentPrintLn("Settings and meta information:");
     out.commentPrintLn("db size = " + db.size());
     // noinspection EmptyCatchBlock
     try {
@@ -178,9 +178,7 @@ public class TextWriter<O extends DatabaseObject> {
       throw new UnableToComplyException("No printable result found.");
     }
 
-    // TODO: generics hack. :-( Could be a different class derived from
-    // BaseCluster!
-    NamingScheme<Cluster<?>> naming = null;
+    NamingScheme naming = null;
     // Process groups or all data in a flat manner?
     if(rc != null) {
       groups = (Collection<DatabaseObjectGroup>) rc.getAllClusters();
@@ -196,37 +194,15 @@ public class TextWriter<O extends DatabaseObject> {
     }
 
     if (ri != null) {
-      String filename = "list";
-      PrintStream outStream = streamOpener.openStream(filename);
-      TextWriterStream out = new TextWriterStreamNormalizing<O>(outStream, writers, getNormalization());
-      printHeader(db, out, settings);
-      // hack to print collectionResult header information
-      if (ri instanceof CollectionResult<?>) {
-        for (String header : ((CollectionResult<?>) ri).getHeader()) {
-          out.commentPrintLn(header);
-        }
-        out.flush();
-      }
-      Iterator<?> i = ri.iter();
-      while (i.hasNext()) {
-        Object o = i.next();
-        TextWriterWriterInterface<?> writer = out.getWriterFor(o);
-        if(writer != null) {
-          writer.writeObject(out, null, o);
-        }        
-        out.flush();
-      }
-      out.commentPrintSeparator();
-      out.flush();
+      writeIterableResult(db, streamOpener, ri, settings);
     }
     if(groups != null) {
       for(DatabaseObjectGroup group : groups) {
         String filename = null;
         // for clusters, use naming.
         if(group instanceof BaseCluster) {
-          Cluster<?> bc = (Cluster<?>) group;
           if(naming != null) {
-            filename = filenameFromLabel(naming.getNameForCluster(bc));
+            filename = filenameFromLabel(naming.getNameFor(group));
           }
         }
 
@@ -237,6 +213,7 @@ public class TextWriter<O extends DatabaseObject> {
         // print group information...
         if(group instanceof TextWriteable) {
           TextWriterWriterInterface<?> writer = out.getWriterFor(group);
+          out.commentPrintLn("Group class: " + group.getClass().getCanonicalName());
           if(writer != null) {
             writer.writeObject(out, null, group);
             out.commentPrintSeparator();
@@ -301,6 +278,33 @@ public class TextWriter<O extends DatabaseObject> {
       }
     out.flush();
   }
+  
+  private void writeIterableResult(Database<O> db, StreamFactory streamOpener, IterableResult<?> ri, List<AttributeSettings> settings) throws UnableToComplyException, IOException {
+    String filename = "list";
+    PrintStream outStream = streamOpener.openStream(filename);
+    TextWriterStream out = new TextWriterStreamNormalizing<O>(outStream, writers, getNormalization());
+    printHeader(db, out, settings);
+    
+    // hack to print collectionResult header information
+    if (ri instanceof CollectionResult<?>) {
+      for (String header : ((CollectionResult<?>) ri).getHeader()) {
+        out.commentPrintLn(header);
+      }
+      out.flush();
+    }
+    Iterator<?> i = ri.iter();
+    while (i.hasNext()) {
+      Object o = i.next();
+      TextWriterWriterInterface<?> writer = out.getWriterFor(o);
+      if(writer != null) {
+        writer.writeObject(out, null, o);
+      }        
+      out.flush();
+    }
+    out.commentPrintSeparator();
+    out.flush();    
+  }
+
 
   /**
    * Setter for normalization
