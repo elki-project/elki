@@ -71,6 +71,7 @@ public class CorrelationModel<V extends RealVector<V, ?>> extends BaseModel impl
 
   /**
    * Implementation of {@link TextWriteable} interface
+   * @param label 
    */
   @Override
   public void writeToText(TextWriterStream out, String label) {
