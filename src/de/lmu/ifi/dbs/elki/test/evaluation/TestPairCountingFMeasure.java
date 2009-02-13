@@ -51,7 +51,7 @@ public class TestPairCountingFMeasure {
     // run by-label
     ByLabelClustering<DoubleVector> bylabel = new ByLabelClustering<DoubleVector>();
     bylabel.run(db);
-    Clustering<Cluster<Model>> rbl = bylabel.getResult();
+    Clustering<Cluster<?>> rbl = bylabel.getResult();
     
     assertEquals(1.0, PairCountingFMeasure.compareClusterings(rai, rai), Double.MIN_VALUE);
     assertEquals(1.0, PairCountingFMeasure.compareClusterings(ran, ran), Double.MIN_VALUE);

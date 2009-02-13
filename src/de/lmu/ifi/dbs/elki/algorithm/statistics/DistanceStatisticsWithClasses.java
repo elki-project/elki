@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
-import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -64,7 +63,7 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
 
     // Cluster by labels
     ByLabelClustering<V> split = new ByLabelClustering<V>();
-    Set<Cluster<Model>> splitted = split.run(database).getAllClusters();
+    Set<Cluster<?>> splitted = split.run(database).getAllClusters();
 
     // global in-cluster min/max
     double gimin = Double.MAX_VALUE;
@@ -91,7 +90,7 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
     }
 
     // iterate per cluster
-    for(Cluster<Model> c1 : splitted) {
+    for(Cluster<?> c1 : splitted) {
       for(Integer id1 : c1) {
         // in-cluster distances
         double imin = Double.MAX_VALUE;
@@ -122,7 +121,7 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
         // other-cluster distances
         double omin = Double.MAX_VALUE;
         double omax = Double.MIN_VALUE;
-        for(Cluster<Model> c2 : splitted) {
+        for(Cluster<?> c2 : splitted) {
           if(c2 == c1) {
             continue;
           }
