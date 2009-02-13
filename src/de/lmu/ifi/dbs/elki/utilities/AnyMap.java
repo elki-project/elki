@@ -24,7 +24,27 @@ public class AnyMap<K> extends HashMap<K, Object> {
   }
   
   /**
-   * (Largely) Type checked get method
+   * Type checked get method
+   * 
+   * @param <T> Return type
+   * @param key Key
+   * @param restriction restriction class
+   * @return Object that is guaranteed to be of class restriction or null
+   */
+  public <T> T get(K key, Class<T> restriction) {
+    Object o = super.get(key);
+    if (o == null) {
+      return null;
+    }
+    try {
+      return restriction.cast(o);
+    } catch (ClassCastException e) {
+      return null;
+    }
+  }
+
+  /**
+   * (Largely) type checked get method for use with generic types
    * 
    * @param <T> Return type
    * @param key Key
@@ -32,17 +52,8 @@ public class AnyMap<K> extends HashMap<K, Object> {
    * @return Object that is guaranteed to be of class restriction or null
    */
   @SuppressWarnings("unchecked")
-  public <T> T get(K key, Class<?> restriction) {
-    Object o = super.get(key);
-    if (o == null) {
-      return null;
-    }
-    try {
-      T r = (T) restriction.cast(o);
-      return r;
-    } catch (ClassCastException e) {
-      return null;
-    }
+  public <T> T getGenerics(K key, Class<?> restriction) {
+    return (T) get(key, restriction);
   }
 
   /**
