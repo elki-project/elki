@@ -4,8 +4,8 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 
 /**
- * Interface to indicate that a distance function is metrical,
- * i.e. satisfies the triangle equality.
+ * <p>Interface to indicate that a distance function is metrical,
+ * i.e. satisfies the triangle equality.</p>
  * 
  * Algorithms such as the M-Tree index structure should use this interface
  * to restrict themselves to appropriate distance functions.
