@@ -490,7 +490,7 @@ public class FastICA<V extends RealVector<V, ?>> extends AbstractParameterizable
                 iterations++;
 
                 if (verbose) {
-                    progress(new ProgressLogRecord(LogLevel.PROGRESS,
+                    progress(new ProgressLogRecord(
                         Util.status(progress) + " - " + iterations,
                         progress.getTask(),
                         progress.status()));
@@ -542,7 +542,7 @@ public class FastICA<V extends RealVector<V, ?>> extends AbstractParameterizable
             iterations++;
 
             if (verbose) {
-                progress(new ProgressLogRecord(LogLevel.PROGRESS,
+                progress(new ProgressLogRecord(
                     Util.status(progress) + " - " + iterations,
                     progress.getTask(), progress.status()));
             }

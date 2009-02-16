@@ -91,7 +91,7 @@ public abstract class AbstractLoggable implements Loggable {
      * objects.
      */
     public void progress(Progress pgr) {
-        logger.log(new ProgressLogRecord(LogLevel.PROGRESS,
+        logger.log(new ProgressLogRecord(
             Util.status(pgr),
             pgr.getTask(),
             pgr.status()));
@@ -109,7 +109,7 @@ public abstract class AbstractLoggable implements Loggable {
      * @see Loggable#progress(de.lmu.ifi.dbs.elki.utilities.Progress)
      */
     public void progress(Progress pgr, int numClusters) {
-        logger.log(new ProgressLogRecord(LogLevel.PROGRESS,
+        logger.log(new ProgressLogRecord(
             Util.status(pgr, numClusters),
             pgr.getTask(),
             pgr.status()));

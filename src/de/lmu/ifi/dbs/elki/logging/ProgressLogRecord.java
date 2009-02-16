@@ -13,7 +13,7 @@ import java.util.logging.LogRecord;
  * An example for usage may be:
  * <pre>
  * partitionProgress.setProcessed(processed++);
- * logger.log(new ProgressLogRecord(Level.INFO,Util.status(partitionProgress),partitionProgress.getTask(),partitionProgress.status()));
+ * logger.log(new ProgressLogRecord(Util.status(partitionProgress),partitionProgress.getTask(),partitionProgress.status()));
  * </pre>
  * This enables the presentation of the progress in a graphical context.
  *
@@ -40,14 +40,13 @@ public class ProgressLogRecord extends LogRecord {
     /**
      * Provides a ProgressLogRecord.
      *
-     * @param level      logging level
      * @param msg        log message
      * @param task       the name of the progressing task
      * @param percentage the percentage of progress
      * @see LogRecord#LogRecord(Level,String)
      */
-    public ProgressLogRecord(Level level, String msg, String task, int percentage) {
-        super(level, msg);
+    public ProgressLogRecord(String msg, String task, int percentage) {
+        super(LogLevel.PROGRESS, msg);
         this.task = task;
         this.percentage = percentage;
     }

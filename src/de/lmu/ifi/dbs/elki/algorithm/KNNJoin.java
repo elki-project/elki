@@ -162,7 +162,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
 
                 if (isVerbose()) {
                     progress.setProcessed(processed);
-                    progress(new ProgressLogRecord(LogLevel.PROGRESS, "\r" + progress.toString()
+                    progress(new ProgressLogRecord("\r" + progress.toString()
                         + " Number of processed data pages: "
                         + processedPages++,
                         progress.getTask(), progress.status()));
