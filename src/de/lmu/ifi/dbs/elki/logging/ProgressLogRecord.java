@@ -13,7 +13,7 @@ import java.util.logging.LogRecord;
  * An example for usage may be:
  * <pre>
  * partitionProgress.setProcessed(processed++);
- * logger.log(new ProgressLogRecord(Util.status(partitionProgress),partitionProgress.getTask(),partitionProgress.status()));
+ * logger.progress(partitionProgress);
  * </pre>
  * This enables the presentation of the progress in a graphical context.
  *

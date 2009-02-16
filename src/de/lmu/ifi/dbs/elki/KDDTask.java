@@ -422,25 +422,21 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
     KDDTask<? extends DatabaseObject> kddTask = new KDDTask();
     try {
       String[] remainingParameters = kddTask.setParameters(args);
+      LoggingConfiguration.requestShowStackTrace(kddTask.wantTrace());
       if(remainingParameters.length != 0) {
         kddTask.warning(kddTask.usage("Unnecessary parameters specified: " + Arrays.asList(remainingParameters) + "\n\nUSAGE:\n"));
       }
       kddTask.run();
     }
     catch(AbortException e) {
-      if(kddTask.wantTrace())
-        e.printStackTrace(System.err);
       kddTask.verbose(kddTask.usage(e.getMessage() + "\n\nUSAGE:"));
     }
     catch(ParameterException e) {
-      if(kddTask.wantTrace())
-        e.printStackTrace(System.err);
       kddTask.warning(kddTask.usage(e.getMessage() + "\n\nUSAGE:\n"));
     }
     // any other exception
     catch(Exception e) {
-      if(kddTask.wantTrace())
-        e.printStackTrace(System.err);
+      LoggingConfiguration.requestShowStackTrace(kddTask.wantTrace());
       kddTask.exception(e.getMessage(), e);
     }
   }

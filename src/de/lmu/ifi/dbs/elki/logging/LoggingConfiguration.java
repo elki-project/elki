@@ -1,8 +1,11 @@
 package de.lmu.ifi.dbs.elki.logging;
 
+
+
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.properties.PropertyName;
 
+import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -126,6 +129,8 @@ public class LoggingConfiguration extends AbstractLoggable {
 	public void setDebugLevel(Level level) {
 		debugFilter.setLevel(level);
 	}
+  
+  
 
 	/**
 	 * Provides the standard handlers for command line interface configuration.
@@ -160,7 +165,7 @@ public class LoggingConfiguration extends AbstractLoggable {
 				new MaskingOutputStream(System.out), new MessageFormatter(),
 				new MessageFilter());
 		Handler progressHandler = new ImmediateFlushHandler(
-				new MaskingOutputStream(System.out), new MessageFormatter(),
+				new MaskingOutputStream(System.out), new ProgressFormatter(),
 				new ProgressFilter());
 		Handler[] consoleHandlers = { debugHandler, verboseHandler,
 				warningHandler, exceptionHandler, messageHandler,
@@ -205,8 +210,28 @@ public class LoggingConfiguration extends AbstractLoggable {
 			Logger.getLogger(LoggingConfiguration.class.getName()).warning(
 					"logger configuration cannot be changed");
 		}
-
 	}
+  
+  /**
+   * Requests the LoggingFramework to show or to not show stack traces of occuring exceptions.
+   * 
+   * 
+   * @param showStackTrace whether or not stack traces of occuring exceptions are requested
+   */
+  public static void requestShowStackTrace(boolean showStackTrace)
+  {
+    Logger logger = Logger.getLogger("");
+    Handler[] handlers = logger.getHandlers();
+    for(Handler handler : handlers)
+    {
+      Formatter f = handler.getFormatter(); 
+      if(f instanceof ExceptionFormatter)
+      {
+        ExceptionFormatter ef = (ExceptionFormatter) f;
+        ef.setShowStacktrace(showStackTrace);
+      }
+    }
+  }
 
 	/**
 	 * Returns whether the LoggingConfiguration is still changeable.

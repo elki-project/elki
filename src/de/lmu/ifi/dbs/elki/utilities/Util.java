@@ -37,10 +37,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
  */
 public final class Util extends AbstractLoggable {
 
-    /**
-     * The logger of this class.
-     */
-//    private static StaticLogger logger = new StaticLogger(Util.class.getName());
 
     static {
         if (LoggingConfiguration.isChangeable()) {

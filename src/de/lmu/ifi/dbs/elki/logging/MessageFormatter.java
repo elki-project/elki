@@ -22,7 +22,7 @@ public class MessageFormatter extends Formatter {
      */
     @Override
     public String format(LogRecord record) {
-        return record.getMessage();
+        return record.getMessage()+"\n";
     }
 
 }
