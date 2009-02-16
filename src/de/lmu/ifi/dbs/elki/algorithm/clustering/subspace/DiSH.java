@@ -149,9 +149,9 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
             "DiSH",
             "Detecting Subspace cluster Hierarchies",
             "Algorithm to find hierarchical correlation clusters in subspaces.",
-            "E. Achtert, C. Boehm, H.-P. Kriegel, P. Kr�ger, I. Mueller-Gorman, A. Zimek: " +
+            "E. Achtert, C. B\u00F6hm, H.-P. Kriegel, P. Kr\u00F6ger, I. M\u00FCller-Gorman, A. Zimek: " +
                 "Detection and Visualization of Subspace Cluster Hierarchies. " +
-                "In Proc. DASFAA Conference, Bangkok, Thailand, 2007."
+                "In Proc. 12th International Conference  on Database Systems for Advanced Applications (DASFAA), Bangkok, Thailand, 2007."
         );
     }
 
