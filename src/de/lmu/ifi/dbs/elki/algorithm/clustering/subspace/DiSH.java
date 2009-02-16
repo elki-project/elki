@@ -270,12 +270,6 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
             StringBuffer msg = new StringBuffer("\n\nStep 3: sort clusters");
             for (Cluster<AxesModel> c : clusters) {
                 msg.append("\n").append(Util.format(dimensionality, c.getModel().getSubspaces())).append(" ids ").append(c.getIDs().size());
-                for (int i = 0; i < c.getParents().size(); i++) {
-                    msg.append("\n   parent ").append(c.getParents().get(i));
-                }
-                for (int i = 0; i < c.numChildren(); i++) {
-                    msg.append("\n   child ").append(c.getChildren().get(i));
-                }
             }
             debugFine(msg.toString());
         }
@@ -286,12 +280,12 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
             StringBuffer msg = new StringBuffer("\n\nStep 4: build hierarchy");
             for (Cluster<AxesModel> c : clusters) {
                 msg.append("\n").append(Util.format(dimensionality, c.getModel().getSubspaces())).append(" ids ").append(c.getIDs().size());
-                for (int i = 0; i < c.getParents().size(); i++) {
-                    msg.append("\n   parent ").append(c.getParents().get(i));
-                }
-                for (int i = 0; i < c.numChildren(); i++) {
-                    msg.append("\n   child ").append(c.getChildren().get(i));
-                }
+              for (Cluster<AxesModel> cluster : c.getParents()) {
+                  msg.append("\n   parent ").append(cluster);
+              }
+              for (Cluster<AxesModel> cluster : c.getChildren()) {
+                  msg.append("\n   child ").append(cluster);
+              }
             }
             debugFine(msg.toString());
         }
