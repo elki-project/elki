@@ -11,19 +11,14 @@ import java.util.LinkedList;
 import java.util.Random;
 import java.util.regex.Pattern;
 
-import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.validation.Schema;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
-
-import com.sun.org.apache.xerces.internal.jaxp.validation.XMLSchemaFactory;
 
 import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution.NormalDistribution;
@@ -43,7 +38,6 @@ import de.lmu.ifi.dbs.elki.wrapper.StandAloneWrapper;
  * 
  * @author Erich Schubert
  */
-// TODO: rewrite with DOM API instead of Pull?
 public class GeneratorXMLSpec extends StandAloneWrapper {
   /**
    * A pattern defining whitespace.
