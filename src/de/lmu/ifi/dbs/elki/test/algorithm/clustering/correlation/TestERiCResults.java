@@ -13,9 +13,8 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.COPAC;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.ERiC;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
-import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.model.CorrelationModel;
+import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ERiCDistanceFunction;
@@ -79,12 +78,12 @@ public class TestERiCResults {
     assertTrue("Some parameters were ignored by the algorithm.", remainingparams.length == 0);
     // run ERiC on database
     eric.run(db);
-    Clustering<Cluster<CorrelationModel<DoubleVector>>> result = eric.getResult();
+    Clustering<CorrelationModel<DoubleVector>> result = eric.getResult();
 
     // run by-label as reference
     ByLabelHierarchicalClustering<DoubleVector> bylabel = new ByLabelHierarchicalClustering<DoubleVector>();
     bylabel.run(db);
-    Clustering<Cluster<Model>> rbl = bylabel.getResult();
+    Clustering<Model> rbl = bylabel.getResult();
 
     // Even with not optimized parameters, we easily achieved 0.62
     // So any loss of quality means something isn't quite right with our

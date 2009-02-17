@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * @author Arthur Zimek
  * @param <V> the type of Realvector handled by this Algorithm
  */
-public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Cluster<Model>>> implements ClusteringAlgorithm<Clustering<Cluster<Model>>,V> {
+public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>,V> {
 
     /**
      * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
@@ -144,7 +144,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
     /**
      * Provides the result of the algorithm.
      */
-    private Clustering<Cluster<Model>> result;
+    private Clustering<Model> result;
 
     /**
      * Holds a set of noise.
@@ -183,7 +183,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
     }
 
     @Override
-    protected Clustering<Cluster<Model>> runInTime(Database<V> database) throws IllegalStateException {
+    protected Clustering<Model> runInTime(Database<V> database) throws IllegalStateException {
         if (isVerbose()) {
             verbose("");
         }
@@ -227,7 +227,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
                 progress(progress, resultList.size());
             }
 
-            result = new Clustering<Cluster<Model>>();
+            result = new Clustering<Model>();
             for (Iterator<List<Integer>> resultListIter = resultList.iterator(); resultListIter.hasNext(); ) {
               DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(resultListIter.next());
               Cluster<Model> c = new Cluster<Model>(group, ClusterModel.CLUSTER);
@@ -437,7 +437,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
      */
     public abstract Class<?> preprocessorClass();
 
-    public Clustering<Cluster<Model>> getResult() {
+    public Clustering<Model> getResult() {
         return result;
     }
 }

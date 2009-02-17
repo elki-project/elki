@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * @param <V> the type of Realvector handled by this Algorithm
  */
 // todo arthur comment class
-public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Cluster<Model>>> implements ClusteringAlgorithm<Clustering<Cluster<Model>>, V> {
+public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, V> {
 
     /**
      * Small value to increment diagonally of a matrix
@@ -67,7 +67,7 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
     /**
      * Stores the result.
      */
-    private Clustering<Cluster<Model>> result;
+    private Clustering<Model> result;
 
     /**
      * Adds parameter
@@ -80,7 +80,7 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
         addOption(K_PARAM);
     }
 
-    public Clustering<Cluster<Model>> getResult() {
+    public Clustering<Model> getResult() {
         return result;
     }
 
@@ -89,7 +89,7 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
     }
 
     @Override
-    public Clustering<Cluster<Model>> runInTime(Database<V> database) throws IllegalStateException {
+    public Clustering<Model> runInTime(Database<V> database) throws IllegalStateException {
         if (database.size() == 0) {
             throw new IllegalArgumentException("database empty: must contain elements");
         }
@@ -166,7 +166,7 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
         }
         while (!means.equals(newMeans) || !Arrays.equals(eigensystems, newEigensystems));
         
-        result = new Clustering<Cluster<Model>>();
+        result = new Clustering<Model>();
         for (int i = 0; i < clusters.size(); i++) {
           DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(clusters.get(i));
           result.addCluster(new Cluster<Model>(group, ClusterModel.CLUSTER));

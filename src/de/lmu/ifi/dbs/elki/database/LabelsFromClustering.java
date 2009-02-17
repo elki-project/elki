@@ -8,7 +8,7 @@ import java.util.Map;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.data.cluster.BaseCluster;
+import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
@@ -39,7 +39,7 @@ public class LabelsFromClustering {
    * @return new database
    * @throws UnableToComplyException
    */
-  public <O extends DatabaseObject, R extends Clustering<C>, C extends BaseCluster<C, M>, M extends Model, L extends ClassLabel> Database<O> makeDatabaseFromClustering(Database<O> olddb, R clustering, Class<L> classLabel) throws UnableToComplyException {
+  public <O extends DatabaseObject, R extends Clustering<M>, M extends Model, L extends ClassLabel> Database<O> makeDatabaseFromClustering(Database<O> olddb, R clustering, Class<L> classLabel) throws UnableToComplyException {
     // we need at least one cluster
     if (clustering.getToplevelClusters().size() <= 0) {
       throw new UnableToComplyException("Clustering doesn't contain any cluster.");
@@ -49,7 +49,7 @@ public class LabelsFromClustering {
     // the easiest way to do this is using the partition() method.
     Map<Integer, List<Integer>> partitions = new HashMap<Integer, List<Integer>>();
     ArrayList<Integer> nonnoise = new ArrayList<Integer>(olddb.size());
-    for(C c : clustering.getAllClusters()) {
+    for(Cluster<M> c : clustering.getAllClusters()) {
       nonnoise.addAll(c.getIDs());
     }
     partitions.put(1, nonnoise);
@@ -57,7 +57,7 @@ public class LabelsFromClustering {
 
     // assign cluster labels
     int clusterID = 1;
-    for(C c : clustering.getAllClusters()) {
+    for(Cluster<M> c : clustering.getAllClusters()) {
       L label = Util.instantiate(classLabel, classLabel.getName());
       label.init(label_prefix + Integer.toString(clusterID));
       for(Integer id : c) {

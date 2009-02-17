@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering;
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.data.cluster.BaseCluster;
+import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 
 /**
@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObject handled by this Clustering
  */
-public interface ClusteringAlgorithm<C extends Clustering<? extends BaseCluster<?,?>>, O extends DatabaseObject> extends Algorithm<O, C> {
+public interface ClusteringAlgorithm<C extends Clustering<? extends Model>, O extends DatabaseObject> extends Algorithm<O, C> {
   /**
    * Runs the algorithm.
    *

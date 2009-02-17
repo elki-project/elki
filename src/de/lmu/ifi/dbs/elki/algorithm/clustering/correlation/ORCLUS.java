@@ -85,7 +85,7 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
    * Performs the ORCLUS algorithm on the given database.
    */
   @Override
-  protected Clustering<Cluster<Model>> runInTime(Database<V> database) throws IllegalStateException {
+  protected Clustering<Model> runInTime(Database<V> database) throws IllegalStateException {
 
     try {
       final int dim = getL();
@@ -133,7 +133,7 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
       }
 
       // get the result
-      Clustering<Cluster<Model>> r = new Clustering<Cluster<Model>>();
+      Clustering<Model> r = new Clustering<Model>();
       for(ORCLUSCluster c : clusters) {
         DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(c.objectIDs);
         r.addCluster(new Cluster<Model>(group, ClusterModel.CLUSTER));

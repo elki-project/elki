@@ -34,16 +34,16 @@ import de.lmu.ifi.dbs.elki.utilities.Description;
  *
  * @param <O>
  */
-public class ByLabelHierarchicalClustering<O extends DatabaseObject> extends AbstractAlgorithm<O,Clustering<Cluster<Model>>> implements ClusteringAlgorithm<Clustering<Cluster<Model>>,O> {
+public class ByLabelHierarchicalClustering<O extends DatabaseObject> extends AbstractAlgorithm<O,Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>,O> {
   /**
    * Holds the result of the algorithm.
    */
-  private Clustering<Cluster<Model>> result;
+  private Clustering<Model> result;
 
   /**
    * Return clustering result
    */
-  public Clustering<Cluster<Model>> getResult() {
+  public Clustering<Model> getResult() {
     return result;
   }
 
@@ -61,7 +61,7 @@ public class ByLabelHierarchicalClustering<O extends DatabaseObject> extends Abs
    * @param database The database to process
    */
   @Override
-  protected Clustering<Cluster<Model>> runInTime(Database<O> database) throws IllegalStateException {
+  protected Clustering<Model> runInTime(Database<O> database) throws IllegalStateException {
     HashMap<String, Set<Integer>> labelmap = new HashMap<String, Set<Integer>>(); 
     
     for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
@@ -116,7 +116,7 @@ public class ByLabelHierarchicalClustering<O extends DatabaseObject> extends Abs
     }
     assert(rootclusters.size() > 0);
 
-    result = new Clustering<Cluster<Model>>(rootclusters);
+    result = new Clustering<Model>(rootclusters);
 
     return result;
   }

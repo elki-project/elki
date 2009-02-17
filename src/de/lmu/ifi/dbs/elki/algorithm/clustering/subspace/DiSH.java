@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
  * @author Elke Achtert
  * @param <V> the type of Realvector handled by this Algorithm
  */
-public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Cluster<AxesModel>>> implements ClusteringAlgorithm<Clustering<Cluster<AxesModel>>,V> {
+public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clustering<AxesModel>> implements ClusteringAlgorithm<Clustering<AxesModel>,V> {
     /**
      * OptionID for {@link #EPSILON_PARAM}
      */
@@ -98,7 +98,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
     /**
      * Holds the result;
      */
-    private Clustering<Cluster<AxesModel>> result;
+    private Clustering<AxesModel> result;
 
     /**
      * Provides the DiSH algorithm,
@@ -123,7 +123,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
      *
      */
     @Override
-    protected Clustering<Cluster<AxesModel>> runInTime(Database<V> database) throws IllegalStateException {
+    protected Clustering<AxesModel> runInTime(Database<V> database) throws IllegalStateException {
         if (isVerbose()) {
             verbose("\nRun OPTICS algorithm.");
         }
@@ -141,7 +141,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
      *
      * @return the result of the algorithm
      */
-    public Clustering<Cluster<AxesModel>> getResult() {
+    public Clustering<AxesModel> getResult() {
         return result;
     }
 
@@ -291,7 +291,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
         }
 
         int lambdaMax = dimensionality - clusters.get(clusters.size() - 1).getModel().getSubspaces().cardinality();
-        result = new Clustering<Cluster<AxesModel>>();
+        result = new Clustering<AxesModel>();
         for (Cluster<AxesModel> c : clusters) {
             if (dimensionality - c.getModel().getSubspaces().cardinality() == lambdaMax) {
                 result.addCluster(c);

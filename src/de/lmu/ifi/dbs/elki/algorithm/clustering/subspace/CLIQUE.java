@@ -61,7 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstrai
  * @author Elke Achtert
  * @param <V> the type of RealVector handled by this Algorithm
  */
-public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Cluster<CLIQUESubspace<V>>>> implements ClusteringAlgorithm<Clustering<Cluster<CLIQUESubspace<V>>>,V> {
+public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clustering<CLIQUESubspace<V>>> implements ClusteringAlgorithm<Clustering<CLIQUESubspace<V>>,V> {
     /**
      * OptionID for {@link #XSI_PARAM}
      */
@@ -133,7 +133,7 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clu
     /**
      * The result of the algorithm;
      */
-    private Clustering<Cluster<CLIQUESubspace<V>>> result;
+    private Clustering<CLIQUESubspace<V>> result;
 
     /**
      * Provides the CLIQUE algorithm,
@@ -160,7 +160,7 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clu
      *
      * @return the result of the algorithm
      */
-    public Clustering<Cluster<CLIQUESubspace<V>>> getResult() {
+    public Clustering<CLIQUESubspace<V>> getResult() {
         return result;
     }
 
@@ -183,7 +183,7 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clu
      *
      */
     @Override
-    protected Clustering<Cluster<CLIQUESubspace<V>>> runInTime(Database<V> database) throws IllegalStateException {
+    protected Clustering<CLIQUESubspace<V>> runInTime(Database<V> database) throws IllegalStateException {
         Map<CLIQUESubspace<V>, Set<Integer>> modelsAndClusters = new HashMap<CLIQUESubspace<V>, Set<Integer>>();
 
         // 1. Identification of subspaces that contain clusters
@@ -220,7 +220,7 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clu
             }
         }
 
-        result = new Clustering<Cluster<CLIQUESubspace<V>>>();
+        result = new Clustering<CLIQUESubspace<V>>();
 
         for (Entry<CLIQUESubspace<V>, Set<Integer>> e : modelsAndClusters.entrySet()) {
           DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(e.getValue());

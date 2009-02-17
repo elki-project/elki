@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * @param <D> a type of {@link Distance} as returned by the used distance function
  * @param <V> a type of {@link RealVector} as a suitable datatype for this algorithm
  */
-public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, D, Clustering<Cluster<Model>>> implements ClusteringAlgorithm<Clustering<Cluster<Model>>,V> {
+public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, D, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>,V> {
 
     /**
      * OptionID for {@link #K_PARAM}
@@ -61,7 +61,7 @@ public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends D
     /**
      * Keeps the result.
      */
-    private Clustering<Cluster<Model>> result;
+    private Clustering<Model> result;
 
     /**
      * Provides the k-means algorithm,
@@ -83,7 +83,7 @@ public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends D
                 "In 5th Berkeley Symp. Math. Statist. Prob., Vol. 1, 1967, pp 281-297");
     }
 
-    public Clustering<Cluster<Model>> getResult() {
+    public Clustering<Model> getResult() {
         return result;
     }
 
@@ -91,7 +91,7 @@ public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends D
      * Performs the k-means algorithm on the given database.
      */
     @Override
-    protected Clustering<Cluster<Model>> runInTime(Database<V> database) throws IllegalStateException {
+    protected Clustering<Model> runInTime(Database<V> database) throws IllegalStateException {
         Random random = new Random();
         if (database.size() > 0) {
             // needs normalization to ensure the randomly generated means
@@ -139,14 +139,14 @@ public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends D
                 changed = !means.equals(oldMeans);
                 iteration++;
             }
-            result = new Clustering<Cluster<Model>>();
+            result = new Clustering<Model>();
             for (int i = 0; i < clusters.size(); i++) {
               DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(clusters.get(i));
               result.addCluster(new Cluster<Model>(group, ClusterModel.CLUSTER));
             }
         }
         else {
-            result = new Clustering<Cluster<Model>>();
+            result = new Clustering<Model>();
         }
         return result;
     }

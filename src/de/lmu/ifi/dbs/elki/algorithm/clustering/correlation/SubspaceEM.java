@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
  * @param <V> the type of Realvector handled by this Algorithm
  */
 //todo arthur comment
-public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Cluster<CorrelationAnalysisSolution<V>>>> implements ClusteringAlgorithm<Clustering<Cluster<CorrelationAnalysisSolution<V>>>,V> {
+public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clustering<CorrelationAnalysisSolution<V>>> implements ClusteringAlgorithm<Clustering<CorrelationAnalysisSolution<V>>,V> {
 
     /**
      * Small value to increment diagonally of a matrix
@@ -94,7 +94,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V,
     /**
      * Stores the result.
      */
-    private Clustering<Cluster<CorrelationAnalysisSolution<V>>> result;
+    private Clustering<CorrelationAnalysisSolution<V>> result;
 
     /**
      * Adds parameters
@@ -108,7 +108,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V,
         addOption(DELTA_PARAM);
     }
 
-    public Clustering<Cluster<CorrelationAnalysisSolution<V>>> getResult() {
+    public Clustering<CorrelationAnalysisSolution<V>> getResult() {
         return result;
     }
 
@@ -117,7 +117,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V,
     }
 
     @Override
-    public Clustering<Cluster<CorrelationAnalysisSolution<V>>> runInTime(Database<V> database) throws IllegalStateException {
+    public Clustering<CorrelationAnalysisSolution<V>> runInTime(Database<V> database) throws IllegalStateException {
         if (database.size() == 0) {
             throw new IllegalArgumentException("database empty: must contain elements");
         }
@@ -270,7 +270,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V,
             verbose("\nassigning clusters");
         }
         List<List<Integer>> hardClusters = hardClustering(database);
-        result = new Clustering<Cluster<CorrelationAnalysisSolution<V>>>();
+        result = new Clustering<CorrelationAnalysisSolution<V>>();
         // provide models within the result
         for (int i = 0; i < k; i++) {
             DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(hardClusters.get(i));

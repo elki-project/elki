@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * @param <O> the type of DatabaseObject the algorithm is applied on
  * @param <D> the type of Distance used
  */
-public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D, Clustering<Cluster<Model>>> implements ClusteringAlgorithm<Clustering<Cluster<Model>>,O> {
+public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>,O> {
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN#EPSILON_PARAM}
      */
@@ -91,7 +91,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
     /**
      * Provides the result of the algorithm.
      */
-    protected Clustering<Cluster<Model>> result;
+    protected Clustering<Model> result;
 
     /**
      * Holds a set of noise.
@@ -129,7 +129,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
      *
      */
     @Override
-    protected Clustering<Cluster<Model>> runInTime(Database<O> database) throws IllegalStateException {
+    protected Clustering<Model> runInTime(Database<O> database) throws IllegalStateException {
         Progress progress = new Progress("Clustering", database.size());
         resultList = new ArrayList<List<Integer>>();
         noise = new HashSet<Integer>();
@@ -164,7 +164,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
             }
         }
 
-        result = new Clustering<Cluster<Model>>();
+        result = new Clustering<Model>();
         for (Iterator<List<Integer>> resultListIter = resultList.iterator(); resultListIter.hasNext();) {
           DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(resultListIter.next());
           Cluster<Model> c = new Cluster<Model>(group, ClusterModel.CLUSTER);
@@ -288,7 +288,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
         return remainingParameters;
     }
 
-    public Clustering<Cluster<Model>> getResult() {
+    public Clustering<Model> getResult() {
         return result;
     }
 }

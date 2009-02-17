@@ -85,7 +85,7 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
      *
      */
     @Override
-    protected Clustering<Cluster<Model>> runInTime(Database<V> database) throws IllegalStateException {
+    protected Clustering<Model> runInTime(Database<V> database) throws IllegalStateException {
 
         try {
             getDistanceFunction().setDatabase(database, false, false);
@@ -145,7 +145,7 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
 
             //todo refinement phase ?
             
-            Clustering<Cluster<Model>> res = new Clustering<Cluster<Model>>();
+            Clustering<Model> res = new Clustering<Model>();
             for (Integer m_i : clusters.keySet()) {
                 PROCLUSCluster c = clusters.get(m_i);
                 DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(c.objectIDs);

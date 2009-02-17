@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
+import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -63,7 +64,7 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
 
     // Cluster by labels
     ByLabelClustering<V> split = new ByLabelClustering<V>();
-    Set<Cluster<?>> splitted = split.run(database).getAllClusters();
+    Set<Cluster<Model>> splitted = split.run(database).getAllClusters();
 
     // global in-cluster min/max
     double gimin = Double.MAX_VALUE;

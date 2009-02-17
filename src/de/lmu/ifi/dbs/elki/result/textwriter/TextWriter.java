@@ -6,6 +6,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -13,9 +14,10 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
-import de.lmu.ifi.dbs.elki.data.cluster.BaseCluster;
+import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.cluster.naming.NamingScheme;
 import de.lmu.ifi.dbs.elki.data.cluster.naming.SimpleEnumeratingScheme;
+import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -119,7 +121,7 @@ public class TextWriter<O extends DatabaseObject> {
   public void output(Database<O> db, Result r, StreamFactory streamOpener, List<AttributeSettings> settings) throws UnableToComplyException, IOException {
     AnnotationResult ra = null;
     OrderingResult ro = null;
-    Clustering<?> rc = null;
+    Clustering<Model> rc = null;
     IterableResult<?> ri = null;
 
     Collection<DatabaseObjectGroup> groups = null;
@@ -136,7 +138,7 @@ public class TextWriter<O extends DatabaseObject> {
     NamingScheme naming = null;
     // Process groups or all data in a flat manner?
     if(rc != null) {
-      groups = (Collection<DatabaseObjectGroup>) rc.getAllClusters();
+      groups = new HashSet<DatabaseObjectGroup>(rc.getAllClusters());
       // force an update of cluster names.
       naming = new SimpleEnumeratingScheme(rc);
     }
@@ -189,12 +191,12 @@ public class TextWriter<O extends DatabaseObject> {
     return null;
   }
 
-  private Clustering<?> getClusteringResult(Result r) {
+  private Clustering<Model> getClusteringResult(Result r) {
     if (r instanceof Clustering) {
-      return (Clustering<?>) r;
+      return (Clustering<Model>) r;
     }
     if(r instanceof MultiResult) {
-      List<Clustering<?>> clusterings = ((MultiResult)r).filterResults(Clustering.class);
+      List<Clustering<Model>> clusterings = ((MultiResult)r).filterResults(Clustering.class);
       // return last.
       // TODO: combine somehow?
       if(clusterings.size() >= 1) {
@@ -253,7 +255,7 @@ public class TextWriter<O extends DatabaseObject> {
   private void writeGroupResult(Database<O> db, StreamFactory streamOpener, DatabaseObjectGroup group, AnnotationResult ra, OrderingResult ro, NamingScheme naming, List<AttributeSettings> settings) throws FileNotFoundException, UnableToComplyException, IOException {
     String filename = null;
     // for clusters, use naming.
-    if(group instanceof BaseCluster) {
+    if(group instanceof Cluster) {
       if(naming != null) {
         filename = filenameFromLabel(naming.getNameFor(group));
       }

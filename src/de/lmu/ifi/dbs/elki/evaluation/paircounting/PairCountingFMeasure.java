@@ -3,7 +3,8 @@ package de.lmu.ifi.dbs.elki.evaluation.paircounting;
 import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.cluster.BaseCluster;
+import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
+import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairGeneratorSingleCluster;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairGeneratorMerge;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairGeneratorNoise;
@@ -32,18 +33,18 @@ public class PairCountingFMeasure {
    * @param clusters Clustering result
    * @return Sorted pair generator
    */
-  public static <R extends Clustering<C>, C extends BaseCluster<C,?>> PairSortedGeneratorInterface getPairGenerator(R clusters) {
+  public static <R extends Clustering<M>, M extends Model> PairSortedGeneratorInterface getPairGenerator(R clusters) {
     // collect all clusters into a flat list.
-    Set<C> allclusters = clusters.getAllClusters();
+    Set<Cluster<M>> allclusters = clusters.getAllClusters();
 
     // Make generators for each cluster
     PairSortedGeneratorInterface[] gens = new PairSortedGeneratorInterface[allclusters.size()];
     int i = 0;
-    for (C c : allclusters) {
+    for (Cluster<?> c : allclusters) {
       if (c.isNoise()) {
         gens[i] = new PairGeneratorNoise(c);
       } else {
-        gens[i] = new PairGeneratorSingleCluster<C>(c);
+        gens[i] = new PairGeneratorSingleCluster(c);
       }
       i++;
     }
@@ -59,7 +60,7 @@ public class PairCountingFMeasure {
    * @param beta Beta value for the F-Measure
    * @return Pair counting F-Measure result.
    */
-  public static <R extends Clustering<C>, C extends BaseCluster<C,?>, S extends Clustering<D>, D extends BaseCluster<D,?>> double compareClusterings(R result1, S result2, double beta) {
+  public static <R extends Clustering<M>, M extends Model, S extends Clustering<N>, N extends Model> double compareClusterings(R result1, S result2, double beta) {
     PairSortedGeneratorInterface first = getPairGenerator(result1);
     PairSortedGeneratorInterface second = getPairGenerator(result2);
     return countPairs(first, second, beta);
@@ -72,7 +73,7 @@ public class PairCountingFMeasure {
    * @param result2 second result
    * @return Pair counting F-1-Measure result.
    */
-  public static <R extends Clustering<C>, C extends BaseCluster<C,?>, S extends Clustering<D>, D extends BaseCluster<D,?>> double compareClusterings(R result1, S result2) {
+  public static <R extends Clustering<M>, M extends Model, S extends Clustering<N>, N extends Model> double compareClusterings(R result1, S result2) {
     return compareClusterings(result1, result2, 1.0);
   }
 

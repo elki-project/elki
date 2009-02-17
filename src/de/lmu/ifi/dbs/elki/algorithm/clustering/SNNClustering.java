@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * @param <O> the type of DatabaseObject the algorithm is applied on
  * @param <D> the type of Distance used for the preprocessing of the shared nearest neighbors neighborhood lists
  */
-public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> extends AbstractAlgorithm<O, Clustering<Cluster<Model>>> implements ClusteringAlgorithm<Clustering<Cluster<Model>>,O> {
+public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> extends AbstractAlgorithm<O, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>,O> {
 
     /**
      * OptionID for {@link #EPSILON_PARAM}
@@ -94,7 +94,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
     /**
      * Provides the result of the algorithm.
      */
-    protected Clustering<Cluster<Model>> result;
+    protected Clustering<Model> result;
 
     /**
      * Holds a set of noise.
@@ -128,7 +128,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
      * Performs the SNN clustering algorithm on the given database.
      */
     @Override
-    protected Clustering<Cluster<Model>> runInTime(Database<O> database) {
+    protected Clustering<Model> runInTime(Database<O> database) {
         Progress progress = new Progress("Clustering", database.size());
         resultList = new ArrayList<List<Integer>>();
         noise = new HashSet<Integer>();
@@ -163,7 +163,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
             }
         }
 
-        result = new Clustering<Cluster<Model>>();
+        result = new Clustering<Model>();
         for (Iterator<List<Integer>> resultListIter = resultList.iterator(); resultListIter.hasNext();) {
           DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(resultListIter.next());
           result.addCluster(new Cluster<Model>(group, ClusterModel.CLUSTER));
@@ -307,7 +307,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
         return remainingParameters;
     }
 
-    public Clustering<Cluster<Model>> getResult() {
+    public Clustering<Model> getResult() {
         return result;
     }
 

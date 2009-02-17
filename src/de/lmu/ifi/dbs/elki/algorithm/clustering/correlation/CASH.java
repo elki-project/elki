@@ -60,7 +60,7 @@ import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredRunner;
  * @author Elke Achtert
  */
 //todo elke hierarchy (later)
-public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering<Cluster<Model>>> implements ClusteringAlgorithm<Clustering<Cluster<Model>>,ParameterizationFunction>{
+public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>,ParameterizationFunction>{
 
     /**
      * OptionID for {@link #MINPTS_PARAM}
@@ -171,7 +171,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
     /**
      * The result.
      */
-    private Clustering<Cluster<Model>> result;
+    private Clustering<Model> result;
 
     /**
      * Holds the dimensionality for noise.
@@ -219,7 +219,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
      *
      */
     @Override
-    protected Clustering<Cluster<Model>> runInTime(Database<ParameterizationFunction> database) throws IllegalStateException {
+    protected Clustering<Model> runInTime(Database<ParameterizationFunction> database) throws IllegalStateException {
         this.database = database;
         if (isVerbose()) {
             StringBuffer msg = new StringBuffer();
@@ -270,7 +270,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
      *
      * @return the result of the algorithm
      */
-    public Clustering<Cluster<Model>> getResult() {
+    public Clustering<Model> getResult() {
         return result;
     }
 
@@ -326,11 +326,11 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
      * @throws ParameterException          if the parameter setting is wrong
      * @throws NonNumericFeaturesException if non numeric feature vectors are used
      */
-    private Clustering<Cluster<Model>> doRun(Database<ParameterizationFunction> database,
+    private Clustering<Model> doRun(Database<ParameterizationFunction> database,
                                      Progress progress) throws UnableToComplyException, ParameterException, NonNumericFeaturesException {
 
       
-      Clustering<Cluster<Model>> res = new Clustering<Cluster<Model>>();
+      Clustering<Model> res = new Clustering<Model>();
 
 
         int dim = database.get(database.iterator().next()).getDimensionality();
@@ -386,7 +386,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
                 Database<ParameterizationFunction> db = buildDB(dim, basis_dim_minus_1, ids, database);
                 if (db.size() != 0) {
                   // add result of dim-1 to this result
-                  Clustering<Cluster<Model>> res_dim_minus_1 = doRun(db, progress);
+                  Clustering<Model> res_dim_minus_1 = doRun(db, progress);
                   for (Cluster<Model> cluster : res_dim_minus_1.getAllClusters()) {
                     res.addCluster(cluster);
                     noiseIDs.removeAll(cluster.getGroup().getIDs());

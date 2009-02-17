@@ -4,17 +4,17 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 
-import de.lmu.ifi.dbs.elki.data.cluster.BaseCluster;
+import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 
 /**
- * Generate sorted ID paris for a {@link BaseCluster}.
+ * Generate sorted ID pairs for a {@link Cluster}.
  * 
  * @author Erich Schubert
  * 
  * @param <C> Cluster class
  */
-public class PairGeneratorSingleCluster<C extends BaseCluster<C, ?>> extends PairSortedGenerator {
+public class PairGeneratorSingleCluster extends PairSortedGenerator {
   /**
    * Ids in parent clusters
    */
@@ -40,13 +40,13 @@ public class PairGeneratorSingleCluster<C extends BaseCluster<C, ?>> extends Pai
    * 
    * @param cluster Cluster
    */
-  public PairGeneratorSingleCluster(C cluster) {
+  public PairGeneratorSingleCluster(Cluster<?> cluster) {
     // collect all parent clusters into a flat list.
-    java.util.Vector<C> allparents = new java.util.Vector<C>();
+    java.util.Vector<Cluster<?>> allparents = new java.util.Vector<Cluster<?>>();
     if(cluster.isHierarchical()) {
       allparents.addAll(cluster.getParents());
       for(int i = 0; i < allparents.size(); i++) {
-        for(C newc : allparents.get(i).getParents()) {
+        for(Cluster<?> newc : allparents.get(i).getParents()) {
           if(!allparents.contains(newc)) {
             allparents.add(newc);
           }
@@ -68,7 +68,7 @@ public class PairGeneratorSingleCluster<C extends BaseCluster<C, ?>> extends Pai
     // TODO: ensure there are no duplicate IDs?
 
     HashSet<Integer> idsset = new HashSet<Integer>(cids);
-    for(C parent : allparents) {
+    for(Cluster<?> parent : allparents) {
       idsset.addAll(parent.getIDs());
     }
     parentids = new int[idsset.size()];

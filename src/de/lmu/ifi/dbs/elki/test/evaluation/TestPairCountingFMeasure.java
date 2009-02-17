@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.test.evaluation;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -9,7 +10,6 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.TrivialAllInOne;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.TrivialAllNoise;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
@@ -41,17 +41,17 @@ public class TestPairCountingFMeasure {
     // run all-in-one
     TrivialAllInOne<DoubleVector> allinone = new TrivialAllInOne<DoubleVector>();
     allinone.run(db);
-    Clustering<Cluster<Model>> rai = allinone.getResult();
+    Clustering<Model> rai = allinone.getResult();
     
     // run all-in-noise
     TrivialAllNoise<DoubleVector> allinnoise = new TrivialAllNoise<DoubleVector>();
     allinnoise.run(db);
-    Clustering<Cluster<Model>> ran = allinnoise.getResult();
+    Clustering<Model> ran = allinnoise.getResult();
     
     // run by-label
     ByLabelClustering<DoubleVector> bylabel = new ByLabelClustering<DoubleVector>();
     bylabel.run(db);
-    Clustering<Cluster<?>> rbl = bylabel.getResult();
+    Clustering<?> rbl = bylabel.getResult();
     
     assertEquals(1.0, PairCountingFMeasure.compareClusterings(rai, rai), Double.MIN_VALUE);
     assertEquals(1.0, PairCountingFMeasure.compareClusterings(ran, ran), Double.MIN_VALUE);

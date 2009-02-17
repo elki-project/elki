@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredRunner;
  * @author Elke Achtert
  * @param <V> the type of Realvector handled by this Algorithm
  */
-public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Cluster<CorrelationModel<V>>>> implements ClusteringAlgorithm<Clustering<Cluster<CorrelationModel<V>>>, V> {
+public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clustering<CorrelationModel<V>>> implements ClusteringAlgorithm<Clustering<CorrelationModel<V>>, V> {
     /**
      * The COPAC clustering algorithm.
      */
@@ -50,7 +50,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
     /**
      * Holds the result.
      */
-    private Clustering<Cluster<CorrelationModel<V>>> result;
+    private Clustering<CorrelationModel<V>> result;
 
     /**
      * Performs the COPAC algorithm on the data and builds
@@ -65,7 +65,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
      * Performs the ERiC algorithm on the given database.
      */
     @Override
-    protected Clustering<Cluster<CorrelationModel<V>>> runInTime(Database<V> database) throws IllegalStateException {
+    protected Clustering<CorrelationModel<V>> runInTime(Database<V> database) throws IllegalStateException {
         int dimensionality = database.dimensionality();
 
         // run COPAC
@@ -123,7 +123,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
             debugFine(msg.toString());
         }
 
-        result = new Clustering<Cluster<CorrelationModel<V>>>();
+        result = new Clustering<CorrelationModel<V>>();
         for (Cluster<CorrelationModel<V>> rc : clusterMap.get(clusterMap.lastKey())) {
             result.addCluster(rc);
         }
@@ -135,7 +135,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
      *
      * @return the result of the algorithm
      */
-    public Clustering<Cluster<CorrelationModel<V>>> getResult() {
+    public Clustering<CorrelationModel<V>> getResult() {
         return result;
     }
 
@@ -217,7 +217,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
             SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap = new TreeMap<Integer, List<Cluster<CorrelationModel<V>>>>();
 
             // result of COPAC algorithm
-            Clustering<Cluster<Model>> copacResult = copacAlgorithm.getResult();
+            Clustering<Model> copacResult = copacAlgorithm.getResult();
             // noise cluster containing all noise objects over all partitions
             Cluster<Model> noise = null;
             

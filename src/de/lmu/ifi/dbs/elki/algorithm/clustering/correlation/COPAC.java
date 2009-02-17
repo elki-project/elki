@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * @author Arthur Zimek
  * @param <V> the type of RealVector handled by this Algorithm
  */
-public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Cluster<Model>>> implements ClusteringAlgorithm<Clustering<Cluster<Model>>,V> {
+public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>,V> {
 
     /**
      * OptionID for {@link #PREPROCESSOR_PARAM}
@@ -80,13 +80,13 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
      * must extend {@link de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm}.
      * <p>Key: {@code -copac.partitionAlgorithm} </p>
      */
-    protected final ClassParameter<ClusteringAlgorithm<Clustering<Cluster<Model>>,V>> PARTITION_ALGORITHM_PARAM =
-        new ClassParameter<ClusteringAlgorithm<Clustering<Cluster<Model>>,V>>(PARTITION_ALGORITHM_ID, ClusteringAlgorithm.class);
+    protected final ClassParameter<ClusteringAlgorithm<Clustering<Model>,V>> PARTITION_ALGORITHM_PARAM =
+        new ClassParameter<ClusteringAlgorithm<Clustering<Model>,V>>(PARTITION_ALGORITHM_ID, ClusteringAlgorithm.class);
 
     /**
      * Holds the instance of the partitioning algorithm specified by {@link #PARTITION_ALGORITHM_PARAM}.
      */
-    private ClusteringAlgorithm<Clustering<Cluster<Model>>,V> partitionAlgorithm;
+    private ClusteringAlgorithm<Clustering<Model>,V> partitionAlgorithm;
 
     /**
      * OptionID for {#PARTITION_DB_PARAM}
@@ -120,7 +120,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
     /**
      * Holds the result.
      */
-    private Clustering<Cluster<Model>> result;
+    private Clustering<Model> result;
 
 
     /**
@@ -142,7 +142,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
      * Performs the COPAC algorithm on the given database.
      */
     @Override
-    protected Clustering<Cluster<Model>> runInTime(Database<V> database) throws IllegalStateException {
+    protected Clustering<Model> runInTime(Database<V> database) throws IllegalStateException {
         // preprocessing
         if (isVerbose()) {
             verbose("\ndb size = " + database.size());
@@ -187,7 +187,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
         return result;
     }
 
-    public Clustering<Cluster<Model>> getResult() {
+    public Clustering<Model> getResult() {
         return result;
     }
 
@@ -316,7 +316,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
             Map<Integer, Database<V>> databasePartitions =
                 database.partition(partitionMap, partitionDatabase, partitionDatabaseParameters);
 
-            result = new Clustering<Cluster<Model>>();
+            result = new Clustering<Model>();
 
             for (Integer partitionID : databasePartitions.keySet()) {
                 // noise partition
@@ -333,7 +333,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
                             " on partition " +
                             partitionID);
                     }
-                    Clustering<Cluster<Model>> p = partitionAlgorithm.run(databasePartitions.get(partitionID));
+                    Clustering<Model> p = partitionAlgorithm.run(databasePartitions.get(partitionID));
                     // Re-Wrap resulting Clusters as DimensionModel clusters.
                     for (Cluster<Model> clus : p.getAllClusters()) {
                       DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Collection<Integer>>(clus.getIDs());
@@ -356,7 +356,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
      *
      * @return the specified partition algorithm
      */
-    public ClusteringAlgorithm<Clustering<Cluster<Model>>,V> getPartitionAlgorithm() {
+    public ClusteringAlgorithm<Clustering<Model>,V> getPartitionAlgorithm() {
         return partitionAlgorithm;
     }
 }

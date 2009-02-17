@@ -23,16 +23,16 @@ import de.lmu.ifi.dbs.elki.utilities.Description;
  * @param <O>
  */
 
-public class TrivialAllInOne<O extends DatabaseObject> extends AbstractAlgorithm<O, Clustering<Cluster<Model>>> implements ClusteringAlgorithm<Clustering<Cluster<Model>>, O> {
+public class TrivialAllInOne<O extends DatabaseObject> extends AbstractAlgorithm<O, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, O> {
   /**
    * Holds the result of the algorithm.
    */
-  private Clustering<Cluster<Model>> result;
+  private Clustering<Model> result;
 
   /**
    * Return clustering result
    */
-  public Clustering<Cluster<Model>> getResult() {
+  public Clustering<Model> getResult() {
     return result;
   }
 
@@ -50,8 +50,8 @@ public class TrivialAllInOne<O extends DatabaseObject> extends AbstractAlgorithm
    * @param database The database to process
    */
   @Override
-  protected Clustering<Cluster<Model>> runInTime(Database<O> database) throws IllegalStateException {
-    result = new Clustering<Cluster<Model>>();
+  protected Clustering<Model> runInTime(Database<O> database) throws IllegalStateException {
+    result = new Clustering<Model>();
     DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(database.getIDs());
     Cluster<Model> c = new Cluster<Model>(group, ClusterModel.CLUSTER);
     result.addCluster(c);

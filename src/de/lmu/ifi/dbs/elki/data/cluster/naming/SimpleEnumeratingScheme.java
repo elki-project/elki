@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.cluster.BaseCluster;
+import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 
 /**
  * Simple enumerating naming scheme. Cluster names are generated as follows: -
@@ -28,7 +28,7 @@ public class SimpleEnumeratingScheme implements NamingScheme {
   /**
    * Assigned cluster names.
    */
-  private Map<BaseCluster<?,?>, String> names = new HashMap<BaseCluster<?,?>, String>();
+  private Map<Cluster<?>, String> names = new HashMap<Cluster<?>, String>();
 
   /**
    * This is the postfix added to the first cluster, which will be removed when
@@ -50,7 +50,7 @@ public class SimpleEnumeratingScheme implements NamingScheme {
    * Assign names to each cluster (which doesn't have a name yet)
    */
   private void updateNames() {
-    for(BaseCluster<?,?> cluster : clustering.getAllClusters()) {
+    for(Cluster<?> cluster : clustering.getAllClusters()) {
       if(names.get(cluster) == null) {
         String sugname = cluster.getNameAutomatic();
         Integer count = namecount.get(sugname);
@@ -70,9 +70,9 @@ public class SimpleEnumeratingScheme implements NamingScheme {
    */
   @Override
   public String getNameFor(Object o) {
-    if(o instanceof BaseCluster) {
+    if(o instanceof Cluster) {
       try {
-        BaseCluster<?,?> cluster = (BaseCluster<?,?>) o;
+        Cluster<?> cluster = (Cluster<?>) o;
         String nam = names.get(cluster);
         if(nam == null) {
           updateNames();

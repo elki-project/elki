@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * @param <D> the type of Distance used
  */
 // todo elke implementation
-public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<V, Clustering<Cluster<Model>>> implements ClusteringAlgorithm<Clustering<Cluster<Model>>,V> {
+public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<V, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>,V> {
 
     /**
      * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
@@ -122,7 +122,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
     /**
      * Holds the result;
      */
-    private Clustering<Cluster<Model>> result;
+    private Clustering<Model> result;
 
     /**
      * Provides the SUBCLU algorithm,
@@ -154,7 +154,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
      *
      */
     @Override
-    protected Clustering<Cluster<Model>> runInTime(Database<V> database) throws IllegalStateException {
+    protected Clustering<Model> runInTime(Database<V> database) throws IllegalStateException {
         try {
             int dimensionality = database.dimensionality();
             // 1. Generate all 1-D clusters
@@ -166,7 +166,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
                 selectedDimensions.set(d);
                 DBSCAN<V, D> dbscan = initDBSCAN(selectedDimensions);
                 dbscan.run(database);
-                Clustering<Cluster<Model>> clusters = dbscan.getResult();
+                Clustering<Model> clusters = dbscan.getResult();
                 if (debug) {
                     debugFine(d + " clusters: " + clusters);
                 }
@@ -184,7 +184,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
      *
      * @return the result of the algorithm
      */
-    public Clustering<Cluster<Model>> getResult() {
+    public Clustering<Model> getResult() {
         return result;
     }
 

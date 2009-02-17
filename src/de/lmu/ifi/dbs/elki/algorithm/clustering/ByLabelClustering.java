@@ -31,16 +31,16 @@ import de.lmu.ifi.dbs.elki.utilities.Description;
  *
  * @param <O>
  */
-public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorithm<O, Clustering<Cluster<? extends Model>>> implements ClusteringAlgorithm<Clustering<Cluster<? extends Model>>,O> {
+public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorithm<O, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>,O> {
   /**
    * Holds the result of the algorithm.
    */
-  private Clustering<Cluster<? extends Model>> result;
+  private Clustering<Model> result;
 
   /**
    * Return clustering result
    */
-  public Clustering<Cluster<? extends Model>> getResult() {
+  public Clustering<Model> getResult() {
     return result;
   }
 
@@ -58,7 +58,7 @@ public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorit
    * @param database The database to process
    */
   @Override
-  protected Clustering<Cluster<? extends Model>> runInTime(Database<O> database) throws IllegalStateException {
+  protected Clustering<Model> runInTime(Database<O> database) throws IllegalStateException {
     HashMap<String, Collection<Integer>> labelmap = new HashMap<String, Collection<Integer>>(); 
     
     for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
@@ -85,7 +85,7 @@ public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorit
       }
     }
 
-    result = new Clustering<Cluster<? extends Model>>();
+    result = new Clustering<Model>();
     for (Collection<Integer> ids : labelmap.values()) {
       DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Collection<Integer>>(ids);
       Cluster<Model> c = new Cluster<Model>(group, ClusterModel.CLUSTER);

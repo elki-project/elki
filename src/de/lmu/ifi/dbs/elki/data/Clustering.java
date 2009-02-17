@@ -5,7 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import de.lmu.ifi.dbs.elki.data.cluster.BaseCluster;
+import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
+import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.result.Result;
 
 /**
@@ -18,18 +19,18 @@ import de.lmu.ifi.dbs.elki.result.Result;
  *
  * @param <C> Cluster type
  */
-public class Clustering<C extends BaseCluster<C, ?>> implements Result {
+public class Clustering<M extends Model> implements Result {
   /**
    * Keep a list of top level clusters.
    */
-  private List<C> toplevelclusters;
+  private List<Cluster<M>> toplevelclusters;
 
   /**
    * Constructor with a list of top level clusters
    * 
    * @param toplevelclusters Top level clusters
    */
-  public Clustering(List<C> toplevelclusters) {
+  public Clustering(List<Cluster<M>> toplevelclusters) {
     super();
     this.toplevelclusters = toplevelclusters;
   }
@@ -38,7 +39,7 @@ public class Clustering<C extends BaseCluster<C, ?>> implements Result {
    * Constructor for an empty clustering
    */
   public Clustering() {
-    this(new ArrayList<C>());
+    this(new ArrayList<Cluster<M>>());
   }
 
   /**
@@ -46,7 +47,7 @@ public class Clustering<C extends BaseCluster<C, ?>> implements Result {
    * 
    * @param n new cluster
    */
-  public void addCluster(C n) {
+  public void addCluster(Cluster<M> n) {
     toplevelclusters.add(n);
   }
 
@@ -55,7 +56,7 @@ public class Clustering<C extends BaseCluster<C, ?>> implements Result {
    * 
    * @return top level clusters
    */
-  public List<C> getToplevelClusters() {
+  public List<Cluster<M>> getToplevelClusters() {
     return toplevelclusters;
   }
 
@@ -64,9 +65,9 @@ public class Clustering<C extends BaseCluster<C, ?>> implements Result {
    * 
    * @return Set of all clusters.
    */
-  public Set<C> getAllClusters() {
-    Set<C> clu = new HashSet<C>();
-    for(C rc : toplevelclusters)
+  public Set<Cluster<M>> getAllClusters() {
+    Set<Cluster<M>> clu = new HashSet<Cluster<M>>();
+    for(Cluster<M> rc : toplevelclusters)
       if(!clu.contains(rc)) {
         clu.add(rc);
         clu = rc.getDescendants(clu);

@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
  * is supposed to consist of rows where each row relates to an object of type V
  * and the columns relate to the attribute values of these objects
  */
-public abstract class AbstractBiclustering<V extends RealVector<V, Double>> extends AbstractAlgorithm<V,Clustering<Cluster<Bicluster<V>>>> implements ClusteringAlgorithm<Clustering<Cluster<Bicluster<V>>>,V> {
+public abstract class AbstractBiclustering<V extends RealVector<V, Double>> extends AbstractAlgorithm<V,Clustering<Bicluster<V>>> implements ClusteringAlgorithm<Clustering<Bicluster<V>>,V> {
     /**
      * Keeps the currently set database.
      */
@@ -55,7 +55,7 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>> exte
      * Keeps the result. A new ResultObject is assigned when the method
      * {@link #runInTime(Database)} is called.
      */
-    private Clustering<Cluster<Bicluster<V>>> result;
+    private Clustering<Bicluster<V>> result;
 
     /**
      * Prepares the algorithm for running on a specific database.
@@ -68,12 +68,12 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>> exte
      *
      */
     @Override
-    protected final Clustering<Cluster<Bicluster<V>>> runInTime(Database<V> database) throws IllegalStateException {
+    protected final Clustering<Bicluster<V>> runInTime(Database<V> database) throws IllegalStateException {
         if (database.size() == 0) {
             throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
         }
         this.database = database;
-        this.result = new Clustering<Cluster<Bicluster<V>>>();
+        this.result = new Clustering<Bicluster<V>>();
         colIDs = new int[this.database.dimensionality()];
         for (int i = 0; i < colIDs.length; i++) {
             colIDs[i] = i + 1;
@@ -310,7 +310,7 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>> exte
         return sum / rows.cardinality();
     }
 
-    public Clustering<Cluster<Bicluster<V>>> getResult() {
+    public Clustering<Bicluster<V>> getResult() {
         return result;
     }
 

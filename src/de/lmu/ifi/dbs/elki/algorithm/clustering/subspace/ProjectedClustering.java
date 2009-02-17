@@ -4,7 +4,6 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.RealVector;
-import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
@@ -20,7 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * @param <V> the type of Realvector handled by this Algorithm
  */
 public abstract class ProjectedClustering<V extends RealVector<V, ?>>
-    extends AbstractAlgorithm<V, Clustering<Cluster<Model>>> implements ClusteringAlgorithm<Clustering<Cluster<Model>>,V> {
+    extends AbstractAlgorithm<V, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>,V> {
 
     /**
      * OptionID for {@link #K_PARAM}
@@ -99,7 +98,7 @@ public abstract class ProjectedClustering<V extends RealVector<V, ?>>
     /**
      * The result.
      */
-    private Clustering<Cluster<Model>> result;
+    private Clustering<Model> result;
 
     /**
      * Adds parameters
@@ -139,7 +138,7 @@ public abstract class ProjectedClustering<V extends RealVector<V, ?>>
         return remainingParameters;
     }
 
-    public Clustering<Cluster<Model>> getResult() {
+    public Clustering<Model> getResult() {
         return result;
     }
 
@@ -184,7 +183,7 @@ public abstract class ProjectedClustering<V extends RealVector<V, ?>>
      *
      * @param result the result to be set
      */
-    protected void setResult(Clustering<Cluster<Model>> result) {
+    protected void setResult(Clustering<Model> result) {
         this.result = result;
     }
 

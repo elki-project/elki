@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.cluster.BaseCluster;
+import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 
 /**
@@ -45,10 +45,9 @@ public class PairGeneratorNoise extends PairSortedGenerator {
   /**
    * Crate new generator for a base cluster object.
    * 
-   * @param <C> cluster type
    * @param cluster object
    */
-  public <C extends BaseCluster<C, ?>> PairGeneratorNoise(C cluster) {
+  public PairGeneratorNoise(Cluster<?> cluster) {
     // build int array for the cluster
     // TODO: copy less.
     List<Integer> idslist = new ArrayList<Integer>(cluster.getIDs());

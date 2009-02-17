@@ -44,7 +44,7 @@ public abstract class AbstractLoggable implements Loggable {
     /**
      * Initializes the logger with the given name and sets the debug status to the given value.
      *
-     * @param debug the debub status.
+     * @param debug the debug status.
      * @param name  the name of the logger.
      */
     protected AbstractLoggable(boolean debug, String name) {

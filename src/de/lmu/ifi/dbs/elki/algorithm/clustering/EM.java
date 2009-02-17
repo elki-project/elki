@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
  * @author Arthur Zimek
  * @param <V> a type of {@link RealVector} as a suitable datatype for this algorithm
  */
-public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Cluster<EMModel<V>>>> implements ClusteringAlgorithm<Clustering<Cluster<EMModel<V>>>,V> {
+public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clustering<EMModel<V>>> implements ClusteringAlgorithm<Clustering<EMModel<V>>,V> {
     /**
      * Small value to increment diagonally of a matrix
      * in order to avoid singularity before building the inverse.
@@ -99,7 +99,7 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Cluster
     /**
      * Keeps the result.
      */
-    private Clustering<Cluster<EMModel<V>>> result;
+    private Clustering<EMModel<V>> result;
 
     /**
      * Provides the EM algorithm (clustering by expectation maximization),
@@ -122,7 +122,7 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Cluster
      * associated the complete probability-vector for all models.
      */
     @Override
-    protected Clustering<Cluster<EMModel<V>>> runInTime(Database<V> database) throws IllegalStateException {
+    protected Clustering<EMModel<V>> runInTime(Database<V> database) throws IllegalStateException {
         if (database.size() == 0) {
             throw new IllegalArgumentException("database empty: must contain elements");
         }
@@ -252,7 +252,7 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Cluster
         for (int i = 0; i < k; i++) {
             resultClusters[i] = hardClusters.get(i).toArray(new Integer[hardClusters.get(i).size()]);
         }
-        result = new Clustering<Cluster<EMModel<V>>>();
+        result = new Clustering<EMModel<V>>();
         //result.associate(SimpleClassLabel.class);
         // provide models within the result
         for (int i = 0; i < k; i++) {
@@ -397,7 +397,7 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Cluster
                 "In Journal of the Royal Statistical Society, Series B, 39(1), 1977, pp. 1-31");
     }
 
-    public Clustering<Cluster<EMModel<V>>> getResult() {
+    public Clustering<EMModel<V>> getResult() {
         return this.result;
     }
 
