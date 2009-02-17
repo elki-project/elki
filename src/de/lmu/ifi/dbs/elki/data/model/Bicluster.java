@@ -134,6 +134,14 @@ public class Bicluster<V extends RealVector<V, Double>> extends AbstractLoggable
     }
     
     /**
+     * Getter to retrieve the database
+     * @return Database
+     */
+    public Database<V> getDatabase() {
+      return database;
+    }
+
+    /**
      * Provides a copy of the column IDs contributing to the bicluster.
      * 
      * 
