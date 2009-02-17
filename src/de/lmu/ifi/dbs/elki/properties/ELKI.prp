@@ -138,6 +138,9 @@ de.lmu.ifi.dbs.elki.parser.Parser=de.lmu.ifi.dbs.elki.parser.BitVectorLabelParse
            de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser,\
            de.lmu.ifi.dbs.elki.parser.RealVectorLabelTransposingParser,\
            de.lmu.ifi.dbs.elki.parser.SparseBitVectorLabelParser
+de.lmu.ifi.dbs.elki.parser.LinebasedParser=\
+           de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser,\
+           de.lmu.ifi.dbs.elki.parser.RealVectorLabelTransposingParser
 # #######################################################
 # Preprocessor - default package: de.lmu.ifi.dbs.elki.preprocessing
 de.lmu.ifi.dbs.elki.preprocessing.Preprocessor=de.lmu.ifi.dbs.elki.preprocessing.DiSHPreprocessor,\
