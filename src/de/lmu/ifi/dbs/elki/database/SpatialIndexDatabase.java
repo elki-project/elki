@@ -34,7 +34,7 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
   /**
    * OptionID for {@link #INDEX_PARAM}
    */
-  public static final OptionID INDEX_ID = OptionID.getOrCreateOptionID("spatialindexdb.index", "Classname of the spatial index to use " + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(SpatialIndex.class) + ". ");
+  public static final OptionID INDEX_ID = OptionID.getOrCreateOptionID("spatialindexdb.index", "Classname of the spatial index to use " + Properties.ELKI_PROPERTIES.restrictionString(SpatialIndex.class) + ". ");
 
   /**
    * Parameter to specify the spatial index to use.

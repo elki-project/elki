@@ -88,7 +88,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
     public static final OptionID PARSER_ID = OptionID.getOrCreateOptionID(
         "onlinelof.parser",
         "Classname of the parser to parse the insertion and/or deletion files " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Parser.class) + "."
+            Properties.ELKI_PROPERTIES.restrictionString(Parser.class) + "."
     );
 
     /**

@@ -37,7 +37,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
     public static final OptionID PARSER_ID = OptionID.getOrCreateOptionID(
         "dbc.parser",
         "Classname specifying the parser to provide a database " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Parser.class) +
+            Properties.ELKI_PROPERTIES.restrictionString(Parser.class) +
             ". "
     );
 

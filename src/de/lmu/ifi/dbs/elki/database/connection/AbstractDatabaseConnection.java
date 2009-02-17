@@ -43,7 +43,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
     public static final OptionID DATABASE_ID = OptionID.getOrCreateOptionID(
         "dbc.database",
         "Classname specifying the database to be provided by the parse method " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Database.class) +
+            Properties.ELKI_PROPERTIES.restrictionString(Database.class) +
             ". "
     );
 
@@ -88,7 +88,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
     public static final OptionID CLASS_LABEL_CLASS_ID = OptionID.getOrCreateOptionID(
         "dbc.classLabelClass",
         "Classname specifying the association of occuring class labels " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(ClassLabel.class) +
+            Properties.ELKI_PROPERTIES.restrictionString(ClassLabel.class) +
             ". "
     );
 

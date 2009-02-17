@@ -39,7 +39,7 @@ public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends
    */
   public static final OptionID WEIGHT_ID = OptionID.getOrCreateOptionID("pca.weight", 
       "Classname of the weight function to use in PCA " 
-      + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(WeightFunction.class) + ".");
+      + Properties.ELKI_PROPERTIES.restrictionString(WeightFunction.class) + ".");
 
   /**
    * Parameter to specify the weight function to use in weighted PCA, must

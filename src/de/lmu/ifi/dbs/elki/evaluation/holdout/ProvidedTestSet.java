@@ -39,7 +39,7 @@ public class ProvidedTestSet<O extends DatabaseObject, L extends ClassLabel> ext
      */
     public static final OptionID TESTSET_DATABASE_CONNECTION_ID = OptionID.getOrCreateOptionID(
         "testdbc", "connection to testset database " +
-        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DatabaseConnection.class) +
+        Properties.ELKI_PROPERTIES.restrictionString(DatabaseConnection.class) +
         ".");
 
     /**

@@ -129,7 +129,7 @@ public class FastICA<V extends RealVector<V, ?>> extends AbstractParameterizable
      */
     public static final OptionID G_ID = OptionID.getOrCreateOptionID("fastica.g",
         "the contrast function to be used to estimate negentropy "
-        + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(ContrastFunction.class) + ". Default: " + DEFAULT_G);
+        + Properties.ELKI_PROPERTIES.restrictionString(ContrastFunction.class) + ". Default: " + DEFAULT_G);
 
     /**
      * Parameter for contrast function g

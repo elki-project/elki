@@ -236,7 +236,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
 
     public final String getPreprocessorDescription() {
         return "Classname of the preprocessor to determine the preference vector of each object "
-            + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(getPreprocessorSuperClass()) +
+            + Properties.ELKI_PROPERTIES.restrictionString(getPreprocessorSuperClass()) +
             ".";
     }
 

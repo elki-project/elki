@@ -283,7 +283,7 @@ public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P e
 
     public String getPreprocessorDescription() {
         return "Classname of the preprocessor to determine the correlation dimension of each object "
-            + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(getPreprocessorSuperClass())
+            + Properties.ELKI_PROPERTIES.restrictionString(getPreprocessorSuperClass())
             + ".";
     }
 

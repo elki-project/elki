@@ -50,7 +50,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
     public static final OptionID PREPROCESSOR_ID = OptionID.getOrCreateOptionID(
         "copac.preprocessor",
         "Classname of the preprocessor to derive partition criterion " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(HiCOPreprocessor.class) +
+            Properties.ELKI_PROPERTIES.restrictionString(HiCOPreprocessor.class) +
             ".");
 
     /**
@@ -72,7 +72,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
     public static final OptionID PARTITION_ALGORITHM_ID = OptionID.getOrCreateOptionID(
         "copac.partitionAlgorithm",
         "Classname of the clustering algorithm to apply to each partition " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(ClusteringAlgorithm.class) +
+            Properties.ELKI_PROPERTIES.restrictionString(ClusteringAlgorithm.class) +
             ".");
 
     /**
@@ -94,7 +94,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
     public static final OptionID PARTITION_DB_ID = OptionID.getOrCreateOptionID(
         "copac.partitionDB",
         "Classname of the database for each partition " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Database.class) +
+            Properties.ELKI_PROPERTIES.restrictionString(Database.class) +
             ". If this parameter is not set, the databases of the partitions have " +
             "the same class as the original database."
     );

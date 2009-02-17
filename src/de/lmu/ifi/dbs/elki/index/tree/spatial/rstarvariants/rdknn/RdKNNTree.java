@@ -61,7 +61,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
      */
     public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("rdknn.distancefunction",
       "the distance function to determine the distance between database objects " +
-      Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) +
+      Properties.ELKI_PROPERTIES.restrictionString(DistanceFunction.class) +
       ". Default: " + DEFAULT_DISTANCE_FUNCTION);
 
     /**

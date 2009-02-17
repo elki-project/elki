@@ -36,7 +36,7 @@ public class PCAFilteredRunner<V extends RealVector<V, ?>> extends PCARunner<V> 
    */
   public static final OptionID PCA_EIGENPAIR_FILTER = OptionID.getOrCreateOptionID("pca.filter",
       "Classname of the filter to determine the strong and weak eigenvectors "
-      + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(EigenPairFilter.class) + ".");
+      + Properties.ELKI_PROPERTIES.restrictionString(EigenPairFilter.class) + ".");
 
   /**
    * Parameter to specify the filter for determination of the strong and weak

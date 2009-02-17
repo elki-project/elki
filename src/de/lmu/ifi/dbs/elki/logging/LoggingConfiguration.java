@@ -26,6 +26,7 @@ public class LoggingConfiguration extends AbstractLoggable {
 	 * General debug flag.
 	 */
 	public static final boolean DEBUG = false;
+  
 
 	/**
 	 * Configuration code for command line interface.
@@ -53,8 +54,8 @@ public class LoggingConfiguration extends AbstractLoggable {
 		super(DEBUG);
 		loggerLevel = LogLevel.ALL;
 
-		if (Properties.KDD_FRAMEWORK_PROPERTIES != null) {
-			String[] level = Properties.KDD_FRAMEWORK_PROPERTIES
+		if (Properties.ELKI_PROPERTIES != null) {
+			String[] level = Properties.ELKI_PROPERTIES
 					.getProperty(PropertyName.DEBUG_LEVEL);
 			if (level.length > 0) {
 
@@ -212,26 +213,6 @@ public class LoggingConfiguration extends AbstractLoggable {
 		}
 	}
   
-  /**
-   * Requests the LoggingFramework to show or to not show stack traces of occuring exceptions.
-   * 
-   * 
-   * @param showStackTrace whether or not stack traces of occuring exceptions are requested
-   */
-  public static void requestShowStackTrace(boolean showStackTrace)
-  {
-    Logger logger = Logger.getLogger("");
-    Handler[] handlers = logger.getHandlers();
-    for(Handler handler : handlers)
-    {
-      Formatter f = handler.getFormatter(); 
-      if(f instanceof ExceptionFormatter)
-      {
-        ExceptionFormatter ef = (ExceptionFormatter) f;
-        ef.setShowStacktrace(showStackTrace);
-      }
-    }
-  }
 
 	/**
 	 * Returns whether the LoggingConfiguration is still changeable.

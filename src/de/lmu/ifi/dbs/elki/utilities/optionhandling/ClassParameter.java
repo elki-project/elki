@@ -74,7 +74,7 @@ public class ClassParameter<C> extends Parameter<String, String> {
      */
     public String[] getRestrictionClasses() {
         if (restrictionClass != null) {
-            return Properties.KDD_FRAMEWORK_PROPERTIES.getProperty(PropertyName.getOrCreatePropertyName(restrictionClass));
+            return Properties.ELKI_PROPERTIES.getProperty(PropertyName.getOrCreatePropertyName(restrictionClass));
         }
         return new String[]{};
     }

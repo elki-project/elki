@@ -65,7 +65,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
      */
     public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID(
         "projdbscan.distancefunction", "the distance function to determine the neighbors for variance analysis "
-        + Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class)
+        + Properties.ELKI_PROPERTIES.restrictionString(DistanceFunction.class)
         + ".");
     
     /**

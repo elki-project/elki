@@ -34,7 +34,7 @@ public final class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID ALGORITHM = new OptionID("algorithm",
         "Classname of an algorithm " +
-        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Algorithm.class) +
+        Properties.ELKI_PROPERTIES.restrictionString(Algorithm.class) +
         ". Either full name to identify classpath or only classname, if its package is " +
         Algorithm.class.getPackage().getName() + "."
     );
@@ -54,7 +54,7 @@ public final class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID DATABASE_CONNECTION = new OptionID("dbc",
         "Classname of a database connection " +
-        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DatabaseConnection.class) +
+        Properties.ELKI_PROPERTIES.restrictionString(DatabaseConnection.class) +
         ". Either full name to identify classpath or only classname, if its package is " +
         DatabaseConnection.class.getPackage().getName() + "."
     );
@@ -75,7 +75,7 @@ public final class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID NORMALIZATION = new OptionID("norm",
         "Classname of a normalization in order to use a database with normalized values " +
-        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Normalization.class) +
+        Properties.ELKI_PROPERTIES.restrictionString(Normalization.class) +
         ". "
     );
 

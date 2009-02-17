@@ -50,7 +50,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
     public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID(
         "projdbscan.distancefunction",
         "Classname of the distance function to determine the distance between database objects " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(AbstractLocallyWeightedDistanceFunction.class) + "."
+            Properties.ELKI_PROPERTIES.restrictionString(AbstractLocallyWeightedDistanceFunction.class) + "."
     );
 
     /**

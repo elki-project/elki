@@ -38,7 +38,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
     public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID(
         "parser.distancefunction",
         "the distance function " +
-        Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) +
+        Properties.ELKI_PROPERTIES.restrictionString(DistanceFunction.class) +
         ".");
 
     /**

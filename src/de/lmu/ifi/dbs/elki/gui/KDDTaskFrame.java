@@ -162,9 +162,9 @@ public class KDDTaskFrame extends JFrame implements PropertyChangeListener {
     protected String[] getPropertyFileInfo(Class<?> type) {
 
         // check if we got a property file
-        if (Properties.KDD_FRAMEWORK_PROPERTIES != null) {
+        if (Properties.ELKI_PROPERTIES != null) {
 
-            return Properties.KDD_FRAMEWORK_PROPERTIES.getProperty(PropertyName.getOrCreatePropertyName(type));
+            return Properties.ELKI_PROPERTIES.getProperty(PropertyName.getOrCreatePropertyName(type));
         }
         return new String[]{};
 

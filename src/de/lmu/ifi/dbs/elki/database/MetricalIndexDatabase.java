@@ -33,7 +33,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
     public static final OptionID INDEX_ID = OptionID.getOrCreateOptionID(
         "metricalindexdb.index",
         "Classname of the metrical index to use " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(MetricalIndex.class) +
+            Properties.ELKI_PROPERTIES.restrictionString(MetricalIndex.class) +
             ". "
     );
 

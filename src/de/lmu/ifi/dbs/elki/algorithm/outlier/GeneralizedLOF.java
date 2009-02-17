@@ -38,7 +38,7 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
     public static final OptionID REACHABILITY_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID(
         "genlof.reachdistfunction",
         "Classname of the distance function to determine the reachability distance between database objects " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) + "."
+            Properties.ELKI_PROPERTIES.restrictionString(DistanceFunction.class) + "."
     );
 
     /**

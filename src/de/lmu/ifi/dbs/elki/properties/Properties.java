@@ -29,20 +29,20 @@ public final class Properties extends AbstractLoggable {
     private static Properties temporalProperties;
 
     static {
-        File propertiesfile = new File(Properties.class.getPackage().getName().replace('.', File.separatorChar) + File.separatorChar + "KDDFramework.prp");
+        File propertiesfile = new File(Properties.class.getPackage().getName().replace('.', File.separatorChar) + File.separatorChar + "ELKI.prp");
         if (propertiesfile.exists() && propertiesfile.canRead()) {
             temporalProperties = new Properties(propertiesfile.getAbsolutePath());
         }
         else // otherwise, the property-file should at least be available within the jar-archive
         {
-            temporalProperties = new Properties(Properties.class.getPackage().getName().replace('.', '/') + '/' + "KDDFramework.prp");
+            temporalProperties = new Properties(Properties.class.getPackage().getName().replace('.', '/') + '/' + "ELKI.prp");
         }
     }
 
     /**
-     * The Properties for the KDDFramework.
+     * The Properties for ELKI.
      */
-    public static final Properties KDD_FRAMEWORK_PROPERTIES = temporalProperties;
+    public static final Properties ELKI_PROPERTIES = temporalProperties;
 
     /**
      * Stores the properties as defined by a property-file.

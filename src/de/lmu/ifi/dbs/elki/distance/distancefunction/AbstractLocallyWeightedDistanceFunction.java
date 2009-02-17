@@ -90,7 +90,7 @@ public abstract class AbstractLocallyWeightedDistanceFunction<O extends RealVect
 
     public String getPreprocessorDescription() {
         return "Classname of the preprocessor to determine the correlation dimension of each objects " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(getPreprocessorSuperClass()) +
+            Properties.ELKI_PROPERTIES.restrictionString(getPreprocessorSuperClass()) +
             ".";
     }
 

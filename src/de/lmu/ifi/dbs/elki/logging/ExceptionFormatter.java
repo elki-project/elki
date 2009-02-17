@@ -1,5 +1,9 @@
 package de.lmu.ifi.dbs.elki.logging;
 
+
+import de.lmu.ifi.dbs.elki.properties.Properties;
+import de.lmu.ifi.dbs.elki.properties.PropertyName;
+
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
@@ -10,7 +14,7 @@ import java.util.logging.LogRecord;
  */
 public class ExceptionFormatter extends Formatter {
     /**
-     * Holds the class specific debug status.
+     * Holds the status of requests for prionting the stack trace.
      * In this case, the status true is required
      * for complete view of exceptions.
      * If <code>showStacktrace</code> is <code>false</code>,
@@ -18,7 +22,7 @@ public class ExceptionFormatter extends Formatter {
      * Otherwise, the user gets information
      * w.r.t. cause and stacktrace.
      */
-    private boolean showStackTrace = LoggingConfiguration.DEBUG;
+    private boolean showStackTrace;
 
     /**
      * Provides an exception formatter
@@ -26,6 +30,13 @@ public class ExceptionFormatter extends Formatter {
      */
     public ExceptionFormatter() {
         super();
+        try
+        {
+          showStackTrace = Boolean.valueOf(Properties.ELKI_PROPERTIES.getProperty(PropertyName.STACK_TRACE_CLI)[0]);
+        }
+        catch (Exception e) {
+          // in this case, the properties are not yet initialized, shoStackTrace just remains false as default
+        }
     }
 
     /**
@@ -46,16 +57,15 @@ public class ExceptionFormatter extends Formatter {
     public String format(LogRecord record) {
         StringBuilder exceptionMessage = new StringBuilder();
         Throwable cause = record.getThrown();
-        if (showStackTrace) {
-            exceptionMessage.append("EXCEPTION: ");
-            if (cause != null) {
-                exceptionMessage.append(cause.getClass().getName());
-            }
-            else {
-                exceptionMessage.append("unknown exception");
-            }
-            exceptionMessage.append('\n');
+        exceptionMessage.append("EXCEPTION: ");
+        if (cause != null) {
+            exceptionMessage.append(cause.getClass().getName());
         }
+        else {
+            exceptionMessage.append("unknown exception");
+        }
+        exceptionMessage.append('\n');
+        
         exceptionMessage.append(record.getMessage());
         exceptionMessage.append('\n');
         if (showStackTrace) {
@@ -85,9 +95,4 @@ public class ExceptionFormatter extends Formatter {
             return "unknown";
         }
     }
-
-    public void setShowStacktrace(boolean showStackTrace) {
-      this.showStackTrace = showStackTrace;
-    }
-
 }

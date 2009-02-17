@@ -29,7 +29,7 @@ public class AlgorithmTest extends AbstractParameterizable {
     public static final OptionID ALGORITHMS_ID = OptionID.getOrCreateOptionID(
         "test.algorithms",
         "A comma separated list of classnames specifying the algorithms to be run with default parametrization " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Algorithm.class) +
+            Properties.ELKI_PROPERTIES.restrictionString(Algorithm.class) +
             ". If this parameter is not set all algorithms as specified in the property file are used."
     );
 
@@ -159,7 +159,7 @@ public class AlgorithmTest extends AbstractParameterizable {
             algorithms = ALGORITHMS_PARAM.instantiateClasses();
         }
         else {
-            List<Class<?>> subclasses = Properties.KDD_FRAMEWORK_PROPERTIES.subclasses(Algorithm.class);
+            List<Class<?>> subclasses = Properties.ELKI_PROPERTIES.subclasses(Algorithm.class);
             this.algorithms = new ArrayList<Algorithm<?,?>>(subclasses.size());
             for (Class<?> subclass : subclasses) {
                 try {

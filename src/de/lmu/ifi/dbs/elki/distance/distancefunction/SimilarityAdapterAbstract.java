@@ -25,7 +25,7 @@ public abstract class SimilarityAdapterAbstract<V extends FeatureVector<V,?>> ex
   public static final OptionID SIMILARITY_FUNCTION_ID = OptionID.getOrCreateOptionID(
       "adapter.similarityfunction",
       "Classname of the similarity function to derive the distance between database objects " +
-          Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(NormalizedSimilarityFunction.class) + "."
+          Properties.ELKI_PROPERTIES.restrictionString(NormalizedSimilarityFunction.class) + "."
   );
 
   /**

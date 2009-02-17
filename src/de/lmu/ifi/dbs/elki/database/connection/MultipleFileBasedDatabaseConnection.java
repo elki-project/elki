@@ -43,7 +43,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject>
     public static final OptionID PARSERS_ID = OptionID.getOrCreateOptionID(
         "multipledbc.parsers",
         "A comma separated list of classnames specifying the parsers to provide a database " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Parser.class) +
+            Properties.ELKI_PROPERTIES.restrictionString(Parser.class) +
             ". If this parameter is not set, " +
             RealVectorLabelParser.class.getName() + " is used as parser for all input files."
     );

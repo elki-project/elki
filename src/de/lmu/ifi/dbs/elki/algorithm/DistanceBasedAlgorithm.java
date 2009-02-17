@@ -30,7 +30,7 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
     public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID(
         "algorithm.distancefunction",
         "Classname of the distance function to determine the distance between database objects " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(DistanceFunction.class) + "."
+            Properties.ELKI_PROPERTIES.restrictionString(DistanceFunction.class) + "."
     );
 
     /**

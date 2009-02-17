@@ -34,7 +34,7 @@ public class ClassifierEvaluationWrapper<O extends DatabaseObject, L extends Cla
   public static final OptionID CLASSIFIER_ALGORITHM_ID = OptionID.getOrCreateOptionID(
       "classifier.algorithm",
       "Classname of the classifier algorithm to evaluate. " +
-          Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Classifier.class) + "."
+          Properties.ELKI_PROPERTIES.restrictionString(Classifier.class) + "."
   );
 
   /**
@@ -57,7 +57,7 @@ public class ClassifierEvaluationWrapper<O extends DatabaseObject, L extends Cla
   public static final OptionID EVALUATION_PROCEDURE_ID = OptionID.getOrCreateOptionID(
       "classifier.eval",
       "Classname of the evaluation-procedure to use for evaluation " +
-          Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(EvaluationProcedure.class) + "."
+          Properties.ELKI_PROPERTIES.restrictionString(EvaluationProcedure.class) + "."
   );
 
   /**
@@ -81,7 +81,7 @@ public class ClassifierEvaluationWrapper<O extends DatabaseObject, L extends Cla
   public static final OptionID HOLDOUT_ID = OptionID.getOrCreateOptionID(
       "classifier.holdout",
       "<Classname of the holdout for evaluation " +
-          Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Holdout.class) + "."
+          Properties.ELKI_PROPERTIES.restrictionString(Holdout.class) + "."
   );
 
   /**

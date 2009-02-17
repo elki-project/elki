@@ -23,7 +23,7 @@ public class DirectoryTask extends StandAloneInputWrapper {
     public static final OptionID WRAPPER_ID = OptionID.getOrCreateOptionID(
         "directorytask.wrapper",
         "Classname of the wrapper to run over all files in the specified directory. " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Wrapper.class) + "."
+            Properties.ELKI_PROPERTIES.restrictionString(Wrapper.class) + "."
     );
 
     /**

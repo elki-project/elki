@@ -131,7 +131,7 @@ public class ERiCDistanceFunction<V extends RealVector<V, ?>, P extends Preproce
 
     public String getPreprocessorDescription() {
         return "Classname of the preprocessor to determine the correlation dimension of each object " +
-            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Preprocessor.class) +
+            Properties.ELKI_PROPERTIES.restrictionString(Preprocessor.class) +
             ".";
     }
 

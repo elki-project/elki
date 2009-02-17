@@ -80,14 +80,6 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
   private final Flag HELP_LONG_FLAG = new Flag(OptionID.HELP_LONG);
 
   /**
-   * Print backtraces on exceptions.
-   * <p>
-   * Key: {@code -stack-trace}
-   * </p>
-   */
-  private final Flag TRACE_FLAG = new Flag(OptionID.TRACE_DEBUG);
-
-  /**
    * Parameter to specify the algorithm to be applied, must extend
    * {@link de.lmu.ifi.dbs.elki.algorithm.Algorithm}.
    * <p>
@@ -195,9 +187,6 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
     // help flag
     addOption(HELP_FLAG);
     addOption(HELP_LONG_FLAG);
-
-    // stack trace flag
-    addOption(TRACE_FLAG);
 
     // decription parameter
     addOption(DESCRIPTION_PARAM);
@@ -407,7 +396,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
       }
     }
     else {
-      throw new IllegalStateException("KDD-Task was not properly initialized. Need to set parameters first.");
+      throw new IllegalStateException(KDDTask.class.getName() + " was not properly initialized. Need to set parameters first.");
     }
   }
 
@@ -422,7 +411,6 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
     KDDTask<? extends DatabaseObject> kddTask = new KDDTask();
     try {
       String[] remainingParameters = kddTask.setParameters(args);
-      LoggingConfiguration.requestShowStackTrace(kddTask.wantTrace());
       if(remainingParameters.length != 0) {
         kddTask.warning(kddTask.usage("Unnecessary parameters specified: " + Arrays.asList(remainingParameters) + "\n\nUSAGE:\n"));
       }
@@ -436,13 +424,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
     }
     // any other exception
     catch(Exception e) {
-      LoggingConfiguration.requestShowStackTrace(kddTask.wantTrace());
       kddTask.exception(e.getMessage(), e);
     }
-  }
-
-  public boolean wantTrace() {
-    // stack trace flag
-    return TRACE_FLAG.isSet();
   }
 }
