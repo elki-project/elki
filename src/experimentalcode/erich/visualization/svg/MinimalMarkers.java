@@ -15,14 +15,15 @@ public class MinimalMarkers implements MarkerLibrary {
   /**
    * Use a given marker on the document. 
    */
-  public void useMarker(SVGPlot plot, Element parent, double x, double y, int style, double size) {
-    Element use = plot.svgElement(null, "rect");
-    SVGUtil.setAtt(use,"x",x - size/2);
-    SVGUtil.setAtt(use,"y",y - size/2);
-    SVGUtil.setAtt(use,"width",size);
-    SVGUtil.setAtt(use,"height",size);
-    SVGUtil.setAtt(use,"style","fill:"+getColor(style));
-    parent.appendChild(use);
+  public Element useMarker(SVGPlot plot, Element parent, double x, double y, int style, double size) {
+    Element marker = plot.svgElement(null, "rect");
+    SVGUtil.setAtt(marker,"x",x - size/2);
+    SVGUtil.setAtt(marker,"y",y - size/2);
+    SVGUtil.setAtt(marker,"width",size);
+    SVGUtil.setAtt(marker,"height",size);
+    SVGUtil.setAtt(marker,"style","fill:"+getColor(style));
+    parent.appendChild(marker);
+    return marker;
   }
 
   /**

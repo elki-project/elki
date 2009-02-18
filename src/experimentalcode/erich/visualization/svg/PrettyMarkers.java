@@ -1,8 +1,5 @@
 package experimentalcode.erich.visualization.svg;
 
-import java.util.BitSet;
-import java.util.HashMap;
-
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -11,15 +8,29 @@ import experimentalcode.erich.visualization.SVGPlot;
 
 public class PrettyMarkers extends MinimalMarkers {
   /**
-   * Bit set of markers we have defined.
+   * Default prefix to use.
    */
-  HashMap<SVGPlot,BitSet> definedMarkers = new HashMap<SVGPlot,BitSet>();
+  private final static String DEFAULT_PREFIX = "s";
+  
+  /**
+   * Prefix for the IDs generated.
+   */
+  private String prefix;
   
   /**
    * Constructor
+   * 
+   * @param prefix Prefix to use.
+   */
+  public PrettyMarkers(String prefix) {
+    this.prefix = prefix;
+  }
+  
+  /**
+   * Constructor without arguments, will use {@link #DEFAULT_PREFIX} as prefix.
    */
   public PrettyMarkers() {
-    // nothing to do.
+    this(DEFAULT_PREFIX);
   }
 
   /**
@@ -135,24 +146,26 @@ public class PrettyMarkers extends MinimalMarkers {
   }
 
   @Override
-  public void useMarker(SVGPlot plot, Element parent, double x, double y, int style, double size) {
-    if(!definedMarkers.containsKey(plot)) {
-      definedMarkers.put(plot, new BitSet());
-    }
-    if(!definedMarkers.get(plot).get(style)) {
+  public Element useMarker(SVGPlot plot, Element parent, double x, double y, int style, double size) {
+    String id = prefix + style;
+    Element existing = plot.getIdElement(id);
+    if (existing == null) {
       Element symbol = plot.svgElement(null, "symbol");
-      SVGUtil.setAtt(symbol,"id","s" + style);
+      SVGUtil.setAtt(symbol,"id",id);
       SVGUtil.setAtt(symbol,"viewBox","-1 -1 2 2");
       plotMarker(plot.getDocument(), symbol, 0, 0, style, 2);
-      definedMarkers.get(plot).set(style);
       plot.getDefs().appendChild(symbol);
+      plot.putIdElement(id, symbol);
     }
     Element use = plot.svgElement(null, "use");
-    use.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, "#s" + style);
+    use.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, "#"+id);
     SVGUtil.setAtt(use,"x",x - size);
     SVGUtil.setAtt(use,"y",y - size);
     SVGUtil.setAtt(use,"width",size * 2);
     SVGUtil.setAtt(use,"height",size * 2);
-    parent.appendChild(use);
+    if (parent != null) {
+      parent.appendChild(use);
+    }
+    return use;
   }
 }

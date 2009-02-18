@@ -24,6 +24,7 @@ public interface MarkerLibrary {
    * @param y coordinate
    * @param style style (enumerated)
    * @param size size
+   * @return Element node generated.
    */
-  public abstract void useMarker(SVGPlot plot, Element parent, double x, double y, int style, double size);
+  public abstract Element useMarker(SVGPlot plot, Element parent, double x, double y, int style, double size);
 }

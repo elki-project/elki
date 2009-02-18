@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -59,6 +60,11 @@ public class SVGPlot {
    * Primary style information
    */
   private Element style;
+  
+  /**
+   * Manage objects with an id.
+   */
+  private HashMap<String, Element> objWithId = new HashMap<String, Element>();
 
   /**
    * Create a new plotting document.
@@ -371,5 +377,25 @@ public class SVGPlot {
    */
   public void saveAsJPEG(File file, int width, int height) throws IOException, TranscoderException {
     saveAsJPEG(file,width,height,0.85);
+  }
+  
+  /**
+   * Add an object id.
+   * 
+   * @param id ID
+   * @param obj Element
+   */
+  public void putIdElement(String id, Element obj) {
+    objWithId.put(id, obj);
+  }
+  
+  /**
+   * Get an element by its id.
+   * 
+   * @param id ID
+   * @return Element
+   */
+  public Element getIdElement(String id) {
+    return objWithId.get(id);
   }
 }
