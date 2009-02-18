@@ -61,7 +61,7 @@ public class SVGPlot {
    * Primary style information
    */
   private Element style;
-  
+
   /**
    * Manage objects with an id.
    */
@@ -116,7 +116,8 @@ public class SVGPlot {
    * @param x2 ending coordinate
    * @param y2 ending coordinate
    * @param labels control whether labels are printed.
-   * @param righthanded control whether to print labels on the right hand side or left hand side
+   * @param righthanded control whether to print labels on the right hand side
+   *        or left hand side
    */
   public void drawAxis(Element parent, LinearScale scale, double x1, double y1, double x2, double y2, boolean labels, boolean righthanded) {
     Element line = svgElement(parent, "line");
@@ -136,7 +137,7 @@ public class SVGPlot {
     ALIGNMENT pos = ALIGNMENT.LL;
     if(labels) {
       double angle = Math.atan2(-ty, tx);
-      //System.err.println(tx + " " + (-ty) + " " + angle);
+      // System.err.println(tx + " " + (-ty) + " " + angle);
       if(angle < -2.6) { // -pi .. -2.6 = -180 .. -150
         pos = righthanded ? ALIGNMENT.RC : ALIGNMENT.LC;
       }
@@ -263,13 +264,13 @@ public class SVGPlot {
   /**
    * Save document into a SVG file.
    * 
-   * TODO: Handle embedded PNG images appropriately,
-   * they might currently be stored in temp files, and then get lost.
+   * TODO: Handle embedded PNG images appropriately, they might currently be
+   * stored in temp files, and then get lost.
    * 
    * @param file Output filename
    * @throws IOException On write errors
-   * @throws TransformerFactoryConfigurationError 
-   * @throws TransformerException 
+   * @throws TransformerFactoryConfigurationError
+   * @throws TransformerException
    */
   public void saveAsSVG(File file) throws IOException, TransformerFactoryConfigurationError, TransformerException {
     OutputStream out = new FileOutputStream(file);
@@ -278,7 +279,7 @@ public class SVGPlot {
     // Use a transformer for pretty printing.
     Transformer xformer = TransformerFactory.newInstance().newTransformer();
     xformer.setOutputProperty(OutputKeys.INDENT, "yes");
-    xformer.transform(new DOMSource(getDocument()), result);    
+    xformer.transform(new DOMSource(getDocument()), result);
     out.flush();
     out.close();
   }
@@ -308,7 +309,7 @@ public class SVGPlot {
    * @throws TranscoderException On input/parsing errors.
    */
   public void saveAsPDF(File file) throws IOException, TranscoderException {
-    transcode(file,new PDFTranscoder());
+    transcode(file, new PDFTranscoder());
   }
 
   /**
@@ -319,9 +320,9 @@ public class SVGPlot {
    * @throws TranscoderException On input/parsing errors.
    */
   public void saveAsPS(File file) throws IOException, TranscoderException {
-    transcode(file,new PSTranscoder());
+    transcode(file, new PSTranscoder());
   }
-  
+
   /**
    * Transcode file to EPS.
    * 
@@ -330,7 +331,7 @@ public class SVGPlot {
    * @throws TranscoderException On input/parsing errors.
    */
   public void saveAsEPS(File file) throws IOException, TranscoderException {
-    transcode(file,new EPSTranscoder());
+    transcode(file, new EPSTranscoder());
   }
 
   /**
@@ -346,7 +347,7 @@ public class SVGPlot {
     PNGTranscoder t = new PNGTranscoder();
     t.addTranscodingHint(PNGTranscoder.KEY_WIDTH, new Float(width));
     t.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, new Float(height));
-    transcode(file,t);
+    transcode(file, t);
   }
 
   /**
@@ -364,7 +365,7 @@ public class SVGPlot {
     t.addTranscodingHint(JPEGTranscoder.KEY_WIDTH, new Float(width));
     t.addTranscodingHint(JPEGTranscoder.KEY_HEIGHT, new Float(height));
     t.addTranscodingHint(JPEGTranscoder.KEY_QUALITY, new Float(quality));
-    transcode(file,t);
+    transcode(file, t);
   }
 
   /**
@@ -377,9 +378,9 @@ public class SVGPlot {
    * @throws TranscoderException On input/parsing errors.
    */
   public void saveAsJPEG(File file, int width, int height) throws IOException, TranscoderException {
-    saveAsJPEG(file,width,height,0.85);
+    saveAsJPEG(file, width, height, 0.85);
   }
-  
+
   /**
    * Add an object id.
    * 
@@ -389,7 +390,7 @@ public class SVGPlot {
   public void putIdElement(String id, Element obj) {
     objWithId.put(id, new WeakReference<Element>(obj));
   }
-  
+
   /**
    * Get an element by its id.
    * 
@@ -397,6 +398,7 @@ public class SVGPlot {
    * @return Element
    */
   public Element getIdElement(String id) {
-    return objWithId.get(id).get();
+    WeakReference<Element> ref = objWithId.get(id);
+    return (ref != null) ? ref.get() : null;
   }
 }
