@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 
 import javax.xml.transform.OutputKeys;
@@ -64,7 +65,7 @@ public class SVGPlot {
   /**
    * Manage objects with an id.
    */
-  private HashMap<String, Element> objWithId = new HashMap<String, Element>();
+  private HashMap<String, WeakReference<Element>> objWithId = new HashMap<String, WeakReference<Element>>();
 
   /**
    * Create a new plotting document.
@@ -386,7 +387,7 @@ public class SVGPlot {
    * @param obj Element
    */
   public void putIdElement(String id, Element obj) {
-    objWithId.put(id, obj);
+    objWithId.put(id, new WeakReference<Element>(obj));
   }
   
   /**
@@ -396,6 +397,6 @@ public class SVGPlot {
    * @return Element
    */
   public Element getIdElement(String id) {
-    return objWithId.get(id);
+    return objWithId.get(id).get();
   }
 }
