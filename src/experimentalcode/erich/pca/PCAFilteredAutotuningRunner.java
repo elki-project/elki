@@ -1,4 +1,4 @@
-package experimentalcode.erich;
+package experimentalcode.erich.pca;
 
 import java.util.Collection;
 import java.util.Iterator;
