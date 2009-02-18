@@ -92,4 +92,50 @@ public final class SVGUtil {
   public static void setAtt(Element el, String name, String d) {
     el.setAttribute(name, d);
   }
+
+  /**
+   * Add a CSS class to an Element.
+   * 
+   * @param e Element
+   * @param cssclass class to add.
+   */
+  public static void addCSSClass(Element e, String cssclass) {
+    String oldval = e.getAttribute("class");
+    if (oldval == null) {
+      setAtt(e, "class", cssclass);
+      return;
+    }
+    String[] classes = oldval.split(" ");
+    for (String c : classes) {
+      if (c.equals(cssclass)) {
+        return;
+      }
+    }
+    setAtt(e, "class", oldval+" "+cssclass);
+  }
+  
+  /**
+   * Remove a CSS class from an Element.
+   * 
+   * @param e Element
+   * @param cssclass class to remove.
+   */
+  public static void removeCSSClass(Element e, String cssclass) {
+    String oldval = e.getAttribute("class");
+    if (oldval == null) {
+      return;
+    }
+    String[] classes = oldval.split(" ");
+    String joined = "";
+    for (String c : classes) {
+      if (! c.equals(cssclass)) {
+        if (joined.length() > 0) {
+          joined = joined + " " + c;
+        } else {
+          joined = c;
+        }
+      }
+    }
+    SVGUtil.setAtt(e, "class", joined);
+  }
 }
