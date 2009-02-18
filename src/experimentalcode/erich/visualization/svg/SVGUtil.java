@@ -36,8 +36,13 @@ public final class SVGUtil {
    * @param name node name
    * @return new SVG element.
    */
+  // Deprecated: Elements on their own often aren't useful.
+  // If possible, they should be set up completely, then added
+  // (since there might be an update manager tracking changes,
+  // or the interim DOM tree not valid!)
+  @Deprecated
   public static Element svgElement(Document document, Element parent, String name) {
-    Element neu = document.createElementNS(SVGConstants.SVG_NAMESPACE_URI, name);
+    Element neu = svgElement(document, name);
     if(parent != null) {
       parent.appendChild(neu);
     }
@@ -52,7 +57,7 @@ public final class SVGUtil {
    * @return new SVG element.
    */
   public static Element svgElement(Document document, String name) {
-    return svgElement(document, null, name);
+    return document.createElementNS(SVGConstants.SVG_NAMESPACE_URI, name);
   }
 
   /**

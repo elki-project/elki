@@ -90,11 +90,13 @@ public class SVGPlot {
     root.setAttributeNS(SVGConstants.XMLNS_NAMESPACE_URI, SVGConstants.XMLNS_PREFIX + ":" + SVGConstants.XLINK_PREFIX, SVGConstants.XLINK_NAMESPACE_URI);
 
     // create element for SVG definitions
-    defs = svgElement(root, "defs");
+    defs = svgElement("defs");
+    root.appendChild(defs);
 
     // create element for Stylesheet information.
-    style = svgElement(root, "style");
+    style = svgElement("style");
     SVGUtil.setAtt(style, "type", "text/css");
+    root.appendChild(style);
   }
 
   /**
@@ -120,12 +122,14 @@ public class SVGPlot {
    *        or left hand side
    */
   public void drawAxis(Element parent, LinearScale scale, double x1, double y1, double x2, double y2, boolean labels, boolean righthanded) {
-    Element line = svgElement(parent, "line");
+    assert(parent != null);
+    Element line = svgElement("line");
     SVGUtil.setAtt(line, "x1", x1);
     SVGUtil.setAtt(line, "y1", -y1);
     SVGUtil.setAtt(line, "x2", x2);
     SVGUtil.setAtt(line, "y2", -y2);
     SVGUtil.setAtt(line, "style", "stroke:silver; stroke-width:0.2%;");
+    parent.appendChild(line);
 
     double tx = x2 - x1;
     double ty = y2 - y1;
@@ -160,7 +164,7 @@ public class SVGPlot {
 
     // draw ticks on x axis
     for(double tick = scale.getMin(); tick <= scale.getMax(); tick += scale.getRes()) {
-      Element tickline = svgElement(parent, "line");
+      Element tickline = svgElement("line");
       double x = x1 + tx * scale.getScaled(tick);
       double y = y1 + ty * scale.getScaled(tick);
       SVGUtil.setAtt(tickline, "x1", x - tw);
@@ -168,9 +172,10 @@ public class SVGPlot {
       SVGUtil.setAtt(tickline, "x2", x + tw);
       SVGUtil.setAtt(tickline, "y2", -y + th);
       SVGUtil.setAtt(tickline, "style", "stroke:black; stroke-width:0.1%;");
+      parent.appendChild(tickline);
       // draw labels
       if(labels) {
-        Element text = svgElement(parent, "text");
+        Element text = svgElement("text");
         SVGUtil.setAtt(text, "style", "font-size: 0.2%");
         switch(pos){
         case LL:
@@ -200,6 +205,7 @@ public class SVGPlot {
           break;
         }
         text.setTextContent(scale.formatValue(tick));
+        parent.appendChild(text);
       }
     }
   }
@@ -211,8 +217,13 @@ public class SVGPlot {
    * @param name node name
    * @return new SVG element.
    */
+  @Deprecated
   public Element svgElement(Element parent, String name) {
-    return SVGUtil.svgElement(document, parent, name);
+    Element e = SVGUtil.svgElement(document, name);
+    if (parent != null) {
+      parent.appendChild(e);
+    }
+    return e;
   }
 
   /**
@@ -222,7 +233,7 @@ public class SVGPlot {
    * @return new SVG element.
    */
   public Element svgElement(String name) {
-    return SVGUtil.svgElement(document, null, name);
+    return SVGUtil.svgElement(document, name);
   }
 
   /**
