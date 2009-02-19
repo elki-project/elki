@@ -14,6 +14,8 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
+import de.lmu.ifi.dbs.elki.data.HierarchicalClassLabel;
+import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.cluster.naming.NamingScheme;
 import de.lmu.ifi.dbs.elki.data.cluster.naming.SimpleEnumeratingScheme;
@@ -64,6 +66,8 @@ public class TextWriter<O extends DatabaseObject> {
     writers.insertHandler(BitSet.class, trivialwriter);
     writers.insertHandler(Vector.class, trivialwriter);
     writers.insertHandler(Distance.class, trivialwriter);
+    writers.insertHandler(SimpleClassLabel.class, trivialwriter);
+    writers.insertHandler(HierarchicalClassLabel.class, trivialwriter);
     // Objects that have an own writeToText method.
     writers.insertHandler(TextWriteable.class, new TextWriterTextWriteable());
   }
