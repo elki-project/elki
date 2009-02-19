@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.data;
+package de.lmu.ifi.dbs.elki.utilities;
 
 import java.util.BitSet;
 import java.util.Comparator;
