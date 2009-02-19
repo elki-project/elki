@@ -1,9 +1,15 @@
 package experimentalcode.noemi;
 
+import java.util.BitSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Random;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering.AbstractBiclustering;
 import de.lmu.ifi.dbs.elki.data.RealVector;
-import de.lmu.ifi.dbs.elki.data.model.Bicluster;
+import de.lmu.ifi.dbs.elki.data.model.BiclusterWithInverted;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
@@ -13,12 +19,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
-
-import java.util.BitSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Random;
 
 /**
  * Provides a biclustering algorithm which deletes or inserts rows/columns
@@ -30,7 +30,7 @@ import java.util.Random;
  * the columns relate to the attribute values of these objects
  */
 
-public class ChengAndChurch<V extends RealVector<V, Double>> extends AbstractBiclustering<V> {
+public class ChengAndChurch<V extends RealVector<V, Double>> extends AbstractBiclustering<V, BiclusterWithInverted<V>> {
 
     /**
      * OptionID for the parameter {@link #SEED_PARAM}.
@@ -594,8 +594,10 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends AbstractBic
                     + "\n");
             }
             maskMatrix();
-            Bicluster<V> bicluster = defineBicluster(rows, cols);
-            addInvertedRows(bicluster, invertedRows);
+            //BiclusterWithInverted<V> bicluster = defineBicluster(rows, cols);
+            BiclusterWithInverted<V> bicluster = new BiclusterWithInverted<V>(rowsBitsetToIDs(rows), colsBitsetToIDs(cols), getDatabase());
+            //addInvertedRows(bicluster, invertedRows);
+            bicluster.setInvertedRows(rowsBitsetToIDs(invertedRows));
             addBiclusterToResult(bicluster);
             reset();
         }
