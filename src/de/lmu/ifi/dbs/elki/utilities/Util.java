@@ -1492,6 +1492,34 @@ public final class Util extends AbstractLoggable {
         return result.toString();
     }
 
+    /**
+     * Returns the index of the n<sup>th</sup> set bit in the given BitSet.
+     * For the parameter <code>nthSetBit</code>, following condition is assumed:
+     * <code>1 &le; nthSetBit &le; bitset.cardinality()</code>.
+     * Otherwise, i.e., if the Bitset contains less than <code>nthSetBit</code> set bits
+     * or <code>nthSetBit</code> is not a positive number,
+     * the method throws an IllegalArgumentException.
+     * 
+     * The worstcase runtime complexity of this method is in <i>O(<code>bitset.cardinality()</code>)</i>.
+     * 
+     * @param bitset the BitSet to derive the index of the n<sup>th</sup> set bit in
+     * @param nthSetBit which set bit to derive the index of
+     * @return the index of the n<sup>th</sup> set bit in the given BitSet
+     * @throws IllegalArgumentException if the Bitset contains less than <code>nthSetBit</code> set bits
+     * or <code>nthSetBit</code> is not a positive number
+     */
+    public static int indexOfNthSetBit(BitSet bitset, int nthSetBit) throws IllegalArgumentException {
+      if(nthSetBit < 1 || nthSetBit > bitset.cardinality()){
+        throw new IllegalArgumentException("Parameter nthSetBit out of range: nthSetBit="+nthSetBit+", bitset.cardinality="+bitset.cardinality());
+      }
+      int i = 0;
+      int index = -1;
+      for (int d = bitset.nextSetBit(0); d >= 0 && i < nthSetBit; d = bitset.nextSetBit(d + 1)) {
+        i++;
+        index = d;
+      }
+      return index;
+    }
 
     /**
      * Provides the intersection of the two specified sets in the given result set.
