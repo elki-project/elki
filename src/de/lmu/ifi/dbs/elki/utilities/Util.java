@@ -178,7 +178,7 @@ public final class Util extends AbstractLoggable {
      * Formats the double array d with the specified separator.
      *
      * @param d   the double array to be formatted
-     * @param sep the seperator between the single values of the double array,
+     * @param sep the separator between the single values of the double array,
      *            e.g. ','
      * @return a String representing the double array d
      */
@@ -200,7 +200,7 @@ public final class Util extends AbstractLoggable {
      * fraction digits.
      *
      * @param d      the double array to be formatted
-     * @param sep    the seperator between the single values of the double array,
+     * @param sep    the separator between the single values of the double array,
      *               e.g. ','
      * @param digits the number of fraction digits
      * @return a String representing the double array d
@@ -233,7 +233,7 @@ public final class Util extends AbstractLoggable {
      * Formats the double array d with the specified number format.
      *
      * @param d   the double array to be formatted
-     * @param sep the seperator between the single values of the double array,
+     * @param sep the separator between the single values of the double array,
      *            e.g. ','
      * @param nf  the number format to be used for formatting
      * @return a String representing the double array d
@@ -256,7 +256,7 @@ public final class Util extends AbstractLoggable {
      * fraction digits.
      *
      * @param f      the float array to be formatted
-     * @param sep    the seperator between the single values of the float array,
+     * @param sep    the separator between the single values of the float array,
      *               e.g. ','
      * @param digits the number of fraction digits
      * @return a String representing the float array f
@@ -288,7 +288,7 @@ public final class Util extends AbstractLoggable {
      * Formats the int array a for printing purposes.
      *
      * @param a   the int array to be formatted
-     * @param sep the seperator between the single values of the float array,
+     * @param sep the separator between the single values of the float array,
      *            e.g. ','
      * @return a String representing the int array a
      */
@@ -312,6 +312,37 @@ public final class Util extends AbstractLoggable {
      * @return a String representing the int array a
      */
     public static String format(int[] a) {
+        return format(a, ", ");
+    }
+
+    /**
+     * Formats the Integer array a for printing purposes.
+     *
+     * @param a   the Integer array to be formatted
+     * @param sep the separator between the single values of the float array,
+     *            e.g. ','
+     * @return a String representing the Integer array a
+     */
+    public static String format(Integer[] a, String sep) {
+        StringBuffer buffer = new StringBuffer();
+        for (int i = 0; i < a.length; i++) {
+            if (i < a.length - 1) {
+                buffer.append(a[i]).append(sep);
+            }
+            else {
+                buffer.append(a[i]);
+            }
+        }
+        return buffer.toString();
+    }
+
+    /**
+     * Formats the Integer array a for printing purposes.
+     *
+     * @param a the Integer array to be formatted
+     * @return a String representing the Integer array a
+     */
+    public static String format(Integer[] a) {
         return format(a, ", ");
     }
 
@@ -370,7 +401,7 @@ public final class Util extends AbstractLoggable {
      * Formats the boolean array b with ',' as separator.
      *
      * @param b   the boolean array to be formatted
-     * @param sep the seperator between the single values of the double array,
+     * @param sep the separator between the single values of the double array,
      *            e.g. ','
      * @return a String representing the boolean array b
      */
