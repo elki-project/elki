@@ -1503,6 +1503,9 @@ public final class Util extends AbstractLoggable {
      * specified <code>BitSet</code>, while the first bit starts with 1.
      * The selected bits are separated
      * by the specified separator  <code>sep</code>.
+     * 
+     * If <code>sep</code> is the empty String, the result is suitable as a parameter for an
+     * IntListParameter.
      *
      * @param b   the bit set to be parsed
      * @param sep the separator
@@ -1511,14 +1514,13 @@ public final class Util extends AbstractLoggable {
      */
     public static String parseSelectedBits(BitSet b, String sep) {
         StringBuffer result = new StringBuffer();
-        for (int i = 0; i < b.length(); i++) {
-            if (b.get(i)) {
-                if (i > 0) {
-                    result.append(sep).append(i + 1);
-                }
-                else
-                    result.append((i + 1));
-            }
+        for (int i = b.nextSetBit(0); i >= 0; i = b.nextSetBit(i+1)) {
+          if (i > 0) {
+              result.append(sep).append(i + 1);
+          }
+          else{
+              result.append((i + 1));
+          }
         }
         return result.toString();
     }
