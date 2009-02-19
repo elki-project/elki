@@ -57,11 +57,6 @@ public class RealVectorLabelParser<V extends RealVector<V, ?>> extends AbstractP
   protected boolean parseFloat;
 
   /**
-   * The parameter name for an index of a numerical class label.
-   */
-  public static final String CLASS_LABEL_INDEX_P = "numericalClassLabelIndex";
-
-  /**
    * OptionID for {@link #CLASS_LABEL_INDEX_PARAM}
    */
   private static final OptionID CLASS_LABEL_INDEX_ID = OptionID.getOrCreateOptionID("parser.classLabelIndex", "Index of a class label (may be numeric), " + "counting whitespace separated entries in a line starting with 0 - " + "the corresponding entry will be treated as a label. ");
