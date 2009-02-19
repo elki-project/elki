@@ -163,6 +163,10 @@ de.lmu.ifi.dbs.elki.preprocessing.ProjectedDBSCANPreprocessor=de.lmu.ifi.dbs.elk
 #           de.lmu.ifi.dbs.elki.preprocessing.KernelFourCPreprocessor,\
            de.lmu.ifi.dbs.elki.preprocessing.PreDeConPreprocessor
 # #######################################################
+# ResultHandler - default pacakge: de.lmu.ifi.dbs.elki.result 
+de.lmu.ifi.dbs.elki.result.ResultHandler=\
+           de.lmu.ifi.dbs.elki.result.ResultWriter
+# #######################################################
 # EigenPairFilter - default package: de.lmu.ifi.dbs.elki.varianceanalysis
 de.lmu.ifi.dbs.elki.varianceanalysis.EigenPairFilter=de.lmu.ifi.dbs.elki.varianceanalysis.FirstNEigenPairFilter,\
   de.lmu.ifi.dbs.elki.varianceanalysis.LimitEigenPairFilter,\

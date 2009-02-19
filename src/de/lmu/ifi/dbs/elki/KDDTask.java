@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
@@ -19,16 +17,13 @@ import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.textwriter.MultipleFilesOutput;
-import de.lmu.ifi.dbs.elki.result.textwriter.SingleStreamOutput;
-import de.lmu.ifi.dbs.elki.result.textwriter.StreamFactory;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriter;
+import de.lmu.ifi.dbs.elki.result.ResultHandler;
+import de.lmu.ifi.dbs.elki.result.ResultWriter;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
@@ -86,7 +81,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
    * Key: {@code -algorithm}
    * </p>
    */
-  private final ClassParameter<Algorithm<O,Result>> ALGORITHM_PARAM = new ClassParameter<Algorithm<O,Result>>(OptionID.ALGORITHM, Algorithm.class);
+  private final ClassParameter<Algorithm<O, Result>> ALGORITHM_PARAM = new ClassParameter<Algorithm<O, Result>>(OptionID.ALGORITHM, Algorithm.class);
 
   /**
    * Optional Parameter to specify a class to obtain a description for, must
@@ -111,16 +106,6 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
   private final ClassParameter<DatabaseConnection<O>> DATABASE_CONNECTION_PARAM = new ClassParameter<DatabaseConnection<O>>(OptionID.DATABASE_CONNECTION, DatabaseConnection.class, FileBasedDatabaseConnection.class.getName());
 
   /**
-   * Optional Parameter to specify the file to write the obtained results in. If
-   * this parameter is omitted, per default the output will sequentially be
-   * given to STDOUT.
-   * <p>
-   * Key: {@code -out}
-   * </p>
-   */
-  private final FileParameter OUTPUT_PARAM = new FileParameter(OptionID.OUTPUT, FileParameter.FileType.OUTPUT_FILE, true);
-
-  /**
    * Optional Parameter to specify a normalization in order to use a database
    * with normalized values.
    * <p>
@@ -139,19 +124,27 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
   private final Flag NORMALIZATION_UNDO_FLAG = new Flag(OptionID.NORMALIZATION_UNDO);
 
   /**
+   * Parameter to specify the database connection to be used, must extend
+   * {@link de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection}.
+   * <p>
+   * Key: {@code -dbc}
+   * </p>
+   * <p>
+   * Default value: {@link FileBasedDatabaseConnection}
+   * </p>
+   */
+  private final ClassParameter<ResultHandler<O, Result>> RESULT_HANDLER_PARAM = new ClassParameter<ResultHandler<O, Result>>(OptionID.RESULT_HANDLER, ResultHandler.class, ResultWriter.class.getName());
+
+  
+  /**
    * Holds the algorithm to run.
    */
-  private Algorithm<O,Result> algorithm;
+  private Algorithm<O, Result> algorithm;
 
   /**
    * Holds the database connection to have the algorithm run with.
    */
   private DatabaseConnection<O> databaseConnection;
-
-  /**
-   * Holds the file to print results to.
-   */
-  private File out;
 
   /**
    * Whether KDDTask has been properly initialized for calling the
@@ -163,6 +156,11 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
    * A normalization - per default no normalization is used.
    */
   private Normalization<O> normalization = null;
+
+  /**
+   * Output handler.
+   */
+  private ResultHandler<O, Result> resulthandler = null;
 
   /**
    * Whether to undo normalization for result.
@@ -188,14 +186,14 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
     addOption(HELP_FLAG);
     addOption(HELP_LONG_FLAG);
 
-    // decription parameter
+    // description parameter
     addOption(DESCRIPTION_PARAM);
 
     // parameter database connection
     addOption(DATABASE_CONNECTION_PARAM);
-
-    // parameter output file
-    addOption(OUTPUT_PARAM);
+    
+    // result handler
+    addOption(RESULT_HANDLER_PARAM);
 
     // parameter normalization
     addOption(NORMALIZATION_PARAM);
@@ -271,7 +269,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
         throw new WrongParameterValueException(DESCRIPTION_PARAM.getName(), descriptionClass, DESCRIPTION_PARAM.getDescription(), e);
       }
       if(p instanceof Algorithm) {
-        Algorithm<?,?> a = (Algorithm<?,?>) p;
+        Algorithm<?, ?> a = (Algorithm<?, ?>) p;
         throw new AbortException(a.getDescription().toString() + '\n' + a.parameterDescription());
       }
       else {
@@ -289,10 +287,9 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
     databaseConnection = DATABASE_CONNECTION_PARAM.instantiateClass();
     remainingParameters = databaseConnection.setParameters(remainingParameters);
 
-    // output
-    if(OUTPUT_PARAM.isSet()) {
-      out = OUTPUT_PARAM.getValue();
-    }
+    // result handler
+    resulthandler = RESULT_HANDLER_PARAM.instantiateClass();
+    remainingParameters = resulthandler.setParameters(remainingParameters);
 
     // normalization
     if(NORMALIZATION_PARAM.isSet()) {
@@ -338,62 +335,39 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
    */
   public MultiResult run() throws IllegalStateException {
     if(initialized) {
-      Database<O> db = databaseConnection.getDatabase(normalization); 
+      Database<O> db = databaseConnection.getDatabase(normalization);
       algorithm.run(db);
-      try {
-        MultiResult result; 
-        Result res = algorithm.getResult();
+      MultiResult result;
+      Result res = algorithm.getResult();
 
-        // standard annotations from the source file
-        // TODO: get them via databaseConnection!
-        // adding them here will make the output writer think
-        // that they were an part of the actual result.
-        AnnotationsFromDatabase<O, ?> ar = new AnnotationsFromDatabase<O, Object>(db);
-        ar.addAssociationGenerics(null, AssociationID.LABEL);
-        ar.addAssociationGenerics(null, AssociationID.CLASS);
+      // standard annotations from the source file
+      // TODO: get them via databaseConnection!
+      // adding them here will make the output writer think
+      // that they were an part of the actual result.
+      AnnotationsFromDatabase<O, ?> ar = new AnnotationsFromDatabase<O, Object>(db);
+      ar.addAssociationGenerics(null, AssociationID.LABEL);
+      ar.addAssociationGenerics(null, AssociationID.CLASS);
 
-        // insert standard annotations when we have a MultiResult
-        if (res instanceof MultiResult) {
-          result = (MultiResult) res;
-          result.prependResult(ar);
-        } else {
-          // TODO: can we always wrap them in a MultiResult safely?
-          result = new MultiResult();        
-          result.addResult(ar);
-          result.addResult(res);
+      // insert standard annotations when we have a MultiResult
+      if(res instanceof MultiResult) {
+        result = (MultiResult) res;
+        result.prependResult(ar);
+      }
+      else {
+        // TODO: can we always wrap them in a MultiResult safely?
+        result = new MultiResult();
+        result.addResult(ar);
+        result.addResult(res);
+      }
+
+      if(result != null) {
+        List<AttributeSettings> settings = getAttributeSettings();
+        if(normalizationUndo) {
+          resulthandler.setNormalization(normalization);
         }
-
-        if(result != null) {
-          List<AttributeSettings> settings = getAttributeSettings();
-          TextWriter<O> writer = new TextWriter<O>();
-          if (normalizationUndo)
-            writer.setNormalization(normalization);
-          StreamFactory output;
-          if (out == null) {
-            output = new SingleStreamOutput();
-          } else if (out.exists()) {
-            if (out.isDirectory()) {
-              if (out.listFiles().length > 0)
-                warning("Output directory specified is not empty. Files will be overwritten and old files may be left over.");
-              output = new MultipleFilesOutput(out);
-            } else {
-              warning("Output file exists and will be overwritten!");
-              output = new SingleStreamOutput(out);
-            }
-          } else {
-            output = new MultipleFilesOutput(out);
-          }
-          writer.output(db, result, output, settings);
-        }
-        return result;
+        resulthandler.processResult(db, result, settings);
       }
-      catch(UnableToComplyException e) {
-        // FIXME: don't lose the original exception message?
-        throw new IllegalStateException("Error in restoring result to original values.", e);
-      }
-      catch(IOException e) {
-        throw new IllegalStateException("Input/Output error writing result.", e);
-      }
+      return result;
     }
     else {
       throw new IllegalStateException(KDDTask.class.getName() + " was not properly initialized. Need to set parameters first.");

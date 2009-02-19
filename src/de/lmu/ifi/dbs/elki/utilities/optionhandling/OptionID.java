@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.properties.Properties;
+import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.utilities.ConstantObject;
 
 /**
@@ -57,6 +58,16 @@ public final class OptionID extends ConstantObject<OptionID> {
         Properties.ELKI_PROPERTIES.restrictionString(DatabaseConnection.class) +
         ". Either full name to identify classpath or only classname, if its package is " +
         DatabaseConnection.class.getPackage().getName() + "."
+    );
+
+    /**
+     * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#RESULT_HANDLER_PARAM}
+     */
+    public static final OptionID RESULT_HANDLER = new OptionID("resulthandler",
+        "Classname of a result handler. " +
+        Properties.ELKI_PROPERTIES.restrictionString(ResultHandler.class) +
+        ". Either full name to identify classpath or only classname, if its package is " +
+        ResultHandler.class.getPackage().getName() + "."
     );
 
     /**
