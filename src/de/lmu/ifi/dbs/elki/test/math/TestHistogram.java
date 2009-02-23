@@ -1,10 +1,10 @@
-package de.lmu.ifi.dbs.elki.test.utilities;
+package de.lmu.ifi.dbs.elki.test.math;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.utilities.Histogram;
+import de.lmu.ifi.dbs.elki.math.Histogram;
 import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
 
 public class TestHistogram {

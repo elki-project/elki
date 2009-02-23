@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.utilities;
+package de.lmu.ifi.dbs.elki.math;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -182,24 +182,6 @@ public class Histogram<T> implements Iterable<SimplePair<Double, T>> {
   }
   
   /**
-   * Convenience constructor for Double-based Histograms.
-   * Uses a constructor to initialize bins with Double(0)
-   * 
-   * @param bins Number of bins
-   * @param min Minimum coordinate
-   * @param max Maximum coordinate
-   * @return New histogram for Doubles.
-   */
-  public static final Histogram<Double> DoubleHistogram(int bins, double min, double max) {
-    return new Histogram<Double>(bins, min, max, new Constructor<Double>() {
-      @Override
-      public Double make() {
-        return new Double(0.0);
-      }
-    });
-  }
-
-  /**
    * Iterator class to iterate over all bins.
    * 
    * @author Erich Schubert
@@ -234,5 +216,41 @@ public class Histogram<T> implements Iterable<SimplePair<Double, T>> {
   @Override
   public Iterator<SimplePair<Double, T>> iterator() {
     return new Iter();
+  }
+  
+  /**
+   * Convenience constructor for Double-based Histograms.
+   * Uses a constructor to initialize bins with Double(0)
+   * 
+   * @param bins Number of bins
+   * @param min Minimum coordinate
+   * @param max Maximum coordinate
+   * @return New histogram for Doubles.
+   */
+  public static final Histogram<Double> DoubleHistogram(int bins, double min, double max) {
+    return new Histogram<Double>(bins, min, max, new Constructor<Double>() {
+      @Override
+      public Double make() {
+        return new Double(0.0);
+      }
+    });
+  }
+
+  /**
+   * Convenience constructor for {@link MeanVariance}-based Histograms.
+   * Uses a constructor to initialize bins with new {@link MeanVariance} objects
+   * 
+   * @param bins Number of bins
+   * @param min Minimum coordinate
+   * @param max Maximum coordinate
+   * @return New histogram for {@link MeanVariance}.
+   */
+  public static final Histogram<MeanVariance> MeanVarianceHistogram(int bins, double min, double max) {
+    return new Histogram<MeanVariance>(bins, min, max, new Constructor<MeanVariance>() {
+      @Override
+      public MeanVariance make() {
+        return new MeanVariance();
+      }
+    });
   }
 }
