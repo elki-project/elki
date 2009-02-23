@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
  *
  * @param <T> Histogram data type.
  */
+// TODO: Add resizing strategy: when size >> 2*initial size, do a downsampling.
 public class Histogram<T> implements Iterable<SimplePair<Double, T>> {
   /**
    * Interface to plug in constructors for type T.
@@ -39,7 +40,12 @@ public class Histogram<T> implements Iterable<SimplePair<Double, T>> {
    * Usually the minimum.
    */
   protected double base;
-
+  
+  /**
+   * To avoid introducing an extra bucket for the maximum value.
+   */
+  protected double max;
+  
   /**
    * Width of a bin.
    */
@@ -65,6 +71,7 @@ public class Histogram<T> implements Iterable<SimplePair<Double, T>> {
    */
   public Histogram(int bins, double min, double max, Constructor<T> maker) {
     this.base = min;
+    this.max = max;
     this.binsize = (max - min) / bins;
     this.size = bins;
     this.data = new ArrayList<T>(bins);
@@ -105,7 +112,7 @@ public class Histogram<T> implements Iterable<SimplePair<Double, T>> {
    * @return data element there (which may be a new empty bin or null)
    */
   public T get(double coord) {
-    int bin = (int) Math.floor((coord - base) / binsize) + offset;
+    int bin = getBinNr(coord);
     // compare with allocated area
     if(bin < 0) {
       T n = make();
@@ -132,8 +139,23 @@ public class Histogram<T> implements Iterable<SimplePair<Double, T>> {
    * @param d
    */
   public void put(double coord, T d) {
-    int bin = (int) Math.floor((coord - base) / binsize) + offset;
+    int bin = getBinNr(coord);
     putBin(bin, d);
+  }
+
+  /**
+   * Compute the bin number.
+   * Has a special case for rounding max down to the last bin.
+   *
+   * @param coord Coordinate
+   * @return bin number
+   */
+  private int getBinNr(double coord) {
+    if (coord == max) {
+      //System.err.println("Triggered special case: "+ (Math.floor((coord - base) / binsize) + offset) + " vs. " + (size - 1));
+      return size - 1;
+    }
+    return (int) Math.floor((coord - base) / binsize) + offset;
   }
 
   /**
@@ -156,6 +178,8 @@ public class Histogram<T> implements Iterable<SimplePair<Double, T>> {
       assert (data.size() == size - bin);
       offset = offset - bin;
       size = size - bin;
+      // drop max value when resizing
+      max = Double.MAX_VALUE;
     }
     else if(bin >= size) {
       this.data.ensureCapacity(bin + 1);
@@ -166,6 +190,8 @@ public class Histogram<T> implements Iterable<SimplePair<Double, T>> {
       data.add(d);
       assert (data.size() == bin + 1);
       size = bin + 1;
+      // drop max value when resizing
+      max = Double.MAX_VALUE;
     }
     else {
       this.data.set(bin, d);
@@ -253,4 +279,41 @@ public class Histogram<T> implements Iterable<SimplePair<Double, T>> {
       }
     });
   }
+
+  /**
+   * Get the number of bins actually in use.
+   * 
+   * @return number of bins
+   */
+  public int getNumBins() {
+    return size;
+  }
+
+  /**
+   * Get the size (width) of a bin.
+   * 
+   * @return bin size
+   */
+  public double getBinsize() {
+    return binsize;
+  }
+  
+  /**
+   * Get minimum (covered by bins, not data!)
+   * 
+   * @return minimum
+   */
+  public double getCoverMinimum() {
+    return base - offset * binsize;
+  }
+
+  /**
+   * Get maximum (covered by bins, not data!)
+   * 
+   * @return maximum
+   */
+  public double getCoverMaximum() {
+    return base + (size - offset) * binsize;
+  }
+
 }
