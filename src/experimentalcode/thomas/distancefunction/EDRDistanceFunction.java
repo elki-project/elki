@@ -25,7 +25,7 @@ public class EDRDistanceFunction<V extends NumberVector<V, ?>>
     /**
      * DELTA parameter
      */
-    private final DoubleParameter DELTA_PARAM = new DoubleParameter(DELTA_ID, new GreaterEqualConstraint(0));
+    private final DoubleParameter DELTA_PARAM = new DoubleParameter(DELTA_ID, new GreaterEqualConstraint(0), 1.0);
     
     /**
      * Keeps the currently set delta.

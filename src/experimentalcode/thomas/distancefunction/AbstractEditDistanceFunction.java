@@ -34,7 +34,7 @@ public abstract class AbstractEditDistanceFunction<V extends NumberVector<V, ?>>
     /**
      * BANDSIZE parameter
      */
-    protected final DoubleParameter BANDSIZE_PARAM = new DoubleParameter(BANDSIZE_ID, new IntervalConstraint(0, IntervalBoundary.CLOSE, 1, IntervalBoundary.CLOSE));
+    protected final DoubleParameter BANDSIZE_PARAM = new DoubleParameter(BANDSIZE_ID, new IntervalConstraint(0, IntervalBoundary.CLOSE, 1, IntervalBoundary.CLOSE), 0.1);
 
     /**
      * Keeps the currently set bandSize.

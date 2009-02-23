@@ -25,7 +25,7 @@ public class ERPDistanceFunction<V extends NumberVector<V, ?>>
     /**
      * G parameter
      */
-    private final DoubleParameter G_PARAM = new DoubleParameter(G_ID, new GreaterEqualConstraint(0));
+    private final DoubleParameter G_PARAM = new DoubleParameter(G_ID, new GreaterEqualConstraint(0), 0.0);
     
     /**
      * Keeps the currently set g.

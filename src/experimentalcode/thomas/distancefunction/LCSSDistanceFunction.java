@@ -58,12 +58,12 @@ public class LCSSDistanceFunction<V extends NumberVector<V, ?>>
     /**
      * PDELTA parameter
      */
-    private final IntParameter PDELTA_PARAM = new IntParameter(PDELTA_ID, new GreaterEqualConstraint(0));
+    private final IntParameter PDELTA_PARAM = new IntParameter(PDELTA_ID, new GreaterEqualConstraint(0), 10);
 
     /**
      * PEPSILON parameter
      */
-    private final DoubleParameter PEPSILON_PARAM = new DoubleParameter(PEPSILON_ID, new GreaterEqualConstraint(0));
+    private final DoubleParameter PEPSILON_PARAM = new DoubleParameter(PEPSILON_ID, new GreaterEqualConstraint(0), 0.1);
 
     /**
      * Keeps the currently set pDelta.
