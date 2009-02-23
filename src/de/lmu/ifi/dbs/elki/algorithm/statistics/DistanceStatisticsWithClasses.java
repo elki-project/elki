@@ -2,7 +2,12 @@ package de.lmu.ifi.dbs.elki.algorithm.statistics;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Random;
 import java.util.Set;
+import java.util.TreeSet;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
@@ -13,14 +18,23 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.math.Histogram;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.math.Histogram.Constructor;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
 
 /**
- * Algorithm to gather statistics over the distance distribution in the data set.
+ * <p>Algorithm to gather statistics over the distance distribution in the data
+ * set.</p>
  * 
  * TODO: Add sampling.
+ * 
  * TODO: Collect in-cluster and cross-cluster averages.
  * 
  * @author Erich Schubert
@@ -28,13 +42,35 @@ import de.lmu.ifi.dbs.elki.utilities.Description;
 public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, DoubleDistance, CollectionResult<DoubleVector>> {
   private CollectionResult<DoubleVector> result;
 
+  /**
+   * OptionID for {@link #SAMPLING_FLAG}
+   */
+  public static final OptionID SAMPLING_ID = OptionID.getOrCreateOptionID("diststat.sampling", "Enable sampling to reduce runtime from O(2*n*n) to O(n*n)+O(n) " + "at the cost of evenutally having more than the configured number of bins.");
+
+  /**
+   * Flag to enable sampling
+   * <p>
+   * Key: {@code -h}
+   * </p>
+   */
+  private final Flag SAMPLING_FLAG = new Flag(SAMPLING_ID);
+
+  /**
+   * Number of bins to use in sampling.
+   */
   private int numbin = 100;
+
+  /**
+   * Sampling
+   */
+  private boolean sampling = false;
 
   /**
    * Empty constructor. Nothing to do.
    */
   public DistanceStatisticsWithClasses() {
     super();
+    addOption(SAMPLING_FLAG);
   }
 
   /**
@@ -49,16 +85,89 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
     // determine binning ranges.
     double gmin = Double.MAX_VALUE;
     double gmax = Double.MIN_VALUE;
-    
-    for (Integer id1 : database.getIDs()) {
-      for (Integer id2 : database.getIDs()) {
-        // skip the point itself.
-        if (id1 == id2) {
-          continue;
+
+    if(sampling) {
+      Random rnd = new Random();
+      // estimate minimum and maximum.
+      int k = (int) Math.max(25,Math.pow(database.size(), 0.2));
+      TreeSet<ComparablePair<Double, Integer>> minhotset = new TreeSet<ComparablePair<Double, Integer>>();
+      TreeSet<ComparablePair<Double, Integer>> maxhotset = new TreeSet<ComparablePair<Double, Integer>>(Collections.reverseOrder());
+      
+      int randomsize = (int)Math.max(25,Math.pow(database.size(), 0.2));
+      double rprob = ((double) randomsize) / size;
+      ArrayList<Integer> randomset = new ArrayList<Integer>(randomsize);
+      
+      Iterator<Integer> iter = database.iterator();
+      if(!iter.hasNext()) {
+        throw new IllegalStateException("Database is empty.");
+      }
+      Integer firstid = iter.next();
+      minhotset.add(new ComparablePair<Double, Integer>(Double.MAX_VALUE, firstid));
+      maxhotset.add(new ComparablePair<Double, Integer>(Double.MIN_VALUE, firstid));
+      while(iter.hasNext()) {
+        Integer id1 = iter.next();
+        // generate candidates for min distance.
+        ArrayList<ComparablePair<Double,Integer>> np = new ArrayList<ComparablePair<Double,Integer>>(k*2+randomsize*2);
+        for(ComparablePair<Double, Integer> pair : minhotset) {
+          Integer id2 = pair.getSecond();
+          // skip the object itself
+          if(id1 == id2) {
+            continue;
+          }
+          double d = distFunc.distance(id1, id2).getValue();
+          np.add(new ComparablePair<Double, Integer>(d, id1));
+          np.add(new ComparablePair<Double, Integer>(d, id2));
         }
-        double d = distFunc.distance(id1, id2).getValue();
-        gmin = Math.min(d, gmin);
-        gmax = Math.max(d, gmax);
+        for(Integer id2 : randomset) {
+          double d = distFunc.distance(id1, id2).getValue();
+          np.add(new ComparablePair<Double, Integer>(d, id1));
+          np.add(new ComparablePair<Double, Integer>(d, id2));
+        }
+        minhotset.addAll(np);
+        shrinkHeap(minhotset, k);
+        
+        // generate candidates for max distance.
+        ArrayList<ComparablePair<Double,Integer>> np2 = new ArrayList<ComparablePair<Double,Integer>>(k*2+randomsize*2);
+        for(ComparablePair<Double, Integer> pair : minhotset) {
+          Integer id2 = pair.getSecond();
+          // skip the object itself
+          if(id1 == id2) {
+            continue;
+          }
+          double d = distFunc.distance(id1, id2).getValue();
+          np2.add(new ComparablePair<Double, Integer>(d, id1));
+          np2.add(new ComparablePair<Double, Integer>(d, id2));
+        }
+        for(Integer id2 : randomset) {
+          double d = distFunc.distance(id1, id2).getValue();
+          np.add(new ComparablePair<Double, Integer>(d, id1));
+          np.add(new ComparablePair<Double, Integer>(d, id2));
+        }
+        maxhotset.addAll(np2);
+        shrinkHeap(maxhotset, k);
+        
+        // update random set
+        if (randomset.size() < randomsize) {
+          randomset.add(id1);
+        } else if (rnd.nextDouble() < rprob) {
+          randomset.set((int)Math.floor(rnd.nextDouble() * randomsize), id1);
+        }
+      }
+      gmin = minhotset.first().getFirst();
+      gmax = maxhotset.first().getFirst();
+    }
+    else {
+      // find exact minimum and maximum first.
+      for(Integer id1 : database.getIDs()) {
+        for(Integer id2 : database.getIDs()) {
+          // skip the point itself.
+          if(id1 == id2) {
+            continue;
+          }
+          double d = distFunc.distance(id1, id2).getValue();
+          gmin = Math.min(d, gmin);
+          gmax = Math.max(d, gmax);
+        }
       }
     }
 
@@ -81,14 +190,12 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
     MeanVariance momax = new MeanVariance();
     MeanVariance model = new MeanVariance();
     // Histograms
-    double step = (gmax - gmin) / numbin;
-    int[] ihist = new int[numbin];
-    int[] ohist = new int[numbin];
-    // zero out for sure.
-    for(int i = 0; i < numbin; i++) {
-      ihist[i] = 0;
-      ohist[i] = 0;
-    }
+    Histogram<SimplePair<Integer, Integer>> hist = new Histogram<SimplePair<Integer, Integer>>(numbin, gmin, gmax, new Constructor<SimplePair<Integer, Integer>>() {
+      @Override
+      public SimplePair<Integer, Integer> make() {
+        return new SimplePair<Integer, Integer>(0, 0);
+      }
+    });
 
     // iterate per cluster
     for(Cluster<?> c1 : splitted) {
@@ -102,10 +209,9 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
             continue;
           }
           double d = distFunc.distance(id1, id2).getValue();
-          
-          int bin = (int) Math.floor((d - gmin) / step);
-          bin = Math.min(bin, numbin - 1);
-          ihist[bin]++;
+
+          SimplePair<Integer, Integer> pair = hist.get(d);
+          pair.first += 1;
 
           imin = Math.min(d, imin);
           imax = Math.max(d, imax);
@@ -132,10 +238,9 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
               continue;
             }
             double d = distFunc.distance(id1, id2).getValue();
-            
-            int bin = (int) Math.floor((d - gmin) / step);
-            bin = Math.min(bin, numbin - 1);
-            ohist[bin]++;
+
+            SimplePair<Integer, Integer> pair = hist.get(d);
+            pair.second += 1;
 
             omin = Math.min(d, omin);
             omax = Math.max(d, omax);
@@ -155,17 +260,17 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
     // count the number of samples we have in the data
     int inum = 0;
     int onum = 0;
-    for (int i = 0; i < numbin; i++) {
-      inum += ihist[i];
-      onum += ohist[i];
+    for(SimplePair<Double, SimplePair<Integer, Integer>> ppair : hist) {
+      inum += ppair.getSecond().getFirst();
+      onum += ppair.getSecond().getSecond();
     }
     int bnum = inum + onum;
     // Note: when sampling is added, this assertion won't hold anymore.
-    assert(bnum == size * (size - 1));
+    assert (bnum == size * (size - 1));
 
     Collection<DoubleVector> binstat = new ArrayList<DoubleVector>(numbin);
-    for(int i = 0; i < numbin; i++) {
-      DoubleVector row = new DoubleVector(new double[] { gmin + (i + .5) * step, ((double)ihist[i]) / inum, ((double)ihist[i]) / bnum, ((double)ohist[i]) / onum, ((double)ohist[i]) / bnum});
+    for(SimplePair<Double, SimplePair<Integer, Integer>> ppair : hist) {
+      DoubleVector row = new DoubleVector(new double[] { ppair.getFirst(), ((double) ppair.getSecond().getFirst()) / inum, ((double) ppair.getSecond().getFirst()) / bnum, ((double) ppair.getSecond().getSecond()) / onum, ((double) ppair.getSecond().getSecond()) / bnum });
       binstat.add(row);
     }
     result = new CollectionResult<DoubleVector>(binstat);
@@ -177,8 +282,23 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
     result.addHeader("Other-Cluster minimum distance (abs, avg, stddev): " + gomin + " " + momin.getMean() + " " + momin.getVariance());
     result.addHeader("Other-Cluster maximum distance (abs, avg, stddev): " + gomax + " " + momax.getMean() + " " + momax.getVariance());
     result.addHeader("Column description: bin center, in-cluster only frequency, in-cluster all frequency, other-cluster only frequency, other cluster all frequency");
-    result.addHeader("In-cluster value count: "+inum+" other cluster value count: "+onum);
+    result.addHeader("In-cluster value count: " + inum + " other cluster value count: " + onum);
     return result;
+  }
+
+  private void shrinkHeap(TreeSet<ComparablePair<Double, Integer>> hotset, int k) {
+    // drop duplicates
+    HashSet<Integer> seenids = new HashSet<Integer>(2*k);
+    int cnt = 0;
+    for (Iterator<ComparablePair<Double, Integer>> i = hotset.iterator(); i.hasNext(); ) {
+      ComparablePair<Double, Integer> p = i.next();
+      if (cnt > k || seenids.contains(p.getSecond())) {
+        i.remove();
+      } else {
+        seenids.add(p.getSecond());
+        cnt++;
+      }
+    }
   }
 
   /**
@@ -193,5 +313,18 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
    */
   public CollectionResult<DoubleVector> getResult() {
     return result;
+  }
+
+  @Override
+  public String[] setParameters(String[] args) throws ParameterException {
+    String[] remainingParameters = super.setParameters(args);
+
+    // sampling
+    if(SAMPLING_FLAG.isSet()) {
+      sampling = true;
+    }
+
+    setParameters(args, remainingParameters);
+    return remainingParameters;
   }
 }
