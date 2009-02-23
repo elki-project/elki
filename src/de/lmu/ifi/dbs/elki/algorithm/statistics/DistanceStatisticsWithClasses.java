@@ -256,6 +256,9 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
         gomax = Math.max(omax, gomax);
       }
     }
+    // Update values (only needed for sampling case).
+    gmin = Math.min(gimin, gomin);
+    gmax = Math.max(gimax, gomax);
 
     // count the number of samples we have in the data
     int inum = 0;
@@ -265,12 +268,12 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
       onum += ppair.getSecond().getSecond();
     }
     int bnum = inum + onum;
-    // Note: when sampling is added, this assertion won't hold anymore.
+    // Note: when full sampling is added, this assertion won't hold anymore.
     assert (bnum == size * (size - 1));
 
     Collection<DoubleVector> binstat = new ArrayList<DoubleVector>(numbin);
     for(SimplePair<Double, SimplePair<Integer, Integer>> ppair : hist) {
-      DoubleVector row = new DoubleVector(new double[] { ppair.getFirst(), ((double) ppair.getSecond().getFirst()) / inum, ((double) ppair.getSecond().getFirst()) / bnum, ((double) ppair.getSecond().getSecond()) / onum, ((double) ppair.getSecond().getSecond()) / bnum });
+      DoubleVector row = new DoubleVector(new double[] { ppair.getFirst(), ((double) ppair.getSecond().getFirst()) / inum / hist.getBinsize(), ((double) ppair.getSecond().getFirst()) / bnum / hist.getBinsize(), ((double) ppair.getSecond().getSecond()) / onum / hist.getBinsize(), ((double) ppair.getSecond().getSecond()) / bnum / hist.getBinsize() });
       binstat.add(row);
     }
     result = new CollectionResult<DoubleVector>(binstat);
