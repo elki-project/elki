@@ -2,11 +2,15 @@ package experimentalcode.thomas.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.MetricDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
+import experimentalcode.thomas.classextensions.NumberVectorExtension;
 
 /**
  * Provides the Longest Common Subsequence distance for NumberVectors.
@@ -41,34 +45,40 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
  * @param <V> the type of NumberVector to compute the distances in between
  */
 public class LCSSDistanceFunction<V extends NumberVector<V, ?>>
-    extends AbstractEditDistanceFunction<V> {
+	extends AbstractDoubleDistanceFunction<V>
+	implements MetricDistanceFunction<V, DoubleDistance> {
+	
+	public enum Step 
+	{
+		NONE, INS, DEL, MATCH
+	}
 
 	/**
      * OptionID for {@link #PDELTA_PARAM}
      */
     public static final OptionID PDELTA_ID = OptionID.getOrCreateOptionID("lcss.pDelta",
-        "the allowed deviation in x direction for LCSS alignment (positive number)");
+        "the allowed deviation in x direction for LCSS alignment (positive double value, 0 <= pDelta <= 1)");
     
     /**
      * OptionID for {@link #PEPSILON_PARAM}
      */
     public static final OptionID PEPSILON_ID = OptionID.getOrCreateOptionID("lcss.pEpsilon",
-        "the allowed deviation in y directionfor LCSS alignment (positive number)");
+        "the allowed deviation in y directionfor LCSS alignment (positive double value, 0 <= pEpsilon <= 1)");
 
     /**
      * PDELTA parameter
      */
-    private final IntParameter PDELTA_PARAM = new IntParameter(PDELTA_ID, new GreaterEqualConstraint(0), 10);
+    private final DoubleParameter PDELTA_PARAM = new DoubleParameter(PDELTA_ID, new IntervalConstraint(0, IntervalBoundary.CLOSE, 1, IntervalBoundary.CLOSE), 0.1);
 
     /**
      * PEPSILON parameter
      */
-    private final DoubleParameter PEPSILON_PARAM = new DoubleParameter(PEPSILON_ID, new GreaterEqualConstraint(0), 0.1);
+    private final DoubleParameter PEPSILON_PARAM = new DoubleParameter(PEPSILON_ID, new IntervalConstraint(0, IntervalBoundary.CLOSE, 1, IntervalBoundary.CLOSE), 0.05);
 
     /**
      * Keeps the currently set pDelta.
      */
-    private int pDelta;
+    private double pDelta;
     
     /**
      * Keeps the currently set pEpsilon.
@@ -93,8 +103,11 @@ public class LCSSDistanceFunction<V extends NumberVector<V, ?>>
      */
     public DoubleDistance distance(V v1, V v2) {
         
-    	final int delta = pDelta;
-		final double epsilon = pEpsilon;
+    	final int delta = (int)Math.ceil(v2.getDimensionality() * pDelta);
+		
+    	double[] extrema = new NumberVectorExtension<V>().getRange(v1, v2);
+    	double range = Math.abs(extrema[1] - extrema[0]);
+    	final double epsilon = range * pEpsilon;
 		
 		int m = -1;
 		int n = -1;
