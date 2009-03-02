@@ -2,41 +2,28 @@ package de.lmu.ifi.dbs.elki.algorithm;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Random;
-import java.util.Set;
-import java.util.TreeSet;
 
-import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.RealVector;
-import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
-import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.math.Histogram;
-import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.math.Histogram.Constructor;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.ComparableTriple;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
 
 /**
- * <p>Algorithm to materialize all the distances in a data set.</p>
- *
- * <p>The result can then be used with the DoubleDistanceParser and
- * MultipleFileInput to use cached distances.</p>
- *
- * <p>Symmetry is assumed.</p>
+ * <p>
+ * Algorithm to materialize all the distances in a data set.
+ * </p>
+ * 
+ * <p>
+ * The result can then be used with the DoubleDistanceParser and
+ * MultipleFileInput to use cached distances.
+ * </p>
+ * 
+ * <p>
+ * Symmetry is assumed.
+ * </p>
  * 
  * @author Erich Schubert
  */
