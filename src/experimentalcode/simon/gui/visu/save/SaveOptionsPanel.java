@@ -42,8 +42,8 @@ public class SaveOptionsPanel extends JPanel implements ItemListener, ChangeList
 	/** If saving as JPEG/PNG show width/height infos here. */
 	private JPanel sizePanel;
 
-	private JCheckBox cbAutoWidth;
-	private JCheckBox cbAutoHeight;
+	private JCheckBox cbLockAspectRatio;
+	//private JCheckBox cbAutoHeight;
 	
 	private JSpinner spinnerWidth;
 	private JSpinner spinnerHeight;
@@ -112,13 +112,8 @@ public class SaveOptionsPanel extends JPanel implements ItemListener, ChangeList
 		spinnerWidth.addChangeListener(this);
 		widthPanel.add(spinnerWidth);
 		
-		cbAutoWidth = new JCheckBox("Auto width");
-		cbAutoWidth.setSelected(true);
-		cbAutoWidth.addActionListener(this);
-		widthPanel.add(cbAutoWidth);
-		
 		sizePanel.add(widthPanel);
-
+		
 		
 		
 		JPanel heightPanel = new JPanel();
@@ -139,12 +134,18 @@ public class SaveOptionsPanel extends JPanel implements ItemListener, ChangeList
 		sizePanel.add(heightPanel);
 
 		
+		cbLockAspectRatio = new JCheckBox("Lock aspect ratio");
+		cbLockAspectRatio.setSelected(true);
+		cbLockAspectRatio.addActionListener(this);
+		sizePanel.add(cbLockAspectRatio);
 		
-		cbAutoHeight = new JCheckBox("Auto height");
-		cbAutoHeight.addActionListener(this);
-		cbAutoHeight.setSelected(true);
 		
-		heightPanel.add(cbAutoHeight);
+		
+//		cbAutoHeight = new JCheckBox("Auto height");
+//		cbAutoHeight.addActionListener(this);
+//		cbAutoHeight.setSelected(true);
+//		
+//		heightPanel.add(cbAutoHeight);
 		
 		
 		resetRatioButton = new JButton("Reset aspect ratio");
@@ -202,15 +203,15 @@ public class SaveOptionsPanel extends JPanel implements ItemListener, ChangeList
 	@Override
 	public void stateChanged(ChangeEvent e) {
 		if (e.getSource() == spinnerWidth) {
-			if (cbAutoHeight.isSelected()) {
+			if (cbLockAspectRatio.isSelected()) {
 				Integer val = (Integer) modelWidth.getValue();
-				spinnerHeight.setValue(new Integer((int) Math.round(val*ratio)));
+				spinnerHeight.setValue(new Integer((int) Math.round(val/ratio)));
 				//TODO: check width/height
 			}
 		} else if (e.getSource() == spinnerHeight) {
-			if (cbAutoWidth.isSelected()) {
+			if (cbLockAspectRatio.isSelected()) {
 				Integer val = (Integer) modelHeight.getValue();
-				spinnerWidth.setValue(new Integer((int) Math.round(val/ratio)));
+				spinnerWidth.setValue(new Integer((int) Math.round(val*ratio)));
 				//TODO: check width/height
 			}
 		}
@@ -221,8 +222,8 @@ public class SaveOptionsPanel extends JPanel implements ItemListener, ChangeList
 		if (evt.getSource() == resetRatioButton) {
 			modelWidth.setValue(width);
 			modelHeight.setValue(height);
-			cbAutoWidth.setSelected(true);
-			cbAutoHeight.setSelected(true);
+			cbLockAspectRatio.setSelected(true);
+			
 		}
 	}
 
