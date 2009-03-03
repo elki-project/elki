@@ -34,8 +34,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
  * random sorting. A value of 0 means the distance function is inverted, i.e. a
  * similarity.
  * 
- * TODO: Make number of bins configurable TODO: Allow fixed binning range,
- * configurable TODO: Add sampling
+ * TODO: Make number of bins configurable
+ * 
+ * TODO: Allow fixed binning range, configurable
+ * 
+ * TODO: Add sampling
  * 
  * @author Erich Schubert
  */
