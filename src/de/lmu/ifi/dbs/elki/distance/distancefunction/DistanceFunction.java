@@ -26,20 +26,20 @@ public interface DistanceFunction<O extends DatabaseObject, D extends Distance<D
   D distance(O o1, O o2);
 
   /**
-   * Returns the distance between the two objcts specified by their obejct ids.
+   * Returns the distance between the two objects specified by their object ids.
    *
    * @param id1 first object id
    * @param id2 second object id
-   * @return the distance between the two objcts specified by their obejct ids
+   * @return the distance between the two objects specified by their object ids
    */
   D distance(Integer id1, Integer id2);
 
   /**
    * Returns the distance between the two specified objects.
-   *
+   * 
    * @param id1 first object id
-   * @param o2  second DatabaseObject
-   * @return the distance between the two objcts specified by their obejct ids
+   * @param o2 second DatabaseObject
+   * @return the distance between the two object specified by their object ids
    */
   D distance(Integer id1, O o2);
 }

@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  */
 // Deprecated: use SimilarityAdapterLinear instead.
 @Deprecated
+@SuppressWarnings("deprecation")
 public class SNNDistanceFunction<V extends FeatureVector<V,?>> extends AbstractDoubleDistanceFunction<V> {
   /**
    * The similarity function.
@@ -34,7 +35,7 @@ public class SNNDistanceFunction<V extends FeatureVector<V,?>> extends AbstractD
    * Distance implementation
    */
   public DoubleDistance distance(V v1, V v2) {
-    DoubleDistance sim = similarityFunction.similarity(v1, v2);
+    DoubleDistance sim = this.similarityFunction.similarity(v1, v2);
     return new DoubleDistance(1.0 - sim.getValue());
   }
 
@@ -47,7 +48,7 @@ public class SNNDistanceFunction<V extends FeatureVector<V,?>> extends AbstractD
   @Override
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
-    remainingParameters = similarityFunction.setParameters(remainingParameters);
+    remainingParameters = this.similarityFunction.setParameters(remainingParameters);
     setParameters(args, remainingParameters);
     return remainingParameters;
   }
@@ -55,6 +56,6 @@ public class SNNDistanceFunction<V extends FeatureVector<V,?>> extends AbstractD
   @Override
   public void setDatabase(Database<V> database, boolean verbose, boolean time) {
     super.setDatabase(database, verbose, time);
-    similarityFunction.setDatabase(database, verbose, time);
+    this.similarityFunction.setDatabase(database, verbose, time);
   }
 }

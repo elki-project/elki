@@ -17,10 +17,10 @@ public class DistanceParsingResult<O extends DatabaseObject, D extends Distance<
   /**
    * The cache of precomputed distances between the database objects.
    */
-  private final Map<Integer, Map<Integer, D>> distanceCache;
+  private final Map<SimplePair<Integer, Integer>, D> distanceCache;
 
   /**
-   * Provides a list of database objects, a list of label obejcts associated
+   * Provides a list of database objects, a list of label objects associated
    * with these objects and cached distances between these objects.
    *
    * @param objectAndLabelList the list of database objects and labels associated with these
@@ -29,7 +29,7 @@ public class DistanceParsingResult<O extends DatabaseObject, D extends Distance<
    *                           objects
    */
   public DistanceParsingResult(List<SimplePair<O,List<String>>> objectAndLabelList,
-                               Map<Integer, Map<Integer, D>> distanceCache) {
+      Map<SimplePair<Integer, Integer>, D> distanceCache) {
     super(objectAndLabelList);
     this.distanceCache = distanceCache;
   }
@@ -39,7 +39,7 @@ public class DistanceParsingResult<O extends DatabaseObject, D extends Distance<
    *
    * @return the cache of precomputed distances between the database objects
    */
-  public Map<Integer, Map<Integer, D>> getDistanceCache() {
+  public Map<SimplePair<Integer, Integer>, D> getDistanceCache() {
     return distanceCache;
   }
 }

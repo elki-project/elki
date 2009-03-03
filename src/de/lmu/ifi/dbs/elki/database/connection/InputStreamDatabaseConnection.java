@@ -84,14 +84,14 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
                 normalization);
 
             // add precomputed distances
-            if (parser instanceof DistanceParser) {
-                Map<Integer, Map<Integer, Distance<?>>> distanceCache = ((DistanceParsingResult) parsingResult)
+            /*if (parser instanceof DistanceParser) {
+              Map<SimplePair<Integer, Integer>, Distance<?>> distanceCache = ((DistanceParsingResult) parsingResult)
                     .getDistanceCache();
                 for (SimplePair<O, Associations> objectAndAssociations : objectAndAssociationsList) {
                     Map<Integer, Distance<?>> distances = distanceCache.remove(objectAndAssociations.getFirst().getID());
                     objectAndAssociations.getSecond().put(AssociationID.CACHED_DISTANCES, distances);
                 }
-            }
+            }*/
 
             if (this.debug) {
                 debugFine("*** insert");

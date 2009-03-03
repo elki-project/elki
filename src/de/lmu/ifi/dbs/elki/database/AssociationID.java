@@ -176,11 +176,11 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
     /**
      * The association id to associate precomputed distances.
      */
-    @SuppressWarnings("unchecked")
+/*    @SuppressWarnings("unchecked")
     public static final AssociationID<Map> CACHED_DISTANCES = new AssociationID<Map>("cachedDistances", Map.class);
-
+*/
     /**
-     * The association id to associate the strong eigencvector weighted matrix of
+     * The association id to associate the strong eigenvector weighted matrix of
      * an object.
      */
     public static final AssociationID<Matrix> STRONG_EIGENVECTOR_MATRIX = new AssociationID<Matrix>("strongEigenvectorMatrix", Matrix.class);

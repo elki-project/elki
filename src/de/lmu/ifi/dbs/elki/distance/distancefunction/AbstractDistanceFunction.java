@@ -36,11 +36,11 @@ public abstract class AbstractDistanceFunction<O extends DatabaseObject, D exten
     }
 
     /**
-     * Returns the distance between the two objcts specified by their obejct ids.
+     * Returns the distance between the two object specified by their object ids.
      *
      * @param id1 first object id
      * @param id2 second object id
-     * @return the distance between the two objcts specified by their obejct ids
+     * @return the distance between the two object specified by their object ids
      */
     public D distance(Integer id1, Integer id2) {
         return distance(getDatabase().get(id1), getDatabase().get(id2));
