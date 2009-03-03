@@ -33,7 +33,7 @@ public class FileBasedDoubleDistanceFunction
      *
      * @param id1 first object id
      * @param o2  second DatabaseObject
-     * @return the distance between the two objcts specified by their obejct ids
+     * @return the distance between the two objects specified by their objects ids
      */
     @Override
     public DoubleDistance distance(Integer id1, ExternalObject o2) {
@@ -41,14 +41,14 @@ public class FileBasedDoubleDistanceFunction
     }
 
     /**
-     * Returns the distance between the two objcts specified by their obejct ids.
+     * Returns the distance between the two objects specified by their objects ids.
      * If a cache is used, the distance value is looked up in the cache. If the distance
      * does not yet exists in cache, it will be computed an put to cache.  If
      * no cache is used, the distance is computed.
      *
      * @param id1 first object id
      * @param id2 second object id
-     * @return the distance between the two objcts specified by their obejct ids
+     * @return the distance between the two objects specified by their objects ids
      */
     @Override
     @SuppressWarnings("unchecked")
