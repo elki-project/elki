@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.database.connection;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.util.zip.GZIPInputStream;
 
@@ -52,33 +53,47 @@ public class FileBasedDatabaseConnection<O extends DatabaseObject> extends Input
 
     try {
       in = new FileInputStream(INPUT_PARAM.getValue());
-      // try autodetecting gzip compression.
-      if (!in.markSupported()) {
-        PushbackInputStream pb = new PushbackInputStream(in, 16);
-        in = pb;
-        // read a magic from the file header
-        byte[] magic = {0, 0};
-        pb.read(magic);
-        pb.unread(magic);
-        if (magic[0] == 31 && magic[1] == -117) {
-          in = new GZIPInputStream(pb);
-        }
-      } else
-      if (in.markSupported()) {
-        in.mark(16);
-        if (in.read() == 31 && in.read() == -117) {
-          in.reset();
-          in = new GZIPInputStream(in);
-        } else {
-          // just rewind the stream
-          in.reset();
-        }
-      }
+      in = tryGzipInput(in);
     }
     catch(IOException e) {
       throw new WrongParameterValueException(INPUT_PARAM, INPUT_PARAM.getValue().getPath(), e);
     }
 
     return remainingParameters;
+  }
+  
+  /**
+   * Try to open a stream as gzip, if it starts with the gzip magic.
+   * 
+   * TODO: move to utils package.
+   * 
+   * @param in original input stream
+   * @return old input stream or a {@link GZIPInputStream} if appropriate.
+   * @throws IOException
+   */
+  public static InputStream tryGzipInput(InputStream in) throws IOException {
+    // try autodetecting gzip compression.
+    if (!in.markSupported()) {
+      PushbackInputStream pb = new PushbackInputStream(in, 16);
+      in = pb;
+      // read a magic from the file header
+      byte[] magic = {0, 0};
+      pb.read(magic);
+      pb.unread(magic);
+      if (magic[0] == 31 && magic[1] == -117) {
+        in = new GZIPInputStream(pb);
+      }
+    } else
+    if (in.markSupported()) {
+      in.mark(16);
+      if (in.read() == 31 && in.read() == -117) {
+        in.reset();
+        in = new GZIPInputStream(in);
+      } else {
+        // just rewind the stream
+        in.reset();
+      }
+    }
+    return in;
   }
 }
