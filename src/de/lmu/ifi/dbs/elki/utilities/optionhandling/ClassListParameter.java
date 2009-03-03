@@ -71,24 +71,17 @@ public class ClassListParameter<C> extends ListParameter<String> {
   public boolean isValid(String value) throws ParameterException {
     String[] classes = SPLIT.split(value);
     if(classes.length == 0) {
-      throw new WrongParameterValueException("Wrong parameter format! Given list of classes for paramter \"" + getName() + "\" is either empty or has the wrong format!\nParameter value required:\n" + getDescription());
+      throw new WrongParameterValueException(this.name, value, "Wrong parameter format! Given list of classes for paramter \"" + getName() + "\" is either empty or has the wrong format!\nParameter value required:\n" + getDescription());
     }
 
     for(String cl : classes) {
       try {
-        if(!restrictionClass.isAssignableFrom(Class.forName(cl))) {
-          throw new WrongParameterValueException("Wrong parameter value for parameter +\"" + getName() + "\". Given class " + cl + " does not extend restriction class " + restrictionClass + ".\n");
+        if(!ClassParameter.satisfiesClassRestriction(restrictionClass, cl)) {
+          throw new WrongParameterValueException(this.name, cl, "Wrong parameter value for parameter \"" + getName() + "\". Given class " + cl + " does not extend restriction class " + restrictionClass + ".\n");
         }
       }
       catch(ClassNotFoundException e) {
-        try {
-          if (!restrictionClass.isAssignableFrom(Class.forName(restrictionClass.getPackage().getName() + "." + value))) {
-            throw new WrongParameterValueException("Wrong parameter value for parameter +\"" + getName() + "\". Given class " + cl + " does not extend restriction class " + restrictionClass + ".\n");            
-          }
-        }
-        catch(ClassNotFoundException e2) {
-          throw new WrongParameterValueException("Wrong parameter value for parameter +\"" + getName() + "\". Given class " + cl + " not found.\n");
-        }
+        throw new WrongParameterValueException(this.name, cl, "Wrong parameter value for parameter \"" + getName() + "\". Given class " + cl + " not found.\n", e);
       }
     }
 
