@@ -111,7 +111,6 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
       List<ParsingResult<O>> parsingResults = new ArrayList<ParsingResult<O>>(numberOfRepresentations);
       int numberOfObjects = 0;
       for(int r = 0; r < numberOfRepresentations; r++) {
-        debugFine("Parsing file " + (r + 1) + ".");
         ParsingResult<O> parsingResult = parsers.get(r).parse(inputStreams.get(r));
         parsingResults.add(parsingResult);
         numberOfObjects = Math.max(parsingResult.getObjectAndLabelList().size(), numberOfObjects);
@@ -130,8 +129,9 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
           representations.add(parsingResult.getObjectAndLabelList().get(i).getFirst());
           List<String> rep_labels = parsingResult.getObjectAndLabelList().get(i).getSecond();
           for(String l : rep_labels) {
-            if(!labels.contains(l))
+            if(!labels.contains(l)) {
               labels.add(l);
+            }
           }
         }
         objectAndLabelsList.add(new SimplePair<MultiRepresentedObject<O>, List<String>>(new MultiRepresentedObject<O>(representations), labels));
