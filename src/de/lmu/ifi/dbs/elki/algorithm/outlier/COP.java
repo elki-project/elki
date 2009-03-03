@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * @author Erich Schubert
  * @param <V> the type of Realvector handled by this Algorithm
  */
-public class CorrelationOutlierProbability<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, DoubleDistance, MultiResult> {
+public class COP<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, DoubleDistance, MultiResult> {
     /**
      * OptionID for {@link #K_PARAM}
      */
@@ -70,7 +70,7 @@ public class CorrelationOutlierProbability<V extends RealVector<V, ?>> extends D
      * Sets minimum points to the optionhandler additionally to the parameters
      * provided by super-classes.
      */
-    public CorrelationOutlierProbability() {
+    public COP() {
         super();
         addOption(K_PARAM);
     }
