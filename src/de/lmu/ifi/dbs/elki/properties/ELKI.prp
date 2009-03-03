@@ -4,7 +4,7 @@ STACK_TRACE_CLI=true
 # #######################################################
 # algorithms - default package: de.lmu.ifi.dbs.elki.algorithm
 de.lmu.ifi.dbs.elki.algorithm.Algorithm=\
-		   de.lmu.ifi.dbs.elki.algorithm.outlier.CorrelationOutlierProbability,\
+		   de.lmu.ifi.dbs.elki.algorithm.outlier.COP,\
 		   de.lmu.ifi.dbs.elki.algorithm.outlier.GeneralizedLOF,\
 		   de.lmu.ifi.dbs.elki.algorithm.outlier.LOF,\
 		   de.lmu.ifi.dbs.elki.algorithm.outlier.OnlineLOF,\
