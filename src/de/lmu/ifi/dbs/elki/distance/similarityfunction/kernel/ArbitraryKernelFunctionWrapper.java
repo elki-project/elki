@@ -40,7 +40,7 @@ public class ArbitraryKernelFunctionWrapper<O extends RealVector<O, ? >> extends
 	 *
 	 * @param o1  first DatabaseObject
 	 * @param o2  second DatabaseObject
-	 * @return the distance between the two objcts specified by their obejct ids
+	 * @return the distance between the two object specified by their object ids
 	 */
 	@Override
 	public DoubleDistance distance(final O o1, final O o2) {
