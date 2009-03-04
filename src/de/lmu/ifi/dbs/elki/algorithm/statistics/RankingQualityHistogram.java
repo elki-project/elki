@@ -111,27 +111,43 @@ public class RankingQualityHistogram<V extends RealVector<V, ?>> extends Distanc
    * @param nei
    * @return area under curve
    */
+  // TODO: make static, move into utilities.
   private double computeROCAUC(int size, Cluster<?> clus, List<QueryResult<DoubleDistance>> nei) {
     int postot = clus.size();
     int negtot = size - postot;
-    int poscur = 0;
-    int negcur = 0;
+    int poscnt = 0;
+    int negcnt = 0;
     double lastpos = 0.0;
-    double lastfalse = 0.0;
+    double lastneg = 0.0;
     double result = 0.0;
     Collection<Integer> ids = clus.getIDs();
-    for(QueryResult<DoubleDistance> p : nei) {
+    
+    // we need an array since using an integer index is much more convenient
+    // for merging multiple equi-distant neighbors.
+    ArrayList<QueryResult<DoubleDistance>> n = new ArrayList<QueryResult<DoubleDistance>>(nei);
+    
+    // TODO: rewrite to use the original list. We only need 1 lookahead.
+    for (int i = 0; i < n.size(); i++) {
+      QueryResult<DoubleDistance> p = n.get(i); 
       if(ids.contains(p.getID())) {
-        poscur += 1;
+        poscnt += 1;
       }
       else {
-        negcur += 1;
+        negcnt += 1;
       }
-      double posrate = ((double) poscur) / postot;
-      double negrate = ((double) negcur) / negtot;
-      result += (negrate - lastfalse) * lastpos;
-      lastfalse = negrate;
-      lastpos = posrate;
+      // defer calculation if this points distance equals the next points distance.
+      if (i + 1 < n.size()) {
+        if (n.get(i+1).getDistance().compareTo(p.getDistance()) == 0) {
+          continue;
+        }
+      }
+      // since lastfalse and lastpost were last updated
+      double curpos = ((double) poscnt) / postot;
+      double curneg = ((double) negcnt) / negtot;
+      // width * height at half way.
+      result += (curneg - lastneg) * (curpos + lastpos) / 2;
+      lastpos = curpos;
+      lastneg = curneg;
     }
     return result;
   }
