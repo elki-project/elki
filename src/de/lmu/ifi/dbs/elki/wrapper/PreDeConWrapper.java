@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PreDeCon;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.utilities.Util;
@@ -10,6 +8,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+
+import java.util.List;
 
 /**
  * A wrapper for the PreDeCon algorithm. Performs an attribute wise normalization on
