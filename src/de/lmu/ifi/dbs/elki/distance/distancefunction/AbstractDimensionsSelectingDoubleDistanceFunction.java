@@ -35,7 +35,7 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
   /**
    * Dimensions parameter.
    */
-  private final IntListParameter DIMS_PARAM = new IntListParameter(DIMS_ID, new ListGreaterEqualConstraint<Integer>(0), true, null);
+  private final IntListParameter DIMS_PARAM = new IntListParameter(DIMS_ID, new ListGreaterEqualConstraint<Integer>(1), true, null);
 
   /**
    * The dimensions to be considered for distance computation.
@@ -56,11 +56,11 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
     String[] remainingParameters = super.setParameters(args);
 
     // dim
-    //dimensions = new BitSet();
     if (DIMS_PARAM.isSet()) {
+      dimensions.clear();
       List<Integer> dimensionList = DIMS_PARAM.getValue();
       for (int d : dimensionList) {
-        dimensions.set(d);
+        dimensions.set(d-1);
       }
     }
 
@@ -82,12 +82,18 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
    * Sets the selected dimensions according to the set bits in the given BitSet.
    * 
    * 
-   * @param dimensions a BitSet designating the new selected dimensions
+   * @param dimensions a BitSet designating the new selected dimensions 
    */
   public void setSelectedDimensions(BitSet dimensions) {
+    String s = dimensions.toString().replace("{", "").replace("}", "").replace(" ", "");
+    try {
+      this.DIMS_PARAM.setValue(s);
+    }
+    catch(ParameterException e) {
+      throw new IllegalArgumentException(e);
+    }
     this.dimensions.clear();
     this.dimensions.or(dimensions);
-    // TODO: set value in parameter
   }
   
   

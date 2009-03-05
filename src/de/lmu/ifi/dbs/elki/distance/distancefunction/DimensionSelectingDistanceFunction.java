@@ -24,7 +24,7 @@ public class DimensionSelectingDistanceFunction<N extends Number, V extends Feat
      * OptionID for {@link #DIM_PARAM}
      */
     public static final OptionID DIM_ID = OptionID.getOrCreateOptionID("dim",
-        "a integer between 1 and the dimensionality of the " +
+        "an integer between 1 and the dimensionality of the " +
         "feature space 1 specifying the dimension to be considered " +
         "for distance computation.");
 
