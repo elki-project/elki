@@ -11,6 +11,10 @@ import java.util.Random;
  * Interface FeatureVector defines the methods that should be implemented by any
  * Object that is element of a real vector space of type N.
  * 
+ * 
+ * @param <V> the type of FeatureVector implemented by a subclass
+ * @param <N> the type of the attribute values
+ * 
  * @author Arthur Zimek 
  */
 public interface FeatureVector<V extends FeatureVector<V,N>,N extends Number> extends DatabaseObject, SpatialObject
