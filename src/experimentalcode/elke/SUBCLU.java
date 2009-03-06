@@ -29,15 +29,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalDistanceFu
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
 /**
- * <p/>
+ * <p>
  * Implementation of the SUBCLU algorithm, an algorithm to
  * detect arbitrarily shaped and positioned clusters
- * in subspaces.
+ * in subspaces.</p>
  * SUBCLU delivers for each subspace the same clusters
  * DBSCAN would have found, when applied to this
  * subspace separately.
- * </p>
- * <p/>
+ * 
+ * <p>
  * Reference:
  * <br>K. Kailing, H.-P. Kriegel, P. Kroeger:
  * Density connected Subspace Clustering for High Dimensional Data.
@@ -198,7 +198,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
             "Density connected Subspace Clustering",
             "Algorithm to detect arbitrarily shaped and positioned clusters " +
                 "in subspaces. SUBCLU delivers for each subspace the same clusters " +
-                "DBSCAN would have found, when applied to this subspace seperately.. ",
+                "DBSCAN would have found, when applied to this subspace seperately. ",
             "K. Kailing, H.-P. Kriegel, P. Kroeger: " +
                 "Density connected Subspace Clustering for High Dimensional Data. " +
                 "In Proc. SIAM Int. Conf. on Data Mining (SDM'04), Lake Buena Vista, FL, 2004.");
