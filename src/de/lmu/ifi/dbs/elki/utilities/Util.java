@@ -714,6 +714,19 @@ public final class Util extends AbstractLoggable {
         // centroid
         O centroid = centroid(database);
 
+        return covarianceMatrix(database, centroid);
+    }
+
+    /**
+     * <p>Determines the covariance matrix of the objects stored in the given
+     * database w.r.t. the given centroid.</p>
+     *
+     * @param database the database storing the objects
+     * @param centroid the dentroid of the database
+     * @return the covarianvce matrix of the specified objects
+     */
+    public static <O extends RealVector<O, ?>> Matrix covarianceMatrix(Database<O> database, O centroid) {
+
         // centered matrix
         int columns = centroid.getDimensionality();
         int rows = database.size();
@@ -736,6 +749,7 @@ public final class Util extends AbstractLoggable {
         return cov;
     }
 
+    
     /**
      * Determines the d x d covariance matrix of the given n x d data matrix.
      *
