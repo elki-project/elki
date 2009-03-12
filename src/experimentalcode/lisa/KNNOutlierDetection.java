@@ -88,7 +88,8 @@ public class KNNOutlierDetection <O extends DatabaseObject, D extends Distance<D
 		  /**
 		   * Runs the algorithm in the timed evaluation part.
 		   */
-		  @Override
+
+      @Override
 		  protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
 			  getDistanceFunction().setDatabase(database, isVerbose(), isTime());
 			  Iterator<Integer> iter = database.iterator();
@@ -100,18 +101,17 @@ public class KNNOutlierDetection <O extends DatabaseObject, D extends Distance<D
 				 D dkn = database.kNNQueryForID(id,  k, getDistanceFunction()).get(k-1).getDistance();
 				  database.associate(KNNO_ODEGREE, id, dkn);
 			  }
-			  //AnnotationsFromDatabase<O, D> res1 = new AnnotationsFromDatabase<O, D>(database);
-		       // res1.addAssociation("KNNO_ODEGREE", KNNO_ODEGREE);
+			  AnnotationsFromDatabase<O, D> res1 = new AnnotationsFromDatabase<O, D>(database);
+		       res1.addAssociation("KNNO_ODEGREE", (AssociationID<D>)KNNO_ODEGREE);
 		        // Ordering
-		        //OrderingFromAssociation<D, O> res2 = new OrderingFromAssociation<D, O>(database, KNNO_ODEGREE, true); 
+		        OrderingFromAssociation<D, O> res2 = new OrderingFromAssociation<D, O>(database,(AssociationID<D>) KNNO_ODEGREE, true); 
 		        // combine results.
-		        //result = new MultiResult();
-		        //result.addResult(res1);
-		        //result.addResult(res2);
-				//return result;
+		        result = new MultiResult();
+		        result.addResult(res1);
+		        result.addResult(res2);
+		        return result;
 				
-			  return null;
-			  
+
 			 
 		  }
 

@@ -114,7 +114,7 @@ public class SimpleIndexBasedOutlierDetection <O extends DatabaseObject, D exten
 		    	//range query for each object. stop if m objects are found
 		    	for (Integer id : database.getIDs()){
 			    	Iterator<Integer> iterator = database.iterator();
-			        int count = 0;
+			        int count = 0;  
 			    	while (iterator.hasNext()&& count < m) {
 			            Integer currentID = iterator.next();
 			            D currentDistance = getDistanceFunction().distance(id, currentID);

@@ -23,13 +23,14 @@ public class GaussianModelOutlierDetection<V extends RealVector<V,Double>> exten
 	protected MultiResult runInTime(Database<V> database) throws IllegalStateException {
 		V mean = Util.centroid(database);
 		V meanNeg = mean.negativeVector();
-		Matrix covarianzTransposed = Util.covarianceMatrix(database, mean).transpose();	
+		Matrix covarianceTransposed = Util.covarianceMatrix(database, mean).transpose();	
 		//for each object compute mahalanobis distance
 		 for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); ) {
              Integer id = iter.next();
              V x = database.get(id);
              Vector x_minus_mean = x.plus(meanNeg).getColumnVector();
-             double mDist = x_minus_mean.times(covarianzTransposed).times(x_minus_mean.transpose()).get(0,0);
+             //transpose andersrum
+             double mDist = (x_minus_mean.times.(covarianceTransposed).times(x_minus_mean.transpose()).get(0,0);
              database.associate(GMOD_MDIST, id, mDist); 
 		 }
 		 AnnotationsFromDatabase<V, Double> res1 = new AnnotationsFromDatabase<V, Double>(database);
@@ -40,11 +41,7 @@ public class GaussianModelOutlierDetection<V extends RealVector<V,Double>> exten
 	        result = new MultiResult();
 	        result.addResult(res1);
 	        result.addResult(res2);
-			return result;
-			
-		 
-		 
-	
+			return result;	 
 	}
 
 	@Override
@@ -55,8 +52,7 @@ public class GaussianModelOutlierDetection<V extends RealVector<V,Double>> exten
 
 	@Override
 	public MultiResult getResult() {
-		// TODO Auto-generated method stub
-		return null;
+		return result;
 	}
 	
 
