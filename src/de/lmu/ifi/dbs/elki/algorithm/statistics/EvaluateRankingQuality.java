@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.evaluation.roc.ROCAUC;
 import de.lmu.ifi.dbs.elki.math.Histogram;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
@@ -101,7 +102,7 @@ public class EvaluateRankingQuality<V extends RealVector<V, ?>> extends Distance
       for(int ind = 0; ind < cmem.size(); ind++) {
         Integer i1 = cmem.get(ind).getSecond();
         List<QueryResult<DoubleDistance>> knn = database.kNNQueryForID(i1, size, distFunc);
-        double result = computeROCAUC(size, clus, knn);
+        double result = ROCAUC.computeROCAUC(size, clus, knn);
 
         hist.get(((double)ind) / clus.size()).addData(result);
 
@@ -124,39 +125,6 @@ public class EvaluateRankingQuality<V extends RealVector<V, ?>> extends Distance
       res.add(row);
     }
     result = new CollectionResult<DoubleVector>(res);
-    return result;
-  }
-
-  /**
-   * Compute a ROC curves Area-under-curve.
-   * 
-   * @param size
-   * @param clus
-   * @param nei
-   * @return area under curve
-   */
-  private double computeROCAUC(int size, Cluster<?> clus, List<QueryResult<DoubleDistance>> nei) {
-    int postot = clus.size();
-    int negtot = size - postot;
-    int poscur = 0;
-    int negcur = 0;
-    double lastpos = 0.0;
-    double lastfalse = 0.0;
-    double result = 0.0;
-    Collection<Integer> ids = clus.getIDs();
-    for(QueryResult<DoubleDistance> p : nei) {
-      if(ids.contains(p.getID())) {
-        poscur += 1;
-      }
-      else {
-        negcur += 1;
-      }
-      double posrate = ((double) poscur) / postot;
-      double negrate = ((double) negcur) / negtot;
-      result += (negrate - lastfalse) * lastpos;
-      lastfalse = negrate;
-      lastpos = posrate;
-    }
     return result;
   }
 

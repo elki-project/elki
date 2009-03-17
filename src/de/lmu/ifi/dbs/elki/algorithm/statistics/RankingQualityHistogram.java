@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.evaluation.roc.ROCAUC;
 import de.lmu.ifi.dbs.elki.math.Histogram;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
@@ -78,9 +79,9 @@ public class RankingQualityHistogram<V extends RealVector<V, ?>> extends Distanc
     for(Cluster<?> clus : splitted) {
       for(Integer i1 : clus.getIDs()) {
         List<QueryResult<DoubleDistance>> knn = database.kNNQueryForID(i1, size, distFunc);
-        double result = computeROCAUC(size, clus, knn);
+        double result = ROCAUC.computeROCAUC(size, clus, knn);
 
-        hist.put(result, hist.get(result) + 1./size);
+        hist.put(result, hist.get(result) + 1. / size);
 
         if(isVerbose()) {
           rocproc++;
@@ -95,60 +96,11 @@ public class RankingQualityHistogram<V extends RealVector<V, ?>> extends Distanc
 
     // Transform Histogram into a Double Vector array.
     Collection<DoubleVector> res = new ArrayList<DoubleVector>(size);
-    for (SimplePair<Double, Double> pair : hist) {
+    for(SimplePair<Double, Double> pair : hist) {
       DoubleVector row = new DoubleVector(new double[] { pair.getFirst(), pair.getSecond() });
       res.add(row);
     }
     result = new CollectionResult<DoubleVector>(res);
-    return result;
-  }
-
-  /**
-   * Compute a ROC curves Area-under-curve.
-   * 
-   * @param size
-   * @param clus
-   * @param nei
-   * @return area under curve
-   */
-  // TODO: make static, move into utilities.
-  private double computeROCAUC(int size, Cluster<?> clus, List<QueryResult<DoubleDistance>> nei) {
-    int postot = clus.size();
-    int negtot = size - postot;
-    int poscnt = 0;
-    int negcnt = 0;
-    double lastpos = 0.0;
-    double lastneg = 0.0;
-    double result = 0.0;
-    Collection<Integer> ids = clus.getIDs();
-    
-    // we need an array since using an integer index is much more convenient
-    // for merging multiple equi-distant neighbors.
-    ArrayList<QueryResult<DoubleDistance>> n = new ArrayList<QueryResult<DoubleDistance>>(nei);
-    
-    // TODO: rewrite to use the original list. We only need 1 lookahead.
-    for (int i = 0; i < n.size(); i++) {
-      QueryResult<DoubleDistance> p = n.get(i); 
-      if(ids.contains(p.getID())) {
-        poscnt += 1;
-      }
-      else {
-        negcnt += 1;
-      }
-      // defer calculation if this points distance equals the next points distance.
-      if (i + 1 < n.size()) {
-        if (n.get(i+1).getDistance().compareTo(p.getDistance()) == 0) {
-          continue;
-        }
-      }
-      // since lastfalse and lastpost were last updated
-      double curpos = ((double) poscnt) / postot;
-      double curneg = ((double) negcnt) / negtot;
-      // width * height at half way.
-      result += (curneg - lastneg) * (curpos + lastpos) / 2;
-      lastpos = curpos;
-      lastneg = curneg;
-    }
     return result;
   }
 
