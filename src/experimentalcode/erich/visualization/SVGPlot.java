@@ -16,6 +16,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.batik.dom.svg.SVGDOMImplementation;
+import org.apache.batik.dom.util.DOMUtilities;
 import org.apache.batik.transcoder.Transcoder;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
@@ -122,7 +123,7 @@ public class SVGPlot {
    *        or left hand side
    */
   public void drawAxis(Element parent, LinearScale scale, double x1, double y1, double x2, double y2, boolean labels, boolean righthanded) {
-    assert(parent != null);
+    assert (parent != null);
     Element line = svgElement("line");
     SVGUtil.setAtt(line, "x1", x1);
     SVGUtil.setAtt(line, "y1", -y1);
@@ -220,7 +221,7 @@ public class SVGPlot {
   @Deprecated
   public Element svgElement(Element parent, String name) {
     Element e = SVGUtil.svgElement(document, name);
-    if (parent != null) {
+    if(parent != null) {
       parent.appendChild(e);
     }
     return e;
@@ -304,7 +305,11 @@ public class SVGPlot {
    * @throws TranscoderException On input/parsing errors
    */
   protected void transcode(File file, Transcoder transcoder) throws IOException, TranscoderException {
-    TranscoderInput input = new TranscoderInput(getDocument());
+    // Since the Transcoder is Batik-based, it will replace the rendering tree,
+    // which would then break display. Thus we need to deep clone the document first.
+    // -- found by Simon.
+    SVGDocument doc = (SVGDocument) DOMUtilities.deepCloneDocument(getDocument(), getDocument().getImplementation());
+    TranscoderInput input = new TranscoderInput(doc);
     OutputStream out = new FileOutputStream(file);
     TranscoderOutput output = new TranscoderOutput(out);
     transcoder.transcode(input, output);
