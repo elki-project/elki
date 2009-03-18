@@ -15,18 +15,18 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
-import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
+import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.IDIDDoubleTriple;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparableTriple;
 import de.lmu.ifi.dbs.elki.utilities.pairs.IntDoublePair;
 
 /**
@@ -339,7 +339,7 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
         }
 
         Map<Integer, Set<Integer>> dimensionMap = new HashMap<Integer, Set<Integer>>();
-        List<IDIDDoubleTriple> z_ijs = new ArrayList<IDIDDoubleTriple>();
+        List<ComparableTriple<Double,Integer,Integer>> z_ijs = new ArrayList<ComparableTriple<Double,Integer,Integer>>();
         for (Integer m_i : medoids) {
             Set<Integer> dims_i = new HashSet<Integer>();
             dimensionMap.put(m_i, dims_i);
@@ -362,21 +362,21 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
             sigma_i = Math.sqrt(sigma_i);
 
             for (int j = 0; j < dim; j++) {
-                z_ijs.add(new IDIDDoubleTriple(m_i, j + 1, (x_i[j] - y_i) / sigma_i));
+                z_ijs.add(new ComparableTriple<Double,Integer,Integer>((x_i[j] - y_i) / sigma_i, m_i, j + 1));
             }
         }
         Collections.sort(z_ijs);
 
         int max = Math.max(getK() * getL(), 2);
         for (int m = 0; m < max; m++) {
-            IDIDDoubleTriple z_ij = z_ijs.get(m);
+          ComparableTriple<Double,Integer,Integer> z_ij = z_ijs.get(m);
 
             if (debug) {
                 debugFine("z_ij " + z_ij);
             }
 
-            Set<Integer> dims_i = dimensionMap.get(z_ij.getId1());
-            dims_i.add(z_ij.getId2());
+            Set<Integer> dims_i = dimensionMap.get(z_ij.getSecond());
+            dims_i.add(z_ij.getThird());
         }
         return dimensionMap;
     }
