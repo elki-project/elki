@@ -10,7 +10,7 @@ import java.io.RandomAccessFile;
 
 /**
  * A PersistentPageFile stores objects persistently that implement the
- * <code>Page</code> interface. For convienience each page is represented by a
+ * <code>Page</code> interface. For convenience each page is represented by a
  * single file. All pages are stored in a specified directory.
  *
  * @author Elke Achtert 
