@@ -4,7 +4,7 @@
  *	by L.Horisberger & G.Schweizer
  * last change: 26.02.1998 by horil
  **/
-package de.lmu.ifi.dbs.elki.tree.btree;
+package de.lmu.ifi.dbs.elki.utilities.tree.btree;
 
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;

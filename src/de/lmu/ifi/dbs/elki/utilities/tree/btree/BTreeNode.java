@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.tree.btree;
+package de.lmu.ifi.dbs.elki.utilities.tree.btree;
 
 import de.lmu.ifi.dbs.elki.persistent.AbstractPage;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;

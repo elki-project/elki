@@ -3,10 +3,10 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.parser.AbstractParser;
-import de.lmu.ifi.dbs.elki.tree.btree.BTree;
-import de.lmu.ifi.dbs.elki.tree.btree.BTreeData;
-import de.lmu.ifi.dbs.elki.tree.btree.DefaultKey;
 import de.lmu.ifi.dbs.elki.utilities.output.ObjectPrinter;
+import de.lmu.ifi.dbs.elki.utilities.tree.btree.BTree;
+import de.lmu.ifi.dbs.elki.utilities.tree.btree.BTreeData;
+import de.lmu.ifi.dbs.elki.utilities.tree.btree.DefaultKey;
 
 import java.io.BufferedReader;
 import java.io.File;

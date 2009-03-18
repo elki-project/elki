@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.tree.btree;
+package de.lmu.ifi.dbs.elki.utilities.tree.btree;
 
 import java.io.Externalizable;
 import java.io.IOException;
