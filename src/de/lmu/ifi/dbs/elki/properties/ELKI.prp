@@ -167,40 +167,40 @@ de.lmu.ifi.dbs.elki.preprocessing.ProjectedDBSCANPreprocessor=de.lmu.ifi.dbs.elk
 de.lmu.ifi.dbs.elki.result.ResultHandler=\
            de.lmu.ifi.dbs.elki.result.ResultWriter
 # #######################################################
-# EigenPairFilter - default package: de.lmu.ifi.dbs.elki.varianceanalysis
-de.lmu.ifi.dbs.elki.varianceanalysis.EigenPairFilter=de.lmu.ifi.dbs.elki.varianceanalysis.FirstNEigenPairFilter,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.LimitEigenPairFilter,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.PercentageEigenPairFilter,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.ProgressiveEigenPairFilter,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.WeakEigenPairFilter,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.RelativeEigenPairFilter,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.SignificantEigenPairFilter,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.CompositeEigenPairFilter
+# EigenPairFilter - default package: de.lmu.ifi.dbs.elki.math.linearalgebra.pca
+de.lmu.ifi.dbs.elki.math.linearalgebra.pca.EigenPairFilter=de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FirstNEigenPairFilter,\
+  de.lmu.ifi.dbs.elki.math.linearalgebra.pca.LimitEigenPairFilter,\
+  de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PercentageEigenPairFilter,\
+  de.lmu.ifi.dbs.elki.math.linearalgebra.pca.ProgressiveEigenPairFilter,\
+  de.lmu.ifi.dbs.elki.math.linearalgebra.pca.WeakEigenPairFilter,\
+  de.lmu.ifi.dbs.elki.math.linearalgebra.pca.RelativeEigenPairFilter,\
+  de.lmu.ifi.dbs.elki.math.linearalgebra.pca.SignificantEigenPairFilter,\
+  de.lmu.ifi.dbs.elki.math.linearalgebra.pca.CompositeEigenPairFilter
 # #######################################################
-# CovarianceMatrixBuilder - default package: de.lmu.ifi.dbs.elki.varianceanalysis
-de.lmu.ifi.dbs.elki.varianceanalysis.CovarianceMatrixBuilder=de.lmu.ifi.dbs.elki.varianceanalysis.PlainCovarianceMatrixBuilder,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.KernelCovarianceMatrixBuilder,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.WeightedCovarianceMatrixBuilder
+# CovarianceMatrixBuilder - default package: de.lmu.ifi.dbs.elki.math.linearalgebra.pca
+de.lmu.ifi.dbs.elki.math.linearalgebra.pca.CovarianceMatrixBuilder=de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PlainCovarianceMatrixBuilder,\
+  de.lmu.ifi.dbs.elki.math.linearalgebra.pca.KernelCovarianceMatrixBuilder,\
+  de.lmu.ifi.dbs.elki.math.linearalgebra.pca.WeightedCovarianceMatrixBuilder
 # #######################################################
-# WeightFunction - default package: de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions
-de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.WeightFunction=de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.ConstantWeight,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.ErfcStddevWeight,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.ErfcWeight,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.ExponentialStddevWeight,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.ExponentialWeight,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.GaussStddevWeight,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.GaussWeight,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.InverseLinearWeight,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.InverseProportionalStddevWeight,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.InverseProportionalWeight,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.LinearWeight,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.QuadraticStddevWeight,\
-  de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.QuadraticWeight
+# WeightFunction - default package: de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions
+de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.WeightFunction=de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ConstantWeight,\
+  de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ErfcStddevWeight,\
+  de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ErfcWeight,\
+  de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ExponentialStddevWeight,\
+  de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ExponentialWeight,\
+  de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.GaussStddevWeight,\
+  de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.GaussWeight,\
+  de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.InverseLinearWeight,\
+  de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.InverseProportionalStddevWeight,\
+  de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.InverseProportionalWeight,\
+  de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.LinearWeight,\
+  de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.QuadraticStddevWeight,\
+  de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.QuadraticWeight
 # #######################################################
 # ContrastFunction - default package: de.lmu.ifi.dbs.elki.varianceanalysis.ica
-#de.lmu.ifi.dbs.elki.varianceanalysis.ica.ContrastFunction=de.lmu.ifi.dbs.elki.varianceanalysis.ica.ExponentialContrastFunction,\
-#  de.lmu.ifi.dbs.elki.varianceanalysis.ica.KurtosisBasedContrastFunction,\
-#  de.lmu.ifi.dbs.elki.varianceanalysis.ica.TanhContrastFunction
+#experimentalcode.elke.ica.ContrastFunction=experimentalcode.elke.ica.ExponentialContrastFunction,\
+#  experimentalcode.elke.ica.KurtosisBasedContrastFunction,\
+#  experimentalcode.elke.ica.TanhContrastFunction
 # #######################################################
 # Parameterizable - default package: de.lmu.ifi.dbs.elki.utilities.optionhandling
 #de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable=de.lmu.ifi.dbs.elki.KDDTask,\
