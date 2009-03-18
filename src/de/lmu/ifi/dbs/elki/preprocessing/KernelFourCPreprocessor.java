@@ -9,6 +9,11 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.ArbitraryKernelFunctionWrapper;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.LinearKernelFunction;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.CompositeEigenPairFilter;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.LimitEigenPairFilter;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.NormalizingEigenPairFilter;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
@@ -22,11 +27,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterFlagGlobalConstraint;
-import de.lmu.ifi.dbs.elki.varianceanalysis.CompositeEigenPairFilter;
-import de.lmu.ifi.dbs.elki.varianceanalysis.LimitEigenPairFilter;
-import de.lmu.ifi.dbs.elki.varianceanalysis.NormalizingEigenPairFilter;
-import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredResult;
-import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredRunner;
 
 /**
  * Preprocessor for kernel 4C local dimensionality, neighbor objects and strong

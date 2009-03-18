@@ -20,13 +20,13 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.BitDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ERiCDistanceFunction;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FirstNEigenPairFilter;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.varianceanalysis.FirstNEigenPairFilter;
-import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredResult;
-import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredRunner;
 
 /**
  * Performs correlation clustering on the data

@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.*;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.*;
 
 public class TestWeightFunctions {
   /**

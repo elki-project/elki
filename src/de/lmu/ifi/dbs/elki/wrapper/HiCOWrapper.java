@@ -5,6 +5,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PCABasedCorrelationDistanceFunction;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PercentageEigenPairFilter;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.elki.utilities.Util;
@@ -18,7 +19,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterC
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
-import de.lmu.ifi.dbs.elki.varianceanalysis.PercentageEigenPairFilter;
 
 /**
  * Wrapper class for HiCO algorithm. Performs an attribute wise normalization on

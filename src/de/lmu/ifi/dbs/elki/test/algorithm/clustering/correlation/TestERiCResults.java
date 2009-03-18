@@ -19,14 +19,14 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ERiCDistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.RelativeEigenPairFilter;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.WeightedCovarianceMatrixBuilder;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ErfcWeight;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredRunner;
-import de.lmu.ifi.dbs.elki.varianceanalysis.RelativeEigenPairFilter;
-import de.lmu.ifi.dbs.elki.varianceanalysis.WeightedCovarianceMatrixBuilder;
-import de.lmu.ifi.dbs.elki.varianceanalysis.weightfunctions.ErfcWeight;
 
 public class TestERiCResults {
   // the following values depend on the data set used!

@@ -4,6 +4,9 @@ import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.LimitEigenPairFilter;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
@@ -16,9 +19,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterFlagGlobalConstraint;
-import de.lmu.ifi.dbs.elki.varianceanalysis.LimitEigenPairFilter;
-import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredResult;
-import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredRunner;
 
 import java.util.ArrayList;
 import java.util.List;

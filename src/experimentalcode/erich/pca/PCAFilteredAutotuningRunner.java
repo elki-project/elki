@@ -12,10 +12,10 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FilteredEigenPairs;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
-import de.lmu.ifi.dbs.elki.varianceanalysis.FilteredEigenPairs;
-import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredResult;
-import de.lmu.ifi.dbs.elki.varianceanalysis.PCAFilteredRunner;
 
 /**
  * Performs a self-tuning local PCA based on the covariance matrices of given

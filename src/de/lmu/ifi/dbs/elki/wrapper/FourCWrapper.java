@@ -6,6 +6,7 @@ import java.util.Vector;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.FourC;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PreDeCon;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.LimitEigenPairFilter;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
@@ -17,7 +18,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
-import de.lmu.ifi.dbs.elki.varianceanalysis.LimitEigenPairFilter;
 
 /**
  * A wrapper for the 4C algorithm. Performs an attribute wise normalization on
