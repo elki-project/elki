@@ -1,4 +1,4 @@
-package experimentalcode.elke;
+package experimentalcode.elke.algorithm;
 
 import java.util.ArrayList;
 import java.util.BitSet;
