@@ -7,7 +7,7 @@ import java.util.Stack;
 
 /**
  * Abstract class implementing general methods of a PageFile.
- * A PageFile stores objects that implement the <code>Page</code> inetrface.
+ * A PageFile stores objects that implement the <code>Page</code> interface.
  *
  * @author Elke Achtert 
  */
