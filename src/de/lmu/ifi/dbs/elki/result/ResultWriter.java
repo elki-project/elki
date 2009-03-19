@@ -18,6 +18,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
+/**
+ * Result handler that feeds the data into a TextWriter
+ * 
+ * @author Erich Schubert
+ *
+ * @param <O> Object type
+ */
 public class ResultWriter<O extends DatabaseObject> extends AbstractParameterizable implements ResultHandler<O, Result> {
   /**
    * Optional Parameter to specify the file to write the obtained results in. If
