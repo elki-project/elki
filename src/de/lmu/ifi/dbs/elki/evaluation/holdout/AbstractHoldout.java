@@ -4,7 +4,7 @@ import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 
 import java.util.Arrays;
@@ -31,7 +31,7 @@ public abstract class AbstractHoldout<O extends DatabaseObject, L extends ClassL
   @SuppressWarnings("unchecked")
   public void setClassLabels(Database<O> database) {
     // TODO: ugly hack?
-    this.labels = Util.getClassLabels(database).toArray((L[]) new Object[]{});
+    this.labels = DatabaseUtil.getClassLabels(database).toArray((L[]) new Object[]{});
     Arrays.sort(this.labels);
   }
 

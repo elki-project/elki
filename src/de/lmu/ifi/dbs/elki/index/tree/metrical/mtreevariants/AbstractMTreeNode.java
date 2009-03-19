@@ -2,11 +2,11 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.AbstractNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalNode;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 
 import java.util.List;
 
@@ -141,7 +141,7 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
         for (int i = 0; i < getNumEntries(); i++) {
             E entry = getEntry(i);
             D distance = mTree.distance(entry.getRoutingObjectID(), routingObjectID);
-            coveringRadius = Util.max(coveringRadius, distance);
+            coveringRadius = DistanceUtil.max(coveringRadius, distance);
         }
         return coveringRadius;
     }

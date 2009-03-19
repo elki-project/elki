@@ -3,8 +3,8 @@ package de.lmu.ifi.dbs.elki.evaluation.holdout;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -63,7 +63,7 @@ public class DisjointCrossValidation<O extends DatabaseObject, L extends ClassLa
     setClassLabels(database);
     TrainingAndTestSet<O,L>[] partitions = TrainingAndTestSet.newArray(nfold);
     List<Integer> ids = database.getIDs();
-    List<Integer>[] parts = Util.newArrayOfList(nfold);
+    List<Integer>[] parts = ClassGenericsUtil.newArrayOfList(nfold);
     for (int i = 0; i < nfold; i++) {
       parts[i] = new ArrayList<Integer>();
     }

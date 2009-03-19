@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rdknn;
 
+import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 
 /**
  * Represents a node in a RDkNN-Tree.
@@ -41,7 +41,7 @@ public class RdKNNNode<D extends NumberDistance<D,N>, N extends Number> extends 
     D result = getEntry(0).getKnnDistance();
     for (int i = 1; i < getNumEntries(); i++) {
       D knnDistance = getEntry(i).getKnnDistance();
-      result = Util.max(result, knnDistance);
+      result = DistanceUtil.max(result, knnDistance);
     }
     return result;
   }

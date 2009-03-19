@@ -10,8 +10,8 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 
 /**
  * This class generates a labeled database based on an existing clusering result.
@@ -58,7 +58,7 @@ public class LabelsFromClustering {
     // assign cluster labels
     int clusterID = 1;
     for(Cluster<M> c : clustering.getAllClusters()) {
-      L label = Util.instantiate(classLabel, classLabel.getName());
+      L label = ClassGenericsUtil.instantiate(classLabel, classLabel.getName());
       label.init(label_prefix + Integer.toString(clusterID));
       for(Integer id : c) {
         newdb.associate(AssociationID.CLASS, id, label);

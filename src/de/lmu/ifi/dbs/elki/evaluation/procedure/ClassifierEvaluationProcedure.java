@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.evaluation.EvaluationResult;
 import de.lmu.ifi.dbs.elki.evaluation.holdout.Holdout;
 import de.lmu.ifi.dbs.elki.evaluation.holdout.TrainingAndTestSet;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
@@ -83,8 +83,8 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
 
     @SuppressWarnings("unchecked")
     public void set(Database<O> training, Database<O> test) {
-        SortedSet<ClassLabel> labels = Util.getClassLabels(training);
-        labels.addAll(Util.getClassLabels(test));
+        SortedSet<ClassLabel> labels = DatabaseUtil.getClassLabels(training);
+        labels.addAll(DatabaseUtil.getClassLabels(test));
         // TODO: ugly cast.
         this.labels = labels.toArray((L[]) new Object[labels.size()]);
         this.holdout = null;
@@ -95,7 +95,7 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
 
     @SuppressWarnings("unchecked")
     public void set(Database<O> data, Holdout<O, L> holdout) {
-        SortedSet<ClassLabel> labels = Util.getClassLabels(data);
+        SortedSet<ClassLabel> labels = DatabaseUtil.getClassLabels(data);
         // TODO: ugly cast.
         this.labels = labels.toArray((L[]) new Object[labels.size()]);
 

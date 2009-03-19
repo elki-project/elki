@@ -19,9 +19,9 @@ import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -417,7 +417,7 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
             Set<Integer> objectIDs = clusterIDs.get(m_i);
             if (!objectIDs.isEmpty()) {
                 Set<Integer> clusterDimensions = dimensions.get(m_i);
-                V centroid = Util.centroid(database, objectIDs);
+                V centroid = DatabaseUtil.centroid(database, objectIDs);
                 clusters.put(m_i, new PROCLUSCluster(objectIDs, clusterDimensions, centroid));
             }
         }

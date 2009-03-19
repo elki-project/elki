@@ -5,7 +5,7 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 
 /**
  * Class for building a "traditional" covariance matrix.
@@ -24,7 +24,7 @@ public class StandardCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends
    */
   @Override
   public Matrix processDatabase(Database<V> database) {
-    return Util.covarianceMatrix(database);
+    return DatabaseUtil.covarianceMatrix(database);
   }
 
   /**
@@ -36,6 +36,6 @@ public class StandardCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends
    */
   @Override
   public Matrix processIds(Collection<Integer> ids, Database<V> database) {
-    return Util.covarianceMatrix(database, ids);
+    return DatabaseUtil.covarianceMatrix(database, ids);
   }
 }

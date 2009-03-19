@@ -6,8 +6,8 @@ import java.util.regex.Pattern;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.MultiRepresentedObject;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -131,7 +131,7 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
     else {
       try {
           // todo
-        defaultDistanceFunction = Util.instantiateGenerics(DistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
+        defaultDistanceFunction = ClassGenericsUtil.instantiateGenerics(DistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
       }
       catch (UnableToComplyException e) {
         throw new WrongParameterValueException(DISTANCE_FUNCTIONS_PARAM, DEFAULT_DISTANCE_FUNCTION, e);

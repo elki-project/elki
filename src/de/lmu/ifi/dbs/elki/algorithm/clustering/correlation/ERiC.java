@@ -23,8 +23,8 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.ERiCDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -240,7 +240,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
                 
                 PCAFilteredResult pcares = pca.processIds(group.getIDs(), database);
                 
-                V centroid = Util.centroid(database, group.getIDs());
+                V centroid = DatabaseUtil.centroid(database, group.getIDs());
                 Cluster<CorrelationModel<V>> correlationCluster = new Cluster<CorrelationModel<V>>(
                     "[" + correlationDimension + "_" + correlationClusters.size() + "]", group,
                     new CorrelationModel<V>(pcares, centroid), new ArrayList<Cluster<CorrelationModel<V>>>(),
@@ -272,7 +272,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
               pca.setParameters(pcaParameters(dimensionality));
               PCAFilteredResult pcares = pca.processIds(noise.getGroup().getIDs(), database);
 
-              V centroid = Util.centroid(database, noise.getGroup().getIDs());
+              V centroid = DatabaseUtil.centroid(database, noise.getGroup().getIDs());
               Cluster<CorrelationModel<V>> correlationCluster = new Cluster<CorrelationModel<V>>("[noise]", noise.getGroup(),
                   new CorrelationModel<V>(pcares, centroid), new ArrayList<Cluster<CorrelationModel<V>>>(),
                   new ArrayList<Cluster<CorrelationModel<V>>>());

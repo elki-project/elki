@@ -21,10 +21,10 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.preprocessing.HiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.properties.Properties;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -256,7 +256,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
         result.addAll(partitionAlgorithm.getAttributeSettings());
         if (optionHandler.isSet(PARTITION_DB_PARAM)) {
             try {
-                Database<V> tmpDB = Util.instantiateGenerics(Database.class, partitionDatabase.getName());
+                Database<V> tmpDB = ClassGenericsUtil.instantiateGenerics(Database.class, partitionDatabase.getName());
                 result.addAll(tmpDB.getAttributeSettings());
             }
             catch (UnableToComplyException e) {
@@ -292,7 +292,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
         // partition database
         if (optionHandler.isSet(PARTITION_DB_PARAM)) {
             try {
-                Database<V> tmpDB = Util.instantiateGenerics(Database.class, partitionDatabase.getName());
+                Database<V> tmpDB = ClassGenericsUtil.instantiateGenerics(Database.class, partitionDatabase.getName());
                 description.append(Description.NEWLINE);
                 description.append(tmpDB.parameterDescription());
             }

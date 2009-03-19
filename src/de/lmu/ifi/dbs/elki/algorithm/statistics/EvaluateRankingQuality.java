@@ -20,10 +20,10 @@ import de.lmu.ifi.dbs.elki.evaluation.roc.ROCAUC;
 import de.lmu.ifi.dbs.elki.math.Histogram;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
 
@@ -77,7 +77,7 @@ public class EvaluateRankingQuality<V extends RealVector<V, ?>> extends Distance
     // Compute cluster averages
     HashMap<Cluster<?>, V> averages = new HashMap<Cluster<?>, V>(splitted.size());
     for(Cluster<?> clus : splitted) {
-      V cent = Util.centroid(database, clus.getIDs());
+      V cent = DatabaseUtil.centroid(database, clus.getIDs());
       averages.put(clus, cent);
     }
 

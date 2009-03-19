@@ -17,10 +17,10 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
@@ -148,7 +148,7 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
     for(Iterator<Integer> idIter = db.iterator(); idIter.hasNext();) {
       dbIDs.add(idIter.next());
     }
-    V centroidDV = Util.centroid(db, dbIDs);
+    V centroidDV = DatabaseUtil.centroid(db, dbIDs);
     Set<Integer> ids;
     if(this.sampleSize != null) {
       if(RANDOM_SAMPLE_FLAG.isSet()) {
@@ -179,7 +179,7 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
    * @return a matrix of equations describing the dependencies
    */
   public CorrelationAnalysisSolution<V> generateModel(Database<V> db, Collection<Integer> ids) {
-    V centroidDV = Util.centroid(db, ids);
+    V centroidDV = DatabaseUtil.centroid(db, ids);
     return generateModel(db, ids, centroidDV);
   }
 

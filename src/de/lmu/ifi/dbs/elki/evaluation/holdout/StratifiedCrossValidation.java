@@ -3,8 +3,8 @@ package de.lmu.ifi.dbs.elki.evaluation.holdout;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -61,7 +61,7 @@ public class StratifiedCrossValidation<O extends DatabaseObject, L extends Class
         this.database = database;
         setClassLabels(database);
 
-        List<Integer>[] classBuckets = Util.newArrayOfArrayList(this.labels.length);
+        List<Integer>[] classBuckets = ClassGenericsUtil.newArrayOfArrayList(this.labels.length);
         for (int i = 0; i < classBuckets.length; i++) {
             classBuckets[i] = new ArrayList<Integer>();
         }
@@ -70,7 +70,7 @@ public class StratifiedCrossValidation<O extends DatabaseObject, L extends Class
             int classIndex = Arrays.binarySearch(labels, database.getAssociation(CLASS, id));
             classBuckets[classIndex].add(id);
         }
-        List<Integer>[] folds = Util.newArrayOfArrayList(nfold);
+        List<Integer>[] folds = ClassGenericsUtil.newArrayOfArrayList(nfold);
         for (int i = 0; i < folds.length; i++) {
             folds[i] = new ArrayList<Integer>();
         }

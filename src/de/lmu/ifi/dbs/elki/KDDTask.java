@@ -19,8 +19,8 @@ import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultWriter;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
@@ -258,10 +258,10 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
       Parameterizable p;
       try {
         try {
-          p = Util.instantiate(Algorithm.class, descriptionClass);
+          p = ClassGenericsUtil.instantiate(Algorithm.class, descriptionClass);
         }
         catch(UnableToComplyException e) {
-          p = Util.instantiate(Parameterizable.class, descriptionClass);
+          p = ClassGenericsUtil.instantiate(Parameterizable.class, descriptionClass);
         }
       }
       catch(UnableToComplyException e) {

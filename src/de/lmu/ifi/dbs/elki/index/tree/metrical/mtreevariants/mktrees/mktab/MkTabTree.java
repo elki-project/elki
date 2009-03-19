@@ -2,10 +2,10 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mktab;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -250,7 +250,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>>
         for (int i = 0; i < distances1.size(); i++) {
             D d1 = distances1.get(i);
             D d2 = distances2.get(i);
-            result.add(Util.max(d1, d2));
+            result.add(DistanceUtil.max(d1, d2));
         }
         return result;
     }

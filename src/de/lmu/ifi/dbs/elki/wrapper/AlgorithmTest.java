@@ -3,8 +3,8 @@ package de.lmu.ifi.dbs.elki.wrapper;
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.properties.Properties;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassListParameter;
@@ -164,7 +164,7 @@ public class AlgorithmTest extends AbstractParameterizable {
             this.algorithms = new ArrayList<Algorithm<?,?>>(subclasses.size());
             for (Class<?> subclass : subclasses) {
                 try {
-                    this.algorithms.add(Util.instantiate(Algorithm.class, subclass.getName()));
+                    this.algorithms.add(ClassGenericsUtil.instantiate(Algorithm.class, subclass.getName()));
                 }
                 catch (UnableToComplyException e) {
                     throw new RuntimeException(e);
@@ -208,7 +208,7 @@ public class AlgorithmTest extends AbstractParameterizable {
 
             FileBasedDatabaseConnectionWrapper<?> wrapper;
             try {
-                wrapper = Util.instantiate(FileBasedDatabaseConnectionWrapper.class, algorithm.getClass().getSimpleName() + "Wrapper");
+                wrapper = ClassGenericsUtil.instantiate(FileBasedDatabaseConnectionWrapper.class, algorithm.getClass().getSimpleName() + "Wrapper");
             }
             catch (UnableToComplyException e) {
                 warning("No wrapper class for " + algorithm.getClass() + " available (" + e.getMessage() + ")");

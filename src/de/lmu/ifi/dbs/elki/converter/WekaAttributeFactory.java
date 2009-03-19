@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.elki.converter;
 
 import de.lmu.ifi.dbs.elki.data.HierarchicalClassLabel;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 
 /**
  * A factory to create WekaAttributes
@@ -34,7 +34,7 @@ public final class WekaAttributeFactory // implements Parameterizable
         catch (NumberFormatException e) {
             HierarchicalClassLabel classLabel;
             try {
-                classLabel = Util.instantiateGenerics(HierarchicalClassLabel.class, classLabelClass.getName());
+                classLabel = ClassGenericsUtil.instantiateGenerics(HierarchicalClassLabel.class, classLabelClass.getName());
             }
             catch (UnableToComplyException e1) {
                 throw new RuntimeException("This should never happen!", e);

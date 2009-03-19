@@ -23,9 +23,9 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -232,7 +232,7 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
     // recompute the seed in each clusters
     for(ORCLUSCluster cluster : clusters) {
       if(cluster.objectIDs.size() > 0) {
-        cluster.centroid = Util.centroid(database, cluster.objectIDs);
+        cluster.centroid = DatabaseUtil.centroid(database, cluster.objectIDs);
       }
     }
   }
@@ -398,7 +398,7 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
     c.objectIDs = new ArrayList<Integer>(ids);
 
     if(c.objectIDs.size() > 0) {
-      c.centroid = Util.centroid(database, c.objectIDs);
+      c.centroid = DatabaseUtil.centroid(database, c.objectIDs);
       c.basis = findBasis(database, c, dim);
     }
     else {

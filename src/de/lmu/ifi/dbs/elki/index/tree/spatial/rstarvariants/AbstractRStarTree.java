@@ -11,6 +11,7 @@ import java.util.Stack;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
@@ -26,7 +27,6 @@ import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultIdentifiable;
@@ -713,7 +713,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
       D minMinDist = distanceFunction.infiniteDistance();
       for (Integer id : ids) {
         D minDist = distanceFunction.minDist(entry.getMBR(), id);
-        minMinDist = Util.min(minDist, minMinDist);
+        minMinDist = DistanceUtil.min(minDist, minMinDist);
       }
       result.add(new DistanceEntry<D, E>(entry, minMinDist, i));
     }

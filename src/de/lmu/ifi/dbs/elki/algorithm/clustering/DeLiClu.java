@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
@@ -376,7 +377,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
                 }
 
                 D distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
-                D reach = Util.max(distance, knns.getAnnotations(entry2.getID())[0].getSecond().getKNNDistance());
+                D reach = DistanceUtil.max(distance, knns.getAnnotations(entry2.getID())[0].getSecond().getKNNDistance());
                 SpatialObjectPair dataPair = new SpatialObjectPair(entry1, entry2, false);
                 updateHeap(reach, dataPair);
             }
@@ -414,7 +415,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
                     continue;
                 }
                 D distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
-                D reach = Util.max(distance, knns.getAnnotations(entry2.getID())[0].getSecond().getKNNDistance());
+                D reach = DistanceUtil.max(distance, knns.getAnnotations(entry2.getID())[0].getSecond().getKNNDistance());
                 SpatialObjectPair dataPair = new SpatialObjectPair(entry1, entry2, false);
                 updateHeap(reach, dataPair);
             }

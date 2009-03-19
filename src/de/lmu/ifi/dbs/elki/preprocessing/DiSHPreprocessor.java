@@ -23,6 +23,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionSelectingDistanceF
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.result.AprioriResult;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
@@ -202,7 +203,7 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
                 }
 
                 // determine neighbors in each dimension
-                Set<Integer>[] allNeighbors = Util.newArrayOfSet(dim);
+                Set<Integer>[] allNeighbors = ClassGenericsUtil.newArrayOfSet(dim);
                 for (int d = 0; d < dim; d++) {
                     List<QueryResult<DoubleDistance>> qrList = database.rangeQuery(id, epsString[d], distanceFunctions[d]);
                     allNeighbors[d] = new HashSet<Integer>(qrList.size());

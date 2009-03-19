@@ -8,8 +8,8 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.MultiRepresentedObject;
 import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -185,7 +185,7 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
     numberOfRepresentations);
     for (int r = 0; r < numberOfRepresentations; r++) {
       try {
-        Normalization<O> norm = Util.instantiateGenerics(Normalization.class,
+        Normalization<O> norm = ClassGenericsUtil.instantiateGenerics(Normalization.class,
             DEFAULT_NORMALIZATION);
         normalizations.add(norm);
       }

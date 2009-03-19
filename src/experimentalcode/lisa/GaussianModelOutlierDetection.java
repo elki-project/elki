@@ -13,17 +13,17 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 
 public class GaussianModelOutlierDetection<V extends RealVector<V,Double>> extends AbstractAlgorithm<V,MultiResult> {
 	MultiResult result;
 	public static final AssociationID<Double> GMOD_MDIST = AssociationID.getOrCreateAssociationID("gmod.mdist", Double.class);
 	@Override
 	protected MultiResult runInTime(Database<V> database) throws IllegalStateException {
-		V mean = Util.centroid(database);
+		V mean = DatabaseUtil.centroid(database);
 		V meanNeg = mean.negativeVector();
-		Matrix covarianceTransposed = Util.covarianceMatrix(database, mean).transpose();	
+		Matrix covarianceTransposed = DatabaseUtil.covarianceMatrix(database, mean).transpose();	
 		//for each object compute mahalanobis distance
 		 for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); ) {
              Integer id = iter.next();

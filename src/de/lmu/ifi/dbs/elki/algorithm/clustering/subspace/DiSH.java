@@ -22,10 +22,10 @@ import de.lmu.ifi.dbs.elki.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
@@ -337,7 +337,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
             // look for the proper cluster
             SimplePair<BitSet, DatabaseObjectGroupCollection<List<Integer>>> cluster = null;
             for (SimplePair<BitSet, DatabaseObjectGroupCollection<List<Integer>>> c : parallelClusters) {
-                V c_centroid = Util.centroid(database, c.second.getIDs(), c.first);
+                V c_centroid = DatabaseUtil.centroid(database, c.second.getIDs(), c.first);
                 PreferenceVectorBasedCorrelationDistance dist = distanceFunction.correlationDistance(object, c_centroid, preferenceVector, preferenceVector);
                 if (dist.getCorrelationValue() == entry.getReachability().getCorrelationValue()) {
                     double d = distanceFunction.weightedDistance(object, c_centroid, dist.getCommonPreferenceVector());
@@ -502,7 +502,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
                                                                   DiSHDistanceFunction<V, DiSHPreprocessor<V, ?>> distanceFunction,
                                                                   SimplePair<BitSet, DatabaseObjectGroupCollection<List<Integer>>> child,
                                                                   Map<BitSet, List<SimplePair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>>> clustersMap) {
-        V child_centroid = Util.centroid(database, child.second.getIDs(), child.first);
+        V child_centroid = DatabaseUtil.centroid(database, child.second.getIDs(), child.first);
 
         SimplePair<BitSet, DatabaseObjectGroupCollection<List<Integer>>> result = null;
         int resultCardinality = -1;
@@ -523,7 +523,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
             if (pv.equals(parentPV)) {
                 List<SimplePair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>> parentList = clustersMap.get(parentPV);
                 for (SimplePair<BitSet, DatabaseObjectGroupCollection<List<Integer>>> parent : parentList) {
-                    V parent_centroid = Util.centroid(database, parent.second.getIDs(), parentPV);
+                    V parent_centroid = DatabaseUtil.centroid(database, parent.second.getIDs(), parentPV);
                     double d = distanceFunction.weightedDistance(child_centroid, parent_centroid, parentPV);
                     if (d <= 2 * epsilon) {
                         result = parent;
@@ -553,7 +553,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
         for (int i = 0; i < clusters.size() - 1; i++) {
             Cluster<AxesModel> c_i = clusters.get(i);
             int subspaceDim_i = dimensionality - c_i.getModel().getSubspaces().cardinality();
-            V ci_centroid = Util.centroid(database, c_i.getIDs(), c_i.getModel().getSubspaces());
+            V ci_centroid = DatabaseUtil.centroid(database, c_i.getIDs(), c_i.getModel().getSubspaces());
 
             for (int j = i + 1; j < clusters.size(); j++) {
                 Cluster<AxesModel> c_j = clusters.get(j);
@@ -577,7 +577,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
                         }
                     }
                     else {
-                        V cj_centroid = Util.centroid(database, c_j.getIDs(), c_j.getModel().getSubspaces());
+                        V cj_centroid = DatabaseUtil.centroid(database, c_j.getIDs(), c_j.getModel().getSubspaces());
                         PreferenceVectorBasedCorrelationDistance distance = distanceFunction.correlationDistance(ci_centroid, cj_centroid, c_i.getModel().getSubspaces(), c_j.getModel().getSubspaces());
                         double d = distanceFunction.weightedDistance(ci_centroid, cj_centroid, distance.getCommonPreferenceVector());
                         if (debug) {
@@ -623,12 +623,12 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
                              Cluster<AxesModel> parent,
                              List<Cluster<AxesModel>> children) {
 
-        V parent_centroid = Util.centroid(database, parent.getIDs(), parent.getModel().getSubspaces());
+        V parent_centroid = DatabaseUtil.centroid(database, parent.getIDs(), parent.getModel().getSubspaces());
         int dimensionality = database.dimensionality();
         int subspaceDim_parent = dimensionality - parent.getModel().getSubspaces().cardinality();
 
         for (Cluster<AxesModel> child : children) {
-            V child_centroid = Util.centroid(database, child.getIDs(), child.getModel().getSubspaces());
+            V child_centroid = DatabaseUtil.centroid(database, child.getIDs(), child.getModel().getSubspaces());
             PreferenceVectorBasedCorrelationDistance distance = distanceFunction.correlationDistance(parent_centroid, child_centroid, parent.getModel().getSubspaces(), child.getModel().getSubspaces());
             if (distance.getCorrelationValue() == subspaceDim_parent) {
                 return true;

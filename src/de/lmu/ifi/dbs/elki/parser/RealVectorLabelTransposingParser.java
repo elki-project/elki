@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.parser;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.FloatVector;
 import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
 
@@ -50,11 +51,11 @@ public class RealVectorLabelTransposingParser<V extends RealVector<V, ?>> extend
           }
 
           if (data == null) {
-            data = Util.newArrayOfArrayList(dimensionality);
+            data = ClassGenericsUtil.newArrayOfArrayList(dimensionality);
             for (int i = 0; i < data.length; i++) {
               data[i] = new ArrayList<Double>();
             }
-            labels = Util.newArrayOfArrayList(dimensionality);
+            labels = ClassGenericsUtil.newArrayOfArrayList(dimensionality);
             for (int i = 0; i < labels.length; i++) {
               labels[i] = new ArrayList<String>();
             }

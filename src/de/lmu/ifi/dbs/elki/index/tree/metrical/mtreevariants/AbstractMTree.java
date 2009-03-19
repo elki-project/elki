@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.BreadthFirstEnumeration;
@@ -19,7 +20,6 @@ import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
@@ -323,7 +323,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
 
                     if (diff.compareTo(sum) <= 0) {
                         D d3 = distance(o_r, q);
-                        D d_min = Util.max(d3.minus(r_or), distanceFunction.nullDistance());
+                        D d_min = DistanceUtil.max(d3.minus(r_or), distanceFunction.nullDistance());
                         if (d_min.compareTo(d_k) <= 0) {
                             pq.addNode(new PQNode<D>(d_min, entry.getID(), o_r));
                         }
@@ -490,7 +490,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
                 D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ?
                     getDistanceFunction().nullDistance() :
                     distance.minus(entry.getCoveringRadius());
-                minMinDist = Util.max(minMinDist, minDist);
+                minMinDist = DistanceUtil.max(minMinDist, minDist);
             }
             result.add(new DistanceEntry<D, E>(entry, minMinDist, i));
         }

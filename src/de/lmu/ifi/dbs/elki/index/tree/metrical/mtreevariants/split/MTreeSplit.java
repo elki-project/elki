@@ -2,12 +2,12 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.Assignments;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -101,11 +101,11 @@ public abstract class MTreeSplit<O extends DatabaseObject, D extends Distance<D>
         assigned1.add(distEntry.getEntry());
 
         if (isLeaf) {
-            return Util.max(currentCR, distEntry.getDistance());
+            return DistanceUtil.max(currentCR, distEntry.getDistance());
         }
         else {
             //noinspection unchecked
-            return Util.max(currentCR,
+            return DistanceUtil.max(currentCR,
                 distEntry.getDistance().plus((distEntry.getEntry()).getCoveringRadius()));
         }
     }

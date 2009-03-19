@@ -12,8 +12,8 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 
 /**
  * This class derives a database partitioning based on a clustering result.
@@ -60,7 +60,7 @@ public class PartitionsFromClustering {
 
     // build result map
     for(Entry<Integer, Database<O>> e : newdb.entrySet()) {
-      L label = Util.instantiate(classLabel, classLabel.getName());
+      L label = ClassGenericsUtil.instantiate(classLabel, classLabel.getName());
       label.init(label_prefix + e.getKey().toString());
       map.put(label, e.getValue());
     }

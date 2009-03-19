@@ -20,8 +20,8 @@ import de.lmu.ifi.dbs.elki.parser.Parser;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
 import de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.elki.properties.Properties;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileListParameter;
@@ -190,7 +190,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
       this.parsers = new ArrayList<Parser<O>>(inputStreams.size());
       for(int i = 0; i < inputStreams.size(); i++) {
         try {
-          Parser<O> parser = Util.instantiateGenerics(Parser.class, RealVectorLabelParser.class.getName());
+          Parser<O> parser = ClassGenericsUtil.instantiateGenerics(Parser.class, RealVectorLabelParser.class.getName());
           this.parsers.add(i, parser);
         }
         catch(UnableToComplyException e) {

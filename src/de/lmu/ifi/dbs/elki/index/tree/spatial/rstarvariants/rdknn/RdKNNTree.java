@@ -9,6 +9,7 @@ import java.util.Map;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
@@ -19,7 +20,6 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
@@ -356,7 +356,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
                         p.setKnnDistance(knnDist_p);
                     }
                 }
-                knnDist_node = Util.max(knnDist_node, p.getKnnDistance());
+                knnDist_node = DistanceUtil.max(knnDist_node, p.getKnnDistance());
             }
         }
         // directory node
@@ -371,7 +371,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
                     preInsert(q, entry, knns_q);
                     knnDist_q = knns_q.getKNNDistance();
                 }
-                knnDist_node = Util.max(knnDist_node, entry.getKnnDistance());
+                knnDist_node = DistanceUtil.max(knnDist_node, entry.getKnnDistance());
             }
         }
         nodeEntry.setKnnDistance(knnDist_node);
@@ -422,14 +422,14 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
                 if (knns != null) {
                     leafEntry.setKnnDistance(knnLists.get(leafEntry.getID()).getKNNDistance());
                 }
-                knnDist_node = Util.max(knnDist_node, leafEntry.getKnnDistance());
+                knnDist_node = DistanceUtil.max(knnDist_node, leafEntry.getKnnDistance());
             }
         }
         else {
             for (int i = 0; i < node.getNumEntries(); i++) {
                 RdKNNEntry<D, N> dirEntry = node.getEntry(i);
                 adjustKNNDistance(dirEntry, knnLists);
-                knnDist_node = Util.max(knnDist_node, dirEntry.getKnnDistance());
+                knnDist_node = DistanceUtil.max(knnDist_node, dirEntry.getKnnDistance());
             }
         }
         entry.setKnnDistance(knnDist_node);

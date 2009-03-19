@@ -12,8 +12,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ConstantWeight;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.WeightFunction;
 import de.lmu.ifi.dbs.elki.properties.Properties;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -98,7 +98,7 @@ public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends
     // for collecting weights
     double weightsum = 0.0;
     // get centroid
-    V centroid = Util.centroid(database, ids);
+    V centroid = DatabaseUtil.centroid(database, ids);
 
     // find maximum distance
     double maxdist = 0.0;

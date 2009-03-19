@@ -22,8 +22,8 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -152,7 +152,7 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
                     }
                 }
                 else {
-                    newMeans.set(i, Util.centroid(database, cluster));
+                    newMeans.set(i, DatabaseUtil.centroid(database, cluster));
                     Matrix covarianceMatrix = Matrix.zeroMatrix(dimensionality);
                     for (Integer id : cluster) {
                         V instance = database.get(id);

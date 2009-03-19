@@ -2,13 +2,13 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkmax;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.QueryStatistic;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -139,14 +139,14 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
             for (int i = 0; i < node.getNumEntries(); i++) {
                 MkMaxEntry<D> leafEntry = node.getEntry(i);
                 leafEntry.setKnnDistance(knnLists.get(leafEntry.getID()).getKNNDistance());
-                knnDist_node = Util.max(knnDist_node, leafEntry.getKnnDistance());
+                knnDist_node = DistanceUtil.max(knnDist_node, leafEntry.getKnnDistance());
             }
         }
         else {
             for (int i = 0; i < node.getNumEntries(); i++) {
                 MkMaxEntry<D> dirEntry = node.getEntry(i);
                 kNNdistanceAdjustment(dirEntry, knnLists);
-                knnDist_node = Util.max(knnDist_node, dirEntry.getKnnDistance());
+                knnDist_node = DistanceUtil.max(knnDist_node, dirEntry.getKnnDistance());
             }
         }
         entry.setKnnDistance(knnDist_node);
@@ -246,7 +246,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
                         p.setKnnDistance(knnDist_p);
                     }
                 }
-                knnDist_node = Util.max(knnDist_node, p.getKnnDistance());
+                knnDist_node = DistanceUtil.max(knnDist_node, p.getKnnDistance());
             }
         }
         // directory node
@@ -260,7 +260,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
                     preInsert(q, dirEntry, knns_q);
                     knnDist_q = knns_q.getKNNDistance();
                 }
-                knnDist_node = Util.max(knnDist_node, dirEntry.getKnnDistance());
+                knnDist_node = DistanceUtil.max(knnDist_node, dirEntry.getKnnDistance());
             }
         }
         if (debug) {

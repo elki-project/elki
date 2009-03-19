@@ -9,13 +9,13 @@ import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
@@ -171,7 +171,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
                 if (processedIDs.contains(neighbour.getID())) {
                     continue;
                 }
-                D reachability = Util.max(neighbour.getDistance(), coreDistance);
+                D reachability = DistanceUtil.max(neighbour.getDistance(), coreDistance);
                 updateHeap(reachability, new COEntry(neighbour.getID(), objectID));
             }
 
@@ -192,7 +192,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
                             continue;
                         }
                         D distance = neighbour.getDistance();
-                        D reachability = Util.max(distance, coreDistance);
+                        D reachability = DistanceUtil.max(distance, coreDistance);
                         updateHeap(reachability, new COEntry(neighbour.getID(), current.objectID));
                     }
                 }

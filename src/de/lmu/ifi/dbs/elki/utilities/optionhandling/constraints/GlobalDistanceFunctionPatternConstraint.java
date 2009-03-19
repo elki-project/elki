@@ -3,8 +3,8 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
@@ -60,7 +60,7 @@ public class GlobalDistanceFunctionPatternConstraint<D extends DistanceFunction<
 
 
         try {
-            DistanceFunction<?, ?> func = Util.instantiate(restrClass, restrictionClass.getValue());
+            DistanceFunction<?, ?> func = ClassGenericsUtil.instantiate(restrClass, restrictionClass.getValue());
             func.valueOf(pattern.getValue());
         }
         catch (IllegalArgumentException e) {

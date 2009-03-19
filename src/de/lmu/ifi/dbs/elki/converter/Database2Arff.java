@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 
 import java.io.OutputStream;
@@ -94,7 +95,7 @@ public class Database2Arff<D extends DatabaseObject & WekaObject<W>, W extends W
             out.print("@attribute class ");
             out.print("{");
             Util.print(
-                new ArrayList<ClassLabel>(Util.getClassLabels(database)),
+                new ArrayList<ClassLabel>(DatabaseUtil.getClassLabels(database)),
                 SEPARATOR, out);
             out.print("}");
             out.println();

@@ -2,11 +2,11 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkmax;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 
 /**
  * Represents a node in an {@link MkMaxTree}.
@@ -65,7 +65,7 @@ class MkMaxTreeNode<O extends DatabaseObject, D extends Distance<D>>
         D knnDist = distanceFunction.nullDistance();
         for (int i = 0; i < getNumEntries(); i++) {
             MkMaxEntry<D> entry = getEntry(i);
-            knnDist = Util.max(knnDist, entry.getKnnDistance());
+            knnDist = DistanceUtil.max(knnDist, entry.getKnnDistance());
         }
         return knnDist;
     }

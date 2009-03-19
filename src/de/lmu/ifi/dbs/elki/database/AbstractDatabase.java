@@ -2,8 +2,8 @@ package de.lmu.ifi.dbs.elki.database;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
@@ -308,7 +308,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
 
       Database<O> database;
       try {
-        database = Util.instantiateGenerics(Database.class, dbClass.getName());
+        database = ClassGenericsUtil.instantiateGenerics(Database.class, dbClass.getName());
         database.setParameters(dbParameters);
         database.insert(objectAndAssociationsList);
         databases.put(partitionID, database);
