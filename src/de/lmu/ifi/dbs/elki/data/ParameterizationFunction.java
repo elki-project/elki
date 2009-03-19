@@ -2,8 +2,8 @@ package de.lmu.ifi.dbs.elki.data;
 
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.output.Format;
 
 /**
@@ -394,7 +394,7 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
             if (d != 0) {
                 result.append(" + \n").append(Format.blanks(offset));
             }
-            result.append(Util.format(getValue(d + 1)));
+            result.append(FormatUtil.format(getValue(d + 1)));
             for (int j = 0; j < d; j++) {
                 result.append(" * sin(a_").append(j + 1).append(")");
             }

@@ -23,6 +23,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionSelectingDistanceF
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.result.AprioriResult;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
@@ -379,7 +380,7 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
 
         if (this.debug) {
             msg.append("\npreference ");
-            msg.append(Util.format(dimensionality, preferenceVector));
+            msg.append(FormatUtil.format(dimensionality, preferenceVector));
             msg.append("\n");
             debugFine(msg.toString());
         }
@@ -432,7 +433,7 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
 
         if (this.debug) {
             msg.append("\npreference ");
-            msg.append(Util.format(dimensionality, preferenceVector));
+            msg.append(FormatUtil.format(dimensionality, preferenceVector));
             msg.append("\n");
             debugFiner(msg.toString());
         }

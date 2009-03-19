@@ -23,6 +23,7 @@ import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
@@ -246,7 +247,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
             StringBuffer msg = new StringBuffer("\nStep 1: extract clusters");
             for (List<SimplePair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>> clusterList : clustersMap.values()) {
                 for (SimplePair<BitSet, DatabaseObjectGroupCollection<List<Integer>>> c : clusterList) {
-                    msg.append("\n").append(Util.format(dimensionality, c.first)).append(" ids ").append(c.second.size());
+                    msg.append("\n").append(FormatUtil.format(dimensionality, c.first)).append(" ids ").append(c.second.size());
                 }
             }
             debugFine(msg.toString());
@@ -258,7 +259,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
             StringBuffer msg = new StringBuffer("\n\nStep 2: check clusters");
             for (List<SimplePair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>> clusterList : clustersMap.values()) {
                 for (SimplePair<BitSet, DatabaseObjectGroupCollection<List<Integer>>> c : clusterList) {
-                    msg.append("\n").append(Util.format(dimensionality, c.first)).append(" ids ").append(c.second.size());
+                    msg.append("\n").append(FormatUtil.format(dimensionality, c.first)).append(" ids ").append(c.second.size());
                 }
             }
             debugFine(msg.toString());
@@ -269,7 +270,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
         if (this.debug) {
             StringBuffer msg = new StringBuffer("\n\nStep 3: sort clusters");
             for (Cluster<AxesModel> c : clusters) {
-                msg.append("\n").append(Util.format(dimensionality, c.getModel().getSubspaces())).append(" ids ").append(c.getIDs().size());
+                msg.append("\n").append(FormatUtil.format(dimensionality, c.getModel().getSubspaces())).append(" ids ").append(c.getIDs().size());
             }
             debugFine(msg.toString());
         }
@@ -279,7 +280,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
         if (this.debug) {
             StringBuffer msg = new StringBuffer("\n\nStep 4: build hierarchy");
             for (Cluster<AxesModel> c : clusters) {
-                msg.append("\n").append(Util.format(dimensionality, c.getModel().getSubspaces())).append(" ids ").append(c.getIDs().size());
+                msg.append("\n").append(FormatUtil.format(dimensionality, c.getModel().getSubspaces())).append(" ids ").append(c.getIDs().size());
               for (Cluster<AxesModel> cluster : c.getParents()) {
                   msg.append("\n   parent ").append(cluster);
               }
@@ -362,7 +363,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
             StringBuffer msg = new StringBuffer("\nStep 0");
             for (List<SimplePair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>> clusterList : clustersMap.values()) {
                 for (SimplePair<BitSet, DatabaseObjectGroupCollection<List<Integer>>> c : clusterList) {
-                    msg.append("\n").append(Util.format(database.dimensionality(), c.first)).append(" ids ").append(c.second.size());
+                    msg.append("\n").append(FormatUtil.format(database.dimensionality(), c.first)).append(" ids ").append(c.second.size());
                 }
             }
             debugFine(msg.toString());
@@ -559,8 +560,8 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
 
                 if (subspaceDim_i < subspaceDim_j) {
                     if (debug) {
-                        msg.append("\n\nl_i=").append(subspaceDim_i).append(" pv_i=[").append(Util.format(database.dimensionality(), c_i.getModel().getSubspaces())).append("]");
-                        msg.append("\nl_j=").append(subspaceDim_j).append(" pv_j=[").append(Util.format(database.dimensionality(), c_j.getModel().getSubspaces())).append("]");
+                        msg.append("\n\nl_i=").append(subspaceDim_i).append(" pv_i=[").append(FormatUtil.format(database.dimensionality(), c_i.getModel().getSubspaces())).append("]");
+                        msg.append("\nl_j=").append(subspaceDim_j).append(" pv_j=[").append(FormatUtil.format(database.dimensionality(), c_j.getModel().getSubspaces())).append("]");
                     }
 
                     // noise level reached

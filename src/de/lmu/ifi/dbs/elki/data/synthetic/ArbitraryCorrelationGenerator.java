@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -398,20 +398,20 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
      *
      * @param outStream      the output stream to write into
      * @param featureVectors the feature vectors to be written
-     * @param dependency     the dependeny of the feature vectors
+     * @param dependency     the dependency of the feature vectors
      * @param std            the standard deviation of the jitter of the feature vectors
      * @throws IOException if an I/O exception occurs during writing
      */
     private void output(OutputStreamWriter outStream, List<DoubleVector> featureVectors, LinearEquationSystem dependency, double std)
         throws IOException {
         outStream.write("########################################################" + LINE_SEPARATOR);
-        outStream.write("### " + MIN_ID.getName() + " [" + Util.format(min, ",", Format.NF4) + "]" + LINE_SEPARATOR);
-        outStream.write("### " + MAX_ID.getName() + " [" + Util.format(max, ",", Format.NF4) + "]" + LINE_SEPARATOR);
+        outStream.write("### " + MIN_ID.getName() + " [" + FormatUtil.format(min, ",", Format.NF4) + "]" + LINE_SEPARATOR);
+        outStream.write("### " + MAX_ID.getName() + " [" + FormatUtil.format(max, ",", Format.NF4) + "]" + LINE_SEPARATOR);
         outStream.write("### " + NUMBER_ID.getName() + " " + number + LINE_SEPARATOR);
-        outStream.write("### " + POINT_ID.getName() + " [" + Util.format(point.getColumnPackedCopy(), Format.NF4) + "]" + LINE_SEPARATOR);
+        outStream.write("### " + POINT_ID.getName() + " [" + FormatUtil.format(point.getColumnPackedCopy(), Format.NF4) + "]" + LINE_SEPARATOR);
         outStream.write("### " + BASIS_ID.getName() + " ");
         for (int i = 0; i < basis.getColumnDimensionality(); i++) {
-            outStream.write("[" + Util.format(basis.getColumn(i).getColumnPackedCopy(), Format.NF4) + "]");
+            outStream.write("[" + FormatUtil.format(basis.getColumn(i).getColumnPackedCopy(), Format.NF4) + "]");
             if (i < basis.getColumnDimensionality() - 1) {
                 outStream.write(",");
             }
@@ -419,9 +419,9 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
         outStream.write(LINE_SEPARATOR);
 
         if (jitter != 0) {
-            outStream.write("### max jitter in each dimension " + Util.format(jitter, Format.NF4) + "%" + LINE_SEPARATOR);
-            outStream.write("### Randomized standard deviation " + Util.format(jitter_std, Format.NF4) + LINE_SEPARATOR);
-            outStream.write("### Real       standard deviation " + Util.format(std, Format.NF4) + LINE_SEPARATOR);
+            outStream.write("### max jitter in each dimension " + FormatUtil.format(jitter, Format.NF4) + "%" + LINE_SEPARATOR);
+            outStream.write("### Randomized standard deviation " + FormatUtil.format(jitter_std, Format.NF4) + LINE_SEPARATOR);
+            outStream.write("### Real       standard deviation " + FormatUtil.format(std, Format.NF4) + LINE_SEPARATOR);
             outStream.write("###" + LINE_SEPARATOR);
         }
 
@@ -444,13 +444,13 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
     }
 
     /**
-     * Returns the standard devitaion of the distance of the feature vectors to
+     * Returns the standard deviation of the distance of the feature vectors to
      * the hyperplane defined by the specified point and basis.
      *
      * @param featureVectors the feature vectors
      * @param point          the model point of the hyperplane
      * @param basis          the basis of the hyperplane
-     * @return the standard devitaion of the distance
+     * @return the standard deviation of the distance
      */
     private double standardDeviation(List<DoubleVector> featureVectors, Vector point, Matrix basis) {
         double std_2 = 0;
@@ -510,12 +510,12 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
     }
 
     /**
-     * Returns a basis for for a hyperplane of the specified correleation
+     * Returns a basis for for a hyperplane of the specified correlation
      * dimension
      *
      * @param dim     the dimensionality of the feature space
      * @param corrDim the correlation dimensionality
-     * @return a basis for a hyperplane of the specified correleation dimension
+     * @return a basis for a hyperplane of the specified correlation dimension
      */
     private Matrix correlationBasis(int dim, int corrDim) {
         double[][] b = new double[dim][corrDim];
@@ -552,7 +552,7 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
         LinearEquationSystem dependency;
 
         /**
-         * Provied a new dependency object.
+         * Provided a new dependency object.
          *
          * @param basisVectors         the basis vectors
          * @param normalvectors        the normal vectors

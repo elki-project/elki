@@ -1,13 +1,13 @@
 package de.lmu.ifi.dbs.elki.math.spacefillingcurves;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.logging.StaticLogger;
-import de.lmu.ifi.dbs.elki.utilities.Util;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.logging.StaticLogger;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
  * Computes the z-values for specified double values.
@@ -54,9 +54,9 @@ public class ZCurve extends AbstractLoggable {
 
         if (logger.debug()) {
             StringBuffer msg = new StringBuffer();
-            msg.append("\nmin   ").append(Util.format(minValues));
-            msg.append("\nmax   ").append(Util.format(maxValues));
-            msg.append("\nscale ").append(Util.format(scalingFactors));
+            msg.append("\nmin   ").append(FormatUtil.format(minValues));
+            msg.append("\nmax   ").append(FormatUtil.format(maxValues));
+            msg.append("\nscale ").append(FormatUtil.format(scalingFactors));
             msg.append("\nLong.MAX_VALUE  " + Long.MAX_VALUE);
             msg.append("\nLong.MIN_VALUE  " + Long.MIN_VALUE);
             logger.debugFine(msg.toString());
@@ -73,8 +73,8 @@ public class ZCurve extends AbstractLoggable {
 
             if (logger.debug()) {
                 StringBuffer msg = new StringBuffer();
-                msg.append("\ndouble values ").append(Util.format(values));
-                msg.append("\nlong values   ").append(Util.format(longValues));
+                msg.append("\ndouble values ").append(FormatUtil.format(values));
+                msg.append("\nlong values   ").append(FormatUtil.format(longValues));
                 logger.debugFine(msg.toString());
             }
             byte[] zValue = zValue(longValues);

@@ -27,8 +27,8 @@ import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.Interval;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
@@ -335,9 +335,9 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clu
 
         if (debug) {
             StringBuffer msg = new StringBuffer();
-            msg.append("\n   minima: ").append(Util.format(minima, ", ", 2));
-            msg.append("\n   maxima: ").append(Util.format(maxima, ", ", 2));
-            msg.append("\n   unit lengths: ").append(Util.format(unit_lengths, ", ", 2));
+            msg.append("\n   minima: ").append(FormatUtil.format(minima, ", ", 2));
+            msg.append("\n   maxima: ").append(FormatUtil.format(maxima, ", ", 2));
+            msg.append("\n   unit lengths: ").append(FormatUtil.format(unit_lengths, ", ", 2));
             debugFiner(msg.toString());
         }
 

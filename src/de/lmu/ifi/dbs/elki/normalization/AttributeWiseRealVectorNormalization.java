@@ -6,6 +6,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleListParameter;
@@ -206,9 +207,9 @@ public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ? >> e
     StringBuffer result = new StringBuffer();
     result.append(pre).append("normalization class: ").append(getClass().getName());
     result.append("\n");
-    result.append(pre).append("normalization minima: ").append(Util.format(minima));
+    result.append(pre).append("normalization minima: ").append(FormatUtil.format(minima));
     result.append("\n");
-    result.append(pre).append("normalization maxima: ").append(Util.format(maxima));
+    result.append(pre).append("normalization maxima: ").append(FormatUtil.format(maxima));
 
     return result.toString();
   }

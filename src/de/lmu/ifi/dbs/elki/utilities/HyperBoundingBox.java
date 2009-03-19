@@ -1,14 +1,14 @@
 package de.lmu.ifi.dbs.elki.utilities;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.Arrays;
 import java.text.NumberFormat;
+import java.util.Arrays;
+
+import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 
 /**
  * HyperBoundingBox represents a hyperrectangle in the multidimensional space.
@@ -279,7 +279,7 @@ public class HyperBoundingBox extends AbstractLoggable implements Externalizable
    */
   @Override
   public String toString() {
-    return "[Min(" + Util.format(min, ",", 10) + "), Max(" + Util.format(max, ",", 10) + ")]";
+    return "[Min(" + FormatUtil.format(min, ",", 10) + "), Max(" + FormatUtil.format(max, ",", 10) + ")]";
   }
 
   /**
@@ -290,7 +290,7 @@ public class HyperBoundingBox extends AbstractLoggable implements Externalizable
    * @return a string representation of this hyper bounding box
    */
   public String toString(String pre, NumberFormat nf) {
-    return pre + "[Min(" + Util.format(min, ",", nf) + "), Max(" + Util.format(max, ",", nf) + ")]";
+    return pre + "[Min(" + FormatUtil.format(min, ",", nf) + "), Max(" + FormatUtil.format(max, ",", nf) + ")]";
   }
 
   /**

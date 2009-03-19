@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
-import de.lmu.ifi.dbs.elki.utilities.Util;
-
 import java.text.NumberFormat;
+
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
  * Provides a vector object that encapsulates an m x 1 - matrix object.
@@ -205,7 +205,7 @@ public class Vector extends Matrix {
    */
   @Override
   public String toString() {
-    return "[" + Util.format(getColumnPackedCopy()) + "]";
+    return "[" + FormatUtil.format(getColumnPackedCopy()) + "]";
   }
 
   /**
@@ -216,7 +216,7 @@ public class Vector extends Matrix {
    */
   @Override
   public String toString(NumberFormat nf) {
-    return "[" + Util.format(getColumnPackedCopy(), nf) + "]";
+    return "[" + FormatUtil.format(getColumnPackedCopy(), nf) + "]";
   }
 
   /**

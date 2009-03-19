@@ -1,13 +1,13 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
+import java.util.BitSet;
+
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.preprocessing.HiSCPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
-import de.lmu.ifi.dbs.elki.utilities.Util;
-
-import java.util.BitSet;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
  * Distance function used in the HiSC algorithm.
@@ -52,7 +52,7 @@ public class HiSCDistanceFunction<V extends RealVector<V, ?>, P extends Preproce
                 msg.append("\nv1 " + getDatabase().getAssociation(AssociationID.LABEL, v1.getID()));
                 msg.append("\nv2 " + getDatabase().getAssociation(AssociationID.LABEL, v2.getID()));
                 msg.append("\nsubspaceDim " + subspaceDim);
-                msg.append("\ncommon pv " + Util.format(dim, commonPreferenceVector));
+                msg.append("\ncommon pv " + FormatUtil.format(dim, commonPreferenceVector));
                 verbose(msg.toString());
             }
         }

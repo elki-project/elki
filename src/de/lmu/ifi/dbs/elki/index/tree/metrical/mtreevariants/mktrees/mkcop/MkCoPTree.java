@@ -1,26 +1,26 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkcop;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.util.PQNode;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.QueryStatistic;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * MkCopTree is a metrical index structure based on the concepts of the M-Tree
@@ -429,11 +429,11 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
         if (debug) {
             msg.append("\nk_0 " + k_0);
             msg.append("\nk_max " + k_max);
-            msg.append("\nlog_k(" + log_k.length + ") " + Util.format(log_k));
+            msg.append("\nlog_k(" + log_k.length + ") " + FormatUtil.format(log_k));
             msg.append("\nsum_log_k " + sum_log_k);
             msg.append("\nsum_log_k^2 " + sum_log_k2);
             msg.append("\nkDists " + knnDistances);
-            msg.append("\nlog_kDist(" + log_kDist.length + ") " + Util.format(log_kDist));
+            msg.append("\nlog_kDist(" + log_kDist.length + ") " + FormatUtil.format(log_kDist));
             msg.append("\nsum_log_kDist " + sum_log_kDist);
             msg.append("\nsum_log_k_kDist " + sum_log_k_kDist);
         }
@@ -465,10 +465,10 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
             warning.append("\nentry " + entry.getRoutingObjectID());
             warning.append("\nlower Hull "
                 + convexHull.getNumberOfPointsInLowerHull() + " "
-                + Util.format(convexHull.getLowerHull()));
+                + FormatUtil.format(convexHull.getLowerHull()));
             warning.append("\nupper Hull "
                 + convexHull.getNumberOfPointsInUpperHull() + " "
-                + Util.format(convexHull.getUpperHull()));
+                + FormatUtil.format(convexHull.getUpperHull()));
             warning.append("\nerr1 " + err1);
             warning.append("\nerr2 " + err2);
             warning.append("\nconservative1 " + conservative);
@@ -685,7 +685,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
                         msg.append("x_a " + x_a + ", y_a " + y_a);
                         msg.append("x_p " + x_p + ", y_p " + y_p);
                         msg.append("a " + a);
-                        msg.append("upperHull " + Util.format(upperHull));
+                        msg.append("upperHull " + FormatUtil.format(upperHull));
                         debugFine(msg.toString());
                     }
                     return appr;

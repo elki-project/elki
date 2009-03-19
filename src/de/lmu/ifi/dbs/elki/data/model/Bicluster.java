@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
-import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
  * Wrapper class to provide the basic properties of a bicluster.
@@ -142,7 +142,7 @@ public class Bicluster<V extends RealVector<V, Double>> extends AbstractLoggable
     out.commentPrintLn("Serialization class: " + this.getClass().getName());
     out.commentPrintLn("Cluster size: " + size());
     out.commentPrintLn("Cluster dimensions: " + colIDs.length);
-    out.commentPrintLn("Included row IDs: " + Util.format(rowIDs));
-    out.commentPrintLn("Included column IDs: " + Util.format(colIDs));
+    out.commentPrintLn("Included row IDs: " + FormatUtil.format(rowIDs));
+    out.commentPrintLn("Included column IDs: " + FormatUtil.format(colIDs));
   }
 }

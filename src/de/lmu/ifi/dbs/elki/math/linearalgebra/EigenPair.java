@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
-import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
  * Helper class which encapsulates an eigenvector and its corresponding
@@ -72,7 +72,7 @@ public class EigenPair implements Comparable<EigenPair> {
    */
   @Override
   public String toString() {
-    return "(ew = " + Util.format(eigenvalue) + ", ev = ["
-           + Util.format(eigenvector.getColumnPackedCopy()) + "])";
+    return "(ew = " + FormatUtil.format(eigenvalue) + ", ev = ["
+           + FormatUtil.format(eigenvector.getColumnPackedCopy()) + "])";
   }
 }

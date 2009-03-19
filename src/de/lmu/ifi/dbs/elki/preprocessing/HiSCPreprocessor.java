@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.Util;
@@ -223,9 +224,9 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
     if (this.debug) {
       msg.append("\nalpha "+alpha);
       msg.append("\nvariances ");
-      msg.append(Util.format(variances, ", ", 4));
+      msg.append(FormatUtil.format(variances, ", ", 4));
       msg.append("\npreference ");
-      msg.append(Util.format(variances.length, preferenceVector));
+      msg.append(FormatUtil.format(variances.length, preferenceVector));
     }
 
     return preferenceVector;

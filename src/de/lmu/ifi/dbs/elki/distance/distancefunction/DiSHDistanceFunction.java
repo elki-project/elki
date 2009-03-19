@@ -1,13 +1,13 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
+import java.util.BitSet;
+
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
-import de.lmu.ifi.dbs.elki.utilities.Util;
-
-import java.util.BitSet;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
  * Distance function used in the DiSH algorithm.
@@ -50,7 +50,7 @@ public class DiSHDistanceFunction<V extends RealVector<V, ?>, P extends Preproce
                     msg.append("\nv1 ").append(getDatabase().getAssociation(AssociationID.LABEL, v1.getID()));
                     msg.append("\nv2 ").append(getDatabase().getAssociation(AssociationID.LABEL, v2.getID()));
                     msg.append("\nsubspaceDim ").append(subspaceDim);
-                    msg.append("\ncommon pv ").append(Util.format(dim, commonPreferenceVector));
+                    msg.append("\ncommon pv ").append(FormatUtil.format(dim, commonPreferenceVector));
                     debugFine(msg.toString());
                 }
             }

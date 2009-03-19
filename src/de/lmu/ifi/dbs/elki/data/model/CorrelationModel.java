@@ -5,7 +5,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
-import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
  * Cluster model using a filtered PCA result and an centroid.
@@ -90,7 +90,7 @@ public class CorrelationModel<V extends RealVector<V, ?>> extends BaseModel impl
         weak = weak.substring(0, weak.length()-1);
       }
       out.commentPrintLn(weak);
-      out.commentPrintLn("Eigenvalues: "+Util.format(getPCAResult().getEigenvalues(), " ", 2));
+      out.commentPrintLn("Eigenvalues: "+FormatUtil.format(getPCAResult().getEigenvalues(), " ", 2));
     }
     catch(NonNumericFeaturesException e) {
       // TODO Auto-generated catch block

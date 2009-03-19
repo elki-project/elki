@@ -1,11 +1,5 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
-import de.lmu.ifi.dbs.elki.data.RationalNumber;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.math.Mathutil;
-import de.lmu.ifi.dbs.elki.utilities.Util;
-
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.io.StreamTokenizer;
@@ -14,6 +8,12 @@ import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Locale;
+
+import de.lmu.ifi.dbs.elki.data.RationalNumber;
+import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.math.Mathutil;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
  * The Matrix Class represents real-valued matrices.
@@ -1620,11 +1620,11 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
         double[] rhs = les.getRHS();
 
         if (this.debug) {
-            msg.append("\na' " + Util.format(this.getArrayCopy()));
-            msg.append("\nb' " + Util.format(columnMatrix.getColumnPackedCopy()));
+            msg.append("\na' " + FormatUtil.format(this.getArrayCopy()));
+            msg.append("\nb' " + FormatUtil.format(columnMatrix.getColumnPackedCopy()));
 
-            msg.append("\na " + Util.format(a));
-            msg.append("\nb " + Util.format(b));
+            msg.append("\na " + FormatUtil.format(a));
+            msg.append("\nb " + FormatUtil.format(b));
             msg.append("\nleq " + les.equationsToString(4));
         }
 

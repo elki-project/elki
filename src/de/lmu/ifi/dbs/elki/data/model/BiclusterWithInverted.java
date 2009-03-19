@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
-import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
  * This code was factored out of the Bicluster class, since not all biclusters have inverted rows.
@@ -67,7 +67,7 @@ public class BiclusterWithInverted<V extends RealVector<V, Double>> extends Bicl
   public void writeToText(TextWriterStream out, String label) {
     super.writeToText(out, label);
     if (this.invertedRows != null) {
-      out.commentPrintLn("inverted rows (row IDs): " + Util.format(this.invertedRows));
+      out.commentPrintLn("inverted rows (row IDs): " + FormatUtil.format(this.invertedRows));
     }      
   }
 }

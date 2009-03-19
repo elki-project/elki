@@ -1,9 +1,5 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.utilities.Util;
-
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
@@ -11,6 +7,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+
+import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
  * Class for systems of linear equations.
@@ -567,7 +567,7 @@ public class LinearEquationSystem extends AbstractLoggable {
 
         StringBuffer msg = new StringBuffer();
         if (this.debug) {
-            msg.append("\nSpecial solution x_0 = [").append(Util.format(x_0, ",", 4)).append("]");
+            msg.append("\nSpecial solution x_0 = [").append(FormatUtil.format(x_0, ",", 4)).append("]");
             msg.append("\nbound Indices ").append(boundIndices);
             msg.append("\nfree Indices ").append(freeIndices);
         }
@@ -598,7 +598,7 @@ public class LinearEquationSystem extends AbstractLoggable {
         if (this.debug) {
             msg.append("\nU");
             for (double[] anU : u) {
-                msg.append("\n").append(Util.format(anU, ",", 4));
+                msg.append("\n").append(FormatUtil.format(anU, ",", 4));
             }
             debugFine(msg.toString());
         }

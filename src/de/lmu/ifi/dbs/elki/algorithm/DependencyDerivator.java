@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
@@ -220,7 +221,7 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
         log.append(transposedWeakEigenvectors.toString(NF));
         log.append('\n');
         log.append("Eigenvalues:\n");
-        log.append(Util.format(pcares.getEigenvalues(), " , ", 2));
+        log.append(FormatUtil.format(pcares.getEigenvalues(), " , ", 2));
         log.append('\n');
         debugFine(log.toString());
       }
