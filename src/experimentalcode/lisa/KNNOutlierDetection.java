@@ -66,6 +66,7 @@ public class KNNOutlierDetection <O extends DatabaseObject, D extends Distance<D
 		   */
 		  public KNNOutlierDetection() {
 		    super();
+		    debug = true;
 		    // kth nearest neighbor
 		    addOption(K_PARAM);
 		    // number of outliers
@@ -99,6 +100,10 @@ public class KNNOutlierDetection <O extends DatabaseObject, D extends Distance<D
 				 id = iter.next();
 				  //distance to the kth nearest neighbor
 				 D dkn = database.kNNQueryForID(id,  k, getDistanceFunction()).get(k-1).getDistance();
+				 if (debug) {
+		        debugFine(dkn + "  dkn");
+		        }
+		      
 				  database.associate(KNNO_ODEGREE, id, dkn);
 			  }
 			  AnnotationsFromDatabase<O, D> res1 = new AnnotationsFromDatabase<O, D>(database);
@@ -123,8 +128,7 @@ public class KNNOutlierDetection <O extends DatabaseObject, D extends Distance<D
 
 		@Override
 		public MultiResult getResult() {
-			// TODO Auto-generated method stub
-			return null;
+			return result;
 		}}
 			  
 			  
