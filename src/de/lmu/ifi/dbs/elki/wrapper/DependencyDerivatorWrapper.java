@@ -4,8 +4,8 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 
 /**
@@ -30,7 +30,7 @@ public class DependencyDerivatorWrapper<O extends DatabaseObject> extends FileBa
         List<String> parameters = super.getKDDTaskParameters();
 
         // algorithm DependencyDerivator
-        Util.addParameter(parameters, OptionID.ALGORITHM, DependencyDerivator.class.getName());
+        OptionUtil.addParameter(parameters, OptionID.ALGORITHM, DependencyDerivator.class.getName());
 
         // normalization
 //    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);

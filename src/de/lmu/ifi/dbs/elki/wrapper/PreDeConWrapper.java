@@ -2,9 +2,9 @@ package de.lmu.ifi.dbs.elki.wrapper;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PreDeCon;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -77,16 +77,16 @@ public class PreDeConWrapper<O extends DatabaseObject> extends NormalizationWrap
         List<String> parameters = super.getKDDTaskParameters();
 
         // PreDeCon algorithm
-        Util.addParameter(parameters, OptionID.ALGORITHM, PreDeCon.class.getName());
+        OptionUtil.addParameter(parameters, OptionID.ALGORITHM, PreDeCon.class.getName());
 
         // epsilon for PreDeCon
-        Util.addParameter(parameters, EPSILON_PARAM, EPSILON_PARAM.getValue());
+        OptionUtil.addParameter(parameters, EPSILON_PARAM, EPSILON_PARAM.getValue());
 
         // minpts for PreDeCon
-        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(MINPTS_PARAM.getValue()));
+        OptionUtil.addParameter(parameters, MINPTS_PARAM, Integer.toString(MINPTS_PARAM.getValue()));
 
         // lambda for PreDeCon
-        Util.addParameter(parameters, LAMBDA_PARAM, Integer.toString(LAMBDA_PARAM.getValue()));
+        OptionUtil.addParameter(parameters, LAMBDA_PARAM, Integer.toString(LAMBDA_PARAM.getValue()));
 
         return parameters;
     }

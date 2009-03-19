@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -183,28 +184,28 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
         List<String> opticsParameters = new ArrayList<String>();
 
         // epsilon for OPTICS
-        Util.addParameter(opticsParameters, OPTICS.EPSILON_ID, DiSHDistanceFunction.INFINITY_PATTERN);
+        OptionUtil.addParameter(opticsParameters, OPTICS.EPSILON_ID, DiSHDistanceFunction.INFINITY_PATTERN);
 
         // minpts for OPTICS
-        Util.addParameter(opticsParameters, OPTICS.MINPTS_ID, Integer.toString(minpts));
+        OptionUtil.addParameter(opticsParameters, OPTICS.MINPTS_ID, Integer.toString(minpts));
 
         // distance function
-        Util.addParameter(opticsParameters, OPTICS.DISTANCE_FUNCTION_ID, DiSHDistanceFunction.class.getName());
+        OptionUtil.addParameter(opticsParameters, OPTICS.DISTANCE_FUNCTION_ID, DiSHDistanceFunction.class.getName());
 
         // epsilon for distance function
-        Util.addParameter(opticsParameters, DiSHDistanceFunction.EPSILON_ID, Double.toString(epsilon));
+        OptionUtil.addParameter(opticsParameters, DiSHDistanceFunction.EPSILON_ID, Double.toString(epsilon));
 
         // omit flag
-        Util.addFlag(opticsParameters, PreprocessorHandler.OMIT_PREPROCESSING_ID);
+        OptionUtil.addFlag(opticsParameters, PreprocessorHandler.OMIT_PREPROCESSING_ID);
 
         // preprocessor
-        Util.addParameter(opticsParameters, PreprocessorHandler.PREPROCESSOR_ID, DiSHPreprocessor.class.getName());
+        OptionUtil.addParameter(opticsParameters, PreprocessorHandler.PREPROCESSOR_ID, DiSHPreprocessor.class.getName());
 
         // preprocessor epsilon
-        Util.addParameter(opticsParameters, DiSHPreprocessor.EPSILON_ID, Double.toString(epsilon));
+        OptionUtil.addParameter(opticsParameters, DiSHPreprocessor.EPSILON_ID, Double.toString(epsilon));
 
         // preprocessor minpts
-        Util.addParameter(opticsParameters, DiSHPreprocessor.MINPTS_ID, Integer.toString(minpts));
+        OptionUtil.addParameter(opticsParameters, DiSHPreprocessor.MINPTS_ID, Integer.toString(minpts));
 
         // remaining parameters
         for (String parameter : remainingParameters) {

@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,7 +94,7 @@ public abstract class AbstractParameterizable extends AbstractLoggable
      * @param part     an array that contains only elements of the first array
      */
     protected final void setParameters(String[] complete, String[] part) {
-        currentParameterArray = Util.parameterDifference(complete, part);
+        currentParameterArray = OptionUtil.parameterDifference(complete, part);
     }
 
     public final String[] getParameters() {

@@ -5,9 +5,9 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.LOF;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
@@ -52,13 +52,13 @@ public class LOFWrapper<O extends DatabaseObject> extends FileBasedDatabaseConne
         List<String> parameters = super.getKDDTaskParameters();
 
         // algorithm LOF
-        Util.addParameter(parameters, OptionID.ALGORITHM, LOF.class.getName());
+        OptionUtil.addParameter(parameters, OptionID.ALGORITHM, LOF.class.getName());
 
         // minpts
-        Util.addParameter(parameters, LOF.MINPTS_ID, Integer.toString(MINPTS_PARAM.getValue()));
+        OptionUtil.addParameter(parameters, LOF.MINPTS_ID, Integer.toString(MINPTS_PARAM.getValue()));
 
         // distance function
-        Util.addParameter(parameters, LOF.DISTANCE_FUNCTION_ID, EuclideanDistanceFunction.class.getName());
+        OptionUtil.addParameter(parameters, LOF.DISTANCE_FUNCTION_ID, EuclideanDistanceFunction.class.getName());
 
         // normalization
 //    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);

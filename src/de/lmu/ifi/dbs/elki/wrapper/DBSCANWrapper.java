@@ -5,9 +5,9 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -75,13 +75,13 @@ public class DBSCANWrapper<O extends DatabaseObject> extends NormalizationWrappe
         List<String> parameters = super.getKDDTaskParameters();
 
         // algorithm DBSCAN
-        Util.addParameter(parameters, OptionID.ALGORITHM, DBSCAN.class.getName());
+        OptionUtil.addParameter(parameters, OptionID.ALGORITHM, DBSCAN.class.getName());
 
         // epsilon
-        Util.addParameter(parameters, EPSILON_PARAM, EPSILON_PARAM.getValue());
+        OptionUtil.addParameter(parameters, EPSILON_PARAM, EPSILON_PARAM.getValue());
 
         // minpts
-        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(MINPTS_PARAM.getValue()));
+        OptionUtil.addParameter(parameters, MINPTS_PARAM, Integer.toString(MINPTS_PARAM.getValue()));
 
         // database
 //    params.add(OptionHandler.OPTION_PREFIX + AbstractDatabaseConnection.DATABASE_CLASS_P);

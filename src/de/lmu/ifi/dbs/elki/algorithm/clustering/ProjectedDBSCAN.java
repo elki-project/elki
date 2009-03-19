@@ -24,12 +24,12 @@ import de.lmu.ifi.dbs.elki.preprocessing.ProjectedDBSCANPreprocessor;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
@@ -400,14 +400,14 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
             distanceFunctionParameters.add(p);
         }
         // omit preprocessing flag
-        Util.addFlag(distanceFunctionParameters, PreprocessorHandler.OMIT_PREPROCESSING_ID);
+        OptionUtil.addFlag(distanceFunctionParameters, PreprocessorHandler.OMIT_PREPROCESSING_ID);
         // preprocessor
-        Util.addParameter(distanceFunctionParameters, PreprocessorHandler.PREPROCESSOR_ID, preprocessorClass().getName());
+        OptionUtil.addParameter(distanceFunctionParameters, PreprocessorHandler.PREPROCESSOR_ID, preprocessorClass().getName());
         // preprocessor epsilon
         distanceFunctionParameters.add(3, OptionHandler.OPTION_PREFIX + ProjectedDBSCANPreprocessor.EPSILON_PARAM.getName());
         distanceFunctionParameters.add(4,epsilon);
         // preprocessor minpts
-        Util.addParameter(distanceFunctionParameters, MINPTS_ID, Integer.toString(minpts));
+        OptionUtil.addParameter(distanceFunctionParameters, MINPTS_ID, Integer.toString(minpts));
 
         distanceFunction.setParameters(distanceFunctionParameters.toArray(new String[distanceFunctionParameters.size()]));
 

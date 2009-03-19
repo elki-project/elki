@@ -5,9 +5,9 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PROCLUS;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.ProjectedClustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
@@ -77,16 +77,16 @@ public class PROCLUSWrapper<O extends DatabaseObject> extends FileBasedDatabaseC
         List<String> parameters = super.getKDDTaskParameters();
 
         // PROCLUS algorithm
-        Util.addParameter(parameters, OptionID.ALGORITHM, PROCLUS.class.getName());
+        OptionUtil.addParameter(parameters, OptionID.ALGORITHM, PROCLUS.class.getName());
 
         // l
-        Util.addParameter(parameters, L_PARAM, Integer.toString(L_PARAM.getValue()));
+        OptionUtil.addParameter(parameters, L_PARAM, Integer.toString(L_PARAM.getValue()));
 
         // k
-        Util.addParameter(parameters, K_PARAM, Integer.toString(K_PARAM.getValue()));
+        OptionUtil.addParameter(parameters, K_PARAM, Integer.toString(K_PARAM.getValue()));
 
         // k_i
-        Util.addParameter(parameters, K_I_PARAM, Integer.toString(K_I_PARAM.getValue()));
+        OptionUtil.addParameter(parameters, K_I_PARAM, Integer.toString(K_I_PARAM.getValue()));
 
 
         return parameters;

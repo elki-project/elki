@@ -2,8 +2,8 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
 
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.NumberParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 
@@ -48,15 +48,15 @@ public class NotEqualValueGlobalConstraint<N extends Number> extends AbstractLog
             if (param.isSet()) {
                 if (!numbers.add(param.getNumberValue())) {
                     throw new WrongParameterValueException("Global Parameter Constraint Error:\n" +
-                        "Parameters " + Util.optionsNamesToString(parameters) +
+                        "Parameters " + OptionUtil.optionsNamesToString(parameters) +
                         " must have different values. Current values: " +
-                        Util.parameterNamesAndValuesToString(parameters) + ".\n");
+                        OptionUtil.parameterNamesAndValuesToString(parameters) + ".\n");
                 }
             }
         }
     }
 
     public String getDescription() {
-        return "Parameters " + Util.optionsNamesToString(parameters) + " must have different values.";
+        return "Parameters " + OptionUtil.optionsNamesToString(parameters) + " must have different values.";
     }
 }

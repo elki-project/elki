@@ -5,9 +5,9 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
@@ -71,9 +71,9 @@ public class DirectoryTask extends StandAloneInputWrapper {
             try {
                 List<String> wrapperParameters = getRemainingParameters();
                 // input
-                Util.addParameter(wrapperParameters, INPUT_ID, inputFile.getAbsolutePath());
+                OptionUtil.addParameter(wrapperParameters, INPUT_ID, inputFile.getAbsolutePath());
                 // output
-                Util.addParameter(wrapperParameters, OUTPUT_ID, getOutput() + File.separator + inputFile.getName());
+                OptionUtil.addParameter(wrapperParameters, OUTPUT_ID, getOutput() + File.separator + inputFile.getName());
 
                 wrapper.setParameters(wrapperParameters.toArray(new String[wrapperParameters.size()]));
                 wrapper.run();

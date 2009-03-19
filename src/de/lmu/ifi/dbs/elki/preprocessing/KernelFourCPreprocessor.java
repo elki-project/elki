@@ -15,11 +15,11 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.NormalizingEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
@@ -158,8 +158,8 @@ public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector
         // save parameters for pca
         final List<String> tmpPCAParameters = new ArrayList<String>();
         // eigen pair filter
-        Util.addParameter(tmpPCAParameters, PCAFilteredRunner.PCA_EIGENPAIR_FILTER, CompositeEigenPairFilter.class.getName());
-        Util.addParameter(tmpPCAParameters, CompositeEigenPairFilter.EIGENPAIR_FILTER_COMPOSITE_LIST,
+        OptionUtil.addParameter(tmpPCAParameters, PCAFilteredRunner.PCA_EIGENPAIR_FILTER, CompositeEigenPairFilter.class.getName());
+        OptionUtil.addParameter(tmpPCAParameters, CompositeEigenPairFilter.EIGENPAIR_FILTER_COMPOSITE_LIST,
             LimitEigenPairFilter.class.getName() + ListParameter.SPLIT
             + NormalizingEigenPairFilter.class.getName() + ListParameter.SPLIT
             + LimitEigenPairFilter.class.getName());
@@ -168,18 +168,18 @@ public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector
         //        Then set absolute again and the new value for delta. I've removed this. -- erich
         // abs
         if (absolute) {
-          Util.addFlag(tmpPCAParameters, LimitEigenPairFilter.EIGENPAIR_FILTER_ABSOLUTE);
+          OptionUtil.addFlag(tmpPCAParameters, LimitEigenPairFilter.EIGENPAIR_FILTER_ABSOLUTE);
         }
         // delta
-        Util.addParameter(tmpPCAParameters, LimitEigenPairFilter.EIGENPAIR_FILTER_DELTA, Double.toString(delta));
+        OptionUtil.addParameter(tmpPCAParameters, LimitEigenPairFilter.EIGENPAIR_FILTER_DELTA, Double.toString(delta));
 
         // Big and small are not used in this version of KernelFourC
         // as they implicitly take the values 1 (big) and 0 (small),
         // big value
-        Util.addParameter(tmpPCAParameters, PCAFilteredRunner.BIG_ID, "1");
+        OptionUtil.addParameter(tmpPCAParameters, PCAFilteredRunner.BIG_ID, "1");
 
         // small value
-        Util.addParameter(tmpPCAParameters, PCAFilteredRunner.SMALL_ID, "0");
+        OptionUtil.addParameter(tmpPCAParameters, PCAFilteredRunner.SMALL_ID, "0");
 
         String[] pcaParameters = tmpPCAParameters.toArray(new String[tmpPCAParameters.size()]);
         pca.setParameters(pcaParameters);

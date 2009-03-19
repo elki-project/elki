@@ -8,9 +8,9 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.DefaultValueGlobalConstraint;
@@ -95,29 +95,29 @@ public class COPACWrapper<O extends DatabaseObject> extends NormalizationWrapper
         List<String> parameters = super.getKDDTaskParameters();
 
         // algorithm COPAC
-        Util.addParameter(parameters, OptionID.ALGORITHM, COPAC.class.getName());
+        OptionUtil.addParameter(parameters, OptionID.ALGORITHM, COPAC.class.getName());
 
         // partition algorithm DBSCAN
-        Util.addParameter(parameters, COPAC.PARTITION_ALGORITHM_ID, DBSCAN.class.getName());
+        OptionUtil.addParameter(parameters, COPAC.PARTITION_ALGORITHM_ID, DBSCAN.class.getName());
 
         // epsilon
-        Util.addParameter(parameters, EPSILON_PARAM, EPSILON_PARAM.getValue());
+        OptionUtil.addParameter(parameters, EPSILON_PARAM, EPSILON_PARAM.getValue());
 
         // minpts
-        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(MINPTS_PARAM.getValue()));
+        OptionUtil.addParameter(parameters, MINPTS_PARAM, Integer.toString(MINPTS_PARAM.getValue()));
 
         // distance function
-        Util.addParameter(parameters, DBSCAN.DISTANCE_FUNCTION_ID, LocallyWeightedDistanceFunction.class.getName());
+        OptionUtil.addParameter(parameters, DBSCAN.DISTANCE_FUNCTION_ID, LocallyWeightedDistanceFunction.class.getName());
 //        parameters.add(ERiCDistanceFunction.class.getName());
 
         // omit preprocessing
-        Util.addFlag(parameters, PreprocessorHandler.OMIT_PREPROCESSING_ID);
+        OptionUtil.addFlag(parameters, PreprocessorHandler.OMIT_PREPROCESSING_ID);
 
         // preprocessor for correlation dimension
-        Util.addParameter(parameters, COPAC.PREPROCESSOR_ID, KnnQueryBasedHiCOPreprocessor.class.getName());
+        OptionUtil.addParameter(parameters, COPAC.PREPROCESSOR_ID, KnnQueryBasedHiCOPreprocessor.class.getName());
 
         // k
-        Util.addParameter(parameters, K_PARAM, Integer.toString(K_PARAM.getValue()));
+        OptionUtil.addParameter(parameters, K_PARAM, Integer.toString(K_PARAM.getValue()));
 
         return parameters;
     }

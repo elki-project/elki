@@ -4,11 +4,11 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.CLIQUE;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
@@ -77,17 +77,17 @@ public class CLIQUEWrapper<O extends DatabaseObject> extends FileBasedDatabaseCo
         List<String> parameters = super.getKDDTaskParameters();
 
         // algorithm CLIQUE
-        Util.addParameter(parameters, OptionID.ALGORITHM, CLIQUE.class.getName());
+        OptionUtil.addParameter(parameters, OptionID.ALGORITHM, CLIQUE.class.getName());
 
         // xsi
-        Util.addParameter(parameters, XSI_PARAM, Integer.toString(XSI_PARAM.getValue()));
+        OptionUtil.addParameter(parameters, XSI_PARAM, Integer.toString(XSI_PARAM.getValue()));
 
         // tau
-        Util.addParameter(parameters, TAU_PARAM, Double.toString(TAU_PARAM.getValue()));
+        OptionUtil.addParameter(parameters, TAU_PARAM, Double.toString(TAU_PARAM.getValue()));
 
         // prune
         if (PRUNE_FLAG.isSet()) {
-            Util.addFlag(parameters, PRUNE_FLAG);
+            OptionUtil.addFlag(parameters, PRUNE_FLAG);
         }
 
         return parameters;

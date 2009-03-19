@@ -8,10 +8,10 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.LimitEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
@@ -151,19 +151,19 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
         // save parameters for pca
         List<String> tmpPCAParameters = new ArrayList<String>();
         // eigen pair filter
-        Util.addParameter(tmpPCAParameters, PCAFilteredRunner.PCA_EIGENPAIR_FILTER, LimitEigenPairFilter.class.getName());
+        OptionUtil.addParameter(tmpPCAParameters, PCAFilteredRunner.PCA_EIGENPAIR_FILTER, LimitEigenPairFilter.class.getName());
         // abs
         if (absolute) {
-            Util.addFlag(tmpPCAParameters, LimitEigenPairFilter.EIGENPAIR_FILTER_ABSOLUTE);
+            OptionUtil.addFlag(tmpPCAParameters, LimitEigenPairFilter.EIGENPAIR_FILTER_ABSOLUTE);
         }
         // delta
-        Util.addParameter(tmpPCAParameters, LimitEigenPairFilter.EIGENPAIR_FILTER_DELTA, Double.toString(delta));
+        OptionUtil.addParameter(tmpPCAParameters, LimitEigenPairFilter.EIGENPAIR_FILTER_DELTA, Double.toString(delta));
 
         // big value
-        Util.addParameter(tmpPCAParameters, PCAFilteredRunner.BIG_ID, "50");
+        OptionUtil.addParameter(tmpPCAParameters, PCAFilteredRunner.BIG_ID, "50");
 
         // small value
-        Util.addParameter(tmpPCAParameters, PCAFilteredRunner.SMALL_ID, "1");
+        OptionUtil.addParameter(tmpPCAParameters, PCAFilteredRunner.SMALL_ID, "1");
 
         String[] pcaParameters = tmpPCAParameters.toArray(new String[tmpPCAParameters.size()]);
         pca.setParameters(pcaParameters);

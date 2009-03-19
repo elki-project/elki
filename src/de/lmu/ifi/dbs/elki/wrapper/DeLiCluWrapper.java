@@ -9,9 +9,9 @@ import de.lmu.ifi.dbs.elki.database.connection.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndex;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTree;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -89,25 +89,25 @@ public class DeLiCluWrapper<O extends DatabaseObject> extends NormalizationWrapp
         List<String> parameters = super.getKDDTaskParameters();
 
         // deliclu algorithm
-        Util.addParameter(parameters, OptionID.ALGORITHM, DeLiClu.class.getName());
+        OptionUtil.addParameter(parameters, OptionID.ALGORITHM, DeLiClu.class.getName());
 
         // minpts
-        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(MINPTS_PARAM.getValue()));
+        OptionUtil.addParameter(parameters, MINPTS_PARAM, Integer.toString(MINPTS_PARAM.getValue()));
 
         // database
-        Util.addParameter(parameters, AbstractDatabaseConnection.DATABASE_ID, SpatialIndexDatabase.class.getName());
+        OptionUtil.addParameter(parameters, AbstractDatabaseConnection.DATABASE_ID, SpatialIndexDatabase.class.getName());
 
         // index
-        Util.addParameter(parameters, SpatialIndexDatabase.INDEX_ID, DeLiCluTree.class.getName());
+        OptionUtil.addParameter(parameters, SpatialIndexDatabase.INDEX_ID, DeLiCluTree.class.getName());
 
         // bulk load
-        Util.addFlag(parameters, SpatialIndex.BULK_LOAD_ID);
+        OptionUtil.addFlag(parameters, SpatialIndex.BULK_LOAD_ID);
 
         // page size
-        Util.addParameter(parameters, PAGE_SIZE_PARAM, Integer.toString(PAGE_SIZE_PARAM.getValue()));
+        OptionUtil.addParameter(parameters, PAGE_SIZE_PARAM, Integer.toString(PAGE_SIZE_PARAM.getValue()));
 
         // cache size
-        Util.addParameter(parameters, CACHE_SIZE_PARAM, Integer.toString(CACHE_SIZE_PARAM.getValue()));
+        OptionUtil.addParameter(parameters, CACHE_SIZE_PARAM, Integer.toString(CACHE_SIZE_PARAM.getValue()));
 
         return parameters;
     }

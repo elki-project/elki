@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.heap.HeapNode;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
@@ -211,9 +212,9 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
         // knn join
         List<String> kNNJoinParameters = new ArrayList<String>();
         // parameter k
-        Util.addParameter(kNNJoinParameters, KNNJoin.K_ID, Integer.toString(minpts));
+        OptionUtil.addParameter(kNNJoinParameters, KNNJoin.K_ID, Integer.toString(minpts));
         // parameter distance function
-        Util.addParameter(kNNJoinParameters, KNNJoin.DISTANCE_FUNCTION_ID, getDistanceFunction().getClass().getName());
+        OptionUtil.addParameter(kNNJoinParameters, KNNJoin.DISTANCE_FUNCTION_ID, getDistanceFunction().getClass().getName());
         Util.addToList(kNNJoinParameters, getDistanceFunction().getParameters());
         knnJoin.setParameters(kNNJoinParameters.toArray(new String[kNNJoinParameters.size()]));
 

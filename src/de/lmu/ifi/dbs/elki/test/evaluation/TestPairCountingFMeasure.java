@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure;
-import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 public class TestPairCountingFMeasure {
@@ -29,7 +29,7 @@ public class TestPairCountingFMeasure {
 
     String[] inputparams = new String[0];
     // Set up database input file:
-    inputparams = Util.addParameter(inputparams,
+    inputparams = OptionUtil.addParameter(inputparams,
         FileBasedDatabaseConnection.INPUT_ID, dataset);
     inputparams = dbconn.setParameters(inputparams);
     // get database

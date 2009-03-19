@@ -4,7 +4,6 @@ import de.lmu.ifi.dbs.elki.KDDTask;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
 
 import java.io.File;
@@ -137,17 +136,17 @@ public abstract class KDDTaskWrapper<O extends DatabaseObject> extends AbstractW
 
         // verbose
         if (isVerbose()) {
-            Util.addFlag(parameters, OptionID.ALGORITHM_VERBOSE);
+            OptionUtil.addFlag(parameters, OptionID.ALGORITHM_VERBOSE);
         }
 
         // time
         if (isTime()) {
-            Util.addFlag(parameters, OptionID.ALGORITHM_TIME);
+            OptionUtil.addFlag(parameters, OptionID.ALGORITHM_TIME);
         }
 
         // output
         if (getOutput() != null) {
-            Util.addParameter(parameters, OUTPUT_PARAM, getOutput().getPath());
+            OptionUtil.addParameter(parameters, OUTPUT_PARAM, getOutput().getPath());
         }
 
         return parameters;

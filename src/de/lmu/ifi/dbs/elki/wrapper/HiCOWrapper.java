@@ -8,11 +8,11 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PCABasedCorrelationDistance
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PercentageEigenPairFilter;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.DefaultValueGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
@@ -114,25 +114,25 @@ public class HiCOWrapper<O extends DatabaseObject> extends NormalizationWrapper<
         List<String> parameters = super.getKDDTaskParameters();
 
         // OPTICS algorithm
-        Util.addParameter(parameters, OptionID.ALGORITHM, OPTICS.class.getName());
+        OptionUtil.addParameter(parameters, OptionID.ALGORITHM, OPTICS.class.getName());
 
         // distance function
-        Util.addParameter(parameters, OPTICS.DISTANCE_FUNCTION_ID, PCABasedCorrelationDistanceFunction.class.getName());
+        OptionUtil.addParameter(parameters, OPTICS.DISTANCE_FUNCTION_ID, PCABasedCorrelationDistanceFunction.class.getName());
 
         // omit flag
-        Util.addFlag(parameters, PreprocessorHandler.OMIT_PREPROCESSING_ID);
+        OptionUtil.addFlag(parameters, PreprocessorHandler.OMIT_PREPROCESSING_ID);
 
         // epsilon
-        Util.addParameter(parameters, OPTICS.EPSILON_ID, PCABasedCorrelationDistanceFunction.INFINITY_PATTERN);
+        OptionUtil.addParameter(parameters, OPTICS.EPSILON_ID, PCABasedCorrelationDistanceFunction.INFINITY_PATTERN);
 
         // minpts
-        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(MINPTS_PARAM.getValue()));
+        OptionUtil.addParameter(parameters, MINPTS_PARAM, Integer.toString(MINPTS_PARAM.getValue()));
 
         // preprocessor
-        Util.addParameter(parameters, PreprocessorHandler.PREPROCESSOR_ID, KnnQueryBasedHiCOPreprocessor.class.getName());
+        OptionUtil.addParameter(parameters, PreprocessorHandler.PREPROCESSOR_ID, KnnQueryBasedHiCOPreprocessor.class.getName());
 
         // k for preprocessor
-        Util.addParameter(parameters, K_PARAM, Integer.toString(K_PARAM.getValue()));
+        OptionUtil.addParameter(parameters, K_PARAM, Integer.toString(K_PARAM.getValue()));
 
         // alpha
         parameters.add(OptionHandler.OPTION_PREFIX + ALPHA_PARAM.getName());

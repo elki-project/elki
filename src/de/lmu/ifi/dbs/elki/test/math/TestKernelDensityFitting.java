@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.FittingFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.GaussianFittingFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.LevenbergMarquardtMethod;
 import de.lmu.ifi.dbs.elki.math.statistics.KernelDensityEstimator;
-import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 public class TestKernelDensityFitting {
@@ -32,7 +32,7 @@ public class TestKernelDensityFitting {
 
     String[] inputparams = new String[0];
     // Set up database input file:
-    inputparams = Util.addParameter(inputparams,
+    inputparams = OptionUtil.addParameter(inputparams,
         FileBasedDatabaseConnection.INPUT_ID, dataset);
     inputparams = dbconn.setParameters(inputparams);
     // get database

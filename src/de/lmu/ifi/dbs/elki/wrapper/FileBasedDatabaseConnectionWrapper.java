@@ -2,8 +2,8 @@ package de.lmu.ifi.dbs.elki.wrapper;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 
 import java.util.List;
@@ -37,7 +37,7 @@ public abstract class FileBasedDatabaseConnectionWrapper<O extends DatabaseObjec
     public List<String> getKDDTaskParameters() throws UnusedParameterException {
         List<String> parameters = super.getKDDTaskParameters();
         // input
-        Util.addParameter(parameters, INPUT_PARAM, INPUT_PARAM.getValue().getPath());
+        OptionUtil.addParameter(parameters, INPUT_PARAM, INPUT_PARAM.getValue().getPath());
         return parameters;
     }
 }

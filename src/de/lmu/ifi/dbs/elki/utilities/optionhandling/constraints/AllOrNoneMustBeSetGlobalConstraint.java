@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
 
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -53,7 +53,7 @@ public class AllOrNoneMustBeSetGlobalConstraint extends AbstractLoggable impleme
         }
         if (!set.isEmpty() && !notSet.isEmpty()) {
             throw new WrongParameterValueException("Global Constraint Error.\n" +
-                "Either all of the parameters " + Util.optionsNamesToString(parameterList) +
+                "Either all of the parameters " + OptionUtil.optionsNamesToString(parameterList) +
                 " must be set or none of them. " +
                 "Parameter(s) currently set: " + set.toString() +
                 ", parameters currently " + "not set: " + notSet.toString());
@@ -61,7 +61,7 @@ public class AllOrNoneMustBeSetGlobalConstraint extends AbstractLoggable impleme
     }
 
     public String getDescription() {
-        return "Either all of the parameters " + Util.optionsNamesToString(parameterList) +
+        return "Either all of the parameters " + OptionUtil.optionsNamesToString(parameterList) +
             " must be set or none of them. ";
     }
 

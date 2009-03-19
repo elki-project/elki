@@ -2,8 +2,8 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
 
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ListParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 
@@ -50,7 +50,7 @@ public class EqualSizeGlobalConstraint extends AbstractLoggable implements Globa
                 }
                 else if (constraintSize != listParam.getListSize()) {
                     throw new WrongParameterValueException("Global constraint errror.\n" +
-                        "The list parameters " + Util.optionsNamesToString(parameters) +
+                        "The list parameters " + OptionUtil.optionsNamesToString(parameters) +
                         " must have equal list sizes.");
                 }
             }
@@ -58,7 +58,7 @@ public class EqualSizeGlobalConstraint extends AbstractLoggable implements Globa
     }
 
     public String getDescription() {
-        return "The list parameters " + Util.optionsNamesToString(parameters) +
+        return "The list parameters " + OptionUtil.optionsNamesToString(parameters) +
             " must have equal list sizes.";
     }
 

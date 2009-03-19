@@ -5,10 +5,10 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OnlineLOF;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
@@ -84,22 +84,22 @@ public class OnlineLOFWrapper<O extends DatabaseObject> extends FileBasedDatabas
         List<String> parameters = super.getKDDTaskParameters();
 
         // algorithm OnlineLOF
-        Util.addParameter(parameters, OptionID.ALGORITHM, OnlineLOF.class.getName());
+        OptionUtil.addParameter(parameters, OptionID.ALGORITHM, OnlineLOF.class.getName());
 
         // minpts
-        Util.addParameter(parameters, OnlineLOF.MINPTS_ID, Integer.toString(MINPTS_PARAM.getValue()));
+        OptionUtil.addParameter(parameters, OnlineLOF.MINPTS_ID, Integer.toString(MINPTS_PARAM.getValue()));
 
         // insertions
-        Util.addParameter(parameters, OnlineLOF.INSERTIONS_ID, INSERTIONS_PARAM.getValue().getPath());
+        OptionUtil.addParameter(parameters, OnlineLOF.INSERTIONS_ID, INSERTIONS_PARAM.getValue().getPath());
 
         // lof
-        Util.addParameter(parameters, OnlineLOF.LOF_ID, LOF_PARAM.getValue().getPath());
+        OptionUtil.addParameter(parameters, OnlineLOF.LOF_ID, LOF_PARAM.getValue().getPath());
 
         // nn
-        Util.addParameter(parameters, OnlineLOF.NN_ID, NN_PARAM.getValue().getPath());
+        OptionUtil.addParameter(parameters, OnlineLOF.NN_ID, NN_PARAM.getValue().getPath());
 
         // distance function
-        Util.addParameter(parameters, OnlineLOF.DISTANCE_FUNCTION_ID, EuclideanDistanceFunction.class.getName());
+        OptionUtil.addParameter(parameters, OnlineLOF.DISTANCE_FUNCTION_ID, EuclideanDistanceFunction.class.getName());
 
         // page size
 //    parameters.add(OptionHandler.OPTION_PREFIX + LOF.PAGE_SIZE_P);

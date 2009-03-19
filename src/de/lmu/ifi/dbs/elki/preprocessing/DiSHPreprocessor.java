@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -328,7 +329,7 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
 
         // parameters for apriori
         List<String> parameters = new ArrayList<String>();
-        Util.addParameter(parameters, APRIORI.MINSUPP_ID, Integer.toString(minpts));
+        OptionUtil.addParameter(parameters, APRIORI.MINSUPP_ID, Integer.toString(minpts));
         APRIORI apriori = new APRIORI();
         apriori.setParameters(parameters.toArray(new String[parameters.size()]));
 
@@ -503,7 +504,7 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
         DimensionSelectingDistanceFunction<N, V>[] distanceFunctions = new DimensionSelectingDistanceFunction[dimensionality];
         for (int d = 0; d < dimensionality; d++) {
             String[] parameters = new String[0];
-            parameters = Util.addParameter(parameters, DimensionSelectingDistanceFunction.DIM_ID, Integer.toString(d + 1));
+            parameters = OptionUtil.addParameter(parameters, DimensionSelectingDistanceFunction.DIM_ID, Integer.toString(d + 1));
             distanceFunctions[d] = new DimensionSelectingDistanceFunction<N, V>();
             distanceFunctions[d].setParameters(parameters);
             distanceFunctions[d].setDatabase(database, verbose, time);

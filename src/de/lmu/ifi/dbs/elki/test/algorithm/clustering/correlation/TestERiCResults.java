@@ -25,7 +25,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.WeightedCovarianceMatrixBuilde
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ErfcWeight;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
-import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 public class TestERiCResults {
@@ -41,7 +41,7 @@ public class TestERiCResults {
 
     String[] inputparams = new String[0];
     // Set up database input file:
-    inputparams = Util.addParameter(inputparams, FileBasedDatabaseConnection.INPUT_ID, dataset);
+    inputparams = OptionUtil.addParameter(inputparams, FileBasedDatabaseConnection.INPUT_ID, dataset);
     inputparams = dbconn.setParameters(inputparams);
     // get database
     Database<DoubleVector> db = dbconn.getDatabase(null);
@@ -55,22 +55,22 @@ public class TestERiCResults {
     // prepare parameters
     List<String> ericparams = new ArrayList<String>();
     eric.setVerbose(false);
-    Util.addParameter(ericparams, COPAC.PARTITION_ALGORITHM_ID, DBSCAN.class.getCanonicalName());
-    Util.addParameter(ericparams, DBSCAN.MINPTS_ID, Integer.toString(30));
-    Util.addParameter(ericparams, DBSCAN.EPSILON_ID, Integer.toString(0));
+    OptionUtil.addParameter(ericparams, COPAC.PARTITION_ALGORITHM_ID, DBSCAN.class.getCanonicalName());
+    OptionUtil.addParameter(ericparams, DBSCAN.MINPTS_ID, Integer.toString(30));
+    OptionUtil.addParameter(ericparams, DBSCAN.EPSILON_ID, Integer.toString(0));
     // ERiC Distance function in DBSCAN:
-    Util.addParameter(ericparams, DBSCAN.DISTANCE_FUNCTION_ID, ERiCDistanceFunction.class.getCanonicalName());
-    Util.addParameter(ericparams, ERiCDistanceFunction.DELTA_ID, Double.toString(0.20));
-    Util.addParameter(ericparams, ERiCDistanceFunction.TAU_ID, Double.toString(0.04));
+    OptionUtil.addParameter(ericparams, DBSCAN.DISTANCE_FUNCTION_ID, ERiCDistanceFunction.class.getCanonicalName());
+    OptionUtil.addParameter(ericparams, ERiCDistanceFunction.DELTA_ID, Double.toString(0.20));
+    OptionUtil.addParameter(ericparams, ERiCDistanceFunction.TAU_ID, Double.toString(0.04));
     // Preprocessing via HiCo:
-    Util.addParameter(ericparams, COPAC.PREPROCESSOR_ID, KnnQueryBasedHiCOPreprocessor.class.getCanonicalName());
-    Util.addParameter(ericparams, KnnQueryBasedHiCOPreprocessor.KNN_HICO_PREPROCESSOR_K, Integer.toString(50));
-    Util.addFlag(ericparams, PreprocessorHandler.OMIT_PREPROCESSING_ID);
+    OptionUtil.addParameter(ericparams, COPAC.PREPROCESSOR_ID, KnnQueryBasedHiCOPreprocessor.class.getCanonicalName());
+    OptionUtil.addParameter(ericparams, KnnQueryBasedHiCOPreprocessor.KNN_HICO_PREPROCESSOR_K, Integer.toString(50));
+    OptionUtil.addFlag(ericparams, PreprocessorHandler.OMIT_PREPROCESSING_ID);
     // PCA
-    Util.addParameter(ericparams, PCAFilteredRunner.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class.getCanonicalName());
-    Util.addParameter(ericparams, WeightedCovarianceMatrixBuilder.WEIGHT_ID, ErfcWeight.class.getCanonicalName());
-    Util.addParameter(ericparams, PCAFilteredRunner.PCA_EIGENPAIR_FILTER, RelativeEigenPairFilter.class.getCanonicalName());
-    Util.addParameter(ericparams, RelativeEigenPairFilter.EIGENPAIR_FILTER_RALPHA, Double.toString(1.60));
+    OptionUtil.addParameter(ericparams, PCAFilteredRunner.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class.getCanonicalName());
+    OptionUtil.addParameter(ericparams, WeightedCovarianceMatrixBuilder.WEIGHT_ID, ErfcWeight.class.getCanonicalName());
+    OptionUtil.addParameter(ericparams, PCAFilteredRunner.PCA_EIGENPAIR_FILTER, RelativeEigenPairFilter.class.getCanonicalName());
+    OptionUtil.addParameter(ericparams, RelativeEigenPairFilter.EIGENPAIR_FILTER_RALPHA, Double.toString(1.60));
     // Set parameters
     String[] remainingparams = eric.setParameters(ericparams.toArray(new String[0]));
     for(String s : remainingparams)

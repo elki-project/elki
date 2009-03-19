@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTree;
 import de.lmu.ifi.dbs.elki.utilities.QueryResult;
-import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 public class TestIndexStructures {
@@ -56,16 +56,16 @@ public class TestIndexStructures {
     testFileBasedDatabaseConnection(new String[]{});
 
     String[] metopts = new String[0];
-    metopts = Util.addParameter(metopts,
+    metopts = OptionUtil.addParameter(metopts,
         AbstractDatabaseConnection.DATABASE_ID, MetricalIndexDatabase.class.getCanonicalName());
-    metopts = Util.addParameter(metopts,
+    metopts = OptionUtil.addParameter(metopts,
         MetricalIndexDatabase.INDEX_ID, MTree.class.getCanonicalName());    
     testFileBasedDatabaseConnection(metopts);
 
     String[] spatopts = new String[0];
-    spatopts = Util.addParameter(spatopts,
+    spatopts = OptionUtil.addParameter(spatopts,
         AbstractDatabaseConnection.DATABASE_ID, SpatialIndexDatabase.class.getCanonicalName());
-    spatopts = Util.addParameter(spatopts,
+    spatopts = OptionUtil.addParameter(spatopts,
         SpatialIndexDatabase.INDEX_ID, RStarTree.class.getCanonicalName());    
     testFileBasedDatabaseConnection(metopts);
 }
@@ -75,7 +75,7 @@ public class TestIndexStructures {
     FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>();
 
     // Set up database input file:
-    inputparams = Util.addParameter(inputparams,
+    inputparams = OptionUtil.addParameter(inputparams,
         FileBasedDatabaseConnection.INPUT_ID, dataset);
     inputparams = dbconn.setParameters(inputparams);
     // get database

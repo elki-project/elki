@@ -23,6 +23,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
@@ -271,7 +272,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
         List<String> parameters = new ArrayList<String>();
 
         // distance function
-        Util.addParameter(parameters, DISTANCE_FUNCTION_PARAM, distanceFunction.getClass().getName());
+        OptionUtil.addParameter(parameters, DISTANCE_FUNCTION_PARAM, distanceFunction.getClass().getName());
 
         // selected dimensions for distance function
         parameters.add(OptionHandler.OPTION_PREFIX + AbstractDimensionsSelectingDoubleDistanceFunction.DIMS_ID.getName());
@@ -284,10 +285,10 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
         }
 
         // epsilon
-        Util.addParameter(parameters, EPSILON_PARAM, epsilon);
+        OptionUtil.addParameter(parameters, EPSILON_PARAM, epsilon);
 
         // minpts
-        Util.addParameter(parameters, MINPTS_PARAM, Integer.toString(minpts));
+        OptionUtil.addParameter(parameters, MINPTS_PARAM, Integer.toString(minpts));
 
         dbscan.setParameters(parameters.toArray(new String[parameters.size()]));
         return dbscan;

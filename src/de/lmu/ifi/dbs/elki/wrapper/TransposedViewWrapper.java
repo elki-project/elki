@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
@@ -66,8 +67,8 @@ public class TransposedViewWrapper<V extends RealVector<V, ?>> extends StandAlon
       FileBasedDatabaseConnection<V> dbConnection = new FileBasedDatabaseConnection<V>();
 
       List<String> dbParameters = getRemainingParameters();
-      Util.addParameter(dbParameters, FileBasedDatabaseConnection.PARSER_ID, RealVectorLabelParser.class.getName());
-      Util.addParameter(dbParameters, FileBasedDatabaseConnection.INPUT_ID, getInput().getPath());
+      OptionUtil.addParameter(dbParameters, FileBasedDatabaseConnection.PARSER_ID, RealVectorLabelParser.class.getName());
+      OptionUtil.addParameter(dbParameters, FileBasedDatabaseConnection.INPUT_ID, getInput().getPath());
       dbConnection.setParameters(dbParameters.toArray(new String[dbParameters.size()]));
 
       Database<V> db = dbConnection.getDatabase(null);

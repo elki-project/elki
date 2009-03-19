@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
 
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -48,13 +48,13 @@ public class OnlyOneIsAllowedToBeSetGlobalConstraint extends AbstractLoggable im
         }
         if (set.size() > 1) {
             throw new WrongParameterValueException("Global Parameter Constraint Error.\n" +
-                "Only one of the parameters " + Util.optionsNamesToString(parameters) + " is allowed to be set. " +
+                "Only one of the parameters " + OptionUtil.optionsNamesToString(parameters) + " is allowed to be set. " +
                 "Parameters currently set: " + set.toString());
         }
     }
 
     public String getDescription() {
-        return "Only one of the parameters " + Util.optionsNamesToString(parameters) + " is allowed to be set.";
+        return "Only one of the parameters " + OptionUtil.optionsNamesToString(parameters) + " is allowed to be set.";
     }
 
 }

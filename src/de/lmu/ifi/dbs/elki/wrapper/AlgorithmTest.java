@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 
@@ -242,13 +243,13 @@ public class AlgorithmTest extends AbstractParameterizable {
         List<String> parameters = new ArrayList<String>();
 
         // in
-        Util.addParameter(parameters, FileBasedDatabaseConnection.INPUT_ID, input.getPath());
+        OptionUtil.addParameter(parameters, FileBasedDatabaseConnection.INPUT_ID, input.getPath());
         // out
-        Util.addParameter(parameters, OptionID.OUTPUT,
+        OptionUtil.addParameter(parameters, OptionID.OUTPUT,
             output.getPath() + File.separator + algorithm.getClass().getSimpleName());
 
         // verbose
-        Util.addFlag(parameters, OptionID.ALGORITHM_VERBOSE);
+        OptionUtil.addFlag(parameters, OptionID.ALGORITHM_VERBOSE);
 
 
         return parameters.toArray(new String[parameters.size()]);

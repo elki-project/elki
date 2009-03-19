@@ -6,10 +6,10 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.DiSH;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.DiSHPreprocessor.Strategy;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
@@ -99,17 +99,17 @@ public class DiSHWrapper<O extends DatabaseObject> extends NormalizationWrapper<
         List<String> parameters = super.getKDDTaskParameters();
 
         // DiSH algorithm
-        Util.addParameter(parameters, OptionID.ALGORITHM, DiSH.class.getName());
+        OptionUtil.addParameter(parameters, OptionID.ALGORITHM, DiSH.class.getName());
 
         // epsilon
-        Util.addParameter(parameters, DiSH.EPSILON_ID, Double.toString(EPSILON_PARAM.getValue()));
+        OptionUtil.addParameter(parameters, DiSH.EPSILON_ID, Double.toString(EPSILON_PARAM.getValue()));
 
         // minpts
-        Util.addParameter(parameters, DiSH.MU_ID, Integer.toString(MU_PARAM.getValue()));
+        OptionUtil.addParameter(parameters, DiSH.MU_ID, Integer.toString(MU_PARAM.getValue()));
 
         // strategy for preprocessor
         if (strategy != null) {
-            Util.addParameter(parameters, DiSHPreprocessor.STRATEGY_ID, strategy);
+            OptionUtil.addParameter(parameters, DiSHPreprocessor.STRATEGY_ID, strategy);
         }
 
         return parameters;
