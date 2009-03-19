@@ -21,8 +21,6 @@ import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
@@ -35,19 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
 /**
  * @version 0.1
  */
-public final class Util extends AbstractLoggable {
-
-
-    static {
-        if (LoggingConfiguration.isChangeable()) {
-            LoggingConfiguration.configureRoot(LoggingConfiguration.CLI);
-        }
-    }
-
-    private Util() {
-        super(LoggingConfiguration.DEBUG);
-    }
-
+public final class Util {
     /**
      * Returns the maximum of the given Distances or the first, if none is
      * greater than the other one.
