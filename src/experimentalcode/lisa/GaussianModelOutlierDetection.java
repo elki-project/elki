@@ -29,8 +29,7 @@ public class GaussianModelOutlierDetection<V extends RealVector<V,Double>> exten
              Integer id = iter.next();
              V x = database.get(id);
              Vector x_minus_mean = x.plus(meanNeg).getColumnVector();
-             //transpose andersrum
-             double mDist = (x_minus_mean.times.(covarianceTransposed).times(x_minus_mean.transpose()).get(0,0);
+             double mDist = x_minus_mean.transpose().times(covarianceTransposed).times(x_minus_mean).get(0,0);
              database.associate(GMOD_MDIST, id, mDist); 
 		 }
 		 AnnotationsFromDatabase<V, Double> res1 = new AnnotationsFromDatabase<V, Double>(database);
