@@ -173,7 +173,7 @@ public class OnDiskArray implements Serializable {
    * @param magic2 Magic number to mix.
    * @return Mixed magic number.
    */
-  private static final int mixMagic(int magic1, int magic2) {
+  public static final int mixMagic(int magic1, int magic2) {
     final long prime = 2654435761L;
     long result = 1;
     result = prime * result + magic1;
