@@ -8,8 +8,9 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  * operation (of dimensionality dim+1), and also the construction of an inverse
  * transformation.
  * 
- * See also: <a
- * href="http://en.wikipedia.org/wiki/Homogeneous_coordinates">Wikipedia on
+ * See also:
+ * 
+ * <a href="http://en.wikipedia.org/wiki/Homogeneous_coordinates">Wikipedia on
  * Homogeneous Coordinates</a> for an introduction to their use for affine
  * transformations.
  * 
@@ -60,12 +61,13 @@ public class AffineTransformation {
   /**
    * Generate a transformation that reorders axes in the given way.
    * 
-   * The list of axes to be used should not contain duplicates, or the resulting matrix
-   * will not be invertible. It does not have to be complete however, in particular an
-   * empty list will result in the identity transform: unmentioned axes will be appended
-   * in their original order.
+   * The list of axes to be used should not contain duplicates, or the resulting
+   * matrix will not be invertible. It does not have to be complete however, in
+   * particular an empty list will result in the identity transform: unmentioned
+   * axes will be appended in their original order.
    * 
-   * @param dim Dimensionality of vector space (resulting Matrix will be dim+1 x dim+1)
+   * @param dim Dimensionality of vector space (resulting Matrix will be dim+1 x
+   *        dim+1)
    * @param axes (Partial) list of axes
    * @return
    */
@@ -95,7 +97,7 @@ public class AffineTransformation {
       m.set(useddim - 1, i, 1.0);
       useddim++;
     }
-    assert(useddim - 2 == dim);
+    assert (useddim - 2 == dim);
     return new AffineTransformation(dim, m, null);
   }
 
@@ -132,10 +134,12 @@ public class AffineTransformation {
     // reset inverse transformation - needs recomputation.
     inv = null;
     double[][] ht = new double[dim + 1][dim + 1];
-    for(int i = 0; i < dim + 1; i++)
+    for(int i = 0; i < dim + 1; i++) {
       ht[i][i] = 1.0;
-    for(int i = 0; i < dim; i++)
+    }
+    for(int i = 0; i < dim; i++) {
       ht[i][dim] = v.get(i);
+    }
     Matrix homTrans = new Matrix(ht);
     trans = homTrans.times(trans);
   }
@@ -143,7 +147,8 @@ public class AffineTransformation {
   /**
    * Add a matrix operation to the matrix.
    * 
-   * Be careful to use only invertible matrices if you want an invertible affine transformation.
+   * Be careful to use only invertible matrices if you want an invertible affine
+   * transformation.
    * 
    * @param m matrix (should be invertible)
    */
@@ -155,9 +160,11 @@ public class AffineTransformation {
     inv = null;
     // extend the matrix with an extra row and column
     double[][] ht = new double[dim + 1][dim + 1];
-    for(int i = 0; i < dim; i++)
-      for(int j = 0; j < dim; j++)
+    for(int i = 0; i < dim; i++) {
+      for(int j = 0; j < dim; j++) {
         ht[i][j] = m.get(i, j);
+      }
+    }
     // the other cells default to identity matrix
     ht[dim][dim] = 1.0;
     Matrix homTrans = new Matrix(ht);
@@ -183,8 +190,9 @@ public class AffineTransformation {
     inv = null;
     double[][] ht = new double[dim + 1][dim + 1];
     // identity matrix
-    for(int i = 0; i < dim + 1; i++)
+    for(int i = 0; i < dim + 1; i++) {
       ht[i][i] = 1.0;
+    }
     // insert rotation values
     ht[axis1][axis1] = +Math.cos(angle);
     ht[axis1][axis2] = -Math.sin(angle);
@@ -192,6 +200,18 @@ public class AffineTransformation {
     ht[axis2][axis2] = +Math.cos(angle);
     // apply
     Matrix homTrans = new Matrix(ht);
+    trans = homTrans.times(trans);
+  }
+
+  /**
+   * Add a reflection along the given axis.
+   * 
+   * @param axis Axis number to do the reflection at.
+   */
+  public void addAxisReflection(int axis) {
+    assert (0 < axis && axis <= dim);
+    Matrix homTrans = Matrix.unitMatrix(dim + 1);
+    homTrans.set(axis, axis, -1);
     trans = homTrans.times(trans);
   }
 
@@ -210,8 +230,9 @@ public class AffineTransformation {
    * @return a copy of the inverse transformation matrix
    */
   public Matrix getInverse() {
-    if(inv == null)
+    if(inv == null) {
       updateInverse();
+    }
     return inv.copy();
   }
 
@@ -231,8 +252,9 @@ public class AffineTransformation {
   public Vector homogeneVector(Vector v) {
     assert (v.getRowDimensionality() == dim);
     double[] dv = new double[dim + 1];
-    for(int i = 0; i < dim; i++)
+    for(int i = 0; i < dim; i++) {
       dv[i] = v.get(i);
+    }
     dv[dim] = 1.0;
     return new Vector(dv);
   }
@@ -248,8 +270,9 @@ public class AffineTransformation {
     double[] dv = new double[dim];
     double scale = v.get(dim);
     assert (Math.abs(scale) > 0.0);
-    for(int i = 0; i < dim; i++)
+    for(int i = 0; i < dim; i++) {
       dv[i] = v.get(i) / scale;
+    }
     return new Vector(dv);
   }
 
@@ -265,8 +288,9 @@ public class AffineTransformation {
     double[] dv = new double[dim];
     double scale = v.get(dim, 0);
     assert (Math.abs(scale) > 0.0);
-    for(int i = 0; i < dim; i++)
+    for(int i = 0; i < dim; i++) {
       dv[i] = v.get(i, 0) / scale;
+    }
     return new Vector(dv);
   }
 
@@ -287,8 +311,9 @@ public class AffineTransformation {
    * @return transformed vector of dimensionality dim
    */
   public Vector applyInverse(Vector v) {
-    if(inv == null)
+    if(inv == null) {
       updateInverse();
+    }
     return unhomogeneVector(inv.times(homogeneVector(v)));
   }
 }
