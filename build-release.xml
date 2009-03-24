@@ -68,45 +68,31 @@
 		<copy todir="${deploy.srcdir}/src">
 			<fileset dir="src">
 				<exclude name="experimentalcode/**"/>
-				<!-- not yet published & polished: COP/MCOP -->
-				<exclude name="${basepackage}algorithm/outlier/*CorrelationOutlierProbability.*"/>
-				<!-- CoDeC requires classifier -->
-				<exclude name="${basepackage}algorithm/CoDeC.*"/>
-				<exclude name="${basepackage}algorithm/ICA.*"/>
+				<!-- not yet published & polished: COP -->
+				<exclude name="${basepackage}algorithm/outlier/COP.*"/>
 				<exclude name="${basepackage}algorithm/classifier/**"/>
-				<exclude name="${basepackage}algorithm/outlier/**"/>
-				<exclude name="${basepackage}algorithm/clustering/biclustering/ChengAndChurch.*"/>
-				<exclude name="${basepackage}algorithm/clustering/biclustering/FLOC.*"/>
-				<exclude name="${basepackage}algorithm/clustering/biclustering/MaPle.*"/>
-				<exclude name="${basepackage}algorithm/clustering/biclustering/NaivePatternBased.*"/>
-				<exclude name="${basepackage}algorithm/clustering/biclustering/PClustering.*"/>
-				<exclude name="${basepackage}algorithm/clustering/correlation/FractalDimensionTest.*"/>
+				<exclude name="${basepackage}algorithm/clustering/biclustering/**"/>
 				<exclude name="${basepackage}algorithm/clustering/correlation/KernelFourC.*"/>
 				<exclude name="${basepackage}algorithm/clustering/correlation/SubspaceAggregation.*"/>
 				<exclude name="${basepackage}algorithm/clustering/correlation/SubspaceEM.*"/>
-				<exclude name="${basepackage}algorithm/clustering/hierarchical/**"/>
-				<exclude name="${basepackage}algorithm/clustering/subspace/FIRES.*"/>
-                <exclude name="${basepackage}algorithm/clustering/subspace/SUBCLU.*"/>
-                <exclude name="${basepackage}algorithm/result/GeneralizedLOFResult.*"/>
-				<exclude name="${basepackage}algorithm/result/ICAResult.*"/>
-				<exclude name="${basepackage}algorithm/result/clustering/FractalDimensionTestResult.*"/>
-				<exclude name="${basepackage}algorithm/result/clustering/HierarchicalFractalDimensionCluster.*"/>
-				<exclude name="${basepackage}algorithm/result/outlier/**"/>
 				<exclude name="${basepackage}converter/Arff2Txt.*"/>
 				<exclude name="${basepackage}converter/ArffSparseInstanceToSparseBitVector.*"/>
 				<exclude name="${basepackage}converter/Database2Arff.*"/>
 				<exclude name="${basepackage}converter/Txt2Arff.*"/>
-				<exclude name="${basepackage}data/synthetic/**"/>
+				<exclude name="${basepackage}data/synthetic/ArbitraryCorrelationGenerator.*"/>
+				<exclude name="${basepackage}data/synthetic/AxesParallelCorrelationGenerator.*"/>
+				<exclude name="${basepackage}data/synthetic/PartiallySimilarVoxelObjectsGenerator.*"/>
 				<exclude name="${basepackage}distance/distancefunction/FractalDimensionBasedDistanceFunction"/>
-                <exclude name="${basepackage}evaluation/**"/>
-				<exclude name="${basepackage}featureextraction/**"/>
-				<exclude name="${basepackage}gui/**"/>
+                <exclude name="${basepackage}evaluation/holdout/**"/>
+                <exclude name="${basepackage}evaluation/procedure/**"/>
+                <exclude name="${basepackage}evaluation/*.*"/>
                 <exclude name="${basepackage}index/tree/spatial/rstarvariants/flat/**"/>
                 <exclude name="${basepackage}math/analysis/**"/>
 				<exclude name="${basepackage}parser/ArffFileParser.**"/>
 				<exclude name="${basepackage}test/**"/>
-                <exclude name="${basepackage}tree/btree/**"/>
-                <exclude name="${basepackage}varianceanalysis/ica/**"/>
+				<!-- dependency from outlier/LOFTable, outlier/NNTable ! -->
+                <!-- <exclude name="${basepackage}utilities/tree/btree/**"/> -->
+				<!-- why exclude wrappers currently? -->
 				<exclude name="${basepackage}wrapper/**"/>
 			</fileset>			
 		</copy>
