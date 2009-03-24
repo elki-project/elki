@@ -67,7 +67,7 @@ public class UpperTriangleMatrix {
    * @param newsize New matrix size.
    * @throws IOException
    */
-  public void resizeMatrix(int newsize) throws IOException {
+  public synchronized void resizeMatrix(int newsize) throws IOException {
     if (! array.isWritable()) {
       throw new IOException("Can't resize a read-only array.");
     }
@@ -109,7 +109,7 @@ public class UpperTriangleMatrix {
    * @param y Second coordinate
    * @throws IOException 
    */
-  public byte[] readRecord(int x, int y) throws IOException {
+  public synchronized byte[] readRecord(int x, int y) throws IOException {
     return array.readRecord(computeOffset(x,y));
   }
 
@@ -121,7 +121,7 @@ public class UpperTriangleMatrix {
    * @param data Data
    * @throws IOException 
    */
-  public void writeRecord(int x, int y, byte[] data) throws IOException {
+  public synchronized void writeRecord(int x, int y, byte[] data) throws IOException {
     array.writeRecord(computeOffset(x,y), data);
   }
 }

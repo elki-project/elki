@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.Serializable;
+import java.nio.channels.FileLock;
 
 /**
  * On Disc Array storage for records of a given size.
@@ -50,6 +51,10 @@ public class OnDiskArray implements Serializable {
    */
   private RandomAccessFile file;
   /**
+   * Lock for the file that will be kept while writing.
+   */
+  private FileLock lock = null;
+  /**
    * Writable or read-only object
    */
   private boolean writable;
@@ -88,6 +93,8 @@ public class OnDiskArray implements Serializable {
     
     // open file.
     file = new RandomAccessFile(filename, "rw");
+    // and acquire a file write lock
+    lock = file.getChannel().lock();
     
     // write magic header
     file.writeInt(this.magic);
@@ -135,6 +142,11 @@ public class OnDiskArray implements Serializable {
     String mode = writable ? "rw" : "r";
     
     file = new RandomAccessFile(filename, mode);
+    if (writable) {
+      // acquire a file write lock
+      lock = file.getChannel().lock();      
+    }
+    
     int readmagic = file.readInt();
     // Validate magic number
     if (readmagic != this.magic) {
@@ -198,7 +210,7 @@ public class OnDiskArray implements Serializable {
    * @param newsize New file size.
    * @throws IOException
    */
-  public void resizeFile(int newsize) throws IOException {
+  public synchronized void resizeFile(int newsize) throws IOException {
     if (!writable) {
       throw new IOException("File is not writeable!");
     }
@@ -218,7 +230,7 @@ public class OnDiskArray implements Serializable {
    * @return Byte array with the records data.
    * @throws IOException
    */
-  public byte[] readRecord(int index) throws IOException {
+  public synchronized byte[] readRecord(int index) throws IOException {
     if (index < 0 || index >= numrecs) {
       throw new IOException("Access beyond end of file.");
     }
@@ -238,7 +250,7 @@ public class OnDiskArray implements Serializable {
    * @param data Array with record data. MUST have appropriate size.
    * @throws IOException
    */
-  public void writeRecord(int index, byte[] data) throws IOException {
+  public synchronized void writeRecord(int index, byte[] data) throws IOException {
     if (!writable) {
       throw new IOException("File is not writeable!");
     }
@@ -268,7 +280,7 @@ public class OnDiskArray implements Serializable {
    * @return additional header data
    * @throws IOException
    */
-  public byte[] readExtraHeader() throws IOException {
+  public synchronized byte[] readExtraHeader() throws IOException {
     int size = headersize - INTERNAL_HEADER_SIZE;
     file.seek(INTERNAL_HEADER_SIZE);
     byte[] buf = new byte[size];
@@ -282,7 +294,7 @@ public class OnDiskArray implements Serializable {
    * @param buf Header data.
    * @throws IOException
    */
-  public void writeExtraHeader(byte[] buf) throws IOException {
+  public synchronized void writeExtraHeader(byte[] buf) throws IOException {
     if (!writable) {
       throw new IOException("File is not writeable!");
     }
@@ -327,8 +339,12 @@ public class OnDiskArray implements Serializable {
    * 
    * @throws IOException
    */
-  public void close() throws IOException {
+  public synchronized void close() throws IOException {
     writable = false;
+    if (lock != null) {
+      lock.release();
+      lock = null;
+    }
     file.close();
   }
 
