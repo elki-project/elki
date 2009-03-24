@@ -77,8 +77,7 @@ public class TestERiCResults {
       System.err.println("Remaining parameter: " + s);
     assertTrue("Some parameters were ignored by the algorithm.", remainingparams.length == 0);
     // run ERiC on database
-    eric.run(db);
-    Clustering<CorrelationModel<DoubleVector>> result = eric.getResult();
+    Clustering<CorrelationModel<DoubleVector>> result = eric.run(db);
 
     // run by-label as reference
     ByLabelHierarchicalClustering<DoubleVector> bylabel = new ByLabelHierarchicalClustering<DoubleVector>();
