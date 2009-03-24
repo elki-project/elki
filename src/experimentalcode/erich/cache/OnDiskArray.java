@@ -90,13 +90,13 @@ public class OnDiskArray implements Serializable {
     file = new RandomAccessFile(filename, "rw");
     
     // write magic header
-    file.writeInt(magicseed);
+    file.writeInt(this.magic);
     
     // write header size
-    file.writeInt(headersize);
+    file.writeInt(this.headersize);
     
     // write size of a single record
-    file.writeInt(recordsize);
+    file.writeInt(this.recordsize);
     
     // write number of records
     // verify position.
@@ -135,10 +135,11 @@ public class OnDiskArray implements Serializable {
     String mode = writable ? "rw" : "r";
     
     file = new RandomAccessFile(filename, mode);
+    int readmagic = file.readInt();
     // Validate magic number
-    if (file.readInt() != this.magic) {
+    if (readmagic != this.magic) {
       file.close();
-      throw new IOException("Magic in LinearDiskCache does not match.");
+      throw new IOException("Magic in LinearDiskCache does not match: "+readmagic+" instead of "+this.magic);
     }
     // Validate header size
     if (file.readInt() != this.headersize) {
@@ -194,15 +195,15 @@ public class OnDiskArray implements Serializable {
   /**
    * Resize file to the intended size
    * 
-   * @param initialsize
+   * @param newsize New file size.
    * @throws IOException
    */
-  private void resizeFile(int initialsize) throws IOException {
+  public void resizeFile(int newsize) throws IOException {
     if (!writable) {
       throw new IOException("File is not writeable!");
     }
     // update the number of records
-    this.numrecs = initialsize;
+    this.numrecs = newsize;
     file.seek(HEADER_POS_SIZE);
     file.writeInt(numrecs);
     
@@ -318,5 +319,25 @@ public class OnDiskArray implements Serializable {
    */
   public boolean isWritable() {
     return writable;
+  }
+
+  /**
+   * Explicitly close the file.
+   * Note: following operations will likely cause IOExceptions.
+   * 
+   * @throws IOException
+   */
+  public void close() throws IOException {
+    writable = false;
+    file.close();
+  }
+
+  /**
+   * Get number of records in file.
+   * 
+   * @return Number of records in the file.
+   */
+  public int getNumRecords() {
+    return numrecs;
   }
 }
