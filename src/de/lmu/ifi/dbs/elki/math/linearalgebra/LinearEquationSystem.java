@@ -11,6 +11,7 @@ import java.util.Locale;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 
 /**
  * Class for systems of linear equations.
@@ -346,8 +347,10 @@ public class LinearEquationSystem extends AbstractLoggable {
             // pivot search for entry in remaining matrix
             // (depends on chosen method in switch)
             // store position in pivotRow, pivotCol
-            MatrixPosition pivotPos = new MatrixPosition(0, 0);
-            MatrixPosition currPos = new MatrixPosition(k, k);
+            
+            // TODO: Note that we're using "row, col", whereas "col, row" would be more common?
+            IntIntPair pivotPos = new IntIntPair(0, 0);
+            IntIntPair currPos = new IntIntPair(k, k);
 
             switch (method) {
                 case TRIVAL_PIVOT_SEARCH:
@@ -357,8 +360,8 @@ public class LinearEquationSystem extends AbstractLoggable {
                     pivotPos = totalPivotSearch(k);
                     break;
             }
-            pivotRow = pivotPos.rowPos;
-            pivotCol = pivotPos.colPos;
+            pivotRow = pivotPos.first;
+            pivotCol = pivotPos.second;
             pivot = coeff[this.row[pivotRow]][col[pivotCol]];
 
             if (this.debug) {
@@ -405,7 +408,7 @@ public class LinearEquationSystem extends AbstractLoggable {
      * @param k search starts at entry (k,k)
      * @return the position of the found pivot element
      */
-    private MatrixPosition totalPivotSearch(int k) {
+    private IntIntPair totalPivotSearch(int k) {
         double max = 0;
         int i, j, pivotRow = k, pivotCol = k;
         double absValue;
@@ -425,7 +428,7 @@ public class LinearEquationSystem extends AbstractLoggable {
                 }//end if
             }//end for j
         }//end for k
-        return new MatrixPosition(pivotRow, pivotCol);
+        return new IntIntPair(pivotRow, pivotCol);
     }
 
     /**
@@ -434,7 +437,7 @@ public class LinearEquationSystem extends AbstractLoggable {
      * @param k search starts at entry (k,k)
      * @return the position of the found pivot element
      */
-    private MatrixPosition nonZeroPivotSearch(int k) {
+    private IntIntPair nonZeroPivotSearch(int k) {
 
         int i, j;
         double absValue;
@@ -447,11 +450,11 @@ public class LinearEquationSystem extends AbstractLoggable {
 
                 // check if absValue is non-zero
                 if (absValue > 0) { // found a pivot element
-                    return new MatrixPosition(i, j);
+                    return new IntIntPair(i, j);
                 }//end if
             }//end for  j
         }//end for k
-        return new MatrixPosition(k, k);
+        return new IntIntPair(k, k);
     }
 
     /**
@@ -460,11 +463,11 @@ public class LinearEquationSystem extends AbstractLoggable {
      * @param pos1 the fist position for the permutation
      * @param pos2 the second position for the permutation
      */
-    private void permutePivot(MatrixPosition pos1, MatrixPosition pos2) {
-        int r1 = pos1.rowPos;
-        int c1 = pos1.colPos;
-        int r2 = pos2.rowPos;
-        int c2 = pos2.colPos;
+    private void permutePivot(IntIntPair pos1, IntIntPair pos2) {
+        int r1 = pos1.first;
+        int c1 = pos1.second;
+        int r2 = pos2.first;
+        int c2 = pos2.second;
         int index;
         index = row[r2];
         row[r2] = row[r1];
