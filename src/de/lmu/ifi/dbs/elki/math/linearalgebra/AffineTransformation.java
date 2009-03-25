@@ -210,6 +210,7 @@ public class AffineTransformation {
    */
   public void addAxisReflection(int axis) {
     assert (0 < axis && axis <= dim);
+    inv = null;
     Matrix homTrans = Matrix.unitMatrix(dim + 1);
     homTrans.set(axis - 1, axis - 1, -1);
     trans = homTrans.times(trans);
@@ -221,7 +222,8 @@ public class AffineTransformation {
    * @param scale Scaling factor
    */
   public void addScaling(double scale) {
-    trans = trans.times(scale);
+    inv = null;
+    trans.set(dim,dim,trans.get(dim, dim) / scale);
   }
 
   /**
