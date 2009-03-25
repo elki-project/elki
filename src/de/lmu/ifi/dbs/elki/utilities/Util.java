@@ -190,35 +190,6 @@ public final class Util {
   }
 
   /**
-   * Provides a script-text for a gnuplot script to use for transposed view of a
-   * specific file of given size of data set.
-   * 
-   * @param filename the filename of the transposed file to be plotted
-   * @param datasetSize the size of the transposed data set
-   * @param dimensionality the dimensionality of the transposed data set
-   * @return a script-text for a gnuplot script to use for transposed view of a
-   *         specific file of given size of data set
-   */
-  public static String transposedGnuplotScript(String filename, int datasetSize, int dimensionality) {
-    StringBuffer script = new StringBuffer();
-    // script.append("set terminal pbm color;\n");
-    script.append("set nokey\n");
-    script.append("set data style linespoints\n");
-    script.append("set xlabel \"attribute\"\n");
-    script.append("show xlabel\n");
-    script.append("plot [0:");
-    script.append(datasetSize - 1).append("] []");
-    for(int p = 1; p <= dimensionality; p++) {
-      script.append("\"").append(filename).append("\" using ").append(p);
-      if(p < dimensionality) {
-        script.append(", ");
-      }
-    }
-    script.append("\npause -1");
-    return script.toString();
-  }
-
-  /**
    * Provides a status report line with leading carriage return. Suitable for
    * density based algorithms, since the number of found clusters is counted.
    * 

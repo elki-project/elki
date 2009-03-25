@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
@@ -97,7 +96,7 @@ public class TransposedViewWrapper<V extends RealVector<V, ?>> extends StandAlon
       out.close();
 
       // write gnuplot script
-      String gnuplotScript = Util.transposedGnuplotScript(outFile.getName(), db.dimensionality(), db.size());
+      String gnuplotScript = transposedGnuplotScript(outFile.getName(), db.dimensionality(), db.size());
       PrintStream gnuplotOut = new PrintStream(new FileOutputStream(new File(gnuplot)));
       gnuplotOut.print(gnuplotScript);
       gnuplotOut.flush();
@@ -138,5 +137,34 @@ public class TransposedViewWrapper<V extends RealVector<V, ?>> extends StandAlon
   @Override
   public String getOutputDescription() {
     return "The name of the output file.";
+  }
+
+  /**
+   * Provides a script-text for a gnuplot script to use for transposed view of a
+   * specific file of given size of data set.
+   * 
+   * @param filename the filename of the transposed file to be plotted
+   * @param datasetSize the size of the transposed data set
+   * @param dimensionality the dimensionality of the transposed data set
+   * @return a script-text for a gnuplot script to use for transposed view of a
+   *         specific file of given size of data set
+   */
+  public static String transposedGnuplotScript(String filename, int datasetSize, int dimensionality) {
+    StringBuffer script = new StringBuffer();
+    // script.append("set terminal pbm color;\n");
+    script.append("set nokey\n");
+    script.append("set data style linespoints\n");
+    script.append("set xlabel \"attribute\"\n");
+    script.append("show xlabel\n");
+    script.append("plot [0:");
+    script.append(datasetSize - 1).append("] []");
+    for(int p = 1; p <= dimensionality; p++) {
+      script.append("\"").append(filename).append("\" using ").append(p);
+      if(p < dimensionality) {
+        script.append(", ");
+      }
+    }
+    script.append("\npause -1");
+    return script.toString();
   }
 }
