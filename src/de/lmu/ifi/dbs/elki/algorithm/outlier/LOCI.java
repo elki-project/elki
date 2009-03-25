@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -143,14 +142,14 @@ public class LOCI<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
     getDistanceFunction().setDatabase(database, isVerbose(), isTime());
     // LOCI preprocessing step
     for (Integer id : database.getIDs()) {
-      List<QueryResult<DoubleDistance>> neighbors = database.rangeQuery(id, rmax, getDistanceFunction());
+      List<ComparablePair<DoubleDistance, Integer>> neighbors = database.rangeQuery(id, rmax, getDistanceFunction());
       // build list of critical distances
       ArrayList<ComparablePair<Double,Integer>> cdist = new ArrayList<ComparablePair<Double,Integer>>(neighbors.size() * 2);
       {
         int i = 0;
-        for (QueryResult<DoubleDistance> r : neighbors) {
-          cdist.add(new ComparablePair<Double,Integer>(r.getDistance().getValue(), i));
-          cdist.add(new ComparablePair<Double,Integer>(r.getDistance().getValue() / alpha, null));
+        for (ComparablePair<DoubleDistance, Integer> r : neighbors) {
+          cdist.add(new ComparablePair<Double,Integer>(r.getFirst().getValue(), i));
+          cdist.add(new ComparablePair<Double,Integer>(r.getFirst().getValue() / alpha, null));
           i++;
         }
       }
@@ -183,10 +182,10 @@ public class LOCI<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
         double nhat_r_alpha = 0.0;
         double sigma_nhat_r_alpha = 0.0;
         // note that the query range is c.first
-        List<QueryResult<DoubleDistance>> rneighbors = database.rangeQuery(id, Double.toString(c.first), getDistanceFunction());
+        List<ComparablePair<DoubleDistance, Integer>> rneighbors = database.rangeQuery(id, Double.toString(c.first), getDistanceFunction());
         if (rneighbors.size() < nmin) continue;
-        for (QueryResult<DoubleDistance> rn : rneighbors) {
-          List<ComparablePair<Double,Integer>> rncdist = database.getAssociation(AssociationID.LOCI_CRITICALDIST, rn.getID());
+        for (ComparablePair<DoubleDistance, Integer> rn : rneighbors) {
+          List<ComparablePair<Double,Integer>> rncdist = database.getAssociation(AssociationID.LOCI_CRITICALDIST, rn.getSecond());
           int rn_alphar = 0;
           for (ComparablePair<Double,Integer> c2 : rncdist) {
             if (c2.first <= alpha_r) rn_alphar=c2.second;

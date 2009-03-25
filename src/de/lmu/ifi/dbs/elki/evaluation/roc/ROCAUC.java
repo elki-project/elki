@@ -5,7 +5,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.utilities.QueryResult;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * Compute the ROC AUC (Receiver Operating Characteristics  Area Under Curve)
@@ -22,7 +22,7 @@ public class ROCAUC {
    * @param nei Query result
    * @return area under curve
    */
-  public static double computeROCAUC(int size, Cluster<?> clus, List<QueryResult<DoubleDistance>> nei) {
+  public static double computeROCAUC(int size, Cluster<?> clus, List<ComparablePair<DoubleDistance, Integer>> nei) {
     // TODO: ensure the collection has efficient "contains".    
     return computeROCAUC(size, clus.getIDs(), nei);
   }
@@ -35,7 +35,7 @@ public class ROCAUC {
    * @param nei Query Result
    * @return area under curve
    */
-  public static double computeROCAUC(int size, Collection<Integer> ids, List<QueryResult<DoubleDistance>> nei) {
+  public static double computeROCAUC(int size, Collection<Integer> ids, List<ComparablePair<DoubleDistance, Integer>> nei) {
     int postot = ids.size();
     int negtot = size - postot;
     int poscnt = 0;
@@ -44,10 +44,10 @@ public class ROCAUC {
     double lastneg = 0.0;
     double result = 0.0;
   
-    QueryResult<DoubleDistance> prev = null;
-    for(QueryResult<DoubleDistance> cur : nei) {
+    ComparablePair<DoubleDistance, Integer> prev = null;
+    for(ComparablePair<DoubleDistance, Integer> cur : nei) {
       // positive or negative match?
-      if(ids.contains(cur.getID())) {
+      if(ids.contains(cur.getSecond())) {
         poscnt += 1;
       }
       else {
@@ -55,7 +55,7 @@ public class ROCAUC {
       }
       // defer calculation if this points distance equals the previous points
       // distance
-      if((prev == null) || (prev.getDistance().compareTo(cur.getDistance()) != 0)) {
+      if((prev == null) || (prev.getFirst().compareTo(cur.getFirst()) != 0)) {
         double curpos = ((double) poscnt) / postot;
         double curneg = ((double) negcnt) / negtot;
         // width * height at half way.

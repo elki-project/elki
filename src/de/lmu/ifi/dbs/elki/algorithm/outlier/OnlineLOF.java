@@ -23,13 +23,13 @@ import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
 
 /**
@@ -233,8 +233,8 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
         }
 
         // get neighbors and reverse nearest neighbors of o
-        List<QueryResult<DoubleDistance>> neighbors = database.kNNQueryForID(o, minpts + 1, getDistanceFunction());
-        List<QueryResult<DoubleDistance>> reverseNeighbors = database.reverseKNNQuery(o, minpts + 1, getDistanceFunction());
+        List<ComparablePair<DoubleDistance, Integer>> neighbors = database.kNNQueryForID(o, minpts + 1, getDistanceFunction());
+        List<ComparablePair<DoubleDistance, Integer>> reverseNeighbors = database.reverseKNNQuery(o, minpts + 1, getDistanceFunction());
         neighbors.remove(0);
         reverseNeighbors.remove(0);
 
@@ -249,12 +249,12 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
         insertObjectIntoTables(o, neighbors);
 
         // 1. Consequences of changing neighbors(p)
-        double kNNDist_o = neighbors.get(minpts - 1).getDistance().getValue();
+        double kNNDist_o = neighbors.get(minpts - 1).getFirst().getValue();
         Map<Integer, Double> knnDistances = new HashMap<Integer, Double>();
-        for (QueryResult<DoubleDistance> qr : reverseNeighbors) {
+        for (ComparablePair<DoubleDistance, Integer> qr : reverseNeighbors) {
             // o has been added to the neighbors(p),
             // therefor another object is no longer in neighbors(p)
-            Integer p = qr.getID();
+            Integer p = qr.getSecond();
             double dist_po = getDistanceFunction().distance(p, o).getValue();
             double reachDist_po = Math.max(kNNDist_o, dist_po);
             NeighborList neighbors_p_old = nnTable.getNeighbors(p);
@@ -312,8 +312,8 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
         }
 
         // 2. Consequences of changing reachdist(q,p)
-        for (QueryResult<DoubleDistance> qr : reverseNeighbors) {
-            Integer p = qr.getID();
+        for (ComparablePair<DoubleDistance, Integer> qr : reverseNeighbors) {
+            Integer p = qr.getSecond();
             double knnDistance_p = knnDistances.get(p);
             NeighborList rnns_p = nnTable.getReverseNeighbors(p);
             if (this.debug) {
@@ -359,13 +359,13 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
      * @param id        the id of the object to be inserted
      * @param neighbors the neighbors of the object to be inserted
      */
-    private void insertObjectIntoTables(Integer id, List<QueryResult<DoubleDistance>> neighbors) {
+    private void insertObjectIntoTables(Integer id, List<ComparablePair<DoubleDistance, Integer>> neighbors) {
         double sum1 = 0;
         double[] sum2 = new double[minpts];
 
         for (int i = 0; i < minpts; i++) {
-            QueryResult<DoubleDistance> qr = neighbors.get(i);
-            Integer p = qr.getID();
+            ComparablePair<DoubleDistance, Integer> qr = neighbors.get(i);
+            Integer p = qr.getSecond();
 
             // insert into NNTable
             NeighborList neighbors_p = nnTable.getNeighbors(p);

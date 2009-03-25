@@ -12,18 +12,17 @@ import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.elki.result.AnnotationsFromHashMap;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
-import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * Joins in a given spatial database to each object its k-nearest neighbors.
@@ -180,7 +179,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
 
     /**
      * Processes the two data pages pr and ps and determines the k-nearest
-     * neighors of pr in ps.
+     * neighbors of pr in ps.
      *
      * @param pr              the first data page
      * @param ps              the second data page
@@ -204,7 +203,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
                 Integer s_id = ps.getEntry(j).getID();
 
                 D distance = getDistanceFunction().distance(r_id, s_id);
-                if (knnList.add(new QueryResult<D>(s_id, distance))) {
+                if (knnList.add(new ComparablePair<D, Integer>(distance, s_id))) {
                     // set kNN distance of r
                     if (infinite) {
                         pr_knn_distance = knnList.getMaximumDistance();

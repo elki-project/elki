@@ -20,7 +20,6 @@ import de.lmu.ifi.dbs.elki.result.AnnotationsFromHashMap;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
@@ -141,15 +140,15 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
       MeanVariance s = new MeanVariance();
 
       // System.out.println("Processing: " +objKey);
-      List<QueryResult<DoubleDistance>> neighbors = database.kNNQueryForID(objKey, k, getDistanceFunction());
-      Iterator<QueryResult<DoubleDistance>> iter = neighbors.iterator();
+      List<ComparablePair<DoubleDistance, Integer>> neighbors = database.kNNQueryForID(objKey, k, getDistanceFunction());
+      Iterator<ComparablePair<DoubleDistance, Integer>> iter = neighbors.iterator();
       while(iter.hasNext()) {
-        Integer key1 = iter.next().getID();
+        Integer key1 = iter.next().getSecond();
         // Iterator iter2 = data.keyIterator();
-        Iterator<QueryResult<DoubleDistance>> iter2 = neighbors.iterator();
+        Iterator<ComparablePair<DoubleDistance, Integer>> iter2 = neighbors.iterator();
         // PriorityQueue best = new PriorityQueue(false, k);
         while(iter2.hasNext()) {
-          Integer key2 = iter2.next().getID();
+          Integer key2 = iter2.next().getSecond();
           if(key2.equals(key1) || key1.equals(objKey) || key2.equals(objKey))
             continue;
           double nenner = calcDenominator(kernelMatrix, objKey, key1, key2);

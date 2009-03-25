@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FilteredEigenPairs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
-import de.lmu.ifi.dbs.elki.utilities.QueryResult;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * Performs a self-tuning local PCA based on the covariance matrices of given
@@ -54,7 +54,7 @@ public class PCAFilteredAutotuningRunner<V extends RealVector<V, ?>> extends PCA
    * @return PCA result
    */
   @Override
-  public PCAFilteredResult processQueryResult(Collection<QueryResult<DoubleDistance>> results, Database<V> database) {
+  public PCAFilteredResult processQueryResult(Collection<ComparablePair<DoubleDistance, Integer>> results, Database<V> database) {
     assertSortedByDistance(results);
     int dim = database.dimensionality();
 
@@ -162,15 +162,15 @@ public class PCAFilteredAutotuningRunner<V extends RealVector<V, ?>> extends PCA
    * 
    * @param results
    */
-  private void assertSortedByDistance(Collection<QueryResult<DoubleDistance>> results) {
+  private void assertSortedByDistance(Collection<ComparablePair<DoubleDistance, Integer>> results) {
     // TODO: sort results instead?
     double dist = -1.0;
-    for(Iterator<QueryResult<DoubleDistance>> it = results.iterator(); it.hasNext();) {
-      QueryResult<DoubleDistance> qr = it.next();
-      if(qr.getDistance().getValue() < dist) {
+    for(Iterator<ComparablePair<DoubleDistance, Integer>> it = results.iterator(); it.hasNext();) {
+      ComparablePair<DoubleDistance, Integer> qr = it.next();
+      if(qr.getFirst().getValue() < dist) {
         System.err.println("WARNING: results not sorted by distance!");
       }
-      dist = qr.getDistance().getValue();
+      dist = qr.getFirst().getValue();
     }
   }
 }

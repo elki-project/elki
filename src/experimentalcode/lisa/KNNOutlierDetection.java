@@ -2,7 +2,6 @@ package experimentalcode.lisa;
 
 import java.util.Iterator;
 
-import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
@@ -99,7 +98,7 @@ public class KNNOutlierDetection <O extends DatabaseObject, D extends Distance<D
 			  while(iter.hasNext()){
 				 id = iter.next();
 				  //distance to the kth nearest neighbor
-				 D dkn = database.kNNQueryForID(id,  k, getDistanceFunction()).get(k-1).getDistance();
+				 D dkn = database.kNNQueryForID(id,  k, getDistanceFunction()).get(k-1).getFirst();
 				 if (debug) {
 		        debugFine(dkn + "  dkn");
 		        }

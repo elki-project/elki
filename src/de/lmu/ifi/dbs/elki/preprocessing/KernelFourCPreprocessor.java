@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.LimitEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.NormalizingEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
-import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ListParameter;
@@ -27,6 +26,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterFlagGlobalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * Preprocessor for kernel 4C local dimensionality, neighbor objects and strong
@@ -114,10 +114,10 @@ public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector
      * @param database  the database for which the preprocessing is performed
      */
     @Override
-    protected void runVarianceAnalysis(final Integer id, final List<QueryResult<D>> neighbors, final Database<V> database) {
+    protected void runVarianceAnalysis(final Integer id, final List<ComparablePair<D, Integer>> neighbors, final Database<V> database) {
         final List<Integer> ids = new ArrayList<Integer>(neighbors.size());
-        for (final QueryResult<D> neighbor : neighbors) {
-            ids.add(neighbor.getID());
+        for (final ComparablePair<D, Integer> neighbor : neighbors) {
+            ids.add(neighbor.getSecond());
         }
         PCAFilteredResult pcares = pca.processIds(ids, database);
 

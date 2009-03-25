@@ -1,16 +1,16 @@
 package de.lmu.ifi.dbs.elki.preprocessing;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-
-import java.util.ArrayList;
-import java.util.List;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * Computes the HiCO correlation dimension of objects of a certain database. The
@@ -62,18 +62,18 @@ public class KnnQueryBasedHiCOPreprocessor<V extends RealVector<V, ?>> extends H
     }
 
     pcaDistanceFunction.setDatabase(database, verbose, time);
-    List<QueryResult<DoubleDistance>> knns = database.kNNQueryForID(id, k, pcaDistanceFunction);
+    List<ComparablePair<DoubleDistance, Integer>> knns = database.kNNQueryForID(id, k, pcaDistanceFunction);
 
     List<Integer> ids = new ArrayList<Integer>(knns.size());
-    for(QueryResult<DoubleDistance> knn : knns) {
-      ids.add(knn.getID());
+    for(ComparablePair<DoubleDistance, Integer> knn : knns) {
+      ids.add(knn.getSecond());
     }
 
     return ids;
   }
 
   @Override
-  protected List<QueryResult<DoubleDistance>> resultsForPCA(Integer id, Database<V> database, boolean verbose, boolean time) {
+  protected List<ComparablePair<DoubleDistance, Integer>> resultsForPCA(Integer id, Database<V> database, boolean verbose, boolean time) {
     if(k == null) {
       V obj = database.get(id);
       k = 3 * obj.getDimensionality();

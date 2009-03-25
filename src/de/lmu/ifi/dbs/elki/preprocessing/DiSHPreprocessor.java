@@ -26,7 +26,6 @@ import de.lmu.ifi.dbs.elki.result.AprioriResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
-import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
@@ -39,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualStringConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
 
 /**
@@ -205,10 +205,10 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
                 // determine neighbors in each dimension
                 Set<Integer>[] allNeighbors = ClassGenericsUtil.newArrayOfSet(dim);
                 for (int d = 0; d < dim; d++) {
-                    List<QueryResult<DoubleDistance>> qrList = database.rangeQuery(id, epsString[d], distanceFunctions[d]);
+                    List<ComparablePair<DoubleDistance, Integer>> qrList = database.rangeQuery(id, epsString[d], distanceFunctions[d]);
                     allNeighbors[d] = new HashSet<Integer>(qrList.size());
-                    for (QueryResult<DoubleDistance> qr : qrList) {
-                        allNeighbors[d].add(qr.getID());
+                    for (ComparablePair<DoubleDistance, Integer> qr : qrList) {
+                        allNeighbors[d].add(qr.getSecond());
                     }
                 }
 

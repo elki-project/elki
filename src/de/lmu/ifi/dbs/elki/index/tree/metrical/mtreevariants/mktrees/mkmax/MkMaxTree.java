@@ -1,5 +1,11 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkmax;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
@@ -7,14 +13,8 @@ import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
-import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.QueryStatistic;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * MkMaxTree is a metrical index structure based on the concepts of the M-Tree
@@ -59,13 +59,13 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
      * these candidates are refined in a second step.
      */
     @Override
-    public List<QueryResult<D>> reverseKNNQuery(O object, int k) {
+    public List<ComparablePair<D, Integer>> reverseKNNQuery(O object, int k) {
         if (k > this.k_max) {
             throw new IllegalArgumentException("Parameter k has to be equal or less than " + "parameter k of the MkMax-Tree!");
         }
 
         // get the candidates
-        List<QueryResult<D>> candidates = new ArrayList<QueryResult<D>>();
+        List<ComparablePair<D, Integer>> candidates = new ArrayList<ComparablePair<D, Integer>>();
         doReverseKNNQuery(object.getID(), getRoot(), null, candidates);
 
         if (k == this.k_max) {
@@ -78,19 +78,19 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
         // refinement of candidates
         Map<Integer, KNNList<D>> knnLists = new HashMap<Integer, KNNList<D>>();
         List<Integer> candidateIDs = new ArrayList<Integer>();
-        for (QueryResult<D> candidate : candidates) {
+        for (ComparablePair<D, Integer> candidate : candidates) {
             KNNList<D> knns = new KNNList<D>(k, getDistanceFunction().infiniteDistance());
-            knnLists.put(candidate.getID(), knns);
-            candidateIDs.add(candidate.getID());
+            knnLists.put(candidate.getSecond(), knns);
+            candidateIDs.add(candidate.getSecond());
         }
         batchNN(getRoot(), candidateIDs, knnLists);
 
-        List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
+        List<ComparablePair<D, Integer>> result = new ArrayList<ComparablePair<D, Integer>>();
         for (Integer id : candidateIDs) {
-            List<QueryResult<D>> knns = knnLists.get(id).toList();
-            for (QueryResult<D> qr : knns) {
-                if (qr.getID() == object.getID()) {
-                    result.add(new QueryResult<D>(id, qr.getDistance()));
+            List<ComparablePair<D, Integer>> knns = knnLists.get(id).toList();
+            for (ComparablePair<D, Integer> qr : knns) {
+                if (qr.getSecond() == object.getID()) {
+                    result.add(new ComparablePair<D, Integer>(qr.getFirst(), id));
                     break;
                 }
             }
@@ -166,7 +166,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
     private void doReverseKNNQuery(Integer q,
                                    MkMaxTreeNode<O, D> node,
                                    MkMaxEntry<D> node_entry,
-                                   List<QueryResult<D>> result) {
+                                   List<ComparablePair<D, Integer>> result) {
 
         // data node
         if (node.isLeaf()) {
@@ -174,7 +174,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
                 MkMaxEntry<D> entry = node.getEntry(i);
                 D distance = getDistanceFunction().distance(entry.getRoutingObjectID(), q);
                 if (distance.compareTo(entry.getKnnDistance()) <= 0) {
-                    result.add(new QueryResult<D>(entry.getRoutingObjectID(), distance));
+                    result.add(new ComparablePair<D, Integer>(distance, entry.getRoutingObjectID()));
                 }
             }
         }
@@ -223,7 +223,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
                 // p is nearer to q than the farthest kNN-candidate of q
                 // ==> p becomes a knn-candidate
                 if (dist_pq.compareTo(knnDist_q) <= 0) {
-                    QueryResult<D> knn = new QueryResult<D>(p.getRoutingObjectID(), dist_pq);
+                    ComparablePair<D, Integer> knn = new ComparablePair<D, Integer>(dist_pq, p.getRoutingObjectID());
                     knns_q.add(knn);
                     if (knns_q.size() >= k_max) {
                         knnDist_q = knns_q.getMaximumDistance();
@@ -235,7 +235,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
                 // q becomes knn of p
                 if (dist_pq.compareTo(p.getKnnDistance()) <= 0) {
                     KNNList<D> knns_p = new KNNList<D>(k_max, getDistanceFunction().infiniteDistance());
-                    knns_p.add(new QueryResult<D>(q.getRoutingObjectID(), dist_pq));
+                    knns_p.add(new ComparablePair<D, Integer>(dist_pq, q.getRoutingObjectID()));
                     doKNNQuery(p.getRoutingObjectID(), knns_p);
 
                     if (knns_p.size() < k_max) {

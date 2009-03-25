@@ -8,9 +8,9 @@ import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * Abstract class with the task of computing a Covariance matrix to be used in PCA.
@@ -51,11 +51,11 @@ public abstract class CovarianceMatrixBuilder<V extends RealVector<V, ?>> extend
    * @param k the number of entries to process
    * @return Covariance Matrix
    */
-  public Matrix processQueryResults(Collection<QueryResult<DoubleDistance>> results, Database<V> database, int k) {
+  public Matrix processQueryResults(Collection<ComparablePair<DoubleDistance, Integer>> results, Database<V> database, int k) {
     Collection<Integer> ids = new ArrayList<Integer>(k);
     int have = 0;
-    for(Iterator<QueryResult<DoubleDistance>> it = results.iterator(); it.hasNext() && have < k; have++) {
-      ids.add(it.next().getID());
+    for(Iterator<ComparablePair<DoubleDistance, Integer>> it = results.iterator(); it.hasNext() && have < k; have++) {
+      ids.add(it.next().getSecond());
     }
     return processIds(ids, database);
   }
@@ -69,7 +69,7 @@ public abstract class CovarianceMatrixBuilder<V extends RealVector<V, ?>> extend
    * @param database the database used
    * @return Covariance Matrix
    */
-  final public Matrix processQueryResults(Collection<QueryResult<DoubleDistance>> results, Database<V> database) {
+  final public Matrix processQueryResults(Collection<ComparablePair<DoubleDistance, Integer>> results, Database<V> database) {
     return processQueryResults(results, database, results.size());
   }
 }

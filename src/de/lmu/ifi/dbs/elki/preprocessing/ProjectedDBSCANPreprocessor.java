@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
-import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
@@ -25,6 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * Abstract superclass for preprocessor of algorithms extending
@@ -125,14 +125,14 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
         int processed = 1;
         while (it.hasNext()) {
             Integer id = it.next();
-            List<QueryResult<D>> neighbors = database.rangeQuery(id, epsilon, rangeQueryDistanceFunction);
+            List<ComparablePair<D, Integer>> neighbors = database.rangeQuery(id, epsilon, rangeQueryDistanceFunction);
 
             if (neighbors.size() >= minpts) {
                 runVarianceAnalysis(id, neighbors, database);
             }
             else {
-                QueryResult<D> firstQR = neighbors.get(0);
-                neighbors = new ArrayList<QueryResult<D>>();
+                ComparablePair<D, Integer> firstQR = neighbors.get(0);
+                neighbors = new ArrayList<ComparablePair<D, Integer>>();
                 neighbors.add(firstQR);
                 runVarianceAnalysis(id, neighbors, database);
             }
@@ -164,7 +164,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
      * @param neighbors the neighbors as query results of the given point
      * @param database  the database for which the preprocessing is performed
      */
-    protected abstract void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<V> database);
+    protected abstract void runVarianceAnalysis(Integer id, List<ComparablePair<D, Integer>> neighbors, Database<V> database);
 
     @Override
     public String[] setParameters(String[] args) throws ParameterException {

@@ -12,12 +12,12 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
-import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * Abstract superclass for preprocessors for HiCO correlation dimension
@@ -88,7 +88,7 @@ public abstract class HiCOPreprocessor<V extends RealVector<V, ?>> extends Abstr
         int processed = 1;
         for (Iterator<Integer> it = database.iterator(); it.hasNext();) {
             Integer id = it.next();
-            List<QueryResult<DoubleDistance>> objs = resultsForPCA(id, database, verbose, false);
+            List<ComparablePair<DoubleDistance, Integer>> objs = resultsForPCA(id, database, verbose, false);
 
             PCAFilteredResult pcares = pca.processQueryResult(objs, database);
 
@@ -162,5 +162,5 @@ public abstract class HiCOPreprocessor<V extends RealVector<V, ?>> extends Abstr
      * @param time     flag to request output of performance time
      * @return the list of the object ids to be considerd within the PCA
      */
-    protected abstract List<QueryResult<DoubleDistance>> resultsForPCA(Integer id, Database<V> database, boolean verbose, boolean time);
+    protected abstract List<ComparablePair<DoubleDistance, Integer>> resultsForPCA(Integer id, Database<V> database, boolean verbose, boolean time);
 }

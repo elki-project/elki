@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.test.index;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -17,9 +17,9 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTree;
-import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 public class TestIndexStructures {
   // the following values depend on the data set used!
@@ -86,19 +86,19 @@ public class TestIndexStructures {
     
     // get the 10 next neighbors
     DoubleVector dv = new DoubleVector(querypoint);
-    List<QueryResult<DoubleDistance>> ids = db.kNNQueryForObject(dv, k, dist);
+    List<ComparablePair<DoubleDistance, Integer>> ids = db.kNNQueryForObject(dv, k, dist);
     
     // verify that the neighbors match.
     int i = 0;
-    for (QueryResult<DoubleDistance> res : ids) {
-      int id = res.getID();
+    for (ComparablePair<DoubleDistance, Integer> res : ids) {
+      int id = res.getSecond();
       DoubleVector c = db.get(id);
       // verify vector
       DoubleVector c2 = new DoubleVector(shouldc[i]);
       assertTrue(dist.distance(c, c2).getValue() < 0.00001);
 
       // Verify distance
-      assertTrue(res.getDistance().getValue() == shouldd[i]);
+      assertTrue(res.getFirst().getValue() == shouldd[i]);
       i++;
     }
   }

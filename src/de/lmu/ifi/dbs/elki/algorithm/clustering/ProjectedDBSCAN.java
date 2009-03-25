@@ -23,7 +23,6 @@ import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.elki.preprocessing.ProjectedDBSCANPreprocessor;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
-import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
@@ -35,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * Provides an abstract algorithm requiring a VarianceAnalysisPreprocessor.
@@ -278,7 +278,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
         }
 
         // compute weighted epsilon neighborhood
-        List<QueryResult<DoubleDistance>> seeds = database.rangeQuery(startObjectID, epsilon, distanceFunction);
+        List<ComparablePair<DoubleDistance, Integer>> seeds = database.rangeQuery(startObjectID, epsilon, distanceFunction);
         // neighbors < minPts -> noise
         if (seeds.size() < minpts) {
             noise.add(startObjectID);
@@ -292,8 +292,8 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
 
         // try to expand the cluster
         List<Integer> currentCluster = new ArrayList<Integer>();
-        for (QueryResult<DoubleDistance> seed : seeds) {
-            Integer nextID = seed.getID();
+        for (ComparablePair<DoubleDistance, Integer> seed : seeds) {
+            Integer nextID = seed.getSecond();
 
             Integer nextID_corrDim = database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, nextID);
             // nextID is not reachable from start object
@@ -312,30 +312,30 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
         seeds.remove(0);
 
         while (seeds.size() > 0) {
-            Integer q = seeds.remove(0).getID();
+            Integer q = seeds.remove(0).getSecond();
             Integer corrDim_q = database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, q);
             // q forms no lambda-dim hyperplane
             if (corrDim_q > lambda)
                 continue;
 
-            List<QueryResult<DoubleDistance>> reachables = database.rangeQuery(q, epsilon, distanceFunction);
+            List<ComparablePair<DoubleDistance, Integer>> reachables = database.rangeQuery(q, epsilon, distanceFunction);
             if (reachables.size() > minpts) {
-                for (QueryResult<DoubleDistance> r : reachables) {
-                    Integer corrDim_r = database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, r.getID());
+                for (ComparablePair<DoubleDistance, Integer> r : reachables) {
+                    Integer corrDim_r = database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, r.getSecond());
                     // r is not reachable from q
                     if (corrDim_r > lambda)
                         continue;
 
-                    boolean inNoise = noise.contains(r.getID());
-                    boolean unclassified = !processedIDs.contains(r.getID());
+                    boolean inNoise = noise.contains(r.getSecond());
+                    boolean unclassified = !processedIDs.contains(r.getSecond());
                     if (inNoise || unclassified) {
                         if (unclassified) {
                             seeds.add(r);
                         }
-                        currentCluster.add(r.getID());
-                        processedIDs.add(r.getID());
+                        currentCluster.add(r.getSecond());
+                        processedIDs.add(r.getSecond());
                         if (inNoise) {
-                            noise.remove(r.getID());
+                            noise.remove(r.getSecond());
                         }
                         if (isVerbose()) {
                             progress.setProcessed(processedIDs.size());

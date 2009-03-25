@@ -4,7 +4,6 @@ package de.lmu.ifi.dbs.elki.database;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedSet;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
@@ -15,7 +14,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.utilities.ConstantObject;
-import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
@@ -68,12 +66,12 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
     /**
      * The association id to associate the neighbors of an object.
      */
-    public static final AssociationID<List<QueryResult<DoubleDistance>>> NEIGHBORS = new AssociationID<List<QueryResult<DoubleDistance>>>("neighbors", List.class);
+    public static final AssociationID<List<ComparablePair<DoubleDistance, Integer>>> NEIGHBORS = new AssociationID<List<ComparablePair<DoubleDistance, Integer>>>("neighbors", List.class);
 
     /**
      * The association id to associate another set of neighbors of an object.
      */
-    public static final AssociationID<List<QueryResult<DoubleDistance>>> NEIGHBORS_2 = new AssociationID<List<QueryResult<DoubleDistance>>>("neighbors2", List.class);
+    public static final AssociationID<List<ComparablePair<DoubleDistance, Integer>>> NEIGHBORS_2 = new AssociationID<List<ComparablePair<DoubleDistance, Integer>>>("neighbors2", List.class);
 
     /**
      * The association id to associate a set of neighbors for use of the shared

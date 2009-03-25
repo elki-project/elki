@@ -19,12 +19,12 @@ import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
-import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * Algorithm to compute local correlation outlier probability.
@@ -91,12 +91,12 @@ public class COP<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, D
             double sqrt2 = Math.sqrt(2.0);
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
                 Integer id = iter.next();
-                List<QueryResult<DoubleDistance>> neighbors = database.kNNQueryForID(id, k + 1, getDistanceFunction());
+                List<ComparablePair<DoubleDistance, Integer>> neighbors = database.kNNQueryForID(id, k + 1, getDistanceFunction());
                 neighbors.remove(0);
 
                 List<Integer> ids = new ArrayList<Integer>(neighbors.size());
-                for (QueryResult<DoubleDistance> n : neighbors) {
-                    ids.add(n.getID());
+                for (ComparablePair<DoubleDistance, Integer> n : neighbors) {
+                    ids.add(n.getSecond());
                 }
 
                 // TODO: do we want to use the query point as centroid?

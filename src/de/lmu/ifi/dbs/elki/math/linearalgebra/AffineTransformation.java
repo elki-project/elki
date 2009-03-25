@@ -211,8 +211,17 @@ public class AffineTransformation {
   public void addAxisReflection(int axis) {
     assert (0 < axis && axis <= dim);
     Matrix homTrans = Matrix.unitMatrix(dim + 1);
-    homTrans.set(axis, axis, -1);
+    homTrans.set(axis - 1, axis - 1, -1);
     trans = homTrans.times(trans);
+  }
+  
+  /**
+   * Simple linear (symmetric) scaling.
+   * 
+   * @param scale Scaling factor
+   */
+  public void addScaling(double scale) {
+    trans = trans.times(scale);
   }
 
   /**

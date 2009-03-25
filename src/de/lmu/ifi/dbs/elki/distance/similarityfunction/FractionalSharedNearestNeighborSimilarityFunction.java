@@ -12,8 +12,8 @@ import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.SharedNearestNeighborsPreprocessor;
-import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
 
 /**
@@ -69,9 +69,9 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
       }
     }
     List<Integer> neighbors = new ArrayList<Integer>(numberOfNeighbors);
-    List<QueryResult<D>> kNN = getDatabase().kNNQueryForObject(obj, numberOfNeighbors, getPreprocessor().getDistanceFunction());
+    List<ComparablePair<D, Integer>> kNN = getDatabase().kNNQueryForObject(obj, numberOfNeighbors, getPreprocessor().getDistanceFunction());
     for (int i = 1; i < kNN.size(); i++) {
-        neighbors.add(kNN.get(i).getID());
+        neighbors.add(kNN.get(i).getSecond());
     }
     SortedSet<Integer> neighs = new TreeSet<Integer>(neighbors);
     // store in cache

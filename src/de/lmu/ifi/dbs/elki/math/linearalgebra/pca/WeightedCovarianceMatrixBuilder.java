@@ -13,10 +13,10 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ConstantWeight
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.WeightFunction;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
-import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * {@link CovarianceMatrixBuilder} with weights.
@@ -150,7 +150,7 @@ public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends
    * @return Covariance Matrix
    */
   @Override
-  public Matrix processQueryResults(Collection<QueryResult<DoubleDistance>> results, Database<V> database, int k) {
+  public Matrix processQueryResults(Collection<ComparablePair<DoubleDistance, Integer>> results, Database<V> database, int k) {
     int dim = database.dimensionality();
     // collecting the sums in each dimension
     double[] sums = new double[dim];
@@ -167,9 +167,9 @@ public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends
     double stddev = 0.0;
     {
       int i = 0;
-      for(Iterator<QueryResult<DoubleDistance>> it = results.iterator(); it.hasNext() && i < k; i++) {
-        QueryResult<DoubleDistance> res = it.next();
-        double dist = res.getDistance().getValue();
+      for(Iterator<ComparablePair<DoubleDistance, Integer>> it = results.iterator(); it.hasNext() && i < k; i++) {
+        ComparablePair<DoubleDistance, Integer> res = it.next();
+        double dist = res.getFirst().getValue();
         stddev += dist * dist;
         if(dist > maxdist)
           maxdist = dist;
@@ -181,10 +181,10 @@ public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends
 
     // calculate weighted PCA
     int i = 0;
-    for(Iterator<QueryResult<DoubleDistance>> it = results.iterator(); it.hasNext() && i < k; i++) {
-      QueryResult<DoubleDistance> res = it.next();
-      V obj = database.get(res.getID());
-      double weight = weightfunction.getWeight(res.getDistance().getValue(), maxdist, stddev);
+    for(Iterator<ComparablePair<DoubleDistance, Integer>> it = results.iterator(); it.hasNext() && i < k; i++) {
+      ComparablePair<DoubleDistance, Integer> res = it.next();
+      V obj = database.get(res.getSecond());
+      double weight = weightfunction.getWeight(res.getFirst().getValue(), maxdist, stddev);
       for(int d1 = 0; d1 < dim; d1++) {
         /* We're exploiting symmetry here, start with d2 == d1 */
         for(int d2 = d1; d2 < dim; d2++) {

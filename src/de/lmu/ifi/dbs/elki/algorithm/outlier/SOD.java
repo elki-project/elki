@@ -16,13 +16,13 @@ import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
-import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * @author Arthur Zimek
@@ -173,7 +173,7 @@ public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends
             Integer id = iter.next();
             if (!id.equals(queryObject)) {
                 DoubleDistance distance = new DoubleDistance(1.0 / similarityFunction.similarity(queryObject, id).getValue());
-                kNearestNeighbors.add(new QueryResult<DoubleDistance>(id, distance));
+                kNearestNeighbors.add(new ComparablePair<DoubleDistance, Integer>(distance, id));
             }
         }
         return kNearestNeighbors;

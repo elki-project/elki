@@ -10,13 +10,13 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.statistics.LinearRegression;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
-import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 
 /**
  * @author Arthur Zimek
@@ -47,10 +47,10 @@ public class FracClusPreprocessor<V extends RealVector<V, ?>> extends AbstractPa
         for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
             Integer id = iter.next();
             List<Integer> neighbors = new ArrayList<Integer>(k);
-            List<QueryResult<DoubleDistance>> kNN = database.kNNQueryForID(id, k + 1, distanceFunction);
+            List<ComparablePair<DoubleDistance, Integer>> kNN = database.kNNQueryForID(id, k + 1, distanceFunction);
             for (int i = 1; i < kNN.size(); i++) {
-                QueryResult<DoubleDistance> ithQueryResult = kNN.get(i);
-                neighbors.add(ithQueryResult.getID());
+                ComparablePair<DoubleDistance, Integer> ithQueryResult = kNN.get(i);
+                neighbors.add(ithQueryResult.getSecond());
             }
             if (this.debug) {
                 List<DoubleDoublePair> points = new ArrayList<DoubleDoublePair>(neighbors.size());

@@ -1,10 +1,15 @@
 package de.lmu.ifi.dbs.elki.utilities;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-
-import java.util.*;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * A wrapper class for storing the k most similar comparable objects.
@@ -15,7 +20,7 @@ public class KNNList<D extends Distance<D>> extends AbstractLoggable {
     /**
      * The underlying set.
      */
-    private SortedSet<QueryResult<D>> list;
+    private SortedSet<ComparablePair<D, Integer>> list;
 
     /**
      * The maximum size of this list.
@@ -35,7 +40,7 @@ public class KNNList<D extends Distance<D>> extends AbstractLoggable {
      */
     public KNNList(int k, D infiniteDistance) {
         super(LoggingConfiguration.DEBUG);
-        this.list = new TreeSet<QueryResult<D>>();
+        this.list = new TreeSet<ComparablePair<D, Integer>>();
         this.k = k;
         this.infiniteDistance = infiniteDistance;
     }
@@ -48,18 +53,18 @@ public class KNNList<D extends Distance<D>> extends AbstractLoggable {
      * @param o the object to be added
      * @return true, if o has been added, false otherwise.
      */
-    public boolean add(QueryResult<D> o) {
+    public boolean add(ComparablePair<D, Integer> o) {
         if (list.size() < k) {
             list.add(o);
             return true;
         }
 
         try {
-            QueryResult<D> last = list.last();
-            D lastKey = last.getDistance();
+          ComparablePair<D, Integer> last = list.last();
+            D lastDist = last.getFirst();
 
-            if (o.getDistance().compareTo(lastKey) < 0) {
-                SortedSet<QueryResult<D>> lastList = list.subSet(new QueryResult<D>(0, lastKey), new QueryResult<D>(Integer.MAX_VALUE, lastKey));
+            if (o.getFirst().compareTo(lastDist) < 0) {
+                SortedSet<ComparablePair<D, Integer>> lastList = list.subSet(new ComparablePair<D, Integer>(lastDist, 0), new ComparablePair<D, Integer>(lastDist, Integer.MAX_VALUE));
 
                 int llSize = lastList.size();
                 if (list.size() - llSize >= k - 1) {
@@ -71,7 +76,7 @@ public class KNNList<D extends Distance<D>> extends AbstractLoggable {
                 return true;
             }
 
-            if (o.getDistance().compareTo(last.getDistance()) == 0) {
+            if (o.getFirst().compareTo(last.getFirst()) == 0) {
                 list.add(o);
                 return true;
             }
@@ -109,8 +114,8 @@ public class KNNList<D extends Distance<D>> extends AbstractLoggable {
         if (list.isEmpty()) {
             return infiniteDistance;
         }
-        QueryResult<D> last = list.last();
-        return last.getDistance();
+        ComparablePair<D, Integer> last = list.last();
+        return last.getFirst();
     }
 
     /**
@@ -118,16 +123,16 @@ public class KNNList<D extends Distance<D>> extends AbstractLoggable {
      *
      * @return a list representation of this KList
      */
-    public List<QueryResult<D>> toList() {
-        return new ArrayList<QueryResult<D>>(list);
+    public List<ComparablePair<D, Integer>> toList() {
+        return new ArrayList<ComparablePair<D, Integer>>(list);
     }
 
     public List<D> distancesToList() {
         List<D> knnDistances = new ArrayList<D>();
-        List<QueryResult<D>> qr = toList();
+        List<ComparablePair<D, Integer>> qr = toList();
 
         for (int i = 0; i < qr.size() && i < k; i++) {
-            knnDistances.add(qr.get(i).getDistance());
+            knnDistances.add(qr.get(i).getFirst());
         }
 
         for (int i = qr.size(); i < k; i++) {
@@ -139,9 +144,9 @@ public class KNNList<D extends Distance<D>> extends AbstractLoggable {
 
     public List<Integer> idsToList() {
         List<Integer> ids = new ArrayList<Integer>(k);
-        List<QueryResult<D>> qr = toList();
+        List<ComparablePair<D, Integer>> qr = toList();
         for (int i = 0; i < qr.size() && i < k; i++) {
-            ids.add(qr.get(i).getID());
+            ids.add(qr.get(i).getSecond());
         }
         return ids;
     }
@@ -196,12 +201,12 @@ public class KNNList<D extends Distance<D>> extends AbstractLoggable {
         if (k != knnList.k) {
             return false;
         }
-        Iterator<QueryResult<D>> it = list.iterator();
-        Iterator<QueryResult<D>> other_it = knnList.list.iterator();
+        Iterator<ComparablePair<D, Integer>> it = list.iterator();
+        Iterator<ComparablePair<D, Integer>> other_it = knnList.list.iterator();
 
         while (it.hasNext()) {
-            QueryResult<D> next = it.next();
-            QueryResult<D> other_next = other_it.next();
+            ComparablePair<D, Integer> next = it.next();
+            ComparablePair<D, Integer> other_next = other_it.next();
 
             if (!next.equals(other_next)) {
                 return false;

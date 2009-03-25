@@ -21,11 +21,11 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.ComparableTriple;
 import de.lmu.ifi.dbs.elki.utilities.pairs.IntDoublePair;
 
@@ -287,8 +287,8 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
      * @param database the database holding the objects
      * @return a mapping of the medoid's id to its locality
      */
-    private Map<Integer, List<QueryResult<DoubleDistance>>> getLocalities(Set<Integer> m_c, Database<V> database) {
-        Map<Integer, List<QueryResult<DoubleDistance>>> result = new HashMap<Integer, List<QueryResult<DoubleDistance>>>();
+    private Map<Integer, List<ComparablePair<DoubleDistance, Integer>>> getLocalities(Set<Integer> m_c, Database<V> database) {
+        Map<Integer, List<ComparablePair<DoubleDistance, Integer>>> result = new HashMap<Integer, List<ComparablePair<DoubleDistance, Integer>>>();
         for (Integer m : m_c) {
             // determine minimum distance between each point in m_c and m
             IntDoublePair minDist = null;
@@ -302,7 +302,7 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
 
             // determine points in sphere centered at m with radius minDist
             assert minDist != null;
-            List<QueryResult<DoubleDistance>> qr = database.rangeQuery(m, Double.toString(minDist.getSecond()), getDistanceFunction());
+            List<ComparablePair<DoubleDistance, Integer>> qr = database.rangeQuery(m, Double.toString(minDist.getSecond()), getDistanceFunction());
             result.put(m, qr);
         }
         return result;
@@ -316,7 +316,7 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
      * @return the set of correlated dimensions for each medoid in the specified medoid set
      */
     private Map<Integer, Set<Integer>> findDimensions(Set<Integer> medoids, Database<V> database) {
-        Map<Integer, List<QueryResult<DoubleDistance>>> localities = getLocalities(medoids, database);
+        Map<Integer, List<ComparablePair<DoubleDistance, Integer>>> localities = getLocalities(medoids, database);
 
         int dim = database.dimensionality();
         Map<Integer, double[]> averageDistances = new HashMap<Integer, double[]>();
@@ -324,10 +324,10 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
         // compute x_ij = avg distance from points in l_i to medoid m_i
         for (Integer m_i : localities.keySet()) {
             V medoid_i = database.get(m_i);
-            List<QueryResult<DoubleDistance>> l_i = localities.get(m_i);
+            List<ComparablePair<DoubleDistance, Integer>> l_i = localities.get(m_i);
             double[] x_i = new double[dim];
-            for (QueryResult<DoubleDistance> qr : l_i) {
-                V o = database.get(qr.getID());
+            for (ComparablePair<DoubleDistance, Integer> qr : l_i) {
+                V o = database.get(qr.getSecond());
                 for (int d = 0; d < dim; d++) {
                     x_i[d] += Math.abs(medoid_i.getValue(d + 1).doubleValue() - o.getValue(d + 1).doubleValue());
                 }

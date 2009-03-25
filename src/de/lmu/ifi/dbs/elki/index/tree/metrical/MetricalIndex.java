@@ -1,12 +1,12 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndex;
-import de.lmu.ifi.dbs.elki.utilities.QueryResult;
-
-import java.util.List;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * Abstract super class for all metrical index classes.
@@ -30,7 +30,7 @@ public abstract class MetricalIndex<O extends DatabaseObject, D extends Distance
    * @param epsilon the string representation of the query range
    * @return a List of the query results
    */
-  public abstract List<QueryResult<D>> rangeQuery(final O object, final String epsilon);
+  public abstract List<ComparablePair<D, Integer>> rangeQuery(final O object, final String epsilon);
 
   /**
    * Performs a k-nearest neighbor query for the given object with the given
@@ -42,7 +42,7 @@ public abstract class MetricalIndex<O extends DatabaseObject, D extends Distance
    * @param k      the number of nearest neighbors to be returned
    * @return a List of the query results
    */
-  public abstract List<QueryResult<D>> kNNQuery(final O object, final int k);
+  public abstract List<ComparablePair<D, Integer>> kNNQuery(final O object, final int k);
 
   /**
    * Performs a reverse k-nearest neighbor query for the given object ID. The
@@ -52,7 +52,7 @@ public abstract class MetricalIndex<O extends DatabaseObject, D extends Distance
    * @param k      the number of nearest neighbors to be returned
    * @return a List of the query results
    */
-  public abstract List<QueryResult<D>> reverseKNNQuery(final O object, int k);
+  public abstract List<ComparablePair<D, Integer>> reverseKNNQuery(final O object, int k);
 
   /**
    * Returns the distance function of this metrical index.

@@ -140,11 +140,11 @@ public class CLIQUESubspace<V extends RealVector<V, ?>> extends Subspace<V> impl
         unit.markAsAssigned();
 
         for (Integer dim : getDimensions()) {
-            CLIQUEUnit<V> left = leftNeighbour(unit, dim);
+            CLIQUEUnit<V> left = leftNeighbor(unit, dim);
             if (left != null && !left.isAssigned())
                 dfs(left, cluster);
 
-            CLIQUEUnit<V> right = rightNeighbour(unit, dim);
+            CLIQUEUnit<V> right = rightNeighbor(unit, dim);
             if (right != null && !right.isAssigned())
                 dfs(right, cluster);
         }
@@ -157,7 +157,7 @@ public class CLIQUESubspace<V extends RealVector<V, ?>> extends Subspace<V> impl
      * @param dim  the dimension
      * @return the left neighbor of the given unit in the specified dimension
      */
-    public CLIQUEUnit<V> leftNeighbour(CLIQUEUnit<V> unit, Integer dim) {
+    public CLIQUEUnit<V> leftNeighbor(CLIQUEUnit<V> unit, Integer dim) {
         Interval i = unit.getInterval(dim);
 
         for (CLIQUEUnit<V> u : denseUnits) {
@@ -174,7 +174,7 @@ public class CLIQUESubspace<V extends RealVector<V, ?>> extends Subspace<V> impl
      * @param dim  the dimension
      * @return the right neighbor of the given unit in the specified dimension
      */
-    public CLIQUEUnit<V> rightNeighbour(CLIQUEUnit<V> unit, Integer dim) {
+    public CLIQUEUnit<V> rightNeighbor(CLIQUEUnit<V> unit, Integer dim) {
         Interval i = unit.getInterval(dim);
 
         for (CLIQUEUnit<V> u : denseUnits) {

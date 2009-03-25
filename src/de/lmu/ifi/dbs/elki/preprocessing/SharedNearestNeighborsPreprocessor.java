@@ -1,5 +1,11 @@
 package de.lmu.ifi.dbs.elki.preprocessing;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -7,19 +13,13 @@ import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
-import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * A preprocessor for annotation of the ids of nearest neighbors to each database object.
@@ -98,9 +98,9 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
             count++;
             Integer id = iter.next();
             List<Integer> neighbors = new ArrayList<Integer>(numberOfNeighbors);
-            List<QueryResult<D>> kNN = database.kNNQueryForID(id, numberOfNeighbors, distanceFunction);
+            List<ComparablePair<D, Integer>> kNN = database.kNNQueryForID(id, numberOfNeighbors, distanceFunction);
             for (int i = 1; i < kNN.size(); i++) {
-                neighbors.add(kNN.get(i).getID());
+                neighbors.add(kNN.get(i).getSecond());
             }
             SortedSet<Integer> set = new TreeSet<Integer>(neighbors);
             database.associate(getAssociationID(), id, set);

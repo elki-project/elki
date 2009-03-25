@@ -1,18 +1,18 @@
 package de.lmu.ifi.dbs.elki.database;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.distance.Distance;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.QueryResult;
-import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
 
 /**
  * Database specifies the requirements for any database implementation. Note that
@@ -83,7 +83,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
    *                         objects
    * @return a List of the query results
    */
-  <D extends Distance<D>> List<QueryResult<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, D> distanceFunction);
+  <D extends Distance<D>> List<ComparablePair<D, Integer>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, D> distanceFunction);
 
   /**
    * Performs a k-nearest neighbor query for the given object ID. The query
@@ -95,7 +95,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
    *                         objects
    * @return a List of the query results
    */
-  <D extends Distance<D>> List<QueryResult<D>> kNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction);
+  <D extends Distance<D>> List<ComparablePair<D, Integer>> kNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction);
 
   /**
    * Performs a k-nearest neighbor query for the given object. The query
@@ -107,7 +107,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
    *                         objects
    * @return a List of the query results
    */
-  <D extends Distance<D>> List<QueryResult<D>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, D> distanceFunction);
+  <D extends Distance<D>> List<ComparablePair<D, Integer>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, D> distanceFunction);
 
   /**
    * Performs k-nearest neighbor queries for the given object IDs. The query
@@ -119,7 +119,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
    *                         objects
    * @return a List of List of the query results
    */
-  <D extends Distance<D>> List<List<QueryResult<D>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction);
+  <D extends Distance<D>> List<List<ComparablePair<D, Integer>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction);
 
   /**
    * Performs a reverse k-nearest neighbor query for the given object ID. The
@@ -131,7 +131,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
    *                         objects
    * @return a List of the query results
    */
-  <D extends Distance<D>> List<QueryResult<D>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, D> distanceFunction);
+  <D extends Distance<D>> List<ComparablePair<D, Integer>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, D> distanceFunction);
 
   /**
    * Returns the DatabaseObject represented by the specified id.

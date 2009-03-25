@@ -1,15 +1,15 @@
 package de.lmu.ifi.dbs.elki.database;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.distance.Distance;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.KNNList;
-import de.lmu.ifi.dbs.elki.utilities.QueryResult;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.utilities.KNNList;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * SequentialDatabase is a simple implementation of a Database. <p/> It does not
@@ -26,7 +26,7 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
         super();
     }
 
-    public <D extends Distance<D>> List<QueryResult<D>> kNNQueryForObject(O queryObject,
+    public <D extends Distance<D>> List<ComparablePair<D, Integer>> kNNQueryForObject(O queryObject,
                                                                           int k,
                                                                           DistanceFunction<O, D> distanceFunction) {
         KNNList<D> knnList = new KNNList<D>(k, distanceFunction.infiniteDistance());
@@ -34,12 +34,12 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
         while (iterator.hasNext()) {
             Integer candidateID = iterator.next();
             O candidate = get(candidateID);
-            knnList.add(new QueryResult<D>(candidateID, distanceFunction.distance(queryObject, candidate)));
+            knnList.add(new ComparablePair<D, Integer>(distanceFunction.distance(queryObject, candidate), candidateID));
         }
         return knnList.toList();
     }
 
-    public <D extends Distance<D>> List<QueryResult<D>> kNNQueryForID(Integer id,
+    public <D extends Distance<D>> List<ComparablePair<D, Integer>> kNNQueryForID(Integer id,
                                                                       int k,
                                                                       DistanceFunction<O, D> distanceFunction) {
         O object = get(id);
@@ -49,12 +49,12 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
         while (iterator.hasNext()) {
             Integer candidateID = iterator.next();
             O candidate = get(candidateID);
-            knnList.add(new QueryResult<D>(candidateID, distanceFunction.distance(object, candidate)));
+            knnList.add(new ComparablePair<D, Integer>(distanceFunction.distance(object, candidate), candidateID));
         }
         return knnList.toList();
     }
 
-    public <D extends Distance<D>> List<List<QueryResult<D>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
+    public <D extends Distance<D>> List<List<ComparablePair<D, Integer>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
         List<KNNList<D>> knnLists = new ArrayList<KNNList<D>>(ids.size());
         //noinspection ForLoopReplaceableByForEach
         for (int i = 0; i < ids.size(); i++) {
@@ -69,21 +69,21 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
                 Integer id = ids.get(i);
                 O object = get(id);
                 KNNList<D> knnList = knnLists.get(i);
-                knnList.add(new QueryResult<D>(candidateID, distanceFunction.distance(object, candidate)));
+                knnList.add(new ComparablePair<D, Integer>(distanceFunction.distance(object, candidate), candidateID));
             }
         }
 
-        List<List<QueryResult<D>>> result = new ArrayList<List<QueryResult<D>>>(ids.size());
+        List<List<ComparablePair<D, Integer>>> result = new ArrayList<List<ComparablePair<D, Integer>>>(ids.size());
         for (int i = 0; i < ids.size(); i++) {
             result.add(knnLists.get(i).toList());
         }
         return result;
     }
 
-    public <D extends Distance<D>> List<QueryResult<D>> rangeQuery(Integer id,
+    public <D extends Distance<D>> List<ComparablePair<D, Integer>> rangeQuery(Integer id,
                                                                    String epsilon,
                                                                    DistanceFunction<O, D> distanceFunction) {
-        List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
+        List<ComparablePair<D, Integer>> result = new ArrayList<ComparablePair<D, Integer>>();
         D distance = distanceFunction.valueOf(epsilon);
         Iterator<Integer> iterator = iterator();
         while (iterator.hasNext()) {
@@ -91,23 +91,23 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
             D currentDistance = distanceFunction.distance(id, currentID);
 
             if (currentDistance.compareTo(distance) <= 0) {
-                result.add(new QueryResult<D>(currentID, currentDistance));
+                result.add(new ComparablePair<D, Integer>(currentDistance, currentID));
             }
         }
         Collections.sort(result);
         return result;
     }
 
-    public <D extends Distance<D>> List<QueryResult<D>> reverseKNNQuery(Integer id,
+    public <D extends Distance<D>> List<ComparablePair<D, Integer>> reverseKNNQuery(Integer id,
                                                                         int k,
                                                                         DistanceFunction<O, D> distanceFunction) {
-        List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
+        List<ComparablePair<D, Integer>> result = new ArrayList<ComparablePair<D, Integer>>();
         for (Iterator<Integer> iter = iterator(); iter.hasNext();) {
             Integer candidateID = iter.next();
-            List<QueryResult<D>> knns = this.kNNQueryForID(candidateID, k, distanceFunction);
-            for (QueryResult<D> knn : knns) {
-                if (knn.getID() == id) {
-                    result.add(new QueryResult<D>(candidateID, knn.getDistance()));
+            List<ComparablePair<D, Integer>> knns = this.kNNQueryForID(candidateID, k, distanceFunction);
+            for (ComparablePair<D, Integer> knn : knns) {
+                if (knn.getSecond() == id) {
+                    result.add(new ComparablePair<D, Integer>(knn.getFirst(), candidateID));
                 }
             }
         }

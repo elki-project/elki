@@ -1,5 +1,11 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkapp;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
@@ -7,7 +13,6 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.util.PQNode;
 import de.lmu.ifi.dbs.elki.math.statistics.PolynomialRegression;
 import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
-import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
@@ -15,12 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * MkAppTree is a metrical index structure based on the concepts of the M-Tree
@@ -163,8 +163,8 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
      * @return a List of the query results
      */
     @Override
-    public List<QueryResult<D>> reverseKNNQuery(O object, int k) {
-        List<QueryResult<D>> result = doReverseKNNQuery(k, object.getID());
+    public List<ComparablePair<D, Integer>> reverseKNNQuery(O object, int k) {
+        List<ComparablePair<D, Integer>> result = doReverseKNNQuery(k, object.getID());
         Collections.sort(result);
         return result;
     }
@@ -244,13 +244,13 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     /**
      * Performs a reverse knn query.
      *
-     * @param k the parametr k of the rknn query
+     * @param k the parameter k of the rknn query
      * @param q the id of the query object
      * @return the result of the reverse knn query
      */
-    private List<QueryResult<D>> doReverseKNNQuery(int k, Integer q) {
+    private List<ComparablePair<D, Integer>> doReverseKNNQuery(int k, Integer q) {
 
-        List<QueryResult<D>> result = new ArrayList<QueryResult<D>>();
+        List<ComparablePair<D, Integer>> result = new ArrayList<ComparablePair<D, Integer>>();
         final Heap<D, Identifiable<?>> pq = new DefaultHeap<D, Identifiable<?>>();
 
         // push root
@@ -294,7 +294,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
                     D approximatedKnnDist = getDistanceFunction().valueOf(Double.toString(approxValue));
 
                     if (distance.compareTo(approximatedKnnDist) <= 0) {
-                        result.add(new QueryResult<D>(entry.getRoutingObjectID(), distance));
+                        result.add(new ComparablePair<D, Integer>(distance, entry.getRoutingObjectID()));
                     }
                 }
             }

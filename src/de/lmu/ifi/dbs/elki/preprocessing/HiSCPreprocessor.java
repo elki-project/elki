@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
-import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
@@ -22,6 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * Preprocessor for HiSC preference vector assignment to objects of a certain
@@ -122,12 +122,12 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
         msg.append("\n knns: ");
       }
 
-      List<QueryResult<DoubleDistance>> knns = database.kNNQueryForID(id, k, distanceFunction);
+      List<ComparablePair<DoubleDistance, Integer>> knns = database.kNNQueryForID(id, k, distanceFunction);
       List<Integer> knnIDs = new ArrayList<Integer>(knns.size());
-      for (QueryResult<DoubleDistance> knn : knns) {
-        knnIDs.add(knn.getID());
+      for (ComparablePair<DoubleDistance, Integer> knn : knns) {
+        knnIDs.add(knn.getSecond());
         if (this.debug) {
-          msg.append(database.getAssociation(AssociationID.LABEL, knn.getID())).append(" ");
+          msg.append(database.getAssociation(AssociationID.LABEL, knn.getSecond())).append(" ");
         }
       }
 

@@ -33,9 +33,9 @@ public class SVGAxis {
     assert (parent != null);
     Element line = SVGUtil.svgElement(document, "line");
     SVGUtil.setAtt(line, "x1", x1);
-    SVGUtil.setAtt(line, "y1", -y1);
+    SVGUtil.setAtt(line, "y1", y1);
     SVGUtil.setAtt(line, "x2", x2);
-    SVGUtil.setAtt(line, "y2", -y2);
+    SVGUtil.setAtt(line, "y2", y2);
     SVGUtil.setAtt(line, "style", "stroke:silver; stroke-width:0.2%;");
     parent.appendChild(line);
   
@@ -48,7 +48,7 @@ public class SVGAxis {
     // choose where to print labels.
     ALIGNMENT pos = ALIGNMENT.LL;
     if(labels) {
-      double angle = Math.atan2(-ty, tx);
+      double angle = - Math.atan2(ty, tx);
       // System.err.println(tx + " " + (-ty) + " " + angle);
       if(angle < -2.6) { // -pi .. -2.6 = -180 .. -150
         pos = righthanded ? ALIGNMENT.RC : ALIGNMENT.LC;
@@ -76,9 +76,9 @@ public class SVGAxis {
       double x = x1 + tx * scale.getScaled(tick);
       double y = y1 + ty * scale.getScaled(tick);
       SVGUtil.setAtt(tickline, "x1", x - tw);
-      SVGUtil.setAtt(tickline, "y1", -y - th);
+      SVGUtil.setAtt(tickline, "y1", y - th);
       SVGUtil.setAtt(tickline, "x2", x + tw);
-      SVGUtil.setAtt(tickline, "y2", -y + th);
+      SVGUtil.setAtt(tickline, "y2", y + th);
       SVGUtil.setAtt(tickline, "style", "stroke:black; stroke-width:0.1%;");
       parent.appendChild(tickline);
       // draw labels
@@ -90,13 +90,13 @@ public class SVGAxis {
         case LC:
         case LR:
           SVGUtil.setAtt(text, "x", x - tw * 2);
-          SVGUtil.setAtt(text, "y", -y - th * 3 + textvoff);
+          SVGUtil.setAtt(text, "y", y - th * 3 + textvoff);
           break;
         case RL:
         case RC:
         case RR:
           SVGUtil.setAtt(text, "x", x + tw * 2);
-          SVGUtil.setAtt(text, "y", -y + th * 3 + textvoff);
+          SVGUtil.setAtt(text, "y", y + th * 3 + textvoff);
         }
         switch(pos){
         case LL:

@@ -7,13 +7,13 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
 import de.lmu.ifi.dbs.elki.utilities.output.Format;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * Preprocessor for PreDeCon local dimensionality and locally weighted matrix
@@ -75,7 +75,7 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends RealVector<V,
    * @param database  the database for which the preprocessing is performed
    */
   @Override
-  protected void runVarianceAnalysis(Integer id, List<QueryResult<D>> neighbors, Database<V> database) {
+  protected void runVarianceAnalysis(Integer id, List<ComparablePair<D, Integer>> neighbors, Database<V> database) {
     StringBuffer msg = new StringBuffer();
 
     int referenceSetSize = neighbors.size();
@@ -102,8 +102,8 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends RealVector<V,
 
     // start variance analyis
     double[] sum = new double[dim];
-    for (QueryResult<D> neighbor : neighbors) {
-      RealVector<?,?> o = database.get(neighbor.getID());
+    for (ComparablePair<D, Integer> neighbor : neighbors) {
+      RealVector<?,?> o = database.get(neighbor.getSecond());
       for (int d = 0; d < dim; d++) {
         sum[d] = + Math.pow(obj.getValue(d + 1).doubleValue() - o.getValue(d + 1).doubleValue(), 2.0);
       }

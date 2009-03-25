@@ -14,8 +14,8 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
-import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
+import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.LogLevel;
@@ -25,11 +25,11 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.QueryResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * ORCLUS provides the ORCLUS algorithm, an algorithm to find clusters in high
@@ -249,11 +249,11 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
   private Matrix findBasis(Database<V> database, ORCLUSCluster cluster, int dim) {
     // covariance matrix of cluster
     // Matrix covariance = Util.covarianceMatrix(database, cluster.objectIDs);
-    List<QueryResult<DoubleDistance>> results = new ArrayList<QueryResult<DoubleDistance>>(cluster.objectIDs.size());
+    List<ComparablePair<DoubleDistance, Integer>> results = new ArrayList<ComparablePair<DoubleDistance, Integer>>(cluster.objectIDs.size());
     for(Iterator<Integer> it = cluster.objectIDs.iterator(); it.hasNext();) {
       Integer id = it.next();
       DoubleDistance distance = getDistanceFunction().distance(cluster.centroid, database.get(id));
-      QueryResult<DoubleDistance> qr = new QueryResult<DoubleDistance>(id, distance);
+      ComparablePair<DoubleDistance, Integer> qr = new ComparablePair<DoubleDistance, Integer>(distance, id);
       results.add(qr);
     }
     Collections.sort(results);
