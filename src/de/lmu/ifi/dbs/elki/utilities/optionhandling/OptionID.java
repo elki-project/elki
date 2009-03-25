@@ -71,13 +71,10 @@ public final class OptionID extends ConstantObject<OptionID> {
     );
 
     /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#OUTPUT_PARAM}
-     * todo richtige beschreibung? oder sind es directories?
+     * OptionID for {@link de.lmu.ifi.dbs.elki.result.ResultWriter#OUTPUT_PARAM}
      */
     public static final OptionID OUTPUT = new OptionID("out",
-        "Name of the file to write the obtained results in. " +
-        "If an algorithm requires several outputfiles, the given filename will be used " +
-        "as prefix followed by automatically created markers. " +
+        "Name of the directory to write the obtained results in. " +
         "If this parameter is omitted, per default the output will sequentially be given to STDOUT."
     );
 
@@ -110,13 +107,6 @@ public final class OptionID extends ConstantObject<OptionID> {
      */
     public static final OptionID ALGORITHM_TIME = new OptionID("time",
         "Flag to request output of performance time.");
-
-    /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#TRACE_FLAG}
-     * and {@link de.lmu.ifi.dbs.elki.wrapper.AbstractWrapper#TRACE_FLAG}
-     */
-    public static final OptionID TRACE_DEBUG = new OptionID("stack-trace",
-        "Print a stack trace on errors.");
 
     /**
      * The description of the OptionID.

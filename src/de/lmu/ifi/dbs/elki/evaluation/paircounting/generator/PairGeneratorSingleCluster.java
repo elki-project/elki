@@ -11,8 +11,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
  * Generate sorted ID pairs for a {@link Cluster}.
  * 
  * @author Erich Schubert
- * 
- * @param <C> Cluster class
  */
 public class PairGeneratorSingleCluster extends PairSortedGenerator {
   /**

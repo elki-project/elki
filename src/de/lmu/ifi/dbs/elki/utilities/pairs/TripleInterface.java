@@ -46,7 +46,7 @@ public interface TripleInterface<FIRST, SECOND, THIRD> {
   /**
    * Assign new value for second component in pair.
    * 
-   * @param second new value for second component
+   * @param third new value for second component
    */
   public void setThird(THIRD third);
 }

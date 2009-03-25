@@ -77,7 +77,7 @@ public class TrainingAndTestSet<O extends DatabaseObject, L extends ClassLabel>
      * @param <O> Database object class
      * @param <L> Class label class
      * @param len array length
-     * @return
+     * @return new array of the given size.
      */
     @SuppressWarnings("unchecked")
     public static <O extends DatabaseObject, L extends ClassLabel> TrainingAndTestSet<O,L>[] newArray(int len) {

@@ -33,21 +33,10 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
     private final Flag VERBOSE_FLAG;
 
     /**
-     * Print backtraces on exceptions.
-     * <p>Key: {@code -stack-trace} </p>
-     */
-    private final Flag TRACE_FLAG;
-
-    /**
      * Value of verbose flag.
      */
     private boolean verbose;
     
-    /**
-     * Value of trace flag.
-     */
-    private boolean trace;
-
     /**
      * The remaining parameters after the option handler grabbed the options for
      * this wrapper.
@@ -69,11 +58,6 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
         HELP_FLAG = new Flag(OptionID.HELP);
         HELP_FLAG.setShortDescription("Flag to obtain help-message. Causes immediate stop of the program.");
         addOption(HELP_FLAG);
-        
-        // trace
-        TRACE_FLAG = new Flag(OptionID.TRACE_DEBUG);
-        TRACE_FLAG.setShortDescription("Print stack trace on exceptions. Useful for development within the framework.");
-        addOption(TRACE_FLAG);
     }
 
      /**
@@ -97,9 +81,6 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
         // verbose
         verbose = VERBOSE_FLAG.isSet();
         
-        // stack trace
-        trace = TRACE_FLAG.isSet();
-
         setParameters(args, new String[0]);
         return new String[0];
     }
@@ -113,15 +94,6 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
      */
     public final boolean isVerbose() {
         return verbose;
-    }
-
-    /**
-     * Returns whether a stack trace should be printed on error.
-     *
-     * @return whether stack trace should be printed on error.
-     */
-    public final boolean wantStackTrace() {
-        return trace;
     }
 
     /**
@@ -153,18 +125,12 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
         run();
       }
       catch(AbortException e) {
-        if (wantStackTrace())
-          e.printStackTrace(System.err);
         verbose(e.toString());
       }
       catch(ParameterException e) {
-        if (wantStackTrace())
-          e.printStackTrace(System.err);
         warning(e.toString());
       }
       catch(Exception e) {
-        if (wantStackTrace())
-          e.printStackTrace(System.err);
         Throwable cause = e.getCause() != null ? e.getCause() : e;
         exception(optionHandler.usage(e.toString()), cause);
       }

@@ -69,7 +69,7 @@ public class AffineTransformation {
    * @param dim Dimensionality of vector space (resulting Matrix will be dim+1 x
    *        dim+1)
    * @param axes (Partial) list of axes
-   * @return
+   * @return new transformation to do the requested reordering
    */
   public static AffineTransformation reorderAxesTransformation(int dim, int[] axes) {
     Matrix m = Matrix.zeroMatrix(dim + 1);

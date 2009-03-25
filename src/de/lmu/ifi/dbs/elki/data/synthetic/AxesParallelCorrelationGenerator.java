@@ -153,7 +153,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
     /**
      * Parameter dep.
      */
-    protected final DoubleListParameter depParameter = new DoubleListParameter(DEPENDENT_VALUES_ID, null, true, null);
+    protected final DoubleListParameter DEPENDENT_VALUES_PARAM = new DoubleListParameter(DEPENDENT_VALUES_ID, null, true, null);
 
     /**
      * Specifies dependent and independent variables.
@@ -219,7 +219,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
 //    maxParameter.setDefaultValue(MAX_DEFAULT);
 
         // dependent values
-        addOption(depParameter);
+        addOption(DEPENDENT_VALUES_PARAM);
         // TODO default value
 
         // parameter number
@@ -235,7 +235,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
         optionHandler.setGlobalParameterConstraint(new LessEqualGlobalConstraint<Integer>(CORRDIM_PARAM, DIM_PARAM));
         optionHandler.setGlobalParameterConstraint(new GlobalListSizeConstraint(MIN_PARAM, DIM_PARAM));
         optionHandler.setGlobalParameterConstraint(new GlobalListSizeConstraint(MAX_PARAM, DIM_PARAM));
-        optionHandler.setGlobalParameterConstraint(new GlobalListSizeConstraint(depParameter, DIM_PARAM));
+        optionHandler.setGlobalParameterConstraint(new GlobalListSizeConstraint(DEPENDENT_VALUES_PARAM, DIM_PARAM));
         // todo global constraint fuer min < max
     }
 
@@ -403,8 +403,8 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
         }
 
         // dependent values
-        if (depParameter.isSet()) {
-            List<Double> dep_list = depParameter.getValue();
+        if (DEPENDENT_VALUES_PARAM.isSet()) {
+            List<Double> dep_list = DEPENDENT_VALUES_PARAM.getValue();
 
             double[] dv = new double[dataDim];
             int c = 0;
@@ -415,11 +415,11 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
                         c++;
                     }
                     else if (dv[d] < min[d] || dv[d] > max[d]) {
-                        throw new WrongParameterValueException(depParameter, dep_list.toString(), null);
+                        throw new WrongParameterValueException(DEPENDENT_VALUES_PARAM, dep_list.toString(), null);
                     }
                 }
                 catch (NumberFormatException e) {
-                    throw new WrongParameterValueException(depParameter, dep_list.toString(), e);
+                    throw new WrongParameterValueException(DEPENDENT_VALUES_PARAM, dep_list.toString(), e);
                 }
             }
             if (c != corrDim) {

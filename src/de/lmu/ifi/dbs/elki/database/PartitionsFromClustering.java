@@ -73,7 +73,6 @@ public class PartitionsFromClustering {
    * 
    * @param <O> Database object type
    * @param <R> Clustering class
-   * @param <C> Cluster class
    * @param <M> Model class
    * @param clustering Clustering to use for partitioning
    * @return map from clusters to database partitions.

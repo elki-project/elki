@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
  * 
  * @author Erich Schubert
  *
- * @param <C> Cluster type
+ * @param <M> Model type
  */
 public class Clustering<M extends Model> implements Result {
   /**

@@ -37,7 +37,7 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
         "default is the centroid of the defined feature space.");
 
     /**
-     * OptionID for {@link #BASIC_PARAM}
+     * OptionID for {@link #BASIS_PARAM}
      */
     public static final OptionID BASIS_ID = OptionID.getOrCreateOptionID(
         "acg.basis", "a list of basis vectors of the correlation hyperplane, "

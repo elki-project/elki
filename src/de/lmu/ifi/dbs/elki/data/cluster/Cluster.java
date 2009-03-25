@@ -23,7 +23,6 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * hierarchy object can be provided, e.g. when there is a single hierarchy object used
  * for keeping all the hierarchy information in one object.
  * 
- * @param <C> Cluster object type (required for hierarchies)
  * @param <M> Model object type
  * 
  * @author Erich Schubert

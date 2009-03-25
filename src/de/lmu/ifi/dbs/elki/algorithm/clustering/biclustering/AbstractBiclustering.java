@@ -114,7 +114,7 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>, M ex
    * Convert a bitset into integer column ids.
    * 
    * @param cols
-   * @return
+   * @return integer column ids
    */
   protected int[] colsBitsetToIDs(BitSet cols) {
     int[] colIDs = new int[cols.cardinality()];
@@ -129,8 +129,8 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>, M ex
   /**
    * Convert a bitset into integer row ids.
    * 
-   * @param cols
-   * @return
+   * @param rows
+   * @return integer row ids
    */
   protected int[] rowsBitsetToIDs(BitSet rows) {
     int[] rowIDs = new int[rows.cardinality()];

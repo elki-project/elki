@@ -76,7 +76,7 @@ public class ClassifierEvaluationWrapper<O extends DatabaseObject, L extends Cla
   protected EvaluationProcedure<O, L, Classifier<O, L, Result>> evaluationProcedure;
 
   /**
-   * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.classifier.AbstractClassifier#HOLDOUT_PARAM}
+   * OptionID for {@link #HOLDOUT_PARAM}
    */
   public static final OptionID HOLDOUT_ID = OptionID.getOrCreateOptionID(
       "classifier.holdout",

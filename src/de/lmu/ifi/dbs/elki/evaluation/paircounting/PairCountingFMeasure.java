@@ -29,7 +29,7 @@ public class PairCountingFMeasure {
    * Get a pair generator for the given Clustering 
    * 
    * @param <R> Clustering result class
-   * @param <C> Cluster type
+   * @param <M> Model type
    * @param clusters Clustering result
    * @return Sorted pair generator
    */

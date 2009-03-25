@@ -13,7 +13,6 @@ import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLStreamException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -166,9 +165,7 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
   /**
    * Process a 'dataset' Element in the XML stream.
    * 
-   * @param event
-   * @param eventReader
-   * @throws XMLStreamException
+   * @param cur Current document nod
    * @throws UnableToComplyException
    */
   private void processElementDataset(Node cur) throws UnableToComplyException {
@@ -198,9 +195,7 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
   /**
    * Process a 'cluster' Element in the XML stream.
    * 
-   * @param event
-   * @param eventReader
-   * @throws XMLStreamException
+   * @param cur Current document nod
    * @throws UnableToComplyException
    */
   private void processElementCluster(Node cur) throws UnableToComplyException {
@@ -259,9 +254,7 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
    * Process a 'uniform' Element in the XML stream.
    * 
    * @param cluster
-   * @param event
-   * @param eventReader
-   * @throws XMLStreamException
+   * @param cur Current document nod
    * @throws UnableToComplyException
    */
   private void processElementUniform(GeneratorSingleCluster cluster, Node cur) throws UnableToComplyException {
@@ -294,9 +287,7 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
    * Process a 'normal' Element in the XML stream.
    * 
    * @param cluster
-   * @param event
-   * @param eventReader
-   * @throws XMLStreamException
+   * @param cur Current document nod
    * @throws UnableToComplyException
    */
   private void processElementNormal(GeneratorSingleCluster cluster, Node cur) throws UnableToComplyException {
@@ -328,9 +319,7 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
    * Process a 'rotate' Element in the XML stream.
    * 
    * @param cluster
-   * @param event
-   * @param eventReader
-   * @throws XMLStreamException
+   * @param cur Current document nod
    * @throws UnableToComplyException
    */
   private void processElementRotate(GeneratorSingleCluster cluster, Node cur) throws UnableToComplyException {
@@ -375,9 +364,7 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
    * Process a 'translate' Element in the XML stream.
    * 
    * @param cluster
-   * @param event
-   * @param eventReader
-   * @throws XMLStreamException
+   * @param cur Current document nod
    * @throws UnableToComplyException
    */
   private void processElementTranslate(GeneratorSingleCluster cluster, Node cur) throws UnableToComplyException {
@@ -405,9 +392,7 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
    * Process a 'clipping' Element in the XML stream.
    * 
    * @param cluster
-   * @param event
-   * @param eventReader
-   * @throws XMLStreamException
+   * @param cur Current document nod
    * @throws UnableToComplyException
    */
   private void processElementClipping(GeneratorSingleCluster cluster, Node cur) throws UnableToComplyException {
@@ -440,9 +425,7 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
   /**
    * Process a 'static' cluster Element in the XML stream.
    * 
-   * @param event
-   * @param eventReader
-   * @throws XMLStreamException
+   * @param cur Current document nod
    * @throws UnableToComplyException
    */
   private void processElementStatic(Node cur) throws UnableToComplyException {
@@ -474,9 +457,7 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
    * Parse a 'point' element (point vector for a static cluster)
    * 
    * @param points current list of points (to append to)
-   * @param event XML event
-   * @param eventReader XML event reader
-   * @throws XMLStreamException
+   * @param cur Current document nod
    * @throws UnableToComplyException
    */
   private void processElementPoint(LinkedList<Vector> points, Node cur) throws UnableToComplyException {

@@ -92,8 +92,9 @@ public class ClassParameter<C> extends Parameter<String, String> {
     }
     boolean does = false;
     try {
-     does =satisfiesClassRestriction(restrictionClass, value);
-    } catch (ClassNotFoundException e) {
+      does = satisfiesClassRestriction(restrictionClass, value);
+    }
+    catch(ClassNotFoundException e) {
       throw new WrongParameterValueException(this.name, value, "subclass / implementing class of " + restrictionClass.getName(), e);
     }
     if(!does) {
@@ -107,8 +108,8 @@ public class ClassParameter<C> extends Parameter<String, String> {
    * 
    * @param restrictionClass
    * @param value
-   * @return
-   * @throws ClassNotFoundException 
+   * @return if the class restriction is satisfied.
+   * @throws ClassNotFoundException
    */
   public static boolean satisfiesClassRestriction(Class<?> restrictionClass, String value) throws ClassNotFoundException {
     try {
@@ -118,12 +119,12 @@ public class ClassParameter<C> extends Parameter<String, String> {
       return false;
     }
     catch(ClassNotFoundException e) {
-      // Tolerate a fail here, retry with full name.
+      // Retry with guessed name prefix: restrictionClass.getPackage().getName()
+      if(restrictionClass.isAssignableFrom(Class.forName(restrictionClass.getPackage().getName() + "." + value))) {
+        return true;
+      }
+      return false;
     }
-    if(restrictionClass.isAssignableFrom(Class.forName(restrictionClass.getPackage().getName() + "." + value))) {
-      return true;
-    }
-    return false;
   }
 
   /**
