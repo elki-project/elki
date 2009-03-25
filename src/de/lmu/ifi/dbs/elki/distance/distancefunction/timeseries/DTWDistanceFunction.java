@@ -1,8 +1,7 @@
-package experimentalcode.thomas.distancefunction;
+package de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
  * Provides the Dynamic Time Warping distance for NumberVectors.

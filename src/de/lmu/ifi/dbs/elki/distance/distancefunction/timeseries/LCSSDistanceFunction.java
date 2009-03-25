@@ -1,4 +1,4 @@
-package experimentalcode.thomas.distancefunction;
+package de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
