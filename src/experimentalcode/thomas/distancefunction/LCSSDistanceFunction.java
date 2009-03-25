@@ -7,10 +7,8 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.MetricDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
-import experimentalcode.thomas.classextensions.NumberVectorExtension;
 
 /**
  * Provides the Longest Common Subsequence distance for NumberVectors.
@@ -105,8 +103,9 @@ public class LCSSDistanceFunction<V extends NumberVector<V, ?>>
         
     	final int delta = (int)Math.ceil(v2.getDimensionality() * pDelta);
 		
-    	double[] extrema = new NumberVectorExtension<V>().getRange(v1, v2);
-    	double range = Math.abs(extrema[1] - extrema[0]);
+    	double[] extrema1 = v1.getRange();
+      double[] extrema2 = v2.getRange();
+      double range = Math.max(extrema1[1],extrema2[1]) - Math.min(extrema1[0], extrema2[0]);
     	final double epsilon = range * pEpsilon;
 		
 		int m = -1;
