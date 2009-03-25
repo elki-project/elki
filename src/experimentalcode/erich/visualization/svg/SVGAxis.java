@@ -43,26 +43,26 @@ public class SVGAxis {
     double ty = y2 - y1;
     // ticks are orthogonal
     double tw = ty * 0.01;
-    double th = tx * 0.01;
+    double th = - tx * 0.01;
   
     // choose where to print labels.
     ALIGNMENT pos = ALIGNMENT.LL;
     if(labels) {
-      double angle = - Math.atan2(ty, tx);
-      // System.err.println(tx + " " + (-ty) + " " + angle);
-      if(angle < -2.6) { // -pi .. -2.6 = -180 .. -150
+      double angle = Math.atan2(ty, tx);
+      //System.err.println(tx + " " + (-ty) + " " + angle);
+      if(angle > 2.6) { // pi .. 2.6 = 180 .. 150
         pos = righthanded ? ALIGNMENT.RC : ALIGNMENT.LC;
       }
-      else if(angle < -0.5) { // -2.3 .. -0.7 = -130 .. -40
-        pos = righthanded ? ALIGNMENT.RL : ALIGNMENT.LR;
-      }
-      else if(angle < 0.5) { // -0.5 .. 0.5 = -30 .. 30
-        pos = righthanded ? ALIGNMENT.RC : ALIGNMENT.LC;
-      }
-      else if(angle < 2.6) { // 0.5 .. 2.6 = 30 .. 150
+      else if(angle > 0.5) { // 2.3 .. 0.7 = 130 .. 40
         pos = righthanded ? ALIGNMENT.RR : ALIGNMENT.LL;
       }
-      else { // 2.6 .. pi = 150 .. 180
+      else if(angle > -0.5) { // 0.5 .. -0.5 = 30 .. -30
+        pos = righthanded ? ALIGNMENT.RC : ALIGNMENT.LC;
+      }
+      else if(angle > -2.6) { // -0.5 .. -2.6 = -30 .. -150
+        pos = righthanded ? ALIGNMENT.RL : ALIGNMENT.LR;
+      }
+      else { // -2.6 .. -pi = -150 .. -180
         pos = righthanded ? ALIGNMENT.RC : ALIGNMENT.LC;
       }
     }
@@ -89,14 +89,14 @@ public class SVGAxis {
         case LL:
         case LC:
         case LR:
-          SVGUtil.setAtt(text, "x", x - tw * 2);
-          SVGUtil.setAtt(text, "y", y - th * 3 + textvoff);
+          SVGUtil.setAtt(text, "x", x + tw * 1.5);
+          SVGUtil.setAtt(text, "y", y + th * 1.5 + textvoff);
           break;
         case RL:
         case RC:
         case RR:
-          SVGUtil.setAtt(text, "x", x + tw * 2);
-          SVGUtil.setAtt(text, "y", y + th * 3 + textvoff);
+          SVGUtil.setAtt(text, "x", x - tw * 1.5);
+          SVGUtil.setAtt(text, "y", y - th * 1.5 + textvoff);
         }
         switch(pos){
         case LL:
