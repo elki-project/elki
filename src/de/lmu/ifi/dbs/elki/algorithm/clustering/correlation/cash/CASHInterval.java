@@ -1,9 +1,11 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.cash;
 
+import java.util.Set;
+import java.util.logging.Logger;
+
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.utilities.Identifiable;
-
-import java.util.Set;
 
 /**
  * Provides a unique interval represented by its id,
@@ -317,7 +319,7 @@ public class CASHInterval extends HyperBoundingBox implements Identifiable<CASHI
             }
         }
 
-        if (debug) {
+        if (LoggingConfiguration.DEBUG) {
             StringBuffer msg = new StringBuffer();
             msg.append("\nchild level ").append(childLevel).append(",  split Dim   ").append(splitDim);
             if (leftChild != null) {
@@ -326,7 +328,7 @@ public class CASHInterval extends HyperBoundingBox implements Identifiable<CASHI
             if (rightChild != null) {
                 msg.append("\nright   ").append(rightChild);
             }
-            debugFine(msg.toString());
+            Logger.getLogger(this.getClass().getName()).fine(msg.toString());
         }
     }
 }

@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.math.statistics;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.output.Format;
@@ -17,7 +15,7 @@ import de.lmu.ifi.dbs.elki.utilities.output.Format;
  *
  * @author Elke Achtert
  */
-public class MultipleLinearRegression extends AbstractLoggable {
+public class MultipleLinearRegression {
 
     /**
      * The (n x 1) - vector holding the y-values (y1, ..., yn)^T.
@@ -74,7 +72,6 @@ public class MultipleLinearRegression extends AbstractLoggable {
      *          where the i-th row has the form (1 x1i ... x1p).
      */
     public MultipleLinearRegression(Vector y, Matrix x) {
-        super(LoggingConfiguration.DEBUG);
         if (y.getDimensionality() <= x.getColumnDimensionality())
             throw new IllegalArgumentException("Number of observed data has to be greater than " +
                 "number of regressors: " +

@@ -1,8 +1,6 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
 
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 
@@ -13,7 +11,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * @author Steffi Wanka
  * 
  */
-public class DistanceFunctionPatternConstraint extends AbstractLoggable implements ParameterConstraint<String> {
+public class DistanceFunctionPatternConstraint implements ParameterConstraint<String> {
 
 	/**
 	 * The distance function the pattern is checked for.
@@ -28,7 +26,6 @@ public class DistanceFunctionPatternConstraint extends AbstractLoggable implemen
 	 *            the distance function the pattern is checked for
 	 */
 	public DistanceFunctionPatternConstraint(DistanceFunction<?,?> distFunction) {
-        super(LoggingConfiguration.DEBUG);
 		this.distanceFunction = distFunction;
 	}
 

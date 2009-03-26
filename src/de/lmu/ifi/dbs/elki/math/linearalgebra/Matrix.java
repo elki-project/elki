@@ -8,9 +8,9 @@ import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.data.RationalNumber;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.math.Mathutil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
@@ -21,8 +21,11 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * For a Matrix {@code M} we have therefore {@code M &isin;$real;<sup>m &times; n</sup>},
  * where {@code m} and {@code n} are the number of rows and columns, respectively.
  */
-@SuppressWarnings("serial")
-public class Matrix extends AbstractLoggable implements Cloneable, java.io.Serializable {
+public class Matrix implements Cloneable, java.io.Serializable {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = -8331523628259600919L;
 
     /**
      * A small number to handle numbers near 0 as 0.
@@ -48,12 +51,9 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
 
     /**
      * Basic-constructor for use in complex constructors only.
-     * Sets the debug-status for the class
-     * according to the present status of
-     * {@link LoggingConfiguration#DEBUG}
      */
     private Matrix() {
-        super(LoggingConfiguration.DEBUG);
+      // Nothing to do
     }
 
     /**
@@ -1619,7 +1619,7 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
         double[][] coefficients = les.getCoefficents();
         double[] rhs = les.getRHS();
 
-        if (this.debug) {
+        if (LoggingConfiguration.DEBUG) {
             msg.append("\na' " + FormatUtil.format(this.getArrayCopy()));
             msg.append("\nb' " + FormatUtil.format(columnMatrix.getColumnPackedCopy()));
 
@@ -1641,19 +1641,19 @@ public class Matrix extends AbstractLoggable implements Cloneable, java.io.Seria
             if (allCoefficientsZero) {
                 double value = rhs[i];
                 if (Math.abs(value) < DELTA) {
-                    if (this.debug) {
+                    if (LoggingConfiguration.DEBUG) {
                         msg.append("\nvalue " + value + "[" + i + "]");
                         msg.append("\nlinearly independent " + false);
-                        debugFine(msg.toString());
+                        Logger.getLogger(this.getClass().getName()).fine(msg.toString());
                     }
                     return false;
                 }
             }
         }
 
-        if (this.debug) {
+        if (LoggingConfiguration.DEBUG) {
             msg.append("\nlinearly independent " + true);
-            debugFine(msg.toString());
+            Logger.getLogger(this.getClass().getName()).fine(msg.toString());
         }
         return true;
     }

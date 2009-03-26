@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.data;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 
 /**
  * A ClassLabel to identify a certain class of objects that is to discern from
@@ -9,17 +7,14 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
  *
  * @author Arthur Zimek
  */
-public abstract class ClassLabel extends AbstractLoggable implements Comparable<ClassLabel> {
+public abstract class ClassLabel implements Comparable<ClassLabel> {
 
     /**
      * ClassLabels need an empty constructor
      * for dynamic access.
      * Subsequently, the init method must be called.
-     * Sets as debug status
-     * {@link LoggingConfiguration#DEBUG}.
      */
     protected ClassLabel() {
-        super(LoggingConfiguration.DEBUG);
         // requires subsequent call of init
     }
 

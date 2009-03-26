@@ -1,14 +1,14 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.output.PrettyPrinter;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.logging.Logger;
+
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.output.PrettyPrinter;
 
 /**
  * Provides an OptionHandler for holding the given options.<p/>
@@ -21,7 +21,7 @@ import java.util.Vector;
  *
  * @author Arthur Zimek
  */
-public class OptionHandler extends AbstractLoggable {
+public class OptionHandler {
     /**
      * The newline-String dependent on the system.
      */
@@ -65,7 +65,6 @@ public class OptionHandler extends AbstractLoggable {
      *                    usage in usage(String))
      */
     public OptionHandler(Map<String, Option<?>> parameters, String programCall) {
-        super(LoggingConfiguration.DEBUG);
         this.parameters = parameters;
         this.programCall = programCall;
         this.globalParameterConstraints = new ArrayList<GlobalParameterConstraint>();
@@ -425,13 +424,14 @@ public class OptionHandler extends AbstractLoggable {
     public void put(Option<?> option) {
         Option<?> put = this.parameters.put(option.getName(), option);
         if (put != null) {
+          Logger logger = Logger.getLogger(this.getClass().getName());
             try {
-                warning("Parameter " + option.getName() + " has been already set before, overwrite old value. " +
+                logger.warning("Parameter " + option.getName() + " has been already set before, overwrite old value. " +
                     "(old value: " + put.getValue().toString() +
                     ", new value: " + option.getValue().toString() + ")");
             }
             catch (UnusedParameterException e) {
-                this.exception(e.getMessage(), e);
+                logger.log(LogLevel.EXCEPTION, e.getMessage(), e);
             }
         }
     }
@@ -458,7 +458,7 @@ public class OptionHandler extends AbstractLoggable {
      */
     public void remove(String optionName) throws UnusedParameterException {
         Option<?> removed = this.parameters.remove(optionName);
-        debugFiner("removed " + removed.getName());
+        Logger.getLogger(this.getClass().getName()).finer("removed " + removed.getName());
         if (removed == null) {
             throw new UnusedParameterException("Cannot remove parameter " + optionName + " because it has not been set before.");
         }

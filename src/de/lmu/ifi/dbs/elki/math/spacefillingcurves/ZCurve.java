@@ -3,10 +3,9 @@ package de.lmu.ifi.dbs.elki.math.spacefillingcurves;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.logging.StaticLogger;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
@@ -14,14 +13,14 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  *
  * @author Elke Achtert
  */
-public class ZCurve extends AbstractLoggable {
+public class ZCurve {
     /**
      * The logger of this class.
      */
-    private static StaticLogger logger = new StaticLogger(ZCurve.class.getName());
+    private static Logger logger = Logger.getLogger(ZCurve.class.getName());
 
     public ZCurve() {
-        super(LoggingConfiguration.DEBUG);
+        // nothing to do.
     }
 
     /**
@@ -52,17 +51,17 @@ public class ZCurve extends AbstractLoggable {
             scalingFactors[d] = (Long.MAX_VALUE) / (maxValues[d] - minValues[d]);
         }
 
-        if (logger.debug()) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             StringBuffer msg = new StringBuffer();
             msg.append("\nmin   ").append(FormatUtil.format(minValues));
             msg.append("\nmax   ").append(FormatUtil.format(maxValues));
             msg.append("\nscale ").append(FormatUtil.format(scalingFactors));
             msg.append("\nLong.MAX_VALUE  " + Long.MAX_VALUE);
             msg.append("\nLong.MIN_VALUE  " + Long.MIN_VALUE);
-            logger.debugFine(msg.toString());
+            logger.fine(msg.toString());
         }
 
-        // discretise the double value over the whole domain
+        // discretize the double value over the whole domain
         final List<byte[]> zValues = new ArrayList<byte[]>();
         for (double[] values : valuesList) {
             // convert the double values to long values
@@ -71,11 +70,11 @@ public class ZCurve extends AbstractLoggable {
                 longValues[d] = (long) ((values[d] - minValues[d]) * scalingFactors[d]);
             }
 
-            if (logger.debug()) {
+            if (logger.isLoggable(LogLevel.FINE)) {
                 StringBuffer msg = new StringBuffer();
                 msg.append("\ndouble values ").append(FormatUtil.format(values));
                 msg.append("\nlong values   ").append(FormatUtil.format(longValues));
-                logger.debugFine(msg.toString());
+                logger.fine(msg.toString());
             }
             byte[] zValue = zValue(longValues);
             zValues.add(zValue);
@@ -87,7 +86,7 @@ public class ZCurve extends AbstractLoggable {
     /**
      * Computes the z-value for the specified long values
      *
-     * @param longValues the array of the discretised double values
+     * @param longValues the array of the discretized double values
      * @return the z-value for the specified long values
      */
     private static byte[] zValue(long[] longValues) {
@@ -101,7 +100,7 @@ public class ZCurve extends AbstractLoggable {
             }
         }
 
-        if (logger.debug()) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             //convert zValues to longValues
             long[] loutput = new long[longValues.length];
             for (int shift = 0; shift < 64; shift++) {
@@ -111,7 +110,7 @@ public class ZCurve extends AbstractLoggable {
                 }
             }
             StringBuffer msg = new StringBuffer();
-            logger.debugFine(msg.toString());
+            logger.fine(msg.toString());
         }
 
         return zValues;

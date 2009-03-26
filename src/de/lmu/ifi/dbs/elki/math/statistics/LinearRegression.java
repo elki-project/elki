@@ -1,15 +1,13 @@
 package de.lmu.ifi.dbs.elki.math.statistics;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
-
 import java.util.List;
+
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 
 /**
  * @author Arthur Zimek
  */
-public class LinearRegression extends AbstractLoggable
+public class LinearRegression
 {
     private double t;
     
@@ -17,7 +15,6 @@ public class LinearRegression extends AbstractLoggable
     
     public LinearRegression(List<DoubleDoublePair> points)
     {
-        super(LoggingConfiguration.DEBUG);
         double sumy = 0.0;
         double sumx = 0.0;
         double sumyy = 0.0;

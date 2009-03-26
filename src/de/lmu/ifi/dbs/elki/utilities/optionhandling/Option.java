@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 
 /**
  * Abstract superclass for specifying program arguments.
@@ -9,7 +7,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
  * @author Steffi Wanka
  * @param <T> the type of a possible value for this option
  */
-public abstract class Option<T> extends AbstractLoggable {
+public abstract class Option<T> {
 
     /**
      * The option name.
@@ -17,7 +15,7 @@ public abstract class Option<T> extends AbstractLoggable {
     protected final String name;
 
     /**
-     * The short description of the optionn. An extended description
+     * The short description of the option. An extended description
      * is provided by the method {@link #getDescription()}
      */
     protected String shortDescription;
@@ -34,23 +32,8 @@ public abstract class Option<T> extends AbstractLoggable {
      * @param optionID the unique id of the option
      */
     public Option(OptionID optionID) {
-        super(LoggingConfiguration.DEBUG);
         this.name = optionID.getName();
         this.shortDescription = optionID.getDescription();
-    }
-
-    /**
-     * Sets the name and description of the option.
-     *
-     * @param name        The name of the option.
-     * @param description The description of the option.
-     * @deprecated use Option(optionID) instead
-     */
-    @Deprecated
-    public Option(String name, String description) {
-        super(LoggingConfiguration.DEBUG);
-        this.name = name;
-        this.shortDescription = description;
     }
 
     /**

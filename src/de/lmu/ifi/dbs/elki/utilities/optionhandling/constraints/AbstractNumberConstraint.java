@@ -1,15 +1,12 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-
 /**
  * Abstract super class for constraints dealing with a certain number value.
  *
  * @author Elke Achtert
  * @param <P> the type of the parameter to be tested by this constraint (e.g., Number, List<Number>)
  */
-public abstract class AbstractNumberConstraint<P> extends AbstractLoggable implements ParameterConstraint<P> {
+public abstract class AbstractNumberConstraint<P> implements ParameterConstraint<P> {
 
   /**
    * The constraint value.
@@ -22,7 +19,6 @@ public abstract class AbstractNumberConstraint<P> extends AbstractLoggable imple
    * @param constraintValue the constraint value
    */
   public AbstractNumberConstraint(Number constraintValue) {
-    super(LoggingConfiguration.DEBUG);
     this.constraintValue = constraintValue;
   }
 }

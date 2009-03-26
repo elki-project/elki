@@ -1,8 +1,5 @@
 package de.lmu.ifi.dbs.elki.distance;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-
 /**
  * An abstract distance implements equals conveniently for any extending class.
  * At the same time any extending class is to implement hashCode properly.
@@ -10,16 +7,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
  * @author Arthur Zimek
  * @param <D> the (final) type of Distance used
  */
-public abstract class AbstractDistance<D extends AbstractDistance<D>> extends AbstractLoggable implements Distance<D> {
-
-    /**
-     * Sets as debug status
-     * {@link LoggingConfiguration#DEBUG}.
-     */
-    protected AbstractDistance() {
-        super(LoggingConfiguration.DEBUG);
-    }
-
+public abstract class AbstractDistance<D extends AbstractDistance<D>> implements Distance<D> {
     /**
      * Any extending class should implement a proper hashCode method.
      */

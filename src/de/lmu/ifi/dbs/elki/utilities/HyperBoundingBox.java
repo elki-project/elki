@@ -7,15 +7,12 @@ import java.io.ObjectOutput;
 import java.text.NumberFormat;
 import java.util.Arrays;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-
 /**
  * HyperBoundingBox represents a hyperrectangle in the multidimensional space.
  *
  * @author Elke Achtert
  */
-public class HyperBoundingBox extends AbstractLoggable implements Externalizable {
+public class HyperBoundingBox implements Externalizable {
   private static final long serialVersionUID = 1;
 
   /**
@@ -32,7 +29,7 @@ public class HyperBoundingBox extends AbstractLoggable implements Externalizable
    * Empty constructor for Externalizable interface.
    */
   public HyperBoundingBox() {
-    super(LoggingConfiguration.DEBUG);
+    // nothing to do
   }
 
   /**
@@ -42,7 +39,6 @@ public class HyperBoundingBox extends AbstractLoggable implements Externalizable
    * @param max - the coordinates of the maximum hyper point
    */
   public HyperBoundingBox(double[] min, double[] max) {
-    super(LoggingConfiguration.DEBUG);
     if (min.length != max.length)
       throw new IllegalArgumentException("min/max need same dimensionality");
 

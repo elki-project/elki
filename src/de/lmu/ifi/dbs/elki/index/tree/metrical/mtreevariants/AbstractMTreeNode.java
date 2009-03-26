@@ -1,14 +1,16 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants;
 
+import java.util.List;
+import java.util.logging.Logger;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.AbstractNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalNode;
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
-
-import java.util.List;
 
 /**
  * Abstract super class for nodes in M-Tree variants.
@@ -35,7 +37,7 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
      * @param file     the file storing the M-Tree
      * @param capacity the capacity (maximum number of entries plus 1 for overflow)
      *                 of this node
-     * @param isLeaf   indicates wether this node is a leaf node
+     * @param isLeaf   indicates whether this node is a leaf node
      */
     public AbstractMTreeNode(PageFile<N> file, int capacity, boolean isLeaf) {
         super(file, capacity, isLeaf);
@@ -62,7 +64,7 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
 
             // assignments to this node
             for (E entry : assignmentsToFirst) {
-                if (this.debug) {
+                if (LoggingConfiguration.DEBUG) {
                     msg.append("n_").append(getID()).append(" ").append(entry).append("\n");
                 }
                 addLeafEntry(entry);
@@ -70,13 +72,13 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
 
             // assignments to the new node
             for (E entry : assignmentsToSecond) {
-                if (this.debug) {
+                if (LoggingConfiguration.DEBUG) {
                     msg.append("n_").append(newNode.getID()).append(" ").append(entry).append("\n");
                 }
                 newNode.addLeafEntry(entry);
             }
-            if (this.debug) {
-                debugFine(msg.toString());
+            if (LoggingConfiguration.DEBUG) {
+              Logger.getLogger(this.getClass().getName()).fine(msg.toString());
             }
             return newNode;
         }
@@ -88,20 +90,20 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
             deleteAllEntries();
 
             for (E entry : assignmentsToFirst) {
-                if (this.debug) {
+                if (LoggingConfiguration.DEBUG) {
                     msg.append("n_").append(getID()).append(" ").append(entry).append("\n");
                 }
                 addDirectoryEntry(entry);
             }
 
             for (E entry : assignmentsToSecond) {
-                if (this.debug) {
+                if (LoggingConfiguration.DEBUG) {
                     msg.append("n_").append(newNode.getID()).append(" ").append(entry).append("\n");
                 }
                 newNode.addDirectoryEntry(entry);
             }
-            if (this.debug) {
-                debugFine(msg.toString());
+            if (LoggingConfiguration.DEBUG) {
+              Logger.getLogger(this.getClass().getName()).fine(msg.toString());
             }
             return newNode;
         }
@@ -204,8 +206,8 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
                 }
             }
 
-            if (this.debug) {
-                debugFine("DirNode " + getID() + " ok!");
+            if (LoggingConfiguration.DEBUG) {
+              Logger.getLogger(this.getClass().getName()).fine("DirNode " + getID() + " ok!");
             }
         }
     }

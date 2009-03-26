@@ -1,17 +1,15 @@
 package de.lmu.ifi.dbs.elki.utilities.output;
 
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-
 import java.util.Vector;
+import java.util.logging.Logger;
 
 /**
  * Class for formatting output into table.
  *
  * @author Arthur Zimek
  */
-public class PrettyPrinter extends AbstractLoggable {
+public class PrettyPrinter {
     /**
      * The newline-String dependent on the system.
      */
@@ -34,13 +32,12 @@ public class PrettyPrinter extends AbstractLoggable {
      * @param separator   a separator to separate different columns (could be empty String)
      */
     public PrettyPrinter(int[] columnWidth, String separator) {
-        super(LoggingConfiguration.DEBUG);
         this.columnWidth = columnWidth;
         this.separator = separator;
     }
 
     /**
-     * Formattes given lineEntries into formatted tableLine, filled with specified fillCharacter.
+     * Formats given lineEntries into formatted tableLine, filled with specified fillCharacter.
      *
      * @param lineEntries   the entries to be written into table
      * @param fillCharacter char to fill the table line with
@@ -55,7 +52,7 @@ public class PrettyPrinter extends AbstractLoggable {
     }
 
     /**
-     * Formattes given lineEntries into formatted tableLine, filled with specified fillCharacter.
+     * Formats given lineEntries into formatted tableLine, filled with specified fillCharacter.
      *
      * @param lineEntries   the entries to be written into table
      * @param fillCharacter char to fill the table line with
@@ -83,7 +80,7 @@ public class PrettyPrinter extends AbstractLoggable {
             }
         }
         else {
-            warning("Wrong number of entries!");
+          Logger.getLogger(this.getClass().getName()).warning("Wrong number of entries!");
         }
         return line.toString();
     }

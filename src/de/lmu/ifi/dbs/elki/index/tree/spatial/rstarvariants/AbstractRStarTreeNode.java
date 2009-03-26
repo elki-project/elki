@@ -1,12 +1,14 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.AbstractNode;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 
@@ -117,7 +119,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
 
       for (int i = 0; i < splitPoint; i++) {
         addLeafEntry(sorting.get(i));
-        if (this.debug) {
+        if (LoggingConfiguration.DEBUG) {
           msg.append("n_").append(getID()).append(" ");
           msg.append(sorting.get(i)).append("\n");
         }
@@ -125,13 +127,13 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
 
       for (int i = 0; i < sorting.size() - splitPoint; i++) {
         newNode.addLeafEntry(sorting.get(splitPoint + i));
-        if (this.debug) {
+        if (LoggingConfiguration.DEBUG) {
           msg.append("n_").append(newNode.getID()).append(" ");
           msg.append(sorting.get(splitPoint + i)).append("\n");
         }
       }
-      if (this.debug) {
-        debugFine(msg.toString());
+      if (LoggingConfiguration.DEBUG) {
+        Logger.getLogger(this.getClass().getName()).fine(msg.toString());
       }
       return newNode;
     }
@@ -144,7 +146,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
 
       for (int i = 0; i < splitPoint; i++) {
         addDirectoryEntry(sorting.get(i));
-        if (this.debug) {
+        if (LoggingConfiguration.DEBUG) {
           msg.append("n_").append(getID()).append(" ");
           msg.append(sorting.get(i)).append("\n");
         }
@@ -152,13 +154,13 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
 
       for (int i = 0; i < sorting.size() - splitPoint; i++) {
         newNode.addDirectoryEntry(sorting.get(splitPoint + i));
-        if (this.debug) {
+        if (LoggingConfiguration.DEBUG) {
           msg.append("n_").append(newNode.getID()).append(" ");
           msg.append(sorting.get(splitPoint + i)).append("\n");
         }
       }
-      if (this.debug) {
-        debugFine(msg.toString());
+      if (LoggingConfiguration.DEBUG) {
+        Logger.getLogger(this.getClass().getName()).fine(msg.toString());
       }
       return newNode;
     }
@@ -214,8 +216,8 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
         }
       }
 
-      if (this.debug) {
-        debugFine("DirNode " + getID() + " ok!");
+      if (LoggingConfiguration.DEBUG) {
+        Logger.getLogger(this.getClass().getName()).fine("DirNode " + getID() + " ok!");
       }
     }
   }

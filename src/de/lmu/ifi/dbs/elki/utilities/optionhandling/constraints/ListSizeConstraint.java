@@ -1,12 +1,10 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.List;
 
 /**
  * Represents a list-size parameter constraint. The size of the list parameter ({@link ListParameter}) to be tested
@@ -14,7 +12,7 @@ import java.util.List;
  *
  * @author Steffi Wanka
  */
-public class ListSizeConstraint<T> extends AbstractLoggable implements ParameterConstraint<List<T>> {
+public class ListSizeConstraint<T> implements ParameterConstraint<List<T>> {
 
     /**
      * The list size constraint.
@@ -27,9 +25,7 @@ public class ListSizeConstraint<T> extends AbstractLoggable implements Parameter
      * @param size the size constraint for the list parameter
      */
     public ListSizeConstraint(int size) {
-        super(LoggingConfiguration.DEBUG);
         sizeConstraint = size;
-
     }
 
     /**

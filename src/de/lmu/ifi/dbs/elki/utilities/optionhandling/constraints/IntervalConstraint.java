@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 
@@ -14,7 +12,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  *
  * @author Steffi Wanka
  */
-public class IntervalConstraint extends AbstractLoggable implements ParameterConstraint<Number> {
+public class IntervalConstraint implements ParameterConstraint<Number> {
     /**
      * Available interval boundary types types:
      * {@link IntervalConstraint.IntervalBoundary#OPEN} denotes an opend interval,
@@ -61,8 +59,6 @@ public class IntervalConstraint extends AbstractLoggable implements ParameterCon
      */
     public IntervalConstraint(Number lowConstraintValue, IntervalBoundary lowBoundary,
                               Number highConstraintValue, IntervalBoundary highBoundary) {
-        super(LoggingConfiguration.DEBUG);
-
         if (lowConstraintValue.doubleValue() >= highConstraintValue.doubleValue()) {
             throw new IllegalArgumentException("Left interval boundary is greater than " +
                 "or equal to right interval boundary!");

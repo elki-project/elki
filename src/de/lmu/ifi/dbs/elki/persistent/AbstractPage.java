@@ -1,8 +1,5 @@
 package de.lmu.ifi.dbs.elki.persistent;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
@@ -13,7 +10,7 @@ import java.io.ObjectOutput;
  * @author Elke Achtert
  */
 // todo elke revise comments
-public abstract class AbstractPage<P extends AbstractPage<P>> extends AbstractLoggable implements Page<P> {
+public abstract class AbstractPage<P extends AbstractPage<P>> implements Page<P> {
     private static final long serialVersionUID = 1;
 
     /**
@@ -44,7 +41,6 @@ public abstract class AbstractPage<P extends AbstractPage<P>> extends AbstractLo
      * @param file the page file that stores the pages.
      */
     public AbstractPage(PageFile<P> file) {
-        super(LoggingConfiguration.DEBUG);
         this.file = file;
     }
 

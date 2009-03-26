@@ -1,8 +1,10 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ListParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 
 /**
  * Represents a global parameter constraint for testing if the size of
@@ -11,7 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
  *
  * @author Steffi Wanka
  */
-public class GlobalListSizeConstraint extends AbstractLoggable implements GlobalParameterConstraint {
+public class GlobalListSizeConstraint implements GlobalParameterConstraint {
     /**
      * List parameter to be tested.
      */
@@ -33,7 +35,6 @@ public class GlobalListSizeConstraint extends AbstractLoggable implements Global
      * @param i integer parameter specifying the constraint list size.
      */
     public GlobalListSizeConstraint(ListParameter<?> v, IntParameter i) {
-        super(LoggingConfiguration.DEBUG);
         this.list = v;
         this.length = i;
     }

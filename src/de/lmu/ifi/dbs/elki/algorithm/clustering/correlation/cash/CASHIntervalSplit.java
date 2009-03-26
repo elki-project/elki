@@ -55,7 +55,7 @@ public class CASHIntervalSplit extends AbstractLoggable {
 
     /**
      * Determines the ids belonging to the given interval, i.e.
-     * the parametrization functions falling within the interval.
+     * the parameterization functions falling within the interval.
      *
      * @param superSetIDs a superset of the ids to be determined
      * @param interval    the hyper bounding box defining the interval of alpha values

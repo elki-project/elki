@@ -7,8 +7,6 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupArray;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
@@ -19,7 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * @author Arthur Zimek
  * @param <V> the type of RealVector handled by this Result
  */
-public class Bicluster<V extends RealVector<V, Double>> extends AbstractLoggable implements TextWriteable, Model {
+public class Bicluster<V extends RealVector<V, Double>> implements TextWriteable, Model {
   /**
    * The ids of the rows included in the bicluster.
    */
@@ -43,7 +41,6 @@ public class Bicluster<V extends RealVector<V, Double>> extends AbstractLoggable
    * @param database the database this bicluster is defined for
    */
   public Bicluster(int[] rowIDs, int[] colIDs, Database<V> database) {
-    super(LoggingConfiguration.DEBUG);
     this.rowIDs = rowIDs;
     this.colIDs = colIDs;
     this.database = database;

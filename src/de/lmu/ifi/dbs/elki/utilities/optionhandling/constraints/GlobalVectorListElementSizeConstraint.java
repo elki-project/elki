@@ -1,13 +1,11 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.VectorListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.List;
 
 /**
  * Global parameter constraint for testing if the dimensions of each vector specified by a
@@ -16,7 +14,7 @@ import java.util.List;
  *
  * @author Steffi Wanka
  */
-public class GlobalVectorListElementSizeConstraint extends AbstractLoggable implements GlobalParameterConstraint {
+public class GlobalVectorListElementSizeConstraint implements GlobalParameterConstraint {
 
     /**
      * Vector list parameter.
@@ -38,7 +36,6 @@ public class GlobalVectorListElementSizeConstraint extends AbstractLoggable impl
      * @param sizeConstraint the integer parameter providing the size constraint
      */
     public GlobalVectorListElementSizeConstraint(VectorListParameter vector, IntParameter sizeConstraint) {
-        super(LoggingConfiguration.DEBUG);
         this.vector = vector;
         this.size = sizeConstraint;
     }

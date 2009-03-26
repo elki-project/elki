@@ -1,11 +1,9 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import java.util.Arrays;
+
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.Arrays;
 
 /**
  * Represents a parameter constraint for testing if the string value of
@@ -14,7 +12,7 @@ import java.util.Arrays;
  *
  * @author Steffi Wanka
  */
-public class EqualStringConstraint extends AbstractLoggable implements ParameterConstraint<String> {
+public class EqualStringConstraint implements ParameterConstraint<String> {
     /**
      * Constraint-strings.
      */
@@ -29,7 +27,6 @@ public class EqualStringConstraint extends AbstractLoggable implements Parameter
      * @param testStrings constraint-strings.
      */
     public EqualStringConstraint(String[] testStrings) {
-        super(LoggingConfiguration.DEBUG);
         this.testStrings = testStrings;
     }
 

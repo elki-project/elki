@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.elki.persistent;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-
 import java.util.Stack;
+import java.util.logging.Logger;
+
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 
 /**
  * Abstract class implementing general methods of a PageFile.
@@ -11,7 +11,7 @@ import java.util.Stack;
  *
  * @author Elke Achtert 
  */
-public abstract class PageFile<P extends Page<P>> extends AbstractLoggable implements CachedFile<P> {
+public abstract class PageFile<P extends Page<P>> implements CachedFile<P> {
 
   /**
    * The cache of this file.
@@ -47,7 +47,6 @@ public abstract class PageFile<P extends Page<P>> extends AbstractLoggable imple
    * Creates a new PageFile.
    */
   protected PageFile() {
-	  super(LoggingConfiguration.DEBUG);
     this.emptyPages = new Stack<Integer>();
     this.nextPageID = 0;
     this.readAccess = 0;
@@ -179,8 +178,8 @@ public abstract class PageFile<P extends Page<P>> extends AbstractLoggable imple
       throw new IllegalStateException("pagesize <= 0!");
 
     int pagesInCache = cacheSize / pageSize;
-    if (this.debug) {
-    	debugFine("Number of pages in cache " + pagesInCache);
+    if (LoggingConfiguration.DEBUG) {
+      Logger.getLogger(this.getClass().getName()).fine("Number of pages in cache " + pagesInCache);
     }
 
 //    if (pagesInCache <= 0)

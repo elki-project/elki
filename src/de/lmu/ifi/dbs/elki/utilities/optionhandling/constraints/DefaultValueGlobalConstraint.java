@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -12,7 +10,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  *
  * @author Steffi Wanka
  */
-public class DefaultValueGlobalConstraint<T extends Comparable<T>> extends AbstractLoggable implements GlobalParameterConstraint {
+public class DefaultValueGlobalConstraint<T extends Comparable<T>> implements GlobalParameterConstraint {
 
     /**
      * Parameter to be set.
@@ -32,7 +30,6 @@ public class DefaultValueGlobalConstraint<T extends Comparable<T>> extends Abstr
      * @param hasValue   the parameter providing the value
      */
     public DefaultValueGlobalConstraint(Parameter<T, ?> needsValue, Parameter<T, ?> hasValue) {
-        super(LoggingConfiguration.DEBUG);
         this.needsValue = needsValue;
         this.hasValue = hasValue;
     }

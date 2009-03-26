@@ -1,13 +1,15 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkapp;
 
+import java.util.Arrays;
+import java.util.logging.Logger;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.output.Format;
-
-import java.util.Arrays;
 
 /**
  * Represents a node in an MkApp-Tree.
@@ -83,10 +85,10 @@ class MkAppTreeNode<O extends DatabaseObject, D extends NumberDistance<D, N>, N 
             b[p] /= p_max;
         }
 
-        if (debug) {
+        if (LoggingConfiguration.DEBUG) {
             StringBuffer msg = new StringBuffer();
             msg.append("b " + Format.format(b, 4));
-            debugFine(msg.toString());
+            Logger.getLogger(this.getClass().getName()).fine(msg.toString());
         }
 
         return new PolynomialApproximation(b);

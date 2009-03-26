@@ -1,9 +1,12 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkcop;
 
+import java.util.logging.Logger;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
 /**
@@ -88,13 +91,13 @@ class MkCoPTreeNode<O extends DatabaseObject, D extends NumberDistance<D, N>, N 
             }
         }
 
-        if (debug) {
+        if (LoggingConfiguration.DEBUG) {
             StringBuffer msg = new StringBuffer();
             msg.append("k_0 " + k_0);
             msg.append("k_max " + k_max);
             msg.append("y_1 " + y_1);
             msg.append("y_kmax " + y_kmax);
-            debugFine(msg.toString());
+            Logger.getLogger(this.getClass().getName()).fine(msg.toString());
         }
 
         // determine m and t

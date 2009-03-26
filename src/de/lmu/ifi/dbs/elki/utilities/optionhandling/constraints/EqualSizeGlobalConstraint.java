@@ -1,13 +1,11 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.List;
 
 /**
  * Global parameter constraint defining that a number of list parameters ({@link de.lmu.ifi.dbs.elki.utilities.optionhandling.ListParameter})
@@ -15,7 +13,7 @@ import java.util.List;
  *
  * @author Steffi Wanka
  */
-public class EqualSizeGlobalConstraint extends AbstractLoggable implements GlobalParameterConstraint {
+public class EqualSizeGlobalConstraint implements GlobalParameterConstraint {
 
     /**
      * List parameters to be tested
@@ -29,7 +27,6 @@ public class EqualSizeGlobalConstraint extends AbstractLoggable implements Globa
      * @param params list parameters to be tested for equal list sizes
      */
     public EqualSizeGlobalConstraint(List<ListParameter<?>> params) {
-        super(LoggingConfiguration.DEBUG);
         this.parameters = params;
     }
 

@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Logger;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 
@@ -18,7 +18,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
  *
  * @author Elke Achtert
  */
-public class LinearEquationSystem extends AbstractLoggable {
+public class LinearEquationSystem {
+    private static Logger logger = Logger.getLogger(LinearEquationSystem.class.getName());
 
     /**
      * Indicates trivial pivot search strategy.
@@ -88,7 +89,6 @@ public class LinearEquationSystem extends AbstractLoggable {
      * @param b the right hand side of the linear equation system
      */
     public LinearEquationSystem(double[][] a, double[] b) {
-        super(LoggingConfiguration.DEBUG);
         if (a == null)
             throw new IllegalArgumentException("Coefficient array is null!");
         if (b == null)
@@ -121,7 +121,6 @@ public class LinearEquationSystem extends AbstractLoggable {
      * @param columnPermutations the column permutations, column i is at position column[i]
      */
     public LinearEquationSystem(double[][] a, double[] b, int[] rowPermutations, int[] columnPermutations) {
-        super(LoggingConfiguration.DEBUG);
         if (a == null)
             throw new IllegalArgumentException("Coefficient array is null!");
         if (b == null)
@@ -364,11 +363,11 @@ public class LinearEquationSystem extends AbstractLoggable {
             pivotCol = pivotPos.second;
             pivot = coeff[this.row[pivotRow]][col[pivotCol]];
 
-            if (this.debug) {
+            if (logger.isLoggable(LogLevel.FINE)) {
                 StringBuffer msg = new StringBuffer();
                 msg.append("equations ").append(equationsToString(4));
                 msg.append("  *** pivot at (").append(pivotRow).append(",").append(pivotCol).append(") = ").append(pivot).append("\n");
-                debugFine(msg.toString());
+                logger.fine(msg.toString());
             }
 
             // permute rows and colums to get this entry onto
@@ -492,10 +491,10 @@ public class LinearEquationSystem extends AbstractLoggable {
         }
         rhs[row[k]] /= pivot;
 
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             StringBuffer msg = new StringBuffer();
             msg.append("set pivot element to 1 ").append(equationsToString(4));
-            debugFine(msg.toString());
+            logger.fine(msg.toString());
 
         }
 
@@ -519,10 +518,10 @@ public class LinearEquationSystem extends AbstractLoggable {
             rhs[row[i]] = rhs[row[i]] - rhs[row[k]] * q;
         }//end for k
 
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             StringBuffer msg = new StringBuffer();
             msg.append("after pivot operation ").append(equationsToString(4));
-            debugFine(msg.toString());
+            logger.fine(msg.toString());
         }
     }
 
@@ -543,8 +542,8 @@ public class LinearEquationSystem extends AbstractLoggable {
         }
 
         if (!isSolvable(method)) {
-            if (this.debug) {
-                debugFine("Equation system is not solvable!");
+            if (logger.isLoggable(LogLevel.FINE)) {
+                logger.fine("Equation system is not solvable!");
             }
             return;
         }
@@ -569,7 +568,7 @@ public class LinearEquationSystem extends AbstractLoggable {
         }
 
         StringBuffer msg = new StringBuffer();
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             msg.append("\nSpecial solution x_0 = [").append(FormatUtil.format(x_0, ",", 4)).append("]");
             msg.append("\nbound Indices ").append(boundIndices);
             msg.append("\nfree Indices ").append(freeIndices);
@@ -598,12 +597,12 @@ public class LinearEquationSystem extends AbstractLoggable {
 
         }
 
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             msg.append("\nU");
             for (double[] anU : u) {
                 msg.append("\n").append(FormatUtil.format(anU, ",", 4));
             }
-            debugFine(msg.toString());
+            logger.fine(msg.toString());
         }
 
         solved = true;

@@ -1,8 +1,5 @@
 package de.lmu.ifi.dbs.elki.utilities;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,7 +9,7 @@ import java.util.Map;
  * 
  * @author Arthur Zimek
  */
-public abstract class ConstantObject<D extends ConstantObject<D>> extends AbstractLoggable implements Comparable<D> {
+public abstract class ConstantObject<D extends ConstantObject<D>> implements Comparable<D> {
   /**
    * Index of constant objects.
    */
@@ -34,7 +31,6 @@ public abstract class ConstantObject<D extends ConstantObject<D>> extends Abstra
    * @param name name of the ConstantObject
    */
   protected ConstantObject(final String name) {
-    super(LoggingConfiguration.DEBUG);
     if(name == null) {
       throw new IllegalArgumentException("The name of a constant object must not be null.");
     }

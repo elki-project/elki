@@ -1,14 +1,12 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import java.util.List;
+import java.util.Vector;
+
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.List;
-import java.util.Vector;
 
 /**
  * Global parameter constraint specifying that only one parameter of a list of
@@ -16,7 +14,7 @@ import java.util.Vector;
  *
  * @author Steffi Wanka
  */
-public class OnlyOneIsAllowedToBeSetGlobalConstraint extends AbstractLoggable implements GlobalParameterConstraint {
+public class OnlyOneIsAllowedToBeSetGlobalConstraint implements GlobalParameterConstraint {
 
     /**
      * List of parameters to be checked.
@@ -30,7 +28,6 @@ public class OnlyOneIsAllowedToBeSetGlobalConstraint extends AbstractLoggable im
      * @param params list of parameters to be checked
      */
     public OnlyOneIsAllowedToBeSetGlobalConstraint(List<Parameter<?, ?>> params) {
-        super(LoggingConfiguration.DEBUG);
         parameters = params;
     }
 

@@ -1,9 +1,5 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.math.spacefillingcurves.ZCurve;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -11,13 +7,18 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
+
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
+import de.lmu.ifi.dbs.elki.math.spacefillingcurves.ZCurve;
 
 /**
  * Encapsulates the required parameters for a bulk split of a spatial index.
  *
  * @author Elke Achtert 
  */
-public class BulkSplit<N extends SpatialObject> extends AbstractLoggable {
+public class BulkSplit<N extends SpatialObject> {
+  private static Logger logger = Logger.getLogger(BulkSplit.class.getName());
   /**
    * Available strategies for bulk loading.
    */
@@ -27,13 +28,13 @@ public class BulkSplit<N extends SpatialObject> extends AbstractLoggable {
   }
 
   public BulkSplit() {
-    super(LoggingConfiguration.DEBUG);
+    // Nothing to do
   }
 
   /**
    * Partitions the specified feature vectors according to the chosen strategy.
    *
-   * @param spatialObjects the spatial objects to be partioned
+   * @param spatialObjects the spatial objects to be partitioned
    * @param minEntries     the minimum number of entries in a partition
    * @param maxEntries     the maximum number of entries in a partition
    * @param strategy       the bulk load strategy
@@ -72,7 +73,7 @@ public class BulkSplit<N extends SpatialObject> extends AbstractLoggable {
       // get the split axis and split point
       int splitAxis = chooseMaximalExtendedSplitAxis(objects);
       int splitPoint = chooseBulkSplitPoint(objects.size(), minEntries, maxEntries);
-      if (this.debug) {
+      if (logger.isLoggable(LogLevel.FINE)) {
         msg.append("\nsplitAxis ").append(splitAxis);
         msg.append("\nsplitPoint ").append(splitPoint);
       }
@@ -89,15 +90,15 @@ public class BulkSplit<N extends SpatialObject> extends AbstractLoggable {
       partitions.add(partition);
 
       // copy array
-      if (this.debug) {
+      if (logger.isLoggable(LogLevel.FINE)) {
         msg.append("\ncurrent partition " + partition);
         msg.append("\nremaining objects # ").append(objects.size());
-        debugFine(msg.toString());
+        logger.fine(msg.toString());
       }
     }
 
-    if (this.debug) {
-      debugFine("\npartitions " + partitions);
+    if (logger.isLoggable(LogLevel.FINE)) {
+      logger.fine("\npartitions " + partitions);
     }
     return partitions;
   }
@@ -123,8 +124,8 @@ public class BulkSplit<N extends SpatialObject> extends AbstractLoggable {
       }
       valuesList.add(values);
     }
-    if (debug) {
-      debugFine(valuesList.toString());
+    if (logger.isLoggable(LogLevel.FINE)) {
+      logger.fine(valuesList.toString());
     }
     List<byte[]> zValuesList = ZCurve.zValues(valuesList);
 
@@ -165,15 +166,15 @@ public class BulkSplit<N extends SpatialObject> extends AbstractLoggable {
       partitions.add(partition);
 
       // copy array
-      if (this.debug) {
+      if (logger.isLoggable(LogLevel.FINE)) {
         msg.append("\ncurrent partition " + partition);
         msg.append("\nremaining objects # ").append(objects.size());
-        debugFine(msg.toString());
+        logger.fine(msg.toString());
       }
     }
 
-    if (this.debug) {
-      debugFine("\npartitions " + partitions);
+    if (logger.isLoggable(LogLevel.FINE)) {
+      logger.fine("\npartitions " + partitions);
     }
     return partitions;
   }

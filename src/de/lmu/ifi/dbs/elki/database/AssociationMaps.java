@@ -1,8 +1,5 @@
 package de.lmu.ifi.dbs.elki.database;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
@@ -13,7 +10,7 @@ import java.util.Set;
  *  
  * @author Arthur Zimek
  */
-public class AssociationMaps extends AbstractLoggable {
+public class AssociationMaps {
 
   /**
    * Holds a mapping from AssociationID to maps for object ids and associated objects.
@@ -28,7 +25,6 @@ public class AssociationMaps extends AbstractLoggable {
      */
     @SuppressWarnings("unchecked")
     public AssociationMaps() {
-        super(LoggingConfiguration.DEBUG);
         associations = new Hashtable<AssociationID, Map<Integer, Object>>();
     }
 

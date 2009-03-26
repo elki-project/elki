@@ -2,8 +2,6 @@ package de.lmu.ifi.dbs.elki.database;
 
 import java.util.Set;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.AnyMap;
 
 /**
@@ -11,7 +9,7 @@ import de.lmu.ifi.dbs.elki.utilities.AnyMap;
  * 
  * @author Arthur Zimek
  */
-public class Associations extends AbstractLoggable {
+public class Associations {
   /**
    * Map to store the actual data.
    */
@@ -22,7 +20,7 @@ public class Associations extends AbstractLoggable {
    * association.
    */
   public Associations() {
-    super(LoggingConfiguration.DEBUG);
+    // nothing to do
   }
 
   /**

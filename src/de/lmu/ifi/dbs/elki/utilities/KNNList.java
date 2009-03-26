@@ -5,10 +5,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.distance.Distance;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
  *
  * @author Elke Achtert
  */
-public class KNNList<D extends Distance<D>> extends AbstractLoggable {
+public class KNNList<D extends Distance<D>> {
     /**
      * The underlying set.
      */
@@ -39,7 +39,6 @@ public class KNNList<D extends Distance<D>> extends AbstractLoggable {
      * @param infiniteDistance the infinite distance
      */
     public KNNList(int k, D infiniteDistance) {
-        super(LoggingConfiguration.DEBUG);
         this.list = new TreeSet<ComparablePair<D, Integer>>();
         this.k = k;
         this.infiniteDistance = infiniteDistance;
@@ -84,8 +83,7 @@ public class KNNList<D extends Distance<D>> extends AbstractLoggable {
             return false;
         }
         catch (Exception e) { // TODO more specialized??
-            this.exception("k " + k, e);
-            this.exception("list " + list, e);
+            Logger.getLogger(this.getClass().getName()).log(LogLevel.EXCEPTION, "k "+k+"\n"+"list "+list, e);
             throw new RuntimeException(e);
         }
     }

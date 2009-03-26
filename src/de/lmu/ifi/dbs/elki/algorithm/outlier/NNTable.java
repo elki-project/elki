@@ -1,13 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.parser.AbstractParser;
-import de.lmu.ifi.dbs.elki.utilities.output.ObjectPrinter;
-import de.lmu.ifi.dbs.elki.utilities.tree.btree.BTree;
-import de.lmu.ifi.dbs.elki.utilities.tree.btree.BTreeData;
-import de.lmu.ifi.dbs.elki.utilities.tree.btree.DefaultKey;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,13 +9,19 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.regex.Pattern;
 
+import de.lmu.ifi.dbs.elki.parser.AbstractParser;
+import de.lmu.ifi.dbs.elki.utilities.output.ObjectPrinter;
+import de.lmu.ifi.dbs.elki.utilities.tree.btree.BTree;
+import de.lmu.ifi.dbs.elki.utilities.tree.btree.BTreeData;
+import de.lmu.ifi.dbs.elki.utilities.tree.btree.DefaultKey;
+
 /**
  * Allows efficient access to nearest and reverse nearest neighbors of an
  * object.
  *
  * @author Elke Achtert
  */
-public class NNTable extends AbstractLoggable {
+public class NNTable {
     /**
      * The printer for output.
      */
@@ -54,7 +52,6 @@ public class NNTable extends AbstractLoggable {
      *                  computing its LOF
      */
     public NNTable(int pageSize, int cacheSize, int minpts) {
-        super(LoggingConfiguration.DEBUG);
         int keySize = 4;
         int neighborSize = 4 + 4 + 4 + 8 + 8;
         int valueSize = minpts * neighborSize;

@@ -1,15 +1,13 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.NumberParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Global parameter constraint specifying that parameters of a list of number
@@ -17,7 +15,7 @@ import java.util.Set;
  *
  * @author Steffi Wanka
  */
-public class NotEqualValueGlobalConstraint<N extends Number> extends AbstractLoggable implements GlobalParameterConstraint {
+public class NotEqualValueGlobalConstraint<N extends Number> implements GlobalParameterConstraint {
 
     /**
      * List of number parameters to be checked.
@@ -32,7 +30,6 @@ public class NotEqualValueGlobalConstraint<N extends Number> extends AbstractLog
      * @param parameters list of number parameters to be tested
      */
     public NotEqualValueGlobalConstraint(List<NumberParameter<N>> parameters) {
-        super(LoggingConfiguration.DEBUG);
         this.parameters = parameters;
     }
 

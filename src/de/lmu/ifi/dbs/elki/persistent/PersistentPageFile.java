@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.RandomAccessFile;
+import java.util.logging.Logger;
+
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 
 /**
  * A PersistentPageFile stores objects persistently that implement the
@@ -55,7 +58,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
 
       // create from existing file
       if (f.exists()) {
-    	  verbose("Create from existing file.");
+        Logger.getLogger(this.getClass().getName()).log(LogLevel.VERBOSE,"Create from existing file.");
         file = new RandomAccessFile(f, "rw");
 
         // init the header
@@ -90,7 +93,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
       }
       // create new file
       else {
-    	  verbose("Create a new file.");
+        Logger.getLogger(this.getClass().getName()).log(LogLevel.VERBOSE,"Create a new file.");
 
         // init the file
         this.file = new RandomAccessFile(f, "rw");

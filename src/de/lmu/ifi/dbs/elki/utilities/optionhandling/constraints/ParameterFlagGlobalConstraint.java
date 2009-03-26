@@ -1,12 +1,10 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
 
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-
-import java.util.List;
 
 /**
  * Global parameter constraint describing the dependency of a parameter ({@link Parameter})
@@ -15,7 +13,7 @@ import java.util.List;
  *
  * @author Steffi Wanka
  */
-public class ParameterFlagGlobalConstraint<C, T extends C> extends AbstractLoggable implements GlobalParameterConstraint {
+public class ParameterFlagGlobalConstraint<C, T extends C> implements GlobalParameterConstraint {
 
     /**
      * Parameter possibly to be checked.
@@ -47,7 +45,6 @@ public class ParameterFlagGlobalConstraint<C, T extends C> extends AbstractLogga
      * @param flagConstraint indicates at which status of the flag the parameter is to be checked
      */
     public ParameterFlagGlobalConstraint(Parameter<T, C> p, List<ParameterConstraint<C>> c, Flag f, boolean flagConstraint) {
-        super(LoggingConfiguration.DEBUG);
         param = p;
         flag = f;
         this.flagConstraint = flagConstraint;

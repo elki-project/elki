@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
 
-import de.lmu.ifi.dbs.elki.logging.Loggable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
@@ -15,7 +14,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * @author Steffi Wanka
  *
  */
-public interface GlobalParameterConstraint extends Loggable {
+public interface GlobalParameterConstraint {
 	
 	/**
 	 * Checks if the respective parameters satisfy the parameter constraint. If not,

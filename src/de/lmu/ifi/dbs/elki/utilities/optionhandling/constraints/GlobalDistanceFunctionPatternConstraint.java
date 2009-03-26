@@ -1,8 +1,6 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
 
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
@@ -16,7 +14,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  *
  * @author Steffi Wanka
  */
-public class GlobalDistanceFunctionPatternConstraint<D extends DistanceFunction<?, ?>> extends AbstractLoggable implements GlobalParameterConstraint {
+public class GlobalDistanceFunctionPatternConstraint<D extends DistanceFunction<?, ?>> implements GlobalParameterConstraint {
 
     /**
      * Class parameter whose restriction class is used to check the validity of the pattern parameter.
@@ -36,7 +34,6 @@ public class GlobalDistanceFunctionPatternConstraint<D extends DistanceFunction<
      * @param restrClass the class parameter defining a distance function
      */
     public GlobalDistanceFunctionPatternConstraint(PatternParameter pattern, ClassParameter<D> restrClass) {
-        super(LoggingConfiguration.DEBUG);
         this.restrictionClass = restrClass;
         this.pattern = pattern;
     }
