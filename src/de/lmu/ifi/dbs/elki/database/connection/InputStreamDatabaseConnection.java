@@ -2,17 +2,12 @@ package de.lmu.ifi.dbs.elki.database.connection;
 
 import java.io.InputStream;
 import java.util.List;
-import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
-import de.lmu.ifi.dbs.elki.parser.DistanceParser;
-import de.lmu.ifi.dbs.elki.parser.DistanceParsingResult;
 import de.lmu.ifi.dbs.elki.parser.Parser;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
 import de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser;
@@ -70,7 +65,6 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
         addOption(PARSER_PARAM);
     }
 
-    @SuppressWarnings("unchecked")
     public Database<O> getDatabase(Normalization<O> normalization) {
         try {
             if (this.debug) {
@@ -82,16 +76,6 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
             // normalize objects and transform labels
             List<SimplePair<O, Associations>> objectAndAssociationsList = normalizeAndTransformLabels(parsingResult.getObjectAndLabelList(),
                 normalization);
-
-            // add precomputed distances
-            /*if (parser instanceof DistanceParser) {
-              Map<SimplePair<Integer, Integer>, Distance<?>> distanceCache = ((DistanceParsingResult) parsingResult)
-                    .getDistanceCache();
-                for (SimplePair<O, Associations> objectAndAssociations : objectAndAssociationsList) {
-                    Map<Integer, Distance<?>> distances = distanceCache.remove(objectAndAssociations.getFirst().getID());
-                    objectAndAssociations.getSecond().put(AssociationID.CACHED_DISTANCES, distances);
-                }
-            }*/
 
             if (this.debug) {
                 debugFine("*** insert");
