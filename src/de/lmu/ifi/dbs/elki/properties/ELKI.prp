@@ -1,5 +1,5 @@
 # debug level: one of ALL,DEBUG_FINEST,DEBUG_FINER,DEBUG_FINE or an integer
-DEBUG_LEVEL=DEBUG_FINE
+DEBUG_LEVEL=FINE
 STACK_TRACE_CLI=true
 # #######################################################
 # algorithms - default package: de.lmu.ifi.dbs.elki.algorithm
