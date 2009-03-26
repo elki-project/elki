@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 
 import java.util.HashMap;
@@ -45,7 +46,7 @@ public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<
      * @return the path of node ids from the root to the objects's parent
      */
     public synchronized List<TreeIndexPathComponent<DeLiCluEntry>> setHandled(O o) {
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             debugFine("setHandled " + o + "\n");
         }
 

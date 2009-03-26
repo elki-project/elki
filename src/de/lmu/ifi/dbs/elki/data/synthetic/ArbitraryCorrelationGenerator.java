@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -190,7 +191,7 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
      */
     @Override
     void generateCorrelation(OutputStreamWriter outStream) throws IOException {
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             StringBuffer msg = new StringBuffer();
             msg.append("\nbasis");
             msg.append(basis.toString(Format.NF4));
@@ -255,7 +256,7 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
         // orthonormal basis of subvectorspace U
         Matrix orthonormalBasis_U = basis.orthonormalize();
         Matrix completeVectors = orthonormalBasis_U.completeBasis();
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             msg.append("\npoint ").append(point.toString(Format.NF4));
             msg.append("\nbasis ").append(basis.toString(Format.NF4));
             msg.append("\northonormal basis ").append(orthonormalBasis_U.toString(Format.NF4));
@@ -266,7 +267,7 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
         // orthonormal basis of vectorspace V
         Matrix basis_V = orthonormalBasis_U.appendColumns(completeVectors);
         basis_V = basis_V.orthonormalize();
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             debugFine("basis V " + basis_V.toString(Format.NF4));
         }
 
@@ -274,18 +275,18 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
         Matrix normalVectors_U = basis_V.getMatrix(0, basis_V.getRowDimensionality() - 1, basis.getColumnDimensionality(), basis
             .getRowDimensionality()
             - basis.getColumnDimensionality() + basis.getColumnDimensionality() - 1);
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             debugFine("normal vector U " + normalVectors_U.toString(Format.NF4));
         }
         Matrix transposedNormalVectors = normalVectors_U.transpose();
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             debugFine("tNV " + transposedNormalVectors.toString(Format.NF4));
             debugFine("point " + point.toString(Format.NF4));
         }
 
         // gauss jordan
         Matrix B = transposedNormalVectors.times(point);
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             debugFine("B " + B.toString(Format.NF4));
         }
         Matrix gaussJordan = new Matrix(transposedNormalVectors.getRowDimensionality(), transposedNormalVectors.getColumnDimensionality()

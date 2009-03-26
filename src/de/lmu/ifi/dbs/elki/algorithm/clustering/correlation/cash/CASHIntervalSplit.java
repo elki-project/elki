@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.cash;
 import de.lmu.ifi.dbs.elki.data.ParameterizationFunction;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.utilities.output.Format;
@@ -66,7 +67,7 @@ public class CASHIntervalSplit extends AbstractLoggable {
      */
     public Set<Integer> determineIDs(Set<Integer> superSetIDs, HyperBoundingBox interval, double d_min, double d_max) {
         StringBuffer msg = new StringBuffer();
-        if (debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             msg.append("\ninterval ").append(interval);
         }
 
@@ -94,7 +95,7 @@ public class CASHIntervalSplit extends AbstractLoggable {
                 maxima.put(id, f_max);
             }
 
-            if (debug) {
+            if (logger.isLoggable(LogLevel.FINE)) {
                 msg.append("\n\nf_min ").append(f_min);
                 msg.append("\nf_max ").append(f_max);
                 msg.append("\nd_min ").append(d_min);
@@ -110,19 +111,19 @@ public class CASHIntervalSplit extends AbstractLoggable {
 
             if (f_min <= d_max && f_max >= d_min) {
                 childIDs.add(id);
-                if (debug) {
+                if (logger.isLoggable(LogLevel.FINE)) {
                     msg.append("\nid ").append(id).append(" appended");
                 }
             }
 
             else {
-                if (debug) {
+                if (logger.isLoggable(LogLevel.FINE)) {
                     msg.append("\nid ").append(id).append(" NOT appended");
                 }
             }
         }
 
-        if (debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             msg.append("\nchildIds ").append(childIDs.size());
             debugFine(msg.toString());
         }

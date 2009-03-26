@@ -32,7 +32,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
    * @param file     the file storing the R*-Tree
    * @param capacity the capacity (maximum number of entries plus 1 for overflow)
    *                 of this node
-   * @param isLeaf   indicates wether this node is a leaf node
+   * @param isLeaf   indicates whether this node is a leaf node
    */
   public AbstractRStarTreeNode(PageFile<N> file, int capacity, boolean isLeaf) {
     super(file, capacity, isLeaf);
@@ -170,7 +170,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
    * Tests this node (for debugging purposes).
    */
   @SuppressWarnings("unchecked")
-  public final void test() {
+  public final void integrityCheck() {
     // leaf node
     if (isLeaf()) {
       for (int i = 0; i < getCapacity(); i++) {
@@ -211,8 +211,8 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
             throw new RuntimeException("Wrong Child: child id no leaf, but node is leaf!");
 
           //noinspection unchecked
-          node.testEntry((N) this, i);
-          node.test();
+          node.integrityCheckParameters((N) this, i);
+          node.integrityCheck();
         }
       }
 
@@ -227,9 +227,9 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
    * Subclasses may need to overwrite this method.
    *
    * @param parent the parent holding the entry representing this node
-   * @param index  the index of the entry in the parents child arry
+   * @param index  the index of the entry in the parents child array
    */
-  protected void testEntry(N parent, int index) {
+  protected void integrityCheckParameters(N parent, int index) {
     // test if mbr is correctly set
     E entry = parent.getEntry(index);
     HyperBoundingBox mbr = mbr();

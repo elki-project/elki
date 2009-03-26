@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialObject;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -104,7 +105,7 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends Ab
 			file.writePage(root);
 			createRoot(root, spatialObjects);
 			setHeight(1);
-			if (this.debug) {
+			if (logger.isLoggable(LogLevel.FINE)) {
 				msg.append("\n  numNodes = 1");
 			}
 		}
@@ -119,7 +120,7 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends Ab
 			List<N> nodes = createLeafNodes(objects);
 
 			int numNodes = nodes.size();
-			if (this.debug) {
+			if (logger.isLoggable(LogLevel.FINE)) {
 				msg.append("\n  numLeafNodes = ").append(numNodes);
 			}
 			setHeight(1);
@@ -135,11 +136,11 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends Ab
 			createRoot(root, new ArrayList<SpatialObject>(nodes));
 			numNodes++;
       setHeight(getHeight()+1);
-			if (this.debug) {
+			if (logger.isLoggable(LogLevel.FINE)) {
 				msg.append("\n  numNodes = ").append(numNodes);
 			}
 		}
-		if (this.debug) {
+		if (logger.isLoggable(LogLevel.FINE)) {
 			msg.append("\n  height = ").append(getHeight());
 			msg.append("\n  root " + getRoot());
 			debugFine(msg.toString() + "\n");
@@ -177,7 +178,7 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends Ab
 
 			// write to file
 			file.writePage(dirNode);
-			if (this.debug) {
+			if (logger.isLoggable(LogLevel.FINER)) {
 				msg.append("\npageNo ").append(dirNode.getID());
 				debugFiner(msg.toString() + "\n");
 			}
@@ -210,7 +211,7 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends Ab
 
 		// write to file
 		file.writePage(root);
-		if (this.debug) {
+		if (logger.isLoggable(LogLevel.FINER)) {
 			StringBuffer msg = new StringBuffer();
 			msg.append("\npageNo ").append(root.getID());
 			debugFiner(msg.toString() + "\n");

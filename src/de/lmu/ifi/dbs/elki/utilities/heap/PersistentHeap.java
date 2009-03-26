@@ -226,7 +226,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
      * Retrieves and removes the minimum node of this heap. If the heap is
      * empty, null will be returned.
      *
-     * @return the minimum node of this heap, null in case of emptyness
+     * @return the minimum node of this heap, null in case of emptiness
      */
     public HeapNode<K, V> getMinNode() {
         if (numElements < 1)
@@ -260,7 +260,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
     }
 
     /**
-     * Indicates wether this heap ist empty.
+     * Indicates whether this heap is empty.
      *
      * @return true if this heap is empty, false otherwise
      */

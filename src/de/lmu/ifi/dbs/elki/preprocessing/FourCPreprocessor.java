@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.LimitEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
@@ -101,7 +102,7 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
         }
         PCAFilteredResult pcares = pca.processIds(ids, database);
 
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             StringBuffer msg = new StringBuffer();
             msg.append("\n").append(id).append(" ").append(database.getAssociation(AssociationID.LABEL, id));
             msg.append("\ncorrDim ").append(pcares.getCorrelationDimension());

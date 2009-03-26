@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.BitDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ERiCDistanceFunction;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
@@ -80,7 +81,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
             verbose("\nStep 2: Extract correlation clusters...");
         }
         SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap = extractCorrelationClusters(database, dimensionality);
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             StringBuffer msg = new StringBuffer("\n\nStep 2: Extract correlation clusters...");
             for (Integer corrDim : clusterMap.keySet()) {
                 List<Cluster<CorrelationModel<V>>> correlationClusters = clusterMap.get(corrDim);
@@ -106,7 +107,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
             verbose("\nStep 3: Build hierarchy...");
         }
         buildHierarchy(clusterMap);
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             StringBuffer msg = new StringBuffer("\n\nStep 3: Build hierarchy");
             for (Integer corrDim : clusterMap.keySet()) {
                 List<Cluster<CorrelationModel<V>>> correlationClusters = clusterMap.get(corrDim);
@@ -317,7 +318,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
         for (Integer childCorrDim : clusterMap.keySet()) {
             List<Cluster<CorrelationModel<V>>> children = clusterMap.get(childCorrDim);
             SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> parentMap = clusterMap.tailMap(childCorrDim + 1);
-            if (debug) {
+            if (logger.isLoggable(LogLevel.FINE)) {
                 msg.append("\n\ncorrdim ").append(childCorrDim);
                 msg.append("\nparents ").append(parentMap.keySet());
             }
@@ -330,7 +331,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
                         if (subspaceDim_parent == lambda_max && child.getParents().isEmpty()) {
                             parent.getChildren().add(child);
                             child.getParents().add(parent);
-                            if (debug) {
+                            if (logger.isLoggable(LogLevel.FINE)) {
                                 msg.append("\n").append(parent).append(" is parent of ").append(child);
                             }
                         }
@@ -340,7 +341,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
                                 !isParent(distanceFunction, parent, child.getParents()))) {
                                 parent.getChildren().add(child);
                                 child.getParents().add(parent);
-                                if (debug) {
+                                if (logger.isLoggable(LogLevel.FINE)) {
                                     msg.append("\n").append(parent).append(" is parent of ").append(child);
                                 }
                             }
@@ -349,7 +350,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
                 }
             }
         }
-        if (debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             debugFine(msg.toString());
         }
 
@@ -375,19 +376,19 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
                 return false;
 
             BitDistance dist = distanceFunction.distance(parent.getModel().getCentroid(), child.getModel().getCentroid(), parent.getModel().getPCAResult(), child.getModel().getPCAResult());
-            if (debug) {
+            if (logger.isLoggable(LogLevel.FINE)) {
                 msg.append("\ndist(").append(child).append(" - ").append(parent).append(") = ").append(dist);
 
             }
             if (!dist.bitValue()) {
-                if (debug) {
+                if (logger.isLoggable(LogLevel.FINE)) {
                     debugFine(msg.toString());
                 }
                 return true;
             }
         }
 
-        if (debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             debugFiner(msg.toString());
         }
         return false;

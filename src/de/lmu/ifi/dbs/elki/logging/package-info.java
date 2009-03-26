@@ -1,13 +1,13 @@
 /**
-<p>Logging facility for controlling logging behaviour of the complete framework.</p>
+<p>Logging facility for controlling logging behavior of the complete framework.</p>
 <h3>Logging</h3>
 Any classes intending to log message should extend {@link de.lmu.ifi.dbs.elki.logging.AbstractLoggable}. 
 <h4>Level specific logging</h4>
 <p><ul>
     <li>Debugging: for debug messages use levels below {@link de.lmu.ifi.dbs.elki.logging.LogLevel#VERBOSE},
-        such as {@link de.lmu.ifi.dbs.elki.logging.LogLevel#DEBUG_FINE DEBUG_FINE},
-        {@link de.lmu.ifi.dbs.elki.logging.LogLevel#DEBUG_FINER DEBUG_FINER},
-        or {@link de.lmu.ifi.dbs.elki.logging.LogLevel#DEBUG_FINEST DEBUG_FINEST}, and use 
+        such as {@link de.lmu.ifi.dbs.elki.logging.LogLevel#FINE FINE},
+        {@link de.lmu.ifi.dbs.elki.logging.LogLevel#FINER FINER},
+        or {@link de.lmu.ifi.dbs.elki.logging.LogLevel#FINEST FINEST}, and use 
         the corresponding methods {@link de.lmu.ifi.dbs.elki.logging.AbstractLoggable#debugFine(String)},
         {@link de.lmu.ifi.dbs.elki.logging.AbstractLoggable#debugFiner(String)},
         {@link de.lmu.ifi.dbs.elki.logging.AbstractLoggable#debugFinest(String)}, respectively.
@@ -47,17 +47,17 @@ catch(SomeException e)
 <h4>Level specific handling</h4>
 <p><ul>
     <li>Debugging: A handler responsible for debug messages should
-    	process only LogRecords of level {@link de.lmu.ifi.dbs.elki.logging.LogLevel#DEBUG_FINE DEBUG_FINE},
-    	{@link de.lmu.ifi.dbs.elki.logging.LogLevel#DEBUG_FINER DEBUG_FINER},
-    	or {@link de.lmu.ifi.dbs.elki.logging.LogLevel#DEBUG_FINEST DEBUG_FINEST} (e.g. by using
+    	process only LogRecords of level {@link de.lmu.ifi.dbs.elki.logging.LogLevel#FINE FINE},
+    	{@link de.lmu.ifi.dbs.elki.logging.LogLevel#FINER FINER},
+    	or {@link de.lmu.ifi.dbs.elki.logging.LogLevel#FINEST FINEST} (e.g. by using
     	{@link de.lmu.ifi.dbs.elki.logging.DebugFilter DebugFilter}).
     	Additionally to setting the global debug mode to <code>false</code>,
     	the {@link de.lmu.ifi.dbs.elki.logging.DebugFilter DebugFilter} can be configured to process messages
-    	above a certain level, but below level {@link de.lmu.ifi.dbs.elki.logging.LogLevel#DEBUG_FINE DEBUG_FINE}. Thus,
+    	above a certain level, but below level {@link de.lmu.ifi.dbs.elki.logging.LogLevel#FINE FINE}. Thus,
     	the developer can make finegrained use of levels
-    	{@link de.lmu.ifi.dbs.elki.logging.LogLevel#DEBUG_FINE DEBUG_FINE},
-    	{@link de.lmu.ifi.dbs.elki.logging.LogLevel#DEBUG_FINER DEBUG_FINER},
-		and {@link de.lmu.ifi.dbs.elki.logging.LogLevel#DEBUG_FINEST DEBUG_FINEST}.
+    	{@link de.lmu.ifi.dbs.elki.logging.LogLevel#FINE FINE},
+    	{@link de.lmu.ifi.dbs.elki.logging.LogLevel#FINER FINER},
+		and {@link de.lmu.ifi.dbs.elki.logging.LogLevel#FINEST FINEST}.
     </li>
     <li>Verbose messages for regular user information:
     	A handler responsible for regular user information should process

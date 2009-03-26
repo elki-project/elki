@@ -27,7 +27,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>>
      */
     public MTree() {
         super();
-        this.debug = true;
+        //this.debug = true;
     }
 
     /**
@@ -54,8 +54,8 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>>
             insert(object, false);
         }
 
-        if (debug) {
-            getRoot().test(this, getRootEntry());
+        if (extraIntegrityChecks) {
+            getRoot().integrityCheck(this, getRootEntry());
         }
     }
 

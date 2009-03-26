@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.normalization.AttributeWiseRealVectorNormalization;
@@ -103,7 +104,6 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V,
      */
     public SubspaceEM() {
         super();
-        debug = true;
         addOption(K_PARAM);
         addOption(DELTA_PARAM);
     }
@@ -246,7 +246,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V,
                     variance += distance * distance;
                 }
                 standardDeviation[i] = hardClustering.get(i).size() == 0 ? 1 : Math.sqrt(variance / hardClustering.get(i).size());
-                if (debug) {
+                if (logger.isLoggable(LogLevel.FINE)) {
                     if (standardDeviation[i] == 0) {
                         debugFine(i + ": " + standardDeviation[i]);
                     }
@@ -258,7 +258,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V,
 
             // new expectation
             emNew = expectationOfMixture(database);
-            if (debug && emNew <= em) {
+            if (logger.isLoggable(LogLevel.FINE) && emNew <= em) {
                 debugFine("expectation value decreasing: old=" + em + " new=" + emNew + " difference=" + (em - emNew));
             }
 
@@ -332,7 +332,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V,
             double priorProbX = database.getAssociation(AssociationID.PROBABILITY_X, id);
             double logP = Math.log(priorProbX);
             sum += logP;
-            if (debug && false) {
+            if (logger.isLoggable(LogLevel.FINE) && false) {
                 debugFine("\nid=" + id + "\nP(x)=" + priorProbX + "\nlogP=" + logP + "\nsum=" + sum);
             }
         }

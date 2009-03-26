@@ -32,7 +32,7 @@ class MkAppTreeNode<O extends DatabaseObject, D extends NumberDistance<D, N>, N 
      *
      * @param file     the file storing the MCop-Tree
      * @param capacity the capacity (maximum number of entries plus 1 for overflow) of this node
-     * @param isLeaf   indicates wether this node is a leaf node
+     * @param isLeaf   indicates whether this node is a leaf node
      */
     public MkAppTreeNode(PageFile<MkAppTreeNode<O, D, N>> file, int capacity, boolean isLeaf) {
         super(file, capacity, isLeaf);
@@ -111,9 +111,9 @@ class MkAppTreeNode<O extends DatabaseObject, D extends NumberDistance<D, N>, N 
     }
 
     @Override
-    protected void test(MkAppEntry<D, N> parentEntry, MkAppTreeNode<O, D, N> parent, int index,
+    protected void integrityCheckParameters(MkAppEntry<D, N> parentEntry, MkAppTreeNode<O, D, N> parent, int index,
                         AbstractMTree<O, D, MkAppTreeNode<O, D, N>, MkAppEntry<D, N>> mTree) {
-        super.test(parentEntry, parent, index, mTree);
+        super.integrityCheckParameters(parentEntry, parent, index, mTree);
 
         MkAppEntry<D, N> entry = parent.getEntry(index);
         PolynomialApproximation approximation_soll = knnDistanceApproximation();

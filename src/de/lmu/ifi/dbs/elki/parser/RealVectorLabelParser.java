@@ -95,7 +95,7 @@ public class RealVectorLabelParser<V extends RealVector<V, ?>> extends AbstractP
    */
   public RealVectorLabelParser() {
     super();
-    debug = true;
+    //debug = true;
     addOption(FLOAT_FLAG);
     addOption(CLASS_LABEL_INDEX_PARAM);
   }

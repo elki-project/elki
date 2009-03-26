@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
@@ -58,7 +59,7 @@ public class PercentageEigenPairFilter extends AbstractParameterizable implement
 
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
     StringBuffer msg = new StringBuffer();
-    if(this.debug) {
+    if(logger.isLoggable(LogLevel.FINE)) {
       msg.append("\nalpha = ").append(alpha);
       msg.append("\nsortedEigenPairs = ").append(eigenPairs);
     }
@@ -73,7 +74,7 @@ public class PercentageEigenPairFilter extends AbstractParameterizable implement
       EigenPair eigenPair = eigenPairs.getEigenPair(i);
       totalSum += eigenPair.getEigenvalue();
     }
-    if(this.debug) {
+    if(logger.isLoggable(LogLevel.FINE)) {
       msg.append("\ntotalSum = ").append(totalSum);
     }
 
@@ -96,7 +97,7 @@ public class PercentageEigenPairFilter extends AbstractParameterizable implement
         strongEigenPairs.add(eigenPair);
       }
     }
-    if(this.debug) {
+    if(logger.isLoggable(LogLevel.FINE)) {
       msg.append("\nstrong EigenPairs = ").append(strongEigenPairs);
       msg.append("\nweak EigenPairs = ").append(weakEigenPairs);
       debugFine(msg.toString());

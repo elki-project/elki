@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
@@ -116,7 +117,7 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
     while (it.hasNext()) {
       Integer id = it.next();
 
-      if (this.debug) {
+      if (logger.isLoggable(LogLevel.FINE)) {
         msg.append("\n\nid = ").append(id);
         msg.append(" ").append(database.getAssociation(AssociationID.LABEL, id));
         msg.append("\n knns: ");
@@ -126,7 +127,7 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
       List<Integer> knnIDs = new ArrayList<Integer>(knns.size());
       for (ComparablePair<DoubleDistance, Integer> knn : knns) {
         knnIDs.add(knn.getSecond());
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
           msg.append(database.getAssociation(AssociationID.LABEL, knn.getSecond())).append(" ");
         }
       }
@@ -140,7 +141,7 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
       }
     }
 
-    if (this.debug) {
+    if (logger.isLoggable(LogLevel.FINE)) {
       debugFine(msg.toString());
     }
 
@@ -221,7 +222,7 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
       }
     }
 
-    if (this.debug) {
+    if (msg != null && logger.isLoggable(LogLevel.FINE)) {
       msg.append("\nalpha "+alpha);
       msg.append("\nvariances ");
       msg.append(FormatUtil.format(variances, ", ", 4));

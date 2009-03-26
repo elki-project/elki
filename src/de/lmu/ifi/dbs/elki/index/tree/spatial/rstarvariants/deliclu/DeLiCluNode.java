@@ -93,15 +93,15 @@ public class DeLiCluNode extends AbstractRStarTreeNode<DeLiCluNode, DeLiCluEntry
   }
 
   /**
-   * Tests, if the parameters of the entry representinmg this node, are correctly set.
+   * Tests, if the parameters of the entry representing this node, are correctly set.
    * Subclasses may need to overwrite this method.
    *
    * @param parent the parent holding the entry representing this node
-   * @param index  the index of the entry in the parents child arry
+   * @param index  the index of the entry in the parents child array
    */
   @Override
-  protected void testEntry(DeLiCluNode parent, int index) {
-    super.testEntry(parent, index);
+  protected void integrityCheckParameters(DeLiCluNode parent, int index) {
+    super.integrityCheckParameters(parent, index);
     // test if hasHandled and hasUnhandled flag are correctly set
     DeLiCluEntry entry = parent.getEntry(index);
     boolean hasHandled = hasHandled();

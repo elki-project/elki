@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.parser.Parser;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
 import de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser;
@@ -238,7 +239,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
         neighbors.remove(0);
         reverseNeighbors.remove(0);
 
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             StringBuffer msg = new StringBuffer();
             msg.append("\nkNNs[").append(o).append("] ").append(neighbors);
             msg.append("\nrNNs[").append(o).append("]").append(reverseNeighbors);
@@ -259,7 +260,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
             double reachDist_po = Math.max(kNNDist_o, dist_po);
             NeighborList neighbors_p_old = nnTable.getNeighbors(p);
 
-            if (this.debug) {
+            if (logger.isLoggable(LogLevel.FINE)) {
                 debugFine("\nold kNNs[" + p + "] " + neighbors_p_old);
             }
             // store knn distance for later use
@@ -279,7 +280,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
             Neighbor neighbor_p_new = new Neighbor(p, index, o, reachDist_po, dist_po);
             Neighbor neighbor_p_old = nnTable.insertAndMove(neighbor_p_new);
 
-            if (this.debug) {
+            if (logger.isLoggable(LogLevel.FINE)) {
                 debugFine("\nold neighbor [" + p + "] " + neighbor_p_old +
                     "\nnew neighbor [" + p + "] " + neighbor_p_new +
                     "\nnew kNNs[" + p + "] " + nnTable.getNeighbors(p));
@@ -297,7 +298,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
             lof_p.insertAndMoveSum2(index, sumReachDists_p);
 
             NeighborList rnns_p = nnTable.getReverseNeighbors(p);
-            if (this.debug) {
+            if (logger.isLoggable(LogLevel.FINE)) {
                 debugFine("\nrnn [" + p + "] " + rnns_p);
             }
             for (Neighbor q : rnns_p) {
@@ -316,7 +317,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
             Integer p = qr.getSecond();
             double knnDistance_p = knnDistances.get(p);
             NeighborList rnns_p = nnTable.getReverseNeighbors(p);
-            if (this.debug) {
+            if (logger.isLoggable(LogLevel.FINE)) {
                 debugFine("\nrnn p [" + p + "] " + rnns_p);
             }
             for (int i = 0; i < rnns_p.size(); i++) {
@@ -337,7 +338,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
 
                     // 2.3 for all r in rnn(q): update sum2 of lof(r)
                     NeighborList rnns_q = nnTable.getReverseNeighbors(q.getObjectID());
-                    if (this.debug) {
+                    if (logger.isLoggable(LogLevel.FINE)) {
                         debugFine("\nrnn q [" + q.getObjectID() + "] " + rnns_q);
                     }
                     for (Neighbor r : rnns_q) {
@@ -388,7 +389,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
         LOFEntry lofEntry = new LOFEntry(sum1, sum2);
         lofTable.insert(id, lofEntry);
 
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             debugFine("LOF " + id + " " + lofEntry);
         }
     }

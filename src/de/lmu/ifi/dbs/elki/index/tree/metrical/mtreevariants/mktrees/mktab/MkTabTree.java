@@ -28,7 +28,7 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>>
      */
     public MkTabTree() {
         super();
-        this.debug = true;
+        //this.debug = true;
     }
 
     /**

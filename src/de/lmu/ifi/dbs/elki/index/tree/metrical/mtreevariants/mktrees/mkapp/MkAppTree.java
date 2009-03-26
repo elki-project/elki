@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.util.PQNode;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.math.statistics.PolynomialRegression;
 import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
@@ -122,7 +123,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
      * @param objects the object to be inserted
      */
     public void insert(List<O> objects) {
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             debugFine("insert " + objects + "\n");
         }
 
@@ -149,8 +150,8 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
         // adjust the knn distances
         adjustApproximatedKNNDistances(getRootEntry(), knnLists);
 
-        if (debug) {
-            getRoot().test(this, getRootEntry());
+        if (extraIntegrityChecks) {
+            getRoot().integrityCheck(this, getRootEntry());
         }
     }
 
@@ -419,11 +420,8 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
         PolynomialRegression regression = new PolynomialRegression(y, x, p);
         PolynomialApproximation approximation = new PolynomialApproximation(regression.getEstimatedCoefficients().getColumnPackedCopy());
 
-        if (debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             msg.append("\napproximation ").append(approximation);
-        }
-
-        if (debug) {
             debugFine(msg.toString());
         }
         return approximation;

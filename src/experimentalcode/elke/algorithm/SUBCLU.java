@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDimensionsSelectingDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionsSelectingEuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Util;
@@ -133,7 +134,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
      */
     public SUBCLU() {
         super();
-        this.debug = true;
+        //this.debug = true;
 
         // parameter epsilon
         addOption(EPSILON_PARAM);
@@ -168,7 +169,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
                 DBSCAN<V, D> dbscan = initDBSCAN(selectedDimensions);
                 dbscan.run(database);
                 Clustering<Model> clusters = dbscan.getResult();
-                if (debug) {
+                if (logger.isLoggable(LogLevel.FINE)) {
                     debugFine(d + " clusters: " + clusters);
                 }
                 // FIXME: INCOMPLETE IMPLEMENTATION

@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.math.statistics.LinearRegression;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
@@ -52,7 +53,7 @@ public class FracClusPreprocessor<V extends RealVector<V, ?>> extends AbstractPa
                 ComparablePair<DoubleDistance, Integer> ithQueryResult = kNN.get(i);
                 neighbors.add(ithQueryResult.getSecond());
             }
-            if (this.debug) {
+            if (logger.isLoggable(LogLevel.FINE)) {
                 List<DoubleDoublePair> points = new ArrayList<DoubleDoublePair>(neighbors.size());
                 for (int i = 1; i <= neighbors.size(); i++) {
                     points.add(new DoubleDoublePair(Math.log(distanceFunction.distance(neighbors.get(i - 1), id).getValue()), Math.log(i)));

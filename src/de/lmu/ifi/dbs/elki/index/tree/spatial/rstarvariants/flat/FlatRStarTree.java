@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 
 /**
@@ -28,7 +29,7 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
    */
   public FlatRStarTree() {
     super();
-    this.debug = true;
+    //this.debug = true;
   }
 
   /**
@@ -46,7 +47,7 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
       root.addDirectoryEntry(createNewDirectoryEntry(node));
     }
 
-    if (this.debug) {
+    if (logger.isLoggable(LogLevel.FINE)) {
       debugFine(getClass() + "\n" + " root: " + root + " with " + nextPageID + " leafNodes.");
     }
   }
@@ -85,7 +86,7 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
     file.setNextPageID(getRootEntry().getID() + 1);
     List<FlatRStarTreeNode> nodes = createLeafNodes(objects);
     int numNodes = nodes.size();
-    if (this.debug) {
+    if (logger.isLoggable(LogLevel.FINE)) {
       debugFine("\n  numLeafNodes = " + numNodes);
     }
 
@@ -98,13 +99,15 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
     numNodes++;
     setHeight(2);
 
-    if (this.debug) {
+    if (logger.isLoggable(LogLevel.FINE)) {
       StringBuffer msg = new StringBuffer();
       msg.append("\n  root = ").append(getRoot());
       msg.append("\n  numNodes = ").append(numNodes);
       msg.append("\n  height = ").append(getHeight());
       debugFine(msg.toString() + "\n");
-      getRoot().test();
+    }
+    if (extraIntegrityChecks) {
+      getRoot().integrityCheck();
     }
   }
 

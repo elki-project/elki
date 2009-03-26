@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.IndexDatabase;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
@@ -65,7 +66,7 @@ public class KNNOutlierDetection <O extends DatabaseObject, D extends Distance<D
 		   */
 		  public KNNOutlierDetection() {
 		    super();
-		    debug = true;
+		    //debug = true;
 		    // kth nearest neighbor
 		    addOption(K_PARAM);
 		    // number of outliers
@@ -99,7 +100,7 @@ public class KNNOutlierDetection <O extends DatabaseObject, D extends Distance<D
 				 id = iter.next();
 				  //distance to the kth nearest neighbor
 				 D dkn = database.kNNQueryForID(id,  k, getDistanceFunction()).get(k-1).getFirst();
-				 if (debug) {
+				 if (logger.isLoggable(LogLevel.FINE)) {
 		        debugFine(dkn + "  dkn");
 		        }
 		      

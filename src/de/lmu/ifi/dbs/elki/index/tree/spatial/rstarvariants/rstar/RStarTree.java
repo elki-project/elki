@@ -21,7 +21,6 @@ public class RStarTree<O extends NumberVector<O,? >> extends NonFlatRStarTree<O,
   public RStarTree() {
     super();
 //    this.debug = true;
-    this.debug = false;
   }
 
   /**

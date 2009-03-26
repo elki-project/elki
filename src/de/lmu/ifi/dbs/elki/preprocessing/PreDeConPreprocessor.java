@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -81,7 +82,7 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends RealVector<V,
     int referenceSetSize = neighbors.size();
     V obj = database.get(id);
 
-    if (debug) {
+    if (logger.isLoggable(LogLevel.FINE)) {
       msg.append("\n\nreferenceSetSize = " + referenceSetSize);
       msg.append("\ndelta = " + delta);
     }
@@ -100,7 +101,7 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends RealVector<V,
     // prepare projected dimensionality
     int projDim = 0;
 
-    // start variance analyis
+    // start variance analysis
     double[] sum = new double[dim];
     for (ComparablePair<D, Integer> neighbor : neighbors) {
       RealVector<?,?> o = database.get(neighbor.getSecond());
@@ -111,7 +112,7 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends RealVector<V,
 
     for (int d = 0; d < dim; d++) {
       if (Math.sqrt(sum[d]) / referenceSetSize <= delta) {
-        if (debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
           msg.append("\nsum[" + d + "]= " + sum[d]);
           msg.append("\n  Math.sqrt(sum[d]) / referenceSetSize)= " + Math.sqrt(sum[d]) / referenceSetSize);
         }
@@ -125,13 +126,13 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends RealVector<V,
     }
 
     if (projDim == 0) {
-      if (debug) {
+      if (logger.isLoggable(LogLevel.FINE)) {
 //        msg.append("\nprojDim == 0!");
       }
       projDim = dim;
     }
 
-    if (debug) {
+    if (logger.isLoggable(LogLevel.FINE)) {
       msg.append("\nprojDim " + database.getAssociation(AssociationID.LABEL, id) + ": " + projDim);
       msg.append("\nsimMatrix " + database.getAssociation(AssociationID.LABEL, id) + ": " + simMatrix.toString(Format.NF4));
       debugFine(msg.toString());

@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.util.PQNode;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
@@ -92,7 +93,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
      * @param objects the object to be inserted
      */
     public void insert(List<O> objects) {
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             debugFine("insert " + objects + "\n");
         }
 
@@ -119,9 +120,9 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
         // adjust the knn distances
         adjustApproximatedKNNDistances(getRootEntry(), knnLists);
 
-        if (debug) {
-            getRoot().test(this, getRootEntry());
-        }
+        //if (debug) {
+        //    getRoot().test(this, getRootEntry());
+        //}
     }
 
     /**
@@ -389,7 +390,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
      */
     private void approximateKnnDistances(MkCoPLeafEntry<D, N> entry, List<D> knnDistances) {
         StringBuffer msg = new StringBuffer();
-        if (debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             msg.append("\nknnDistances " + knnDistances);
         }
 
@@ -426,7 +427,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
             sum_log_k2 += (log_k[i] * log_k[i]);
         }
 
-        if (debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             msg.append("\nk_0 " + k_0);
             msg.append("\nk_max " + k_max);
             msg.append("\nlog_k(" + log_k.length + ") " + FormatUtil.format(log_k));
@@ -451,7 +452,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
         double err1 = ssqerr(k_0, k_max, log_k, log_kDist, conservative.getM(), conservative.getT());
         double err2 = ssqerr(k_0, k_max, log_k, log_kDist, c2.getM(), c2.getT());
 
-        if (debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             msg.append("err1 " + err1);
             msg.append("err2 " + err2);
         }
@@ -492,7 +493,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
         entry.setConservativeKnnDistanceApproximation(conservative);
         entry.setProgressiveKnnDistanceApproximation(progressive);
 
-        if (debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             debugFine(msg.toString());
         }
 
@@ -593,7 +594,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
             double current_t = log_kDist[ii] - current_m * log_k[ii];
             ApproximationLine current_approx = new ApproximationLine(k_0, current_m, current_t);
 
-            if (debug) {
+            if (logger.isLoggable(LogLevel.FINE)) {
                 msg.append("\nlog_kDist[" + jj + "] " + log_kDist[jj]);
                 msg.append("\nlog_kDist[" + ii + "] " + log_kDist[ii]);
                 msg.append("\nlog_k[" + jj + "] " + log_k[jj]);
@@ -620,7 +621,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
             }
         }
 
-        if (debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             msg.append("\nupper Approx " + approx);
             debugFine(msg.toString());
         }
@@ -649,7 +650,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
                 sum_log_k_kDist, sum_log_kDist);
             double t_a = y_a - m_a * x_a;
 
-            if (debug) {
+            if (logger.isLoggable(LogLevel.FINE)) {
                 msg.append("\na=" + a + " m_a=" + m_a + ", t_a=" + t_a);
                 msg.append("\n err " + ssqerr(k_0, k_max, log_k, log_kDist, m_a, m_a));
             }
@@ -664,7 +665,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
 
             if (lessThanPre && lessThanSuc) {
                 ApproximationLine appr = new ApproximationLine(k_0, m_a, t_a);
-                if (debug) {
+                if (logger.isLoggable(LogLevel.FINE)) {
                     msg.append("\n1 anchor = " + a);
                     debugFine(msg.toString());
                 }
@@ -679,7 +680,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
                     t_a = y_a - m_a * x_a;
 
                     ApproximationLine appr = new ApproximationLine(k_0, m_a, t_a);
-                    if (debug) {
+                    if (logger.isLoggable(LogLevel.FINE)) {
                         msg.append("2 anchor = " + a);
                         msg.append("appr1 " + appr);
                         msg.append("x_a " + x_a + ", y_a " + y_a);
@@ -701,7 +702,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
                     t_a = y_a - m_a * x_a;
                     ApproximationLine appr = new ApproximationLine(k_0, m_a, t_a);
 
-                    if (debug) {
+                    if (logger.isLoggable(LogLevel.FINE)) {
                         msg.append("3 anchor = " + a + " -- " + (a + 1));
                         msg.append("appr2 " + appr);
                         debugFine(msg.toString());

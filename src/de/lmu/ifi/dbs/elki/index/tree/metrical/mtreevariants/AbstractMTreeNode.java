@@ -155,7 +155,7 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
      * @param entry the entry representing this node
      */
     @SuppressWarnings("unchecked")
-    public final void test(AbstractMTree<O, D, N, E> mTree, E entry) {
+    public final void integrityCheck(AbstractMTree<O, D, N, E> mTree, E entry) {
         // leaf node
         if (isLeaf()) {
             for (int i = 0; i < getCapacity(); i++) {
@@ -201,8 +201,8 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
                     }
 
                     //noinspection unchecked
-                    node.test(entry, (N) this, i, mTree);
-                    node.test(mTree, e);
+                    node.integrityCheckParameters(entry, (N) this, i, mTree);
+                    node.integrityCheck(mTree, e);
                 }
             }
 
@@ -221,7 +221,7 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
      * @param index       the index of the entry in the parents child arry
      * @param mTree       the M-Tree holding this node
      */
-    protected void test(E parentEntry, N parent, int index, AbstractMTree<O, D, N, E> mTree) {
+    protected void integrityCheckParameters(E parentEntry, N parent, int index, AbstractMTree<O, D, N, E> mTree) {
         // test if parent distance is correctly set
         E entry = parent.getEntry(index);
         D parentDistance = mTree.distance(entry.getRoutingObjectID(), parentEntry.getRoutingObjectID());

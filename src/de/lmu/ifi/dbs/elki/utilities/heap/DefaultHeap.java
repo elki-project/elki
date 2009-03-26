@@ -35,7 +35,7 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable<?>> imp
   private Hashtable<Integer, Integer> indices;
 
   /**
-   * Indicates weather this heap is organised in ascending or descending
+   * Indicates weather this heap is organized in ascending or descending
    * order.
    */
   private boolean ascending = true;
@@ -50,8 +50,8 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable<?>> imp
   /**
    * Creates a new heap that stores the elements in the specified order.
    *
-   * @param ascending if true, the heap is organised in ascending order, otherwise
-   *                  the heap is organised in descending other
+   * @param ascending if true, the heap is organized in ascending order, otherwise
+   *                  the heap is organized in descending other
    */
   public DefaultHeap(boolean ascending) {
     this.heap = new Vector<HeapNode<K, V>>();
@@ -80,7 +80,7 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable<?>> imp
    * Retrieves and removes the minimum node of this heap. If the heap is
    * empty, null will be returned.
    *
-   * @return the minimum node of this heap, null in case of emptyness
+   * @return the minimum node of this heap, null in case of emptiness
    */
   public HeapNode<K, V> getMinNode() {
     if (isEmpty())
@@ -89,7 +89,7 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable<?>> imp
   }
 
   /**
-   * Indicates wether this heap ist empty.
+   * Indicates whether this heap is empty.
    *
    * @return true if this heap is empty, false otherwise
    */

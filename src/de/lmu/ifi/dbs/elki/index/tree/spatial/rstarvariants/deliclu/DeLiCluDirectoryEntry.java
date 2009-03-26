@@ -5,7 +5,7 @@ import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 
 /**
  * Defines the requirements for a directory entry in an DeLiClu-Tree node.
- * Additionally to a directory entry in an R*-Tree two boolean flags that indicate wether this entry's node
+ * Additionally to a directory entry in an R*-Tree two boolean flags that indicate whether this entry's node
  * contains handled or unhandled data objects.
  *
  * @author Elke Achtert 
@@ -36,7 +36,7 @@ public class DeLiCluDirectoryEntry extends SpatialDirectoryEntry implements DeLi
    * Constructs a new DeLiCluDirectoryEntry object with the given parameters.
    *
    * @param id  the unique id of the underlying spatial node
-   * @param mbr the minmum bounding rectangle of the underlying spatial node
+   * @param mbr the minimum bounding rectangle of the underlying spatial node
    * @param hasHandled indicates if this entry has handled nodes
    * @param hasUnhandled indicates if this entry has unhandled nodes
    */

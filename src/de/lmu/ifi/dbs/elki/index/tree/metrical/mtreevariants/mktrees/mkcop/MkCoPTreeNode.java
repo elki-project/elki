@@ -30,7 +30,7 @@ class MkCoPTreeNode<O extends DatabaseObject, D extends NumberDistance<D, N>, N 
      *
      * @param file     the file storing the MCop-Tree
      * @param capacity the capacity (maximum number of entries plus 1 for overflow) of this node
-     * @param isLeaf   indicates wether this node is a leaf node
+     * @param isLeaf   indicates whether this node is a leaf node
      */
     public MkCoPTreeNode(PageFile<MkCoPTreeNode<O, D, N>> file, int capacity, boolean isLeaf) {
         super(file, capacity, isLeaf);
@@ -155,9 +155,9 @@ class MkCoPTreeNode<O extends DatabaseObject, D extends NumberDistance<D, N>, N 
     }
 
     @Override
-    protected void test(MkCoPEntry<D, N> parentEntry, MkCoPTreeNode<O, D, N> parent, int index,
+    protected void integrityCheckParameters(MkCoPEntry<D, N> parentEntry, MkCoPTreeNode<O, D, N> parent, int index,
                         AbstractMTree<O, D, MkCoPTreeNode<O, D, N>, MkCoPEntry<D, N>> mTree) {
-        super.test(parentEntry, parent, index, mTree);
+        super.integrityCheckParameters(parentEntry, parent, index, mTree);
         // test conservative approximation
         MkCoPEntry<D, N> entry = parent.getEntry(index);
         int k_max = ((MkCoPTree<O, D, N>) mTree).getK_max();

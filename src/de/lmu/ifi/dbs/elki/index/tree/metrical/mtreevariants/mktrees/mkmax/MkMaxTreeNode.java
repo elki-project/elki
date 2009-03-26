@@ -32,7 +32,7 @@ class MkMaxTreeNode<O extends DatabaseObject, D extends Distance<D>>
      * @param file     the file storing the MkMaxTree
      * @param capacity the capacity (maximum number of entries plus 1 for overflow)
      *                 of this node
-     * @param isLeaf   indicates wether this node is a leaf node
+     * @param isLeaf   indicates whether this node is a leaf node
      */
     public MkMaxTreeNode(PageFile<MkMaxTreeNode<O, D>> file, int capacity, boolean isLeaf) {
         super(file, capacity, isLeaf);
@@ -87,8 +87,8 @@ class MkMaxTreeNode<O extends DatabaseObject, D extends Distance<D>>
      * the k-nearest neighbor distance of this node is correctly set.
      */
     @Override
-    protected void test(MkMaxEntry<D> parentEntry, MkMaxTreeNode<O, D> parent, int index, AbstractMTree<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> mTree) {
-        super.test(parentEntry, parent, index, mTree);
+    protected void integrityCheckParameters(MkMaxEntry<D> parentEntry, MkMaxTreeNode<O, D> parent, int index, AbstractMTree<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> mTree) {
+        super.integrityCheckParameters(parentEntry, parent, index, mTree);
         // test if knn distance is correctly set
         MkMaxEntry<D> entry = parent.getEntry(index);
         D knnDistance = kNNDistance(mTree.getDistanceFunction());

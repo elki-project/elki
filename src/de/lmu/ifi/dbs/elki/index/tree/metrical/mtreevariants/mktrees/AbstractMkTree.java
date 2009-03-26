@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -23,7 +24,7 @@ import java.util.Map;
  * using the k-nn distances of the entries, where k is less than or equal to the
  * specified parameter {@link #K_MAX_PARAM}.
  *
- * @author Elke Achtert (<a href="mailto:achtert@dbs.ifi.lmu.de">achtert@dbs.ifi.lmu.de</a>)
+ * @author Elke Achtert
  * @param <O> the type of DatabaseObject to be stored in the metrical index
  * @param <D> the type of Distance used in the metrical index
  * @param <N> the type of MetricalNode used in the metrical index
@@ -85,7 +86,7 @@ public abstract class AbstractMkTree<O extends DatabaseObject, D extends Distanc
      * a batch knn query is performed and the knn distances are adjusted.<p/>
      */
     public final void insert(List<O> objects) {
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             debugFine("insert " + objects + "\n");
         }
 
@@ -113,8 +114,8 @@ public abstract class AbstractMkTree<O extends DatabaseObject, D extends Distanc
         // adjust the knn distances
         kNNdistanceAdjustment(getRootEntry(), knnLists);
 
-        if (debug) {
-            getRoot().test(this, getRootEntry());
+        if (extraIntegrityChecks) {
+            getRoot().integrityCheck(this, getRootEntry());
         }
     }
 

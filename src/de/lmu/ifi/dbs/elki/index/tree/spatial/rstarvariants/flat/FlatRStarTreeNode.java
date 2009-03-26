@@ -23,7 +23,7 @@ public class FlatRStarTreeNode extends AbstractRStarTreeNode<FlatRStarTreeNode, 
    * Deletes the entry at the specified index and shifts all
    * entries after the index to left.
    *
-   * @param index the index at which the entry is to be deketed
+   * @param index the index at which the entry is to be deleted
    */
   @Override
   public boolean deleteEntry(int index) {
@@ -37,7 +37,7 @@ public class FlatRStarTreeNode extends AbstractRStarTreeNode<FlatRStarTreeNode, 
    * @param file     the file storing the R*-Tree
    * @param capacity the capacity (maximum number of entries plus 1 for overflow)
    *                 of this node
-   * @param isLeaf   indicates wether this node is a leaf node
+   * @param isLeaf   indicates whether this node is a leaf node
    */
   public FlatRStarTreeNode(PageFile<FlatRStarTreeNode> file, int capacity, boolean isLeaf) {
     super(file, capacity, isLeaf);

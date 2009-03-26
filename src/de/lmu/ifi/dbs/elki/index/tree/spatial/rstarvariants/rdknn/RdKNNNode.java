@@ -26,7 +26,7 @@ public class RdKNNNode<D extends NumberDistance<D,N>, N extends Number> extends 
    * @param file     the file storing the RdKNN-Tree
    * @param capacity the capacity (maximum number of entries plus 1 for overflow)
    *                 of this node
-   * @param isLeaf   indicates wether this node is a leaf node
+   * @param isLeaf   indicates whether this node is a leaf node
    */
   public RdKNNNode(PageFile<RdKNNNode<D,N>> file, int capacity, boolean isLeaf) {
     super(file, capacity, isLeaf);
@@ -75,15 +75,15 @@ public class RdKNNNode<D extends NumberDistance<D,N>, N extends Number> extends 
   }
 
   /**
-   * Tests, if the parameters of the entry representinmg this node, are correctly set.
+   * Tests, if the parameters of the entry representing this node, are correctly set.
    * Subclasses may need to overwrite this method.
    *
    * @param parent the parent holding the entry representing this node
-   * @param index  the index of the entry in the parents child arry
+   * @param index  the index of the entry in the parents child array
    */
   @Override
-  protected void testEntry(RdKNNNode<D,N> parent, int index) {
-    super.testEntry(parent, index);
+  protected void integrityCheckParameters(RdKNNNode<D,N> parent, int index) {
+    super.integrityCheckParameters(parent, index);
     // test if knn distance is correctly set
     RdKNNEntry<D,N> entry = parent.getEntry(index);
     D knnDistance = kNNDistance();

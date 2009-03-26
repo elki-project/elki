@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.Assignments;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.MLBDistSplit;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.util.PQNode;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
@@ -43,6 +44,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
  */
 public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>>
     extends MetricalIndex<O, D, N, E> {
+
+    protected final static boolean extraIntegrityChecks = true;  
 
     /**
      * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
@@ -238,7 +241,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
      */
     // todo: implement a bulk load for M-Tree and remove this method
     protected final void insert(O object, boolean withPreInsert) {
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             debugFine("insert " + object.getID() + " " + object + "\n");
         }
 
@@ -248,7 +251,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
 
         // choose subtree for insertion
         TreeIndexPath<E> subtree = choosePath(object.getID(), getRootPath());
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             debugFine("\ninsertion-subtree " + subtree + "\n");
         }
 
@@ -271,8 +274,8 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
         adjustTree(subtree);
 
         // test
-        if (debug && withPreInsert) {
-            getRoot().test(this, getRootEntry());
+        if (extraIntegrityChecks && withPreInsert) {
+            getRoot().integrityCheck(this, getRootEntry());
         }
     }
 
@@ -550,7 +553,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
         file.writePage(node);
         file.writePage(newNode);
 
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             String msg = "Split Node " + node.getID() + " (" + this.getClass() + ")\n" + "      newNode " + newNode.getID() + "\n"
                 + "      firstPromoted " + assignments.getFirstRoutingObject() + "\n" + "      firstAssignments(" + node.getID() + ") "
                 + assignments.getFirstAssignments() + "\n" + "      firstCR " + assignments.getFirstCoveringRadius() + "\n"
@@ -655,7 +658,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
      * @param subtree the subtree to be adjusted
      */
     private void adjustTree(TreeIndexPath<E> subtree) {
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             debugFine("\nAdjust tree " + subtree + "\n");
         }
 
@@ -679,7 +682,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
                 // get the parent and add the new split node
                 E parentEntry = subtree.getParentPath().getLastPathComponent().getEntry();
                 N parent = getNode(parentEntry);
-                if (this.debug) {
+                if (logger.isLoggable(LogLevel.FINE)) {
                     debugFine("\nparent " + parent);
                 }
                 D parentDistance2 = distance(parentEntry.getRoutingObjectID(), assignments.getSecondRoutingObject());
@@ -771,7 +774,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
         file.writePage(root);
         file.writePage(oldRoot);
         file.writePage(newNode);
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             String msg = "\nCreate new Root: ID=" + root.getID();
             msg += "\nchild1 " + oldRoot;
             msg += "\nchild2 " + newNode;

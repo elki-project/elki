@@ -22,12 +22,12 @@ public interface Heap<K extends Comparable<K>, V extends Identifiable<?>> extend
    * Retrieves and removes the minimum node of this heap.
    * If the heap is empty, null will be returned.
    *
-   * @return the minimum node of this heap, null in case of emptyness
+   * @return the minimum node of this heap, null in case of emptiness
    */
   HeapNode<K,V> getMinNode();
 
   /**
-   * Indicates wether this heap ist empty.
+   * Indicates whether this heap is empty.
    *
    * @return true if this heap is empty, false otherwise
    */

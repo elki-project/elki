@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.data.model.AxesModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DiSHDistanceFunction;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
@@ -111,7 +112,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
     public DiSH() {
         super();
         // FIXME apparently still in debug mode??? no output???
-        this.debug = true;
+        //this.debug = true;
 
         // parameter epsilon
         addOption(EPSILON_PARAM);
@@ -244,7 +245,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
         // extract clusters
         Map<BitSet, List<SimplePair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>>> clustersMap = extractClusters(database, distanceFunction, clusterOrder);
 
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             StringBuffer msg = new StringBuffer("\nStep 1: extract clusters");
             for (List<SimplePair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>> clusterList : clustersMap.values()) {
                 for (SimplePair<BitSet, DatabaseObjectGroupCollection<List<Integer>>> c : clusterList) {
@@ -256,7 +257,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
 
         // check if there are clusters < minpts
         checkClusters(database, distanceFunction, clustersMap);
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             StringBuffer msg = new StringBuffer("\n\nStep 2: check clusters");
             for (List<SimplePair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>> clusterList : clustersMap.values()) {
                 for (SimplePair<BitSet, DatabaseObjectGroupCollection<List<Integer>>> c : clusterList) {
@@ -268,7 +269,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
 
         // actualize the levels and indices and sort the clusters
         List<Cluster<AxesModel>> clusters = sortClusters(clustersMap, dimensionality);
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             StringBuffer msg = new StringBuffer("\n\nStep 3: sort clusters");
             for (Cluster<AxesModel> c : clusters) {
                 msg.append("\n").append(FormatUtil.format(dimensionality, c.getModel().getSubspaces())).append(" ids ").append(c.getIDs().size());
@@ -278,7 +279,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
 
         // build the hierarchy
         buildHierarchy(database, distanceFunction, clusters, dimensionality);
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             StringBuffer msg = new StringBuffer("\n\nStep 4: build hierarchy");
             for (Cluster<AxesModel> c : clusters) {
                 msg.append("\n").append(FormatUtil.format(dimensionality, c.getModel().getSubspaces())).append(" ids ").append(c.getIDs().size());
@@ -360,7 +361,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
             }
         }
 
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             StringBuffer msg = new StringBuffer("\nStep 0");
             for (List<SimplePair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>> clusterList : clustersMap.values()) {
                 for (SimplePair<BitSet, DatabaseObjectGroupCollection<List<Integer>>> c : clusterList) {
@@ -560,7 +561,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
                 int subspaceDim_j = dimensionality - c_j.getModel().getSubspaces().cardinality();
 
                 if (subspaceDim_i < subspaceDim_j) {
-                    if (debug) {
+                    if (logger.isLoggable(LogLevel.FINER)) {
                         msg.append("\n\nl_i=").append(subspaceDim_i).append(" pv_i=[").append(FormatUtil.format(database.dimensionality(), c_i.getModel().getSubspaces())).append("]");
                         msg.append("\nl_j=").append(subspaceDim_j).append(" pv_j=[").append(FormatUtil.format(database.dimensionality(), c_j.getModel().getSubspaces())).append("]");
                     }
@@ -571,7 +572,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
                         if (c_i.getParents().isEmpty()) {
                             c_j.getChildren().add(c_i);
                             c_i.getParents().add(c_j);
-                            if (debug) {
+                            if (logger.isLoggable(LogLevel.FINER)) {
                                 msg.append("\n").append(c_j).append(" is parent of ").append(c_i);
                             }
                         }
@@ -580,7 +581,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
                         V cj_centroid = DatabaseUtil.centroid(database, c_j.getIDs(), c_j.getModel().getSubspaces());
                         PreferenceVectorBasedCorrelationDistance distance = distanceFunction.correlationDistance(ci_centroid, cj_centroid, c_i.getModel().getSubspaces(), c_j.getModel().getSubspaces());
                         double d = distanceFunction.weightedDistance(ci_centroid, cj_centroid, distance.getCommonPreferenceVector());
-                        if (debug) {
+                        if (logger.isLoggable(LogLevel.FINER)) {
                             msg.append("\ndist ").append(distance.getCorrelationValue());
                         }
 
@@ -590,7 +591,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
                                 if (c_i.getParents().isEmpty() || !isParent(database, distanceFunction, c_j, c_i.getParents())) {
                                     c_j.getChildren().add(c_i);
                                     c_i.getParents().add(c_j);
-                                    if (debug) {
+                                    if (logger.isLoggable(LogLevel.FINER)) {
                                         msg.append("\n").append(c_j).append(" is parent of ").append(c_i);
                                     }
                                 }
@@ -603,7 +604,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
                 }
             }
         }
-        if (debug) {
+        if (logger.isLoggable(LogLevel.FINER)) {
             debugFiner(msg.toString());
         }
     }

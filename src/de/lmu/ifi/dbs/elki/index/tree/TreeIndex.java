@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.index.tree;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.index.Index;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.persistent.LRUCache;
 import de.lmu.ifi.dbs.elki.persistent.MemoryPageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
@@ -257,7 +258,7 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
         this.dirMinimum = header.getDirMinimum();
         this.leafMinimum = header.getLeafMinimum();
 
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             StringBuffer msg = new StringBuffer();
             msg.append(getClass());
             msg.append("\n file = ").append(file.getClass());
@@ -295,7 +296,7 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
         // create empty root
         createEmptyRoot(object);
 
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             StringBuffer msg = new StringBuffer();
             msg.append(getClass()).append("\n");
             msg.append(" file    = ").append(file.getClass()).append("\n");

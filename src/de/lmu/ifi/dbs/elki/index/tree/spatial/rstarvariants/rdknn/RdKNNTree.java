@@ -86,7 +86,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
      */
     public RdKNNTree() {
         super();
-        this.debug = true;
+        //this.debug = true;
 
         addOption(K_PARAM);
         addOption(DISTANCE_FUNCTION_PARAM);
@@ -149,8 +149,8 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
         adjustKNNDistance(getRootEntry(), knnLists);
 
         // test
-        if (debug) {
-            getRoot().test();
+        if (extraIntegrityChecks) {
+            getRoot().integrityCheck();
         }
     }
 

@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
@@ -51,7 +52,7 @@ public class FirstNEigenPairFilter extends AbstractParameterizable implements Ei
 
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
     StringBuffer msg = new StringBuffer();
-    if(this.debug) {
+    if(logger.isLoggable(LogLevel.FINE)) {
       msg.append("\nsortedEigenPairs ").append(eigenPairs.toString());
       msg.append("\nn = ").append(n);
     }
@@ -71,7 +72,7 @@ public class FirstNEigenPairFilter extends AbstractParameterizable implements Ei
       }
     }
 
-    if(this.debug) {
+    if(logger.isLoggable(LogLevel.FINE)) {
       msg.append("\nstrong EigenPairs = ").append(strongEigenPairs);
       msg.append("\nweak EigenPairs = ").append(weakEigenPairs);
       debugFine(msg.toString());

@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractLocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.elki.preprocessing.ProjectedDBSCANPreprocessor;
 import de.lmu.ifi.dbs.elki.properties.Properties;
@@ -260,7 +261,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
         String label = database.getAssociation(AssociationID.LABEL, startObjectID);
         Integer corrDim = database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, startObjectID);
 
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             debugFine("\nEXPAND CLUSTER id = " + startObjectID + " " + label + " " + corrDim + "\n#clusters: " + resultList.size());
 
         }

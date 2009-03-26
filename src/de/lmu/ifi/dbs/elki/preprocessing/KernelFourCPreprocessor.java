@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.ArbitraryKernelFunctionWrapper;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.LinearKernelFunction;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.CompositeEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.LimitEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.NormalizingEigenPairFilter;
@@ -74,7 +75,7 @@ public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector
     private double delta;
 
     /**
-     * Indicates wether delta is an absolute or a relative value.
+     * Indicates whether delta is an absolute or a relative value.
      */
     private boolean absolute;
 
@@ -121,7 +122,7 @@ public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector
         }
         PCAFilteredResult pcares = pca.processIds(ids, database);
 
-        if (debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             final StringBuffer msg = new StringBuffer();
             msg.append("\n").append(id).append(" ").append(database.getAssociation(AssociationID.LABEL, id));
             msg.append("\ncorrDim ").append(pcares.getCorrelationDimension());

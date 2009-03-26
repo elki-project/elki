@@ -76,7 +76,6 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
      */
     public SubspaceAggregation() {
         super();
-        debug = true;
         addOption(K_PARAM);
     }
 

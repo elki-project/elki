@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -212,7 +213,7 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
     }
     else {
       Matrix transposedWeakEigenvectors = weakEigenvectors.transpose();
-      if(this.debug) {
+      if(logger.isLoggable(LogLevel.FINE)) {
         StringBuilder log = new StringBuilder();
         log.append("strong Eigenvectors:\n");
         log.append(pcares.getEigenvectors().times(pcares.selectionMatrixOfStrongEigenvectors()).toString(NF));
@@ -226,7 +227,7 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
         debugFine(log.toString());
       }
       Matrix B = transposedWeakEigenvectors.times(centroid);
-      if(this.debug) {
+      if(logger.isLoggable(LogLevel.FINE)) {
         StringBuilder log = new StringBuilder();
         log.append("Centroid:\n");
         log.append(centroid);

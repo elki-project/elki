@@ -10,6 +10,7 @@ import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.result.AprioriResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
@@ -148,7 +149,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
                 StringBuffer msg = new StringBuffer();
                 BitSet[] frequentItemsets = frequentItemsets(candidates,
                     database);
-                if (this.debug) {
+                if (logger.isLoggable(LogLevel.VERBOSE)) {
                     msg.append("\ncandidates").append(Arrays.asList(candidates));
                     msg.append("\nfrequentItemsets").append(Arrays.asList(frequentItemsets));
                 }
@@ -157,7 +158,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
                 }
                 BitSet[] joined = join(frequentItemsets);
                 candidates = prune(joined, size);
-                if (this.debug) {
+                if (logger.isLoggable(LogLevel.VERBOSE)) {
                     msg.append("\npruned candidates").append(Arrays.asList(candidates));
                     verbose(msg.toString());
                 }

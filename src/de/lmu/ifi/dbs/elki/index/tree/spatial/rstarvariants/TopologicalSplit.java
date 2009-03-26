@@ -25,8 +25,8 @@ class TopologicalSplit<E extends SpatialEntry> {
   private int splitPoint = -1;
 
   /**
-   * Indicates wether the sorting according to maximal or to minmal
-   * value has been used for chosing the split axis and split point.
+   * Indicates whether the sorting according to maximal or to minimal
+   * value has been used for choosing the split axis and split point.
    */
   private int bestSorting;
 
@@ -88,10 +88,10 @@ class TopologicalSplit<E extends SpatialEntry> {
   }
 
   /**
-   * Returns wether the sorting according to maximal or to minmal
-   * value has been used for chosing the split axis and split point.
+   * Returns whether the sorting according to maximal or to minimal
+   * value has been used for choosing the split axis and split point.
    *
-   * @return SpatialComparator.MIN if the sorting according to  minmal
+   * @return SpatialComparator.MIN if the sorting according to  minimal
    *         value has been used, SpatialComparator.MAX otherwise
    */
   public int getBestSorting() {
@@ -117,7 +117,7 @@ class TopologicalSplit<E extends SpatialEntry> {
 
     for (int i = 1; i <= dim; i++) {
       double currentPerimeter = 0.0;
-      // sort the entries according to their minmal and according to their maximal value
+      // sort the entries according to their minimal and according to their maximal value
       final SpatialComparator compMin = new SpatialComparator(i, SpatialComparator.MIN);
       Collections.sort(minSorting, compMin);
       final SpatialComparator compMax = new SpatialComparator(i, SpatialComparator.MAX);
@@ -147,7 +147,7 @@ class TopologicalSplit<E extends SpatialEntry> {
   private void chooseSplitPoint(int minEntries) {
     // numEntries
     int numEntries = maxSorting.size();
-    // sort upper and lower in the right dimesnion
+    // sort upper and lower in the right dimension
     final SpatialComparator compMin = new SpatialComparator(splitAxis, SpatialComparator.MIN);
     Collections.sort(minSorting, compMin);
     final SpatialComparator compMax = new SpatialComparator(splitAxis, SpatialComparator.MAX);
@@ -159,7 +159,7 @@ class TopologicalSplit<E extends SpatialEntry> {
     double minOverlap = Double.MAX_VALUE;
     // the volume of mbr1 and mbr2
     double volume = 0.0;
-    // indicates wether the sorting according to maximal or to minmal value is best for the split axis
+    // indicates whether the sorting according to maximal or to minimal value is best for the split axis
     bestSorting = -1;
 
     for (int i = 0; i <= numEntries - 2 * minEntries; i++) {

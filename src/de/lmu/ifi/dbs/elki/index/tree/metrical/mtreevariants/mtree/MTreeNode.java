@@ -27,7 +27,7 @@ public class MTreeNode<O extends DatabaseObject, D extends Distance<D>> extends 
      * @param file     the file storing the M-Tree
      * @param capacity the capacity (maximum number of entries plus 1 for overflow)
      *                 of this node
-     * @param isLeaf   indicates wether this node is a leaf node
+     * @param isLeaf   indicates whether this node is a leaf node
      */
     public MTreeNode(PageFile<MTreeNode<O, D>> file, int capacity, boolean isLeaf) {
         super(file, capacity, isLeaf);

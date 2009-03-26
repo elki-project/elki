@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.QueryStatistic;
 import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
@@ -38,7 +39,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
      */
     public MkMaxTree() {
         super();
-        this.debug = true;
+        //this.debug = true;
     }
 
     /**
@@ -206,7 +207,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
      * @param knns_q    the knns of q
      */
     private void preInsert(MkMaxEntry<D> q, MkMaxEntry<D> nodeEntry, KNNList<D> knns_q) {
-        if (this.debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             debugFine("\npreInsert " + q + " - " + nodeEntry + "\n");
         }
 
@@ -263,7 +264,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>>
                 knnDist_node = DistanceUtil.max(knnDist_node, dirEntry.getKnnDistance());
             }
         }
-        if (debug) {
+        if (logger.isLoggable(LogLevel.FINE)) {
             debugFine(nodeEntry + "set knn dist " + knnDist_node);
         }
         nodeEntry.setKnnDistance(knnDist_node);

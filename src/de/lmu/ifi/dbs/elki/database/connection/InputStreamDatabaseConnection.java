@@ -6,6 +6,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.parser.Parser;
@@ -67,7 +68,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
 
     public Database<O> getDatabase(Normalization<O> normalization) {
         try {
-            if (this.debug) {
+            if (logger.isLoggable(LogLevel.FINE)) {
                 debugFine("*** parse");
             }
 
@@ -77,7 +78,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
             List<SimplePair<O, Associations>> objectAndAssociationsList = normalizeAndTransformLabels(parsingResult.getObjectAndLabelList(),
                 normalization);
 
-            if (this.debug) {
+            if (logger.isLoggable(LogLevel.FINE)) {
                 debugFine("*** insert");
             }
 

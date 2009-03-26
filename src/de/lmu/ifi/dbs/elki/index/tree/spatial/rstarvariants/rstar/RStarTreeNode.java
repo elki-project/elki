@@ -25,7 +25,7 @@ public class RStarTreeNode extends AbstractRStarTreeNode<RStarTreeNode, SpatialE
    * @param file     the file storing the R*-Tree
    * @param capacity the capacity (maximum number of entries plus 1 for overflow)
    *                 of this node
-   * @param isLeaf   indicates wether this node is a leaf node
+   * @param isLeaf   indicates whether this node is a leaf node
    */
   public RStarTreeNode(PageFile<RStarTreeNode> file, int capacity, boolean isLeaf) {
     super(file, capacity, isLeaf);

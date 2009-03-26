@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.logging.ProgressLogRecord;
 import de.lmu.ifi.dbs.elki.result.AnnotationsFromHashMap;
 import de.lmu.ifi.dbs.elki.utilities.Description;
@@ -104,13 +105,12 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
             // data pages of s
             List<E> ps_candidates = db.getLeaves();
             Progress progress = new Progress(this.getClass().getName(), db.size());
-            if (this.debug) {
+            if (logger.isLoggable(LogLevel.FINE)) {
                 debugFine("# ps = " + ps_candidates.size());
-
             }
             // data pages of r
             List<E> pr_candidates = new ArrayList<E>(ps_candidates);
-            if (this.debug) {
+            if (logger.isLoggable(LogLevel.FINE)) {
                 debugFine("# pr = " + pr_candidates.size());
             }
             int processed = 0;
@@ -120,7 +120,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
                 HyperBoundingBox pr_mbr = pr_entry.getMBR();
                 N pr = db.getIndex().getNode(pr_entry);
                 D pr_knn_distance = distFunction.infiniteDistance();
-                if (this.debug) {
+                if (logger.isLoggable(LogLevel.FINE)) {
                     debugFine(" ------ PR = " + pr);
                 }
                 // create for each data object a knn list

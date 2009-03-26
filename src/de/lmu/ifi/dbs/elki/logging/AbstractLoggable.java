@@ -23,12 +23,13 @@ public abstract class AbstractLoggable implements Loggable {
     /**
      * Holds the class specific debug status.
      */
+    @Deprecated
     protected boolean debug;
 
     /**
      * The logger of the class.
      */
-    private final Logger logger;
+    protected final Logger logger;
 
     /**
      * Initializes the logger and sets the debug status to the given value.
@@ -160,7 +161,7 @@ public abstract class AbstractLoggable implements Loggable {
      */
     public void debugFine(String msg) {
 
-        LogRecord record = new LogRecord(LogLevel.DEBUG_FINE, msg);
+        LogRecord record = new LogRecord(LogLevel.FINE, msg);
         record.setSourceClassName(this.getClass().getName());
         record.setSourceMethodName(inferCaller(this.getClass().getName()));
         logger.log(record);
@@ -174,7 +175,7 @@ public abstract class AbstractLoggable implements Loggable {
      * objects.
      */
     public void debugFiner(String msg) {
-        LogRecord record = new LogRecord(LogLevel.DEBUG_FINER, msg);
+        LogRecord record = new LogRecord(LogLevel.FINER, msg);
         record.setSourceClassName(this.getClass().getName());
         record.setSourceMethodName(inferCaller(this.getClass().getName()));
         logger.log(record);
@@ -188,7 +189,7 @@ public abstract class AbstractLoggable implements Loggable {
      * objects.
      */
     public void debugFinest(String msg) {
-        LogRecord record = new LogRecord(LogLevel.DEBUG_FINEST, msg);
+        LogRecord record = new LogRecord(LogLevel.FINEST, msg);
         record.setSourceClassName(this.getClass().getName());
         record.setSourceMethodName(inferCaller(this.getClass().getName()));
         logger.log(record);

@@ -4,7 +4,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
 
 /**
  * Defines the requirements for a leaf entry in an DeLiClu-Tree node.
- * Additionally to a leaf entry in an R*-Tree two boolean flags that indicate wether this entry's node
+ * Additionally to a leaf entry in an R*-Tree two boolean flags that indicate whether this entry's node
  * contains handled or unhandled data objects.
  *
  * @author Elke Achtert 
