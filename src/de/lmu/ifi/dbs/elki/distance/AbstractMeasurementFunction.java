@@ -56,6 +56,11 @@ public abstract class AbstractMeasurementFunction<O extends DatabaseObject, D ex
         return this.pattern.pattern();
     }
 
+    /**
+     * @param database Database
+     * @param verbose unused
+     * @param time unused
+     */
     public void setDatabase(Database<O> database, boolean verbose, boolean time) {
         this.database = database;
     }

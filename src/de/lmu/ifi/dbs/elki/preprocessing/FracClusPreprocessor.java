@@ -40,7 +40,7 @@ public class FracClusPreprocessor<V extends RealVector<V, ?>> extends AbstractPa
 
     public void run(Database<V> database, boolean verbose, boolean time) {
         EuclideanDistanceFunction<V> distanceFunction = new EuclideanDistanceFunction<V>();
-        distanceFunction.setDatabase(database, false, false); //  TODO: parameters verbose, time???
+        distanceFunction.setDatabase(database, verbose, time);
         if (verbose) {
             verbose("assigning database objects to base clusters");
         }

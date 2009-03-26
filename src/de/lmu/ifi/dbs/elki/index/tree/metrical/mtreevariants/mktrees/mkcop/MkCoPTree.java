@@ -717,6 +717,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
         return null;
     }
 
+    @SuppressWarnings("unused")
     private ApproximationLine approximateUpperHull_OLD(ConvexHull convexHull,
                                                        double[] log_k, double sum_log_k, double sum_log_k2,
                                                        double[] log_kDist, double sum_log_kDist, double sum_log_k_kDist) {

@@ -136,7 +136,7 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
     }
 
     @Override
-    protected Result runInTime(Database<O> database) throws IllegalStateException {
+    protected Result runInTime(@SuppressWarnings("unused") Database<O> database) throws IllegalStateException {
       // TODO Implement sensible default behavior.
       return null;
     }

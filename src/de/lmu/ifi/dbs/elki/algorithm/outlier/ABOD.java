@@ -276,6 +276,7 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
   }
 
   // TODO: remove?
+  @SuppressWarnings("unused")
   private double[] calcNormalization(Integer xKey, HashMap<Integer, Double> dists) {
     double[] result = new double[2];
     for(Integer yKey : dists.keySet()) {
@@ -296,7 +297,7 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
     return result;
   }
 
-  private double[] calcFastNormalization(Integer x, HashMap<Integer, Double> dists) {
+  private double[] calcFastNormalization(@SuppressWarnings("unused") Integer x, HashMap<Integer, Double> dists) {
     double[] result = new double[2];
 
     double sum = 0;

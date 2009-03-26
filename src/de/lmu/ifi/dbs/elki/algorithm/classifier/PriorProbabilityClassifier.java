@@ -72,6 +72,8 @@ public class PriorProbabilityClassifier<O extends DatabaseObject, L extends Clas
      * Returns the index of the most abundant class.
      * According to the prior class probability distribution,
      * this is the index of the class showing maximum prior probability.
+     * 
+     * @param instance unused
      */
     @Override
     public int classify(O instance) throws IllegalStateException {
@@ -80,6 +82,8 @@ public class PriorProbabilityClassifier<O extends DatabaseObject, L extends Clas
 
     /**
      * Returns the distribution of the classes' prior probabilities.
+     * 
+     * @param instance unused
      */
     public double[] classDistribution(O instance) throws IllegalStateException {
         return distribution;
@@ -101,7 +105,7 @@ public class PriorProbabilityClassifier<O extends DatabaseObject, L extends Clas
     }
 
     @Override
-    protected Result runInTime(Database<O> database) throws IllegalStateException {
+    protected Result runInTime(@SuppressWarnings("unused") Database<O> database) throws IllegalStateException {
       // TODO Implement sensible default behavior. 
       return null;
     }

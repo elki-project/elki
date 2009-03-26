@@ -177,7 +177,7 @@ public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Di
     }
 
     @Override
-    protected CorrelationAnalysisSolution<V> runInTime(Database<V> database) throws IllegalStateException {
+    protected CorrelationAnalysisSolution<V> runInTime(@SuppressWarnings("unused") Database<V> database) throws IllegalStateException {
       // TODO Add sensible result.
       return null;
     }

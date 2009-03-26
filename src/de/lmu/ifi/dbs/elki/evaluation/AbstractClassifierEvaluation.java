@@ -46,6 +46,15 @@ public abstract class AbstractClassifierEvaluation<O extends DatabaseObject, L e
         this.classifier = classifier;
     }
 
+    /**
+     * low-level output of results
+     * 
+     * @param outStream output stream
+     * @param normalization Normalization
+     * @param settings Settings
+     * @throws UnableToComplyException
+     * @throws IOException
+     */
     // TODO: Remove/Rewrite
     public void output(PrintStream outStream, Normalization<O> normalization, List<AttributeSettings> settings) throws UnableToComplyException, IOException {
         //writeHeader(outStream, settings, null);

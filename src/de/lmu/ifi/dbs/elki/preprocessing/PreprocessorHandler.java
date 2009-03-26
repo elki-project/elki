@@ -165,6 +165,8 @@ public class PreprocessorHandler<O extends DatabaseObject, P extends Preprocesso
     /**
      * Invoked after objects of the database have been updated in some way.
      * Runs the preprocessor if {@link #OMIT_PREPROCESSING_FLAG} is not set.
+     * 
+     * @param e unused
      */
     public void objectsChanged(DatabaseEvent e) {
         if (!omit) {
@@ -175,6 +177,8 @@ public class PreprocessorHandler<O extends DatabaseObject, P extends Preprocesso
     /**
      * Invoked after an object has been inserted into the database.
      * Runs the preprocessor if {@link #OMIT_PREPROCESSING_FLAG} is not set.
+     *
+     * @param e unused
      */
     public void objectsInserted(DatabaseEvent e) {
         if (!omit) {
@@ -185,6 +189,8 @@ public class PreprocessorHandler<O extends DatabaseObject, P extends Preprocesso
     /**
      * Invoked after an object has been deleted from the database.
      * Runs the preprocessor if {@link #OMIT_PREPROCESSING_FLAG} is not set.
+     * 
+     * @param e unused
      */
     public void objectsRemoved(DatabaseEvent e) {
         if (!omit) {
