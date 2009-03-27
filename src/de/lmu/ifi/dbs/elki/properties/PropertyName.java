@@ -2,8 +2,6 @@ package de.lmu.ifi.dbs.elki.properties;
 
 import de.lmu.ifi.dbs.elki.utilities.ConstantObject;
 
-import java.util.logging.Level;
-
 /**
  * todo: remove old property names?
  * PropertyName for lookup in property file for class definitions.
@@ -15,12 +13,12 @@ public final class PropertyName extends ConstantObject<PropertyName> {
   /**
    * Property debug level.
    */
-  public static final PropertyName DEBUG_LEVEL = new PropertyName("DEBUG_LEVEL", Level.class);
+//  public static final PropertyName DEBUG_LEVEL = new PropertyName("DEBUG_LEVEL", Level.class);
   
   /**
    * Property request status for stack trace.
    */
-  public static final PropertyName STACK_TRACE_CLI = new PropertyName("STACK_TRACE_CLI", Boolean.class);
+//  public static final PropertyName STACK_TRACE_CLI = new PropertyName("STACK_TRACE_CLI", Boolean.class);
 
   /**
    * Property algorithms.

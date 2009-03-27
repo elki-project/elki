@@ -1,9 +1,6 @@
 package de.lmu.ifi.dbs.elki.logging;
 
 
-import de.lmu.ifi.dbs.elki.properties.Properties;
-import de.lmu.ifi.dbs.elki.properties.PropertyName;
-
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
@@ -14,13 +11,13 @@ import java.util.logging.LogRecord;
  */
 public class ExceptionFormatter extends Formatter {
     /**
-     * Holds the status of requests for prionting the stack trace.
+     * Holds the status of requests for printing the stack trace.
      * In this case, the status true is required
      * for complete view of exceptions.
      * If <code>showStacktrace</code> is <code>false</code>,
      * only the exception message is printed.
      * Otherwise, the user gets information
-     * w.r.t. cause and stacktrace.
+     * w.r.t. cause and stack trace.
      */
     private boolean showStackTrace;
 
@@ -28,28 +25,29 @@ public class ExceptionFormatter extends Formatter {
      * Provides an exception formatter
      * for exception messages.
      */
-    public ExceptionFormatter() {
+    public ExceptionFormatter(boolean showStackTrace) {
         super();
-        try
-        {
-          showStackTrace = Boolean.valueOf(Properties.ELKI_PROPERTIES.getProperty(PropertyName.STACK_TRACE_CLI)[0]);
-        }
-        catch (Exception e) {
-          // in this case, the properties are not yet initialized, shoStackTrace just remains false as default
-        }
+        this.showStackTrace = showStackTrace;
+        //try
+        //{
+        //  showStackTrace = Boolean.valueOf(Properties.ELKI_PROPERTIES.getProperty(PropertyName.STACK_TRACE_CLI)[0]);
+        //}
+        //catch (Exception e) {
+        //  // in this case, the properties are not yet initialized, showStackTrace just remains false as default
+        //}
     }
 
     /**
      * Exception messages are formatted dependent from the
      * debug mode as assigned by DEBUG.
      * <ul>
-     * <li>If debug mode is deactivated (i.e. <code>DEBUG=false</code>)
+     * <li>If debug mode is disabled (i.e. <code>DEBUG=false</code>)
      * the regular user information will be provided:
      * i.e., the message of the LogEntry only.
      * </li>
      * <li>In debug mode, one more detailed
      * information is provided, as the name
-     * of the causing exception and the stacktrace.
+     * of the causing exception and the stack trace.
      * </li>
      * </ul>
      */

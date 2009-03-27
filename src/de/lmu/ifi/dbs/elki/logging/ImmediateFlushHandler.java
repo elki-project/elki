@@ -29,7 +29,9 @@ public class ImmediateFlushHandler extends StreamHandler {
      */
     public ImmediateFlushHandler(OutputStream out, Formatter formatter, SelectiveFilter filter) {
         super(out, formatter);
-        super.setFilter(filter);
+        if (filter != null) {
+          super.setFilter(filter);
+        }
         super.setLevel(filter.getLevel());
     }
 
@@ -50,7 +52,7 @@ public class ImmediateFlushHandler extends StreamHandler {
 
 
     /**
-     * Publishs the given LogRecord and flushs immediately.
+     * Publishes the given LogRecord and flushes immediately.
      */
     @Override
     public synchronized void publish(LogRecord record) {

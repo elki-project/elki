@@ -10,7 +10,7 @@ import java.util.logging.LogRecord;
  *
  * @author Arthur Zimek
  */
-public abstract class SelectiveFilter extends AbstractLoggable implements Filter {
+public class SelectiveFilter extends AbstractLoggable implements Filter {
     /**
      * The level to filter for.
      */

@@ -16,7 +16,7 @@ import java.io.OutputStream;
  *
  * @author Arthur Zimek
  */
-public class MaskingOutputStream extends FilterOutputStream {
+public class NonClosingOutputStream extends FilterOutputStream {
 
     /**
      * Keeps the given OutputStream as underlying OutputStream,
@@ -25,7 +25,7 @@ public class MaskingOutputStream extends FilterOutputStream {
      *
      * @param out an OutputStream to pass methodcalls to
      */
-    public MaskingOutputStream(OutputStream out) {
+    public NonClosingOutputStream(OutputStream out) {
         super(out);
     }
 

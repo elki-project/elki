@@ -9,7 +9,7 @@ import java.util.logging.LogRecord;
 public class ProgressFormatter extends Formatter {
   /**
    * Provides a progress formatter
-   * to simply retrieve the preogress of an LogRecord.
+   * to simply retrieve the progress of an LogRecord.
    */
   public ProgressFormatter() {
       super();

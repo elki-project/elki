@@ -38,15 +38,15 @@ public class LogLevel extends java.util.logging.Level {
 	/**
 	 * MESSAGE is a message level describing common messages to keep the user informed of the status of the program.
 	 */
-	public static final Level MESSAGE = new LogLevel("MESSAGE", Level.INFO.intValue() + 3);
+	public static final Level MESSAGE = new LogLevel("MESSAGE", Level.INFO.intValue() + 2);
 	
 	/**
 	 * PROGRESS is a message level describing progress messages.
 	 */
-	public static final Level PROGRESS = new LogLevel("PROGRESS", Level.INFO.intValue() + 2);
+	public static final Level PROGRESS = new LogLevel("PROGRESS", Level.INFO.intValue() + 1);
 	
 	/**
 	 * VERBOSE is a message level providing regular user information.
 	 */
-	public static final Level VERBOSE = new LogLevel("VERBOSE", Level.INFO.intValue() + 1);
+	public static final Level VERBOSE = new LogLevel("VERBOSE", Level.INFO.intValue() - 1);
 }

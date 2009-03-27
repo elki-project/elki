@@ -67,9 +67,9 @@ public final class Properties {
         catch (Exception e) {
             logger.warning("Unable to load properties file " + filename + ".\n");
         }
-        if (PROPERTIES.containsKey(PropertyName.DEBUG_LEVEL.getName()) && LoggingConfiguration.isChangeable()) {
-            LoggingConfiguration.configureRoot(LoggingConfiguration.CLI);
-        }
+        //if (PROPERTIES.containsKey(PropertyName.DEBUG_LEVEL.getName()) && LoggingConfiguration.isChangeable()) {
+        //    LoggingConfiguration.configureRoot(LoggingConfiguration.CLI);
+        //}
     }
 
     /**
