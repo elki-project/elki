@@ -50,7 +50,7 @@ public abstract class ConstantObject<D extends ConstantObject<D>> implements Com
   /**
    * Returns the name of the ConstantObject.
    * 
-   * @return the name of hte ConstantObject
+   * @return the name of the ConstantObject
    */
   public String getName() {
     return new String(name);
@@ -66,7 +66,11 @@ public abstract class ConstantObject<D extends ConstantObject<D>> implements Com
    */
   @SuppressWarnings("unchecked")
   public static final <D extends ConstantObject<D>> D lookup(final Class<D> type, final String name) {
-    return (D) CONSTANT_OBJECTS_INDEX.get(type).get(name);
+    Map<String, ConstantObject<?>> typeindex = CONSTANT_OBJECTS_INDEX.get(type);
+    if (typeindex == null) {
+      return null;
+    }
+    return (D) typeindex.get(name);
   }
 
   /**
