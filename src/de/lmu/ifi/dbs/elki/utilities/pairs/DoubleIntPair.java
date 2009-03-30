@@ -1,14 +1,13 @@
 package de.lmu.ifi.dbs.elki.utilities.pairs;
 
 /**
- * Pair storing an integer and a double. For efficiency reasons this class is made final
- * and it thus is also sane to allow direct (public) access to the values.
+ * Pair storing an integer and a double.
  * 
  * Since double and int are native types, this can't be done via the {@link ComparablePair} generic.
  * 
  * @author Erich Schubert
  */
-public final class DoubleIntPair implements Comparable<DoubleIntPair>, ComparableSwapped<DoubleIntPair> {
+public class DoubleIntPair implements Comparable<DoubleIntPair> {
   /**
    * first value
    */
@@ -50,7 +49,7 @@ public final class DoubleIntPair implements Comparable<DoubleIntPair>, Comparabl
    * Trivial hashCode implementation mixing the two integers.
    */
   @Override
-  public int hashCode() {
+  public final int hashCode() {
     long firsthash = Double.doubleToLongBits(first);
     firsthash = firsthash ^ (firsthash >> 32); 
     // primitive hash function mixing the two integers.
@@ -85,7 +84,7 @@ public final class DoubleIntPair implements Comparable<DoubleIntPair>, Comparabl
    * 
    * @return first value
    */
-  public double getFirst() {
+  public final double getFirst() {
     return first;
   }
 
@@ -94,7 +93,7 @@ public final class DoubleIntPair implements Comparable<DoubleIntPair>, Comparabl
    * 
    * @param first new value
    */
-  public void setFirst(double first) {
+  public final void setFirst(double first) {
     this.first = first;
   }
 
@@ -103,7 +102,7 @@ public final class DoubleIntPair implements Comparable<DoubleIntPair>, Comparabl
    * 
    * @return second value
    */
-  public int getSecond() {
+  public final int getSecond() {
     return second;
   }
 
@@ -112,7 +111,7 @@ public final class DoubleIntPair implements Comparable<DoubleIntPair>, Comparabl
    * 
    * @param second new value
    */
-  public void setSecond(int second) {
+  public final void setSecond(int second) {
     this.second = second;
   }
 }

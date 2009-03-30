@@ -1,24 +1,27 @@
 package de.lmu.ifi.dbs.elki.utilities.pairs;
 
 /**
- * Triple without comparison
+ * Triple without comparison.
+ * 
+ * See also {@link ComparableTriple}
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <FIRST> first type
  * @param <SECOND> second type
  * @param <THIRD> second type
  */
-public final class SimpleTriple<FIRST,SECOND,THIRD> implements TripleInterface<FIRST, SECOND, THIRD> {
-  /* these are public by intention, Pair<> is supposed to be a simple wrapper and *final* */
+public class SimpleTriple<FIRST, SECOND, THIRD> {
   /**
    * First value
    */
   public FIRST first;
+
   /**
    * Second value
    */
   public SECOND second;
+
   /**
    * Third value
    */
@@ -50,7 +53,7 @@ public final class SimpleTriple<FIRST,SECOND,THIRD> implements TripleInterface<F
    * 
    * @return first element in triple
    */
-  public FIRST getFirst() {
+  public final FIRST getFirst() {
     return first;
   }
 
@@ -59,7 +62,7 @@ public final class SimpleTriple<FIRST,SECOND,THIRD> implements TripleInterface<F
    * 
    * @param first new value for first element
    */
-  public void setFirst(FIRST first) {
+  public final void setFirst(FIRST first) {
     this.first = first;
   }
 
@@ -68,7 +71,7 @@ public final class SimpleTriple<FIRST,SECOND,THIRD> implements TripleInterface<F
    * 
    * @return second element in triple
    */
-  public SECOND getSecond() {
+  public final SECOND getSecond() {
     return second;
   }
 
@@ -77,7 +80,7 @@ public final class SimpleTriple<FIRST,SECOND,THIRD> implements TripleInterface<F
    * 
    * @param second new value for second element
    */
-  public void setSecond(SECOND second) {
+  public final void setSecond(SECOND second) {
     this.second = second;
   }
 
@@ -86,7 +89,7 @@ public final class SimpleTriple<FIRST,SECOND,THIRD> implements TripleInterface<F
    * 
    * @return third element in triple
    */
-  public THIRD getThird() {
+  public final THIRD getThird() {
     return third;
   }
 
@@ -95,7 +98,7 @@ public final class SimpleTriple<FIRST,SECOND,THIRD> implements TripleInterface<F
    * 
    * @param third new value for third element
    */
-  public void setThird(THIRD third) {
+  public final void setThird(THIRD third) {
     this.third = third;
   }
 
@@ -105,7 +108,7 @@ public final class SimpleTriple<FIRST,SECOND,THIRD> implements TripleInterface<F
    * @param size Size of array to be constructed.
    */
   @SuppressWarnings("unchecked")
-  public static final <F,S,T> SimpleTriple<F,S,T>[] newArray(int size) {
+  public static final <F, S, T> SimpleTriple<F, S, T>[] newArray(int size) {
     return new SimpleTriple[size];
   }
 
@@ -117,26 +120,51 @@ public final class SimpleTriple<FIRST,SECOND,THIRD> implements TripleInterface<F
   @SuppressWarnings("unchecked")
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) return false;
-    if (!(obj instanceof SimpleTriple)) return false;
-    SimpleTriple<FIRST,SECOND,THIRD> other = (SimpleTriple<FIRST,SECOND,THIRD>) obj;
-    if (this.first == null) {
-      if (other.getFirst() != null) return false;
-    } else {
-      if (other.getFirst() == null) return false;
-      if (!this.first.equals(other.getFirst())) return false;
+    if(obj == null) {
+      return false;
     }
-    if (this.second == null) {
-      if (other.getSecond() != null) return false;
-    } else {
-      if (other.getSecond() == null) return false;
-      if (!this.second.equals(other.getSecond())) return false;
+    if(!(obj instanceof SimpleTriple)) {
+      return false;
     }
-    if (this.third == null) {
-      if (other.getThird() != null) return false;
-    } else {
-      if (other.getThird() == null) return false;
-      if (!this.third.equals(other.getThird())) return false;
+    SimpleTriple<FIRST, SECOND, THIRD> other = (SimpleTriple<FIRST, SECOND, THIRD>) obj;
+    if(this.first == null) {
+      if(other.getFirst() != null) {
+        return false;
+      }
+    }
+    else {
+      if(other.getFirst() == null) {
+        return false;
+      }
+      if(!this.first.equals(other.getFirst())) {
+        return false;
+      }
+    }
+    if(this.second == null) {
+      if(other.getSecond() != null) {
+        return false;
+      }
+    }
+    else {
+      if(other.getSecond() == null) {
+        return false;
+      }
+      if(!this.second.equals(other.getSecond())) {
+        return false;
+      }
+    }
+    if(this.third == null) {
+      if(other.getThird() != null) {
+        return false;
+      }
+    }
+    else {
+      if(other.getThird() == null) {
+        return false;
+      }
+      if(!this.third.equals(other.getThird())) {
+        return false;
+      }
     }
     return true;
   }
@@ -145,7 +173,7 @@ public final class SimpleTriple<FIRST,SECOND,THIRD> implements TripleInterface<F
    * Canonical derived hash function
    */
   @Override
-  public int hashCode() {
+  public final int hashCode() {
     // primitive hash function mixing the three integer hash values.
     // this number does supposedly not have any factors in common with 2^32
     final long prime = 2654435761L;

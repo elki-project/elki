@@ -1,14 +1,13 @@
 package de.lmu.ifi.dbs.elki.utilities.pairs;
 
 /**
- * Pair storing two integers. For efficiency reasons this class is made final
- * and it thus is also sane to allow direct (public) access to the values.
+ * Pair storing two integers.
  * 
  * Since int is a native type, this can't be done via the {@link ComparablePair} generic.
  * 
  * @author Erich Schubert
  */
-public final class IntIntPair implements Comparable<IntIntPair>, ComparableSwapped<IntIntPair> {
+public class IntIntPair implements Comparable<IntIntPair> {
   /**
    * first value
    */
@@ -50,7 +49,7 @@ public final class IntIntPair implements Comparable<IntIntPair>, ComparableSwapp
    * Trivial hashCode implementation mixing the two integers.
    */
   @Override
-  public int hashCode() {
+  public final int hashCode() {
     // primitive hash function mixing the two integers.
     // this number does supposedly not have any factors in common with 2^32
     return (int) (first * 2654435761L + second);
@@ -83,7 +82,7 @@ public final class IntIntPair implements Comparable<IntIntPair>, ComparableSwapp
    * 
    * @return first value
    */
-  public int getFirst() {
+  public final int getFirst() {
     return first;
   }
 
@@ -92,7 +91,7 @@ public final class IntIntPair implements Comparable<IntIntPair>, ComparableSwapp
    * 
    * @param first new value
    */
-  public void setFirst(int first) {
+  public final void setFirst(int first) {
     this.first = first;
   }
 
@@ -101,7 +100,7 @@ public final class IntIntPair implements Comparable<IntIntPair>, ComparableSwapp
    * 
    * @return second value
    */
-  public int getSecond() {
+  public final int getSecond() {
     return second;
   }
 
@@ -110,7 +109,7 @@ public final class IntIntPair implements Comparable<IntIntPair>, ComparableSwapp
    * 
    * @param second new value
    */
-  public void setSecond(int second) {
+  public final void setSecond(int second) {
     this.second = second;
   }
 }

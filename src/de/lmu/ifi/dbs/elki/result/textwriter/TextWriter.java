@@ -31,12 +31,16 @@ import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.combinators.AnnotationCombiner;
-import de.lmu.ifi.dbs.elki.result.textwriter.writers.*;
+import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterDatabaseObjectInline;
+import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterObjectComment;
+import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterObjectInline;
+import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterTextWriteable;
+import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterTriple;
 import de.lmu.ifi.dbs.elki.utilities.HandlerList;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
-import de.lmu.ifi.dbs.elki.utilities.pairs.TripleInterface;
+import de.lmu.ifi.dbs.elki.utilities.pairs.SimpleTriple;
 
 @SuppressWarnings("unchecked")
 public class TextWriter<O extends DatabaseObject> {
@@ -66,7 +70,7 @@ public class TextWriter<O extends DatabaseObject> {
     writers.insertHandler(Distance.class, trivialwriter);
     writers.insertHandler(SimpleClassLabel.class, trivialwriter);
     writers.insertHandler(HierarchicalClassLabel.class, trivialwriter);
-    writers.insertHandler(TripleInterface.class, new TextWriterTriple());
+    writers.insertHandler(SimpleTriple.class, new TextWriterTriple());
     // Objects that have an own writeToText method.
     writers.insertHandler(TextWriteable.class, new TextWriterTextWriteable());
   }
