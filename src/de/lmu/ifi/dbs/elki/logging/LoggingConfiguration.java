@@ -56,10 +56,8 @@ public final class LoggingConfiguration {
    */
   private LoggingConfiguration() {
     LogManager logManager = LogManager.getLogManager();
+    LogLevel.assertLevelsLoaded();
     Logger logger = Logger.getLogger(LoggingConfiguration.class.getName());
-    // Ensure that our log levels are loaded before parsing the configuration
-    // file.
-    LogLevel.VERBOSE.getName();
 
     // Load logging configuration from resources.
     try {
@@ -155,7 +153,7 @@ public final class LoggingConfiguration {
     // TODO: perhaps more suitable formatters?
     Handler exceptionHandler = new ImmediateFlushHandler(new NonClosingOutputStream(System.err), new ExceptionFormatter(STACKTRACE), new SelectiveFilter(LogLevel.EXCEPTION));
     Handler warningHandler = new ImmediateFlushHandler(new NonClosingOutputStream(System.err), new SimpleFormatter(), new SelectiveFilter(LogLevel.WARNING));
-    Handler messageHandler = new ImmediateFlushHandler(new NonClosingOutputStream(System.out), new MessageFormatter(), new SelectiveFilter(LogLevel.MESSAGE));
+    Handler messageHandler = new ImmediateFlushHandler(new NonClosingOutputStream(System.out), new MessageFormatter(), new SelectiveFilter(LogLevel.INFO));
     Handler progressHandler = new ImmediateFlushHandler(new NonClosingOutputStream(System.out), new ProgressFormatter(), new SelectiveFilter(LogLevel.PROGRESS));
     Handler verboseHandler = new ImmediateFlushHandler(new NonClosingOutputStream(System.out), new MessageFormatter(), new SelectiveFilter(LogLevel.VERBOSE));
     Handler debugHandler = new ImmediateFlushHandler(new NonClosingOutputStream(System.err), new SimpleFormatter(), new SelectiveFilter(LogLevel.FINE));

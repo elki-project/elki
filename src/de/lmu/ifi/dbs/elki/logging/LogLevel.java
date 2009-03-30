@@ -31,14 +31,17 @@ public class LogLevel extends java.util.logging.Level {
 	}
 	
 	/**
+	 * Assert that the class was initialized, and that the levels are registered with the LogManager
+	 */
+	public static void assertLevelsLoaded() {
+	  // this is to ensure the levels have been initialized.
+	  EXCEPTION.getName();
+	}
+	
+	/**
 	 * EXCEPTION is a message level indicating a serious failure.
 	 */
 	public static final Level EXCEPTION = new LogLevel("EXCEPTION", Level.SEVERE.intValue()+1);
-	
-	/**
-	 * MESSAGE is a message level describing common messages to keep the user informed of the status of the program.
-	 */
-	public static final Level MESSAGE = new LogLevel("MESSAGE", Level.INFO.intValue() + 2);
 	
 	/**
 	 * PROGRESS is a message level describing progress messages.

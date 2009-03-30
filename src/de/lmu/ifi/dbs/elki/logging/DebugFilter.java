@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.logging;
 
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
 
 /**
  * A filter for all (or specified) logs - suitable for handling debugging messages.
@@ -11,15 +10,6 @@ import java.util.logging.LogRecord;
  * @author Arthur Zimek
  */
 public class DebugFilter extends SelectiveFilter {
-
-    /**
-     * Provides a debug filter for all levels
-     * below {@link LogLevel#VERBOSE VERBOSE}.
-     */
-    public DebugFilter() {
-        super(LogLevel.ALL);
-    }
-
     /**
      * Provides a debug filter for all levels
      * below {@link LogLevel#VERBOSE VERBOSE}
@@ -29,7 +19,7 @@ public class DebugFilter extends SelectiveFilter {
      */
     public DebugFilter(Level debugLevel) {
 
-        super(debugLevel);
+        super(debugLevel, LogLevel.VERBOSE);
     }
 
     /**
@@ -43,24 +33,10 @@ public class DebugFilter extends SelectiveFilter {
      *              or {@link LogLevel#FINEST FINEST}.
      */
     @Override
-    public void setLevel(Level level) {
+    public void setMinLevel(Level level) {
         if (level.intValue() > LogLevel.FINE.intValue()) {
             warning("debug level set to " + level.toString() + " - no debug messages will be logged.\n");
         }
-        super.setLevel(level);
+        super.setMinLevel(level);
     }
-
-    /**
-     * A LogRecord is loggable if it is at least of the currently selected
-     * debug level, but at most of level {@link LogLevel#FINE FINE}.
-     */
-    @Override
-    public boolean isLoggable(LogRecord record) {
-
-        return record.getLevel().intValue() >= getLevel().intValue()
-            && record.getLevel().intValue() <= LogLevel.FINE.intValue()
-            && record.getLevel().intValue() >= LogLevel.ALL.intValue();
-    }
-
-
 }
