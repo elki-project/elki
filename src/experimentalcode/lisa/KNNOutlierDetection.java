@@ -6,19 +6,19 @@ import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.IndexDatabase;
+
 import de.lmu.ifi.dbs.elki.distance.Distance;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+
 import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
+
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
+
 
 
 
@@ -27,7 +27,7 @@ public class KNNOutlierDetection <O extends DatabaseObject, D extends Distance<D
 	public static final OptionID K_ID = OptionID.getOrCreateOptionID(
 		      "knno.k",
 		      "kth nearest neighbor"
-		  );;
+		  );
 
 	public static final OptionID N_ID = OptionID.getOrCreateOptionID(
 				      "knno.n",

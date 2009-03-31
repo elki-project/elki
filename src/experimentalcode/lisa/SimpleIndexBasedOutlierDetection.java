@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
@@ -25,12 +24,12 @@ public class SimpleIndexBasedOutlierDetection <O extends DatabaseObject, D exten
 	public static final OptionID D_ID = OptionID.getOrCreateOptionID(
 		      "sibo.d",
 		      "size of the D-neighborhood"
-		  );;
+		  );
 
 	public static final OptionID P_ID = OptionID.getOrCreateOptionID(
 				      "sibo.p",
 				      "minimum fraction of objects that must be outside the D-neigborhood of an outlier"
-				  );;
+				  );
 		
 		public static final AssociationID<Boolean> SIBO_OFLAG= AssociationID.getOrCreateAssociationID("sibo.oflag", Boolean.class);
 		/**

@@ -66,7 +66,6 @@ public class KNNIntegralOutlierDetection <O extends DatabaseObject, D extends Di
        */
       public KNNIntegralOutlierDetection() {
         super();
-        debug = true;
         // kth nearest neighbor
         addOption(K_PARAM);
         // number of outliers
@@ -105,9 +104,9 @@ public class KNNIntegralOutlierDetection <O extends DatabaseObject, D extends Di
          for (int i = 1; i< k; i++) {
            skn = skn.plus(knn.get(i).getFirst());
          }
-         if (debug) {
+         
             debugFine(skn + "  dkn");
-            }
+            
           
           database.associate(KNNIO_ODEGREE, id, skn);
         }
