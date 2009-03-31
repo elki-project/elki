@@ -7,10 +7,11 @@ import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
- * AnnotationCombiner is a class that combines multiple Annotation Results into one.
+ * AnnotationCombiner is a class that combines multiple Annotation Results into
+ * one.
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <T>
  */
 public class AnnotationCombiner<T> implements AnnotationResult<T> {
@@ -18,14 +19,14 @@ public class AnnotationCombiner<T> implements AnnotationResult<T> {
    * Results to combine
    */
   private Collection<AnnotationResult<T>> results = new ArrayList<AnnotationResult<T>>();
-  
+
   /**
    * Constructor
    */
   public AnnotationCombiner() {
     this(new ArrayList<AnnotationResult<T>>());
   }
-  
+
   /**
    * Constructor with a list of results to combine.
    * 
@@ -51,11 +52,14 @@ public class AnnotationCombiner<T> implements AnnotationResult<T> {
   @Override
   public Pair<String, T>[] getAnnotations(Integer objID) {
     ArrayList<Pair<String, T>> annotations = new ArrayList<Pair<String, T>>();
-    for (AnnotationResult<T> result : results) {
+    for(AnnotationResult<T> result : results) {
+      if(result != null) {
         Pair<String, T>[] newannotations = result.getAnnotations(objID);
-        for (Pair<String, T> newann : newannotations)
+        for(Pair<String, T> newann : newannotations) {
           annotations.add(newann);
+        }
       }
+    }
     Pair<String, T>[] result = Pair.newArray(0);
     return annotations.toArray(result);
   }
