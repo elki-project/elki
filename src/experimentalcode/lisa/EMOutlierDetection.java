@@ -24,7 +24,7 @@ public class EMOutlierDetection<V extends RealVector<V, ?>> extends AbstractAlgo
    */
   public EMOutlierDetection() {
     super();
-    debug = true;
+
     }
   
   /**

@@ -1,7 +1,5 @@
 package experimentalcode.lisa;
 
-
-
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
@@ -14,6 +12,7 @@ import de.lmu.ifi.dbs.elki.utilities.Description;
 import java.util.ArrayList;
 import java.util.List;
 /**
+ * Likelyhood-based outlier detection
  * Assuming that a data set contains objects from a mixture of two probability distributions. 
  * Objects are put in a set of normal objects and the set of anomalous objects is empty. An iterative procedure then transfers 
  * objects from the ordinary set to the anomalous set as long as the transfer increases the overall likelihood of the data. 
