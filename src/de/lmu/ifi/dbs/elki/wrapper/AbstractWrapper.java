@@ -119,7 +119,7 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
      * @param args the arguments to run this wrapper
      */
     public void runCLIWrapper(String[] args) {
-      LoggingConfiguration.configureRoot(LoggingConfiguration.CLI);
+      LoggingConfiguration.assertConfigured();
       try {
         setParameters(args);
         run();

@@ -117,7 +117,7 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
      * @param args the arguments to run this wrapper
      */
     public static void main(String[] args) {
-        LoggingConfiguration.configureRoot(LoggingConfiguration.CLI);
+        LoggingConfiguration.assertConfigured();
 
         ArbitraryCorrelationGenerator wrapper = new ArbitraryCorrelationGenerator();
         try {

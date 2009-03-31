@@ -245,7 +245,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
      * @param args the arguments to run this wrapper
      */
     public static void main(String[] args) {
-        LoggingConfiguration.configureRoot(LoggingConfiguration.CLI);
+        LoggingConfiguration.assertConfigured();
         AxesParallelCorrelationGenerator wrapper = new AxesParallelCorrelationGenerator();
         try {
             wrapper.setParameters(args);

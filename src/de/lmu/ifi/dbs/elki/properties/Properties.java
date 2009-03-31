@@ -57,9 +57,7 @@ public final class Properties {
      * @param filename name of a file to provide property-definitions.
      */
     private Properties(String filename) {
-        if (LoggingConfiguration.isChangeable()) {
-            LoggingConfiguration.configureRoot(LoggingConfiguration.CLI);
-        }
+        LoggingConfiguration.assertConfigured();
         this.PROPERTIES = new java.util.Properties();
         try {
             PROPERTIES.load(ClassLoader.getSystemResourceAsStream(filename));

@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  */
 public abstract class AbstractLoggable {
   static {
-    LoggingConfiguration.configureRoot(LoggingConfiguration.CLI);
+    LoggingConfiguration.assertConfigured();
   }
 
   /**

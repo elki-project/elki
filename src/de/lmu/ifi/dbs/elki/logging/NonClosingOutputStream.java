@@ -23,7 +23,7 @@ public class NonClosingOutputStream extends FilterOutputStream {
      * passing calls to the underlying OutputStream,
      * but preventing it from being closed.
      *
-     * @param out an OutputStream to pass methodcalls to
+     * @param out an OutputStream to pass method calls to
      */
     public NonClosingOutputStream(OutputStream out) {
         super(out);

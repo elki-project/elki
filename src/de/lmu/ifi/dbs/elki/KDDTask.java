@@ -382,7 +382,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
    */
   @SuppressWarnings("unchecked")
   public static void main(String[] args) {
-    LoggingConfiguration.configureRootFinally(LoggingConfiguration.CLI);
+    LoggingConfiguration.assertConfigured();
     KDDTask<? extends DatabaseObject> kddTask = new KDDTask();
     try {
       String[] remainingParameters = kddTask.setParameters(args);
