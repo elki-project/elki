@@ -2,22 +2,20 @@ package experimentalcode.lisa;
 
 import java.util.Iterator;
 import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
-
+import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
-
 import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 
 
@@ -99,7 +97,7 @@ public class KNNIntegralOutlierDetection <O extends DatabaseObject, D extends Di
          id = iter.next();
           //compute sum of the  distances to the k nearest neighbors
          
-         List<ComparablePair<D,Integer>> knn = database.kNNQueryForID(id,  k, getDistanceFunction());
+         List<DistanceResultPair<D>> knn = database.kNNQueryForID(id,  k, getDistanceFunction());
          D skn = knn.get(0).getFirst();
          for (int i = 1; i< k; i++) {
            skn = skn.plus(knn.get(i).getFirst());
