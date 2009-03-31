@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.pairs.ComparableTriple;
+import de.lmu.ifi.dbs.elki.utilities.pairs.CTriple;
 
 /**
  * <p>
@@ -27,8 +27,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.ComparableTriple;
  * 
  * @author Erich Schubert
  */
-public class MaterializeDistances<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, DoubleDistance, CollectionResult<ComparableTriple<Integer, Integer, Double>>> {
-  private CollectionResult<ComparableTriple<Integer, Integer, Double>> result;
+public class MaterializeDistances<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, DoubleDistance, CollectionResult<CTriple<Integer, Integer, Double>>> {
+  private CollectionResult<CTriple<Integer, Integer, Double>> result;
 
   /**
    * Empty constructor. Nothing to do.
@@ -41,12 +41,12 @@ public class MaterializeDistances<V extends RealVector<V, ?>> extends DistanceBa
    * Iterates over all points in the database.
    */
   @Override
-  protected CollectionResult<ComparableTriple<Integer, Integer, Double>> runInTime(Database<V> database) throws IllegalStateException {
+  protected CollectionResult<CTriple<Integer, Integer, Double>> runInTime(Database<V> database) throws IllegalStateException {
     DistanceFunction<V, DoubleDistance> distFunc = getDistanceFunction();
     distFunc.setDatabase(database, isVerbose(), isTime());
     int size = database.size();
 
-    Collection<ComparableTriple<Integer, Integer, Double>> r = new ArrayList<ComparableTriple<Integer, Integer, Double>>(size * (size + 1) / 2);
+    Collection<CTriple<Integer, Integer, Double>> r = new ArrayList<CTriple<Integer, Integer, Double>>(size * (size + 1) / 2);
 
     for(Integer id1 : database.getIDs()) {
       for(Integer id2 : database.getIDs()) {
@@ -55,10 +55,10 @@ public class MaterializeDistances<V extends RealVector<V, ?>> extends DistanceBa
           continue;
         }
         double d = distFunc.distance(id1, id2).getValue();
-        r.add(new ComparableTriple<Integer, Integer, Double>(id1, id2, d));
+        r.add(new CTriple<Integer, Integer, Double>(id1, id2, d));
       }
     }
-    result = new CollectionResult<ComparableTriple<Integer, Integer, Double>>(r);
+    result = new CollectionResult<CTriple<Integer, Integer, Double>>(r);
 
     return result;
   }
@@ -73,7 +73,7 @@ public class MaterializeDistances<V extends RealVector<V, ?>> extends DistanceBa
   /**
    * Return a result object
    */
-  public CollectionResult<ComparableTriple<Integer, Integer, Double>> getResult() {
+  public CollectionResult<CTriple<Integer, Integer, Double>> getResult() {
     return result;
   }
 }

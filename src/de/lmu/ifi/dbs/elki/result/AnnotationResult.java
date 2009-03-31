@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.result;
 
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * The AnnotationResult interface.
@@ -18,5 +18,5 @@ public interface AnnotationResult<T> extends Result {
    * @param objID
    * @return an array of pairs (label, value)
    */
-  public SimplePair<String, T>[] getAnnotations(Integer objID);
+  public Pair<String, T>[] getAnnotations(Integer objID);
 }

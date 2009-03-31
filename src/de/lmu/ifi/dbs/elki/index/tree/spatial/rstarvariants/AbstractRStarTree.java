@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Stack;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
@@ -32,7 +33,6 @@ import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultIdentifiable;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.heap.HeapNode;
-import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * Abstract superclass for index structures based on a R*-Tree.
@@ -226,11 +226,11 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
    * @return a List of the query results
    */
   @Override
-  public <D extends Distance<D>> List<ComparablePair<D, Integer>> rangeQuery(O object, String epsilon,
+  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(O object, String epsilon,
       SpatialDistanceFunction<O, D> distanceFunction) {
 
     D range = distanceFunction.valueOf(epsilon);
-    final List<ComparablePair<D, Integer>> result = new ArrayList<ComparablePair<D, Integer>>();
+    final List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
     final Heap<D, Identifiable<?>> pq = new DefaultHeap<D, Identifiable<?>>();
 
     // push root
@@ -252,7 +252,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
         if (distance.compareTo(range) <= 0) {
           E entry = node.getEntry(i);
           if (node.isLeaf()) {
-            result.add(new ComparablePair<D, Integer>(distance, entry.getID()));
+            result.add(new DistanceResultPair<D>(distance, entry.getID()));
           }
           else {
             pq.addNode(new DefaultHeapNode<D, Identifiable<?>>(distance, new DefaultIdentifiable(entry.getID())));
@@ -278,7 +278,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
    * @return a List of the query results
    */
   @Override
-  public <D extends Distance<D>> List<ComparablePair<D, Integer>> kNNQuery(O object, int k,
+  public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQuery(O object, int k,
       SpatialDistanceFunction<O, D> distanceFunction) {
     if (k < 1) {
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
@@ -299,7 +299,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
    * @return a List of the query results
    */
   @Override
-  public <D extends Distance<D>> List<List<ComparablePair<D, Integer>>> bulkKNNQueryForIDs(List<Integer> ids, int k, SpatialDistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForIDs(List<Integer> ids, int k, SpatialDistanceFunction<O, D> distanceFunction) {
     if (k < 1) {
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
     }
@@ -311,7 +311,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
 
     batchNN(getRoot(), distanceFunction, knnLists);
 
-    List<List<ComparablePair<D, Integer>>> result = new ArrayList<List<ComparablePair<D, Integer>>>();
+    List<List<DistanceResultPair<D>>> result = new ArrayList<List<DistanceResultPair<D>>>();
     for (Integer id : ids) {
       result.add(knnLists.get(id).toList());
     }
@@ -328,7 +328,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
    * @return a List of the query results
    */
   @Override
-  public <D extends Distance<D>> List<ComparablePair<D, Integer>> reverseKNNQuery(O object, int k, SpatialDistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQuery(O object, int k, SpatialDistanceFunction<O, D> distanceFunction) {
     throw new UnsupportedOperationException("Not yet supported!");
   }
 
@@ -528,7 +528,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
                 distanceFunction.minDist(entry.getMBR(), (O) object);
 
           if (distance.compareTo(maxDist) <= 0) {
-            knnList.add(new ComparablePair<D, Integer>(distance, entry.getID()));
+            knnList.add(new DistanceResultPair<D>(distance, entry.getID()));
             maxDist = knnList.getKNNDistance();
           }
         }
@@ -567,7 +567,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O,? >, N extends 
 
           D dist_pq = distanceFunction.distance(p.getID(), q);
           if (dist_pq.compareTo(knn_q_maxDist) <= 0) {
-            knns_q.add(new ComparablePair<D, Integer>(dist_pq, p.getID()));
+            knns_q.add(new DistanceResultPair<D>(dist_pq, p.getID()));
           }
         }
       }

@@ -11,6 +11,7 @@ import java.util.Set;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
@@ -28,7 +29,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * Dependency derivator computes quantitatively linear dependencies among
@@ -156,10 +156,10 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
         ids = db.randomSample(this.sampleSize, 1);
       }
       else {
-        List<ComparablePair<D, Integer>> queryResults = db.kNNQueryForObject(centroidDV, this.sampleSize, this.getDistanceFunction());
+        List<DistanceResultPair<D>> queryResults = db.kNNQueryForObject(centroidDV, this.sampleSize, this.getDistanceFunction());
         ids = new HashSet<Integer>(this.sampleSize);
-        for(ComparablePair<D, Integer> qr : queryResults) {
-          ids.add(qr.getSecond());
+        for(DistanceResultPair<D> qr : queryResults) {
+          ids.add(qr.getID());
         }
       }
     }

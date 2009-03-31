@@ -5,7 +5,7 @@ import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.Distance;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Provides a list of database objects and labels associated with these objects
@@ -17,7 +17,7 @@ public class DistanceParsingResult<O extends DatabaseObject, D extends Distance<
   /**
    * The cache of precomputed distances between the database objects.
    */
-  private final Map<SimplePair<Integer, Integer>, D> distanceCache;
+  private final Map<Pair<Integer, Integer>, D> distanceCache;
 
   /**
    * Provides a list of database objects, a list of label objects associated
@@ -28,8 +28,8 @@ public class DistanceParsingResult<O extends DatabaseObject, D extends Distance<
    * @param distanceCache      the cache of precomputed distances between the database
    *                           objects
    */
-  public DistanceParsingResult(List<SimplePair<O,List<String>>> objectAndLabelList,
-      Map<SimplePair<Integer, Integer>, D> distanceCache) {
+  public DistanceParsingResult(List<Pair<O,List<String>>> objectAndLabelList,
+      Map<Pair<Integer, Integer>, D> distanceCache) {
     super(objectAndLabelList);
     this.distanceCache = distanceCache;
   }
@@ -39,7 +39,7 @@ public class DistanceParsingResult<O extends DatabaseObject, D extends Distance<
    *
    * @return the cache of precomputed distances between the database objects
    */
-  public Map<SimplePair<Integer, Integer>, D> getDistanceCache() {
+  public Map<Pair<Integer, Integer>, D> getDistanceCache() {
     return distanceCache;
   }
 }

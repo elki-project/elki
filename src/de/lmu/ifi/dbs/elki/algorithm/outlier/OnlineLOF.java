@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.connection.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.LogLevel;
@@ -30,8 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Online algorithm to efficiently update density-based local
@@ -106,7 +106,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
     /**
      * The objects to be inserted.
      */
-    private List<SimplePair<O, Associations>> insertions;
+    private List<Pair<O, Associations>> insertions;
 
     /**
      * Provides the Online LOF algorithm,
@@ -139,7 +139,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
         nnTable.resetPageAccess();
         getDistanceFunction().setDatabase(database, isVerbose(), isTime());
         try {
-            for (SimplePair<O, Associations> objectAndAssociations : insertions) {
+            for (Pair<O, Associations> objectAndAssociations : insertions) {
                 insert(database, objectAndAssociations);
             }
         }
@@ -226,7 +226,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
      * @param objectAndAssociation the objects and their associations to be inserted
      * @throws UnableToComplyException if insertion is not possible
      */
-    private void insert(Database<O> database, SimplePair<O, Associations> objectAndAssociation) throws UnableToComplyException {
+    private void insert(Database<O> database, Pair<O, Associations> objectAndAssociation) throws UnableToComplyException {
         // insert o into db
         Integer o = database.insert(objectAndAssociation);
         if (isVerbose()) {
@@ -234,8 +234,8 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
         }
 
         // get neighbors and reverse nearest neighbors of o
-        List<ComparablePair<DoubleDistance, Integer>> neighbors = database.kNNQueryForID(o, minpts + 1, getDistanceFunction());
-        List<ComparablePair<DoubleDistance, Integer>> reverseNeighbors = database.reverseKNNQuery(o, minpts + 1, getDistanceFunction());
+        List<DistanceResultPair<DoubleDistance>> neighbors = database.kNNQueryForID(o, minpts + 1, getDistanceFunction());
+        List<DistanceResultPair<DoubleDistance>> reverseNeighbors = database.reverseKNNQuery(o, minpts + 1, getDistanceFunction());
         neighbors.remove(0);
         reverseNeighbors.remove(0);
 
@@ -250,12 +250,12 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
         insertObjectIntoTables(o, neighbors);
 
         // 1. Consequences of changing neighbors(p)
-        double kNNDist_o = neighbors.get(minpts - 1).getFirst().getValue();
+        double kNNDist_o = neighbors.get(minpts - 1).getDistance().getValue();
         Map<Integer, Double> knnDistances = new HashMap<Integer, Double>();
-        for (ComparablePair<DoubleDistance, Integer> qr : reverseNeighbors) {
+        for (DistanceResultPair<DoubleDistance> qr : reverseNeighbors) {
             // o has been added to the neighbors(p),
             // therefor another object is no longer in neighbors(p)
-            Integer p = qr.getSecond();
+            Integer p = qr.getID();
             double dist_po = getDistanceFunction().distance(p, o).getValue();
             double reachDist_po = Math.max(kNNDist_o, dist_po);
             NeighborList neighbors_p_old = nnTable.getNeighbors(p);
@@ -313,8 +313,8 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
         }
 
         // 2. Consequences of changing reachdist(q,p)
-        for (ComparablePair<DoubleDistance, Integer> qr : reverseNeighbors) {
-            Integer p = qr.getSecond();
+        for (DistanceResultPair<DoubleDistance> qr : reverseNeighbors) {
+            Integer p = qr.getID();
             double knnDistance_p = knnDistances.get(p);
             NeighborList rnns_p = nnTable.getReverseNeighbors(p);
             if (logger.isLoggable(LogLevel.FINE)) {
@@ -354,19 +354,19 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
     }
 
     /**
-     * Auxiliary method for {@link #insert(Database, SimplePair)}:
+     * Auxiliary method for {@link #insert(Database, Pair)}:
      * inserts the objects with the specified id into the the {@link #nnTable} and {@link #lofTable}.
      *
      * @param id        the id of the object to be inserted
      * @param neighbors the neighbors of the object to be inserted
      */
-    private void insertObjectIntoTables(Integer id, List<ComparablePair<DoubleDistance, Integer>> neighbors) {
+    private void insertObjectIntoTables(Integer id, List<DistanceResultPair<DoubleDistance>> neighbors) {
         double sum1 = 0;
         double[] sum2 = new double[minpts];
 
         for (int i = 0; i < minpts; i++) {
-            ComparablePair<DoubleDistance, Integer> qr = neighbors.get(i);
-            Integer p = qr.getSecond();
+            DistanceResultPair<DoubleDistance> qr = neighbors.get(i);
+            Integer p = qr.getID();
 
             // insert into NNTable
             NeighborList neighbors_p = nnTable.getNeighbors(p);
@@ -402,10 +402,10 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
      * @return a list of objects and their associations
      */
     // FIXME: duplicated code, this belongs to the parser classes.
-    private List<SimplePair<O, Associations>> transformObjectAndLabels(List<SimplePair<O, List<String>>> objectAndLabelsList) {
-        List<SimplePair<O, Associations>> result = new ArrayList<SimplePair<O, Associations>>();
+    private List<Pair<O, Associations>> transformObjectAndLabels(List<Pair<O, List<String>>> objectAndLabelsList) {
+        List<Pair<O, Associations>> result = new ArrayList<Pair<O, Associations>>();
 
-        for (SimplePair<O, List<String>> objectAndLabels : objectAndLabelsList) {
+        for (Pair<O, List<String>> objectAndLabels : objectAndLabelsList) {
             List<String> labels = objectAndLabels.getSecond();
 
             StringBuffer labelBuffer = new StringBuffer();
@@ -426,7 +426,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
             if (labelBuffer.length() != 0)
                 associationMap.put(AssociationID.LABEL, labelBuffer.toString());
 
-            result.add(new SimplePair<O, Associations>(objectAndLabels.getFirst(), associationMap));
+            result.add(new Pair<O, Associations>(objectAndLabels.getFirst(), associationMap));
         }
         return result;
     }

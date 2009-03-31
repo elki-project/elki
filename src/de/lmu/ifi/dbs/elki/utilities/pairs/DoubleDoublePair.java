@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.utilities.pairs;
 /**
  * Pair storing two doubles.
  * 
- * Since double is a native type, this can't be done via the {@link ComparablePair} generic.
+ * Since double is a native type, this can't be done via the {@link CPair} generic.
  * 
  * @author Erich Schubert
  */

@@ -3,12 +3,12 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
-import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * MTree is a metrical index structure based on the concepts of the M-Tree.
@@ -74,7 +74,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>>
      * @throws UnsupportedOperationException
      */
     @Override
-    public List<ComparablePair<D, Integer>> reverseKNNQuery(@SuppressWarnings("unused") O object, @SuppressWarnings("unused") int k) {
+    public List<DistanceResultPair<D>> reverseKNNQuery(@SuppressWarnings("unused") O object, @SuppressWarnings("unused") int k) {
         throw new UnsupportedOperationException("Reverse knn-queries are not yet supported!");
     }
 

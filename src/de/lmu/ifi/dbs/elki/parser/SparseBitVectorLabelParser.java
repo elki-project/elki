@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.parser;
 
 import de.lmu.ifi.dbs.elki.data.BitVector;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -38,7 +38,7 @@ public class SparseBitVectorLabelParser extends AbstractParser<BitVector> {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 0;
     int dimensionality = -1;
-    List<SimplePair<BitVector,List<String>>> objectAndLabelsList = new ArrayList<SimplePair<BitVector,List<String>>>();
+    List<Pair<BitVector,List<String>>> objectAndLabelsList = new ArrayList<Pair<BitVector,List<String>>>();
     try {
       List<BitSet> bitSets = new ArrayList<BitSet>();
       List<List<String>> allLabels = new ArrayList<List<String>>();
@@ -68,7 +68,7 @@ public class SparseBitVectorLabelParser extends AbstractParser<BitVector> {
       for (int i = 0; i < bitSets.size(); i++) {
         BitSet bitSet = bitSets.get(i);
         List<String> labels = allLabels.get(i);
-        SimplePair<BitVector,List<String>> objectAndLabels = new SimplePair<BitVector,List<String>>(new BitVector(bitSet, dimensionality), labels);
+        Pair<BitVector,List<String>> objectAndLabels = new Pair<BitVector,List<String>>(new BitVector(bitSet, dimensionality), labels);
         objectAndLabelsList.add(objectAndLabels);
       }
     }

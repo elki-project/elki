@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Provides a DistanceFunction that is based on double distances given by a
@@ -57,7 +57,7 @@ public class FileBasedDoubleDistanceFunction<V extends DatabaseObject> extends A
 
   private DistanceParser<V, DoubleDistance> parser = null;
 
-  private Map<SimplePair<Integer, Integer>, DoubleDistance> cache = null;
+  private Map<Pair<Integer, Integer>, DoubleDistance> cache = null;
   
   public FileBasedDoubleDistanceFunction() {
     super();
@@ -113,7 +113,7 @@ public class FileBasedDoubleDistanceFunction<V extends DatabaseObject> extends A
       return distance(id2, id1);
     }
 
-    return cache.get(new SimplePair<Integer, Integer>(id1, id2));
+    return cache.get(new Pair<Integer, Integer>(id1, id2));
   }
   
   /**

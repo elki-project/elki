@@ -9,12 +9,12 @@ import java.util.regex.Pattern;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.statistics.LinearRegression;
 import de.lmu.ifi.dbs.elki.preprocessing.FracClusPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
-import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 
 /**
@@ -42,13 +42,13 @@ public class FractalDimensionBasedDistanceFunction<V extends RealVector<V, ?>>
 
         KNNList<DoubleDistance> knnList = new KNNList<DoubleDistance>(this.getPreprocessor().getK(), STANDARD_DOUBLE_DISTANCE_FUNCTION.infiniteDistance());
         for (Integer id : supporters) {
-            knnList.add(new ComparablePair<DoubleDistance, Integer>(STANDARD_DOUBLE_DISTANCE_FUNCTION.distance(id, centroid), id));
+            knnList.add(new DistanceResultPair<DoubleDistance>(STANDARD_DOUBLE_DISTANCE_FUNCTION.distance(id, centroid), id));
         }
 
         List<DoubleDistance> distances = new ArrayList<DoubleDistance>();
 
-        for (ComparablePair<DoubleDistance, Integer> qr : knnList.toList()) {
-            distances.add(qr.getFirst());
+        for (DistanceResultPair<DoubleDistance> qr : knnList.toList()) {
+            distances.add(qr.getDistance());
         }
 
         List<DoubleDoublePair> points = new ArrayList<DoubleDoublePair>(distances.size());

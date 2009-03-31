@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Provides a DistanceFunction that is based on float distances given by a
@@ -57,7 +57,7 @@ public class FileBasedFloatDistanceFunction<V extends DatabaseObject> extends Ab
 
   private DistanceParser<V, FloatDistance> parser = null;
 
-  private Map<SimplePair<Integer, Integer>, FloatDistance> cache = null;
+  private Map<Pair<Integer, Integer>, FloatDistance> cache = null;
   
   public FileBasedFloatDistanceFunction() {
     super();
@@ -113,7 +113,7 @@ public class FileBasedFloatDistanceFunction<V extends DatabaseObject> extends Ab
       return distance(id2, id1);
     }
 
-    return cache.get(new SimplePair<Integer, Integer>(id1, id2));
+    return cache.get(new Pair<Integer, Integer>(id1, id2));
   }
   
   /**

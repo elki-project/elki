@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Normalization performs a normalization on a set of feature vectors and is
@@ -27,7 +27,7 @@ public interface Normalization<O extends DatabaseObject> extends Parameterizable
    * @throws NonNumericFeaturesException if feature vectors differ in length or values are not
    *                                     suitable to normalization
    */
-  List<SimplePair<O, Associations>> normalizeObjects(List<SimplePair<O, Associations>> objectAndAssociationsList) throws NonNumericFeaturesException;
+  List<Pair<O, Associations>> normalizeObjects(List<Pair<O, Associations>> objectAndAssociationsList) throws NonNumericFeaturesException;
 
   /**
    * Performs a normalization on a set of feature vectors.

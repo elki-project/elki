@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -72,8 +72,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     reusableIDs = new ArrayList<Integer>();
   }
 
-  public void insert(List<SimplePair<O, Associations>> objectsAndAssociationsList) throws UnableToComplyException {
-    for(SimplePair<O, Associations> objectAndAssociations : objectsAndAssociationsList) {
+  public void insert(List<Pair<O, Associations>> objectsAndAssociationsList) throws UnableToComplyException {
+    for(Pair<O, Associations> objectAndAssociations : objectsAndAssociationsList) {
       insert(objectAndAssociations);
     }
   }
@@ -82,7 +82,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @throws UnableToComplyException if database reached limit of storage
    *         capacity
    */
-  public Integer insert(SimplePair<O, Associations> objectAndAssociations) throws UnableToComplyException {
+  public Integer insert(Pair<O, Associations> objectAndAssociations) throws UnableToComplyException {
     O object = objectAndAssociations.getFirst();
     // insert object
     Integer id = setNewID(object);
@@ -298,12 +298,12 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
 
     Map<Integer, Database<O>> databases = new Hashtable<Integer, Database<O>>();
     for(Integer partitionID : partitions.keySet()) {
-      List<SimplePair<O, Associations>> objectAndAssociationsList = new ArrayList<SimplePair<O, Associations>>();
+      List<Pair<O, Associations>> objectAndAssociationsList = new ArrayList<Pair<O, Associations>>();
       List<Integer> ids = partitions.get(partitionID);
       for(Integer id : ids) {
         O object = get(id);
         Associations associations = getAssociations(id);
-        objectAndAssociationsList.add(new SimplePair<O, Associations>(object, associations));
+        objectAndAssociationsList.add(new Pair<O, Associations>(object, associations));
       }
 
       Database<O> database;
@@ -401,9 +401,9 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    * @param objectAndAssociationsList the list of objects and their associations
    * @return the list of database objects
    */
-  protected List<O> getObjects(List<SimplePair<O, Associations>> objectAndAssociationsList) {
+  protected List<O> getObjects(List<Pair<O, Associations>> objectAndAssociationsList) {
     List<O> objects = new ArrayList<O>(objectAndAssociationsList.size());
-    for(SimplePair<O, Associations> objectAndAssociations : objectAndAssociationsList) {
+    for(Pair<O, Associations> objectAndAssociations : objectAndAssociationsList) {
       objects.add(objectAndAssociations.getFirst());
     }
     return objects;

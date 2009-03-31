@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.result;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Annotations backed by hashmaps.
@@ -17,7 +17,7 @@ public class AnnotationsFromHashMap<T> implements AnnotationResult<T> {
   /**
    * Store the hashmaps for results.
    */
-  private ArrayList<SimplePair<String,HashMap<Integer,T>>> maps = new ArrayList<SimplePair<String,HashMap<Integer,T>>>();
+  private ArrayList<Pair<String,HashMap<Integer,T>>> maps = new ArrayList<Pair<String,HashMap<Integer,T>>>();
 
   /**
    * Constructor
@@ -33,20 +33,20 @@ public class AnnotationsFromHashMap<T> implements AnnotationResult<T> {
    * @param map Hashmap to back the result.
    */
   public void addMap(String name, HashMap<Integer,T> map) {
-    maps.add(new SimplePair<String,HashMap<Integer,T>>(name, map));
+    maps.add(new Pair<String,HashMap<Integer,T>>(name, map));
   }
 
   /**
    * Retrieve the annotations for the given ID.  
    */
   @Override
-  public SimplePair<String,T>[] getAnnotations(Integer objID) {
-    SimplePair<String,T>[] result = SimplePair.newArray(maps.size());
+  public Pair<String,T>[] getAnnotations(Integer objID) {
+    Pair<String,T>[] result = Pair.newArray(maps.size());
     int index = 0;
-    for (SimplePair<String, HashMap<Integer,T>> pair : maps) {
+    for (Pair<String, HashMap<Integer,T>> pair : maps) {
       // TODO: null handling? skip null values?
       T o = pair.getSecond().get(objID);
-      result[index] = new SimplePair<String, T>(pair.getFirst(), o);
+      result[index] = new Pair<String, T>(pair.getFirst(), o);
       index++;
     }
     return result;

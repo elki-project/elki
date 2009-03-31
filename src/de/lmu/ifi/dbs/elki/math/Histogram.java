@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.math;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Class to manage a simple Histogram.
@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
  * @param <T> Histogram data type.
  */
 // TODO: Add resizing strategy: when size >> 2*initial size, do a downsampling.
-public class Histogram<T> implements Iterable<SimplePair<Double, T>> {
+public class Histogram<T> implements Iterable<Pair<Double, T>> {
   /**
    * Interface to plug in constructors for type T.
    * 
@@ -212,7 +212,7 @@ public class Histogram<T> implements Iterable<SimplePair<Double, T>> {
    * 
    * @author Erich Schubert
    */
-  protected class Iter implements Iterator<SimplePair<Double, T>> {
+  protected class Iter implements Iterator<Pair<Double, T>> {
     /**
      * Current bin number
      */
@@ -224,8 +224,8 @@ public class Histogram<T> implements Iterable<SimplePair<Double, T>> {
     }
 
     @Override
-    public SimplePair<Double, T> next() {
-      SimplePair<Double, T> pair = new SimplePair<Double, T>(base + (bin + 0.5 - offset) * binsize, data.get(bin));
+    public Pair<Double, T> next() {
+      Pair<Double, T> pair = new Pair<Double, T>(base + (bin + 0.5 - offset) * binsize, data.get(bin));
       bin++;
       return pair;
     }
@@ -240,7 +240,7 @@ public class Histogram<T> implements Iterable<SimplePair<Double, T>> {
    * Get an iterator over all histogram bins.
    */
   @Override
-  public Iterator<SimplePair<Double, T>> iterator() {
+  public Iterator<Pair<Double, T>> iterator() {
     return new Iter();
   }
   

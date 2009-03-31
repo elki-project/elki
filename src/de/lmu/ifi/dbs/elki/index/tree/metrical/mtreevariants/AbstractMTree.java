@@ -7,6 +7,7 @@ import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -31,7 +32,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * Abstract super class for all M-Tree variants.
@@ -107,9 +107,9 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
 
     @Override
-    public final List<ComparablePair<D, Integer>> rangeQuery(O object, String epsilon) {
+    public final List<DistanceResultPair<D>> rangeQuery(O object, String epsilon) {
         D range = distanceFunction.valueOf(epsilon);
-        final List<ComparablePair<D, Integer>> result = new ArrayList<ComparablePair<D, Integer>>();
+        final List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
 
         doRangeQuery(null, getRoot(), object.getID(), range, result);
 
@@ -119,7 +119,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
 
     @Override
-    public final List<ComparablePair<D, Integer>> kNNQuery(O object, int k) {
+    public final List<DistanceResultPair<D>> kNNQuery(O object, int k) {
         if (k < 1) {
             throw new IllegalArgumentException("At least one object has to be requested!");
         }
@@ -349,7 +349,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
                     if (diff.compareTo(d_k) <= 0) {
                         D d3 = distanceFunction.distance(o_j, q);
                         if (d3.compareTo(d_k) <= 0) {
-                            ComparablePair<D, Integer> queryResult = new ComparablePair<D, Integer>(d3, o_j);
+                            DistanceResultPair<D> queryResult = new DistanceResultPair<D>(d3, o_j);
                             knnList.add(queryResult);
                             d_k = knnList.getKNNDistance();
                         }
@@ -425,7 +425,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
 
                     D dist_pq = distanceFunction.distance(p.getRoutingObjectID(), q);
                     if (dist_pq.compareTo(knn_q_maxDist) <= 0) {
-                        knns_q.add(new ComparablePair<D, Integer>(dist_pq, p.getRoutingObjectID()));
+                        knns_q.add(new DistanceResultPair<D>(dist_pq, p.getRoutingObjectID()));
                     }
                 }
             }
@@ -606,7 +606,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
      * @param r_q    the query range
      * @param result the list holding the query results
      */
-    private void doRangeQuery(Integer o_p, N node, Integer q, D r_q, List<ComparablePair<D, Integer>> result) {
+    private void doRangeQuery(Integer o_p, N node, Integer q, D r_q, List<DistanceResultPair<D>> result) {
         if (!node.isLeaf()) {
             for (int i = 0; i < node.getNumEntries(); i++) {
                 E entry = node.getEntry(i);
@@ -644,8 +644,8 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
                 if (diff.compareTo(r_q) <= 0) {
                     D d3 = distanceFunction.distance(o_j, q);
                     if (d3.compareTo(r_q) <= 0) {
-                      ComparablePair<D, Integer> queryResult = new ComparablePair<D, Integer>(d3, o_j);
-                        result.add(queryResult);
+                      DistanceResultPair<D> queryResult = new DistanceResultPair<D>(d3, o_j);
+                      result.add(queryResult);
                     }
                 }
             }

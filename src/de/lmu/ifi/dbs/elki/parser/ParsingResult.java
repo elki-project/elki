@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.parser;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ public class ParsingResult<O extends DatabaseObject>
     /**
      * The list of database objects and labels associated with these objects.
      */
-    private final List<SimplePair<O,List<String>>> objectAndLabelList;
+    private final List<Pair<O,List<String>>> objectAndLabelList;
 
     /**
      * Provides a list of database objects and labels associated with these
@@ -25,7 +25,7 @@ public class ParsingResult<O extends DatabaseObject>
      *            the list of database objects and labels associated with these
      *            objects
      */
-    public ParsingResult(List<SimplePair<O,List<String>>> objectAndLabelList)
+    public ParsingResult(List<Pair<O,List<String>>> objectAndLabelList)
     {
         this.objectAndLabelList = objectAndLabelList;
     }
@@ -37,7 +37,7 @@ public class ParsingResult<O extends DatabaseObject>
      * @return the list of database objects and labels associated with these
      *         objects
      */
-    public List<SimplePair<O,List<String>>> getObjectAndLabelList()
+    public List<Pair<O,List<String>>> getObjectAndLabelList()
     {
         return objectAndLabelList;
     }

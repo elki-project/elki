@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.utilities.pairs;
 /**
  * Pair storing an integer and a double.
  * 
- * Since double and int are native types, this can't be done via the {@link ComparablePair} generic.
+ * Since double and int are native types, this can't be done via the {@link CPair} generic.
  * 
  * @author Erich Schubert
  */

@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.utilities.pairs;
 /**
  * Triple without comparison.
  * 
- * See also {@link ComparableTriple}
+ * See also {@link CTriple}
  * 
  * @author Erich Schubert
  * 
@@ -11,7 +11,7 @@ package de.lmu.ifi.dbs.elki.utilities.pairs;
  * @param <SECOND> second type
  * @param <THIRD> second type
  */
-public class SimpleTriple<FIRST, SECOND, THIRD> {
+public class Triple<FIRST, SECOND, THIRD> {
   /**
    * First value
    */
@@ -34,7 +34,7 @@ public class SimpleTriple<FIRST, SECOND, THIRD> {
    * @param second Value of second component
    * @param third Value of third component
    */
-  public SimpleTriple(FIRST first, SECOND second, THIRD third) {
+  public Triple(FIRST first, SECOND second, THIRD third) {
     this.first = first;
     this.second = second;
     this.third = third;
@@ -108,8 +108,8 @@ public class SimpleTriple<FIRST, SECOND, THIRD> {
    * @param size Size of array to be constructed.
    */
   @SuppressWarnings("unchecked")
-  public static final <F, S, T> SimpleTriple<F, S, T>[] newArray(int size) {
-    return new SimpleTriple[size];
+  public static final <F, S, T> Triple<F, S, T>[] newArray(int size) {
+    return new Triple[size];
   }
 
   /**
@@ -123,10 +123,10 @@ public class SimpleTriple<FIRST, SECOND, THIRD> {
     if(obj == null) {
       return false;
     }
-    if(!(obj instanceof SimpleTriple)) {
+    if(!(obj instanceof Triple)) {
       return false;
     }
-    SimpleTriple<FIRST, SECOND, THIRD> other = (SimpleTriple<FIRST, SECOND, THIRD>) obj;
+    Triple<FIRST, SECOND, THIRD> other = (Triple<FIRST, SECOND, THIRD>) obj;
     if(this.first == null) {
       if(other.getFirst() != null) {
         return false;

@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ROCAUC;
@@ -19,8 +20,7 @@ import de.lmu.ifi.dbs.elki.math.Histogram;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
-import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Evaluate a distance function with respect to kNN queries. For each point, the
@@ -78,7 +78,7 @@ public class RankingQualityHistogram<V extends RealVector<V, ?>> extends Distanc
     // sort neighbors
     for(Cluster<?> clus : splitted) {
       for(Integer i1 : clus.getIDs()) {
-        List<ComparablePair<DoubleDistance, Integer>> knn = database.kNNQueryForID(i1, size, distFunc);
+        List<DistanceResultPair<DoubleDistance>> knn = database.kNNQueryForID(i1, size, distFunc);
         double result = ROCAUC.computeROCAUC(size, clus, knn);
 
         hist.put(result, hist.get(result) + 1. / size);
@@ -96,7 +96,7 @@ public class RankingQualityHistogram<V extends RealVector<V, ?>> extends Distanc
 
     // Transform Histogram into a Double Vector array.
     Collection<DoubleVector> res = new ArrayList<DoubleVector>(size);
-    for(SimplePair<Double, Double> pair : hist) {
+    for(Pair<Double, Double> pair : hist) {
       DoubleVector row = new DoubleVector(new double[] { pair.getFirst(), pair.getSecond() });
       res.add(row);
     }

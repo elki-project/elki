@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
@@ -17,7 +18,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * <p/>
@@ -248,13 +248,13 @@ public class LOF<O extends DatabaseObject> extends
      * @param id       the object id
      */
     public void computeNeighbors(Database<O> database, Integer id) {
-        List<ComparablePair<DoubleDistance, Integer>> neighbors = database.kNNQueryForID(
+        List<DistanceResultPair<DoubleDistance>> neighbors = database.kNNQueryForID(
             id, minpts + 1, getDistanceFunction());
         neighbors.remove(0);
 
         for (int k = 0; k < minpts; k++) {
-          ComparablePair<DoubleDistance, Integer> qr = neighbors.get(k);
-            Neighbor neighbor = new Neighbor(id, k, qr.getSecond(), 0, qr.getFirst().getValue());
+          DistanceResultPair<DoubleDistance> qr = neighbors.get(k);
+            Neighbor neighbor = new Neighbor(id, k, qr.getID(), 0, qr.getDistance().getValue());
             nnTable.insert(neighbor);
         }
     }

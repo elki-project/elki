@@ -5,7 +5,7 @@ import de.lmu.ifi.dbs.elki.data.FloatVector;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -77,7 +77,7 @@ public class RealVectorLabelTransposingParser<V extends RealVector<V, ?>> extend
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
 
-    List<SimplePair<V, List<String>>> objectAndLabelList = new ArrayList<SimplePair<V, List<String>>>(data.length);
+    List<Pair<V, List<String>>> objectAndLabelList = new ArrayList<Pair<V, List<String>>>(data.length);
     for (int i = 0; i < data.length; i++) {
       List<String> label = new ArrayList<String>();
       label.add(labels[i].toString());
@@ -89,7 +89,7 @@ public class RealVectorLabelTransposingParser<V extends RealVector<V, ?>> extend
       else {
         featureVector = (V) new DoubleVector(data[i]);
       }
-      SimplePair<V, List<String>> objectAndLabels = new SimplePair<V, List<String>>(featureVector, label);
+      Pair<V, List<String>> objectAndLabels = new Pair<V, List<String>>(featureVector, label);
       objectAndLabelList.add(objectAndLabels);
     }
 

@@ -13,8 +13,7 @@ import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionSelectingDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Database implemented by inverted lists that supports range queries on a specific dimension.
@@ -34,7 +33,7 @@ public class InvertedListDatabase<N extends Number, O extends FeatureVector<O, N
      *          if database reached limit of storage capacity
      */
     @Override
-    public Integer insert(SimplePair<O, Associations> objectAndAssociations) throws UnableToComplyException {
+    public Integer insert(Pair<O, Associations> objectAndAssociations) throws UnableToComplyException {
         Integer id = super.insert(objectAndAssociations);
         O object = objectAndAssociations.getFirst();
 
@@ -86,8 +85,8 @@ public class InvertedListDatabase<N extends Number, O extends FeatureVector<O, N
      */
     @SuppressWarnings("unchecked")
     @Override
-    public <D extends Distance<D>> List<ComparablePair<D, Integer>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, D> distanceFunction) {
-        List<ComparablePair<D, Integer>> result = new ArrayList<ComparablePair<D, Integer>>();
+    public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, D> distanceFunction) {
+        List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
 
         if (distanceFunction instanceof DimensionSelectingDistanceFunction) {
             DimensionSelectingDistanceFunction df = (DimensionSelectingDistanceFunction) distanceFunction;
@@ -106,7 +105,7 @@ public class InvertedListDatabase<N extends Number, O extends FeatureVector<O, N
                 for (Integer currentID : ids) {
                     // noinspection unchecked
                     D currentDistance = (D) df.distance(currentID, id);
-                    result.add(new ComparablePair<D, Integer>(currentDistance, currentID));
+                    result.add(new DistanceResultPair<D>(currentDistance, currentID));
                 }
             }
 
@@ -129,7 +128,7 @@ public class InvertedListDatabase<N extends Number, O extends FeatureVector<O, N
      * @return a List of the query results
      */
     @Override
-    public <D extends Distance<D>> List<ComparablePair<D, Integer>> kNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
+    public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
         return super.kNNQueryForID(id, k, distanceFunction);
     }
 
@@ -144,7 +143,7 @@ public class InvertedListDatabase<N extends Number, O extends FeatureVector<O, N
      * @return a List of the query results
      */
     @Override
-    public <D extends Distance<D>> List<ComparablePair<D, Integer>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, D> distanceFunction) {
+    public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, D> distanceFunction) {
         return super.kNNQueryForObject(queryObject, k, distanceFunction);
     }
 
@@ -159,7 +158,7 @@ public class InvertedListDatabase<N extends Number, O extends FeatureVector<O, N
      * @return a List of List of the query results
      */
     @Override
-    public <D extends Distance<D>> List<List<ComparablePair<D, Integer>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
+    public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
         return super.bulkKNNQueryForID(ids, k, distanceFunction);
     }
 
@@ -174,7 +173,7 @@ public class InvertedListDatabase<N extends Number, O extends FeatureVector<O, N
      * @return a List of the query results
      */
     @Override
-    public <D extends Distance<D>> List<ComparablePair<D, Integer>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
+    public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
         return super.reverseKNNQuery(id, k, distanceFunction);
     }
 }

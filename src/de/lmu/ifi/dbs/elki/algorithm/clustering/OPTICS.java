@@ -8,6 +8,7 @@ import java.util.Set;
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -26,7 +27,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * OPTICS provides the OPTICS algorithm.
@@ -163,16 +163,16 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
             progress(progress);
         }
 
-        List<ComparablePair<D, Integer>> neighbors = database.rangeQuery(objectID, epsilon, getDistanceFunction());
-        D coreDistance = neighbors.size() < minpts ? getDistanceFunction().infiniteDistance() : neighbors.get(minpts - 1).getFirst();
+        List<DistanceResultPair<D>> neighbors = database.rangeQuery(objectID, epsilon, getDistanceFunction());
+        D coreDistance = neighbors.size() < minpts ? getDistanceFunction().infiniteDistance() : neighbors.get(minpts - 1).getDistance();
 
         if (!getDistanceFunction().isInfiniteDistance(coreDistance)) {
-            for (ComparablePair<D, Integer> neighbor : neighbors) {
-                if (processedIDs.contains(neighbor.getSecond())) {
+            for (DistanceResultPair<D> neighbor : neighbors) {
+                if (processedIDs.contains(neighbor.getID())) {
                     continue;
                 }
-                D reachability = DistanceUtil.max(neighbor.getFirst(), coreDistance);
-                updateHeap(reachability, new COEntry(neighbor.getSecond(), objectID));
+                D reachability = DistanceUtil.max(neighbor.getDistance(), coreDistance);
+                updateHeap(reachability, new COEntry(neighbor.getID(), objectID));
             }
 
             while (!heap.isEmpty()) {
@@ -184,16 +184,16 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
                 neighbors = database.rangeQuery(current.objectID, epsilon, getDistanceFunction());
                 coreDistance = neighbors.size() < minpts ?
                     getDistanceFunction().infiniteDistance() :
-                    neighbors.get(minpts - 1).getFirst();
+                    neighbors.get(minpts - 1).getDistance();
 
                 if (!getDistanceFunction().isInfiniteDistance(coreDistance)) {
-                    for (ComparablePair<D, Integer> neighbor : neighbors) {
-                        if (processedIDs.contains(neighbor.getSecond())) {
+                    for (DistanceResultPair<D> neighbor : neighbors) {
+                        if (processedIDs.contains(neighbor.getID())) {
                             continue;
                         }
-                        D distance = neighbor.getFirst();
+                        D distance = neighbor.getDistance();
                         D reachability = DistanceUtil.max(distance, coreDistance);
-                        updateHeap(reachability, new COEntry(neighbor.getSecond(), current.objectID));
+                        updateHeap(reachability, new COEntry(neighbor.getID(), current.objectID));
                     }
                 }
                 if (isVerbose()) {

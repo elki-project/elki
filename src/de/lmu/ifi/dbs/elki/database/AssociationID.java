@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.utilities.ConstantObject;
-import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.CPair;
 
 /**
  * An AssociationID is used by databases as a unique identifier for specific
@@ -66,12 +66,12 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
     /**
      * The association id to associate the neighbors of an object.
      */
-    public static final AssociationID<List<ComparablePair<DoubleDistance, Integer>>> NEIGHBORS = new AssociationID<List<ComparablePair<DoubleDistance, Integer>>>("neighbors", List.class);
+    public static final AssociationID<List<DistanceResultPair<DoubleDistance>>> NEIGHBORS = new AssociationID<List<DistanceResultPair<DoubleDistance>>>("neighbors", List.class);
 
     /**
      * The association id to associate another set of neighbors of an object.
      */
-    public static final AssociationID<List<ComparablePair<DoubleDistance, Integer>>> NEIGHBORS_2 = new AssociationID<List<ComparablePair<DoubleDistance, Integer>>>("neighbors2", List.class);
+    public static final AssociationID<List<DistanceResultPair<DoubleDistance>>> NEIGHBORS_2 = new AssociationID<List<DistanceResultPair<DoubleDistance>>>("neighbors2", List.class);
 
     /**
      * The association id to associate a set of neighbors for use of the shared
@@ -131,7 +131,7 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
   /**
    * The LOCI critical distances of an object.
    */
-  public static final AssociationID<List<ComparablePair<Double,Integer>>> LOCI_CRITICALDIST = new AssociationID<List<ComparablePair<Double,Integer>>>("loci-cdist", List.class);
+  public static final AssociationID<List<CPair<Double,Integer>>> LOCI_CRITICALDIST = new AssociationID<List<CPair<Double,Integer>>>("loci-cdist", List.class);
   
   /**
    * The LOCI MDEF / SigmaMDEF maximum values radius

@@ -4,6 +4,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndex;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
@@ -12,7 +13,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualStringConstraint;
-import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * Abstract super class for all spatial index classes.
@@ -102,7 +102,7 @@ public abstract class SpatialIndex<O extends NumberVector<O, ?>, N extends Spati
    *        between the objects
    * @return a List of the query results
    */
-  public abstract <D extends Distance<D>> List<ComparablePair<D, Integer>> rangeQuery(final O obj, final String epsilon, final SpatialDistanceFunction<O, D> distanceFunction);
+  public abstract <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(final O obj, final String epsilon, final SpatialDistanceFunction<O, D> distanceFunction);
 
   /**
    * Performs a k-nearest neighbor query for the given object with the given
@@ -115,7 +115,7 @@ public abstract class SpatialIndex<O extends NumberVector<O, ?>, N extends Spati
    *        between the objects
    * @return a List of the query results
    */
-  public abstract <D extends Distance<D>> List<ComparablePair<D, Integer>> kNNQuery(final O obj, final int k, final SpatialDistanceFunction<O, D> distanceFunction);
+  public abstract <D extends Distance<D>> List<DistanceResultPair<D>> kNNQuery(final O obj, final int k, final SpatialDistanceFunction<O, D> distanceFunction);
 
   /**
    * Performs a reverse k-nearest neighbor query for the given object ID. The
@@ -127,7 +127,7 @@ public abstract class SpatialIndex<O extends NumberVector<O, ?>, N extends Spati
    *        between the objects
    * @return a List of the query results
    */
-  public abstract <D extends Distance<D>> List<ComparablePair<D, Integer>> reverseKNNQuery(final O object, final int k, final SpatialDistanceFunction<O, D> distanceFunction);
+  public abstract <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQuery(final O object, final int k, final SpatialDistanceFunction<O, D> distanceFunction);
 
   /**
    * Performs a bulk k-nearest neighbor query for the given object IDs. The
@@ -139,7 +139,7 @@ public abstract class SpatialIndex<O extends NumberVector<O, ?>, N extends Spati
    *        between the objects
    * @return a List of the query results
    */
-  public abstract <D extends Distance<D>> List<List<ComparablePair<D, Integer>>> bulkKNNQueryForIDs(List<Integer> ids, final int k, final SpatialDistanceFunction<O, D> distanceFunction);
+  public abstract <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForIDs(List<Integer> ids, final int k, final SpatialDistanceFunction<O, D> distanceFunction);
 
   /**
    * Returns a list of entries pointing to the leaf nodes of this spatial index.

@@ -6,14 +6,14 @@ import java.util.Comparator;
  * Generic SimplePair<FIRST,SECOND> class.
  * 
  * Does not implement any "special" interfaces such as Comparable, use
- * {@link ComparablePair} if you want comparable pairs.
+ * {@link CPair} if you want comparable pairs.
  * 
  * @author Erich Schubert
  * 
  * @param <FIRST> first type
  * @param <SECOND> second type
  */
-public class SimplePair<FIRST, SECOND> {
+public class Pair<FIRST, SECOND> {
   /**
    * First value in pair
    */
@@ -30,7 +30,7 @@ public class SimplePair<FIRST, SECOND> {
    * @param first first parameter
    * @param second second parameter
    */
-  public SimplePair(FIRST first, SECOND second) {
+  public Pair(FIRST first, SECOND second) {
     this.first = first;
     this.second = second;
   }
@@ -86,8 +86,8 @@ public class SimplePair<FIRST, SECOND> {
    * @return empty array of the new type.
    */
   @SuppressWarnings("unchecked")
-  public static final <F, S> SimplePair<F, S>[] newArray(int size) {
-    return new SimplePair[size];
+  public static final <F, S> Pair<F, S>[] newArray(int size) {
+    return new Pair[size];
   }
 
   /**
@@ -104,10 +104,10 @@ public class SimplePair<FIRST, SECOND> {
     if(obj == null) {
       return false;
     }
-    if(!(obj instanceof SimplePair)) {
+    if(!(obj instanceof Pair)) {
       return false;
     }
-    SimplePair<FIRST, SECOND> other = (SimplePair<FIRST, SECOND>) obj;
+    Pair<FIRST, SECOND> other = (Pair<FIRST, SECOND>) obj;
     return (this.first.equals(other.getFirst())) && (this.second.equals(other.getSecond()));
   }
 
@@ -131,30 +131,30 @@ public class SimplePair<FIRST, SECOND> {
    * @param <FIRST> first type
    * @param <SECOND> second type
    */
-  public static class CompareByFirst<FIRST, SECOND> implements Comparator<SimplePair<FIRST, SECOND>> {
+  public static class CompareByFirst<FIRST, SECOND> implements Comparator<Pair<FIRST, SECOND>> {
     /**
      * A comparator for type P.
      */
     private Comparator<FIRST> comparator;
 
     /**
-     * Provides a comparator for an {@link SimplePair} based on the given
+     * Provides a comparator for an {@link Pair} based on the given
      * Comparator for type <code>P</code>.
      * 
      * @param comparator a Comparator for type <code>P</code> to base the
-     *        comparison of an {@link SimplePair} on
+     *        comparison of an {@link Pair} on
      */
     public CompareByFirst(Comparator<FIRST> comparator) {
       this.comparator = comparator;
     }
 
     /**
-     * To Objects of type {@link SimplePair} are compared based on the
+     * To Objects of type {@link Pair} are compared based on the
      * comparison of their property using the current {@link #comparator}.
      * 
      * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
-    public int compare(SimplePair<FIRST, SECOND> o1, SimplePair<FIRST, SECOND> o2) {
+    public int compare(Pair<FIRST, SECOND> o1, Pair<FIRST, SECOND> o2) {
       return comparator.compare(o1.getFirst(), o2.getFirst());
     }
   }
@@ -165,30 +165,30 @@ public class SimplePair<FIRST, SECOND> {
    * @param <FIRST> first type
    * @param <SECOND> second type
    */
-  public static class CompareBySecond<FIRST, SECOND> implements Comparator<SimplePair<FIRST, SECOND>> {
+  public static class CompareBySecond<FIRST, SECOND> implements Comparator<Pair<FIRST, SECOND>> {
     /**
      * A comparator for type P.
      */
     private Comparator<SECOND> comparator;
 
     /**
-     * Provides a comparator for an {@link SimplePair} based on the given
+     * Provides a comparator for an {@link Pair} based on the given
      * Comparator for type <code>P</code>.
      * 
      * @param comparator a Comparator for type <code>P</code> to base the
-     *        comparison of an {@link SimplePair} on
+     *        comparison of an {@link Pair} on
      */
     public CompareBySecond(Comparator<SECOND> comparator) {
       this.comparator = comparator;
     }
 
     /**
-     * To Objects of type {@link SimplePair} are compared based on the
+     * To Objects of type {@link Pair} are compared based on the
      * comparison of their property using the current {@link #comparator}.
      * 
      * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
-    public int compare(SimplePair<FIRST, SECOND> o1, SimplePair<FIRST, SECOND> o2) {
+    public int compare(Pair<FIRST, SECOND> o1, Pair<FIRST, SECOND> o2) {
       return comparator.compare(o1.getSecond(), o2.getSecond());
     }
   }
@@ -199,7 +199,7 @@ public class SimplePair<FIRST, SECOND> {
    * @param <FIRST> first type
    * @param <SECOND> second type
    */
-  public static class Compare<FIRST, SECOND> implements Comparator<SimplePair<FIRST, SECOND>> {
+  public static class Compare<FIRST, SECOND> implements Comparator<Pair<FIRST, SECOND>> {
     /**
      * A comparator for type FIRST.
      */
@@ -211,11 +211,11 @@ public class SimplePair<FIRST, SECOND> {
     private Comparator<SECOND> scomparator;
 
     /**
-     * Provides a comparator for an {@link SimplePair} based on the given
+     * Provides a comparator for an {@link Pair} based on the given
      * Comparator for type <code>P</code>.
      * 
      * @param comparator a Comparator for type <code>P</code> to base the
-     *        comparison of an {@link SimplePair} on
+     *        comparison of an {@link Pair} on
      */
     public Compare(Comparator<FIRST> fcomparator, Comparator<SECOND> scomparator) {
       this.fcomparator = fcomparator;
@@ -223,12 +223,12 @@ public class SimplePair<FIRST, SECOND> {
     }
 
     /**
-     * Two Objects of type {@link SimplePair} are compared based on the
+     * Two Objects of type {@link Pair} are compared based on the
      * comparison of their property using the comparators {@link #fcomparator}, then {@link #scomparator}.
      * 
      * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
-    public int compare(SimplePair<FIRST, SECOND> o1, SimplePair<FIRST, SECOND> o2) {
+    public int compare(Pair<FIRST, SECOND> o1, Pair<FIRST, SECOND> o2) {
       int delta1 = fcomparator.compare(o1.getFirst(), o2.getFirst());
       if (delta1 != 0) {
         return delta1;
@@ -243,7 +243,7 @@ public class SimplePair<FIRST, SECOND> {
    * @param <FIRST> first type
    * @param <SECOND> second type
    */
-  public static class CompareSwapped<FIRST, SECOND> implements Comparator<SimplePair<FIRST, SECOND>> {
+  public static class CompareSwapped<FIRST, SECOND> implements Comparator<Pair<FIRST, SECOND>> {
     /**
      * A comparator for type FIRST.
      */
@@ -255,11 +255,11 @@ public class SimplePair<FIRST, SECOND> {
     private Comparator<SECOND> scomparator;
 
     /**
-     * Provides a comparator for an {@link SimplePair} based on the given
+     * Provides a comparator for an {@link Pair} based on the given
      * Comparator for type <code>P</code>.
      * 
      * @param comparator a Comparator for type <code>P</code> to base the
-     *        comparison of an {@link SimplePair} on
+     *        comparison of an {@link Pair} on
      */
     public CompareSwapped(Comparator<FIRST> fcomparator, Comparator<SECOND> scomparator) {
       this.fcomparator = fcomparator;
@@ -267,12 +267,12 @@ public class SimplePair<FIRST, SECOND> {
     }
 
     /**
-     * Two Objects of type {@link SimplePair} are compared based on the
+     * Two Objects of type {@link Pair} are compared based on the
      * comparison of their property using the given comparators {@link #scomparator}, then {@link #fcomparator}.
      * 
      * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
-    public int compare(SimplePair<FIRST, SECOND> o1, SimplePair<FIRST, SECOND> o2) {
+    public int compare(Pair<FIRST, SECOND> o1, Pair<FIRST, SECOND> o2) {
       int delta2 = scomparator.compare(o1.getSecond(), o2.getSecond());
       if (delta2 != 0) {
         return delta2;

@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
@@ -25,7 +26,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * DBSCAN provides the DBSCAN algorithm,
@@ -190,7 +190,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
      * @param progress      the progress object for logging the current status
      */
     protected void expandCluster(Database<O> database, Integer startObjectID, Progress progress) {
-        List<ComparablePair<D, Integer>> seeds = database.rangeQuery(startObjectID, epsilon, getDistanceFunction());
+        List<DistanceResultPair<D>> seeds = database.rangeQuery(startObjectID, epsilon, getDistanceFunction());
 
         // startObject is no core-object
         if (seeds.size() < minpts) {
@@ -205,8 +205,8 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
 
         // try to expand the cluster
         List<Integer> currentCluster = new ArrayList<Integer>();
-        for (ComparablePair<D, Integer> seed : seeds) {
-            Integer nextID = seed.getSecond();
+        for (DistanceResultPair<D> seed : seeds) {
+            Integer nextID = seed.getID();
             if (!processedIDs.contains(nextID)) {
                 currentCluster.add(nextID);
                 processedIDs.add(nextID);
@@ -219,12 +219,12 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
         seeds.remove(0);
 
         while (seeds.size() > 0) {
-            Integer o = seeds.remove(0).getSecond();
-            List<ComparablePair<D, Integer>> neighborhood = database.rangeQuery(o, epsilon, getDistanceFunction());
+            Integer o = seeds.remove(0).getID();
+            List<DistanceResultPair<D>> neighborhood = database.rangeQuery(o, epsilon, getDistanceFunction());
 
             if (neighborhood.size() >= minpts) {
-                for (ComparablePair<D, Integer> neighbor : neighborhood) {
-                    Integer p = neighbor.getSecond();
+                for (DistanceResultPair<D> neighbor : neighborhood) {
+                    Integer p = neighbor.getID();
                     boolean inNoise = noise.contains(p);
                     boolean unclassified = !processedIDs.contains(p);
                     if (inNoise || unclassified) {

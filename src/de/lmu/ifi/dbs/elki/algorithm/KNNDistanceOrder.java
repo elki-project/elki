@@ -105,7 +105,7 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
         for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
             Integer id = iter.next();
             if (random.nextDouble() < percentage) {
-                knnDistances.add((database.kNNQueryForID(id, k, this.getDistanceFunction())).get(k - 1).getFirst());
+                knnDistances.add((database.kNNQueryForID(id, k, this.getDistanceFunction())).get(k - 1).getDistance());
             }
         }
         Collections.sort(knnDistances, Collections.reverseOrder());

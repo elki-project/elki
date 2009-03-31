@@ -8,6 +8,7 @@ import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
@@ -25,7 +26,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * RDkNNTree is a spatial index structure based on the concepts of the R*-Tree
@@ -111,13 +111,13 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
     @Override
     protected void postDelete(O o) {
         // reverse knn of o
-        List<ComparablePair<D, Integer>> rnns = new ArrayList<ComparablePair<D, Integer>>();
+        List<DistanceResultPair<D>> rnns = new ArrayList<DistanceResultPair<D>>();
         doReverseKNN(getRoot(), o, rnns);
 
         // knn of rnn
         List<Integer> ids = new ArrayList<Integer>();
-        for (ComparablePair<D, Integer> rnn : rnns) {
-            ids.add(rnn.getSecond());
+        for (DistanceResultPair<D> rnn : rnns) {
+            ids.add(rnn.getID());
         }
 
         final Map<Integer, KNNList<D>> knnLists = new HashMap<Integer, KNNList<D>>(ids.size());
@@ -164,7 +164,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
      */
     @Override
     @SuppressWarnings("unchecked")
-    public <T extends Distance<T>> List<ComparablePair<T, Integer>> reverseKNNQuery(O object, int k, SpatialDistanceFunction<O, T> distanceFunction) {
+    public <T extends Distance<T>> List<DistanceResultPair<T>> reverseKNNQuery(O object, int k, SpatialDistanceFunction<O, T> distanceFunction) {
         // TODO: at some point we might have different distance functions with the same class
         // E.g. EuclideanInColumns(1-3) vs. EuclideanInColumns(4-6)
         if (!distanceFunction.getClass().equals(this.distanceFunction.getClass())) {
@@ -176,33 +176,33 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
         }
 
         // get candidates
-        List<ComparablePair<D, Integer>> candidates = new ArrayList<ComparablePair<D, Integer>>();
+        List<DistanceResultPair<D>> candidates = new ArrayList<DistanceResultPair<D>>();
         doReverseKNN(getRoot(), object, candidates);
 
         if (k == k_max) {
             Collections.sort(candidates);
-            List<ComparablePair<T, Integer>> result = new ArrayList<ComparablePair<T, Integer>>();
-            for (ComparablePair<D, Integer> qr : candidates)
-                result.add((ComparablePair<T, Integer>) qr);
+            List<DistanceResultPair<T>> result = new ArrayList<DistanceResultPair<T>>();
+            for (DistanceResultPair<D> qr : candidates)
+                result.add((DistanceResultPair<T>) qr);
             return result;
         }
 
         // refinement of candidates
         Map<Integer, KNNList<T>> knnLists = new HashMap<Integer, KNNList<T>>();
         List<Integer> candidateIDs = new ArrayList<Integer>();
-        for (ComparablePair<D, Integer> candidate : candidates) {
+        for (DistanceResultPair<D> candidate : candidates) {
             KNNList<T> knns = new KNNList<T>(k, distanceFunction.infiniteDistance());
-            knnLists.put(candidate.getSecond(), knns);
-            candidateIDs.add(candidate.getSecond());
+            knnLists.put(candidate.getID(), knns);
+            candidateIDs.add(candidate.getID());
         }
         batchNN(getRoot(), distanceFunction, knnLists);
 
-        List<ComparablePair<T, Integer>> result = new ArrayList<ComparablePair<T, Integer>>();
+        List<DistanceResultPair<T>> result = new ArrayList<DistanceResultPair<T>>();
         for (Integer id : candidateIDs) {
-            List<ComparablePair<T, Integer>> knns = knnLists.get(id).toList();
-            for (ComparablePair<T, Integer> qr : knns) {
-                if (qr.getSecond() == object.getID()) {
-                    result.add(new ComparablePair<T, Integer>(qr.getFirst(), id));
+            List<DistanceResultPair<T>> knns = knnLists.get(id).toList();
+            for (DistanceResultPair<T> qr : knns) {
+                if (qr.getID() == object.getID()) {
+                    result.add(new DistanceResultPair<T>(qr.getDistance(), id));
                     break;
                 }
             }
@@ -333,7 +333,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
                 // p is nearer to q than the farthest kNN-candidate of q
                 // ==> p becomes a knn-candidate
                 if (dist_pq.compareTo(knnDist_q) <= 0) {
-                    ComparablePair<D, Integer> knn = new ComparablePair<D, Integer>(dist_pq, p.getID());
+                    DistanceResultPair<D> knn = new DistanceResultPair<D>(dist_pq, p.getID());
                     knns_q.add(knn);
                     if (knns_q.size() >= k_max) {
                         knnDist_q = knns_q.getMaximumDistance();
@@ -345,7 +345,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
                 // q becomes knn of p
                 if (dist_pq.compareTo(p.getKnnDistance()) <= 0) {
                     KNNList<D> knns_p = new KNNList<D>(k_max, distanceFunction.infiniteDistance());
-                    knns_p.add(new ComparablePair<D, Integer>(dist_pq, q.getID()));
+                    knns_p.add(new DistanceResultPair<D>(dist_pq, q.getID()));
                     doKNNQuery(p.getID(), distanceFunction, knns_p);
 
                     if (knns_p.size() < k_max) {
@@ -382,15 +382,15 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
      *
      * @param node   the root node of the current subtree
      * @param o      the id of the object for which the rknn query is performed
-     * @param result the list conrtaining the query results
+     * @param result the list containing the query results
      */
-    private void doReverseKNN(RdKNNNode<D, N> node, O o, List<ComparablePair<D, Integer>> result) {
+    private void doReverseKNN(RdKNNNode<D, N> node, O o, List<DistanceResultPair<D>> result) {
         if (node.isLeaf()) {
             for (int i = 0; i < node.getNumEntries(); i++) {
                 RdKNNLeafEntry<D, N> entry = (RdKNNLeafEntry<D, N>) node.getEntry(i);
                 D distance = distanceFunction.distance(entry.getID(), o);
                 if (distance.compareTo(entry.getKnnDistance()) <= 0) {
-                    result.add(new ComparablePair<D, Integer>(distance, entry.getID()));
+                    result.add(new DistanceResultPair<D>(distance, entry.getID()));
                 }
             }
         }

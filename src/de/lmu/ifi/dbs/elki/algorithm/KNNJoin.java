@@ -6,6 +6,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
@@ -23,7 +24,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * Joins in a given spatial database to each object its k-nearest neighbors.
@@ -203,7 +203,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
                 Integer s_id = ps.getEntry(j).getID();
 
                 D distance = getDistanceFunction().distance(r_id, s_id);
-                if (knnList.add(new ComparablePair<D, Integer>(distance, s_id))) {
+                if (knnList.add(new DistanceResultPair<D>(distance, s_id))) {
                     // set kNN distance of r
                     if (infinite) {
                         pr_knn_distance = knnList.getMaximumDistance();

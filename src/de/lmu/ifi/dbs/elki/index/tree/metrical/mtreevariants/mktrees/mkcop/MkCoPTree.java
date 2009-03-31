@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.util.PQNode;
@@ -21,7 +22,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * MkCopTree is a metrical index structure based on the concepts of the M-Tree
@@ -134,13 +134,13 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
      * @return a List of the query results
      */
     @Override
-    public List<ComparablePair<D, Integer>> reverseKNNQuery(O object, int k) {
+    public List<DistanceResultPair<D>> reverseKNNQuery(O object, int k) {
         if (k > this.k_max) {
             throw new IllegalArgumentException("Parameter k has to be less or equal than "
                 + "parameter kmax of the MCop-Tree!");
         }
 
-        List<ComparablePair<D, Integer>> result = new ArrayList<ComparablePair<D, Integer>>();
+        List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
         List<Integer> candidates = new ArrayList<Integer>();
         doReverseKNNQuery(k, object.getID(), result, candidates);
 
@@ -158,10 +158,10 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
         rkNNStatistics.addTrueHits(result.size());
 
         for (Integer id : candidates) {
-            List<ComparablePair<D, Integer>> knns = knnLists.get(id).toList();
-            for (ComparablePair<D, Integer> qr : knns) {
-                if (qr.getSecond() == object.getID()) {
-                    result.add(new ComparablePair<D, Integer>(qr.getFirst(), id));
+            List<DistanceResultPair<D>> knns = knnLists.get(id).toList();
+            for (DistanceResultPair<D> qr : knns) {
+                if (qr.getID() == object.getID()) {
+                    result.add(new DistanceResultPair<D>(qr.getDistance(), id));
                     break;
                 }
             }
@@ -271,7 +271,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
      *                   refinement)
      */
     private void doReverseKNNQuery(int k, Integer q,
-                                   List<ComparablePair<D, Integer>> result,
+                                   List<DistanceResultPair<D>> result,
                                    List<Integer> candidates) {
 
         final Heap<D, Identifiable<?>> pq = new DefaultHeap<D, Identifiable<?>>();
@@ -307,7 +307,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
                     D approximatedKnnDist_prog = entry.approximateProgressiveKnnDistance(k, getDistanceFunction());
 
                     if (distance.compareTo(approximatedKnnDist_prog) <= 0) {
-                        result.add(new ComparablePair<D, Integer>(distance, entry.getRoutingObjectID()));
+                        result.add(new DistanceResultPair<D>(distance, entry.getRoutingObjectID()));
                     }
                     else {
                         D approximatedKnnDist_cons = entry.approximateConservativeKnnDistance(k, getDistanceFunction());

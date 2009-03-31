@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
@@ -22,7 +23,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * Algorithm to compute density-based local outlier factors in a database based
@@ -116,7 +116,7 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
             int counter = 1;
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
                 Integer id = iter.next();
-                List<ComparablePair<DoubleDistance, Integer>> neighbors = database.kNNQueryForID(id, k + 1, getDistanceFunction());
+                List<DistanceResultPair<DoubleDistance>> neighbors = database.kNNQueryForID(id, k + 1, getDistanceFunction());
                 neighbors.remove(0);
                 database.associate(AssociationID.NEIGHBORS, id, neighbors);
                 if (isVerbose()) {
@@ -137,7 +137,7 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
             int counter = 1;
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
                 Integer id = iter.next();
-                List<ComparablePair<DoubleDistance, Integer>> neighbors = database.kNNQueryForID(id, k + 1, reachabilityDistanceFunction);
+                List<DistanceResultPair<DoubleDistance>> neighbors = database.kNNQueryForID(id, k + 1, reachabilityDistanceFunction);
                 neighbors.remove(0);
                 database.associate(AssociationID.NEIGHBORS_2, id, neighbors);
                 if (isVerbose()) {
@@ -158,11 +158,11 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
                 Integer id = iter.next();
                 double sum = 0;
-                List<ComparablePair<DoubleDistance, Integer>> neighbors = database.getAssociation(AssociationID.NEIGHBORS_2, id);
-                for (ComparablePair<DoubleDistance, Integer> neighbor : neighbors) {
-                    List<ComparablePair<DoubleDistance, Integer>> neighborsNeighbors = database.getAssociation(AssociationID.NEIGHBORS_2, neighbor.getSecond());
-                    sum += Math.max(neighbor.getFirst().getValue(),
-                        neighborsNeighbors.get(neighborsNeighbors.size() - 1).getFirst().getValue());
+                List<DistanceResultPair<DoubleDistance>> neighbors = database.getAssociation(AssociationID.NEIGHBORS_2, id);
+                for (DistanceResultPair<DoubleDistance> neighbor : neighbors) {
+                    List<DistanceResultPair<DoubleDistance>> neighborsNeighbors = database.getAssociation(AssociationID.NEIGHBORS_2, neighbor.getID());
+                    sum += Math.max(neighbor.getDistance().getValue(),
+                        neighborsNeighbors.get(neighborsNeighbors.size() - 1).getDistance().getValue());
                 }
                 Double lrd = neighbors.size() / sum;
                 database.associate(AssociationID.LRD, id, lrd);
@@ -187,9 +187,9 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
                 Integer id = iter.next();
                 //computeLOF(database, id);
                 Double lrd = database.getAssociation(AssociationID.LRD, id);
-                List<ComparablePair<DoubleDistance, Integer>> neighbors = database.getAssociation(AssociationID.NEIGHBORS, id);
+                List<DistanceResultPair<DoubleDistance>> neighbors = database.getAssociation(AssociationID.NEIGHBORS, id);
                 double sum = 0;
-                for (ComparablePair<DoubleDistance, Integer> neighbor1 : neighbors) {
+                for (DistanceResultPair<DoubleDistance> neighbor1 : neighbors) {
                     sum += database.getAssociation(AssociationID.LRD, neighbor1.getSecond()) / lrd;
                 }
                 Double lof = sum / neighbors.size();

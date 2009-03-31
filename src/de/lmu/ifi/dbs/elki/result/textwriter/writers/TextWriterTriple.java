@@ -5,7 +5,7 @@ import java.io.IOException;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterWriterInterface;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimpleTriple;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
 
 /**
  * Write a triple
@@ -13,10 +13,10 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.SimpleTriple;
  * @author Erich Schubert
  *
  */
-public class TextWriterTriple extends TextWriterWriterInterface<SimpleTriple<?,?,?>> {
+public class TextWriterTriple extends TextWriterWriterInterface<Triple<?,?,?>> {
   @Override
   @SuppressWarnings("unchecked")
-  public void write(TextWriterStream out, String label, SimpleTriple<?,?,?> object) throws UnableToComplyException, IOException {
+  public void write(TextWriterStream out, String label, Triple<?,?,?> object) throws UnableToComplyException, IOException {
     if (object != null) {
       Object first = object.getFirst();
       if (first != null) {

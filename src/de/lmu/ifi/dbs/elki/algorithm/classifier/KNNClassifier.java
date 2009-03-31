@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.Description;
@@ -14,7 +15,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * KNNClassifier classifies instances based on the class distribution among the
@@ -85,12 +85,12 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
             double[] distribution = new double[getLabels().length];
             int[] occurences = new int[getLabels().length];
 
-            List<ComparablePair<D, Integer>> query = database.kNNQueryForObject(instance,
+            List<DistanceResultPair<D>> query = database.kNNQueryForObject(instance,
                 k, getDistanceFunction());
-            for (ComparablePair<D, Integer> neighbor : query) {
+            for (DistanceResultPair<D> neighbor : query) {
                 // noinspection unchecked
                 int index = Arrays.binarySearch(getLabels(),
-                    (AssociationID.CLASS.getType().cast(database.getAssociation(AssociationID.CLASS, neighbor.getSecond()))));
+                    (AssociationID.CLASS.getType().cast(database.getAssociation(AssociationID.CLASS, neighbor.getID()))));
                 if (index >= 0) {
                     occurences[index]++;
                 }

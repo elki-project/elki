@@ -8,13 +8,13 @@ import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
+import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.SharedNearestNeighborsPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * @author Arthur Zimek
@@ -26,7 +26,7 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
   /**
    * Cache for objects not handled by the preprocessor
    */
-  private ArrayList<SimplePair<O,SortedSet<Integer>>> cache = new ArrayList<SimplePair<O,SortedSet<Integer>>>();
+  private ArrayList<Pair<O,SortedSet<Integer>>> cache = new ArrayList<Pair<O,SortedSet<Integer>>>();
   
   /**
    * Holds the number of nearest neighbors to be used.
@@ -63,19 +63,19 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
       }
     }
     // try cache second
-    for (SimplePair<O, SortedSet<Integer>> item : cache) {
+    for (Pair<O, SortedSet<Integer>> item : cache) {
       if (item.getFirst() == obj) {
         return item.getSecond();
       }
     }
     List<Integer> neighbors = new ArrayList<Integer>(numberOfNeighbors);
-    List<ComparablePair<D, Integer>> kNN = getDatabase().kNNQueryForObject(obj, numberOfNeighbors, getPreprocessor().getDistanceFunction());
+    List<DistanceResultPair<D>> kNN = getDatabase().kNNQueryForObject(obj, numberOfNeighbors, getPreprocessor().getDistanceFunction());
     for (int i = 1; i < kNN.size(); i++) {
-        neighbors.add(kNN.get(i).getSecond());
+        neighbors.add(kNN.get(i).getID());
     }
     SortedSet<Integer> neighs = new TreeSet<Integer>(neighbors);
     // store in cache
-    cache.add(0, new SimplePair<O,SortedSet<Integer>>(obj, neighs));
+    cache.add(0, new Pair<O,SortedSet<Integer>>(obj, neighs));
     // limit cache size
     while (cache.size() > cachesize) {
       cache.remove(cachesize);

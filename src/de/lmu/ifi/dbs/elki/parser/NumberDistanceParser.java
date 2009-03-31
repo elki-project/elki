@@ -20,7 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Provides a parser for parsing one distance value per line.
@@ -63,10 +63,10 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
   public DistanceParsingResult<ExternalObject, D> parse(InputStream in) {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 0;
-    List<SimplePair<ExternalObject, List<String>>> objectAndLabelsList = new ArrayList<SimplePair<ExternalObject, List<String>>>();
+    List<Pair<ExternalObject, List<String>>> objectAndLabelsList = new ArrayList<Pair<ExternalObject, List<String>>>();
 
     Set<Integer> ids = new HashSet<Integer>();
-    Map<SimplePair<Integer, Integer>, D> distanceCache = new HashMap<SimplePair<Integer, Integer>, D>();
+    Map<Pair<Integer, Integer>, D> distanceCache = new HashMap<Pair<Integer, Integer>, D>();
     try {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(lineNumber % 10000 == 0 && logger.isLoggable(LogLevel.FINE)) {
@@ -127,7 +127,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
       debugFine("add to objectAndLabelsList");
     }
     for(Integer id : ids) {
-      objectAndLabelsList.add(new SimplePair<ExternalObject, List<String>>(new ExternalObject(id), new ArrayList<String>()));
+      objectAndLabelsList.add(new Pair<ExternalObject, List<String>>(new ExternalObject(id), new ArrayList<String>()));
     }
 
     return new DistanceParsingResult<ExternalObject, D>(objectAndLabelsList, distanceCache);
@@ -186,14 +186,14 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
    * @param distance the distance value
    * @param cache the distance cache
    */
-  private void put(Integer id1, Integer id2, D distance, Map<SimplePair<Integer, Integer>, D> cache) {
+  private void put(Integer id1, Integer id2, D distance, Map<Pair<Integer, Integer>, D> cache) {
     // the smaller id is the first key
     if(id1 > id2) {
       put(id2, id1, distance, cache);
       return;
     }
 
-    D oldDistance = cache.put(new SimplePair<Integer, Integer>(id1, id2), distance);
+    D oldDistance = cache.put(new Pair<Integer, Integer>(id1, id2), distance);
 
     if(oldDistance != null) {
       throw new IllegalArgumentException("Distance value for specified ids is already assigned!");
@@ -210,12 +210,12 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
    * @return <tt>true</tt> if this cache contains a distance value for the
    *         specified ids, false otherwise
    */
-  public boolean containsKey(Integer id1, Integer id2, Map<SimplePair<Integer, Integer>, D> cache) {
+  public boolean containsKey(Integer id1, Integer id2, Map<Pair<Integer, Integer>, D> cache) {
     if(id1 > id2) {
       return containsKey(id2, id1, cache);
     }
 
-    return cache.containsKey(new SimplePair<Integer, Integer>(id1, id2));
+    return cache.containsKey(new Pair<Integer, Integer>(id1, id2));
   }
 
 }

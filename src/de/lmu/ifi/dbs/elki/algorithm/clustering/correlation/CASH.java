@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Provides the CASH algorithm, an subspace clustering algorithm based on the hough transform.
@@ -556,13 +556,13 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
                                                        Set<Integer> ids,
                                                        Database<ParameterizationFunction> database) throws UnableToComplyException {
         // build objects and associations
-        List<SimplePair<ParameterizationFunction,Associations>> oaas = new ArrayList<SimplePair<ParameterizationFunction,Associations>>(ids.size());
+        List<Pair<ParameterizationFunction,Associations>> oaas = new ArrayList<Pair<ParameterizationFunction,Associations>>(ids.size());
 
         for (Integer id : ids) {
             ParameterizationFunction f = project(basis, database.get(id));
 
             Associations associations = database.getAssociations(id);
-            SimplePair<ParameterizationFunction,Associations> oaa = new SimplePair<ParameterizationFunction,Associations>(f, associations);
+            Pair<ParameterizationFunction,Associations> oaa = new Pair<ParameterizationFunction,Associations>(f, associations);
             oaas.add(oaa);
         }
 
@@ -812,12 +812,12 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
     private Database<DoubleVector> buildDerivatorDB(Database<ParameterizationFunction> database,
                                                   CASHInterval interval) throws UnableToComplyException {
         // build objects and associations
-        List<SimplePair<DoubleVector, Associations>> oaas = new ArrayList<SimplePair<DoubleVector, Associations>>(database.size());
+        List<Pair<DoubleVector, Associations>> oaas = new ArrayList<Pair<DoubleVector, Associations>>(database.size());
 
         for (Integer id : interval.getIDs()) {
             Associations associations = database.getAssociations(id);
             DoubleVector v = new DoubleVector(database.get(id).getRowVector().getRowPackedCopy());
-            SimplePair<DoubleVector, Associations> oaa = new SimplePair<DoubleVector, Associations>(v, associations);
+            Pair<DoubleVector, Associations> oaa = new Pair<DoubleVector, Associations>(v, associations);
             oaas.add(oaa);
         }
 
@@ -885,12 +885,12 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
     private Database<DoubleVector> buildDerivatorDB(Database<ParameterizationFunction> database,
                                                   Set<Integer> ids) throws UnableToComplyException {
         // build objects and associations
-        List<SimplePair<DoubleVector,Associations>> oaas = new ArrayList<SimplePair<DoubleVector,Associations>>(database.size());
+        List<Pair<DoubleVector,Associations>> oaas = new ArrayList<Pair<DoubleVector,Associations>>(database.size());
 
         for (Integer id : ids) {
             Associations associations = database.getAssociations(id);
             DoubleVector v = new DoubleVector(database.get(id).getRowVector().getRowPackedCopy());
-            SimplePair<DoubleVector,Associations> oaa = new SimplePair<DoubleVector,Associations>(v, associations);
+            Pair<DoubleVector,Associations> oaa = new Pair<DoubleVector,Associations>(v, associations);
             oaas.add(oaa);
         }
 

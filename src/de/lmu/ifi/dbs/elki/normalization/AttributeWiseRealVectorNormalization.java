@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.AllOrNoneMustBeSetGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualSizeGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.output.Format;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Class to perform and undo a normalization on real vectors with respect to
@@ -82,10 +82,10 @@ public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ? >> e
     optionHandler.setGlobalParameterConstraint(new EqualSizeGlobalConstraint(global));
   }
 
-  public List<SimplePair<V, Associations>> normalizeObjects(List<SimplePair<V, Associations>> objectAndAssociationsList)
+  public List<Pair<V, Associations>> normalizeObjects(List<Pair<V, Associations>> objectAndAssociationsList)
       throws NonNumericFeaturesException {
     if (objectAndAssociationsList.size() == 0)
-      return new ArrayList<SimplePair<V, Associations>>();
+      return new ArrayList<Pair<V, Associations>>();
 
     if (minima.length == 0 && maxima.length == 0)
       determineMinMax(objectAndAssociationsList);
@@ -95,8 +95,8 @@ public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ? >> e
       throw new IllegalArgumentException("Dimensionalities do not agree!");
 
     try {
-      List<SimplePair<V, Associations>> normalized = new ArrayList<SimplePair<V, Associations>>();
-      for (SimplePair<V, Associations> objectAndAssociations : objectAndAssociationsList) {
+      List<Pair<V, Associations>> normalized = new ArrayList<Pair<V, Associations>>();
+      for (Pair<V, Associations> objectAndAssociations : objectAndAssociationsList) {
         double[] values = new double[objectAndAssociations.getFirst().getDimensionality()];
         for (int d = 1; d <= objectAndAssociations.getFirst().getDimensionality(); d++) {
           values[d - 1] = (objectAndAssociations.getFirst().getValue(d).doubleValue() - minima[d - 1]) / factor(d);
@@ -105,7 +105,7 @@ public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ? >> e
         V normalizedFeatureVector = objectAndAssociationsList.get(0).getFirst().newInstance(values);
         normalizedFeatureVector.setID(objectAndAssociations.getFirst().getID());
         Associations associations = objectAndAssociations.getSecond();
-        normalized.add(new SimplePair<V, Associations>(normalizedFeatureVector, associations));
+        normalized.add(new Pair<V, Associations>(normalizedFeatureVector, associations));
       }
       return normalized;
     }
@@ -297,13 +297,13 @@ public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ? >> e
    *
    * @param objectAndAssociationsList the list of feature vectors and their associations
    */
-  private void determineMinMax(List<SimplePair<V, Associations>> objectAndAssociationsList) {
+  private void determineMinMax(List<Pair<V, Associations>> objectAndAssociationsList) {
     if (objectAndAssociationsList.isEmpty())
       return;
     int dimensionality = objectAndAssociationsList.get(0).getFirst().getDimensionality();
     initMinMax(dimensionality);
 
-    for (SimplePair<V, Associations> objectAndAssociations : objectAndAssociationsList) {
+    for (Pair<V, Associations> objectAndAssociations : objectAndAssociationsList) {
       updateMinMax(objectAndAssociations.getFirst());
     }
   }

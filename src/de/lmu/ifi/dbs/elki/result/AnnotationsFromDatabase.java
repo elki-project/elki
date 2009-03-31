@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Class representing Annotations backed by a database using {@link AssociationID}s.
@@ -24,7 +24,7 @@ public class AnnotationsFromDatabase<O extends DatabaseObject, T> implements Ann
   /**
    * Storage of included associations.
    */
-  private ArrayList<SimplePair<String, AssociationID<T>>> associations = new ArrayList<SimplePair<String, AssociationID<T>>>();
+  private ArrayList<Pair<String, AssociationID<T>>> associations = new ArrayList<Pair<String, AssociationID<T>>>();
 
   /**
    * Constructor
@@ -51,7 +51,7 @@ public class AnnotationsFromDatabase<O extends DatabaseObject, T> implements Ann
    * @param association Association ID.
    */
   public void addAssociation(String label, AssociationID<T> association) {
-    associations.add(new SimplePair<String, AssociationID<T>>(label, association));
+    associations.add(new Pair<String, AssociationID<T>>(label, association));
   }
 
   /**
@@ -63,19 +63,19 @@ public class AnnotationsFromDatabase<O extends DatabaseObject, T> implements Ann
    */
   @SuppressWarnings("unchecked")
   public void addAssociationGenerics(String label, AssociationID<?> association) {
-    associations.add(new SimplePair<String, AssociationID<T>>(label, (AssociationID<T>) association));
+    associations.add(new Pair<String, AssociationID<T>>(label, (AssociationID<T>) association));
   }
 
   /**
    * Retrieve the given annotations for this object from the Database.
    */
   @Override
-  public SimplePair<String,T>[] getAnnotations(Integer objID) {
-    SimplePair<String,T>[] result = SimplePair.newArray(associations.size());
+  public Pair<String,T>[] getAnnotations(Integer objID) {
+    Pair<String,T>[] result = Pair.newArray(associations.size());
     int index = 0;
-    for (SimplePair<String, AssociationID<T>> pair : associations) {
+    for (Pair<String, AssociationID<T>> pair : associations) {
       T o = getDatabase().getAssociation(pair.getSecond(), objID);
-      result[index] = new SimplePair<String, T>(pair.getFirst(), o);
+      result[index] = new Pair<String, T>(pair.getFirst(), o);
       index++;
     }
     return result;

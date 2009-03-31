@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Provides a database connection based on multiple files and parsers to be set.
@@ -99,8 +99,8 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
 
       // comparator to sort the ObjectAndLabels lists provided by the
       // parsers.
-      Comparator<SimplePair<O, List<String>>> comparator = new Comparator<SimplePair<O, List<String>>>() {
-        public int compare(SimplePair<O, List<String>> o1, SimplePair<O, List<String>> o2) {
+      Comparator<Pair<O, List<String>>> comparator = new Comparator<Pair<O, List<String>>>() {
+        public int compare(Pair<O, List<String>> o1, Pair<O, List<String>> o2) {
           String classLabel1 = o1.getSecond().get(classLabelIndex);
           String classLabel2 = o2.getSecond().get(classLabelIndex);
           return classLabel1.compareTo(classLabel2);
@@ -115,12 +115,12 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
         parsingResults.add(parsingResult);
         numberOfObjects = Math.max(parsingResult.getObjectAndLabelList().size(), numberOfObjects);
         // sort the representations according to the external ids
-        List<SimplePair<O, List<String>>> objectAndLabelsList = parsingResult.getObjectAndLabelList();
+        List<Pair<O, List<String>>> objectAndLabelsList = parsingResult.getObjectAndLabelList();
         Collections.sort(objectAndLabelsList, comparator);
       }
 
       // build the multi-represented objects and their labels
-      List<SimplePair<MultiRepresentedObject<O>, List<String>>> objectAndLabelsList = new ArrayList<SimplePair<MultiRepresentedObject<O>, List<String>>>();
+      List<Pair<MultiRepresentedObject<O>, List<String>>> objectAndLabelsList = new ArrayList<Pair<MultiRepresentedObject<O>, List<String>>>();
       for(int i = 0; i < numberOfObjects; i++) {
         List<O> representations = new ArrayList<O>(numberOfRepresentations);
         List<String> labels = new ArrayList<String>();
@@ -134,11 +134,11 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
             }
           }
         }
-        objectAndLabelsList.add(new SimplePair<MultiRepresentedObject<O>, List<String>>(new MultiRepresentedObject<O>(representations), labels));
+        objectAndLabelsList.add(new Pair<MultiRepresentedObject<O>, List<String>>(new MultiRepresentedObject<O>(representations), labels));
       }
 
       // normalize objects and transform labels
-      List<SimplePair<MultiRepresentedObject<O>, Associations>> objectAndAssociationList = normalizeAndTransformLabels(objectAndLabelsList, normalization);
+      List<Pair<MultiRepresentedObject<O>, Associations>> objectAndAssociationList = normalizeAndTransformLabels(objectAndLabelsList, normalization);
 
       // insert into database
       database.insert(objectAndAssociationList);

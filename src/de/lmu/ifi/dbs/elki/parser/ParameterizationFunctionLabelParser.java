@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.parser;
 
 import de.lmu.ifi.dbs.elki.data.ParameterizationFunction;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -36,7 +36,7 @@ public class ParameterizationFunctionLabelParser extends AbstractParser<Paramete
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         int lineNumber = 1;
         int dimensionality = -1;
-        List<SimplePair<ParameterizationFunction,List<String>>> objectAndLabelsList = new ArrayList<SimplePair<ParameterizationFunction,List<String>>>();
+        List<Pair<ParameterizationFunction,List<String>>> objectAndLabelsList = new ArrayList<Pair<ParameterizationFunction,List<String>>>();
         try {
             for (String line; (line = reader.readLine()) != null; lineNumber++) {
                 if (!line.startsWith(COMMENT) && line.length() > 0) {
@@ -63,7 +63,7 @@ public class ParameterizationFunctionLabelParser extends AbstractParser<Paramete
                     }
 
                     ParameterizationFunction function = new ParameterizationFunction(Util.convertToDoubles(attributes));
-                    SimplePair<ParameterizationFunction,List<String>> objectAndLabel = new SimplePair<ParameterizationFunction,List<String>>(function, labels);
+                    Pair<ParameterizationFunction,List<String>> objectAndLabel = new Pair<ParameterizationFunction,List<String>>(function, labels);
                     objectAndLabelsList.add(objectAndLabel);
                 }
             }

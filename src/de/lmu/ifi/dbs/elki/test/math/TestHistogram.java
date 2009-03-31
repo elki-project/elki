@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.math.Histogram;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 public class TestHistogram {
   Histogram<Double> hist;
@@ -34,7 +34,7 @@ public class TestHistogram {
     
     // compare results via Iterator.
     int off = 0;
-    for (SimplePair<Double, Double> pair : hist) {
+    for (Pair<Double, Double> pair : hist) {
       assertEquals("Array iterator bin position", -0.15 + 0.1 * off, pair.getFirst(), 0.00001);
       assertEquals("Array iterator bin contents", resized[off], pair.getSecond(), 0.00001);
       off++;

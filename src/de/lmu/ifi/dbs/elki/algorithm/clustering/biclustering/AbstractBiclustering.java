@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Bicluster;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Abstract class as a convenience for different biclustering approaches.
@@ -234,11 +234,11 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>, M ex
     if(properties.size() != to - from) {
       throw new IllegalArgumentException("Length of properties (=" + properties.size() + ") does not conform specified length (=" + (to - from) + ")");
     }
-    List<SimplePair<Integer, P>> pairs = new ArrayList<SimplePair<Integer, P>>(to - from);
+    List<Pair<Integer, P>> pairs = new ArrayList<Pair<Integer, P>>(to - from);
     for(int i = 0; i < properties.size(); i++) {
-      pairs.add(new SimplePair<Integer, P>(ids[i + from], properties.get(i)));
+      pairs.add(new Pair<Integer, P>(ids[i + from], properties.get(i)));
     }
-    Collections.sort(pairs, new SimplePair.CompareBySecond<Integer, P>(comp));
+    Collections.sort(pairs, new Pair.CompareBySecond<Integer, P>(comp));
 
     for(int i = from; i < to; i++) {
       ids[i] = pairs.get(i - from).getFirst();

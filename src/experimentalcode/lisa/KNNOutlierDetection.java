@@ -99,7 +99,7 @@ public class KNNOutlierDetection <O extends DatabaseObject, D extends Distance<D
 			  while(iter.hasNext()){
 				 id = iter.next();
 				  //distance to the kth nearest neighbor
-				 D dkn = database.kNNQueryForID(id,  k, getDistanceFunction()).get(k-1).getFirst();
+				 D dkn = database.kNNQueryForID(id,  k, getDistanceFunction()).get(k-1).getDistance();
 				 if (logger.isLoggable(LogLevel.FINE)) {
 		        debugFine(dkn + "  dkn");
 		        }

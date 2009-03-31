@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * AnnotationCombiner is a class that combines multiple Annotation Results into one.
@@ -49,14 +49,14 @@ public class AnnotationCombiner<T> implements AnnotationResult<T> {
    * Retrieve all annotations and return them as combined array.
    */
   @Override
-  public SimplePair<String, T>[] getAnnotations(Integer objID) {
-    ArrayList<SimplePair<String, T>> annotations = new ArrayList<SimplePair<String, T>>();
+  public Pair<String, T>[] getAnnotations(Integer objID) {
+    ArrayList<Pair<String, T>> annotations = new ArrayList<Pair<String, T>>();
     for (AnnotationResult<T> result : results) {
-        SimplePair<String, T>[] newannotations = result.getAnnotations(objID);
-        for (SimplePair<String, T> newann : newannotations)
+        Pair<String, T>[] newannotations = result.getAnnotations(objID);
+        for (Pair<String, T> newann : newannotations)
           annotations.add(newann);
       }
-    SimplePair<String, T>[] result = SimplePair.newArray(0);
+    Pair<String, T>[] result = Pair.newArray(0);
     return annotations.toArray(result);
   }
 }

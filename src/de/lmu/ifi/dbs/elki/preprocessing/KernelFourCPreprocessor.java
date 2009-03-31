@@ -6,6 +6,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.ArbitraryKernelFunctionWrapper;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.LinearKernelFunction;
@@ -27,7 +28,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterFlagGlobalConstraint;
-import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * Preprocessor for kernel 4C local dimensionality, neighbor objects and strong
@@ -115,9 +115,9 @@ public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector
      * @param database  the database for which the preprocessing is performed
      */
     @Override
-    protected void runVarianceAnalysis(final Integer id, final List<ComparablePair<D, Integer>> neighbors, final Database<V> database) {
+    protected void runVarianceAnalysis(final Integer id, final List<DistanceResultPair<D>> neighbors, final Database<V> database) {
         final List<Integer> ids = new ArrayList<Integer>(neighbors.size());
-        for (final ComparablePair<D, Integer> neighbor : neighbors) {
+        for (final DistanceResultPair<D> neighbor : neighbors) {
             ids.add(neighbor.getSecond());
         }
         PCAFilteredResult pcares = pca.processIds(ids, database);

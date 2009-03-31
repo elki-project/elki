@@ -39,8 +39,8 @@ import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterTriple;
 import de.lmu.ifi.dbs.elki.utilities.HandlerList;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimpleTriple;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
 
 @SuppressWarnings("unchecked")
 public class TextWriter<O extends DatabaseObject> {
@@ -70,7 +70,7 @@ public class TextWriter<O extends DatabaseObject> {
     writers.insertHandler(Distance.class, trivialwriter);
     writers.insertHandler(SimpleClassLabel.class, trivialwriter);
     writers.insertHandler(HierarchicalClassLabel.class, trivialwriter);
-    writers.insertHandler(SimpleTriple.class, new TextWriterTriple());
+    writers.insertHandler(Triple.class, new TextWriterTriple());
     // Objects that have an own writeToText method.
     writers.insertHandler(TextWriteable.class, new TextWriterTextWriteable());
   }
@@ -228,7 +228,7 @@ public class TextWriter<O extends DatabaseObject> {
     return null;
   }
 
-  private void printObject(TextWriterStream out, O obj, SimplePair<String, Object>[] anns) throws UnableToComplyException, IOException {
+  private void printObject(TextWriterStream out, O obj, Pair<String, Object>[] anns) throws UnableToComplyException, IOException {
     // Write database element itself.
     {
       TextWriterWriterInterface<?> owriter = out.getWriterFor(obj);
@@ -302,7 +302,7 @@ public class TextWriter<O extends DatabaseObject> {
         continue;
       }
       // do we have annotations to print?
-      SimplePair<String, Object>[] objs = null;
+      Pair<String, Object>[] objs = null;
       if(ra != null) {
         objs = ra.getAnnotations(objID);
       }

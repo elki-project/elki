@@ -9,7 +9,7 @@ package de.lmu.ifi.dbs.elki.utilities.pairs;
  * @param <SECOND> second type
  * @param <THIRD> second type
  */
-public final class ComparableTriple<FIRST extends Comparable<FIRST>,SECOND extends Comparable<SECOND>, THIRD extends Comparable<THIRD>> extends SimpleTriple<FIRST, SECOND, THIRD> implements Comparable<ComparableTriple<FIRST,SECOND,THIRD>> {
+public final class CTriple<FIRST extends Comparable<FIRST>,SECOND extends Comparable<SECOND>, THIRD extends Comparable<THIRD>> extends Triple<FIRST, SECOND, THIRD> implements Comparable<CTriple<FIRST,SECOND,THIRD>> {
   /**
    * Constructor with fields
    * 
@@ -17,7 +17,7 @@ public final class ComparableTriple<FIRST extends Comparable<FIRST>,SECOND exten
    * @param second Value of second component
    * @param third Value of third component
    */
-  public ComparableTriple(FIRST first, SECOND second, THIRD third) {
+  public CTriple(FIRST first, SECOND second, THIRD third) {
     super(first, second, third);
   }
 
@@ -34,7 +34,7 @@ public final class ComparableTriple<FIRST extends Comparable<FIRST>,SECOND exten
    * 
    * @param other Object to compare to
    */
-  public int compareTo(ComparableTriple<FIRST, SECOND, THIRD> other) {
+  public int compareTo(CTriple<FIRST, SECOND, THIRD> other) {
     // try comparing by first
     if (this.first != null) {
       if (other.first == null) return -1;
@@ -65,7 +65,7 @@ public final class ComparableTriple<FIRST extends Comparable<FIRST>,SECOND exten
    * @param size Size of array to be constructed.
    */
   @SuppressWarnings("unchecked")
-  public static final <F extends Comparable<F>,S extends Comparable<S>, T extends Comparable<T>> ComparableTriple<F,S,T>[] newArray(int size) {
-    return new ComparableTriple[size];
+  public static final <F extends Comparable<F>,S extends Comparable<S>, T extends Comparable<T>> CTriple<F,S,T>[] newArray(int size) {
+    return new CTriple[size];
   }
 }

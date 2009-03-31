@@ -26,8 +26,8 @@ import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.CPair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * <p>Algorithm to gather statistics over the distance distribution in the data
@@ -90,8 +90,8 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
       Random rnd = new Random();
       // estimate minimum and maximum.
       int k = (int) Math.max(25,Math.pow(database.size(), 0.2));
-      TreeSet<ComparablePair<Double, Integer>> minhotset = new TreeSet<ComparablePair<Double, Integer>>();
-      TreeSet<ComparablePair<Double, Integer>> maxhotset = new TreeSet<ComparablePair<Double, Integer>>(Collections.reverseOrder());
+      TreeSet<CPair<Double, Integer>> minhotset = new TreeSet<CPair<Double, Integer>>();
+      TreeSet<CPair<Double, Integer>> maxhotset = new TreeSet<CPair<Double, Integer>>(Collections.reverseOrder());
       
       int randomsize = (int)Math.max(25,Math.pow(database.size(), 0.2));
       double rprob = ((double) randomsize) / size;
@@ -102,46 +102,46 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
         throw new IllegalStateException("Database is empty.");
       }
       Integer firstid = iter.next();
-      minhotset.add(new ComparablePair<Double, Integer>(Double.MAX_VALUE, firstid));
-      maxhotset.add(new ComparablePair<Double, Integer>(Double.MIN_VALUE, firstid));
+      minhotset.add(new CPair<Double, Integer>(Double.MAX_VALUE, firstid));
+      maxhotset.add(new CPair<Double, Integer>(Double.MIN_VALUE, firstid));
       while(iter.hasNext()) {
         Integer id1 = iter.next();
         // generate candidates for min distance.
-        ArrayList<ComparablePair<Double,Integer>> np = new ArrayList<ComparablePair<Double,Integer>>(k*2+randomsize*2);
-        for(ComparablePair<Double, Integer> pair : minhotset) {
+        ArrayList<CPair<Double,Integer>> np = new ArrayList<CPair<Double,Integer>>(k*2+randomsize*2);
+        for(CPair<Double, Integer> pair : minhotset) {
           Integer id2 = pair.getSecond();
           // skip the object itself
           if(id1 == id2) {
             continue;
           }
           double d = distFunc.distance(id1, id2).getValue();
-          np.add(new ComparablePair<Double, Integer>(d, id1));
-          np.add(new ComparablePair<Double, Integer>(d, id2));
+          np.add(new CPair<Double, Integer>(d, id1));
+          np.add(new CPair<Double, Integer>(d, id2));
         }
         for(Integer id2 : randomset) {
           double d = distFunc.distance(id1, id2).getValue();
-          np.add(new ComparablePair<Double, Integer>(d, id1));
-          np.add(new ComparablePair<Double, Integer>(d, id2));
+          np.add(new CPair<Double, Integer>(d, id1));
+          np.add(new CPair<Double, Integer>(d, id2));
         }
         minhotset.addAll(np);
         shrinkHeap(minhotset, k);
         
         // generate candidates for max distance.
-        ArrayList<ComparablePair<Double,Integer>> np2 = new ArrayList<ComparablePair<Double,Integer>>(k*2+randomsize*2);
-        for(ComparablePair<Double, Integer> pair : minhotset) {
+        ArrayList<CPair<Double,Integer>> np2 = new ArrayList<CPair<Double,Integer>>(k*2+randomsize*2);
+        for(CPair<Double, Integer> pair : minhotset) {
           Integer id2 = pair.getSecond();
           // skip the object itself
           if(id1 == id2) {
             continue;
           }
           double d = distFunc.distance(id1, id2).getValue();
-          np2.add(new ComparablePair<Double, Integer>(d, id1));
-          np2.add(new ComparablePair<Double, Integer>(d, id2));
+          np2.add(new CPair<Double, Integer>(d, id1));
+          np2.add(new CPair<Double, Integer>(d, id2));
         }
         for(Integer id2 : randomset) {
           double d = distFunc.distance(id1, id2).getValue();
-          np.add(new ComparablePair<Double, Integer>(d, id1));
-          np.add(new ComparablePair<Double, Integer>(d, id2));
+          np.add(new CPair<Double, Integer>(d, id1));
+          np.add(new CPair<Double, Integer>(d, id2));
         }
         maxhotset.addAll(np2);
         shrinkHeap(maxhotset, k);
@@ -190,10 +190,10 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
     MeanVariance momax = new MeanVariance();
     MeanVariance model = new MeanVariance();
     // Histograms
-    Histogram<SimplePair<Integer, Integer>> hist = new Histogram<SimplePair<Integer, Integer>>(numbin, gmin, gmax, new Constructor<SimplePair<Integer, Integer>>() {
+    Histogram<Pair<Integer, Integer>> hist = new Histogram<Pair<Integer, Integer>>(numbin, gmin, gmax, new Constructor<Pair<Integer, Integer>>() {
       @Override
-      public SimplePair<Integer, Integer> make() {
-        return new SimplePair<Integer, Integer>(0, 0);
+      public Pair<Integer, Integer> make() {
+        return new Pair<Integer, Integer>(0, 0);
       }
     });
 
@@ -210,7 +210,7 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
           }
           double d = distFunc.distance(id1, id2).getValue();
 
-          SimplePair<Integer, Integer> pair = hist.get(d);
+          Pair<Integer, Integer> pair = hist.get(d);
           pair.first += 1;
 
           imin = Math.min(d, imin);
@@ -239,7 +239,7 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
             }
             double d = distFunc.distance(id1, id2).getValue();
 
-            SimplePair<Integer, Integer> pair = hist.get(d);
+            Pair<Integer, Integer> pair = hist.get(d);
             pair.second += 1;
 
             omin = Math.min(d, omin);
@@ -263,7 +263,7 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
     // count the number of samples we have in the data
     int inum = 0;
     int onum = 0;
-    for(SimplePair<Double, SimplePair<Integer, Integer>> ppair : hist) {
+    for(Pair<Double, Pair<Integer, Integer>> ppair : hist) {
       inum += ppair.getSecond().getFirst();
       onum += ppair.getSecond().getSecond();
     }
@@ -272,7 +272,7 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
     assert (bnum == size * (size - 1));
 
     Collection<DoubleVector> binstat = new ArrayList<DoubleVector>(numbin);
-    for(SimplePair<Double, SimplePair<Integer, Integer>> ppair : hist) {
+    for(Pair<Double, Pair<Integer, Integer>> ppair : hist) {
       DoubleVector row = new DoubleVector(new double[] { ppair.getFirst(), ((double) ppair.getSecond().getFirst()) / inum / hist.getBinsize(), ((double) ppair.getSecond().getFirst()) / bnum / hist.getBinsize(), ((double) ppair.getSecond().getSecond()) / onum / hist.getBinsize(), ((double) ppair.getSecond().getSecond()) / bnum / hist.getBinsize() });
       binstat.add(row);
     }
@@ -289,12 +289,12 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
     return result;
   }
 
-  private void shrinkHeap(TreeSet<ComparablePair<Double, Integer>> hotset, int k) {
+  private void shrinkHeap(TreeSet<CPair<Double, Integer>> hotset, int k) {
     // drop duplicates
     HashSet<Integer> seenids = new HashSet<Integer>(2*k);
     int cnt = 0;
-    for (Iterator<ComparablePair<Double, Integer>> i = hotset.iterator(); i.hasNext(); ) {
-      ComparablePair<Double, Integer> p = i.next();
+    for (Iterator<CPair<Double, Integer>> i = hotset.iterator(); i.hasNext(); ) {
+      CPair<Double, Integer> p = i.next();
       if (cnt > k || seenids.contains(p.getSecond())) {
         i.remove();
       } else {

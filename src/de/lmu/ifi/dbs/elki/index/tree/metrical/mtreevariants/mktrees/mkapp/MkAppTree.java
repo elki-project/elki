@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.util.PQNode;
@@ -21,7 +22,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * MkAppTree is a metrical index structure based on the concepts of the M-Tree
@@ -164,8 +164,8 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
      * @return a List of the query results
      */
     @Override
-    public List<ComparablePair<D, Integer>> reverseKNNQuery(O object, int k) {
-        List<ComparablePair<D, Integer>> result = doReverseKNNQuery(k, object.getID());
+    public List<DistanceResultPair<D>> reverseKNNQuery(O object, int k) {
+        List<DistanceResultPair<D>> result = doReverseKNNQuery(k, object.getID());
         Collections.sort(result);
         return result;
     }
@@ -249,9 +249,9 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
      * @param q the id of the query object
      * @return the result of the reverse knn query
      */
-    private List<ComparablePair<D, Integer>> doReverseKNNQuery(int k, Integer q) {
+    private List<DistanceResultPair<D>> doReverseKNNQuery(int k, Integer q) {
 
-        List<ComparablePair<D, Integer>> result = new ArrayList<ComparablePair<D, Integer>>();
+        List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
         final Heap<D, Identifiable<?>> pq = new DefaultHeap<D, Identifiable<?>>();
 
         // push root
@@ -295,7 +295,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
                     D approximatedKnnDist = getDistanceFunction().valueOf(Double.toString(approxValue));
 
                     if (distance.compareTo(approximatedKnnDist) <= 0) {
-                        result.add(new ComparablePair<D, Integer>(distance, entry.getRoutingObjectID()));
+                        result.add(new DistanceResultPair<D>(distance, entry.getRoutingObjectID()));
                     }
                 }
             }

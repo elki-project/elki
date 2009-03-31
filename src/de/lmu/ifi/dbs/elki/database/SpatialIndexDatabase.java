@@ -17,8 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * SpatialIndexDatabase is a database implementation which is supported by a
@@ -59,7 +58,7 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
    * underlying index structure.
    */
   @Override
-  public Integer insert(SimplePair<O, Associations> objectAndAssociations) throws UnableToComplyException {
+  public Integer insert(Pair<O, Associations> objectAndAssociations) throws UnableToComplyException {
     Integer id = super.insert(objectAndAssociations);
     O object = objectAndAssociations.getFirst();
     index.insert(object);
@@ -73,19 +72,19 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
    * objects will be inserted sequentially.
    */
   @Override
-  public void insert(List<SimplePair<O, Associations>> objectsAndAssociationsList) throws UnableToComplyException {
-    for(SimplePair<O, Associations> objectAndAssociations : objectsAndAssociationsList) {
+  public void insert(List<Pair<O, Associations>> objectsAndAssociationsList) throws UnableToComplyException {
+    for(Pair<O, Associations> objectAndAssociations : objectsAndAssociationsList) {
       super.insert(objectAndAssociations);
     }
     index.insert(getObjects(objectsAndAssociationsList));
   }
 
-  public <D extends Distance<D>> List<ComparablePair<D, Integer>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, D> distanceFunction) {
     if(distanceFunction.isInfiniteDistance(distanceFunction.valueOf(epsilon))) {
-      final List<ComparablePair<D, Integer>> result = new ArrayList<ComparablePair<D, Integer>>();
+      final List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
       for(Iterator<Integer> it = iterator(); it.hasNext();) {
         Integer next = it.next();
-        result.add(new ComparablePair<D, Integer>(distanceFunction.distance(id, next), next));
+        result.add(new DistanceResultPair<D>(distanceFunction.distance(id, next), next));
       }
       Collections.sort(result);
       return result;
@@ -93,13 +92,13 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
 
     if(!(distanceFunction instanceof SpatialDistanceFunction)) {
       // TODO: why is this emulated here, but not for other queries.
-      List<ComparablePair<D, Integer>> result = new ArrayList<ComparablePair<D, Integer>>();
+      List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
       D distance = distanceFunction.valueOf(epsilon);
       for(Iterator<Integer> it = iterator(); it.hasNext();) {
         Integer next = it.next();
         D currentDistance = distanceFunction.distance(id, next);
         if(currentDistance.compareTo(distance) <= 0) {
-          result.add(new ComparablePair<D, Integer>(currentDistance, next));
+          result.add(new DistanceResultPair<D>(currentDistance, next));
         }
       }
       Collections.sort(result);
@@ -110,21 +109,21 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
     }
   }
 
-  public <D extends Distance<D>> List<ComparablePair<D, Integer>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, D> distanceFunction) {
     if(!(distanceFunction instanceof SpatialDistanceFunction)) {
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
     }
     return index.kNNQuery(queryObject, k, (SpatialDistanceFunction<O, D>) distanceFunction);
   }
 
-  public <D extends Distance<D>> List<ComparablePair<D, Integer>> kNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
     if(!(distanceFunction instanceof SpatialDistanceFunction)) {
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
     }
     return index.kNNQuery(get(id), k, (SpatialDistanceFunction<O, D>) distanceFunction);
   }
 
-  public <D extends Distance<D>> List<List<ComparablePair<D, Integer>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
     if(!(distanceFunction instanceof SpatialDistanceFunction)) {
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
     }
@@ -141,7 +140,7 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
    *        between the objects
    * @return a List of the query results
    */
-  public <D extends Distance<D>> List<ComparablePair<D, Integer>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
+  public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
     if(!(distanceFunction instanceof SpatialDistanceFunction)) {
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
     }
@@ -149,13 +148,13 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
       return index.reverseKNNQuery(get(id), k, (SpatialDistanceFunction<O, D>) distanceFunction);
     }
     catch(UnsupportedOperationException e) {
-      List<ComparablePair<D, Integer>> result = new ArrayList<ComparablePair<D, Integer>>();
+      List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
       for(Iterator<Integer> iter = iterator(); iter.hasNext();) {
         Integer candidateID = iter.next();
-        List<ComparablePair<D, Integer>> knns = this.kNNQueryForID(candidateID, k, distanceFunction);
-        for(ComparablePair<D, Integer> knn : knns) {
-          if(knn.getSecond() == id) {
-            result.add(new ComparablePair<D, Integer>(knn.getFirst(), candidateID));
+        List<DistanceResultPair<D>> knns = this.kNNQueryForID(candidateID, k, distanceFunction);
+        for(DistanceResultPair<D> knn : knns) {
+          if(knn.getID() == id) {
+            result.add(new DistanceResultPair<D>(knn.getDistance(), candidateID));
           }
         }
       }

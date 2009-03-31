@@ -14,8 +14,7 @@ import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * MetricalIndexDatabase is a database implementation which is supported by a
@@ -61,7 +60,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
      * the underlying index structure.
      */
     @Override
-    public Integer insert(SimplePair<O, Associations> objectAndAssociations) throws UnableToComplyException {
+    public Integer insert(Pair<O, Associations> objectAndAssociations) throws UnableToComplyException {
         Integer id = super.insert(objectAndAssociations);
         O object = objectAndAssociations.getFirst();
         index.insert(object);
@@ -75,78 +74,78 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
      * the objects will be inserted sequentially.
      */
     @Override
-    public void insert(List<SimplePair<O, Associations>> objectsAndAssociationsList) throws UnableToComplyException {
-        for (SimplePair<O, Associations> objectAndAssociations : objectsAndAssociationsList) {
+    public void insert(List<Pair<O, Associations>> objectsAndAssociationsList) throws UnableToComplyException {
+        for (Pair<O, Associations> objectAndAssociations : objectsAndAssociationsList) {
             super.insert(objectAndAssociations);
         }
         this.index.insert(getObjects(objectsAndAssociationsList));
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Distance<T>> List<ComparablePair<T, Integer>> rangeQuery(Integer id,
+    public <T extends Distance<T>> List<DistanceResultPair<T>> rangeQuery(Integer id,
                                                                    String epsilon,
                                                                    DistanceFunction<O, T> distanceFunction) {
         if (!distanceFunction.getClass().equals(index.getDistanceFunction().getClass()))
             throw new IllegalArgumentException("Parameter distanceFunction must be an instance of " +
                 index.getDistanceFunction().getClass());
 
-        List<ComparablePair<D, Integer>> rangeQuery = index.rangeQuery(get(id), epsilon);
+        List<DistanceResultPair<D>> rangeQuery = index.rangeQuery(get(id), epsilon);
 
-        List<ComparablePair<T, Integer>> result = new ArrayList<ComparablePair<T, Integer>>();
-        for (ComparablePair<D, Integer> qr : rangeQuery)
-            result.add((ComparablePair<T, Integer>) qr);
+        List<DistanceResultPair<T>> result = new ArrayList<DistanceResultPair<T>>();
+        for (DistanceResultPair<D> qr : rangeQuery)
+            result.add((DistanceResultPair<T>) qr);
 
         return result;
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Distance<T>> List<ComparablePair<T, Integer>> kNNQueryForObject(
+    public <T extends Distance<T>> List<DistanceResultPair<T>> kNNQueryForObject(
         O queryObject, int k, DistanceFunction<O, T> distanceFunction) {
         if (!distanceFunction.getClass().equals(index.getDistanceFunction().getClass()))
             throw new IllegalArgumentException("Parameter distanceFunction must be an instance of "
                 + index.getDistanceFunction().getClass());
 
-        List<ComparablePair<D, Integer>> knnQuery = index.kNNQuery(queryObject, k);
+        List<DistanceResultPair<D>> knnQuery = index.kNNQuery(queryObject, k);
 
-        List<ComparablePair<T, Integer>> result = new ArrayList<ComparablePair<T, Integer>>();
-        for (ComparablePair<D, Integer> qr : knnQuery)
-            result.add((ComparablePair<T, Integer>) qr);
+        List<DistanceResultPair<T>> result = new ArrayList<DistanceResultPair<T>>();
+        for (DistanceResultPair<D> qr : knnQuery)
+            result.add((DistanceResultPair<T>) qr);
 
         return result;
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Distance<T>> List<ComparablePair<T, Integer>> kNNQueryForID(Integer id, int k, DistanceFunction<O, T> distanceFunction) {
+    public <T extends Distance<T>> List<DistanceResultPair<T>> kNNQueryForID(Integer id, int k, DistanceFunction<O, T> distanceFunction) {
 
         if (!distanceFunction.getClass().equals(index.getDistanceFunction().getClass()))
             throw new IllegalArgumentException("Parameter distanceFunction must be an instance of "
                 + index.getDistanceFunction().getClass());
 
-        List<ComparablePair<D, Integer>> knnQuery = index.kNNQuery(get(id), k);
+        List<DistanceResultPair<D>> knnQuery = index.kNNQuery(get(id), k);
 
-        List<ComparablePair<T, Integer>> result = new ArrayList<ComparablePair<T, Integer>>();
-        for (ComparablePair<D, Integer> qr : knnQuery)
-            result.add((ComparablePair<T, Integer>) qr);
+        List<DistanceResultPair<T>> result = new ArrayList<DistanceResultPair<T>>();
+        for (DistanceResultPair<D> qr : knnQuery)
+            result.add((DistanceResultPair<T>) qr);
 
         return result;
     }
 
-    public <T extends Distance<T>> List<List<ComparablePair<T, Integer>>> bulkKNNQueryForID(@SuppressWarnings("unused") List<Integer> ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") DistanceFunction<O, T> distanceFunction) {
+    public <T extends Distance<T>> List<List<DistanceResultPair<T>>> bulkKNNQueryForID(@SuppressWarnings("unused") List<Integer> ids, @SuppressWarnings("unused") int k, @SuppressWarnings("unused") DistanceFunction<O, T> distanceFunction) {
         throw new UnsupportedOperationException("Not yet supported!");
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Distance<T>> List<ComparablePair<T, Integer>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, T> distanceFunction) {
+    public <T extends Distance<T>> List<DistanceResultPair<T>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, T> distanceFunction) {
         if (!distanceFunction.getClass().equals(index.getDistanceFunction().getClass()))
             throw new IllegalArgumentException("Parameter distanceFunction must be an instance of "
                 + index.getDistanceFunction().getClass() +
                 ", but is " + distanceFunction.getClass());
 
-        List<ComparablePair<D, Integer>> rknnQuery = index.reverseKNNQuery(get(id), k);
+        List<DistanceResultPair<D>> rknnQuery = index.reverseKNNQuery(get(id), k);
 
-        List<ComparablePair<T, Integer>> result = new ArrayList<ComparablePair<T, Integer>>();
-        for (ComparablePair<D, Integer> qr : rknnQuery)
-            result.add((ComparablePair<T, Integer>) qr);
+        List<DistanceResultPair<T>> result = new ArrayList<DistanceResultPair<T>>();
+        for (DistanceResultPair<D> qr : rknnQuery)
+            result.add((DistanceResultPair<T>) qr);
 
         return result;
     }

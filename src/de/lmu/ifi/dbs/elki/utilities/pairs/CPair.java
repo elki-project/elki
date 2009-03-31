@@ -10,14 +10,14 @@ import java.util.Comparator;
  * @param <FIRST> first type
  * @param <SECOND> second type
  */
-public class ComparablePair<FIRST extends Comparable<FIRST>, SECOND extends Comparable<SECOND>> extends SimplePair<FIRST, SECOND> implements Comparable<ComparablePair<FIRST, SECOND>> {
+public class CPair<FIRST extends Comparable<FIRST>, SECOND extends Comparable<SECOND>> extends Pair<FIRST, SECOND> implements Comparable<CPair<FIRST, SECOND>> {
   /**
    * Initialize pair
    * 
    * @param first first parameter
    * @param second second parameter
    */
-  public ComparablePair(FIRST first, SECOND second) {
+  public CPair(FIRST first, SECOND second) {
     super(first, second);
   }
 
@@ -26,7 +26,7 @@ public class ComparablePair<FIRST extends Comparable<FIRST>, SECOND extends Comp
    * 
    * @param other Object to compare to
    */
-  public int compareTo(ComparablePair<FIRST, SECOND> other) {
+  public int compareTo(CPair<FIRST, SECOND> other) {
     // try comparing by first
     if(this.first != null) {
       if(other.first == null) {
@@ -60,7 +60,7 @@ public class ComparablePair<FIRST extends Comparable<FIRST>, SECOND extends Comp
    * 
    * @param other Object to compare to
    */
-  public int compareSwappedTo(ComparablePair<FIRST, SECOND> other) {
+  public int compareSwappedTo(CPair<FIRST, SECOND> other) {
     // try comparing by second
     if(this.second != null) {
       if(other.second == null) {
@@ -96,8 +96,8 @@ public class ComparablePair<FIRST extends Comparable<FIRST>, SECOND extends Comp
    * @param size Size of array to be constructed
    */
   @SuppressWarnings("unchecked")
-  public static final <F extends Comparable<F>, S extends Comparable<S>> ComparablePair<F, S>[] newArray(int size) {
-    return new ComparablePair[size];
+  public static final <F extends Comparable<F>, S extends Comparable<S>> CPair<F, S>[] newArray(int size) {
+    return new CPair[size];
   }
   
   /**
@@ -106,7 +106,7 @@ public class ComparablePair<FIRST extends Comparable<FIRST>, SECOND extends Comp
    * @param <FIRST>
    * @param <SECOND>
    */
-  public final static class CompareSwapped<FIRST extends Comparable<FIRST>, SECOND extends Comparable<SECOND>> implements Comparator<ComparablePair<FIRST,SECOND>> {
+  public final static class CompareSwapped<FIRST extends Comparable<FIRST>, SECOND extends Comparable<SECOND>> implements Comparator<CPair<FIRST,SECOND>> {
     /**
      * Compare by second component, using the ComparableSwapped interface.
      * 
@@ -114,7 +114,7 @@ public class ComparablePair<FIRST extends Comparable<FIRST>, SECOND extends Comp
      * @param o2 Second object
      */
     @Override
-    public int compare(ComparablePair<FIRST,SECOND> o1, ComparablePair<FIRST,SECOND> o2) {
+    public int compare(CPair<FIRST,SECOND> o1, CPair<FIRST,SECOND> o2) {
       return o1.compareSwappedTo(o2);
     }
 

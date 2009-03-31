@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.distance.Distance;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Class to store the result of an ordering clustering algorithm such as OPTICS.
@@ -95,12 +95,12 @@ public class ClusterOrderResult<D extends Distance<D>> implements OrderingResult
    * Implementation of the {@link AnnotationResult} interface.
    */
   @Override
-  public SimplePair<String, Object>[] getAnnotations(Integer objID) {
-    SimplePair<String, Object>[] anns = SimplePair.newArray(3);
+  public Pair<String, Object>[] getAnnotations(Integer objID) {
+    Pair<String, Object>[] anns = Pair.newArray(3);
     // TODO: do we really need to include the ID here?
-    anns[0] = new SimplePair<String, Object>("ID", objID);
-    anns[1] = new SimplePair<String, Object>("REACHABILITY", map.get(objID).getReachability());
-    anns[2] = new SimplePair<String, Object>("PREDECESSOR", map.get(objID).getPredecessorID());
+    anns[0] = new Pair<String, Object>("ID", objID);
+    anns[1] = new Pair<String, Object>("REACHABILITY", map.get(objID).getReachability());
+    anns[2] = new Pair<String, Object>("PREDECESSOR", map.get(objID).getPredecessorID());
     return anns;
   }
 

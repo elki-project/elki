@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
-import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * MkTabTree is a metrical index structure based on the concepts of the M-Tree
@@ -49,13 +49,13 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>>
     }
 
     @Override
-    public List<ComparablePair<D, Integer>> reverseKNNQuery(O object, int k) {
+    public List<DistanceResultPair<D>> reverseKNNQuery(O object, int k) {
         if (k > this.k_max) {
             throw new IllegalArgumentException("Parameter k has to be less or equal than " +
                 "parameter kmax of the MkTab-Tree!");
         }
 
-        List<ComparablePair<D, Integer>> result = new ArrayList<ComparablePair<D, Integer>>();
+        List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
         doReverseKNNQuery(k, object.getID(), null, getRoot(), result);
 
         Collections.sort(result);
@@ -187,14 +187,14 @@ public class MkTabTree<O extends DatabaseObject, D extends Distance<D>>
      * @param node       the root of the subtree
      * @param result     the list holding the query result
      */
-    private void doReverseKNNQuery(int k, Integer q, MkTabEntry<D> node_entry, MkTabTreeNode<O, D> node, List<ComparablePair<D, Integer>> result) {
+    private void doReverseKNNQuery(int k, Integer q, MkTabEntry<D> node_entry, MkTabTreeNode<O, D> node, List<DistanceResultPair<D>> result) {
         // data node
         if (node.isLeaf()) {
             for (int i = 0; i < node.getNumEntries(); i++) {
                 MkTabEntry<D> entry = node.getEntry(i);
                 D distance = getDistanceFunction().distance(entry.getRoutingObjectID(), q);
                 if (distance.compareTo(entry.getKnnDistance(k)) <= 0) {
-                    result.add(new ComparablePair<D, Integer>(distance, entry.getRoutingObjectID()));
+                    result.add(new DistanceResultPair<D>(distance, entry.getRoutingObjectID()));
                 }
             }
         }

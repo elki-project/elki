@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.NotEqualValueGlobalConstraint;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Abstract super class for all database connections. AbstractDatabaseConnection
@@ -217,9 +217,9 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
      * @return a list of normalized objects and their associations
      * @throws NonNumericFeaturesException if any exception occurs during normalization
      */
-    protected List<SimplePair<O, Associations>> normalizeAndTransformLabels(List<SimplePair<O,List<String>>> objectAndLabelsList,
+    protected List<Pair<O, Associations>> normalizeAndTransformLabels(List<Pair<O,List<String>>> objectAndLabelsList,
                                                                          Normalization<O> normalization) throws NonNumericFeaturesException {
-        List<SimplePair<O, Associations>> objectAndAssociationsList = transformLabels(objectAndLabelsList);
+        List<Pair<O, Associations>> objectAndAssociationsList = transformLabels(objectAndLabelsList);
 
         if (normalization == null) {
             return objectAndAssociationsList;
@@ -236,10 +236,10 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
      * @param objectAndLabelsList the list of object and their labels to be transformed
      * @return a list of objects and their associations
      */
-    private List<SimplePair<O, Associations>> transformLabels(List<SimplePair<O,List<String>>> objectAndLabelsList) {
-        List<SimplePair<O, Associations>> result = new ArrayList<SimplePair<O, Associations>>();
+    private List<Pair<O, Associations>> transformLabels(List<Pair<O,List<String>>> objectAndLabelsList) {
+        List<Pair<O, Associations>> result = new ArrayList<Pair<O, Associations>>();
 
-        for (SimplePair<O,List<String>> objectAndLabels : objectAndLabelsList) {
+        for (Pair<O,List<String>> objectAndLabels : objectAndLabelsList) {
             List<String> labels = objectAndLabels.getSecond();
             if (classLabelIndex != null && classLabelIndex >= labels.size()) {
                 throw new IllegalArgumentException("No class label at index " + (classLabelIndex) + " specified!");
@@ -305,7 +305,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
                 associationMap.put(AssociationID.EXTERNAL_ID, externalIDLabel);
             }
 
-            result.add(new SimplePair<O, Associations>(objectAndLabels.getFirst(), associationMap));
+            result.add(new Pair<O, Associations>(objectAndLabels.getFirst(), associationMap));
         }
         return result;
     }

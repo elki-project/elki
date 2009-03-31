@@ -4,7 +4,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * A parser that can parse single line.
@@ -19,5 +19,5 @@ public interface LinebasedParser<O extends DatabaseObject> extends Parameterizab
    * @param line single line
    * @return parsing result
    */
-  public SimplePair<O, List<String>> parseLine(String line);
+  public Pair<O, List<String>> parseLine(String line);
 }

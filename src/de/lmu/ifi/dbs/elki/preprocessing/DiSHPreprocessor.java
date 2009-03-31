@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.SequentialDatabase;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionSelectingDistanceFunction;
@@ -39,8 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualStringConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
-import de.lmu.ifi.dbs.elki.utilities.pairs.SimplePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Preprocessor for DiSH preference vector assignment to objects of a certain
@@ -206,10 +206,10 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
                 // determine neighbors in each dimension
                 Set<Integer>[] allNeighbors = ClassGenericsUtil.newArrayOfSet(dim);
                 for (int d = 0; d < dim; d++) {
-                    List<ComparablePair<DoubleDistance, Integer>> qrList = database.rangeQuery(id, epsString[d], distanceFunctions[d]);
+                    List<DistanceResultPair<DoubleDistance>> qrList = database.rangeQuery(id, epsString[d], distanceFunctions[d]);
                     allNeighbors[d] = new HashSet<Integer>(qrList.size());
-                    for (ComparablePair<DoubleDistance, Integer> qr : qrList) {
-                        allNeighbors[d].add(qr.getSecond());
+                    for (DistanceResultPair<DoubleDistance> qr : qrList) {
+                        allNeighbors[d].add(qr.getID());
                     }
                 }
 
@@ -355,7 +355,7 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
                 if (associations == null) {
                     associations = new Associations();
                 }
-                SimplePair<BitVector,Associations> oaa = new SimplePair<BitVector,Associations>(new BitVector(bits), associations);
+                Pair<BitVector,Associations> oaa = new Pair<BitVector,Associations>(new BitVector(bits), associations);
                 apriori_db.insert(oaa);
             }
         }

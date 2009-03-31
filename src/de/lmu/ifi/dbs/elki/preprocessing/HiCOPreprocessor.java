@@ -6,6 +6,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
@@ -17,7 +18,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.pairs.ComparablePair;
 
 /**
  * Abstract superclass for preprocessors for HiCO correlation dimension
@@ -88,7 +88,7 @@ public abstract class HiCOPreprocessor<V extends RealVector<V, ?>> extends Abstr
         int processed = 1;
         for (Iterator<Integer> it = database.iterator(); it.hasNext();) {
             Integer id = it.next();
-            List<ComparablePair<DoubleDistance, Integer>> objs = resultsForPCA(id, database, verbose, false);
+            List<DistanceResultPair<DoubleDistance>> objs = resultsForPCA(id, database, verbose, false);
 
             PCAFilteredResult pcares = pca.processQueryResult(objs, database);
 
@@ -140,27 +140,27 @@ public abstract class HiCOPreprocessor<V extends RealVector<V, ?>> extends Abstr
 
     /**
      * Returns the ids of the objects stored in the specified database to be
-     * considerd within the PCA for the specified object id.
+     * considered within the PCA for the specified object id.
      *
      * @param id       the id of the object for which a PCA should be performed
      * @param database the database holding the objects
      * @param verbose  flag to allow verbose messages while performing the
      *                 algorithm
      * @param time     flag to request output of performance time
-     * @return the list of the object ids to be considerd within the PCA
+     * @return the list of the object ids to be considered within the PCA
      */
     protected abstract List<Integer> objectIDsForPCA(Integer id, Database<V> database, boolean verbose, boolean time);
 
     /**
      * Returns the ids of the objects and distances stored in the specified
-     * database to be considerd within the PCA for the specified object id.
+     * database to be considered within the PCA for the specified object id.
      *
      * @param id       the id of the object for which a PCA should be performed
      * @param database the database holding the objects
      * @param verbose  flag to allow verbose messages while performing the
      *                 algorithm
      * @param time     flag to request output of performance time
-     * @return the list of the object ids to be considerd within the PCA
+     * @return the list of the object ids to be considered within the PCA
      */
-    protected abstract List<ComparablePair<DoubleDistance, Integer>> resultsForPCA(Integer id, Database<V> database, boolean verbose, boolean time);
+    protected abstract List<DistanceResultPair<DoubleDistance>> resultsForPCA(Integer id, Database<V> database, boolean verbose, boolean time);
 }
