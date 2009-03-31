@@ -56,7 +56,10 @@ public abstract class AbstractLoggable {
    * <p/>
    * If the logger is currently enabled for the EXCEPTION message level then the
    * given message is forwarded to all the registered output Handler objects.
+   * 
+   * Depreciated: use {@link LoggingUtil.logExpensive(LogLevel.SEVERE, ...) instead.
    */
+  @Deprecated
   public void exception(String msg, Throwable e) {
     logger.log(LogLevel.EXCEPTION, msg, e);
   }
