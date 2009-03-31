@@ -12,7 +12,7 @@ public class MultiResult implements Result {
    * Store the actual results
    */
   private ArrayList<Result> results;
-  
+
   /**
    * Constructor
    * 
@@ -69,12 +69,16 @@ public class MultiResult implements Result {
   @SuppressWarnings("unchecked")
   public <C> ArrayList<C> filterResults(Class<?> restrictionClass) {
     ArrayList<C> res = new ArrayList<C>();
-    for (Result result : results)
-      try {
-        res.add((C) restrictionClass.cast(result));
-      } catch (ClassCastException e) {
-        // skip non-matching items
+    for(Result result : results) {
+      if(result != null) {
+        try {
+          res.add((C) restrictionClass.cast(result));
+        }
+        catch(ClassCastException e) {
+          // skip non-matching items
+        }
       }
+    }
     return res;
   }
 }
