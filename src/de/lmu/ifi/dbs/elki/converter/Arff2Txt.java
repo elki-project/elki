@@ -1,6 +1,8 @@
 package de.lmu.ifi.dbs.elki.converter;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.parser.AbstractParser;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -35,17 +37,17 @@ public class Arff2Txt extends StandAloneInputWrapper {
         }
         catch (ParameterException e) {
             Throwable cause = e.getCause() != null ? e.getCause() : e;
-            wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
+            LoggingUtil.logExpensive(LogLevel.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
         }
         catch (UnableToComplyException e) {
             Throwable cause = e.getCause() != null ? e.getCause() : e;
-            wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
+            LoggingUtil.logExpensive(LogLevel.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
         }
         catch (AbortException e) {
-            wrapper.verbose(e.getMessage());
+          LoggingUtil.logExpensive(LogLevel.VERBOSE, e.getMessage());
         }
         catch (Exception e) {
-            wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
+          LoggingUtil.logExpensive(LogLevel.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
         }
     }
 

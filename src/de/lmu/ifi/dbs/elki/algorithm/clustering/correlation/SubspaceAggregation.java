@@ -19,6 +19,8 @@ import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
@@ -302,7 +304,7 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
 //            scriptFile.deleteOnExit();
         }
         catch (IOException e) {
-            exception(e.getMessage(), e);
+            LoggingUtil.logExpensive(LogLevel.SEVERE, e.getMessage(), e);
         }
 //        catch(InterruptedException e)
 //        {

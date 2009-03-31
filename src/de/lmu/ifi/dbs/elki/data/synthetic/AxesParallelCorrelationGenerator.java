@@ -1,6 +1,8 @@
 package de.lmu.ifi.dbs.elki.data.synthetic;
 
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
@@ -253,10 +255,10 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
         }
         catch (ParameterException e) {
             Throwable cause = e.getCause() != null ? e.getCause() : e;
-            wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
+            LoggingUtil.logExpensive(LogLevel.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
         }
         catch (Exception e) {
-            wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
+          LoggingUtil.logExpensive(LogLevel.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
         }
     }
 

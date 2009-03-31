@@ -431,7 +431,7 @@ public class OptionHandler {
                     ", new value: " + option.getValue().toString() + ")");
             }
             catch (UnusedParameterException e) {
-                logger.log(LogLevel.EXCEPTION, e.getMessage(), e);
+                logger.log(LogLevel.SEVERE, e.getMessage(), e);
             }
         }
     }

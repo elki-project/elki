@@ -137,7 +137,7 @@ public final class Properties {
                         }
                     }
                     catch (Exception e) {
-                      logger.log(LogLevel.EXCEPTION, e.getMessage(), e);
+                      logger.log(LogLevel.SEVERE, "Exception building class restriction string.", e);
                     }
                 }
             }

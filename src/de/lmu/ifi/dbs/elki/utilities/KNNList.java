@@ -5,11 +5,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
 
 /**
  * A wrapper class for storing the k most similar comparable objects.
@@ -58,34 +56,28 @@ public class KNNList<D extends Distance<D>> {
       return true;
     }
 
-    try {
-      DistanceResultPair<D> last = list.last();
-      D lastDist = last.getDistance();
+    DistanceResultPair<D> last = list.last();
+    D lastDist = last.getDistance();
 
-      if(o.getDistance().compareTo(lastDist) < 0) {
-        SortedSet<DistanceResultPair<D>> lastList = list.subSet(new DistanceResultPair<D>(lastDist, 0), new DistanceResultPair<D>(lastDist, Integer.MAX_VALUE));
+    if(o.getDistance().compareTo(lastDist) < 0) {
+      SortedSet<DistanceResultPair<D>> lastList = list.subSet(new DistanceResultPair<D>(lastDist, 0), new DistanceResultPair<D>(lastDist, Integer.MAX_VALUE));
 
-        int llSize = lastList.size();
-        if(list.size() - llSize >= k - 1) {
-          for(int i = 0; i < llSize; i++) {
-            list.remove(list.last());
-          }
+      int llSize = lastList.size();
+      if(list.size() - llSize >= k - 1) {
+        for(int i = 0; i < llSize; i++) {
+          list.remove(list.last());
         }
-        list.add(o);
-        return true;
       }
-
-      if(o.getDistance().compareTo(last.getDistance()) == 0) {
-        list.add(o);
-        return true;
-      }
-
-      return false;
+      list.add(o);
+      return true;
     }
-    catch(Exception e) { // TODO more specialized??
-      Logger.getLogger(this.getClass().getName()).log(LogLevel.EXCEPTION, "k " + k + "\n" + "list " + list, e);
-      throw new RuntimeException(e);
+
+    if(o.getDistance().compareTo(last.getDistance()) == 0) {
+      list.add(o);
+      return true;
     }
+
+    return false;
   }
 
   /**

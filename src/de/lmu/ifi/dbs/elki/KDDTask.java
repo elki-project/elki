@@ -266,7 +266,8 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
         }
       }
       catch(UnableToComplyException e) {
-        exception(e.getMessage(), e);
+        // FIXME: log here?
+        Logger.getLogger(KDDTask.class.getName()).log(LogLevel.SEVERE, e.getMessage(), e);
         throw new WrongParameterValueException(DESCRIPTION_PARAM.getName(), descriptionClass, DESCRIPTION_PARAM.getDescription(), e);
       }
       if(p instanceof Algorithm) {
@@ -383,23 +384,24 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
   @SuppressWarnings("unchecked")
   public static void main(String[] args) {
     LoggingConfiguration.assertConfigured();
+    Logger logger = Logger.getLogger(KDDTask.class.getName());
     KDDTask<? extends DatabaseObject> kddTask = new KDDTask();
     try {
       String[] remainingParameters = kddTask.setParameters(args);
       if(remainingParameters.length != 0) {
-        kddTask.warning(kddTask.usage("Unnecessary parameters specified: " + Arrays.asList(remainingParameters) + "\n\nUSAGE:\n"));
+        logger.warning(kddTask.usage("Unnecessary parameters specified: " + Arrays.asList(remainingParameters) + "\n\nUSAGE:\n"));
       }
       kddTask.run();
     }
     catch(AbortException e) {
-      kddTask.verbose(kddTask.usage(e.getMessage() + "\n\nUSAGE:"));
+      logger.info(kddTask.usage(e.getMessage() + "\n\nUSAGE:"));
     }
     catch(ParameterException e) {
-      kddTask.warning(kddTask.usage(e.getMessage() + "\n\nUSAGE:\n"));
+      logger.warning(kddTask.usage(e.getMessage() + "\n\nUSAGE:\n"));
     }
     // any other exception
     catch(Exception e) {
-      kddTask.exception(e.getMessage(), e);
+      logger.log(LogLevel.SEVERE, e.getMessage(), e);
     }
   }
 }

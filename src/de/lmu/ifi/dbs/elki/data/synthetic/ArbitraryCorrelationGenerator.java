@@ -8,6 +8,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -126,10 +127,10 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
         }
         catch (ParameterException e) {
             Throwable cause = e.getCause() != null ? e.getCause() : e;
-            wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
+            LoggingUtil.logExpensive(LogLevel.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
         }
         catch (Exception e) {
-            wrapper.exception(wrapper.optionHandler.usage(e.getMessage()), e);
+          LoggingUtil.logExpensive(LogLevel.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
         }
     }
 

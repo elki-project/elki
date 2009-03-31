@@ -1,7 +1,9 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -132,7 +134,7 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
       }
       catch(Exception e) {
         Throwable cause = e.getCause() != null ? e.getCause() : e;
-        exception(optionHandler.usage(e.toString()), cause);
+        LoggingUtil.logExpensive(LogLevel.SEVERE, optionHandler.usage(e.toString()), cause);
       }
     }
 }

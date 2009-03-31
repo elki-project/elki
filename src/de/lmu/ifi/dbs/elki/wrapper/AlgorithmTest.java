@@ -2,6 +2,8 @@ package de.lmu.ifi.dbs.elki.wrapper;
 
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
@@ -111,7 +113,7 @@ public class AlgorithmTest extends AbstractParameterizable {
         }
         catch (Exception e) {
             Throwable cause = e.getCause() != null ? e.getCause() : e;
-            algorithmTest.exception(algorithmTest.optionHandler.usage(e.getMessage()), cause);
+            LoggingUtil.logExpensive(LogLevel.SEVERE, algorithmTest.optionHandler.usage(e.getMessage()), cause);
         }
 
         algorithmTest.run();
