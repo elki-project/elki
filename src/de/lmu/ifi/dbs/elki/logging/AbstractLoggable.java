@@ -70,6 +70,7 @@ public abstract class AbstractLoggable {
    * If the logger is currently enabled for the WARNING message level then the
    * given message is forwarded to all the registered output Handler objects.
    */
+  @Deprecated
   public void warning(String msg) {
     logger.log(LogLevel.WARNING, msg);
   }
@@ -80,6 +81,7 @@ public abstract class AbstractLoggable {
    * If the logger is currently enabled for the INFO level then the given
    * message is forwarded to all the registered output Handler objects.
    */
+  @Deprecated
   public void info(String msg) {
     logger.log(LogLevel.INFO, msg);
   }

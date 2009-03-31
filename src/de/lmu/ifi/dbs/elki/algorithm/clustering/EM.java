@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.LogLevel;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
@@ -367,7 +368,7 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Cluster
                 normalization.normalize(list);
             }
             catch (NonNumericFeaturesException e) {
-                warning(e.getMessage());
+              LoggingUtil.logExpensive(LogLevel.WARNING, e.getMessage());
             }
             List<V> means = new ArrayList<V>(k);
             if (isVerbose()) {
@@ -379,7 +380,7 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Cluster
                     means.add(normalization.restore(randomVector));
                 }
                 catch (NonNumericFeaturesException e) {
-                    warning(e.getMessage());
+                    logger.log(LogLevel.WARNING, e.getMessage());
                     means.add(randomVector);
                 }
             }

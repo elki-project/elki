@@ -6,6 +6,8 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.textwriter.MultipleFilesOutput;
 import de.lmu.ifi.dbs.elki.result.textwriter.SingleStreamOutput;
@@ -22,7 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * Result handler that feeds the data into a TextWriter
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <O> Object type
  */
 public class ResultWriter<O extends DatabaseObject> extends AbstractParameterizable implements ResultHandler<O, Result> {
@@ -67,8 +69,12 @@ public class ResultWriter<O extends DatabaseObject> extends AbstractParameteriza
     return remainingParameters;
   }
 
-  /* (non-Javadoc)
-   * @see de.lmu.ifi.dbs.elki.result.ResultHandler#processResult(de.lmu.ifi.dbs.elki.database.Database, de.lmu.ifi.dbs.elki.result.Result, java.util.List)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.lmu.ifi.dbs.elki.result.ResultHandler#processResult(de.lmu.ifi.dbs.elki
+   * .database.Database, de.lmu.ifi.dbs.elki.result.Result, java.util.List)
    */
   public void processResult(Database<O> db, Result result, List<AttributeSettings> settings) {
     TextWriter<O> writer = new TextWriter<O>();
@@ -83,12 +89,13 @@ public class ResultWriter<O extends DatabaseObject> extends AbstractParameteriza
       }
       else if(out.exists()) {
         if(out.isDirectory()) {
-          if(out.listFiles().length > 0)
-            warning("Output directory specified is not empty. Files will be overwritten and old files may be left over.");
+          if(out.listFiles().length > 0) {
+            LoggingUtil.logExpensive(LogLevel.WARNING, "Output directory specified is not empty. Files will be overwritten and old files may be left over.");
+          }
           output = new MultipleFilesOutput(out);
         }
         else {
-          warning("Output file exists and will be overwritten!");
+          LoggingUtil.logExpensive(LogLevel.WARNING, "Output file exists and will be overwritten!");
           output = new SingleStreamOutput(out);
         }
       }
@@ -110,8 +117,12 @@ public class ResultWriter<O extends DatabaseObject> extends AbstractParameteriza
     }
   }
 
-  /* (non-Javadoc)
-   * @see de.lmu.ifi.dbs.elki.result.ResultHandler#setNormalization(de.lmu.ifi.dbs.elki.normalization.Normalization)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.lmu.ifi.dbs.elki.result.ResultHandler#setNormalization(de.lmu.ifi.dbs
+   * .elki.normalization.Normalization)
    */
   public void setNormalization(Normalization<O> normalization) {
     this.normalization = normalization;

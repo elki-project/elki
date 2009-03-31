@@ -187,7 +187,7 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
         processElementStatic(child);
       }
       else if(child.getNodeType() == Node.ELEMENT_NODE) {
-        warning("Unknown element in XML specification file: " + child.getNodeName());
+        logger.warning("Unknown element in XML specification file: " + child.getNodeName());
       }
     }
   }
@@ -243,7 +243,7 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
         processElementClipping(cluster, child);
       }
       else if(child.getNodeType() == Node.ELEMENT_NODE) {
-        warning("Unknown element in XML specification file: " + child.getNodeName());
+        logger.warning("Unknown element in XML specification file: " + child.getNodeName());
       }
     }
     
@@ -278,7 +278,7 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
     // TODO: check for unknown attributes.
     for(Node child : new XMLNodeIterator(cur.getFirstChild())) {
       if(child.getNodeType() == Node.ELEMENT_NODE) {
-        warning("Unknown element in XML specification file: " + child.getNodeName());
+        logger.warning("Unknown element in XML specification file: " + child.getNodeName());
       }
     }
   }
@@ -310,7 +310,7 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
     // TODO: check for unknown attributes.
     for(Node child : new XMLNodeIterator(cur.getFirstChild())) {
       if(child.getNodeType() == Node.ELEMENT_NODE) {
-        warning("Unknown element in XML specification file: " + child.getNodeName());
+        logger.warning("Unknown element in XML specification file: " + child.getNodeName());
       }
     }
   }
@@ -355,7 +355,7 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
     // TODO: check for unknown attributes.
     for(Node child : new XMLNodeIterator(cur.getFirstChild())) {
       if(child.getNodeType() == Node.ELEMENT_NODE) {
-        warning("Unknown element in XML specification file: " + child.getNodeName());
+        logger.warning("Unknown element in XML specification file: " + child.getNodeName());
       }
     }
   }
@@ -383,7 +383,7 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
     // TODO: check for unknown attributes.
     for(Node child : new XMLNodeIterator(cur.getFirstChild())) {
       if(child.getNodeType() == Node.ELEMENT_NODE) {
-        warning("Unknown element in XML specification file: " + child.getNodeName());
+        logger.warning("Unknown element in XML specification file: " + child.getNodeName());
       }
     }
   }
@@ -417,7 +417,7 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
     // TODO: check for unknown attributes.
     for(Node child : new XMLNodeIterator(cur.getFirstChild())) {
       if(child.getNodeType() == Node.ELEMENT_NODE) {
-        warning("Unknown element in XML specification file: " + child.getNodeName());
+        logger.warning("Unknown element in XML specification file: " + child.getNodeName());
       }
     }
   }
@@ -441,7 +441,7 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
         processElementPoint(points, child);
       }
       else if(child.getNodeType() == Node.ELEMENT_NODE) {
-        warning("Unknown element in XML specification file: " + child.getNodeName());
+        logger.warning("Unknown element in XML specification file: " + child.getNodeName());
       }
     }
     // *** add new cluster object
@@ -476,7 +476,7 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
     // TODO: check for unknown attributes.
     for(Node child : new XMLNodeIterator(cur.getFirstChild())) {
       if(child.getNodeType() == Node.ELEMENT_NODE) {
-        warning("Unknown element in XML specification file: " + child.getNodeName());
+        logger.warning("Unknown element in XML specification file: " + child.getNodeName());
       }
     }
   }

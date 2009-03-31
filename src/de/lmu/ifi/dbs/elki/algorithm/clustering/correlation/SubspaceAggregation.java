@@ -210,7 +210,7 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
                 normalization.normalize(list);
             }
             catch (NonNumericFeaturesException e) {
-                warning(e.getMessage());
+              LoggingUtil.logExpensive(LogLevel.WARNING, e.getMessage());
             }
             List<V> means = new ArrayList<V>(k);
             if (isVerbose()) {
@@ -222,7 +222,7 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
                     means.add(normalization.restore(randomVector));
                 }
                 catch (NonNumericFeaturesException e) {
-                    warning(e.getMessage());
+                  logger.log(LogLevel.WARNING, e.getMessage());
                     means.add(randomVector);
                 }
             }

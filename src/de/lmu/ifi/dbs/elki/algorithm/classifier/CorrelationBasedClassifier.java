@@ -18,6 +18,8 @@ import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
@@ -119,10 +121,10 @@ public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Di
                 model_i.output(printStream, null, dependencyDerivator.getAttributeSettings());
             }
             catch (UnableToComplyException e) {
-                warning(e.getMessage() + "\n");
+              LoggingUtil.logExpensive(LogLevel.WARNING, e.getMessage() + "\n");
             }
             catch(IOException e) {
-                warning(e.getMessage() + "\n");
+              LoggingUtil.logExpensive(LogLevel.WARNING, e.getMessage() + "\n");
             }
         }
         return stream.toString();

@@ -127,10 +127,10 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
         run();
       }
       catch(AbortException e) {
-        verbose(e.toString());
+        LoggingUtil.logExpensive(LogLevel.VERBOSE, e.toString());
       }
       catch(ParameterException e) {
-        warning(e.toString());
+        LoggingUtil.logExpensive(LogLevel.WARNING, e.toString());
       }
       catch(Exception e) {
         Throwable cause = e.getCause() != null ? e.getCause() : e;
