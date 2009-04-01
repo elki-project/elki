@@ -32,27 +32,6 @@ public final class SVGUtil {
    * Create a SVG element in appropriate namespace
    * 
    * @param document containing document
-   * @param parent parent element
-   * @param name node name
-   * @return new SVG element.
-   */
-  // Deprecated: Elements on their own often aren't useful.
-  // If possible, they should be set up completely, then added
-  // (since there might be an update manager tracking changes,
-  // or the interim DOM tree not valid!)
-  @Deprecated
-  public static Element svgElement(Document document, Element parent, String name) {
-    Element neu = svgElement(document, name);
-    if(parent != null) {
-      parent.appendChild(neu);
-    }
-    return neu;
-  }
-
-  /**
-   * Create a SVG element in appropriate namespace
-   * 
-   * @param document containing document
    * @param name node name
    * @return new SVG element.
    */

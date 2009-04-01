@@ -1691,41 +1691,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
     }
 
     /**
-     * Returns a matrix derived by Gauss-Jordan-elimination.
-     *
-     * @return a new Matrix that is the result of Gauss-Jordan-elimination
-     * @deprecated use LinearEquationSystem instead
-     */
-    @Deprecated
-    public Matrix gaussJordanElimination() {
-        Matrix gauss = this.gaussElimination();
-
-        // reduced form
-        for (int row = gauss.getRowDimensionality() - 1; row > 0; row--) {
-            int firstCol = -1;
-            for (int col = 0; col < gauss.getColumnDimensionality() && firstCol == -1; col++) {
-                // if(gauss.get(row, col) != 0.0) // i.e. == 1
-                if (gauss.get(row, col) == 1.0) {
-                    // if (gauss.get(row, col) < DELTA * -1 || gauss.get(row,
-                    // col) > DELTA) {
-                    firstCol = col;
-                }
-            }
-            if (firstCol > -1) {
-                for (int currentRow = row - 1; currentRow >= 0; currentRow--) {
-                    double multiplier = gauss.get(currentRow, firstCol);
-                    for (int col = firstCol; col < gauss.getColumnDimensionality(); col++) {
-                        gauss.set(currentRow, col, gauss.get(currentRow, col) - gauss.get(row, col) * multiplier);
-                    }
-                }
-            }
-        }
-
-        return gauss;
-    }
-
-    /**
-     * Performes an exact Gauss-elimination of this Matrix using RationalNumbers
+     * Perform an exact Gauss-elimination of this Matrix using RationalNumbers
      * to yield highest possible accuracy.
      *
      * @return an array of arrays of RationalNumbers representing the
@@ -1742,11 +1708,11 @@ public class Matrix implements Cloneable, java.io.Serializable {
     }
 
     /**
-     * Performes recursivly Gauss-elimination on the given matrix of
+     * Perform recursive Gauss-elimination on the given matrix of
      * RationalNumbers.
      *
      * @param gauss an array of arrays of RationalNumber
-     * @return recursivly derived Gauss-elimination-form of the given matrix of
+     * @return recursive derived Gauss-elimination-form of the given matrix of
      *         RationalNumbers
      */
     private static RationalNumber[][] exactGaussElimination(RationalNumber[][] gauss) {
@@ -1800,62 +1766,6 @@ public class Matrix implements Cloneable, java.io.Serializable {
                 System.arraycopy(gauss, 1, subMatrix, 0, gauss.length - 1);
                 RationalNumber[][] eliminatedSubMatrix = exactGaussElimination(subMatrix);
                 System.arraycopy(eliminatedSubMatrix, 0, gauss, 1, eliminatedSubMatrix.length);
-            }
-        }
-        return gauss;
-    }
-
-    /**
-     * Recursive gauss-elimination (non-reduced form).
-     *
-     * @return a new Matrix that is the result of Gauss-elimination
-     */
-    private Matrix gaussElimination() {
-        Matrix gauss = this.copy();
-        int firstCol = -1;
-        int firstRow = -1;
-
-        // 1. find first column unequal to zero
-        for (int col = 0; col < gauss.getColumnDimensionality() && firstCol == -1; col++) {
-            for (int row = 0; row < gauss.getRowDimensionality() && firstCol == -1; row++) {
-                if (gauss.get(row, col) < DELTA * -1 || gauss.get(row, col) > DELTA) {
-                    firstCol = col;
-                    firstRow = row;
-                }
-            }
-        }
-
-        // 2. set row as first row
-        if (firstCol != -1) {
-            if (firstRow != 0) {
-                Matrix row = gauss.getMatrix(firstRow, firstRow, 0, gauss.getColumnDimensionality() - 1);
-                gauss.setMatrix(firstRow, firstRow, 0, gauss.getColumnDimensionality() - 1, gauss.getMatrix(0, 0, 0, gauss.getColumnDimensionality() - 1));
-                gauss.setMatrix(0, 0, 0, gauss.getColumnDimensionality() - 1, row);
-            }
-
-            // 3. create leading 1
-            double a = gauss.get(0, firstCol);
-            if (a != 1) {
-                for (int col = 0; col < gauss.getColumnDimensionality(); col++) {
-                    gauss.set(0, col, gauss.get(0, col) / a);
-                }
-            }
-
-            // 4. eliminate values unequal to zero below leading 1
-            for (int row = 1; row < gauss.getRowDimensionality(); row++) {
-                double multiplier = gauss.get(row, firstCol);
-                // if(multiplier != 0.0)
-                if (multiplier < DELTA * -1 || multiplier > DELTA) {
-                    for (int col = firstCol; col < gauss.getColumnDimensionality(); col++) {
-                        gauss.set(row, col, gauss.get(row, col) - gauss.get(0, col) * multiplier);
-                    }
-                }
-            }
-
-            // 5. recursion
-            if (gauss.getRowDimensionality() > 1) {
-                Matrix subMatrix = gauss.getMatrix(1, gauss.getRowDimensionality() - 1, 0, gauss.getColumnDimensionality() - 1);
-                gauss.setMatrix(1, gauss.getRowDimensionality() - 1, 0, gauss.getColumnDimensionality() - 1, subMatrix.gaussElimination());
             }
         }
         return gauss;

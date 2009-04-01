@@ -184,52 +184,6 @@ public class OptionHandler {
         return remain;
     }
 
-    /**
-     * Returns the value of the given option, if there is one.
-     *
-     * @param option option to get value of. The option should be asked for without
-     *               leading &quot;-&quot; or closing &quot;:&quot;.
-     * @return String value of given option
-     * @throws UnusedParameterException  if the given option is not used
-     * @throws NoParameterValueException if the given option is only a flag and should therefore have
-     *                                   no value
-     * @deprecated use <code>getParameterValue(parameter)</code> instead.
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    public <T> T getOptionValue(String option) throws UnusedParameterException, NoParameterValueException {
-
-        if (parameters.containsKey(option)) {
-            try {
-                return (T) parameters.get(option).getValue();
-            }
-            catch (ClassCastException e) {
-                throw new NoParameterValueException("Parameter " + option + " is flag which has no value.", e);
-            }
-        }
-        else {
-            throw new UnusedParameterException("Parameter " + option + " is not assigned to the option handler.");
-        }
-    }
-
-//    /**
-//     * Returns the value of the given parameter, if there is one.
-//     *
-//     * @param parameter parameter to get value of
-//     * @return value of given parameter
-//     * @throws UnusedParameterException if the given parameter is not used
-//     * todo entfernen, falls nicht gebraucht
-//     */
-//    @SuppressWarnings("unchecked")
-//    public <T> T getParameterValue(Parameter<T, ?> parameter) throws UnusedParameterException {
-//        if (parameters.containsKey(parameter.getName())) {
-//            return (T) parameters.get(parameter.getName()).getValue();
-//        }
-//        else {
-//            throw new UnusedParameterException("Parameter " + parameter + " is not assigned to the option handler.");
-//        }
-//    }
-
     public Option<?> getOption(String name) throws UnusedParameterException {
         if (parameters.containsKey(name)) {
             return parameters.get(name);
@@ -402,18 +356,6 @@ public class OptionHandler {
         String[] parameterArray = new String[currentParameters.length];
         System.arraycopy(currentParameters, 0, parameterArray, 0, currentParameters.length);
         return parameterArray;
-    }
-
-    /**
-     * Adds the given parameter map to the OptionHandler's current parameter
-     * map.
-     *
-     * @param params Parameter map to be added.
-     * @deprecated
-     */
-    @Deprecated
-    public void put(Map<String, Option<?>> params) {
-        this.parameters.putAll(params);
     }
 
     /**

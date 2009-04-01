@@ -102,22 +102,6 @@ public class SVGPlot {
   /**
    * Create a SVG element in the SVG namespace. Non-static version.
    * 
-   * @param parent parent node. May be null.
-   * @param name node name
-   * @return new SVG element.
-   */
-  @Deprecated
-  public Element svgElement(Element parent, String name) {
-    Element e = SVGUtil.svgElement(document, name);
-    if(parent != null) {
-      parent.appendChild(e);
-    }
-    return e;
-  }
-
-  /**
-   * Create a SVG element in the SVG namespace. Non-static version.
-   * 
    * @param name node name
    * @return new SVG element.
    */

@@ -25,24 +25,6 @@ public class PairGeneratorNoise extends PairSortedGenerator {
   private int pos;
   
   /**
-   * Create new generator for noise pairs.
-   * 
-   * Note: this will <em>not make a copy of param ids</em>, and ids will be sorted.
-   * 
-   * @param ids array to use as source.
-   */
-  @Deprecated
-  public PairGeneratorNoise(int[] ids) {
-    this.ids = ids;
-    Arrays.sort(this.ids);
-    
-    pos = 0;
-    if (ids.length > 0) {
-      setCurrent(new IntIntPair(ids[pos], ids[pos]));
-    }
-  }
-
-  /**
    * Crate new generator for a base cluster object.
    * 
    * @param cluster object
