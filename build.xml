@@ -120,7 +120,6 @@
 	<target name="init" description="initial conditions">		
 		<property name="deploy" value="${windows.disk.prefix}${deploy.archive}version-${now}" />
 		<property name="executable" value="${windows.disk.prefix}${deploy.executable}" />		
-		<mkdir dir="${deploy}" />
 		<delete file="${jarFile}" />
 		<delete dir="${buildpath}" />
 		<delete dir="${classpath}" />
@@ -183,6 +182,7 @@
 	</target>
 
 	<target name="copy" description="copies the executable jar file to archive and executable directory" depends="init, createjar">
+		<mkdir dir="${deploy}"/>
 		<copy todir="${deploy}">
 			<fileset file="${jarFile}" />
 		</copy>
