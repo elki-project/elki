@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
@@ -137,7 +138,7 @@ public final class Properties {
                         }
                     }
                     catch (Exception e) {
-                      logger.log(LogLevel.SEVERE, "Exception building class restriction string.", e);
+                      LoggingUtil.exception("Exception building class restriction string.", e);
                     }
                 }
             }
@@ -229,7 +230,7 @@ public final class Properties {
                         }
                     }
                     catch (Exception e) {
-                        logger.log(LogLevel.SEVERE, e.getMessage(), e);
+                      LoggingUtil.exception(e.getMessage(), e);
                     }
                 }
             }

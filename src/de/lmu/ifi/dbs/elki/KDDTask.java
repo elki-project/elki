@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
@@ -267,7 +268,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
       }
       catch(UnableToComplyException e) {
         // FIXME: log here?
-        Logger.getLogger(KDDTask.class.getName()).log(LogLevel.SEVERE, e.getMessage(), e);
+        LoggingUtil.exception(e.getMessage(), e);
         throw new WrongParameterValueException(DESCRIPTION_PARAM.getName(), descriptionClass, DESCRIPTION_PARAM.getDescription(), e);
       }
       if(p instanceof Algorithm) {
@@ -401,7 +402,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
     }
     // any other exception
     catch(Exception e) {
-      logger.log(LogLevel.SEVERE, e.getMessage(), e);
+      LoggingUtil.exception(e.getMessage(), e);
     }
   }
 }

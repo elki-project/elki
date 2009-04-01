@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.LogLevel;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FirstNEigenPairFilter;
@@ -669,7 +668,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
             }
 
             if (heap.size() >= 40000) {
-              LoggingUtil.logExpensive(LogLevel.SEVERE, "Heap size > 40.000!!!");
+                warning("Heap size > 40.000!!!");
                 heap.clear();
                 return null;
             }

@@ -492,7 +492,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V,
 //            scriptFile.deleteOnExit();
         }
         catch (IOException e) {
-          LoggingUtil.logExpensive(LogLevel.SEVERE, e.getMessage(), e);
+          LoggingUtil.exception(e.getMessage(), e);
         }
 //        catch(InterruptedException e)
 //        {

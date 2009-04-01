@@ -304,7 +304,7 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
 //            scriptFile.deleteOnExit();
         }
         catch (IOException e) {
-            LoggingUtil.logExpensive(LogLevel.SEVERE, e.getMessage(), e);
+          LoggingUtil.exception(e.getMessage(), e);
         }
 //        catch(InterruptedException e)
 //        {

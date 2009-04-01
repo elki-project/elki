@@ -37,17 +37,17 @@ public class Arff2Txt extends StandAloneInputWrapper {
         }
         catch (ParameterException e) {
             Throwable cause = e.getCause() != null ? e.getCause() : e;
-            LoggingUtil.logExpensive(LogLevel.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
+            LoggingUtil.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
         }
         catch (UnableToComplyException e) {
             Throwable cause = e.getCause() != null ? e.getCause() : e;
-            LoggingUtil.logExpensive(LogLevel.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
+            LoggingUtil.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
         }
         catch (AbortException e) {
           LoggingUtil.logExpensive(LogLevel.VERBOSE, e.getMessage());
         }
         catch (Exception e) {
-          LoggingUtil.logExpensive(LogLevel.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
+          LoggingUtil.exception(wrapper.optionHandler.usage(e.getMessage()), e);
         }
     }
 

@@ -1,19 +1,31 @@
 package de.lmu.ifi.dbs.elki.data.synthetic;
 
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.utilities.Progress;
-import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.*;
-import de.lmu.ifi.dbs.elki.wrapper.StandAloneWrapper;
-
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.regex.Pattern;
+
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.utilities.Progress;
+import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleListParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalListSizeConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualGlobalConstraint;
+import de.lmu.ifi.dbs.elki.wrapper.StandAloneWrapper;
 
 /**
  * Provides automatic generation of axes parallel hyperplanes of arbitrary
@@ -255,10 +267,10 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
         }
         catch (ParameterException e) {
             Throwable cause = e.getCause() != null ? e.getCause() : e;
-            LoggingUtil.logExpensive(LogLevel.SEVERE, wrapper.optionHandler.usage(e.getMessage()), cause);
+            LoggingUtil.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
         }
         catch (Exception e) {
-          LoggingUtil.logExpensive(LogLevel.SEVERE, wrapper.optionHandler.usage(e.getMessage()), e);
+          LoggingUtil.exception(wrapper.optionHandler.usage(e.getMessage()), e);
         }
     }
 

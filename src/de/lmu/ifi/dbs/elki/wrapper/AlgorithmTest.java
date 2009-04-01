@@ -99,7 +99,7 @@ public class AlgorithmTest extends AbstractParameterizable {
     }
     catch(Exception e) {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
-      LoggingUtil.logExpensive(LogLevel.SEVERE, algorithmTest.optionHandler.usage(e.getMessage()), cause);
+      LoggingUtil.exception(algorithmTest.optionHandler.usage(e.getMessage()), cause);
     }
 
     algorithmTest.run();

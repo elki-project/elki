@@ -134,7 +134,7 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
       }
       catch(Exception e) {
         Throwable cause = e.getCause() != null ? e.getCause() : e;
-        LoggingUtil.logExpensive(LogLevel.SEVERE, optionHandler.usage(e.toString()), cause);
+        LoggingUtil.exception(optionHandler.usage(e.toString()), cause);
       }
     }
 }
