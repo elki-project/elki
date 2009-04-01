@@ -20,7 +20,7 @@ public class AbortException extends RuntimeException {
    * Exception for aborting some process and transporting a message.
    * 
    * @param message message to be transported
-   * @param cause
+   * @param cause cause of this exception
    */
   public AbortException(String message, Throwable cause) {
     super(message, cause);
