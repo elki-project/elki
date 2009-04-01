@@ -4,7 +4,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Class with utilities used in logging.
+ * This final class contains some static convenience methods for logging.
+ * 
+ * {@link #logExpensive} allows the programmer to easily emit a log message, however the function
+ * is rather expensive and thus should not be used within loop constructs.
  * 
  * @author Erich Schubert
  */
@@ -12,7 +15,8 @@ public final class LoggingUtil {
   /**
    * Expensive logging function that is convenient, but should only be used in rare conditions.
    * 
-   * For 'frequent' logging, use more efficient techniques!
+   * For 'frequent' logging, use more efficient techniques, such as explained in the
+   * {@link de.lmu.ifi.dbs.elki.logging logging package documentation}.
    * 
    * @param level Logging level
    * @param message Message to log.
@@ -32,7 +36,8 @@ public final class LoggingUtil {
   /**
    * Expensive logging function that is convenient, but should only be used in rare conditions.
    * 
-   * For 'frequent' logging, use more efficient techniques!
+   * For 'frequent' logging, use more efficient techniques, such as explained in the
+   * {@link de.lmu.ifi.dbs.elki.logging logging package documentation}.
    * 
    * @param level Logging level
    * @param message Message to log.
