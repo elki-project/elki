@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -38,6 +39,25 @@ public interface FeatureVector<V extends FeatureVector<V,N>,N extends Number> ex
             InstantiationException, IllegalAccessException,
             InvocationTargetException;
 
+
+    /**
+     * Returns a new FeatureVector of V for the given values.
+     * 
+     * @param values
+     *            the values of the featureVector
+     * @return a new FeatureVector of V for the given values
+     * @throws NoSuchMethodException
+     * @throws SecurityException
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     * @throws IllegalArgumentException
+     */
+    V newInstance(List<N> values) throws SecurityException,
+            NoSuchMethodException, IllegalArgumentException,
+            InstantiationException, IllegalAccessException,
+            InvocationTargetException;
+    
     /**
      * Returns a FeatureVector of V with uniformly distributed (0-1) random values.
      * 
@@ -53,12 +73,26 @@ public interface FeatureVector<V extends FeatureVector<V,N>,N extends Number> ex
      * @param min
      *            minimum of random value
      * @param max
-     *            maximu of random value
+     *            maximum of random value
      * @param random
      *            a random instance
      * @return a FeatureVector of V with random values between min and max
      */
     V randomInstance(N min, N max, Random random);
+    
+    /**
+     * Returns a FeatureVector of V with random values between min and max.
+     * 
+     * @param min
+     *            minimum of random value for each axis
+     * @param max
+     *            maximum of random value for each axis
+     * @param random
+     *            a random instance
+     * @return a FeatureVector of V with random values between min and max
+     */
+    V randomInstance(V min, V max, Random random);
+
 
     /**
      * The dimensionality of the vector space whereof this FeatureVector is an

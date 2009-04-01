@@ -90,6 +90,18 @@ public class SparseDoubleVector extends RealVector<SparseDoubleVector, Double> {
         return new SparseDoubleVector(randomValues);
     }
 
+    /**
+     * 
+     * @see de.lmu.ifi.dbs.elki.data.FeatureVector#randomInstance(de.lmu.ifi.dbs.elki.data.FeatureVector, de.lmu.ifi.dbs.elki.data.FeatureVector, java.util.Random)
+     */
+    public SparseDoubleVector randomInstance(SparseDoubleVector min, SparseDoubleVector max, Random random) {
+      double[] randomValues = new double[dimensionality];
+      for (int i = 0; i < dimensionality; i++) {
+        randomValues[i] = random.nextDouble() * (max.getValue(i+1) - min.getValue(i+1)) + min.getValue(i+1);
+      }
+      return new SparseDoubleVector(randomValues);
+    }
+    
     public int getDimensionality() {
         return dimensionality;
     }
@@ -169,5 +181,7 @@ public class SparseDoubleVector extends RealVector<SparseDoubleVector, Double> {
         }
         return values;
     }
+
+    
 
 }

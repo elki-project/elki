@@ -97,7 +97,19 @@ public DoubleVector newInstance(double[] values) {
     }
     return new DoubleVector(randomValues);
   }
-
+  
+  /**
+   * 
+   * @see de.lmu.ifi.dbs.elki.data.FeatureVector#randomInstance(de.lmu.ifi.dbs.elki.data.FeatureVector, de.lmu.ifi.dbs.elki.data.FeatureVector, java.util.Random)
+   */
+  public DoubleVector randomInstance(DoubleVector min, DoubleVector max, Random random) {
+    double[] randomValues = new double[getDimensionality()];
+    for (int i = 0; i < randomValues.length; i++) {
+      randomValues[i] = random.nextDouble() * (max.getValue(i+1) - min.getValue(i+1)) + max.getValue(i+1);
+    }
+    return new DoubleVector(randomValues);
+  }
+  
   public int getDimensionality() {
     return values.length;
   }
@@ -155,4 +167,6 @@ public DoubleVector newInstance(double[] values) {
     }
     return featureLine.toString();
   }
+
+  
 }

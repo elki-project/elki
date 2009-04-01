@@ -98,6 +98,18 @@ public class BitVector extends NumberVector<BitVector, Bit> {
     }
 
     /**
+     * Returns the same as
+     * {@link BitVector#randomInstance(Random) randomInstance(random)}.
+     * 
+     * @param min unused
+     * @param max unused
+     * @param random as in {@link BitVector#randomInstance(Random) randomInstance(random)}
+     */
+    public BitVector randomInstance(BitVector min, BitVector max, Random random) {
+      return randomInstance(random);
+    }
+    
+    /**
      * The dimensionality of the binary vector space of which this BitVector is an
      * element.
      * 
@@ -332,5 +344,7 @@ public class BitVector extends NumberVector<BitVector, Bit> {
             return false;
         }
     }
+
+
 
 }

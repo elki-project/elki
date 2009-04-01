@@ -83,6 +83,18 @@ public class FloatVector extends RealVector<FloatVector, Float> {
         return new FloatVector(randomValues);
     }
 
+    /**
+     * 
+     * @see de.lmu.ifi.dbs.elki.data.FeatureVector#randomInstance(de.lmu.ifi.dbs.elki.data.FeatureVector, de.lmu.ifi.dbs.elki.data.FeatureVector, java.util.Random)
+     */
+    public FloatVector randomInstance(FloatVector min, FloatVector max, Random random) {
+        float[] randomValues = new float[getDimensionality()];
+        for (int i = 0; i < randomValues.length; i++) {
+            randomValues[i] = random.nextFloat() * (max.getValue(i+1) - min.getValue(i+1)) + min.getValue(i+1);
+        }
+        return new FloatVector(randomValues);
+    }
+    
     public int getDimensionality() {
         return values.length;
     }
@@ -140,4 +152,6 @@ public class FloatVector extends RealVector<FloatVector, Float> {
         }
         return featureLine.toString();
     }
+
+    
 }

@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.elki.converter.WekaObject;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 /**
  * NumberVector is an abstract implementation of FeatureVector. Provided is an
@@ -39,6 +40,11 @@ public abstract class NumberVector<V extends NumberVector<V, N>, N extends Numbe
     Object[] parameterValues = { values };
     Constructor<V> c = (Constructor<V>) this.getClass().getConstructor(parameterClasses);
     return c.newInstance(parameterValues);
+  }
+  
+  public V newInstance(List<N> values) throws SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException {
+    N[] valuesArray = (N[]) new Number[values.size()];
+    return newInstance(values.toArray(valuesArray));
   }
 
   /**
