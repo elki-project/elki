@@ -167,43 +167,6 @@ public abstract class AbstractParameterizable extends AbstractLoggable
     }
 
     /**
-     * Returns true if the value of the given option is set, false otherwise.
-     *
-     * @param option The option should be asked for without leading &quot;-&quot;
-     *               or closing &quot;:&quot;.
-     * @return boolean true if the value of the given option is set, false
-     *         otherwise
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Option#isSet()
-     */
-    @Deprecated
-    // Deprecated: use option.isSet() instead
-    protected boolean isSet(Option<?> option) {
-        return option.isSet();
-    }
-
-    /**
-     * Returns the value of the given parameter by calling
-     * {@link Parameter#getValue()}.
-     *
-     * @param parameter the parameter to get the value of
-     * @return the value of given parameter
-     * @throws IllegalStateException if this Parameterizable object has not been initialized
-     *                               properly (e.g. the setParameters(String[]) method has been failed
-     *                               to be called).
-     * @see Parameter#getValue()
-     */
-    @Deprecated
-    // Deprecated: use option.getValue() instead
-    protected <T> T getParameterValue(Parameter<T, ?> parameter) throws IllegalStateException {
-        try {
-            return parameter.getValue();
-        }
-        catch (UnusedParameterException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    /**
      * @see OptionHandler#getOptions()
      */
     public Option<?>[] getPossibleOptions() {
