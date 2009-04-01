@@ -262,7 +262,7 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
             StringBuffer msg = new StringBuffer();
             msg.append(getClass());
             msg.append("\n file = ").append(file.getClass());
-            debugFine(msg.toString());
+            logger.log(LogLevel.FINE, msg.toString());
         }
 
         this.initialized = true;
@@ -305,7 +305,7 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
             msg.append(" maximum number of leaf entries = ").append((leafCapacity - 1)).append("\n");
             msg.append(" minimum number of leaf entries = ").append(leafMinimum).append("\n");
             msg.append(" root    = ").append(getRoot());
-            debugFine(msg.toString());
+            logger.log(LogLevel.FINE, msg.toString());
         }
 
         initialized = true;

@@ -70,7 +70,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
     try {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(lineNumber % 10000 == 0 && logger.isLoggable(LogLevel.FINE)) {
-          debugFine("parse " + lineNumber / 10000);
+          logger.log(LogLevel.FINE, "parse " + lineNumber / 10000);
           // logger.fine("parse " + lineNumber / 10000);
         }
         if(!line.startsWith(COMMENT) && line.length() > 0) {
@@ -110,7 +110,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
     }
 
     if(logger.isLoggable(LogLevel.FINE)) {
-      debugFine("check");
+      logger.log(LogLevel.FINE, "check");
     }
 
     // check if all distance values are specified
@@ -124,7 +124,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
     }
 
     if(logger.isLoggable(LogLevel.FINE)) {
-      debugFine("add to objectAndLabelsList");
+      logger.log(LogLevel.FINE, "add to objectAndLabelsList");
     }
     for(Integer id : ids) {
       objectAndLabelsList.add(new Pair<ExternalObject, List<String>>(new ExternalObject(id), new ArrayList<String>()));

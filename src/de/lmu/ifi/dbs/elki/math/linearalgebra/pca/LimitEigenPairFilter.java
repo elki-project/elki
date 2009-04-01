@@ -101,7 +101,7 @@ public class LimitEigenPairFilter extends AbstractParameterizable implements Eig
 	public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
 		StringBuffer msg = new StringBuffer();
 		if (logger.isLoggable(LogLevel.FINE)) {
-			msg.append("\ndelta = ").append(delta);
+			msg.append("delta = ").append(delta);
 		}
 
 		// determine limit
@@ -140,7 +140,7 @@ public class LimitEigenPairFilter extends AbstractParameterizable implements Eig
 		if (logger.isLoggable(LogLevel.FINE)) {
 			msg.append("\nstrong EigenPairs = ").append(strongEigenPairs);
 			msg.append("\nweak EigenPairs = ").append(weakEigenPairs);
-			debugFine(msg.toString());
+			logger.log(LogLevel.FINE, msg.toString());
 		}
 
 		return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);

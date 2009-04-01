@@ -262,8 +262,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
         Integer corrDim = database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, startObjectID);
 
         if (logger.isLoggable(LogLevel.FINE)) {
-            debugFine("\nEXPAND CLUSTER id = " + startObjectID + " " + label + " " + corrDim + "\n#clusters: " + resultList.size());
-
+          logger.log(LogLevel.FINE, "EXPAND CLUSTER id = " + startObjectID + " " + label + " " + corrDim + "\n#clusters: " + resultList.size());
         }
 
         // euclidean epsilon neighborhood < minpts OR local dimensionality >

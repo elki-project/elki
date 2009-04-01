@@ -246,41 +246,41 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
         Map<BitSet, List<Pair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>>> clustersMap = extractClusters(database, distanceFunction, clusterOrder);
 
         if (logger.isLoggable(LogLevel.FINE)) {
-            StringBuffer msg = new StringBuffer("\nStep 1: extract clusters");
+            StringBuffer msg = new StringBuffer("Step 1: extract clusters");
             for (List<Pair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>> clusterList : clustersMap.values()) {
                 for (Pair<BitSet, DatabaseObjectGroupCollection<List<Integer>>> c : clusterList) {
                     msg.append("\n").append(FormatUtil.format(dimensionality, c.first)).append(" ids ").append(c.second.size());
                 }
             }
-            debugFine(msg.toString());
+            logger.log(LogLevel.FINE, msg.toString());
         }
 
         // check if there are clusters < minpts
         checkClusters(database, distanceFunction, clustersMap);
         if (logger.isLoggable(LogLevel.FINE)) {
-            StringBuffer msg = new StringBuffer("\n\nStep 2: check clusters");
+            StringBuffer msg = new StringBuffer("Step 2: check clusters");
             for (List<Pair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>> clusterList : clustersMap.values()) {
                 for (Pair<BitSet, DatabaseObjectGroupCollection<List<Integer>>> c : clusterList) {
                     msg.append("\n").append(FormatUtil.format(dimensionality, c.first)).append(" ids ").append(c.second.size());
                 }
             }
-            debugFine(msg.toString());
+            logger.log(LogLevel.FINE, msg.toString());
         }
 
         // actualize the levels and indices and sort the clusters
         List<Cluster<AxesModel>> clusters = sortClusters(clustersMap, dimensionality);
         if (logger.isLoggable(LogLevel.FINE)) {
-            StringBuffer msg = new StringBuffer("\n\nStep 3: sort clusters");
+            StringBuffer msg = new StringBuffer("Step 3: sort clusters");
             for (Cluster<AxesModel> c : clusters) {
                 msg.append("\n").append(FormatUtil.format(dimensionality, c.getModel().getSubspaces())).append(" ids ").append(c.getIDs().size());
             }
-            debugFine(msg.toString());
+            logger.log(LogLevel.FINE, msg.toString());
         }
 
         // build the hierarchy
         buildHierarchy(database, distanceFunction, clusters, dimensionality);
         if (logger.isLoggable(LogLevel.FINE)) {
-            StringBuffer msg = new StringBuffer("\n\nStep 4: build hierarchy");
+            StringBuffer msg = new StringBuffer("Step 4: build hierarchy");
             for (Cluster<AxesModel> c : clusters) {
                 msg.append("\n").append(FormatUtil.format(dimensionality, c.getModel().getSubspaces())).append(" ids ").append(c.getIDs().size());
               for (Cluster<AxesModel> cluster : c.getParents()) {
@@ -290,7 +290,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
                   msg.append("\n   child ").append(cluster);
               }
             }
-            debugFine(msg.toString());
+            logger.log(LogLevel.FINE, msg.toString());
         }
 
         int lambdaMax = dimensionality - clusters.get(clusters.size() - 1).getModel().getSubspaces().cardinality();
@@ -362,13 +362,13 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
         }
 
         if (logger.isLoggable(LogLevel.FINE)) {
-            StringBuffer msg = new StringBuffer("\nStep 0");
+            StringBuffer msg = new StringBuffer("Step 0");
             for (List<Pair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>> clusterList : clustersMap.values()) {
                 for (Pair<BitSet, DatabaseObjectGroupCollection<List<Integer>>> c : clusterList) {
                     msg.append("\n").append(FormatUtil.format(database.dimensionality(), c.first)).append(" ids ").append(c.second.size());
                 }
             }
-            debugFine(msg.toString());
+            logger.log(LogLevel.FINE, msg.toString());
         }
 
         // add the predecessor to the cluster
@@ -605,7 +605,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
             }
         }
         if (logger.isLoggable(LogLevel.FINER)) {
-            debugFiner(msg.toString());
+          logger.log(LogLevel.FINER, msg.toString());
         }
     }
 

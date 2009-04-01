@@ -28,7 +28,6 @@ public class NormalizingEigenPairFilter extends AbstractParameterizable
 	}
 
 	public FilteredEigenPairs filter(final SortedEigenPairs eigenPairs) {
-		final StringBuffer msg = new StringBuffer();
 		// initialize strong and weak eigenpairs
 		// all normalized eigenpairs are regarded as strong
 		final List<EigenPair> strongEigenPairs = new ArrayList<EigenPair>();
@@ -39,9 +38,10 @@ public class NormalizingEigenPairFilter extends AbstractParameterizable
 			strongEigenPairs.add(eigenPair);
 		}
 		if (logger.isLoggable(LogLevel.FINE)) {
-			msg.append("\nstrong EigenPairs = ").append(strongEigenPairs);
+	    final StringBuffer msg = new StringBuffer();
+			msg.append("strong EigenPairs = ").append(strongEigenPairs);
 			msg.append("\nweak EigenPairs = ").append(weakEigenPairs);
-			debugFine(msg.toString());
+			logger.log(LogLevel.FINE, msg.toString());
 		}
 
 		return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);

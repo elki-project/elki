@@ -67,15 +67,15 @@ public abstract class KDDTaskWrapper<O extends DatabaseObject> extends AbstractW
   public final void run() throws UnableToComplyException {
     try {
       List<String> parameters = getKDDTaskParameters();
-      debugFiner("got KDD Task parametes");
+      logger.log(LogLevel.FINER, "got KDD Task parametes");
       KDDTask<O> task = new KDDTask<O>();
-      debugFiner("KDD task has been instanstiated");
+      logger.log(LogLevel.FINER, "KDD task has been instanstiated");
       String[] remainingParameters = task.setParameters(parameters.toArray(new String[parameters.size()]));
       if(remainingParameters.length != 0) {
         LoggingUtil.logExpensive(LogLevel.WARNING, task.usage("Unnecessary parameters specified: " + Arrays.asList(remainingParameters) + "\n\nUSAGE:\n"));
         return;
       }
-      debugFiner("set KDD Task parameters, will run kdd Task");
+      logger.log(LogLevel.FINER, "set KDD Task parameters, will run kdd Task");
       result = task.run();
     }
     catch(ParameterException e) {

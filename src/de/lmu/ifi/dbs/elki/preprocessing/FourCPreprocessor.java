@@ -104,9 +104,9 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
 
         if (logger.isLoggable(LogLevel.FINE)) {
             StringBuffer msg = new StringBuffer();
-            msg.append("\n").append(id).append(" ").append(database.getAssociation(AssociationID.LABEL, id));
+            msg.append(id).append(" ").append(database.getAssociation(AssociationID.LABEL, id));
             msg.append("\ncorrDim ").append(pcares.getCorrelationDimension());
-            debugFine(msg.toString());
+            logger.log(LogLevel.FINE, msg.toString());
         }
         database.associate(AssociationID.LOCAL_DIMENSIONALITY, id, pcares.getCorrelationDimension());
         database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, pcares.similarityMatrix());

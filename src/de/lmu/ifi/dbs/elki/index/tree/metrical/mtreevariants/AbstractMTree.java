@@ -242,7 +242,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     // todo: implement a bulk load for M-Tree and remove this method
     protected final void insert(O object, boolean withPreInsert) {
         if (logger.isLoggable(LogLevel.FINE)) {
-            debugFine("insert " + object.getID() + " " + object + "\n");
+          logger.log(LogLevel.FINE, "insert " + object.getID() + " " + object + "\n");
         }
 
         if (!initialized) {
@@ -252,7 +252,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
         // choose subtree for insertion
         TreeIndexPath<E> subtree = choosePath(object.getID(), getRootPath());
         if (logger.isLoggable(LogLevel.FINE)) {
-            debugFine("\ninsertion-subtree " + subtree + "\n");
+          logger.log(LogLevel.FINE, "insertion-subtree " + subtree + "\n");
         }
 
         // determine parent distance
@@ -559,7 +559,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
                 + assignments.getFirstAssignments() + "\n" + "      firstCR " + assignments.getFirstCoveringRadius() + "\n"
                 + "      secondPromoted " + assignments.getSecondRoutingObject() + "\n" + "      secondAssignments(" + newNode.getID()
                 + ") " + assignments.getSecondAssignments() + "\n" + "      secondCR " + assignments.getSecondCoveringRadius() + "\n";
-            debugFine(msg);
+            logger.log(LogLevel.FINE, msg);
         }
 
         return new SplitResult(split, newNode);
@@ -659,7 +659,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
      */
     private void adjustTree(TreeIndexPath<E> subtree) {
         if (logger.isLoggable(LogLevel.FINE)) {
-            debugFine("\nAdjust tree " + subtree + "\n");
+          logger.log(LogLevel.FINE, "Adjust tree " + subtree + "\n");
         }
 
         // get the root of the subtree
@@ -683,7 +683,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
                 E parentEntry = subtree.getParentPath().getLastPathComponent().getEntry();
                 N parent = getNode(parentEntry);
                 if (logger.isLoggable(LogLevel.FINE)) {
-                    debugFine("\nparent " + parent);
+                  logger.log(LogLevel.FINE, "parent " + parent);
                 }
                 D parentDistance2 = distance(parentEntry.getRoutingObjectID(), assignments.getSecondRoutingObject());
                 parent.addDirectoryEntry(createNewDirectoryEntry(splitNode, assignments.getSecondRoutingObject(), parentDistance2));
@@ -775,11 +775,11 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
         file.writePage(oldRoot);
         file.writePage(newNode);
         if (logger.isLoggable(LogLevel.FINE)) {
-            String msg = "\nCreate new Root: ID=" + root.getID();
+            String msg = "Create new Root: ID=" + root.getID();
             msg += "\nchild1 " + oldRoot;
             msg += "\nchild2 " + newNode;
             msg += "\n";
-            debugFine(msg);
+            logger.log(LogLevel.FINE, msg);
         }
 
         return new TreeIndexPath<E>(new TreeIndexPathComponent<E>(getRootEntry(), null));

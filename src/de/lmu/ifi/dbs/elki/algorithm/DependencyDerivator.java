@@ -224,7 +224,7 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
         log.append("Eigenvalues:\n");
         log.append(FormatUtil.format(pcares.getEigenvalues(), " , ", 2));
         log.append('\n');
-        debugFine(log.toString());
+        logger.log(LogLevel.FINE, log.toString());
       }
       Matrix B = transposedWeakEigenvectors.times(centroid);
       if(logger.isLoggable(LogLevel.FINE)) {
@@ -235,7 +235,7 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
         log.append("tEV * Centroid\n");
         log.append(B);
         log.append('\n');
-        debugFine(log.toString());
+        logger.log(LogLevel.FINE, log.toString());
       }
 
       Matrix gaussJordan = new Matrix(transposedWeakEigenvectors.getRowDimensionality(), transposedWeakEigenvectors.getColumnDimensionality() + B.getColumnDimensionality());

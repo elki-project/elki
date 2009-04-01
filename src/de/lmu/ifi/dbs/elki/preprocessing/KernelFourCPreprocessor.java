@@ -124,9 +124,9 @@ public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector
 
         if (logger.isLoggable(LogLevel.FINE)) {
             final StringBuffer msg = new StringBuffer();
-            msg.append("\n").append(id).append(" ").append(database.getAssociation(AssociationID.LABEL, id));
+            msg.append(id).append(" ").append(database.getAssociation(AssociationID.LABEL, id));
             msg.append("\ncorrDim ").append(pcares.getCorrelationDimension());
-            debugFine(msg.toString());
+            logger.log(LogLevel.FINE, msg.toString());
         }
         database.associate(AssociationID.LOCAL_DIMENSIONALITY, id, pcares.getCorrelationDimension());
         database.associate(AssociationID.STRONG_EIGENVECTOR_MATRIX, id, pcares.getStrongEigenvectors());

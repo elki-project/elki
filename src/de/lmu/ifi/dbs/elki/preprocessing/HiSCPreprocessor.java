@@ -142,7 +142,7 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
     }
 
     if (logger.isLoggable(LogLevel.FINE)) {
-      debugFine(msg.toString());
+      logger.log(LogLevel.FINE, msg.toString());
     }
 
     if (verbose) {

@@ -194,11 +194,11 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
     void generateCorrelation(OutputStreamWriter outStream) throws IOException {
         if (logger.isLoggable(LogLevel.FINE)) {
             StringBuffer msg = new StringBuffer();
-            msg.append("\nbasis");
+            msg.append("basis");
             msg.append(basis.toString(Format.NF4));
             msg.append("\npoint");
             msg.append(point.toString(Format.NF4));
-            debugFine(msg.toString());
+            logger.log(LogLevel.FINE, msg.toString());
         }
 
         if (point.getRowDimensionality() != basis.getRowDimensionality())
@@ -252,24 +252,24 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
      * @return the dependencies
      */
     private Dependency determineDependency() {
-        StringBuffer msg = new StringBuffer();
-
         // orthonormal basis of subvectorspace U
         Matrix orthonormalBasis_U = basis.orthonormalize();
         Matrix completeVectors = orthonormalBasis_U.completeBasis();
         if (logger.isLoggable(LogLevel.FINE)) {
-            msg.append("\npoint ").append(point.toString(Format.NF4));
+            StringBuffer msg = new StringBuffer();
+
+            msg.append("point ").append(point.toString(Format.NF4));
             msg.append("\nbasis ").append(basis.toString(Format.NF4));
             msg.append("\northonormal basis ").append(orthonormalBasis_U.toString(Format.NF4));
             msg.append("\ncomplete vectors ").append(completeVectors.toString(Format.NF4));
-            debugFine(msg.toString());
+            logger.log(LogLevel.FINE, msg.toString());
         }
 
         // orthonormal basis of vectorspace V
         Matrix basis_V = orthonormalBasis_U.appendColumns(completeVectors);
         basis_V = basis_V.orthonormalize();
         if (logger.isLoggable(LogLevel.FINE)) {
-            debugFine("basis V " + basis_V.toString(Format.NF4));
+          logger.log(LogLevel.FINE, "basis V " + basis_V.toString(Format.NF4));
         }
 
         // normal vectors of U
@@ -277,12 +277,12 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
             .getRowDimensionality()
             - basis.getColumnDimensionality() + basis.getColumnDimensionality() - 1);
         if (logger.isLoggable(LogLevel.FINE)) {
-            debugFine("normal vector U " + normalVectors_U.toString(Format.NF4));
+          logger.log(LogLevel.FINE, "normal vector U " + normalVectors_U.toString(Format.NF4));
         }
         Matrix transposedNormalVectors = normalVectors_U.transpose();
         if (logger.isLoggable(LogLevel.FINE)) {
-            debugFine("tNV " + transposedNormalVectors.toString(Format.NF4));
-            debugFine("point " + point.toString(Format.NF4));
+          logger.log(LogLevel.FINE, "tNV " + transposedNormalVectors.toString(Format.NF4));
+          logger.log(LogLevel.FINE, "point " + point.toString(Format.NF4));
         }
 
         // gauss jordan

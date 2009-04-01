@@ -69,7 +69,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
     public Database<O> getDatabase(Normalization<O> normalization) {
         try {
             if (logger.isLoggable(LogLevel.FINE)) {
-                debugFine("*** parse");
+              logger.log(LogLevel.FINE, "*** parse");
             }
 
             // parse
@@ -79,7 +79,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
                 normalization);
 
             if (logger.isLoggable(LogLevel.FINE)) {
-                debugFine("*** insert");
+              logger.log(LogLevel.FINE, "*** insert");
             }
 
             // insert into database

@@ -170,7 +170,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
                 dbscan.run(database);
                 Clustering<Model> clusters = dbscan.getResult();
                 if (logger.isLoggable(LogLevel.FINE)) {
-                    debugFine(d + " clusters: " + clusters);
+                  logger.log(LogLevel.FINE, d + " clusters: " + clusters);
                 }
                 // FIXME: INCOMPLETE IMPLEMENTATION
             }

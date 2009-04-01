@@ -48,7 +48,7 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
     }
 
     if (logger.isLoggable(LogLevel.FINE)) {
-      debugFine(getClass() + "\n" + " root: " + root + " with " + nextPageID + " leafNodes.");
+      logger.log(LogLevel.FINE, "root: " + root + " with " + nextPageID + " leafNodes.");
     }
   }
 
@@ -87,7 +87,7 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
     List<FlatRStarTreeNode> nodes = createLeafNodes(objects);
     int numNodes = nodes.size();
     if (logger.isLoggable(LogLevel.FINE)) {
-      debugFine("\n  numLeafNodes = " + numNodes);
+      logger.log(LogLevel.FINE, "  numLeafNodes = " + numNodes);
     }
 
     // create root
@@ -101,10 +101,10 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
 
     if (logger.isLoggable(LogLevel.FINE)) {
       StringBuffer msg = new StringBuffer();
-      msg.append("\n  root = ").append(getRoot());
+      msg.append("  root = ").append(getRoot());
       msg.append("\n  numNodes = ").append(numNodes);
       msg.append("\n  height = ").append(getHeight());
-      debugFine(msg.toString() + "\n");
+      logger.log(LogLevel.FINE, msg.toString() + "\n");
     }
     if (extraIntegrityChecks) {
       getRoot().integrityCheck();

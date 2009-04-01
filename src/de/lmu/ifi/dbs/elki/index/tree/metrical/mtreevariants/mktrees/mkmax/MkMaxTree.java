@@ -204,7 +204,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
    */
   private void preInsert(MkMaxEntry<D> q, MkMaxEntry<D> nodeEntry, KNNList<D> knns_q) {
     if(logger.isLoggable(LogLevel.FINE)) {
-      debugFine("\npreInsert " + q + " - " + nodeEntry + "\n");
+      logger.log(LogLevel.FINE, "preInsert " + q + " - " + nodeEntry + "\n");
     }
 
     D knnDist_q = knns_q.getKNNDistance();
@@ -261,7 +261,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
       }
     }
     if(logger.isLoggable(LogLevel.FINE)) {
-      debugFine(nodeEntry + "set knn dist " + knnDist_node);
+      logger.log(LogLevel.FINE, nodeEntry + "set knn dist " + knnDist_node);
     }
     nodeEntry.setKnnDistance(knnDist_node);
   }

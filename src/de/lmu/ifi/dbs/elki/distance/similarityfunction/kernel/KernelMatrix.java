@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 
@@ -52,7 +53,7 @@ public class KernelMatrix<O extends RealVector<O,? >> extends AbstractParameteri
    */
   public KernelMatrix(final KernelFunction<O, DoubleDistance> kernelFunction,
                       final Database<O> database, final List<Integer> ids) {
-    debugFiner("Computing kernel matrix");
+    logger.log(LogLevel.FINER, "Computing kernel matrix");
     kernel = new Matrix(ids.size(), ids.size());
     double value;
     Collections.sort(ids);

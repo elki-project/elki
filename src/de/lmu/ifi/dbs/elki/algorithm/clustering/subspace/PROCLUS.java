@@ -106,7 +106,7 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
             Set<Integer> medoids = greedy(sampleSet, medoidSize);
 
             if (logger.isLoggable(LogLevel.FINE)) {
-                debugFine("m " + medoids);
+              logger.log(LogLevel.FINE, "m " + medoids);
             }
 
             // iterative phase
@@ -116,7 +116,7 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
             Set<Integer> m_current = initialSet(medoids, k);
 
             if (logger.isLoggable(LogLevel.FINE)) {
-                debugFine("m_c " + m_current);
+              logger.log(LogLevel.FINE, "m_c " + m_current);
             }
 
             Map<Integer, PROCLUSCluster> clusters = null;
@@ -373,7 +373,7 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
           CTriple<Double,Integer,Integer> z_ij = z_ijs.get(m);
 
             if (logger.isLoggable(LogLevel.FINE)) {
-                debugFine("z_ij " + z_ij);
+              logger.log(LogLevel.FINE, "z_ij " + z_ij);
             }
 
             Set<Integer> dims_i = dimensionMap.get(z_ij.getSecond());

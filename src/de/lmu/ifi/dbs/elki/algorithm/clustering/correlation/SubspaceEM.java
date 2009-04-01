@@ -249,7 +249,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V,
                 standardDeviation[i] = hardClustering.get(i).size() == 0 ? 1 : Math.sqrt(variance / hardClustering.get(i).size());
                 if (logger.isLoggable(LogLevel.FINE)) {
                     if (standardDeviation[i] == 0) {
-                        debugFine(i + ": " + standardDeviation[i]);
+                      logger.log(LogLevel.FINE, i + ": " + standardDeviation[i]);
                     }
                 }
                 normDistributionFactor[i] = 1.0 / (standardDeviation[i] * Math.sqrt(2 * Math.PI));
@@ -260,7 +260,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V,
             // new expectation
             emNew = expectationOfMixture(database);
             if (logger.isLoggable(LogLevel.FINE) && emNew <= em) {
-                debugFine("expectation value decreasing: old=" + em + " new=" + emNew + " difference=" + (em - emNew));
+              logger.log(LogLevel.FINE, "expectation value decreasing: old=" + em + " new=" + emNew + " difference=" + (em - emNew));
             }
 
         }
@@ -334,7 +334,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V,
             double logP = Math.log(priorProbX);
             sum += logP;
             if (logger.isLoggable(LogLevel.FINE) && false) {
-                debugFine("\nid=" + id + "\nP(x)=" + priorProbX + "\nlogP=" + logP + "\nsum=" + sum);
+              logger.log(LogLevel.FINE, "id=" + id + "\nP(x)=" + priorProbX + "\nlogP=" + logP + "\nsum=" + sum);
             }
         }
         return sum;

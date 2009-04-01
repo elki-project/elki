@@ -92,7 +92,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
 //          msg.append("\n  basis " + cluster.getPCA().getWeakEigenvectors().toString("    ", NF) + "  ids " + cluster.getIDs().size());
                 }
             }
-            debugFine(msg.toString());
+            logger.log(LogLevel.FINE, msg.toString());
         }
         if (isVerbose()) {
             int clusters = 0;
@@ -351,7 +351,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
             }
         }
         if (logger.isLoggable(LogLevel.FINE)) {
-            debugFine(msg.toString());
+          logger.log(LogLevel.FINE, msg.toString());
         }
 
     }
@@ -382,14 +382,14 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
             }
             if (!dist.bitValue()) {
                 if (logger.isLoggable(LogLevel.FINE)) {
-                    debugFine(msg.toString());
+                  logger.log(LogLevel.FINE, msg.toString());
                 }
                 return true;
             }
         }
 
         if (logger.isLoggable(LogLevel.FINE)) {
-            debugFiner(msg.toString());
+          logger.log(LogLevel.FINE, msg.toString());
         }
         return false;
     }

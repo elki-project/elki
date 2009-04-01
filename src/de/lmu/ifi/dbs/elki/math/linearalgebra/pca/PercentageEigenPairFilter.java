@@ -60,7 +60,7 @@ public class PercentageEigenPairFilter extends AbstractParameterizable implement
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
     StringBuffer msg = new StringBuffer();
     if(logger.isLoggable(LogLevel.FINE)) {
-      msg.append("\nalpha = ").append(alpha);
+      msg.append("alpha = ").append(alpha);
       msg.append("\nsortedEigenPairs = ").append(eigenPairs);
     }
 
@@ -100,7 +100,7 @@ public class PercentageEigenPairFilter extends AbstractParameterizable implement
     if(logger.isLoggable(LogLevel.FINE)) {
       msg.append("\nstrong EigenPairs = ").append(strongEigenPairs);
       msg.append("\nweak EigenPairs = ").append(weakEigenPairs);
-      debugFine(msg.toString());
+      logger.log(LogLevel.FINE, msg.toString());
     }
 
     return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);

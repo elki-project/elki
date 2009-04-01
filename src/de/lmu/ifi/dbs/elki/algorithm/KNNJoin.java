@@ -106,12 +106,12 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
             List<E> ps_candidates = db.getLeaves();
             Progress progress = new Progress(this.getClass().getName(), db.size());
             if (logger.isLoggable(LogLevel.FINE)) {
-                debugFine("# ps = " + ps_candidates.size());
+              logger.log(LogLevel.FINE, "# ps = " + ps_candidates.size());
             }
             // data pages of r
             List<E> pr_candidates = new ArrayList<E>(ps_candidates);
             if (logger.isLoggable(LogLevel.FINE)) {
-                debugFine("# pr = " + pr_candidates.size());
+              logger.log(LogLevel.FINE, "# pr = " + pr_candidates.size());
             }
             int processed = 0;
             int processedPages = 0;
@@ -121,7 +121,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
                 N pr = db.getIndex().getNode(pr_entry);
                 D pr_knn_distance = distFunction.infiniteDistance();
                 if (logger.isLoggable(LogLevel.FINE)) {
-                    debugFine(" ------ PR = " + pr);
+                  logger.log(LogLevel.FINE, " ------ PR = " + pr);
                 }
                 // create for each data object a knn list
                 for (int j = 0; j < pr.getNumEntries(); j++) {

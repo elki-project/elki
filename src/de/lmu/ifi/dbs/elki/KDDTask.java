@@ -204,7 +204,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
 
     optionHandler.setProgrammCall(CALL);
     if(logger.isLoggable(LogLevel.FINEST)) {
-      debugFinest("Root logger level: " + Logger.getLogger("").getLevel().getName() + "\n");
+      logger.log(LogLevel.FINER, "Root logger level: " + Logger.getLogger("").getLevel().getName() + "\n");
     }
   }
 

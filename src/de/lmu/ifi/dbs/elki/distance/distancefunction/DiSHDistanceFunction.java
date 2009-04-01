@@ -46,13 +46,12 @@ public class DiSHDistanceFunction<V extends RealVector<V, ?>, P extends Preproce
                 subspaceDim++;
                 if (logger.isLoggable(LogLevel.FINE)) {
                     StringBuffer msg = new StringBuffer();
-                    msg.append("\n");
-                    msg.append("\nd ").append(d);
+                    msg.append("d ").append(d);
                     msg.append("\nv1 ").append(getDatabase().getAssociation(AssociationID.LABEL, v1.getID()));
                     msg.append("\nv2 ").append(getDatabase().getAssociation(AssociationID.LABEL, v2.getID()));
                     msg.append("\nsubspaceDim ").append(subspaceDim);
                     msg.append("\ncommon pv ").append(FormatUtil.format(dim, commonPreferenceVector));
-                    debugFine(msg.toString());
+                    logger.log(LogLevel.FINE, msg.toString());
                 }
             }
         }

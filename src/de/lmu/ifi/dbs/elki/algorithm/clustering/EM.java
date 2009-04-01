@@ -146,13 +146,13 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Cluster
             clusterWeights.add(1.0 / k);
             if (logger.isLoggable(LogLevel.FINE) && false) {
                 StringBuffer msg = new StringBuffer();
-                msg.append("\nmodel ").append(i).append(":\n");
+                msg.append(" model ").append(i).append(":\n");
                 msg.append(" mean:    ").append(means.get(i)).append("\n");
                 msg.append(" m:\n").append(m.toString("        ")).append("\n");
                 msg.append(" m.det(): ").append(m.det()).append("\n");
                 msg.append(" cluster weight: ").append(clusterWeights.get(i)).append("\n");
                 msg.append(" normDistFact:   ").append(normDistrFactor.get(i)).append("\n");
-                debugFine(msg.toString());
+                logger.log(LogLevel.FINE, msg.toString());
             }
         }
         assignProbabilitiesToInstances(database, normDistrFactor, means, invCovMatr, clusterWeights);
@@ -292,7 +292,7 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Cluster
                 double power = rowTimesCovTimesCol.get(0, 0) / 2.0;
                 double prob = normDistrFactor.get(i) * Math.exp(-power);
                 if (logger.isLoggable(LogLevel.FINE) && false) {
-                    debugFine("\n" +
+                  logger.log(LogLevel.FINE, 
                         " difference vector= ( " + difference.toString() + " )\n" +
                         " differenceRow:\n" + differenceRow.toString("    ") + "\n" +
                         " differenceCol:\n" + differenceCol.toString("    ") + "\n" +
@@ -335,7 +335,7 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Cluster
             double logP = Math.log(priorProbX);
             sum += logP;
             if (logger.isLoggable(LogLevel.FINE) && false) {
-                debugFine("\nid=" + id + "\nP(x)=" + priorProbX + "\nlogP=" + logP + "\nsum=" + sum);
+              logger.log(LogLevel.FINE, "id=" + id + "\nP(x)=" + priorProbX + "\nlogP=" + logP + "\nsum=" + sum);
             }
         }
         return sum;

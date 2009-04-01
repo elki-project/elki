@@ -47,7 +47,7 @@ public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<
      */
     public synchronized List<TreeIndexPathComponent<DeLiCluEntry>> setHandled(O o) {
         if (logger.isLoggable(LogLevel.FINE)) {
-            debugFine("setHandled " + o + "\n");
+          logger.log(LogLevel.FINE, "setHandled " + o + "\n");
         }
 
         // find the leaf node containing o

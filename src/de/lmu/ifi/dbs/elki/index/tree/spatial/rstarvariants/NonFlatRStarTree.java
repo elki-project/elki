@@ -143,7 +143,7 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends Ab
 		if (logger.isLoggable(LogLevel.FINE)) {
 			msg.append("\n  height = ").append(getHeight());
 			msg.append("\n  root " + getRoot());
-			debugFine(msg.toString() + "\n");
+			logger.log(LogLevel.FINE, msg.toString() + "\n");
 		}
 	}
 
@@ -164,8 +164,6 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends Ab
 				minEntries, maxEntries, bulkLoadStrategy);
 
 		for (List<N> partition : partitions) {
-			StringBuffer msg = new StringBuffer();
-
 			// create node
 			N dirNode = createNewDirectoryNode(dirCapacity);
 			file.writePage(dirNode);
@@ -179,8 +177,9 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends Ab
 			// write to file
 			file.writePage(dirNode);
 			if (logger.isLoggable(LogLevel.FINER)) {
+			  StringBuffer msg = new StringBuffer();
 				msg.append("\npageNo ").append(dirNode.getID());
-				debugFiner(msg.toString() + "\n");
+				logger.log(LogLevel.FINER, msg.toString() + "\n");
 			}
 		}
 
@@ -213,8 +212,8 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends Ab
 		file.writePage(root);
 		if (logger.isLoggable(LogLevel.FINER)) {
 			StringBuffer msg = new StringBuffer();
-			msg.append("\npageNo ").append(root.getID());
-			debugFiner(msg.toString() + "\n");
+			msg.append("pageNo ").append(root.getID());
+			logger.log(LogLevel.FINER, msg.toString() + "\n");
 		}
 
 		return root;

@@ -62,7 +62,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    */
   public final void insert(O object) {
     if(logger.isLoggable(LogLevel.FINE)) {
-      debugFine("insert object " + object.getID() + "\n");
+      logger.log(LogLevel.FINE, "insert object " + object.getID() + "\n");
     }
 
     if(!initialized) {
@@ -98,7 +98,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
         StringBuffer msg = new StringBuffer();
         msg.append(" height  = ").append(height).append("\n");
         msg.append(" root    = ").append(getRoot());
-        debugFine(msg.toString());
+        logger.log(LogLevel.FINE, msg.toString());
       }
     }
     else {
@@ -126,7 +126,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     TreeIndexPath<E> subtree = choosePath(getRootPath(), mbr, 1);
 
     if(logger.isLoggable(LogLevel.FINE)) {
-      debugFine("\ninsertion-subtree " + subtree + "\n");
+      logger.log(LogLevel.FINE, "insertion-subtree " + subtree + "\n");
     }
 
     N parent = getNode(subtree.getLastPathComponent().getEntry());
@@ -149,7 +149,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     HyperBoundingBox mbr = entry.getMBR();
     TreeIndexPath<E> subtree = choosePath(getRootPath(), mbr, level);
     if(logger.isLoggable(LogLevel.FINE)) {
-      debugFine("\nsubtree " + subtree);
+      logger.log(LogLevel.FINE, "subtree " + subtree);
     }
 
     N parent = getNode(subtree.getLastPathComponent().getEntry());
@@ -169,7 +169,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    */
   public final boolean delete(O object) {
     if(logger.isLoggable(LogLevel.FINE)) {
-      debugFine("delete " + object.getID() + "\n");
+      logger.log(LogLevel.FINE, "delete " + object.getID() + "\n");
     }
 
     // find the leaf node containing o
@@ -431,7 +431,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
       StringBuffer msg = new StringBuffer();
       msg.append(getClass());
       msg.append("\n height = ").append(height);
-      debugFine(msg.toString());
+      logger.log(LogLevel.FINE, msg.toString());
     }
   }
 
@@ -628,8 +628,6 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     List<List<O>> partitions = split.partition(objects, minEntries, maxEntries, bulkLoadStrategy);
 
     for(List<O> partition : partitions) {
-      StringBuffer msg = new StringBuffer();
-
       // create leaf node
       N leafNode = createNewLeafNode(leafCapacity);
       file.writePage(leafNode);
@@ -644,14 +642,14 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
       file.writePage(leafNode);
 
       if(logger.isLoggable(LogLevel.FINE)) {
-        msg.append("\npageNo ").append(leafNode.getID()).append("\n");
-        debugFine(msg.toString());
-
+        StringBuffer msg = new StringBuffer();
+        msg.append("pageNo ").append(leafNode.getID()).append("\n");
+        logger.log(LogLevel.FINE, msg.toString());
       }
     }
 
     if(logger.isLoggable(LogLevel.FINE)) {
-      debugFine("numDataPages = " + result.size());
+      logger.log(LogLevel.FINE, "numDataPages = " + result.size());
     }
     return result;
   }
@@ -800,8 +798,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    */
   private TreeIndexPath<E> choosePath(TreeIndexPath<E> subtree, HyperBoundingBox mbr, int level) {
     if(logger.isLoggable(LogLevel.FINER)) {
-      debugFiner("node " + subtree + ", level " + level);
-      // logger.finer("node " + subtree + ", level " + level);
+      logger.log(LogLevel.FINER, "node " + subtree + ", level " + level);
     }
 
     N node = getNode(subtree.getLastPathComponent().getEntry());
@@ -936,7 +933,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     if(node.getID() != 0 && (reInsert == null || !reInsert)) {
       reinsertions.put(level, true);
       if(logger.isLoggable(LogLevel.FINE)) {
-        debugFine("REINSERT " + reinsertions + "\n");
+        logger.log(LogLevel.FINE, "REINSERT " + reinsertions + "\n");
       }
       reInsert(node, level, path);
       return null;
@@ -981,7 +978,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
       msg.append("      splitAxis ").append(split.getSplitAxis()).append("\n");
       msg.append("      splitPoint ").append(split.getSplitPoint()).append("\n");
       msg.append("      newNode ").append(newNode.getID()).append("\n");
-      debugFine(msg.toString());
+      logger.log(LogLevel.FINE, msg.toString());
     }
 
     return newNode;
@@ -1033,13 +1030,13 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
       DistanceEntry<DoubleDistance, E> re = reInsertEntries[i];
       if(node.isLeaf()) {
         if(logger.isLoggable(LogLevel.FINE)) {
-          debugFine("reinsert " + re.getEntry());
+          logger.log(LogLevel.FINE, "reinsert " + re.getEntry());
         }
         insertLeafEntry(re.getEntry());
       }
       else {
         if(logger.isLoggable(LogLevel.FINE)) {
-          debugFine("reinsert " + re.getEntry() + " at " + level);
+          logger.log(LogLevel.FINE, "reinsert " + re.getEntry() + " at " + level);
         }
         insertDirectoryEntry(re.getEntry(), level);
       }
@@ -1053,7 +1050,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    */
   private void adjustTree(TreeIndexPath<E> subtree) {
     if(logger.isLoggable(LogLevel.FINE)) {
-      debugFine("\nAdjust tree " + subtree + "\n");
+      logger.log(LogLevel.FINE, "Adjust tree " + subtree + "\n");
     }
 
     // get the root of the subtree
@@ -1077,7 +1074,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
           // get the parent and add the new split node
           N parent = getNode(subtree.getParentPath().getLastPathComponent().getEntry());
           if(logger.isLoggable(LogLevel.FINE)) {
-            debugFine("\nparent " + parent);
+            logger.log(LogLevel.FINE, "parent " + parent);
           }
           parent.addDirectoryEntry(createNewDirectoryEntry(split));
 
@@ -1215,11 +1212,11 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     file.writePage(oldRoot);
     file.writePage(newNode);
     if(logger.isLoggable(LogLevel.FINE)) {
-      String msg = "\nCreate new Root: ID=" + root.getID();
+      String msg = "Create new Root: ID=" + root.getID();
       msg += "\nchild1 " + oldRoot + " " + oldRoot.mbr() + " " + oldRootEntry.getMBR();
       msg += "\nchild2 " + newNode + " " + newNode.mbr() + " " + newNodeEntry.getMBR();
       msg += "\n";
-      debugFine(msg);
+      logger.log(LogLevel.FINE, msg);
     }
 
     return new TreeIndexPath<E>(new TreeIndexPathComponent<E>(getRootEntry(), null));

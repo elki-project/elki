@@ -119,7 +119,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
    */
   public void insert(List<O> objects) {
     if(logger.isLoggable(LogLevel.FINE)) {
-      debugFine("insert " + objects + "\n");
+      logger.log(LogLevel.FINE, "insert " + objects + "\n");
     }
 
     if(!initialized) {
@@ -405,8 +405,8 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     PolynomialApproximation approximation = new PolynomialApproximation(regression.getEstimatedCoefficients().getColumnPackedCopy());
 
     if(logger.isLoggable(LogLevel.FINE)) {
-      msg.append("\napproximation ").append(approximation);
-      debugFine(msg.toString());
+      msg.append("approximation ").append(approximation);
+      logger.log(LogLevel.FINE, msg.toString());
     }
     return approximation;
 

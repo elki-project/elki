@@ -53,7 +53,7 @@ public class FirstNEigenPairFilter extends AbstractParameterizable implements Ei
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
     StringBuffer msg = new StringBuffer();
     if(logger.isLoggable(LogLevel.FINE)) {
-      msg.append("\nsortedEigenPairs ").append(eigenPairs.toString());
+      msg.append("sortedEigenPairs ").append(eigenPairs.toString());
       msg.append("\nn = ").append(n);
     }
 
@@ -75,7 +75,7 @@ public class FirstNEigenPairFilter extends AbstractParameterizable implements Ei
     if(logger.isLoggable(LogLevel.FINE)) {
       msg.append("\nstrong EigenPairs = ").append(strongEigenPairs);
       msg.append("\nweak EigenPairs = ").append(weakEigenPairs);
-      debugFine(msg.toString());
+      logger.log(LogLevel.FINE, msg.toString());
     }
 
     return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);

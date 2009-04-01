@@ -198,7 +198,7 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
                 final Integer id = it.next();
 
                 if (logger.isLoggable(LogLevel.FINE)) {
-                    msg.append("\nid = ").append(id);
+                    msg.append("id = ").append(id);
                     msg.append(" ").append(database.get(id));
                     msg.append(" ").append(database.getAssociation(AssociationID.LABEL, id));
                 }
@@ -218,7 +218,7 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
                 progress.setProcessed(processed++);
 
                 if (logger.isLoggable(LogLevel.FINE)) {
-                    debugFine(msg.toString());
+                  logger.log(LogLevel.FINE, msg.toString());
                 }
 
                 if (verbose) {
@@ -385,7 +385,7 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
             msg.append("\npreference ");
             msg.append(FormatUtil.format(dimensionality, preferenceVector));
             msg.append("\n");
-            debugFine(msg.toString());
+            logger.log(LogLevel.FINE, msg.toString());
         }
 
         return preferenceVector;
@@ -438,7 +438,7 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
             msg.append("\npreference ");
             msg.append(FormatUtil.format(dimensionality, preferenceVector));
             msg.append("\n");
-            debugFiner(msg.toString());
+            logger.log(LogLevel.FINER, msg.toString());
         }
 
         return preferenceVector;

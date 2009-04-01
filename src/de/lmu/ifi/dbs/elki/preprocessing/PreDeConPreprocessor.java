@@ -83,7 +83,7 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends RealVector<V,
     V obj = database.get(id);
 
     if (logger.isLoggable(LogLevel.FINE)) {
-      msg.append("\n\nreferenceSetSize = " + referenceSetSize);
+      msg.append("referenceSetSize = " + referenceSetSize);
       msg.append("\ndelta = " + delta);
     }
 
@@ -135,7 +135,7 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends RealVector<V,
     if (logger.isLoggable(LogLevel.FINE)) {
       msg.append("\nprojDim " + database.getAssociation(AssociationID.LABEL, id) + ": " + projDim);
       msg.append("\nsimMatrix " + database.getAssociation(AssociationID.LABEL, id) + ": " + simMatrix.toString(Format.NF4));
-      debugFine(msg.toString());
+      logger.log(LogLevel.FINE, msg.toString());
     }
 
     // set the associations

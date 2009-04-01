@@ -92,7 +92,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
    */
   public void insert(List<O> objects) {
     if(logger.isLoggable(LogLevel.FINE)) {
-      debugFine("insert " + objects + "\n");
+      logger.log(LogLevel.FINE, "insert " + objects + "\n");
     }
 
     if(!initialized) {
@@ -473,7 +473,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     entry.setProgressiveKnnDistanceApproximation(progressive);
 
     if(logger.isLoggable(LogLevel.FINE)) {
-      debugFine(msg.toString());
+      logger.log(LogLevel.FINE, msg.toString());
     }
 
   }
@@ -583,7 +583,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
 
     if(logger.isLoggable(LogLevel.FINE)) {
       msg.append("\nupper Approx " + approx);
-      debugFine(msg.toString());
+      logger.log(LogLevel.FINE, msg.toString());
     }
     return approx;
   }
@@ -624,7 +624,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
         ApproximationLine appr = new ApproximationLine(k_0, m_a, t_a);
         if(logger.isLoggable(LogLevel.FINE)) {
           msg.append("\n1 anchor = " + a);
-          debugFine(msg.toString());
+          logger.log(LogLevel.FINE, msg.toString());
         }
         return appr;
       }

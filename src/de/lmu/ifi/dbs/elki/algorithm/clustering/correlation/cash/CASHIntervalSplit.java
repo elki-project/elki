@@ -68,7 +68,7 @@ public class CASHIntervalSplit extends AbstractLoggable {
     public Set<Integer> determineIDs(Set<Integer> superSetIDs, HyperBoundingBox interval, double d_min, double d_max) {
         StringBuffer msg = new StringBuffer();
         if (logger.isLoggable(LogLevel.FINE)) {
-            msg.append("\ninterval ").append(interval);
+            msg.append("interval ").append(interval);
         }
 
         Set<Integer> childIDs = new HashSet<Integer>(superSetIDs.size());
@@ -125,7 +125,7 @@ public class CASHIntervalSplit extends AbstractLoggable {
 
         if (logger.isLoggable(LogLevel.FINE)) {
             msg.append("\nchildIds ").append(childIDs.size());
-            debugFine(msg.toString());
+            logger.log(LogLevel.FINE, msg.toString());
         }
 
         if (childIDs.size() < minPts) {

@@ -57,7 +57,9 @@ public abstract class AbstractLoggable {
    * If the logger is currently enabled for the EXCEPTION message level then the
    * given message is forwarded to all the registered output Handler objects.
    * 
-   * Depreciated: use {@link LoggingUtil.logExpensive(LogLevel.SEVERE, ...) instead.
+   * Depreciated:
+   * 
+   * use {@link LoggingUtil.logExpensive(LogLevel.SEVERE, msg, e) instead.
    */
   @Deprecated
   public void exception(String msg, Throwable e) {
@@ -69,6 +71,10 @@ public abstract class AbstractLoggable {
    * <p/>
    * If the logger is currently enabled for the WARNING message level then the
    * given message is forwarded to all the registered output Handler objects.
+   * 
+   * Depreciated:
+   * 
+   * use {@link LoggingUtil.logExpensive(LogLevel.WARNING, msg) instead.
    */
   @Deprecated
   public void warning(String msg) {
@@ -80,6 +86,18 @@ public abstract class AbstractLoggable {
    * <p/>
    * If the logger is currently enabled for the INFO level then the given
    * message is forwarded to all the registered output Handler objects.
+   * 
+   * Depreciated:
+   * 
+   * Use
+   * 
+   * <pre>
+   * if (logger.isLoggable(LogLevel.INFO)) {
+   *   logger.log(LogLevel.INFO, msg);
+   * }
+   * </pre>
+   * 
+   * instead. If msg is a constant, you can leave away the if statement.
    */
   @Deprecated
   public void info(String msg) {
@@ -150,7 +168,20 @@ public abstract class AbstractLoggable {
    * If the logger is currently enabled for the DEBUG_FINE message level then
    * the given message is forwarded to all the registered output Handler
    * objects.
+   * 
+   * Depreciated:
+   * 
+   * Use
+   * 
+   * <pre>
+   * if (logger.isLoggable(LogLevel.FINE)) {
+   *   logger.log(LogLevel.FINE, msg);
+   * }
+   * </pre>
+   * 
+   * instead. If msg is a constant, you can leave away the if statement.
    */
+  @Deprecated
   public void debugFine(String msg) {
 
     LogRecord record = new LogRecord(LogLevel.FINE, msg);
@@ -165,7 +196,20 @@ public abstract class AbstractLoggable {
    * If the logger is currently enabled for the DEBUG_FINER message level then
    * the given message is forwarded to all the registered output Handler
    * objects.
+   * 
+   * Depreciated:
+   * 
+   * Use
+   * 
+   * <pre>
+   * if (logger.isLoggable(LogLevel.FINER)) {
+   *   logger.log(LogLevel.FINER, msg);
+   * }
+   * </pre>
+   * 
+   * instead. If msg is a constant, you can leave away the if statement.
    */
+  @Deprecated
   public void debugFiner(String msg) {
     LogRecord record = new LogRecord(LogLevel.FINER, msg);
     record.setSourceClassName(this.getClass().getName());
@@ -179,7 +223,20 @@ public abstract class AbstractLoggable {
    * If the logger is currently enabled for the DEBUG_FINEST message level then
    * the given message is forwarded to all the registered output Handler
    * objects.
+   * 
+   * Depreciated:
+   * 
+   * Use
+   * 
+   * <pre>
+   * if (logger.isLoggable(LogLevel.FINEST)) {
+   *   logger.log(LogLevel.FINEST, msg);
+   * }
+   * </pre>
+   * 
+   * instead. If msg is a constant, you can leave away the if statement.
    */
+  @Deprecated
   public void debugFinest(String msg) {
     LogRecord record = new LogRecord(LogLevel.FINEST, msg);
     record.setSourceClassName(this.getClass().getName());
