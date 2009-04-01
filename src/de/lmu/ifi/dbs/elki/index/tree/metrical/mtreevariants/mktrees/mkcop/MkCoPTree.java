@@ -632,24 +632,26 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
       else if(!lessThanPre) {
         if(marked.contains(a - 1)) {
           m_a = (y_a - y_p) / (x_a - x_p);
-          if(y_a == y_p)
+          if(y_a == y_p) {
             m_a = 0;
+          }
           t_a = y_a - m_a * x_a;
 
           ApproximationLine appr = new ApproximationLine(k_0, m_a, t_a);
           if(logger.isLoggable(LogLevel.FINE)) {
             msg.append("2 anchor = " + a);
-            msg.append("appr1 " + appr);
-            msg.append("x_a " + x_a + ", y_a " + y_a);
-            msg.append("x_p " + x_p + ", y_p " + y_p);
-            msg.append("a " + a);
-            msg.append("upperHull " + FormatUtil.format(upperHull));
-            debugFine(msg.toString());
+            msg.append(" appr1 " + appr);
+            msg.append(" x_a " + x_a + ", y_a " + y_a);
+            msg.append(" x_p " + x_p + ", y_p " + y_p);
+            msg.append(" a " + a);
+            msg.append(" upperHull " + FormatUtil.format(upperHull));
+            logger.log(LogLevel.FINE, msg.toString());
           }
           return appr;
         }
-        else
+        else {
           a = a - 1;
+        }
       }
       else {
         if(marked.contains(a + 1)) {
@@ -661,13 +663,14 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
 
           if(logger.isLoggable(LogLevel.FINE)) {
             msg.append("3 anchor = " + a + " -- " + (a + 1));
-            msg.append("appr2 " + appr);
-            debugFine(msg.toString());
+            msg.append(" appr2 " + appr);
+            logger.log(LogLevel.FINE, msg.toString());
           }
           return appr;
         }
-        else
+        else {
           a = a + 1;
+        }
       }
     }
 

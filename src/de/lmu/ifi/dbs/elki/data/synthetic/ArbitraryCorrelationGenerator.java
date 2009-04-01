@@ -288,7 +288,7 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
         // gauss jordan
         Matrix B = transposedNormalVectors.times(point);
         if (logger.isLoggable(LogLevel.FINE)) {
-            debugFine("B " + B.toString(Format.NF4));
+          logger.log(LogLevel.FINE, "B " + B.toString(Format.NF4));
         }
         Matrix gaussJordan = new Matrix(transposedNormalVectors.getRowDimensionality(), transposedNormalVectors.getColumnDimensionality()
             + B.getColumnDimensionality());

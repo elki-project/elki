@@ -82,7 +82,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
         }
         SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap = extractCorrelationClusters(database, dimensionality);
         if (logger.isLoggable(LogLevel.FINE)) {
-            StringBuffer msg = new StringBuffer("\n\nStep 2: Extract correlation clusters...");
+            StringBuffer msg = new StringBuffer("Step 2: Extract correlation clusters...");
             for (Integer corrDim : clusterMap.keySet()) {
                 List<Cluster<CorrelationModel<V>>> correlationClusters = clusterMap.get(corrDim);
                 msg.append("\n\ncorrDim ").append(corrDim);
@@ -108,7 +108,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
         }
         buildHierarchy(clusterMap);
         if (logger.isLoggable(LogLevel.FINE)) {
-            StringBuffer msg = new StringBuffer("\n\nStep 3: Build hierarchy");
+            StringBuffer msg = new StringBuffer("Step 3: Build hierarchy");
             for (Integer corrDim : clusterMap.keySet()) {
                 List<Cluster<CorrelationModel<V>>> correlationClusters = clusterMap.get(corrDim);
                 for (Cluster<CorrelationModel<V>> cluster : correlationClusters) {
@@ -122,7 +122,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
                     }
                 }
             }
-            debugFine(msg.toString());
+            logger.log(LogLevel.FINE, msg.toString());
         }
 
         result = new Clustering<CorrelationModel<V>>();

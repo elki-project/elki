@@ -336,7 +336,7 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clu
 
         if (logger.isLoggable(LogLevel.FINER)) {
             StringBuffer msg = new StringBuffer();
-            msg.append("\n   minima: ").append(FormatUtil.format(minima, ", ", 2));
+            msg.append("   minima: ").append(FormatUtil.format(minima, ", ", 2));
             msg.append("\n   maxima: ").append(FormatUtil.format(maxima, ", ", 2));
             msg.append("\n   unit lengths: ").append(FormatUtil.format(unit_lengths, ", ", 2));
             logger.log(LogLevel.FINER, msg.toString());
@@ -354,8 +354,8 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clu
         }
         if (logger.isLoggable(LogLevel.FINER)) {
             StringBuffer msg = new StringBuffer();
-            msg.append("\n   unit bounds ").append(new Matrix(unit_bounds).toString("   "));
-            debugFiner(msg.toString());
+            msg.append("   unit bounds ").append(new Matrix(unit_bounds).toString("   "));
+            logger.log(LogLevel.FINER, msg.toString());
         }
 
         // build the 1 dimensional units
@@ -368,8 +368,8 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clu
 
         if (logger.isLoggable(LogLevel.FINER)) {
             StringBuffer msg = new StringBuffer();
-            msg.append("\n   total number of 1-dim units: ").append(units.size());
-            debugFiner(msg.toString());
+            msg.append("   total number of 1-dim units: ").append(units.size());
+            logger.log(LogLevel.FINER, msg.toString());
         }
 
         return units;
