@@ -84,7 +84,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
      */
     @Override
     @SuppressWarnings("unchecked")
-    protected AnnotationsFromHashMap runInTime(Database<V> database) throws IllegalStateException {
+    protected AnnotationsFromHashMap<KNNList<D>> runInTime(Database<V> database) throws IllegalStateException {
         if (!(database instanceof SpatialIndexDatabase)) {
             throw new IllegalStateException(
                 "Database must be an instance of "
