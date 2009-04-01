@@ -6,6 +6,12 @@ import org.w3c.dom.Element;
 
 import experimentalcode.erich.visualization.SVGPlot;
 
+/**
+ * Marker library achieving a larger number of styles by combining different shapes
+ * with different colors. Uses object ID management by SVGPlot.
+ * 
+ * @author Erich Schubert
+ */
 public class PrettyMarkers extends MinimalMarkers {
   /**
    * Default prefix to use.
@@ -53,103 +59,103 @@ public class PrettyMarkers extends MinimalMarkers {
     switch(style % 8){
     case 0: {
       // + cross
-      Element line1 = SVGUtil.svgElement(document, "line");
-      SVGUtil.setAtt(line1,"x1", x);
-      SVGUtil.setAtt(line1,"y1", y - size / 2);
-      SVGUtil.setAtt(line1,"x2", x);
-      SVGUtil.setAtt(line1,"y2", y + size / 2);
-      SVGUtil.setAtt(line1,"style", "stroke:" + colorstr + "; stroke-width:" + SVGUtil.fmt(size / 6));
+      Element line1 = SVGUtil.svgElement(document, SVGConstants.SVG_LINE_TAG);
+      SVGUtil.setAtt(line1,SVGConstants.SVG_X1_ATTRIBUTE, x);
+      SVGUtil.setAtt(line1,SVGConstants.SVG_Y1_ATTRIBUTE, y - size / 2);
+      SVGUtil.setAtt(line1,SVGConstants.SVG_X2_ATTRIBUTE, x);
+      SVGUtil.setAtt(line1,SVGConstants.SVG_Y2_ATTRIBUTE, y + size / 2);
+      SVGUtil.setAtt(line1,SVGConstants.SVG_STYLE_ATTRIBUTE, "stroke:" + colorstr + "; stroke-width:" + SVGUtil.fmt(size / 6));
       parent.appendChild(line1);
-      Element line2 = SVGUtil.svgElement(document, "line");
-      SVGUtil.setAtt(line2,"x1", x - size / 2);
-      SVGUtil.setAtt(line2,"y1", y);
-      SVGUtil.setAtt(line2,"x2", x + size / 2);
-      SVGUtil.setAtt(line2,"y2", y);
-      SVGUtil.setAtt(line2,"style", "stroke:" + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
+      Element line2 = SVGUtil.svgElement(document, SVGConstants.SVG_LINE_TAG);
+      SVGUtil.setAtt(line2,SVGConstants.SVG_X1_ATTRIBUTE, x - size / 2);
+      SVGUtil.setAtt(line2,SVGConstants.SVG_Y1_ATTRIBUTE, y);
+      SVGUtil.setAtt(line2,SVGConstants.SVG_X2_ATTRIBUTE, x + size / 2);
+      SVGUtil.setAtt(line2,SVGConstants.SVG_Y2_ATTRIBUTE, y);
+      SVGUtil.setAtt(line2,SVGConstants.SVG_STYLE_ATTRIBUTE, "stroke:" + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
       parent.appendChild(line2);
       break;
     }
     case 1: {
       // X cross
-      Element line1 = SVGUtil.svgElement(document, "line");
-      SVGUtil.setAtt(line1,"x1", x - size / 2.828427);
-      SVGUtil.setAtt(line1,"y1", y - size / 2.828427);
-      SVGUtil.setAtt(line1,"x2", x + size / 2.828427);
-      SVGUtil.setAtt(line1,"y2", y + size / 2.828427);
-      SVGUtil.setAtt(line1,"style", "stroke:" + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
+      Element line1 = SVGUtil.svgElement(document, SVGConstants.SVG_LINE_TAG);
+      SVGUtil.setAtt(line1,SVGConstants.SVG_X1_ATTRIBUTE, x - size / 2.828427);
+      SVGUtil.setAtt(line1,SVGConstants.SVG_Y1_ATTRIBUTE, y - size / 2.828427);
+      SVGUtil.setAtt(line1,SVGConstants.SVG_X2_ATTRIBUTE, x + size / 2.828427);
+      SVGUtil.setAtt(line1,SVGConstants.SVG_Y2_ATTRIBUTE, y + size / 2.828427);
+      SVGUtil.setAtt(line1,SVGConstants.SVG_STYLE_ATTRIBUTE, "stroke:" + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
       parent.appendChild(line1);
-      Element line2 = SVGUtil.svgElement(document, "line");
-      SVGUtil.setAtt(line2,"x1", x - size / 2.828427);
-      SVGUtil.setAtt(line2,"y1", y + size / 2.828427);
-      SVGUtil.setAtt(line2,"x2", x + size / 2.828427);
-      SVGUtil.setAtt(line2,"y2", y - size / 2.828427);
-      SVGUtil.setAtt(line2,"style", "stroke:" + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
+      Element line2 = SVGUtil.svgElement(document, SVGConstants.SVG_LINE_TAG);
+      SVGUtil.setAtt(line2,SVGConstants.SVG_X1_ATTRIBUTE, x - size / 2.828427);
+      SVGUtil.setAtt(line2,SVGConstants.SVG_Y1_ATTRIBUTE, y + size / 2.828427);
+      SVGUtil.setAtt(line2,SVGConstants.SVG_X2_ATTRIBUTE, x + size / 2.828427);
+      SVGUtil.setAtt(line2,SVGConstants.SVG_Y2_ATTRIBUTE, y - size / 2.828427);
+      SVGUtil.setAtt(line2,SVGConstants.SVG_STYLE_ATTRIBUTE, "stroke:" + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
       parent.appendChild(line2);
       break;
     }
     case 2: {
       // O filled circle
-      Element circ = SVGUtil.svgElement(document, "circle");
-      SVGUtil.setAtt(circ,"cx", x);
-      SVGUtil.setAtt(circ,"cy", y);
-      SVGUtil.setAtt(circ,"r", size / 2);
-      SVGUtil.setAtt(circ,"style", "fill:" + colorstr);
+      Element circ = SVGUtil.svgElement(document, SVGConstants.SVG_CIRCLE_TAG);
+      SVGUtil.setAtt(circ,SVGConstants.SVG_CX_ATTRIBUTE, x);
+      SVGUtil.setAtt(circ,SVGConstants.SVG_CY_ATTRIBUTE, y);
+      SVGUtil.setAtt(circ,SVGConstants.SVG_R_ATTRIBUTE, size / 2);
+      SVGUtil.setAtt(circ,SVGConstants.SVG_STYLE_ATTRIBUTE, "fill:" + colorstr);
       parent.appendChild(circ);
       break;
     }
     case 3: {
       // [] filled rectangle
-      Element rect = SVGUtil.svgElement(document, "rect");
-      SVGUtil.setAtt(rect,"x",x - size / 2);
-      SVGUtil.setAtt(rect,"y",y - size / 2);
-      SVGUtil.setAtt(rect,"width",size);
-      SVGUtil.setAtt(rect,"height",size);
-      SVGUtil.setAtt(rect,"style","fill:" + colorstr);
+      Element rect = SVGUtil.svgElement(document, SVGConstants.SVG_RECT_TAG);
+      SVGUtil.setAtt(rect,SVGConstants.SVG_X_ATTRIBUTE,x - size / 2);
+      SVGUtil.setAtt(rect,SVGConstants.SVG_Y_ATTRIBUTE,y - size / 2);
+      SVGUtil.setAtt(rect,SVGConstants.SVG_WIDTH_ATTRIBUTE,size);
+      SVGUtil.setAtt(rect,SVGConstants.SVG_HEIGHT_ATTRIBUTE,size);
+      SVGUtil.setAtt(rect,SVGConstants.SVG_STYLE_ATTRIBUTE,"fill:" + colorstr);
       parent.appendChild(rect);
       break;
     }
     case 4: {
       // <> filled diamond
-      Element rect = SVGUtil.svgElement(document, "rect");
-      SVGUtil.setAtt(rect,"x",x - size / 2);
-      SVGUtil.setAtt(rect,"y",y - size / 2);
-      SVGUtil.setAtt(rect,"width",size);
-      SVGUtil.setAtt(rect,"height",size);
-      SVGUtil.setAtt(rect,"style","fill:" + colorstr);
-      SVGUtil.setAtt(rect,"transform","rotate(45," + SVGUtil.fmt(x) + "," + SVGUtil.fmt(y) + ")");
+      Element rect = SVGUtil.svgElement(document, SVGConstants.SVG_RECT_TAG);
+      SVGUtil.setAtt(rect,SVGConstants.SVG_X_ATTRIBUTE,x - size / 2);
+      SVGUtil.setAtt(rect,SVGConstants.SVG_Y_ATTRIBUTE,y - size / 2);
+      SVGUtil.setAtt(rect,SVGConstants.SVG_WIDTH_ATTRIBUTE,size);
+      SVGUtil.setAtt(rect,SVGConstants.SVG_HEIGHT_ATTRIBUTE,size);
+      SVGUtil.setAtt(rect,SVGConstants.SVG_STYLE_ATTRIBUTE,"fill:" + colorstr);
+      SVGUtil.setAtt(rect,SVGConstants.SVG_TRANSFORM_ATTRIBUTE,"rotate(45," + SVGUtil.fmt(x) + "," + SVGUtil.fmt(y) + ")");
       parent.appendChild(rect);
       break;
     }
     case 5: {
       // O hollow circle
-      Element circ = SVGUtil.svgElement(document, "circle");
-      SVGUtil.setAtt(circ,"cx",x);
-      SVGUtil.setAtt(circ,"cy",y);
-      SVGUtil.setAtt(circ,"r",size / 2);
-      SVGUtil.setAtt(circ,"style","fill: none; stroke: " + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
+      Element circ = SVGUtil.svgElement(document, SVGConstants.SVG_CIRCLE_TAG);
+      SVGUtil.setAtt(circ,SVGConstants.SVG_CX_ATTRIBUTE,x);
+      SVGUtil.setAtt(circ,SVGConstants.SVG_CY_ATTRIBUTE,y);
+      SVGUtil.setAtt(circ,SVGConstants.SVG_R_ATTRIBUTE,size / 2);
+      SVGUtil.setAtt(circ,SVGConstants.SVG_STYLE_ATTRIBUTE,"fill: none; stroke: " + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
       parent.appendChild(circ);
       break;
     }
     case 6: {
       // [] hollow rectangle
-      Element rect = SVGUtil.svgElement(document, "rect");
-      SVGUtil.setAtt(rect,"x",x - size / 2);
-      SVGUtil.setAtt(rect,"y",y - size / 2);
-      SVGUtil.setAtt(rect,"width",size);
-      SVGUtil.setAtt(rect,"height",size);
-      SVGUtil.setAtt(rect,"style","fill: none; stroke: " + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
+      Element rect = SVGUtil.svgElement(document, SVGConstants.SVG_RECT_TAG);
+      SVGUtil.setAtt(rect,SVGConstants.SVG_X_ATTRIBUTE,x - size / 2);
+      SVGUtil.setAtt(rect,SVGConstants.SVG_Y_ATTRIBUTE,y - size / 2);
+      SVGUtil.setAtt(rect,SVGConstants.SVG_WIDTH_ATTRIBUTE,size);
+      SVGUtil.setAtt(rect,SVGConstants.SVG_HEIGHT_ATTRIBUTE,size);
+      SVGUtil.setAtt(rect,SVGConstants.SVG_STYLE_ATTRIBUTE,"fill: none; stroke: " + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
       parent.appendChild(rect);
       break;
     }
     case 7: {
       // <> hollow diamond
-      Element rect = SVGUtil.svgElement(document, "rect");
-      SVGUtil.setAtt(rect,"x",x - size / 2);
-      SVGUtil.setAtt(rect,"y",y - size / 2);
-      SVGUtil.setAtt(rect,"width",size);
-      SVGUtil.setAtt(rect,"height",size);
-      SVGUtil.setAtt(rect,"style","fill: none; stroke: " + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
-      SVGUtil.setAtt(rect,"transform","rotate(45," + SVGUtil.fmt(x) + "," + SVGUtil.fmt(y) + ")");
+      Element rect = SVGUtil.svgElement(document, SVGConstants.SVG_RECT_TAG);
+      SVGUtil.setAtt(rect,SVGConstants.SVG_X_ATTRIBUTE,x - size / 2);
+      SVGUtil.setAtt(rect,SVGConstants.SVG_Y_ATTRIBUTE,y - size / 2);
+      SVGUtil.setAtt(rect,SVGConstants.SVG_WIDTH_ATTRIBUTE,size);
+      SVGUtil.setAtt(rect,SVGConstants.SVG_HEIGHT_ATTRIBUTE,size);
+      SVGUtil.setAtt(rect,SVGConstants.SVG_STYLE_ATTRIBUTE,"fill: none; stroke: " + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
+      SVGUtil.setAtt(rect,SVGConstants.SVG_TRANSFORM_ATTRIBUTE,"rotate(45," + SVGUtil.fmt(x) + "," + SVGUtil.fmt(y) + ")");
       parent.appendChild(rect);
       break;
     }
@@ -161,19 +167,19 @@ public class PrettyMarkers extends MinimalMarkers {
     String id = prefix + style;
     Element existing = plot.getIdElement(id);
     if (existing == null) {
-      Element symbol = plot.svgElement("symbol");
-      SVGUtil.setAtt(symbol,"id",id);
-      SVGUtil.setAtt(symbol,"viewBox","-1 -1 2 2");
+      Element symbol = plot.svgElement(SVGConstants.SVG_SYMBOL_TAG);
+      SVGUtil.setAtt(symbol,SVGConstants.SVG_ID_ATTRIBUTE,id);
+      SVGUtil.setAtt(symbol,SVGConstants.SVG_VIEW_BOX_ATTRIBUTE,"-1 -1 2 2");
       plotMarker(plot.getDocument(), symbol, 0, 0, style, 2);
       plot.getDefs().appendChild(symbol);
       plot.putIdElement(id, symbol);
     }
-    Element use = plot.svgElement("use");
+    Element use = plot.svgElement(SVGConstants.SVG_USE_TAG);
     use.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, "#"+id);
-    SVGUtil.setAtt(use,"x",x - size);
-    SVGUtil.setAtt(use,"y",y - size);
-    SVGUtil.setAtt(use,"width",size * 2);
-    SVGUtil.setAtt(use,"height",size * 2);
+    SVGUtil.setAtt(use,SVGConstants.SVG_X_ATTRIBUTE,x - size);
+    SVGUtil.setAtt(use,SVGConstants.SVG_Y_ATTRIBUTE,y - size);
+    SVGUtil.setAtt(use,SVGConstants.SVG_WIDTH_ATTRIBUTE,size * 2);
+    SVGUtil.setAtt(use,SVGConstants.SVG_HEIGHT_ATTRIBUTE,size * 2);
     if (parent != null) {
       parent.appendChild(use);
     }

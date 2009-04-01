@@ -33,6 +33,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.svg.SVGDocument;
 
 import experimentalcode.erich.visualization.svg.SVGUtil;
+import experimentalcode.erich.visualization.svg.css.CSSClassManager;
 
 /**
  * Base class for SVG plots. Provides some basic functionality such as element
@@ -61,6 +62,11 @@ public class SVGPlot {
    * Primary style information
    */
   private Element style;
+  
+  /**
+   * CSS class manager
+   */
+  private CSSClassManager cssman;
 
   /**
    * Manage objects with an id.
@@ -74,7 +80,7 @@ public class SVGPlot {
     super();
     // Get a DOMImplementation.
     DOMImplementation domImpl = SVGDOMImplementation.getDOMImplementation();
-    DocumentType dt = domImpl.createDocumentType("svg", SVGConstants.SVG_PUBLIC_ID, SVGConstants.SVG_SYSTEM_ID);
+    DocumentType dt = domImpl.createDocumentType(SVGConstants.SVG_SVG_TAG, SVGConstants.SVG_PUBLIC_ID, SVGConstants.SVG_SYSTEM_ID);
     // Workaround: sometimes DocumentType doesn't work right, which
     // causes problems with
     // serialization...
@@ -82,21 +88,23 @@ public class SVGPlot {
       dt = null;
     }
 
-    document = (SVGDocument) domImpl.createDocument(SVGConstants.SVG_NAMESPACE_URI, "svg", dt);
+    document = (SVGDocument) domImpl.createDocument(SVGConstants.SVG_NAMESPACE_URI, SVGConstants.SVG_SVG_TAG, dt);
 
     root = document.getDocumentElement();
     // setup common SVG namespaces
-    root.setAttribute("xmlns", SVGConstants.SVG_NAMESPACE_URI);
+    root.setAttribute(SVGConstants.XMLNS_PREFIX, SVGConstants.SVG_NAMESPACE_URI);
     root.setAttributeNS(SVGConstants.XMLNS_NAMESPACE_URI, SVGConstants.XMLNS_PREFIX + ":" + SVGConstants.XLINK_PREFIX, SVGConstants.XLINK_NAMESPACE_URI);
 
     // create element for SVG definitions
-    defs = svgElement("defs");
+    defs = svgElement(SVGConstants.SVG_DEFS_TAG);
     root.appendChild(defs);
 
     // create element for Stylesheet information.
-    style = svgElement("style");
-    SVGUtil.setAtt(style, "type", "text/css");
+    style = SVGUtil.makeStyleElement(document);
     root.appendChild(style);
+    
+    // create a CSS class manager.
+    cssman = new CSSClassManager();
   }
 
   /**
@@ -139,10 +147,30 @@ public class SVGPlot {
   /**
    * Getter for style element.
    * 
-   * @return Stylesheet DOM element
+   * @return stylesheet DOM element
+   * @deprecated Contents will be overwritten by CSS class manager!
    */
+  @Deprecated
   public Element getStyle() {
     return style;
+  }
+  
+  /**
+   * Get the plots CSS class manager.
+   * 
+   * Note that you need to invoke {@link #updateStyleElement()} to make changes take effect.
+   * 
+   * @return CSS class manager.
+   */
+  public CSSClassManager getCSSClassManager() {
+    return cssman;
+  }
+  
+  /**
+   * Update style element - invoke this appropriately after any change to the CSS styles. 
+   */
+  public void updateStyleElement() {
+    cssman.updateStyleElement(document, style);
   }
 
   /**

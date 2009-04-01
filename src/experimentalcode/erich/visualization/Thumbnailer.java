@@ -12,11 +12,13 @@ import org.apache.batik.transcoder.TranscoderException;
  *
  */
 class Thumbnailer {
+  private String prefix;
+  
   /**
    * Constructor
    */
-  public Thumbnailer() {
-    // Nothing to do.
+  public Thumbnailer(String prefix) {
+    this.prefix = prefix;
   }
 
   /**
@@ -29,7 +31,7 @@ class Thumbnailer {
   public synchronized File thumbnail(SVGPlot plot, int thumbnailsize) {
     File temp = null;
     try {
-      temp = File.createTempFile("elki-viz-", ".png");
+      temp = File.createTempFile(prefix, ".png");
       temp.deleteOnExit();
       plot.saveAsPNG(temp, thumbnailsize, thumbnailsize);
     }

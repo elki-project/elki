@@ -79,9 +79,9 @@ public final class SVGUtil {
    * @param cssclass class to add.
    */
   public static void addCSSClass(Element e, String cssclass) {
-    String oldval = e.getAttribute("class");
+    String oldval = e.getAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE);
     if (oldval == null) {
-      setAtt(e, "class", cssclass);
+      setAtt(e, SVGConstants.SVG_CLASS_ATTRIBUTE, cssclass);
       return;
     }
     String[] classes = oldval.split(" ");
@@ -90,7 +90,7 @@ public final class SVGUtil {
         return;
       }
     }
-    setAtt(e, "class", oldval+" "+cssclass);
+    setAtt(e, SVGConstants.SVG_CLASS_ATTRIBUTE, oldval+" "+cssclass);
   }
   
   /**
@@ -100,7 +100,7 @@ public final class SVGUtil {
    * @param cssclass class to remove.
    */
   public static void removeCSSClass(Element e, String cssclass) {
-    String oldval = e.getAttribute("class");
+    String oldval = e.getAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE);
     if (oldval == null) {
       return;
     }
@@ -115,6 +115,18 @@ public final class SVGUtil {
         }
       }
     }
-    SVGUtil.setAtt(e, "class", joined);
+    SVGUtil.setAtt(e, SVGConstants.SVG_CLASS_ATTRIBUTE, joined);
+  }
+
+  /**
+   * Make a new CSS style element for the given Document.
+   * 
+   * @param document document (factory)
+   * @return new CSS style element.
+   */
+  public static Element makeStyleElement(Document document) {
+    Element style = SVGUtil.svgElement(document, SVGConstants.SVG_STYLE_TAG);
+    SVGUtil.setAtt(style, SVGConstants.SVG_TYPE_ATTRIBUTE, SVGConstants.CSS_MIME_TYPE);
+    return style;
   }
 }
