@@ -52,6 +52,41 @@ public final class LoggingUtil {
       Logger.getAnonymousLogger().log(level, message);
     }
   }
+  
+  /**
+   * Static version to log a severe exception.
+   * 
+   * @param message Exception message, may be null (defaults to e.getMessage())
+   * @param e causing exception
+   */
+  public final static void exception(String message, Throwable e) {
+    if (message == null && e != null) {
+      message = e.getMessage();
+    }
+    logExpensive(LogLevel.SEVERE, message, e);
+  }
+
+  /**
+   * Static version to log a warning message.
+   * 
+   * @param message Warning message.
+   */
+  public final static void warning(String message) {
+    logExpensive(LogLevel.WARNING, message);    
+  }
+
+  /**
+   * Static version to log a warning message.
+   * 
+   * @param message Warning message, may be null (defaults to e.getMessage())
+   * @param e causing exception
+   */
+  public final static void warning(String message, Throwable e) {
+    if (message == null && e != null) {
+      message = e.getMessage();
+    }
+    logExpensive(LogLevel.WARNING, message, e);
+  }
 
   /**
    * Infer which class has called the logging helper.

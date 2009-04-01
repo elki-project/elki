@@ -21,7 +21,6 @@ public abstract class AbstractLoggable {
   /**
    * Holds the class specific debug status.
    */
-  @Deprecated
   protected boolean debug;
 
   /**
@@ -52,18 +51,17 @@ public abstract class AbstractLoggable {
   }
 
   /**
-   * Log an EXCEPTION message.
+   * Log an exception at SEVERE level.
    * <p/>
-   * If the logger is currently enabled for the EXCEPTION message level then the
+   * If the logger is currently enabled for the SEVERE message level then the
    * given message is forwarded to all the registered output Handler objects.
    * 
    * Depreciated:
    * 
    * use {@link LoggingUtil.logExpensive(LogLevel.SEVERE, msg, e) instead.
    */
-  @Deprecated
   public void exception(String msg, Throwable e) {
-    logger.log(LogLevel.EXCEPTION, msg, e);
+    logger.log(LogLevel.SEVERE, msg, e);
   }
 
   /**
@@ -76,7 +74,6 @@ public abstract class AbstractLoggable {
    * 
    * use {@link LoggingUtil.logExpensive(LogLevel.WARNING, msg) instead.
    */
-  @Deprecated
   public void warning(String msg) {
     logger.log(LogLevel.WARNING, msg);
   }
@@ -99,7 +96,6 @@ public abstract class AbstractLoggable {
    * 
    * instead. If msg is a constant, you can leave away the if statement.
    */
-  @Deprecated
   public void info(String msg) {
     logger.log(LogLevel.INFO, msg);
   }
@@ -181,9 +177,7 @@ public abstract class AbstractLoggable {
    * 
    * instead. If msg is a constant, you can leave away the if statement.
    */
-  @Deprecated
   public void debugFine(String msg) {
-
     LogRecord record = new LogRecord(LogLevel.FINE, msg);
     record.setSourceClassName(this.getClass().getName());
     record.setSourceMethodName(inferCaller(this.getClass().getName()));
@@ -209,7 +203,6 @@ public abstract class AbstractLoggable {
    * 
    * instead. If msg is a constant, you can leave away the if statement.
    */
-  @Deprecated
   public void debugFiner(String msg) {
     LogRecord record = new LogRecord(LogLevel.FINER, msg);
     record.setSourceClassName(this.getClass().getName());
@@ -236,7 +229,6 @@ public abstract class AbstractLoggable {
    * 
    * instead. If msg is a constant, you can leave away the if statement.
    */
-  @Deprecated
   public void debugFinest(String msg) {
     LogRecord record = new LogRecord(LogLevel.FINEST, msg);
     record.setSourceClassName(this.getClass().getName());
