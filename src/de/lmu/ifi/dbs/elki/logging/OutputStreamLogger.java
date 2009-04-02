@@ -22,7 +22,7 @@ public class OutputStreamLogger extends OutputStreamWriter {
   /**
    * Flag to signal if we have had a newline recently.
    */
-  private boolean hadNewline = true;
+  private int charsSinceNewline = 0;
 
   /**
    * Carriage return character.
@@ -43,6 +43,11 @@ public class OutputStreamLogger extends OutputStreamWriter {
    * Newline as char array.
    */
   public static final char[] NEWLINEC = NEWLINE.toCharArray();
+
+  /**
+   * Whitespace.
+   */
+  public static final String WHITESPACE = "                                                                                ";
 
   /**
    * Constructor.
@@ -93,46 +98,94 @@ public class OutputStreamLogger extends OutputStreamWriter {
   }
 
   /**
-   * Compare two char array ranges for identical characters.
+   * Count the tailing non-newline characters.
    * 
-   * @param a1 First array
-   * @param off1 Offset in array
-   * @param a2 Second array
-   * @param off2 Offset in array
-   * @param len Length to compare.
-   * @return
+   * @param cbuf Character buffer
+   * @param off Offset
+   * @param len Range
+   * @return number of tailing non-newline character
    */
-  private static final boolean compareArray(char[] a1, int off1, char[] a2, int off2, int len) {
-    for(int i = 0; i < len; i++) {
-      if(a1[off1 + i] != a2[off2 + i]) {
-        return false;
+  private int tailingNonNewline(char[] cbuf, int off, int len) {
+    for(int cnt = 0; cnt < len; cnt++) {
+      final int pos = off + (len - 1) - cnt;
+      if(cbuf[pos] == UNIX_NEWLINE) {
+        return cnt;
       }
+      if(cbuf[pos] == CARRIAGE_RETURN) {
+        return cnt;
+      }
+      // TODO: need to compare to NEWLINEC, too?
     }
-    return true;
+    return len;
   }
 
   /**
-   * Compare a string and a char array ranges for identical characters.
+   * Count the tailing non-newline characters.
    * 
-   * @param a1 First String
-   * @param off1 Offset in array
-   * @param a2 Second array
-   * @param off2 Offset in array
-   * @param len Length to compare.
-   * @return
+   * @param str String
+   * @param off Offset
+   * @param len Range
+   * @return number of tailing non-newline character
    */
-  private static final boolean compareString(String a1, int off1, char[] a2, int off2, int len) {
-    for(int i = 0; i < len; i++) {
-      if(a1.charAt(off1 + i) != a2[off2 + i]) {
-        return false;
+  private int tailingNonNewline(String str, int off, int len) {
+    for(int cnt = 0; cnt < len; cnt++) {
+      final int pos = off + (len - 1) - cnt;
+      if(str.charAt(pos) == UNIX_NEWLINE) {
+        return cnt;
       }
+      if(str.charAt(pos) == CARRIAGE_RETURN) {
+        return cnt;
+      }
+      // TODO: need to compare to NEWLINE, too?
     }
-    return true;
+    return len;
   }
 
   /**
-   * Writer that keeps track of when it hasn't seen a newline yet, will auto-insert newlines
-   * except when lines start with a carriage return.
+   * Count the number of non-newline character in the string.
+   * 
+   * @param cbuf character buffer
+   * @param off offset
+   * @param len length
+   * @return
+   */
+  private int countNonNewline(char[] cbuf, int off, int len) {
+    for(int cnt = 0; cnt < len; cnt++) {
+      final int pos = off + cnt;
+      if(cbuf[pos] == UNIX_NEWLINE) {
+        return cnt;
+      }
+      if(cbuf[pos] == CARRIAGE_RETURN) {
+        return cnt;
+      }
+    }
+    return len;
+  }
+
+  /**
+   * Count the number of non-newline character in the string.
+   * 
+   * @param str String
+   * @param off offset
+   * @param len length
+   * @return
+   */
+  private int countNonNewline(String str, int off, int len) {
+    for(int cnt = 0; cnt < len; cnt++) {
+      final int pos = off + cnt;
+      if(str.charAt(pos) == UNIX_NEWLINE) {
+        return cnt;
+      }
+      if(str.charAt(pos) == CARRIAGE_RETURN) {
+        return cnt;
+      }
+    }
+    return len;
+  }
+
+  /**
+   * Writer that keeps track of when it hasn't seen a newline yet, will
+   * auto-insert newlines except when lines start with a carriage return.
    */
   @Override
   public void write(char[] cbuf, int off, int len) throws IOException {
@@ -140,26 +193,36 @@ public class OutputStreamLogger extends OutputStreamWriter {
       return;
     }
     // if we havn't last seen a newline, and don't get a CR, insert a newline.
-    if(!hadNewline && cbuf[off] != CARRIAGE_RETURN) {
-      super.write(NEWLINEC, 0, NEWLINEC.length);
+    if(charsSinceNewline > 0) {
+      if(cbuf[off] != CARRIAGE_RETURN) {
+        super.write(NEWLINEC, 0, NEWLINEC.length);
+        charsSinceNewline = 0;
+      }
+      else {
+        // length of this line:
+        int nonnl = countNonNewline(cbuf, off + 1, len - 1);
+        // clear the existing chars.
+        if(nonnl < charsSinceNewline) {
+          super.write(CARRIAGE_RETURN);
+          while(charsSinceNewline > 0) {
+            final int n = Math.min(charsSinceNewline, WHITESPACE.length());
+            super.write(WHITESPACE, 0, n);
+            charsSinceNewline -= n;
+          }
+        }
+        else {
+          charsSinceNewline = 0;
+        }
+      }
     }
-    // check if we write a trailing newline.
-    if(len >= NEWLINEC.length && compareArray(cbuf, off + len - NEWLINEC.length, NEWLINEC, 0, NEWLINEC.length)) {
-      hadNewline = true;
-    }
-    else if(cbuf[off + len - 1] == UNIX_NEWLINE) {
-      hadNewline = true;
-    }
-    else {
-      hadNewline = false;
-    }
+    charsSinceNewline = tailingNonNewline(cbuf, off, len);
     super.write(cbuf, off, len);
     flush();
   }
 
   /**
-   * Writer that keeps track of when it hasn't seen a newline yet, will auto-insert newlines
-   * except when lines start with a carriage return.
+   * Writer that keeps track of when it hasn't seen a newline yet, will
+   * auto-insert newlines except when lines start with a carriage return.
    */
   @Override
   public void write(String str, int off, int len) throws IOException {
@@ -167,19 +230,29 @@ public class OutputStreamLogger extends OutputStreamWriter {
       return;
     }
     // if we havn't last seen a newline, and don't get a CR, insert a newline.
-    if(!hadNewline && str.charAt(off) != CARRIAGE_RETURN) {
-      super.write(NEWLINEC, 0, NEWLINEC.length);
+    if(charsSinceNewline > 0) {
+      if(str.charAt(off) != CARRIAGE_RETURN) {
+        super.write(NEWLINEC, 0, NEWLINEC.length);
+        charsSinceNewline = 0;
+      }
+      else {
+        // length of this line:
+        int nonnl = countNonNewline(str, off + 1, len - 1);
+        // clear the existing chars.
+        if(nonnl < charsSinceNewline) {
+          super.write(CARRIAGE_RETURN);
+          while(charsSinceNewline > 0) {
+            final int n = Math.min(charsSinceNewline, WHITESPACE.length());
+            super.write(WHITESPACE, 0, n);
+            charsSinceNewline -= n;
+          }
+        }
+        else {
+          charsSinceNewline = 0;
+        }
+      }
     }
-    // check if we write a trailing newline.
-    if(len >= NEWLINEC.length && compareString(str, off + len - NEWLINEC.length, NEWLINEC, 0, NEWLINEC.length)) {
-      hadNewline = true;
-    }
-    else if(str.charAt(off + len - 1) == UNIX_NEWLINE) {
-      hadNewline = true;
-    }
-    else {
-      hadNewline = false;
-    }
+    charsSinceNewline = tailingNonNewline(str, off, len);
     super.write(str, off, len);
     flush();
   }

@@ -16,11 +16,11 @@ public class TestOutputStreamLogger {
     ByteArrayOutputStream buf = new ByteArrayOutputStream();
     Writer wri = new OutputStreamLogger(buf);
     wri.write("Test."+OutputStreamLogger.NEWLINE);
-    wri.write("\r1");
-    wri.write("\r2");
+    wri.write("\r123");
+    wri.write("\r23");
     wri.write("\r3");
     wri.write("Test.");
-    String should = "Test."+OutputStreamLogger.NEWLINE+"\r1\r2\r3"+OutputStreamLogger.NEWLINE+"Test.";
+    String should = "Test."+OutputStreamLogger.NEWLINE+"\r123\r   \r23\r  \r3"+OutputStreamLogger.NEWLINE+"Test.";
     assertEquals("Output doesn't match requirements.", should, buf.toString());
   }
 }
