@@ -1,10 +1,14 @@
 package experimentalcode.erich.visualization;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 
 import javax.xml.transform.OutputKeys;
@@ -17,12 +21,14 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.apache.batik.dom.svg.SVGDOMImplementation;
 import org.apache.batik.dom.util.DOMUtilities;
+import org.apache.batik.svggen.SVGSyntax;
 import org.apache.batik.transcoder.Transcoder;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.JPEGTranscoder;
 import org.apache.batik.transcoder.image.PNGTranscoder;
+import org.apache.batik.util.Base64EncoderStream;
 import org.apache.batik.util.SVGConstants;
 import org.apache.fop.render.ps.EPSTranscoder;
 import org.apache.fop.render.ps.PSTranscoder;
@@ -30,8 +36,12 @@ import org.apache.fop.svg.PDFTranscoder;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.w3c.dom.svg.SVGDocument;
 
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.utilities.xml.XMLNodeListIterator;
 import experimentalcode.erich.visualization.svg.SVGUtil;
 import experimentalcode.erich.visualization.svg.css.CSSClassManager;
 
@@ -62,7 +72,7 @@ public class SVGPlot {
    * Primary style information
    */
   private Element style;
-  
+
   /**
    * CSS class manager
    */
@@ -102,7 +112,7 @@ public class SVGPlot {
     // create element for Stylesheet information.
     style = SVGUtil.makeStyleElement(document);
     root.appendChild(style);
-    
+
     // create a CSS class manager.
     cssman = new CSSClassManager();
   }
@@ -154,20 +164,22 @@ public class SVGPlot {
   public Element getStyle() {
     return style;
   }
-  
+
   /**
    * Get the plots CSS class manager.
    * 
-   * Note that you need to invoke {@link #updateStyleElement()} to make changes take effect.
+   * Note that you need to invoke {@link #updateStyleElement()} to make changes
+   * take effect.
    * 
    * @return CSS class manager.
    */
   public CSSClassManager getCSSClassManager() {
     return cssman;
   }
-  
+
   /**
-   * Update style element - invoke this appropriately after any change to the CSS styles. 
+   * Update style element - invoke this appropriately after any change to the
+   * CSS styles.
    */
   public void updateStyleElement() {
     cssman.updateStyleElement(document, style);
@@ -176,8 +188,7 @@ public class SVGPlot {
   /**
    * Save document into a SVG file.
    * 
-   * TODO: Handle embedded PNG images appropriately, they might currently be
-   * stored in temp files, and then get lost.
+   * References PNG images from the temporary files will be inlined automatically.
    * 
    * @param file Output filename
    * @throws IOException On write errors
@@ -188,10 +199,42 @@ public class SVGPlot {
     OutputStream out = new FileOutputStream(file);
     // TODO embed linked images.
     javax.xml.transform.Result result = new StreamResult(out);
-    // Use a transformer for pretty printing.
+    // deep clone document
+    SVGDocument doc = (SVGDocument) DOMUtilities.deepCloneDocument(getDocument(), getDocument().getImplementation());
+    NodeList imgs = doc.getElementsByTagNameNS(SVGConstants.SVG_NAMESPACE_URI, SVGConstants.SVG_IMAGE_TAG);
+    final String tmpurl = new File(System.getProperty("java.io.tmpdir") + File.separator).toURI().toString();
+    for(Node img : new XMLNodeListIterator(imgs)) {
+      if(img instanceof Element) {
+        try {
+          Element i = (Element) img;
+          String href = i.getAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_ATTRIBUTE);
+          if(href.startsWith(tmpurl) && href.endsWith(".png")) {
+            // need to convert the image into an inline image.
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            Base64EncoderStream encoder = new Base64EncoderStream(os);
+            File in = new File(new URI(href));
+            FileInputStream instream = new FileInputStream(in);
+            byte[] buf = new byte[4096];
+            while(true) {
+              int read = instream.read(buf, 0, buf.length);
+              if (read <= 0) { break; }
+              encoder.write(buf, 0, read);
+            }
+            instream.close();
+            encoder.close();
+            // replace HREF with inlined image data.
+            i.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_ATTRIBUTE, SVGSyntax.DATA_PROTOCOL_PNG_PREFIX + os.toString());
+          }
+        }
+        catch(URISyntaxException e) {
+          LoggingUtil.warning("Error in embedding PNG image.");
+        }
+      }
+    }
+    // Use a transformer for pretty printing
     Transformer xformer = TransformerFactory.newInstance().newTransformer();
     xformer.setOutputProperty(OutputKeys.INDENT, "yes");
-    xformer.transform(new DOMSource(getDocument()), result);
+    xformer.transform(new DOMSource(doc), result);
     out.flush();
     out.close();
   }
@@ -206,7 +249,8 @@ public class SVGPlot {
    */
   protected void transcode(File file, Transcoder transcoder) throws IOException, TranscoderException {
     // Since the Transcoder is Batik-based, it will replace the rendering tree,
-    // which would then break display. Thus we need to deep clone the document first.
+    // which would then break display. Thus we need to deep clone the document
+    // first.
     // -- found by Simon.
     SVGDocument doc = (SVGDocument) DOMUtilities.deepCloneDocument(getDocument(), getDocument().getImplementation());
     TranscoderInput input = new TranscoderInput(doc);
