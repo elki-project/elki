@@ -5,6 +5,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.svg.SVGDocument;
 
 import experimentalcode.erich.scales.LinearScale;
+import experimentalcode.erich.visualization.SVGPlot;
+import experimentalcode.erich.visualization.svg.css.CSSClass;
+import experimentalcode.erich.visualization.svg.css.CSSClassManager;
+import experimentalcode.erich.visualization.svg.css.CSSClassManager.CSSNamingConflict;
 
 public class SVGAxis {
 
@@ -15,6 +19,48 @@ public class SVGAxis {
    */
   private enum ALIGNMENT {
     LL, RL, LC, RC, LR, RR
+  }
+
+  /**
+   * CSS class name for the axes
+   */
+  private final static String CSS_AXIS = "axis";
+
+  /**
+   * CSS class name for the axes
+   */
+  private final static String CSS_AXIS_TICK = "axis-tick";
+
+  /**
+   * CSS class name for the axes
+   */
+  private final static String CSS_AXIS_LABEL = "axis-label";
+
+  /**
+   * Register CSS classes with a {@link CSSClassManager}
+   * 
+   * @param owner Owner of the CSS classes
+   * @param manager Manager to register the classes with
+   * @throws CSSNamingConflict when a name clash occurs
+   */
+  public static void setupCSSClasses(Object owner, CSSClassManager manager) throws CSSNamingConflict {
+    if (!manager.contains(CSS_AXIS)) {
+      CSSClass axis = new CSSClass(owner, CSS_AXIS);
+      axis.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_SILVER_VALUE);
+      axis.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, "0.2%");
+      manager.addClass(axis);
+    }
+    if (!manager.contains(CSS_AXIS_TICK)) {
+      CSSClass tick = new CSSClass(owner, CSS_AXIS_TICK);
+      tick.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_SILVER_VALUE);
+      tick.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, "0.1%");
+      manager.addClass(tick);
+    }
+    if (!manager.contains(CSS_AXIS_LABEL)) {
+      CSSClass label = new CSSClass(owner, CSS_AXIS_LABEL);
+      label.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, "0.2%");
+      manager.addClass(label);
+    }
   }
 
   /**
@@ -29,15 +75,17 @@ public class SVGAxis {
    * @param labels control whether labels are printed.
    * @param righthanded control whether to print labels on the right hand side
    *        or left hand side
+   * @throws CSSNamingConflict when a conflict occurs in CSS
    */
-  public static void drawAxis(SVGDocument document, Element parent, LinearScale scale, double x1, double y1, double x2, double y2, boolean labels, boolean righthanded) {
+  public static void drawAxis(SVGPlot plot, Element parent, LinearScale scale, double x1, double y1, double x2, double y2, boolean labels, boolean righthanded) throws CSSNamingConflict {
+    SVGDocument document = plot.getDocument();
     assert (parent != null);
     Element line = SVGUtil.svgElement(document, SVGConstants.SVG_LINE_TAG);
     SVGUtil.setAtt(line, SVGConstants.SVG_X1_ATTRIBUTE, x1);
     SVGUtil.setAtt(line, SVGConstants.SVG_Y1_ATTRIBUTE, y1);
     SVGUtil.setAtt(line, SVGConstants.SVG_X2_ATTRIBUTE , x2);
     SVGUtil.setAtt(line, SVGConstants.SVG_Y2_ATTRIBUTE, y2);
-    SVGUtil.setAtt(line, SVGConstants.SVG_STYLE_ATTRIBUTE, "stroke:silver; stroke-width:0.2%;");
+    SVGUtil.setAtt(line, SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_AXIS);
     parent.appendChild(line);
   
     double tx = x2 - x1;
@@ -80,12 +128,12 @@ public class SVGAxis {
       SVGUtil.setAtt(tickline, SVGConstants.SVG_Y1_ATTRIBUTE, y - th);
       SVGUtil.setAtt(tickline, SVGConstants.SVG_X2_ATTRIBUTE, x + tw);
       SVGUtil.setAtt(tickline, SVGConstants.SVG_Y2_ATTRIBUTE, y + th);
-      SVGUtil.setAtt(tickline, SVGConstants.SVG_STYLE_ATTRIBUTE, "stroke:black; stroke-width:0.1%;");
+      SVGUtil.setAtt(tickline, SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_AXIS_TICK);
       parent.appendChild(tickline);
       // draw labels
       if(labels) {
         Element text = SVGUtil.svgElement(document, SVGConstants.SVG_TEXT_TAG);
-        SVGUtil.setAtt(text, SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.2%");
+        SVGUtil.setAtt(text, SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_AXIS_LABEL);
         switch(pos){
         case LL:
         case LC:
@@ -117,6 +165,7 @@ public class SVGAxis {
         parent.appendChild(text);
       }
     }
+    setupCSSClasses(plot, plot.getCSSClassManager());
   }
 
 }
