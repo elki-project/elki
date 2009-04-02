@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.logging;
 
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.logging.ErrorManager;
 import java.util.logging.Formatter;
@@ -53,15 +52,15 @@ public class CLISmartHandler extends Handler {
    */
   public CLISmartHandler(final OutputStream out, final OutputStream err) {
     super();
-    this.out = new OutputStreamWriter(out);
-    this.err = new OutputStreamWriter(err);
+    this.out = new OutputStreamLogger(out);
+    this.err = new OutputStreamLogger(err);
   }
 
   /**
-   * Default constructor using {@link System.out} and {@link System.err}
+   * Default constructor using {@link System#out} and {@link System#err}
    */
   public CLISmartHandler() {
-    this(new NonClosingOutputStream(System.out), new NonClosingOutputStream(System.err));
+    this(System.out, System.err);
   }
 
   /**
@@ -69,18 +68,8 @@ public class CLISmartHandler extends Handler {
    */
   @Override
   public void close() throws SecurityException {
-    try {
-      out.close();
-    }
-    catch(Exception ex) {
-      reportError(null, ex, ErrorManager.CLOSE_FAILURE);
-    }
-    try {
-      err.close();
-    }
-    catch(Exception ex) {
-      reportError(null, ex, ErrorManager.CLOSE_FAILURE);
-    }
+    // we have wrapped the output streams in OutputStreamLogger anyway
+    // which will ignore any close() call.
   }
 
   /**
@@ -145,7 +134,7 @@ public class CLISmartHandler extends Handler {
     // write
     try {
       destination.write(m);
-      // always flush.
+      // always flush (although the streams should auto-flush already)
       destination.flush();
     }
     catch(Exception ex) {

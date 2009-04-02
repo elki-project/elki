@@ -203,7 +203,7 @@ public final class Util {
     status.append(progress.toString());
     status.append(" Number of clusters: ");
     status.append(clusters);
-    status.append(".                           ");
+    status.append(".");
     return status.toString();
   }
 
@@ -217,7 +217,6 @@ public final class Util {
     StringBuffer status = new StringBuffer();
     status.append("\r");
     status.append(progress.toString());
-    status.append("                           ");
     return status.toString();
   }
 
