@@ -134,6 +134,7 @@ public class SVGAxis {
       if(labels) {
         Element text = SVGUtil.svgElement(document, SVGConstants.SVG_TEXT_TAG);
         SVGUtil.setAtt(text, SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_AXIS_LABEL);
+        SVGUtil.setAtt(text, SVGConstants.SVG_TEXT_RENDERING_ATTRIBUTE, SVGConstants.SVG_OPTIMIZE_LEGIBILITY_VALUE);
         switch(pos){
         case LL:
         case LC:
