@@ -20,11 +20,6 @@ public final class LoggingConfiguration {
   public static boolean DEBUG = false;
 
   /**
-   * Configuration code for command line interface.
-   */
-  public static final int CLI = 0;
-
-  /**
    * Configuration file name
    */
   private static final String CLIConffile = "logging-cli.properties";
