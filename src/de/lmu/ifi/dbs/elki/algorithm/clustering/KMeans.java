@@ -114,8 +114,8 @@ public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends D
             List<V> means = new ArrayList<V>(k);
             List<V> oldMeans;
             List<List<Integer>> clusters;
-            if (isVerbose()) {
-                verbose("initializing random vectors");
+            if (logger.isVerbose()) {
+              logger.verbose("initializing random vectors");
             }
             for (int i = 0; i < k; i++) {
                 V randomVector = randomBase.randomInstance(random);
@@ -131,8 +131,8 @@ public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends D
             boolean changed = true;
             int iteration = 1;
             while (changed) {
-                if (isVerbose()) {
-                    verbose("iteration " + iteration);
+                if (logger.isVerbose()) {
+                  logger.verbose("iteration " + iteration);
                 }
                 oldMeans = new ArrayList<V>(k);
                 oldMeans.addAll(means);

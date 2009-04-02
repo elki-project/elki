@@ -18,8 +18,6 @@ import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
@@ -234,7 +232,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
     }
 
     if(dirCapacity < 10) {
-      LoggingUtil.logExpensive(LogLevel.WARNING, "Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
+      logger.warning("Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
     }
 
     // minimum entries per directory node
@@ -252,7 +250,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
     }
 
     if(leafCapacity < 10) {
-      LoggingUtil.logExpensive(LogLevel.WARNING, "Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
+      logger.warning("Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
     }
 
     // minimum entries per leaf node
@@ -262,7 +260,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
     }
 
     if(verbose) {
-      verbose("Directory Capacity: " + dirCapacity + "\nLeaf Capacity: " + leafCapacity);
+      logger.verbose("Directory Capacity: " + dirCapacity + "\nLeaf Capacity: " + leafCapacity);
     }
   }
 

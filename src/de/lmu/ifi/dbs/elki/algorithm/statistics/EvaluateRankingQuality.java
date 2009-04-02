@@ -67,8 +67,8 @@ public class EvaluateRankingQuality<V extends RealVector<V, ?>> extends Distance
     ArrayList<Integer> ids = new ArrayList<Integer>(database.getIDs());
     int size = ids.size();
 
-    if(isVerbose()) {
-      verbose("Preprocessing clusters...");
+    if(logger.isVerbose()) {
+      logger.verbose("Preprocessing clusters...");
     }
     // Cluster by labels
     ByLabelClustering<V> split = new ByLabelClustering<V>();
@@ -83,8 +83,8 @@ public class EvaluateRankingQuality<V extends RealVector<V, ?>> extends Distance
 
     Histogram<MeanVariance> hist = Histogram.MeanVarianceHistogram(100, 0.0, 1.0);
 
-    if(isVerbose()) {
-      verbose("Processing points...");
+    if(logger.isVerbose()) {
+      logger.verbose("Processing points...");
     }
     Progress rocloop = new Progress("ROC computation loop ...", size);
     int rocproc = 0;
@@ -106,15 +106,12 @@ public class EvaluateRankingQuality<V extends RealVector<V, ?>> extends Distance
 
         hist.get(((double)ind) / clus.size()).addData(result);
 
-        if(isVerbose()) {
+        if(logger.isVerbose()) {
           rocproc++;
           rocloop.setProcessed(rocproc);
-          progress(rocloop);
+          logger.progress(rocloop);
         }
       }
-    }
-    if(isVerbose()) {
-      verbose("");
     }
     // Collections.sort(results);
 

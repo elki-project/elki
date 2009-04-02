@@ -222,11 +222,11 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
     @Override
     protected Clustering<Model> runInTime(Database<ParameterizationFunction> database) throws IllegalStateException {
         this.database = database;
-        if (isVerbose()) {
+        if (logger.isVerbose()) {
             StringBuffer msg = new StringBuffer();
             msg.append("\nDB size: ").append(database.size());
             msg.append("\nmin Dim: ").append(minDim);
-            verbose(msg.toString());
+            logger.verbose(msg.toString());
         }
 
         try {
@@ -234,9 +234,9 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
             noiseDim = database.get(database.iterator().next()).getDimensionality();
 
             Progress progress = new Progress("Clustering", database.size());
-            if (isVerbose()) {
+            if (logger.isVerbose()) {
                 progress.setProcessed(0);
-                progress(progress);
+                logger.progress(progress);
             }
 
             result = doRun(database, progress);
@@ -251,7 +251,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
                     msg.append("\n Cluster: "+c.getModel().getClass().getName()+" size: "+c.size());
                   }
                 }
-                verbose(msg.toString());
+                logger.verbose(msg.toString());
             }
         }
         catch (UnableToComplyException e) {
@@ -349,10 +349,10 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
             msg.append("\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
             logger.log(LogLevel.FINE, msg.toString());
         }
-        else if (isVerbose()) {
+        else if (logger.isVerbose()) {
             StringBuffer msg = new StringBuffer();
-            msg.append("\nXXXX dim ").append(dim).append(" database.size ").append(database.size());
-            verbose(msg.toString());
+            msg.append("XXXX dim ").append(dim).append(" database.size ").append(database.size());
+            logger.verbose(msg.toString());
         }
 
         // get the ''best'' d-dimensional intervals at max level
@@ -361,8 +361,8 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
             if (logger.isLoggable(LogLevel.FINE)) {
               logger.log(LogLevel.FINE, "next interval in dim " + dim + ": " + interval);
             }
-            else if (isVerbose()) {
-                verbose("\nnext interval in dim " + dim + ": " + interval);
+            else if (logger.isVerbose()) {
+              logger.verbose("next interval in dim " + dim + ": " + interval);
             }
 
             // only noise left
@@ -420,7 +420,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
 
             if (isVerbose()) {
                 progress.setProcessed(processedIDs.size());
-                progress(progress);
+                logger.progress(progress);
             }
         }
 
@@ -459,7 +459,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
 
         if (isVerbose()) {
             progress.setProcessed(processedIDs.size());
-            progress(progress);
+            logger.progress(progress);
         }
 
 
@@ -497,13 +497,13 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
             msg.append("\ndIntervalSize ").append(dIntervalSize);
             logger.log(LogLevel.FINE, msg.toString());
         }
-        else if (isVerbose()) {
+        else if (logger.isVerbose()) {
             StringBuffer msg = new StringBuffer();
             msg.append("d_min ").append(d_min);
             msg.append("\nd_max ").append(d_max);
             msg.append("\nnumDIntervals ").append(numDIntervals);
             msg.append("\ndIntervalSize ").append(dIntervalSize);
-            verbose(msg.toString());
+            logger.verbose(msg.toString());
         }
 
         // alpha intervals
@@ -663,17 +663,17 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
                 return interval;
             }
 
-            if (heap.size() % 10000 == 0 && isVerbose()) {
-                verbose("heap size " + heap.size());
+            if (heap.size() % 10000 == 0 && logger.isVerbose()) {
+                logger.verbose("heap size " + heap.size());
             }
 
             if (heap.size() >= 40000) {
-                warning("Heap size > 40.000!!!");
+                logger.warning("Heap size > 40.000!!!");
                 heap.clear();
                 return null;
             }
 
-            if (logger.isLoggable(LogLevel.FINER)) {
+            if (logger.isDebuggingFiner()) {
               logger.log(LogLevel.FINER, "split " + interval.toString() + " " + interval.getLevel() + "-" + interval.getMaxSplitDimension());
             }
             interval.split();

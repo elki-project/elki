@@ -19,7 +19,7 @@ import java.util.logging.LogRecord;
  *
  * @author Arthur Zimek
  */
-public class ProgressLogRecord extends LogRecord {
+public class ProgressLogRecord extends ElkiLogRecord {
 
 
     /**

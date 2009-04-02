@@ -126,7 +126,7 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Resu
         long end = System.currentTimeMillis();
         if (isTime()) {
             long elapsedTime = end - start;
-            verbose(this.getClass().getName() + " runtime  : " + elapsedTime + " milliseconds.");
+            logger.verbose(this.getClass().getName() + " runtime  : " + elapsedTime + " milliseconds.");
 
         }
         if (database instanceof IndexDatabase && isVerbose()) {
@@ -135,7 +135,7 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Resu
             msg.append(getClass().getName()).append(" physical read access : ").append(db.getPhysicalReadAccess()).append("\n");
             msg.append(getClass().getName()).append(" physical write access : ").append(db.getPhysicalWriteReadAccess()).append("\n");
             msg.append(getClass().getName()).append(" logical page access : ").append(db.getLogicalPageAccess()).append("\n");
-            verbose(msg.toString());
+            logger.verbose(msg.toString());
         }
         return res;
     }

@@ -60,8 +60,8 @@ public class RankingQualityHistogram<V extends RealVector<V, ?>> extends Distanc
     ArrayList<Integer> ids = new ArrayList<Integer>(database.getIDs());
     int size = ids.size();
 
-    if(isVerbose()) {
-      verbose("Preprocessing clusters...");
+    if(logger.isVerbose()) {
+      logger.verbose("Preprocessing clusters...");
     }
     // Cluster by labels
     ByLabelClustering<V> split = new ByLabelClustering<V>();
@@ -69,8 +69,8 @@ public class RankingQualityHistogram<V extends RealVector<V, ?>> extends Distanc
 
     Histogram<Double> hist = Histogram.DoubleHistogram(100, 0.0, 1.0);
 
-    if(isVerbose()) {
-      verbose("Processing points...");
+    if(logger.isVerbose()) {
+      logger.verbose("Processing points...");
     }
     Progress rocloop = new Progress("ROC computation loop ...", size);
     int rocproc = 0;
@@ -83,15 +83,12 @@ public class RankingQualityHistogram<V extends RealVector<V, ?>> extends Distanc
 
         hist.put(result, hist.get(result) + 1. / size);
 
-        if(isVerbose()) {
+        if(logger.isVerbose()) {
           rocproc++;
           rocloop.setProcessed(rocproc);
-          progress(rocloop);
+          logger.progress(rocloop);
         }
       }
-    }
-    if(isVerbose()) {
-      verbose("");
     }
 
     // Transform Histogram into a Double Vector array.

@@ -188,27 +188,27 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clu
         Map<CLIQUESubspace<V>, Set<Integer>> modelsAndClusters = new HashMap<CLIQUESubspace<V>, Set<Integer>>();
 
         // 1. Identification of subspaces that contain clusters
-        if (isVerbose()) {
-            verbose("*** 1. Identification of subspaces that contain clusters ***");
+        if (logger.isVerbose()) {
+          logger.verbose("*** 1. Identification of subspaces that contain clusters ***");
         }
         SortedMap<Integer, SortedSet<CLIQUESubspace<V>>> dimensionToDenseSubspaces = new TreeMap<Integer, SortedSet<CLIQUESubspace<V>>>();
         SortedSet<CLIQUESubspace<V>> denseSubspaces = findOneDimensionalDenseSubspaces(database);
         dimensionToDenseSubspaces.put(0, denseSubspaces);
-        if (isVerbose()) {
-            verbose("    1-dimensional dense subspaces: " + denseSubspaces.size());
+        if (logger.isVerbose()) {
+          logger.verbose("    1-dimensional dense subspaces: " + denseSubspaces.size());
         }
 
         for (int k = 2; k <= database.dimensionality() && !denseSubspaces.isEmpty(); k++) {
             denseSubspaces = findDenseSubspaces(database, denseSubspaces);
             dimensionToDenseSubspaces.put(k - 1, denseSubspaces);
-            if (isVerbose()) {
-                verbose("    " + k + "-dimensional dense subspaces: " + denseSubspaces.size());
+            if (logger.isVerbose()) {
+              logger.verbose("    " + k + "-dimensional dense subspaces: " + denseSubspaces.size());
             }
         }
 
         // 2. Identification of clusters
-        if (isVerbose()) {
-            verbose("\n*** 2. Identification of clusters ***");
+        if (logger.isVerbose()) {
+          logger.verbose("*** 2. Identification of clusters ***");
         }
 
         for (Integer dim : dimensionToDenseSubspaces.keySet()) {
@@ -216,8 +216,8 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clu
             Map<CLIQUESubspace<V>, Set<Integer>> modelsToClusters = determineClusters(database, subspaces);
             modelsAndClusters.putAll(modelsToClusters);
 
-            if (isVerbose()) {
-                verbose("    " + (dim + 1) + "-dimensionional clusters: " + modelsToClusters.size());
+            if (logger.isVerbose()) {
+              logger.verbose("    " + (dim + 1) + "-dimensionional clusters: " + modelsToClusters.size());
             }
         }
 

@@ -81,8 +81,8 @@ public abstract class HiCOPreprocessor<V extends RealVector<V, ?>> extends Abstr
 
         long start = System.currentTimeMillis();
         Progress progress = new Progress("Preprocessing correlation dimension", database.size());
-        if (verbose) {
-            verbose("Preprocessing:");
+        if (logger.isVerbose()) {
+          logger.verbose("Preprocessing:");
         }
 
         int processed = 1;
@@ -96,15 +96,15 @@ public abstract class HiCOPreprocessor<V extends RealVector<V, ?>> extends Abstr
             database.associate(AssociationID.LOCALLY_WEIGHTED_MATRIX, id, pcares.similarityMatrix());
             progress.setProcessed(processed++);
 
-            if (verbose) {
-                progress(progress);
+            if (logger.isVerbose()) {
+              logger.progress(progress);
             }
         }
 
         long end = System.currentTimeMillis();
         if (time) {
             long elapsedTime = end - start;
-            verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
+            logger.verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
         }
     }
 

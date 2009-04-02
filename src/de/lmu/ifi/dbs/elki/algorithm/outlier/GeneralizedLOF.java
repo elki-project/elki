@@ -104,13 +104,13 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
     protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
         getDistanceFunction().setDatabase(database, isVerbose(), isTime());
         reachabilityDistanceFunction.setDatabase(database, isVerbose(), isTime());
-        if (isVerbose()) {
-            verbose("\nLOF ");
+        if (logger.isVerbose()) {
+          logger.verbose("LOF ");
         }
 
         {// compute neighbors of each db object
-            if (isVerbose()) {
-                verbose("\ncomputing neighborhoods");
+            if (logger.isVerbose()) {
+              logger.verbose("computing neighborhoods");
             }
             Progress progressNeighborhoods = new Progress("LOF", database.size());
             int counter = 1;
@@ -119,19 +119,16 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
                 List<DistanceResultPair<DoubleDistance>> neighbors = database.kNNQueryForID(id, k + 1, getDistanceFunction());
                 neighbors.remove(0);
                 database.associate(AssociationID.NEIGHBORS, id, neighbors);
-                if (isVerbose()) {
+                if (logger.isVerbose()) {
                     progressNeighborhoods.setProcessed(counter);
-                    progress(progressNeighborhoods);
+                    logger.progress(progressNeighborhoods);
                 }
-            }
-            if (isVerbose()) {
-                verbose("");
             }
         }
 
         {// computing reach dist function neighborhoods
-            if (isVerbose()) {
-                verbose("\ncomputing neighborhods for reachability function");
+            if (logger.isVerbose()) {
+              logger.verbose("computing neighborhods for reachability function");
             }
             Progress reachDistNeighborhoodsProgress = new Progress("Reachability DIstance Neighborhoods", database.size());
             int counter = 1;
@@ -140,18 +137,15 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
                 List<DistanceResultPair<DoubleDistance>> neighbors = database.kNNQueryForID(id, k + 1, reachabilityDistanceFunction);
                 neighbors.remove(0);
                 database.associate(AssociationID.NEIGHBORS_2, id, neighbors);
-                if (isVerbose()) {
+                if (logger.isVerbose()) {
                     reachDistNeighborhoodsProgress.setProcessed(counter);
-                    progress(reachDistNeighborhoodsProgress);
+                    logger.progress(reachDistNeighborhoodsProgress);
                 }
-            }
-            if (isVerbose()) {
-                verbose("");
             }
         }
         {// computing LRDs
-            if (isVerbose()) {
-                verbose("\ncomputing LRDs");
+            if (logger.isVerbose()) {
+              logger.verbose("computing LRDs");
             }
             Progress lrdsProgress = new Progress("LRD", database.size());
             int counter = 1;
@@ -166,19 +160,16 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
                 }
                 Double lrd = neighbors.size() / sum;
                 database.associate(AssociationID.LRD, id, lrd);
-                if (isVerbose()) {
+                if (logger.isVerbose()) {
                     lrdsProgress.setProcessed(counter);
-                    progress(lrdsProgress);
+                    logger.progress(lrdsProgress);
                 }
-            }
-            if (isVerbose()) {
-                verbose("");
             }
         }
         // XXX: everything here appears to be stupid
         {// compute LOF of each db object
-            if (isVerbose()) {
-                verbose("\ncomputing LOFs");
+            if (logger.isVerbose()) {
+              logger.verbose("computing LOFs");
             }
 
             Progress progressLOFs = new Progress("LOF for objects", database.size());
@@ -194,13 +185,10 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
                 }
                 Double lof = sum / neighbors.size();
                 database.associate(AssociationID.LOF, id, lof);
-                if (isVerbose()) {
+                if (logger.isVerbose()) {
                     progressLOFs.setProcessed(counter);
-                    progress(progressLOFs);
+                    logger.progress(progressLOFs);
                 }
-            }
-            if (isVerbose()) {
-                verbose("");
             }
         }
         AnnotationsFromDatabase<O, Double> res1 = new AnnotationsFromDatabase<O, Double>(database);

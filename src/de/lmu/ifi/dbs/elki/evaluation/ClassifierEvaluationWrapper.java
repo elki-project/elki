@@ -144,7 +144,7 @@ public class ClassifierEvaluationWrapper<O extends DatabaseObject, L extends Cla
       evaluationResult = evaluationProcedure.evaluate(classifier);
       long endeval = System.currentTimeMillis();
       if (this.isTime()) {
-          verbose("time required for evaluation: " + (endeval - starteval) + " msec.");
+        logger.verbose("time required for evaluation: " + (endeval - starteval) + " msec.");
       }
       return evaluationResult;
   }

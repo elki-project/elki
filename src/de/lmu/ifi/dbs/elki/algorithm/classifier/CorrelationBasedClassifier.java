@@ -64,8 +64,8 @@ public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Di
             List<Integer> keys = new ArrayList<Integer>(clusters.keySet());
             Collections.sort(keys);
             for (Integer classID : keys) {
-                if (isVerbose()) {
-                    verbose("Deriving model for class "
+                if (logger.isVerbose()) {
+                  logger.verbose("Deriving model for class "
                         + this.getClassLabel(classID).toString());
                 }
                 Database<V> cluster = clusters.get(classID);

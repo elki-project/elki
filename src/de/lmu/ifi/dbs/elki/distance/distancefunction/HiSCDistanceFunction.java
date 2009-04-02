@@ -5,7 +5,6 @@ import java.util.BitSet;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.PreferenceVectorBasedCorrelationDistance;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.preprocessing.HiSCPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
@@ -45,16 +44,15 @@ public class HiSCDistanceFunction<V extends RealVector<V, ?>, P extends Preproce
 
         if (Math.max(dist1, dist2) > getEpsilon()) {
             subspaceDim++;
-            if (logger.isLoggable(LogLevel.VERBOSE)) {
+            if (logger.isVerbose()) {
                 StringBuffer msg = new StringBuffer();
-                msg.append("\n");
                 msg.append("\ndist1 " + dist1);
                 msg.append("\ndist2 " + dist2);
                 msg.append("\nv1 " + getDatabase().getAssociation(AssociationID.LABEL, v1.getID()));
                 msg.append("\nv2 " + getDatabase().getAssociation(AssociationID.LABEL, v2.getID()));
                 msg.append("\nsubspaceDim " + subspaceDim);
                 msg.append("\ncommon pv " + FormatUtil.format(dim, commonPreferenceVector));
-                verbose(msg.toString());
+                logger.verbose(msg.toString());
             }
         }
 

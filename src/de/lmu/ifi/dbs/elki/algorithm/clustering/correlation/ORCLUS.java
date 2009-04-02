@@ -107,8 +107,8 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
       double beta = StrictMath.exp(-StrictMath.log((double) dim_c / (double) dim) * StrictMath.log(1 / alpha) / StrictMath.log((double) k_c / (double) k));
 
       while(k_c > k) {
-        if(isVerbose()) {
-          progress(new LogRecord(LogLevel.PROGRESS, "\rCurrent number of clusters: " + clusters.size() + ".                           "));
+        if(logger.isVerbose()) {
+          logger.progress(new LogRecord(LogLevel.PROGRESS, "\rCurrent number of clusters: " + clusters.size() + ".                           "));
         }
 
         // find partitioning induced by the seeds of the clusters
@@ -128,8 +128,8 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
       }
       assign(database, clusters);
 
-      if(isVerbose()) {
-        verbose("\nNumber of clusters: " + clusters.size() + ".                           ");
+      if(logger.isVerbose()) {
+        logger.verbose("\nNumber of clusters: " + clusters.size() + ".                           ");
       }
 
       // get the result
@@ -299,8 +299,8 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
     }
 
     while(clusters.size() > k_new) {
-      if(isVerbose()) {
-        progress(new LogRecord(LogLevel.PROGRESS, "\rCurrent number of clusters: " + clusters.size() + ".                           "));
+      if(logger.isVerbose()) {
+        logger.progress(new LogRecord(LogLevel.PROGRESS, "\rCurrent number of clusters: " + clusters.size() + ".                           "));
       }
       // find the smallest value of r_ij
       ProjectedEnergy minPE = Collections.min(projectedEnergies);

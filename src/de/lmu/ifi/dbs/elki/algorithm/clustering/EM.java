@@ -16,7 +16,6 @@ import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.LogLevel;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
@@ -129,8 +128,8 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Cluster
             throw new IllegalArgumentException("database empty: must contain elements");
         }
         // initial models
-        if (isVerbose()) {
-            verbose("initializing " + k + " models");
+        if (logger.isVerbose()) {
+          logger.verbose("initializing " + k + " models");
         }
         List<V> means = initialMeans(database);
         List<Matrix> covarianceMatrices = new ArrayList<Matrix>(k);
@@ -159,15 +158,15 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Cluster
         double emNew = expectationOfMixture(database);
 
         // iteration unless no change
-        if (isVerbose()) {
-            verbose("iterating EM");
+        if (logger.isVerbose()) {
+          logger.verbose("iterating EM");
         }
         double em;
         int it = 0;
         do {
             it++;
-            if (isVerbose()) {
-                verbose("iteration " + it + " - expectation value: " + emNew);
+            if (logger.isVerbose()) {
+              logger.verbose("iteration " + it + " - expectation value: " + emNew);
             }
             em = emNew;
 
@@ -226,8 +225,8 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Cluster
         }
         while (Math.abs(em - emNew) > delta);
 
-        if (isVerbose()) {
-            verbose("\nassigning clusters");
+        if (logger.isVerbose()) {
+          logger.verbose("assigning clusters");
         }
 
         // fill result with clusters and models
@@ -368,11 +367,11 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Cluster
                 normalization.normalize(list);
             }
             catch (NonNumericFeaturesException e) {
-              LoggingUtil.logExpensive(LogLevel.WARNING, e.getMessage());
+              logger.warning(e.getMessage());
             }
             List<V> means = new ArrayList<V>(k);
-            if (isVerbose()) {
-                verbose("initializing random vectors");
+            if (logger.isVerbose()) {
+              logger.verbose("initializing random vectors");
             }
             for (int i = 0; i < k; i++) {
                 V randomVector = randomBase.randomInstance(random);
@@ -380,7 +379,7 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Cluster
                     means.add(normalization.restore(randomVector));
                 }
                 catch (NonNumericFeaturesException e) {
-                    logger.log(LogLevel.WARNING, e.getMessage());
+                    logger.warning(e.getMessage());
                     means.add(randomVector);
                 }
             }

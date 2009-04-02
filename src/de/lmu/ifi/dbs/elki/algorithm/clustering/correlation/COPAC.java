@@ -144,14 +144,14 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
     @Override
     protected Clustering<Model> runInTime(Database<V> database) throws IllegalStateException {
         // preprocessing
-        if (isVerbose()) {
-            verbose("\ndb size = " + database.size());
-            verbose("dimensionality = " + database.dimensionality());
+        if (logger.isVerbose()) {
+          logger.verbose("db size = " + database.size());
+            logger.verbose("dimensionality = " + database.dimensionality());
         }
         preprocessor.run(database, isVerbose(), isTime());
         // partitioning
-        if (isVerbose()) {
-            verbose("\nPartitioning...");
+        if (logger.isVerbose()) {
+          logger.verbose("\nPartitioning...");
         }
         Map<Integer, List<Integer>> partitionMap = new Hashtable<Integer, List<Integer>>();
         Progress partitionProgress = new Progress("Partitioning", database.size());
@@ -166,19 +166,19 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
             }
 
             partitionMap.get(corrdim).add(id);
-            if (isVerbose()) {
+            if (logger.isVerbose()) {
                 partitionProgress.setProcessed(processed++);
-                progress(partitionProgress);
+                logger.progress(partitionProgress);
             }
         }
 
-        if (isVerbose()) {
+        if (logger.isVerbose()) {
             partitionProgress.setProcessed(database.size());
-            progress(partitionProgress);
+            logger.progress(partitionProgress);
 
             for (Integer corrDim : partitionMap.keySet()) {
                 List<Integer> list = partitionMap.get(corrDim);
-                verbose("\nPartition " + corrDim + " = " + list.size() + " objects.");
+                logger.verbose("Partition " + corrDim + " = " + list.size() + " objects.");
             }
         }
 
@@ -327,8 +327,8 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
                     result.addCluster(new Cluster<Model>(group, true, ClusterModel.CLUSTER));
                 }
                 else {
-                    if (isVerbose()) {
-                        verbose("\nRunning " +
+                    if (logger.isVerbose()) {
+                      logger.verbose("Running " +
                             partitionAlgorithm.getDescription().getShortTitle() +
                             " on partition " +
                             partitionID);

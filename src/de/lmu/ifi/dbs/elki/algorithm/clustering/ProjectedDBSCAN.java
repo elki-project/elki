@@ -185,17 +185,14 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
 
     @Override
     protected Clustering<Model> runInTime(Database<V> database) throws IllegalStateException {
-        if (isVerbose()) {
-            verbose("");
-        }
         try {
             Progress progress = new Progress("Clustering", database.size());
             resultList = new ArrayList<List<Integer>>();
             noise = new HashSet<Integer>();
             processedIDs = new HashSet<Integer>(database.size());
             distanceFunction.setDatabase(database, isVerbose(), isTime());
-            if (isVerbose()) {
-                verbose("\nClustering:");
+            if (logger.isVerbose()) {
+              logger.verbose("Clustering:");
             }
             if (database.size() >= minpts) {
                 for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
@@ -270,7 +267,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
         if (corrDim == null || corrDim > lambda) {
             noise.add(startObjectID);
             processedIDs.add(startObjectID);
-            if (isVerbose()) {
+            if (logger.isVerbose()) {
                 progress.setProcessed(processedIDs.size());
                 progress(progress, resultList.size());
             }
@@ -283,7 +280,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
         if (seeds.size() < minpts) {
             noise.add(startObjectID);
             processedIDs.add(startObjectID);
-            if (isVerbose()) {
+            if (logger.isVerbose()) {
                 progress.setProcessed(processedIDs.size());
                 progress(progress, resultList.size());
             }
@@ -337,7 +334,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
                         if (inNoise) {
                             noise.remove(r.getID());
                         }
-                        if (isVerbose()) {
+                        if (logger.isVerbose()) {
                             progress.setProcessed(processedIDs.size());
                             int numClusters = currentCluster.size() > minpts ? resultList.size() + 1 : resultList.size();
                             progress(progress, numClusters);
@@ -362,7 +359,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
             processedIDs.add(startObjectID);
         }
 
-        if (isVerbose()) {
+        if (logger.isVerbose()) {
             progress.setProcessed(processedIDs.size());
             progress(progress, resultList.size());
         }

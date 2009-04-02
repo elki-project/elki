@@ -118,8 +118,8 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
         rangeQueryDistanceFunction.setDatabase(database, verbose, time);
 
         Progress progress = new Progress(this.getClass().getName(), database.size());
-        if (verbose) {
-            verbose("Preprocessing:");
+        if (logger.isVerbose()) {
+          logger.verbose("Preprocessing:");
         }
         Iterator<Integer> it = database.iterator();
         int processed = 1;
@@ -138,18 +138,15 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
             }
 
             progress.setProcessed(processed++);
-            if (verbose) {
-                progress(progress);
+            if (logger.isVerbose()) {
+              logger.progress(progress);
             }
-        }
-        if (verbose) {
-            verbose("");
         }
 
         long end = System.currentTimeMillis();
         if (time) {
             long elapsedTime = end - start;
-            verbose(this.getClass().getName() + " runtime: "
+            logger.verbose(this.getClass().getName() + " runtime: "
                 + elapsedTime + " milliseconds.");
         }
     }

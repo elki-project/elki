@@ -120,8 +120,8 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
             }
 
             gnuplot("Iteration_" + it + "_", database, means, eigensystems);
-            if (isVerbose()) {
-                verbose("iteration " + it);
+            if (logger.isVerbose()) {
+              logger.verbose("iteration " + it);
             }
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
                 Integer id = iter.next();
@@ -148,8 +148,8 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
                     newEigensystems = shrinkedEigensystems;
                     k--;
                     i--;
-                    if (isVerbose()) {
-                        verbose("reduced number of clusters, new: " + k);
+                    if (logger.isVerbose()) {
+                      logger.verbose("reduced number of clusters, new: " + k);
                     }
                 }
                 else {
@@ -213,8 +213,8 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
               LoggingUtil.logExpensive(LogLevel.WARNING, e.getMessage());
             }
             List<V> means = new ArrayList<V>(k);
-            if (isVerbose()) {
-                verbose("initializing random vectors");
+            if (logger.isVerbose()) {
+              logger.verbose("initializing random vectors");
             }
             for (int i = 0; i < k; i++) {
                 V randomVector = randomBase.randomInstance(random);
@@ -263,8 +263,8 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
         if (means.size() != eigensystems.length) {
             throw new IllegalArgumentException("number of means: " + means.size() + " -- number of eigensystems: " + eigensystems.length);
         }
-        if (isVerbose()) {
-            verbose("plotting " + title);
+        if (logger.isVerbose()) {
+          logger.verbose("plotting " + title);
         }
         StringBuilder script = new StringBuilder();
 

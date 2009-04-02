@@ -134,8 +134,8 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
         noise = new HashSet<Integer>();
         processedIDs = new HashSet<Integer>(database.size());
         similarityFunction.setDatabase(database, isVerbose(), isTime());
-        if (isVerbose()) {
-            verbose("Clustering:");
+        if (logger.isVerbose()) {
+          logger.verbose("Clustering:");
         }
         if (database.size() >= minpts) {
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
@@ -146,7 +146,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
                         break;
                     }
                 }
-                if (isVerbose()) {
+                if (logger.isVerbose()) {
                     progress.setProcessed(processedIDs.size());
                     progress(progress, resultList.size());
                 }
@@ -156,7 +156,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
                 Integer id = iter.next();
                 noise.add(id);
-                if (isVerbose()) {
+                if (logger.isVerbose()) {
                     progress.setProcessed(noise.size());
                     progress(progress, resultList.size());
                 }
@@ -171,9 +171,6 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
         DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(noise);
         result.addCluster(new Cluster<Model>(group, true, ClusterModel.CLUSTER));
         
-        if (isVerbose()) {
-            verbose("");
-        }
         return result;
     }
 
@@ -212,7 +209,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
         if (seeds.size() < minpts) {
             noise.add(startObjectID);
             processedIDs.add(startObjectID);
-            if (isVerbose()) {
+            if (logger.isVerbose()) {
                 progress.setProcessed(processedIDs.size());
                 progress(progress, resultList.size());
             }
@@ -254,7 +251,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
                 }
             }
 
-            if (isVerbose()) {
+            if (logger.isVerbose()) {
                 progress.setProcessed(processedIDs.size());
                 int numClusters = currentCluster.size() > minpts ? resultList.size() + 1 : resultList.size();
                 progress(progress, numClusters);

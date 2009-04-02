@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.util.PQNode;
 import de.lmu.ifi.dbs.elki.logging.LogLevel;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.statistics.PolynomialRegression;
 import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
@@ -208,7 +207,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     }
 
     if(dirCapacity < 10) {
-      LoggingUtil.logExpensive(LogLevel.WARNING, "Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
+      logger.warning("Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
     }
 
     // leafCapacity = (pageSize - overhead) / (objectID + parentDistance +
@@ -220,13 +219,13 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     }
 
     if(leafCapacity < 10) {
-      LoggingUtil.logExpensive(LogLevel.WARNING, "Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
+      logger.warning("Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
     }
 
     initialized = true;
 
     if(verbose) {
-      verbose("Directory Capacity: " + (dirCapacity - 1) + "\nLeaf Capacity:    " + (leafCapacity - 1));
+      logger.verbose("Directory Capacity: " + (dirCapacity - 1) + "\nLeaf Capacity:    " + (leafCapacity - 1));
     }
   }
 

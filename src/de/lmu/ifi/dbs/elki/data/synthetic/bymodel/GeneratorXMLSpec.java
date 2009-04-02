@@ -448,8 +448,8 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
     GeneratorStatic cluster = new GeneratorStatic(name, points);
 
     gen.addCluster(cluster);
-    if(isVerbose()) {
-      verbose("Loaded cluster " + cluster.name + " from specification.");
+    if(logger.isVerbose()) {
+      logger.verbose("Loaded cluster " + cluster.name + " from specification.");
     }
   }
 
@@ -517,23 +517,23 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
    * Runs the wrapper with the specified arguments.
    */
   public void run() throws UnableToComplyException {
-    if(isVerbose()) {
-      verbose("Loading specification ...");
+    if(logger.isVerbose()) {
+      logger.verbose("Loading specification ...");
     }
     loadXMLSpecification(specfile);
-    if(isVerbose()) {
-      verbose("Generating clusters ...");
+    if(logger.isVerbose()) {
+      logger.verbose("Generating clusters ...");
     }
     gen.setTestAgainstModel(testAgainstModel);
     gen.generate();
-    if(isVerbose()) {
-      verbose("Writing output ...");
+    if(logger.isVerbose()) {
+      logger.verbose("Writing output ...");
     }
     try {
       File outputFile = getOutput();
       if(outputFile.exists()) {
-        if(isVerbose()) {
-          verbose("The file " + outputFile + " already exists, " + "the generator result will be appended.");
+        if(logger.isVerbose()) {
+          logger.verbose("The file " + outputFile + " already exists, " + "the generator result will be appended.");
         }
       }
 
@@ -549,8 +549,8 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
     catch(IOException e) {
       throw new UnableToComplyException(e.getMessage(), e);
     }
-    if(isVerbose())
-      verbose("Done.");
+    if(logger.isVerbose())
+      logger.verbose("Done.");
   }
 
   /**

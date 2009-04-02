@@ -135,8 +135,8 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
         noise = new HashSet<Integer>();
         processedIDs = new HashSet<Integer>(database.size());
         getDistanceFunction().setDatabase(database, isVerbose(), isTime());
-        if (isVerbose()) {
-            verbose("\nClustering:");
+        if (logger.isVerbose()) {
+          logger.verbose("\nClustering:");
         }
         if (database.size() >= minpts) {
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
@@ -147,7 +147,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
                         break;
                     }
                 }
-                if (isVerbose()) {
+                if (logger.isVerbose()) {
                     progress.setProcessed(processedIDs.size());
                     progress(progress, resultList.size());
                 }
@@ -157,7 +157,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
                 Integer id = iter.next();
                 noise.add(id);
-                if (isVerbose()) {
+                if (logger.isVerbose()) {
                     progress.setProcessed(noise.size());
                     progress(progress, resultList.size());
                 }
@@ -175,9 +175,6 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
         Cluster<Model> n = new Cluster<Model>(group, true, ClusterModel.CLUSTER);        
         result.addCluster(n);
 
-        if (isVerbose()) {
-            verbose("");
-        }
         return result;
     }
 
@@ -196,7 +193,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
         if (seeds.size() < minpts) {
             noise.add(startObjectID);
             processedIDs.add(startObjectID);
-            if (isVerbose()) {
+            if (logger.isVerbose()) {
                 progress.setProcessed(processedIDs.size());
                 progress(progress, resultList.size());
             }
@@ -240,7 +237,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
                 }
             }
 
-            if (isVerbose()) {
+            if (logger.isVerbose()) {
                 progress.setProcessed(processedIDs.size());
                 int numClusters = currentCluster.size() > minpts ? resultList.size() + 1 : resultList.size();
                 progress(progress, numClusters);

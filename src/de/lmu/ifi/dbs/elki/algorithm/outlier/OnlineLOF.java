@@ -148,12 +148,12 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
         }
 
         if (isTime()) {
-            verbose("\nPhysical read Access LOF-Table: " + lofTable.getPhysicalReadAccess());
-            verbose("Physical write Access LOF-Table: " + lofTable.getPhysicalWriteAccess());
-            verbose("Logical page Access LOF-Table:  " + lofTable.getLogicalPageAccess());
-            verbose("Physical read Access NN-Table:  " + nnTable.getPhysicalReadAccess());
-            verbose("Physical write Access NN-Table:  " + nnTable.getPhysicalWriteAccess());
-            verbose("Logical page Access NN-Table:   " + nnTable.getLogicalPageAccess());
+          logger.verbose("Physical read Access LOF-Table: " + lofTable.getPhysicalReadAccess());
+          logger.verbose("Physical write Access LOF-Table: " + lofTable.getPhysicalWriteAccess());
+          logger.verbose("Logical page Access LOF-Table:  " + lofTable.getLogicalPageAccess());
+          logger.verbose("Physical read Access NN-Table:  " + nnTable.getPhysicalReadAccess());
+          logger.verbose("Physical write Access NN-Table:  " + nnTable.getPhysicalWriteAccess());
+          logger.verbose("Logical page Access NN-Table:   " + nnTable.getLogicalPageAccess());
         }
         
         AnnotationsFromDatabase<O, Double> res1 = new AnnotationsFromDatabase<O, Double>(database);
@@ -229,8 +229,8 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
     private void insert(Database<O> database, Pair<O, Associations> objectAndAssociation) throws UnableToComplyException {
         // insert o into db
         Integer o = database.insert(objectAndAssociation);
-        if (isVerbose()) {
-            verbose("Insert " + o);
+        if (logger.isVerbose()) {
+          logger.verbose("Insert " + o);
         }
 
         // get neighbors and reverse nearest neighbors of o

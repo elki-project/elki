@@ -128,22 +128,19 @@ public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends
         Progress progress = new Progress("assigning SOD", database.size());
         int processed = 0;
         similarityFunction.setDatabase(database, isVerbose(), isTime());
-        if (isVerbose()) {
-            verbose("assigning subspace outlier degree:");
+        if (logger.isVerbose()) {
+          logger.verbose("assigning subspace outlier degree:");
         }
         for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
             Integer queryObject = iter.next();
             processed++;
-            if (isVerbose()) {
+            if (logger.isVerbose()) {
                 progress.setProcessed(processed);
-                progress(progress);
+                logger.progress(progress);
             }
             List<Integer> knnList = getKNN(database, queryObject).idsToList();
             SODModel<V> model = new SODModel<V>(database, knnList, alpha, database.get(queryObject));
             database.associate(SOD_MODEL, queryObject, model);
-        }
-        if (isVerbose()) {
-            verbose("");
         }
         AnnotationsFromDatabase<V, SODModel> res1 = new AnnotationsFromDatabase<V, SODModel>(database);
         res1.addAssociation("SOD", SOD_MODEL);

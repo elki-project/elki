@@ -89,8 +89,8 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
      */
     public void run(Database<O> database, boolean verbose, boolean time) {
         distanceFunction.setDatabase(database, verbose, time);
-        if (verbose) {
-            verbose("Assigning nearest neighbor lists to database objects");
+        if (logger.isVerbose()) {
+          logger.verbose("Assigning nearest neighbor lists to database objects");
         }
         Progress preprocessing = new Progress("assigning nearest neighbor lists", database.size());
         int count = 0;
@@ -104,13 +104,10 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
             }
             SortedSet<Integer> set = new TreeSet<Integer>(neighbors);
             database.associate(getAssociationID(), id, set);
-            if (verbose) {
+            if (logger.isVerbose()) {
                 preprocessing.setProcessed(count);
-                progress(preprocessing);
+                logger.progress(preprocessing);
             }
-        }
-        if (verbose) {
-            verbose();
         }
     }
 

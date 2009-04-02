@@ -88,7 +88,7 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends
 
                 if (isVerbose()) {
                     progress.setProcessed(id);
-                    progress(progress);
+                    logger.progress(progress);
                 }
             }
         }
@@ -99,9 +99,6 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends
         HashMap<Integer, Integer> piClone = (HashMap<Integer, Integer>) pi.clone();
         HashMap<Integer, D> lambdaClone = (HashMap<Integer, D>) lambda.clone();
 
-        if (isVerbose()) {
-            verbose("");
-        }
         result = new MultiResult();
         AnnotationsFromHashMap<Integer> ann1 = new AnnotationsFromHashMap<Integer>();
         ann1.addMap("PI", piClone);

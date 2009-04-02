@@ -111,17 +111,17 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
         int[][] confusion = new int[labels.length][labels.length];
         for (int p = 0; p < this.partition.length; p++) {
             TrainingAndTestSet<O, L> partition = this.partition[p];
-            if (verbose) {
-                verbose("building classifier for partition " + (p + 1));
+            if (logger.isVerbose()) {
+              logger.verbose("building classifier for partition " + (p + 1));
             }
             long buildstart = System.currentTimeMillis();
             algorithm.buildClassifier(partition.getTraining(), labels);
             long buildend = System.currentTimeMillis();
             if (time) {
-                verbose("time for building classifier for partition " + (p + 1) + ": " + (buildend - buildstart) + " msec.");
+              logger.verbose("time for building classifier for partition " + (p + 1) + ": " + (buildend - buildstart) + " msec.");
             }
             if (verbose) {
-                verbose("evaluating classifier for partition " + (p + 1));
+              logger.verbose("evaluating classifier for partition " + (p + 1));
             }
             long evalstart = System.currentTimeMillis();
             for (Iterator<Integer> iter = partition.getTest().iterator(); iter.hasNext();) {
@@ -133,7 +133,7 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
             }
             long evalend = System.currentTimeMillis();
             if (time) {
-                verbose("time for evaluating classifier for partition " + (p + 1) + ": " + (evalend - evalstart) + " msec.");
+              logger.verbose("time for evaluating classifier for partition " + (p + 1) + ": " + (evalend - evalstart) + " msec.");
             }
         }
         if (testSetProvided) {

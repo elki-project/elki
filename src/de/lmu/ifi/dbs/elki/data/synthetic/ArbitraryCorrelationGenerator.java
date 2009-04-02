@@ -217,10 +217,8 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
 
         // determine the dependency
         Dependency dependency = determineDependency();
-        if (isVerbose()) {
-            StringBuffer msg = new StringBuffer();
-            msg.append(dependency.toString());
-            verbose(msg.toString());
+        if (logger.isVerbose()) {
+          logger.verbose(dependency.toString());
         }
 
         Matrix b = dependency.basisVectors;
@@ -238,8 +236,8 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
         }
 
         double std = standardDeviation(featureVectors, point, b);
-        if (isVerbose()) {
-            verbose("standard deviation " + std);
+        if (logger.isVerbose()) {
+          logger.verbose("standard deviation " + std);
         }
 
         output(outStream, featureVectors, dependency.dependency, std);

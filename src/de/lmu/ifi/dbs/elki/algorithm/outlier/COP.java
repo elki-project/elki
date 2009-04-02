@@ -78,13 +78,13 @@ public class COP<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, D
     @Override
     protected MultiResult runInTime(Database<V> database) throws IllegalStateException {
         getDistanceFunction().setDatabase(database, isVerbose(), isTime());
-        if (isVerbose()) {
-            verbose("\nCorrelationOutlierDetection ");
+        if (logger.isVerbose()) {
+          logger.verbose("CorrelationOutlierDetection ");
         }
 
         {// compute neighbors of each db object
-            if (isVerbose()) {
-                verbose("\nRunning dependency derivation");
+            if (logger.isVerbose()) {
+              logger.verbose("Running dependency derivation");
             }
             Progress progressLocalPCA = new Progress("COD", database.size());
             int counter = 1;
@@ -129,13 +129,10 @@ public class COP<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, D
 
                 database.associate(AssociationID.COP_SOL, id, depsol);
 
-                if (isVerbose()) {
+                if (logger.isVerbose()) {
                     progressLocalPCA.setProcessed(counter);
-                    progress(progressLocalPCA);
+                    logger.progress(progressLocalPCA);
                 }
-            }
-            if (isVerbose()) {
-                verbose("");
             }
         }
         AnnotationsFromDatabase<V,?> res1 = new AnnotationsFromDatabase<V,Object>(database);

@@ -159,8 +159,8 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
         try {
             int dimensionality = database.dimensionality();
             // 1. Generate all 1-D clusters
-            if (isVerbose()) {
-                verbose("*** Step 1: Generate all 1-D clusters ***");
+            if (logger.isVerbose()) {
+              logger.verbose("*** Step 1: Generate all 1-D clusters ***");
             }
             for (int d = 0; d < dimensionality; d++) {
                 BitSet selectedDimensions = new BitSet();

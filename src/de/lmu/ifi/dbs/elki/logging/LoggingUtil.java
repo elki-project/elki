@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.logging;
 
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 /**
@@ -43,13 +44,16 @@ public final class LoggingUtil {
    * @param message Message to log.
    */
   public final static void logExpensive(Level level, String message) {
+    LogRecord rec = new ElkiLogRecord(level, message);
     String[] caller = inferCaller();
     if(caller != null) {
+      rec.setSourceClassName(caller[0]);
+      rec.setSourceMethodName(caller[1]);
       Logger logger = Logger.getLogger(caller[0]);
-      logger.logp(level, caller[0], caller[1], message);
+      logger.log(rec);
     }
     else {
-      Logger.getAnonymousLogger().log(level, message);
+      Logger.getAnonymousLogger().log(rec);
     }
   }
   

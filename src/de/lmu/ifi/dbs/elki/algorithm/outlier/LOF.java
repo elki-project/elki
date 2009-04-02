@@ -142,13 +142,13 @@ public class LOF<O extends DatabaseObject> extends
     @Override
     protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
         getDistanceFunction().setDatabase(database, isVerbose(), isTime());
-        if (isVerbose()) {
-            verbose("\n##### Computing LOFs:");
+        if (logger.isVerbose()) {
+          logger.verbose("##### Computing LOFs:");
         }
 
         {// compute neighbors of each db object
-            if (isVerbose()) {
-                verbose("\nStep 1: computing neighborhoods:");
+            if (logger.isVerbose()) {
+              logger.verbose("Step 1: computing neighborhoods:");
             }
             Progress progressNeighborhoods = new Progress("LOF", database.size());
             int counter = 1;
@@ -156,38 +156,32 @@ public class LOF<O extends DatabaseObject> extends
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
                 Integer id = iter.next();
                 computeNeighbors(database, id);
-                if (isVerbose()) {
+                if (logger.isVerbose()) {
                     progressNeighborhoods.setProcessed(counter);
-                    progress(progressNeighborhoods);
+                    logger.progress(progressNeighborhoods);
                 }
-            }
-            if (isVerbose()) {
-                verbose("");
             }
         }
 
         {// computing reachability distances
-            if (isVerbose()) {
-                verbose("\nStep 2: computing reachability distances:");
+            if (logger.isVerbose()) {
+              logger.verbose("Step 2: computing reachability distances:");
             }
             Progress progressNeighborhoods = new Progress("LOF", database.size());
             int counter = 1;
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
                 Integer id = iter.next();
                 nnTable.computeReachabilityDistances(id);
-                if (isVerbose()) {
+                if (logger.isVerbose()) {
                     progressNeighborhoods.setProcessed(counter);
-                    progress(progressNeighborhoods);
+                    logger.progress(progressNeighborhoods);
                 }
-            }
-            if (isVerbose()) {
-                verbose("");
             }
         }
 
         {// compute LOF of each db object
-            if (isVerbose()) {
-                verbose("\n Step 3: computing LOFs:");
+            if (logger.isVerbose()) {
+              logger.verbose("Step 3: computing LOFs:");
             }
             // keeps the lofs for each object
             lofTable = new LOFTable(pageSize, cacheSize, minpts);
@@ -198,33 +192,30 @@ public class LOF<O extends DatabaseObject> extends
                 for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
                     Integer id = iter.next();
                     computeLOF(id);
-                    if (isVerbose()) {
+                    if (logger.isVerbose()) {
                         progressLOFs.setProcessed(counter + 1);
-                        progress(progressLOFs);
+                        logger.progress(progressLOFs);
                     }
-                }
-                if (isVerbose()) {
-                    verbose("");
                 }
             }
 
             if (isTime()) {
-                verbose("\nPhysical read Access LOF-Table: "
+              logger.verbose("\nPhysical read Access LOF-Table: "
                     + lofTable.getPhysicalReadAccess());
 
-                verbose("Physical write Access LOF-Table: "
+              logger.verbose("Physical write Access LOF-Table: "
                     + lofTable.getPhysicalWriteAccess());
 
-                verbose("Logical page Access LOF-Table:  "
+              logger.verbose("Logical page Access LOF-Table:  "
                     + lofTable.getLogicalPageAccess());
 
-                verbose("Physical read Access NN-Table:  "
+              logger.verbose("Physical read Access NN-Table:  "
                     + nnTable.getPhysicalReadAccess());
 
-                verbose("Physical write Access NN-Table:  "
+              logger.verbose("Physical write Access NN-Table:  "
                     + nnTable.getPhysicalWriteAccess());
 
-                verbose("Logical page Access NN-Table:   "
+              logger.verbose("Logical page Access NN-Table:   "
                     + nnTable.getLogicalPageAccess());
             }
             AnnotationsFromDatabase<O, Double> res1 = new AnnotationsFromDatabase<O, Double>(database);

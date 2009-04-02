@@ -9,8 +9,6 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 
 /**
  * MTree is a metrical index structure based on the concepts of the M-Tree.
@@ -98,7 +96,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Abst
     }
 
     if(dirCapacity < 10) {
-      LoggingUtil.logExpensive(LogLevel.WARNING, "Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
+      logger.warning("Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
     }
     // leafCapacity = (pageSize - overhead) / (objectID + parentDistance) +
     // 1
@@ -109,11 +107,11 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Abst
     }
 
     if(leafCapacity < 10) {
-      LoggingUtil.logExpensive(LogLevel.WARNING, "Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
+      logger.warning("Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
     }
 
     if(verbose) {
-      verbose("Directory Capacity: " + (dirCapacity - 1) + "\nLeaf Capacity:    " + (leafCapacity - 1));
+      logger.verbose("Directory Capacity: " + (dirCapacity - 1) + "\nLeaf Capacity:    " + (leafCapacity - 1));
     }
   }
 

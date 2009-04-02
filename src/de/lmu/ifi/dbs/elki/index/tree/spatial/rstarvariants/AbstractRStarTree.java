@@ -25,7 +25,6 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.Enlargement;
 import de.lmu.ifi.dbs.elki.logging.LogLevel;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
@@ -453,7 +452,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     }
 
     if(dirCapacity < 10) {
-      LoggingUtil.logExpensive(LogLevel.WARNING, "Page size is choosen very small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
+      logger.warning("Page size is choosen very small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
     }
 
     // minimum entries per directory node
@@ -470,7 +469,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     }
 
     if(leafCapacity < 10) {
-      LoggingUtil.logExpensive(LogLevel.WARNING, "Page size is choosen very small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
+      logger.warning("Page size is choosen very small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
     }
 
     // minimum entries per leaf node
@@ -480,7 +479,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     }
 
     if(verbose) {
-      verbose("Directory Capacity:  " + (dirCapacity - 1) + "\nDirectory minimum: " + dirMinimum + "\nLeaf Capacity:     " + (leafCapacity - 1) + "\nLeaf Minimum:      " + leafMinimum);
+      logger.verbose("Directory Capacity:  " + (dirCapacity - 1) + "\nDirectory minimum: " + dirMinimum + "\nLeaf Capacity:     " + (leafCapacity - 1) + "\nLeaf Minimum:      " + leafMinimum);
     }
   }
 

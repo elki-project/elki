@@ -129,8 +129,8 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
         numNodes = index.numNodes();
 
         // first do the knn-Join
-        if (isVerbose()) {
-            verbose("\nknnJoin...");
+        if (logger.isVerbose()) {
+          logger.verbose("knnJoin...");
         }
         knnJoin.run(database);
         AnnotationsFromHashMap knns = knnJoin.getResult();
@@ -138,8 +138,8 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
         Progress progress = new Progress("Clustering", database.size());
         int size = database.size();
 
-        if (isVerbose()) {
-            verbose("\nDeLiClu...");
+        if (logger.isVerbose()) {
+          logger.verbose("DeLiClu...");
         }
 
         clusterOrder = new ClusterOrderResult<D>();
@@ -176,9 +176,9 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
                 // reinsert expanded leafs
                 reinsertExpanded(distFunction, index, path, knns);
 
-                if (isVerbose()) {
+                if (logger.isVerbose()) {
                     progress.setProcessed(numHandled);
-                    progress(progress);
+                    logger.progress(progress);
                 }
             }
         }

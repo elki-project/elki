@@ -135,13 +135,13 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
 
                 m_current = computeM_current(medoids, m_best, m_bad);
                 loops++;
-                if (isVerbose()) {
-                    verbose("\rCurrent number of clusters: " + clusters.size() + ".                           ");
+                if (logger.isVerbose()) {
+                  logger.verbose("\rCurrent number of clusters: " + clusters.size() + ".");
                 }
             }
 
-            if (isVerbose()) {
-                verbose("\nNumber of clusters: " + clusters.size() + ".                           ");
+            if (logger.isVerbose()) {
+              logger.verbose("Number of clusters: " + clusters.size() + ".");
             }
 
             //todo refinement phase ?

@@ -221,19 +221,15 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
                   logger.log(LogLevel.FINE, msg.toString());
                 }
 
-                if (verbose) {
-                    progress(progress);
+                if (logger.isVerbose()) {
+                  logger.progress(progress);
                 }
-            }
-
-            if (verbose) {
-                verbose("");
             }
 
             long end = System.currentTimeMillis();
             if (time) {
                 long elapsedTime = end - start;
-                verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
+                logger.verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
             }
         }
         catch (ParameterException e) {

@@ -71,14 +71,14 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
         int dimensionality = database.dimensionality();
 
         // run COPAC
-        if (isVerbose()) {
-            verbose("Step 1: Preprocessing local correlation dimensionalities and partitioning data...");
+        if (logger.isVerbose()) {
+          logger.verbose("Step 1: Preprocessing local correlation dimensionalities and partitioning data...");
         }
         copacAlgorithm.run(database);
 
         // extract correlation clusters
-        if (isVerbose()) {
-            verbose("\nStep 2: Extract correlation clusters...");
+        if (logger.isVerbose()) {
+          logger.verbose("Step 2: Extract correlation clusters...");
         }
         SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap = extractCorrelationClusters(database, dimensionality);
         if (logger.isLoggable(LogLevel.FINE)) {
@@ -94,17 +94,17 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
             }
             logger.log(LogLevel.FINE, msg.toString());
         }
-        if (isVerbose()) {
+        if (logger.isVerbose()) {
             int clusters = 0;
             for (List<Cluster<CorrelationModel<V>>> correlationClusters : clusterMap.values()) {
                 clusters += correlationClusters.size();
             }
-            verbose(clusters + " clusters extracted.");
+            logger.verbose(clusters + " clusters extracted.");
         }
 
         // build hierarchy
-        if (isVerbose()) {
-            verbose("\nStep 3: Build hierarchy...");
+        if (logger.isVerbose()) {
+          logger.verbose("\nStep 3: Build hierarchy...");
         }
         buildHierarchy(clusterMap);
         if (logger.isLoggable(LogLevel.FINE)) {

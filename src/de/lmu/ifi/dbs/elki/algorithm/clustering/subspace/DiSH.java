@@ -127,13 +127,13 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
      */
     @Override
     protected Clustering<AxesModel> runInTime(Database<V> database) throws IllegalStateException {
-        if (isVerbose()) {
-            verbose("\nRun OPTICS algorithm.");
+        if (logger.isVerbose()) {
+          logger.verbose("Run OPTICS algorithm.");
         }
         optics.run(database);
 
-        if (isVerbose()) {
-            verbose("\n\nCompute Clusters.");
+        if (logger.isVerbose()) {
+          logger.verbose("Compute Clusters.");
         }
         computeClusters(database, optics.getResult());
         return result;
@@ -355,9 +355,9 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
             cluster.second.ids.add(entry.getID());
             entryToClusterMap.put(entry.getID(), cluster);
 
-            if (isVerbose()) {
+            if (logger.isVerbose()) {
                 progress.setProcessed(++processed);
-                progress(progress);
+                logger.progress(progress);
             }
         }
 

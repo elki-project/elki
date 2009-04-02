@@ -281,8 +281,8 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
         try {
             File outputFile = getOutput();
             if (outputFile.exists()) {
-                if (isVerbose()) {
-                    verbose("The file " + outputFile + " already exists, " + "the generator result will be appended.");
+                if (logger.isVerbose()) {
+                  logger.verbose("The file " + outputFile + " already exists, " + "the generator result will be appended.");
                 }
             }
 
@@ -316,9 +316,9 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
 
         // generate the feature vectors
         Progress progress_1 = new Progress("Generate the feature vectors", number);
-        if (isVerbose()) {
-            verbose(LINE_SEPARATOR + "corrDim " + corrDim + LINE_SEPARATOR);
-            verbose("Generate the feature vectors" + LINE_SEPARATOR);
+        if (logger.isVerbose()) {
+          logger.verbose("corrDim " + corrDim);
+          logger.verbose("Generate the feature vectors");
         }
         double[][] featureVectors = new double[number][dataDim];
         for (int n = 0; n < number; n++) {
@@ -329,17 +329,17 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
                     featureVectors[n][d] = RANDOM.nextDouble() * (max[d] - min[d]) + min[d];
             }
 
-            if (isVerbose()) {
+            if (logger.isVerbose()) {
                 progress_1.setProcessed(n);
-                verbose("\r" + progress_1.toString());
+                logger.verbose("\r" + progress_1.toString());
             }
         }
 
         // jitter the feature vectors
         if (jitter != 0) {
             Progress progress_2 = new Progress("Jitter the feature vectors", number);
-            if (isVerbose()) {
-                verbose(LINE_SEPARATOR + "Jitter the feature vectors" + LINE_SEPARATOR);
+            if (logger.isVerbose()) {
+              logger.verbose("Jitter the feature vectors");
             }
             for (int n = 0; n < number; n++) {
                 for (int d = 0; d < dataDim; d++) {
@@ -350,26 +350,26 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
                     else
                         featureVectors[n][d] -= jitter;
                 }
-                if (isVerbose()) {
+                if (logger.isVerbose()) {
                     progress_2.setProcessed(n);
-                    verbose("\r" + progress_2.toString());
+                    logger.verbose("\r" + progress_2.toString());
                 }
             }
         }
 
         // print the feature vectors
         Progress progress_3 = new Progress("Print the feature vectors", number);
-        if (isVerbose()) {
-            verbose(LINE_SEPARATOR + "Print the feature vectors" + LINE_SEPARATOR);
+        if (logger.isVerbose()) {
+          logger.verbose("Print the feature vectors");
         }
         for (int n = 0; n < number; n++) {
             for (int d = 0; d < dataDim; d++) {
                 outStream.write(featureVectors[n][d] + " ");
             }
             outStream.write(label + LINE_SEPARATOR);
-            if (isVerbose()) {
+            if (logger.isVerbose()) {
                 progress_3.setProcessed(n);
-                verbose("\r" + progress_3.toString());
+                logger.verbose("\r" + progress_3.toString());
             }
         }
     }

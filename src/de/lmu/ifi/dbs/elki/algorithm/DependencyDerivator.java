@@ -142,8 +142,8 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
    */
   @Override
   public CorrelationAnalysisSolution<V> runInTime(Database<V> db) throws IllegalStateException {
-    if(isVerbose()) {
-      verbose("retrieving database objects...");
+    if(logger.isVerbose()) {
+      logger.verbose("retrieving database objects...");
     }
     Set<Integer> dbIDs = new HashSet<Integer>();
     for(Iterator<Integer> idIter = db.iterator(); idIter.hasNext();) {
@@ -194,8 +194,8 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
    */
   public CorrelationAnalysisSolution<V> generateModel(Database<V> db, Collection<Integer> ids, V centroidDV) {
     CorrelationAnalysisSolution<V> sol;
-    if(isVerbose()) {
-      verbose("PCA...");
+    if(logger.isVerbose()) {
+      logger.verbose("PCA...");
     }
 
     PCAFilteredResult pcares = pca.processIds(ids, db);
@@ -242,8 +242,8 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
       gaussJordan.setMatrix(0, transposedWeakEigenvectors.getRowDimensionality() - 1, 0, transposedWeakEigenvectors.getColumnDimensionality() - 1, transposedWeakEigenvectors);
       gaussJordan.setMatrix(0, gaussJordan.getRowDimensionality() - 1, transposedWeakEigenvectors.getColumnDimensionality(), gaussJordan.getColumnDimensionality() - 1, B);
 
-      if(isVerbose()) {
-        verbose("Gauss-Jordan-Elimination of " + gaussJordan.toString(NF));
+      if(logger.isVerbose()) {
+        logger.verbose("Gauss-Jordan-Elimination of " + gaussJordan.toString(NF));
       }
 
       double[][] a = new double[transposedWeakEigenvectors.getRowDimensionality()][transposedWeakEigenvectors.getColumnDimensionality()];
@@ -256,7 +256,7 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
 
       sol = new CorrelationAnalysisSolution<V>(lq, db, strongEigenvectors, pcares.getWeakEigenvectors(), pcares.similarityMatrix(), centroid, NF);
 
-      if(isVerbose()) {
+      if(logger.isVerbose()) {
         StringBuilder log = new StringBuilder();
         log.append("Solution:");
         log.append('\n');
@@ -264,7 +264,7 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
         log.append('\n');
         log.append(lq.equationsToString(NF.getMaximumFractionDigits()));
         log.append('\n');
-        verbose(log.toString());
+        logger.verbose(log.toString());
       }
     }
     return sol;

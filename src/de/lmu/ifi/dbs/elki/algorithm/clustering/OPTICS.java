@@ -139,8 +139,8 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
                 expandClusterOrder(database, id, progress);
             }
         }
-        if (isVerbose()) {
-            verbose("");
+        if (logger.isVerbose()) {
+          logger.verbose("");
         }
         return clusterOrder;
     }
@@ -160,7 +160,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
 
         if (isVerbose()) {
             progress.setProcessed(processedIDs.size());
-            progress(progress);
+            logger.progress(progress);
         }
 
         List<DistanceResultPair<D>> neighbors = database.rangeQuery(objectID, epsilon, getDistanceFunction());
@@ -198,7 +198,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
                 }
                 if (isVerbose()) {
                     progress.setProcessed(processedIDs.size());
-                    progress(progress);
+                    logger.progress(progress);
                 }
             }
         }

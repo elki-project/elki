@@ -124,8 +124,8 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V,
         }
 //        int n = database.size();
         // initial models
-        if (isVerbose()) {
-            verbose("initializing " + k + " models");
+        if (logger.isVerbose()) {
+          logger.verbose("initializing " + k + " models");
         }
 
         List<V> means = initialMeans(database);
@@ -150,16 +150,16 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V,
         assignProbabilities(database, normDistributionFactor, standardDeviation, clusterWeight, means, eigensystems, selectionStrong);
         double emNew = expectationOfMixture(database);
         // iteration unless no change
-        if (isVerbose()) {
-            verbose("iterating subspace EM");
+        if (logger.isVerbose()) {
+          logger.verbose("iterating subspace EM");
         }
         double em;
         int it = 0;
         do {
             it++;
             gnuplot("Iteration_" + it + "_", database, means, eigensystems);
-            if (isVerbose()) {
-                verbose("iteration " + it + " - expectation value: " + emNew);
+            if (logger.isVerbose()) {
+              logger.verbose("iteration " + it + " - expectation value: " + emNew);
             }
             em = emNew;
 
@@ -267,8 +267,8 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V,
         while (Math.abs(em - emNew) > delta);
 
         // provide a hard clustering
-        if (isVerbose()) {
-            verbose("\nassigning clusters");
+        if (logger.isVerbose()) {
+          logger.verbose("assigning clusters");
         }
         List<List<Integer>> hardClusters = hardClustering(database);
         result = new Clustering<CorrelationAnalysisSolution<V>>();
@@ -401,8 +401,8 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V,
               LoggingUtil.logExpensive(LogLevel.WARNING, e.getMessage());
             }
             List<V> means = new ArrayList<V>(k);
-            if (isVerbose()) {
-                verbose("initializing random vectors");
+            if (logger.isVerbose()) {
+              logger.verbose("initializing random vectors");
             }
             for (int i = 0; i < k; i++) {
                 V randomVector = randomBase.randomInstance(random);
@@ -451,8 +451,8 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V,
         if (means.size() != eigensystems.length) {
             throw new IllegalArgumentException("number of means: " + means.size() + " -- number of eigensystems: " + eigensystems.length);
         }
-        if (isVerbose()) {
-            verbose("plotting " + title);
+        if (logger.isVerbose()) {
+          logger.verbose("plotting " + title);
         }
         StringBuilder script = new StringBuilder();
 

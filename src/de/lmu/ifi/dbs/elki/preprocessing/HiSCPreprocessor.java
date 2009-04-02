@@ -136,8 +136,8 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
       database.associate(AssociationID.PREFERENCE_VECTOR, id, preferenceVector);
       progress.setProcessed(processed++);
 
-      if (verbose) {
-        progress(progress);
+      if (logger.isVerbose()) {
+        logger.progress(progress);
       }
     }
 
@@ -145,14 +145,10 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
       logger.log(LogLevel.FINE, msg.toString());
     }
 
-    if (verbose) {
-      verbose("");
-    }
-
     long end = System.currentTimeMillis();
     if (time) {
       long elapsedTime = end - start;
-      verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
+      logger.verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
     }
 
   }

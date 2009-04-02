@@ -1,8 +1,11 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -15,10 +18,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Class that runs all specified algorithms with default parametrization.
@@ -190,14 +189,14 @@ public class AlgorithmTest extends AbstractParameterizable {
       // continue;
       // }
 
-      verbose("\n*******************************************************************" + "\nRunning " + algorithm.getClass().getName());
+      logger.verbose("*******************************************************************" + "\nRunning " + algorithm.getClass().getName());
 
       FileBasedDatabaseConnectionWrapper<?> wrapper;
       try {
         wrapper = ClassGenericsUtil.instantiate(FileBasedDatabaseConnectionWrapper.class, algorithm.getClass().getSimpleName() + "Wrapper");
       }
       catch(UnableToComplyException e) {
-        LoggingUtil.logExpensive(LogLevel.WARNING, "No wrapper class for " + algorithm.getClass() + " available (" + e.getMessage() + ")", e);
+        logger.warning("No wrapper class for " + algorithm.getClass() + " available (" + e.getMessage() + ")", e);
         continue;
       }
 
@@ -206,10 +205,10 @@ public class AlgorithmTest extends AbstractParameterizable {
         wrapper.run();
       }
       catch(UnableToComplyException e) {
-        LoggingUtil.logExpensive(LogLevel.WARNING, algorithm.getClass() + " is unable to comply: " + e.getMessage(), e);
+        logger.warning(algorithm.getClass() + " is unable to comply: " + e.getMessage(), e);
       }
       catch(ParameterException e) {
-        LoggingUtil.logExpensive(LogLevel.WARNING, algorithm.getClass() + " has a parameter exception: " + e.getMessage(), e);
+        logger.warning(algorithm.getClass() + " has a parameter exception: " + e.getMessage(), e);
       }
 
     }
