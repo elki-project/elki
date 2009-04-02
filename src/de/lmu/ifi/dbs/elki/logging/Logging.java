@@ -6,7 +6,6 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.utilities.Progress;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 
 public class Logging {
   /**
@@ -293,6 +292,6 @@ public class Logging {
    * @param pgr Progress to log.
    */
   public void progress(Progress pgr) {
-    logger.log(new ProgressLogRecord(Util.status(pgr), pgr.getTask(), pgr.status()));
+    logger.log(new ProgressLogRecord("\r" + pgr.toString(), pgr.getTask(), pgr.status()));
   }
 }

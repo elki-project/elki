@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.logging;
 import java.util.logging.LogRecord;
 
 import de.lmu.ifi.dbs.elki.utilities.Progress;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 
 /**
  * Abstract superclass for classes being loggable, i.e. classes intending to log
@@ -98,7 +97,13 @@ public abstract class AbstractLoggable {
    * @see Loggable#progress(de.lmu.ifi.dbs.elki.utilities.Progress)
    */
   public void progress(Progress pgr, int numClusters) {
-    logger.progress(new ProgressLogRecord(Util.status(pgr, numClusters), pgr.getTask(), pgr.status()));
+    StringBuffer status = new StringBuffer();
+    status.append("\r");
+    status.append(pgr.toString());
+    status.append(" Number of clusters: ");
+    status.append(numClusters);
+    status.append(".");
+    logger.progress(new ProgressLogRecord(status.toString(), pgr.getTask(), pgr.status()));
   }
 
   /**

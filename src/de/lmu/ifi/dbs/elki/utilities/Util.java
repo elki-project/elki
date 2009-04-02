@@ -190,37 +190,6 @@ public final class Util {
   }
 
   /**
-   * Provides a status report line with leading carriage return. Suitable for
-   * density based algorithms, since the number of found clusters is counted.
-   * 
-   * @param progress the progress status
-   * @param clusters current number of clusters
-   * @return a status report line with leading carriage return
-   */
-  public static String status(Progress progress, int clusters) {
-    StringBuffer status = new StringBuffer();
-    status.append("\r");
-    status.append(progress.toString());
-    status.append(" Number of clusters: ");
-    status.append(clusters);
-    status.append(".");
-    return status.toString();
-  }
-
-  /**
-   * Provides a status report line with leading carriage return.
-   * 
-   * @param progress the progress status
-   * @return a status report line with leading carriage return
-   */
-  public static String status(Progress progress) {
-    StringBuffer status = new StringBuffer();
-    status.append("\r");
-    status.append(progress.toString());
-    return status.toString();
-  }
-
-  /**
    * Prints the given list to the specified PrintStream. The list entries are
    * separated by the specified separator. The last entry is not followed by a
    * separator. Thus, if a newline is used as separator, it might make sense to
