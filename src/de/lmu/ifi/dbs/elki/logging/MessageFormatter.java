@@ -4,7 +4,7 @@ import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
 /**
- * A formatter to simply retrieve the message of an LogRecord.
+ * A formatter to simply retrieve the message of an LogRecord without printing origin information.
  *
  * @author Arthur Zimek
  */

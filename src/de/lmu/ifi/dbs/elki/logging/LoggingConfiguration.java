@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 /**
  * Facility for configuration of logging.
  * 
- * @author Arthur Zimek
+ * @author Erich Schubert
  */
 public final class LoggingConfiguration {
   /**
