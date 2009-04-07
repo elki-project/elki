@@ -1,6 +1,8 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
+import java.util.ArrayList;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
@@ -8,9 +10,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The PercentageEigenPairFilter sorts the eigenpairs in descending order of
@@ -59,7 +58,7 @@ public class PercentageEigenPairFilter extends AbstractParameterizable implement
 
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
     StringBuffer msg = new StringBuffer();
-    if(logger.isLoggable(LogLevel.FINE)) {
+    if(logger.isDebugging()) {
       msg.append("alpha = ").append(alpha);
       msg.append("\nsortedEigenPairs = ").append(eigenPairs);
     }
@@ -74,7 +73,7 @@ public class PercentageEigenPairFilter extends AbstractParameterizable implement
       EigenPair eigenPair = eigenPairs.getEigenPair(i);
       totalSum += eigenPair.getEigenvalue();
     }
-    if(logger.isLoggable(LogLevel.FINE)) {
+    if(logger.isDebugging()) {
       msg.append("\ntotalSum = ").append(totalSum);
     }
 
@@ -97,10 +96,10 @@ public class PercentageEigenPairFilter extends AbstractParameterizable implement
         strongEigenPairs.add(eigenPair);
       }
     }
-    if(logger.isLoggable(LogLevel.FINE)) {
+    if(logger.isDebugging()) {
       msg.append("\nstrong EigenPairs = ").append(strongEigenPairs);
       msg.append("\nweak EigenPairs = ").append(weakEigenPairs);
-      logger.log(LogLevel.FINE, msg.toString());
+      logger.debugFine(msg.toString());
     }
 
     return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);

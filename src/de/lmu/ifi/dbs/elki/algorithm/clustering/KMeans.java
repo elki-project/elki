@@ -13,12 +13,10 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
-import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
+import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.utilities.Description;
@@ -109,7 +107,7 @@ public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends D
                 normalization.normalize(list);
             }
             catch (NonNumericFeaturesException e) {
-              LoggingUtil.logExpensive(LogLevel.WARNING, e.getMessage());
+              logger.warning(e.getMessage());
             }
             List<V> means = new ArrayList<V>(k);
             List<V> oldMeans;
@@ -123,8 +121,8 @@ public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends D
                     means.add(normalization.restore(randomVector));
                 }
                 catch (NonNumericFeaturesException e) {
-                  logger.log(LogLevel.WARNING, e.getMessage());
-                    means.add(randomVector);
+                  logger.warning(e.getMessage());
+                  means.add(randomVector);
                 }
             }
             clusters = sort(means, database);

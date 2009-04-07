@@ -23,7 +23,6 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionSelectingDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.result.AprioriResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
@@ -197,7 +196,7 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
                 StringBuffer msg = new StringBuffer();
                 final Integer id = it.next();
 
-                if (logger.isLoggable(LogLevel.FINE)) {
+                if (logger.isDebugging()) {
                     msg.append("id = ").append(id);
                     msg.append(" ").append(database.get(id));
                     msg.append(" ").append(database.getAssociation(AssociationID.LABEL, id));
@@ -217,8 +216,8 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
                 database.associate(AssociationID.PREFERENCE_VECTOR, id, preferenceVector);
                 progress.setProcessed(processed++);
 
-                if (logger.isLoggable(LogLevel.FINE)) {
-                  logger.log(LogLevel.FINE, msg.toString());
+                if (logger.isDebugging()) {
+                  logger.debugFine(msg.toString());
                 }
 
                 if (logger.isVerbose()) {
@@ -361,7 +360,7 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
         AprioriResult aprioriResult = apriori.getResult();
         List<BitSet> frequentItemsets = aprioriResult.getSolution();
         Map<BitSet, Integer> supports = aprioriResult.getSupports();
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             msg.append("\nFrequent itemsets: " + frequentItemsets);
             msg.append("\nAll supports: " + supports);
         }
@@ -377,11 +376,11 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
             }
         }
 
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             msg.append("\npreference ");
             msg.append(FormatUtil.format(dimensionality, preferenceVector));
             msg.append("\n");
-            logger.log(LogLevel.FINE, msg.toString());
+            logger.debugFine(msg.toString());
         }
 
         return preferenceVector;
@@ -406,7 +405,7 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
                 candidates.put(i, s_i);
             }
         }
-        if (logger.isLoggable(LogLevel.FINER)) {
+        if (logger.isDebuggingFiner()) {
             msg.append("\ncandidates " + candidates.keySet());
         }
 
@@ -430,11 +429,11 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
             }
         }
 
-        if (logger.isLoggable(LogLevel.FINER)) {
+        if (logger.isDebuggingFiner()) {
             msg.append("\npreference ");
             msg.append(FormatUtil.format(dimensionality, preferenceVector));
             msg.append("\n");
-            logger.log(LogLevel.FINER, msg.toString());
+            logger.debugFiner(msg.toString());
         }
 
         return preferenceVector;

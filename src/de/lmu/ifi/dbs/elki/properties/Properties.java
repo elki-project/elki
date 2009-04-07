@@ -3,13 +3,11 @@ package de.lmu.ifi.dbs.elki.properties;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
@@ -18,7 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @author Arthur Zimek
  */
 public final class Properties {
-    public static Logger logger = Logger.getLogger(Properties.class.getName());
+    public static Logging logger = Logging.getLogger(Properties.class);
 
     /**
      * The pattern to split for separate entries in a property string, which is
@@ -132,13 +130,13 @@ public final class Properties {
                         logger.warning("Invalid classname \"" + name + "\" for property \"" + propertyName.getName() + "\" of class \"" + propertyName.getType().getName() + "\" in property-file - " + e.getMessage() + " - " + e.getClass().getName() + "\n");
                     }
                     catch (NullPointerException e) {
-                        if (logger.isLoggable(LogLevel.FINEST)) {
+                        if (logger.isDebuggingFinest()) {
 
-                          logger.finest(e.getClass().getName() + ": " + e.getMessage());
+                          logger.debugFinest(e.getClass().getName() + ": " + e.getMessage());
                         }
                     }
                     catch (Exception e) {
-                      LoggingUtil.exception("Exception building class restriction string.", e);
+                      logger.exception("Exception building class restriction string.", e);
                     }
                 }
             }
@@ -224,13 +222,13 @@ public final class Properties {
                       logger.warning("Invalid classname \"" + className + "\" for property \"" + propertyName.getName() + "\" of class \"" + propertyName.getType().getName() + "\" in property-file - " + e.getMessage() + " - " + e.getClass().getName() + "\n");
                     }
                     catch (NullPointerException e) {
-                        if (logger.isLoggable(LogLevel.FINEST)) {
+                        if (logger.isDebuggingFinest()) {
 
-                            logger.finest(e.getClass().getName() + ": " + e.getMessage());
+                            logger.debugFinest(e.getClass().getName() + ": " + e.getMessage());
                         }
                     }
                     catch (Exception e) {
-                      LoggingUtil.exception(e.getMessage(), e);
+                      logger.exception(e.getMessage(), e);
                     }
                 }
             }

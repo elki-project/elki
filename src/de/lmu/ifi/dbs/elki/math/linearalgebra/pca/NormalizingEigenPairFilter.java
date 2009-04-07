@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
@@ -37,11 +36,11 @@ public class NormalizingEigenPairFilter extends AbstractParameterizable
 			normalizeEigenPair(eigenPair);
 			strongEigenPairs.add(eigenPair);
 		}
-		if (logger.isLoggable(LogLevel.FINE)) {
+		if (logger.isDebugging()) {
 	    final StringBuffer msg = new StringBuffer();
 			msg.append("strong EigenPairs = ").append(strongEigenPairs);
 			msg.append("\nweak EigenPairs = ").append(weakEigenPairs);
-			logger.log(LogLevel.FINE, msg.toString());
+			logger.debugFine(msg.toString());
 		}
 
 		return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);

@@ -22,7 +22,14 @@ public class MessageFormatter extends Formatter {
      */
     @Override
     public String format(LogRecord record) {
-        return record.getMessage()+"\n";
+      String msg = record.getMessage();
+      if (msg.charAt(0) == OutputStreamLogger.CARRIAGE_RETURN) {
+        return msg;
+      }
+      if (msg.endsWith(OutputStreamLogger.NEWLINE)) {
+        return msg;
+      }
+      return msg+"\n";
     }
 
 }

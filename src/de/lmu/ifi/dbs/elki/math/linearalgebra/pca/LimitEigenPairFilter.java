@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
@@ -100,7 +99,7 @@ public class LimitEigenPairFilter extends AbstractParameterizable implements Eig
 
 	public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
 		StringBuffer msg = new StringBuffer();
-		if (logger.isLoggable(LogLevel.FINE)) {
+		if (logger.isDebugging()) {
 			msg.append("delta = ").append(delta);
 		}
 
@@ -119,7 +118,7 @@ public class LimitEigenPairFilter extends AbstractParameterizable implements Eig
 			}
 			limit = max * delta;
 		}
-		if (logger.isLoggable(LogLevel.FINE)) {
+		if (logger.isDebugging()) {
 			msg.append("\nlimit = ").append(limit);
 		}
 
@@ -137,10 +136,10 @@ public class LimitEigenPairFilter extends AbstractParameterizable implements Eig
 				weakEigenPairs.add(eigenPair);
 			}
 		}
-		if (logger.isLoggable(LogLevel.FINE)) {
+		if (logger.isDebugging()) {
 			msg.append("\nstrong EigenPairs = ").append(strongEigenPairs);
 			msg.append("\nweak EigenPairs = ").append(weakEigenPairs);
-			logger.log(LogLevel.FINE, msg.toString());
+			logger.debugFine(msg.toString());
 		}
 
 		return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);

@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.index.tree;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.index.Index;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.persistent.LRUCache;
 import de.lmu.ifi.dbs.elki.persistent.MemoryPageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
@@ -258,11 +257,11 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
         this.dirMinimum = header.getDirMinimum();
         this.leafMinimum = header.getLeafMinimum();
 
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             StringBuffer msg = new StringBuffer();
             msg.append(getClass());
             msg.append("\n file = ").append(file.getClass());
-            logger.log(LogLevel.FINE, msg.toString());
+            logger.debugFine(msg.toString());
         }
 
         this.initialized = true;
@@ -296,7 +295,7 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
         // create empty root
         createEmptyRoot(object);
 
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             StringBuffer msg = new StringBuffer();
             msg.append(getClass()).append("\n");
             msg.append(" file    = ").append(file.getClass()).append("\n");
@@ -305,7 +304,7 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
             msg.append(" maximum number of leaf entries = ").append((leafCapacity - 1)).append("\n");
             msg.append(" minimum number of leaf entries = ").append(leafMinimum).append("\n");
             msg.append(" root    = ").append(getRoot());
-            logger.log(LogLevel.FINE, msg.toString());
+            logger.debugFine(msg.toString());
         }
 
         initialized = true;

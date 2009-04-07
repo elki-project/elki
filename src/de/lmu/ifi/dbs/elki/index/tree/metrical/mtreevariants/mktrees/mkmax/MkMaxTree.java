@@ -13,8 +13,6 @@ import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.QueryStatistic;
 
@@ -203,8 +201,8 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
    * @param knns_q the knns of q
    */
   private void preInsert(MkMaxEntry<D> q, MkMaxEntry<D> nodeEntry, KNNList<D> knns_q) {
-    if(logger.isLoggable(LogLevel.FINE)) {
-      logger.log(LogLevel.FINE, "preInsert " + q + " - " + nodeEntry + "\n");
+    if(logger.isDebugging()) {
+      logger.debugFine("preInsert " + q + " - " + nodeEntry + "\n");
     }
 
     D knnDist_q = knns_q.getKNNDistance();
@@ -260,8 +258,8 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
         knnDist_node = DistanceUtil.max(knnDist_node, dirEntry.getKnnDistance());
       }
     }
-    if(logger.isLoggable(LogLevel.FINE)) {
-      logger.log(LogLevel.FINE, nodeEntry + "set knn dist " + knnDist_node);
+    if(logger.isDebugging()) {
+      logger.debugFine(nodeEntry + "set knn dist " + knnDist_node);
     }
     nodeEntry.setKnnDistance(knnDist_node);
   }
@@ -286,7 +284,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
     }
 
     if(dirCapacity < 10) {
-      LoggingUtil.logExpensive(LogLevel.WARNING, "Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
+      logger.warning("Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
     }
 
     // leafCapacity = (pageSize - overhead) / (objectID + parentDistance +
@@ -298,7 +296,7 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
     }
 
     if(leafCapacity < 10) {
-      LoggingUtil.logExpensive(LogLevel.WARNING, "Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
+      logger.warning("Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
     }
   }
 

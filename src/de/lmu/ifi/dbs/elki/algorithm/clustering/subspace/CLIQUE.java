@@ -25,7 +25,6 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
@@ -262,8 +261,8 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clu
 
         for (CLIQUESubspace<V> subspace : denseSubspaces) {
             Map<CLIQUESubspace<V>, Set<Integer>> clusters = subspace.determineClusters(database);
-            if (logger.isLoggable(LogLevel.FINE)) {
-              logger.log(LogLevel.FINE, "Subspace " + subspace + " clusters " + clusters.size());
+            if (logger.isDebugging()) {
+              logger.debugFine("Subspace " + subspace + " clusters " + clusters.size());
             }
             result.putAll(clusters);
         }
@@ -334,12 +333,12 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clu
             unit_lengths[d] = (maxima[d] - minima[d]) / xsi;
         }
 
-        if (logger.isLoggable(LogLevel.FINER)) {
+        if (logger.isDebuggingFiner()) {
             StringBuffer msg = new StringBuffer();
             msg.append("   minima: ").append(FormatUtil.format(minima, ", ", 2));
             msg.append("\n   maxima: ").append(FormatUtil.format(maxima, ", ", 2));
             msg.append("\n   unit lengths: ").append(FormatUtil.format(unit_lengths, ", ", 2));
-            logger.log(LogLevel.FINER, msg.toString());
+            logger.debugFiner(msg.toString());
         }
 
         // determine the boundaries of the units
@@ -352,10 +351,10 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clu
                     unit_bounds[x][d] = maxima[d];
             }
         }
-        if (logger.isLoggable(LogLevel.FINER)) {
+        if (logger.isDebuggingFiner()) {
             StringBuffer msg = new StringBuffer();
             msg.append("   unit bounds ").append(new Matrix(unit_bounds).toString("   "));
-            logger.log(LogLevel.FINER, msg.toString());
+            logger.debugFiner(msg.toString());
         }
 
         // build the 1 dimensional units
@@ -366,10 +365,10 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clu
             }
         }
 
-        if (logger.isLoggable(LogLevel.FINER)) {
+        if (logger.isDebuggingFiner()) {
             StringBuffer msg = new StringBuffer();
             msg.append("   total number of 1-dim units: ").append(units.size());
-            logger.log(LogLevel.FINER, msg.toString());
+            logger.debugFiner(msg.toString());
         }
 
         return units;
@@ -428,11 +427,11 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clu
             }
         }
 
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             StringBuffer msg = new StringBuffer();
             msg.append("   number of 1-dim dense units: ").append(denseUnits.size());
             msg.append("\n   number of 1-dim dense subspace candidates: ").append(denseSubspaces.size());
-            logger.log(LogLevel.FINE, msg.toString());
+            logger.debugFine(msg.toString());
         }
 
         return new TreeSet<CLIQUESubspace<V>>(denseSubspaces.values());

@@ -2,9 +2,8 @@ package de.lmu.ifi.dbs.elki.utilities.heap;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.logging.Logger;
 
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.DefaultPageHeader;
 import de.lmu.ifi.dbs.elki.persistent.LRUCache;
 import de.lmu.ifi.dbs.elki.persistent.MemoryPageFile;
@@ -32,7 +31,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
      */
     private static final long serialVersionUID = -8099124402895872945L;
     
-    private static Logger logger = Logger.getLogger(PersistentHeap.class.getName());
+    private static Logging logger = Logging.getLogger(PersistentHeap.class);
 
     /**
      * The file storing the elements of this heap.
@@ -149,7 +148,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
                 new LRUCache<Deap<K, V>>(), fileName);
         }
 
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             msg.append("\n pageSize = ");
             msg.append(pageSize);
             msg.append(" (= 1 deap)");
@@ -166,7 +165,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
 
             msg.append("\n maxDeapSize = ");
             msg.append(maxDeapSize);
-            logger.fine(msg.toString());
+            logger.debugFine(msg.toString());
         }
     }
 
@@ -187,7 +186,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
 
         // cachePath is empty at beginning
         if (deap == null) {
-            if (logger.isLoggable(LogLevel.FINE))
+            if (logger.isDebugging())
                 msg.append("Cache is empty, create new deap!");
             deap = createNewLastDeap();
         }
@@ -199,7 +198,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
                 throw new IllegalArgumentException("Cache is full!");
 
             // else: create new deap and reorganize cache
-            if (logger.isLoggable(LogLevel.FINE))
+            if (logger.isDebugging())
                 msg.append("Last deap is full, create new deap! (").append(size()).
                     append(") I/O = ").append(getPhysicalReadAccess() + getPhysicalWriteAccess());
             deap = createNewLastDeap();
@@ -213,12 +212,12 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
 
         numElements++;
 
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             msg.append("\n add ");
             msg.append(node);
             msg.append("\n");
             msg.append(this);
-            logger.fine(msg.toString());
+            logger.debugFine(msg.toString());
         }
     }
 
@@ -241,19 +240,19 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
 
         // if first deap is empty, adjust recursively with sons
         if (deap.isEmpty()) {
-            if (logger.isLoggable(LogLevel.FINE))
+            if (logger.isDebugging())
                 msg.append("First deap is empty --> adjust it!");
             adjustFirstDeap();
         }
 
         numElements--;
 
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             msg.append("\n add ");
             msg.append(min);
             msg.append("\n");
             msg.append(this);
-            logger.fine(msg.toString());
+            logger.debugFine(msg.toString());
         }
 
         return min;
@@ -429,8 +428,8 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
             return null;
         }
 
-        if (logger.isLoggable(LogLevel.FINE))
-            logger.fine("height = " + height);
+        if (logger.isDebugging())
+            logger.debugFine("height = " + height);
 
         return cachePath[height - 1];
     }
@@ -475,13 +474,13 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
         else {
             height++;
             file.setCacheSize((maxCacheSize - height) * pageSize);
-            if (logger.isLoggable(LogLevel.FINE)) {
-                logger.fine("NEW CACHESIZE " + (maxCacheSize - height)
+            if (logger.isDebugging()) {
+                logger.debugFine("NEW CACHESIZE " + (maxCacheSize - height)
                     + " I/O = " + (getPhysicalReadAccess() + getPhysicalWriteAccess()));
             }
         }
-        if (logger.isLoggable(LogLevel.FINE))
-            logger.fine("***** new cache: " + this);
+        if (logger.isDebugging())
+            logger.debugFine("***** new cache: " + this);
 
         // increase deap counter
         numDeaps++;
@@ -600,7 +599,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
     private void adjustFirstDeap() {
         StringBuffer msg = new StringBuffer();
 
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             msg.append("\n numDeaps = ");
             msg.append(numDeaps);
             msg.append("\n PQ:");
@@ -628,7 +627,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
         // if last deap is not full -> fill it up with entries from deap before
         if (!last.isFull()) {
             fill(last);
-            if (logger.isLoggable(LogLevel.FINE)) {
+            if (logger.isDebugging()) {
                 msg.append("\n last not full:\n");
                 msg.append(this);
             }
@@ -637,9 +636,9 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
         adjust(first, last);
         shrinkCache();
 
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             msg.append(this);
-            logger.fine(msg.toString());
+            logger.debugFine(msg.toString());
         }
     }
 
@@ -654,7 +653,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
             return;
 
         StringBuffer msg = new StringBuffer();
-        if (logger.isLoggable(LogLevel.FINE))
+        if (logger.isDebugging())
             msg.append(this);
 
         // parent has children
@@ -691,7 +690,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
                 // adjust the son
                 adjust(son, last);
 
-                if (logger.isLoggable(LogLevel.FINE)) {
+                if (logger.isDebugging()) {
                     msg.append("son is full \n");
                     msg.append(this);
                 }
@@ -713,10 +712,10 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
                 if (!inCache(parent))
                     file.writePage(parent);
 
-                if (logger.isLoggable(LogLevel.FINE)) {
+                if (logger.isDebugging()) {
                     msg.append("son is not full \n");
                     msg.append(this);
-                    logger.fine(msg.toString());
+                    logger.debugFine(msg.toString());
                 }
             }
         }
@@ -775,8 +774,8 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
 
         // delete (old) last deap from disk
         file.deletePage(last.getIndex());
-        if (logger.isLoggable(LogLevel.FINE))
-            logger.fine("***** new cache: " + Arrays.asList(getCacheIndizes()));
+        if (logger.isDebugging())
+            logger.debugFine("***** new cache: " + Arrays.asList(getCacheIndizes()));
     }
 
     /**

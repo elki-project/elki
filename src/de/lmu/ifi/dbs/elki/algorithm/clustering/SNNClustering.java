@@ -148,7 +148,8 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
                 }
                 if (logger.isVerbose()) {
                     progress.setProcessed(processedIDs.size());
-                    progress(progress, resultList.size());
+                    progress.setAuxiliary("Number of clusters: "+resultList.size());
+                    progress(progress);
                 }
             }
         }
@@ -158,7 +159,8 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
                 noise.add(id);
                 if (logger.isVerbose()) {
                     progress.setProcessed(noise.size());
-                    progress(progress, resultList.size());
+                    progress.setAuxiliary("Number of clusters: "+resultList.size());
+                    progress(progress);
                 }
             }
         }
@@ -211,7 +213,8 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
             processedIDs.add(startObjectID);
             if (logger.isVerbose()) {
                 progress.setProcessed(processedIDs.size());
-                progress(progress, resultList.size());
+                progress.setAuxiliary("Number of clusters: "+resultList.size());
+                progress(progress);
             }
             return;
         }
@@ -254,7 +257,8 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
             if (logger.isVerbose()) {
                 progress.setProcessed(processedIDs.size());
                 int numClusters = currentCluster.size() > minpts ? resultList.size() + 1 : resultList.size();
-                progress(progress, numClusters);
+                progress.setAuxiliary("Number of clusters: "+numClusters);
+                progress(progress);
             }
 
             if (processedIDs.size() == database.size() && noise.size() == 0) {

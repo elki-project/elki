@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.logging;
 
-import java.util.logging.LogRecord;
-
 import de.lmu.ifi.dbs.elki.utilities.Progress;
 
 /**
@@ -87,36 +85,6 @@ public abstract class AbstractLoggable {
   }
 
   /**
-   * Log a PROGRESS message.
-   * <p/>
-   * If the logger is currently enabled for the PROGRESS message level then the
-   * given message is forwarded to all the registered output Handler objects.
-   * 
-   * @param pgr the progress to be logged
-   * @param numClusters The current number of clusters
-   * @see Loggable#progress(de.lmu.ifi.dbs.elki.utilities.Progress)
-   */
-  public void progress(Progress pgr, int numClusters) {
-    StringBuffer status = new StringBuffer();
-    status.append("\r");
-    status.append(pgr.toString());
-    status.append(" Number of clusters: ");
-    status.append(numClusters);
-    status.append(".");
-    logger.progress(new ProgressLogRecord(status.toString(), pgr.getTask(), pgr.status()));
-  }
-
-  /**
-   * Log a PROGRESS message.
-   * <p/>
-   * If the logger is currently enabled for the PROGRESS message level then the
-   * given message is forwarded to all the registered output Handler objects.
-   */
-  public void progress(LogRecord record) {
-    logger.progress(record);
-  }
-
-  /**
    * Log a VERBOSE message.
    * <p/>
    * If the logger is currently enabled for the VERBOSE message level then the
@@ -138,8 +106,8 @@ public abstract class AbstractLoggable {
    * Use
    * 
    * <pre>
-   * if (logger.isLoggable(LogLevel.FINE)) {
-   *   logger.log(LogLevel.FINE, msg);
+   * if (logger.isDebugging()) {
+   *   logger.debugFine(msg);
    * }
    * </pre>
    * 
@@ -161,8 +129,8 @@ public abstract class AbstractLoggable {
    * Use
    * 
    * <pre>
-   * if (logger.isLoggable(LogLevel.FINER)) {
-   *   logger.log(LogLevel.FINER, msg);
+   * if (logger.isDebuggingFiner()) {
+   *   logger.debugFiner(msg);
    * }
    * </pre>
    * 
@@ -184,8 +152,8 @@ public abstract class AbstractLoggable {
    * Use
    * 
    * <pre>
-   * if (logger.isLoggable(LogLevel.FINEST)) {
-   *   logger.log(LogLevel.FINEST, msg);
+   * if (logger.isDebuggingFinest()) {
+   *   logger.debugFinest(msg);
    * }
    * </pre>
    * 

@@ -3,9 +3,8 @@ package de.lmu.ifi.dbs.elki.math.spacefillingcurves;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
 
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
@@ -17,7 +16,7 @@ public class ZCurve {
     /**
      * The logger of this class.
      */
-    private static Logger logger = Logger.getLogger(ZCurve.class.getName());
+    private static Logging logger = Logging.getLogger(ZCurve.class);
 
     public ZCurve() {
         // nothing to do.
@@ -51,14 +50,14 @@ public class ZCurve {
             scalingFactors[d] = (Long.MAX_VALUE) / (maxValues[d] - minValues[d]);
         }
 
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             StringBuffer msg = new StringBuffer();
             msg.append("\nmin   ").append(FormatUtil.format(minValues));
             msg.append("\nmax   ").append(FormatUtil.format(maxValues));
             msg.append("\nscale ").append(FormatUtil.format(scalingFactors));
             msg.append("\nLong.MAX_VALUE  " + Long.MAX_VALUE);
             msg.append("\nLong.MIN_VALUE  " + Long.MIN_VALUE);
-            logger.fine(msg.toString());
+            logger.debugFine(msg.toString());
         }
 
         // discretize the double value over the whole domain
@@ -70,11 +69,11 @@ public class ZCurve {
                 longValues[d] = (long) ((values[d] - minValues[d]) * scalingFactors[d]);
             }
 
-            if (logger.isLoggable(LogLevel.FINE)) {
+            if (logger.isDebugging()) {
                 StringBuffer msg = new StringBuffer();
                 msg.append("\ndouble values ").append(FormatUtil.format(values));
                 msg.append("\nlong values   ").append(FormatUtil.format(longValues));
-                logger.fine(msg.toString());
+                logger.debugFine(msg.toString());
             }
             byte[] zValue = zValue(longValues);
             zValues.add(zValue);
@@ -100,7 +99,7 @@ public class ZCurve {
             }
         }
 
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             //convert zValues to longValues
             long[] loutput = new long[longValues.length];
             for (int shift = 0; shift < 64; shift++) {
@@ -110,7 +109,7 @@ public class ZCurve {
                 }
             }
             StringBuffer msg = new StringBuffer();
-            logger.fine(msg.toString());
+            logger.debugFine(msg.toString());
         }
 
         return zValues;

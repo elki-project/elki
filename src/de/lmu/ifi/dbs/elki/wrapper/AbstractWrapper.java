@@ -1,16 +1,14 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * AbstractWrapper sets the values for flags verbose and help. <p/> Any Wrapper
@@ -26,13 +24,13 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
      * Flag to obtain help-message.
      * <p>Key: {@code -h} </p>
      */
-    private final Flag HELP_FLAG;
+    private final Flag HELP_FLAG = new Flag(OptionID.HELP);
 
     /**
      * Flag to allow verbose messages while performing the wrapper.
      * <p>Key: {@code -verbose} </p>
      */
-    private final Flag VERBOSE_FLAG;
+    private final Flag VERBOSE_FLAG = new Flag(OptionID.ALGORITHM_VERBOSE);
 
     /**
      * Value of verbose flag.
@@ -52,13 +50,9 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
      */
     protected AbstractWrapper() {
         // verbose
-        VERBOSE_FLAG = new Flag(OptionID.ALGORITHM_VERBOSE);
-        VERBOSE_FLAG.setShortDescription("Flag to allow verbose messages while performing the wrapper.");
         addOption(VERBOSE_FLAG);
 
         // help
-        HELP_FLAG = new Flag(OptionID.HELP);
-        HELP_FLAG.setShortDescription("Flag to obtain help-message. Causes immediate stop of the program.");
         addOption(HELP_FLAG);
     }
 
@@ -82,6 +76,9 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
 
         // verbose
         verbose = VERBOSE_FLAG.isSet();
+        if (verbose) {
+          LoggingConfiguration.setVerbose(true);
+        }
         
         setParameters(args, new String[0]);
         return new String[0];
@@ -127,14 +124,14 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
         run();
       }
       catch(AbortException e) {
-        LoggingUtil.logExpensive(LogLevel.VERBOSE, e.toString());
+        logger.verbose(e.toString());
       }
       catch(ParameterException e) {
-        LoggingUtil.logExpensive(LogLevel.WARNING, e.toString());
+        logger.warning(e.toString());
       }
       catch(Exception e) {
         Throwable cause = e.getCause() != null ? e.getCause() : e;
-        LoggingUtil.exception(optionHandler.usage(e.toString()), cause);
+        logger.exception(optionHandler.usage(e.toString()), cause);
       }
     }
 }

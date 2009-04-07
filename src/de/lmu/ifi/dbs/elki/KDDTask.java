@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
@@ -204,9 +203,6 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
     addOption(NORMALIZATION_UNDO_FLAG);
 
     optionHandler.setProgrammCall(CALL);
-    if(logger.isLoggable(LogLevel.FINEST)) {
-      logger.log(LogLevel.FINER, "Root logger level: " + Logger.getLogger("").getLevel().getName() + "\n");
-    }
   }
 
   /**

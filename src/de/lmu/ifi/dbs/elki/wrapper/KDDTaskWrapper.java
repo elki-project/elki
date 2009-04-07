@@ -1,16 +1,19 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
-import de.lmu.ifi.dbs.elki.KDDTask;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.*;
-
 import java.io.File;
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
+
+import de.lmu.ifi.dbs.elki.KDDTask;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 
 /**
  * KDDTaskWrapper is an abstract super class for all wrapper classes running
@@ -67,15 +70,15 @@ public abstract class KDDTaskWrapper<O extends DatabaseObject> extends AbstractW
   public final void run() throws UnableToComplyException {
     try {
       List<String> parameters = getKDDTaskParameters();
-      logger.log(LogLevel.FINER, "got KDD Task parametes");
+      logger.debugFiner("got KDD Task parametes");
       KDDTask<O> task = new KDDTask<O>();
-      logger.log(LogLevel.FINER, "KDD task has been instanstiated");
+      logger.debugFiner("KDD task has been instanstiated");
       String[] remainingParameters = task.setParameters(parameters.toArray(new String[parameters.size()]));
       if(remainingParameters.length != 0) {
-        LoggingUtil.logExpensive(LogLevel.WARNING, task.usage("Unnecessary parameters specified: " + Arrays.asList(remainingParameters) + "\n\nUSAGE:\n"));
+        logger.warning(task.usage("Unnecessary parameters specified: " + Arrays.asList(remainingParameters) + "\n\nUSAGE:\n"));
         return;
       }
-      logger.log(LogLevel.FINER, "set KDD Task parameters, will run kdd Task");
+      logger.debugFiner("set KDD Task parameters, will run kdd Task");
       result = task.run();
     }
     catch(ParameterException e) {

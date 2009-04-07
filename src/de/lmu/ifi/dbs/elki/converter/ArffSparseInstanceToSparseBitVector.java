@@ -1,13 +1,5 @@
 package de.lmu.ifi.dbs.elki.converter;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbortException;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.parser.AbstractParser;
-import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.wrapper.StandAloneInputWrapper;
-
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -20,6 +12,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.parser.AbstractParser;
+import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.wrapper.StandAloneInputWrapper;
 
 /**
  * Converts an arff sparse instance file to a file readable with a
@@ -119,7 +118,7 @@ public class ArffSparseInstanceToSparseBitVector extends StandAloneInputWrapper 
             LoggingUtil.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
         }
         catch (AbortException e) {
-          LoggingUtil.logExpensive(LogLevel.VERBOSE, e.getMessage());
+          LoggingUtil.message(e.getMessage());
         }
         catch (Exception e) {
           LoggingUtil.exception(wrapper.optionHandler.usage(e.getMessage()), e);

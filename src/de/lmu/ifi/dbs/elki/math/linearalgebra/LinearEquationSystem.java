@@ -7,9 +7,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.Logger;
 
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 
@@ -19,7 +18,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
  * @author Elke Achtert
  */
 public class LinearEquationSystem {
-    private static Logger logger = Logger.getLogger(LinearEquationSystem.class.getName());
+    private static Logging logger = Logging.getLogger(LinearEquationSystem.class);
 
     /**
      * Indicates trivial pivot search strategy.
@@ -363,11 +362,11 @@ public class LinearEquationSystem {
             pivotCol = pivotPos.second;
             pivot = coeff[this.row[pivotRow]][col[pivotCol]];
 
-            if (logger.isLoggable(LogLevel.FINE)) {
+            if (logger.isDebugging()) {
                 StringBuffer msg = new StringBuffer();
                 msg.append("equations ").append(equationsToString(4));
                 msg.append("  *** pivot at (").append(pivotRow).append(",").append(pivotCol).append(") = ").append(pivot).append("\n");
-                logger.fine(msg.toString());
+                logger.debugFine(msg.toString());
             }
 
             // permute rows and colums to get this entry onto
@@ -491,10 +490,10 @@ public class LinearEquationSystem {
         }
         rhs[row[k]] /= pivot;
 
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             StringBuffer msg = new StringBuffer();
             msg.append("set pivot element to 1 ").append(equationsToString(4));
-            logger.fine(msg.toString());
+            logger.debugFine(msg.toString());
 
         }
 
@@ -518,10 +517,10 @@ public class LinearEquationSystem {
             rhs[row[i]] = rhs[row[i]] - rhs[row[k]] * q;
         }//end for k
 
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             StringBuffer msg = new StringBuffer();
             msg.append("after pivot operation ").append(equationsToString(4));
-            logger.fine(msg.toString());
+            logger.debugFine(msg.toString());
         }
     }
 
@@ -542,8 +541,8 @@ public class LinearEquationSystem {
         }
 
         if (!isSolvable(method)) {
-            if (logger.isLoggable(LogLevel.FINE)) {
-                logger.fine("Equation system is not solvable!");
+            if (logger.isDebugging()) {
+                logger.debugFine("Equation system is not solvable!");
             }
             return;
         }
@@ -568,7 +567,7 @@ public class LinearEquationSystem {
         }
 
         StringBuffer msg = new StringBuffer();
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             msg.append("\nSpecial solution x_0 = [").append(FormatUtil.format(x_0, ",", 4)).append("]");
             msg.append("\nbound Indices ").append(boundIndices);
             msg.append("\nfree Indices ").append(freeIndices);
@@ -597,12 +596,12 @@ public class LinearEquationSystem {
 
         }
 
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             msg.append("\nU");
             for (double[] anU : u) {
                 msg.append("\n").append(FormatUtil.format(anU, ",", 4));
             }
-            logger.fine(msg.toString());
+            logger.debugFine(msg.toString());
         }
 
         solved = true;

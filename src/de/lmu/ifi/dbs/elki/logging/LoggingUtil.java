@@ -60,6 +60,15 @@ public final class LoggingUtil {
   /**
    * Static version to log a severe exception.
    * 
+   * @param e Exception to log
+   */
+  public final static void exception(Throwable e) {
+    logExpensive(Level.SEVERE, e.getMessage(), e);
+  }
+
+  /**
+   * Static version to log a severe exception.
+   * 
    * @param message Exception message, may be null (defaults to e.getMessage())
    * @param e causing exception
    */
@@ -67,7 +76,7 @@ public final class LoggingUtil {
     if (message == null && e != null) {
       message = e.getMessage();
     }
-    logExpensive(LogLevel.SEVERE, message, e);
+    logExpensive(Level.SEVERE, message, e);
   }
 
   /**
@@ -76,7 +85,7 @@ public final class LoggingUtil {
    * @param message Warning message.
    */
   public final static void warning(String message) {
-    logExpensive(LogLevel.WARNING, message);    
+    logExpensive(Level.WARNING, message);    
   }
 
   /**
@@ -89,11 +98,37 @@ public final class LoggingUtil {
     if (message == null && e != null) {
       message = e.getMessage();
     }
-    logExpensive(LogLevel.WARNING, message, e);
+    logExpensive(Level.WARNING, message, e);
+  }
+
+  /**
+   * Static version to log a 'info' message.
+   * 
+   * @param message Warning message.
+   */
+  public final static void message(String message) {
+    logExpensive(Level.INFO, message);    
+  }
+
+  /**
+   * Static version to log a 'info' message.
+   * 
+   * @param message Warning message, may be null (defaults to e.getMessage())
+   * @param e causing exception
+   */
+  public final static void message(String message, Throwable e) {
+    if (message == null && e != null) {
+      message = e.getMessage();
+    }
+    logExpensive(Level.INFO, message, e);
   }
 
   /**
    * Infer which class has called the logging helper.
+   * 
+   * While this looks like duplicated code from ElkiLogRecord, it is needed here
+   * to find an appropriate Logger (and check the logging level) for the calling class,
+   * not just to log the right class and method name.
    * 
    * @return calling class name and calling method name
    */

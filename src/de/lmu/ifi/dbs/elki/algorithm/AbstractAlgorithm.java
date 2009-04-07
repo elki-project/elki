@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.algorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.IndexDatabase;
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
@@ -76,8 +77,8 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Resu
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
-        verbose = VERBOSE_FLAG.isSet();
-        time = TIME_FLAG.isSet();
+        setVerbose(VERBOSE_FLAG.isSet());
+        setTime(TIME_FLAG.isSet());
         setParameters(args, remainingParameters);
         return remainingParameters;
     }
@@ -105,6 +106,10 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Resu
     public void setVerbose(boolean verbose) {
         this.verbose = verbose;
         VERBOSE_FLAG.setValue(verbose);
+        // only positively set verbose, to not re-set it for nested algorithms.
+        if (verbose) {
+          LoggingConfiguration.setVerbose(verbose);
+        }
     }
 
     public void setTime(boolean time) {

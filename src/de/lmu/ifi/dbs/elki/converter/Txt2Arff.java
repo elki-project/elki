@@ -1,15 +1,6 @@
 package de.lmu.ifi.dbs.elki.converter;
 
 
-import de.lmu.ifi.dbs.elki.algorithm.AbortException;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.parser.AbstractParser;
-import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.wrapper.StandAloneInputWrapper;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -26,6 +17,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.parser.AbstractParser;
+import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.wrapper.StandAloneInputWrapper;
 
 /**
  * Converts a txt file to an arff file. All attributes that can be parsed as
@@ -56,7 +55,7 @@ public class Txt2Arff<W extends WekaAttribute> extends StandAloneInputWrapper {
       LoggingUtil.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
     }
     catch (AbortException e) {
-      LoggingUtil.logExpensive(LogLevel.VERBOSE, e.getMessage());
+      LoggingUtil.message(e.getMessage());
     }
     catch (Exception e) {
       LoggingUtil.exception(wrapper.optionHandler.usage(e.getMessage()), e);

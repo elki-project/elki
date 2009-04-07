@@ -24,29 +24,29 @@ logging:</p>
 <p>After development, it should be changed to <code>false || {@link de.lmu.ifi.dbs.elki.logging.LoggingConfiguration#DEBUG LoggingConfiguration.DEBUG}</code>.</p>
 </li>
 <li><p>If the class contains 'frequent' logging code, acquire a static Logger reference:</p>
-<code>protected static final logger = Logger.getLogger(Example.class.getName());
+<code>protected static final {@link de.lmu.ifi.dbs.elki.logging.Logging Logging} logger = {@link de.lmu.ifi.dbs.elki.logging.Logging#getLogger Logging.getLogger}(Example.class);
 </li>
 <li><p>Wrap logging statements in appropriate level checks:</p>
 <code>
-if (logger.isLoggable({@link de.lmu.ifi.dbs.elki.logging.LogLevel LogLevel}.INFO)) {
+if ({@link de.lmu.ifi.dbs.elki.logging.Logging#isVerbose logger.isVerbose()}) {
   // compute logging message
-  logger.log({@link de.lmu.ifi.dbs.elki.logging.LogLevel LogLevel}.INFO, expensive + message + construction);
+  {@link de.lmu.ifi.dbs.elki.logging.Logging#verbose logger.verbose}(expensive + message + construction);
 }
 </code>
 </li>
 <li><p>For infrequent logging, the following static convenience function is appropriate:</p>
 <code>
-  {@link de.lmu.ifi.dbs.elki.logging.LoggingUtil#logExpensive LoggingUtil.logExpensive}({@link de.lmu.ifi.dbs.elki.logging.LogLevel LogLevel}.SEVERE, "Out of memory in algorithm.", exception);
+  {@link de.lmu.ifi.dbs.elki.logging.LoggingUtil#exception LoggingUtil.exception}("Out of memory in algorithm.", exception);
 </code>
-<p>This function is expensive (it acquire a stack trace to obtain class and method references,
+<p>This function is expensive (it acquires a stack trace to obtain class and method references,
 retrieves a logger reference etc.) and thus should only be used for 'rare' logging events.</p>
 </li>
-<li><p>In cases where many test would occur, also consider using:</p>
+<li><p>In cases where many tests would occur, also consider using:</p>
 <pre>
-final boolean verbose = logger.isLoggable({@link de.lmu.ifi.dbs.elki.logging.LogLevel LogLevel}.VERBOSE);
+final boolean verbose = {@link de.lmu.ifi.dbs.elki.logging.Logging#isVerbose logger.isVerbose}();
 // ... for, while, anything expensive
 if (verbose) {
-  logger.log(...);
+  {@link de.lmu.ifi.dbs.elki.logging.Logging#verbose logger.verbose}(...);
 }
 </pre>
 </li>

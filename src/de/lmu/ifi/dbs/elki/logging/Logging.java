@@ -7,6 +7,20 @@ import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.utilities.Progress;
 
+/**
+ * This class is a wrapper around {@link java.util.logging.Logger} and
+ * {@link java.util.logging.LogManager} offering additional convenience functions.
+ * 
+ * If a class keeps a static reference to the appropriate {@link Logging} object,
+ * performance penalty compared to standard logging should be minimal.
+ * 
+ * However when using {@link java.util.logging.LogRecord} directly instead of 
+ * {@link ElkiLogRecord}, the use of the {@link #log(LogRecord)} method will result in
+ * incorrectly logged cause location. Therefore, use {@link ElkiLogRecord}!
+ * 
+ * @author Erich Schubert
+ *
+ */
 public class Logging {
   /**
    * HashMap to keep track of loggers.
@@ -43,7 +57,7 @@ public class Logging {
    * @param c Class name to retrieve logging for
    * @return Logger
    */
-  public static Logging getLogger(final String name) {
+  public synchronized static Logging getLogger(final String name) {
     Logging logger = loggers.get(name);
     if(logger == null) {
       logger = new Logging(Logger.getLogger(name));
@@ -68,16 +82,29 @@ public class Logging {
    * @return true if verbose
    */
   public boolean isVerbose() {
-    return logger.isLoggable(LogLevel.INFO);
+    return logger.isLoggable(Level.INFO);
+  }
+
+  /**
+   * Test whether to log 'debug' at 'FINE' level.
+   * 
+   * This is the same as {@link #isDebuggingFine}
+   * 
+   * @return true if debug logging enabled
+   */
+  public boolean isDebugging() {
+    return logger.isLoggable(Level.FINE);
   }
 
   /**
    * Test whether to log 'debug' at 'FINE' level
    * 
+   * This is the same as {@link #isDebugging}
+   *  
    * @return true if debug logging enabled
    */
-  public boolean isDebugging() {
-    return logger.isLoggable(LogLevel.FINE);
+  public boolean isDebuggingFine() {
+    return logger.isLoggable(Level.FINE);
   }
 
   /**
@@ -86,7 +113,7 @@ public class Logging {
    * @return true if debug logging enabled
    */
   public boolean isDebuggingFiner() {
-    return logger.isLoggable(LogLevel.FINER);
+    return logger.isLoggable(Level.FINER);
   }
 
   /**
@@ -95,7 +122,7 @@ public class Logging {
    * @return true if debug logging enabled
    */
   public boolean isDebuggingFinest() {
-    return logger.isLoggable(LogLevel.FINEST);
+    return logger.isLoggable(Level.FINEST);
   }
 
   /**
@@ -138,7 +165,7 @@ public class Logging {
    * @param e Exception
    */
   public void warning(String message, Throwable e) {
-    log(LogLevel.WARNING, message, e);
+    log(Level.WARNING, message, e);
   }
 
   /**
@@ -147,7 +174,7 @@ public class Logging {
    * @param message Warning log message.
    */
   public void warning(String message) {
-    log(LogLevel.WARNING, message);
+    log(Level.WARNING, message);
   }
 
   /**
@@ -159,7 +186,7 @@ public class Logging {
    * @param e Exception
    */
   public void verbose(String message, Throwable e) {
-    log(LogLevel.INFO, message, e);
+    log(Level.INFO, message, e);
   }
 
   /**
@@ -170,7 +197,30 @@ public class Logging {
    * @param message Informational log message.
    */
   public void verbose(String message) {
-    log(LogLevel.INFO, message);
+    log(Level.INFO, message);
+  }
+
+  /**
+   * Log a message at the 'fine' debugging level.
+   * 
+   * You should check isDebugging() before building the message.
+   * 
+   * @param message Informational log message.
+   * @param e Exception
+   */
+  public void debug(String message, Throwable e) {
+    log(Level.FINE, message, e);
+  }
+
+  /**
+   * Log a message at the 'fine' debugging level.
+   * 
+   * You should check isDebugging() before building the message.
+   * 
+   * @param message Informational log message.
+   */
+  public void debug(String message) {
+    log(Level.FINE, message);
   }
 
   /**
@@ -182,7 +232,7 @@ public class Logging {
    * @param e Exception
    */
   public void debugFine(String message, Throwable e) {
-    log(LogLevel.FINE, message, e);
+    log(Level.FINE, message, e);
   }
 
   /**
@@ -193,7 +243,30 @@ public class Logging {
    * @param message Informational log message.
    */
   public void debugFine(String message) {
-    log(LogLevel.FINE, message);
+    log(Level.FINE, message);
+  }
+
+  /**
+   * Log a message at the 'fine' debugging level.
+   * 
+   * You should check isDebugging() before building the message.
+   * 
+   * @param message Informational log message.
+   * @param e Exception
+   */
+  public void fine(String message, Throwable e) {
+    log(Level.FINE, message, e);
+  }
+
+  /**
+   * Log a message at the 'fine' debugging level.
+   * 
+   * You should check isDebugging() before building the message.
+   * 
+   * @param message Informational log message.
+   */
+  public void fine(String message) {
+    log(Level.FINE, message);
   }
 
   /**
@@ -205,7 +278,7 @@ public class Logging {
    * @param e Exception
    */
   public void debugFiner(String message, Throwable e) {
-    log(LogLevel.FINER, message, e);
+    log(Level.FINER, message, e);
   }
 
   /**
@@ -216,7 +289,30 @@ public class Logging {
    * @param message Informational log message.
    */
   public void debugFiner(String message) {
-    log(LogLevel.FINER, message);
+    log(Level.FINER, message);
+  }
+
+  /**
+   * Log a message at the 'finer' debugging level.
+   * 
+   * You should check isDebugging() before building the message.
+   * 
+   * @param message Informational log message.
+   * @param e Exception
+   */
+  public void finer(String message, Throwable e) {
+    log(Level.FINER, message, e);
+  }
+
+  /**
+   * Log a message at the 'finer' debugging level.
+   * 
+   * You should check isDebugging() before building the message.
+   * 
+   * @param message Informational log message.
+   */
+  public void finer(String message) {
+    log(Level.FINER, message);
   }
 
   /**
@@ -228,7 +324,7 @@ public class Logging {
    * @param e Exception
    */
   public void debugFinest(String message, Throwable e) {
-    log(LogLevel.FINEST, message, e);
+    log(Level.FINEST, message, e);
   }
 
   /**
@@ -239,7 +335,30 @@ public class Logging {
    * @param message Informational log message.
    */
   public void debugFinest(String message) {
-    log(LogLevel.FINEST, message);
+    log(Level.FINEST, message);
+  }
+
+  /**
+   * Log a message at the 'finest' debugging level.
+   * 
+   * You should check isDebugging() before building the message.
+   * 
+   * @param message Informational log message.
+   * @param e Exception
+   */
+  public void finest(String message, Throwable e) {
+    log(Level.FINEST, message, e);
+  }
+
+  /**
+   * Log a message at the 'finest' debugging level.
+   * 
+   * You should check isDebugging() before building the message.
+   * 
+   * @param message Informational log message.
+   */
+  public void finest(String message) {
+    log(Level.FINEST, message);
   }
 
   /**
@@ -249,49 +368,34 @@ public class Logging {
    * @param e Exception
    */
   public void exception(String message, Throwable e) {
-    log(LogLevel.SEVERE, message, e);
+    log(Level.SEVERE, message, e);
   }
 
   /**
-   * Log a message at the 'progress' level.
+   * Log an exception at the 'severe' level.
    * 
-   * You should check isVerbose() before building the message.
-   * 
-   * @param message Informational log message.
    * @param e Exception
    */
-  public void progress(String message, Throwable e) {
-    log(LogLevel.PROGRESS, message, e);
+  public void exception(Throwable e) {
+    log(Level.SEVERE, e.getMessage(), e);
   }
 
-  /**
-   * Log a message at the 'progress' level.
-   * 
-   * You should check isVerbose() before building the message.
-   * 
-   * @param message Informational log message.
-   */
-  public void progress(String message) {
-    log(LogLevel.PROGRESS, message);
-  }
-
-  /**
-   * Log a 'progress' log record.
-   * 
-   * You should check isVerbose() before building the message.
-   * 
-   * @param rec Log record.
-   */
-  public void progress(LogRecord rec) {
-    logger.log(rec);
-  }
-  
   /**
    * Log a Progress class. 
    * 
    * @param pgr Progress to log.
    */
   public void progress(Progress pgr) {
-    logger.log(new ProgressLogRecord("\r" + pgr.toString(), pgr.getTask(), pgr.status()));
+    StringBuffer buf = new StringBuffer();
+    buf.append(OutputStreamLogger.CARRIAGE_RETURN);
+    pgr.appendToBuffer(buf);
+    logger.log(Level.INFO, buf.toString());
+  }
+
+  /**
+   * @return the wrapped {@link java.util.logging.Logger}
+   */
+  public Logger getWrappedLogger() {
+    return logger;
   }
 }

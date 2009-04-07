@@ -5,6 +5,7 @@ import java.io.Writer;
 import java.util.logging.ErrorManager;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
 
@@ -23,11 +24,6 @@ public class CLISmartHandler extends Handler {
    * Output stream for error output.
    */
   private Writer err;
-
-  /**
-   * Formatter for Progress records
-   */
-  private Formatter progformat = new ProgressFormatter();
 
   /**
    * Formatter for regular messages (informational records)
@@ -98,7 +94,7 @@ public class CLISmartHandler extends Handler {
   public void publish(final LogRecord record) {
     // determine destination
     final Writer destination;
-    if(record.getLevel().intValue() >= LogLevel.WARNING.intValue()) {
+    if(record.getLevel().intValue() >= Level.WARNING.intValue()) {
       destination = this.err;
     }
     else {
@@ -107,14 +103,11 @@ public class CLISmartHandler extends Handler {
     // choose an appropriate formatter
     final Formatter fmt;
     // always format progress messages using the progress formatter.
-    if(record instanceof ProgressLogRecord) {
-      fmt = progformat;
-    }
-    else if(record.getLevel().intValue() >= LogLevel.WARNING.intValue()) {
+    if(record.getLevel().intValue() >= Level.WARNING.intValue()) {
       // format errors using the error formatter
       fmt = errformat;
     }
-    else if(record.getLevel().intValue() <= LogLevel.FINE.intValue()) {
+    else if(record.getLevel().intValue() <= Level.FINE.intValue()) {
       // format debug statements using the debug formatter.
       fmt = debugformat;
     }

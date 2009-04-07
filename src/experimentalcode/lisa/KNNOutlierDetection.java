@@ -6,15 +6,11 @@ import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
-
 import de.lmu.ifi.dbs.elki.distance.Distance;
-
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -100,8 +96,8 @@ public class KNNOutlierDetection <O extends DatabaseObject, D extends Distance<D
 				 id = iter.next();
 				  //distance to the kth nearest neighbor
 				 D dkn = database.kNNQueryForID(id,  k, getDistanceFunction()).get(k-1).getDistance();
-				 if (logger.isLoggable(LogLevel.FINE)) {
-		        debugFine(dkn + "  dkn");
+				 if (logger.isDebugging()) {
+				   logger.debugFine(dkn + "  dkn");
 		        }
 		      
 				  database.associate(KNNO_ODEGREE, id, dkn);

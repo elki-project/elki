@@ -1,15 +1,14 @@
 package de.lmu.ifi.dbs.elki.utilities.tree.btree;
 
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
-import de.lmu.ifi.dbs.elki.persistent.AbstractPage;
-import de.lmu.ifi.dbs.elki.persistent.PageFile;
-
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.Arrays;
-import java.util.logging.Logger;
+
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.persistent.AbstractPage;
+import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
 /**
  * BTreeNode denotes a node in a BTree.
@@ -19,7 +18,7 @@ import java.util.logging.Logger;
 public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Externalizable> extends AbstractPage<BTreeNode<K, V>> {
     private static final long serialVersionUID = 1;
 
-    private static Logger logger = Logger.getLogger(BTreeNode.class.getName());
+    private static Logging logger = Logging.getLogger(BTreeNode.class.getName());
     
     /**
      * The order of the BTree: determines the maximum number of entries (2*m)
@@ -257,7 +256,7 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
             index++;
             if (index == parent.numKeys) break;
         }
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             msg.append(index);
             msg.append("\n parent  bef ");
             msg.append(Arrays.asList(parent.data));
@@ -270,7 +269,7 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
 
         // shift the data in parent one position right and insert data[m]
         parent.shiftRight(index, data[m], newNode.getID(), true);
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             msg.append("\n parent  aft ");
             msg.append(Arrays.asList(parent.data));
             msg.append(Arrays.asList(parent.childIDs));
@@ -310,7 +309,7 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
         newNode.numKeys = m;
         this.numKeys = m;
 
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             msg.append("\n this    aft ");
             msg.append(Arrays.asList(this.data));
             msg.append(Arrays.asList(this.childIDs));
@@ -323,8 +322,8 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
         getFile().writePage(parent);
         getFile().writePage(newNode);
 
-        if (logger.isLoggable(LogLevel.FINE)) {
-            logger.fine(msg.toString());
+        if (logger.isDebugging()) {
+            logger.debugFine(msg.toString());
         }
 
         if (parent.numKeys > 2 * m) parent.overflowTreatment();
@@ -341,7 +340,7 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
             throw new IllegalStateException("This node is not root!");
 
         StringBuffer msg = new StringBuffer();
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             msg.append("\n this.data ");
             msg.append(Arrays.asList(this.data));
         }
@@ -390,7 +389,7 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
         childIDs[0] = left.getID();
         childIDs[1] = right.getID();
 
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             msg.append("\n left.data ");
             msg.append(Arrays.asList(left.data));
             msg.append("\n left.children ");
@@ -407,8 +406,8 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
         getFile().writePage(right);
         getFile().writePage(this);
 
-        if (logger.isLoggable(LogLevel.FINE)) {
-            logger.fine(msg.toString());
+        if (logger.isDebugging()) {
+            logger.debugFine(msg.toString());
         }
     }
 
@@ -434,7 +433,7 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
         BTreeNode<K, V> parent = getFile().readPage(parentID);
         int parentIndex = 0;
         while (parent.childIDs[parentIndex] != this.getID()) parentIndex++;
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             msg.append("\n parentNode: ");
             msg.append(parent);
             msg.append(", index: ");
@@ -459,8 +458,8 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
                 getFile().writePage(this);
                 getFile().writePage(leftBrother);
                 getFile().writePage(parent);
-                if (logger.isLoggable(LogLevel.FINE)) {
-                    logger.fine(msg.toString());
+                if (logger.isDebugging()) {
+                    logger.debugFine(msg.toString());
                 }
 
                 return;
@@ -483,8 +482,8 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
                 getFile().writePage(this);
                 getFile().writePage(rightBrother);
                 getFile().writePage(parent);
-                if (logger.isLoggable(LogLevel.FINE)) {
-                    logger.fine(msg.toString());
+                if (logger.isDebugging()) {
+                    logger.debugFine(msg.toString());
                 }
 
                 return;
@@ -493,7 +492,7 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
 
         // merge with siblings
         parent.mergeChild(parentIndex);
-        logger.log(LogLevel.VERBOSE, msg.toString());
+        logger.verbose(msg.toString());
 
         if (parent.numKeys < m)
             parent.underflowTreatment();
@@ -515,7 +514,7 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
 
 
         StringBuffer msg = new StringBuffer();
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             msg.append("\n this.data ");
             msg.append(Arrays.asList(this.data));
         }
@@ -545,7 +544,7 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
             }
         }
 
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             msg.append("\n this.data ");
             msg.append(Arrays.asList(this.data));
         }
@@ -553,8 +552,8 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
         getFile().deletePage(left.getID());
         getFile().writePage(this);
 
-        if (logger.isLoggable(LogLevel.FINE)) {
-            logger.fine(msg.toString());
+        if (logger.isDebugging()) {
+            logger.debugFine(msg.toString());
 //      logger.fine(msg.toString());
         }
     }
@@ -646,7 +645,7 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
      */
     private void shiftRight(int startPos, BTreeData<K, V> data, Integer childID, boolean rightChild) {
         StringBuffer msg = null;
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             msg = new StringBuffer();
             msg.append("\n this.data ");
             msg.append(Arrays.asList(this.data));
@@ -672,12 +671,12 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
             this.childIDs[startPos + 1] = childID;
         numKeys++;
 
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             msg.append("\n this.data ");
             msg.append(Arrays.asList(this.data));
             msg.append("\n this.children ");
             msg.append(Arrays.asList(this.childIDs));
-            logger.fine(msg.toString());
+            logger.debugFine(msg.toString());
         }
     }
 
@@ -693,7 +692,7 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
      */
     private BTreeData<K, V> shiftLeft(int startPos, boolean leftChild) {
         StringBuffer msg = new StringBuffer();
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             msg.append("\n this.data ");
             msg.append(Arrays.asList(this.data));
             msg.append("\n this.children ");
@@ -713,12 +712,12 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
         this.childIDs[numKeys] = null;
         numKeys--;
 
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             msg.append("\n this.data ");
             msg.append(Arrays.asList(this.data));
             msg.append("\n this.children ");
             msg.append(Arrays.asList(this.childIDs));
-            logger.fine(msg.toString());
+            logger.debugFine(msg.toString());
         }
         return data;
     }

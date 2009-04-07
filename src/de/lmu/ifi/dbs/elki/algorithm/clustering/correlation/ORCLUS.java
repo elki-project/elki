@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.LogRecord;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.ProjectedClustering;
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -19,7 +18,6 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAResult;
@@ -108,7 +106,7 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
 
       while(k_c > k) {
         if(logger.isVerbose()) {
-          logger.progress(new LogRecord(LogLevel.PROGRESS, "\rCurrent number of clusters: " + clusters.size() + ".                           "));
+          logger.verbose("\rCurrent number of clusters: " + clusters.size() + ".");
         }
 
         // find partitioning induced by the seeds of the clusters
@@ -300,7 +298,7 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
 
     while(clusters.size() > k_new) {
       if(logger.isVerbose()) {
-        logger.progress(new LogRecord(LogLevel.PROGRESS, "\rCurrent number of clusters: " + clusters.size() + ".                           "));
+        logger.verbose("\rCurrent number of clusters: " + clusters.size() + ".");
       }
       // find the smallest value of r_ij
       ProjectedEnergy minPE = Collections.min(projectedEnergies);

@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
@@ -117,7 +116,7 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
     while (it.hasNext()) {
       Integer id = it.next();
 
-      if (logger.isLoggable(LogLevel.FINE)) {
+      if (logger.isDebugging()) {
         msg.append("\n\nid = ").append(id);
         msg.append(" ").append(database.getAssociation(AssociationID.LABEL, id));
         msg.append("\n knns: ");
@@ -127,7 +126,7 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
       List<Integer> knnIDs = new ArrayList<Integer>(knns.size());
       for (DistanceResultPair<DoubleDistance> knn : knns) {
         knnIDs.add(knn.getID());
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
           msg.append(database.getAssociation(AssociationID.LABEL, knn.getID())).append(" ");
         }
       }
@@ -141,8 +140,8 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
       }
     }
 
-    if (logger.isLoggable(LogLevel.FINE)) {
-      logger.log(LogLevel.FINE, msg.toString());
+    if (logger.isDebugging()) {
+      logger.debugFine(msg.toString());
     }
 
     long end = System.currentTimeMillis();
@@ -218,7 +217,7 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
       }
     }
 
-    if (msg != null && logger.isLoggable(LogLevel.FINE)) {
+    if (msg != null && logger.isDebugging()) {
       msg.append("\nalpha "+alpha);
       msg.append("\nvariances ");
       msg.append(FormatUtil.format(variances, ", ", 4));

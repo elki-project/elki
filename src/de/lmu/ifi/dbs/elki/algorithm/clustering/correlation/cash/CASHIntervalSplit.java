@@ -1,17 +1,16 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.cash;
 
-import de.lmu.ifi.dbs.elki.data.ParameterizationFunction;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.utilities.output.Format;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import de.lmu.ifi.dbs.elki.data.ParameterizationFunction;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.utilities.output.Format;
 
 /**
  * Supports the splitting of CASH intervals.
@@ -67,7 +66,7 @@ public class CASHIntervalSplit extends AbstractLoggable {
      */
     public Set<Integer> determineIDs(Set<Integer> superSetIDs, HyperBoundingBox interval, double d_min, double d_max) {
         StringBuffer msg = new StringBuffer();
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             msg.append("interval ").append(interval);
         }
 
@@ -95,7 +94,7 @@ public class CASHIntervalSplit extends AbstractLoggable {
                 maxima.put(id, f_max);
             }
 
-            if (logger.isLoggable(LogLevel.FINE)) {
+            if (logger.isDebugging()) {
                 msg.append("\n\nf_min ").append(f_min);
                 msg.append("\nf_max ").append(f_max);
                 msg.append("\nd_min ").append(d_min);
@@ -111,21 +110,21 @@ public class CASHIntervalSplit extends AbstractLoggable {
 
             if (f_min <= d_max && f_max >= d_min) {
                 childIDs.add(id);
-                if (logger.isLoggable(LogLevel.FINE)) {
+                if (logger.isDebugging()) {
                     msg.append("\nid ").append(id).append(" appended");
                 }
             }
 
             else {
-                if (logger.isLoggable(LogLevel.FINE)) {
+                if (logger.isDebugging()) {
                     msg.append("\nid ").append(id).append(" NOT appended");
                 }
             }
         }
 
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             msg.append("\nchildIds ").append(childIDs.size());
-            logger.log(LogLevel.FINE, msg.toString());
+            logger.debugFine(msg.toString());
         }
 
         if (childIDs.size() < minPts) {

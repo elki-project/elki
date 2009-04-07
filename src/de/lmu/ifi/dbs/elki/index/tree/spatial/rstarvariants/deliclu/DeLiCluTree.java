@@ -1,5 +1,10 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.index.tree.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.elki.index.tree.Entry;
@@ -7,13 +12,7 @@ import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * DeLiCluTree is a spatial index structure based on an R-TRee. DeLiCluTree is
@@ -46,8 +45,8 @@ public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<
      * @return the path of node ids from the root to the objects's parent
      */
     public synchronized List<TreeIndexPathComponent<DeLiCluEntry>> setHandled(O o) {
-        if (logger.isLoggable(LogLevel.FINE)) {
-          logger.log(LogLevel.FINE, "setHandled " + o + "\n");
+        if (logger.isDebugging()) {
+          logger.debugFine("setHandled " + o + "\n");
         }
 
         // find the leaf node containing o

@@ -6,7 +6,6 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.textwriter.MultipleFilesOutput;
@@ -90,12 +89,12 @@ public class ResultWriter<O extends DatabaseObject> extends AbstractParameteriza
       else if(out.exists()) {
         if(out.isDirectory()) {
           if(out.listFiles().length > 0) {
-            LoggingUtil.logExpensive(LogLevel.WARNING, "Output directory specified is not empty. Files will be overwritten and old files may be left over.");
+            LoggingUtil.warning("Output directory specified is not empty. Files will be overwritten and old files may be left over.");
           }
           output = new MultipleFilesOutput(out);
         }
         else {
-          LoggingUtil.logExpensive(LogLevel.WARNING, "Output file exists and will be overwritten!");
+          LoggingUtil.warning("Output file exists and will be overwritten!");
           output = new SingleStreamOutput(out);
         }
       }

@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.database.SequentialDatabase;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FirstNEigenPairFilter;
@@ -341,13 +340,13 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
         Set<Integer> noiseIDs = getDatabaseIDs(database);
         initHeap(heap, database, dim, noiseIDs);
 
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             StringBuffer msg = new StringBuffer();
             msg.append("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
             msg.append("\nXXXX dim ").append(dim);
             msg.append("\nXXXX database.size ").append(database.size());
             msg.append("\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-            logger.log(LogLevel.FINE, msg.toString());
+            logger.debugFine(msg.toString());
         }
         else if (logger.isVerbose()) {
             StringBuffer msg = new StringBuffer();
@@ -358,8 +357,8 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
         // get the ''best'' d-dimensional intervals at max level
         while (!heap.isEmpty()) {
             CASHInterval interval = determineNextIntervalAtMaxLevel(heap);
-            if (logger.isLoggable(LogLevel.FINE)) {
-              logger.log(LogLevel.FINE, "next interval in dim " + dim + ": " + interval);
+            if (logger.isDebugging()) {
+              logger.debugFine("next interval in dim " + dim + ": " + interval);
             }
             else if (logger.isVerbose()) {
               logger.verbose("next interval in dim " + dim + ": " + interval);
@@ -442,7 +441,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
             }
         }
 
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             StringBuffer msg = new StringBuffer();
             msg.append("noise fuer dim ").append(dim).append(": ").append(noiseIDs.size());
             
@@ -454,7 +453,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
                 msg.append("\n Cluster: "+c.getModel().getClass().getName()+" size: "+c.size());
               }
             }
-            logger.log(LogLevel.FINE, msg.toString());
+            logger.debugFine(msg.toString());
         }
 
         if (isVerbose()) {
@@ -489,13 +488,13 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
         double[] d_mins = new double[numDIntervals];
         double[] d_maxs = new double[numDIntervals];
 
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             StringBuffer msg = new StringBuffer();
             msg.append("d_min ").append(d_min);
             msg.append("\nd_max ").append(d_max);
             msg.append("\nnumDIntervals ").append(numDIntervals);
             msg.append("\ndIntervalSize ").append(dIntervalSize);
-            logger.log(LogLevel.FINE, msg.toString());
+            logger.debugFine(msg.toString());
         }
         else if (logger.isVerbose()) {
             StringBuffer msg = new StringBuffer();
@@ -534,10 +533,10 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
             }
         }
 
-        if (logger.isLoggable(LogLevel.FINER)) {
+        if (logger.isDebuggingFiner()) {
             StringBuffer msg = new StringBuffer();
             msg.append("heap.size ").append(heap.size());
-            logger.log(LogLevel.FINER, msg.toString());
+            logger.debugFiner(msg.toString());
         }
     }
 
@@ -570,8 +569,8 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
         Database<ParameterizationFunction> result = new SequentialDatabase<ParameterizationFunction>();
         result.insert(oaas);
 
-        if (logger.isLoggable(LogLevel.FINE)) {
-          logger.log(LogLevel.FINE, "db fuer dim " + (dim - 1) + ": " + result.size());
+        if (logger.isDebugging()) {
+          logger.debugFine("db fuer dim " + (dim - 1) + ": " + result.size());
         }
 
         return result;
@@ -674,7 +673,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
             }
 
             if (logger.isDebuggingFiner()) {
-              logger.log(LogLevel.FINER, "split " + interval.toString() + " " + interval.getLevel() + "-" + interval.getMaxSplitDimension());
+              logger.debugFiner("split " + interval.toString() + " " + interval.getLevel() + "-" + interval.getMaxSplitDimension());
             }
             interval.split();
 
@@ -825,8 +824,8 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
         Database<DoubleVector> result = new SequentialDatabase<DoubleVector>();
         result.insert(oaas);
 
-        if (logger.isLoggable(LogLevel.FINE)) {
-          logger.log(LogLevel.FINE, "db fuer derivator : " + result.size());
+        if (logger.isDebugging()) {
+          logger.debugFine("db fuer derivator : " + result.size());
         }
 
         return result;

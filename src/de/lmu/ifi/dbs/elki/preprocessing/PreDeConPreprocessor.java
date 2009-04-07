@@ -7,7 +7,6 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -82,7 +81,7 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends RealVector<V,
     int referenceSetSize = neighbors.size();
     V obj = database.get(id);
 
-    if (logger.isLoggable(LogLevel.FINE)) {
+    if (logger.isDebugging()) {
       msg.append("referenceSetSize = " + referenceSetSize);
       msg.append("\ndelta = " + delta);
     }
@@ -112,7 +111,7 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends RealVector<V,
 
     for (int d = 0; d < dim; d++) {
       if (Math.sqrt(sum[d]) / referenceSetSize <= delta) {
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
           msg.append("\nsum[" + d + "]= " + sum[d]);
           msg.append("\n  Math.sqrt(sum[d]) / referenceSetSize)= " + Math.sqrt(sum[d]) / referenceSetSize);
         }
@@ -126,16 +125,16 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends RealVector<V,
     }
 
     if (projDim == 0) {
-      if (logger.isLoggable(LogLevel.FINE)) {
+      if (logger.isDebugging()) {
 //        msg.append("\nprojDim == 0!");
       }
       projDim = dim;
     }
 
-    if (logger.isLoggable(LogLevel.FINE)) {
+    if (logger.isDebugging()) {
       msg.append("\nprojDim " + database.getAssociation(AssociationID.LABEL, id) + ": " + projDim);
       msg.append("\nsimMatrix " + database.getAssociation(AssociationID.LABEL, id) + ": " + simMatrix.toString(Format.NF4));
-      logger.log(LogLevel.FINE, msg.toString());
+      logger.debugFine(msg.toString());
     }
 
     // set the associations

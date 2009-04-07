@@ -1,13 +1,12 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialObject;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Abstract superclass for all non-flat R*-Tree variants.
@@ -105,7 +104,7 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends Ab
 			file.writePage(root);
 			createRoot(root, spatialObjects);
 			setHeight(1);
-			if (logger.isLoggable(LogLevel.FINE)) {
+			if (logger.isDebugging()) {
 				msg.append("\n  numNodes = 1");
 			}
 		}
@@ -120,7 +119,7 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends Ab
 			List<N> nodes = createLeafNodes(objects);
 
 			int numNodes = nodes.size();
-			if (logger.isLoggable(LogLevel.FINE)) {
+			if (logger.isDebugging()) {
 				msg.append("\n  numLeafNodes = ").append(numNodes);
 			}
 			setHeight(1);
@@ -136,14 +135,14 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends Ab
 			createRoot(root, new ArrayList<SpatialObject>(nodes));
 			numNodes++;
       setHeight(getHeight()+1);
-			if (logger.isLoggable(LogLevel.FINE)) {
+			if (logger.isDebugging()) {
 				msg.append("\n  numNodes = ").append(numNodes);
 			}
 		}
-		if (logger.isLoggable(LogLevel.FINE)) {
+		if (logger.isDebugging()) {
 			msg.append("\n  height = ").append(getHeight());
 			msg.append("\n  root " + getRoot());
-			logger.log(LogLevel.FINE, msg.toString() + "\n");
+			logger.debugFine(msg.toString() + "\n");
 		}
 	}
 
@@ -176,10 +175,10 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends Ab
 
 			// write to file
 			file.writePage(dirNode);
-			if (logger.isLoggable(LogLevel.FINER)) {
+			if (logger.isDebuggingFiner()) {
 			  StringBuffer msg = new StringBuffer();
 				msg.append("\npageNo ").append(dirNode.getID());
-				logger.log(LogLevel.FINER, msg.toString() + "\n");
+				logger.debugFiner(msg.toString() + "\n");
 			}
 		}
 
@@ -210,10 +209,10 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends Ab
 
 		// write to file
 		file.writePage(root);
-		if (logger.isLoggable(LogLevel.FINER)) {
+		if (logger.isDebuggingFiner()) {
 			StringBuffer msg = new StringBuffer();
 			msg.append("pageNo ").append(root.getID());
-			logger.log(LogLevel.FINER, msg.toString() + "\n");
+			logger.debugFiner(msg.toString() + "\n");
 		}
 
 		return root;

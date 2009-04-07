@@ -10,7 +10,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.math.statistics.LinearRegression;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
@@ -53,13 +52,13 @@ public class FracClusPreprocessor<V extends RealVector<V, ?>> extends AbstractPa
                 DistanceResultPair<DoubleDistance> ithQueryResult = kNN.get(i);
                 neighbors.add(ithQueryResult.getID());
             }
-            if (logger.isLoggable(LogLevel.FINE)) {
+            if (logger.isDebugging()) {
                 List<DoubleDoublePair> points = new ArrayList<DoubleDoublePair>(neighbors.size());
                 for (int i = 1; i <= neighbors.size(); i++) {
                     points.add(new DoubleDoublePair(Math.log(distanceFunction.distance(neighbors.get(i - 1), id).getValue()), Math.log(i)));
                 }
                 double fractalDimension = new LinearRegression(points).getM();
-                logger.log(LogLevel.FINE, "Fractal Dimension of Point " + id + ": " + fractalDimension + " -- label: " + database.getAssociation(AssociationID.LABEL, id));
+                logger.debugFine("Fractal Dimension of Point " + id + ": " + fractalDimension + " -- label: " + database.getAssociation(AssociationID.LABEL, id));
             }
             database.associate(AssociationID.NEIGHBOR_IDS, id, neighbors);
         }

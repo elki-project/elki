@@ -20,7 +20,6 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.BitDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ERiCDistanceFunction;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
@@ -81,7 +80,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
           logger.verbose("Step 2: Extract correlation clusters...");
         }
         SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap = extractCorrelationClusters(database, dimensionality);
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             StringBuffer msg = new StringBuffer("Step 2: Extract correlation clusters...");
             for (Integer corrDim : clusterMap.keySet()) {
                 List<Cluster<CorrelationModel<V>>> correlationClusters = clusterMap.get(corrDim);
@@ -92,7 +91,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
 //          msg.append("\n  basis " + cluster.getPCA().getWeakEigenvectors().toString("    ", NF) + "  ids " + cluster.getIDs().size());
                 }
             }
-            logger.log(LogLevel.FINE, msg.toString());
+            logger.debugFine(msg.toString());
         }
         if (logger.isVerbose()) {
             int clusters = 0;
@@ -107,7 +106,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
           logger.verbose("\nStep 3: Build hierarchy...");
         }
         buildHierarchy(clusterMap);
-        if (logger.isLoggable(LogLevel.FINE)) {
+        if (logger.isDebugging()) {
             StringBuffer msg = new StringBuffer("Step 3: Build hierarchy");
             for (Integer corrDim : clusterMap.keySet()) {
                 List<Cluster<CorrelationModel<V>>> correlationClusters = clusterMap.get(corrDim);
@@ -122,7 +121,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
                     }
                 }
             }
-            logger.log(LogLevel.FINE, msg.toString());
+            logger.debugFine(msg.toString());
         }
 
         result = new Clustering<CorrelationModel<V>>();
@@ -318,7 +317,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
         for (Integer childCorrDim : clusterMap.keySet()) {
             List<Cluster<CorrelationModel<V>>> children = clusterMap.get(childCorrDim);
             SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> parentMap = clusterMap.tailMap(childCorrDim + 1);
-            if (logger.isLoggable(LogLevel.FINE)) {
+            if (logger.isDebugging()) {
                 msg.append("\n\ncorrdim ").append(childCorrDim);
                 msg.append("\nparents ").append(parentMap.keySet());
             }
@@ -331,7 +330,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
                         if (subspaceDim_parent == lambda_max && child.getParents().isEmpty()) {
                             parent.getChildren().add(child);
                             child.getParents().add(parent);
-                            if (logger.isLoggable(LogLevel.FINE)) {
+                            if (logger.isDebugging()) {
                                 msg.append("\n").append(parent).append(" is parent of ").append(child);
                             }
                         }
@@ -341,7 +340,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
                                 !isParent(distanceFunction, parent, child.getParents()))) {
                                 parent.getChildren().add(child);
                                 child.getParents().add(parent);
-                                if (logger.isLoggable(LogLevel.FINE)) {
+                                if (logger.isDebugging()) {
                                     msg.append("\n").append(parent).append(" is parent of ").append(child);
                                 }
                             }
@@ -350,8 +349,8 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
                 }
             }
         }
-        if (logger.isLoggable(LogLevel.FINE)) {
-          logger.log(LogLevel.FINE, msg.toString());
+        if (logger.isDebugging()) {
+          logger.debugFine(msg.toString());
         }
 
     }
@@ -376,20 +375,20 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
                 return false;
 
             BitDistance dist = distanceFunction.distance(parent.getModel().getCentroid(), child.getModel().getCentroid(), parent.getModel().getPCAResult(), child.getModel().getPCAResult());
-            if (logger.isLoggable(LogLevel.FINE)) {
+            if (logger.isDebugging()) {
                 msg.append("\ndist(").append(child).append(" - ").append(parent).append(") = ").append(dist);
 
             }
             if (!dist.bitValue()) {
-                if (logger.isLoggable(LogLevel.FINE)) {
-                  logger.log(LogLevel.FINE, msg.toString());
+                if (logger.isDebugging()) {
+                  logger.debugFine(msg.toString());
                 }
                 return true;
             }
         }
 
-        if (logger.isLoggable(LogLevel.FINE)) {
-          logger.log(LogLevel.FINE, msg.toString());
+        if (logger.isDebugging()) {
+          logger.debugFine(msg.toString());
         }
         return false;
     }

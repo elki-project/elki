@@ -68,10 +68,10 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
 
     /**
      * Parameter to specify the number of nearest neighbors of an object to be considered for computing its LOF,
-     * must be an integer greater than 0.
+     * must be an integer greater than 1.
      * <p>Key: {@code -genlof.k} </p>
      */
-    private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(0));
+    private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(1));
 
     /**
      * Holds the value of {@link #K_PARAM}.
@@ -128,7 +128,7 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
 
         {// computing reach dist function neighborhoods
             if (logger.isVerbose()) {
-              logger.verbose("computing neighborhods for reachability function");
+              logger.verbose("computing neighborhoods for reachability function");
             }
             Progress reachDistNeighborhoodsProgress = new Progress("Reachability DIstance Neighborhoods", database.size());
             int counter = 1;

@@ -14,7 +14,6 @@ import java.util.Set;
 import de.lmu.ifi.dbs.elki.data.ExternalObject;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
@@ -69,8 +68,8 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
     Map<Pair<Integer, Integer>, D> distanceCache = new HashMap<Pair<Integer, Integer>, D>();
     try {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
-        if(lineNumber % 10000 == 0 && logger.isLoggable(LogLevel.FINE)) {
-          logger.log(LogLevel.FINE, "parse " + lineNumber / 10000);
+        if(lineNumber % 10000 == 0 && logger.isDebugging()) {
+          logger.debugFine("parse " + lineNumber / 10000);
           // logger.fine("parse " + lineNumber / 10000);
         }
         if(!line.startsWith(COMMENT) && line.length() > 0) {
@@ -109,8 +108,8 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
 
-    if(logger.isLoggable(LogLevel.FINE)) {
-      logger.log(LogLevel.FINE, "check");
+    if(logger.isDebugging()) {
+      logger.debugFine("check");
     }
 
     // check if all distance values are specified
@@ -123,8 +122,8 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
       }
     }
 
-    if(logger.isLoggable(LogLevel.FINE)) {
-      logger.log(LogLevel.FINE, "add to objectAndLabelsList");
+    if(logger.isDebugging()) {
+      logger.debugFine("add to objectAndLabelsList");
     }
     for(Integer id : ids) {
       objectAndLabelsList.add(new Pair<ExternalObject, List<String>>(new ExternalObject(id), new ArrayList<String>()));

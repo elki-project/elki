@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -194,8 +193,8 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
    */
   public CorrelationAnalysisSolution<V> generateModel(Database<V> db, Collection<Integer> ids, V centroidDV) {
     CorrelationAnalysisSolution<V> sol;
-    if(logger.isVerbose()) {
-      logger.verbose("PCA...");
+    if(logger.isDebuggingFine()) {
+      logger.debugFine("PCA...");
     }
 
     PCAFilteredResult pcares = pca.processIds(ids, db);
@@ -213,37 +212,31 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
     }
     else {
       Matrix transposedWeakEigenvectors = weakEigenvectors.transpose();
-      if(logger.isLoggable(LogLevel.FINE)) {
+      if(logger.isDebugging()) {
         StringBuilder log = new StringBuilder();
-        log.append("strong Eigenvectors:\n");
-        log.append(pcares.getEigenvectors().times(pcares.selectionMatrixOfStrongEigenvectors()).toString(NF));
-        log.append('\n');
-        log.append("transposed weak Eigenvectors:\n");
-        log.append(transposedWeakEigenvectors.toString(NF));
-        log.append('\n');
+        log.append("Strong Eigenvectors:\n");
+        log.append(pcares.getEigenvectors().times(pcares.selectionMatrixOfStrongEigenvectors()).toString(NF)).append('\n');
+        log.append("Transposed weak Eigenvectors:\n");
+        log.append(transposedWeakEigenvectors.toString(NF)).append('\n');
         log.append("Eigenvalues:\n");
         log.append(FormatUtil.format(pcares.getEigenvalues(), " , ", 2));
-        log.append('\n');
-        logger.log(LogLevel.FINE, log.toString());
+        logger.debugFine(log.toString());
       }
       Matrix B = transposedWeakEigenvectors.times(centroid);
-      if(logger.isLoggable(LogLevel.FINE)) {
+      if(logger.isDebugging()) {
         StringBuilder log = new StringBuilder();
-        log.append("Centroid:\n");
-        log.append(centroid);
-        log.append('\n');
+        log.append("Centroid:\n").append(centroid).append('\n');
         log.append("tEV * Centroid\n");
         log.append(B);
-        log.append('\n');
-        logger.log(LogLevel.FINE, log.toString());
+        logger.debugFine(log.toString());
       }
 
       Matrix gaussJordan = new Matrix(transposedWeakEigenvectors.getRowDimensionality(), transposedWeakEigenvectors.getColumnDimensionality() + B.getColumnDimensionality());
       gaussJordan.setMatrix(0, transposedWeakEigenvectors.getRowDimensionality() - 1, 0, transposedWeakEigenvectors.getColumnDimensionality() - 1, transposedWeakEigenvectors);
       gaussJordan.setMatrix(0, gaussJordan.getRowDimensionality() - 1, transposedWeakEigenvectors.getColumnDimensionality(), gaussJordan.getColumnDimensionality() - 1, B);
 
-      if(logger.isVerbose()) {
-        logger.verbose("Gauss-Jordan-Elimination of " + gaussJordan.toString(NF));
+      if(logger.isDebuggingFiner()) {
+        logger.debugFiner("Gauss-Jordan-Elimination of " + gaussJordan.toString(NF));
       }
 
       double[][] a = new double[transposedWeakEigenvectors.getRowDimensionality()][transposedWeakEigenvectors.getColumnDimensionality()];
@@ -256,15 +249,12 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
 
       sol = new CorrelationAnalysisSolution<V>(lq, db, strongEigenvectors, pcares.getWeakEigenvectors(), pcares.similarityMatrix(), centroid, NF);
 
-      if(logger.isVerbose()) {
+      if(logger.isDebuggingFine()) {
         StringBuilder log = new StringBuilder();
-        log.append("Solution:");
-        log.append('\n');
+        log.append("Solution:\n");
         log.append("Standard deviation ").append(sol.getStandardDeviation());
-        log.append('\n');
         log.append(lq.equationsToString(NF.getMaximumFractionDigits()));
-        log.append('\n');
-        logger.verbose(log.toString());
+        logger.debugFine(log.toString());
       }
     }
     return sol;

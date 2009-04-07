@@ -25,6 +25,11 @@ public final class LoggingConfiguration {
   private static final String CLIConffile = "logging-cli.properties";
 
   /**
+   * Top level ELKI package (for setting 'verbose')
+   */
+  private static final String TOPLEVEL_PACKAGE = "de.lmu.ifi.dbs.elki";
+
+  /**
    * Configuration base
    */
   private static final String confbase = LoggingConfiguration.class.getPackage().getName();
@@ -39,7 +44,6 @@ public final class LoggingConfiguration {
    */
   private LoggingConfiguration() {
     LogManager logManager = LogManager.getLogManager();
-    LogLevel.assertLevelsLoaded();
     Logger logger = Logger.getLogger(LoggingConfiguration.class.getName());
 
     // Load logging configuration from resources.
@@ -77,7 +81,7 @@ public final class LoggingConfiguration {
   private void loadConfigurationPrivate(final String pkg, final String name) {
     final Logger logger = Logger.getLogger(LoggingConfiguration.class.getName());
     final String base = (pkg == null) ? "" : pkg;
-    if (name == null) {
+    if(name == null) {
       logger.log(Level.SEVERE, "No configuration file name given.");
       return;
     }
@@ -87,7 +91,7 @@ public final class LoggingConfiguration {
     Properties cfgprop = new Properties();
     try {
       InputStream res = ClassLoader.getSystemResourceAsStream(base.replace('.', '/') + '/' + name);
-      if (res != null) {
+      if(res != null) {
         cfgprop.load(res);
       }
       if(cfgfile.exists() && cfgfile.canRead()) {
@@ -95,11 +99,11 @@ public final class LoggingConfiguration {
       }
     }
     catch(Exception e) {
-      logger.log(Level.SEVERE, "Failed to load logging properties from "+cfgfile.getAbsolutePath(), e);
+      logger.log(Level.SEVERE, "Failed to load logging properties from " + cfgfile.getAbsolutePath(), e);
     }
     DEBUG = Boolean.valueOf(cfgprop.getProperty("debug"));
   }
-  
+
   /**
    * Reconfigure logging using a configuration file.
    * 
@@ -115,5 +119,24 @@ public final class LoggingConfiguration {
    */
   public static void assertConfigured() {
     // nothing happening here, just to ensure static construction was run.
+  }
+
+  /**
+   * Reconfigure logging to enable 'verbose' logging at the top level.
+   */
+  public static void setVerbose(boolean verbose) {
+    Logger logger = Logger.getLogger(TOPLEVEL_PACKAGE);
+    if(verbose) {
+      // decrease to INFO if it was higher
+      if(logger.getLevel() == null || logger.getLevel().intValue() > Level.INFO.intValue()) {
+        logger.setLevel(Level.INFO);
+      }
+    }
+    else {
+      // increase to warning level if it was INFO.
+      if(logger.getLevel() != null || logger.getLevel() == Level.INFO) {
+        logger.setLevel(Level.WARNING);
+      }
+    }
   }
 }

@@ -20,7 +20,6 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
@@ -105,8 +104,8 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
             int medoidSize = Math.min(database.size(), m_i * k);
             Set<Integer> medoids = greedy(sampleSet, medoidSize);
 
-            if (logger.isLoggable(LogLevel.FINE)) {
-              logger.log(LogLevel.FINE, "m " + medoids);
+            if (logger.isDebugging()) {
+              logger.debugFine("m " + medoids);
             }
 
             // iterative phase
@@ -115,8 +114,8 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
             Set<Integer> m_bad = null;
             Set<Integer> m_current = initialSet(medoids, k);
 
-            if (logger.isLoggable(LogLevel.FINE)) {
-              logger.log(LogLevel.FINE, "m_c " + m_current);
+            if (logger.isDebugging()) {
+              logger.debugFine("m_c " + m_current);
             }
 
             Map<Integer, PROCLUSCluster> clusters = null;
@@ -372,8 +371,8 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
         for (int m = 0; m < max; m++) {
           CTriple<Double,Integer,Integer> z_ij = z_ijs.get(m);
 
-            if (logger.isLoggable(LogLevel.FINE)) {
-              logger.log(LogLevel.FINE, "z_ij " + z_ij);
+            if (logger.isDebugging()) {
+              logger.debugFine("z_ij " + z_ij);
             }
 
             Set<Integer> dims_i = dimensionMap.get(z_ij.getSecond());

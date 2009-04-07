@@ -1,13 +1,5 @@
 package de.lmu.ifi.dbs.elki.converter;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbortException;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.parser.AbstractParser;
-import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.wrapper.StandAloneInputWrapper;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,6 +9,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
+
+import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.parser.AbstractParser;
+import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.wrapper.StandAloneInputWrapper;
 
 /**
  * Converts an arff file into a whitespace separated txt file.
@@ -44,7 +43,7 @@ public class Arff2Txt extends StandAloneInputWrapper {
             LoggingUtil.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
         }
         catch (AbortException e) {
-          LoggingUtil.logExpensive(LogLevel.VERBOSE, e.getMessage());
+          LoggingUtil.message(e.getMessage());
         }
         catch (Exception e) {
           LoggingUtil.exception(wrapper.optionHandler.usage(e.getMessage()), e);

@@ -19,7 +19,6 @@ import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -247,9 +246,9 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V,
                     variance += distance * distance;
                 }
                 standardDeviation[i] = hardClustering.get(i).size() == 0 ? 1 : Math.sqrt(variance / hardClustering.get(i).size());
-                if (logger.isLoggable(LogLevel.FINE)) {
+                if (logger.isDebugging()) {
                     if (standardDeviation[i] == 0) {
-                      logger.log(LogLevel.FINE, i + ": " + standardDeviation[i]);
+                      logger.debugFine(i + ": " + standardDeviation[i]);
                     }
                 }
                 normDistributionFactor[i] = 1.0 / (standardDeviation[i] * Math.sqrt(2 * Math.PI));
@@ -259,8 +258,8 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V,
 
             // new expectation
             emNew = expectationOfMixture(database);
-            if (logger.isLoggable(LogLevel.FINE) && emNew <= em) {
-              logger.log(LogLevel.FINE, "expectation value decreasing: old=" + em + " new=" + emNew + " difference=" + (em - emNew));
+            if (logger.isDebugging() && emNew <= em) {
+              logger.debugFine("expectation value decreasing: old=" + em + " new=" + emNew + " difference=" + (em - emNew));
             }
 
         }
@@ -333,8 +332,8 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V,
             double priorProbX = database.getAssociation(AssociationID.PROBABILITY_X, id);
             double logP = Math.log(priorProbX);
             sum += logP;
-            if (logger.isLoggable(LogLevel.FINE) && false) {
-              logger.log(LogLevel.FINE, "id=" + id + "\nP(x)=" + priorProbX + "\nlogP=" + logP + "\nsum=" + sum);
+            if (logger.isDebugging() && false) {
+              logger.debugFine("id=" + id + "\nP(x)=" + priorProbX + "\nlogP=" + logP + "\nsum=" + sum);
             }
         }
         return sum;
@@ -398,7 +397,7 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V,
                 normalization.normalize(list);
             }
             catch (NonNumericFeaturesException e) {
-              LoggingUtil.logExpensive(LogLevel.WARNING, e.getMessage());
+              logger.warning(e.getMessage());
             }
             List<V> means = new ArrayList<V>(k);
             if (logger.isVerbose()) {
@@ -410,8 +409,8 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V,
                     means.add(normalization.restore(randomVector));
                 }
                 catch (NonNumericFeaturesException e) {
-                  logger.log(LogLevel.WARNING, e.getMessage());
-                    means.add(randomVector);
+                  logger.warning(e.getMessage());
+                  means.add(randomVector);
                 }
             }
             return means;

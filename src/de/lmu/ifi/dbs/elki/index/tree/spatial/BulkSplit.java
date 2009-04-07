@@ -7,9 +7,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.ZCurve;
 
 /**
@@ -18,7 +17,7 @@ import de.lmu.ifi.dbs.elki.math.spacefillingcurves.ZCurve;
  * @author Elke Achtert 
  */
 public class BulkSplit<N extends SpatialObject> {
-  private static Logger logger = Logger.getLogger(BulkSplit.class.getName());
+  private static Logging logger = Logging.getLogger(BulkSplit.class);
   /**
    * Available strategies for bulk loading.
    */
@@ -73,7 +72,7 @@ public class BulkSplit<N extends SpatialObject> {
       // get the split axis and split point
       int splitAxis = chooseMaximalExtendedSplitAxis(objects);
       int splitPoint = chooseBulkSplitPoint(objects.size(), minEntries, maxEntries);
-      if (logger.isLoggable(LogLevel.FINE)) {
+      if (logger.isDebugging()) {
         msg.append("\nsplitAxis ").append(splitAxis);
         msg.append("\nsplitPoint ").append(splitPoint);
       }
@@ -90,15 +89,15 @@ public class BulkSplit<N extends SpatialObject> {
       partitions.add(partition);
 
       // copy array
-      if (logger.isLoggable(LogLevel.FINE)) {
+      if (logger.isDebugging()) {
         msg.append("\ncurrent partition " + partition);
         msg.append("\nremaining objects # ").append(objects.size());
-        logger.fine(msg.toString());
+        logger.debugFine(msg.toString());
       }
     }
 
-    if (logger.isLoggable(LogLevel.FINE)) {
-      logger.fine("\npartitions " + partitions);
+    if (logger.isDebugging()) {
+      logger.debugFine("partitions " + partitions);
     }
     return partitions;
   }
@@ -124,8 +123,8 @@ public class BulkSplit<N extends SpatialObject> {
       }
       valuesList.add(values);
     }
-    if (logger.isLoggable(LogLevel.FINE)) {
-      logger.fine(valuesList.toString());
+    if (logger.isDebugging()) {
+      logger.debugFine(valuesList.toString());
     }
     List<byte[]> zValuesList = ZCurve.zValues(valuesList);
 
@@ -166,15 +165,15 @@ public class BulkSplit<N extends SpatialObject> {
       partitions.add(partition);
 
       // copy array
-      if (logger.isLoggable(LogLevel.FINE)) {
+      if (logger.isDebugging()) {
         msg.append("\ncurrent partition " + partition);
         msg.append("\nremaining objects # ").append(objects.size());
-        logger.fine(msg.toString());
+        logger.debugFine(msg.toString());
       }
     }
 
-    if (logger.isLoggable(LogLevel.FINE)) {
-      logger.fine("\npartitions " + partitions);
+    if (logger.isDebugging()) {
+      logger.debugFine("partitions " + partitions);
     }
     return partitions;
   }

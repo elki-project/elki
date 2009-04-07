@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
 
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.output.PrettyPrinter;
 
@@ -366,14 +366,14 @@ public class OptionHandler {
     public void put(Option<?> option) {
         Option<?> put = this.parameters.put(option.getName(), option);
         if (put != null) {
-          Logger logger = Logger.getLogger(this.getClass().getName());
+            Logging logger = Logging.getLogger(this.getClass());
             try {
                 logger.warning("Parameter " + option.getName() + " has been already set before, overwrite old value. " +
                     "(old value: " + put.getValue().toString() +
                     ", new value: " + option.getValue().toString() + ")");
             }
             catch (UnusedParameterException e) {
-                logger.log(LogLevel.SEVERE, e.getMessage(), e);
+                logger.exception(e.getMessage(), e);
             }
         }
     }

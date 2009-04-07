@@ -5,7 +5,6 @@ import java.util.BitSet;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.PreferenceVectorBasedCorrelationDistance;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
@@ -44,14 +43,14 @@ public class DiSHDistanceFunction<V extends RealVector<V, ?>, P extends Preproce
             double d = weightedDistance(v1, v2, commonPreferenceVector);
             if (d > 2 * getEpsilon()) {
                 subspaceDim++;
-                if (logger.isLoggable(LogLevel.FINE)) {
+                if (logger.isDebugging()) {
                     StringBuffer msg = new StringBuffer();
                     msg.append("d ").append(d);
                     msg.append("\nv1 ").append(getDatabase().getAssociation(AssociationID.LABEL, v1.getID()));
                     msg.append("\nv2 ").append(getDatabase().getAssociation(AssociationID.LABEL, v2.getID()));
                     msg.append("\nsubspaceDim ").append(subspaceDim);
                     msg.append("\ncommon pv ").append(FormatUtil.format(dim, commonPreferenceVector));
-                    logger.log(LogLevel.FINE, msg.toString());
+                    logger.debugFine(msg.toString());
                 }
             }
         }

@@ -15,7 +15,6 @@ import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.logging.LogLevel;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
@@ -143,7 +142,7 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Cluster
             normDistrFactor.add(1.0 / Math.sqrt(Math.pow(2 * Math.PI, dimensionality) * m.det()));
             invCovMatr.add(m.inverse());
             clusterWeights.add(1.0 / k);
-            if (logger.isLoggable(LogLevel.FINE) && false) {
+            if (logger.isDebugging() && false) {
                 StringBuffer msg = new StringBuffer();
                 msg.append(" model ").append(i).append(":\n");
                 msg.append(" mean:    ").append(means.get(i)).append("\n");
@@ -151,7 +150,7 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Cluster
                 msg.append(" m.det(): ").append(m.det()).append("\n");
                 msg.append(" cluster weight: ").append(clusterWeights.get(i)).append("\n");
                 msg.append(" normDistFact:   ").append(normDistrFactor.get(i)).append("\n");
-                logger.log(LogLevel.FINE, msg.toString());
+                logger.debugFine(msg.toString());
             }
         }
         assignProbabilitiesToInstances(database, normDistrFactor, means, invCovMatr, clusterWeights);
@@ -290,8 +289,8 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Cluster
                 Matrix rowTimesCovTimesCol = rowTimesCov.times(differenceCol);
                 double power = rowTimesCovTimesCol.get(0, 0) / 2.0;
                 double prob = normDistrFactor.get(i) * Math.exp(-power);
-                if (logger.isLoggable(LogLevel.FINE) && false) {
-                  logger.log(LogLevel.FINE, 
+                if (logger.isDebugging() && false) {
+                  logger.debugFine(
                         " difference vector= ( " + difference.toString() + " )\n" +
                         " differenceRow:\n" + differenceRow.toString("    ") + "\n" +
                         " differenceCol:\n" + differenceCol.toString("    ") + "\n" +
@@ -333,8 +332,8 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Cluster
             double priorProbX = database.getAssociation(AssociationID.PROBABILITY_X, id);
             double logP = Math.log(priorProbX);
             sum += logP;
-            if (logger.isLoggable(LogLevel.FINE) && false) {
-              logger.log(LogLevel.FINE, "id=" + id + "\nP(x)=" + priorProbX + "\nlogP=" + logP + "\nsum=" + sum);
+            if (logger.isDebugging() && false) {
+              logger.debugFine("id=" + id + "\nP(x)=" + priorProbX + "\nlogP=" + logP + "\nsum=" + sum);
             }
         }
         return sum;
