@@ -103,9 +103,8 @@ public abstract class AbstractMeasurementFunction<O extends DatabaseObject, D ex
      */
     @Override
     public String parameterDescription() {
-        StringBuffer description = new StringBuffer(super.parameterDescription());
-        description.append(optionHandler.usage("Pattern for defining a range: " +
-            "\"" + requiredInputPattern() + "\".", false));
+        StringBuffer description = new StringBuffer(super.inlineParameterDescription());
+        description.append("Pattern for defining a range: \"" + requiredInputPattern() + "\".");
         return description.toString();
     }
 }

@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
@@ -109,6 +110,9 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
         StringBuilder description = new StringBuilder();
         description.append(super.parameterDescription());
         if (distanceFunction != null) {
+            description.append(OptionHandler.OPTION_PREFIX);
+            description.append(DISTANCE_FUNCTION_ID.getName());
+            description.append(" ");
             description.append(distanceFunction.parameterDescription());
         }
         return description.toString();

@@ -47,7 +47,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
   /**
    * Information for citation and version.
    */
-  public static final String INFORMATION = "Version 0.1 (2008, July)\n\n" + "published in:\n" + "Elke Achtert, Hans-Peter Kriegel, Arthur Zimek:\n" + "ELKI: A Software System for Evaluation of Subspace Clustering Algorithms.\n" + "In Proc. 20th International Conference on Scientific and Statistical Database Management (SSDBM 2008), Hong Kong, China, 2008.\n\n";
+  public static final String INFORMATION = "ELKI Version 0.1 (2008, July)\n\n" + "published in:\n" + "Elke Achtert, Hans-Peter Kriegel, Arthur Zimek:\n" + "ELKI: A Software System for Evaluation of Subspace Clustering Algorithms.\n" + "In Proc. 20th International Conference on Scientific and Statistical Database Management (SSDBM 2008), Hong Kong, China, 2008.";
 
   /**
    * The String for calling this class' main routine on command line interface.
@@ -245,11 +245,6 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
     }
     helpOptionHandler.grabOptions(args);
 
-    // help
-    if(helpOptionHandler.isSet(HELP_FLAG) || helpOptionHandler.isSet(HELP_LONG_FLAG)) {
-      throw new AbortException(INFORMATION + parameterDescription());
-    }
-
     // description
     if(helpOptionHandler.isSet(DESCRIPTION_PARAM)) {
       String descriptionClass = DESCRIPTION_PARAM.getValue();
@@ -275,7 +270,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
         throw new AbortException(p.parameterDescription());
       }
     }
-
+    
     String[] remainingParameters = super.setParameters(args);
 
     // algorithm
@@ -300,6 +295,11 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
       throw new WrongParameterValueException("Illegal parameter setting: Flag " + NORMALIZATION_UNDO_FLAG + " is set, but no normalization is specified.");
     }
 
+    // help
+    if(helpOptionHandler.isSet(HELP_FLAG) || helpOptionHandler.isSet(HELP_LONG_FLAG)) {
+      throw new AbortException(INFORMATION);
+    }
+    
     initialized = true;
     setParameters(args, remainingParameters);
     return remainingParameters;
@@ -391,10 +391,12 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
       kddTask.run();
     }
     catch(AbortException e) {
+      // ensure we actually show the message:
+      LoggingConfiguration.setVerbose(true);
       logger.info(kddTask.usage(e.getMessage() + "\n\nUSAGE:"));
     }
     catch(ParameterException e) {
-      logger.warning(kddTask.usage(e.getMessage() + "\n\nUSAGE:\n"));
+      logger.warning(kddTask.usage(e.getMessage() + "\n\nUSAGE:"));
     }
     // any other exception
     catch(Exception e) {

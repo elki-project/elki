@@ -241,8 +241,8 @@ public class OptionHandler {
      *         constructor.
      */
     public String usage(String message, boolean standalone) {
-        String empty = "";
-        String space = " ";
+        final String empty = "";
+        final String space = " ";
         int lineLength = 80;
         String paramLineIndent = "        ";
         StringBuffer messageBuffer = new StringBuffer();
@@ -251,8 +251,6 @@ public class OptionHandler {
         }
 
         String[] options = new String[parameters.size()];
-
-        String[] shortDescriptions = new String[options.length];
 
         String[] longDescriptions = new String[options.length];
 
@@ -265,28 +263,22 @@ public class OptionHandler {
 
             String currentOption = option.getKey();
 
-            String desc = option.getValue().getDescription();
-
-            String shortDescription = empty;
-            String longDescription = desc;
+            String longDescription = option.getValue().getDescription();
 
             if (option.getValue() instanceof Parameter) {
                 currentOption = currentOption.substring(0);
             }
             currentOption = OPTION_PREFIX + currentOption;
             options[counter] = currentOption;
-            shortDescriptions[counter] = shortDescription;
             longDescriptions[counter] = longDescription;
-            longestShortline = Math.max(longestShortline, currentOption.length() + shortDescription.length() + 1);
-            currentLength = currentLength + currentOption.length() + 2 + shortDescription.length();
+            longestShortline = Math.max(longestShortline, currentOption.length() + 1);
+            currentLength = currentLength + currentOption.length() + 1;
             if (currentLength > lineLength) {
                 paramLine.append(NEWLINE);
                 paramLine.append(paramLineIndent);
                 currentLength = paramLineIndent.length();
             }
             paramLine.append(currentOption);
-            paramLine.append(space);
-            paramLine.append(shortDescription);
             paramLine.append(space);
 
             counter++;
@@ -301,6 +293,10 @@ public class OptionHandler {
             descriptionIndent.append(space);
         }
         int thirdCol = lineLength - (firstCol + secondCol);
+        // if the column would be zero-width, give up...
+        if (thirdCol < 0) {
+          thirdCol = lineLength;
+        }
         int[] cols = {firstCol, secondCol, thirdCol};
         PrettyPrinter prettyPrinter = new PrettyPrinter(cols, empty);
         char fillchar = ' ';
@@ -320,8 +316,6 @@ public class OptionHandler {
             StringBuffer option = new StringBuffer();
             option.append(indent);
             option.append(options[i]);
-            option.append(space);
-            option.append(shortDescriptions[i]);
             Vector<String> lines = prettyPrinter.breakLine(longDescriptions[i], 2);
             String[] firstline = {option.toString(), mark, lines.firstElement()};
             messageBuffer.append(prettyPrinter.formattedLine(firstline, fillchar)).append(NEWLINE);
