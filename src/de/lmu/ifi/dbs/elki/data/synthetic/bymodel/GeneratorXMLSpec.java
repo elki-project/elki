@@ -7,17 +7,22 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.net.URL;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.regex.Pattern;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.validation.Schema;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
+
+import com.sun.org.apache.xerces.internal.jaxp.validation.XMLSchemaFactory;
 
 import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution.NormalDistribution;
@@ -73,6 +78,11 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
    */
   private final DoubleParameter SIZE_SCALE_PARAM = new DoubleParameter(SIZE_SCALE_ID, 1.0);
 
+  /**
+   * File name of the generators XML Schema file.
+   */
+  private static final String GENERATOR_SCHEMA_FILE = GeneratorXMLSpec.class.getPackage().getName().replace('.', '/') + '/'+ "GeneratorByModel.xsd";
+  
   /**
    * The configuration file.
    */
@@ -136,9 +146,18 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
       InputStream in = new FileInputStream(specfile);
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-      //Schema schema = XMLSchemaFactory.newInstance(XMLConstants.XML_DTD_NS_URI).newSchema();
-      //dbf.setSchema(schema);
-      // dbf.setIgnoringElementContentWhitespace(true);
+      URL url = ClassLoader.getSystemResource(GENERATOR_SCHEMA_FILE);
+      if (url != null) {
+        try {
+        Schema schema = XMLSchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(url);
+        dbf.setSchema(schema);
+        dbf.setIgnoringElementContentWhitespace(true);
+        } catch (Exception e) {
+          logger.warning("Could not set up XML Schema validation for speciciation file.");
+        }
+      } else {
+        logger.warning("Could not set up XML Schema validation for speciciation file.");
+      }
       Document doc = dbf.newDocumentBuilder().parse(in);
       Node root = doc.getDocumentElement();
       if(root.getNodeName() == "dataset") {

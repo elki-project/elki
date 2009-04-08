@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="dataset">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice minOccurs="1" maxOccurs="unbounded">
+          <xs:element ref="cluster" />
+          <xs:element ref="static" />
+        </xs:choice>
+      </xs:sequence>
+      <xs:attribute name="test-model" type="xs:boolean" use="optional" />
+      <xs:attribute name="random-seed" type="xs:integer" use="optional" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="cluster">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice minOccurs="1" maxOccurs="unbounded">
+          <xs:element ref="uniform" />
+          <xs:element ref="normal" />
+        </xs:choice>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="translate" />
+          <xs:element ref="rotate" />
+        </xs:choice>
+        <xs:element ref="clip" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="name" type="xs:string" use="required" />
+      <xs:attribute name="size" type="xs:integer" use="required" />
+      <xs:attribute name="density-correction" type="xs:decimal" use="optional" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="uniform">
+    <xs:complexType>
+      <xs:attribute name="max" type="xs:decimal" use="optional" />
+      <xs:attribute name="min" type="xs:decimal" use="optional" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="normal">
+    <xs:complexType>
+      <xs:attribute name="mean" type="xs:decimal" use="optional" />
+      <xs:attribute name="stddev" type="xs:decimal" use="optional" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="clip">
+    <xs:complexType>
+      <xs:attribute name="max" type="xs:string" use="required" />
+      <xs:attribute name="min" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="static">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="point" />
+      </xs:sequence>
+      <xs:attribute name="name" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="point">
+    <xs:complexType>
+      <xs:attribute name="vector" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="rotate">
+    <xs:complexType>
+      <xs:attribute name="axis1" type="xs:integer" use="required" />
+      <xs:attribute name="axis2" type="xs:integer" use="required" />
+      <xs:attribute name="angle" type="xs:decimal" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="translate">
+    <xs:complexType>
+      <xs:attribute name="vector" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
