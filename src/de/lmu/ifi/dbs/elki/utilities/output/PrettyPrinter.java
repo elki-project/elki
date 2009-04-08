@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.utilities.output;
 import java.util.Vector;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
  * Class for formatting output into table.
@@ -75,22 +76,17 @@ public class PrettyPrinter {
     StringBuffer line = new StringBuffer();
     if(lineEntries.length == columnWidth.length) {
       for(int i = 0; i < lineEntries.length; i++) {
-        StringBuffer fill = new StringBuffer();
-        for(int f = 0; f < (columnWidth[i] - lineEntries[i].length()); f++) {
-          fill.append(fillCharacter);
-        }
-        if(leftBounded[i]) {
-          line.append(lineEntries[i]);
-          if (i != lineEntries.length - 1) {
-            line.append(fill.toString());
-          }
-        }
-        else {
-          line.append(fill.toString());
+        if(! leftBounded[i]) {
+          line.append(FormatUtil.padRightAligned(lineEntries[i], columnWidth[i]));
+          line.append(separator);
+        } else
+        if (i != lineEntries.length - 1) {
+          line.append(FormatUtil.pad(lineEntries[i], columnWidth[i]));          
+          line.append(separator);
+        } else {
+          // last column.
           line.append(lineEntries[i]);
         }
-
-        line.append(separator);
       }
     }
     else {

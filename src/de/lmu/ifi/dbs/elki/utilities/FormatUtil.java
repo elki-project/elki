@@ -425,4 +425,28 @@ public final class FormatUtil {
     }
     return new String(buf);
   }
+
+  /**
+   * Pad a string to a given length by adding whitespace to the right.
+   * 
+   * @param o original string
+   * @param len destination length
+   * @return padded string of at least length len (and o otherwise)
+   */
+  public static String pad(String o, int len) {
+    if (o.length() >= len) { return o; }
+    return o + whitespace(len - o.length());
+  }
+  
+  /**
+   * Pad a string to a given length by adding whitespace to the left.
+   * 
+   * @param o original string
+   * @param len destination length
+   * @return padded string of at least length len (and o otherwise)
+   */
+  public static String padRightAligned(String o, int len) {
+    if (o.length() >= len) { return o; }
+    return whitespace(len - o.length()) + o;
+  }
 }
