@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
 
+import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.output.PrettyPrinter;
@@ -21,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.output.PrettyPrinter;
  *
  * @author Arthur Zimek
  */
-public class OptionHandler {
+public class OptionHandler extends AbstractLoggable {
     /**
      * The newline-String dependent on the system.
      */
@@ -65,6 +66,7 @@ public class OptionHandler {
      *                    usage in usage(String))
      */
     public OptionHandler(Map<String, Option<?>> parameters, String programCall) {
+        super(false);
         this.parameters = parameters;
         this.programCall = programCall;
         this.globalParameterConstraints = new ArrayList<GlobalParameterConstraint>();
@@ -93,13 +95,13 @@ public class OptionHandler {
             }
 
             // get the option without the option prefix -
-            String noPrefixOption = currentOptions[i].substring(1);
+            String noPrefixOption = currentOptions[i].substring(OPTION_PREFIX.length());
 
             // check if parameter-Map contains the current option
             if (parameters.containsKey(noPrefixOption)) {
 
                 Option<?> current = parameters.get(noPrefixOption);
-                // check if ithe option is a parameter or a flag
+                // check if the option is a parameter or a flag
                 if (current instanceof Parameter) {
 
                     // check if there is a next element in the option array and
@@ -119,7 +121,7 @@ public class OptionHandler {
                             i++;
                         }
                     }
-                    // next element seems to be a paramter of flag identifier!
+                    // next element seems to be a parameter of flag identifier!
                     else {
                         throw new NoParameterValueException("Parameter " + currentOptions[i] + " requires a parameter value!");
                     }
@@ -148,7 +150,7 @@ public class OptionHandler {
 
                 // unexpected option type
                 else {
-                    // TODO unexpected option type
+                    // FIXME unexpected option type
                 }
 
             }
@@ -168,13 +170,11 @@ public class OptionHandler {
         String[] remain = new String[unexpectedParameters.size()];
         unexpectedParameters.toArray(remain);
 
-//    if (this.debug) { // TODO doesn't work!! has to be checked!
-//      for (Map.Entry<String, Option<?>> option : parameters.entrySet()) {
-//        debugFine("option " + option.getKey() + " has value " + option.getValue().getValue());
-//
-//      }
-//
-//    }
+        if (logger.isDebuggingFiner()) {
+          for (Map.Entry<String, Option<?>> option : parameters.entrySet()) {
+            logger.debugFiner("option " + option.getKey() + " has value " + option.getValue().getValue());
+          }
+        }
 
         setDefaultValues();
 
