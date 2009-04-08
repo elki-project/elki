@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
-import de.lmu.ifi.dbs.elki.utilities.output.Format;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
  * Represents a node in an MkApp-Tree.
@@ -87,7 +87,7 @@ class MkAppTreeNode<O extends DatabaseObject, D extends NumberDistance<D, N>, N 
 
         if (LoggingConfiguration.DEBUG) {
             StringBuffer msg = new StringBuffer();
-            msg.append("b " + Format.format(b, 4));
+            msg.append("b " + FormatUtil.format(b, 4));
             Logger.getLogger(this.getClass().getName()).fine(msg.toString());
         }
 

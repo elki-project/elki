@@ -16,7 +16,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.AllOrNoneMustBeSetGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualSizeGlobalConstraint;
-import de.lmu.ifi.dbs.elki.utilities.output.Format;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -254,8 +253,8 @@ public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ? >> e
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> settings = super.getAttributeSettings();
     AttributeSettings mySettings = settings.get(0);
-    mySettings.addSetting("value of min ", Format.format(minima));
-    mySettings.addSetting("value of max ", Format.format(maxima));
+    mySettings.addSetting("value of min ", FormatUtil.format(minima));
+    mySettings.addSetting("value of max ", FormatUtil.format(maxima));
     return settings;
   }
 

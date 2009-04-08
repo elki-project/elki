@@ -8,6 +8,28 @@ import java.util.Locale;
  * Utility methods for output formatting of various number objects
  */
 public final class FormatUtil {
+
+  /**
+   * Number Formatter for output purposes.
+   */
+  public static final NumberFormat NF2 = NumberFormat.getInstance(Locale.US);
+  public static final NumberFormat NF4 = NumberFormat.getInstance(Locale.US);
+  public static final NumberFormat NF8 = NumberFormat.getInstance(Locale.US);
+
+  static {
+    NF2.setMinimumFractionDigits(2);
+    NF2.setMaximumFractionDigits(2);
+    NF4.setMinimumFractionDigits(4);
+    NF4.setMaximumFractionDigits(4);
+    NF8.setMinimumFractionDigits(8);
+    NF8.setMaximumFractionDigits(8);
+  }
+
+  /**
+   * Whitespace. The string should cover the commonly used length.
+   */
+  private static final String WHITESPACE_BUFFER = "                                                                                ";
+
   /**
    * Formats the double d with the specified fraction digits.
    * 
@@ -129,6 +151,18 @@ public final class FormatUtil {
    */
   public static String format(double[] d) {
     return format(d, ", ", 2);
+  }
+
+  /**
+   * Formats the double array d with ', ' as separator
+   * and with the specified fraction digits.
+   *
+   * @param d      the double array to be formatted
+   * @param digits the number of fraction digits
+   * @return a String representing the double array d
+   */
+  public static String format(double[] d, int digits) {
+    return format(d, ", ", digits);
   }
 
   /**
@@ -373,5 +407,22 @@ public final class FormatUtil {
   public static String format(int dim, BitSet bitSet) {
     // TODO: removed whitespace - hierarchy reading to be adapted!
     return format(bitSet, dim, ",");
+  }
+  
+  /**
+   * Returns a string with the specified number of whitespace.
+   *
+   * @param n the number of whitespace characters
+   * @return a string with the specified number of blanks
+   */
+  public static String whitespace(int n) {
+    if (n < WHITESPACE_BUFFER.length()) {
+      return WHITESPACE_BUFFER.substring(0,n);
+    }
+    char[] buf = new char[n];
+    for (int i = 0; i < n; i++) {
+      buf[i] = WHITESPACE_BUFFER.charAt(0);
+    }
+    return new String(buf);
   }
 }

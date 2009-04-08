@@ -9,8 +9,8 @@ import de.lmu.ifi.dbs.elki.data.ParameterizationFunction;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.utilities.output.Format;
 
 /**
  * Supports the splitting of CASH intervals.
@@ -103,8 +103,8 @@ public class CASHIntervalSplit extends AbstractLoggable {
 
             if (f_min - f_max > ParameterizationFunction.DELTA) {
                 throw new IllegalArgumentException("Houston, we have a problem: f_min > f_max! " +
-                                                   "\nf_min[" + Format.format(interval.centroid()) + "] = " + f_min +
-                                                   "\nf_max[" + Format.format(interval.centroid()) + "] = " + f_max +
+                                                   "\nf_min[" + FormatUtil.format(interval.centroid()) + "] = " + f_min +
+                                                   "\nf_max[" + FormatUtil.format(interval.centroid()) + "] = " + f_max +
                                                    "\nf " + database.get(id));
             }
 

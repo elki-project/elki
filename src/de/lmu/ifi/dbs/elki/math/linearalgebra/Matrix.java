@@ -1349,7 +1349,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
     /**
      * getDiagonal returns array of diagonal-elements.
      *
-     * @return double[] the values on the diagonaly of the Matrix
+     * @return double[] the values on the diagonal of the Matrix
      */
     public double[] getDiagonal() {
         double[] diagonal = new double[rowdimension];
@@ -1391,7 +1391,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
     /**
      * Scales the specified column with the specified factor.
      *
-     * @param j     the index of the column tp be scaled
+     * @param j     the index of the column to be scaled
      * @param scale the factor to scale the column
      */
     public void scaleColumn(int j, double scale) {

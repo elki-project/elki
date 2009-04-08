@@ -20,7 +20,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.VectorListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalListSizeConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalVectorListElementSizeConstraint;
-import de.lmu.ifi.dbs.elki.utilities.output.Format;
 
 /**
  * Provides automatic generation of arbitrary oriented hyperplanes of arbitrary
@@ -194,9 +193,9 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
         if (logger.isDebugging()) {
             StringBuffer msg = new StringBuffer();
             msg.append("basis");
-            msg.append(basis.toString(Format.NF4));
+            msg.append(basis.toString(FormatUtil.NF4));
             msg.append("\npoint");
-            msg.append(point.toString(Format.NF4));
+            msg.append(point.toString(FormatUtil.NF4));
             logger.debugFine(msg.toString());
         }
 
@@ -255,10 +254,10 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
         if (logger.isDebugging()) {
             StringBuffer msg = new StringBuffer();
 
-            msg.append("point ").append(point.toString(Format.NF4));
-            msg.append("\nbasis ").append(basis.toString(Format.NF4));
-            msg.append("\northonormal basis ").append(orthonormalBasis_U.toString(Format.NF4));
-            msg.append("\ncomplete vectors ").append(completeVectors.toString(Format.NF4));
+            msg.append("point ").append(point.toString(FormatUtil.NF4));
+            msg.append("\nbasis ").append(basis.toString(FormatUtil.NF4));
+            msg.append("\northonormal basis ").append(orthonormalBasis_U.toString(FormatUtil.NF4));
+            msg.append("\ncomplete vectors ").append(completeVectors.toString(FormatUtil.NF4));
             logger.debugFine(msg.toString());
         }
 
@@ -266,7 +265,7 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
         Matrix basis_V = orthonormalBasis_U.appendColumns(completeVectors);
         basis_V = basis_V.orthonormalize();
         if (logger.isDebugging()) {
-          logger.debugFine("basis V " + basis_V.toString(Format.NF4));
+          logger.debugFine("basis V " + basis_V.toString(FormatUtil.NF4));
         }
 
         // normal vectors of U
@@ -274,18 +273,18 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
             .getRowDimensionality()
             - basis.getColumnDimensionality() + basis.getColumnDimensionality() - 1);
         if (logger.isDebugging()) {
-          logger.debugFine("normal vector U " + normalVectors_U.toString(Format.NF4));
+          logger.debugFine("normal vector U " + normalVectors_U.toString(FormatUtil.NF4));
         }
         Matrix transposedNormalVectors = normalVectors_U.transpose();
         if (logger.isDebugging()) {
-          logger.debugFine("tNV " + transposedNormalVectors.toString(Format.NF4));
-          logger.debugFine("point " + point.toString(Format.NF4));
+          logger.debugFine("tNV " + transposedNormalVectors.toString(FormatUtil.NF4));
+          logger.debugFine("point " + point.toString(FormatUtil.NF4));
         }
 
         // gauss jordan
         Matrix B = transposedNormalVectors.times(point);
         if (logger.isDebugging()) {
-          logger.debugFine("B " + B.toString(Format.NF4));
+          logger.debugFine("B " + B.toString(FormatUtil.NF4));
         }
         Matrix gaussJordan = new Matrix(transposedNormalVectors.getRowDimensionality(), transposedNormalVectors.getColumnDimensionality()
             + B.getColumnDimensionality());
@@ -404,13 +403,13 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
     private void output(OutputStreamWriter outStream, List<DoubleVector> featureVectors, LinearEquationSystem dependency, double std)
         throws IOException {
         outStream.write("########################################################" + LINE_SEPARATOR);
-        outStream.write("### " + MIN_ID.getName() + " [" + FormatUtil.format(min, ",", Format.NF4) + "]" + LINE_SEPARATOR);
-        outStream.write("### " + MAX_ID.getName() + " [" + FormatUtil.format(max, ",", Format.NF4) + "]" + LINE_SEPARATOR);
+        outStream.write("### " + MIN_ID.getName() + " [" + FormatUtil.format(min, ",", FormatUtil.NF4) + "]" + LINE_SEPARATOR);
+        outStream.write("### " + MAX_ID.getName() + " [" + FormatUtil.format(max, ",", FormatUtil.NF4) + "]" + LINE_SEPARATOR);
         outStream.write("### " + NUMBER_ID.getName() + " " + number + LINE_SEPARATOR);
-        outStream.write("### " + POINT_ID.getName() + " [" + FormatUtil.format(point.getColumnPackedCopy(), Format.NF4) + "]" + LINE_SEPARATOR);
+        outStream.write("### " + POINT_ID.getName() + " [" + FormatUtil.format(point.getColumnPackedCopy(), FormatUtil.NF4) + "]" + LINE_SEPARATOR);
         outStream.write("### " + BASIS_ID.getName() + " ");
         for (int i = 0; i < basis.getColumnDimensionality(); i++) {
-            outStream.write("[" + FormatUtil.format(basis.getColumn(i).getColumnPackedCopy(), Format.NF4) + "]");
+            outStream.write("[" + FormatUtil.format(basis.getColumn(i).getColumnPackedCopy(), FormatUtil.NF4) + "]");
             if (i < basis.getColumnDimensionality() - 1) {
                 outStream.write(",");
             }
@@ -418,16 +417,16 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
         outStream.write(LINE_SEPARATOR);
 
         if (jitter != 0) {
-            outStream.write("### max jitter in each dimension " + FormatUtil.format(jitter, Format.NF4) + "%" + LINE_SEPARATOR);
-            outStream.write("### Randomized standard deviation " + FormatUtil.format(jitter_std, Format.NF4) + LINE_SEPARATOR);
-            outStream.write("### Real       standard deviation " + FormatUtil.format(std, Format.NF4) + LINE_SEPARATOR);
+            outStream.write("### max jitter in each dimension " + FormatUtil.format(jitter, FormatUtil.NF4) + "%" + LINE_SEPARATOR);
+            outStream.write("### Randomized standard deviation " + FormatUtil.format(jitter_std, FormatUtil.NF4) + LINE_SEPARATOR);
+            outStream.write("### Real       standard deviation " + FormatUtil.format(std, FormatUtil.NF4) + LINE_SEPARATOR);
             outStream.write("###" + LINE_SEPARATOR);
         }
 
         if (dependency != null) {
             outStream.write("### " + LINE_SEPARATOR);
             outStream.write("### dependency ");
-            outStream.write(dependency.equationsToString("### ", Format.NF4.getMaximumFractionDigits()));
+            outStream.write(dependency.equationsToString("### ", FormatUtil.NF4.getMaximumFractionDigits()));
         }
         outStream.write("########################################################" + LINE_SEPARATOR);
 
@@ -573,7 +572,7 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
             return
                 // "basisVectors : " + basisVectors.toString(NF) +
                 // "normalVectors: " + normalVectors.toString(NF) +
-                "dependency: " + dependency.equationsToString(Format.NF4.getMaximumFractionDigits());
+                "dependency: " + dependency.equationsToString(FormatUtil.NF4.getMaximumFractionDigits());
         }
     }
 }

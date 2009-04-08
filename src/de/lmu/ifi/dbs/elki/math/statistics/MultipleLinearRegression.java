@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.math.statistics;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.output.Format;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
  * Multiple linear regression attempts to model the relationship between two or more
@@ -127,7 +127,7 @@ public class MultipleLinearRegression {
         msg.append(b.toString(9, 4));
         msg.append("\ne = ");
         msg.append(e.toString(9, 4));
-        msg.append("error variance = ").append(Format.format(variance, 4));
+        msg.append("error variance = ").append(FormatUtil.format(variance, 4));
         return msg.toString();
     }
 

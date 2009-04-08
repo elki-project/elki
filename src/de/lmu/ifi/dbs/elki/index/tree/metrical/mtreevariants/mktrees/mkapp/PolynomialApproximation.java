@@ -1,11 +1,11 @@
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkapp;
 
-import de.lmu.ifi.dbs.elki.utilities.output.Format;
-
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
  * Provides an polynomial approximation bo + b1*k + b2*k^2 + ... + bp*k^p
@@ -122,6 +122,6 @@ public class PolynomialApproximation implements Externalizable {
    */
   @Override
   public String toString() {
-    return Format.format(b, 4);
+    return FormatUtil.format(b, 4);
   }
 }

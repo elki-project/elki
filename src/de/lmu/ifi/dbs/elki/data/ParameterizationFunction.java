@@ -4,7 +4,6 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.utilities.output.Format;
 
 /**
  * A parameterization function describes all lines in a
@@ -209,11 +208,11 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
             "f_c " + f_c + "\n" +
             "f_r " + f_r + "\n" +
             "p " + getColumnVector() + "\n" +
-            "box min " + Format.format(interval.getMin()) + "\n" +
-            "box max " + Format.format(interval.getMax()) + "\n" +
-            "alpha   " + Format.format(alpha_extreme_c) + "\n" +
-            "alpha_l " + Format.format(alpha_extreme_l) + "\n" +
-            "alpha_r " + Format.format(alpha_extreme_r) + "\n" +
+            "box min " + FormatUtil.format(interval.getMin()) + "\n" +
+            "box max " + FormatUtil.format(interval.getMax()) + "\n" +
+            "alpha   " + FormatUtil.format(alpha_extreme_c) + "\n" +
+            "alpha_l " + FormatUtil.format(alpha_extreme_l) + "\n" +
+            "alpha_r " + FormatUtil.format(alpha_extreme_r) + "\n" +
             "n " + n);
 
     }
@@ -392,7 +391,7 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
         StringBuffer result = new StringBuffer();
         for (int d = 0; d < getDimensionality(); d++) {
             if (d != 0) {
-                result.append(" + \n").append(Format.blanks(offset));
+                result.append(" + \n").append(FormatUtil.whitespace(offset));
             }
             result.append(FormatUtil.format(getValue(d + 1)));
             for (int j = 0; j < d; j++) {
@@ -434,7 +433,7 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
                 throw new IllegalStateException("Houston, we have a problem!" +
                     "\n" + this +
                     "\n" + this.getColumnVector() +
-                    "\n" + Format.format(alphaExtremum));
+                    "\n" + FormatUtil.format(alphaExtremum));
             }
         }
 
@@ -471,7 +470,7 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
         else {
             throw new IllegalStateException("Houston, we have a problem:" +
                 "\n" + this +
-                "\nextremum at " + Format.format(alphaExtremum) +
+                "\nextremum at " + FormatUtil.format(alphaExtremum) +
                 "\nf  " + f +
                 "\nf1 " + f1 +
                 "\nf2 " + f2);

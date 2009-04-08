@@ -8,12 +8,12 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
-import de.lmu.ifi.dbs.elki.utilities.output.Format;
 
 /**
  * Preprocessor for PreDeCon local dimensionality and locally weighted matrix
@@ -133,7 +133,7 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends RealVector<V,
 
     if (logger.isDebugging()) {
       msg.append("\nprojDim " + database.getAssociation(AssociationID.LABEL, id) + ": " + projDim);
-      msg.append("\nsimMatrix " + database.getAssociation(AssociationID.LABEL, id) + ": " + simMatrix.toString(Format.NF4));
+      msg.append("\nsimMatrix " + database.getAssociation(AssociationID.LABEL, id) + ": " + simMatrix.toString(FormatUtil.NF4));
       logger.debugFine(msg.toString());
     }
 
