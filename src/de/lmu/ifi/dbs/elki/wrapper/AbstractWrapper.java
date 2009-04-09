@@ -89,11 +89,6 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
       this.remainingParameters.add(s);
     }
 
-    // help
-    if(HELP_FLAG.isSet()) {
-      throw new AbortException(optionHandler.usage(""));
-    }
-
     // verbose
     verbose = VERBOSE_FLAG.isSet();
     if(verbose) {
@@ -140,7 +135,11 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
   public void runCLIWrapper(String[] args) {
     LoggingConfiguration.assertConfigured();
     try {
-      setParameters(args);
+      this.setParameters(args);
+      // help
+      if(HELP_FLAG.isSet()) {
+        throw new AbortException("Usage:\n\n"+parameterDescription());
+      }
       run();
     }
     catch(AbortException e) {
@@ -150,7 +149,7 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
     catch(ParameterException e) {
       if(HELP_FLAG.isSet()) {
         LoggingConfiguration.setVerbose(true);
-        logger.verbose(optionHandler.usage(""));
+        logger.verbose("Usage:\n\n"+parameterDescription());
       }
       logger.warning(e.toString());
     }

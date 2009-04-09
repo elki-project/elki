@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki;
 import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
-import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
@@ -12,6 +11,7 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
@@ -386,7 +386,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
    */
   public static void main(String[] args) {
     LoggingConfiguration.assertConfigured();
-    Logger logger = Logger.getLogger(KDDTask.class.getName());
+    Logging logger = Logging.getLogger(KDDTask.class);
     KDDTask<? extends DatabaseObject> kddTask = new KDDTask<DatabaseObject>();
     try {
       String[] remainingParameters = kddTask.setParameters(args);
@@ -398,10 +398,10 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
     catch(AbortException e) {
       // ensure we actually show the message:
       LoggingConfiguration.setVerbose(true);
-      logger.info(kddTask.usage(e.getMessage() + "\n\nUSAGE:"));
+      logger.verbose(kddTask.usage(e.getMessage() + "\n\nUSAGE:"));
     }
     catch(ParameterException e) {
-      logger.warning(kddTask.usage(e.getMessage() + "\n\nUSAGE:"));
+      logger.warning(e.getMessage(), e);
     }
     // any other exception
     catch(Exception e) {
