@@ -40,7 +40,7 @@ public class ResultWriter<O extends DatabaseObject> extends AbstractParameteriza
   /**
    * GZIP compression flag
    */
-  private final OptionID GZIP_OUTPUT = OptionID.getOrCreateOptionID("out.gzip", "Flag to enable gzip compression of output files.");
+  private final OptionID GZIP_OUTPUT = OptionID.getOrCreateOptionID("out.gzip", "Enable gzip compression of output files.");
   
   /**
    * Flag to control GZIP compression.
@@ -50,7 +50,7 @@ public class ResultWriter<O extends DatabaseObject> extends AbstractParameteriza
   /**
    * Suppress overwrite warning
    */
-  private final OptionID OVERWRITE_OPTION = OptionID.getOrCreateOptionID("out.silentoverwrite", "Flag to silently overwrite output files.");
+  private final OptionID OVERWRITE_OPTION = OptionID.getOrCreateOptionID("out.silentoverwrite", "Silently overwrite output files.");
   
   /**
    * Flag to suppress overwrite warning.
@@ -173,5 +173,4 @@ public class ResultWriter<O extends DatabaseObject> extends AbstractParameteriza
   public Normalization<O> getNormalization() {
     return normalization;
   }
-
 }
