@@ -48,6 +48,16 @@ public class ResultWriter<O extends DatabaseObject> extends AbstractParameteriza
   private final Flag GZIP_FLAG = new Flag(GZIP_OUTPUT);
   
   /**
+   * Suppress overwrite warning
+   */
+  private final OptionID OVERWRITE_OPTION = OptionID.getOrCreateOptionID("out.silentoverwrite", "Flag to silently overwrite output files.");
+  
+  /**
+   * Flag to suppress overwrite warning.
+   */
+  private final Flag OVERWRITE_FLAG = new Flag(OVERWRITE_OPTION);
+  
+  /**
    * Holds the file to print results to.
    */
   private File out;
@@ -61,6 +71,11 @@ public class ResultWriter<O extends DatabaseObject> extends AbstractParameteriza
    * Whether or not to do gzip compression on output.
    */
   private boolean gzip = false;
+  
+  /**
+   * Whether or not to warn on overwrite
+   */
+  private boolean warnoverwrite = true;
 
   /**
    * Constructor.
@@ -70,6 +85,7 @@ public class ResultWriter<O extends DatabaseObject> extends AbstractParameteriza
     // parameter output file
     addOption(OUTPUT_PARAM);
     addOption(GZIP_FLAG);
+    addOption(OVERWRITE_FLAG);
   }
 
   @Override
@@ -81,6 +97,7 @@ public class ResultWriter<O extends DatabaseObject> extends AbstractParameteriza
       out = OUTPUT_PARAM.getValue();
     }
     gzip = GZIP_FLAG.isSet();
+    warnoverwrite = OVERWRITE_FLAG.isSet() != true; // inversed!
     setParameters(args, remainingParameters);
     return remainingParameters;
   }
@@ -105,13 +122,15 @@ public class ResultWriter<O extends DatabaseObject> extends AbstractParameteriza
       }
       else if(out.exists()) {
         if(out.isDirectory()) {
-          if(out.listFiles().length > 0) {
+          if(warnoverwrite && out.listFiles().length > 0) {
             logger.warning("Output directory specified is not empty. Files will be overwritten and old files may be left over.");
           }
           output = new MultipleFilesOutput(out, gzip);
         }
         else {
-          logger.warning("Output file exists and will be overwritten!");
+          if (warnoverwrite) {
+            logger.warning("Output file exists and will be overwritten!");
+          }
           output = new SingleStreamOutput(out, gzip);
         }
       }
