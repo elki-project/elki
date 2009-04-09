@@ -11,7 +11,6 @@ import de.lmu.ifi.dbs.elki.evaluation.holdout.Holdout;
 import de.lmu.ifi.dbs.elki.evaluation.holdout.StratifiedCrossValidation;
 import de.lmu.ifi.dbs.elki.evaluation.procedure.ClassifierEvaluationProcedure;
 import de.lmu.ifi.dbs.elki.evaluation.procedure.EvaluationProcedure;
-import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
@@ -33,8 +32,7 @@ public class ClassifierEvaluationWrapper<O extends DatabaseObject, L extends Cla
    */
   public static final OptionID CLASSIFIER_ALGORITHM_ID = OptionID.getOrCreateOptionID(
       "classifier.algorithm",
-      "Classname of the classifier algorithm to evaluate. " +
-          Properties.ELKI_PROPERTIES.restrictionString(Classifier.class) + "."
+      "Classifier algorithm to evaluate."
   );
 
   /**
@@ -56,8 +54,7 @@ public class ClassifierEvaluationWrapper<O extends DatabaseObject, L extends Cla
    */
   public static final OptionID EVALUATION_PROCEDURE_ID = OptionID.getOrCreateOptionID(
       "classifier.eval",
-      "Classname of the evaluation-procedure to use for evaluation " +
-          Properties.ELKI_PROPERTIES.restrictionString(EvaluationProcedure.class) + "."
+      "Evaluation-procedure to use."
   );
 
   /**
@@ -80,8 +77,7 @@ public class ClassifierEvaluationWrapper<O extends DatabaseObject, L extends Cla
    */
   public static final OptionID HOLDOUT_ID = OptionID.getOrCreateOptionID(
       "classifier.holdout",
-      "<Classname of the holdout for evaluation " +
-          Properties.ELKI_PROPERTIES.restrictionString(Holdout.class) + "."
+      "Holdout class used in evaluation."
   );
 
   /**

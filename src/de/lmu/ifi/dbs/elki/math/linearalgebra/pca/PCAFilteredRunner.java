@@ -10,7 +10,6 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
@@ -35,8 +34,7 @@ public class PCAFilteredRunner<V extends RealVector<V, ?>> extends PCARunner<V> 
    * {@link #EIGENPAIR_FILTER_PARAM}
    */
   public static final OptionID PCA_EIGENPAIR_FILTER = OptionID.getOrCreateOptionID("pca.filter",
-      "Classname of the filter to determine the strong and weak eigenvectors "
-      + Properties.ELKI_PROPERTIES.restrictionString(EigenPairFilter.class) + ".");
+      "Filter class to determine the strong and weak eigenvectors.");
 
   /**
    * Parameter to specify the filter for determination of the strong and weak

@@ -20,7 +20,6 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.preprocessing.HiCOPreprocessor;
-import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
@@ -49,9 +48,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
      */
     public static final OptionID PREPROCESSOR_ID = OptionID.getOrCreateOptionID(
         "copac.preprocessor",
-        "Classname of the preprocessor to derive partition criterion " +
-            Properties.ELKI_PROPERTIES.restrictionString(HiCOPreprocessor.class) +
-            ".");
+        "Preprocessor to derive partition criterion.");
 
     /**
      * Parameter to specify the preprocessor to derive partition criterion,
@@ -71,9 +68,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
      */
     public static final OptionID PARTITION_ALGORITHM_ID = OptionID.getOrCreateOptionID(
         "copac.partitionAlgorithm",
-        "Classname of the clustering algorithm to apply to each partition " +
-            Properties.ELKI_PROPERTIES.restrictionString(ClusteringAlgorithm.class) +
-            ".");
+        "Clustering algorithm to apply to each partition.");
 
     /**
      * Parameter to specify the clustering algorithm to apply to each partition,
@@ -93,10 +88,9 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
      */
     public static final OptionID PARTITION_DB_ID = OptionID.getOrCreateOptionID(
         "copac.partitionDB",
-        "Classname of the database for each partition " +
-            Properties.ELKI_PROPERTIES.restrictionString(Database.class) +
-            ". If this parameter is not set, the databases of the partitions have " +
-            "the same class as the original database."
+        "Database class for each partition. "+
+        "If this parameter is not set, the databases of the partitions have " +
+        "the same class as the original database."
     );
 
     /**

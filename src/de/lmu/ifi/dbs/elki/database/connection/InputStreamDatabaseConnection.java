@@ -11,7 +11,6 @@ import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.parser.Parser;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
 import de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser;
-import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
@@ -31,9 +30,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
      */
     public static final OptionID PARSER_ID = OptionID.getOrCreateOptionID(
         "dbc.parser",
-        "Classname specifying the parser to provide a database " +
-            Properties.ELKI_PROPERTIES.restrictionString(Parser.class) +
-            ". "
+        "Parser to provide the database."
     );
 
     /**

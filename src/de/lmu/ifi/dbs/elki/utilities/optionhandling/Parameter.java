@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 
+import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 
 import java.util.Collections;
@@ -208,6 +209,24 @@ public abstract class Parameter<T, C> extends Option<T> {
     public T getDefaultValue() {
         return defaultValue;
     }
+    
+    /**
+     * Whether this class has a list of default values.
+     * 
+     * @return whether the class has a description of valid values.
+     */
+    public boolean hasValuesDescription() {
+      return false;
+    }
+    
+    /**
+     * Return a string explaining valid values.
+     * 
+     * @return String explaining valid values (e.g. a class list) 
+     */
+    public String getValuesDescription() {
+      return "";
+    }
 
     /**
      * Resets the value of the parameter to null.
@@ -225,11 +244,20 @@ public abstract class Parameter<T, C> extends Option<T> {
         StringBuffer description = new StringBuffer();
         description.append(getParameterType()).append(" ");
         description.append(shortDescription);
+        if (hasValuesDescription()) {
+          description.append("\n");
+          description.append(getValuesDescription());
+        }
         if (hasDefaultValue()) {
-            description.append(" Default: ").append(getDefaultValue().toString()).append(".");
+            description.append("\nDefault:"+Properties.NONBREAKING_SPACE).append(getDefaultValue().toString()).append(".");
         }
         if (!constraints.isEmpty()) {
-            description.append(" Constraint(s): ");
+            if (constraints.size() == 1) {
+              description.append("\nConstraint: ");
+            }
+            else if (constraints.size() > 1) {
+              description.append("\nConstraints: ");
+            }
             for (int i = 0; i < constraints.size(); i++) {
                 ParameterConstraint<C> constraint = constraints.get(i);
                 if (i > 0) {

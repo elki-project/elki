@@ -18,11 +18,9 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractLocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.elki.preprocessing.ProjectedDBSCANPreprocessor;
-import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
@@ -49,8 +47,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
      */
     public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID(
         "projdbscan.distancefunction",
-        "Classname of the distance function to determine the distance between database objects " +
-            Properties.ELKI_PROPERTIES.restrictionString(AbstractLocallyWeightedDistanceFunction.class) + "."
+        "Distance function to determine the distance between database objects."
     );
 
     /**
@@ -59,16 +56,15 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
      * <p>Key: {@code -projdbscan.distancefunction} </p>
      * <p>Default value: {@link de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction} </p>
      */
-    protected final ClassParameter<AbstractLocallyWeightedDistanceFunction<V, ?>> DISTANCE_FUNCTION_PARAM =
-        new ClassParameter<AbstractLocallyWeightedDistanceFunction<V, ?>>(
+    protected final ClassParameter<LocallyWeightedDistanceFunction<V, ?>> DISTANCE_FUNCTION_PARAM =
+        new ClassParameter<LocallyWeightedDistanceFunction<V, ?>>(
             DISTANCE_FUNCTION_ID,
-            AbstractLocallyWeightedDistanceFunction.class,
-            LocallyWeightedDistanceFunction.class.getName());
+            LocallyWeightedDistanceFunction.class);
 
     /**
      * Holds the instance of the distance function specified by {@link #DISTANCE_FUNCTION_PARAM}.
      */
-    private AbstractLocallyWeightedDistanceFunction<V, ?> distanceFunction;
+    private LocallyWeightedDistanceFunction<V, ?> distanceFunction;
 
     /**
      * OptionID for {@link #EPSILON_PARAM}
@@ -178,7 +174,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
         addOption(DISTANCE_FUNCTION_PARAM);
 
         // global parameter constraint epsilon <-> distance function
-        GlobalParameterConstraint con = new GlobalDistanceFunctionPatternConstraint<AbstractLocallyWeightedDistanceFunction<V, ?>>(EPSILON_PARAM, DISTANCE_FUNCTION_PARAM);
+        GlobalParameterConstraint con = new GlobalDistanceFunctionPatternConstraint<LocallyWeightedDistanceFunction<V, ?>>(EPSILON_PARAM, DISTANCE_FUNCTION_PARAM);
         optionHandler.setGlobalParameterConstraint(con);
     }
 

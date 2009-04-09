@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
-import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -31,9 +30,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
      */
     public static final OptionID INDEX_ID = OptionID.getOrCreateOptionID(
         "metricalindexdb.index",
-        "Classname of the metrical index to use " +
-            Properties.ELKI_PROPERTIES.restrictionString(MetricalIndex.class) +
-            ". "
+        "Metrical index class to use."
     );
 
     /**

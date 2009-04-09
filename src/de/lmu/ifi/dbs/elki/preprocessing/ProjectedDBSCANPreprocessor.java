@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
-import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.Progress;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
@@ -64,9 +63,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
      * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
      */
     public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID(
-        "projdbscan.distancefunction", "the distance function to determine the neighbors for variance analysis "
-        + Properties.ELKI_PROPERTIES.restrictionString(DistanceFunction.class)
-        + ".");
+        "projdbscan.distancefunction", "Distance function to determine the neighbors for variance analysis.");
     
     /**
      * Parameter distance function

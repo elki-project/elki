@@ -75,7 +75,7 @@ public abstract class KDDTaskWrapper<O extends DatabaseObject> extends AbstractW
       logger.debugFiner("KDD task has been instanstiated");
       String[] remainingParameters = task.setParameters(parameters.toArray(new String[parameters.size()]));
       if(remainingParameters.length != 0) {
-        logger.warning(task.usage("Unnecessary parameters specified: " + Arrays.asList(remainingParameters) + "\n\nUSAGE:\n"));
+        logger.warning("Unnecessary parameters specified: " + Arrays.asList(remainingParameters) + "\n");
         return;
       }
       logger.debugFiner("set KDD Task parameters, will run kdd Task");

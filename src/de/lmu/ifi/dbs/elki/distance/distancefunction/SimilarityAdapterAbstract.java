@@ -5,7 +5,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.FractionalSharedNearestNeighborSimilarityFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.NormalizedSimilarityFunction;
-import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -24,8 +23,7 @@ public abstract class SimilarityAdapterAbstract<V extends FeatureVector<V,?>> ex
    */
   public static final OptionID SIMILARITY_FUNCTION_ID = OptionID.getOrCreateOptionID(
       "adapter.similarityfunction",
-      "Classname of the similarity function to derive the distance between database objects " +
-          Properties.ELKI_PROPERTIES.restrictionString(NormalizedSimilarityFunction.class) + "."
+      "Similarity function to derive the distance between database objects from."
   );
 
   /**

@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
+import java.util.regex.Pattern;
+
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.SubspaceDistance;
@@ -7,9 +9,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
-import de.lmu.ifi.dbs.elki.properties.Properties;
-
-import java.util.regex.Pattern;
 
 /**
  * Provides a distance function to determine a kind of correlation distance
@@ -43,9 +42,7 @@ public class SubspaceDistanceFunction<V extends RealVector<V, ?>, P extends Prep
     }
 
     public final String getPreprocessorDescription() {
-        return "Classname of the preprocessor to determine the correlation dimension of each object "
-            + Properties.ELKI_PROPERTIES.restrictionString(getPreprocessorSuperClass()) +
-            ".";
+        return "Preprocessor class to determine the correlation dimension of each object.";
     }
 
     /**

@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
-import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -33,7 +32,7 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
   /**
    * OptionID for {@link #INDEX_PARAM}
    */
-  public static final OptionID INDEX_ID = OptionID.getOrCreateOptionID("spatialindexdb.index", "Classname of the spatial index to use " + Properties.ELKI_PROPERTIES.restrictionString(SpatialIndex.class) + ". ");
+  public static final OptionID INDEX_ID = OptionID.getOrCreateOptionID("spatialindexdb.index", "Spatial index class to use.");
 
   /**
    * Parameter to specify the spatial index to use.

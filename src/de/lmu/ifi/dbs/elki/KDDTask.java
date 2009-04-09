@@ -384,15 +384,14 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
    * 
    * @param args parameter list according to description
    */
-  @SuppressWarnings("unchecked")
   public static void main(String[] args) {
     LoggingConfiguration.assertConfigured();
     Logger logger = Logger.getLogger(KDDTask.class.getName());
-    KDDTask<? extends DatabaseObject> kddTask = new KDDTask();
+    KDDTask<? extends DatabaseObject> kddTask = new KDDTask<DatabaseObject>();
     try {
       String[] remainingParameters = kddTask.setParameters(args);
       if(remainingParameters.length != 0) {
-        logger.warning(kddTask.usage("Unnecessary parameters specified: " + Arrays.asList(remainingParameters) + "\n\nUSAGE:\n"));
+        logger.warning("Unnecessary parameters specified: " + Arrays.asList(remainingParameters) + "\n");
       }
       kddTask.run();
     }

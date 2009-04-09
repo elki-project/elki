@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ConstantWeight;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.WeightFunction;
-import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -38,8 +37,7 @@ public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends
    * OptionID for {@link #WEIGHT_PARAM}
    */
   public static final OptionID WEIGHT_ID = OptionID.getOrCreateOptionID("pca.weight", 
-      "Classname of the weight function to use in PCA " 
-      + Properties.ELKI_PROPERTIES.restrictionString(WeightFunction.class) + ".");
+      "Weight function to use in weighted PCA.");
 
   /**
    * Parameter to specify the weight function to use in weighted PCA, must

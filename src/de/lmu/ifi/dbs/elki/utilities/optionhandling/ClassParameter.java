@@ -203,4 +203,25 @@ public class ClassParameter<C> extends Parameter<String, String> {
     return instance;
   }
 
+  /**
+   * This class sometimes provides a list of value descriptions.
+   * 
+   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter#hasValuesDescription()
+   */
+  @Override
+  public boolean hasValuesDescription() {
+    return true;
+  }
+
+  /**
+   * Return a description of known valid classes.
+   * 
+   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter#getValuesDescription()
+   */
+  @Override
+  public String getValuesDescription() {
+    return Properties.ELKI_PROPERTIES.restrictionString(getRestrictionClass());
+  }
+
+  
 }

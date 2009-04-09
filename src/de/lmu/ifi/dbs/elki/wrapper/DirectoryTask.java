@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.wrapper;
 import java.io.File;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -22,8 +21,7 @@ public class DirectoryTask extends StandAloneInputWrapper {
      */
     public static final OptionID WRAPPER_ID = OptionID.getOrCreateOptionID(
         "directorytask.wrapper",
-        "Classname of the wrapper to run over all files in the specified directory. " +
-            Properties.ELKI_PROPERTIES.restrictionString(Wrapper.class) + "."
+        "Wrapper to run over all files in the specified directory.."
     );
 
     /**

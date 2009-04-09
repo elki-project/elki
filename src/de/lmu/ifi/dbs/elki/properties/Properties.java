@@ -23,6 +23,11 @@ public final class Properties {
      * a &quot;,&quot;.
      */
     public static final Pattern PROPERTY_SEPARATOR = Pattern.compile(",");
+    
+    /**
+     * Non-breaking unicode space character.
+     */
+    public static final String NONBREAKING_SPACE = " ";
 
     /**
      *
@@ -96,7 +101,7 @@ public final class Properties {
     public String restrictionString(Class<?> superclass) {
         String prefix = superclass.getPackage().getName()+".";
         StringBuilder info = new StringBuilder();
-        info.append("(");
+        info.append("Class ");
         if (superclass.isInterface()) {
             info.append("implementing ");
         }
@@ -111,17 +116,16 @@ public final class Properties {
         else {
             String[] classNames = getProperty(propertyName);
             if (classNames.length > 0) {
-                info.append(" -- available classes:\n");
+                info.append(" -- known classes (full class name or within package "+prefix+"):");
                 for (String name : classNames) {
                     try {
                         if (superclass.isAssignableFrom(Class.forName(name))) {
-                            info.append("-> "); // non-breaking-space character at end!
+                            info.append("\n->"+NONBREAKING_SPACE); // non-breaking-space character at end!
                             if (name.startsWith(prefix)) {
                               info.append(name.substring(prefix.length()));
                             } else {
                               info.append(name);
                             }
-                            info.append('\n');
                         }
                         else {
                           logger.warning("Invalid classname \"" + name + "\" for property \"" + propertyName.getName() + "\" of class \"" + propertyName.getType().getName() + "\" in property-file\n");
@@ -145,10 +149,11 @@ public final class Properties {
                 }
             }
             else {
-                logger.warning("Not found properties for property name: " + propertyName.getName() + "\n");
+              if (logger.isDebugging()) {
+                logger.debug("Not found properties for property name: " + propertyName.getName() + "\n");
+              }
             }
         }
-        info.append(")");
         return info.toString();
     }
 

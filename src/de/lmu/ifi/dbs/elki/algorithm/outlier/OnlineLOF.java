@@ -19,7 +19,6 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.parser.Parser;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
 import de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser;
-import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
@@ -87,8 +86,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
      */
     public static final OptionID PARSER_ID = OptionID.getOrCreateOptionID(
         "onlinelof.parser",
-        "Classname of the parser to parse the insertion and/or deletion files " +
-            Properties.ELKI_PROPERTIES.restrictionString(Parser.class) + "."
+        "Parser to parse the insertion and/or deletion files."
     );
 
     /**

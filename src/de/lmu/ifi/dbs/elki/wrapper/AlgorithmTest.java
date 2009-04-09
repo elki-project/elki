@@ -29,7 +29,7 @@ public class AlgorithmTest extends AbstractParameterizable {
   /**
    * OptionID for {@link #ALGORITHMS_PARAM}
    */
-  public static final OptionID ALGORITHMS_ID = OptionID.getOrCreateOptionID("test.algorithms", "A comma separated list of classnames specifying the algorithms to be run with default parametrization " + Properties.ELKI_PROPERTIES.restrictionString(Algorithm.class) + ". If this parameter is not set all algorithms as specified in the property file are used.");
+  public static final OptionID ALGORITHMS_ID = OptionID.getOrCreateOptionID("test.algorithms", "Comma separated list of classnames specifying the algorithms to be run with default parametrization. If this parameter is not set all algorithms as specified in the property file are used.");
 
   /**
    * Optional parameter to specify the algorithms to be run with default

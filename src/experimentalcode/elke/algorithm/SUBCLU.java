@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDimensionsSelectingDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionsSelectingEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
@@ -56,8 +55,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
      */
     public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID(
         "subclu.distancefunction",
-        "Classname of the distance function to determine the distance between database objects " +
-            Properties.ELKI_PROPERTIES.restrictionString(AbstractDimensionsSelectingDoubleDistanceFunction.class) + "."
+        "Distance function to determine the distance between database objects."
     );
 
     /**

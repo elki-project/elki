@@ -1,17 +1,16 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
+import java.util.BitSet;
+
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.preprocessing.PreferenceVectorPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
-import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-
-import java.util.BitSet;
 
 /**
  * Abstract super class for all preference vector based correlation distance functions.
@@ -235,9 +234,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
     }
 
     public final String getPreprocessorDescription() {
-        return "Classname of the preprocessor to determine the preference vector of each object "
-            + Properties.ELKI_PROPERTIES.restrictionString(getPreprocessorSuperClass()) +
-            ".";
+        return "Preprocessor class to determine the preference vector of each object.";
     }
 
     /**

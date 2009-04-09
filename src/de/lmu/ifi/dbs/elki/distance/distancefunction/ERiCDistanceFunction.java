@@ -8,7 +8,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
-import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -130,9 +129,7 @@ public class ERiCDistanceFunction<V extends RealVector<V, ?>, P extends Preproce
     }
 
     public String getPreprocessorDescription() {
-        return "Classname of the preprocessor to determine the correlation dimension of each object " +
-            Properties.ELKI_PROPERTIES.restrictionString(Preprocessor.class) +
-            ".";
+        return "Preprocessor class to determine the correlation dimension of each object.";
     }
 
     /**

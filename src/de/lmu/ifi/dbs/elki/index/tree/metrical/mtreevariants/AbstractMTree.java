@@ -22,7 +22,6 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.Assignments;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.MLBDistSplit;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.util.PQNode;
-import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
@@ -51,8 +50,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
      */
     public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID(
         "mtree.distancefunction",
-        "Classname of the distance function to determine the distance between database objects " +
-            Properties.ELKI_PROPERTIES.restrictionString(DistanceFunction.class) + "."
+        "Distance function to determine the distance between database objects."
     );
 
     /**

@@ -1,10 +1,5 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 
-import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
-import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
-import de.lmu.ifi.dbs.elki.normalization.Normalization;
-import de.lmu.ifi.dbs.elki.properties.Properties;
-import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.utilities.ConstantObject;
 
 /**
@@ -34,40 +29,29 @@ public final class OptionID extends ConstantObject<OptionID> {
      * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#ALGORITHM_PARAM}
      */
     public static final OptionID ALGORITHM = new OptionID("algorithm",
-        "Algorithm to run " +
-        Properties.ELKI_PROPERTIES.restrictionString(Algorithm.class) +
-        ". Either full name to identify classpath or only classname, if its package is " +
-        Algorithm.class.getPackage().getName() + "."
+        "Algorithm to run."
     );
 
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#DESCRIPTION_PARAM}
      */
     public static final OptionID DESCRIPTION = new OptionID("description",
-        "Class to obtain a description of " +
-//            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Parameterizable.class) +
-"- for classes that implement " + Parameterizable.class.getName() + ")" +
-" -- no further processing will be performed."
+        "Class to obtain a description of. " +
+        "Causes immediate stop of the program."
     );
 
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#DATABASE_CONNECTION_PARAM}
      */
     public static final OptionID DATABASE_CONNECTION = new OptionID("dbc",
-        "Database connection class " +
-        Properties.ELKI_PROPERTIES.restrictionString(DatabaseConnection.class) +
-        ". Either full name to identify classpath or only classname, if its package is " +
-        DatabaseConnection.class.getPackage().getName() + "."
+        "Database connection class."
     );
 
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#RESULT_HANDLER_PARAM}
      */
     public static final OptionID RESULT_HANDLER = new OptionID("resulthandler",
-        "Result handler class " +
-        Properties.ELKI_PROPERTIES.restrictionString(ResultHandler.class) +
-        ". Either full name to identify classpath or only classname, if its package is " +
-        ResultHandler.class.getPackage().getName() + "."
+        "Result handler class."
     );
 
     /**
@@ -82,9 +66,7 @@ public final class OptionID extends ConstantObject<OptionID> {
      * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#NORMALIZATION_PARAM}
      */
     public static final OptionID NORMALIZATION = new OptionID("norm",
-        "Normalization class in order to use a database with normalized values " +
-        Properties.ELKI_PROPERTIES.restrictionString(Normalization.class) +
-        ". "
+        "Normalization class in order to normalize values in the database."
     );
 
     /**

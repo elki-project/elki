@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.SequentialDatabase;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
-import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
@@ -42,9 +41,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
      */
     public static final OptionID DATABASE_ID = OptionID.getOrCreateOptionID(
         "dbc.database",
-        "Classname specifying the database to be provided by the parse method " +
-            Properties.ELKI_PROPERTIES.restrictionString(Database.class) +
-            ". "
+        "Database class to be provided by the parse method."
     );
 
     /**
@@ -87,9 +84,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
      */
     public static final OptionID CLASS_LABEL_CLASS_ID = OptionID.getOrCreateOptionID(
         "dbc.classLabelClass",
-        "Classname specifying the association of occuring class labels " +
-            Properties.ELKI_PROPERTIES.restrictionString(ClassLabel.class) +
-            ". "
+        "Class label class to use."
     );
 
     /**

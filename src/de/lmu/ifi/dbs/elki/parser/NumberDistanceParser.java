@@ -14,7 +14,6 @@ import java.util.Set;
 import de.lmu.ifi.dbs.elki.data.ExternalObject;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -35,7 +34,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
   /**
    * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
    */
-  public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("parser.distancefunction", "the distance function " + Properties.ELKI_PROPERTIES.restrictionString(DistanceFunction.class) + ".");
+  public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("parser.distancefunction", "Distance function.");
 
   /**
    * Parameter for distance function.

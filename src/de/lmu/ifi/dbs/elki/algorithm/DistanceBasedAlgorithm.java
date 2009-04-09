@@ -1,18 +1,17 @@
 package de.lmu.ifi.dbs.elki.algorithm;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-
-import java.util.List;
 
 /**
  * Provides an abstract algorithm already setting the distance function.
@@ -30,8 +29,7 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
      */
     public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID(
         "algorithm.distancefunction",
-        "Classname of the distance function to determine the distance between database objects " +
-            Properties.ELKI_PROPERTIES.restrictionString(DistanceFunction.class) + "."
+        "Distance function to determine the distance between database objects."
     );
 
     /**

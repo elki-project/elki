@@ -19,7 +19,6 @@ import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.parser.Parser;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
 import de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser;
-import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
@@ -42,7 +41,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
   /**
    * OptionID for {@link #PARSERS_PARAM}
    */
-  public static final OptionID PARSERS_ID = OptionID.getOrCreateOptionID("multipledbc.parsers", "A comma separated list of classnames specifying the parsers to provide a database " + Properties.ELKI_PROPERTIES.restrictionString(Parser.class) + ". If this parameter is not set, " + RealVectorLabelParser.class.getName() + " is used as parser for all input files.");
+  public static final OptionID PARSERS_ID = OptionID.getOrCreateOptionID("multipledbc.parsers", "Comma separated list of classnames specifying the parsers to provide a database. If this parameter is not set, " + RealVectorLabelParser.class.getName() + " is used as parser for all input files.");
 
   /**
    * Optional parameter to specify the parsers to provide a database, must

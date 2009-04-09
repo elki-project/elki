@@ -10,7 +10,6 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
@@ -38,9 +37,7 @@ public class ProvidedTestSet<O extends DatabaseObject, L extends ClassLabel> ext
      * OptionID for {@link #TESTSET_DATABASE_CONNECTION_PARAM}
      */
     public static final OptionID TESTSET_DATABASE_CONNECTION_ID = OptionID.getOrCreateOptionID(
-        "testdbc", "connection to testset database " +
-        Properties.ELKI_PROPERTIES.restrictionString(DatabaseConnection.class) +
-        ".");
+        "testdbc", "Database connection to testset database.");
 
     /**
      * Parameter for test set database connection

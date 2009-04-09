@@ -1,16 +1,15 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
-import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-
-import java.util.List;
 
 /**
  * Abstract super class for locally weighted distance functions using a preprocessor
@@ -89,9 +88,7 @@ public abstract class AbstractLocallyWeightedDistanceFunction<O extends RealVect
     }
 
     public String getPreprocessorDescription() {
-        return "Classname of the preprocessor to determine the correlation dimension of each objects " +
-            Properties.ELKI_PROPERTIES.restrictionString(getPreprocessorSuperClass()) +
-            ".";
+        return "Preprocessor class to determine the correlation dimension of each object.";
     }
 
 
