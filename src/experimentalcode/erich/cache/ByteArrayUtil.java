@@ -7,6 +7,9 @@ package experimentalcode.erich.cache;
  * {@link java.io.ByteArrayOutputStream} and {@link java.io.DataInputStream}
  * doesn't seem appropriate.
  * 
+ * {@see java.io.DataOutputStream}
+ * {@see java.io.ByteArrayOutputStream}
+ * 
  * @author Erich Schubert
  */
 public final class ByteArrayUtil {
@@ -18,8 +21,8 @@ public final class ByteArrayUtil {
    * @param v data
    */
   public final static void writeShort(byte[] array, int offset, int v) {
-    array[offset] = (byte) ((v >>> 8) & 0xFF);
-    array[offset + 1] = (byte) ((v >>> 0) & 0xFF);
+    array[offset + 0] = (byte) (v >>> 8);
+    array[offset + 1] = (byte) (v >>> 0);
   }
 
   /**
@@ -30,10 +33,10 @@ public final class ByteArrayUtil {
    * @param v data
    */
   public final static void writeInt(byte[] array, int offset, int v) {
-    array[offset] = (byte) ((v >>> 24) & 0xFF);
-    array[offset + 1] = (byte) ((v >>> 16) & 0xFF);
-    array[offset + 2] = (byte) ((v >>> 8) & 0xFF);
-    array[offset + 3] = (byte) ((v >>> 0) & 0xFF);
+    array[offset + 0] = (byte) (v >>> 24);
+    array[offset + 1] = (byte) (v >>> 16);
+    array[offset + 2] = (byte) (v >>> 8);
+    array[offset + 3] = (byte) (v >>> 0);
   }
 
   /**
@@ -44,14 +47,14 @@ public final class ByteArrayUtil {
    * @param v data
    */
   public final static void writeLong(byte[] array, int offset, long v) {
-    array[offset] = (byte) ((v >>> 56) & 0xFF);
-    array[offset + 1] = (byte) ((v >>> 48) & 0xFF);
-    array[offset + 2] = (byte) ((v >>> 40) & 0xFF);
-    array[offset + 3] = (byte) ((v >>> 32) & 0xFF);
-    array[offset + 4] = (byte) ((v >>> 24) & 0xFF);
-    array[offset + 5] = (byte) ((v >>> 16) & 0xFF);
-    array[offset + 6] = (byte) ((v >>> 8) & 0xFF);
-    array[offset + 7] = (byte) ((v >>> 0) & 0xFF);
+    array[offset + 0] = (byte) (v >>> 56);
+    array[offset + 1] = (byte) (v >>> 48);
+    array[offset + 2] = (byte) (v >>> 40);
+    array[offset + 3] = (byte) (v >>> 32);
+    array[offset + 4] = (byte) (v >>> 24);
+    array[offset + 5] = (byte) (v >>> 16);
+    array[offset + 6] = (byte) (v >>> 8);
+    array[offset + 7] = (byte) (v >>> 0);
   }
 
   /**
@@ -85,7 +88,7 @@ public final class ByteArrayUtil {
    */
   public final static short readShort(byte[] array, int offset) {
     // First make integers to resolve signed vs. unsigned issues.
-    int b0 = array[offset] & 0xFF;
+    int b0 = array[offset + 0] & 0xFF;
     int b1 = array[offset + 1] & 0xFF;
     return (short) ((b0 << 8) + (b1 << 0));
   }
@@ -99,7 +102,7 @@ public final class ByteArrayUtil {
    */
   public final static int readUnsignedShort(byte[] array, int offset) {
     // First make integers to resolve signed vs. unsigned issues.
-    int b0 = array[offset] & 0xFF;
+    int b0 = array[offset + 0] & 0xFF;
     int b1 = array[offset + 1] & 0xFF;
     return ((b0 << 8) + (b1 << 0));
   }
@@ -113,7 +116,7 @@ public final class ByteArrayUtil {
    */
   public final static int readInt(byte[] array, int offset) {
     // First make integers to resolve signed vs. unsigned issues.
-    int b0 = array[offset] & 0xFF;
+    int b0 = array[offset + 0] & 0xFF;
     int b1 = array[offset + 1] & 0xFF;
     int b2 = array[offset + 2] & 0xFF;
     int b3 = array[offset + 3] & 0xFF;
@@ -129,11 +132,11 @@ public final class ByteArrayUtil {
    */
   public final static long readLong(byte[] array, int offset) {
     // First make integers to resolve signed vs. unsigned issues.
-    int b0 = array[offset] & 0xFF;
-    int b1 = array[offset + 1] & 0xFF;
-    int b2 = array[offset + 2] & 0xFF;
-    int b3 = array[offset + 3] & 0xFF;
-    int b4 = array[offset + 4] & 0xFF;
+    long b0 = array[offset + 0];
+    long b1 = array[offset + 1] & 0xFF;
+    long b2 = array[offset + 2] & 0xFF;
+    long b3 = array[offset + 3] & 0xFF;
+    long b4 = array[offset + 4] & 0xFF;
     int b5 = array[offset + 5] & 0xFF;
     int b6 = array[offset + 6] & 0xFF;
     int b7 = array[offset + 7] & 0xFF;
