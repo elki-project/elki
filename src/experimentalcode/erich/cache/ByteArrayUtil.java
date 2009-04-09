@@ -3,8 +3,9 @@ package experimentalcode.erich.cache;
 /**
  * Class with various utilities for manipulating byte arrays.
  * 
- * If you find a reusable copy of this in the Java API, please tell me.
- * Using a ByteArrayOutputStream doesn't seem appropriate.
+ * If you find a reusable copy of this in the Java API, please tell me. Using a
+ * {@link java.io.ByteArrayOutputStream} and {@link java.io.DataInputStream}
+ * doesn't seem appropriate.
  * 
  * @author Erich Schubert
  */
@@ -83,7 +84,10 @@ public final class ByteArrayUtil {
    * @return (signed) short
    */
   public final static short readShort(byte[] array, int offset) {
-    return (short) ((array[offset] << 8) + (array[offset + 1] << 0));
+    // First make integers to resolve signed vs. unsigned issues.
+    int b0 = array[offset] & 0xFF;
+    int b1 = array[offset + 1] & 0xFF;
+    return (short) ((b0 << 8) + (b1 << 0));
   }
 
   /**
@@ -94,7 +98,10 @@ public final class ByteArrayUtil {
    * @return short
    */
   public final static int readUnsignedShort(byte[] array, int offset) {
-    return ((array[offset] << 8) + (array[offset + 1] << 0));
+    // First make integers to resolve signed vs. unsigned issues.
+    int b0 = array[offset] & 0xFF;
+    int b1 = array[offset + 1] & 0xFF;
+    return ((b0 << 8) + (b1 << 0));
   }
 
   /**
@@ -105,7 +112,12 @@ public final class ByteArrayUtil {
    * @return data
    */
   public final static int readInt(byte[] array, int offset) {
-    return ((array[offset] << 24) + (array[offset + 1] << 16) + (array[offset + 2] << 8) + (array[offset + 3] << 0));
+    // First make integers to resolve signed vs. unsigned issues.
+    int b0 = array[offset] & 0xFF;
+    int b1 = array[offset + 1] & 0xFF;
+    int b2 = array[offset + 2] & 0xFF;
+    int b3 = array[offset + 3] & 0xFF;
+    return ((b0 << 24) + (b1 << 16) + (b2 << 8) + (b3 << 0));
   }
 
   /**
@@ -116,7 +128,16 @@ public final class ByteArrayUtil {
    * @return data
    */
   public final static long readLong(byte[] array, int offset) {
-    return ((array[offset] << 56) + (array[offset + 1] << 48) + (array[offset + 2] << 40) + (array[offset + 3] << 32) + (array[offset + 4] << 24) + (array[offset + 5] << 16) + (array[offset + 6] << 8) + (array[offset + 7] << 0));
+    // First make integers to resolve signed vs. unsigned issues.
+    int b0 = array[offset] & 0xFF;
+    int b1 = array[offset + 1] & 0xFF;
+    int b2 = array[offset + 2] & 0xFF;
+    int b3 = array[offset + 3] & 0xFF;
+    int b4 = array[offset + 4] & 0xFF;
+    int b5 = array[offset + 5] & 0xFF;
+    int b6 = array[offset + 6] & 0xFF;
+    int b7 = array[offset + 7] & 0xFF;
+    return ((b0 << 56) + (b1 << 48) + (b2 << 40) + (b3 << 32) + (b4 << 24) + (b5 << 16) + (b6 << 8) + (b7 << 0));
   }
 
   /**
@@ -126,7 +147,7 @@ public final class ByteArrayUtil {
    * @param offset Offset to read at
    * @return data
    */
-  public final float readFloat(byte[] array, int offset) {
+  public final static float readFloat(byte[] array, int offset) {
     return Float.intBitsToFloat(readInt(array, offset));
   }
 
@@ -137,7 +158,7 @@ public final class ByteArrayUtil {
    * @param offset Offset to read at
    * @return data
    */
-  public final double readDouble(byte[] array, int offset) {
+  public final static double readDouble(byte[] array, int offset) {
     return Double.longBitsToDouble(readLong(array, offset));
   }
 }
