@@ -124,4 +124,22 @@ public class UpperTriangleMatrix {
   public synchronized void writeRecord(int x, int y, byte[] data) throws IOException {
     array.writeRecord(computeOffset(x,y), data);
   }
+  
+  /**
+   * Close the matrix file.
+   * 
+   * @throws IOException
+   */
+  public synchronized void close() throws IOException {
+    array.close();
+  }
+
+  /**
+   * Query the size of the matrix.
+   * 
+   * @return size of the matrix
+   */
+  public int getMatrixSize() {
+    return matrixsize;
+  }
 }
