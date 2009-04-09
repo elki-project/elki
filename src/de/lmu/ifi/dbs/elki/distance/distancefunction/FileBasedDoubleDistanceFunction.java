@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Map;
+import java.util.TreeSet;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
@@ -124,7 +126,12 @@ public class FileBasedDoubleDistanceFunction<V extends DatabaseObject> extends A
    */
   @Override
   public String parameterDescription() {
-    return "File based double distance for database objects. No parameters required. " + "Pattern for defining a range: \"" + requiredInputPattern() + "\".";
+    StringBuffer buf = new StringBuffer();
+    buf.append(super.parameterDescription());
+    if (parser != null) {
+      buf.append(parser.parameterDescription());
+    }
+    return buf.toString();
   }
 
   @Override
@@ -152,5 +159,19 @@ public class FileBasedDoubleDistanceFunction<V extends DatabaseObject> extends A
     InputStream in = FileBasedDatabaseConnection.tryGzipInput(new FileInputStream(matrixfile));
     DistanceParsingResult<V, DoubleDistance> res = parser.parse(in);
     cache = res.getDistanceCache();
+  }
+  
+  /**
+   * Return a collection of all IDs in the cache.
+   * 
+   * @return Collection of all IDs in the cache.
+   */
+  public Collection<Integer> getIDs() {
+    TreeSet<Integer> ids = new TreeSet<Integer>();
+    for (Pair<Integer, Integer> pair : cache.keySet()) {
+      ids.add(pair.first);
+      ids.add(pair.second);
+    }
+    return ids;
   }
 }
