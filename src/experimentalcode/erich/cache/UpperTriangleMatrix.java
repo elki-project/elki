@@ -39,7 +39,7 @@ public class UpperTriangleMatrix {
     byte[] header = array.readExtraHeader();
     this.matrixsize = ByteArrayUtil.readInt(header, 0);
     if (arraysize(matrixsize) != array.getNumRecords()) {
-      throw new IOException("Matrix file size doesn't match specified dimensions.");
+      throw new IOException("Matrix file size doesn't match specified dimensions: "+matrixsize+"->"+arraysize(matrixsize)+" vs. "+array.getNumRecords());
     }
   }
 
@@ -53,8 +53,10 @@ public class UpperTriangleMatrix {
    * @param matrixsize Size of matrix to store
    * @throws IOException
    */
-  // TODO: ensure matrixsize * (matrixsize-1) doesn't overflow. 
   public UpperTriangleMatrix(File filename, int magicseed, int extraheadersize, int recordsize, int matrixsize) throws IOException {
+    if (matrixsize >= 0xFFFF) {
+      throw new RuntimeException("Matrix size is too big and will overflow the integer datatype.");
+    }
     this.matrixsize = matrixsize;
     array = new OnDiskArray(filename, OnDiskArray.mixMagic((int)serialVersionUID, magicseed), extraheadersize + TRIANGLE_HEADER_SIZE, recordsize, arraysize(matrixsize));
     byte[] header = new byte[extraheadersize + TRIANGLE_HEADER_SIZE];
@@ -68,6 +70,9 @@ public class UpperTriangleMatrix {
    * @throws IOException
    */
   public synchronized void resizeMatrix(int newsize) throws IOException {
+    if (newsize >= 0xFFFF) {
+      throw new RuntimeException("Matrix size is too big and will overflow the integer datatype.");
+    }
     if (! array.isWritable()) {
       throw new IOException("Can't resize a read-only array.");
     }
@@ -110,6 +115,9 @@ public class UpperTriangleMatrix {
    * @throws IOException 
    */
   public synchronized byte[] readRecord(int x, int y) throws IOException {
+    if (x >= matrixsize || y >= matrixsize) {
+      throw new ArrayIndexOutOfBoundsException();
+    }
     return array.readRecord(computeOffset(x,y));
   }
 
