@@ -4,7 +4,10 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * Class to output all result data to a single stream (e.g. Stdout, single file)
@@ -19,10 +22,21 @@ public class SingleStreamOutput implements StreamFactory {
   private PrintStream stream;
   
   /**
-   * Constructor
+   * Constructor using stdout.
+   * @throws IOException 
    */
-  public SingleStreamOutput()  {
+  public SingleStreamOutput() throws IOException  {
     this(FileDescriptor.out);
+  }
+  
+  /**
+   * Constructor using stdout
+   * 
+   * @param gzip Use gzip compression
+   * @throws IOException 
+   */
+  public SingleStreamOutput(boolean gzip) throws IOException  {
+    this(FileDescriptor.out, gzip);
   }
   
   /**
@@ -31,35 +45,65 @@ public class SingleStreamOutput implements StreamFactory {
    * @param out filename
    * @throws FileNotFoundException
    */
-  public SingleStreamOutput(File out) throws FileNotFoundException {
+  public SingleStreamOutput(File out) throws IOException {
     this(new FileOutputStream(out));
+  }
+
+  /**
+   * Constructor with given file name.
+   * 
+   * @param out filename
+   * @param gzip Use gzip compression
+   * @throws FileNotFoundException
+   */
+  public SingleStreamOutput(File out, boolean gzip) throws IOException {
+    this(new FileOutputStream(out), gzip);
   }
 
   /**
    * Constructor with given FileDescriptor
    * 
    * @param out file descriptor
+   * @throws IOException 
    */
-  public SingleStreamOutput(FileDescriptor out)  {
+  public SingleStreamOutput(FileDescriptor out) throws IOException {
     this(new FileOutputStream(out));
+  }
+  
+  /**
+   * Constructor with given FileDescriptor
+   * 
+   * @param out file descriptor
+   * @param gzip Use gzip compression
+   * @throws IOException 
+   */
+  public SingleStreamOutput(FileDescriptor out, boolean gzip) throws IOException {
+    this(new FileOutputStream(out), gzip);
   }
   
   /**
    * Constructor with given FileOutputStream.
    * 
    * @param out File output stream
+   * @throws IOException 
    */
-  public SingleStreamOutput(FileOutputStream out) {
-    this(new PrintStream(out));
+  public SingleStreamOutput(FileOutputStream out) throws IOException {
+    this(out, false);
   }
 
   /**
-   * Constructor with given PrintStream
+   * Constructor with given FileOutputStream.
    * 
-   * @param out PrintStream to use.
+   * @param out File output stream
+   * @throws IOException 
    */
-  public SingleStreamOutput(PrintStream out) {
-    stream = out;
+  public SingleStreamOutput(FileOutputStream out, boolean gzip) throws IOException {
+    OutputStream os = out;
+    if (gzip) {
+      // wrap into gzip stream.
+      os = new GZIPOutputStream(os);
+    }
+    this.stream = new PrintStream(os);
   }
 
   /**
@@ -72,4 +116,11 @@ public class SingleStreamOutput implements StreamFactory {
     return stream;
   }
 
+  /**
+   * Close output stream.
+   */
+  @Override
+  public void closeAllStreams() {
+    stream.close();
+  }
 }

@@ -6,7 +6,6 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.textwriter.MultipleFilesOutput;
 import de.lmu.ifi.dbs.elki.result.textwriter.SingleStreamOutput;
@@ -16,6 +15,7 @@ import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
@@ -38,6 +38,16 @@ public class ResultWriter<O extends DatabaseObject> extends AbstractParameteriza
   private final FileParameter OUTPUT_PARAM = new FileParameter(OptionID.OUTPUT, FileParameter.FileType.OUTPUT_FILE, true);
 
   /**
+   * GZIP compression flag
+   */
+  private final OptionID GZIP_OUTPUT = OptionID.getOrCreateOptionID("out.gzip", "Flag to enable gzip compression of output files.");
+  
+  /**
+   * Flag to control GZIP compression.
+   */
+  private final Flag GZIP_FLAG = new Flag(GZIP_OUTPUT);
+  
+  /**
    * Holds the file to print results to.
    */
   private File out;
@@ -46,6 +56,11 @@ public class ResultWriter<O extends DatabaseObject> extends AbstractParameteriza
    * Normalization to use.
    */
   private Normalization<O> normalization;
+  
+  /**
+   * Whether or not to do gzip compression on output.
+   */
+  private boolean gzip = false;
 
   /**
    * Constructor.
@@ -54,6 +69,7 @@ public class ResultWriter<O extends DatabaseObject> extends AbstractParameteriza
     super();
     // parameter output file
     addOption(OUTPUT_PARAM);
+    addOption(GZIP_FLAG);
   }
 
   @Override
@@ -64,6 +80,7 @@ public class ResultWriter<O extends DatabaseObject> extends AbstractParameteriza
     if(OUTPUT_PARAM.isSet()) {
       out = OUTPUT_PARAM.getValue();
     }
+    gzip = GZIP_FLAG.isSet();
     setParameters(args, remainingParameters);
     return remainingParameters;
   }
@@ -84,22 +101,23 @@ public class ResultWriter<O extends DatabaseObject> extends AbstractParameteriza
     StreamFactory output;
     try {
       if(out == null) {
-        output = new SingleStreamOutput();
+        output = new SingleStreamOutput(gzip);
       }
       else if(out.exists()) {
         if(out.isDirectory()) {
           if(out.listFiles().length > 0) {
-            LoggingUtil.warning("Output directory specified is not empty. Files will be overwritten and old files may be left over.");
+            logger.warning("Output directory specified is not empty. Files will be overwritten and old files may be left over.");
           }
-          output = new MultipleFilesOutput(out);
+          output = new MultipleFilesOutput(out, gzip);
         }
         else {
-          LoggingUtil.warning("Output file exists and will be overwritten!");
-          output = new SingleStreamOutput(out);
+          logger.warning("Output file exists and will be overwritten!");
+          output = new SingleStreamOutput(out, gzip);
         }
       }
       else {
-        output = new MultipleFilesOutput(out);
+        // If it doesn't exist yet, make a MultipleFilesOutput.
+        output = new MultipleFilesOutput(out, gzip);
       }
     }
     catch(IOException e) {
@@ -114,6 +132,7 @@ public class ResultWriter<O extends DatabaseObject> extends AbstractParameteriza
     catch(UnableToComplyException e) {
       throw new IllegalStateException("Unable to comply while writing result.", e);
     }
+    output.closeAllStreams();
   }
 
   /*

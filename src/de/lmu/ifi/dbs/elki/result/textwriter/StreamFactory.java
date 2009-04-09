@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.result.textwriter;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintStream;
 
 /**
@@ -17,7 +17,12 @@ public interface StreamFactory {
    * 
    * @param label Output label.
    * @return stream object for the given label
-   * @throws FileNotFoundException
+   * @throws IOException
    */
-  public PrintStream openStream(String label) throws FileNotFoundException;
+  public PrintStream openStream(String label) throws IOException;
+  
+  /**
+   * Close (and forget) all streams the factory has opened.
+   */
+  public void closeAllStreams();
 }
