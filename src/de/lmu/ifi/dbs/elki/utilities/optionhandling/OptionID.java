@@ -20,21 +20,21 @@ public final class OptionID extends ConstantObject<OptionID> {
      * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#HELP_FLAG}
      */
     public static final OptionID HELP = new OptionID("h",
-        "Flag to obtain help-message, either for the main-routine or for any specified algorithm. " +
+        "Request a help-message, either for the main-routine or for any specified algorithm. " +
         "Causes immediate stop of the program.");
 
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#HELP_LONG_FLAG}
      */
     public static final OptionID HELP_LONG = new OptionID("help",
-        "Flag to obtain help-message, either for the main-routine or for any specified algorithm. " +
+        "Request a help-message, either for the main-routine or for any specified algorithm. " +
         "Causes immediate stop of the program.");
 
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#ALGORITHM_PARAM}
      */
     public static final OptionID ALGORITHM = new OptionID("algorithm",
-        "Classname of an algorithm " +
+        "Algorithm to run " +
         Properties.ELKI_PROPERTIES.restrictionString(Algorithm.class) +
         ". Either full name to identify classpath or only classname, if its package is " +
         Algorithm.class.getPackage().getName() + "."
@@ -44,7 +44,7 @@ public final class OptionID extends ConstantObject<OptionID> {
      * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#DESCRIPTION_PARAM}
      */
     public static final OptionID DESCRIPTION = new OptionID("description",
-        "Name of a class to obtain a description " +
+        "Class to obtain a description of " +
 //            Properties.KDD_FRAMEWORK_PROPERTIES.restrictionString(Parameterizable.class) +
 "- for classes that implement " + Parameterizable.class.getName() + ")" +
 " -- no further processing will be performed."
@@ -54,7 +54,7 @@ public final class OptionID extends ConstantObject<OptionID> {
      * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#DATABASE_CONNECTION_PARAM}
      */
     public static final OptionID DATABASE_CONNECTION = new OptionID("dbc",
-        "Classname of a database connection " +
+        "Database connection class " +
         Properties.ELKI_PROPERTIES.restrictionString(DatabaseConnection.class) +
         ". Either full name to identify classpath or only classname, if its package is " +
         DatabaseConnection.class.getPackage().getName() + "."
@@ -64,7 +64,7 @@ public final class OptionID extends ConstantObject<OptionID> {
      * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#RESULT_HANDLER_PARAM}
      */
     public static final OptionID RESULT_HANDLER = new OptionID("resulthandler",
-        "Classname of a result handler. " +
+        "Result handler class " +
         Properties.ELKI_PROPERTIES.restrictionString(ResultHandler.class) +
         ". Either full name to identify classpath or only classname, if its package is " +
         ResultHandler.class.getPackage().getName() + "."
@@ -74,7 +74,7 @@ public final class OptionID extends ConstantObject<OptionID> {
      * OptionID for {@link de.lmu.ifi.dbs.elki.result.ResultWriter#OUTPUT_PARAM}
      */
     public static final OptionID OUTPUT = new OptionID("out",
-        "Name of the directory to write the obtained results in. " +
+        "Directory name (or name of an existing file) to write the obtained results in. " +
         "If this parameter is omitted, per default the output will sequentially be given to STDOUT."
     );
 
@@ -82,7 +82,7 @@ public final class OptionID extends ConstantObject<OptionID> {
      * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#NORMALIZATION_PARAM}
      */
     public static final OptionID NORMALIZATION = new OptionID("norm",
-        "Classname of a normalization in order to use a database with normalized values " +
+        "Normalization class in order to use a database with normalized values " +
         Properties.ELKI_PROPERTIES.restrictionString(Normalization.class) +
         ". "
     );
@@ -91,7 +91,7 @@ public final class OptionID extends ConstantObject<OptionID> {
      * OptionID for {@link de.lmu.ifi.dbs.elki.KDDTask#NORMALIZATION_PARAM}
      */
     public static final OptionID NORMALIZATION_UNDO = new OptionID("normUndo",
-        "Flag to revert result to original values - " +
+        "Revert normalization result to original values - " +
         "invalid option if no normalization has been performed.");
 
     /**
@@ -99,14 +99,14 @@ public final class OptionID extends ConstantObject<OptionID> {
      * and {@link de.lmu.ifi.dbs.elki.evaluation.procedure.ClassifierEvaluationProcedure#VERBOSE_FLAG}
      */
     public static final OptionID ALGORITHM_VERBOSE = new OptionID("verbose",
-        "Flag to allow verbose messages while performing the algorithm.");
+        "Enable verbose messages while performing the algorithm.");
 
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#TIME_FLAG}
      * and {@link de.lmu.ifi.dbs.elki.evaluation.procedure.ClassifierEvaluationProcedure#TIME_FLAG}
      */
     public static final OptionID ALGORITHM_TIME = new OptionID("time",
-        "Flag to request output of performance time.");
+        "Request output of performance time.");
 
     /**
      * The description of the OptionID.

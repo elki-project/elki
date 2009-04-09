@@ -116,5 +116,5 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
             description.append(distanceFunction.parameterDescription());
         }
         return description.toString();
-    }
+    }    
 }

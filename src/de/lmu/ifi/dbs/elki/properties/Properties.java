@@ -93,8 +93,8 @@ public final class Properties {
      * @return a description string listing all classes for the given superclass
      *         or interface as specified in the properties
      */
-    @SuppressWarnings("unchecked")
-    public String restrictionString(Class superclass) {
+    public String restrictionString(Class<?> superclass) {
+        String prefix = superclass.getPackage().getName()+".";
         StringBuilder info = new StringBuilder();
         info.append("(");
         if (superclass.isInterface()) {
@@ -115,8 +115,12 @@ public final class Properties {
                 for (String name : classNames) {
                     try {
                         if (superclass.isAssignableFrom(Class.forName(name))) {
-                            info.append("-->");
-                            info.append(name);
+                            info.append("-> "); // non-breaking-space character at end!
+                            if (name.startsWith(prefix)) {
+                              info.append(name.substring(prefix.length()));
+                            } else {
+                              info.append(name);
+                            }
                             info.append('\n');
                         }
                         else {

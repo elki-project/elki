@@ -103,7 +103,7 @@ public abstract class AbstractMeasurementFunction<O extends DatabaseObject, D ex
      */
     @Override
     public String parameterDescription() {
-        StringBuffer description = new StringBuffer(super.inlineParameterDescription());
+        StringBuffer description = new StringBuffer(super.parameterDescription());
         description.append("Pattern for defining a range: \"" + requiredInputPattern() + "\".");
         return description.toString();
     }

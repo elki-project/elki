@@ -330,7 +330,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
         StringBuilder description = new StringBuilder();
         description.append(super.parameterDescription());
         description.append(Description.NEWLINE);
-        description.append(similarityFunction.inlineParameterDescription());
+        description.append(similarityFunction.parameterDescription());
         description.append(Description.NEWLINE);
         return description.toString();
     }

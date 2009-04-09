@@ -60,13 +60,13 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Resu
     }
 
     /**
-     * Returns {@link #parameterDescription(String,boolean) #parameterDescription("", false)}.
+     * Returns {@link #parameterDescription(String) #parameterDescription("")}.
      *
-     * @see #parameterDescription(String,boolean)
+     * @see #parameterDescription(String)
      */
     @Override
     public String parameterDescription() {
-        return parameterDescription("", false);
+        return parameterDescription("");
     }
 
     /**

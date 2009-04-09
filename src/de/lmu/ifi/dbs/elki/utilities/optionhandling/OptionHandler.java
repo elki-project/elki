@@ -289,20 +289,18 @@ public class OptionHandler extends AbstractLoggable {
       counter++;
     }
 
-    String mark = ":";
     String indent = "  ";
     int firstCol = indent.length() + longestShortline;
-    int secondCol = mark.length();
     StringBuffer descriptionIndent = new StringBuffer();
-    for(int i = 0; i < firstCol + secondCol; i++) {
+    for(int i = 0; i < firstCol; i++) {
       descriptionIndent.append(space);
     }
-    int thirdCol = lineLength - (firstCol + secondCol);
+    int thirdCol = lineLength - firstCol;
     // if the column would be zero-width, give up...
     if(thirdCol < 0) {
       thirdCol = lineLength;
     }
-    int[] cols = { firstCol, secondCol, thirdCol };
+    int[] cols = { firstCol, thirdCol };
     PrettyPrinter prettyPrinter = new PrettyPrinter(cols, "");
     char fillchar = ' ';
 
@@ -321,8 +319,8 @@ public class OptionHandler extends AbstractLoggable {
       StringBuffer option = new StringBuffer();
       option.append(indent);
       option.append(options[i]);
-      Vector<String> lines = prettyPrinter.breakLine(longDescriptions[i], 2);
-      String[] firstline = { option.toString(), mark, lines.firstElement() };
+      Vector<String> lines = prettyPrinter.breakLine(longDescriptions[i], 1);
+      String[] firstline = { option.toString(), lines.firstElement() };
       messageBuffer.append(prettyPrinter.formattedLine(firstline, fillchar)).append(NEWLINE);
       for(int l = 1; l < lines.size(); l++) {
         messageBuffer.append(descriptionIndent).append(lines.get(l)).append(NEWLINE);

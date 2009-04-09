@@ -135,7 +135,6 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
    * </p>
    */
   private final ClassParameter<ResultHandler<O, Result>> RESULT_HANDLER_PARAM = new ClassParameter<ResultHandler<O, Result>>(OptionID.RESULT_HANDLER, ResultHandler.class, ResultWriter.class.getName());
-
   
   /**
    * Holds the algorithm to run.
@@ -210,7 +209,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
    */
   @Override
   public String parameterDescription() {
-    return optionHandler.usage("");
+    return optionHandler.usage("", true);
   }
 
   /**
@@ -233,6 +232,13 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
       usage.append(ALGORITHM_PARAM.getName());
       usage.append(" ");
       usage.append(algorithm.parameterDescription());
+      usage.append(NEWLINE);
+    }
+    if(resulthandler != null) {
+      usage.append(OptionHandler.OPTION_PREFIX);
+      usage.append(RESULT_HANDLER_PARAM.getName());
+      usage.append(" ");
+      usage.append(resulthandler.parameterDescription());
       usage.append(NEWLINE);
     }
     return usage.toString();

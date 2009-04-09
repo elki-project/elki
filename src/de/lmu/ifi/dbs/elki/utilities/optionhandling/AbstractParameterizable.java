@@ -121,23 +121,13 @@ public abstract class AbstractParameterizable extends AbstractLoggable
 
     /**
      * Returns a description of the class and the required parameters
-     * by calling {@code optionHandler.usage("")}. Subclasses may need to overwrite this method
+     * by calling {@code optionHandler.usage("", false)}. Subclasses may need to overwrite this method
      * for a more detailed description.
      *
+     * @param standalone Give parameter description.
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler#usage(String)
      */
     public String parameterDescription() {
-        return optionHandler.usage("");
-    }
-
-
-    /**
-     * Returns a description of the class and the required parameters.
-     * by calling {@code optionHandler.usage("",false)}.
-     *
-     * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler#usage(String,boolean)
-     */
-    public String inlineParameterDescription() {
         return optionHandler.usage("", false);
     }
 
@@ -150,20 +140,7 @@ public abstract class AbstractParameterizable extends AbstractLoggable
      * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler#usage(String)
      */
     protected String parameterDescription(String message) {
-        return optionHandler.usage(message);
-    }
-
-    /**
-     * Returns an usage-String by calling
-     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler#usage(String,boolean)}.
-     *
-     * @param message    some error-message, if needed (may be null or empty String)
-     * @param standalone whether the class using the OptionHandler provides a main
-     *                   method
-     * @return an usage-String
-     */
-    protected String parameterDescription(String message, boolean standalone) {
-        return this.optionHandler.usage(message, standalone);
+        return optionHandler.usage(message, false);
     }
 
     /**
