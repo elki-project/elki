@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * Provides a DistanceFunction that is based on double distances given by a
  * distance matrix of an external file.
  * 
- * @author Elke Achtert
+ * @author Erich Schubert
  */
 public class DiskCacheBasedDoubleDistanceFunction<V extends DatabaseObject> extends AbstractDoubleDistanceFunction<V> {
   /**
