@@ -52,64 +52,57 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
     }
 
     public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
-        List<KNNList<D>> knnLists = new ArrayList<KNNList<D>>(ids.size());
-        //noinspection ForLoopReplaceableByForEach
-        for (int i = 0; i < ids.size(); i++) {
-            knnLists.add(new KNNList<D>(k, distanceFunction.infiniteDistance()));
-        }
+      List<KNNList<D>> knnLists = new ArrayList<KNNList<D>>(ids.size());
+      for(@SuppressWarnings("unused") Integer i : this) {
+        knnLists.add(new KNNList<D>(k, distanceFunction.infiniteDistance()));
+      }
 
-        Iterator<Integer> iterator = iterator();
-        while (iterator.hasNext()) {
-            Integer candidateID = iterator.next();
-            O candidate = get(candidateID);
-            for (int i = 0; i < ids.size(); i++) {
-                Integer id = ids.get(i);
-                O object = get(id);
-                KNNList<D> knnList = knnLists.get(i);
-                knnList.add(new DistanceResultPair<D>(distanceFunction.distance(object, candidate), candidateID));
-            }
-        }
-
-        List<List<DistanceResultPair<D>>> result = new ArrayList<List<DistanceResultPair<D>>>(ids.size());
+      for(Integer candidateID : this) {
+        O candidate = get(candidateID);
         for (int i = 0; i < ids.size(); i++) {
-            result.add(knnLists.get(i).toList());
+          Integer id = ids.get(i);
+          O object = get(id);
+          KNNList<D> knnList = knnLists.get(i);
+          knnList.add(new DistanceResultPair<D>(distanceFunction.distance(object, candidate), candidateID));
         }
-        return result;
+      }
+
+      List<List<DistanceResultPair<D>>> result = new ArrayList<List<DistanceResultPair<D>>>(ids.size());
+      for (Integer i : this) {
+        result.add(knnLists.get(i).toList());
+      }
+      return result;
     }
 
     public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(Integer id,
                                                                    String epsilon,
                                                                    DistanceFunction<O, D> distanceFunction) {
-        List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
-        D distance = distanceFunction.valueOf(epsilon);
-        Iterator<Integer> iterator = iterator();
-        while (iterator.hasNext()) {
-            Integer currentID = iterator.next();
-            D currentDistance = distanceFunction.distance(id, currentID);
-
-            if (currentDistance.compareTo(distance) <= 0) {
-                result.add(new DistanceResultPair<D>(currentDistance, currentID));
-            }
+      List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
+      D distance = distanceFunction.valueOf(epsilon);
+      for(Integer currentID : this){
+        D currentDistance = distanceFunction.distance(id, currentID);
+        if (currentDistance.compareTo(distance) <= 0) {
+          result.add(new DistanceResultPair<D>(currentDistance, currentID));
         }
-        Collections.sort(result);
-        return result;
+      }
+      Collections.sort(result);
+      return result;
     }
 
     public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQuery(Integer id,
                                                                         int k,
                                                                         DistanceFunction<O, D> distanceFunction) {
-        List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
-        for (Iterator<Integer> iter = iterator(); iter.hasNext();) {
-            Integer candidateID = iter.next();
-            List<DistanceResultPair<D>> knns = this.kNNQueryForID(candidateID, k, distanceFunction);
-            for (DistanceResultPair<D> knn : knns) {
-                if (knn.getID() == id) {
-                    result.add(new DistanceResultPair<D>(knn.getDistance(), candidateID));
-                }
-            }
+      List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
+      for (Integer candidateID : this){
+        List<DistanceResultPair<D>> knns = this.kNNQueryForID(candidateID, k, distanceFunction);
+        for (DistanceResultPair<D> knn : knns) {
+          if (knn.getID() == id) {
+            result.add(new DistanceResultPair<D>(knn.getDistance(), candidateID));
+          }
         }
-        Collections.sort(result);
-        return result;
+      }
+      Collections.sort(result);
+      return result;
     }
 
     /**
