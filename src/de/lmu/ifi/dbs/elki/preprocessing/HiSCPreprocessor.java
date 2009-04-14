@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.Progress;
+import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
@@ -101,7 +101,7 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
     StringBuffer msg = new StringBuffer();
 
     long start = System.currentTimeMillis();
-    Progress progress = new Progress("Preprocessing preference vector", database.size());
+    FiniteProgress progress = new FiniteProgress("Preprocessing preference vector", database.size());
 
     if (k == null) {
       V obj = database.get(database.iterator().next());

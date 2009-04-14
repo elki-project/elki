@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.utilities.Progress;
+import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeapNode;
@@ -232,7 +232,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
             processedIDs = new HashSet<Integer>(database.size());
             noiseDim = database.get(database.iterator().next()).getDimensionality();
 
-            Progress progress = new Progress("Clustering", database.size());
+            FiniteProgress progress = new FiniteProgress("Clustering", database.size());
             if (logger.isVerbose()) {
                 progress.setProcessed(0);
                 logger.progress(progress);
@@ -327,7 +327,7 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
      * @throws NonNumericFeaturesException if non numeric feature vectors are used
      */
     private Clustering<Model> doRun(Database<ParameterizationFunction> database,
-                                     Progress progress) throws UnableToComplyException, ParameterException, NonNumericFeaturesException {
+                                     FiniteProgress progress) throws UnableToComplyException, ParameterException, NonNumericFeaturesException {
 
       
       Clustering<Model> res = new Clustering<Model>();

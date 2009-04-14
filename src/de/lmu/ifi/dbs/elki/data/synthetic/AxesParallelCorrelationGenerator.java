@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.utilities.Progress;
+import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
@@ -315,7 +315,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
         outStream.write("########################################################" + LINE_SEPARATOR);
 
         // generate the feature vectors
-        Progress progress_1 = new Progress("Generate the feature vectors", number);
+        FiniteProgress progress_1 = new FiniteProgress("Generate the feature vectors", number);
         if (logger.isVerbose()) {
           logger.verbose("corrDim " + corrDim);
           logger.verbose("Generate the feature vectors");
@@ -337,7 +337,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
 
         // jitter the feature vectors
         if (jitter != 0) {
-            Progress progress_2 = new Progress("Jitter the feature vectors", number);
+            FiniteProgress progress_2 = new FiniteProgress("Jitter the feature vectors", number);
             if (logger.isVerbose()) {
               logger.verbose("Jitter the feature vectors");
             }
@@ -358,7 +358,7 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
         }
 
         // print the feature vectors
-        Progress progress_3 = new Progress("Print the feature vectors", number);
+        FiniteProgress progress_3 = new FiniteProgress("Print the feature vectors", number);
         if (logger.isVerbose()) {
           logger.verbose("Print the feature vectors");
         }

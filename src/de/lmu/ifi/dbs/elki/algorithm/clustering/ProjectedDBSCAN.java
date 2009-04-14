@@ -21,7 +21,8 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.elki.preprocessing.ProjectedDBSCANPreprocessor;
-import de.lmu.ifi.dbs.elki.utilities.Progress;
+import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
+import de.lmu.ifi.dbs.elki.utilities.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
@@ -181,7 +182,8 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
     @Override
     protected Clustering<Model> runInTime(Database<V> database) throws IllegalStateException {
         try {
-            Progress progress = new Progress("Clustering", database.size());
+            FiniteProgress objprog = new FiniteProgress("Processing objects", database.size());
+            IndefiniteProgress clusprog = new IndefiniteProgress("Number of clusters");
             resultList = new ArrayList<List<Integer>>();
             noise = new HashSet<Integer>();
             processedIDs = new HashSet<Integer>(database.size());
@@ -193,15 +195,15 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
                 for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
                     Integer id = iter.next();
                     if (!processedIDs.contains(id)) {
-                        expandCluster(database, id, progress);
+                        expandCluster(database, id, objprog, clusprog);
                         if (processedIDs.size() == database.size() && noise.size() == 0) {
                             break;
                         }
                     }
                     if (isVerbose()) {
-                        progress.setProcessed(processedIDs.size());
-                        progress.setAuxiliary("Number of clusters: "+resultList.size());
-                        progress(progress);
+                        objprog.setProcessed(processedIDs.size());
+                        clusprog.setProcessed(resultList.size());
+                        logger.progress(objprog, clusprog);
                     }
                 }
             }
@@ -210,17 +212,17 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
                     Integer id = iter.next();
                     noise.add(id);
                     if (isVerbose()) {
-                        progress.setProcessed(processedIDs.size());
-                        progress.setAuxiliary("Number of clusters: "+resultList.size());
-                        progress(progress);
+                        objprog.setProcessed(processedIDs.size());
+                        clusprog.setProcessed(resultList.size());
+                        logger.progress(objprog,clusprog);
                     }
                 }
             }
 
             if (isVerbose()) {
-                progress.setProcessed(processedIDs.size());
-                progress.setAuxiliary("Number of clusters: "+resultList.size());
-                progress(progress);
+                objprog.setProcessed(processedIDs.size());
+                clusprog.setProcessed(resultList.size());
+                logger.progress(objprog,clusprog);
             }
 
             result = new Clustering<Model>();
@@ -235,10 +237,12 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
             result.addCluster(n);
 
             if (isVerbose()) {
-                progress.setProcessed(processedIDs.size());
-                progress.setAuxiliary("Number of clusters: "+resultList.size());
-                progress(progress);
+                objprog.setProcessed(processedIDs.size());
+                clusprog.setProcessed(resultList.size());
+                logger.progress(objprog,clusprog);
             }
+            // Signal that the progress has completed.
+            clusprog.setCompleted();
         }
         catch (Exception e) {
             throw new IllegalStateException(e);
@@ -251,9 +255,9 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
      *
      * @param database      the database to run the algorithm on
      * @param startObjectID the object id of the database object to start the expansion with
-     * @param progress      the progress object for logging the current status
+     * @param objprog      the progress object for logging the current status
      */
-    protected void expandCluster(Database<V> database, Integer startObjectID, Progress progress) {
+    protected void expandCluster(Database<V> database, Integer startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
         String label = database.getAssociation(AssociationID.LABEL, startObjectID);
         Integer corrDim = database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, startObjectID);
 
@@ -267,9 +271,9 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
             noise.add(startObjectID);
             processedIDs.add(startObjectID);
             if (logger.isVerbose()) {
-                progress.setProcessed(processedIDs.size());
-                progress.setAuxiliary("Number of clusters: "+resultList.size());
-                progress(progress);
+                objprog.setProcessed(processedIDs.size());
+                clusprog.setProcessed(resultList.size());
+                logger.progress(objprog,clusprog);
             }
             return;
         }
@@ -281,9 +285,9 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
             noise.add(startObjectID);
             processedIDs.add(startObjectID);
             if (logger.isVerbose()) {
-                progress.setProcessed(processedIDs.size());
-                progress.setAuxiliary("Number of clusters: "+resultList.size());
-                progress(progress);
+                objprog.setProcessed(processedIDs.size());
+                clusprog.setProcessed(resultList.size());
+                logger.progress(objprog,clusprog);
             }
             return;
         }
@@ -336,10 +340,10 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
                             noise.remove(r.getID());
                         }
                         if (logger.isVerbose()) {
-                            progress.setProcessed(processedIDs.size());
+                            objprog.setProcessed(processedIDs.size());
                             int numClusters = currentCluster.size() > minpts ? resultList.size() + 1 : resultList.size();
-                            progress.setAuxiliary("Number of clusters: "+numClusters);
-                            progress(progress);
+                            clusprog.setProcessed(numClusters);
+                            logger.progress(objprog,clusprog);
                         }
                     }
                 }
@@ -362,9 +366,9 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
         }
 
         if (logger.isVerbose()) {
-            progress.setProcessed(processedIDs.size());
-            progress.setAuxiliary("Number of clusters: "+resultList.size());
-            progress(progress);
+            objprog.setProcessed(processedIDs.size());
+            clusprog.setProcessed(resultList.size());
+            logger.progress(objprog, clusprog);
         }
     }
 

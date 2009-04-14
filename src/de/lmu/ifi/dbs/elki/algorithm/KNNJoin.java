@@ -16,8 +16,9 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
 import de.lmu.ifi.dbs.elki.result.AnnotationsFromHashMap;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.utilities.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
-import de.lmu.ifi.dbs.elki.utilities.Progress;
+import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -102,7 +103,8 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
         try {
             // data pages of s
             List<E> ps_candidates = db.getLeaves();
-            Progress progress = new Progress(this.getClass().getName(), db.size());
+            FiniteProgress progress = new FiniteProgress(this.getClass().getName(), db.size());
+            IndefiniteProgress pageprog = new IndefiniteProgress("Number of processed data pages");
             if (logger.isDebugging()) {
               logger.debugFine("# ps = " + ps_candidates.size());
             }
@@ -159,10 +161,11 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
 
                 if (logger.isVerbose()) {
                     progress.setProcessed(processed);
-                    progress.setAuxiliary("Number of processed data pages: " + processedPages++);
-                    logger.progress(progress);
+                    pageprog.setProcessed(processedPages++);
+                    logger.progress(progress, pageprog);
                 }
             }
+            pageprog.setCompleted();
             result = new AnnotationsFromHashMap();
             result.addMap("KNNS", knnLists);
         }

@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.result.AnnotationsFromHashMap;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.Progress;
+import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
 
 /**
  * Efficient implementation of the Single-Link Algorithm SLINK of R. Sibson.
@@ -65,7 +65,7 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends
     protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
 
         try {
-            Progress progress = new Progress("Clustering", database.size());
+            FiniteProgress progress = new FiniteProgress("Clustering", database.size());
             getDistanceFunction().setDatabase(database, isVerbose(), isTime());
 
             // sort the db objects according to their ids

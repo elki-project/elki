@@ -20,7 +20,8 @@ import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.IntegerDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SharedNearestNeighborSimilarityFunction;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.Progress;
+import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
+import de.lmu.ifi.dbs.elki.utilities.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -129,7 +130,8 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
      */
     @Override
     protected Clustering<Model> runInTime(Database<O> database) {
-        Progress progress = new Progress("Clustering", database.size());
+        FiniteProgress objprog = new FiniteProgress("Clustering", database.size());
+        IndefiniteProgress clusprog = new IndefiniteProgress("Number of clusters");
         resultList = new ArrayList<List<Integer>>();
         noise = new HashSet<Integer>();
         processedIDs = new HashSet<Integer>(database.size());
@@ -141,15 +143,15 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
                 Integer id = iter.next();
                 if (!processedIDs.contains(id)) {
-                    expandCluster(database, id, progress);
+                    expandCluster(database, id, objprog, clusprog);
                     if (processedIDs.size() == database.size() && noise.size() == 0) {
                         break;
                     }
                 }
                 if (logger.isVerbose()) {
-                    progress.setProcessed(processedIDs.size());
-                    progress.setAuxiliary("Number of clusters: "+resultList.size());
-                    progress(progress);
+                    objprog.setProcessed(processedIDs.size());
+                    clusprog.setProcessed(resultList.size());
+                    logger.progress(objprog, clusprog);
                 }
             }
         }
@@ -158,12 +160,14 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
                 Integer id = iter.next();
                 noise.add(id);
                 if (logger.isVerbose()) {
-                    progress.setProcessed(noise.size());
-                    progress.setAuxiliary("Number of clusters: "+resultList.size());
-                    progress(progress);
+                    objprog.setProcessed(noise.size());
+                    clusprog.setProcessed(resultList.size());
+                    logger.progress(objprog,clusprog);
                 }
             }
         }
+        // signal completion.
+        clusprog.setCompleted();
 
         result = new Clustering<Model>();
         for (Iterator<List<Integer>> resultListIter = resultList.iterator(); resultListIter.hasNext();) {
@@ -202,9 +206,9 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
      *
      * @param database      the database on which the algorithm is run
      * @param startObjectID potential seed of a new potential cluster
-     * @param progress      the progress object to report about the progress of clustering
+     * @param objprog      the progress object to report about the progress of clustering
      */
-    protected void expandCluster(Database<O> database, Integer startObjectID, Progress progress) {
+    protected void expandCluster(Database<O> database, Integer startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
         List<Integer> seeds = findSNNNeighbors(database, startObjectID);
 
         // startObject is no core-object
@@ -212,9 +216,9 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
             noise.add(startObjectID);
             processedIDs.add(startObjectID);
             if (logger.isVerbose()) {
-                progress.setProcessed(processedIDs.size());
-                progress.setAuxiliary("Number of clusters: "+resultList.size());
-                progress(progress);
+                objprog.setProcessed(processedIDs.size());
+                clusprog.setProcessed(resultList.size());
+                logger.progress(objprog,clusprog);
             }
             return;
         }
@@ -255,10 +259,10 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
             }
 
             if (logger.isVerbose()) {
-                progress.setProcessed(processedIDs.size());
+                objprog.setProcessed(processedIDs.size());
                 int numClusters = currentCluster.size() > minpts ? resultList.size() + 1 : resultList.size();
-                progress.setAuxiliary("Number of clusters: "+numClusters);
-                progress(progress);
+                clusprog.setProcessed(numClusters);
+                logger.progress(objprog,clusprog);
             }
 
             if (processedIDs.size() == database.size() && noise.size() == 0) {

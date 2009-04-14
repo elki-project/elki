@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.Progress;
+import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
@@ -114,7 +114,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
         long start = System.currentTimeMillis();
         rangeQueryDistanceFunction.setDatabase(database, verbose, time);
 
-        Progress progress = new Progress(this.getClass().getName(), database.size());
+        FiniteProgress progress = new FiniteProgress(this.getClass().getName(), database.size());
         if (logger.isVerbose()) {
           logger.verbose("Preprocessing:");
         }

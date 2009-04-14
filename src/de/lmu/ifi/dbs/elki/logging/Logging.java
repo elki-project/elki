@@ -381,7 +381,7 @@ public class Logging {
   }
 
   /**
-   * Log a Progress class. 
+   * Log a Progress object. 
    * 
    * @param pgr Progress to log.
    */
@@ -389,6 +389,21 @@ public class Logging {
     StringBuffer buf = new StringBuffer();
     buf.append(OutputStreamLogger.CARRIAGE_RETURN);
     pgr.appendToBuffer(buf);
+    logger.log(Level.INFO, buf.toString());
+  }
+
+  /**
+   * Log a Progress object. 
+   * 
+   * @param pgr1 First progress to log.
+   * @param pgr2 Second progress to log.
+   */
+  public void progress(Progress pgr1, Progress pgr2) {
+    StringBuffer buf = new StringBuffer();
+    buf.append(OutputStreamLogger.CARRIAGE_RETURN);
+    pgr1.appendToBuffer(buf);
+    buf.append(" ");
+    pgr2.appendToBuffer(buf);
     logger.log(Level.INFO, buf.toString());
   }
 

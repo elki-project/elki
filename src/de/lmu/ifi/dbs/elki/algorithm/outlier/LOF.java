@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.Progress;
+import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -150,7 +150,7 @@ public class LOF<O extends DatabaseObject> extends
             if (logger.isVerbose()) {
               logger.verbose("Step 1: computing neighborhoods:");
             }
-            Progress progressNeighborhoods = new Progress("LOF", database.size());
+            FiniteProgress progressNeighborhoods = new FiniteProgress("LOF", database.size());
             int counter = 1;
             nnTable = new NNTable(pageSize, cacheSize, minpts);
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
@@ -167,7 +167,7 @@ public class LOF<O extends DatabaseObject> extends
             if (logger.isVerbose()) {
               logger.verbose("Step 2: computing reachability distances:");
             }
-            Progress progressNeighborhoods = new Progress("LOF", database.size());
+            FiniteProgress progressNeighborhoods = new FiniteProgress("LOF", database.size());
             int counter = 1;
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
                 Integer id = iter.next();
@@ -186,7 +186,7 @@ public class LOF<O extends DatabaseObject> extends
             // keeps the lofs for each object
             lofTable = new LOFTable(pageSize, cacheSize, minpts);
             {
-                Progress progressLOFs = new Progress("LOF: LOF for objects",
+                FiniteProgress progressLOFs = new FiniteProgress("LOF: LOF for objects",
                     database.size());
                 int counter = 0;
                 for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {

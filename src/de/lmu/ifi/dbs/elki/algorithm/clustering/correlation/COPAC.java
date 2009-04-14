@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.preprocessing.HiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.Progress;
+import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
@@ -148,7 +148,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
           logger.verbose("\nPartitioning...");
         }
         Map<Integer, List<Integer>> partitionMap = new Hashtable<Integer, List<Integer>>();
-        Progress partitionProgress = new Progress("Partitioning", database.size());
+        FiniteProgress partitionProgress = new FiniteProgress("Partitioning", database.size());
         int processed = 1;
 
         for (Iterator<Integer> dbiter = database.iterator(); dbiter.hasNext();) {

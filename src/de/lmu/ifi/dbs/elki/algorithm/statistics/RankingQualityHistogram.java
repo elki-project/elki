@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.elki.evaluation.roc.ROCAUC;
 import de.lmu.ifi.dbs.elki.math.Histogram;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.Progress;
+import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -72,7 +72,7 @@ public class RankingQualityHistogram<V extends RealVector<V, ?>> extends Distanc
     if(logger.isVerbose()) {
       logger.verbose("Processing points...");
     }
-    Progress rocloop = new Progress("ROC computation loop ...", size);
+    FiniteProgress rocloop = new FiniteProgress("Computing ROC AUC values", size);
     int rocproc = 0;
 
     // sort neighbors

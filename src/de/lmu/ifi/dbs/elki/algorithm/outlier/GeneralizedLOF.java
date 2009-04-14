@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.Progress;
+import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
@@ -110,7 +110,7 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
             if (logger.isVerbose()) {
               logger.verbose("computing neighborhoods");
             }
-            Progress progressNeighborhoods = new Progress("LOF", database.size());
+            FiniteProgress progressNeighborhoods = new FiniteProgress("LOF", database.size());
             int counter = 1;
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
                 Integer id = iter.next();
@@ -128,7 +128,7 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
             if (logger.isVerbose()) {
               logger.verbose("computing neighborhoods for reachability function");
             }
-            Progress reachDistNeighborhoodsProgress = new Progress("Reachability DIstance Neighborhoods", database.size());
+            FiniteProgress reachDistNeighborhoodsProgress = new FiniteProgress("Reachability Distance Neighborhoods", database.size());
             int counter = 1;
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
                 Integer id = iter.next();
@@ -145,7 +145,7 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
             if (logger.isVerbose()) {
               logger.verbose("computing LRDs");
             }
-            Progress lrdsProgress = new Progress("LRD", database.size());
+            FiniteProgress lrdsProgress = new FiniteProgress("LRD", database.size());
             int counter = 1;
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
                 Integer id = iter.next();
@@ -170,7 +170,7 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
               logger.verbose("computing LOFs");
             }
 
-            Progress progressLOFs = new Progress("LOF for objects", database.size());
+            FiniteProgress progressLOFs = new FiniteProgress("LOF for objects", database.size());
             int counter = 1;
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
                 Integer id = iter.next();

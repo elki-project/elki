@@ -18,7 +18,8 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.Progress;
+import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
+import de.lmu.ifi.dbs.elki.utilities.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -130,7 +131,8 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
      */
     @Override
     protected Clustering<Model> runInTime(Database<O> database) throws IllegalStateException {
-        Progress progress = new Progress("Clustering", database.size());
+        FiniteProgress objprog = new FiniteProgress("Processing objects", database.size());
+        IndefiniteProgress clusprog = new IndefiniteProgress("Number of clusters");
         resultList = new ArrayList<List<Integer>>();
         noise = new HashSet<Integer>();
         processedIDs = new HashSet<Integer>(database.size());
@@ -142,15 +144,15 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
                 Integer id = iter.next();
                 if (!processedIDs.contains(id)) {
-                    expandCluster(database, id, progress);
+                    expandCluster(database, id, objprog, clusprog);
                     if (processedIDs.size() == database.size() && noise.size() == 0) {
                         break;
                     }
                 }
                 if (logger.isVerbose()) {
-                    progress.setProcessed(processedIDs.size());
-                    progress.setAuxiliary("Number of clusters: "+resultList.size());
-                    progress(progress);
+                    objprog.setProcessed(processedIDs.size());
+                    clusprog.setProcessed(resultList.size());
+                    logger.progress(objprog, clusprog);
                 }
             }
         }
@@ -159,9 +161,9 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
                 Integer id = iter.next();
                 noise.add(id);
                 if (logger.isVerbose()) {
-                    progress.setProcessed(noise.size());
-                    progress.setAuxiliary("Number of clusters: "+resultList.size());
-                    progress(progress);
+                    objprog.setProcessed(noise.size());
+                    clusprog.setProcessed(resultList.size());
+                    logger.progress(objprog, clusprog);
                 }
             }
         }
@@ -186,9 +188,9 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
      *
      * @param database      the database on which the algorithm is run
      * @param startObjectID potential seed of a new potential cluster
-     * @param progress      the progress object for logging the current status
+     * @param objprog      the progress object for logging the current status
      */
-    protected void expandCluster(Database<O> database, Integer startObjectID, Progress progress) {
+    protected void expandCluster(Database<O> database, Integer startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
         List<DistanceResultPair<D>> seeds = database.rangeQuery(startObjectID, epsilon, getDistanceFunction());
 
         // startObject is no core-object
@@ -196,9 +198,9 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
             noise.add(startObjectID);
             processedIDs.add(startObjectID);
             if (logger.isVerbose()) {
-                progress.setProcessed(processedIDs.size());
-                progress.setAuxiliary("Number of clusters: "+resultList.size());
-                progress(progress);
+                objprog.setProcessed(processedIDs.size());
+                clusprog.setProcessed(resultList.size());
+                logger.progress(objprog, clusprog);
             }
             return;
         }
@@ -241,9 +243,10 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
             }
 
             if (logger.isVerbose()) {
-                progress.setProcessed(processedIDs.size());
+                objprog.setProcessed(processedIDs.size());
                 int numClusters = currentCluster.size() > minpts ? resultList.size() + 1 : resultList.size();
-                progress.setAuxiliary("Number of clusters: "+numClusters);
+                clusprog.setProcessed(numClusters);
+                logger.progress(objprog, clusprog);
             }
 
             if (processedIDs.size() == database.size() && noise.size() == 0) {
@@ -260,6 +263,8 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
             noise.add(startObjectID);
             processedIDs.add(startObjectID);
         }
+        // Signal that the progress has completed.
+        clusprog.setCompleted();
     }
 
     public Description getDescription() {

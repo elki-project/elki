@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.Progress;
+import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
@@ -92,7 +92,7 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
         if (logger.isVerbose()) {
           logger.verbose("Assigning nearest neighbor lists to database objects");
         }
-        Progress preprocessing = new Progress("assigning nearest neighbor lists", database.size());
+        FiniteProgress preprocessing = new FiniteProgress("assigning nearest neighbor lists", database.size());
         int count = 0;
         for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
             count++;

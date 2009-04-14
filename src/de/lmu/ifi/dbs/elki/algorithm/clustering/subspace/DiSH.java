@@ -25,7 +25,7 @@ import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.Progress;
+import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
@@ -314,7 +314,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
                                                                                           DiSHDistanceFunction<V, DiSHPreprocessor<V, ?>> distanceFunction,
                                                                                           ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> clusterOrder) {
 
-        Progress progress = new Progress("Extract Clusters", database.size());
+        FiniteProgress progress = new FiniteProgress("Extract Clusters", database.size());
         int processed = 0;
         Map<BitSet, List<Pair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>>> clustersMap = new HashMap<BitSet, List<Pair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>>>();
         Map<Integer, ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance>> entryMap = new HashMap<Integer, ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance>>();

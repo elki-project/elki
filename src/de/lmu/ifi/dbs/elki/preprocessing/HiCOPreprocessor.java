@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
-import de.lmu.ifi.dbs.elki.utilities.Progress;
+import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
@@ -80,7 +80,7 @@ public abstract class HiCOPreprocessor<V extends RealVector<V, ?>> extends Abstr
         }
 
         long start = System.currentTimeMillis();
-        Progress progress = new Progress("Preprocessing correlation dimension", database.size());
+        FiniteProgress progress = new FiniteProgress("Preprocessing correlation dimension", database.size());
         if (logger.isVerbose()) {
           logger.verbose("Preprocessing:");
         }

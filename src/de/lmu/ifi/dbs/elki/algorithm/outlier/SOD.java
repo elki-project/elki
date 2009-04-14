@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
-import de.lmu.ifi.dbs.elki.utilities.Progress;
+import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
@@ -125,7 +125,7 @@ public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends
     @SuppressWarnings("unchecked")
     @Override
     protected MultiResult runInTime(Database<V> database) throws IllegalStateException {
-        Progress progress = new Progress("assigning SOD", database.size());
+        FiniteProgress progress = new FiniteProgress("assigning SOD", database.size());
         int processed = 0;
         similarityFunction.setDatabase(database, isVerbose(), isTime());
         if (logger.isVerbose()) {

@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Identifiable;
-import de.lmu.ifi.dbs.elki.utilities.Progress;
+import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
@@ -125,7 +125,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
      */
     @Override
     protected ClusterOrderResult<D> runInTime(Database<O> database) {
-        Progress progress = new Progress("Clustering", database.size());
+        FiniteProgress progress = new FiniteProgress("Clustering", database.size());
 
         int size = database.size();
         processedIDs = new HashSet<Integer>(size);
@@ -153,7 +153,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
      * @param progress the progress object to actualize the current progress if the
      *                 algorithm
      */
-    protected void expandClusterOrder(Database<O> database, Integer objectID, Progress progress) {
+    protected void expandClusterOrder(Database<O> database, Integer objectID, FiniteProgress progress) {
 
         clusterOrder.add(objectID, null, getDistanceFunction().infiniteDistance());
         processedIDs.add(objectID);

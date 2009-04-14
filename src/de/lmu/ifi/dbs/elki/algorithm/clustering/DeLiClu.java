@@ -24,7 +24,7 @@ import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
-import de.lmu.ifi.dbs.elki.utilities.Progress;
+import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeapNode;
@@ -135,7 +135,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
         knnJoin.run(database);
         AnnotationsFromHashMap knns = knnJoin.getResult();
 
-        Progress progress = new Progress("Clustering", database.size());
+        FiniteProgress progress = new FiniteProgress("Clustering", database.size());
         int size = database.size();
 
         if (logger.isVerbose()) {

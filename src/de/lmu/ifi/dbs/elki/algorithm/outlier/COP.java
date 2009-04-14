@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.Progress;
+import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -79,14 +79,14 @@ public class COP<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, D
     protected MultiResult runInTime(Database<V> database) throws IllegalStateException {
         getDistanceFunction().setDatabase(database, isVerbose(), isTime());
         if (logger.isVerbose()) {
-          logger.verbose("CorrelationOutlierDetection ");
+          logger.verbose("CorrelationOutlierProbability ");
         }
 
         {// compute neighbors of each db object
             if (logger.isVerbose()) {
               logger.verbose("Running dependency derivation");
             }
-            Progress progressLocalPCA = new Progress("COD", database.size());
+            FiniteProgress progressLocalPCA = new FiniteProgress("COP", database.size());
             int counter = 1;
             double sqrt2 = Math.sqrt(2.0);
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {

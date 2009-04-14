@@ -23,7 +23,7 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.Progress;
+import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.pairs.CPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -86,7 +86,7 @@ public class EvaluateRankingQuality<V extends RealVector<V, ?>> extends Distance
     if(logger.isVerbose()) {
       logger.verbose("Processing points...");
     }
-    Progress rocloop = new Progress("ROC computation loop ...", size);
+    FiniteProgress rocloop = new FiniteProgress("Computing ROC AUC values", size);
     int rocproc = 0;
 
     // sort neighbors

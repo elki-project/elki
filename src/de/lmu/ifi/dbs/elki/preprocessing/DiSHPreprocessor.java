@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.result.AprioriResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.Progress;
+import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
@@ -171,7 +171,7 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
 
         try {
             long start = System.currentTimeMillis();
-            Progress progress = new Progress("Preprocessing preference vector", database.size());
+            FiniteProgress progress = new FiniteProgress("Preprocessing preference vector", database.size());
 
             // only one epsilon value specified
             int dim = database.dimensionality();
