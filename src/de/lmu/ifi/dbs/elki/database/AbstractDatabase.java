@@ -358,7 +358,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
   }
 
   public final Set<Integer> randomSample(int k, long seed) {
-    if(k < 0) {
+    if(k < 0 || k > this.size()) {
       throw new IllegalArgumentException("Illegal value for size of random sample: " + k);
     }
 
