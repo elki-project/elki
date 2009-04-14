@@ -137,7 +137,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
    * </p>
    */
   private final ClassParameter<ResultHandler<O, Result>> RESULT_HANDLER_PARAM = new ClassParameter<ResultHandler<O, Result>>(OptionID.RESULT_HANDLER, ResultHandler.class, ResultWriter.class.getName());
-  
+
   /**
    * Holds the algorithm to run.
    */
@@ -193,7 +193,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
 
     // parameter database connection
     addOption(DATABASE_CONNECTION_PARAM);
-    
+
     // result handler
     addOption(RESULT_HANDLER_PARAM);
 
@@ -202,9 +202,9 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
 
     // normalization-undo flag
     addOption(NORMALIZATION_UNDO_FLAG);
-    
+
     // normalization-undo depends on a defined normalization.
-    GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint<String,String>(NORMALIZATION_PARAM, null, NORMALIZATION_UNDO_FLAG, true);
+    GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint<String, String>(NORMALIZATION_PARAM, null, NORMALIZATION_UNDO_FLAG, true);
     optionHandler.setGlobalParameterConstraint(gpc);
 
     optionHandler.setProgrammCall(CALL);
@@ -282,7 +282,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
         throw new AbortException(p.parameterDescription());
       }
     }
-    
+
     String[] remainingParameters = super.setParameters(args);
 
     // algorithm
@@ -308,7 +308,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
     if(helpOptionHandler.isSet(HELP_FLAG) || helpOptionHandler.isSet(HELP_LONG_FLAG)) {
       throw new AbortException(INFORMATION);
     }
-    
+
     initialized = true;
     setParameters(args, remainingParameters);
     return remainingParameters;
@@ -404,7 +404,9 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
       logger.verbose(kddTask.usage(e.getMessage() + "\n\nUSAGE:"));
     }
     catch(ParameterException e) {
-      logger.warning(e.getMessage(), e);
+      // Note: the stack-trace is not included, since this exception is
+      // supposedly only thrown with an already helpful message.
+      logger.warning(e.getMessage());
     }
     // any other exception
     catch(Exception e) {
