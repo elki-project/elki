@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 
 /**
@@ -39,7 +40,7 @@ public class PartitionsFromClustering {
   public <O extends DatabaseObject, R extends Clustering<M>, M extends Model, L extends ClassLabel> Map<L,Database<O>> makeDatabasesFromClustering(Database<O> olddb, R clustering, Class<L> classLabel) throws UnableToComplyException {
     // we need at least one cluster
     if (clustering.getToplevelClusters().size() <= 0) {
-      throw new UnableToComplyException("Clustering doesn't contain any cluster.");
+      throw new UnableToComplyException(ExceptionMessages.CLUSTERING_EMPTY);
     }
 
     // prepare a map for the partitioning call.
@@ -81,7 +82,7 @@ public class PartitionsFromClustering {
   public <O extends DatabaseObject, R extends Clustering<M>, M extends Model> Map<Cluster<M>,Database<O>> makeDatabasesFromClustering(Database<O> olddb, R clustering) throws UnableToComplyException {
     // we need at least one cluster
     if (clustering.getToplevelClusters().size() <= 0) {
-      throw new UnableToComplyException("Clustering doesn't contain any cluster.");
+      throw new UnableToComplyException(ExceptionMessages.CLUSTERING_EMPTY);
     }
 
     // prepare a map for the partitioning call.

@@ -25,6 +25,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -118,8 +119,8 @@ public class SubspaceEM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V,
 
     @Override
     public Clustering<CorrelationAnalysisSolution<V>> runInTime(Database<V> database) throws IllegalStateException {
-        if (database.size() == 0) {
-            throw new IllegalArgumentException("database empty: must contain elements");
+        if(database == null || database.size() == 0) {
+          throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
         }
 //        int n = database.size();
         // initial models

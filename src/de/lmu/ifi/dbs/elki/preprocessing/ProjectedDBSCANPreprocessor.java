@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
+import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
@@ -107,8 +108,8 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
     }
 
     public void run(Database<V> database, boolean verbose, boolean time) {
-        if (database == null) {
-            throw new IllegalArgumentException("Database must not be null!");
+        if (database == null || database.size() <= 0) {
+          throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
         }
 
         long start = System.currentTimeMillis();

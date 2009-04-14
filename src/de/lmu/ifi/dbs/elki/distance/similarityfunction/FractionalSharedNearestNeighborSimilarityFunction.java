@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.SharedNearestNeighborsPreprocessor;
+import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -104,7 +105,7 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
   }
 
   public boolean isUndefinedDistance(@SuppressWarnings("unused") DoubleDistance distance) {
-    throw new UnsupportedOperationException("Undefinded distance not supported!");
+    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_UNDEFINED_DISTANCE);
   }
 
   public DoubleDistance nullDistance() {
@@ -112,7 +113,7 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
   }
 
   public DoubleDistance undefinedDistance() {
-    throw new UnsupportedOperationException("Undefinded distance not supported!");
+    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_UNDEFINED_DISTANCE);
   }
 
   public DoubleDistance valueOf(String pattern) throws IllegalArgumentException {

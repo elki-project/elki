@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.data.MultiRepresentedObject;
 import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassListParameter;
@@ -247,7 +248,7 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
    * @throws UnsupportedOperationException
    */
   public LinearEquationSystem transform(LinearEquationSystem linearEquationSystem) {
-    throw new UnsupportedOperationException("Operation not supported!");
+    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED);
   }
 
   /**

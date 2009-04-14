@@ -25,6 +25,7 @@ import de.lmu.ifi.dbs.elki.normalization.AttributeWiseRealVectorNormalization;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -90,8 +91,8 @@ public class SubspaceAggregation<V extends RealVector<V, ?>> extends AbstractAlg
 
     @Override
     public Clustering<Model> runInTime(Database<V> database) throws IllegalStateException {
-        if (database.size() == 0) {
-            throw new IllegalArgumentException("database empty: must contain elements");
+        if(database == null || database.size() == 0) {
+          throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
         }
         List<V> newMeans = initialMeans(database);
         int dimensionality = newMeans.get(0).getDimensionality();

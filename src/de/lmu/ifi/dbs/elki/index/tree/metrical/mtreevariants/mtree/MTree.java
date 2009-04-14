@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
+import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 
 /**
  * MTree is a metrical index structure based on the concepts of the M-Tree.
@@ -73,7 +74,7 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Abst
    */
   @Override
   public List<DistanceResultPair<D>> reverseKNNQuery(@SuppressWarnings("unused") O object, @SuppressWarnings("unused") int k) {
-    throw new UnsupportedOperationException("Reverse knn-queries are not yet supported!");
+    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 
   @Override

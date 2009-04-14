@@ -6,6 +6,8 @@ import java.io.RandomAccessFile;
 import java.io.Serializable;
 import java.nio.channels.FileLock;
 
+import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
+
 /**
  * On Disc Array storage for records of a given size.
  * 
@@ -88,7 +90,7 @@ public class OnDiskArray implements Serializable {
 
     // do not allow overwriting.
     if (filename.exists()) {
-      throw new IOException("File already exists.");
+      throw new IOException(ExceptionMessages.FILE_EXISTS);
     }
     
     // open file.

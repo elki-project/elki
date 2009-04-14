@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
+import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
@@ -75,8 +76,8 @@ public abstract class HiCOPreprocessor<V extends RealVector<V, ?>> extends Abstr
      * @param time     flag to request output of performance time
      */
     public void run(Database<V> database, boolean verbose, boolean time) {
-        if (database == null) {
-            throw new IllegalArgumentException("Database must not be null!");
+        if (database == null || database.size() <= 0) {
+            throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
         }
 
         long start = System.currentTimeMillis();

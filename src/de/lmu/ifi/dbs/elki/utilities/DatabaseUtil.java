@@ -143,8 +143,8 @@ public final class DatabaseUtil {
    * @throws IllegalArgumentException if the database is empty
    */
   public static <O extends RealVector<O, ?>> O centroid(Database<O> database) {
-      if (database.size() == 0) {
-          throw new IllegalArgumentException("Database is empty!");
+      if (database == null || database.size() == 0) {
+          throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
       }
       int dim = database.dimensionality();
       double[] centroid = new double[dim];

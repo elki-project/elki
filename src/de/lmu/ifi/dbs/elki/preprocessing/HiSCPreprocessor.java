@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
@@ -91,12 +92,9 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
   }
 
   public void run(Database<V> database, boolean verbose, boolean time) {
-    if (database == null) {
-      throw new IllegalArgumentException("Database must not be null!");
+    if (database == null || database.size() <= 0) {
+      throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
-
-    if (database.size() == 0)
-      return;
 
     StringBuffer msg = new StringBuffer();
 

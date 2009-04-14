@@ -106,7 +106,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
       }
     }
     catch(IOException e) {
-      throw new RuntimeException("IOException occurred: \n " + e);
+      throw new RuntimeException("IOException occurred.", e);
     }
   }
 

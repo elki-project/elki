@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 
 import java.util.Arrays;
@@ -59,7 +60,7 @@ public class PriorProbabilityClassifier<O extends DatabaseObject, L extends Clas
                 occurences[index]++;
             }
             else {
-                throw new IllegalStateException("inconsistent state of database - found new label: " + label);
+                throw new IllegalStateException(ExceptionMessages.INCONSISTENT_STATE_NEW_LABEL +": "+ label);
             }
         }
         double size = database.size();

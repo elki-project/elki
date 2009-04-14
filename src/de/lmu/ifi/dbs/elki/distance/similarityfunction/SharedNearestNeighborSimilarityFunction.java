@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.IntegerDistance;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.SharedNearestNeighborsPreprocessor;
+import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 
 import java.util.Iterator;
 import java.util.SortedSet;
@@ -94,7 +95,7 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
     }
 
     public boolean isUndefinedDistance(@SuppressWarnings("unused") IntegerDistance distance) {
-        throw new UnsupportedOperationException("Undefinded distance not supported!");
+        throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_UNDEFINED_DISTANCE);
     }
 
     public IntegerDistance nullDistance() {
@@ -102,7 +103,7 @@ public class SharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D
     }
 
     public IntegerDistance undefinedDistance() {
-        throw new UnsupportedOperationException("Undefinded distance not supported!");
+        throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_UNDEFINED_DISTANCE);
     }
 
     public IntegerDistance valueOf(String pattern) throws IllegalArgumentException {

@@ -25,6 +25,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.result.AprioriResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
@@ -159,14 +160,9 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
         addOption(STRATEGY_PARAM);
     }
 
-//    @SuppressWarnings("unchecked")
     public void run(Database<V> database, boolean verbose, boolean time) {
-        if (database == null) {
-            throw new IllegalArgumentException("Database must not be null!");
-        }
-
-        if (database.size() == 0) {
-            return;
+        if (database == null || database.size() == 0) {
+            throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
         }
 
         try {

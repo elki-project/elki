@@ -144,11 +144,11 @@ public class ArffSparseInstanceToSparseBitVector extends StandAloneInputWrapper 
             }
         }
         catch (FileNotFoundException e) {
-            throw new UnableToComplyException("FileNotFoundException occurred."
-                + e);
+            throw new UnableToComplyException("FileNotFoundException occurred.",
+                e);
         }
         catch (IOException e) {
-            throw new UnableToComplyException("IOException occurred." + e);
+            throw new UnableToComplyException("IOException occurred.", e);
         }
     }
 

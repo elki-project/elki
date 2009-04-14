@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.database;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -390,7 +391,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
       }
     }
     else {
-      throw new UnsupportedOperationException("Database is empty.");
+      throw new UnsupportedOperationException(ExceptionMessages.DATABASE_EMPTY);
     }
   }
 

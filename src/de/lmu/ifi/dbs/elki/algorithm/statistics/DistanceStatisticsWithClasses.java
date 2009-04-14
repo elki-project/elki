@@ -23,6 +23,7 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.Histogram.Constructor;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -99,7 +100,7 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
       
       Iterator<Integer> iter = database.iterator();
       if(!iter.hasNext()) {
-        throw new IllegalStateException("Database is empty.");
+        throw new IllegalStateException(ExceptionMessages.DATABASE_EMPTY);
       }
       Integer firstid = iter.next();
       minhotset.add(new CPair<Double, Integer>(Double.MAX_VALUE, firstid));

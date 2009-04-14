@@ -66,7 +66,7 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>, M ex
    */
   @Override
   protected final Clustering<M> runInTime(Database<V> database) throws IllegalStateException {
-    if(database.size() == 0) {
+    if(database == null || database.size() == 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
     this.database = database;

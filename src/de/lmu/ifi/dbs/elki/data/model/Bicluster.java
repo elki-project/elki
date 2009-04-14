@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
+import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
@@ -88,7 +89,7 @@ public class Bicluster<V extends RealVector<V, Double>> implements TextWriteable
       }
 
       public void remove() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_REMOVE);
       }
 
     };

@@ -103,7 +103,7 @@ public class OnDiskArrayPageFile<P extends Page<P>> extends PageFile<P> {
       }
     }
     catch(IOException e) {
-      throw new RuntimeException("IOException occurred: \n " + e);
+      throw new RuntimeException("IOException occurred.", e);
     }
   }
 
@@ -134,7 +134,7 @@ public class OnDiskArrayPageFile<P extends Page<P>> extends PageFile<P> {
     }
     catch(IOException e) {
       e.fillInStackTrace();
-      throw new RuntimeException("IOException occurred during reading of page " + pageID + "\n" + e);
+      throw new RuntimeException("IOException occurred during reading of page " + pageID, e);
     }
   }
 

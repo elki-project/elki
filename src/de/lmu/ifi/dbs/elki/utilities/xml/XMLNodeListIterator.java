@@ -5,6 +5,8 @@ import java.util.Iterator;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
+
 /**
  * Simple adapter class to iterate over a DOM tree nodes children.
  * 
@@ -56,7 +58,7 @@ public final class XMLNodeListIterator implements Iterable<Node>, Iterator<Node>
    */
   @Override
   public void remove() {
-    throw new UnsupportedOperationException("XMLNodeIterator doesn't support remove");
+    throw new UnsupportedOperationException(this.getClass().getSimpleName()+": "+ExceptionMessages.UNSUPPORTED_REMOVE);
   }
 
   /**

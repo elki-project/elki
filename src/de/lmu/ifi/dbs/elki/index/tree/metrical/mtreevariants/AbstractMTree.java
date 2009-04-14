@@ -22,6 +22,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.Assignments;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.MLBDistSplit;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.util.PQNode;
+import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
@@ -89,7 +90,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
      * @throws UnsupportedOperationException
      */
     public final boolean delete(@SuppressWarnings("unused") O o) {
-        throw new UnsupportedOperationException("Deletion of objects is not yet supported by an M-Tree!");
+        throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
     }
 
     /**
@@ -100,7 +101,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
      */
     @Override
     protected final void postDelete(@SuppressWarnings("unused") O o) {
-        throw new UnsupportedOperationException("Deletion of objects is not yet supported by an M-Tree!");
+        throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
     }
 
     @Override
