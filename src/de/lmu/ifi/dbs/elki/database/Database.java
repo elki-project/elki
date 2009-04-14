@@ -195,9 +195,10 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
 
   /**
    * Returns an iterator iterating over all keys of the database.
+   * 
    *
    * @return an iterator iterating over all keys of the database
-   * @see Iterable#iterator()
+   * @see Iterable#iterator() - for a Database {@code db}, this allows the construct {@code for(Integer id : db){ // work with database ids }}.
    */
   Iterator<Integer> iterator();
 
