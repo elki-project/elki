@@ -29,9 +29,7 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
                                                                           int k,
                                                                           DistanceFunction<O, D> distanceFunction) {
         KNNList<D> knnList = new KNNList<D>(k, distanceFunction.infiniteDistance());
-        Iterator<Integer> iterator = iterator();
-        while (iterator.hasNext()) {
-            Integer candidateID = iterator.next();
+        for(Integer candidateID : this){
             O candidate = get(candidateID);
             knnList.add(new DistanceResultPair<D>(distanceFunction.distance(queryObject, candidate), candidateID));
         }
