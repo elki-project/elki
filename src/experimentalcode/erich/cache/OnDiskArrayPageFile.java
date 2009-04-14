@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.persistent;
+package experimentalcode.erich.cache;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -6,19 +6,21 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.RandomAccessFile;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.persistent.Cache;
+import de.lmu.ifi.dbs.elki.persistent.Page;
+import de.lmu.ifi.dbs.elki.persistent.PageFile;
+import de.lmu.ifi.dbs.elki.persistent.PageHeader;
 
 /**
- * A PersistentPageFile stores objects persistently that implement the
+ * A OnDiskArrayPageFile stores objects persistently that implement the
  * <code>Page</code> interface. For convenience each page is represented by a
  * single file. All pages are stored in a specified directory.
  * 
  * @author Elke Achtert
  */
-public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
-
+public class OnDiskArrayPageFile<P extends Page<P>> extends PageFile<P> {
   /**
    * Indicates an empty page.
    */
@@ -32,7 +34,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
   /**
    * The file storing the pages.
    */
-  private final RandomAccessFile file;
+  private final OnDiskArray file;
 
   /**
    * The header of this page file.
@@ -40,14 +42,14 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
   protected final PageHeader header;
 
   /**
-   * Creates a new PersistentPageFile from an existing file.
+   * Creates a new OnDiskArrayPageFile from an existing file.
    * 
    * @param header the header of this file
    * @param fileName the name of the file
    * @param cacheSize the size of the cache in Byte
    * @param cache the class of the cache to be used
    */
-  public PersistentPageFile(PageHeader header, int cacheSize, Cache<P> cache, String fileName) {
+  public OnDiskArrayPageFile(PageHeader header, int cacheSize, Cache<P> cache, String fileName) {
     super();
 
     try {
@@ -57,22 +59,18 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
       // create from existing file
       if(f.exists()) {
         Logging.getLogger(this.getClass()).verbose("Create from existing file.");
-        file = new RandomAccessFile(f, "rw");
+        this.file = new OnDiskArray(f, 0, header.size(), pageSize, true);
 
         // init the header
         this.header = header;
-        header.readHeader(file);
+        header.readHeader(file.readExtraHeader());
 
         // init the cache
         initCache(header.getPageSize(), cacheSize, cache);
 
         // reading empty nodes in Stack
-        int i = 0;
-        while(file.getFilePointer() + pageSize <= file.length()) {
-          int offset = header.size() + pageSize * i;
-          byte[] buffer = new byte[pageSize];
-          file.seek(offset);
-          file.read(buffer);
+        for(int i = 0; i < file.getNumRecords(); i++) {
+          byte[] buffer = file.readRecord(i);
 
           ByteArrayInputStream bais = new ByteArrayInputStream(buffer);
           ObjectInputStream ois = new ObjectInputStream(bais);
@@ -94,12 +92,11 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
         Logging.getLogger(this.getClass()).verbose("Create a new file.");
 
         // init the file
-        this.file = new RandomAccessFile(f, "rw");
-        this.file.setLength(0);
+        this.file = new OnDiskArray(f, 0, header.size(), pageSize, 0);
 
         // writing header
         this.header = header;
-        header.writeHeader(file);
+        this.file.writeExtraHeader(header.asByteArray());
 
         // init the cache
         initCache(header.getPageSize(), cacheSize, cache);
@@ -125,11 +122,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
       // get from file and put to cache
       if(page == null) {
         readAccess++;
-        int offset = header.size() + pageSize * pageID;
-        byte[] buffer = new byte[pageSize];
-        file.seek(offset);
-        file.read(buffer);
-        page = byteArrayToPage(buffer);
+        page = byteArrayToPage(this.file.readRecord(pageID));
         if(page != null) {
           // noinspection unchecked
           page.setFile(this);
@@ -160,9 +153,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
       // delete from file
       writeAccess++;
       byte[] array = pageToByteArray(null);
-      int offset = header.size() + pageSize * pageID;
-      file.seek(offset);
-      file.write(array);
+      file.writeRecord(pageID, array);
     }
     catch(IOException e) {
       e.fillInStackTrace();
@@ -182,9 +173,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
         page.setDirty(false);
         writeAccess++;
         byte[] array = pageToByteArray(page);
-        int offset = header.size() + pageSize * page.getID();
-        file.seek(offset);
-        file.write(array);
+        file.writeRecord(page.getID(), array);
       }
       catch(IOException e) {
         e.fillInStackTrace();
@@ -215,7 +204,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
   public void clear() {
     try {
       super.clear();
-      file.setLength(header.size());
+      file.resizeFile(0);
     }
     catch(IOException e) {
       e.fillInStackTrace();

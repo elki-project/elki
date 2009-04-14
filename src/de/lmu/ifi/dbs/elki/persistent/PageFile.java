@@ -6,10 +6,10 @@ import java.util.logging.Logger;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 
 /**
- * Abstract class implementing general methods of a PageFile.
- * A PageFile stores objects that implement the <code>Page</code> interface.
- *
- * @author Elke Achtert 
+ * Abstract class implementing general methods of a PageFile. A PageFile stores
+ * objects that implement the <code>Page</code> interface.
+ * 
+ * @author Elke Achtert
  */
 public abstract class PageFile<P extends Page<P>> implements CachedFile<P> {
 
@@ -86,26 +86,26 @@ public abstract class PageFile<P extends Page<P>> implements CachedFile<P> {
 
   /**
    * Sets the id of the given page.
-   *
+   * 
    * @param page the page to set the id
    */
   public void setPageID(P page) {
-    if (page.getID() == null) {
+    if(page.getID() == null) {
       Integer pageID = getNextEmptyPageID();
 
-      if (pageID == null) {
+      if(pageID == null) {
         page.setID(nextPageID++);
       }
-      else
+      else {
         page.setID(pageID);
+      }
     }
   }
 
   /**
-   * Writes a page into this file.
-   * The method tests if the page has already an id, otherwise
-   * a new id is assigned and returned.
-   *
+   * Writes a page into this file. The method tests if the page has already an
+   * id, otherwise a new id is assigned and returned.
+   * 
    * @param page the page to be written
    * @return the id of the page
    */
@@ -121,7 +121,7 @@ public abstract class PageFile<P extends Page<P>> implements CachedFile<P> {
 
   /**
    * Reads the page with the given id from this file.
-   *
+   * 
    * @param pageID the id of the page to be returned
    * @return the page with the given pageId
    */
@@ -132,7 +132,7 @@ public abstract class PageFile<P extends Page<P>> implements CachedFile<P> {
 
   /**
    * Deletes the node with the specified id from this file.
-   *
+   * 
    * @param pageID the id of the node to be deleted
    */
   public void deletePage(int pageID) {
@@ -159,7 +159,7 @@ public abstract class PageFile<P extends Page<P>> implements CachedFile<P> {
 
   /**
    * Sets the maximum size of the cache of this file.
-   *
+   * 
    * @param cacheSize
    */
   public void setCacheSize(int cacheSize) {
@@ -168,23 +168,25 @@ public abstract class PageFile<P extends Page<P>> implements CachedFile<P> {
 
   /**
    * Initializes the cache.
-   *
-   * @param pageSize  the size of a page in Bytes
+   * 
+   * @param pageSize the size of a page in Bytes
    * @param cacheSize the size of the cache in Byte
-   * @param cache     the class of the cache to be used
+   * @param cache the class of the cache to be used
    */
-  void initCache(int pageSize, int cacheSize, Cache<P> cache) {
-    if (pageSize <= 0)
+  protected void initCache(int pageSize, int cacheSize, Cache<P> cache) {
+    if(pageSize <= 0) {
       throw new IllegalStateException("pagesize <= 0!");
+    }
 
     int pagesInCache = cacheSize / pageSize;
-    if (LoggingConfiguration.DEBUG) {
+    if(LoggingConfiguration.DEBUG) {
       Logger.getLogger(this.getClass().getName()).fine("Number of pages in cache " + pagesInCache);
     }
 
-//    if (pagesInCache <= 0)
-//      throw new IllegalArgumentException("Cache size of " + cacheSize + " Bytes is chosen too small: " +
-//                                         cacheSize + "/" + pageSize + " = " + pagesInCache);
+    // if (pagesInCache <= 0)
+    // throw new IllegalArgumentException("Cache size of " + cacheSize +
+    // " Bytes is chosen too small: " +
+    // cacheSize + "/" + pageSize + " = " + pagesInCache);
 
     this.pageSize = pageSize;
     this.cache = cache;
@@ -193,19 +195,21 @@ public abstract class PageFile<P extends Page<P>> implements CachedFile<P> {
 
   /**
    * Returns the next empty page id.
-   *
+   * 
    * @return the next empty page id
    */
   private Integer getNextEmptyPageID() {
-    if (!emptyPages.empty())
+    if(!emptyPages.empty()) {
       return emptyPages.pop();
-    else
+    }
+    else {
       return null;
+    }
   }
 
   /**
    * Returns the next page id.
-   *
+   * 
    * @return the next page id
    */
   public int getNextPageID() {
@@ -214,7 +218,7 @@ public abstract class PageFile<P extends Page<P>> implements CachedFile<P> {
 
   /**
    * Sets the next page id.
-   *
+   * 
    * @param nextPageID the next page id to be set
    */
   public void setNextPageID(int nextPageID) {
