@@ -197,6 +197,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
    * Returns an iterator iterating over all keys of the database.
    *
    * @return an iterator iterating over all keys of the database
+   * @see Iterable#iterator()
    */
   Iterator<Integer> iterator();
 
