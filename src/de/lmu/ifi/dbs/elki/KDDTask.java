@@ -32,6 +32,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterFlagGlobalConstraint;
 
 /**
  * Provides a KDDTask that can be used to perform any algorithm implementing
@@ -200,6 +202,10 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
 
     // normalization-undo flag
     addOption(NORMALIZATION_UNDO_FLAG);
+    
+    // normalization-undo depends on a defined normalization.
+    GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint<String,String>(NORMALIZATION_PARAM, null, NORMALIZATION_UNDO_FLAG, true);
+    optionHandler.setGlobalParameterConstraint(gpc);
 
     optionHandler.setProgrammCall(CALL);
   }
@@ -296,9 +302,6 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
       normalization = NORMALIZATION_PARAM.instantiateClass();
       normalizationUndo = NORMALIZATION_UNDO_FLAG.isSet();
       remainingParameters = normalization.setParameters(remainingParameters);
-    }
-    else if(NORMALIZATION_UNDO_FLAG.isSet()) {
-      throw new WrongParameterValueException("Illegal parameter setting: Flag " + NORMALIZATION_UNDO_FLAG + " is set, but no normalization is specified.");
     }
 
     // help

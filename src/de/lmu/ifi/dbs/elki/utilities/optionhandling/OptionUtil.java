@@ -89,6 +89,26 @@ public final class OptionUtil {
   }
 
   /**
+   * Returns a string representation of the specified list of
+   * options containing the names of the options.
+   *
+   * @param options the list of options
+   * @return the names of the options
+   */
+  public static <O extends Option<?>> String optionsNamesToString(O[] options) {
+      StringBuffer buffer = new StringBuffer();
+      buffer.append("[");
+      for (int i = 0; i < options.length; i++) {
+          buffer.append(options[i].getName());
+          if (i != options.length - 1) {
+              buffer.append(",");
+          }
+      }
+      buffer.append("]");
+      return buffer.toString();
+  }
+
+  /**
    * Returns an array that contains all elements of the first parameter array that
    * are not contained by the second parameter array. The first parameter array must at
    * least be as long as the second. The second must not contain entries that
