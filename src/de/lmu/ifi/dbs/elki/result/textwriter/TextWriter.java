@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterObjectComment;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterObjectInline;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterTextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterTriple;
+import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterVector;
 import de.lmu.ifi.dbs.elki.utilities.HandlerList;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
@@ -73,7 +74,7 @@ public class TextWriter<O extends DatabaseObject> {
     writers.insertHandler(Double.class, trivialwriter);
     writers.insertHandler(Integer.class, trivialwriter);
     writers.insertHandler(BitSet.class, trivialwriter);
-    writers.insertHandler(Vector.class, trivialwriter);
+    writers.insertHandler(Vector.class, new TextWriterVector());
     writers.insertHandler(Distance.class, trivialwriter);
     writers.insertHandler(SimpleClassLabel.class, trivialwriter);
     writers.insertHandler(HierarchicalClassLabel.class, trivialwriter);
