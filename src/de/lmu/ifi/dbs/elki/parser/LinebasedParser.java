@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * Will be used by a parser to re-read results.
  *
  * @author Erich Schubert
+ * @param <O> object type
  */
 public interface LinebasedParser<O extends DatabaseObject> extends Parameterizable {
   /**

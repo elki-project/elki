@@ -10,6 +10,8 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
  * A DistanceParser shall provide a DistanceParsingResult by parsing an InputStream.
  *
  * @author Arthur Zimek
+ * @param <O> object type
+ * @param <D> distance type
  */
 public interface DistanceParser<O extends DatabaseObject, D extends Distance<D>> extends Parser<O> {
 

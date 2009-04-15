@@ -28,6 +28,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * Lines starting with &quot;#&quot; will be ignored.
  * 
  * @author Elke Achtert
+ * @param <D> distance type
+ * @param <N> number type
  */
 public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Number> extends AbstractParser<ExternalObject> implements DistanceParser<ExternalObject, D> {
 

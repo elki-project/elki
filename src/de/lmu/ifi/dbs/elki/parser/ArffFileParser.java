@@ -19,6 +19,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * base parser.
  * 
  * @author Arthur Zimek
+ * @param <O> object type
+ * @param <W> attribute type
  */
 public class ArffFileParser<O extends DatabaseObject & WekaObject<W>, W extends WekaAttribute> extends AbstractParser<O>
 {

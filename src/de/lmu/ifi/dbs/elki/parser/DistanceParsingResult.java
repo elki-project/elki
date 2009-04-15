@@ -12,6 +12,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * and a cache of precomputed distances between the database objects.
  *
  * @author Elke Achtert
+ * @param <O> object type
+ * @param <D> distance type
  */
 public class DistanceParsingResult<O extends DatabaseObject, D extends Distance<D>> extends ParsingResult<O> {
   /**

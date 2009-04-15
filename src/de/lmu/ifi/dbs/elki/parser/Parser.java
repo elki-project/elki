@@ -9,6 +9,7 @@ import java.io.InputStream;
  * A Parser shall provide a ParsingResult by parsing an InputStream.
  *
  * @author Arthur Zimek
+ * @param <O> object type
  */
 public interface Parser<O extends DatabaseObject> extends Parameterizable {
   /**

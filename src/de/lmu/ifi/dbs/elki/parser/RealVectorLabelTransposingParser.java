@@ -18,6 +18,7 @@ import java.util.List;
  * Parser reads points transposed. Line n gives the n-th attribute for all points.
  *
  * @author Arthur Zimek
+ * @param <V> real vector type
  */
 public class RealVectorLabelTransposingParser<V extends RealVector<V, ?>> extends RealVectorLabelParser<V> {
 

@@ -9,6 +9,7 @@ import java.util.List;
  * Provides a list of database objects and labels associated with these objects.
  * 
  * @author Elke Achtert 
+ * @param <O> object type
  */
 public class ParsingResult<O extends DatabaseObject>
 {

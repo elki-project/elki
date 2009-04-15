@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
  * handling options.
  *
  * @author Arthur Zimek
+ * @param <O> object type
  */
 public abstract class AbstractParser<O extends DatabaseObject> extends AbstractParameterizable implements Parser<O> {
   /**
