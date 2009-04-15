@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * JUnit Test for the class {@link AffineTransformation}
  * 
  * @author Erich Schubert
- *
+ * 
  */
 public class TestAffineTransformation {
   /**
@@ -143,15 +143,39 @@ public class TestAffineTransformation {
   @Test
   public void testReorder() {
     Vector v = new Vector(new double[] { 3, 5, 7 });
+    // all permutations
     Vector p1 = new Vector(new double[] { 3, 5, 7 });
     Vector p2 = new Vector(new double[] { 3, 7, 5 });
     Vector p3 = new Vector(new double[] { 5, 3, 7 });
     Vector p4 = new Vector(new double[] { 5, 7, 3 });
     Vector p5 = new Vector(new double[] { 7, 3, 5 });
     Vector p6 = new Vector(new double[] { 7, 5, 3 });
-    Vector[] ps = new Vector[] { p1, p2, p3, p4, p5, p6 };
+    Vector[] ps = new Vector[] {
+    // with no arguments.
+    p1,
+    // with just one argument.
+    p1, p3, p5,
+    // with two arguments.
+    p1, p2, p3, p4, p5, p6,
+    };
 
+    // index in reference array
     int idx = 0;
+    // with 0 arguments
+    {
+      AffineTransformation aff = AffineTransformation.reorderAxesTransformation(v.getDimensionality(), new int[] {});
+      Vector n = aff.apply(v).minus(ps[idx]);
+      assertEquals("Permutation " + idx + " doesn't match.", n.length(), 0.0, 0.001);
+      idx++;
+    }
+    // with one argument
+    for(int d1 = 1; d1 <= 3; d1++) {
+      AffineTransformation aff = AffineTransformation.reorderAxesTransformation(v.getDimensionality(), new int[] { d1 });
+      Vector n = aff.apply(v).minus(ps[idx]);
+      assertEquals("Permutation " + idx + " doesn't match.", n.length(), 0.0, 0.001);
+      idx++;
+    }
+    // with two arguments
     for(int d1 = 1; d1 <= 3; d1++) {
       for(int d2 = 1; d2 <= 3; d2++) {
         if(d1 == d2) {
@@ -159,7 +183,7 @@ public class TestAffineTransformation {
         }
         AffineTransformation aff = AffineTransformation.reorderAxesTransformation(v.getDimensionality(), new int[] { d1, d2 });
         Vector n = aff.apply(v).minus(ps[idx]);
-        assertEquals("Permutation "+idx+" doesn't match.", n.length(), 0.0, 0.001);
+        assertEquals("Permutation " + idx + " doesn't match.", n.length(), 0.0, 0.001);
         idx++;
       }
     }
