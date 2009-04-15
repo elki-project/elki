@@ -8,8 +8,16 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
-public class TestAffineTransformations {
-
+/**
+ * JUnit Test for the class {@link AffineTransformation}
+ * 
+ * @author Erich Schubert
+ *
+ */
+public class TestAffineTransformation {
+  /**
+   * Test identity transform
+   */
   @Test
   public void testIdentityTransform() {
     int testdim = 5;
@@ -20,18 +28,21 @@ public class TestAffineTransformations {
 
     // test application to a vector
     double[] dv = new double[testdim];
-    for (int i=0; i<testdim; i++)
-      dv[i] = i*i + testdim;
+    for(int i = 0; i < testdim; i++)
+      dv[i] = i * i + testdim;
     Vector v1 = new Vector(dv);
     Vector v2 = new Vector(dv);
 
     Vector v3 = t.apply(v1);
-    assertEquals("identity transformation wasn't identical",v2,v3);
-    
+    assertEquals("identity transformation wasn't identical", v2, v3);
+
     Vector v4 = t.applyInverse(v2);
-    assertEquals("inverse of identity wasn't identity",v1,v4);
+    assertEquals("inverse of identity wasn't identity", v1, v4);
   }
 
+  /**
+   * Test adding translation vectors
+   */
   @Test
   public void testTranslation() {
     int testdim = 5;
@@ -43,47 +54,49 @@ public class TestAffineTransformations {
 
     // translation vector
     double[] tv = new double[testdim];
-    for (int i=0; i<testdim; i++)
+    for(int i = 0; i < testdim; i++)
       tv[i] = i + testdim;
     t.addTranslation(new Vector(tv));
-    
+
     Matrix tm2 = t.getTransformation();
     // Manually do the same changes to the matrix tm
-    for (int i=0; i<testdim; i++)
-      tm.set(i,testdim, i + testdim);
+    for(int i = 0; i < testdim; i++)
+      tm.set(i, testdim, i + testdim);
     // Compare the results
     assertEquals("Translation wasn't added correctly to matrix.", tm, tm2);
-    
+
     // test application to a vector
     double[] dv1 = new double[testdim];
     double[] dv2 = new double[testdim];
-    for (int i=0; i<testdim; i++) {
-      dv1[i] = i*i + testdim;
-      dv2[i] = i*i + i + 2*testdim;
+    for(int i = 0; i < testdim; i++) {
+      dv1[i] = i * i + testdim;
+      dv2[i] = i * i + i + 2 * testdim;
     }
     Vector v1 = new Vector(dv1);
     Vector v2 = new Vector(dv2);
 
     Vector v3 = t.apply(v1);
-    assertEquals("Vector wasn't translated properly forward.",v2,v3);
+    assertEquals("Vector wasn't translated properly forward.", v2, v3);
     Vector v4 = t.applyInverse(v2);
-    assertEquals("Vector wasn't translated properly backwards.",v1,v4);
+    assertEquals("Vector wasn't translated properly backwards.", v1, v4);
     Vector v5 = t.applyInverse(v3);
-    assertEquals("Vector wasn't translated properly back and forward.",v1,v5);    
+    assertEquals("Vector wasn't translated properly back and forward.", v1, v5);
   }
 
-
+  /**
+   * Test direct inclusion of matrices
+   */
   @Test
   public void testMatrix() {
     int testdim = 5;
     int axis1 = 1;
     int axis2 = 3;
-    
-    assert(axis1 < testdim);
-    assert(axis2 < testdim);
+
+    assert (axis1 < testdim);
+    assert (axis2 < testdim);
     // don't change the angle; we'll be using that executing the rotation
     // three times will be identity (approximately)
-    double angle = Math.toRadians(360/3);
+    double angle = Math.toRadians(360 / 3);
     AffineTransformation t = new AffineTransformation(testdim);
     assertTrue(t.getDimensionality() == testdim);
     Matrix tm = t.getTransformation();
@@ -92,35 +105,63 @@ public class TestAffineTransformations {
 
     // rotation matrix
     double[][] rm = new double[testdim][testdim];
-    for (int i=0; i<testdim; i++)
+    for(int i = 0; i < testdim; i++)
       rm[i][i] = 1;
     // add the rotation
-    rm[axis1][axis1] = + Math.cos(angle);
-    rm[axis1][axis2] = - Math.sin(angle);
-    rm[axis2][axis1] = + Math.sin(angle);
-    rm[axis2][axis2] = + Math.cos(angle);
+    rm[axis1][axis1] = +Math.cos(angle);
+    rm[axis1][axis2] = -Math.sin(angle);
+    rm[axis2][axis1] = +Math.sin(angle);
+    rm[axis2][axis2] = +Math.cos(angle);
     t.addMatrix(new Matrix(rm));
     Matrix tm2 = t.getTransformation();
-    
+
     // We know that we didn't do any translations and tm is the unity matrix
     // so we can manually do the rotation on it, too.
-    tm.set(axis1,axis1,+ Math.cos(angle));
-    tm.set(axis1,axis2,- Math.sin(angle));
-    tm.set(axis2,axis1,+ Math.sin(angle));
-    tm.set(axis2,axis2,+ Math.cos(angle));
-    
+    tm.set(axis1, axis1, +Math.cos(angle));
+    tm.set(axis1, axis2, -Math.sin(angle));
+    tm.set(axis2, axis1, +Math.sin(angle));
+    tm.set(axis2, axis2, +Math.cos(angle));
+
     // Compare the results
     assertEquals("Rotation wasn't added correctly to matrix.", tm, tm2);
-    
+
     // test application to a vector
     double[] dv = new double[testdim];
-    for (int i=0; i<testdim; i++) {
-      dv[i] = i*i + testdim;
+    for(int i = 0; i < testdim; i++) {
+      dv[i] = i * i + testdim;
     }
     Vector v1 = new Vector(dv);
     Vector v3 = t.applyInverse(t.apply(v1));
     assertTrue("Forward-Backward didn't work correctly.", v1.almostEquals(v3));
     Vector v4 = t.apply(t.apply(t.apply(v1)));
-    assertTrue("Triple-Rotation by 120 degree didn't work",v1.almostEquals(v4));
+    assertTrue("Triple-Rotation by 120 degree didn't work", v1.almostEquals(v4));
+  }
+
+  /**
+   * Test {@link AffineTransformation#reorderAxesTransformation}
+   */
+  @Test
+  public void testReorder() {
+    Vector v = new Vector(new double[] { 3, 5, 7 });
+    Vector p1 = new Vector(new double[] { 3, 5, 7 });
+    Vector p2 = new Vector(new double[] { 3, 7, 5 });
+    Vector p3 = new Vector(new double[] { 5, 3, 7 });
+    Vector p4 = new Vector(new double[] { 5, 7, 3 });
+    Vector p5 = new Vector(new double[] { 7, 3, 5 });
+    Vector p6 = new Vector(new double[] { 7, 5, 3 });
+    Vector[] ps = new Vector[] { p1, p2, p3, p4, p5, p6 };
+
+    int idx = 0;
+    for(int d1 = 1; d1 <= 3; d1++) {
+      for(int d2 = 1; d2 <= 3; d2++) {
+        if(d1 == d2) {
+          continue;
+        }
+        AffineTransformation aff = AffineTransformation.reorderAxesTransformation(v.getDimensionality(), new int[] { d1, d2 });
+        Vector n = aff.apply(v).minus(ps[idx]);
+        assertEquals("Permutation "+idx+" doesn't match.", n.length(), 0.0, 0.001);
+        idx++;
+      }
+    }
   }
 }

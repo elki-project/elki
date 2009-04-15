@@ -76,7 +76,7 @@ public class AffineTransformation {
     // insert ones appropriately:
     for(int i = 0; i < axes.length; i++) {
       assert (0 < axes[i] && axes[i] <= dim);
-      m.set(axes[i] - 1, i, 1.0);
+      m.set(i, axes[i] - 1, 1.0);
     }
     int useddim = 1;
     for(int i = axes.length; i < dim + 1; i++) {
@@ -94,7 +94,7 @@ public class AffineTransformation {
           }
         }
       }
-      m.set(useddim - 1, i, 1.0);
+      m.set(i, useddim - 1, 1.0);
       useddim++;
     }
     assert (useddim - 2 == dim);
