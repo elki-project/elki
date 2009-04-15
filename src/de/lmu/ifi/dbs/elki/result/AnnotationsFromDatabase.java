@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Erich Schubert
  *
  * @param <O> Database object type
+ * @param <T> Association type
  */
 // TODO: replace Object with a generics type?
 public class AnnotationsFromDatabase<O extends DatabaseObject, T> implements AnnotationResult<T> {

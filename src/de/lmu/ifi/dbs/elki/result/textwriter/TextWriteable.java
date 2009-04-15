@@ -10,7 +10,8 @@ package de.lmu.ifi.dbs.elki.result.textwriter;
 public interface TextWriteable {
   /**
    * Write self to the given {@link TextWriterStream}
-   * @param out
+   * @param out Output writer
+   * @param label Label
    */
   public void writeToText(TextWriterStream out, String label);
 }

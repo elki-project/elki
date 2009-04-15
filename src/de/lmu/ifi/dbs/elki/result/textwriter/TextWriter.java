@@ -42,6 +42,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
 
+/**
+ * Class to write a result to human-readable text output
+ * 
+ * @author Erich Schubert
+ *
+ * @param <O> Object type
+ */
 @SuppressWarnings("unchecked")
 public class TextWriter<O extends DatabaseObject> {
   /**

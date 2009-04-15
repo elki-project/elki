@@ -11,6 +11,9 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterWriterInterface;
  * 
  */
 public class TextWriterObjectComment extends TextWriterWriterInterface<Object> {
+  /**
+   * Put an object into the comment section
+   */
   @Override
   public void write(TextWriterStream out, String label, Object object) {
     String res = "";

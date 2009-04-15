@@ -14,6 +14,9 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
  *
  */
 public class TextWriterTriple extends TextWriterWriterInterface<Triple<?,?,?>> {
+  /**
+   * Serialize a triple, component-wise
+   */
   @Override
   @SuppressWarnings("unchecked")
   public void write(TextWriterStream out, String label, Triple<?,?,?> object) throws UnableToComplyException, IOException {

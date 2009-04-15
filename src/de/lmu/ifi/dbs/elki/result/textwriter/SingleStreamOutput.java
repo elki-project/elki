@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.result.textwriter;
 
 import java.io.File;
 import java.io.FileDescriptor;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -43,7 +42,7 @@ public class SingleStreamOutput implements StreamFactory {
    * Constructor with given file name.
    * 
    * @param out filename
-   * @throws FileNotFoundException
+   * @throws IOException
    */
   public SingleStreamOutput(File out) throws IOException {
     this(new FileOutputStream(out));
@@ -54,7 +53,7 @@ public class SingleStreamOutput implements StreamFactory {
    * 
    * @param out filename
    * @param gzip Use gzip compression
-   * @throws FileNotFoundException
+   * @throws IOException
    */
   public SingleStreamOutput(File out, boolean gzip) throws IOException {
     this(new FileOutputStream(out), gzip);
@@ -95,6 +94,7 @@ public class SingleStreamOutput implements StreamFactory {
    * Constructor with given FileOutputStream.
    * 
    * @param out File output stream
+   * @param gzip Use gzip compression
    * @throws IOException 
    */
   public SingleStreamOutput(FileOutputStream out, boolean gzip) throws IOException {

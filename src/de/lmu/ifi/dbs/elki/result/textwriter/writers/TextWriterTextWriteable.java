@@ -11,6 +11,9 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterWriterInterface;
  *
  */
 public class TextWriterTextWriteable extends TextWriterWriterInterface<TextWriteable> {
+  /**
+   * Use the objects own text serialization.
+   */
   @Override
   public void write(TextWriterStream out, String label, TextWriteable obj) {
     obj.writeToText(out, label);

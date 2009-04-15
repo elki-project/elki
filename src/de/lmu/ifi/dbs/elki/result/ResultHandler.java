@@ -8,6 +8,14 @@ import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
+/**
+ * Interface for any class that can handle results
+ * 
+ * @author Erich Schubert
+ *
+ * @param <O> Object type
+ * @param <R> Result type
+ */
 public interface ResultHandler<O extends DatabaseObject, R extends Result> extends Parameterizable {
 
   /**

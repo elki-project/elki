@@ -88,6 +88,9 @@ public class ResultWriter<O extends DatabaseObject> extends AbstractParameteriza
     addOption(OVERWRITE_FLAG);
   }
 
+  /**
+   * set Parameters
+   */
   @Override
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
@@ -102,12 +105,12 @@ public class ResultWriter<O extends DatabaseObject> extends AbstractParameteriza
     return remainingParameters;
   }
 
-  /*
-   * (non-Javadoc)
+  /**
+   * Process a single result.
    * 
-   * @see
-   * de.lmu.ifi.dbs.elki.result.ResultHandler#processResult(de.lmu.ifi.dbs.elki
-   * .database.Database, de.lmu.ifi.dbs.elki.result.Result, java.util.List)
+   * @param db Database 
+   * @param result Result
+   * @param settings Settings
    */
   public void processResult(Database<O> db, Result result, List<AttributeSettings> settings) {
     TextWriter<O> writer = new TextWriter<O>();
@@ -154,12 +157,9 @@ public class ResultWriter<O extends DatabaseObject> extends AbstractParameteriza
     output.closeAllStreams();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * de.lmu.ifi.dbs.elki.result.ResultHandler#setNormalization(de.lmu.ifi.dbs
-   * .elki.normalization.Normalization)
+  /**
+   * @param normalization Normalization to use
+   * @see de.lmu.ifi.dbs.elki.result.ResultHandler#setNormalization
    */
   public void setNormalization(Normalization<O> normalization) {
     this.normalization = normalization;

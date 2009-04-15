@@ -10,6 +10,9 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterWriterInterface;
  * 
  */
 public class TextWriterObjectInline extends TextWriterWriterInterface<Object> {
+  /**
+   * Serialize an object into the inline section.
+   */
   @Override
   public void write(TextWriterStream out, String label, Object object) {
     String res = "";
@@ -17,7 +20,7 @@ public class TextWriterObjectInline extends TextWriterWriterInterface<Object> {
       res = res + label + "=";
     }
     if(object != null) {
-      res = res + object.toString();
+      res = res + object.toString().replace(" ", "");
     }
     out.inlinePrintNoQuotes(res);
   }
