@@ -28,6 +28,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterFlagGlo
  * assignment to objects of a certain database.
  *
  * @author Arthur Zimek
+ * @param <D> Distance type
+ * @param <V> Vector type
  */
 public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>> extends ProjectedDBSCANPreprocessor<D, V> {
     /**
@@ -61,6 +63,9 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
      */
     private PCAFilteredRunner<V> pca = new PCAFilteredRunner<V>();
 
+    /**
+     * Constructor
+     */
     @SuppressWarnings("unchecked")
     public FourCPreprocessor() {
         super();

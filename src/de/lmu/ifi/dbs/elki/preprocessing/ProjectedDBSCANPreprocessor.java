@@ -31,7 +31,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * the ProjectedDBSCAN algorithm.
  *
  * @author Arthur Zimek
- *         todo parameter
+ * @param <D> Distance type
+ * @param <V> Vector type
  */
 public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>> extends AbstractParameterizable implements Preprocessor<V> {
 

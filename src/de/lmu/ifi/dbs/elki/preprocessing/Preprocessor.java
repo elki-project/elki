@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * objects of a certain database.
  *
  * @author Elke Achtert (
+ * @param <O> Object type
  */
 public interface Preprocessor<O extends DatabaseObject> extends Parameterizable {
   /**

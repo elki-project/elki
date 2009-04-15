@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 
 /**
  * @author Arthur Zimek
+ * @param <V> Vector type
  */
 public class FracClusPreprocessor<V extends RealVector<V, ?>> extends AbstractParameterizable implements Preprocessor<V> {
     private int k;
@@ -33,6 +34,9 @@ public class FracClusPreprocessor<V extends RealVector<V, ?>> extends AbstractPa
     private IntParameter NUMBER_OF_SUPPORTERS_PARAM = new IntParameter(NUMBER_OF_SUPPORTERS_ID,
         new GreaterEqualConstraint(2));
 
+    /**
+     * Constructor
+     */
     public FracClusPreprocessor() {
         super();
         addOption(NUMBER_OF_SUPPORTERS_PARAM);
@@ -71,6 +75,10 @@ public class FracClusPreprocessor<V extends RealVector<V, ?>> extends AbstractPa
         return remainingParameters;
     }
 
+    /**
+     * get k
+     * @return k
+     */
     public int getK() {
         return this.k;
     }

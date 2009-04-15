@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterC
  * PCA is based on epsilon range queries.
  * 
  * @author Elke Achtert
+ * @param <V> Vector type
  */
 public class RangeQueryBasedHiCOPreprocessor<V extends RealVector<V, ?>> extends HiCOPreprocessor<V> {
   /**

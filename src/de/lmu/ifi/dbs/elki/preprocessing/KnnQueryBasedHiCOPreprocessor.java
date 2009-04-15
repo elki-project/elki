@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * PCA is based on k nearest neighbor queries.
  * 
  * @author Elke Achtert
+ * @param <V> Vector type
  */
 public class KnnQueryBasedHiCOPreprocessor<V extends RealVector<V, ?>> extends HiCOPreprocessor<V> {
   /**

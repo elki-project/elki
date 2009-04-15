@@ -47,13 +47,22 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * database.
  *
  * @author Elke Achtert
+ * @param <V> Vector type
+ * @param <N> Number type
  */
 public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> extends AbstractParameterizable implements PreferenceVectorPreprocessor<V> {
     /**
      * Available strategies for determination of the preference vector.
      */
     public enum Strategy {
-        APRIORI, MAX_INTERSECTION
+        /**
+         * Apriori strategy
+         */
+        APRIORI,
+        /**
+         * Max intersection strategy
+         */
+        MAX_INTERSECTION
     }
 
     /**

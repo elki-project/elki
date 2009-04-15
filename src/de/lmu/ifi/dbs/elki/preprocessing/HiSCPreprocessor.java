@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstrai
  * database.
  *
  * @author Elke Achtert 
+ * @param <V> Vector type
  */
 public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParameterizable implements PreferenceVectorPreprocessor<V> {
 

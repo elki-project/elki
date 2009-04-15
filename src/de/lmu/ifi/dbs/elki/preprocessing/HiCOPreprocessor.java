@@ -25,6 +25,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * assignment to objects of a certain database.
  *
  * @author Elke Achtert
+ * @param <V> Vector type
  */
 public abstract class HiCOPreprocessor<V extends RealVector<V, ?>> extends AbstractParameterizable implements Preprocessor<V> {
     /**

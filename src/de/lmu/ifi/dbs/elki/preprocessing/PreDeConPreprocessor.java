@@ -19,7 +19,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstrai
  * Preprocessor for PreDeCon local dimensionality and locally weighted matrix
  * assignment to objects of a certain database.
  *
- * @author Peer Kr&ouml;ger
+ * @author Peer Kröger
+ * @param <D> Distance type
+ * @param <V> Vector type
  */
 public class PreDeConPreprocessor<D extends Distance<D>, V extends RealVector<V,?>> extends ProjectedDBSCANPreprocessor<D,V> {
   /**

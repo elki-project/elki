@@ -33,6 +33,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterFlagGlo
  * eigenvector matrix assignment to objects of a certain database.
  *
  * @author Simon Paradies
+ * @param <D> Distance type
+ * @param <V> Vector type
  */
 public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>> extends ProjectedDBSCANPreprocessor<D, V> {
 
