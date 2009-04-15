@@ -47,18 +47,30 @@ public class EMModel<V extends RealVector<V, ?>> extends BaseModel {
     }
   }
 
+  /**
+   * @return mean
+   */
   public V getMean() {
     return mean;
   }
 
+  /**
+   * @param mean
+   */
   public void setMean(V mean) {
     this.mean = mean;
   }
 
+  /**
+   * @return covariance matrix
+   */
   public Matrix getCovarianceMatrix() {
     return covarianceMatrix;
   }
 
+  /**
+   * @param covarianceMatrix
+   */
   public void setCovarianceMatrix(Matrix covarianceMatrix) {
     this.covarianceMatrix = covarianceMatrix;
   }

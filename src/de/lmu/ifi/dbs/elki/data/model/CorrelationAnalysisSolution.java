@@ -1,8 +1,5 @@
 package de.lmu.ifi.dbs.elki.data.model;
 
-import java.io.File;
-import java.io.FileDescriptor;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.text.NumberFormat;
@@ -10,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
@@ -18,6 +14,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStreamNormalizing;
@@ -131,19 +128,6 @@ public class CorrelationAnalysisSolution<V extends RealVector<V, ?>> implements 
       variance += distance * distance;
     }
     standardDeviation = Math.sqrt(variance / db.size());
-  }
-
-  //@Override
-  //TODO: remove?
-  public void output(File out, Normalization<V> normalization, List<AttributeSettings> settings) throws UnableToComplyException, IOException {
-    PrintStream outStream;
-    try {
-      outStream = new PrintStream(new FileOutputStream(out));
-    }
-    catch(Exception e) {
-      outStream = new PrintStream(new FileOutputStream(FileDescriptor.out));
-    }
-    output(outStream, normalization, settings);
   }
 
   /**

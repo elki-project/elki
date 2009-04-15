@@ -97,6 +97,7 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
    * @param name
    * @param group
    * @param noise Noise flag
+   * @param model Model
    */
   public Cluster(String name, DatabaseObjectGroup group, boolean noise, M model) {
     this(name, group, noise, model, null);
@@ -107,6 +108,7 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
    * 
    * @param name
    * @param group
+   * @param model Model
    */
   public Cluster(String name, DatabaseObjectGroup group, M model) {
     this(name, group, false, model, null);
@@ -127,6 +129,7 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
    * Constructor without hierarchy information and name 
    * 
    * @param group
+   * @param model Model
    */
   public Cluster(DatabaseObjectGroup group, M model) {
     this(null, group, false, model, null);
@@ -246,6 +249,7 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
   
   /**
    * Collect descendants
+   * @return Set of descendants
    */
   public Set<Cluster<M>> getDescendants() {
     return getDescendants(new HashSet<Cluster<M>>());

@@ -79,6 +79,8 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
    * 
    * @param name Cluster name
    * @param size Cluster size
+   * @param densitycorrection Density correction factor
+   * @param random 
    */
   public GeneratorSingleCluster(String name, int size, double densitycorrection, Random random) {
     super();

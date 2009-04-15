@@ -28,6 +28,7 @@ public interface DatabaseObjectGroup extends Iterable<Integer> {
   
   /**
    * Retrieve the collection / data size.
+   * @return collection size
    */
   public int size();
 }

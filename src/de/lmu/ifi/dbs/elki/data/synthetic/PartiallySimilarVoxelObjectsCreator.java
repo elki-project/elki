@@ -49,6 +49,10 @@ public class PartiallySimilarVoxelObjectsCreator extends AbstractParameterizable
   // TODO: constraints
   private final IntParameter SIMILARITY_SIZE_PARAM = new IntParameter(SIMILARITY_SIZE_ID);
 
+  /**
+   * @param parameters
+   * @throws ParameterException
+   */
   public PartiallySimilarVoxelObjectsCreator(String[] parameters) throws ParameterException {
     addOption(CUBE_SIZE_MIN_PARAM);
     addOption(CUBE_SIZE_MAX_PARAM);
@@ -58,11 +62,18 @@ public class PartiallySimilarVoxelObjectsCreator extends AbstractParameterizable
     optionHandler.grabOptions(parameters);
   }
 
+  /**
+   * @param message
+   * @return usage description
+   */
   public String usage(String message) {
     return optionHandler.usage(message);
   }
 
   // FIXME: unify main method with other wrappers?
+  /**
+   * @param args
+   */
   public static void main(String[] args) {
     try {
       new PartiallySimilarVoxelObjectsCreator(args);

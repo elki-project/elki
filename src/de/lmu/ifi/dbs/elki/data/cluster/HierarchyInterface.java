@@ -3,6 +3,13 @@ package de.lmu.ifi.dbs.elki.data.cluster;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Interface to access hierarchies.
+ * 
+ * @author Erich Schubert
+ *
+ * @param <C> Object type in hierarchy
+ */
 public interface HierarchyInterface<C> {
   /**
    * Test for hierarchical properties
@@ -27,7 +34,9 @@ public interface HierarchyInterface<C> {
   /**
    * Collect descendants (recursive children)
    * 
+   * @param <T> collection type
    * @param collection Collection to fill
+   * @return filled collection 
    */
   public <T extends Collection<C>> T getDescendants(T collection);
   /**
@@ -46,7 +55,9 @@ public interface HierarchyInterface<C> {
   /**
    * Collect ancestors (recursive parents)
    * 
+   * @param <T> collection type
    * @param collection Collection to fill.
+   * @return filled collection
    */
   public <T extends Collection<C>> T getAncestors(T collection);
 }

@@ -23,6 +23,7 @@ public interface HierarchyImplementation<C extends HierarchyInterface<C>> {
   
   /**
    * Get number of children
+   * @param self 
    * @return number of children
    */
   public int numChildren(C self);
@@ -38,6 +39,7 @@ public interface HierarchyImplementation<C extends HierarchyInterface<C>> {
   /**
    * Collect descendants (recursive children)
    * 
+   * @param <T> Collection type
    * @param self
    * @param collection Collection to fill
    * @return collection of descendants
@@ -45,6 +47,7 @@ public interface HierarchyImplementation<C extends HierarchyInterface<C>> {
   public <T extends Collection<C>> T getDescendants(C self, T collection);
   /**
    * Get number of parents
+   * @param self reference object
    * @return number of parents
    */
   public int numParents(C self);
@@ -60,7 +63,9 @@ public interface HierarchyImplementation<C extends HierarchyInterface<C>> {
   /**
    * Collect ancestors (recursive parents)
    * 
+   * @param <T> Collection type
    * @param self
+   * @param collection Collection to fill
    * @return collection of ancestors
    */
   public <T extends Collection<C>> T getAncestors(C self, T collection);

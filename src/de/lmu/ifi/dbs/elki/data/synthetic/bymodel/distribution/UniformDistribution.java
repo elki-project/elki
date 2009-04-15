@@ -30,6 +30,7 @@ public final class UniformDistribution implements Distribution {
    * Constructor for a uniform distribution on the interval [min, max[
    * @param min Minimum value
    * @param max Maximum value
+   * @param random Random generator
    */
   public UniformDistribution(double min, double max, Random random) {
     // Swap parameters if they were given incorrectly.

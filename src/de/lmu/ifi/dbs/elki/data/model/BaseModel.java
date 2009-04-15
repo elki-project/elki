@@ -16,6 +16,7 @@ public abstract class BaseModel implements Model {
    * it is meant as signal to make Models printable. 
    * 
    * @param out
+   * @param label 
    */
   //@Override
   public void writeToText(TextWriterStream out, String label) {

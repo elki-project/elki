@@ -25,6 +25,7 @@ public interface GeneratorInterfaceDynamic extends GeneratorInterface {
   
   /**
    * Retrieve remaining number of retries.
+   * @return remaining number of retries
    */
   public int getRetries();
 }

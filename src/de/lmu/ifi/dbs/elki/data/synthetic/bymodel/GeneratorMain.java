@@ -116,6 +116,12 @@ public class GeneratorMain {
     }
   }
 
+  /**
+   * Write the resulting clusters to an output stream.
+   * 
+   * @param outStream output stream
+   * @throws IOException
+   */
   public void writeClusters(OutputStreamWriter outStream) throws IOException {
     // compute global discard values
     int totalsize = 0;

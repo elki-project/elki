@@ -28,6 +28,7 @@ public final class NormalDistribution implements Distribution {
    * 
    * @param mean Mean
    * @param stddev Standard Deviation
+   * @param random Random generator
    */
   public NormalDistribution(double mean, double stddev, Random random) {
     this.mean = mean;

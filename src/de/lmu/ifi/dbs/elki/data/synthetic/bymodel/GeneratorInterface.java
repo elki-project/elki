@@ -48,6 +48,8 @@ public interface GeneratorInterface {
    * NOTE: The list may be modified by the caller, it is not immutable.
    * The class should not return a copy, but should allow modification.
    * However when removing points, the called is expected to call setDiscarded.
+   * 
+   * @return points
    */
   public List<Vector> getPoints(); 
 

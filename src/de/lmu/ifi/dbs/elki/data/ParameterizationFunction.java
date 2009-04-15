@@ -18,8 +18,17 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
      * Available types for the global extremum.
      */
     public enum ExtremumType {
+        /**
+         * Minimum
+         */
         MINIMUM,
+        /**
+         * Maximum
+         */
         MAXIMUM,
+        /**
+         * Constant
+         */
         CONSTANT
     }
 

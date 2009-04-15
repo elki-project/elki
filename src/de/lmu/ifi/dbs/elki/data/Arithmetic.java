@@ -6,6 +6,7 @@ package de.lmu.ifi.dbs.elki.data;
  * operation.
  * 
  * @author Arthur Zimek 
+ * @param <N> Number type
  */
 public interface Arithmetic<N extends Number> extends Comparable<N>
 {

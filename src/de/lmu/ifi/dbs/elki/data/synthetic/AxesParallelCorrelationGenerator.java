@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.wrapper.StandAloneWrapper;
  * todo parameter
  */
 public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
-    public final static String LINE_SEPARATOR = System.getProperty("line.separator");
+    protected final static String LINE_SEPARATOR = System.getProperty("line.separator");
 
     /**
      * A pattern defining a comma.

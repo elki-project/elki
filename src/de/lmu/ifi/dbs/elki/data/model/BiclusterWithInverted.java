@@ -22,6 +22,11 @@ public class BiclusterWithInverted<V extends RealVector<V, Double>> extends Bicl
    */
   private int[] invertedRows;
 
+  /**
+   * @param rowIDs Row IDs
+   * @param colIDs Col IDs
+   * @param database Database
+   */
   public BiclusterWithInverted(int[] rowIDs, int[] colIDs, Database<V> database) {
     super(rowIDs, colIDs, database);
   }
