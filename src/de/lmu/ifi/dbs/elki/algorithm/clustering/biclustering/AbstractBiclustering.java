@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <V> a certain subtype of RealVector - the data matrix is supposed to
  *        consist of rows where each row relates to an object of type V and the
  *        columns relate to the attribute values of these objects
+ * @param <M> Cluster model type
  */
 public abstract class AbstractBiclustering<V extends RealVector<V, Double>, M extends Bicluster<V>> extends AbstractAlgorithm<V, Clustering<M>> implements ClusteringAlgorithm<Clustering<M>, V> {
   /**

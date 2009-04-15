@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 
 /**
@@ -26,7 +25,6 @@ public abstract class CovarianceMatrixBuilder<V extends RealVector<V, ?>> extend
    * 
    * @param database the database used
    * @return Covariance Matrix
-   * @throws UnableToComplyException
    */
   public Matrix processDatabase(Database<V> database) {
     return processIds(database.getIDs(), database);

@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.CPair;
  * @author Matthias Schubert (Original Code)
  * @author Erich Schubert (ELKIfication)
  * 
+ * @param <V> Vector type
  */
 public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, DoubleDistance, MultiResult> {
   /**
@@ -132,6 +133,7 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
    * 
    * @param database Database to use
    * @param k k for kNN queries
+   * @return result
    */
   public MultiResult getRanking(Database<V> database, int k) {
     KernelMatrix<V> kernelMatrix = new KernelMatrix<V>(kernelFunction, database);
@@ -185,6 +187,7 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
    * @param database Database to use
    * @param k k for kNN queries
    * @param sampleSize Sample size
+   * @return result
    */
   public MultiResult getFastRanking(Database<V> database, int k, int sampleSize) {
     KernelMatrix<V> kernelMatrix = new KernelMatrix<V>(kernelFunction, database);
@@ -409,6 +412,9 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
     return nn;
   }
 
+  /**
+   * @param data
+   */
   // TODO: this should be done by the result classes.
   public void getExplanations(Database<V> data) {
     KernelMatrix<V> kernelMatrix = new KernelMatrix<V>(kernelFunction, data);

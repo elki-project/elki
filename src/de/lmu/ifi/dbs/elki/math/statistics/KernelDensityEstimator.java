@@ -3,11 +3,11 @@ package de.lmu.ifi.dbs.elki.math.statistics;
 /**
  * Estimate density given an array of points.
  * 
- * Estimates a density using a kernel density estimator.
- * Multiple common Kernel functions are supported.
+ * Estimates a density using a kernel density estimator. Multiple common Kernel
+ * functions are supported.
  * 
  * @author Erich Schubert
- *
+ * 
  */
 public class KernelDensityEstimator {
   /**
@@ -15,18 +15,34 @@ public class KernelDensityEstimator {
    * 
    */
   public static enum Kernel {
-    KERNEL_UNIFORM, KERNEL_TRIANGLE, KERNEL_EPANECHNIKOV, KERNEL_GAUSSIAN
+    /**
+     * Uniform Kernel
+     */
+    KERNEL_UNIFORM,
+    /**
+     * Triangular Kernel
+     */
+    KERNEL_TRIANGLE,
+    /**
+     * Epanechnikov Kernel
+     */
+    KERNEL_EPANECHNIKOV,
+    /**
+     * Gaussian Kernel
+     */
+    KERNEL_GAUSSIAN
   }
 
   /**
    * Scaling constant for Gaussian kernel
    */
-  private static final double GSCALE = 1.0 / Math.sqrt(2.0*Math.PI);
-  
+  private static final double GSCALE = 1.0 / Math.sqrt(2.0 * Math.PI);
+
   /**
    * Result storage: density
    */
   private double[] dens;
+
   /**
    * Result storage: variance / quality
    */
@@ -44,7 +60,7 @@ public class KernelDensityEstimator {
   public KernelDensityEstimator(double[] data, double min, double max, Kernel kernel, int windows) {
     process(data, min, max, kernel, windows);
   }
-  
+
   /**
    * Process a new array
    * 
@@ -86,7 +102,9 @@ public class KernelDensityEstimator {
       }
       double realwidth = (Math.min(data[current] + halfwidth, max) - Math.max(min, data[current] - halfwidth));
       double weight = realwidth / (2 * halfwidth);
-      dens[current] = value / (data.length * realwidth / 2); // value / (realwidth * expected);
+      dens[current] = value / (data.length * realwidth / 2); // value /
+      // (realwidth *
+      // expected);
       var[current] = 1 / weight; // / (weight*weight);
 
       // System.out.println(xs[current]+" "+ys[current]);

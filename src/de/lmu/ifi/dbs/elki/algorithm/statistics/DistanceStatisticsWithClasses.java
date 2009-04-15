@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * TODO: Collect in-cluster and cross-cluster averages.
  * 
  * @author Erich Schubert
+ * @param <V> Vector type
  */
 public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, DoubleDistance, CollectionResult<DoubleVector>> {
   private CollectionResult<DoubleVector> result;

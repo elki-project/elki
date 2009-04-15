@@ -5,6 +5,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 
 /**
+ * TODO: arthur comment
  * @author Arthur Zimek
  */
 public class LinearRegression
@@ -13,6 +14,10 @@ public class LinearRegression
     
     private double m;
     
+    /**
+     * TODO: arthur comment
+     * @param points
+     */
     public LinearRegression(List<DoubleDoublePair> points)
     {
         double sumy = 0.0;
@@ -36,11 +41,19 @@ public class LinearRegression
         t = (sumy - m * sumx) / gap; 
     }
 
+    /**
+     * TODO: arthur comment
+     * @return m
+     */
     public double getM()
     {
         return this.m;
     }
 
+    /**
+     * TODO: arthur comment
+     * @return t
+     */
     public double getT()
     {
         return this.t;

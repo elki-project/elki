@@ -151,6 +151,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
      * Construct a matrix from a copy of a 2-D array.
      *
      * @param A Two-dimensional array of doubles.
+     * @return new matrix
      * @throws IllegalArgumentException All rows must have the same length
      */
     public static Matrix constructWithCopy(double[][] A) {
@@ -1107,6 +1108,8 @@ public class Matrix implements Cloneable, java.io.Serializable {
      * row appear on a single line, the last row is followed by a blank line.
      *
      * @param input the input stream.
+     * @return New matrix
+     * @throws java.io.IOException on input error 
      */
     public static Matrix read(BufferedReader input) throws java.io.IOException {
         StreamTokenizer tokenizer = new StreamTokenizer(input);

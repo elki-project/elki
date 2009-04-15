@@ -26,6 +26,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.CTriple;
  * </p>
  * 
  * @author Erich Schubert
+ * @param <V> Vector type
  */
 public class MaterializeDistances<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, DoubleDistance, CollectionResult<CTriple<Integer, Integer, Double>>> {
   private CollectionResult<CTriple<Integer, Integer, Double>> result;

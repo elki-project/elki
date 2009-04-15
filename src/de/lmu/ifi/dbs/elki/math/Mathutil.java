@@ -1,9 +1,12 @@
 package de.lmu.ifi.dbs.elki.math;
 
+/**
+ * A collection of math related utility functions.
+ */
 public class Mathutil {
 
    /** 
-    * Computes the squareroot of the sum of the squared arguments
+    * Computes the square root of the sum of the squared arguments
     * without under or overflow.
     * 
     * @param a first cathetus

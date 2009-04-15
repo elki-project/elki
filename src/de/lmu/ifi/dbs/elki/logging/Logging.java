@@ -54,7 +54,7 @@ public class Logging {
   /**
    * Retrieve logging utility for a particular class.
    * 
-   * @param c Class name to retrieve logging for
+   * @param name Class name 
    * @return Logger
    */
   public synchronized static Logging getLogger(final String name) {
@@ -70,7 +70,7 @@ public class Logging {
    * Verify if logging is enabled at that particular level.
    * 
    * @param lev Logging level
-   * @return
+   * @return status
    */
   public boolean isLoggable(Level lev) {
     return logger.isLoggable(lev);

@@ -31,6 +31,14 @@ public class SODModel<O extends RealVector<O, Double>> implements TextWriteable,
 
     private double sod;
     
+    /**
+     * TODO: arthur comment
+     * 
+     * @param database
+     * @param neighborhood
+     * @param alpha
+     * @param queryObject
+     */
     public SODModel(Database<O> database, List<Integer> neighborhood, double alpha, O queryObject) {
         // TODO: store database link?
         centerValues = new double[database.dimensionality()];
@@ -70,12 +78,24 @@ public class SODModel<O extends RealVector<O, Double>> implements TextWriteable,
         sod = subspaceOutlierDegree(queryObject, center);
     }
 
+    /**
+     * TODO arthur comment
+     * 
+     * @param queryObject
+     * @param center
+     * @return sod value
+     */
     public double subspaceOutlierDegree(O queryObject, O center) {
         double distance = DISTANCE_FUNCTION.distance(queryObject, center).getValue();
         distance /= weightVector.cardinality();
         return distance;
     }
 
+    /**
+     * Return the SOD of the point.
+     * 
+     * @return sod value
+     */
     public double getSod() {
         return this.sod;
     }

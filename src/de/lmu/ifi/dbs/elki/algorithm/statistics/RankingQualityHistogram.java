@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * TODO: Add sampling
  * 
  * @author Erich Schubert
+ * @param <V> Vector type
  */
 public class RankingQualityHistogram<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, DoubleDistance, CollectionResult<DoubleVector>> {
   private CollectionResult<DoubleVector> result;

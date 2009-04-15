@@ -250,6 +250,9 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
     return usage.toString();
   }
 
+  /**
+   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters(java.lang.String[])
+   */
   @Override
   public String[] setParameters(String[] args) throws ParameterException {
     if(args.length == 0) {

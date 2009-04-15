@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @author Arthur Zimek
  */
 public final class Properties {
-    public static Logging logger = Logging.getLogger(Properties.class);
+    private static Logging logger = Logging.getLogger(Properties.class);
 
     /**
      * The pattern to split for separate entries in a property string, which is

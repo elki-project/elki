@@ -199,6 +199,15 @@ public class Vector extends Matrix {
   }
 
   /**
+   * Returns a string representation of this vector without adding extra whitespace
+   *
+   * @return a string representation of this vector.
+   */
+  public String toStringNoWhitespace() {
+    return "[" + FormatUtil.format(getColumnPackedCopy(),",") + "]";
+  }
+
+  /**
    * Returns a string representation of this vector.
    *
    * @return a string representation of this vector.

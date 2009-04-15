@@ -232,9 +232,10 @@ public class CASHInterval extends HyperBoundingBox implements Identifiable {
      * Compares this object with the specified object for order.  Returns a
      * negative integer, zero, or a positive integer as this object is less
      * than, equal to, or greater than the specified object.
+     * @param other Object to compare to
+     * @return comparison result
      */
-    public int compareTo(Identifiable o) {
-        CASHInterval other = (CASHInterval) o;
+    public int compareTo(CASHInterval other) {
         if (this.equals(other)) return 0;
 
         if (this.priority() < other.priority()) return -1;

@@ -13,24 +13,74 @@ public class StudentDistribution {
    * Available alpha values.
    */
   public static double _6000 = 0.6;
+  /**
+   * Available alpha values.
+   */
   public static double _8000 = 0.8;
+  /**
+   * Available alpha values.
+   */
   public static double _9000 = 0.9;
+  /**
+   * Available alpha values.
+   */
   public static double _9500 = 0.95;
+  /**
+   * Available alpha values.
+   */
   public static double _9750 = 0.975;
+  /**
+   * Available alpha values.
+   */
   public static double _9900 = 0.99;
+  /**
+   * Available alpha values.
+   */
   public static double _9950 = 0.995;
+  /**
+   * Available alpha values.
+   */
   public static double _9990 = 0.999;
+  /**
+   * Available alpha values.
+   */
   public static double _9995 = 0.9995;
+  /**
+   * Available alpha values.
+   */
   public static double _4000 = 0.4;
+  /**
+   * Available alpha values.
+   */
   public static double _2000 = 0.2;
+  /**
+   * Available alpha values.
+   */
   public static double _1000 = 0.1;
+  /**
+   * Available alpha values.
+   */
   public static double _0500 = 0.05;
+  /**
+   * Available alpha values.
+   */
   public static double _0250 = 0.025;
+  /**
+   * Available alpha values.
+   */
   public static double _0100 = 0.01;
+  /**
+   * Available alpha values.
+   */
   public static double _0050 = 0.005;
+  /**
+   * Available alpha values.
+   */
   public static double _0010 = 0.001;
+  /**
+   * Available alpha values.
+   */
   public static double _0005 = 0.005;
-
 
   /**
    * Holds the t-values.
@@ -44,7 +94,7 @@ public class StudentDistribution {
   /**
    * Returns the t-value for the given alpha-value and degree of freedom.
    *
-   * @param alpha thre alpha value
+   * @param alpha the alpha value
    * @param n     the degree of freedom
    * @return the t-value for the given alpha-value and degree of freedom
    */

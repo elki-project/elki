@@ -22,6 +22,10 @@ public class Histogram<T> implements Iterable<Pair<Double, T>> {
    * @param <T>
    */
   public static abstract class Constructor<T> {
+    /**
+     * Construct a new T when needed.
+     * @return new T
+     */
     public abstract T make();
   }
   

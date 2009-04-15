@@ -185,6 +185,9 @@ public class LevenbergMarquardtMethod {
     return newchisq;
   }
   
+  /**
+   * Perform an iteration of the approximation loop.
+   */
   public void iterate() {
     // build covmat out of fitting matrix by multiplying diagonal elements with 1+lambda
     for (int i=0; i < numfit; i++) {

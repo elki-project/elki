@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.utilities.Description;
  * Useful in testing e.g. index structures and as template for custom algorithms.
  * 
  * @author Erich Schubert
+ * @param <V> Vector type
  */
 public class DummyAlgorithm<V extends NumberVector<V,?>> extends AbstractAlgorithm<V,Result> {
 

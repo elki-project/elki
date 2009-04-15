@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <L> the type of the ClassLabel the Classifier is assigning
+ * @param <R> result type
  */
 public interface Classifier<O extends DatabaseObject, L extends ClassLabel, R extends Result>
     extends Algorithm<O, R> {

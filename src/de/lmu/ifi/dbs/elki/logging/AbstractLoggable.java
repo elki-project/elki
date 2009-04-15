@@ -51,10 +51,8 @@ public abstract class AbstractLoggable {
    * <p/>
    * If the logger is currently enabled for the SEVERE message level then the
    * given message is forwarded to all the registered output Handler objects.
-   * 
-   * Depreciated:
-   * 
-   * use {@link LoggingUtil.logExpensive(LogLevel.SEVERE, msg, e) instead.
+   * @param msg 
+   * @param e 
    */
   public void exception(String msg, Throwable e) {
     logger.exception(msg, e);
@@ -65,10 +63,7 @@ public abstract class AbstractLoggable {
    * <p/>
    * If the logger is currently enabled for the WARNING message level then the
    * given message is forwarded to all the registered output Handler objects.
-   * 
-   * Depreciated:
-   * 
-   * use {@link LoggingUtil.logExpensive(LogLevel.WARNING, msg) instead.
+   * @param msg 
    */
   public void warning(String msg) {
     logger.warning(msg);
@@ -79,6 +74,7 @@ public abstract class AbstractLoggable {
    * <p/>
    * If the logger is currently enabled for the PROGRESS message level then the
    * given message is forwarded to all the registered output Handler objects.
+   * @param pgr 
    */
   public void progress(Progress pgr) {
     logger.progress(pgr);
@@ -89,6 +85,7 @@ public abstract class AbstractLoggable {
    * <p/>
    * If the logger is currently enabled for the VERBOSE message level then the
    * given message is forwarded to all the registered output Handler objects.
+   * @param msg 
    */
   public void verbose(String msg) {
     logger.verbose(msg);
@@ -112,6 +109,7 @@ public abstract class AbstractLoggable {
    * </pre>
    * 
    * instead. If msg is a constant, you can leave away the if statement.
+   * @param msg 
    */
   public void debugFine(String msg) {
     logger.debugFine(msg);
@@ -135,6 +133,7 @@ public abstract class AbstractLoggable {
    * </pre>
    * 
    * instead. If msg is a constant, you can leave away the if statement.
+   * @param msg 
    */
   public void debugFiner(String msg) {
     logger.debugFiner(msg);
@@ -158,6 +157,7 @@ public abstract class AbstractLoggable {
    * </pre>
    * 
    * instead. If msg is a constant, you can leave away the if statement.
+   * @param msg 
    */
   public void debugFinest(String msg) {
     logger.debugFinest(msg);

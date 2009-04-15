@@ -40,6 +40,11 @@ public class PCAResult {
     this.eigenvectors = eigenvectors;
   }
 
+  /**
+   * Build a PCA result from an existing set of EigenPairs.
+   * 
+   * @param eigenPairs existing eigenpairs
+   */
   public PCAResult(SortedEigenPairs eigenPairs) {
     super();
     // TODO: we might want to postpone the instantiation of eigenvalue and eigenvectors.

@@ -125,6 +125,7 @@ public class PCARunner<V extends RealVector<V, ?>> extends AbstractParameterizab
    * Process an existing covariance Matrix
    * 
    * @param covarMatrix the matrix used for performing pca
+   * @return PCA result
    */
   public PCAResult processCovarMatrix(Matrix covarMatrix) {
     // TODO: add support for a different implementation to do EVD?
@@ -136,6 +137,7 @@ public class PCARunner<V extends RealVector<V, ?>> extends AbstractParameterizab
    * Process an existing eigenvalue decomposition
    * 
    * @param evd eigenvalue decomposition to use
+   * @return PCA result
    */
   public PCAResult processEVD(EigenvalueDecomposition evd) {
     SortedEigenPairs eigenPairs = new SortedEigenPairs(evd, false);

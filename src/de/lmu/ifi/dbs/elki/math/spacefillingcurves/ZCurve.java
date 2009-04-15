@@ -18,6 +18,9 @@ public class ZCurve {
      */
     private static Logging logger = Logging.getLogger(ZCurve.class);
 
+    /**
+     * Constructor
+     */
     public ZCurve() {
         // nothing to do.
     }

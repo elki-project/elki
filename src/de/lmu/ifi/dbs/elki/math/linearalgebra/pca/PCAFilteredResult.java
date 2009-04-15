@@ -74,6 +74,8 @@ public class PCAFilteredResult extends PCAResult {
    * 
    * @param eigenPairs
    * @param filteredEigenPairs
+   * @param big large value in selection matrix
+   * @param small small value in selection matrix
    */
 
   public PCAFilteredResult(SortedEigenPairs eigenPairs, FilteredEigenPairs filteredEigenPairs, double big, double small) {

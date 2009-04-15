@@ -123,6 +123,7 @@ public final class LoggingConfiguration {
 
   /**
    * Reconfigure logging to enable 'verbose' logging at the top level.
+   * @param verbose verbosity flag
    */
   public static void setVerbose(boolean verbose) {
     Logger logger = Logger.getLogger(TOPLEVEL_PACKAGE);

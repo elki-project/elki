@@ -280,6 +280,7 @@ public class LinearEquationSystem {
 
     /**
      * Returns a string representation of the solution of this equation system.
+     * @param fractionDigits 
      *
      * @return a string representation of the solution of this equation system
      */
