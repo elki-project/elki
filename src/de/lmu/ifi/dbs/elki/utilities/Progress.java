@@ -13,7 +13,7 @@ public interface Progress {
    * @param buf Buffer to serialize to
    * @return Buffer the data was serialized to.
    */
-  public abstract StringBuffer appendToBuffer(StringBuffer buf);
+  public StringBuffer appendToBuffer(StringBuffer buf);
 
   /**
    * Test whether a progress is complete (and thus doesn't need to be shown anymore)
@@ -28,6 +28,5 @@ public interface Progress {
    * 
    * @see java.lang.Object#toString()
    */
-  @Override
-  public abstract String toString();
+  public String toString();
 }

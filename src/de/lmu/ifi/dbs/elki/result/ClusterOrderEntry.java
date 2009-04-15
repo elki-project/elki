@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.utilities.Identifiable;
  * @author Elke Achtert
  * @param <D> the type of Distance used by the ClusterOrderEntry
  */
-public class ClusterOrderEntry<D extends Distance<D>> implements Identifiable<ClusterOrderEntry<D>> {
+public class ClusterOrderEntry<D extends Distance<D>> implements Identifiable {
     /**
      * The id of the entry.
      */
@@ -115,7 +115,7 @@ public class ClusterOrderEntry<D extends Distance<D>> implements Identifiable<Cl
      * @return a negative integer, zero, or a positive integer as this object
      *         is less than, equal to, or greater than the specified object.
      */
-    public int compareTo(Identifiable<ClusterOrderEntry<D>> o) {
+    public int compareTo(Identifiable o) {
         return this.objectID - o.getID();
     }
 

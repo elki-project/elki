@@ -12,7 +12,7 @@ import java.io.ObjectOutput;
  *
  * @author Elke Achtert 
  */
-public class DefaultIdentifiable implements Identifiable<DefaultIdentifiable>, Comparable<DefaultIdentifiable>, Externalizable {
+public class DefaultIdentifiable implements Identifiable, Comparable<DefaultIdentifiable>, Externalizable {
   private static final long serialVersionUID = 1;
   /**
    * The unique id of this Identifiable.
@@ -101,6 +101,7 @@ public class DefaultIdentifiable implements Identifiable<DefaultIdentifiable>, C
    * and arrays.
    *
    * @param out the stream to write the object to
+   * @throws IOException on write errors
    */
   public void writeExternal(ObjectOutput out) throws IOException {
     out.writeInt(id);
@@ -114,6 +115,7 @@ public class DefaultIdentifiable implements Identifiable<DefaultIdentifiable>, C
    * and with the same types as were written by writeExternal.
    *
    * @param in the stream to read data from in order to restore the object
+   * @throws IOException on read errors
    */
   public void readExternal(ObjectInput in) throws IOException {
     id = in.readInt();

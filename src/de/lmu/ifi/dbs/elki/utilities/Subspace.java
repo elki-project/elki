@@ -7,9 +7,10 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
- * Represents a subspace of the original dataspace.
+ * Represents a subspace of the original data space.
  *
  * @author Elke Achtert
+ * @param <V> Vector class
  */
 public class Subspace<V extends RealVector<V, ?>> {
   /**
@@ -18,7 +19,7 @@ public class Subspace<V extends RealVector<V, ?>> {
   private SortedSet<Integer> dimensions;
 
   /**
-   * Creates a new one-dimensional subspace of the original dataspace.
+   * Creates a new one-dimensional subspace of the original data space.
    *
    * @param dimension the dimension building this subspace
    */
@@ -28,7 +29,7 @@ public class Subspace<V extends RealVector<V, ?>> {
   }
 
   /**
-   * Creates a new k-dimensional subspace of the original dataspace.
+   * Creates a new k-dimensional subspace of the original data space.
    *
    * @param dimensions the dimensions building this subspace
    */
@@ -47,12 +48,12 @@ public class Subspace<V extends RealVector<V, ?>> {
 
   /**
    * Joins this subspace with the specified subspace.
-   * The join is only sucessful if
+   * The join is only successful if
    * both subspaces have the first k-1 dimensions in common
    * (where k is the number of dimensions).
    *
    * @param other the subspace to join
-   * @param all   the overall number of featuer vectors
+   * @param all   the overall number of feature vectors
    * @param tau   the density threshold for the selectivity of a unit
    * @return the join of this subspace with the specified subspace
    *         if the join condition is fulfilled,
@@ -66,7 +67,7 @@ public class Subspace<V extends RealVector<V, ?>> {
 
   /**
    * Joins the dimensions of this subspace with the dimensions
-   * of the specified subspace. The join is only sucessful if
+   * of the specified subspace. The join is only successful if
    * both subspaces have the first k-1 dimensions in common
    * (where k is the number of dimensions).
    *

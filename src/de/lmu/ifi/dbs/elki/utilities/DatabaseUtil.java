@@ -16,13 +16,18 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
+/**
+ * Class with Database-related utility functions such as centroid computation, covariances etc.
+ * 
+ * @author Erich Schubert
+ */
 public final class DatabaseUtil {
-
   /**
    * Returns the centroid as a RealVector object of the specified objects
    * stored in the given database. The objects belonging to the specified ids
    * must be instance of <code>RealVector</code>.
    *
+   * @param <V> Vector type
    * @param database the database storing the objects
    * @param ids      the ids of the objects
    * @return the centroid of the specified objects stored in the given
@@ -58,6 +63,7 @@ public final class DatabaseUtil {
    * stored in the given database. The objects belonging to the specified ids
    * must be instance of <code>RealVector</code>.
    *
+   * @param <V> Vector type
    * @param database the database storing the objects
    * @param ids      the identifiable objects
    * @param bitSet   the bitSet specifiying the dimensions to be considered
@@ -97,6 +103,7 @@ public final class DatabaseUtil {
    * stored in the given database. The objects belonging to the specified ids
    * must be instance of <code>RealVector</code>.
    *
+   * @param <V> Vector type
    * @param database the database storing the objects
    * @param iter     iterator over the identifiable objects
    * @param bitSet   the bitSet specifiying the dimensions to be considered
@@ -137,6 +144,7 @@ public final class DatabaseUtil {
    * Returns the centroid as a RealVector object of the specified database.
    * The objects must be instance of <code>RealVector</code>.
    *
+   * @param <O> Vector type
    * @param database the database storing the objects
    * @return the centroid of the specified objects stored in the given
    *         database
@@ -194,9 +202,10 @@ public final class DatabaseUtil {
    * Determines the covariance matrix of the objects stored in the given
    * database.
    *
+   * @param <V> Vector type
    * @param database the database storing the objects
    * @param ids      the ids of the objects
-   * @return the covarianvce matrix of the specified objects
+   * @return the covariance matrix of the specified objects
    */
   public static <V extends RealVector<V, ?>> Matrix covarianceMatrix(Database<V> database, Collection<Integer> ids) {
       // centroid
@@ -223,8 +232,9 @@ public final class DatabaseUtil {
    * Determines the covariance matrix of the objects stored in the given
    * database.
    *
+   * @param <O> Vector type
    * @param database the database storing the objects
-   * @return the covarianvce matrix of the specified objects
+   * @return the covariance matrix of the specified objects
    */
   public static <O extends RealVector<O, ?>> Matrix covarianceMatrix(Database<O> database) {
       // centroid
@@ -237,9 +247,10 @@ public final class DatabaseUtil {
    * <p>Determines the covariance matrix of the objects stored in the given
    * database w.r.t. the given centroid.</p>
    *
+   * @param <O> Vector type
    * @param database the database storing the objects
-   * @param centroid the dentroid of the database
-   * @return the covarianvce matrix of the specified objects
+   * @param centroid the centroid of the database
+   * @return the covariance matrix of the specified objects
    */
   public static <O extends RealVector<O, ?>> Matrix covarianceMatrix(Database<O> database, O centroid) {
   
@@ -269,7 +280,7 @@ public final class DatabaseUtil {
    * Determines the d x d covariance matrix of the given n x d data matrix.
    *
    * @param data the database storing the objects
-   * @return the covarianvce matrix of the given data matrix.
+   * @return the covariance matrix of the given data matrix.
    */
   public static Matrix covarianceMatrix(Matrix data) {
       // centroid
@@ -295,6 +306,7 @@ public final class DatabaseUtil {
    * Determines the variances in each dimension of all
    * objects stored in the given database.
    *
+   * @param <O> Vector type
    * @param database the database storing the objects
    * @return the variances in each dimension of all objects stored in the given database
    */
@@ -321,6 +333,7 @@ public final class DatabaseUtil {
    * objects stored in the given database.
    * Returns <code>variances(database, centroid(database, ids), ids)</code>
    *
+   * @param <V> Vector type
    * @param database the database storing the objects
    * @param ids      the ids of the objects
    * @return the variances in each dimension of the specified objects
@@ -333,6 +346,7 @@ public final class DatabaseUtil {
    * Determines the variances in each dimension of the specified
    * objects stored in the given database.
    *
+   * @param <V> Vector type
    * @param database the database storing the objects
    * @param ids      the ids of the objects
    * @param centroid the centroid  or reference vector of the ids
@@ -360,7 +374,7 @@ public final class DatabaseUtil {
    * objects stored in the given database.
    *
    * @param database the database storing the objects
-   * @param ids      the array of ids of the objects to be considered in each diemsnion
+   * @param ids      the array of ids of the objects to be considered in each dimension
    * @param centroid the centroid  or reference vector of the ids
    * @return the variances in each dimension of the specified objects
    */
@@ -433,6 +447,7 @@ public final class DatabaseUtil {
   /**
    * Returns a collection of the ids of the objects stored in the specified database.
    *
+   * @param <O> Object type
    * @param db the database storing the objects
    * @return a collection of the ids of the objects stored in the specified database
    */

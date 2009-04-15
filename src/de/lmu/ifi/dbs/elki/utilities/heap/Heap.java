@@ -7,9 +7,11 @@ import java.io.Serializable;
 /**
  * Encapsulates methods common to all heaps.
  *
+ * @param <K> Key type
+ * @param <V> Value type
  * @author Elke Achtert 
  */
-public interface Heap<K extends Comparable<K>, V extends Identifiable<?>> extends Serializable {
+public interface Heap<K extends Comparable<K>, V extends Identifiable> extends Serializable {
 
   /**
    * Adds a node to this heap.

@@ -10,6 +10,8 @@ import java.io.ObjectOutput;
  * and a corresponding value.
  *
  * @author Elke Achtert 
+ * @param <K> Key type
+ * @param <V> Value type
  */
 public class BTreeData<K extends Comparable<K> & Externalizable, V extends Externalizable> implements Externalizable {
   private static final long serialVersionUID = 1;

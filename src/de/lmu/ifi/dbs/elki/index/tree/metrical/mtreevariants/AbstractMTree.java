@@ -292,7 +292,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
      * @param knnList the query result list
      */
     protected final void doKNNQuery(Integer q, KNNList<D> knnList) {
-        final Heap<D, Identifiable<?>> pq = new DefaultHeap<D, Identifiable<?>>();
+        final Heap<D, Identifiable> pq = new DefaultHeap<D, Identifiable>();
 
         // push root
         pq.addNode(new PQNode<D>(distanceFunction.nullDistance(), getRootEntry().getID(), null));

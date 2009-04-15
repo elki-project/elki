@@ -26,6 +26,7 @@ public final class ClassGenericsUtil {
    * If the Class for className is not found, the instantiation is tried using
    * the package of the given type as package of the given className.
    * 
+   * @param <T> Class type for compile time type checking
    * @param type desired Class type of the Object to retrieve
    * @param className name of the class to instantiate
    * @return a new instance of the given type for the specified className
@@ -67,6 +68,7 @@ public final class ClassGenericsUtil {
    * This is a weaker type checked version of "instantiate" for use with
    * generics.
    * 
+   * @param <T> Class type for compile time type checking
    * @param type desired Class type of the Object to retrieve
    * @param className name of the class to instantiate
    * @return a new instance of the given type for the specified className

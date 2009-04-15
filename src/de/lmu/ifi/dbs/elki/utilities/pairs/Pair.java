@@ -82,6 +82,8 @@ public class Pair<FIRST, SECOND> {
   /**
    * Create a new array of the given size (for generics)
    * 
+   * @param <F> First class
+   * @param <S> Second class
    * @param size array size
    * @return empty array of the new type.
    */
@@ -152,7 +154,10 @@ public class Pair<FIRST, SECOND> {
      * To Objects of type {@link Pair} are compared based on the
      * comparison of their property using the current {@link #comparator}.
      * 
-     * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+     * @param o1 First object
+     * @param o2 Second object
+     * @return comparison result
+     * @see java.util.Comparator#compare
      */
     public int compare(Pair<FIRST, SECOND> o1, Pair<FIRST, SECOND> o2) {
       return comparator.compare(o1.getFirst(), o2.getFirst());
@@ -186,7 +191,10 @@ public class Pair<FIRST, SECOND> {
      * To Objects of type {@link Pair} are compared based on the
      * comparison of their property using the current {@link #comparator}.
      * 
-     * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+     * @param o1 First object
+     * @param o2 Second object
+     * @return comparison result
+     * @see java.util.Comparator#compare
      */
     public int compare(Pair<FIRST, SECOND> o1, Pair<FIRST, SECOND> o2) {
       return comparator.compare(o1.getSecond(), o2.getSecond());
@@ -214,8 +222,8 @@ public class Pair<FIRST, SECOND> {
      * Provides a comparator for an {@link Pair} based on the given
      * Comparator for type <code>P</code>.
      * 
-     * @param comparator a Comparator for type <code>P</code> to base the
-     *        comparison of an {@link Pair} on
+     * @param fcomparator Comparator for the first component
+     * @param scomparator Comparator for the second component
      */
     public Compare(Comparator<FIRST> fcomparator, Comparator<SECOND> scomparator) {
       this.fcomparator = fcomparator;
@@ -226,7 +234,10 @@ public class Pair<FIRST, SECOND> {
      * Two Objects of type {@link Pair} are compared based on the
      * comparison of their property using the comparators {@link #fcomparator}, then {@link #scomparator}.
      * 
-     * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+     * @param o1 First object
+     * @param o2 Second object
+     * @return comparison result
+     * @see java.util.Comparator#compare
      */
     public int compare(Pair<FIRST, SECOND> o1, Pair<FIRST, SECOND> o2) {
       int delta1 = fcomparator.compare(o1.getFirst(), o2.getFirst());
@@ -258,8 +269,8 @@ public class Pair<FIRST, SECOND> {
      * Provides a comparator for an {@link Pair} based on the given
      * Comparator for type <code>P</code>.
      * 
-     * @param comparator a Comparator for type <code>P</code> to base the
-     *        comparison of an {@link Pair} on
+     * @param fcomparator Comparator for the first component
+     * @param scomparator Comparator for the second component
      */
     public CompareSwapped(Comparator<FIRST> fcomparator, Comparator<SECOND> scomparator) {
       this.fcomparator = fcomparator;
@@ -270,7 +281,10 @@ public class Pair<FIRST, SECOND> {
      * Two Objects of type {@link Pair} are compared based on the
      * comparison of their property using the given comparators {@link #scomparator}, then {@link #fcomparator}.
      * 
-     * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+     * @param o1 First object
+     * @param o2 Second object
+     * @return comparison result
+     * @see java.util.Comparator#compare
      */
     public int compare(Pair<FIRST, SECOND> o1, Pair<FIRST, SECOND> o2) {
       int delta2 = scomparator.compare(o1.getSecond(), o2.getSecond());

@@ -10,10 +10,16 @@ import java.util.Locale;
 public final class FormatUtil {
 
   /**
-   * Number Formatter for output purposes.
+   * Number Formatter (2 digits) for output purposes.
    */
   public static final NumberFormat NF2 = NumberFormat.getInstance(Locale.US);
+  /**
+   * Number Formatter (4 digits) for output purposes.
+   */
   public static final NumberFormat NF4 = NumberFormat.getInstance(Locale.US);
+  /**
+   * Number Formatter (8 digits) for output purposes.
+   */
   public static final NumberFormat NF8 = NumberFormat.getInstance(Locale.US);
 
   static {

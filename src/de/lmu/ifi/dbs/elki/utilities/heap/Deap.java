@@ -15,7 +15,7 @@ import java.util.Vector;
  * 
  * @author Elke Achtert 
  */
-class Deap<K extends Comparable<K> & Serializable, V extends Identifiable<?> & Serializable>
+class Deap<K extends Comparable<K> & Serializable, V extends Identifiable & Serializable>
         extends MinMaxHeap<K, V> implements Page<Deap<K,V>>
 {
     private static final long serialVersionUID = 1;

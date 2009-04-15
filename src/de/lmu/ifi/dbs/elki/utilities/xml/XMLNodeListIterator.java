@@ -20,14 +20,14 @@ public final class XMLNodeListIterator implements Iterable<Node>, Iterator<Node>
   private int index;
   
   /**
-   * The nodelist to iterate over.
+   * The {@link NodeList} to iterate over.
    */
   private NodeList nodelist;
 
   /**
    * Constructor with first element to iterate over.
    * 
-   * @param first first child of parent node.
+   * @param nl NodeList to iterate over.
    */
   public XMLNodeListIterator(NodeList nl) {
     super();

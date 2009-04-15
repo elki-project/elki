@@ -5,10 +5,12 @@ import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 /**
  * A default implementation of an object that can be stored in a heap.
  *
+ * @param <K> Key type
+ * @param <V> Value type
  * @author Elke Achtert 
  */
 @SuppressWarnings("serial")
-public class DefaultHeapNode<K extends Comparable<K>, V extends Identifiable<?>> implements HeapNode<K, V> {
+public class DefaultHeapNode<K extends Comparable<K>, V extends Identifiable> implements HeapNode<K, V> {
 
   /**
    * The key of this heap node.

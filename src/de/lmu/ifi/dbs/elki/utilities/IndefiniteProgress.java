@@ -1,5 +1,10 @@
 package de.lmu.ifi.dbs.elki.utilities;
 
+/**
+ * Progress class without a fixed destination value.
+ * 
+ * @author Erich Schubert
+ */
 public class IndefiniteProgress extends AbstractProgress {
   /**
    * Store completion flag.

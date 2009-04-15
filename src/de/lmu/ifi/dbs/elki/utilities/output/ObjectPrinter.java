@@ -6,13 +6,14 @@ package de.lmu.ifi.dbs.elki.utilities.output;
  * string representation.
  *
  * @author Elke Achtert 
+ * @param <O> Object type
  */
-public interface ObjectPrinter<O extends Object> {
+public interface ObjectPrinter<O> {
   /**
    * Get the object's print data.
    *
    * @param o the object to be printed
-   * @return result  a string containing the ouput
+   * @return result  a string containing the output
    */
   String getPrintData(O o);
 

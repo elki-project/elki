@@ -447,7 +447,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
     /**
      * Encapsulates an entry in the cluster order.
      */
-    public class SpatialObjectPair implements Identifiable<SpatialObjectPair> {
+    public class SpatialObjectPair implements Identifiable {
         /**
          * The first entry of this pair.
          */
@@ -488,7 +488,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
          *         object is less than, equal to, or greater than the specified
          *         object.
          */
-        public int compareTo(Identifiable<SpatialObjectPair> o) {
+        public int compareTo(Identifiable o) {
             SpatialObjectPair other = (SpatialObjectPair) o;
 
             if (this.entry1.getID() < other.entry1.getID()) {

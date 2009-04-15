@@ -269,7 +269,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
     /**
      * Encapsulates an entry in the cluster order.
      */
-    public class COEntry implements Identifiable<COEntry> {
+    public class COEntry implements Identifiable {
         /**
          * The id of the entry.
          */
@@ -301,7 +301,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
          *         object is less than, equal to, or greater than the specified
          *         object.
          */
-        public int compareTo(Identifiable<COEntry> o) {
+        public int compareTo(Identifiable o) {
             COEntry other = (COEntry) o;
             if (this.objectID < other.objectID) {
                 return -1;

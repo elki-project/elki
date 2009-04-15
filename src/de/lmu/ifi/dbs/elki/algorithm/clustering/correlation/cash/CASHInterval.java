@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.utilities.Identifiable;
  *
  * @author Elke Achtert
  */
-public class CASHInterval extends HyperBoundingBox implements Identifiable<CASHInterval> {
+public class CASHInterval extends HyperBoundingBox implements Identifiable {
     private static final long serialVersionUID = 1;
 
     /**
@@ -233,7 +233,7 @@ public class CASHInterval extends HyperBoundingBox implements Identifiable<CASHI
      * negative integer, zero, or a positive integer as this object is less
      * than, equal to, or greater than the specified object.
      */
-    public int compareTo(Identifiable<CASHInterval> o) {
+    public int compareTo(Identifiable o) {
         CASHInterval other = (CASHInterval) o;
         if (this.equals(other)) return 0;
 

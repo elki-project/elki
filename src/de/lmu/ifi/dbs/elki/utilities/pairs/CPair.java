@@ -25,6 +25,7 @@ public class CPair<FIRST extends Comparable<FIRST>, SECOND extends Comparable<SE
    * Generic derived compare function.
    * 
    * @param other Object to compare to
+   * @return comparison result
    */
   public int compareTo(CPair<FIRST, SECOND> other) {
     // try comparing by first
@@ -59,6 +60,7 @@ public class CPair<FIRST extends Comparable<FIRST>, SECOND extends Comparable<SE
    * Generic derived compare function, with swapped components.
    * 
    * @param other Object to compare to
+   * @return comparison result
    */
   public int compareSwappedTo(CPair<FIRST, SECOND> other) {
     // try comparing by second
@@ -93,7 +95,10 @@ public class CPair<FIRST extends Comparable<FIRST>, SECOND extends Comparable<SE
   /**
    * Array constructor for generics
    * 
+   * @param <F> First type
+   * @param <S> Second type
    * @param size Size of array to be constructed
+   * @return New array of requested size
    */
   @SuppressWarnings("unchecked")
   public static final <F extends Comparable<F>, S extends Comparable<S>> CPair<F, S>[] newArray(int size) {

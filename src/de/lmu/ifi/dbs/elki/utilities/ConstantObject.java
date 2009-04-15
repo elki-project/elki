@@ -8,6 +8,7 @@ import java.util.Map;
  * immutable and unique by class and name.
  * 
  * @author Arthur Zimek
+ * @param <D> Class self refence for {@link Comparable} restriction
  */
 public abstract class ConstantObject<D extends ConstantObject<D>> implements Comparable<D> {
   /**
@@ -59,6 +60,7 @@ public abstract class ConstantObject<D extends ConstantObject<D>> implements Com
   /**
    * Provides a ConstantObject of specified class and name if it exists.
    * 
+   * @param <D> Type for compile time type checking
    * @param type the type of the desired ConstantObject
    * @param name the name of the desired ConstantObject
    * @return the ConstantObject of designated type and name if it exists, null
@@ -123,6 +125,8 @@ public abstract class ConstantObject<D extends ConstantObject<D>> implements Com
    * Two constant objects are generally compared by their name. The result
    * reflects the lexicographical order of the names by
    * {@link String#compareTo(String) this.getName().compareTo(o.getName()}.
+   * @param o Object to compare to.
+   * @return comparison result
    * 
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */

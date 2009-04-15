@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.distance.Distance;
  * A wrapper class for storing the k most similar comparable objects.
  * 
  * @author Elke Achtert
+ * @param <D> Distance class
  */
 public class KNNList<D extends Distance<D>> {
   /**
@@ -117,6 +118,11 @@ public class KNNList<D extends Distance<D>> {
     return new ArrayList<DistanceResultPair<D>>(list);
   }
 
+  /**
+   * Return a list containing just the distances
+   * 
+   * @return list of distances
+   */
   public List<D> distancesToList() {
     List<D> knnDistances = new ArrayList<D>();
     List<DistanceResultPair<D>> qr = toList();
@@ -132,6 +138,11 @@ public class KNNList<D extends Distance<D>> {
     return knnDistances;
   }
 
+  /**
+   * Return a list containing only the object IDs
+   * 
+   * @return list of object ids
+   */
   public List<Integer> idsToList() {
     List<Integer> ids = new ArrayList<Integer>(k);
     List<DistanceResultPair<D>> qr = toList();
@@ -206,6 +217,10 @@ public class KNNList<D extends Distance<D>> {
     return list.equals(knnList.list);
   }
 
+  /**
+   * Combine list hash code with the value of k.
+   * @see java.lang.Object#hashCode()
+   */
   @Override
   public int hashCode() {
     int result;

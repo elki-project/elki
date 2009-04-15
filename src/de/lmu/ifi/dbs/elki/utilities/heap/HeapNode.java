@@ -7,9 +7,11 @@ import java.io.Serializable;
 /**
  * Defines the requirements for an object that can be used as a node in a Heap.
  * 
+ * @param <K> Key type
+ * @param <V> Value type
  * @author Elke Achtert 
  */
-public interface HeapNode<K extends Comparable<K>, V extends Identifiable<?>>
+public interface HeapNode<K extends Comparable<K>, V extends Identifiable>
         extends Comparable<HeapNode<K, V>>, Serializable
 {
 

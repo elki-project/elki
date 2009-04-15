@@ -11,9 +11,11 @@ import java.util.Vector;
  * instances of <code>HeapNode<\code>
  * (@see HeapNode).
  *
+ * @param <K> Key type
+ * @param <V> Value type
  * @author Elke Achtert 
  */
-public class DefaultHeap<K extends Comparable<K>, V extends Identifiable<?>> implements Heap<K, V> {
+public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implements Heap<K, V> {
   /**
    * Serial version number. 
    */
@@ -219,7 +221,7 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable<?>> imp
    * Heapifies the subtree located at i. Precondition: i's both childtrees are
    * heapordered
    *
-   * @param i the idex of the subtree to be heapified
+   * @param i the index of the subtree to be heapified
    */
   protected final void heapify(int i) {
     // move the key down the tree till we're done.

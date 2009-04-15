@@ -256,7 +256,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
   /**
    * Performs a reverse knn query.
    * 
-   * @param k the parametr k of the rknn query
+   * @param k the parameter k of the rknn query
    * @param q the id of the query object
    * @param result holds the true results (they need not to be refined)
    * @param candidates holds possible candidates for the result (they need a
@@ -264,7 +264,7 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
    */
   private void doReverseKNNQuery(int k, Integer q, List<DistanceResultPair<D>> result, List<Integer> candidates) {
 
-    final Heap<D, Identifiable<?>> pq = new DefaultHeap<D, Identifiable<?>>();
+    final Heap<D, Identifiable> pq = new DefaultHeap<D, Identifiable>();
 
     // push root
     pq.addNode(new PQNode<D>(getDistanceFunction().nullDistance(), getRootEntry().getID(), null));

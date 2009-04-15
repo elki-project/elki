@@ -47,6 +47,8 @@ public abstract class AbstractProgress implements Progress {
 
   /**
    * Get the number of items already processed at a time being.
+   * 
+   * @return number of processed items
    */
   public int getProcessed() {
     return processed;

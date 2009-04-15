@@ -9,6 +9,8 @@ import java.util.HashMap;
  * The use of the inherited {@link #get(Object)} method is depreciated.
  * 
  * @author Erich Schubert
+ * 
+ * @param <K> Key class type
  */
 public class AnyMap<K> extends HashMap<K, Object> {
   /**

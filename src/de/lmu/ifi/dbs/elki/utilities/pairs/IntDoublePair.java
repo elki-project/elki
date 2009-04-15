@@ -61,6 +61,7 @@ public class IntDoublePair implements Comparable<IntDoublePair> {
    * Implementation of comparable interface, sorting by first then second.
    * 
    * @param other Object to compare to
+   * @return comparison result
    */
   public int compareTo(IntDoublePair other) {
     int fdiff = this.first - other.first;
@@ -72,6 +73,7 @@ public class IntDoublePair implements Comparable<IntDoublePair> {
    * Implementation of comparableSwapped interface, sorting by second then first.
    * 
    * @param other Object to compare to
+   * @return comparison result
    */
   public int compareSwappedTo(IntDoublePair other) {
     int fdiff = Double.compare(this.second, other.second);

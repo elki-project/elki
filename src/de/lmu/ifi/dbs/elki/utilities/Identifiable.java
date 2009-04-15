@@ -5,7 +5,7 @@ package de.lmu.ifi.dbs.elki.utilities;
  *
  * @author Elke Achtert 
  */
-public interface Identifiable<O> {
+public interface Identifiable {
   /**
    * Returns the unique id of this object.
    *

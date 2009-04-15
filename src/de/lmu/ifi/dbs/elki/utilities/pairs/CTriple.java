@@ -33,6 +33,7 @@ public final class CTriple<FIRST extends Comparable<FIRST>,SECOND extends Compar
    * Generic derived compare function.
    * 
    * @param other Object to compare to
+   * @return comparison result
    */
   public int compareTo(CTriple<FIRST, SECOND, THIRD> other) {
     // try comparing by first
@@ -62,7 +63,11 @@ public final class CTriple<FIRST extends Comparable<FIRST>,SECOND extends Compar
   /**
    * Array constructor for generics
    * 
+   * @param <F> First type
+   * @param <S> Second type
+   * @param <T> Third type
    * @param size Size of array to be constructed.
+   * @return New array of requested size
    */
   @SuppressWarnings("unchecked")
   public static final <F extends Comparable<F>,S extends Comparable<S>, T extends Comparable<T>> CTriple<F,S,T>[] newArray(int size) {

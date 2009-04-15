@@ -104,8 +104,12 @@ public class Triple<FIRST, SECOND, THIRD> {
 
   /**
    * Array constructor for generics
+   * @param <F> First type
+   * @param <S> Second type
+   * @param <T> Third type
    * 
    * @param size Size of array to be constructed.
+   * @return new array of the requested size.
    */
   @SuppressWarnings("unchecked")
   public static final <F, S, T> Triple<F, S, T>[] newArray(int size) {

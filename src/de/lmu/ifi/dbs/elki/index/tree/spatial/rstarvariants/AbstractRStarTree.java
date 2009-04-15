@@ -231,14 +231,14 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
 
     D range = distanceFunction.valueOf(epsilon);
     final List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
-    final Heap<D, Identifiable<?>> pq = new DefaultHeap<D, Identifiable<?>>();
+    final Heap<D, Identifiable> pq = new DefaultHeap<D, Identifiable>();
 
     // push root
-    pq.addNode(new DefaultHeapNode<D, Identifiable<?>>(distanceFunction.nullDistance(), new DefaultIdentifiable(getRootEntry().getID())));
+    pq.addNode(new DefaultHeapNode<D, Identifiable>(distanceFunction.nullDistance(), new DefaultIdentifiable(getRootEntry().getID())));
 
     // search in tree
     while(!pq.isEmpty()) {
-      HeapNode<D, Identifiable<?>> pqNode = pq.getMinNode();
+      HeapNode<D, Identifiable> pqNode = pq.getMinNode();
       if(pqNode.getKey().compareTo(range) > 0) {
         break;
       }
@@ -254,7 +254,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
             result.add(new DistanceResultPair<D>(distance, entry.getID()));
           }
           else {
-            pq.addNode(new DefaultHeapNode<D, Identifiable<?>>(distance, new DefaultIdentifiable(entry.getID())));
+            pq.addNode(new DefaultHeapNode<D, Identifiable>(distance, new DefaultIdentifiable(entry.getID())));
           }
         }
       }
@@ -497,15 +497,15 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
   protected <D extends Distance<D>> void doKNNQuery(Object object, SpatialDistanceFunction<O, D> distanceFunction, KNNList<D> knnList) {
 
     // variables
-    final Heap<D, Identifiable<?>> pq = new DefaultHeap<D, Identifiable<?>>();
+    final Heap<D, Identifiable> pq = new DefaultHeap<D, Identifiable>();
 
     // push root
-    pq.addNode(new DefaultHeapNode<D, Identifiable<?>>(distanceFunction.nullDistance(), new DefaultIdentifiable(getRootEntry().getID())));
+    pq.addNode(new DefaultHeapNode<D, Identifiable>(distanceFunction.nullDistance(), new DefaultIdentifiable(getRootEntry().getID())));
     D maxDist = distanceFunction.infiniteDistance();
 
     // search in tree
     while(!pq.isEmpty()) {
-      HeapNode<D, Identifiable<?>> pqNode = pq.getMinNode();
+      HeapNode<D, Identifiable> pqNode = pq.getMinNode();
 
       if(pqNode.getKey().compareTo(maxDist) > 0) {
         return;
@@ -530,7 +530,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
           E entry = node.getEntry(i);
           D distance = object instanceof Integer ? distanceFunction.minDist(entry.getMBR(), (Integer) object) : distanceFunction.minDist(entry.getMBR(), (O) object);
           if(distance.compareTo(maxDist) <= 0) {
-            pq.addNode(new DefaultHeapNode<D, Identifiable<?>>(distance, new DefaultIdentifiable(entry.getID())));
+            pq.addNode(new DefaultHeapNode<D, Identifiable>(distance, new DefaultIdentifiable(entry.getID())));
           }
         }
       }

@@ -195,6 +195,7 @@ public final class Util {
    * separator. Thus, if a newline is used as separator, it might make sense to
    * print a newline to the PrintStream after calling this method.
    * 
+   * @param <O> object class 
    * @param list the list to be printed
    * @param separator the separator to separate entries of the list
    * @param out the target PrintStream
@@ -326,6 +327,7 @@ public final class Util {
    * Provides the intersection of the two specified sets in the given result
    * set.
    * 
+   * @param <O> object class 
    * @param s1 the first set
    * @param s2 the second set
    * @param result the result set
@@ -381,6 +383,7 @@ public final class Util {
   /**
    * Adds the entries of the specified array to the end of the given list.
    * 
+   * @param <O> object class 
    * @param list the list
    * @param array the array containing the objects to be added to the list
    */
