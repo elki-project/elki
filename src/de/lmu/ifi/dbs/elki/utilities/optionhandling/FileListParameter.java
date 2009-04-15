@@ -15,7 +15,13 @@ public class FileListParameter extends ListParameter<File> {
      * {@link #OUTPUT_FILES} denotes output files.
      */
     public enum FilesType {
+        /**
+         * Input files (i.e. read only)
+         */
         INPUT_FILES,
+        /**
+         * Output files
+         */
         OUTPUT_FILES
     }
 

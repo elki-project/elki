@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * parameters ({@link NumberParameter}) are not allowed to have the same value.
  *
  * @author Steffi Wanka
+ * @param <N> Number type
  */
 public class NotEqualValueGlobalConstraint<N extends Number> implements GlobalParameterConstraint {
 

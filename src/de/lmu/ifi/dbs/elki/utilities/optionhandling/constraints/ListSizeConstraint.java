@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * has to be equal to the specified list size constraint.
  *
  * @author Steffi Wanka
+ * @param <T> Parameter type
  */
 public class ListSizeConstraint<T> implements ParameterConstraint<List<T>> {
 

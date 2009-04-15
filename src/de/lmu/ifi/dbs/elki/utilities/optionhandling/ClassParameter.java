@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.properties.PropertyName;
  * Parameter class for a parameter specifying a class name.
  * 
  * @author Steffi Wanka
+ * @param <C> Class type
  */
 public class ClassParameter<C> extends Parameter<String, String> {
 

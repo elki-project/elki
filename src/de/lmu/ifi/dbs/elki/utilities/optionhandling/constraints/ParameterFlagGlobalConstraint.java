@@ -13,6 +13,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
  * the flag the parameter is tested for keeping its constraints or not.
  * 
  * @author Steffi Wanka
+ * @param <C> Constraint type
+ * @param <T> Parameter type
  */
 public class ParameterFlagGlobalConstraint<C, T extends C> implements GlobalParameterConstraint {
 

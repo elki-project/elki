@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * pattern for a given class parameter ({@link ClassParameter}) defining a specific distance function.
  *
  * @author Steffi Wanka
+ * @param <D> Distance function type
  */
 public class GlobalDistanceFunctionPatternConstraint<D extends DistanceFunction<?, ?>> implements GlobalParameterConstraint {
 

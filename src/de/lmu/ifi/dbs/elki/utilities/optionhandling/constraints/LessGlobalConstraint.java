@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * number parameter ({@link NumberParameter}) given.
  *
  * @author Steffi Wanka
+ * @param <T> Number type
  */
 public class LessGlobalConstraint<T extends Number> implements GlobalParameterConstraint {
 

@@ -14,7 +14,13 @@ public class FileParameter extends Parameter<File, Object> {
      * {@link #OUTPUT_FILE} denotes an output file.
      */
     public enum FileType {
+        /**
+         * Input files (i.e. read only)
+         */
         INPUT_FILE,
+        /**
+         * Output files
+         */
         OUTPUT_FILE
     }
 

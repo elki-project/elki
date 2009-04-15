@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * the parameter value of another parameter.
  *
  * @author Steffi Wanka
+ * @param <T> Parameter type
  */
 public class DefaultValueGlobalConstraint<T extends Comparable<T>> implements GlobalParameterConstraint {
 

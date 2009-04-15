@@ -5,6 +5,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
+/**
+ * Utility functions related to Option handling.
+ *
+ */
 public final class OptionUtil {
 
   /**
@@ -72,6 +76,7 @@ public final class OptionUtil {
    * Returns a string representation of the specified list of
    * options containing the names of the options.
    *
+   * @param <O> Option type
    * @param options the list of options
    * @return the names of the options
    */
@@ -92,6 +97,7 @@ public final class OptionUtil {
    * Returns a string representation of the specified list of
    * options containing the names of the options.
    *
+   * @param <O> Option type
    * @param options the list of options
    * @return the names of the options
    */
@@ -208,6 +214,7 @@ public final class OptionUtil {
    * Returns a string representation of the list of number
    * parameters containing the names and the values of the parameters.
    *
+   * @param <N> Parameter type
    * @param parameters the list of number parameters
    * @return the names and the values of the parameters
    */

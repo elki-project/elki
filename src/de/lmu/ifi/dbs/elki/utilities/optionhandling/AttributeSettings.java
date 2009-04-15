@@ -48,7 +48,8 @@ public class AttributeSettings {
 
   /**
    * Returns a string representation of the object.
-   *
+   * 
+   * @param prefix 
    * @return a string representation of the object.
    */
   public String toString(String prefix) {

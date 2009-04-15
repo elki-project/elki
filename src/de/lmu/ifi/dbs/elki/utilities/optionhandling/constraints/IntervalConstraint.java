@@ -21,8 +21,14 @@ public class IntervalConstraint implements ParameterConstraint<Number> {
      * i.e. an equal to or less than (or equal to or greater than) comparison
      */
     public enum IntervalBoundary {
-        OPEN,
-        CLOSE
+      /**
+       * Open interval boundary
+       */
+      OPEN,
+      /**
+       * Closed interval boundary
+       */
+      CLOSE
     }
 
     /**

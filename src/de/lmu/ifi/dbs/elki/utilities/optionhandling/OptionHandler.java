@@ -86,7 +86,7 @@ public class OptionHandler extends AbstractLoggable {
    * @return String[] an array containing the unexpected parameters in the given
    *         order. Parameters are treated as unexpected if they are not known
    *         to the OptionHandler or if they were already read.
-   * @throws NoParameterValueException if a parameter, for which a value is
+   * @throws ParameterException if a parameter, for which a value is
    *         required, has none (e.g. because the next value is itself some
    *         option)
    */
@@ -189,13 +189,6 @@ public class OptionHandler extends AbstractLoggable {
     checkGlobalParameterConstraints();
 
     return remain;
-  }
-
-  public Option<?> getOption(String name) throws UnusedParameterException {
-    if(parameters.containsKey(name)) {
-      return parameters.get(name);
-    }
-    throw new UnusedParameterException("Parameter " + name + " is not assigned to the option handler.");
   }
 
   /**
@@ -379,6 +372,11 @@ public class OptionHandler extends AbstractLoggable {
     }
   }
 
+  /**
+   * Add a global parameter constraint.
+   * 
+   * @param gpc constraint
+   */
   public void setGlobalParameterConstraint(GlobalParameterConstraint gpc) {
     globalParameterConstraints.add(gpc);
   }
@@ -407,6 +405,11 @@ public class OptionHandler extends AbstractLoggable {
     }
   }
 
+  /**
+   * Get the available options of this handler.
+   * 
+   * @return new array of options.
+   */
   public Option<?>[] getOptions() {
     return parameters.values().toArray(new Option[] {});
   }

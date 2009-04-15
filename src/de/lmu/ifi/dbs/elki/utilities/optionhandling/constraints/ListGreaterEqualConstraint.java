@@ -11,6 +11,7 @@ import java.util.List;
  * tested have to be greater than or equal to the specified constraint value.
  *
  * @author Elke Achtert
+ * @param <N> Number type
  */
 public class ListGreaterEqualConstraint<N extends Number> extends AbstractNumberConstraint<List<N>> {
     /**

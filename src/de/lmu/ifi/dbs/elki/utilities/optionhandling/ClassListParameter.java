@@ -11,6 +11,7 @@ import java.util.List;
  * Parameter class for a parameter specifying a list of class names.
  * 
  * @author Steffi Wanka
+ * @param <C> Class type
  */
 public class ClassListParameter<C> extends ListParameter<String> {
 
