@@ -7,8 +7,19 @@ import org.junit.Test;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.GaussianFittingFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.LevenbergMarquardtMethod;
 
-
+/**
+ * Test to evaluate Levenberg-Marquardt fitting on a given Gaussian
+ * distribution.
+ * 
+ * @author Erich Schubert
+ * 
+ */
 public class TestLevenbergMarquardtGaussianFitting {
+  /**
+   * Evaluate on a symmetric Gaussian distribution. Traditional estimation
+   * already has the mean quite good, but is far off on the stddev. The improved
+   * fitting is much better on the stddev.
+   */
   // these points were generated with mean 0.12345 and stddev 0.98765
   @Test
   public void testSymmetric() {
@@ -25,15 +36,19 @@ public class TestLevenbergMarquardtGaussianFitting {
     LevenbergMarquardtMethod fit = new LevenbergMarquardtMethod(new GaussianFittingFunction(), params, dofit, testx, testy, s);
     for(int i = 0; i < 50; i++) {
       fit.iterate();
-      //double[] ps = fit.getParams();
-      // System.out.println("Mean: "+ps[0]+" Stddev: "+(ps[1]/Math.sqrt(2)) +
-      // " Amp: "+((1/ps[2])/Math.sqrt(2*Math.PI)));
-      //System.out.println("Mean: " + ps[0] + " Stddev: " + (ps[1] / Math.sqrt(2)) + " Amp: " + ps[2]);
     }
     double[] ps = fit.getParams();
-    assertTrue(ps[1] > 1.0);
+    // compare results.
+    double[] should = { 0.152986763079, 1.00115077, 1 };
+    assertEquals("Mean doesn't match.", should[0], ps[0], 0.0001);
+    assertEquals("Stddev doesn't match.", should[1], ps[1], 0.0001);
+    assertEquals("Scaling doesn't match.", should[2], ps[2], 0.0001);
   }
 
+  /**
+   * Same experiment, but only with one leg of the distribution. This results in
+   * the traditional mean being far off.
+   */
   @Test
   public void testAsymmetric() {
     double[] testx = { 0.157737801486, 0.20750247789, 0.257267154295, 0.307031830699, 0.356796507103, 0.406561183507, 0.456325859912, 0.506090536316, 0.55585521272, 0.605619889124, 0.655384565529, 0.705149241933, 0.754913918337, 0.804678594741, 0.854443271146, 0.90420794755, 0.953972623954, 1.00373730036, 1.05350197676, 1.10326665317, 1.15303132957, 1.20279600598, 1.25256068238, 1.30232535878, 1.35209003519, 1.40185471159, 1.451619388, 1.5013840644, 1.55114874081, 1.60091341721, 1.65067809361, 1.70044277002, 1.75020744642, 1.79997212283, 1.84973679923, 1.89950147564, 1.94926615204, 1.99903082844, 2.04879550485, 2.09856018125, 2.14832485766, 2.19808953406, 2.24785421046, 2.29761888687, 2.34738356327, 2.39714823968, 2.44691291608, 2.49667759249, 2.54644226889, 2.59620694529, 2.6459716217, 2.6957362981, 2.74550097451, 2.79526565091, 2.84503032732, 2.89479500372, 2.94455968012, 2.99432435653, 3.04408903293, 3.09385370934 };
@@ -49,13 +64,12 @@ public class TestLevenbergMarquardtGaussianFitting {
     LevenbergMarquardtMethod fit = new LevenbergMarquardtMethod(new GaussianFittingFunction(), params, dofit, testx, testy, s);
     for(int i = 0; i < 50; i++) {
       fit.iterate();
-      //double[] ps = fit.getParams();
-      // System.out.println("Mean: "+ps[0]+" Stddev: "+(ps[1]/Math.sqrt(2)) +
-      // " Amp: "+((1/ps[2])/Math.sqrt(2*Math.PI)));
-      //System.out.println("Mean: " + ps[0] + " Stddev: " + (ps[1] / Math.sqrt(2)) + " Amp: " + ps[2]);
     }
     double[] ps = fit.getParams();
-    assertTrue(ps[0] < 0.2);
-    assertTrue(ps[1] > 0.95);
+    // compare results.
+    double[] should = { 0.1557811515, 1.006463733, 1 };
+    assertEquals("Mean doesn't match.", should[0], ps[0], 0.0001);
+    assertEquals("Stddev doesn't match.", should[1], ps[1], 0.0001);
+    assertEquals("Scaling doesn't match.", should[2], ps[2], 0.0001);
   }
 }

@@ -28,6 +28,15 @@ import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
+/**
+ * Perform a full ERiC run, and compare the result with a clustering derived
+ * from the data set labels. This test ensures that ERiC performance doesn't
+ * unexpectedly drop on this data set (and also ensures that the algorithms
+ * work, as a side effect).
+ * 
+ * @author Erich Schubert
+ * 
+ */
 public class TestERiCResults {
   // the following values depend on the data set used!
   String dataset = "data/testdata/unittests/hierarchical-3d2d1d.csv";
@@ -35,6 +44,11 @@ public class TestERiCResults {
   // size of the data set
   int shoulds = 600;
 
+  /**
+   * Run ERiC with fixed parameters and compare the result to a golden standard.
+   * 
+   * @throws ParameterException
+   */
   @Test
   public void testERiCResults() throws ParameterException {
     FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>();

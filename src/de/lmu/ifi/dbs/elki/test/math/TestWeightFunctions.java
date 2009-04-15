@@ -6,6 +6,11 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.*;
 
+/**
+ * JUnit test to assert consistency of a couple of Weight functions
+ * @author Erich Schubert
+ *
+ */
 public class TestWeightFunctions {
   /**
    * Just a 'boring' value test for completeness.

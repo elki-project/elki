@@ -7,9 +7,16 @@ import org.junit.Test;
 import de.lmu.ifi.dbs.elki.math.Histogram;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
+/**
+ * JUnit test to test the {@link Histogram} class.
+ * @author Erich Schubert
+ */
 public class TestHistogram {
   Histogram<Double> hist;
 
+  /**
+   * Test that adds some data to the histogram and compares results. 
+   */
   @Test
   public final void testHistogram() {
     Double[] initial = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };

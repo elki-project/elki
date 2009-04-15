@@ -17,12 +17,21 @@ import de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
+/**
+ * Validate {@link PairCountingFMeasure} with respect to its ability to compare data clusterings.
+ * 
+ * @author Erich Schubert
+ */
 public class TestPairCountingFMeasure {
   // the following values depend on the data set used!
   String dataset = "data/testdata/unittests/hierarchical-3d2d1d.csv";
   // size of the data set
   int shoulds = 600;
 
+  /**
+   * Validate {@link PairCountingFMeasure} with respect to its ability to compare data clusterings.
+   * @throws ParameterException 
+   */
   @Test
   public void testCompareDatabases() throws ParameterException {
     FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>();
