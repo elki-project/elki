@@ -15,8 +15,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
  * in a specified dimension.
  *
  * @author Elke Achtert
+ * @param <N> number type
  * @param <V> the type of FeatureVector to compute the distances in between
- * todo parameter
  */
 public class DimensionSelectingDistanceFunction<N extends Number, V extends FeatureVector<V, N>>
     extends AbstractDoubleDistanceFunction<V> implements SpatialDistanceFunction<V, DoubleDistance> {
@@ -38,6 +38,9 @@ public class DimensionSelectingDistanceFunction<N extends Number, V extends Feat
      */
     private int dim;
 
+    /**
+     * Constructor
+     */
     public DimensionSelectingDistanceFunction() {
         super();
 

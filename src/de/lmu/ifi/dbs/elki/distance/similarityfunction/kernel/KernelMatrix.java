@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
  * Provides a class for storing the kernel matrix and several extraction methods for convenience.
  *
  * @author Simon Paradies
+ * @param <O> object type
  */
 public class KernelMatrix<O extends RealVector<O,? >> extends AbstractParameterizable {
 
@@ -85,6 +86,10 @@ public class KernelMatrix<O extends RealVector<O,? >> extends AbstractParameteri
     return Math.sqrt(getSquaredDistance(o1, o2));
   }
 
+  /**
+   * Get the kernel matrix.
+   * @return kernel
+   */
   public Matrix getKernel() {
     return kernel;
   }

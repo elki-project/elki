@@ -12,50 +12,46 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstrai
 
 /**
  * Provides the Edit Distance for NumberVectors.
- *
+ * 
  * @author Thomas Bernecker
  * @param <V> the type of NumberVector to compute the distances in between
  */
-public abstract class AbstractEditDistanceFunction<V extends NumberVector<V, ?>>
-    extends AbstractDoubleDistanceFunction<V>
-    implements MetricDistanceFunction<V, DoubleDistance> {
+public abstract class AbstractEditDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDoubleDistanceFunction<V> implements MetricDistanceFunction<V, DoubleDistance> {
 
-	public enum Step 
-	{
-		NONE, INS, DEL, MATCH
-	}
-	
-	/**
-     * OptionID for {@link #BANDSIZE_PARAM}
-     */
-    public static final OptionID BANDSIZE_ID = OptionID.getOrCreateOptionID("edit.bandSize",
-        "the band size for Edit Distance alignment (positive double value, 0 <= bandSize <= 1)");
+  protected enum Step {
+    NONE, INS, DEL, MATCH
+  }
 
-    /**
-     * BANDSIZE parameter
-     */
-    protected final DoubleParameter BANDSIZE_PARAM = new DoubleParameter(BANDSIZE_ID, new IntervalConstraint(0, IntervalBoundary.CLOSE, 1, IntervalBoundary.CLOSE), 0.1);
+  /**
+   * OptionID for {@link #BANDSIZE_PARAM}
+   */
+  public static final OptionID BANDSIZE_ID = OptionID.getOrCreateOptionID("edit.bandSize", "the band size for Edit Distance alignment (positive double value, 0 <= bandSize <= 1)");
 
-    /**
-     * Keeps the currently set bandSize.
-     */
-    protected double bandSize;
-	
-	/**
-     * Provides a Dynamic Time Warping distance function that can compute the Dynamic Time Warping
-     * distance (that is a DoubleDistance) for NumberVectors.
-     */
-    protected AbstractEditDistanceFunction() {
-        super();
-        addOption(BANDSIZE_PARAM);
-    }
+  /**
+   * BANDSIZE parameter
+   */
+  protected final DoubleParameter BANDSIZE_PARAM = new DoubleParameter(BANDSIZE_ID, new IntervalConstraint(0, IntervalBoundary.CLOSE, 1, IntervalBoundary.CLOSE), 0.1);
 
-    @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingOptions = super.setParameters(args);
+  /**
+   * Keeps the currently set bandSize.
+   */
+  protected double bandSize;
 
-        bandSize = BANDSIZE_PARAM.getValue();
+  /**
+   * Provides a Dynamic Time Warping distance function that can compute the
+   * Dynamic Time Warping distance (that is a DoubleDistance) for NumberVectors.
+   */
+  protected AbstractEditDistanceFunction() {
+    super();
+    addOption(BANDSIZE_PARAM);
+  }
 
-        return remainingOptions;
-    }
+  @Override
+  public String[] setParameters(String[] args) throws ParameterException {
+    String[] remainingOptions = super.setParameters(args);
+
+    bandSize = BANDSIZE_PARAM.getValue();
+
+    return remainingOptions;
+  }
 }

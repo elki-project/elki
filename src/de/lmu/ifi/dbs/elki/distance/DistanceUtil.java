@@ -1,10 +1,16 @@
 package de.lmu.ifi.dbs.elki.distance;
 
+/**
+ * Class with distance related utility functions.
+ * 
+ * @author Erich Schubert
+ */
 public final class DistanceUtil {
   /**
    * Returns the maximum of the given Distances or the first, if none is greater
    * than the other one.
    * 
+   * @param <D> distance type
    * @param d1 first Distance
    * @param d2 second Distance
    * @return Distance the maximum of the given Distances or the first, if
@@ -26,6 +32,7 @@ public final class DistanceUtil {
    * Returns the minimum of the given Distances or the first, if none is less
    * than the other one.
    * 
+   * @param <D> distance type
    * @param d1 first Distance
    * @param d2 second Distance
    * @return Distance the minimum of the given Distances or the first, if

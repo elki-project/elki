@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  *
  * @author Elke Achtert
  * @param <O> the type of DatabaseObject to compute the distances in between
+ * @param <P> preprocessor type
  */
 public abstract class AbstractLocallyWeightedDistanceFunction<O extends RealVector<O, ?>, P extends Preprocessor<O>>
     extends AbstractDoubleDistanceFunction<O> implements PreprocessorClient {

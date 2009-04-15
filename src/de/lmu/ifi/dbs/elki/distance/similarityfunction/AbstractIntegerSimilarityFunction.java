@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 /**
  * @author Arthur Zimek
+ * @param <O> object type
  */
 public abstract class AbstractIntegerSimilarityFunction<O extends DatabaseObject> extends AbstractSimilarityFunction<O, IntegerDistance>
 {

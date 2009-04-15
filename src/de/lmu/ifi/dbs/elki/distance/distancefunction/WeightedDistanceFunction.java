@@ -21,6 +21,7 @@ public class WeightedDistanceFunction<V extends NumberVector<V, ? >>
 
   /**
    * Provides the Weighted distance for feature vectors.
+   * @param weightMatrix weight matrix
    */
   public WeightedDistanceFunction(Matrix weightMatrix) {
     super();

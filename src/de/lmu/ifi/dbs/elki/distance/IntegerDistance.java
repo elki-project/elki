@@ -20,6 +20,11 @@ public class IntegerDistance extends NumberDistance<IntegerDistance, Integer> {
         super(null);
     }
 
+    /**
+     * Constructor
+     * 
+     * @param value distance value
+     */
     public IntegerDistance(int value) {
         super(value);
     }

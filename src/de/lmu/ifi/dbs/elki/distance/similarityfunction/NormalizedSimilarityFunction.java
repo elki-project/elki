@@ -8,6 +8,8 @@ import de.lmu.ifi.dbs.elki.distance.Distance;
  * produce values in the range of [0:1].
  * 
  * @author Erich Schubert
+ * @param <O> object type
+ * @param <D> distance type
  *
  */
 public interface NormalizedSimilarityFunction<O extends DatabaseObject, D extends Distance<D>> extends SimilarityFunction<O,D> {

@@ -19,13 +19,17 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 
 /**
  * @author Arthur Zimek
+ * @param <V> vector type
  */
 //  todo arthur comment all
 public class FractalDimensionBasedDistanceFunction<V extends RealVector<V, ?>>
     extends AbstractPreprocessorBasedDistanceFunction<V, FracClusPreprocessor<V>, DoubleDistance> {
 
-    public final EuclideanDistanceFunction<V> STANDARD_DOUBLE_DISTANCE_FUNCTION = new EuclideanDistanceFunction<V>();
+    private final EuclideanDistanceFunction<V> STANDARD_DOUBLE_DISTANCE_FUNCTION = new EuclideanDistanceFunction<V>();
 
+    /**
+     * Constructor
+     */
     public FractalDimensionBasedDistanceFunction() {
         super(Pattern.compile(new EuclideanDistanceFunction<V>().requiredInputPattern()));
     }

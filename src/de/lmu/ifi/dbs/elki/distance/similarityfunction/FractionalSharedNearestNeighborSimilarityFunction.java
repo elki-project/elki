@@ -19,6 +19,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * @author Arthur Zimek
+ * @param <O> object type
+ * @param <D> distance type
  */
 // todo arthur comment class
 public class FractionalSharedNearestNeighborSimilarityFunction<O extends DatabaseObject, D extends Distance<D>> extends AbstractPreprocessorBasedSimilarityFunction<O, SharedNearestNeighborsPreprocessor<O, D>, DoubleDistance> implements NormalizedSimilarityFunction<O, DoubleDistance> {

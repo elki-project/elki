@@ -26,6 +26,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * distance matrix of an external file.
  * 
  * @author Elke Achtert
+ * @param <V> Vector type
  */
 public class FileBasedDoubleDistanceFunction<V extends DatabaseObject> extends AbstractDoubleDistanceFunction<V> {
 
@@ -61,6 +62,9 @@ public class FileBasedDoubleDistanceFunction<V extends DatabaseObject> extends A
 
   private Map<Pair<Integer, Integer>, DoubleDistance> cache = null;
   
+  /**
+   * Constructor
+   */
   public FileBasedDoubleDistanceFunction() {
     super();
     addOption(MATRIX_PARAM);

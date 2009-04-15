@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * a similarity between the two feature vectors V1 and V2 defined by (V1^T*V2)^degree.
  *
  * @author Simon Paradies
+ * @param <O> vector type
  */
 public class PolynomialKernelFunction<O extends FeatureVector<O, ? >> extends AbstractDoubleKernelFunction<O> {
   /**

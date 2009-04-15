@@ -11,6 +11,8 @@ import java.util.regex.Pattern;
  * class.
  *
  * @author Elke Achtert 
+ * @param <O> object type
+ * @param <D> distance type
  */
 public abstract class AbstractKernelFunction<O extends DatabaseObject, D extends Distance<D>> extends AbstractDistanceFunction<O, D> implements KernelFunction<O, D> {
   /**

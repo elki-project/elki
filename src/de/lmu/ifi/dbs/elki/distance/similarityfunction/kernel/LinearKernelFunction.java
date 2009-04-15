@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
  * a similarity between the two feature vectors V1 and V2 defined by V1^T*V2.
  *
  * @author Simon Paradies
+ * @param <O> vector type
  */
 public class LinearKernelFunction<O extends FeatureVector<O, ? >> extends AbstractDoubleKernelFunction<O> {
 

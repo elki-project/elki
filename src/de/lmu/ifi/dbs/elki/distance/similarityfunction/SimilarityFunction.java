@@ -9,6 +9,8 @@ import de.lmu.ifi.dbs.elki.distance.MeasurementFunction;
  * function.
  *
  * @author Elke Achtert 
+ * @param <O> object type
+ * @param <D> distance type
  */
 public interface SimilarityFunction<O extends DatabaseObject, D extends Distance<D>> extends MeasurementFunction<O, D> {
 

@@ -24,6 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * distance matrix of an external file.
  * 
  * @author Elke Achtert
+ * @param <V> object type
  */
 public class FileBasedFloatDistanceFunction<V extends DatabaseObject> extends AbstractFloatDistanceFunction<V> {
 
@@ -59,6 +60,9 @@ public class FileBasedFloatDistanceFunction<V extends DatabaseObject> extends Ab
 
   private Map<Pair<Integer, Integer>, FloatDistance> cache = null;
   
+  /**
+   * Constructor
+   */
   public FileBasedFloatDistanceFunction() {
     super();
     addOption(MATRIX_PARAM);

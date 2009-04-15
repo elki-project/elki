@@ -12,8 +12,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  *
  * @author Arthur Zimek
  * @param <V> the type of FeatureVector to compute the distances in between
+ * @param <N> number type
  * TODO: implement SpatialDistanceFunction
- * todo parameter
  */
 public class LPNormDistanceFunction<V extends FeatureVector<V, N>, N extends Number>
     extends AbstractDoubleDistanceFunction<V> implements MetricDistanceFunction<V, DoubleDistance> {

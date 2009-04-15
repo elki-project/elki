@@ -11,6 +11,7 @@ import java.io.ObjectOutput;
  * points and the euclidean distance between the two points.
  *
  * @author Elke Achtert
+ * @param <D> distance type
  */
 public class CorrelationDistance<D extends CorrelationDistance<D>> extends AbstractDistance<D> {
 

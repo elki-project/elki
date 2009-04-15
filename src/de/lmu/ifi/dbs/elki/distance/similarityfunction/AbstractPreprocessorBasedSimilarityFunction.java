@@ -17,6 +17,9 @@ import java.util.regex.Pattern;
  * Abstract super class for distance functions needing a preprocessor.
  *
  * @author Elke Achtert
+ * @param <O> object type
+ * @param <P> preprocessor type
+ * @param <D> distance type 
  */
 public abstract class AbstractPreprocessorBasedSimilarityFunction<O extends DatabaseObject, P extends Preprocessor<O>, D extends Distance<D>>
     extends AbstractSimilarityFunction<O, D> implements PreprocessorBasedMeasurementFunction<O, P, D> {

@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * Currently only supports 2D data and x1^2 ~ x2 correlations.
  *
  * @author Simon Paradies
+ * @param <O> vector type
  */
 public class FooKernelFunction<O extends FeatureVector<?,?>> extends AbstractDoubleKernelFunction<O>{
 

@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
  * Provides a wrapper for arbitrary kernel functions whose kernel matrix has been precomputed.
  *
  * @author Simon Paradies
+ * @param <O> object type
  */
 public class ArbitraryKernelFunctionWrapper<O extends RealVector<O, ? >> extends AbstractDoubleKernelFunction<O>{
 
