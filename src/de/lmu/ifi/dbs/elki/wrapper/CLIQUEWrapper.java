@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstrai
  * Wrapper class for CLIQUE algorithm.
  *
  * @author Elke Achtert
+ * @param <O> object type
  */
 public class CLIQUEWrapper<O extends DatabaseObject> extends FileBasedDatabaseConnectionWrapper<O> {
 

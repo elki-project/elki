@@ -20,8 +20,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
  * Wrapper class for the {@link DeLiClu} algorithm.
  *
  * @author Elke Achtert
+ * @param <O> object type
  */
-
 public class DeLiCluWrapper<O extends DatabaseObject> extends NormalizationWrapper<O> {
     /**
      * Parameter to specify the threshold for minimum number of points in

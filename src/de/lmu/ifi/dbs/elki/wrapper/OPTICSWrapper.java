@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * on the database objects.
  *
  * @author Elke Achtert
+ * @param <O> object type
  */
 public class OPTICSWrapper<O extends DatabaseObject> extends NormalizationWrapper<O> {
 

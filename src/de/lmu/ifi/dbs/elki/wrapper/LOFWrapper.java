@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * Wrapper class for LOF algorithm.
  *
  * @author Elke Achtert
+ * @param <O> object type
  */
 public class LOFWrapper<O extends DatabaseObject> extends FileBasedDatabaseConnectionWrapper<O> {
 

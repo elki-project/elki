@@ -24,6 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
  * the database objects.
  *
  * @author Elke Achtert
+ * @param <O> object type
  */
 public class ERiCWrapper<O extends DatabaseObject> extends NormalizationWrapper<O> {
 

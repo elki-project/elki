@@ -18,11 +18,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 
 /**
- * todo parameter
  * Wrapper class for DiSH algorithm. Performs an attribute wise normalization on
  * the database objects.
  *
  * @author Elke Achtert
+ * @param <O> object type
  */
 public class DiSHWrapper<O extends DatabaseObject> extends NormalizationWrapper<O> {
 

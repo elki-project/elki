@@ -16,6 +16,7 @@ import java.util.List;
  * the database objects.
  *
  * @author Elke Achtert
+ * @param <O> object type
  */
 public class PreDeConWrapper<O extends DatabaseObject> extends NormalizationWrapper<O> {
 

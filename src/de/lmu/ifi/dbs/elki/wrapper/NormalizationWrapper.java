@@ -15,6 +15,7 @@ import java.util.List;
  * and reverts the result to the original values.
  *
  * @author Elke Achtert
+ * @param <O> object type
  */
 public abstract class NormalizationWrapper<O extends DatabaseObject> extends FileBasedDatabaseConnectionWrapper<O> {
 

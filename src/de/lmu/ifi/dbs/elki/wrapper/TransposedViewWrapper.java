@@ -23,6 +23,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * written.
  * 
  * @author Elke Achtert
+ * @param <V> vector type
  */
 public class TransposedViewWrapper<V extends RealVector<V, ?>> extends StandAloneInputWrapper {
   /**
@@ -49,7 +50,7 @@ public class TransposedViewWrapper<V extends RealVector<V, ?>> extends StandAlon
   }
 
   /**
-   * Adds parameter {@link #} todo to the option handler additionally to
+   * Adds parameter {@link #GNUPLOT_PARAM} to the option handler additionally to
    * parameters of super class.
    */
   public TransposedViewWrapper() {

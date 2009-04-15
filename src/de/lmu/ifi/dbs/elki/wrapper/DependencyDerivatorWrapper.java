@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
  * Wrapper class for the dependency derivator.
  *
  * @author Elke Achtert
+ * @param <O> object type
  */
 public class DependencyDerivatorWrapper<O extends DatabaseObject> extends FileBasedDatabaseConnectionWrapper<O> {
 

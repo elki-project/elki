@@ -22,6 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * the database objects.
  *
  * @author Elke Achtert
+ * @param <O> object type
  */
 public class COPACWrapper<O extends DatabaseObject> extends NormalizationWrapper<O> {
 

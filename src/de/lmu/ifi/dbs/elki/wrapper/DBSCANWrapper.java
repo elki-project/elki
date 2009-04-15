@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * Wrapper class for the {@link DBSCAN} algorithm with default parametrization.
  *
  * @author Elke Achtert
+ * @param <O> object type
  */
 public class DBSCANWrapper<O extends DatabaseObject> extends NormalizationWrapper<O> {
 

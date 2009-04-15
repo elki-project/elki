@@ -25,7 +25,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstrai
  * the database objects.
  *
  * @author Elke Achtert
- *         todo parameter
+ * @param <O> object type
  */
 public class HiCOWrapper<O extends DatabaseObject> extends NormalizationWrapper<O> {
 

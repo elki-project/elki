@@ -13,6 +13,7 @@ import java.util.List;
  * classes running algorithms in a kdd task using a file based database connection.
  *
  * @author Elke Achtert
+ * @param <O> object type
  */
 public abstract class FileBasedDatabaseConnectionWrapper<O extends DatabaseObject> extends KDDTaskWrapper<O> {
     /**

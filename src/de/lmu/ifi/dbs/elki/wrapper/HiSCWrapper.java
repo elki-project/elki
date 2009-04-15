@@ -21,7 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstrai
  * Wrapper class for HiSC algorithm.
  *
  * @author Elke Achtert
- *         todo parameter
+ * @param <O> object type
  */
 public class HiSCWrapper<O extends DatabaseObject> extends FileBasedDatabaseConnectionWrapper<O> {
   /**

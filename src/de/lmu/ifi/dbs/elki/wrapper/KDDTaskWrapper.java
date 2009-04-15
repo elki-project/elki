@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
  * algorithms in a kdd task.
  * 
  * @author Elke Achtert
+ * @param <O> object type
  */
 public abstract class KDDTaskWrapper<O extends DatabaseObject> extends AbstractWrapper {
 

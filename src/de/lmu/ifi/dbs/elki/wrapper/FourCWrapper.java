@@ -24,7 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
  * the database objects.
  *
  * @author Arthur Zimek
- *         todo parameter
+ * @param <O> object type
  */
 public class FourCWrapper<O extends DatabaseObject> extends NormalizationWrapper<O> {
 

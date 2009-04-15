@@ -16,6 +16,7 @@ import java.util.List;
  * Wrapper class for CASH algorithm.
  *
  * @author Elke Achtert
+ * @param <O> object type
  */
 public class CASHWrapper<O extends DatabaseObject> extends FileBasedDatabaseConnectionWrapper<O> {
 
