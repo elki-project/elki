@@ -5,10 +5,18 @@ import java.io.IOException;
 
 import org.junit.*;
 
+/**
+ * Test the on-disk UpperTriangleMatrix class.
+ * @author Erich Schubert
+ *
+ */
 // TODO: also test with a static sample file.
 public class TestUpperTriangleMatrix {
   File file = new File("UpperTriangleTestFile.test.dat");
 
+  /**
+   * Check that we don't overwrite any file.
+   */
   @Before
   public void checkTestFile() {
     if(file.exists()) {
@@ -16,6 +24,9 @@ public class TestUpperTriangleMatrix {
     }
   }
 
+  /**
+   * Clean up afterwards
+   */
   @After
   public void removeTestFile() {
     if(file.exists()) {
@@ -25,8 +36,12 @@ public class TestUpperTriangleMatrix {
     }
   }
 
+  /**
+   * Test the ondisk triangle matrix
+   * @throws IOException
+   */
   @Test
-  public void testOnDiskArray() throws IOException {
+  public void testUpperTriangleMatrix() throws IOException {
     final int extraheadersize = 2;
     final int recsize = 3;
     int matsize = 2;

@@ -5,10 +5,17 @@ import java.io.IOException;
 
 import org.junit.*;
 
+/**
+ * Test to validate proper OnDiskArray operation.
+ * @author Erich Schubert
+ */
 // TODO: also test with a static sample file.
 public class TestOnDiskArray {
   File file = new File("OnDiskArrayTestFile.test.dat");
 
+  /**
+   * Fail if test file still exists.
+   */
   @Before
   public void checkTestFile() {
     if(file.exists()) {
@@ -16,6 +23,9 @@ public class TestOnDiskArray {
     }
   }
 
+  /**
+   * Clean up afterwards.
+   */
   @After
   public void removeTestFile() {
     if(file.exists()) {
@@ -25,6 +35,10 @@ public class TestOnDiskArray {
     }
   }
 
+  /**
+   * Test the OnDiskArray class.
+   * @throws IOException
+   */
   @Test
   public void testOnDiskArray() throws IOException {
     final int extraheadersize = 2;

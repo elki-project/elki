@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageHeader;
  * single file. All pages are stored in a specified directory.
  * 
  * @author Elke Achtert
+ * @param <P> Page type
  */
 public class OnDiskArrayPageFile<P extends Page<P>> extends PageFile<P> {
   /**

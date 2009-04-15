@@ -3,6 +3,11 @@ package experimentalcode.erich.cache;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * Class representing an upper triangle matrix backed by an on-disk array of O((n+1)*n/2) size
+ * 
+ * @author Erich Schubert
+ */
 public class UpperTriangleMatrix {
   /**
    * Serial number, also used for generating a magic 
@@ -112,6 +117,7 @@ public class UpperTriangleMatrix {
    * 
    * @param x First coordinate
    * @param y Second coordinate
+   * @return record raw data
    * @throws IOException 
    */
   public synchronized byte[] readRecord(int x, int y) throws IOException {

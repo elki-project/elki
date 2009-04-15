@@ -16,6 +16,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.wrapper.AbstractWrapper;
 
+/**
+ * Wrapper to convert a traditional text-serialized result into a on-disk matrix
+ * for random access.
+ * 
+ * @author Erich Schubert
+ * 
+ */
 public class LoadDistanceResultIntoDiskCache extends AbstractWrapper {
   /**
    * OptionID for {@link #CACHE_PARAM}
@@ -29,11 +36,6 @@ public class LoadDistanceResultIntoDiskCache extends AbstractWrapper {
    * </p>
    */
   private final FileParameter CACHE_PARAM = new FileParameter(CACHE_ID, FileParameter.FileType.OUTPUT_FILE);
-
-  /**
-   * OptionID for {@link #DISTANCE_PARAM}
-   */
-  public static final OptionID DISTANCE_ID = OptionID.getOrCreateOptionID("loader.distance", "Distance function to cache.");
 
   /**
    * Debug flag, to double-check all write operations.

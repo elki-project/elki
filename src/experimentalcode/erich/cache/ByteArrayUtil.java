@@ -7,8 +7,7 @@ package experimentalcode.erich.cache;
  * {@link java.io.ByteArrayOutputStream} and {@link java.io.DataInputStream}
  * doesn't seem appropriate.
  * 
- * {@see java.io.DataOutputStream}
- * {@see java.io.ByteArrayOutputStream}
+ * C.f. {@link java.io.DataOutputStream} and {@link java.io.ByteArrayOutputStream}
  * 
  * @author Erich Schubert
  */

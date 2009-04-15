@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * distance matrix of an external file.
  * 
  * @author Erich Schubert
+ * @param <V> object type
  */
 public class DiskCacheBasedDoubleDistanceFunction<V extends DatabaseObject> extends AbstractDoubleDistanceFunction<V> {
   /**
@@ -38,6 +39,9 @@ public class DiskCacheBasedDoubleDistanceFunction<V extends DatabaseObject> exte
 
   private UpperTriangleMatrix cache = null;
   
+  /**
+   * Default constructor.
+   */
   public DiskCacheBasedDoubleDistanceFunction() {
     super();
     addOption(MATRIX_PARAM);

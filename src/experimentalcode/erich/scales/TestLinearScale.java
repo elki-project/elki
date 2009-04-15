@@ -4,8 +4,17 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+/**
+ * Test class to test rounding of the linear scale.
+ * 
+ * @author Erich Schubert
+ *
+ */
 public class TestLinearScale {
 
+  /**
+   * Produces a simple linear scale and verifies the tick lines are placed as expected.
+   */
   @Test
   public final void testLinearScale() {
     LinearScale a = new LinearScale(3,97);

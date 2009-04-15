@@ -26,8 +26,12 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
  * exhibit the clearest correlation.
  * 
  * @author Erich Schubert
+ * @param <V> vector type
  */
 public class PCAFilteredAutotuningRunner<V extends RealVector<V, ?>> extends PCAFilteredRunner<V> {
+  /**
+   * Default constructor
+   */
   public PCAFilteredAutotuningRunner() {
     super();
   }
