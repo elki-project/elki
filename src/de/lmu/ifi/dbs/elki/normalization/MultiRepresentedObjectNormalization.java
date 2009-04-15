@@ -22,6 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * respect to given normalizations for each representation.
  *
  * @author Elke Achtert 
+ * @param <O> object type
  */
 public class MultiRepresentedObjectNormalization<O extends DatabaseObject>
 extends AbstractNormalization<MultiRepresentedObject<O>> {

@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
  * Abstract super class for all normalizations.
  *
  * @author Elke Achtert
+ * @param <O> object type
  */
 public abstract class AbstractNormalization<O extends DatabaseObject> extends AbstractParameterizable implements Normalization<O> {
 

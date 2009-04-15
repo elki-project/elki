@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * dependencies quantitatively adapted to the original space.
  *
  * @author Arthur Zimek
+ * @param <O> object type
  */
 public interface Normalization<O extends DatabaseObject> extends Parameterizable {
   /**

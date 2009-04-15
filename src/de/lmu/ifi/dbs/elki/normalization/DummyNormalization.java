@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * if one representation needs no normalization.
  *
  * @author Elke Achtert
+ * @param <O> object type
  */
 public class DummyNormalization<O extends DatabaseObject> extends AbstractParameterizable implements Normalization<O> {
 

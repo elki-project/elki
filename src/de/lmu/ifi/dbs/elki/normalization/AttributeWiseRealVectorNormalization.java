@@ -23,6 +23,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * given minimum and maximum in each dimension.
  *
  * @author Elke Achtert 
+ * @param <V> vector type
  */
 public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ? >> extends AbstractNormalization<V> {
   /**
