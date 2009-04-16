@@ -27,7 +27,7 @@ public class CollectionResult<O> implements IterableResult<O> {
    * Constructor
    * 
    * @param col Collection represented
-   * @param header Auxillary information for result headers
+   * @param header Auxiliary information for result headers
    */
   public CollectionResult(Collection<O> col, Collection<String> header) {
     this.col = col;
