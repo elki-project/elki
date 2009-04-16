@@ -25,7 +25,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 public class FractalDimensionBasedDistanceFunction<V extends RealVector<V, ?>>
     extends AbstractPreprocessorBasedDistanceFunction<V, FracClusPreprocessor<V>, DoubleDistance> {
 
-    private final EuclideanDistanceFunction<V> STANDARD_DOUBLE_DISTANCE_FUNCTION = new EuclideanDistanceFunction<V>();
+    public final EuclideanDistanceFunction<V> STANDARD_DOUBLE_DISTANCE_FUNCTION = new EuclideanDistanceFunction<V>();
 
     /**
      * Constructor
