@@ -356,8 +356,8 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
       // adding them here will make the output writer think
       // that they were an part of the actual result.
       AnnotationsFromDatabase<O, ?> ar = new AnnotationsFromDatabase<O, Object>(db);
-      ar.addAssociationGenerics(null, AssociationID.LABEL);
-      ar.addAssociationGenerics(null, AssociationID.CLASS);
+      ar.addAssociationGenerics(AssociationID.LABEL);
+      ar.addAssociationGenerics(AssociationID.CLASS);
 
       // insert standard annotations when we have a MultiResult
       if(res instanceof MultiResult) {

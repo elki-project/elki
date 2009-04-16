@@ -131,7 +131,7 @@ public class SimpleIndexBasedOutlierDetection <O extends DatabaseObject, D exten
 		    	}
 		    }
 		    AnnotationsFromDatabase<O, Boolean> res1 = new AnnotationsFromDatabase<O, Boolean>(database);
-	        res1.addAssociation("OFLAG", SIBO_OFLAG);
+	        res1.addAssociation(SIBO_OFLAG);
 	        // Ordering
 	        OrderingFromAssociation<Boolean, O> res2 = new OrderingFromAssociation<Boolean, O>(database, SIBO_OFLAG, true); 
 	        // combine results.

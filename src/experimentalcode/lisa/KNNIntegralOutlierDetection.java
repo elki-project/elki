@@ -109,7 +109,7 @@ public class KNNIntegralOutlierDetection <O extends DatabaseObject, D extends Di
           database.associate(KNNIO_ODEGREE, id, skn);
         }
         AnnotationsFromDatabase<O, D> res1 = new AnnotationsFromDatabase<O, D>(database);
-           res1.addAssociation("KNNIO_ODEGREE", (AssociationID<D>)KNNIO_ODEGREE);
+           res1.addAssociation((AssociationID<D>)KNNIO_ODEGREE);
             // Ordering
             OrderingFromAssociation<D, O> res2 = new OrderingFromAssociation<D, O>(database,(AssociationID<D>) KNNIO_ODEGREE, true); 
             // combine results.

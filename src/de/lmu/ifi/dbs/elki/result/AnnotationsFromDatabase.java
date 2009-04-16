@@ -15,7 +15,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <O> Database object type
  * @param <T> Association type
  */
-// TODO: replace Object with a generics type?
 public class AnnotationsFromDatabase<O extends DatabaseObject, T> implements AnnotationResult<T> {
   /**
    * database storage
@@ -48,23 +47,21 @@ public class AnnotationsFromDatabase<O extends DatabaseObject, T> implements Ann
   /**
    * Add an association to the result.
    * 
-   * @param label Label of the Annotation
    * @param association Association ID.
    */
-  public void addAssociation(String label, AssociationID<T> association) {
-    associations.add(new Pair<String, AssociationID<T>>(label, association));
+  public void addAssociation(AssociationID<T> association) {
+    associations.add(new Pair<String, AssociationID<T>>(association.getLabel(), association));
   }
 
   /**
    * Add an annotation to the result for generics.
    * Note that type-safety is ignored here!
    * 
-   * @param label Label of the Annotation
    * @param association Annotation data.
    */
   @SuppressWarnings("unchecked")
-  public void addAssociationGenerics(String label, AssociationID<?> association) {
-    associations.add(new Pair<String, AssociationID<T>>(label, (AssociationID<T>) association));
+  public void addAssociationGenerics(AssociationID<?> association) {
+    associations.add(new Pair<String, AssociationID<T>>(association.getLabel(), (AssociationID<T>) association));
   }
 
   /**

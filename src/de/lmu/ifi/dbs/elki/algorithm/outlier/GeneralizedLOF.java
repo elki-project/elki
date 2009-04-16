@@ -190,7 +190,7 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
             }
         }
         AnnotationsFromDatabase<O, Double> res1 = new AnnotationsFromDatabase<O, Double>(database);
-        res1.addAssociation("LOF", AssociationID.LOF);
+        res1.addAssociation(AssociationID.LOF);
         // Ordering
         OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database, AssociationID.LOF, true); 
         // combine results.

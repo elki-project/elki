@@ -58,7 +58,7 @@ public class MixtureModelOutlierDetection<V extends RealVector<V,Double>> extend
       }
     }
     AnnotationsFromDatabase<V, Boolean> res1 = new AnnotationsFromDatabase<V, Boolean>(database);
-    res1.addAssociation("MMOD_OFLAG", MMOD_OFLAG);
+    res1.addAssociation(MMOD_OFLAG);
     // Ordering
     OrderingFromAssociation<Boolean, V> res2 = new OrderingFromAssociation<Boolean, V>(database, MMOD_OFLAG, true); 
     // combine results.

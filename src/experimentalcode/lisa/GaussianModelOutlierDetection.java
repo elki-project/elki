@@ -32,7 +32,7 @@ public class GaussianModelOutlierDetection<V extends RealVector<V,Double>> exten
              database.associate(GMOD_MDIST, id, mDist); 
 		 }
 		 AnnotationsFromDatabase<V, Double> res1 = new AnnotationsFromDatabase<V, Double>(database);
-	        res1.addAssociation("MDIST", GMOD_MDIST);
+	        res1.addAssociation(GMOD_MDIST);
 	        // Ordering
 	        OrderingFromAssociation<Double, V> res2 = new OrderingFromAssociation<Double, V>(database, GMOD_MDIST, true); 
 	        // combine results.

@@ -136,10 +136,10 @@ public class COP<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, D
             }
         }
         AnnotationsFromDatabase<V,?> res1 = new AnnotationsFromDatabase<V,Object>(database);
-        res1.addAssociationGenerics("COP", AssociationID.COP);
-        res1.addAssociationGenerics("COPDIM", AssociationID.COP_DIM);
-        res1.addAssociationGenerics("ERRORVECTOR", AssociationID.COP_ERROR_VECTOR);
-        res1.addAssociationGenerics("COP SOL", AssociationID.COP_SOL);
+        res1.addAssociationGenerics(AssociationID.COP);
+        res1.addAssociationGenerics(AssociationID.COP_DIM);
+        res1.addAssociationGenerics(AssociationID.COP_ERROR_VECTOR);
+        res1.addAssociationGenerics(AssociationID.COP_SOL);
         // Ordering
         OrderingFromAssociation<Double, V> res2 = new OrderingFromAssociation<Double, V>(database, AssociationID.COP, true); 
         // combine results.

@@ -212,8 +212,8 @@ public class LOCI<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
       database.associate(AssociationID.LOCI_MDEF_CRITICAL_RADIUS, id, maxnormr);
     }
     AnnotationsFromDatabase<O, Double> res1 = new AnnotationsFromDatabase<O, Double>(database);
-    res1.addAssociation("MDEF_NORM", AssociationID.LOCI_MDEF_NORM);
-    res1.addAssociation("LOCI_RADIUS", AssociationID.LOCI_MDEF_CRITICAL_RADIUS);
+    res1.addAssociation(AssociationID.LOCI_MDEF_NORM);
+    res1.addAssociation(AssociationID.LOCI_MDEF_CRITICAL_RADIUS);
     OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database, AssociationID.LOCI_MDEF_NORM, true);
     result = new MultiResult();
     result.addResult(res1);

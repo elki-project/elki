@@ -143,7 +143,7 @@ public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends
             database.associate(SOD_MODEL, queryObject, model);
         }
         AnnotationsFromDatabase<V, SODModel> res1 = new AnnotationsFromDatabase<V, SODModel>(database);
-        res1.addAssociation("SOD", SOD_MODEL);
+        res1.addAssociation(SOD_MODEL);
         // TODO: Add SOD value directly to allow ranking?
         // Ordering
         OrderingFromAssociation<?, V> res2 = new OrderingFromAssociation(database, SOD_MODEL, true); 

@@ -261,6 +261,7 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
     /**
      * Gets or creates the AssociationID for the given name and given type.
      *
+     * @param <C> association class
      * @param name the name
      * @param type the type of the association
      * @return the AssociationID for the given name
@@ -278,6 +279,7 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
      * Gets or creates the AssociationID for the given name and given type.
      * Generics version, with relaxed typechecking.
      *
+     * @param <C> association class
      * @param name the name
      * @param type the type of the association
      * @return the AssociationID for the given name
@@ -289,5 +291,14 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
             associationID = new AssociationID<C>(name, type);
         }
         return associationID;
+    }
+    
+    /**
+     * Return the name formatted for use in text serialization
+     * 
+     * @return uppercased, no whitespace version of the association name.
+     */
+    public String getLabel() {
+      return getName().replace(" ", "_").toUpperCase();
     }
 }

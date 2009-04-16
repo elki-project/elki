@@ -219,7 +219,7 @@ public class LOF<O extends DatabaseObject> extends
                     + nnTable.getLogicalPageAccess());
             }
             AnnotationsFromDatabase<O, Double> res1 = new AnnotationsFromDatabase<O, Double>(database);
-            res1.addAssociation("LOF", AssociationID.LOF);
+            res1.addAssociation(AssociationID.LOF);
             // TODO: re-add lof and nn tables.
             // Ordering
             OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database, AssociationID.LOF, true); 
