@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 
 
 
-public class SimpleIndexBasedOutlierDetection <O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O , D , MultiResult> {
+public class DBOutlierDetection <O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O , D , MultiResult> {
 	
 	public static final OptionID D_ID = OptionID.getOrCreateOptionID(
 		      "sibo.d",
@@ -61,7 +61,7 @@ public class SimpleIndexBasedOutlierDetection <O extends DatabaseObject, D exten
 		  /**
 		   * Constructor, adding options to option handler.
 		   */
-		  public SimpleIndexBasedOutlierDetection() {
+		  public DBOutlierDetection() {
 		    super();
 		    // neighborhood size
 		    addOption(D_PARAM);
@@ -98,7 +98,7 @@ public class SimpleIndexBasedOutlierDetection <O extends DatabaseObject, D exten
 		    //if index exists, kNN query. if the distance to the mth nearest neighbor is more than d -> object is outlier  
 		    if (database instanceof IndexDatabase){
 		    	for(Integer id : database.getIDs()){
-		    		if(database.kNNQueryForID(id, m , getDistanceFunction()).get(m-1).getDistance().compareTo(distance)  <= 0){
+		    		if(database.kNNQueryForID(id, m , getDistanceFunction()).get(m-1).getFirst().compareTo(distance)  <= 0){
 		    			//flag as outlier
 		    			database.associate(SIBO_OFLAG, id, true);
 		    		}

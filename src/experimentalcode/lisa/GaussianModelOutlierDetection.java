@@ -22,14 +22,17 @@ public class GaussianModelOutlierDetection<V extends RealVector<V,Double>> exten
 	protected MultiResult runInTime(Database<V> database) throws IllegalStateException {
 		V mean = DatabaseUtil.centroid(database);
 		V meanNeg = mean.negativeVector();
-		Matrix covarianceTransposed = DatabaseUtil.covarianceMatrix(database, mean).transpose();	
+		Matrix covarianceMatrix = DatabaseUtil.covarianceMatrix(database, mean);
+		Matrix covarianceTransposed = covarianceMatrix.transpose();
+		Double covarianceDet = covarianceMatrix.det();
 		//for each object compute mahalanobis distance
 		 for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); ) {
              Integer id = iter.next();
              V x = database.get(id);
              Vector x_minus_mean = x.plus(meanNeg).getColumnVector();
              double mDist = x_minus_mean.transpose().times(covarianceTransposed).times(x_minus_mean).get(0,0);
-             database.associate(GMOD_MDIST, id, mDist); 
+             double prob = (1.0/(Math.pow(Math.sqrt(2*Math.PI), database.size())*Math.sqrt(covarianceDet))) * Math.exp(- mDist/2.0);
+             database.associate(GMOD_MDIST, id, prob); 
 		 }
 		 AnnotationsFromDatabase<V, Double> res1 = new AnnotationsFromDatabase<V, Double>(database);
 	        res1.addAssociation(GMOD_MDIST);
