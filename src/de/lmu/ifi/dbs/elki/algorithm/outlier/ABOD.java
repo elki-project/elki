@@ -10,6 +10,7 @@ import java.util.PriorityQueue;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
@@ -20,6 +21,7 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.AnnotationsFromHashMap;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
@@ -104,6 +106,16 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
   private final ClassParameter<KernelFunction<V, DoubleDistance>> KERNEL_FUNCTION_PARAM = new ClassParameter<KernelFunction<V, DoubleDistance>>(KERNEL_FUNCTION_ID, KernelFunction.class, PolynomialKernelFunction.class.getCanonicalName());
 
   /**
+   * Association ID for ABOD.
+   */
+  public final AssociationID<Double> ABOD_SCORE = AssociationID.getOrCreateAssociationID("ABOD", Double.class);
+
+  /**
+   * Association ID for ABOD Normalization value.
+   */
+  public final AssociationID<Double> ABOD_NORM = AssociationID.getOrCreateAssociationID("ABOD normalization", Double.class);
+
+  /**
    * Store the configured Kernel version
    */
   KernelFunction<V, DoubleDistance> kernelFunction;
@@ -162,19 +174,24 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
       }
       pq.add(new CPair<Double, Integer>(s.getVariance(), objKey));
     }
+    
+    Double maxabod = Double.MIN_VALUE;
     HashMap<Integer, Double> abodvalues = new HashMap<Integer, Double>();
     for(CPair<Double, Integer> pair : pq) {
       abodvalues.put(pair.getSecond(), pair.getFirst());
+      maxabod = Math.max(maxabod, pair.getFirst());
     }
     // ABOD values as result
     AnnotationsFromHashMap<Double> res1 = new AnnotationsFromHashMap<Double>();
-    res1.addMap("ABOD", abodvalues);
+    res1.addMap(ABOD_SCORE, abodvalues);
     // resulting ordering
     OrderingFromHashMap<Double> res2 = new OrderingFromHashMap<Double>(abodvalues, true);
     // combine results.
     result = new MultiResult();
     result.addResult(res1);
     result.addResult(res2);
+    // store normalization information.
+    ResultUtil.setGlobalAssociation(result, ABOD_NORM, maxabod);
     return result;
   }
 
@@ -266,18 +283,23 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
 
     }
     // System.out.println(v + " Punkte von " + data.size() + " verfeinert !!");
+    Double maxabod = Double.MIN_VALUE;
     HashMap<Integer, Double> abodvalues = new HashMap<Integer, Double>();
-    for(CPair<Double, Integer> pair : pq)
+    for(CPair<Double, Integer> pair : pq) {
       abodvalues.put(pair.getSecond(), pair.getFirst());
+      maxabod = Math.max(maxabod, pair.getFirst());
+    }
     // ABOD values as result
     AnnotationsFromHashMap<Double> res1 = new AnnotationsFromHashMap<Double>();
-    res1.addMap("ABOD", abodvalues);
+    res1.addMap(ABOD_SCORE, abodvalues);
     // resulting ordering
     OrderingFromHashMap<Double> res2 = new OrderingFromHashMap<Double>(abodvalues, true);
     // combine results.
     result = new MultiResult();
     result.addResult(res1);
     result.addResult(res2);
+    // store normalization information.
+    ResultUtil.setGlobalAssociation(result, ABOD_NORM, maxabod);
     return result;
   }
 

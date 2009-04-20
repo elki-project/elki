@@ -218,15 +218,16 @@ public class LOF<O extends DatabaseObject> extends
               logger.verbose("Logical page Access NN-Table:   "
                     + nnTable.getLogicalPageAccess());
             }
-            AnnotationsFromDatabase<O, Double> res1 = new AnnotationsFromDatabase<O, Double>(database);
-            res1.addAssociation(AssociationID.LOF);
-            // TODO: re-add lof and nn tables.
+            // FIXME: re-add lof and nn tables.
+            
+            //AnnotationsFromDatabase<O, Double> res1 = new AnnotationsFromDatabase<O, Double>(database);
+            //res1.addAssociation(AssociationID.LOF);
             // Ordering
-            OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database, AssociationID.LOF, true); 
+            //OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database, AssociationID.LOF, true); 
             // combine results.
-            result = new MultiResult();
-            result.addResult(res1);
-            result.addResult(res2);
+            //result = new MultiResult();
+            //result.addResult(res1);
+            //result.addResult(res2);
         }
         return result;
     }

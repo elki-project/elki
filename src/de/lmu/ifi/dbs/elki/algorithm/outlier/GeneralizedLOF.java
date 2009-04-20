@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -11,9 +12,10 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
+import de.lmu.ifi.dbs.elki.result.AnnotationsFromHashMap;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
@@ -106,6 +108,8 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
           logger.verbose("LOF ");
         }
 
+        // TODO: use some abstraction to allow on-disk storage.
+        HashMap<Integer, List<DistanceResultPair<DoubleDistance>>> neigh = new HashMap<Integer, List<DistanceResultPair<DoubleDistance>>>();
         {// compute neighbors of each db object
             if (logger.isVerbose()) {
               logger.verbose("computing neighborhoods");
@@ -116,7 +120,7 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
                 Integer id = iter.next();
                 List<DistanceResultPair<DoubleDistance>> neighbors = database.kNNQueryForID(id, k + 1, getDistanceFunction());
                 neighbors.remove(0);
-                database.associate(AssociationID.NEIGHBORS, id, neighbors);
+                neigh.put(id, neighbors);
                 if (logger.isVerbose()) {
                     progressNeighborhoods.setProcessed(counter);
                     logger.progress(progressNeighborhoods);
@@ -124,6 +128,8 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
             }
         }
 
+        // TODO: use some abstraction to allow on-disk storage.
+        HashMap<Integer, List<DistanceResultPair<DoubleDistance>>> neigh2 = new HashMap<Integer, List<DistanceResultPair<DoubleDistance>>>();
         {// computing reach dist function neighborhoods
             if (logger.isVerbose()) {
               logger.verbose("computing neighborhoods for reachability function");
@@ -134,13 +140,14 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
                 Integer id = iter.next();
                 List<DistanceResultPair<DoubleDistance>> neighbors = database.kNNQueryForID(id, k + 1, reachabilityDistanceFunction);
                 neighbors.remove(0);
-                database.associate(AssociationID.NEIGHBORS_2, id, neighbors);
+                neigh2.put(id, neighbors);
                 if (logger.isVerbose()) {
                     reachDistNeighborhoodsProgress.setProcessed(counter);
                     logger.progress(reachDistNeighborhoodsProgress);
                 }
             }
         }
+        HashMap<Integer, Double> lrds = new HashMap<Integer, Double>();
         {// computing LRDs
             if (logger.isVerbose()) {
               logger.verbose("computing LRDs");
@@ -150,14 +157,14 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
                 Integer id = iter.next();
                 double sum = 0;
-                List<DistanceResultPair<DoubleDistance>> neighbors = database.getAssociation(AssociationID.NEIGHBORS_2, id);
+                List<DistanceResultPair<DoubleDistance>> neighbors = neigh2.get(id);
                 for (DistanceResultPair<DoubleDistance> neighbor : neighbors) {
-                    List<DistanceResultPair<DoubleDistance>> neighborsNeighbors = database.getAssociation(AssociationID.NEIGHBORS_2, neighbor.getID());
+                    List<DistanceResultPair<DoubleDistance>> neighborsNeighbors = neigh2.get(neighbor.getID());
                     sum += Math.max(neighbor.getDistance().getValue(),
                         neighborsNeighbors.get(neighborsNeighbors.size() - 1).getDistance().getValue());
                 }
                 Double lrd = neighbors.size() / sum;
-                database.associate(AssociationID.LRD, id, lrd);
+                lrds.put(id, lrd);
                 if (logger.isVerbose()) {
                     lrdsProgress.setProcessed(counter);
                     logger.progress(lrdsProgress);
@@ -165,6 +172,8 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
             }
         }
         // XXX: everything here appears to be stupid
+        HashMap<Integer, Double> lofs = new HashMap<Integer, Double>();
+        double lofmax = 0;
         {// compute LOF of each db object
             if (logger.isVerbose()) {
               logger.verbose("computing LOFs");
@@ -175,28 +184,31 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
                 Integer id = iter.next();
                 //computeLOF(database, id);
-                Double lrd = database.getAssociation(AssociationID.LRD, id);
-                List<DistanceResultPair<DoubleDistance>> neighbors = database.getAssociation(AssociationID.NEIGHBORS, id);
+                Double lrd = lrds.get(id);
+                List<DistanceResultPair<DoubleDistance>> neighbors = neigh.get(id);
                 double sum = 0;
                 for (DistanceResultPair<DoubleDistance> neighbor1 : neighbors) {
-                    sum += database.getAssociation(AssociationID.LRD, neighbor1.getSecond()) / lrd;
+                    sum += lrds.get(neighbor1.getSecond()) / lrd;
                 }
                 Double lof = sum / neighbors.size();
-                database.associate(AssociationID.LOF, id, lof);
+                lofs.put(id, lof);
+                lofmax = Math.max(lofmax, lof);
                 if (logger.isVerbose()) {
                     progressLOFs.setProcessed(counter);
                     logger.progress(progressLOFs);
                 }
             }
         }
-        AnnotationsFromDatabase<O, Double> res1 = new AnnotationsFromDatabase<O, Double>(database);
-        res1.addAssociation(AssociationID.LOF);
+        AnnotationsFromHashMap<Double> res1 = new AnnotationsFromHashMap<Double>();
+        res1.addMap(AssociationID.LOF, lofs);
         // Ordering
         OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database, AssociationID.LOF, true); 
         // combine results.
         result = new MultiResult();
         result.addResult(res1);
         result.addResult(res2);
+        
+        ResultUtil.setGlobalAssociation(result, AssociationID.LOF_MAX, lofmax);
 
         return result;
     }

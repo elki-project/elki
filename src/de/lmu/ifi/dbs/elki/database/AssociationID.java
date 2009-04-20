@@ -65,16 +65,6 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
     public static final AssociationID<List<Integer>> NEIGHBOR_IDS = new AssociationID<List<Integer>>("neighborids", List.class);
 
     /**
-     * The association id to associate the neighbors of an object.
-     */
-    public static final AssociationID<List<DistanceResultPair<DoubleDistance>>> NEIGHBORS = new AssociationID<List<DistanceResultPair<DoubleDistance>>>("neighbors", List.class);
-
-    /**
-     * The association id to associate another set of neighbors of an object.
-     */
-    public static final AssociationID<List<DistanceResultPair<DoubleDistance>>> NEIGHBORS_2 = new AssociationID<List<DistanceResultPair<DoubleDistance>>>("neighbors2", List.class);
-
-    /**
      * The association id to associate a set of neighbors for use of the shared
      * nearest neighbor similarity function.
      */
@@ -92,16 +82,16 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
     public static final AssociationID<DoubleDistance> DOUBLE_DISTANCE = new AssociationID<DoubleDistance>("doubleDistance", DoubleDistance.class);
 
     /**
-     * The association id to associate the LRD of an object for the LOF algorithm.
-     */
-    public static final AssociationID<Double> LRD = new AssociationID<Double>("lrd", Double.class);
-
-    /**
      * The association id to associate the LOF of an object for the LOF algorithm.
      */
     public static final AssociationID<Double> LOF = new AssociationID<Double>("lof", Double.class);
 
     /**
+     * The association id to associate the maximum LOF of an algorithm run.
+     */
+    public static final AssociationID<Double> LOF_MAX = new AssociationID<Double>("lof max", Double.class);
+
+  /**
    * The association id to associate the Correlation Outlier Probability of an object
    */
   public static final AssociationID<Double> COP = new AssociationID<Double>("cop", Double.class);
