@@ -10,6 +10,12 @@ import experimentalcode.erich.visualization.svg.css.CSSClass;
 import experimentalcode.erich.visualization.svg.css.CSSClassManager;
 import experimentalcode.erich.visualization.svg.css.CSSClassManager.CSSNamingConflict;
 
+/**
+ * Class to draw a simple axis with tick marks on the plot.
+ * 
+ * @author Erich Schubert
+ *
+ */
 public class SVGAxis {
 
   /**
@@ -66,6 +72,7 @@ public class SVGAxis {
   /**
    * Plot an axis with appropriate scales
    * 
+   * @param plot Plot object
    * @param parent Containing element
    * @param scale axis scale information
    * @param x1 starting coordinate

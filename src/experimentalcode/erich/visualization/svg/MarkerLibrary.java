@@ -19,6 +19,7 @@ public interface MarkerLibrary {
    * Symbols will be named "s0", "s1" etc.; these names must not be used by other elements in
    * the SVG document!
    * 
+   * @param plot Plot to draw on
    * @param parent parent node
    * @param x coordinate
    * @param y coordinate

@@ -7,6 +7,13 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+/**
+ * Utility class for SVG processing.
+ * 
+ * Much of the classes are to allow easier attribute setting (conversion to string) and Namespace handling
+ * 
+ * @author Erich Schubert
+ */
 public final class SVGUtil {
 
   /**

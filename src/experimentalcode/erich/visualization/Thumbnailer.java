@@ -12,13 +12,29 @@ import org.apache.batik.transcoder.TranscoderException;
  *
  */
 class Thumbnailer {
+  /**
+   * Default prefix
+   */
+  private static final String DEFAULT_PREFIX = "elki-";
+  
+  /**
+   * Prefix storage.
+   */
   private String prefix;
   
   /**
    * Constructor
+   * @param prefix Filename prefix to avoid collisions (e.g "elki-")
    */
   public Thumbnailer(String prefix) {
     this.prefix = prefix;
+  }
+
+  /**
+   * Constructor
+   */
+  public Thumbnailer() {
+    this(DEFAULT_PREFIX);
   }
 
   /**
