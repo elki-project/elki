@@ -2,8 +2,10 @@ package de.lmu.ifi.dbs.elki.data;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.utilities.Util;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -75,6 +77,16 @@ public class SparseDoubleVector extends RealVector<SparseDoubleVector, Double> {
     @Override
     public SparseDoubleVector newInstance(double[] values) {
         return new SparseDoubleVector(values);
+    }
+
+    
+    
+    public SparseDoubleVector newInstance(Double[] values) {
+      return new SparseDoubleVector(Util.unbox(values));
+    }
+
+    public SparseDoubleVector newInstance(List<Double> values) {
+      return new SparseDoubleVector(Util.convertToDoubles(values));
     }
 
     public SparseDoubleVector randomInstance(Random random) {

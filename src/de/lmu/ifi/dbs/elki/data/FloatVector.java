@@ -63,6 +63,14 @@ public class FloatVector extends RealVector<FloatVector, Float> {
     public FloatVector newInstance(double[] values) {
         return new FloatVector(Util.convertToFloat(values));
     }
+    
+    public FloatVector newInstance(Float[] values) {
+      return new FloatVector(values);
+    }
+
+    public FloatVector newInstance(List<Float> values) {
+      return new FloatVector(values);
+    }
 
     /**
      * @return a new FloatVector with random values between 0 and 1

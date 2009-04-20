@@ -29,11 +29,12 @@ public abstract class NumberVector<V extends NumberVector<V, N>, N extends Numbe
    */
   public final static String ATTRIBUTE_SEPARATOR = " ";
 
+  /*
   /**
    * Creates and returns a new instance of V based on the passed values.
    * 
    * @see de.lmu.ifi.dbs.elki.data.FeatureVector#newInstance
-   */
+   * /
   @SuppressWarnings("unchecked")
   public V newInstance(N[] values) throws SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException {
     Class<?>[] parameterClasses = { values.getClass() };
@@ -46,12 +47,13 @@ public abstract class NumberVector<V extends NumberVector<V, N>, N extends Numbe
    * Creates and returns a new instance of V based on the passed values.
    * 
    * @see de.lmu.ifi.dbs.elki.data.FeatureVector#newInstance
-   */
+   * /
   @SuppressWarnings("unchecked")
   public V newInstance(List<N> values) throws SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException {
     N[] valuesArray = (N[]) new Number[values.size()];
     return newInstance(values.toArray(valuesArray));
   }
+  */
 
   /**
    * An Object obj is equal to this NumberVector if it is an instance of the

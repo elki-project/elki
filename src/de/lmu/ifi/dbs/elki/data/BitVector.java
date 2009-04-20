@@ -4,6 +4,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 import java.util.BitSet;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -55,19 +56,44 @@ public class BitVector extends NumberVector<BitVector, Bit> {
         }
         this.dimensionality = bits.length;
     }
+    
+    /**
+     * Provides a new BitVector corresponding to the bits in the given list.
+     *
+     * @param bits an array of bits specifying the bits in this bit vector
+     */
+    public BitVector(List<Bit> bits) {
+        this.bits = new BitSet(bits.size());
+        int i = 0;
+        for (Bit bit : bits) {
+          this.bits.set(i, bit.bitValue());
+          i++;
+        }
+        this.dimensionality = bits.size();
+    }
 
     /**
      * Creates and returns a new BitVector based on the passed values.
      * 
      * @return a new instance of this BitVector with the specified values
      * 
-     * @see de.lmu.ifi.dbs.elki.data.NumberVector#newInstance
      */
     @Override
     public BitVector newInstance(Bit[] values) {
         return new BitVector(values);
     }
-
+    
+    /**
+     * Creates and returns a new BitVector based on the passed values.
+     * 
+     * @return a new instance of this BitVector with the specified values
+     * 
+     */
+    @Override
+    public BitVector newInstance(List<Bit> values) {
+        return new BitVector(values);
+    }
+    
     /**
      * Returns a BitVector with random values.
      * 
@@ -93,7 +119,8 @@ public class BitVector extends NumberVector<BitVector, Bit> {
      * @param max unused
      * @param random as in {@link BitVector#randomInstance(Random) randomInstance(random)}
      */
-    public BitVector randomInstance(Bit min, Bit max, Random random) {
+    public BitVector randomInstance(@SuppressWarnings("unused") Bit min,
+        @SuppressWarnings("unused") Bit max, Random random) {
         return randomInstance(random);
     }
 
@@ -105,7 +132,8 @@ public class BitVector extends NumberVector<BitVector, Bit> {
      * @param max unused
      * @param random as in {@link BitVector#randomInstance(Random) randomInstance(random)}
      */
-    public BitVector randomInstance(BitVector min, BitVector max, Random random) {
+    public BitVector randomInstance(@SuppressWarnings("unused") BitVector min,
+        @SuppressWarnings("unused") BitVector max, Random random) {
       return randomInstance(random);
     }
     

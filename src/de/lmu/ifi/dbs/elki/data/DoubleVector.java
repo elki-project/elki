@@ -72,7 +72,21 @@ public class DoubleVector extends RealVector<DoubleVector,Double> {
    * @return a new DoubleVector with the specified values
    */
   @Override
-public DoubleVector newInstance(double[] values) {
+  public DoubleVector newInstance(Double[] values) {
+    return new DoubleVector(values);
+  }
+  
+  /**
+   * @return a new DoubleVector with the specified values
+   */
+  @Override
+  public DoubleVector newInstance(double[] values) {
+    return new DoubleVector(values);
+  }
+  
+  
+
+  public DoubleVector newInstance(List<Double> values) {
     return new DoubleVector(values);
   }
 

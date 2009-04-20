@@ -27,17 +27,8 @@ public interface FeatureVector<V extends FeatureVector<V,N>,N extends Number> ex
      * @param values
      *            the values of the featureVector
      * @return a new FeatureVector of V for the given values
-     * @throws NoSuchMethodException
-     * @throws SecurityException
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
-     * @throws InstantiationException
-     * @throws IllegalArgumentException
      */
-    V newInstance(N[] values) throws SecurityException,
-            NoSuchMethodException, IllegalArgumentException,
-            InstantiationException, IllegalAccessException,
-            InvocationTargetException;
+    V newInstance(N[] values);
 
 
     /**
@@ -46,17 +37,8 @@ public interface FeatureVector<V extends FeatureVector<V,N>,N extends Number> ex
      * @param values
      *            the values of the featureVector
      * @return a new FeatureVector of V for the given values
-     * @throws NoSuchMethodException
-     * @throws SecurityException
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
-     * @throws InstantiationException
-     * @throws IllegalArgumentException
      */
-    V newInstance(List<N> values) throws SecurityException,
-            NoSuchMethodException, IllegalArgumentException,
-            InstantiationException, IllegalAccessException,
-            InvocationTargetException;
+    V newInstance(List<N> values);
     
     /**
      * Returns a FeatureVector of V with uniformly distributed (0-1) random values.
