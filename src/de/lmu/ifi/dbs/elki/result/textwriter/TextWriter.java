@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.cluster.naming.NamingScheme;
 import de.lmu.ifi.dbs.elki.data.cluster.naming.SimpleEnumeratingScheme;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -30,6 +31,7 @@ import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.combinators.AnnotationCombiner;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterDatabaseObjectInline;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterObjectComment;
@@ -129,11 +131,10 @@ public class TextWriter<O extends DatabaseObject> {
    * @param db Database object
    * @param r Result class
    * @param streamOpener output stream manager
-   * @param settings Settings to output
    * @throws UnableToComplyException
    * @throws IOException
    */
-  public void output(Database<O> db, Result r, StreamFactory streamOpener, List<AttributeSettings> settings) throws UnableToComplyException, IOException {
+  public void output(Database<O> db, Result r, StreamFactory streamOpener) throws UnableToComplyException, IOException {
     AnnotationResult ra = null;
     OrderingResult ro = null;
     Clustering<Model> rc = null;
@@ -164,6 +165,8 @@ public class TextWriter<O extends DatabaseObject> {
       groups = new ArrayList<DatabaseObjectGroup>();
       groups.add(new DatabaseObjectGroupCollection<Collection<Integer>>(db.getIDs()));
     }
+    
+    List<AttributeSettings> settings = ResultUtil.getGlobalAssociation((MultiResult)r, AssociationID.META_SETTINGS);
 
     if(ri != null) {
       writeIterableResult(db, streamOpener, ri, settings);

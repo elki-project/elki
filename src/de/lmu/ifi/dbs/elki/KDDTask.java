@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.ResultWriter;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
@@ -373,10 +374,12 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
 
       if(result != null) {
         List<AttributeSettings> settings = getAttributeSettings();
+        ResultUtil.setGlobalAssociation(result, AssociationID.META_SETTINGS, settings);
+        
         if(normalizationUndo) {
           resulthandler.setNormalization(normalization);
         }
-        resulthandler.processResult(db, result, settings);
+        resulthandler.processResult(db, result);
       }
       return result;
     }

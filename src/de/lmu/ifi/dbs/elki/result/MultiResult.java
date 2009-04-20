@@ -81,4 +81,27 @@ public class MultiResult implements Result {
     }
     return res;
   }
+
+  /**
+   * Return first results of the given restriction class
+   * 
+   * @param <C>
+   * @param restrictionClass
+   * @return first matching result
+   */
+  // We can't ensure that restrictionClass matches C.
+  @SuppressWarnings("unchecked")
+  public <C> C getFirstFilteredResult(Class<?> restrictionClass) {
+    for(Result result : results) {
+      if(result != null) {
+        try {
+          return (C) restrictionClass.cast(result);
+        }
+        catch(ClassCastException e) {
+          // skip non-matching items
+        }
+      }
+    }
+    return null;
+  }
 }

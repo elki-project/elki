@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.result;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -13,7 +12,6 @@ import de.lmu.ifi.dbs.elki.result.textwriter.StreamFactory;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriter;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -110,9 +108,8 @@ public class ResultWriter<O extends DatabaseObject> extends AbstractParameteriza
    * 
    * @param db Database 
    * @param result Result
-   * @param settings Settings
    */
-  public void processResult(Database<O> db, Result result, List<AttributeSettings> settings) {
+  public void processResult(Database<O> db, Result result) {
     TextWriter<O> writer = new TextWriter<O>();
     if(normalization != null) {
       writer.setNormalization(normalization);
@@ -146,7 +143,7 @@ public class ResultWriter<O extends DatabaseObject> extends AbstractParameteriza
       throw new IllegalStateException("Error opening output.", e);
     }
     try {
-      writer.output(db, result, output, settings);
+      writer.output(db, result, output);
     }
     catch(IOException e) {
       throw new IllegalStateException("Input/Output error while writing result.", e);

@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.utilities.ConstantObject;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.pairs.CPair;
 
 /**
@@ -194,11 +195,9 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
     public static final AssociationID<KernelMatrix<?>> KERNEL_MATRIX = new AssociationID<KernelMatrix<?>>("kernelMatrix", KernelMatrix.class);
 
     /**
-     * The association id to associate any arbitrary object.
+     * Meta-data: algorithm settings
      */
-    public static final AssociationID<Object> OBJECT = new AssociationID<Object>("object", Object.class);
-
-
+    public static final AssociationID<List<AttributeSettings>> META_SETTINGS = new AssociationID<List<AttributeSettings>>("meta setttings", List.class);
 
     /**
      * The serial version UID.
