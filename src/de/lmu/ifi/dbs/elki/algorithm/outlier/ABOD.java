@@ -34,11 +34,12 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.CPair;
 /**
  * Angle-Based Outlier Detection
  * 
- * Outlier detection using variance analysis on angles, especially for high dimensional data sets.
+ * Outlier detection using variance analysis on angles, especially for high
+ * dimensional data sets.
  * 
- * H.-P. Kriegel, M. Schubert, and A. Zimek:
- * Angle-Based Outlier Detection in High-dimensional Data.
- * In: Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining (KDD '08), Las Vegas, NV, 2008.
+ * H.-P. Kriegel, M. Schubert, and A. Zimek: Angle-Based Outlier Detection in
+ * High-dimensional Data. In: Proc. 14th ACM SIGKDD Int. Conf. on Knowledge
+ * Discovery and Data Mining (KDD '08), Las Vegas, NV, 2008.
  * 
  * @author Matthias Schubert (Original Code)
  * @author Erich Schubert (ELKIfication)
@@ -49,8 +50,7 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
   /**
    * OptionID for {@link #K_PARAM}
    */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("abod.k", 
-      "Parameter k for kNN queries.");
+  public static final OptionID K_ID = OptionID.getOrCreateOptionID("abod.k", "Parameter k for kNN queries.");
 
   /**
    * Parameter for k
@@ -61,12 +61,11 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
    * k parameter
    */
   private int k;
-  
+
   /**
    * OptionID for {@link #FAST_FLAG}
    */
-  public static final OptionID FAST_ID = OptionID.getOrCreateOptionID("abod.fast", 
-      "Flag to indicate that the algorithm should run the fast/approximative version.");
+  public static final OptionID FAST_ID = OptionID.getOrCreateOptionID("abod.fast", "Flag to indicate that the algorithm should run the fast/approximative version.");
 
   /**
    * Flag for fast mode
@@ -81,8 +80,7 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
   /**
    * OptionID for {@link #FAST_SAMPLE_PARAM}
    */
-  public static final OptionID FAST_SAMPLE_ID = OptionID.getOrCreateOptionID("abod.samplesize", 
-      "Sample size to use in fast mode.");
+  public static final OptionID FAST_SAMPLE_ID = OptionID.getOrCreateOptionID("abod.samplesize", "Sample size to use in fast mode.");
 
   /**
    * Parameter for sample size
@@ -97,16 +95,13 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
   /**
    * OptionID for {@link #KERNEL_FUNCTION_PARAM}
    */
-  public static final OptionID KERNEL_FUNCTION_ID = OptionID.getOrCreateOptionID("abod.kernelfunction", 
-      "Kernel function to use.");
+  public static final OptionID KERNEL_FUNCTION_ID = OptionID.getOrCreateOptionID("abod.kernelfunction", "Kernel function to use.");
 
   /**
    * Parameter for Kernel Function
    */
   // TODO: is a Polynomial Kernel the best default?
-  private final ClassParameter<KernelFunction<V, DoubleDistance>> KERNEL_FUNCTION_PARAM =
-    new ClassParameter<KernelFunction<V, DoubleDistance>>(KERNEL_FUNCTION_ID,
-        KernelFunction.class, PolynomialKernelFunction.class.getCanonicalName());
+  private final ClassParameter<KernelFunction<V, DoubleDistance>> KERNEL_FUNCTION_PARAM = new ClassParameter<KernelFunction<V, DoubleDistance>>(KERNEL_FUNCTION_ID, KernelFunction.class, PolynomialKernelFunction.class.getCanonicalName());
 
   /**
    * Store the configured Kernel version
@@ -152,8 +147,9 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
         // PriorityQueue best = new PriorityQueue(false, k);
         while(iter2.hasNext()) {
           Integer key2 = iter2.next().getID();
-          if(key2.equals(key1) || key1.equals(objKey) || key2.equals(objKey))
+          if(key2.equals(key1) || key1.equals(objKey) || key2.equals(objKey)) {
             continue;
+          }
           double nenner = calcDenominator(kernelMatrix, objKey, key1, key2);
 
           if(nenner != 0) {
@@ -166,9 +162,10 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
       }
       pq.add(new CPair<Double, Integer>(s.getVariance(), objKey));
     }
-    HashMap<Integer,Double> abodvalues = new HashMap<Integer,Double>();
-    for (CPair<Double, Integer> pair : pq)
+    HashMap<Integer, Double> abodvalues = new HashMap<Integer, Double>();
+    for(CPair<Double, Integer> pair : pq) {
       abodvalues.put(pair.getSecond(), pair.getFirst());
+    }
     // ABOD values as result
     AnnotationsFromHashMap<Double> res1 = new AnnotationsFromHashMap<Double>();
     res1.addMap("ABOD", abodvalues);
@@ -209,8 +206,9 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
       // " " + counter2[1]);
       // umsetzen von Pq zu list
       List<Integer> neighbors = new ArrayList<Integer>(nn.size());
-      while(!nn.isEmpty())
+      while(!nn.isEmpty()) {
         neighbors.add(nn.remove().getSecond());
+      }
       // getFilter
       double var = getAbofFilter(kernelMatrix, aKey, dists, counter[1], counter[0], neighbors);
       pq.add(new CPair<Double, Integer>(var, aKey));
@@ -221,24 +219,28 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
     System.out.println(pq.size() + " objects ordered into candidate list.");
     int v = 0;
     while(!pq.isEmpty()) {
-      if(resqueue.size() == k && pq.peek().getFirst() > resqueue.peek().getFirst())
+      if(resqueue.size() == k && pq.peek().getFirst() > resqueue.peek().getFirst()) {
         break;
+      }
       // double approx = pq.peek().getFirst();
       Integer aKey = pq.remove().getSecond();
-      // if(!result.isEmpty())
+      // if(!result.isEmpty()) {
       // System.out.println("Best Candidate " + aKey+" : " + pq.firstPriority()
       // + " worst result: " + result.firstPriority());
-      // else
+      // } else {
       // System.out.println("Best Candidate " + aKey+" : " + pq.firstPriority()
       // + " worst result: " + Double.MAX_VALUE);
+      // }
       v++;
       MeanVariance s = new MeanVariance();
       for(Integer bKey : database.getIDs()) {
-        if(bKey.equals(aKey))
+        if(bKey.equals(aKey)) {
           continue;
+        }
         for(Integer cKey : database.getIDs()) {
-          if(cKey.equals(aKey))
+          if(cKey.equals(aKey)) {
             continue;
+          }
           // double nenner = dists[y]*dists[z];
           double nenner = calcDenominator(kernelMatrix, aKey, bKey, cKey);
           if(nenner != 0) {
@@ -264,8 +266,8 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
 
     }
     // System.out.println(v + " Punkte von " + data.size() + " verfeinert !!");
-    HashMap<Integer,Double> abodvalues = new HashMap<Integer,Double>();
-    for (CPair<Double, Integer> pair : pq)
+    HashMap<Integer, Double> abodvalues = new HashMap<Integer, Double>();
+    for(CPair<Double, Integer> pair : pq)
       abodvalues.put(pair.getSecond(), pair.getFirst());
     // ABOD values as result
     AnnotationsFromHashMap<Double> res1 = new AnnotationsFromHashMap<Double>();
@@ -284,13 +286,16 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
   private double[] calcNormalization(Integer xKey, HashMap<Integer, Double> dists) {
     double[] result = new double[2];
     for(Integer yKey : dists.keySet()) {
-      if(yKey.equals(xKey))
+      if(yKey.equals(xKey)) {
         continue;
+      }
       for(Integer zKey : dists.keySet()) {
-        if(zKey <= yKey)
+        if(zKey <= yKey) {
           continue;
-        if(zKey.equals(xKey))
+        }
+        if(zKey.equals(xKey)) {
           continue;
+        }
         if(dists.get(yKey) != 0 && dists.get(zKey) != 0) {
           double sqr = Math.sqrt(dists.get(yKey) * dists.get(zKey));
           result[0] += 1 / sqr;
@@ -337,13 +342,15 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
     Iterator<Integer> iter = neighbors.iterator();
     while(iter.hasNext()) {
       Integer bKey = iter.next();
-      if(bKey.equals(aKey))
+      if(bKey.equals(aKey)) {
         continue;
+      }
       Iterator<Integer> iter2 = neighbors.iterator();
       while(iter2.hasNext()) {
         Integer cKey = iter2.next();
-        if(cKey.equals(aKey))
+        if(cKey.equals(aKey)) {
           continue;
+        }
         if(cKey > bKey) {
           double nenner = dists.get(bKey).doubleValue() * dists.get(cKey).doubleValue();
           if(nenner != 0) {
@@ -405,8 +412,9 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
     for(Integer bKey : data.getIDs()) {
       double val = calcCos(kernelMatrix, aKey, bKey);
       dists.put(bKey, val);
-      if(counter % step == 0)
+      if(counter % step == 0) {
         nn.add(new CPair<Double, Integer>(val, bKey));
+      }
       counter++;
     }
     return nn;
@@ -434,12 +442,14 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
         MeanVariance s2 = new MeanVariance();
         Integer key1 = iter.next();
         Iterator<Integer> iter2 = data.iterator();
-        if(objKey.equals(key1))
+        if(objKey.equals(key1)) {
           continue;
+        }
         while(iter2.hasNext()) {
           Integer key2 = iter2.next();
-          if(key2.equals(key1) || objKey.equals(key2))
+          if(key2.equals(key1) || objKey.equals(key2)) {
             continue;
+          }
           double nenner = calcDenominator(kernelMatrix, objKey, key1, key2);
           if(nenner != 0) {
             double tmp = calcNumerator(kernelMatrix, objKey, key1, key2) / nenner;
@@ -457,18 +467,21 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
       expList.add(explain.remove().getSecond());
       while(!explain.isEmpty()) {
         Integer nextKey = explain.remove().getSecond();
-        if(nextKey.equals(objKey))
+        if(nextKey.equals(objKey)) {
           continue;
+        }
         double max = Double.MIN_VALUE;
         for(Integer exp : expList) {
-          if(exp.equals(objKey) || nextKey.equals(exp))
+          if(exp.equals(objKey) || nextKey.equals(exp)) {
             continue;
+          }
           double nenner = Math.sqrt(calcCos(kernelMatrix, objKey, nextKey)) * Math.sqrt(calcCos(kernelMatrix, objKey, exp));
           double angle = calcNumerator(kernelMatrix, objKey, nextKey, exp) / nenner;
           max = Math.max(angle, max);
         }
-        if(max < 0.5)
+        if(max < 0.5) {
           expList.add(nextKey);
+        }
       }
       explaintab.put(objKey, expList);
     }
@@ -476,8 +489,9 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
     System.out.println("Result: ABOD");
     int count = 0;
     while(!pq.isEmpty()) {
-      if(count > 10)
+      if(count > 10) {
         break;
+      }
       double factor = pq.peek().getFirst();
       Integer key = pq.remove().getSecond();
       System.out.print(data.get(key) + " ");
@@ -508,10 +522,12 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
   @Override
   protected MultiResult runInTime(Database<V> database) throws IllegalStateException {
     this.kernelFunction.setDatabase(database, false, false);
-    if (fast)
+    if(fast) {
       return getFastRanking(database, k, sampleSize);
-    else
+    }
+    else {
       return getRanking(database, k);
+    }
   }
 
   /**
@@ -519,11 +535,7 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
    */
   @Override
   public Description getDescription() {
-    return new Description("ABOD", "Angle-Based Outlier Detection",
-        "Outlier detection using variance analysis on angles, especially for high dimensional data sets.",
-        "H.-P. Kriegel, M. Schubert, and A. Zimek: "
-        + "Angle-Based Outlier Detection in High-dimensional Data. "
-        + "In: Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining (KDD '08), Las Vegas, NV, 2008.");
+    return new Description("ABOD", "Angle-Based Outlier Detection", "Outlier detection using variance analysis on angles, especially for high dimensional data sets.", "H.-P. Kriegel, M. Schubert, and A. Zimek: " + "Angle-Based Outlier Detection in High-dimensional Data. " + "In: Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining (KDD '08), Las Vegas, NV, 2008.");
   }
 
   /**
@@ -547,20 +559,21 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
 
   /**
    * Calls the super method and sets parameters {@link #FAST_FLAG},
-   * {@link #FAST_SAMPLE_PARAM} and {@link #KERNEL_FUNCTION_PARAM}. The remaining
-   * parameters are then passed to the {@link #kernelFunction}.
+   * {@link #FAST_SAMPLE_PARAM} and {@link #KERNEL_FUNCTION_PARAM}. The
+   * remaining parameters are then passed to the {@link #kernelFunction}.
    */
   @Override
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
     k = K_PARAM.getValue();
-    
+
     fast = FAST_FLAG.getValue();
 
     if(fast) {
-      if (! FAST_SAMPLE_PARAM.isSet())
+      if(!FAST_SAMPLE_PARAM.isSet()) {
         throw new NoParameterValueException("If you set a fast mode, you also need to set a sample size.");
+      }
       sampleSize = FAST_SAMPLE_PARAM.getValue();
     }
 
