@@ -118,7 +118,7 @@ public class KNNIntegralOutlierDetection <O extends DatabaseObject, D extends Do
             // Ordering
             OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database, KNNIO_ODEGREE, true); 
             // combine results.
-            ResultUtil.setGlobalAssociation(result, KNNIO_MAXODEGREE, maxProb);
+            //ResultUtil.setGlobalAssociation(result, KNNIO_MAXODEGREE, maxProb);
             result = new MultiResult();
             result.addResult(res1);
             result.addResult(res2);
