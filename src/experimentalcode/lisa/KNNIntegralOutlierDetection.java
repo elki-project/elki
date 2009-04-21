@@ -93,6 +93,7 @@ public class KNNIntegralOutlierDetection <O extends DatabaseObject, D extends Do
 
       @Override
       protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
+        double maxodegree = 0;
         getDistanceFunction().setDatabase(database, isVerbose(), isTime());
         Iterator<Integer> iter = database.iterator();
         Integer id;
@@ -110,6 +111,9 @@ public class KNNIntegralOutlierDetection <O extends DatabaseObject, D extends Do
             debugFine(skn + "  dkn");
             
           double doubleSkn = skn.getValue();
+          if(doubleSkn > maxodegree) {
+            maxodegree = doubleSkn;
+          }
           database.associate(KNNIO_ODEGREE, id, doubleSkn);
         }
         
@@ -118,10 +122,11 @@ public class KNNIntegralOutlierDetection <O extends DatabaseObject, D extends Do
             // Ordering
             OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database, KNNIO_ODEGREE, true); 
             // combine results.
-            //ResultUtil.setGlobalAssociation(result, KNNIO_MAXODEGREE, maxProb);
+            
             result = new MultiResult();
             result.addResult(res1);
             result.addResult(res2);
+            ResultUtil.setGlobalAssociation(result, KNNIO_MAXODEGREE, maxodegree);
             return result;
         
 

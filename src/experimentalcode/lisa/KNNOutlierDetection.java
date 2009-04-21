@@ -7,9 +7,11 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -18,7 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 
 
-public class KNNOutlierDetection <O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O , D , MultiResult> {
+public class KNNOutlierDetection <O extends DatabaseObject, D extends DoubleDistance> extends DistanceBasedAlgorithm<O , DoubleDistance , MultiResult> {
 	
 	public static final OptionID K_ID = OptionID.getOrCreateOptionID(
 		      "knno.k",
@@ -30,7 +32,8 @@ public class KNNOutlierDetection <O extends DatabaseObject, D extends Distance<D
 				      "number of outliers that are searched"
 				  );
 		
-		public static final AssociationID<Distance> KNNO_ODEGREE= AssociationID.getOrCreateAssociationID("knno_odegree", Distance.class);
+		public static final AssociationID<Double> KNNO_ODEGREE= AssociationID.getOrCreateAssociationID("knno_odegree", Double.class);
+		 public static final AssociationID<Double> KNNO_MAXODEGREE = AssociationID.getOrCreateAssociationID("knno_maxodegree", Double.class);
 		/**
 		   * Parameter to specify the kth nearest neighbor,
 		   * 
@@ -88,28 +91,33 @@ public class KNNOutlierDetection <O extends DatabaseObject, D extends Distance<D
 
       @Override
 		  protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
-			  getDistanceFunction().setDatabase(database, isVerbose(), isTime());
+			  double maxodegree = 0;
+        getDistanceFunction().setDatabase(database, isVerbose(), isTime());
 			  Iterator<Integer> iter = database.iterator();
 			  Integer id;
 			  //compute distance to the k nearest neighbor. n objects with the highest distance are flagged as outliers
 			  while(iter.hasNext()){
 				 id = iter.next();
 				  //distance to the kth nearest neighbor
-				 D dkn = database.kNNQueryForID(id,  k, getDistanceFunction()).get(k-1).getDistance();
+				 Double dkn = database.kNNQueryForID(id,  k, getDistanceFunction()).get(k-1).getDistance().getValue();
+
 				 if (logger.isDebugging()) {
 				   logger.debugFine(dkn + "  dkn");
 		        }
-		      
+		      if(dkn > maxodegree) {
+		        maxodegree = dkn;
+		      }
 				  database.associate(KNNO_ODEGREE, id, dkn);
 			  }
-			  AnnotationsFromDatabase<O, D> res1 = new AnnotationsFromDatabase<O, D>(database);
-		       res1.addAssociation((AssociationID<D>)KNNO_ODEGREE);
+			  AnnotationsFromDatabase<O, Double> res1 = new AnnotationsFromDatabase<O, Double>(database);
+		       res1.addAssociation(KNNO_ODEGREE);
 		        // Ordering
-		        OrderingFromAssociation<D, O> res2 = new OrderingFromAssociation<D, O>(database,(AssociationID<D>) KNNO_ODEGREE, true); 
+		        OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database,KNNO_ODEGREE, true); 
 		        // combine results.
 		        result = new MultiResult();
 		        result.addResult(res1);
 		        result.addResult(res2);
+		        ResultUtil.setGlobalAssociation(result, KNNO_MAXODEGREE, maxodegree);
 		        return result;
 				
 
