@@ -47,6 +47,9 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
    */
   protected SpatialIndex<O, N, E> index;
 
+  /**
+   * Constructor.
+   */
   public SpatialIndexDatabase() {
     super();
     addOption(INDEX_PARAM);

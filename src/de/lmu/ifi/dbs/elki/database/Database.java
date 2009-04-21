@@ -76,6 +76,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
    * range and the according distance function. The query result is in
    * ascending order to the distance to the query object.
    *
+   * @param <D>              distance type
    * @param id               the ID of the query object
    * @param epsilon          the string representation of the query range
    * @param distanceFunction the distance function that computes the distances between the
@@ -88,6 +89,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
    * Performs a k-nearest neighbor query for the given object ID. The query
    * result is in ascending order to the distance to the query object.
    *
+   * @param <D>              distance type
    * @param id               the ID of the query object
    * @param k                the number of nearest neighbors to be returned
    * @param distanceFunction the distance function that computes the distances between the
@@ -100,6 +102,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
    * Performs a k-nearest neighbor query for the given object. The query
    * result is in ascending order to the distance to the query object.
    *
+   * @param <D>              distance type
    * @param queryObject      the query object
    * @param k                the number of nearest neighbors to be returned
    * @param distanceFunction the distance function that computes the distances between the
@@ -112,6 +115,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
    * Performs k-nearest neighbor queries for the given object IDs. The query
    * result is in ascending order to the distance to the query object.
    *
+   * @param <D>              distance type
    * @param ids              the IDs of the query objects
    * @param k                the number of nearest neighbors to be returned
    * @param distanceFunction the distance function that computes the distances between the
@@ -124,6 +128,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
    * Performs a reverse k-nearest neighbor query for the given object ID. The
    * query result is in ascending order to the distance to the query object.
    *
+   * @param <D>              distance type
    * @param id               the ID of the query object
    * @param k                the number of nearest neighbors to be returned
    * @param distanceFunction the distance function that computes the distances between the
@@ -144,6 +149,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
   /**
    * Associates a association in a certain relation to a certain Object.
    *
+   * @param <T>           association data type
    * @param associationID the id of the association, respectively the name of the
    *                      relation
    * @param objectID      the id of the Object to which the association is related
@@ -155,6 +161,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
   /**
    * Associates a global association in a certain relation to the database.
    *
+   * @param <T>           association data type
    * @param associationID the id of the association, respectively the name of the
    *                      relation
    * @param association   the association to be associated with the database
@@ -174,6 +181,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
    * Returns the association specified by the given associationID and related
    * to the specified Object.
    *
+   * @param <T>           association data type
    * @param associationID the id of the association, respectively the name of the
    *                      relation
    * @param objectID      the id of the Object to which the association is related
@@ -186,6 +194,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
   /**
    * Returns the global association specified by the given associationID.
    *
+   * @param <T>           association data type
    * @param associationID the id of the association, respectively the name of the
    *                      relation
    * @return Object the association or null, if there is no association with the specified
@@ -198,7 +207,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
    * 
    *
    * @return an iterator iterating over all keys of the database
-   * @see Iterable#iterator() - for a Database {@code db}, this allows the construct {@code for(Integer id : db){ // work with database ids }}.
+   * @see Iterable#iterator() - for a Database {@code db}, this allows the construct {@code for(Integer id : db) // work with database ids }.
    */
   Iterator<Integer> iterator();
 

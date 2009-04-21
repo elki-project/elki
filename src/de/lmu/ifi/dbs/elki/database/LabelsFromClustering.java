@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 
 /**
- * This class generates a labeled database based on an existing clusering result.
+ * This class generates a labeled database based on an existing clustering result.
  * 
  * @author Erich Schubert
  *
@@ -34,6 +34,7 @@ public class LabelsFromClustering {
    * @param <R> Clustering Result
    * @param <M> Cluster Model class
    * @param <L> Label class
+   * @param olddb database the original objects come from
    * @param clustering clustering to work on
    * @param classLabel label class to use.
    * @return new database

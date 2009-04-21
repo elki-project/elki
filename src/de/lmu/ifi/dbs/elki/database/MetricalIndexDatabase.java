@@ -22,6 +22,9 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  *
  * @author Elke Achtert
  * @param <O> the type of FeatureVector as element of the database
+ * @param <D> Distance type
+ * @param <N> Node type
+ * @param <E> Entry type
  */
 public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<D>, N extends MetricalNode<N, E>, E extends MTreeEntry<D>>
     extends IndexDatabase<O> {
@@ -48,6 +51,9 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
      */
     MetricalIndex<O, D, N, E> index;
 
+    /**
+     * Constructor
+     */
     public MetricalIndexDatabase() {
         super();
         addOption(INDEX_PARAM);
