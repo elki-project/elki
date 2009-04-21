@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * single file. All pages are stored in a specified directory.
  * 
  * @author Elke Achtert
+ * @param <P> Page type
  */
 public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
 
@@ -246,12 +247,12 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
       }
     }
     catch(IOException e) {
-      // TODO exception handling
+      // FIXME exception handling
       e.printStackTrace();
       return null;
     }
     catch(ClassNotFoundException e) {
-      // TODO exception handling
+      // FIXME exception handling
       e.printStackTrace();
       return null;
     }

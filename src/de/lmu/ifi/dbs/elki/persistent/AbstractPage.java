@@ -8,6 +8,7 @@ import java.io.ObjectOutput;
  * Abstract superclass for pages.
  * 
  * @author Elke Achtert
+ * @param <P> Self reference
  */
 // todo elke revise comments
 public abstract class AbstractPage<P extends AbstractPage<P>> implements Page<P> {
@@ -29,7 +30,7 @@ public abstract class AbstractPage<P extends AbstractPage<P>> implements Page<P>
   private PageFile<P> file;
 
   /**
-   * Empty constructor for externalizable interface.
+   * Empty constructor for Externalizable interface.
    */
   public AbstractPage() {
     this(null);

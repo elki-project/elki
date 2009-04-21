@@ -29,7 +29,6 @@ public interface PageHeader {
      * Initializes this header from the specified file.
      *
      * @param data byte array with the page data.
-     * @throws IOException if an I/O-error occurs during reading
      */
     void readHeader(byte[] data);
 
@@ -43,6 +42,7 @@ public interface PageHeader {
 
     /**
      * Return the header as byte array
+     * @return header as byte array
      */
     byte[] asByteArray();
 

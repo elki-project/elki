@@ -8,6 +8,7 @@ import java.util.Map;
  * Implemented as a Map with keys representing the ids of the saved pages.
  * 
  * @author Elke Achtert
+ * @param <P> Page type
  */
 public class MemoryPageFile<P extends Page<P>> extends PageFile<P> {
 

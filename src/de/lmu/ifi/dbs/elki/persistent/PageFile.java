@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
  * objects that implement the <code>Page</code> interface.
  * 
  * @author Elke Achtert
+ * @param <P> Page type
  */
 public abstract class PageFile<P extends Page<P>> implements CachedFile<P> {
 
@@ -54,21 +55,24 @@ public abstract class PageFile<P extends Page<P>> implements CachedFile<P> {
   }
 
   /**
-   * Returns the physical read I/O-Access of this file.
+   * Returns the physical read I/O-Accesses of this file.
+   * @return Number of physical read I/O accesses
    */
   public final long getPhysicalReadAccess() {
     return readAccess;
   }
 
   /**
-   * Returns the physical write I/O-Access of this file.
+   * Returns the physical write I/O-Accesses of this file.
+   * @return Number of physical write I/O accesses
    */
   public final long getPhysicalWriteAccess() {
     return writeAccess;
   }
 
   /**
-   * Returns the logical read I/O-Access of this file.
+   * Returns the logical read I/O-Accesses of this file.
+   * @return Number of logical I/O accesses
    */
   public final long getLogicalPageAccess() {
     return cache.getPageAccess();

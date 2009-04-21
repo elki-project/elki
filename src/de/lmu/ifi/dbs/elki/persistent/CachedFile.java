@@ -5,6 +5,7 @@ package de.lmu.ifi.dbs.elki.persistent;
  * objects implementing the Page interface.
  * 
  * @author Elke Achtert
+ * @param <P> Page type
  */
 public interface CachedFile<P extends Page<P>> {
 

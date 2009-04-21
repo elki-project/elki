@@ -13,6 +13,7 @@ import java.util.Map;
  * object is dropped.
  * 
  * @author Elke Achtert
+ * @param <P> Page type
  */
 public class LRUCache<P extends Page<P>> implements Cache<P> {
   /**

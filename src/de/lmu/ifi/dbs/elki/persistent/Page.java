@@ -7,9 +7,9 @@ import java.io.Externalizable;
  * persistently saved.
  * 
  * @author Elke Achtert
+ * @param <P> Self-reference
  */
 public interface Page<P extends Page<P>> extends Externalizable {
-
   /**
    * Returns the unique id of this Page.
    * 

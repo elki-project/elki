@@ -5,6 +5,7 @@ package de.lmu.ifi.dbs.elki.persistent;
  * Page interface.
  * 
  * @author Elke Achtert
+ * @param <P> Page type
  */
 public interface Cache<P extends Page<P>> {
 
@@ -69,5 +70,4 @@ public interface Cache<P extends Page<P>> {
    * Resets the pages access of this cache.
    */
   void resetPageAccess();
-
 }
