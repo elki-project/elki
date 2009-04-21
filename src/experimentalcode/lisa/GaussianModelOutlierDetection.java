@@ -12,17 +12,20 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 
 public class GaussianModelOutlierDetection<V extends RealVector<V,Double>> extends AbstractAlgorithm<V,MultiResult> {
 	
   MultiResult result;
-	public static final AssociationID<Double> GMOD_MDIST = AssociationID.getOrCreateAssociationID("gmod.mdist", Double.class);
 	
+	public static final AssociationID<Double> GMOD_PROB = AssociationID.getOrCreateAssociationID("gmod.prob", Double.class);
+	public static final AssociationID<Double> GMOD_MAXPROB = AssociationID.getOrCreateAssociationID("gmod.maxprob", Double.class);
 	@Override
 	protected MultiResult runInTime(Database<V> database) throws IllegalStateException {
-		V mean = DatabaseUtil.centroid(database);
+		double maxProb = 0;
+	  V mean = DatabaseUtil.centroid(database);
 		V meanNeg = mean.negativeVector();
 		debugFine(mean.toString());
 		Matrix covarianceMatrix = DatabaseUtil.covarianceMatrix(database, mean);
@@ -37,12 +40,19 @@ public class GaussianModelOutlierDetection<V extends RealVector<V,Double>> exten
              Vector x_minus_mean = x.plus(meanNeg).getColumnVector();
              double mDist = x_minus_mean.transpose().times(covarianceTransposed).times(x_minus_mean).get(0,0);
              double prob = fakt * Math.exp(- mDist/2.0);
-             database.associate(GMOD_MDIST, id, prob); 
+             if(prob > maxProb) {
+               maxProb = prob;
+             }
+             
+             database.associate(GMOD_PROB, id, prob); 
 		 }
+
+		 ResultUtil.setGlobalAssociation(result, GMOD_MAXPROB, maxProb);
 		 AnnotationsFromDatabase<V, Double> res1 = new AnnotationsFromDatabase<V, Double>(database);
-	        res1.addAssociation(GMOD_MDIST);
+	        
+	        res1.addAssociation(GMOD_PROB);
 	        // Ordering
-	        OrderingFromAssociation<Double, V> res2 = new OrderingFromAssociation<Double, V>(database, GMOD_MDIST, true); 
+	        OrderingFromAssociation<Double, V> res2 = new OrderingFromAssociation<Double, V>(database, GMOD_PROB, true); 
 	        // combine results.
 	        result = new MultiResult();
 	        result.addResult(res1);

@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -34,6 +35,8 @@ public class KNNIntegralOutlierDetection <O extends DatabaseObject, D extends Do
           );
     
     public static final AssociationID<Double> KNNIO_ODEGREE= AssociationID.getOrCreateAssociationID("knnio_odegree", Double.class);
+   
+    public static final AssociationID<Double> KNNIO_MAXODEGREE = AssociationID.getOrCreateAssociationID("knnio_maxodegree", Double.class);
     /**
        * Parameter to specify the kth nearest neighbor,
        * 
@@ -109,11 +112,13 @@ public class KNNIntegralOutlierDetection <O extends DatabaseObject, D extends Do
           double doubleSkn = skn.getValue();
           database.associate(KNNIO_ODEGREE, id, doubleSkn);
         }
+        
         AnnotationsFromDatabase<O, Double> res1 = new AnnotationsFromDatabase<O, Double>(database);
            res1.addAssociation(KNNIO_ODEGREE);
             // Ordering
-            OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database,(AssociationID<Double>) KNNIO_ODEGREE, true); 
+            OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database, KNNIO_ODEGREE, true); 
             // combine results.
+            ResultUtil.setGlobalAssociation(result, KNNIO_MAXODEGREE, maxProb);
             result = new MultiResult();
             result.addResult(res1);
             result.addResult(res2);
