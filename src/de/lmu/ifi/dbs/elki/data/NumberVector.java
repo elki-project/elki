@@ -3,10 +3,6 @@ package de.lmu.ifi.dbs.elki.data;
 import de.lmu.ifi.dbs.elki.converter.WekaNumericAttribute;
 import de.lmu.ifi.dbs.elki.converter.WekaObject;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.List;
-
 /**
  * NumberVector is an abstract implementation of FeatureVector. Provided is an
  * attribute separator (space), and the ID-methods as required for a
@@ -74,7 +70,6 @@ public abstract class NumberVector<V extends NumberVector<V, N>, N extends Numbe
       V rv = (V) obj;
       boolean equal = (this.getDimensionality() == rv.getDimensionality());
       for(int i = 1; i <= getDimensionality() && equal; i++) {
-        // noinspection ConstantConditions
         equal &= this.getValue(i).equals(rv.getValue(i));
       }
       return equal;
