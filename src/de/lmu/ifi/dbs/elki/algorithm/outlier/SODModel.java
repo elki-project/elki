@@ -73,9 +73,8 @@ public class SODModel<O extends RealVector<O, Double>> implements TextWriteable,
                 weightVector.set(d, true);
             }
         }
-        DISTANCE_FUNCTION.setSelectedDimensions(weightVector);
         center = queryObject.newInstance(centerValues);
-        sod = subspaceOutlierDegree(queryObject, center);
+        sod = subspaceOutlierDegree(queryObject, center, weightVector);
     }
 
     /**
@@ -83,9 +82,11 @@ public class SODModel<O extends RealVector<O, Double>> implements TextWriteable,
      * 
      * @param queryObject
      * @param center
+     * @param weightVector
      * @return sod value
      */
-    public double subspaceOutlierDegree(O queryObject, O center) {
+    private double subspaceOutlierDegree(O queryObject, O center, BitSet weightVector) {
+        DISTANCE_FUNCTION.setSelectedDimensions(weightVector);
         double distance = DISTANCE_FUNCTION.distance(queryObject, center).getValue();
         distance /= weightVector.cardinality();
         return distance;
