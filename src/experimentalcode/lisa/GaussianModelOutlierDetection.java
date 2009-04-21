@@ -16,22 +16,27 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 
 public class GaussianModelOutlierDetection<V extends RealVector<V,Double>> extends AbstractAlgorithm<V,MultiResult> {
-	MultiResult result;
+	
+  MultiResult result;
 	public static final AssociationID<Double> GMOD_MDIST = AssociationID.getOrCreateAssociationID("gmod.mdist", Double.class);
+	
 	@Override
 	protected MultiResult runInTime(Database<V> database) throws IllegalStateException {
 		V mean = DatabaseUtil.centroid(database);
 		V meanNeg = mean.negativeVector();
+		debugFine(mean.toString());
 		Matrix covarianceMatrix = DatabaseUtil.covarianceMatrix(database, mean);
-		Matrix covarianceTransposed = covarianceMatrix.transpose();
-		Double covarianceDet = covarianceMatrix.det();
+		debugFine(covarianceMatrix.toString());
+		Matrix covarianceTransposed = covarianceMatrix.inverse();
+		double covarianceDet = covarianceMatrix.det();
+		double fakt = (1.0/(Math.sqrt(Math.pow(2*Math.PI, database.dimensionality())*(covarianceDet)))); 
 		//for each object compute mahalanobis distance
 		 for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); ) {
              Integer id = iter.next();
              V x = database.get(id);
              Vector x_minus_mean = x.plus(meanNeg).getColumnVector();
              double mDist = x_minus_mean.transpose().times(covarianceTransposed).times(x_minus_mean).get(0,0);
-             double prob = (1.0/(Math.pow(Math.sqrt(2*Math.PI), database.size())*Math.sqrt(covarianceDet))) * Math.exp(- mDist/2.0);
+             double prob = fakt * Math.exp(- mDist/2.0);
              database.associate(GMOD_MDIST, id, prob); 
 		 }
 		 AnnotationsFromDatabase<V, Double> res1 = new AnnotationsFromDatabase<V, Double>(database);

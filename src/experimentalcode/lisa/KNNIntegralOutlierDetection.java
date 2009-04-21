@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
@@ -20,7 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 
 
-public class KNNIntegralOutlierDetection <O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O , D , MultiResult> {
+public class KNNIntegralOutlierDetection <O extends DatabaseObject, D extends DoubleDistance> extends DistanceBasedAlgorithm<O , DoubleDistance , MultiResult> {
   
   public static final OptionID K_ID = OptionID.getOrCreateOptionID(
           "knnio.k",
@@ -32,7 +33,7 @@ public class KNNIntegralOutlierDetection <O extends DatabaseObject, D extends Di
               "number of outliers that are searched"
           );
     
-    public static final AssociationID<Distance> KNNIO_ODEGREE= AssociationID.getOrCreateAssociationID("knnio_odegree", Distance.class);
+    public static final AssociationID<Double> KNNIO_ODEGREE= AssociationID.getOrCreateAssociationID("knnio_odegree", Double.class);
     /**
        * Parameter to specify the kth nearest neighbor,
        * 
@@ -97,21 +98,21 @@ public class KNNIntegralOutlierDetection <O extends DatabaseObject, D extends Di
          id = iter.next();
           //compute sum of the  distances to the k nearest neighbors
          
-         List<DistanceResultPair<D>> knn = database.kNNQueryForID(id,  k, getDistanceFunction());
-         D skn = knn.get(0).getFirst();
+         List<DistanceResultPair<DoubleDistance>> knn = database.kNNQueryForID(id,  k, getDistanceFunction());
+         DoubleDistance skn = knn.get(0).getFirst();
          for (int i = 1; i< k; i++) {
            skn = skn.plus(knn.get(i).getFirst());
          }
          
             debugFine(skn + "  dkn");
             
-          
-          database.associate(KNNIO_ODEGREE, id, skn);
+          double doubleSkn = skn.getValue();
+          database.associate(KNNIO_ODEGREE, id, doubleSkn);
         }
-        AnnotationsFromDatabase<O, D> res1 = new AnnotationsFromDatabase<O, D>(database);
-           res1.addAssociation((AssociationID<D>)KNNIO_ODEGREE);
+        AnnotationsFromDatabase<O, Double> res1 = new AnnotationsFromDatabase<O, Double>(database);
+           res1.addAssociation(KNNIO_ODEGREE);
             // Ordering
-            OrderingFromAssociation<D, O> res2 = new OrderingFromAssociation<D, O>(database,(AssociationID<D>) KNNIO_ODEGREE, true); 
+            OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database,(AssociationID<Double>) KNNIO_ODEGREE, true); 
             // combine results.
             result = new MultiResult();
             result.addResult(res1);
