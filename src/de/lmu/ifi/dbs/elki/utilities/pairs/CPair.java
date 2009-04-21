@@ -5,6 +5,9 @@ import java.util.Comparator;
 /**
  * Pair with canonical comparison function.
  * 
+ * Note: this cannot be a subclass of {@link FCPair}, because of the Comparable
+ * interface, which cannot be implemented with different generics.
+
  * @author Erich Schubert
  * 
  * @param <FIRST> first type
@@ -38,8 +41,9 @@ public class CPair<FIRST extends Comparable<FIRST>, SECOND extends Comparable<SE
         return delta1;
       }
     }
-    else if(other.first != null)
+    else if(other.first != null) {
       return +1;
+    }
     // try comparing by second
     if(this.second != null) {
       if(other.second == null) {
