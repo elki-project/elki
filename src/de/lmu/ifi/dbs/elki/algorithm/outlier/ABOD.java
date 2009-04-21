@@ -108,12 +108,12 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
   /**
    * Association ID for ABOD.
    */
-  public final AssociationID<Double> ABOD_SCORE = AssociationID.getOrCreateAssociationID("ABOD", Double.class);
+  public static final AssociationID<Double> ABOD_SCORE = AssociationID.getOrCreateAssociationID("ABOD", Double.class);
 
   /**
    * Association ID for ABOD Normalization value.
    */
-  public final AssociationID<Double> ABOD_NORM = AssociationID.getOrCreateAssociationID("ABOD normalization", Double.class);
+  public static final AssociationID<Double> ABOD_NORM = AssociationID.getOrCreateAssociationID("ABOD normalization", Double.class);
 
   /**
    * Store the configured Kernel version
