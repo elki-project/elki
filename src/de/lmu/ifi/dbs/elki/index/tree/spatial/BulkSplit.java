@@ -13,66 +13,76 @@ import de.lmu.ifi.dbs.elki.math.spacefillingcurves.ZCurve;
 
 /**
  * Encapsulates the required parameters for a bulk split of a spatial index.
- *
- * @author Elke Achtert 
+ * 
+ * @author Elke Achtert
+ * @param <N> object type
  */
 public class BulkSplit<N extends SpatialObject> {
   private static Logging logger = Logging.getLogger(BulkSplit.class);
+
   /**
    * Available strategies for bulk loading.
    */
   public enum Strategy {
+    /**
+     * ZCurve strategy
+     */
     ZCURVE,
+    /**
+     * Max extension strategy
+     */
     MAX_EXTENSION
   }
 
+  /**
+   * Constructor
+   */
   public BulkSplit() {
     // Nothing to do
   }
 
   /**
    * Partitions the specified feature vectors according to the chosen strategy.
-   *
+   * 
    * @param spatialObjects the spatial objects to be partitioned
-   * @param minEntries     the minimum number of entries in a partition
-   * @param maxEntries     the maximum number of entries in a partition
-   * @param strategy       the bulk load strategy
-   * @return the partition of the specified spatial objects according to the chosen strategy
+   * @param minEntries the minimum number of entries in a partition
+   * @param maxEntries the maximum number of entries in a partition
+   * @param strategy the bulk load strategy
+   * @return the partition of the specified spatial objects according to the
+   *         chosen strategy
    */
-  public List<List<N>> partition(List<N> spatialObjects, int minEntries, int maxEntries,
-                                             Strategy strategy) {
-    if (strategy == Strategy.MAX_EXTENSION) {
+  public List<List<N>> partition(List<N> spatialObjects, int minEntries, int maxEntries, Strategy strategy) {
+    if(strategy == Strategy.MAX_EXTENSION) {
       return maximalExtensionPartition(spatialObjects, minEntries, maxEntries);
     }
-
-    else if (strategy == Strategy.ZCURVE) {
+    else if(strategy == Strategy.ZCURVE) {
       return zValuePartition(spatialObjects, minEntries, maxEntries);
     }
-
-    else throw new IllegalArgumentException("Unknown bulk load strategy!");
+    else {
+      throw new IllegalArgumentException("Unknown bulk load strategy!");
+    }
   }
 
   /**
    * Partitions the specified feature vectors where the split axes are the
    * dimensions with maximum extension
-   *
+   * 
    * @param spatialObjects the spatial objects to be partitioned
-   * @param minEntries     the minimum number of entries in a partition
-   * @param maxEntries     the maximum number of entries in a partition
+   * @param minEntries the minimum number of entries in a partition
+   * @param maxEntries the maximum number of entries in a partition
    * @return the partition of the specified spatial objects
    */
-  private List<List<N>> maximalExtensionPartition(List<N> spatialObjects,
-                                                              int minEntries, int maxEntries) {
+  private List<List<N>> maximalExtensionPartition(List<N> spatialObjects, int minEntries, int maxEntries) {
     List<List<N>> partitions = new ArrayList<List<N>>();
     List<N> objects = new ArrayList<N>(spatialObjects);
 
-    while (objects.size() > 0) {
+    while(objects.size() > 0) {
       StringBuffer msg = new StringBuffer();
 
       // get the split axis and split point
       int splitAxis = chooseMaximalExtendedSplitAxis(objects);
       int splitPoint = chooseBulkSplitPoint(objects.size(), minEntries, maxEntries);
-      if (logger.isDebugging()) {
+      if(logger.isDebugging()) {
         msg.append("\nsplitAxis ").append(splitAxis);
         msg.append("\nsplitPoint ").append(splitPoint);
       }
@@ -82,21 +92,21 @@ public class BulkSplit<N extends SpatialObject> {
 
       // insert into partition
       List<N> partition = new ArrayList<N>();
-      for (int i = 0; i < splitPoint; i++) {
+      for(int i = 0; i < splitPoint; i++) {
         N o = objects.remove(0);
         partition.add(o);
       }
       partitions.add(partition);
 
       // copy array
-      if (logger.isDebugging()) {
+      if(logger.isDebugging()) {
         msg.append("\ncurrent partition " + partition);
         msg.append("\nremaining objects # ").append(objects.size());
         logger.debugFine(msg.toString());
       }
     }
 
-    if (logger.isDebugging()) {
+    if(logger.isDebugging()) {
       logger.debugFine("partitions " + partitions);
     }
     return partitions;
@@ -104,10 +114,10 @@ public class BulkSplit<N extends SpatialObject> {
 
   /**
    * Partitions the spatial objects according to their z-values.
-   *
+   * 
    * @param spatialObjects the spatial objects to be partitioned
-   * @param minEntries     the minimum number of entries in a partition
-   * @param maxEntries     the maximum number of entries in a partition
+   * @param minEntries the minimum number of entries in a partition
+   * @param maxEntries the maximum number of entries in a partition
    * @return A partition of the spatial objects according to their z-values
    */
   private List<List<N>> zValuePartition(List<N> spatialObjects, int minEntries, int maxEntries) {
@@ -116,21 +126,21 @@ public class BulkSplit<N extends SpatialObject> {
 
     // get z-values
     List<double[]> valuesList = new ArrayList<double[]>();
-    for (SpatialObject o : spatialObjects) {
+    for(SpatialObject o : spatialObjects) {
       double[] values = new double[o.getDimensionality()];
-      for (int d = 0; d < o.getDimensionality(); d++) {
+      for(int d = 0; d < o.getDimensionality(); d++) {
         values[d] = o.getMin(d + 1);
       }
       valuesList.add(values);
     }
-    if (logger.isDebugging()) {
+    if(logger.isDebugging()) {
       logger.debugFine(valuesList.toString());
     }
     List<byte[]> zValuesList = ZCurve.zValues(valuesList);
 
     // map z-values
     final Map<Integer, byte[]> zValues = new HashMap<Integer, byte[]>();
-    for (int i = 0; i < spatialObjects.size(); i++) {
+    for(int i = 0; i < spatialObjects.size(); i++) {
       SpatialObject o = spatialObjects.get(i);
       byte[] zValue = zValuesList.get(i);
       zValues.put(o.getID(), zValue);
@@ -142,11 +152,15 @@ public class BulkSplit<N extends SpatialObject> {
         byte[] z1 = zValues.get(o1.getID());
         byte[] z2 = zValues.get(o1.getID());
 
-        for (int i = 0; i < z1.length; i++) {
+        for(int i = 0; i < z1.length; i++) {
           byte z1_i = z1[i];
           byte z2_i = z2[i];
-          if (z1_i < z2_i) return -1;
-          else if (z1_i > z2_i) return +1;
+          if(z1_i < z2_i) {
+            return -1;
+          }
+          else if(z1_i > z2_i) {
+            return +1;
+          }
         }
         return o1.getID() - o2.getID();
       }
@@ -154,34 +168,34 @@ public class BulkSplit<N extends SpatialObject> {
     Collections.sort(objects, comparator);
 
     // insert into partition
-    while (objects.size() > 0) {
+    while(objects.size() > 0) {
       StringBuffer msg = new StringBuffer();
       int splitPoint = chooseBulkSplitPoint(objects.size(), minEntries, maxEntries);
       List<N> partition = new ArrayList<N>();
-      for (int i = 0; i < splitPoint; i++) {
+      for(int i = 0; i < splitPoint; i++) {
         N o = objects.remove(0);
         partition.add(o);
       }
       partitions.add(partition);
 
       // copy array
-      if (logger.isDebugging()) {
+      if(logger.isDebugging()) {
         msg.append("\ncurrent partition " + partition);
         msg.append("\nremaining objects # ").append(objects.size());
         logger.debugFine(msg.toString());
       }
     }
 
-    if (logger.isDebugging()) {
+    if(logger.isDebugging()) {
       logger.debugFine("partitions " + partitions);
     }
     return partitions;
   }
 
   /**
-   * Computes and returns the best split axis. The best split axis
-   * is the split axes with the maximal extension.
-   *
+   * Computes and returns the best split axis. The best split axis is the split
+   * axes with the maximal extension.
+   * 
    * @param objects the spatial objects to be splitted
    * @return the best split axis
    */
@@ -193,26 +207,28 @@ public class BulkSplit<N extends SpatialObject> {
     Arrays.fill(minExtension, Double.MAX_VALUE);
 
     // compute min and max value in each dimension
-    for (SpatialObject object : objects) {
-      for (int d = 1; d <= dimension; d++) {
+    for(SpatialObject object : objects) {
+      for(int d = 1; d <= dimension; d++) {
         double min, max;
         min = object.getMin(d);
         max = object.getMax(d);
 
-        if (maxExtension[d - 1] < max)
+        if(maxExtension[d - 1] < max) {
           maxExtension[d - 1] = max;
+        }
 
-        if (minExtension[d - 1] > min)
+        if(minExtension[d - 1] > min) {
           minExtension[d - 1] = min;
+        }
       }
     }
 
     // set split axis to dim with maximal extension
     int splitAxis = -1;
     double max = 0;
-    for (int d = 1; d <= dimension; d++) {
+    for(int d = 1; d <= dimension; d++) {
       double currentExtension = maxExtension[d - 1] - minExtension[d - 1];
-      if (max < currentExtension) {
+      if(max < currentExtension) {
         max = currentExtension;
         splitAxis = d;
       }
@@ -222,22 +238,22 @@ public class BulkSplit<N extends SpatialObject> {
 
   /**
    * Computes and returns the best split point.
-   *
+   * 
    * @param numEntries the number of entries to be split
    * @param minEntries the number of minimum entries in the node to be split
    * @param maxEntries number of maximum entries in the node to be split
    * @return the best split point
    */
   private int chooseBulkSplitPoint(int numEntries, int minEntries, int maxEntries) {
-    if (numEntries < minEntries) {
+    if(numEntries < minEntries) {
       throw new IllegalArgumentException("numEntries < minEntries!");
     }
 
-    if (numEntries <= maxEntries) {
+    if(numEntries <= maxEntries) {
       return numEntries;
     }
 
-    else if (numEntries < maxEntries + minEntries) {
+    else if(numEntries < maxEntries + minEntries) {
       return (numEntries - minEntries);
     }
 

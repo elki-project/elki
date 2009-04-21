@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
  *
  * @author Elke Achtert
  * @param <V> the type of FeatureVector to compute the distances in between
+ * @param <D> distance type
  */
 public interface SpatialDistanceFunction<V extends FeatureVector<V, ?>, D extends Distance<D>> extends DistanceFunction<V, D> {
 

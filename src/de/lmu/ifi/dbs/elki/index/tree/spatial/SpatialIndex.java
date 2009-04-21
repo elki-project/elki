@@ -18,6 +18,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualStringConst
  * Abstract super class for all spatial index classes.
  * 
  * @author Elke Achtert
+ * @param <O> Vector type
+ * @param <N> Node type
+ * @param <E> Entry type
  */
 public abstract class SpatialIndex<O extends NumberVector<O, ?>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends TreeIndex<O, N, E> {
   /**
@@ -50,6 +53,9 @@ public abstract class SpatialIndex<O extends NumberVector<O, ?>, N extends Spati
    */
   protected BulkSplit.Strategy bulkLoadStrategy;
 
+  /**
+   * Index constructor.
+   */
   public SpatialIndex() {
     super();
     addOption(BULK_LOAD_FLAG);
@@ -74,8 +80,9 @@ public abstract class SpatialIndex<O extends NumberVector<O, ?>, N extends Spati
       else if(strategy.equals(BulkSplit.Strategy.ZCURVE.toString())) {
         bulkLoadStrategy = BulkSplit.Strategy.ZCURVE;
       }
-      else
+      else {
         throw new WrongParameterValueException(BULK_LOAD_STRATEGY_PARAM, strategy, null);
+      }
     }
 
     return remainingParameters;
@@ -96,6 +103,7 @@ public abstract class SpatialIndex<O extends NumberVector<O, ?>, N extends Spati
    * and the according distance function. The query result is in ascending order
    * to the distance to the query object.
    * 
+   * @param <D> distance type
    * @param obj the query object
    * @param epsilon the string representation of the query range
    * @param distanceFunction the distance function that computes the distances
@@ -109,6 +117,7 @@ public abstract class SpatialIndex<O extends NumberVector<O, ?>, N extends Spati
    * parameter k and the according distance function. The query result is in
    * ascending order to the distance to the query object.
    * 
+   * @param <D> distance type
    * @param obj the query object
    * @param k the number of nearest neighbors to be returned
    * @param distanceFunction the distance function that computes the distances
@@ -121,6 +130,7 @@ public abstract class SpatialIndex<O extends NumberVector<O, ?>, N extends Spati
    * Performs a reverse k-nearest neighbor query for the given object ID. The
    * query result is in ascending order to the distance to the query object.
    * 
+   * @param <D> distance type
    * @param object the query object
    * @param k the number of nearest neighbors to be returned
    * @param distanceFunction the distance function that computes the distances
@@ -133,6 +143,7 @@ public abstract class SpatialIndex<O extends NumberVector<O, ?>, N extends Spati
    * Performs a bulk k-nearest neighbor query for the given object IDs. The
    * query result is in ascending order to the distance to the query objects.
    * 
+   * @param <D> distance type
    * @param ids the query objects
    * @param k the number of nearest neighbors to be returned
    * @param distanceFunction the distance function that computes the distances

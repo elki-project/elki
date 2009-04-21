@@ -51,7 +51,7 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
   private int numElements;
 
   /**
-   * The maximum number of deaps in th cache, corresponds to the maximum height
+   * The maximum number of deaps in the cache, corresponds to the maximum height
    * of this heap.
    */
   private final int maxCacheSize;
@@ -171,8 +171,9 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
    * @param node the node to be added
    */
   public synchronized void addNode(final HeapNode<K, V> node) {
-    if(getIndexOf(node.getValue()) != null)
+    if(getIndexOf(node.getValue()) != null) {
       throw new IllegalArgumentException("Node " + node + " already exists in this heap!");
+    }
 
     StringBuffer msg = new StringBuffer();
 
@@ -871,11 +872,11 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
   }
 
   /**
-   * Re-establishes the heaporder: while minimum of the specified max is greater
+   * Re-establishes the heap order: while minimum of the specified max is greater
    * than maximum of the specified min the minimum will be moved up and the
    * maximum will be moved down.
    * 
-   * @param min the minmum deap to be tested
+   * @param min the minimum deap to be tested
    * @param max the maximum deap to be tested
    */
   private boolean heapify(Deap<K, V> min, Deap<K, V> max) {

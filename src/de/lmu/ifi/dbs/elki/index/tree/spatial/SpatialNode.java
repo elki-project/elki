@@ -8,6 +8,8 @@ import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
  * A spatial node can be a spatial directory node or a spatial leaf node.
  *
  * @author Elke Achtert 
+ * @param <N> Self reference
+ * @param <E> Entry type
  */
 public interface SpatialNode<N extends SpatialNode<N,E>, E extends SpatialEntry> extends Node<N,E>, SpatialObject {
   /**
