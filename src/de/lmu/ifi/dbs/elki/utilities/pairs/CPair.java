@@ -3,17 +3,14 @@ package de.lmu.ifi.dbs.elki.utilities.pairs;
 import java.util.Comparator;
 
 /**
- * Pair with canonical comparison function.
+ * Pair with canonical comparison function derived from generics.
  * 
- * Note: this cannot be a subclass of {@link FCPair}, because of the Comparable
- * interface, which cannot be implemented with different generics.
-
  * @author Erich Schubert
  * 
  * @param <FIRST> first type
  * @param <SECOND> second type
  */
-public class CPair<FIRST extends Comparable<FIRST>, SECOND extends Comparable<SECOND>> extends Pair<FIRST, SECOND> implements Comparable<CPair<FIRST, SECOND>> {
+public class CPair<FIRST extends Comparable<FIRST>, SECOND extends Comparable<SECOND>> extends FCPair<FIRST, SECOND> {
   /**
    * Initialize pair
    * 
@@ -32,17 +29,9 @@ public class CPair<FIRST extends Comparable<FIRST>, SECOND extends Comparable<SE
    */
   public int compareTo(CPair<FIRST, SECOND> other) {
     // try comparing by first
-    if(this.first != null) {
-      if(other.first == null) {
-        return -1;
-      }
-      int delta1 = this.first.compareTo(other.first);
-      if(delta1 != 0) {
-        return delta1;
-      }
-    }
-    else if(other.first != null) {
-      return +1;
+    int delta1 = super.compareTo(other);
+    if (delta1 != 0) {
+      return delta1;
     }
     // try comparing by second
     if(this.second != null) {
@@ -81,19 +70,7 @@ public class CPair<FIRST extends Comparable<FIRST>, SECOND extends Comparable<SE
       return +1;
     }
     // try comparing by first
-    if(this.first != null) {
-      if(other.first == null) {
-        return -1;
-      }
-      int delta1 = this.first.compareTo(other.first);
-      if(delta1 != 0) {
-        return delta1;
-      }
-    }
-    else if(other.first != null) {
-      return +1;
-    }
-    return 0;
+    return super.compareTo(other);
   }
 
   /**

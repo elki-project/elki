@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.pairs.CPair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
 
 /**
  * Angle-Based Outlier Detection
@@ -144,7 +144,7 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
    */
   public MultiResult getRanking(Database<V> database, int k) {
     KernelMatrix<V> kernelMatrix = new KernelMatrix<V>(kernelFunction, database);
-    PriorityQueue<CPair<Double, Integer>> pq = new PriorityQueue<CPair<Double, Integer>>(database.size(), Collections.reverseOrder());
+    PriorityQueue<FCPair<Double, Integer>> pq = new PriorityQueue<FCPair<Double, Integer>>(database.size(), Collections.reverseOrder());
 
     for(Integer objKey : database.getIDs()) {
       MeanVariance s = new MeanVariance();
@@ -172,12 +172,12 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
 
         }
       }
-      pq.add(new CPair<Double, Integer>(s.getVariance(), objKey));
+      pq.add(new FCPair<Double, Integer>(s.getVariance(), objKey));
     }
     
     Double maxabod = Double.MIN_VALUE;
     HashMap<Integer, Double> abodvalues = new HashMap<Integer, Double>();
-    for(CPair<Double, Integer> pair : pq) {
+    for(FCPair<Double, Integer> pair : pq) {
       abodvalues.put(pair.getSecond(), pair.getFirst());
       maxabod = Math.max(maxabod, pair.getFirst());
     }
@@ -206,15 +206,15 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
   public MultiResult getFastRanking(Database<V> database, int k, int sampleSize) {
     KernelMatrix<V> kernelMatrix = new KernelMatrix<V>(kernelFunction, database);
 
-    PriorityQueue<CPair<Double, Integer>> pq = new PriorityQueue<CPair<Double, Integer>>(database.size(), Collections.reverseOrder());
+    PriorityQueue<FCPair<Double, Integer>> pq = new PriorityQueue<FCPair<Double, Integer>>(database.size(), Collections.reverseOrder());
     // get Candidate Ranking
     for(Integer aKey : database.getIDs()) {
       HashMap<Integer, Double> dists = new HashMap<Integer, Double>(database.size());
       // determine kNearestNeighbors and pairwise distances
-      PriorityQueue<CPair<Double, Integer>> nn = calcDistsandNN(database, kernelMatrix, sampleSize, aKey, dists);
+      PriorityQueue<FCPair<Double, Integer>> nn = calcDistsandNN(database, kernelMatrix, sampleSize, aKey, dists);
       if(false) {
         // alternative:
-        PriorityQueue<CPair<Double, Integer>> nn2 = calcDistsandRNDSample(database, kernelMatrix, sampleSize, aKey, dists);
+        PriorityQueue<FCPair<Double, Integer>> nn2 = calcDistsandRNDSample(database, kernelMatrix, sampleSize, aKey, dists);
       }
 
       // get normalization
@@ -228,11 +228,11 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
       }
       // getFilter
       double var = getAbofFilter(kernelMatrix, aKey, dists, counter[1], counter[0], neighbors);
-      pq.add(new CPair<Double, Integer>(var, aKey));
+      pq.add(new FCPair<Double, Integer>(var, aKey));
       // System.out.println("prog "+(prog++));
     }
     // refine Candidates
-    PriorityQueue<CPair<Double, Integer>> resqueue = new PriorityQueue<CPair<Double, Integer>>(k);
+    PriorityQueue<FCPair<Double, Integer>> resqueue = new PriorityQueue<FCPair<Double, Integer>>(k);
     System.out.println(pq.size() + " objects ordered into candidate list.");
     int v = 0;
     while(!pq.isEmpty()) {
@@ -272,12 +272,12 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
       double var = s.getVariance();
       // System.out.println(aKey+ " : " + approx +" " + var);
       if(resqueue.size() < k) {
-        resqueue.add(new CPair<Double, Integer>(var, aKey));
+        resqueue.add(new FCPair<Double, Integer>(var, aKey));
       }
       else {
         if(resqueue.peek().getFirst() > var) {
           resqueue.remove();
-          resqueue.add(new CPair<Double, Integer>(var, aKey));
+          resqueue.add(new FCPair<Double, Integer>(var, aKey));
         }
       }
 
@@ -285,7 +285,7 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
     // System.out.println(v + " Punkte von " + data.size() + " verfeinert !!");
     Double maxabod = Double.MIN_VALUE;
     HashMap<Integer, Double> abodvalues = new HashMap<Integer, Double>();
-    for(CPair<Double, Integer> pair : pq) {
+    for(FCPair<Double, Integer> pair : pq) {
       abodvalues.put(pair.getSecond(), pair.getFirst());
       maxabod = Math.max(maxabod, pair.getFirst());
     }
@@ -409,33 +409,33 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
     return (kernelMatrix.getDistance(aKey, aKey) + kernelMatrix.getDistance(bKey, cKey) - kernelMatrix.getDistance(aKey, cKey) - kernelMatrix.getDistance(aKey, bKey));
   }
 
-  private PriorityQueue<CPair<Double, Integer>> calcDistsandNN(Database<V> data, KernelMatrix<V> kernelMatrix, int sampleSize, Integer aKey, HashMap<Integer, Double> dists) {
-    PriorityQueue<CPair<Double, Integer>> nn = new PriorityQueue<CPair<Double, Integer>>(sampleSize);
+  private PriorityQueue<FCPair<Double, Integer>> calcDistsandNN(Database<V> data, KernelMatrix<V> kernelMatrix, int sampleSize, Integer aKey, HashMap<Integer, Double> dists) {
+    PriorityQueue<FCPair<Double, Integer>> nn = new PriorityQueue<FCPair<Double, Integer>>(sampleSize);
     for(Integer bKey : data.getIDs()) {
       double val = calcCos(kernelMatrix, aKey, bKey);
       dists.put(bKey, val);
       if(nn.size() < sampleSize) {
-        nn.add(new CPair<Double, Integer>(val, bKey));
+        nn.add(new FCPair<Double, Integer>(val, bKey));
       }
       else {
         if(val < nn.peek().getFirst()) {
           nn.remove();
-          nn.add(new CPair<Double, Integer>(val, bKey));
+          nn.add(new FCPair<Double, Integer>(val, bKey));
         }
       }
     }
     return nn;
   }
 
-  private PriorityQueue<CPair<Double, Integer>> calcDistsandRNDSample(Database<V> data, KernelMatrix<V> kernelMatrix, int sampleSize, Integer aKey, HashMap<Integer, Double> dists) {
-    PriorityQueue<CPair<Double, Integer>> nn = new PriorityQueue<CPair<Double, Integer>>(sampleSize);
+  private PriorityQueue<FCPair<Double, Integer>> calcDistsandRNDSample(Database<V> data, KernelMatrix<V> kernelMatrix, int sampleSize, Integer aKey, HashMap<Integer, Double> dists) {
+    PriorityQueue<FCPair<Double, Integer>> nn = new PriorityQueue<FCPair<Double, Integer>>(sampleSize);
     int step = (int) ((double) data.size() / (double) sampleSize);
     int counter = 0;
     for(Integer bKey : data.getIDs()) {
       double val = calcCos(kernelMatrix, aKey, bKey);
       dists.put(bKey, val);
       if(counter % step == 0) {
-        nn.add(new CPair<Double, Integer>(val, bKey));
+        nn.add(new FCPair<Double, Integer>(val, bKey));
       }
       counter++;
     }
@@ -449,13 +449,13 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
   public void getExplanations(Database<V> data) {
     KernelMatrix<V> kernelMatrix = new KernelMatrix<V>(kernelFunction, data);
     // PQ for Outlier Ranking
-    PriorityQueue<CPair<Double, Integer>> pq = new PriorityQueue<CPair<Double, Integer>>(data.size(), Collections.reverseOrder());
+    PriorityQueue<FCPair<Double, Integer>> pq = new PriorityQueue<FCPair<Double, Integer>>(data.size(), Collections.reverseOrder());
     HashMap<Integer, LinkedList<Integer>> explaintab = new HashMap<Integer, LinkedList<Integer>>();
     // test all objects
     for(Integer objKey : data.getIDs()) {
       MeanVariance s = new MeanVariance();
       // Queue for the best explanation
-      PriorityQueue<CPair<Double, Integer>> explain = new PriorityQueue<CPair<Double, Integer>>();
+      PriorityQueue<FCPair<Double, Integer>> explain = new PriorityQueue<FCPair<Double, Integer>>();
       // determine Object
       // for each pair of other objects
       Iterator<Integer> iter = data.iterator();
@@ -479,11 +479,11 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
             s2.addData(tmp, 1 / sqr);
           }
         }
-        explain.add(new CPair<Double, Integer>(s2.getVariance(), key1));
+        explain.add(new FCPair<Double, Integer>(s2.getVariance(), key1));
         s.addData(s2);
       }
       // build variance of the observed vectors
-      pq.add(new CPair<Double, Integer>(s.getVariance(), objKey));
+      pq.add(new FCPair<Double, Integer>(s.getVariance(), objKey));
       //
       LinkedList<Integer> expList = new LinkedList<Integer>();
       expList.add(explain.remove().getSecond());

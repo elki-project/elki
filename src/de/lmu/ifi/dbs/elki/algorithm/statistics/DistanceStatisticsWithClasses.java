@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.pairs.CPair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -92,8 +92,8 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
       Random rnd = new Random();
       // estimate minimum and maximum.
       int k = (int) Math.max(25,Math.pow(database.size(), 0.2));
-      TreeSet<CPair<Double, Integer>> minhotset = new TreeSet<CPair<Double, Integer>>();
-      TreeSet<CPair<Double, Integer>> maxhotset = new TreeSet<CPair<Double, Integer>>(Collections.reverseOrder());
+      TreeSet<FCPair<Double, Integer>> minhotset = new TreeSet<FCPair<Double, Integer>>();
+      TreeSet<FCPair<Double, Integer>> maxhotset = new TreeSet<FCPair<Double, Integer>>(Collections.reverseOrder());
       
       int randomsize = (int)Math.max(25,Math.pow(database.size(), 0.2));
       double rprob = ((double) randomsize) / size;
@@ -104,46 +104,46 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
         throw new IllegalStateException(ExceptionMessages.DATABASE_EMPTY);
       }
       Integer firstid = iter.next();
-      minhotset.add(new CPair<Double, Integer>(Double.MAX_VALUE, firstid));
-      maxhotset.add(new CPair<Double, Integer>(Double.MIN_VALUE, firstid));
+      minhotset.add(new FCPair<Double, Integer>(Double.MAX_VALUE, firstid));
+      maxhotset.add(new FCPair<Double, Integer>(Double.MIN_VALUE, firstid));
       while(iter.hasNext()) {
         Integer id1 = iter.next();
         // generate candidates for min distance.
-        ArrayList<CPair<Double,Integer>> np = new ArrayList<CPair<Double,Integer>>(k*2+randomsize*2);
-        for(CPair<Double, Integer> pair : minhotset) {
+        ArrayList<FCPair<Double,Integer>> np = new ArrayList<FCPair<Double,Integer>>(k*2+randomsize*2);
+        for(FCPair<Double, Integer> pair : minhotset) {
           Integer id2 = pair.getSecond();
           // skip the object itself
           if(id1 == id2) {
             continue;
           }
           double d = distFunc.distance(id1, id2).getValue();
-          np.add(new CPair<Double, Integer>(d, id1));
-          np.add(new CPair<Double, Integer>(d, id2));
+          np.add(new FCPair<Double, Integer>(d, id1));
+          np.add(new FCPair<Double, Integer>(d, id2));
         }
         for(Integer id2 : randomset) {
           double d = distFunc.distance(id1, id2).getValue();
-          np.add(new CPair<Double, Integer>(d, id1));
-          np.add(new CPair<Double, Integer>(d, id2));
+          np.add(new FCPair<Double, Integer>(d, id1));
+          np.add(new FCPair<Double, Integer>(d, id2));
         }
         minhotset.addAll(np);
         shrinkHeap(minhotset, k);
         
         // generate candidates for max distance.
-        ArrayList<CPair<Double,Integer>> np2 = new ArrayList<CPair<Double,Integer>>(k*2+randomsize*2);
-        for(CPair<Double, Integer> pair : minhotset) {
+        ArrayList<FCPair<Double,Integer>> np2 = new ArrayList<FCPair<Double,Integer>>(k*2+randomsize*2);
+        for(FCPair<Double, Integer> pair : minhotset) {
           Integer id2 = pair.getSecond();
           // skip the object itself
           if(id1 == id2) {
             continue;
           }
           double d = distFunc.distance(id1, id2).getValue();
-          np2.add(new CPair<Double, Integer>(d, id1));
-          np2.add(new CPair<Double, Integer>(d, id2));
+          np2.add(new FCPair<Double, Integer>(d, id1));
+          np2.add(new FCPair<Double, Integer>(d, id2));
         }
         for(Integer id2 : randomset) {
           double d = distFunc.distance(id1, id2).getValue();
-          np.add(new CPair<Double, Integer>(d, id1));
-          np.add(new CPair<Double, Integer>(d, id2));
+          np.add(new FCPair<Double, Integer>(d, id1));
+          np.add(new FCPair<Double, Integer>(d, id2));
         }
         maxhotset.addAll(np2);
         shrinkHeap(maxhotset, k);
@@ -291,12 +291,12 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
     return result;
   }
 
-  private void shrinkHeap(TreeSet<CPair<Double, Integer>> hotset, int k) {
+  private void shrinkHeap(TreeSet<FCPair<Double, Integer>> hotset, int k) {
     // drop duplicates
     HashSet<Integer> seenids = new HashSet<Integer>(2*k);
     int cnt = 0;
-    for (Iterator<CPair<Double, Integer>> i = hotset.iterator(); i.hasNext(); ) {
-      CPair<Double, Integer> p = i.next();
+    for (Iterator<FCPair<Double, Integer>> i = hotset.iterator(); i.hasNext(); ) {
+      FCPair<Double, Integer> p = i.next();
       if (cnt > k || seenids.contains(p.getSecond())) {
         i.remove();
       } else {

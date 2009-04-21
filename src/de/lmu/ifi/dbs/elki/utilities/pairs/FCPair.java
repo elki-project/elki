@@ -3,9 +3,6 @@ package de.lmu.ifi.dbs.elki.utilities.pairs;
 /**
  * Pair that can only be compared by it's first component.
  * 
- * Note: this cannot be a superclass of {@link CPair}, because of the Comparable
- * interface, which cannot be implemented with different generics.
- * 
  * @author Erich Schubert
  * 
  * @param <FIRST> first type (comparable)

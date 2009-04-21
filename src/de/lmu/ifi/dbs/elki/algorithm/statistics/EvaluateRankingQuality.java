@@ -24,7 +24,7 @@ import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
-import de.lmu.ifi.dbs.elki.utilities.pairs.CPair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -92,11 +92,11 @@ public class EvaluateRankingQuality<V extends RealVector<V, ?>> extends Distance
 
     // sort neighbors
     for(Cluster<?> clus : splitted) {
-      ArrayList<CPair<Double, Integer>> cmem = new ArrayList<CPair<Double, Integer>>(clus.size());
+      ArrayList<FCPair<Double, Integer>> cmem = new ArrayList<FCPair<Double, Integer>>(clus.size());
       V av = averages.get(clus);
       for(Integer i1 : clus.getIDs()) {
         Double d = distFunc.distance(database.get(i1), av).getValue();
-        cmem.add(new CPair<Double, Integer>(d, i1));
+        cmem.add(new FCPair<Double, Integer>(d, i1));
       }
       Collections.sort(cmem);
 
