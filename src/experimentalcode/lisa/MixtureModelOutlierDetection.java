@@ -111,7 +111,7 @@ public static final OptionID C_ID = OptionID.getOrCreateOptionID("mmo.c", "cutof
       if(deltaLog > c) {
         //flag as outlier 
         database.associate(MMOD_OFLAG, x, 1.0);
-        logLike = currentLogLike;   
+        logLike = currentLogLike;
         i--;
       }
       else{
@@ -158,8 +158,16 @@ public static final OptionID C_ID = OptionID.getOrCreateOptionID("mmo.c", "cutof
       V meanNeg = mean.negativeVector();
       
       Matrix covarianceMatrix = DatabaseUtil.covarianceMatrix(database, normalObjs);
-//      debugFine(covarianceMatrix.toString());
-      Matrix covInv = covarianceMatrix.inverse();
+      Matrix covInv;
+      debugFine(covarianceMatrix.toString());
+      //test singuläre matrix
+      if(covarianceMatrix.equals(new Matrix(normalObjs.size(), normalObjs.size()))) {
+       
+        covInv = covarianceMatrix;
+      }
+      else {
+        covInv = covarianceMatrix.inverse();
+      }
       double covarianceDet = covarianceMatrix.det();
       double fakt = (1.0/(Math.sqrt(Math.pow(2*Math.PI, database.dimensionality())*(covarianceDet)))); 
       //for each object compute probability and sum
