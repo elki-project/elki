@@ -22,27 +22,27 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 public class DBOutlierDetection <O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O , D , MultiResult> {
 	
 	public static final OptionID D_ID = OptionID.getOrCreateOptionID(
-		      "sibo.d",
+		      "dbod.d",
 		      "size of the D-neighborhood"
 		  );
 
 	public static final OptionID P_ID = OptionID.getOrCreateOptionID(
-				      "sibo.p",
+				      "dbod.p",
 				      "minimum fraction of objects that must be outside the D-neigborhood of an outlier"
 				  );
 		
-		public static final AssociationID<Boolean> SIBO_OFLAG= AssociationID.getOrCreateAssociationID("sibo.oflag", Boolean.class);
+		public static final AssociationID<Double> DBOD_OFLAG= AssociationID.getOrCreateAssociationID("dbod.oflag", Double.class);
 		/**
 		   * Parameter to specify the size of the D-neighborhood,
 		   * 
-		   * <p>Key: {@code -sibo.d} </p>
+		   * <p>Key: {@code -dbod.d} </p>
 		   */
 		  private final PatternParameter D_PARAM = new PatternParameter(D_ID);
 		  
 		  /**
 		   * Parameter to specify the minimum fraction of objects that must be outside the D-neigborhood of an outlier,
 		   * 
-		   * <p>Key: {@code -sibo.p} </p>
+		   * <p>Key: {@code -dbod.p} </p>
 		   */
 		  private final DoubleParameter P_PARAM = new DoubleParameter(P_ID);
 		  /**
@@ -95,16 +95,18 @@ public class DBOutlierDetection <O extends DatabaseObject, D extends Distance<D>
 			D distance = getDistanceFunction().valueOf(d);
 			//maximum number of objects in the D-neighborhood of an outlier 
 		    int m = (int) ((database.size())*(1-p));
+		    debugFine("maximum number of objects  " + m);
 		    //if index exists, kNN query. if the distance to the mth nearest neighbor is more than d -> object is outlier  
 		    if (database instanceof IndexDatabase){
 		    	for(Integer id : database.getIDs()){
+		    	  debugFine("distance to mth nearest neighbour" + database.kNNQueryForID(id, m, getDistanceFunction()).toString());
 		    		if(database.kNNQueryForID(id, m , getDistanceFunction()).get(m-1).getFirst().compareTo(distance)  <= 0){
 		    			//flag as outlier
-		    			database.associate(SIBO_OFLAG, id, true);
+		    			database.associate(DBOD_OFLAG, id, 1.0);
 		    		}
 		    		else {
 		    			//flag as no outlier
-			    		database.associate(SIBO_OFLAG, id, false);
+			    		database.associate(DBOD_OFLAG, id, 0.0);
 		    		}
 		    	}
 		    }
@@ -116,24 +118,27 @@ public class DBOutlierDetection <O extends DatabaseObject, D extends Distance<D>
 			    	while (iterator.hasNext()&& count < m) {
 			            Integer currentID = iterator.next();
 			            D currentDistance = getDistanceFunction().distance(id, currentID);
+			       debugFine("point " +id + "dcurrentdistance  " + currentDistance);
 			            if (currentDistance.compareTo(distance) <= 0) {
 			            	count ++;
 			            }
 			    	}
-			    	if(count<= m){
+			    	
+			    	
+			    	if(count< m){
 			    		//flag as outlier
-			    		database.associate(SIBO_OFLAG, id, true);
+			    		database.associate(DBOD_OFLAG, id, 1.0);
 			    	}
 			    	else {
 			    		//flag as no outlier
-			    		database.associate(SIBO_OFLAG, id, false);
+			    		database.associate(DBOD_OFLAG, id, 0.0);
 			    	}
 		    	}
 		    }
-		    AnnotationsFromDatabase<O, Boolean> res1 = new AnnotationsFromDatabase<O, Boolean>(database);
-	        res1.addAssociation(SIBO_OFLAG);
+		    AnnotationsFromDatabase<O, Double> res1 = new AnnotationsFromDatabase<O, Double>(database);
+	        res1.addAssociation(DBOD_OFLAG);
 	        // Ordering
-	        OrderingFromAssociation<Boolean, O> res2 = new OrderingFromAssociation<Boolean, O>(database, SIBO_OFLAG, true); 
+	        OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database, DBOD_OFLAG, true); 
 	        // combine results.
 	        result = new MultiResult();
 	        result.addResult(res1);
