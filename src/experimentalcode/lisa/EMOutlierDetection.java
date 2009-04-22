@@ -7,8 +7,11 @@ import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
+import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
+import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -24,6 +27,8 @@ import java.util.List;
  */
 public class EMOutlierDetection<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, MultiResult>{
   EM emClustering;
+  
+  public static final AssociationID<Double> DBOD_MAXCPROB= AssociationID.getOrCreateAssociationID("dbod_maxcprob", Double.class);
   /**
    * Provides the result of the algorithm.
    */
@@ -59,22 +64,43 @@ public class EMOutlierDetection<V extends RealVector<V, ?>> extends AbstractAlgo
     emClustering.run(database);
     Iterator<Integer> iter = database.iterator();
     if (iter.hasNext()){
-      
+      Double maxProb = 0.0;
+      Integer id = iter.next();
       List<AnnotationResult<List<Double>>> annotations = result.filterResults(AnnotationResult.class);
       for (AnnotationResult<List<Double>> annotation : annotations){
-        for (Pair<String, ?> pair : annotation.getAnnotations(iter.next())){
+        for (Pair<String, List<Double>> pair : annotation.getAnnotations(iter.next())){
           if (pair != null && pair.getFirst() != null && pair.getFirst().equals(AssociationID.PROBABILITY_CLUSTER_I_GIVEN_X)){
-            probabilities= annotation; 
-            probabilities.
-          }
+            List<Double> probs = pair.getSecond(); 
+       
+            for(Double prob: probs) {
+              if(prob > maxProb) {
+                maxProb = prob;
+              }
+            }
+          }                                                                                                                      
         }
       }
-    } else {
+      database.associate(DBOD_MAXCPROB, id, maxProb);     
+  
+    } 
+    else {
       throw new RuntimeException("Database empty.");
     }
+ 
+    AnnotationsFromDatabase<V, Double> res1 = new AnnotationsFromDatabase<V, Double>(database);
+    res1.addAssociation(DBOD_MAXCPROB);
+     // Ordering
+     OrderingFromAssociation<Double, V> res2 = new OrderingFromAssociation<Double, V>(database, DBOD_MAXCPROB, true); 
+     // combine results.
+     
+     result = new MultiResult();
+     result.addResult(res1);
+     result.addResult(res2);
+     return result;
+ 
   
     
-    return null;
+
   }
 
   @Override
@@ -85,8 +111,8 @@ public class EMOutlierDetection<V extends RealVector<V, ?>> extends AbstractAlgo
 
   @Override
   public MultiResult getResult() {
-    // TODO Auto-generated method stub
-    return null;
+    
+    return result;
   }
   
 }
