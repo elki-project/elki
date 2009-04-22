@@ -8,7 +8,7 @@ import java.util.Map;
  * immutable and unique by class and name.
  * 
  * @author Arthur Zimek
- * @param <D> Class self refence for {@link Comparable} restriction
+ * @param <D> Class self reference for {@link Comparable} restriction
  */
 public abstract class ConstantObject<D extends ConstantObject<D>> implements Comparable<D> {
   /**
