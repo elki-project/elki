@@ -89,17 +89,17 @@ public class ClassParameter<C> extends Parameter<String, String> {
   @Override
   public boolean isValid(String value) throws ParameterException {
     if(value == null) {
-      throw new WrongParameterValueException("Parameter Error.\n" + "No value for parameter \"" + getName() + "\" " + "given.");
+      throw new UnspecifiedParameterException("Parameter Error.\n" + "No value for parameter \"" + getName() + "\" " + "given.");
     }
     boolean does = false;
     try {
       does = satisfiesClassRestriction(restrictionClass, value);
     }
     catch(ClassNotFoundException e) {
-      throw new WrongParameterValueException(this.name, value, "subclass / implementing class of " + restrictionClass.getName(), e);
+      throw new WrongParameterValueException(this.name, value, "Class not found. Expected subclass / implementing class of " + restrictionClass.getName(), e);
     }
     if(!does) {
-      throw new WrongParameterValueException(this.name, value, "subclass / implementing class of " + restrictionClass.getName());
+      throw new WrongParameterValueException(this.name, value, "Class needs to be subclass / implementing class of " + restrictionClass.getName());
     }
     return does;
   }

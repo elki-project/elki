@@ -466,7 +466,7 @@ public class OptionHandler extends AbstractLoggable {
     if(!notOptional.isEmpty()) {
 
       if(notOptional.size() == 1) {
-        throw new WrongParameterValueException("Aborted. Parameter " + notOptional.get(0).getName() + " requires parameter value.");
+        throw new UnspecifiedParameterException("Aborted. Parameter " + notOptional.get(0).getName() + " requires parameter value.");
       }
       StringBuffer buffer = new StringBuffer();
       for(int i = 0; i < notOptional.size(); i++) {
@@ -475,7 +475,7 @@ public class OptionHandler extends AbstractLoggable {
           buffer.append(",");
         }
       }
-      throw new WrongParameterValueException("Aborted. Parameters " + buffer.toString() + " require parameter values.");
+      throw new UnspecifiedParameterException("Aborted. Parameters " + buffer.toString() + " require parameter values.");
     }
   }
 

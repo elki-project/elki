@@ -72,7 +72,7 @@ public class ClassListParameter<C> extends ListParameter<String> {
   public boolean isValid(String value) throws ParameterException {
     String[] classes = SPLIT.split(value);
     if(classes.length == 0) {
-      throw new WrongParameterValueException(this.name, value, "Wrong parameter format! Given list of classes for paramter \"" + getName() + "\" is either empty or has the wrong format!\nParameter value required:\n" + getDescription());
+      throw new UnspecifiedParameterException("Wrong parameter format! Given list of classes for paramter \"" + getName() + "\" is either empty or has the wrong format!\nParameter value required:\n" + getDescription());
     }
 
     for(String cl : classes) {

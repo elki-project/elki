@@ -63,7 +63,7 @@ public class FileParameter extends Parameter<File, Object> {
     @Override
     public boolean isValid(String value) throws ParameterException {
         if (value == null) {
-            throw new WrongParameterValueException("Parameter \"" + getName()
+            throw new UnspecifiedParameterException("Parameter \"" + getName()
                 + "\": No filename given!\nParameter description: " + getDescription());
         }
 

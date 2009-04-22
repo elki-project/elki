@@ -57,7 +57,7 @@ public class FileListParameter extends ListParameter<File> {
     public boolean isValid(String value) throws ParameterException {
         String[] files = SPLIT.split(value);
         if (files.length == 0) {
-            throw new WrongParameterValueException("Given list of files for paramter \"" + getName()
+            throw new UnspecifiedParameterException("Given list of files for paramter \"" + getName()
                 + "\" is either empty or has the wrong format!\nParameter value required:\n" + getDescription());
         }
 

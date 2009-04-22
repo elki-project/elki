@@ -59,7 +59,7 @@ public class IntListParameter extends ListParameter<Integer> {
   public boolean isValid(String value) throws ParameterException {
     String[] values = SPLIT.split(value);
     if(values.length == 0) {
-      throw new WrongParameterValueException("Wrong parameter format! Given list of integer values for parameter \"" + getName() + "\" is either empty or has the wrong format!\nParameter value required:\n" + getDescription());
+      throw new UnspecifiedParameterException("Wrong parameter format! Given list of integer values for parameter \"" + getName() + "\" is either empty or has the wrong format!\nParameter value required:\n" + getDescription());
     }
 
     // list for checking the parameter constraints

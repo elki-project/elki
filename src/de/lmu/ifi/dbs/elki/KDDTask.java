@@ -27,11 +27,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterFlagGlobalConstraint;
@@ -407,15 +410,29 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
     catch(AbortException e) {
       // ensure we actually show the message:
       LoggingConfiguration.setVerbose(true);
-      logger.verbose(kddTask.usage(e.getMessage() + "\n\nUSAGE:"));
+      logger.verbose(kddTask.usage("USAGE:"));
+      logger.verbose(e.getMessage());
+    }
+    catch(UnspecifiedParameterException e) {
+      LoggingConfiguration.setVerbose(true);
+      logger.verbose(kddTask.usage("USAGE:"));
+      logger.warning(e.getMessage());
     }
     catch(ParameterException e) {
       // Note: the stack-trace is not included, since this exception is
       // supposedly only thrown with an already helpful message.
+      if (kddTask.HELP_FLAG.isSet()) {
+        LoggingConfiguration.setVerbose(true);
+        logger.verbose(kddTask.usage("USAGE:"));
+      }
       logger.warning(e.getMessage());
     }
     // any other exception
     catch(Exception e) {
+      if (kddTask.HELP_FLAG.isSet()) {
+        LoggingConfiguration.setVerbose(true);
+        logger.verbose(kddTask.usage("USAGE:"));
+      }
       LoggingUtil.exception(e.getMessage(), e);
     }
   }
