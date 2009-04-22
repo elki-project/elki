@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.result.AnnotationsFromHashMap;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
-import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
+import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
@@ -202,7 +202,7 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
         AnnotationsFromHashMap<Double> res1 = new AnnotationsFromHashMap<Double>();
         res1.addMap(AssociationID.LOF, lofs);
         // Ordering
-        OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database, AssociationID.LOF, true); 
+        OrderingFromHashMap<Double> res2 = new OrderingFromHashMap<Double>(lofs, true);
         // combine results.
         result = new MultiResult();
         result.addResult(res1);
