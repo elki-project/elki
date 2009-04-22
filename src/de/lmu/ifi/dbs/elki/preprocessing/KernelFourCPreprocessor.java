@@ -86,9 +86,8 @@ public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector
     private PCAFilteredRunner<V> pca = new PCAFilteredRunner<V>();
 
     /**
-     *
+     * Default Constructor
      */
-    @SuppressWarnings("unchecked")
     public KernelFourCPreprocessor() {
         super();
         addOption(DELTA_PARAM);
@@ -96,12 +95,12 @@ public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector
 
         // parameter constraints are only valid if delta is a relative value! Thus they are
         // dependent on the absolute flag, that is they are global constraints!
-        final ArrayList<ParameterConstraint> deltaCons = new ArrayList<ParameterConstraint>();
+        final ArrayList<ParameterConstraint<Number>> deltaCons = new ArrayList<ParameterConstraint<Number>>();
         // TODO: I moved the constraint up to the parameter itself, since it applies in both cases, right? -- erich
         //deltaCons.add(new GreaterEqualConstraint(0));
         deltaCons.add(new LessEqualConstraint(1));
 
-        GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint(DELTA_PARAM, deltaCons, ABSOLUTE_PARAM, false);
+        GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint<Number, Double>(DELTA_PARAM, deltaCons, ABSOLUTE_PARAM, false);
         optionHandler.setGlobalParameterConstraint(gpc);
     }
 

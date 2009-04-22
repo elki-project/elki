@@ -66,7 +66,6 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
     /**
      * Constructor
      */
-    @SuppressWarnings("unchecked")
     public FourCPreprocessor() {
         super();
 
@@ -84,7 +83,7 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
         //deltaCons.add(new GreaterEqualConstraint(0));
         deltaCons.add(new LessEqualConstraint(1));
 
-        GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint(DELTA_PARAM, deltaCons, ABSOLUTE_PARAM, false);
+        GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint<Number, Double>(DELTA_PARAM, deltaCons, ABSOLUTE_PARAM, false);
         optionHandler.setGlobalParameterConstraint(gpc);
     }
 

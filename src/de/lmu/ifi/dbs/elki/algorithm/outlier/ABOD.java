@@ -27,10 +27,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.NoParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterFlagGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
 
 /**
@@ -133,6 +135,9 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
     addOption(FAST_FLAG);
     addOption(FAST_SAMPLE_PARAM);
     addOption(KERNEL_FUNCTION_PARAM);
+
+    GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint<Number, Integer>(FAST_SAMPLE_PARAM, null, FAST_FLAG, true);
+    optionHandler.setGlobalParameterConstraint(gpc);    
   }
 
   /**
@@ -594,7 +599,7 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
 
     if(fast) {
       if(!FAST_SAMPLE_PARAM.isSet()) {
-        throw new NoParameterValueException("If you set a fast mode, you also need to set a sample size.");
+        throw new UnspecifiedParameterException("If you set a fast mode, you also need to set a sample size.");
       }
       sampleSize = FAST_SAMPLE_PARAM.getValue();
     }
