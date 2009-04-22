@@ -162,7 +162,8 @@ de.lmu.ifi.dbs.elki.preprocessing.ProjectedDBSCANPreprocessor=de.lmu.ifi.dbs.elk
 # #######################################################
 # ResultHandler - default pacakge: de.lmu.ifi.dbs.elki.result 
 de.lmu.ifi.dbs.elki.result.ResultHandler=\
-           de.lmu.ifi.dbs.elki.result.ResultWriter
+           de.lmu.ifi.dbs.elki.result.ResultWriter,\
+           de.lmu.ifi.dbs.elki.result.DiscardResultHandler
 # #######################################################
 # EigenPairFilter - default package: de.lmu.ifi.dbs.elki.math.linearalgebra.pca
 de.lmu.ifi.dbs.elki.math.linearalgebra.pca.EigenPairFilter=de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FirstNEigenPairFilter,\
