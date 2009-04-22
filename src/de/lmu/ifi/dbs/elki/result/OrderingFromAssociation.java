@@ -11,28 +11,31 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 
 /**
- * Return an ordering result backed by a database.
- * Note that the implementation will sort with O(n lg n) database accesses on average, O(n*n) in worst case
+ * Return an ordering result backed by a database. Note that the implementation
+ * will sort with O(n lg n) database accesses on average, O(n*n) in worst case
  * to avoid having to store all objects in memory.
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <T> data type of annotation.
  * @param <O> database object type
  */
-public class OrderingFromAssociation<T extends Comparable<T>,O extends DatabaseObject> implements OrderingResult {
+public class OrderingFromAssociation<T extends Comparable<T>, O extends DatabaseObject> implements OrderingResult {
   /**
    * Database
    */
   protected Database<O> db;
+
   /**
    * AssocationID to use
    */
   protected AssociationID<T> association;
+
   /**
    * Internal comparator to use for sorting.
    */
   protected Comparator<T> comparator;
+
   /**
    * Factor to signal ascending (+1) / descending (-1) order
    */
@@ -53,10 +56,11 @@ public class OrderingFromAssociation<T extends Comparable<T>,O extends DatabaseO
   }
 
   /**
-   * Internally used comparator using a preexisting comparator for the given datatype
+   * Internally used comparator using a preexisting comparator for the given
+   * datatype
    * 
    * @author Erich Schubert
-   *
+   * 
    */
   protected class DerivedComparator implements Comparator<Integer> {
     @Override
@@ -115,10 +119,12 @@ public class OrderingFromAssociation<T extends Comparable<T>,O extends DatabaseO
   @Override
   public Iterator<Integer> iter(Collection<Integer> ids) {
     ArrayList<Integer> sorted = new ArrayList<Integer>(ids);
-    if (comparator != null)
+    if(comparator != null) {
       Collections.sort(sorted, new DerivedComparator());
-    else
+    }
+    else {
       Collections.sort(sorted, new ImpliedComparator());
+    }
     return sorted.iterator();
   }
 }
