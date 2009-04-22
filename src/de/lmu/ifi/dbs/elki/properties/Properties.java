@@ -27,7 +27,7 @@ public final class Properties {
     /**
      * Non-breaking unicode space character.
      */
-    public static final String NONBREAKING_SPACE = " ";
+    public static final String NONBREAKING_SPACE = "\u00a0";
 
     /**
      *
