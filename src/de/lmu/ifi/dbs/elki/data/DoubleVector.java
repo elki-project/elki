@@ -135,6 +135,17 @@ public class DoubleVector extends RealVector<DoubleVector,Double> {
     return values[dimension - 1];
   }
 
+  /**
+   * Get a copy of the raw double[] array.
+   * 
+   * @return copy of values array.
+   */
+  public double[] getValues() {
+    double[] copy = new double[values.length];
+    System.arraycopy(values, 0, copy, 0, values.length);
+    return copy;
+  }
+
   public Vector getColumnVector() {
     return new Vector(values);
   }
@@ -142,7 +153,7 @@ public class DoubleVector extends RealVector<DoubleVector,Double> {
   public Matrix getRowVector() {
     return new Matrix(new double[][]{values.clone()});
   }
-
+  
   public DoubleVector plus(DoubleVector fv) {
     if (fv.getDimensionality() != this.getDimensionality()) {
       throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
