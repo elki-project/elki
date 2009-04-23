@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -180,8 +179,7 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Cluster
             }
 
             // weights and means
-            for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
-                Integer id = iter.next();
+            for (Integer id : database) {
                 List<Double> clusterProbabilities = database.getAssociation(AssociationID.PROBABILITY_CLUSTER_I_GIVEN_X, id);
 
                 for (int i = 0; i < k; i++) {
@@ -198,8 +196,7 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Cluster
                 means.set(i, newMean);
             }
             // covariance matrices
-            for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
-                Integer id = iter.next();
+            for (Integer id : database) {
                 List<Double> clusterProbabilities = database.getAssociation(AssociationID.PROBABILITY_CLUSTER_I_GIVEN_X, id);
                 V instance = database.get(id);
                 for (int i = 0; i < k; i++) {
@@ -235,8 +232,7 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Cluster
         }
 
         // provide a hard clustering
-        for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
-            Integer id = iter.next();
+        for (Integer id : database){
             List<Double> clusterProbabilities = database.getAssociation(AssociationID.PROBABILITY_CLUSTER_I_GIVEN_X, id);
             int maxIndex = 0;
             double currentMax = 0.0;
@@ -276,9 +272,7 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Cluster
      * @param clusterWeights  the weights of the current clusters
      */
     protected void assignProbabilitiesToInstances(Database<V> database, List<Double> normDistrFactor, List<V> means, List<Matrix> invCovMatr, List<Double> clusterWeights) {
-        Iterator<Integer> databaseIterator = database.iterator();
-        while (databaseIterator.hasNext()) {
-            Integer id = databaseIterator.next();
+        for (Integer id : database) {            
             V x = database.get(id);
             List<Double> probabilities = new ArrayList<Double>(k);
             for (int i = 0; i < k; i++) {
@@ -327,8 +321,7 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Cluster
      */
     protected double expectationOfMixture(Database<V> database) {
         double sum = 0.0;
-        for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
-            Integer id = iter.next();
+        for (Integer id : database) {            
             double priorProbX = database.getAssociation(AssociationID.PROBABILITY_X, id);
             double logP = Math.log(priorProbX);
             sum += logP;
@@ -359,8 +352,8 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Cluster
             V randomBase = database.get(database.iterator().next());
             AttributeWiseRealVectorNormalization<V> normalization = new AttributeWiseRealVectorNormalization<V>();
             List<V> list = new ArrayList<V>(database.size());
-            for (Iterator<Integer> dbIter = database.iterator(); dbIter.hasNext();) {
-                list.add(database.get(dbIter.next()));
+            for (Integer id : database) {
+                list.add(database.get(id));
             }
             try {
                 normalization.normalize(list);
