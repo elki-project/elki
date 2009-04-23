@@ -163,9 +163,6 @@ public class TextWriter<O extends DatabaseObject> {
       // force an update of cluster names.
       naming = new SimpleEnumeratingScheme(rc.get(0));
     }
-    else if(ri != null) {
-      // TODO
-    }
     else {
       groups = new ArrayList<DatabaseObjectGroup>();
       groups.add(new DatabaseObjectGroupCollection<Collection<Integer>>(db.getIDs()));
