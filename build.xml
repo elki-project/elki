@@ -139,6 +139,8 @@
 			<exclude name="*.xsd" />
 			<exclude name="**/zelki/**" />
 			<exclude name="**/test/**"/>
+			<exclude name="experimentalcode/tobias/**"/>
+			<exclude name="experimentalcode/simon/tests/**"/>
 			<src path="${source}" />
 		</javac>
 	</target>
@@ -150,7 +152,10 @@
 			</fileset>
 			<fileset dir="${classpath}" />
 		</copy>
+		<unjar dest="${buildpath}" src="${build.lib}/batik-all-1.7.jar"/>
 		<unjar dest="${buildpath}" src="${build.lib}/junit-4.5.jar"/>
+		<unjar dest="${buildpath}" src="${build.lib}/pdf-transcoder.jar"/>
+		<unjar dest="${buildpath}" src="${build.lib}/xml-commons-external-1.3.04.jar"/>
 		<copy todir="${buildpath}">
 			<fileset dir="${source}">
 				<exclude name="**/*.java" />
