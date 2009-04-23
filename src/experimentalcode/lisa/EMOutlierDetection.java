@@ -23,7 +23,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <V>
  */
 public class EMOutlierDetection<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, MultiResult>{
-  EM emClustering;
+  EM<V> emClustering;
   
   public static final AssociationID<Double> DBOD_MAXCPROB= AssociationID.getOrCreateAssociationID("dbod_maxcprob", Double.class);
   /**
