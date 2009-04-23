@@ -71,7 +71,7 @@ public class EMOutlierDetection<V extends RealVector<V, ?>> extends AbstractAlgo
                 maxProb = prob;
           }
       }                                                                                                                    
-      database.associate(DBOD_MAXCPROB, id, maxProb);     
+      database.associate(DBOD_MAXCPROB, id, 1 - maxProb);     
     }
     AnnotationFromDatabase<Double, V> res1 = new AnnotationFromDatabase<Double, V>(database, DBOD_MAXCPROB);
      // Ordering
