@@ -17,7 +17,7 @@ public interface ColorLibrary {
    * Return the i'th color.
    * 
    * @param index color index
-   * @return color in hexadecimal notation (#aabbcc) (CSS/SVG/HTML)
+   * @return color in hexadecimal notation (#aabbcc) or color name ("red") as valid in CSS and SVG.
    */
   public String getColor(int index);
 }
