@@ -12,7 +12,12 @@ import experimentalcode.erich.visualization.SVGPlot;
  * 
  * @author Erich Schubert
  */
-public class PrettyMarkers extends MinimalMarkers {
+public class PrettyMarkers implements MarkerLibrary {
+  /**
+   * Color library
+   */
+  private ColorLibrary colors = new PublicationColorLibrary();
+
   /**
    * Default prefix to use.
    */
@@ -51,10 +56,10 @@ public class PrettyMarkers extends MinimalMarkers {
    * @param style marker style (enumerated)
    * @param size size
    */
-  public static void plotMarker(Document document, Element parent, double x, double y, int style, double size) {
+  public void plotMarker(Document document, Element parent, double x, double y, int style, double size) {
     assert(parent != null);
     // TODO: add more styles.
-    String colorstr = getColor(style);
+    String colorstr = colors.getColor(style);
 
     switch(style % 8){
     case 0: {

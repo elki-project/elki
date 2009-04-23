@@ -13,6 +13,11 @@ import experimentalcode.erich.visualization.SVGPlot;
  */
 public class MinimalMarkers implements MarkerLibrary {
   /**
+   * Color library
+   */
+  private ColorLibrary colors = new PublicationColorLibrary();
+  
+  /**
    * Constructor
    */
   public MinimalMarkers() {
@@ -28,20 +33,8 @@ public class MinimalMarkers implements MarkerLibrary {
     SVGUtil.setAtt(marker, SVGConstants.SVG_Y_ATTRIBUTE, y - size / 2);
     SVGUtil.setAtt(marker, SVGConstants.SVG_WIDTH_ATTRIBUTE, size);
     SVGUtil.setAtt(marker, SVGConstants.SVG_HEIGHT_ATTRIBUTE, size);
-    SVGUtil.setAtt(marker, SVGConstants.SVG_STYLE_ATTRIBUTE, "fill:" + getColor(style));
+    SVGUtil.setAtt(marker, SVGConstants.SVG_STYLE_ATTRIBUTE, "fill:" + colors.getColor(style));
     parent.appendChild(marker);
     return marker;
-  }
-
-  /**
-   * Colors enumeration.
-   * 
-   * @param style index
-   * @return SVG color string
-   */
-  public static String getColor(int style) {
-    String[] colors = { SVGConstants.CSS_RED_VALUE, SVGConstants.CSS_BLUE_VALUE, SVGConstants.CSS_GREEN_VALUE, SVGConstants.CSS_ORANGE_VALUE, SVGConstants.CSS_CYAN_VALUE, SVGConstants.CSS_MAGENTA_VALUE, SVGConstants.CSS_YELLOW_VALUE };
-    String colorstr = colors[style % colors.length];
-    return colorstr;
   }
 }
