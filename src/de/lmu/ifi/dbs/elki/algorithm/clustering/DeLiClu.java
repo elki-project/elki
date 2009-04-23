@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluEntry
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluNode;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTree;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.AnnotationsFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Identifiable;
@@ -103,8 +103,8 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
      * Performs the DeLiClu algorithm on the given database.
      *
      */
-    @Override
     @SuppressWarnings("unchecked")
+    @Override
     protected ClusterOrderResult<D> runInTime(Database<O> database) throws IllegalStateException {
         if (!(database instanceof SpatialIndexDatabase)) {
             throw new IllegalArgumentException(
@@ -133,7 +133,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
           logger.verbose("knnJoin...");
         }
         knnJoin.run(database);
-        AnnotationsFromHashMap knns = knnJoin.getResult();
+        AnnotationFromHashMap<KNNList<D>> knns = knnJoin.getResult();
 
         FiniteProgress progress = new FiniteProgress("Clustering", database.size());
         int size = database.size();

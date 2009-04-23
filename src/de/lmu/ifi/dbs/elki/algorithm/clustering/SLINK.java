@@ -7,9 +7,10 @@ import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
-import de.lmu.ifi.dbs.elki.result.AnnotationsFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
@@ -27,6 +28,16 @@ import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
  */
 public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends
     DistanceBasedAlgorithm<O, D, MultiResult> {
+
+    /**
+     * Association ID for SLINK pi pointer
+     */
+    private static final AssociationID<Integer> SLINK_PI = AssociationID.getOrCreateAssociationID("SLINK pi", Integer.class);
+
+    /**
+     * Association ID for SLINK lambda value
+     */
+    private static final AssociationID<Distance<?>> SLINK_LAMBDA = AssociationID.getOrCreateAssociationIDGenerics("SLINK lambda", Distance.class);
 
     /**
      * The values of the function Pi of the pointer representation.
@@ -100,12 +111,8 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends
         HashMap<Integer, D> lambdaClone = (HashMap<Integer, D>) lambda.clone();
 
         result = new MultiResult();
-        AnnotationsFromHashMap<Integer> ann1 = new AnnotationsFromHashMap<Integer>();
-        ann1.addMap("PI", piClone);
-        AnnotationsFromHashMap<D> ann2 = new AnnotationsFromHashMap<D>();
-        ann2.addMap("LAMBDA", lambdaClone);
-        result.addResult(ann1);
-        result.addResult(ann2);
+        result.addResult(new AnnotationFromHashMap<Integer>(SLINK_PI, piClone));
+        result.addResult(new AnnotationFromHashMap<D>((AssociationID<D>)SLINK_LAMBDA, lambdaClone));
         // TODO: ensure that the object ID itself is also output. using AssociationID? 
         return result;
     }

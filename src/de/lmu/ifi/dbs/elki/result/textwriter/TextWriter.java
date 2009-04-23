@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.result.combinators.AnnotationCombiner;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterDatabaseObjectInline;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterObjectComment;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterObjectInline;
@@ -135,7 +134,7 @@ public class TextWriter<O extends DatabaseObject> {
    * @throws IOException
    */
   public void output(Database<O> db, Result r, StreamFactory streamOpener) throws UnableToComplyException, IOException {
-    AnnotationResult ra = null;
+    List<AnnotationResult> ra = null;
     OrderingResult ro = null;
     Clustering<Model> rc = null;
     IterableResult<?> ri = null;
@@ -178,18 +177,16 @@ public class TextWriter<O extends DatabaseObject> {
     }
   }
 
-  private AnnotationResult getAnnotationResults(Result r) {
+  private List<AnnotationResult> getAnnotationResults(Result r) {
+    List<AnnotationResult> anns;
     if (r instanceof AnnotationResult) {
-      return (AnnotationResult) r;
+      anns = new ArrayList<AnnotationResult>(0);
+      anns.add((AnnotationResult) r);
+      return anns;
     }
     if(r instanceof MultiResult) {
-      List<AnnotationResult> anns = ((MultiResult)r).filterResults(AnnotationResult.class);
-      if(anns.size() == 1) {
-        return anns.get(0);
-      }
-      if(anns.size() > 0) {
-        return new AnnotationCombiner(anns);
-      }
+      anns = ((MultiResult)r).filterResults(AnnotationResult.class);
+      return anns;
     }
     return null;
   }
@@ -239,7 +236,7 @@ public class TextWriter<O extends DatabaseObject> {
     return null;
   }
 
-  private void printObject(TextWriterStream out, O obj, Pair<String, Object>[] anns) throws UnableToComplyException, IOException {
+  private void printObject(TextWriterStream out, O obj, List<Pair<String, Object>> anns) throws UnableToComplyException, IOException {
     // Write database element itself.
     {
       TextWriterWriterInterface<?> owriter = out.getWriterFor(obj);
@@ -251,26 +248,22 @@ public class TextWriter<O extends DatabaseObject> {
 
     // print the annotations
     if(anns != null) {
-      for(int i = 0; i < anns.length; i++) {
-        // skip empty annotations
-        if(anns[i] == null) {
+      for(Pair<String, Object> a : anns) {
+        if(a.getSecond() == null) {
           continue;
         }
-        if(anns[i].getSecond() == null) {
-          continue;
-        }
-        TextWriterWriterInterface<?> writer = out.getWriterFor(anns[i].getSecond());
+        TextWriterWriterInterface<?> writer = out.getWriterFor(a.getSecond());
         if(writer == null) {
-          throw new UnableToComplyException("No handler for element " + i + " in Output: " + anns[i].getSecond().getClass().getSimpleName());
+          throw new UnableToComplyException("No handler for annotation " + a.getFirst() + " in Output: " + a.getSecond().getClass().getSimpleName());
         }
 
-        writer.writeObject(out, anns[i].getFirst(), anns[i].getSecond());
+        writer.writeObject(out, a.getFirst(), a.getSecond());
       }
     }
     out.flush();
   }
 
-  private void writeGroupResult(Database<O> db, StreamFactory streamOpener, DatabaseObjectGroup group, AnnotationResult ra, OrderingResult ro, NamingScheme naming, List<AttributeSettings> settings) throws FileNotFoundException, UnableToComplyException, IOException {
+  private void writeGroupResult(Database<O> db, StreamFactory streamOpener, DatabaseObjectGroup group, List<AnnotationResult> ra, OrderingResult ro, NamingScheme naming, List<AttributeSettings> settings) throws FileNotFoundException, UnableToComplyException, IOException {
     String filename = null;
     // for clusters, use naming.
     if(group instanceof Cluster) {
@@ -313,9 +306,11 @@ public class TextWriter<O extends DatabaseObject> {
         continue;
       }
       // do we have annotations to print?
-      Pair<String, Object>[] objs = null;
+      List<Pair<String, Object>> objs = new ArrayList<Pair<String, Object>>();
       if(ra != null) {
-        objs = ra.getAnnotations(objID);
+        for (AnnotationResult a : ra) {
+          objs.add(new Pair<String, Object>(a.getAssociationID().getLabel(), a.getValueFor(objID)));
+        }
       }
       // print the object with its annotations.
       printObject(out, obj, objs);

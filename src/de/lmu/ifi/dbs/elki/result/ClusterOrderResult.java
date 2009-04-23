@@ -16,7 +16,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  *
  * @param <D> distance type.
  */
-public class ClusterOrderResult<D extends Distance<D>> implements OrderingResult, AnnotationResult<Object>, Iterable<ClusterOrderEntry<D>> {
+// TODO: Annotations!
+public class ClusterOrderResult<D extends Distance<D>> implements OrderingResult, Iterable<ClusterOrderEntry<D>> {
   /**
    * Cluster order storage
    */
@@ -94,7 +95,8 @@ public class ClusterOrderResult<D extends Distance<D>> implements OrderingResult
    * 
    * Implementation of the {@link AnnotationResult} interface.
    */
-  @Override
+  //@Override
+  // TODO: re-add functionality!
   public Pair<String, Object>[] getAnnotations(Integer objID) {
     Pair<String, Object>[] anns = Pair.newArray(3);
     // TODO: do we really need to include the ID here?

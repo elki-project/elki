@@ -6,6 +6,7 @@ import java.util.TreeMap;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
+import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -15,7 +16,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
-import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromDatabase;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
@@ -357,19 +358,20 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
       // TODO: get them via databaseConnection!
       // adding them here will make the output writer think
       // that they were an part of the actual result.
-      AnnotationsFromDatabase<O, ?> ar = new AnnotationsFromDatabase<O, Object>(db);
-      ar.addAssociationGenerics(AssociationID.LABEL);
-      ar.addAssociationGenerics(AssociationID.CLASS);
+      AnnotationFromDatabase<String, O> ar1 = new AnnotationFromDatabase<String, O>(db, AssociationID.LABEL);
+      AnnotationFromDatabase<ClassLabel, O> ar2 = new AnnotationFromDatabase<ClassLabel, O>(db, AssociationID.CLASS);
 
       // insert standard annotations when we have a MultiResult
       if(res instanceof MultiResult) {
         result = (MultiResult) res;
-        result.prependResult(ar);
+        result.prependResult(ar1);
+        result.prependResult(ar2);
       }
       else {
         // TODO: can we always wrap them in a MultiResult safely?
         result = new MultiResult();
-        result.addResult(ar);
+        result.addResult(ar1);
+        result.addResult(ar2);
         result.addResult(res);
       }
 

@@ -154,7 +154,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
         // FIXME: re-add lof and nn tables.
         //result = new LOFResult<O>(database, lofTable, nnTable);
         
-        //AnnotationsFromDatabase<O, Double> res1 = new AnnotationsFromDatabase<O, Double>(database);
+        //AnnotationFromDatabase<O, Double> res1 = new AnnotationFromDatabase<O, Double>(database);
         // res1.addAssociation(AssociationID.LOF);
         // Ordering
         // OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database, AssociationID.LOF, true); 

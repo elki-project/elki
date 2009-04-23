@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromDatabase;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -48,9 +48,7 @@ public class GaussianModelOutlierDetection<V extends RealVector<V,Double>> exten
 		 }
 
 
-		 AnnotationsFromDatabase<V, Double> res1 = new AnnotationsFromDatabase<V, Double>(database);
-	        
-	        res1.addAssociation(GMOD_PROB);
+		 AnnotationFromDatabase<Double, V> res1 = new AnnotationFromDatabase<Double, V>(database, GMOD_PROB);
 	        // Ordering
 	        OrderingFromAssociation<Double, V> res2 = new OrderingFromAssociation<Double, V>(database, GMOD_PROB, true); 
 	        // combine results.

@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromDatabase;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -109,8 +109,7 @@ public class KNNOutlierDetection <O extends DatabaseObject, D extends DoubleDist
 		      }
 				  database.associate(KNNO_ODEGREE, id, dkn);
 			  }
-			  AnnotationsFromDatabase<O, Double> res1 = new AnnotationsFromDatabase<O, Double>(database);
-		       res1.addAssociation(KNNO_ODEGREE);
+			  AnnotationFromDatabase<Double, O> res1 = new AnnotationFromDatabase<Double, O>(database, KNNO_ODEGREE);
 		        // Ordering
 		        OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database,KNNO_ODEGREE, true); 
 		        // combine results.

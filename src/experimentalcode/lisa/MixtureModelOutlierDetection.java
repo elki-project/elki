@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromDatabase;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
@@ -124,8 +124,7 @@ public static final OptionID C_ID = OptionID.getOrCreateOptionID("mmo.c", "cutof
       debugFine("normalsize   " + normalObjs.size()+ " anormalsize  " + anomalousObjs.size() + " all " + anomalousObjs.size()+normalObjs.size() );
     }
     
-    AnnotationsFromDatabase<V, Double> res1 = new AnnotationsFromDatabase<V, Double>(database);
-    res1.addAssociation(MMOD_OFLAG);
+    AnnotationFromDatabase<Double, V> res1 = new AnnotationFromDatabase<Double, V>(database, MMOD_OFLAG);
     // Ordering
     OrderingFromAssociation<Double, V> res2 = new OrderingFromAssociation<Double, V>(database, MMOD_OFLAG, true); 
     //combine results.

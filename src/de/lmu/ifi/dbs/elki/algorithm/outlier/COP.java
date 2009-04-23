@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromDatabase;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
 import de.lmu.ifi.dbs.elki.utilities.Description;
@@ -40,11 +40,11 @@ public class COP<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, D
      */
     public static final OptionID K_ID = OptionID.getOrCreateOptionID(
         "cop.k",
-        "The number of nearest neighbors of an object to be considered for computing its COP.");
+        "The number of nearest neighbors of an object to be considered for computing its COP_SCORE.");
 
     /**
      * Parameter to specify the number of nearest neighbors of an object to be
-     * considered for computing its COP, must be an integer greater than 0.
+     * considered for computing its COP_SCORE, must be an integer greater than 0.
      * <p/>
      * Key: {@code -cop.k}
      * </p>
@@ -67,6 +67,35 @@ public class COP<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, D
     MultiResult result;
 
     /**
+     * The association id to associate the Correlation Outlier Probability of an object
+     */
+    public static final AssociationID<Double> COP_SCORE = AssociationID.getOrCreateAssociationID("cop", Double.class);
+
+    /**
+     * The association id to associate the COP_SCORE error vector of an object for the COP_SCORE
+     * algorithm.
+     */
+    public static final AssociationID<Vector> COP_ERROR_VECTOR = AssociationID.getOrCreateAssociationID("cop error vector", Vector.class);
+
+    /**
+     * The association id to associate the COP_SCORE data vector of an object for the COP_SCORE
+     * algorithm.
+     */
+    // TODO: use or remove.
+    public static final AssociationID<Matrix> COP_DATA_VECTORS = AssociationID.getOrCreateAssociationID("cop data vectors", Matrix.class);
+
+    /**
+     * The association id to associate the COP_SCORE correlation dimensionality of an object for the COP_SCORE
+     * algorithm.
+     */
+    public static final AssociationID<Integer> COP_DIM = AssociationID.getOrCreateAssociationID("cop dim", Integer.class);
+
+    /**
+     * The association id to associate the COP_SCORE correlation solution
+     */
+    public static final AssociationID<CorrelationAnalysisSolution<?>> COP_SOL = AssociationID.getOrCreateAssociationIDGenerics("cop sol", CorrelationAnalysisSolution.class);
+
+    /**
      * Sets minimum points to the optionhandler additionally to the parameters
      * provided by super-classes.
      */
@@ -86,7 +115,7 @@ public class COP<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, D
             if (logger.isVerbose()) {
               logger.verbose("Running dependency derivation");
             }
-            FiniteProgress progressLocalPCA = new FiniteProgress("COP", database.size());
+            FiniteProgress progressLocalPCA = new FiniteProgress("COP_SCORE", database.size());
             int counter = 1;
             double sqrt2 = Math.sqrt(2.0);
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
@@ -107,27 +136,27 @@ public class COP<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, D
                     double traddistance = depsol.getCentroid().minus(database.get(id).getColumnVector()).euclideanNorm(0);
                     if (traddistance > 0.0) {
                         double distance = depsol.distance(database.get(id));
-                        database.associate(AssociationID.COP, id, distance / traddistance);
+                        database.associate(COP_SCORE, id, distance / traddistance);
                     }
                     else {
-                        database.associate(AssociationID.COP, id, 0.0);
+                        database.associate(COP_SCORE, id, 0.0);
                     }
                 }
                 double stddev = depsol.getStandardDeviation();
                 double distance = depsol.distance(database.get(id));
                 double prob = ErrorFunctions.erf(distance / (stddev * sqrt2));
 
-                database.associate(AssociationID.COP, id, prob);
+                database.associate(COP_SCORE, id, prob);
 
                 Vector errv = depsol.errorVector(database.get(id));
-                database.associate(AssociationID.COP_ERROR_VECTOR, id, errv);
+                database.associate(COP_ERROR_VECTOR, id, errv);
 
                 Matrix datav = depsol.dataProjections(database.get(id));
-                database.associate(AssociationID.COP_DATA_VECTORS, id, datav);
+                database.associate(COP_DATA_VECTORS, id, datav);
 
-                database.associate(AssociationID.COP_DIM, id, depsol.getCorrelationDimensionality());
+                database.associate(COP_DIM, id, depsol.getCorrelationDimensionality());
 
-                database.associate(AssociationID.COP_SOL, id, depsol);
+                database.associate(COP_SOL, id, depsol);
 
                 if (logger.isVerbose()) {
                     progressLocalPCA.setProcessed(counter);
@@ -135,22 +164,18 @@ public class COP<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, D
                 }
             }
         }
-        AnnotationsFromDatabase<V,?> res1 = new AnnotationsFromDatabase<V,Object>(database);
-        res1.addAssociationGenerics(AssociationID.COP);
-        res1.addAssociationGenerics(AssociationID.COP_DIM);
-        res1.addAssociationGenerics(AssociationID.COP_ERROR_VECTOR);
-        res1.addAssociationGenerics(AssociationID.COP_SOL);
-        // Ordering
-        OrderingFromAssociation<Double, V> res2 = new OrderingFromAssociation<Double, V>(database, AssociationID.COP, true); 
         // combine results.
         result = new MultiResult();
-        result.addResult(res1);
-        result.addResult(res2);
+        result.addResult(new AnnotationFromDatabase<Double, V>(database,COP_SCORE));
+        result.addResult(new AnnotationFromDatabase<Integer, V>(database,COP_DIM));
+        result.addResult(new AnnotationFromDatabase<Vector, V>(database,COP_ERROR_VECTOR));
+        result.addResult(new AnnotationFromDatabase<CorrelationAnalysisSolution<?>, V>(database,COP_SOL));
+        result.addResult(new OrderingFromAssociation<Double, V>(database,COP_SCORE, true)); 
         return result;
     }
 
     public Description getDescription() {
-        return new Description("COP", "Correlation Outlier Probability", "Algorithm to compute correlation-based local outlier probabilitys in a database based on the parameter " + K_PARAM + " and different distance functions", "unpublished");
+        return new Description("COP_SCORE", "Correlation Outlier Probability", "Algorithm to compute correlation-based local outlier probabilitys in a database based on the parameter " + K_PARAM + " and different distance functions", "unpublished");
     }
 
     /**

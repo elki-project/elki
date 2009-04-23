@@ -1,6 +1,8 @@
 package de.lmu.ifi.dbs.elki.result;
 
 import java.util.ArrayList;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 
 /**
@@ -55,6 +57,50 @@ public class ResultUtil {
       M res = mr.getAssociation(meta);
       if(res != null) {
         return res;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * (Try to) find an association of the given ID in the result.
+   * 
+   * @param <T> Association result type
+   * @param result Result to find associations in
+   * @param assoc Association
+   * @return First matching annotation result or null
+   */
+  public static final <T> AnnotationResult<T> findAnnotationResult(MultiResult result, AssociationID<T> assoc) {
+    List<Result> anns = result.filterResults(AnnotationResult.class);
+    return findAnnotationResult(anns, assoc);
+  }
+
+  /**
+   * (Try to) find an association of the given ID in the result.
+   * 
+   * @param <T> Association result type
+   * @param anns List of Results
+   * @param assoc Association
+   * @return First matching annotation result or null
+   */
+  @SuppressWarnings("unchecked")
+  public static final <T> AnnotationResult<T> findAnnotationResult(List<Result> anns, AssociationID<T> assoc) {
+    if(anns == null) {
+      return null;
+    }
+    for(Result r : anns) {
+      if(r instanceof AnnotationResult) {
+        AnnotationResult<?> a = (AnnotationResult<?>) r;
+        if(a.getAssociationID() == assoc) { // == should be okay - unique objects
+          return (AnnotationResult<T>) a;
+        }
+      }
+      // recurse into MultiResults - no loop detection!
+      if (r instanceof MultiResult) {
+        AnnotationResult<T> rec = findAnnotationResult((MultiResult)r, assoc); 
+        if (rec != null) {
+          return rec;
+        }
       }
     }
     return null;

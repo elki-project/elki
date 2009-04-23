@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.IndexDatabase;
 import de.lmu.ifi.dbs.elki.distance.Distance;
-import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromDatabase;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
 import de.lmu.ifi.dbs.elki.utilities.Description;
@@ -135,8 +135,7 @@ public class DBOutlierDetection <O extends DatabaseObject, D extends Distance<D>
 			    	}
 		    	}
 		    }
-		    AnnotationsFromDatabase<O, Double> res1 = new AnnotationsFromDatabase<O, Double>(database);
-	        res1.addAssociation(DBOD_OFLAG);
+		    AnnotationFromDatabase<Double, O> res1 = new AnnotationFromDatabase<Double, O>(database, DBOD_OFLAG);
 	        // Ordering
 	        OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database, DBOD_OFLAG, true); 
 	        // combine results.

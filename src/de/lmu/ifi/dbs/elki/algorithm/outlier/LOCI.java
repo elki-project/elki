@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromDatabase;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
 import de.lmu.ifi.dbs.elki.utilities.Description;
@@ -102,6 +102,21 @@ public class LOCI<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
   MultiResult result;
 
   /**
+   * The LOCI critical distances of an object.
+   */
+  public static final AssociationID<List<CPair<Double,Integer>>> LOCI_CRITICALDIST = AssociationID.getOrCreateAssociationIDGenerics("loci-cdist", List.class);
+
+  /**
+   * The LOCI MDEF / SigmaMDEF maximum values radius
+   */
+  public static final AssociationID<Double> LOCI_MDEF_CRITICAL_RADIUS = AssociationID.getOrCreateAssociationID("loci.mdefrad", Double.class);
+
+  /**
+   * The LOCI MDEF / SigmaMDEF maximum value (normalized MDEF)
+   */
+  public static final AssociationID<Double> LOCI_MDEF_NORM = AssociationID.getOrCreateAssociationID("loci.mdefnorm", Double.class);
+
+  /**
    * Constructor, adding options to option handler.
    */
   public LOCI() {
@@ -164,13 +179,13 @@ public class LOCI<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
           lastk = c.second;
       }
       
-      database.associate(AssociationID.LOCI_CRITICALDIST, id, cdist);
+      database.associate(LOCI_CRITICALDIST, id, cdist);
     }
     // LOCI main step
     for (Integer id : database.getIDs()) {
       double maxmdefnorm = 0.0;
       double maxnormr = 0;
-      List<CPair<Double,Integer>> cdist = database.getAssociation(AssociationID.LOCI_CRITICALDIST, id);
+      List<CPair<Double,Integer>> cdist = database.getAssociation(LOCI_CRITICALDIST, id);
       for (CPair<Double,Integer> c : cdist) {
         double alpha_r = alpha * c.first;
         // compute n(p_i, \alpha * r) from list
@@ -186,7 +201,7 @@ public class LOCI<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
         List<DistanceResultPair<DoubleDistance>> rneighbors = database.rangeQuery(id, Double.toString(c.first), getDistanceFunction());
         if (rneighbors.size() < nmin) continue;
         for (DistanceResultPair<DoubleDistance> rn : rneighbors) {
-          List<CPair<Double,Integer>> rncdist = database.getAssociation(AssociationID.LOCI_CRITICALDIST, rn.getID());
+          List<CPair<Double,Integer>> rncdist = database.getAssociation(LOCI_CRITICALDIST, rn.getID());
           int rn_alphar = 0;
           for (CPair<Double,Integer> c2 : rncdist) {
             if (c2.first <= alpha_r) rn_alphar=c2.second;
@@ -208,16 +223,13 @@ public class LOCI<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
         }
       }
       // TODO: when nmin was never fulfilled, the values will remain 0.
-      database.associate(AssociationID.LOCI_MDEF_NORM, id, maxmdefnorm);
-      database.associate(AssociationID.LOCI_MDEF_CRITICAL_RADIUS, id, maxnormr);
+      database.associate(LOCI_MDEF_NORM, id, maxmdefnorm);
+      database.associate(LOCI_MDEF_CRITICAL_RADIUS, id, maxnormr);
     }
-    AnnotationsFromDatabase<O, Double> res1 = new AnnotationsFromDatabase<O, Double>(database);
-    res1.addAssociation(AssociationID.LOCI_MDEF_NORM);
-    res1.addAssociation(AssociationID.LOCI_MDEF_CRITICAL_RADIUS);
-    OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database, AssociationID.LOCI_MDEF_NORM, true);
     result = new MultiResult();
-    result.addResult(res1);
-    result.addResult(res2);
+    result.addResult(new AnnotationFromDatabase<Double, O>(database,LOCI_MDEF_NORM));
+    result.addResult(new AnnotationFromDatabase<Double, O>(database,LOCI_MDEF_CRITICAL_RADIUS));
+    result.addResult(new OrderingFromAssociation<Double, O>(database,LOCI_MDEF_NORM, true));
     return result;
   }
 

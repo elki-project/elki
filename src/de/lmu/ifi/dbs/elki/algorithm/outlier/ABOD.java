@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.PolynomialKernelFunction;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.result.AnnotationsFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -186,15 +186,10 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
       abodvalues.put(pair.getSecond(), pair.getFirst());
       maxabod = Math.max(maxabod, pair.getFirst());
     }
-    // ABOD values as result
-    AnnotationsFromHashMap<Double> res1 = new AnnotationsFromHashMap<Double>();
-    res1.addMap(ABOD_SCORE, abodvalues);
-    // resulting ordering
-    OrderingFromHashMap<Double> res2 = new OrderingFromHashMap<Double>(abodvalues, true);
     // combine results.
     result = new MultiResult();
-    result.addResult(res1);
-    result.addResult(res2);
+    result.addResult(new AnnotationFromHashMap<Double>(ABOD_SCORE, abodvalues));
+    result.addResult(new OrderingFromHashMap<Double>(abodvalues, true));
     // store normalization information.
     ResultUtil.setGlobalAssociation(result, ABOD_NORM, maxabod);
     return result;
@@ -295,14 +290,9 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
       maxabod = Math.max(maxabod, pair.getFirst());
     }
     // ABOD values as result
-    AnnotationsFromHashMap<Double> res1 = new AnnotationsFromHashMap<Double>();
-    res1.addMap(ABOD_SCORE, abodvalues);
-    // resulting ordering
-    OrderingFromHashMap<Double> res2 = new OrderingFromHashMap<Double>(abodvalues, true);
-    // combine results.
     result = new MultiResult();
-    result.addResult(res1);
-    result.addResult(res2);
+    result.addResult(new AnnotationFromHashMap<Double>(ABOD_SCORE, abodvalues));
+    result.addResult(new OrderingFromHashMap<Double>(abodvalues, true));
     // store normalization information.
     ResultUtil.setGlobalAssociation(result, ABOD_NORM, maxabod);
     return result;

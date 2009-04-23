@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.result.AnnotationsFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -53,6 +53,16 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
             EuclideanDistanceFunction.class.getName());
 
     /**
+     * The association id to associate the LOF_SCORE of an object for the LOF_SCORE algorithm.
+     */
+    public static final AssociationID<Double> LOF_SCORE = AssociationID.getOrCreateAssociationID("lof", Double.class);
+
+    /**
+     * The association id to associate the maximum LOF_SCORE of an algorithm run.
+     */
+    public static final AssociationID<Double> LOF_MAX = AssociationID.getOrCreateAssociationID("lof max", Double.class);
+
+    /**
      * Holds the instance of the reachability distance function specified by
      * {@link #REACHABILITY_DISTANCE_FUNCTION_PARAM}.
      */
@@ -63,11 +73,11 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
      */
     public static final OptionID K_ID = OptionID.getOrCreateOptionID(
         "genlof.k",
-        "The number of nearest neighbors of an object to be considered for computing its LOF."
+        "The number of nearest neighbors of an object to be considered for computing its LOF_SCORE."
     );
 
     /**
-     * Parameter to specify the number of nearest neighbors of an object to be considered for computing its LOF,
+     * Parameter to specify the number of nearest neighbors of an object to be considered for computing its LOF_SCORE,
      * must be an integer greater than 1.
      * <p>Key: {@code -genlof.k} </p>
      */
@@ -84,7 +94,7 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
     MultiResult result;
 
     /**
-     * Provides the Generalized LOF algorithm,
+     * Provides the Generalized LOF_SCORE algorithm,
      * adding parameters
      * {@link #K_PARAM} and {@link #REACHABILITY_DISTANCE_FUNCTION_PARAM}
      * to the option handler additionally to parameters of super class.
@@ -98,14 +108,14 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
     }
 
     /**
-     * Performs the Generalized LOF algorithm on the given database.
+     * Performs the Generalized LOF_SCORE algorithm on the given database.
      */
     @Override
     protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
         getDistanceFunction().setDatabase(database, isVerbose(), isTime());
         reachabilityDistanceFunction.setDatabase(database, isVerbose(), isTime());
         if (logger.isVerbose()) {
-          logger.verbose("LOF ");
+          logger.verbose("LOF_SCORE ");
         }
 
         // TODO: use some abstraction to allow on-disk storage.
@@ -114,7 +124,7 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
             if (logger.isVerbose()) {
               logger.verbose("computing neighborhoods");
             }
-            FiniteProgress progressNeighborhoods = new FiniteProgress("LOF", database.size());
+            FiniteProgress progressNeighborhoods = new FiniteProgress("LOF_SCORE", database.size());
             int counter = 1;
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
                 Integer id = iter.next();
@@ -174,12 +184,12 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
         // XXX: everything here appears to be stupid
         HashMap<Integer, Double> lofs = new HashMap<Integer, Double>();
         double lofmax = 0;
-        {// compute LOF of each db object
+        {// compute LOF_SCORE of each db object
             if (logger.isVerbose()) {
               logger.verbose("computing LOFs");
             }
 
-            FiniteProgress progressLOFs = new FiniteProgress("LOF for objects", database.size());
+            FiniteProgress progressLOFs = new FiniteProgress("LOF_SCORE for objects", database.size());
             int counter = 1;
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
                 Integer id = iter.next();
@@ -199,16 +209,11 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
                 }
             }
         }
-        AnnotationsFromHashMap<Double> res1 = new AnnotationsFromHashMap<Double>();
-        res1.addMap(AssociationID.LOF, lofs);
-        // Ordering
-        OrderingFromHashMap<Double> res2 = new OrderingFromHashMap<Double>(lofs, true);
-        // combine results.
         result = new MultiResult();
-        result.addResult(res1);
-        result.addResult(res2);
+        result.addResult(new AnnotationFromHashMap<Double>(LOF_SCORE, lofs));
+        result.addResult(new OrderingFromHashMap<Double>(lofs, true));
         
-        ResultUtil.setGlobalAssociation(result, AssociationID.LOF_MAX, lofmax);
+        ResultUtil.setGlobalAssociation(result, LOF_MAX, lofmax);
 
         return result;
     }

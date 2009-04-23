@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.SpatialIndexDatabase;
@@ -13,7 +14,7 @@ import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
-import de.lmu.ifi.dbs.elki.result.AnnotationsFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.utilities.IndefiniteProgress;
@@ -36,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * @param <E> the type of entry used in the spatial node
  */
 public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry>
-    extends DistanceBasedAlgorithm<V, D, AnnotationsFromHashMap<KNNList<D>>> {
+    extends DistanceBasedAlgorithm<V, D, AnnotationFromHashMap<KNNList<D>>> {
 
     /**
      * OptionID for {@link #K_PARAM}
@@ -56,9 +57,14 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
         new IntParameter(K_ID, new GreaterConstraint(0), 1);
 
     /**
+     * Association ID for KNNLists.
+     */
+    public static final AssociationID<KNNList<?>> KNNLIST = AssociationID.getOrCreateAssociationIDGenerics("KNNS", KNNList.class); 
+
+    /**
      * The knn lists for each object.
      */
-    private AnnotationsFromHashMap<KNNList<D>> result;
+    private AnnotationFromHashMap<KNNList<D>> result;
 
     /**
      * Provides a KNN-Join,
@@ -83,7 +89,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
      */
     @Override
     @SuppressWarnings("unchecked")
-    protected AnnotationsFromHashMap<KNNList<D>> runInTime(Database<V> database) throws IllegalStateException {
+    protected AnnotationFromHashMap<KNNList<D>> runInTime(Database<V> database) throws IllegalStateException {
         if (!(database instanceof SpatialIndexDatabase)) {
             throw new IllegalStateException(
                 "Database must be an instance of "
@@ -166,8 +172,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
                 }
             }
             pageprog.setCompleted();
-            result = new AnnotationsFromHashMap();
-            result.addMap("KNNS", knnLists);
+            result = new AnnotationFromHashMap(KNNLIST, knnLists);
         }
 
         catch (Exception e) {
@@ -229,7 +234,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
      *
      * @return the result of the algorithm
      */
-    public AnnotationsFromHashMap<KNNList<D>> getResult() {
+    public AnnotationFromHashMap<KNNList<D>> getResult() {
         return result;
     }
 

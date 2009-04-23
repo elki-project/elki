@@ -7,15 +7,12 @@ import java.util.List;
 import java.util.SortedSet;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
-import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.utilities.ConstantObject;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
-import de.lmu.ifi.dbs.elki.utilities.pairs.CPair;
 
 /**
  * An AssociationID is used by databases as a unique identifier for specific
@@ -82,59 +79,6 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
     public static final AssociationID<DoubleDistance> DOUBLE_DISTANCE = new AssociationID<DoubleDistance>("doubleDistance", DoubleDistance.class);
 
     /**
-     * The association id to associate the LOF of an object for the LOF algorithm.
-     */
-    public static final AssociationID<Double> LOF = new AssociationID<Double>("lof", Double.class);
-
-    /**
-     * The association id to associate the maximum LOF of an algorithm run.
-     */
-    public static final AssociationID<Double> LOF_MAX = new AssociationID<Double>("lof max", Double.class);
-
-  /**
-   * The association id to associate the Correlation Outlier Probability of an object
-   */
-  public static final AssociationID<Double> COP = new AssociationID<Double>("cop", Double.class);
-  
-  /**
-   * The association id to associate the COP error vector of an object for the COP
-   * algorithm.
-   */
-  public static final AssociationID<Vector> COP_ERROR_VECTOR = new AssociationID<Vector>("cop error vector", Vector.class);
-  
-  /**
-   * The association id to associate the COP data vector of an object for the COP
-   * algorithm.
-   */
-  public static final AssociationID<Matrix> COP_DATA_VECTORS = new AssociationID<Matrix>("cop data vectors", Matrix.class);
-  
-  /**
-   * The association id to associate the COP correlation dimensionality of an object for the COP
-   * algorithm.
-   */
-  public static final AssociationID<Integer> COP_DIM = new AssociationID<Integer>("cop dim", Integer.class);
-  
-  /**
-   * The association id to associate the COP correlation solution
-   */
-  public static final AssociationID<CorrelationAnalysisSolution<?>> COP_SOL = new AssociationID<CorrelationAnalysisSolution<?>>("cop sol", CorrelationAnalysisSolution.class);
-  
-  /**
-   * The LOCI critical distances of an object.
-   */
-  public static final AssociationID<List<CPair<Double,Integer>>> LOCI_CRITICALDIST = new AssociationID<List<CPair<Double,Integer>>>("loci-cdist", List.class);
-  
-  /**
-   * The LOCI MDEF / SigmaMDEF maximum values radius
-   */
-  public static final AssociationID<Double> LOCI_MDEF_CRITICAL_RADIUS = new AssociationID<Double>("loci.mdefrad", Double.class);
-  
-  /**
-   * The LOCI MDEF / SigmaMDEF maximum value (normalized MDEF)
-   */
-  public static final AssociationID<Double> LOCI_MDEF_NORM = new AssociationID<Double>("loci.mdefnorm", Double.class);
-  
-  /**
      * AssociationID to associate the probabilities for an instance given a (set
      * of) distribution(s).
      */

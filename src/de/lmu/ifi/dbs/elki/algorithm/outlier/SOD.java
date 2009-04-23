@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SharedNearestNeighborSimilarityFunction;
-import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromDatabase;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
 import de.lmu.ifi.dbs.elki.utilities.Description;
@@ -142,15 +142,10 @@ public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends
             SODModel<V> model = new SODModel<V>(database, knnList, alpha, database.get(queryObject));
             database.associate(SOD_MODEL, queryObject, model);
         }
-        AnnotationsFromDatabase<V, SODModel> res1 = new AnnotationsFromDatabase<V, SODModel>(database);
-        res1.addAssociation(SOD_MODEL);
-        // TODO: Add SOD value directly to allow ranking?
-        // Ordering
-        OrderingFromAssociation<?, V> res2 = new OrderingFromAssociation(database, SOD_MODEL, true); 
         // combine results.
         sodResult = new MultiResult();
-        sodResult.addResult(res1);
-        sodResult.addResult(res2);
+        sodResult.addResult(new AnnotationFromDatabase<SODModel, V>(database, SOD_MODEL));
+        sodResult.addResult(new OrderingFromAssociation(database, SOD_MODEL, true));
         return sodResult;
     }
 
