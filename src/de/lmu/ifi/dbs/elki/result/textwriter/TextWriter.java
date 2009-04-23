@@ -23,6 +23,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
@@ -53,6 +54,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
  */
 @SuppressWarnings("unchecked")
 public class TextWriter<O extends DatabaseObject> {
+  /**
+   * Logger
+   */
+  private static final Logging logger = Logging.getLogger(TextWriter.class);
+
   /**
    * Extension for txt-files.
    */
@@ -134,17 +140,17 @@ public class TextWriter<O extends DatabaseObject> {
    * @throws IOException
    */
   public void output(Database<O> db, Result r, StreamFactory streamOpener) throws UnableToComplyException, IOException {
-    List<AnnotationResult> ra = null;
-    OrderingResult ro = null;
-    Clustering<Model> rc = null;
-    IterableResult<?> ri = null;
+    List<AnnotationResult<?>> ra = null;
+    List<OrderingResult> ro = null;
+    List<Clustering<? extends Model>> rc = null;
+    List<IterableResult<?>> ri = null;
 
     Collection<DatabaseObjectGroup> groups = null;
 
-    ra = getAnnotationResults(r);
-    ro = getOrderingResult(r);
-    rc = getClusteringResult(r);
-    ri = getIterableResult(r);
+    ra = ResultUtil.getAnnotationResults(r);
+    ro = ResultUtil.getOrderingResults(r);
+    rc = ResultUtil.getClusteringResults(r);
+    ri = ResultUtil.getIterableResults(r);
 
     if(ra == null && ro == null && rc == null && ri == null) {
       throw new UnableToComplyException("No printable result found.");
@@ -152,10 +158,10 @@ public class TextWriter<O extends DatabaseObject> {
 
     NamingScheme naming = null;
     // Process groups or all data in a flat manner?
-    if(rc != null) {
-      groups = new HashSet<DatabaseObjectGroup>(rc.getAllClusters());
+    if(rc != null && rc.size() > 0) {
+      groups = new HashSet<DatabaseObjectGroup>(rc.get(0).getAllClusters());
       // force an update of cluster names.
-      naming = new SimpleEnumeratingScheme(rc);
+      naming = new SimpleEnumeratingScheme(rc.get(0));
     }
     else if(ri != null) {
       // TODO
@@ -167,73 +173,14 @@ public class TextWriter<O extends DatabaseObject> {
     
     List<AttributeSettings> settings = ResultUtil.getGlobalAssociation((MultiResult)r, AssociationID.META_SETTINGS);
 
-    if(ri != null) {
-      writeIterableResult(db, streamOpener, ri, settings);
+    if(ri != null && ri.size() > 0) {
+      writeIterableResult(db, streamOpener, ri.get(0), settings);
     }
     if(groups != null) {
       for(DatabaseObjectGroup group : groups) {
         writeGroupResult(db, streamOpener, group, ra, ro, naming, settings);
       }
     }
-  }
-
-  private List<AnnotationResult> getAnnotationResults(Result r) {
-    List<AnnotationResult> anns;
-    if (r instanceof AnnotationResult) {
-      anns = new ArrayList<AnnotationResult>(0);
-      anns.add((AnnotationResult) r);
-      return anns;
-    }
-    if(r instanceof MultiResult) {
-      anns = ((MultiResult)r).filterResults(AnnotationResult.class);
-      return anns;
-    }
-    return null;
-  }
-
-  private OrderingResult getOrderingResult(Result r) {
-    if (r instanceof OrderingResult) {
-      return (OrderingResult) r;
-    }
-    if(r instanceof MultiResult) {
-      List<OrderingResult> orderings = ((MultiResult)r).filterResults(OrderingResult.class);
-      // return last.
-      // TODO: combine somehow?
-      if(orderings.size() >= 1) {
-        return orderings.get(orderings.size() - 1);
-      }
-    }
-    return null;
-  }
-
-  private Clustering<Model> getClusteringResult(Result r) {
-    if (r instanceof Clustering) {
-      return (Clustering<Model>) r;
-    }
-    if(r instanceof MultiResult) {
-      List<Clustering<Model>> clusterings = ((MultiResult)r).filterResults(Clustering.class);
-      // return last.
-      // TODO: combine somehow?
-      if(clusterings.size() >= 1) {
-        return clusterings.get(clusterings.size() - 1);
-      }
-    }
-    return null;
-  }
-
-  private IterableResult<?> getIterableResult(Result r) {
-    if (r instanceof IterableResult) {
-      return (IterableResult<?>) r;
-    }
-    if(r instanceof MultiResult) {
-      List<IterableResult<?>> iters = ((MultiResult)r).filterResults(IterableResult.class);
-      // return last.
-      // TODO: combine somehow?
-      if(iters.size() >= 1) {
-        return iters.get(iters.size() - 1);
-      }
-    }
-    return null;
   }
 
   private void printObject(TextWriterStream out, O obj, List<Pair<String, Object>> anns) throws UnableToComplyException, IOException {
@@ -263,7 +210,7 @@ public class TextWriter<O extends DatabaseObject> {
     out.flush();
   }
 
-  private void writeGroupResult(Database<O> db, StreamFactory streamOpener, DatabaseObjectGroup group, List<AnnotationResult> ra, OrderingResult ro, NamingScheme naming, List<AttributeSettings> settings) throws FileNotFoundException, UnableToComplyException, IOException {
+  private void writeGroupResult(Database<O> db, StreamFactory streamOpener, DatabaseObjectGroup group, List<AnnotationResult<?>> ra, List<OrderingResult> ro, NamingScheme naming, List<AttributeSettings> settings) throws FileNotFoundException, UnableToComplyException, IOException {
     String filename = null;
     // for clusters, use naming.
     if(group instanceof Cluster) {
@@ -291,8 +238,12 @@ public class TextWriter<O extends DatabaseObject> {
     Collection<Integer> ids = group.getIDs();
     Iterator<Integer> iter = ids.iterator();
     // apply sorting.
-    if(ro != null) {
-      iter = ro.iter(ids);
+    if(ro != null && ro.size() > 0) {
+      try {
+        iter = ro.get(0).iter(ids);
+      } catch (Exception e) {
+        logger.warning("Exception while trying to sort results.",e);
+      }
     }
 
     while(iter.hasNext()) {

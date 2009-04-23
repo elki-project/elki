@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.result;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 
 /**
@@ -102,6 +103,78 @@ public class ResultUtil {
           return rec;
         }
       }
+    }
+    return null;
+  }
+
+  /**
+   * Collect all Annotation results from a Result
+   * 
+   * @param r Result
+   * @return List of all annotation results
+   */
+  public static List<AnnotationResult<?>> getAnnotationResults(Result r) {
+    if (r instanceof AnnotationResult) {
+      List<AnnotationResult<?>> anns = new ArrayList<AnnotationResult<?>>(1);
+      anns.add((AnnotationResult<?>) r);
+      return anns;
+    }
+    if(r instanceof MultiResult) {
+      return ((MultiResult)r).filterResults(AnnotationResult.class);
+    }
+    return null;
+  }
+
+  /**
+   * Collect all ordering results from a Result
+   * 
+   * @param r Result
+   * @return List of ordering results
+   */
+  public static List<OrderingResult> getOrderingResults(Result r) {
+    if (r instanceof OrderingResult) {
+      List<OrderingResult> ors = new ArrayList<OrderingResult>(1);
+      ors.add((OrderingResult) r);
+      return ors;
+    }
+    if(r instanceof MultiResult) {
+      return ((MultiResult)r).filterResults(OrderingResult.class);
+    }
+    return null;
+  }
+
+  /**
+   * Collect all clustering results from a Result
+   * 
+   * @param r Result
+   * @return List of clustering results
+   */
+  public static List<Clustering<?>> getClusteringResults(Result r) {
+    if (r instanceof Clustering) {
+      List<Clustering<?>> crs = new ArrayList<Clustering<?>>(1);
+      crs.add((Clustering<?>) r);
+      return crs;
+    }
+    if(r instanceof MultiResult) {
+      return ((MultiResult)r).filterResults(Clustering.class);
+    }
+    return null;
+  }
+
+  /**
+   * Return all Iterable results
+   * 
+   * @param r Result
+   * @return List of iterable results
+   */
+  public static List<IterableResult<?>> getIterableResults(Result r) {
+    if (r instanceof IterableResult) {
+      List<IterableResult<?>> irs = new ArrayList<IterableResult<?>>(1);
+      irs.add((IterableResult<?>) r);
+      return irs;
+    }
+    if(r instanceof MultiResult) {
+      return ((MultiResult)r).filterResults(IterableResult.class);
     }
     return null;
   }
