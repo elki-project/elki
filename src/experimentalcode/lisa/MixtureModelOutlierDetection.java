@@ -110,7 +110,7 @@ private static final double SINGULARITY_CHEAT = 1E-9;
       normalObjs.remove(i);
       double currentLogLike = normalObjs.size()*Math.log(1-l) + loglikelihoodNormal(normalObjs, database) + anomalousObjs.size()*Math.log(l) + loglikelihoodAnomalous(anomalousObjs);
  
-      double deltaLog = currentLogLike - logLike;
+      double deltaLog =Math.abs(logLike- currentLogLike) ;
       //debugFine( "delta   " + deltaLog);
       //threshold
       if(deltaLog > c) {
