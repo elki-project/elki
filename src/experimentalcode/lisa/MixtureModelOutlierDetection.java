@@ -102,7 +102,7 @@ private static final double SINGULARITY_CHEAT = 1E-9;
     double logLike = database.size()*Math.log(1-l) + loglikelihoodNormal(normalObjs, database);
     debugFine("normalsize   " + normalObjs.size()+ " anormalsize  " + anomalousObjs.size() + " all " + (anomalousObjs.size()+normalObjs.size()) );
     
-    for(int i= 0; i< normalObjs.size(); i++){
+    for(int i= 0; i< normalObjs.size()&& normalObjs.size() > 0; i++){
       debugFine("i     " + i);
       //move object to anomalousObjs and test if the loglikelyhood increases significantly
       Integer x = normalObjs.get(i);
@@ -120,6 +120,7 @@ private static final double SINGULARITY_CHEAT = 1E-9;
         debugFine("outlier id" + x);
         database.associate(MMOD_OFLAG, x, 0.3);
         logLike = currentLogLike;
+        debugFine("##########" + i);
         i--;
       }
       else{
@@ -163,6 +164,10 @@ private static final double SINGULARITY_CHEAT = 1E-9;
    */
   private double loglikelihoodNormal(List<Integer> normalObjs, Database<V> database) {
     double prob = 0;
+    if (normalObjs.isEmpty()){
+      return prob;
+    }
+    else {
       V mean = DatabaseUtil.centroid(database, normalObjs);
       V meanNeg = mean.negativeVector();
       
@@ -187,6 +192,7 @@ private static final double SINGULARITY_CHEAT = 1E-9;
        }
 //       debugFine("probnormal      " + prob);
        return prob;
+    }
   }
   
   @Override
