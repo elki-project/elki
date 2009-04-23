@@ -98,7 +98,7 @@ public class DBOutlierDetection <O extends DatabaseObject, D extends Distance<D>
 		    debugFine("maximum number of objects  " + m);
 		    //if index exists, kNN query. if the distance to the mth nearest neighbor is more than d -> object is outlier  
 		    if (database instanceof IndexDatabase){
-		    	for(Integer id : database.getIDs()){
+		    	for(Integer id : database){
 		    	  debugFine("distance to mth nearest neighbour" + database.kNNQueryForID(id, m, getDistanceFunction()).toString());
 		    		if(database.kNNQueryForID(id, m , getDistanceFunction()).get(m-1).getFirst().compareTo(distance)  <= 0){
 		    			//flag as outlier
@@ -112,7 +112,7 @@ public class DBOutlierDetection <O extends DatabaseObject, D extends Distance<D>
 		    }
 		    else {
 		    	//range query for each object. stop if m objects are found
-		    	for (Integer id : database.getIDs()){
+		    	for (Integer id : database){
 			    	Iterator<Integer> iterator = database.iterator();
 			        int count = 0;  
 			    	while (iterator.hasNext()&& count < m) {

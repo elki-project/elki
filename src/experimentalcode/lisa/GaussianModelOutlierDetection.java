@@ -1,9 +1,6 @@
 package experimentalcode.lisa;
 
-import java.util.Iterator;
-
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -34,8 +31,7 @@ public class GaussianModelOutlierDetection<V extends RealVector<V,Double>> exten
 		double covarianceDet = covarianceMatrix.det();
 		double fakt = (1.0/(Math.sqrt(Math.pow(2*Math.PI, database.dimensionality())*(covarianceDet)))); 
 		//for each object compute mahalanobis distance
-		 for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); ) {
-             Integer id = iter.next();
+		 for (Integer id : database) {
              V x = database.get(id);
              Vector x_minus_mean = x.plus(meanNeg).getColumnVector();
              double mDist = x_minus_mean.transpose().times(covarianceTransposed).times(x_minus_mean).get(0,0);
