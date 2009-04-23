@@ -27,10 +27,10 @@ public class KNNOutlierDetection <O extends DatabaseObject, D extends DoubleDist
 		      "kth nearest neighbor"
 		  );
 
-	public static final OptionID N_ID = OptionID.getOrCreateOptionID(
+	/*public static final OptionID N_ID = OptionID.getOrCreateOptionID(
 				      "knno.n",
 				      "number of outliers that are searched"
-				  );
+				  );*/
 		
 		public static final AssociationID<Double> KNNO_ODEGREE= AssociationID.getOrCreateAssociationID("knno_odegree", Double.class);
 		 public static final AssociationID<Double> KNNO_MAXODEGREE = AssociationID.getOrCreateAssociationID("knno_maxodegree", Double.class);
@@ -41,12 +41,12 @@ public class KNNOutlierDetection <O extends DatabaseObject, D extends DoubleDist
 		   */
 		  private final IntParameter K_PARAM = new IntParameter(K_ID);
 		  
-		  /**
+		  /*
 		   * Parameter to specify the number of outliers
 		   * 
 		   * <p>Key: {@code -knno.n} </p>
-		   */
-		  private final IntParameter N_PARAM = new IntParameter(N_ID);
+		   /
+		  private final IntParameter N_PARAM = new IntParameter(N_ID);*/
 		  /**
 		   * Holds the value of {@link #K_PARAM}.
 		   */
@@ -54,7 +54,7 @@ public class KNNOutlierDetection <O extends DatabaseObject, D extends DoubleDist
 		  /**
 		   * Holds the value of {@link #N_PARAM}.
 		   */
-		  private int n;
+		  //private int n;
 		  /**
 		   * Provides the result of the algorithm.
 		   */
@@ -69,7 +69,7 @@ public class KNNOutlierDetection <O extends DatabaseObject, D extends DoubleDist
 		    // kth nearest neighbor
 		    addOption(K_PARAM);
 		    // number of outliers
-		    addOption(N_PARAM);
+		    //addOption(N_PARAM);
 		    }
 		  
 		  /**
@@ -81,7 +81,7 @@ public class KNNOutlierDetection <O extends DatabaseObject, D extends DoubleDist
 		  public String[] setParameters(String[] args) throws ParameterException {
 		      String[] remainingParameters = super.setParameters(args);
 		      k = K_PARAM.getValue();
-			  n = N_PARAM.getValue(); 
+			 // n = N_PARAM.getValue(); 
 		      return remainingParameters;
 		  }
 
