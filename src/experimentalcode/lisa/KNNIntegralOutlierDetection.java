@@ -95,11 +95,8 @@ public class KNNIntegralOutlierDetection <O extends DatabaseObject, D extends Do
       protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
         double maxodegree = 0;
         getDistanceFunction().setDatabase(database, isVerbose(), isTime());
-        Iterator<Integer> iter = database.iterator();
-        Integer id;
         //compute distance to the k nearest neighbor. n objects with the highest distance are flagged as outliers
-        while(iter.hasNext()){
-         id = iter.next();
+        for(Integer id : database){
           //compute sum of the  distances to the k nearest neighbors
          
          List<DistanceResultPair<DoubleDistance>> knn = database.kNNQueryForID(id,  k, getDistanceFunction());
