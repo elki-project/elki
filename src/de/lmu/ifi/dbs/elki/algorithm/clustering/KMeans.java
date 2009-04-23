@@ -100,8 +100,8 @@ public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends D
             V randomBase = database.get(database.iterator().next());
             AttributeWiseRealVectorNormalization<V> normalization = new AttributeWiseRealVectorNormalization<V>();
             List<V> list = new ArrayList<V>(database.size());
-            for (Iterator<Integer> dbIter = database.iterator(); dbIter.hasNext();) {
-                list.add(database.get(dbIter.next()));
+            for (Integer id : database) {
+                list.add(database.get(id));
             }
             try {
                 normalization.normalize(list);
@@ -200,9 +200,8 @@ public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends D
             clusters.add(new LinkedList<Integer>());
         }
 
-        for (Iterator<Integer> dbIter = database.iterator(); dbIter.hasNext();) {
+        for (Integer id : database) {
             List<D> distances = new ArrayList<D>(k);
-            Integer id = dbIter.next();
             V fv = database.get(id);
             int minIndex = 0;
             for (int d = 0; d < k; d++) {
