@@ -9,7 +9,29 @@ import org.apache.batik.util.SVGConstants;
  * @author Erich Schubert
  */
 public class PublicationColorLibrary implements ColorLibrary {
-  private static String[] colors = { SVGConstants.CSS_RED_VALUE, SVGConstants.CSS_BLUE_VALUE, SVGConstants.CSS_GREEN_VALUE, SVGConstants.CSS_ORANGE_VALUE, SVGConstants.CSS_CYAN_VALUE, SVGConstants.CSS_MAGENTA_VALUE, SVGConstants.CSS_YELLOW_VALUE };
+  /**
+   * These colors are hand-picked to provide reasonable contrast
+   * and readability. Therefore we stick to primary colors first,
+   * and the first two colors are red and blue to help red-green blind people.
+   * Yellow usually offers bad contrast, therefore comes late.
+   * Magenta often shows up too similar to red, cyan too similar to blue.
+   */
+  private static String[] colors = {
+    // red
+    SVGConstants.CSS_RED_VALUE,
+    // blue
+    SVGConstants.CSS_BLUE_VALUE,
+    // green
+    SVGConstants.CSS_GREEN_VALUE,
+    // orange
+    SVGConstants.CSS_ORANGE_VALUE,
+    // cyan
+    SVGConstants.CSS_CYAN_VALUE,
+    // magenta
+    SVGConstants.CSS_MAGENTA_VALUE,
+    // yellow
+    SVGConstants.CSS_YELLOW_VALUE
+  };
 
   @Override
   public String getColor(int index) {
