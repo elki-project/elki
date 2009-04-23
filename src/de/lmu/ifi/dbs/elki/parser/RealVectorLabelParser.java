@@ -43,7 +43,7 @@ import java.util.List;
  * @author Arthur Zimek
  * @param <V> the type of RealVector expected in the {@link ParsingResult}
  */
-public class RealVectorLabelParser<V extends RealVector<V, ?>> extends AbstractParser<V> implements LinebasedParser<V> {
+public class RealVectorLabelParser<V extends RealVector<?, ?>> extends AbstractParser<V> implements LinebasedParser<V> {
   /**
    * OptionID for {@link #FLOAT_FLAG}
    */
@@ -149,13 +149,15 @@ public class RealVectorLabelParser<V extends RealVector<V, ?>> extends AbstractP
       }
     }
 
+    V vec;
     Pair<V, List<String>> objectAndLabels;
     if(parseFloat) {
-      objectAndLabels = new Pair<V, List<String>>((V) new FloatVector(Util.convertToFloat(attributes)), labels);
+      vec = (V) new FloatVector(Util.convertToFloat(attributes));
     }
     else {
-      objectAndLabels = new Pair<V, List<String>>((V) new DoubleVector(attributes), labels);
+      vec = (V) new DoubleVector(attributes);
     }
+    objectAndLabels = new Pair<V, List<String>>(vec, labels);
     return objectAndLabels;
   }
 

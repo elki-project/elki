@@ -20,7 +20,7 @@ import java.util.List;
  * @author Arthur Zimek
  * @param <V> real vector type
  */
-public class RealVectorLabelTransposingParser<V extends RealVector<V, ?>> extends RealVectorLabelParser<V> {
+public class RealVectorLabelTransposingParser<V extends RealVector<?, ?>> extends RealVectorLabelParser<V> {
 
   /**
    * Provides a parser to read points transposed (per column).

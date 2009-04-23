@@ -159,7 +159,7 @@ public static final OptionID C_ID = OptionID.getOrCreateOptionID("mmo.c", "cutof
       Matrix covarianceMatrix = DatabaseUtil.covarianceMatrix(database, normalObjs);
       Matrix covInv;
       debugFine(covarianceMatrix.toString());
-      //test singuläre matrix
+      //test singulaere matrix
       if(covarianceMatrix.equals(new Matrix(normalObjs.size(), normalObjs.size()))) {
        
         covInv = covarianceMatrix;

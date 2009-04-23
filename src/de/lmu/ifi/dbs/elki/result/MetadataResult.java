@@ -53,7 +53,8 @@ public class MetadataResult implements Result {
    * @param meta Key
    * @return stored meta data or null
    */
-  public <M> M getAssociationGenerics(AssociationID<M> meta) {
-    return data.getGenerics(meta.getName(), meta.getType());
+  @SuppressWarnings("unchecked")
+  public <M> M getAssociationGenerics(AssociationID<?> meta) {
+    return (M) data.getGenerics(meta.getName(), meta.getType());
   }
 }

@@ -108,11 +108,11 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends
         }
 
         HashMap<Integer, Integer> piClone = (HashMap<Integer, Integer>) pi.clone();
-        HashMap<Integer, D> lambdaClone = (HashMap<Integer, D>) lambda.clone();
+        HashMap<Integer, Distance<?>> lambdaClone = (HashMap<Integer, Distance<?>>) lambda.clone();
 
         result = new MultiResult();
         result.addResult(new AnnotationFromHashMap<Integer>(SLINK_PI, piClone));
-        result.addResult(new AnnotationFromHashMap<D>((AssociationID<D>)SLINK_LAMBDA, lambdaClone));
+        result.addResult(new AnnotationFromHashMap<Distance<?>>(SLINK_LAMBDA, lambdaClone));
         // TODO: ensure that the object ID itself is also output. using AssociationID? 
         return result;
     }
