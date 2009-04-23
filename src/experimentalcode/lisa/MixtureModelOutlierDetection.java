@@ -109,18 +109,16 @@ private static final double SINGULARITY_CHEAT = 1E-9;
       anomalousObjs.add(x);
       normalObjs.remove(i);
       double currentLogLike = normalObjs.size()*Math.log(1-l) + loglikelihoodNormal(normalObjs, database) + anomalousObjs.size()*Math.log(l) + loglikelihoodAnomalous(anomalousObjs);
-    // debugFine("1.    " + normalObjs.size()*Math.log(1-l));
-     //debugFine("2.       " + l);
-      //debugFine("currentloglike   " + currentLogLike);
-      double deltaLog = Math.abs(logLike - currentLogLike);
+ 
+      double deltaLog = currentLogLike - logLike;
       //debugFine( "delta   " + deltaLog);
       //threshold
       if(deltaLog > c) {
         //flag as outlier 
         debugFine("outlier id" + x);
-        database.associate(MMOD_OFLAG, x, 0.3);
+        database.associate(MMOD_OFLAG, x, 1.0);
         logLike = currentLogLike;
-        debugFine("##########" + i);
+       
         i--;
       }
       else{
