@@ -130,8 +130,8 @@
 		<mkdir dir="${classpath}" />
 		
 
-		<javac destdir="${classpath}" deprecation="true" debug="true" optimize="true" source="1.6" debuglevel="">
-			<compilerarg value="-Xlint:all"/>
+		<javac destdir="${classpath}" deprecation="false" debug="false" optimize="true" source="1.6" debuglevel="">
+			<!--<compilerarg value="-Xlint:all"/>-->
 			<classpath refid="compileClasspath" />
 			<exclude name="*.xml" />
 			<exclude name="*.html" />
@@ -139,8 +139,8 @@
 			<exclude name="*.xsd" />
 			<exclude name="**/zelki/**" />
 			<exclude name="**/test/**"/>
-			<exclude name="experimentalcode/tobias/**"/>
-			<exclude name="experimentalcode/simon/tests/**"/>
+			<exclude name="**/experimentalcode/tobias/**"/>
+			<exclude name="**/experimentalcode/simon/tests/**"/>
 			<src path="${source}" />
 		</javac>
 	</target>
