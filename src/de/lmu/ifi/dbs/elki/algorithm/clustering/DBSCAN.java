@@ -141,8 +141,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
           logger.verbose("\nClustering:");
         }
         if (database.size() >= minpts) {
-            for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
-                Integer id = iter.next();
+            for (Integer id : database) {
                 if (!processedIDs.contains(id)) {
                     expandCluster(database, id, objprog, clusprog);
                     if (processedIDs.size() == database.size() && noise.size() == 0) {
@@ -157,8 +156,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
             }
         }
         else {
-            for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
-                Integer id = iter.next();
+            for (Integer id : database) {
                 noise.add(id);
                 if (logger.isVerbose()) {
                     objprog.setProcessed(noise.size());

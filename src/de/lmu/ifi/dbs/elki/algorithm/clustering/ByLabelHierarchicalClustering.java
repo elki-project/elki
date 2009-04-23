@@ -64,8 +64,7 @@ public class ByLabelHierarchicalClustering<O extends DatabaseObject> extends Abs
   protected Clustering<Model> runInTime(Database<O> database) throws IllegalStateException {
     HashMap<String, Set<Integer>> labelmap = new HashMap<String, Set<Integer>>(); 
     
-    for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
-      Integer id = iter.next();
+    for (Integer id : database) {
       String label = null;
       
       // try class label first

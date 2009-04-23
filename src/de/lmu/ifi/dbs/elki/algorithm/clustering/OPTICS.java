@@ -133,8 +133,7 @@ public class OPTICS<O extends DatabaseObject, D extends Distance<D>> extends Dis
         heap = new DefaultHeap<D, COEntry>();
         getDistanceFunction().setDatabase(database, isVerbose(), isTime());
 
-        for (Iterator<Integer> it = database.iterator(); it.hasNext();) {
-            Integer id = it.next();
+        for (Integer id : database) {
             if (!processedIDs.contains(id)) {
                 expandClusterOrder(database, id, progress);
             }

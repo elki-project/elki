@@ -213,6 +213,8 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
 
   /**
    * Returns a list comprising all IDs currently in use.
+   * 
+   * The list returned shall not be linked to any actual list possibly hold in the database implementation.
    *
    * @return a list comprising all IDs currently in use
    */

@@ -192,8 +192,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
               logger.verbose("Clustering:");
             }
             if (database.size() >= minpts) {
-                for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
-                    Integer id = iter.next();
+                for (Integer id : database) {
                     if (!processedIDs.contains(id)) {
                         expandCluster(database, id, objprog, clusprog);
                         if (processedIDs.size() == database.size() && noise.size() == 0) {
@@ -208,8 +207,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
                 }
             }
             else {
-                for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
-                    Integer id = iter.next();
+                for (Integer id :database) {
                     noise.add(id);
                     if (isVerbose()) {
                         objprog.setProcessed(processedIDs.size());

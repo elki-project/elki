@@ -371,10 +371,17 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     return sample;
   }
 
+  /**
+   * Returns a list of all ids currently in use in the database.
+   * 
+   * The list is not affected of any changes made to the database in the future nor vice versa.
+   * 
+   * @see de.lmu.ifi.dbs.elki.database.Database#getIDs()
+   */
   public List<Integer> getIDs() {
     List<Integer> ids = new ArrayList<Integer>(this.size());
-    for(Iterator<Integer> dbIter = this.iterator(); dbIter.hasNext();) {
-      ids.add(dbIter.next());
+    for(Integer id : this) {
+      ids.add(id);
     }
     return ids;
   }

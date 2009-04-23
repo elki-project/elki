@@ -79,8 +79,8 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>, M ex
     rowIDs = new int[this.getDatabase().size()];
     {
       int i = 0;
-      for(Iterator<Integer> iter = this.getDatabase().iterator(); iter.hasNext();) {
-        rowIDs[i] = iter.next();
+      for(Integer id : this.getDatabase()) {
+        rowIDs[i] = id;
         i++;
       }
     }

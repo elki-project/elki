@@ -151,7 +151,7 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
     KernelMatrix<V> kernelMatrix = new KernelMatrix<V>(kernelFunction, database);
     PriorityQueue<FCPair<Double, Integer>> pq = new PriorityQueue<FCPair<Double, Integer>>(database.size(), Collections.reverseOrder());
 
-    for(Integer objKey : database.getIDs()) {
+    for(Integer objKey : database) {
       MeanVariance s = new MeanVariance();
 
       // System.out.println("Processing: " +objKey);
@@ -208,7 +208,7 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
 
     PriorityQueue<FCPair<Double, Integer>> pq = new PriorityQueue<FCPair<Double, Integer>>(database.size(), Collections.reverseOrder());
     // get Candidate Ranking
-    for(Integer aKey : database.getIDs()) {
+    for(Integer aKey : database) {
       HashMap<Integer, Double> dists = new HashMap<Integer, Double>(database.size());
       // determine kNearestNeighbors and pairwise distances
       PriorityQueue<FCPair<Double, Integer>> nn = calcDistsandNN(database, kernelMatrix, sampleSize, aKey, dists);
@@ -250,11 +250,11 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
       // }
       v++;
       MeanVariance s = new MeanVariance();
-      for(Integer bKey : database.getIDs()) {
+      for(Integer bKey : database) {
         if(bKey.equals(aKey)) {
           continue;
         }
-        for(Integer cKey : database.getIDs()) {
+        for(Integer cKey : database) {
           if(cKey.equals(aKey)) {
             continue;
           }
@@ -406,7 +406,7 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
 
   private PriorityQueue<FCPair<Double, Integer>> calcDistsandNN(Database<V> data, KernelMatrix<V> kernelMatrix, int sampleSize, Integer aKey, HashMap<Integer, Double> dists) {
     PriorityQueue<FCPair<Double, Integer>> nn = new PriorityQueue<FCPair<Double, Integer>>(sampleSize);
-    for(Integer bKey : data.getIDs()) {
+    for(Integer bKey : data) {
       double val = calcCos(kernelMatrix, aKey, bKey);
       dists.put(bKey, val);
       if(nn.size() < sampleSize) {
@@ -426,7 +426,7 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
     PriorityQueue<FCPair<Double, Integer>> nn = new PriorityQueue<FCPair<Double, Integer>>(sampleSize);
     int step = (int) ((double) data.size() / (double) sampleSize);
     int counter = 0;
-    for(Integer bKey : data.getIDs()) {
+    for(Integer bKey : data) {
       double val = calcCos(kernelMatrix, aKey, bKey);
       dists.put(bKey, val);
       if(counter % step == 0) {
@@ -447,7 +447,7 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
     PriorityQueue<FCPair<Double, Integer>> pq = new PriorityQueue<FCPair<Double, Integer>>(data.size(), Collections.reverseOrder());
     HashMap<Integer, LinkedList<Integer>> explaintab = new HashMap<Integer, LinkedList<Integer>>();
     // test all objects
-    for(Integer objKey : data.getIDs()) {
+    for(Integer objKey : data) {
       MeanVariance s = new MeanVariance();
       // Queue for the best explanation
       PriorityQueue<FCPair<Double, Integer>> explain = new PriorityQueue<FCPair<Double, Integer>>();

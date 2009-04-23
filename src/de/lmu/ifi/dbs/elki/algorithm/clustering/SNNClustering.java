@@ -140,8 +140,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
           logger.verbose("Clustering:");
         }
         if (database.size() >= minpts) {
-            for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
-                Integer id = iter.next();
+            for (Integer id : database) {
                 if (!processedIDs.contains(id)) {
                     expandCluster(database, id, objprog, clusprog);
                     if (processedIDs.size() == database.size() && noise.size() == 0) {
@@ -156,8 +155,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
             }
         }
         else {
-            for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
-                Integer id = iter.next();
+            for (Integer id : database) {
                 noise.add(id);
                 if (logger.isVerbose()) {
                     objprog.setProcessed(noise.size());
@@ -189,8 +187,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
      */
     protected List<Integer> findSNNNeighbors(Database<O> database, Integer queryObject) {
         List<Integer> neighbors = new LinkedList<Integer>();
-        for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
-            Integer id = iter.next();
+        for (Integer id : database) {
             if (similarityFunction.similarity(queryObject, id).compareTo(epsilon) >= 0) {
                 neighbors.add(id);
             }

@@ -61,8 +61,7 @@ public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorit
   protected Clustering<Model> runInTime(Database<O> database) throws IllegalStateException {
     HashMap<String, Collection<Integer>> labelmap = new HashMap<String, Collection<Integer>>(); 
     
-    for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
-      Integer id = iter.next();
+    for (Integer id : database) {
       String label = null;
       
       // try class label first

@@ -1,10 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
@@ -14,6 +9,11 @@ import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Efficient implementation of the Single-Link Algorithm SLINK of R. Sibson.
@@ -80,11 +80,7 @@ public class SLINK<O extends DatabaseObject, D extends Distance<D>> extends
             getDistanceFunction().setDatabase(database, isVerbose(), isTime());
 
             // sort the db objects according to their ids
-            ArrayList<Integer> ids = new ArrayList<Integer>();
-            Iterator<Integer> it = database.iterator();
-            while (it.hasNext()) {
-                ids.add(it.next());
-            }
+            List<Integer> ids = database.getIDs();
             Collections.sort(ids);
 
             ArrayList<Integer> processedIDs = new ArrayList<Integer>();
