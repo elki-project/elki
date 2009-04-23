@@ -377,7 +377,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
                 }
 
                 D distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
-                D reach = DistanceUtil.max(distance, knns.getAnnotations(entry2.getID())[0].getSecond().getKNNDistance());
+                D reach = DistanceUtil.max(distance, knns.getValueFor(entry2.getID()).getKNNDistance());
                 SpatialObjectPair dataPair = new SpatialObjectPair(entry1, entry2, false);
                 updateHeap(reach, dataPair);
             }
@@ -415,7 +415,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
                     continue;
                 }
                 D distance = distFunction.distance(entry1.getMBR(), entry2.getMBR());
-                D reach = DistanceUtil.max(distance, knns.getAnnotations(entry2.getID())[0].getSecond().getKNNDistance());
+                D reach = DistanceUtil.max(distance, knns.getValueFor(entry2.getID()).getKNNDistance());
                 SpatialObjectPair dataPair = new SpatialObjectPair(entry1, entry2, false);
                 updateHeap(reach, dataPair);
             }
