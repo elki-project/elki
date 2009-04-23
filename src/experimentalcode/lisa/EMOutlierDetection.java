@@ -1,23 +1,20 @@
 package experimentalcode.lisa;
 
+import java.util.Iterator;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.EM;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.ABOD;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromDatabase;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.AnnotationsFromDatabase;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-
-import java.util.Iterator;
-import java.util.List;
 /**
  * outlier detection algorithm using EM Clustering. If an object does not belong to any cluster it is supposed to be an outlier.
  * if the probability for an object to belong to the most probable cluster is still relatively low this object is an outlier 
@@ -87,8 +84,7 @@ public class EMOutlierDetection<V extends RealVector<V, ?>> extends AbstractAlgo
       throw new RuntimeException("Database empty.");
     }
  
-    AnnotationsFromDatabase<V, Double> res1 = new AnnotationsFromDatabase<V, Double>(database);
-    res1.addAssociation(DBOD_MAXCPROB);
+    AnnotationFromDatabase<Double, V> res1 = new AnnotationFromDatabase<Double, V>(database, DBOD_MAXCPROB);
      // Ordering
      OrderingFromAssociation<Double, V> res2 = new OrderingFromAssociation<Double, V>(database, DBOD_MAXCPROB, true); 
      // combine results.
