@@ -33,7 +33,12 @@ public class MixtureModelOutlierDetection<V extends RealVector<V,Double>> extend
   public static final AssociationID<Double> MMOD_OFLAG = AssociationID.getOrCreateAssociationID("mmod.oflag", Double.class);
 public static final OptionID L_ID = OptionID.getOrCreateOptionID("mmo.l", "expected fraction of outliers");
 public static final OptionID C_ID = OptionID.getOrCreateOptionID("mmo.c", "cutoff");
-  
+/**
+ * Small value to increment diagonally of a matrix
+ * in order to avoid singularity before building the inverse.
+ */
+private static final double SINGULARITY_CHEAT = 1E-9;  
+
       /**
        * Parameter to specify the fraction of expected outliers,
        * 
@@ -95,8 +100,10 @@ public static final OptionID C_ID = OptionID.getOrCreateOptionID("mmo.c", "cutof
     List<Integer> anomalousObjs = new ArrayList<Integer>();
     //compute loglikelyhood
     double logLike = database.size()*Math.log(1-l) + loglikelihoodNormal(normalObjs, database);
-    //debugFine("loglike "+ logLike);
+    debugFine("normalsize   " + normalObjs.size()+ " anormalsize  " + anomalousObjs.size() + " all " + (anomalousObjs.size()+normalObjs.size()) );
+    
     for(int i= 0; i< normalObjs.size(); i++){
+      debugFine("i     " + i);
       //move object to anomalousObjs and test if the loglikelyhood increases significantly
       Integer x = normalObjs.get(i);
       anomalousObjs.add(x);
@@ -110,18 +117,21 @@ public static final OptionID C_ID = OptionID.getOrCreateOptionID("mmo.c", "cutof
       //threshold
       if(deltaLog > c) {
         //flag as outlier 
-        database.associate(MMOD_OFLAG, x, 1.0);
+        debugFine("outlier id" + x);
+        database.associate(MMOD_OFLAG, x, 0.3);
         logLike = currentLogLike;
         i--;
       }
       else{
         //move object back to normalObjects
         normalObjs.add(i, x);
+        debugFine("nonoutlier id" + x);
         anomalousObjs.remove(anomalousObjs.size()-1);
         //flag as non outlier
         database.associate(MMOD_OFLAG, x, 0.0);
+        
       }
-      debugFine("normalsize   " + normalObjs.size()+ " anormalsize  " + anomalousObjs.size() + " all " + anomalousObjs.size()+normalObjs.size() );
+      
     }
     
     AnnotationFromDatabase<Double, V> res1 = new AnnotationFromDatabase<Double, V>(database, MMOD_OFLAG);
@@ -142,7 +152,7 @@ public static final OptionID C_ID = OptionID.getOrCreateOptionID("mmo.c", "cutof
     int n = anomalousObjs.size();
     
     double prob = n*Math.log( Math.pow(1.0/n,n));   
-    debugFine(" anormal   " + prob);
+//    debugFine(" anormal   " + prob);
     return prob;
   }
   /**
@@ -158,15 +168,13 @@ public static final OptionID C_ID = OptionID.getOrCreateOptionID("mmo.c", "cutof
       
       Matrix covarianceMatrix = DatabaseUtil.covarianceMatrix(database, normalObjs);
       Matrix covInv;
-      debugFine(covarianceMatrix.toString());
+      
       //test singulaere matrix
-      if(covarianceMatrix.equals(new Matrix(normalObjs.size(), normalObjs.size()))) {
-       
-        covInv = covarianceMatrix;
-      }
-      else {
-        covInv = covarianceMatrix.inverse();
-      }
+     
+//     debugFine(covarianceMatrix.toString()); 
+     covInv = covarianceMatrix.cheatToAvoidSingularity(SINGULARITY_CHEAT).inverse();
+      
+      
       double covarianceDet = covarianceMatrix.det();
       double fakt = (1.0/(Math.sqrt(Math.pow(2*Math.PI, database.dimensionality())*(covarianceDet)))); 
       //for each object compute probability and sum
@@ -177,7 +185,7 @@ public static final OptionID C_ID = OptionID.getOrCreateOptionID("mmo.c", "cutof
                prob += Math.log(fakt * Math.exp(- mDist/2.0));
                
        }
-       debugFine("probnormal      " + prob);
+//       debugFine("probnormal      " + prob);
        return prob;
   }
   

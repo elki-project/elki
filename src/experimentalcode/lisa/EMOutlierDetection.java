@@ -5,7 +5,9 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.EM;
+import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDatabase;
@@ -23,7 +25,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <V>
  */
 public class EMOutlierDetection<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, MultiResult>{
-  EM<V> emClustering;
+  EM<V> emClustering = new EM<V>();
   
   public static final AssociationID<Double> DBOD_MAXCPROB= AssociationID.getOrCreateAssociationID("dbod_maxcprob", Double.class);
   /**
@@ -57,46 +59,29 @@ public class EMOutlierDetection<V extends RealVector<V, ?>> extends AbstractAlgo
 
   @Override
   protected MultiResult runInTime(Database<V> database) throws IllegalStateException {
-    AnnotationResult<List<Double>> probabilities; 
-    emClustering.run(database);
+     
+    Clustering<EMModel<V>> emresult = emClustering.run(database);
     Iterator<Integer> iter = database.iterator();
-    if (iter.hasNext()){
+    while(iter.hasNext()){
       Double maxProb = 0.0;
       Integer id = iter.next();
-      List<AnnotationResult<List<Double>>> annotations = result.filterResults(AnnotationResult.class);
-      for (AnnotationResult<List<Double>> annotation : annotations){
-        for (Pair<String, List<Double>> pair : annotation.getAnnotations(iter.next())){
-          if (pair != null && pair.getFirst() != null && pair.getFirst().equals(AssociationID.PROBABILITY_CLUSTER_I_GIVEN_X)){
-            List<Double> probs = pair.getSecond(); 
-       
-            for(Double prob: probs) {
-              if(prob > maxProb) {
+      List<Double> probs = database.getAssociation(AssociationID.PROBABILITY_CLUSTER_I_GIVEN_X, id);
+      for (Double prob : probs){
+         if(prob > maxProb) {
                 maxProb = prob;
-              }
-            }
-          }                                                                                                                      
-        }
-      }
+          }
+      }                                                                                                                    
       database.associate(DBOD_MAXCPROB, id, maxProb);     
-  
-    } 
-    else {
-      throw new RuntimeException("Database empty.");
     }
- 
     AnnotationFromDatabase<Double, V> res1 = new AnnotationFromDatabase<Double, V>(database, DBOD_MAXCPROB);
      // Ordering
      OrderingFromAssociation<Double, V> res2 = new OrderingFromAssociation<Double, V>(database, DBOD_MAXCPROB, true); 
      // combine results.
-     
      result = new MultiResult();
      result.addResult(res1);
      result.addResult(res2);
      return result;
  
-  
-    
-
   }
 
   @Override
