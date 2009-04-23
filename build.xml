@@ -8,7 +8,7 @@
 	<property name="classpath" value="classesBuild" />
 	<property name="build.lib" value="lib"/>
 	<property name="buildpath" value="build" />
-	<property name="jarFile" value="kdd.jar" />
+	<property name="jarFile" value="elki.jar" />
 	<property name="main-class" value="de.lmu.ifi.dbs.elki.KDDTask" />
 	<property name="source" value="src" />
 	
