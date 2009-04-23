@@ -47,7 +47,7 @@ public class GaussianModelOutlierDetection<V extends RealVector<V,Double>> exten
              database.associate(GMOD_PROB, id, prob); 
 		 }
 
-		 ResultUtil.setGlobalAssociation(result, GMOD_MAXPROB, maxProb);
+
 		 AnnotationsFromDatabase<V, Double> res1 = new AnnotationsFromDatabase<V, Double>(database);
 	        
 	        res1.addAssociation(GMOD_PROB);
@@ -55,6 +55,7 @@ public class GaussianModelOutlierDetection<V extends RealVector<V,Double>> exten
 	        OrderingFromAssociation<Double, V> res2 = new OrderingFromAssociation<Double, V>(database, GMOD_PROB, true); 
 	        // combine results.
 	        result = new MultiResult();
+	        ResultUtil.setGlobalAssociation(result, GMOD_MAXPROB, maxProb);
 	        result.addResult(res1);
 	        result.addResult(res2);
 			return result;	 
