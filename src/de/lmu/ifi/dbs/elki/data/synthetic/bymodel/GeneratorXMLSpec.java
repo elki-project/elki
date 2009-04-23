@@ -80,8 +80,8 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
   /**
    * File name of the generators XML Schema file.
    */
-  private static final String GENERATOR_SCHEMA_FILE = GeneratorXMLSpec.class.getPackage().getName().replace('.', '/') + '/'+ "GeneratorByModel.xsd";
-  
+  private static final String GENERATOR_SCHEMA_FILE = GeneratorXMLSpec.class.getPackage().getName().replace('.', '/') + '/' + "GeneratorByModel.xsd";
+
   /**
    * The configuration file.
    */
@@ -146,15 +146,17 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
       URL url = ClassLoader.getSystemResource(GENERATOR_SCHEMA_FILE);
-      if (url != null) {
+      if(url != null) {
         try {
-        Schema schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(url);
-        dbf.setSchema(schema);
-        dbf.setIgnoringElementContentWhitespace(true);
-        } catch (Exception e) {
+          Schema schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(url);
+          dbf.setSchema(schema);
+          dbf.setIgnoringElementContentWhitespace(true);
+        }
+        catch(Exception e) {
           logger.warning("Could not set up XML Schema validation for speciciation file.");
         }
-      } else {
+      }
+      else {
         logger.warning("Could not set up XML Schema validation for speciciation file.");
       }
       Document doc = dbf.newDocumentBuilder().parse(in);
@@ -264,7 +266,7 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
         logger.warning("Unknown element in XML specification file: " + child.getNodeName());
       }
     }
-    
+
     gen.addCluster(cluster);
   }
 
