@@ -16,13 +16,12 @@ import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
-
-import com.sun.org.apache.xerces.internal.jaxp.validation.XMLSchemaFactory;
 
 import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution.NormalDistribution;
@@ -149,7 +148,7 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
       URL url = ClassLoader.getSystemResource(GENERATOR_SCHEMA_FILE);
       if (url != null) {
         try {
-        Schema schema = XMLSchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(url);
+        Schema schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(url);
         dbf.setSchema(schema);
         dbf.setIgnoringElementContentWhitespace(true);
         } catch (Exception e) {
