@@ -12,8 +12,10 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDatabase;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
+import de.lmu.ifi.dbs.elki.result.MetadataResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -61,27 +63,23 @@ public class EMOutlierDetection<V extends RealVector<V, ?>> extends AbstractAlgo
   protected MultiResult runInTime(Database<V> database) throws IllegalStateException {
      
     Clustering<EMModel<V>> emresult = emClustering.run(database);
-    Iterator<Integer> iter = database.iterator();
-    while(iter.hasNext()){
+    double globmax = 0.0; 
+    for (Integer id : database) {
       Double maxProb = 0.0;
-      Integer id = iter.next();
       List<Double> probs = database.getAssociation(AssociationID.PROBABILITY_CLUSTER_I_GIVEN_X, id);
       for (Double prob : probs){
-         if(prob > maxProb) {
-                maxProb = prob;
-          }
-      }                                                                                                                    
+         maxProb = Math.max(prob, maxProb);
+      }
       database.associate(DBOD_MAXCPROB, id, 1 - maxProb);     
+      globmax = Math.max(1 - maxProb, globmax);
     }
-    AnnotationFromDatabase<Double, V> res1 = new AnnotationFromDatabase<Double, V>(database, DBOD_MAXCPROB);
+    result = new MultiResult();
+    result.addResult(new AnnotationFromDatabase<Double, V>(database, DBOD_MAXCPROB));
      // Ordering
-     OrderingFromAssociation<Double, V> res2 = new OrderingFromAssociation<Double, V>(database, DBOD_MAXCPROB, true); 
-     // combine results.
-     result = new MultiResult();
-     result.addResult(res1);
-     result.addResult(res2);
-     return result;
- 
+    result.addResult(new OrderingFromAssociation<Double, V>(database, DBOD_MAXCPROB, true));
+    result.addResult(emresult);
+    ResultUtil.setGlobalAssociation(result, DBOD_MAXCPROB, globmax);
+    return result;
   }
 
   @Override
