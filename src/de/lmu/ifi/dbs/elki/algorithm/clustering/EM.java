@@ -78,6 +78,8 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Cluster
             "E(M) - E(M') < em.delta"
     );
 
+    private static final double MIN_LOGLIKELIHOOD = -100000;
+
 
     /**
      * Parameter to specify the termination criterion for maximization of E(M): E(M) - E(M') < em.delta,
@@ -283,8 +285,8 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Cluster
                 Matrix rowTimesCovTimesCol = rowTimesCov.times(differenceCol);
                 double power = rowTimesCovTimesCol.get(0, 0) / 2.0;
                 double prob = normDistrFactor.get(i) * Math.exp(-power);
-                if (logger.isDebugging() && false) {
-                  logger.debugFine(
+                if (logger.isDebuggingFinest() && false) {
+                  logger.debugFinest(
                         " difference vector= ( " + difference.toString() + " )\n" +
                         " differenceRow:\n" + differenceRow.toString("    ") + "\n" +
                         " differenceCol:\n" + differenceCol.toString("    ") + "\n" +
@@ -305,7 +307,14 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Cluster
             database.associate(AssociationID.PROBABILITY_X, id, priorProbability);
             List<Double> clusterProbabilities = new ArrayList<Double>(k);
             for (int i = 0; i < k; i++) {
-                clusterProbabilities.add(probabilities.get(i) / priorProbability * clusterWeights.get(i));
+                assert(priorProbability >= 0.0);
+                assert(clusterWeights.get(i) >= 0.0);
+                // do not divide by zero!
+                if (priorProbability == 0.0) {
+                  clusterProbabilities.add(0.0);                  
+                } else {
+                  clusterProbabilities.add(probabilities.get(i) / priorProbability * clusterWeights.get(i));
+                }
             }
             database.associate(AssociationID.PROBABILITY_CLUSTER_I_GIVEN_X, id, clusterProbabilities);
         }
@@ -323,10 +332,12 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Cluster
         double sum = 0.0;
         for (Integer id : database) {            
             double priorProbX = database.getAssociation(AssociationID.PROBABILITY_X, id);
-            double logP = Math.log(priorProbX);
-            sum += logP;
-            if (logger.isDebugging() && false) {
-              logger.debugFine("id=" + id + "\nP(x)=" + priorProbX + "\nlogP=" + logP + "\nsum=" + sum);
+            double logP = Math.max(Math.log(priorProbX),MIN_LOGLIKELIHOOD);
+            if (!Double.isNaN(logP)) {
+              sum += logP;
+            }
+            if (logger.isDebuggingFinest() && false) {
+              logger.debugFinest("id=" + id + "\nP(x)=" + priorProbX + "\nlogP=" + logP + "\nsum=" + sum);
             }
         }
         return sum;
