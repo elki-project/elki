@@ -38,6 +38,9 @@ import de.lmu.ifi.dbs.elki.utilities.heap.HeapNode;
  * Abstract superclass for index structures based on a R*-Tree.
  * 
  * @author Elke Achtert
+ * @param <O> Object type
+ * @param <N> Node type
+ * @param <E> Entry type
  */
 public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends SpatialIndex<O, N, E> {
   protected final static boolean extraIntegrityChecks = false;

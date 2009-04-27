@@ -16,6 +16,8 @@ import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
  * Abstract superclass for nodes in a R*-Tree.
  *
  * @author Elke Achtert 
+ * @param <N> Node type
+ * @param <E> Entry type
  */
 public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends AbstractNode<N, E> implements SpatialNode<N,E> {
 

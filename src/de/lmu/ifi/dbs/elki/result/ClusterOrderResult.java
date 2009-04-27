@@ -94,6 +94,8 @@ public class ClusterOrderResult<D extends Distance<D>> implements OrderingResult
    * Retrieve annotations for the cluster order.
    * 
    * Implementation of the {@link AnnotationResult} interface.
+   * @param objID Object ID
+   * @return Annotations for this object
    */
   //@Override
   // TODO: re-add functionality!

@@ -9,6 +9,8 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * Represents a node in a RDkNN-Tree.
  *
  * @author Elke Achtert 
+ * @param <D> Distance type
+ * @param <N> Number type
  */
 public class RdKNNNode<D extends NumberDistance<D,N>, N extends Number> extends AbstractRStarTreeNode<RdKNNNode<D,N>, RdKNNEntry<D,N>> {
   private static final long serialVersionUID = 1;

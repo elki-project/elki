@@ -68,6 +68,7 @@ class MkCoPLeafEntry<D extends NumberDistance<D, N>, N extends Number> extends M
     /**
      * Returns the progressive approximated knn distance of the entry.
      *
+     * @param <O> Object type
      * @param k                the parameter k of the knn distance
      * @param distanceFunction the distance function
      * @return the progressive approximated knn distance of the entry

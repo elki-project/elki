@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
  * methods to search for certain object in the structure and ensures persistence.
  *
  * @author Elke Achtert 
+ * @param <O> object type
  */
 public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractRStarTree<O, FlatRStarTreeNode, SpatialEntry> {
 

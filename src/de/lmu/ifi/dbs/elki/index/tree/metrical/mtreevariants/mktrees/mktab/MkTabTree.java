@@ -19,6 +19,8 @@ import de.lmu.ifi.dbs.elki.utilities.KNNList;
  * of a node.
  * 
  * @author Elke Achtert
+ * @param <O> Object type
+ * @param <D> Distance type
  */
 public class MkTabTree<O extends DatabaseObject, D extends Distance<D>> extends AbstractMkTree<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> {
 

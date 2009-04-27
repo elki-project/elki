@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
  * algorithm.
  *
  * @author Elke Achtert
+ * @param <O> object type
  */
 public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<O, DeLiCluNode, DeLiCluEntry> {
 

@@ -10,6 +10,8 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * Represents a node in an M-Tree.
  *
  * @author Elke Achtert
+ * @param <O> Object type
+ * @param <D> Distance type
  */
 public class MTreeNode<O extends DatabaseObject, D extends Distance<D>> extends AbstractMTreeNode<O, D, MTreeNode<O, D>, MTreeEntry<D>> {
     private static final long serialVersionUID = 1;

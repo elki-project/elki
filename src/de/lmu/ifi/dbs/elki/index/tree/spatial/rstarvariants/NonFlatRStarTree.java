@@ -12,6 +12,9 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialObject;
  * Abstract superclass for all non-flat R*-Tree variants.
  * 
  * @author Elke Achtert 
+ * @param <O> Object type
+ * @param <N> Node type
+ * @param <E> Entry type
  */
 public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends AbstractRStarTreeNode<N, E>, E
     extends SpatialEntry> extends AbstractRStarTree<O, N, E> {

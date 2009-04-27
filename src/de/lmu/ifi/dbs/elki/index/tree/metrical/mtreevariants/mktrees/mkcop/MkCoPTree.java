@@ -27,6 +27,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * supporting efficient processing of reverse k nearest neighbor queries for
  * parameter k < kmax.
  * 
+ * @param <O> Object type
+ * @param <D> Distance type
+ * @param <N> Number type
  * @author Elke Achtert
  */
 public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>, N extends Number> extends AbstractMTree<O, D, MkCoPTreeNode<O, D, N>, MkCoPEntry<D, N>> {

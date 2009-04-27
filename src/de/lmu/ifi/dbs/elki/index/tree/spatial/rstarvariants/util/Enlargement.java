@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
  * Encapsulates the parameters for enlargement of nodes after insertion of new objects.
  *
  * @author Elke Achtert 
+ * @param <E> Entry type
  */
 public class Enlargement<E extends SpatialEntry> implements Comparable<Enlargement<E>> {
   /**
@@ -20,12 +21,12 @@ public class Enlargement<E extends SpatialEntry> implements Comparable<Enlargeme
   private double volume;
 
   /**
-   * The increasement of the volume.
+   * The increment of the volume.
    */
   private double volInc;
 
   /**
-   * The increasement of the overlap.
+   * The increment of the overlap.
    */
   private double overlapInc;
 
@@ -34,8 +35,8 @@ public class Enlargement<E extends SpatialEntry> implements Comparable<Enlargeme
    *
    * @param pathComponent the path information of the entry representing the node
    * @param volume        the volume of the node's MBR
-   * @param volInc        the increasement of the volume
-   * @param overlapInc    the increasement of the overlap
+   * @param volInc        the increment of the volume
+   * @param overlapInc    the increment of the overlap
    */
   public Enlargement(TreeIndexPathComponent<E> pathComponent, double volume, double volInc, double overlapInc) {
     this.pathComponent = pathComponent;
@@ -46,8 +47,8 @@ public class Enlargement<E extends SpatialEntry> implements Comparable<Enlargeme
 
   /**
    * Compares this Enlargement with the specified Enlargement.
-   * First the increasement of the overlap will be compared. If both are equal
-   * the increasement of the volume will be compared. If also both are equal
+   * First the increment of the overlap will be compared. If both are equal
+   * the increment of the volume will be compared. If also both are equal
    * the volumes of both nodes will be compared. If both are equal the ids of
    * the nodes will be compared.
    *

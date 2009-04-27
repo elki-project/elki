@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
  * for certain object in the structure and ensures persistence.
  *
  * @author Elke Achtert 
+ * @param <O> Object type
  */
 public class RStarTree<O extends NumberVector<O,? >> extends NonFlatRStarTree<O, RStarTreeNode, SpatialEntry> {
 

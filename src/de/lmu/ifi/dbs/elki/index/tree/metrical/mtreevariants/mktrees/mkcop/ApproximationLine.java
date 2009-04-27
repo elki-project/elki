@@ -97,6 +97,9 @@ public class ApproximationLine implements Externalizable {
   /**
    * Returns the approximated knn-distance at the specified k.
    *
+   * @param <O> Object type
+   * @param <D> Distance type
+   * @param <N> Number type
    * @param k                the value for which the knn-distance should be returned
    * @param distanceFunction the distance function
    * @return the approximated knn-distance at the specified k

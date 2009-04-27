@@ -13,6 +13,8 @@ import java.io.ObjectOutput;
  * of the underlying data object.
  *
  * @author Elke Achtert 
+ * @param <D> Distance type
+ * @param <N> Number type
  */
 public class RdKNNLeafEntry<D extends NumberDistance<D,N>, N extends Number>
     extends SpatialLeafEntry implements RdKNNEntry<D,N> {

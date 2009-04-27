@@ -30,9 +30,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * supporting efficient processing of reverse k nearest neighbor queries. The
  * k-nn distance is stored in each entry of a node.
  * <p/>
- * todo: noch nicht fertig!!!
+ * TODO: noch nicht fertig!!!
  * 
  * @author Elke Achtert
+ * @param <O> Object type
+ * @param <D> Distance type
+ * @param <N> Number type
  */
 public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D, N>, N extends Number> extends NonFlatRStarTree<O, RdKNNNode<D, N>, RdKNNEntry<D, N>> {
 

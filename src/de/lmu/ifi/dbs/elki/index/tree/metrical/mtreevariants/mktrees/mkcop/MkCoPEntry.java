@@ -12,12 +12,12 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
  *
  * @author Elke Achtert 
  */
-
 interface MkCoPEntry<D extends NumberDistance<D,N>, N extends Number> extends MTreeEntry<D> {
 
   /**
    * Returns the conservative approximated knn distance of the entry.
    *
+   * @param <O> Object type
    * @param k                the parameter k of the knn distance
    * @param distanceFunction the distance function
    * @return the conservative approximated knn distance of the entry
