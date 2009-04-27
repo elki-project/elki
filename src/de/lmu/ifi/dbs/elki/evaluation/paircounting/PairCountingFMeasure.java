@@ -55,6 +55,10 @@ public class PairCountingFMeasure {
   /**
    * Compare two clustering results.
    * 
+   * @param <R> Result type
+   * @param <M> Model type
+   * @param <S> Result type
+   * @param <N> Model type
    * @param result1 first result
    * @param result2 second result
    * @param beta Beta value for the F-Measure
@@ -69,6 +73,10 @@ public class PairCountingFMeasure {
   /**
    * Compare two clustering results.
    * 
+   * @param <R> Result type
+   * @param <M> Model type
+   * @param <S> Result type
+   * @param <N> Model type
    * @param result1 first result
    * @param result2 second result
    * @return Pair counting F-1-Measure result.
