@@ -85,14 +85,14 @@ public class LimitEigenPairFilter extends AbstractParameterizable implements Eig
     // delta must be >= 0 and <= 1 if it's a relative value
 		// Since relative or absolute is dependent on the absolute flag this is a
 		// global constraint!
-		List<ParameterConstraint<?>> cons = new Vector<ParameterConstraint<?>>();
-    // TODO: I moved the constraint up to the parameter itself, since it applies in both cases, right? -- erich
-		//ParameterConstraint aboveNull = new GreaterEqualConstraint(0);
-		//cons.add(aboveNull);
-		ParameterConstraint<?> underOne = new LessEqualConstraint(1);
+		List<ParameterConstraint<Number>> cons = new Vector<ParameterConstraint<Number>>();
+    // TODO: Keep the constraint here - applies to non-conditional case as well, and is set above.
+		ParameterConstraint<Number> aboveNull = new GreaterEqualConstraint(0);
+		cons.add(aboveNull);
+		ParameterConstraint<Number> underOne = new LessEqualConstraint(1);
 		cons.add(underOne);
 
-		GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint(DELTA_PARAM, cons, ABSOLUTE_FLAG, false);
+		GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint<Number, Double>(DELTA_PARAM, cons, ABSOLUTE_FLAG, false);
 		optionHandler.setGlobalParameterConstraint(gpc);
 	}
 
