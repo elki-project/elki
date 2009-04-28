@@ -285,7 +285,7 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
 
     remainingParameters = pca.setParameters(remainingParameters);
 
-    setParameters(args, remainingParameters);
+    rememberParametersExcept(args, remainingParameters);
     return remainingParameters;
   }
 

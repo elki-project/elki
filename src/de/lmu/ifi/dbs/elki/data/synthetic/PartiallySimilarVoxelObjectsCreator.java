@@ -67,7 +67,7 @@ public class PartiallySimilarVoxelObjectsCreator extends AbstractParameterizable
    * @return usage description
    */
   public String usage(String message) {
-    return optionHandler.usage(message);
+    return optionHandler.usage(message, true);
   }
 
   // FIXME: unify main method with other wrappers?

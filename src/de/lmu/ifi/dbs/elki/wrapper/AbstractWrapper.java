@@ -95,7 +95,7 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
       LoggingConfiguration.setVerbose(true);
     }
 
-    setParameters(args, new String[0]);
+    rememberParametersExcept(args, new String[0]);
     return new String[0];
   }
 

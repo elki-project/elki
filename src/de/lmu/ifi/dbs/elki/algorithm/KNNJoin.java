@@ -225,7 +225,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
       String[] remainingParameters = super.setParameters(args);
       k = K_PARAM.getValue();
       
-      setParameters(args, remainingParameters);
+      rememberParametersExcept(args, remainingParameters);
       return super.setParameters(remainingParameters);
     }
 

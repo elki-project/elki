@@ -20,9 +20,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 public interface EvaluationProcedure<O extends DatabaseObject, L extends ClassLabel, A extends Algorithm<O, Result>> extends Parameterizable
 {
     /**
-     * Message to indicate failure to call either {@link #set(Database, Database) set(trainingset, testset)}
-     * or {@link #set(Database, Holdout) set(database,holdout)} before calling
-     * {@link #evaluate(Algorithm) evaluate(algorithm)}.
+     * Message to indicate failure to call either {@link #setTrainingset(Database, Database) set(trainingset, testset)}
+     * or have the user specify a holdout before calling {@link #evaluate(Algorithm) evaluate(algorithm)}.
      */
     public static final String ILLEGAL_STATE = "EvaluationProcedure has not been properly prepared to perform an evaluation.";
     
@@ -44,42 +43,14 @@ public interface EvaluationProcedure<O extends DatabaseObject, L extends ClassLa
     public void setVerbose(boolean verbose);
     
     /**
-     * Sets the specified training and test set.
-     * 
-     * 
-     * @param training the database to train an algorithm
-     * @param test the database to test an algorithm
-     */
-    public void set(Database<O> training, Database<O> test);
-     
-    /**
-     * The given database can be splitted as specified
-     * by a certain holdout procedure. The partitions are set
-     * as training and test sets for the evaluation procedure.
-     * 
-     * 
-     * @param data the database to prepare holdouts from
-     * @param holdout the holdout procedure
-     */
-    public void set(Database<O> data, Holdout<O,L> holdout);
-     
-    /**
      * Evaluates an algorithm.
      * 
-     * 
+     * @param test Test set to run on 
      * @param algorithm the algorithm to evaluate
      * @return the evaluation of the specified algorithm
      * based on the previously specified training and test sets
      * @throws IllegalStateException if a holdout is required to set
      * before calling this method
      */
-    public EvaluationResult<O,A> evaluate(A algorithm) throws IllegalStateException;
-    
-    /**
-     * Provides a description of the used holdout.
-     * 
-     * 
-     * @return a description of the used holdout
-     */
-    public String setting();
+    public EvaluationResult<O,A> evaluate(Database<O> test, A algorithm) throws IllegalStateException;
 }

@@ -233,7 +233,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
         partitionAlgorithm.setVerbose(isVerbose());
         remainingParameters = partitionAlgorithm.setParameters(partitiongAlgorithmParameters);
 
-        setParameters(args, remainingParameters);
+        rememberParametersExcept(args, remainingParameters);
         return remainingParameters;
     }
 

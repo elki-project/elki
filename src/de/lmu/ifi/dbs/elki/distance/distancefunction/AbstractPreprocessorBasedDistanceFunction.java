@@ -64,7 +64,7 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
         String[] remainingParameters = super.setParameters(args);
 
         remainingParameters = preprocessorHandler.setParameters(remainingParameters);
-        setParameters(args, remainingParameters);
+        rememberParametersExcept(args, remainingParameters);
 
         return remainingParameters;
     }

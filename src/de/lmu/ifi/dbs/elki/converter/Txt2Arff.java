@@ -48,17 +48,17 @@ public class Txt2Arff<W extends WekaAttribute> extends StandAloneInputWrapper {
     }
     catch (ParameterException e) {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
-      LoggingUtil.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
+      LoggingUtil.exception(wrapper.optionHandler.usage(e.getMessage(), true), cause);
     }
     catch (UnableToComplyException e) {
       Throwable cause = e.getCause() != null ? e.getCause() : e;
-      LoggingUtil.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
+      LoggingUtil.exception(wrapper.optionHandler.usage(e.getMessage(), true), cause);
     }
     catch (AbortException e) {
       LoggingUtil.message(e.getMessage());
     }
     catch (Exception e) {
-      LoggingUtil.exception(wrapper.optionHandler.usage(e.getMessage()), e);
+      LoggingUtil.exception(wrapper.optionHandler.usage(e.getMessage(), true), e);
     }
   }
 

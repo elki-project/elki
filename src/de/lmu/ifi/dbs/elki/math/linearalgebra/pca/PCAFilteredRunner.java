@@ -122,7 +122,7 @@ public class PCAFilteredRunner<V extends RealVector<V, ?>> extends PCARunner<V> 
     // eigenPair filter
     eigenPairFilter = EIGENPAIR_FILTER_PARAM.instantiateClass();
     remainingParameters = eigenPairFilter.setParameters(remainingParameters);
-    setParameters(args, remainingParameters);
+    rememberParametersExcept(args, remainingParameters);
 
     return remainingParameters;
   }

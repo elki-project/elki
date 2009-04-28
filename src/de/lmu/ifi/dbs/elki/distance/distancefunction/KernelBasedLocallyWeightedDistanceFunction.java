@@ -106,7 +106,7 @@ public class KernelBasedLocallyWeightedDistanceFunction<V extends RealVector<V, 
         // kernel function
         kernelFunction = KERNEL_FUNCTION_PARAM.instantiateClass();
         remainingParameters = kernelFunction.setParameters(remainingParameters);
-        setParameters(args, remainingParameters);
+        rememberParametersExcept(args, remainingParameters);
 
         return remainingParameters;
     }

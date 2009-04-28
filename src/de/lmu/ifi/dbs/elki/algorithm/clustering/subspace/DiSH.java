@@ -213,7 +213,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
         }
 
         remainingParameters = optics.setParameters(opticsParameters.toArray(new String[opticsParameters.size()]));
-        setParameters(args, remainingParameters);
+        rememberParametersExcept(args, remainingParameters);
 
         return remainingParameters;
     }

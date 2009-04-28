@@ -155,7 +155,7 @@ public class FileBasedDoubleDistanceFunction<V extends DatabaseObject> extends A
       throw new WrongParameterValueException(MATRIX_PARAM, matrixfile.toString(), e);      
     }
 
-    setParameters(args, remainingParameters);
+    rememberParametersExcept(args, remainingParameters);
     return remainingParameters;
   }
 

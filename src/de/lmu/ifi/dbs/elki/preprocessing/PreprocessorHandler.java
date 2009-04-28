@@ -127,7 +127,7 @@ public class PreprocessorHandler<O extends DatabaseObject, P extends Preprocesso
         // preprocessor
         preprocessor = PREPROCESSOR_PARAM.instantiateClass();
         remainingParameters = preprocessor.setParameters(remainingParameters);
-        setParameters(args, remainingParameters);
+        rememberParametersExcept(args, remainingParameters);
 
         return remainingParameters;
     }

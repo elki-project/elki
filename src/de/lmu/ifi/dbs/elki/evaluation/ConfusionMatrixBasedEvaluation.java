@@ -47,7 +47,7 @@ public class ConfusionMatrixBasedEvaluation<O extends DatabaseObject, L extends 
     public void outputEvaluationResult(PrintStream out) {
         out.println("\nEvaluation:");
         out.println(evaluationProcedure.getClass().getName());
-        out.println(evaluationProcedure.setting());
+        //out.println(evaluationProcedure.setting());
         out.print("\nAccuracy: \n  correctly classified instances: ");
         out.println(confusionmatrix.truePositives());
         out.print("true positive rate:         ");

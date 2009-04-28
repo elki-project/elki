@@ -222,7 +222,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
         // distance function
         distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
         remainingParameters = distanceFunction.setParameters(remainingParameters);
-        setParameters(args, remainingParameters);
+        rememberParametersExcept(args, remainingParameters);
 
         return remainingParameters;
     }

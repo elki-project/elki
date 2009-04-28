@@ -78,10 +78,7 @@ public class DimensionSelectingDistanceFunction<N extends Number, V extends Feat
      */
     @Override
     public String parameterDescription() {
-        StringBuffer description = new StringBuffer();
-        description.append(optionHandler.usage("Distance within one specified dimension for NumberVectors. "));
-        description.append('\n');
-        return description.toString();
+        return "Distance within one specified dimension for NumberVectors." + super.parameterDescription();
     }
 
     public DoubleDistance minDist(HyperBoundingBox mbr, V v) {

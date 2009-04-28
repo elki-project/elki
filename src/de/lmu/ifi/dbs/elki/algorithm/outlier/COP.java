@@ -194,7 +194,7 @@ public class COP<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, D
         dependencyDerivator = new DependencyDerivator<V, DoubleDistance>();
         remainingParameters = dependencyDerivator.setParameters(remainingParameters);
 
-        setParameters(args, remainingParameters);
+        rememberParametersExcept(args, remainingParameters);
         return remainingParameters;
     }
 

@@ -81,7 +81,7 @@ public class RangeQueryBasedHiCOPreprocessor<V extends RealVector<V, ?>> extends
 
     epsilon = EPSILON_PARAM.getValue();
 
-    setParameters(args, remainingParameters);
+    rememberParametersExcept(args, remainingParameters);
     return remainingParameters;
   }
 

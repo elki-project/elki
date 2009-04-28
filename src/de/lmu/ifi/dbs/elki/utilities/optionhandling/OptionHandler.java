@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -65,13 +66,12 @@ public class OptionHandler extends AbstractLoggable {
    * as keys. Leading &quot;-&quot; do not have to be specified since
    * OptionHandler will provide them.
    * 
-   * @param parameters Map containing the options
    * @param programCall String for the program-call using this OptionHandler
    *        (for usage in usage(String))
    */
-  public OptionHandler(Map<String, Option<?>> parameters, String programCall) {
+  public OptionHandler(String programCall) {
     super(false);
-    this.parameters = parameters;
+    this.parameters = new TreeMap<String, Option<?>>();
     this.programCall = programCall;
     this.globalParameterConstraints = new ArrayList<GlobalParameterConstraint>();
   }
@@ -216,18 +216,6 @@ public class OptionHandler extends AbstractLoggable {
    */
   public boolean isSet(Option<?> option) {
     return isSet(option.getName());
-  }
-
-  /**
-   * Returns an usage-String according to the descriptions given in the
-   * constructor. Same as <code>usage(message,true)</code>.
-   * 
-   * @param message some error-message, if needed (may be null or empty String)
-   * @return an usage-String according to the descriptions given in the
-   *         constructor.
-   */
-  public String usage(String message) {
-    return usage(message, true);
   }
 
   /**
@@ -420,15 +408,19 @@ public class OptionHandler extends AbstractLoggable {
    * 
    * @param settings the attribute settings to add the settings of the options
    *        assigned to this option handler to
-   * @throws UnusedParameterException todo
    */
-  public void addOptionSettings(AttributeSettings settings) throws UnusedParameterException {
+  public void addOptionSettings(AttributeSettings settings)  {
     for(Option<?> option : parameters.values()) {
       if(option instanceof Flag) {
         settings.addSetting(option.getName(), Boolean.toString(isSet(option.getName())));
       }
       else {
-        Object value = option.getValue();
+        Object value;
+        try {
+          value = option.getValue();
+        } catch (UnusedParameterException e) {
+          value = null;
+        }
         if(value != null) {
           settings.addSetting(option.getName(), value.toString());
         }

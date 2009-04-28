@@ -73,7 +73,7 @@ public class PCARunner<V extends RealVector<V, ?>> extends AbstractParameterizab
     // small value
     covarianceMatrixBuilder = COVARIANCE_PARAM.instantiateClass();
     remainingParameters = covarianceMatrixBuilder.setParameters(remainingParameters);
-    setParameters(args, remainingParameters);
+    rememberParametersExcept(args, remainingParameters);
 
     return remainingParameters;
   }

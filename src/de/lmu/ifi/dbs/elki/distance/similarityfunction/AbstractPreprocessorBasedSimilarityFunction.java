@@ -64,7 +64,7 @@ public abstract class AbstractPreprocessorBasedSimilarityFunction<O extends Data
         String[] remainingParameters = super.setParameters(args);
 
         remainingParameters = preprocessorHandler.setParameters(remainingParameters);
-        setParameters(args, remainingParameters);
+        rememberParametersExcept(args, remainingParameters);
 
         return remainingParameters;
     }

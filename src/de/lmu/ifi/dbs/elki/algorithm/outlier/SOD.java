@@ -184,7 +184,7 @@ public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends
         alpha = ALPHA_PARAM.getValue();
 
         remainingParameters = similarityFunction.setParameters(remainingParameters);
-        setParameters(args, remainingParameters);
+        rememberParametersExcept(args, remainingParameters);
         return remainingParameters;
     }
 

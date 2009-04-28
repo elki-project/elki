@@ -106,7 +106,7 @@ public abstract class DistanceBasedClassifier<O extends DatabaseObject, D extend
         // distance function
         distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
         remainingParameters = distanceFunction.setParameters(remainingParameters);
-        setParameters(args, remainingParameters);
+        rememberParametersExcept(args, remainingParameters);
 
         return remainingParameters;
     }

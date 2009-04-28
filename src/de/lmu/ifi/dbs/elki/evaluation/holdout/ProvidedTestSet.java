@@ -93,7 +93,7 @@ public class ProvidedTestSet<O extends DatabaseObject, L extends ClassLabel> ext
 
         remainingParameters = dbc.setParameters(remainingParameters);
         testset = dbc.getDatabase(null);
-        setParameters(args, remainingParameters);
+        rememberParametersExcept(args, remainingParameters);
 
         return remainingParameters;
     }

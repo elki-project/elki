@@ -186,7 +186,7 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
     index = INDEX_PARAM.instantiateClass();
 
     remainingParameters = index.setParameters(remainingParameters);
-    setParameters(args, remainingParameters);
+    rememberParametersExcept(args, remainingParameters);
     index.setDatabase(this);
 
     return remainingParameters;

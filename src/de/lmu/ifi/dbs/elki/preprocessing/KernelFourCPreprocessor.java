@@ -184,7 +184,7 @@ public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector
 
         String[] pcaParameters = tmpPCAParameters.toArray(new String[tmpPCAParameters.size()]);
         pca.setParameters(pcaParameters);
-        setParameters(args, remainingParameters);
+        rememberParametersExcept(args, remainingParameters);
 
         return remainingParameters;
     }

@@ -186,7 +186,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
         // database
         database = DATABASE_PARAM.instantiateClass();
         remainingParameters = database.setParameters(remainingParameters);
-        setParameters(args, remainingParameters);
+        rememberParametersExcept(args, remainingParameters);
 
         return remainingParameters;
     }

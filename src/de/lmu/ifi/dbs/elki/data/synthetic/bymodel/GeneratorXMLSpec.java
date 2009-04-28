@@ -131,7 +131,7 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
       clusterRandom = new Random(RANDOMSEED_PARAM.getValue());
     }
 
-    setParameters(args, remainingParameters);
+    rememberParametersExcept(args, remainingParameters);
     return remainingParameters;
   }
 

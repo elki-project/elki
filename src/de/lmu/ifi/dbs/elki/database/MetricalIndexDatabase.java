@@ -186,7 +186,7 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
         index = INDEX_PARAM.instantiateClass();
 
         remainingParameters = index.setParameters(remainingParameters);
-        setParameters(args, remainingParameters);
+        rememberParametersExcept(args, remainingParameters);
         index.setDatabase(this);
 
         return remainingParameters;

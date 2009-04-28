@@ -162,7 +162,7 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
     // pca
     remainingParameters = pca.setParameters(remainingParameters);
 
-    setParameters(args, remainingParameters);
+    rememberParametersExcept(args, remainingParameters);
     return remainingParameters;
   }
 

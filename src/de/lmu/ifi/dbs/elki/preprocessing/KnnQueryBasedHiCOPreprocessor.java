@@ -97,7 +97,7 @@ public class KnnQueryBasedHiCOPreprocessor<V extends RealVector<V, ?>> extends H
       k = K_PARAM.getValue();
     }
 
-    setParameters(args, remainingParameters);
+    rememberParametersExcept(args, remainingParameters);
     return remainingParameters;
   }
 

@@ -244,7 +244,7 @@ public class GeneralizedLOF<O extends DatabaseObject> extends DistanceBasedAlgor
         // reachabilityDistanceFunction
         reachabilityDistanceFunction = REACHABILITY_DISTANCE_FUNCTION_PARAM.instantiateClass();
         remainingParameters = reachabilityDistanceFunction.setParameters(remainingParameters);
-        setParameters(args, remainingParameters);
+        rememberParametersExcept(args, remainingParameters);
 
         return remainingParameters;
     }

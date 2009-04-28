@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.TreeMap;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
@@ -28,7 +27,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -179,7 +177,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
    */
   public KDDTask() {
 
-    helpOptionHandler = new OptionHandler(new TreeMap<String, Option<?>>(), this.getClass().getName());
+    helpOptionHandler = new OptionHandler(this.getClass().getName());
     helpOptionHandler.put(HELP_FLAG);
     helpOptionHandler.put(HELP_LONG_FLAG);
     helpOptionHandler.put(DESCRIPTION_PARAM);
@@ -316,7 +314,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
     }
 
     initialized = true;
-    setParameters(args, remainingParameters);
+    rememberParametersExcept(args, remainingParameters);
     return remainingParameters;
   }
 

@@ -148,7 +148,7 @@ public class FileBasedFloatDistanceFunction<V extends DatabaseObject> extends Ab
       throw new WrongParameterValueException(MATRIX_PARAM, matrixfile.toString(), e);      
     }
 
-    setParameters(args, remainingParameters);
+    rememberParametersExcept(args, remainingParameters);
     return remainingParameters;
   }
 

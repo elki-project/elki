@@ -51,7 +51,7 @@ public abstract class AbstractLocallyWeightedDistanceFunction<O extends RealVect
         String[] remainingParameters = super.setParameters(args);
 
         remainingParameters = preprocessorHandler.setParameters(remainingParameters);
-        setParameters(args, remainingParameters);
+        rememberParametersExcept(args, remainingParameters);
 
         return remainingParameters;
     }

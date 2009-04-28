@@ -32,7 +32,7 @@ public class AttributeSettings {
   /**
    * Adds a new setting to this settings.
    * @param name the name of the attribute
-   * @param value a string representation of the value of the attribut
+   * @param value a string representation of the value of the attribute
    */
   public void addSetting(String name,String value) {
     settings.add(new AttributeSetting(name, value));

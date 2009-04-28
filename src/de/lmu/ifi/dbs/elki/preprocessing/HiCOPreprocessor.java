@@ -123,7 +123,7 @@ public abstract class HiCOPreprocessor<V extends RealVector<V, ?>> extends Abstr
         remainingParameters = pcaDistanceFunction.setParameters(remainingParameters);
         remainingParameters = pca.setParameters(remainingParameters);
 
-        setParameters(args, remainingParameters);
+        rememberParametersExcept(args, remainingParameters);
 
         return remainingParameters;
     }

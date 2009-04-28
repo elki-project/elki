@@ -267,10 +267,10 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
         }
         catch (ParameterException e) {
             Throwable cause = e.getCause() != null ? e.getCause() : e;
-            LoggingUtil.exception(wrapper.optionHandler.usage(e.getMessage()), cause);
+            LoggingUtil.exception(wrapper.optionHandler.usage(e.getMessage(), true), cause);
         }
         catch (Exception e) {
-          LoggingUtil.exception(wrapper.optionHandler.usage(e.getMessage()), e);
+          LoggingUtil.exception(wrapper.optionHandler.usage(e.getMessage(), true), e);
         }
     }
 

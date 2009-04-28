@@ -60,16 +60,6 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Resu
     }
 
     /**
-     * Returns {@link #parameterDescription(String) #parameterDescription("")}.
-     *
-     * @see #parameterDescription(String)
-     */
-    @Override
-    public String parameterDescription() {
-        return parameterDescription("");
-    }
-
-    /**
      * Calls the super method
      * and sets additionally the values of the flags
      * {@link #VERBOSE_FLAG} and {@link #TIME_FLAG}.
@@ -79,7 +69,7 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Resu
         String[] remainingParameters = super.setParameters(args);
         setVerbose(VERBOSE_FLAG.isSet());
         setTime(TIME_FLAG.isSet());
-        setParameters(args, remainingParameters);
+        rememberParametersExcept(args, remainingParameters);
         return remainingParameters;
     }
 

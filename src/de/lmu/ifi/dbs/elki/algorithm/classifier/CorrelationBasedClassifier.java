@@ -161,7 +161,7 @@ public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Di
         dependencyDerivator.setTime(isTime());
         remainingParameters = dependencyDerivator.setParameters(dependencyDerivatorParameters);
 
-        setParameters(args, remainingParameters);
+        rememberParametersExcept(args, remainingParameters);
         return remainingParameters;
     }
 

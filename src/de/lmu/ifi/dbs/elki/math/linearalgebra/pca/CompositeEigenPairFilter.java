@@ -85,7 +85,7 @@ public class CompositeEigenPairFilter extends AbstractParameterizable implements
       remainingParameters = filter.setParameters(remainingParameters);
     }
 
-    setParameters(args, remainingParameters);
+    rememberParametersExcept(args, remainingParameters);
 
     return remainingParameters;
   }

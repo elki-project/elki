@@ -130,7 +130,7 @@ public class DiskCacheBasedDoubleDistanceFunction<V extends DatabaseObject> exte
       throw new WrongParameterValueException(MATRIX_PARAM, matrixfile.toString(), e);      
     }
 
-    setParameters(args, remainingParameters);
+    rememberParametersExcept(args, remainingParameters);
     return remainingParameters;
   }
 }

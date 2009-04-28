@@ -329,7 +329,7 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
       sampling = true;
     }
 
-    setParameters(args, remainingParameters);
+    rememberParametersExcept(args, remainingParameters);
     return remainingParameters;
   }
 }

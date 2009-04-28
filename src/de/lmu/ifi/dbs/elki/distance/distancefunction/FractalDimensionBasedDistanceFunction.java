@@ -94,10 +94,6 @@ public class FractalDimensionBasedDistanceFunction<V extends RealVector<V, ?>>
         return FracClusPreprocessor.class.getName();
     }
 
-    public String getPreprocessorDescription() {
-        return this.optionHandler.usage("");
-    }
-
     /**
      * @return the super class for the preprocessor parameter,
      *         which is {@link de.lmu.ifi.dbs.elki.preprocessing.FracClusPreprocessor}
@@ -113,5 +109,10 @@ public class FractalDimensionBasedDistanceFunction<V extends RealVector<V, ?>>
         STANDARD_DOUBLE_DISTANCE_FUNCTION.setDatabase(this.getDatabase(), verbose, time);
     }
 
+    @Override
+    // FIXME: add a description.
+    public String getPreprocessorDescription() {
+      return "FIXME: I need a description.";
+    }
 
 }

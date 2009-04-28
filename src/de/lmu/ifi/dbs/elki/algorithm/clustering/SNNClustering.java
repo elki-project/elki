@@ -304,7 +304,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
         minpts = MINPTS_PARAM.getValue();
 
         remainingParameters = similarityFunction.setParameters(remainingParameters);
-        setParameters(args, remainingParameters);
+        rememberParametersExcept(args, remainingParameters);
 
         return remainingParameters;
     }

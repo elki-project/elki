@@ -184,7 +184,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
         copacAlgorithm.setVerbose(isVerbose());
         copacAlgorithm.setTime(isTime());
         remainingParameters = copacAlgorithm.setParameters(remainingParameters);
-        setParameters(args, remainingParameters);
+        rememberParametersExcept(args, remainingParameters);
 
         return remainingParameters;
     }

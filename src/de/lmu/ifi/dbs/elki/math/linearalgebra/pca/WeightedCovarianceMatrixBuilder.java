@@ -76,7 +76,7 @@ public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     weightfunction = WEIGHT_PARAM.instantiateClass();
-    setParameters(args, remainingParameters);
+    rememberParametersExcept(args, remainingParameters);
     return remainingParameters;
   }
 

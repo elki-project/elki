@@ -125,7 +125,7 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
       for (DistanceFunction<O, D> distanceFunction : this.distanceFunctions) {
         remainingParameters = distanceFunction.setParameters(remainingParameters);
       }
-      setParameters(args, remainingParameters);
+      rememberParametersExcept(args, remainingParameters);
       return remainingParameters;
     }
     else {
@@ -137,7 +137,7 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
         throw new WrongParameterValueException(DISTANCE_FUNCTIONS_PARAM, DEFAULT_DISTANCE_FUNCTION, e);
       }
       remainingParameters = defaultDistanceFunction.setParameters(remainingParameters);
-      setParameters(args, remainingParameters);
+      rememberParametersExcept(args, remainingParameters);
       return remainingParameters;
     }
   }

@@ -7,8 +7,6 @@ import de.lmu.ifi.dbs.elki.algorithm.classifier.Classifier;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.evaluation.holdout.Holdout;
-import de.lmu.ifi.dbs.elki.evaluation.holdout.StratifiedCrossValidation;
 import de.lmu.ifi.dbs.elki.evaluation.procedure.ClassifierEvaluationProcedure;
 import de.lmu.ifi.dbs.elki.evaluation.procedure.EvaluationProcedure;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -73,30 +71,6 @@ public class ClassifierEvaluationWrapper<O extends DatabaseObject, L extends Cla
   protected EvaluationProcedure<O, L, Classifier<O, L, Result>> evaluationProcedure;
 
   /**
-   * OptionID for {@link #HOLDOUT_PARAM}
-   */
-  public static final OptionID HOLDOUT_ID = OptionID.getOrCreateOptionID(
-      "classifier.holdout",
-      "Holdout class used in evaluation."
-  );
-
-  /**
-   * Parameter to specify the holdout for evaluation,
-   * must extend {@link de.lmu.ifi.dbs.elki.evaluation.holdout.Holdout}.
-   * <p>Key: {@code -classifier.holdout} </p>
-   * <p>Default value: {@link StratifiedCrossValidation} </p>
-   */
-  private final ClassParameter<Holdout<O, L>> HOLDOUT_PARAM = new ClassParameter<Holdout<O, L>>(
-      HOLDOUT_ID,
-      Holdout.class,
-      StratifiedCrossValidation.class.getName());
-
-  /**
-   * Holds the value of {@link #HOLDOUT_PARAM}.
-   */
-  protected Holdout<O, L> holdout;
-
-  /**
    * The result.
    */
   private EvaluationResult<O, Classifier<O, L, Result>> evaluationResult;
@@ -113,9 +87,6 @@ public class ClassifierEvaluationWrapper<O extends DatabaseObject, L extends Cla
 
       // parameter evaluation procedure
       addOption(EVALUATION_PROCEDURE_PARAM);
-
-      // parameter holdout
-      addOption(HOLDOUT_PARAM);
   }
   
   /**
@@ -134,10 +105,9 @@ public class ClassifierEvaluationWrapper<O extends DatabaseObject, L extends Cla
   protected final EvaluationResult<O,Classifier<O,L,Result>> runInTime(Database<O> database) throws IllegalStateException {
       evaluationProcedure.setTime(this.isTime());
       evaluationProcedure.setVerbose(this.isVerbose());
-      evaluationProcedure.set(database, holdout);
 
       long starteval = System.currentTimeMillis();
-      evaluationResult = evaluationProcedure.evaluate(classifier);
+      evaluationResult = evaluationProcedure.evaluate(database, classifier);
       long endeval = System.currentTimeMillis();
       if (this.isTime()) {
         logger.verbose("time required for evaluation: " + (endeval - starteval) + " msec.");
@@ -151,10 +121,8 @@ public class ClassifierEvaluationWrapper<O extends DatabaseObject, L extends Cla
   
   /**
    * Calls the super method
-   * and instantiates {@link #evaluationProcedure} according to the value of parameter {@link #EVALUATION_PROCEDURE_PARAM}
-   * and {@link #holdout} according to the value of parameter {@link #HOLDOUT_PARAM}.
-   * The remaining parameters are passed to the {@link #evaluationProcedure}
-   * and, then, to the {@link #holdout}.
+   * and instantiates {@link #evaluationProcedure} according to the value of parameter {@link #EVALUATION_PROCEDURE_PARAM}.
+   * The remaining parameters are passed to the {@link #evaluationProcedure}.
    */
   @Override
   public String[] setParameters(String[] args) throws ParameterException {
@@ -172,18 +140,14 @@ public class ClassifierEvaluationWrapper<O extends DatabaseObject, L extends Cla
       evaluationProcedure.setVerbose(isVerbose());
       remainingParameters = evaluationProcedure.setParameters(remainingParameters);
 
-      // parameter holdout
-      holdout = HOLDOUT_PARAM.instantiateClass();
-      remainingParameters = holdout.setParameters(remainingParameters);
-
-      setParameters(args, remainingParameters);
+      rememberParametersExcept(args, remainingParameters);
       return remainingParameters;
   }
 
   /**
    * Calls the super method
    * and adds to the returned attribute settings the attribute settings of
-   * {@link #evaluationProcedure} and {@link #holdout}.
+   * {@link #evaluationProcedure}.
    *
    */
   @Override
@@ -192,7 +156,6 @@ public class ClassifierEvaluationWrapper<O extends DatabaseObject, L extends Cla
 
       attributeSettings.addAll(classifier.getAttributeSettings());
       attributeSettings.addAll(evaluationProcedure.getAttributeSettings());
-      attributeSettings.addAll(holdout.getAttributeSettings());
 
       return attributeSettings;
   }
@@ -200,7 +163,7 @@ public class ClassifierEvaluationWrapper<O extends DatabaseObject, L extends Cla
   /**
    * Calls the super method
    * and appends the parameter description of
-   * {@link #evaluationProcedure} and {@link #holdout} if they are already initialized.
+   * {@link #evaluationProcedure}  if they are already initialized.
    */
   @Override
   public String parameterDescription() {
@@ -214,10 +177,6 @@ public class ClassifierEvaluationWrapper<O extends DatabaseObject, L extends Cla
           // evaluationProcedure
       if (evaluationProcedure != null) {
           description.append(evaluationProcedure.parameterDescription());
-      }
-      // holdout
-      if (holdout != null) {
-          description.append(holdout.parameterDescription());
       }
 
       return description.toString();

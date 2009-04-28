@@ -99,7 +99,7 @@ public class ResultWriter<O extends DatabaseObject> extends AbstractParameteriza
     }
     gzip = GZIP_FLAG.isSet();
     warnoverwrite = OVERWRITE_FLAG.isSet() != true; // inversed!
-    setParameters(args, remainingParameters);
+    rememberParametersExcept(args, remainingParameters);
     return remainingParameters;
   }
 

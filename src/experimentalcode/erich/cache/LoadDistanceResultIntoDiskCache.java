@@ -109,7 +109,7 @@ public class LoadDistanceResultIntoDiskCache extends AbstractWrapper {
 
     // Pass on parameters to distance function.
     remainingParameters = distance.setParameters(remainingParameters);
-    super.setParameters(args, remainingParameters);
+    super.rememberParametersExcept(args, remainingParameters);
 
     if(remainingParameters.length != 0) {
       LoggingUtil.warning("Unnecessary parameters specified: " + Arrays.asList(remainingParameters));
