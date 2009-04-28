@@ -11,7 +11,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -270,22 +269,6 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
     return result.toString();
   }
 
-   /**
-     * Calls the super method
-     * and adds to the returned attribute settings the attribute settings of
-     * all instances of {@link #normalizations}.
-     */
-    @Override
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> result = super.getAttributeSettings();
-
-    for (Normalization<O> normalization : normalizations) {
-      result.addAll(normalization.getAttributeSettings());
-    }
-
-    return result;
-  }
-
   /**
    * Sets the attributes of the class accordingly to the given parameters.
    * Returns a new String array containing those entries of the given array
@@ -304,8 +287,13 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
       // FIXME: add support back for NO_NORMALIZATION keyword?
       // Right now, the user needs to specify DummyNormalization.class.getName()
       this.normalizations = NORMALIZATION_PARAM.instantiateClasses();
+      for (Normalization<O> normalization : normalizations) {
+        remainingOptions = normalization.setParameters(remainingOptions);
+        addParameterizable(normalization);
+      }
     }
 
+    rememberParametersExcept(args, remainingOptions);
     return remainingOptions;
   }
 }

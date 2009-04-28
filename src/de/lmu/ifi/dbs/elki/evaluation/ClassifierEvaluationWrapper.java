@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.evaluation;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.classifier.Classifier;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
@@ -11,7 +9,6 @@ import de.lmu.ifi.dbs.elki.evaluation.procedure.ClassifierEvaluationProcedure;
 import de.lmu.ifi.dbs.elki.evaluation.procedure.EvaluationProcedure;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -133,31 +130,17 @@ public class ClassifierEvaluationWrapper<O extends DatabaseObject, L extends Cla
       classifier.setTime(isTime());
       classifier.setVerbose(isVerbose());
       remainingParameters = classifier.setParameters(remainingParameters);
+      addParameterizable(classifier);
 
       // parameter evaluation procedure
       evaluationProcedure = EVALUATION_PROCEDURE_PARAM.instantiateClass();
       evaluationProcedure.setTime(isTime());
       evaluationProcedure.setVerbose(isVerbose());
       remainingParameters = evaluationProcedure.setParameters(remainingParameters);
+      addParameterizable(evaluationProcedure);
 
       rememberParametersExcept(args, remainingParameters);
       return remainingParameters;
-  }
-
-  /**
-   * Calls the super method
-   * and adds to the returned attribute settings the attribute settings of
-   * {@link #evaluationProcedure}.
-   *
-   */
-  @Override
-  public List<AttributeSettings> getAttributeSettings() {
-      List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-
-      attributeSettings.addAll(classifier.getAttributeSettings());
-      attributeSettings.addAll(evaluationProcedure.getAttributeSettings());
-
-      return attributeSettings;
   }
 
   /**

@@ -8,7 +8,6 @@ import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -247,16 +246,6 @@ public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ? >> e
       maxima = Util.unbox(max_list.toArray(new Double[max_list.size()]));
     }
     return remainingParameters;
-  }
-
-  // todo minima und maxima doppelt drin?
-  @Override
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> settings = super.getAttributeSettings();
-    AttributeSettings mySettings = settings.get(0);
-    mySettings.addSetting("value of min ", FormatUtil.format(minima));
-    mySettings.addSetting("value of max ", FormatUtil.format(maxima));
-    return settings;
   }
 
   /**

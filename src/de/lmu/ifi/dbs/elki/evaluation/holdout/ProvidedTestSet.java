@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.evaluation.holdout;
 
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
@@ -11,7 +10,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -90,24 +88,12 @@ public class ProvidedTestSet<O extends DatabaseObject, L extends ClassLabel> ext
         String[] remainingParameters = super.setParameters(args);
 
         dbc = TESTSET_DATABASE_CONNECTION_PARAM.instantiateClass();
-
         remainingParameters = dbc.setParameters(remainingParameters);
+        addParameterizable(dbc);
+        
         testset = dbc.getDatabase(null);
+        
         rememberParametersExcept(args, remainingParameters);
-
         return remainingParameters;
     }
-
-    /**
-     * Calls the super method
-     * and adds to the returned attribute settings the attribute settings of
-     * the {@link #dbc}.
-     */
-    @Override
-    public List<AttributeSettings> getAttributeSettings() {
-        List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-        attributeSettings.addAll(dbc.getAttributeSettings());
-        return attributeSettings;
-    }
-
 }

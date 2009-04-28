@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -208,21 +207,10 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
 
         distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
         remainingParameters = distanceFunction.setParameters(remainingParameters);
+        addParameterizable(distanceFunction);
+        
         rememberParametersExcept(args, remainingParameters);
-
         return remainingParameters;
-    }
-
-    /**
-     * Calls the super method
-     * and adds to the returned attribute settings the attribute settings of
-     * the {@link #distanceFunction}.
-     */
-    @Override
-    public List<AttributeSettings> getAttributeSettings() {
-        List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-        attributeSettings.addAll(distanceFunction.getAttributeSettings());
-        return attributeSettings;
     }
 
     public final void setDatabase(Database<O> database) {

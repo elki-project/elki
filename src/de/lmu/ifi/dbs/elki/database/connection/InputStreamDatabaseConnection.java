@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.elki.parser.Parser;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
 import de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -142,20 +141,9 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
         // parser
         parser = PARSER_PARAM.instantiateClass();
         remainingParameters = parser.setParameters(remainingParameters);
+        addParameterizable(parser);
+        
         rememberParametersExcept(args, remainingParameters);
-
         return remainingParameters;
-    }
-
-    /**
-     * Calls the super method
-     * and adds to the returned attribute settings the attribute settings of
-     * the {@link #parser}.
-     */
-    @Override
-    public List<AttributeSettings> getAttributeSettings() {
-        List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-        attributeSettings.addAll(parser.getAttributeSettings());
-        return attributeSettings;
     }
 }

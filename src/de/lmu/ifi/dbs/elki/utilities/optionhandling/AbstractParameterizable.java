@@ -1,7 +1,9 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
@@ -24,6 +26,11 @@ public abstract class AbstractParameterizable extends AbstractLoggable implement
    * Holds the currently set parameter array.
    */
   private String[] currentParameterArray = new String[0];
+  
+  /**
+   * Hold parameterizables contained
+   */
+  private List<Pair<Parameterizable, List<OptionID>>> parameterizables = new ArrayList<Pair<Parameterizable, List<OptionID>>>(0);
 
   /**
    * Creates a new AbstractParameterizable that provides the option handler and
@@ -52,8 +59,41 @@ public abstract class AbstractParameterizable extends AbstractLoggable implement
    *        Parameterizable
    * @throws UnusedParameterException if the given Option is unknown
    */
-  protected void deleteOption(Option<?> option) throws UnusedParameterException {
+  protected void removeOption(Option<?> option) throws UnusedParameterException {
     this.optionHandler.remove(option.getName());
+  }
+  
+  /**
+   * Add a new parameterizable to the list. Used for listing options and settings.
+   * 
+   * @param p parameterizable
+   */
+  protected void addParameterizable(Parameterizable p) {
+    this.parameterizables.add(new Pair<Parameterizable, List<OptionID>>(p, null));
+  }
+  
+  /**
+   * Add a new parameterizable to the list. Used for listing options and settings.
+   * 
+   * @param p parameterizable
+   * @param override overridden parameters
+   */
+  protected void addParameterizable(Parameterizable p, List<OptionID> override) {
+    this.parameterizables.add(new Pair<Parameterizable, List<OptionID>>(p, override));
+  }
+  
+  /**
+   * Remove a parameterizable from the list. Used for listing options and settings.
+   * 
+   * @param p parametrizable to remove
+   */
+  protected void removeParameterizable(Parameterizable p) {
+    for (ListIterator<Pair<Parameterizable, List<OptionID>>> iter = this.parameterizables.listIterator(); iter.hasNext(); ) {
+      if (iter.next().getFirst() == p) {
+        iter.remove();
+        break;
+      }
+    }
   }
 
   /**
@@ -123,12 +163,25 @@ public abstract class AbstractParameterizable extends AbstractLoggable implement
 
   /**
    * Returns the settings of all options assigned to the option handler.
+   * @return the settings of all options assigned to the option handler
    */
+  // FIXME - legacy adapter. Retire and use collectOptions instead.
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> settings = new ArrayList<AttributeSettings>();
-    AttributeSettings mySettings = new AttributeSettings(this);
-    optionHandler.addOptionSettings(mySettings);
-    settings.add(mySettings);
+    // collect all options
+    List<Pair<Parameterizable, Option<?>>> collection = new ArrayList<Pair<Parameterizable, Option<?>>>();
+    this.collectOptions(collection);
+    // group by parameterizable
+    HashMap<Parameterizable, AttributeSettings> map = new HashMap<Parameterizable, AttributeSettings>();
+    for (Pair<Parameterizable, Option<?>> pair : collection) {
+      AttributeSettings set = map.get(pair.getFirst());
+      if (set == null) {
+        set = new AttributeSettings(pair.getFirst());
+        map.put(pair.getFirst(), set);
+        settings.add(set);
+      }
+      set.addOption(pair.getSecond());
+    }
     return settings;
   }
 
@@ -141,14 +194,6 @@ public abstract class AbstractParameterizable extends AbstractLoggable implement
    */
   public String parameterDescription() {
     return optionHandler.usage("", false);
-  }
-
-  /**
-   * @see OptionHandler#getOptions()
-   */
-  // TODO: remove - only used in guidraft1?
-  public Option<?>[] getPossibleOptions() {
-    return optionHandler.getOptions();
   }
 
   /**
@@ -169,6 +214,27 @@ public abstract class AbstractParameterizable extends AbstractLoggable implement
     Option<?>[] opts = this.optionHandler.getOptions();
     for(Option<?> o : opts) {
       collection.add(new Pair<Parameterizable, Option<?>>(this, o));
+      // TODO: recurse into ClassParameters?
+    }
+    for (Pair<Parameterizable,List<OptionID>> p : parameterizables) {
+      if (p.getSecond() != null) {
+        // remove any of the given parameters
+        ArrayList<Pair<Parameterizable, Option<?>>> col = new ArrayList<Pair<Parameterizable, Option<?>>>();
+        p.getFirst().collectOptions(col);
+        ArrayList<OptionID> toremove = new ArrayList<OptionID>(p.getSecond());
+        for (ListIterator<Pair<Parameterizable, Option<?>>> i2 = col.listIterator(); i2.hasNext(); ) {
+          Pair<Parameterizable, Option<?>> p2 = i2.next();
+          if (toremove.remove(p2.getSecond().getOptionID())) {
+            i2.remove();
+          }
+        }
+        if (toremove.size() > 0) {
+          // TODO: change to "debugFine"?
+          logger.warning("Options were given as ignore-because-predefined that were not found in the collected options.");
+        }
+      } else {
+        p.getFirst().collectOptions(collection);
+      }
     }
   }
 }

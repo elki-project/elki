@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 
+import java.util.regex.Pattern;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
@@ -7,11 +9,7 @@ import de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-
-import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * Abstract super class for distance functions needing a preprocessor.
@@ -64,21 +62,10 @@ public abstract class AbstractPreprocessorBasedSimilarityFunction<O extends Data
         String[] remainingParameters = super.setParameters(args);
 
         remainingParameters = preprocessorHandler.setParameters(remainingParameters);
+        addParameterizable(preprocessorHandler);
+        
         rememberParametersExcept(args, remainingParameters);
-
         return remainingParameters;
-    }
-
-    /**
-     * Calls the super method
-     * and adds to the returned attribute settings the attribute settings of the
-     * {@link #preprocessorHandler}.
-     */
-    @Override
-    public List<AttributeSettings> getAttributeSettings() {
-        List<AttributeSettings> mySettings = super.getAttributeSettings();
-        mySettings.addAll(preprocessorHandler.getAttributeSettings());
-        return mySettings;
     }
 
     /**

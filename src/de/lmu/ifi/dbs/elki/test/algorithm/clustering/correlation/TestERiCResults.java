@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ERiCDistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.RelativeEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.WeightedCovarianceMatrixBuilder;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ErfcWeight;
@@ -81,14 +82,16 @@ public class TestERiCResults {
     OptionUtil.addParameter(ericparams, KnnQueryBasedHiCOPreprocessor.KNN_HICO_PREPROCESSOR_K, Integer.toString(50));
     OptionUtil.addFlag(ericparams, PreprocessorHandler.OMIT_PREPROCESSING_ID);
     // PCA
-    OptionUtil.addParameter(ericparams, PCAFilteredRunner.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class.getCanonicalName());
+    OptionUtil.addParameter(ericparams, PCARunner.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class.getCanonicalName());
     OptionUtil.addParameter(ericparams, WeightedCovarianceMatrixBuilder.WEIGHT_ID, ErfcWeight.class.getCanonicalName());
     OptionUtil.addParameter(ericparams, PCAFilteredRunner.PCA_EIGENPAIR_FILTER, RelativeEigenPairFilter.class.getCanonicalName());
     OptionUtil.addParameter(ericparams, RelativeEigenPairFilter.EIGENPAIR_FILTER_RALPHA, Double.toString(1.60));
     // Set parameters
     String[] remainingparams = eric.setParameters(ericparams.toArray(new String[0]));
-    for(String s : remainingparams)
+    for(String s : remainingparams) {
       System.err.println("Remaining parameter: " + s);
+    }
+    //System.err.println(eric.getAttributeSettings().toString());
     assertTrue("Some parameters were ignored by the algorithm.", remainingparams.length == 0);
     // run ERiC on database
     Clustering<CorrelationModel<DoubleVector>> result = eric.run(db);

@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -24,9 +25,8 @@ import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -213,21 +213,11 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
         }
 
         remainingParameters = optics.setParameters(opticsParameters.toArray(new String[opticsParameters.size()]));
+        OptionID[] masked = { OPTICS.EPSILON_ID, OPTICS.MINPTS_ID, OPTICS.DISTANCE_FUNCTION_ID, DiSHDistanceFunction.EPSILON_ID, PreprocessorHandler.OMIT_PREPROCESSING_ID, PreprocessorHandler.PREPROCESSOR_ID, DiSHPreprocessor.EPSILON_ID, DiSHPreprocessor.MINPTS_ID};
+        addParameterizable(optics, Arrays.asList(masked));
+        
         rememberParametersExcept(args, remainingParameters);
-
         return remainingParameters;
-    }
-
-    /**
-     * Calls the super method
-     * and adds to the returned attribute settings the attribute settings of
-     * the algorithm {@link #optics}.
-     */
-    @Override
-    public List<AttributeSettings> getAttributeSettings() {
-        List<AttributeSettings> settings = super.getAttributeSettings();
-        settings.addAll(optics.getAttributeSettings());
-        return settings;
     }
 
     /**

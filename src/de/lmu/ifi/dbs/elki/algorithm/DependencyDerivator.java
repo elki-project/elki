@@ -21,7 +21,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -284,20 +283,10 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
     }
 
     remainingParameters = pca.setParameters(remainingParameters);
+    addParameterizable(pca);
 
     rememberParametersExcept(args, remainingParameters);
     return remainingParameters;
-  }
-
-  /**
-   * Calls the super method and adds to the returned attribute settings the
-   * attribute settings of the {@link #pca}.
-   */
-  @Override
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-    attributeSettings.addAll(pca.getAttributeSettings());
-    return attributeSettings;
   }
 
   /**

@@ -24,7 +24,6 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -211,55 +210,32 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
 
-        // partition algorithm
-        partitionAlgorithm = PARTITION_ALGORITHM_PARAM.instantiateClass();
-
         // partition db
-        if (optionHandler.isSet(PARTITION_DB_PARAM)) {
+        if (PARTITION_DB_PARAM.isSet()) {
             Database<V> tmpDB = PARTITION_DB_PARAM.instantiateClass();
             remainingParameters = tmpDB.setParameters(remainingParameters);
             partitionDatabaseParameters = tmpDB.getParameters();
+            // FIXME: we're leaking a reference here.
+            addParameterizable(tmpDB);
             partitionDatabase = (Class<Database<V>>) tmpDB.getClass();
         }
 
         // preprocessor
         preprocessor = PREPROCESSOR_PARAM.instantiateClass();
         remainingParameters = preprocessor.setParameters(remainingParameters);
+        addParameterizable(preprocessor);
 
         // partition algorithm
+        partitionAlgorithm = PARTITION_ALGORITHM_PARAM.instantiateClass();
         String[] partitiongAlgorithmParameters = new String[remainingParameters.length];
         System.arraycopy(remainingParameters, 0, partitiongAlgorithmParameters, 0, remainingParameters.length);
         partitionAlgorithm.setTime(isTime());
         partitionAlgorithm.setVerbose(isVerbose());
         remainingParameters = partitionAlgorithm.setParameters(partitiongAlgorithmParameters);
+        addParameterizable(partitionAlgorithm);
 
         rememberParametersExcept(args, remainingParameters);
         return remainingParameters;
-    }
-
-    /**
-     * Calls the super method
-     * and adds to the returned attribute settings the attribute settings of
-     * the {@link #preprocessor}, the {@link #partitionAlgorithm}, and {@link #partitionDatabase}.
-     */
-    @Override
-    public List<AttributeSettings> getAttributeSettings() {
-        List<AttributeSettings> result = super.getAttributeSettings();
-
-        result.addAll(preprocessor.getAttributeSettings());
-        result.addAll(partitionAlgorithm.getAttributeSettings());
-        if (optionHandler.isSet(PARTITION_DB_PARAM)) {
-            try {
-                Database<V> tmpDB = ClassGenericsUtil.instantiateGenerics(Database.class, partitionDatabase.getName());
-                result.addAll(tmpDB.getAttributeSettings());
-            }
-            catch (UnableToComplyException e) {
-                // tested before
-                throw new RuntimeException("This should never happen!", e);
-            }
-        }
-
-        return result;
     }
 
     /**
@@ -284,7 +260,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
             description.append(partitionAlgorithm.parameterDescription());
         }
         // partition database
-        if (optionHandler.isSet(PARTITION_DB_PARAM)) {
+        if (PARTITION_DB_PARAM.isSet()) {
             try {
                 Database<V> tmpDB = ClassGenericsUtil.instantiateGenerics(Database.class, partitionDatabase.getName());
                 description.append(Description.NEWLINE);

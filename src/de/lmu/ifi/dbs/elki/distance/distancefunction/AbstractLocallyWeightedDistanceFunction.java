@@ -1,14 +1,11 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorClient;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
@@ -51,21 +48,10 @@ public abstract class AbstractLocallyWeightedDistanceFunction<O extends RealVect
         String[] remainingParameters = super.setParameters(args);
 
         remainingParameters = preprocessorHandler.setParameters(remainingParameters);
+        addParameterizable(preprocessorHandler);
+        
         rememberParametersExcept(args, remainingParameters);
-
         return remainingParameters;
-    }
-
-    /**
-     * Calls the super method
-     * and adds to the returned attribute settings the attribute settings of the
-     * {@link #preprocessorHandler}.
-     */
-    @Override
-    public List<AttributeSettings> getAttributeSettings() {
-        List<AttributeSettings> mySettings = super.getAttributeSettings();
-        mySettings.addAll(preprocessorHandler.getAttributeSettings());
-        return mySettings;
     }
 
     @Override

@@ -15,7 +15,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -121,23 +120,13 @@ public abstract class HiCOPreprocessor<V extends RealVector<V, ?>> extends Abstr
 
         pcaDistanceFunction = PCA_DISTANCE_PARAM.instantiateClass();
         remainingParameters = pcaDistanceFunction.setParameters(remainingParameters);
+        addParameterizable(pcaDistanceFunction);
+        
         remainingParameters = pca.setParameters(remainingParameters);
+        addParameterizable(pca);
 
         rememberParametersExcept(args, remainingParameters);
-
         return remainingParameters;
-    }
-
-    /**
-     * Calls the super method
-     * and adds to the returned attribute settings the attribute settings of
-     * the {@link #pca}.
-     */
-    @Override
-    public List<AttributeSettings> getAttributeSettings() {
-        List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-        attributeSettings.addAll(pca.getAttributeSettings());
-        return attributeSettings;
     }
 
     /**

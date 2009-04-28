@@ -21,7 +21,6 @@ import de.lmu.ifi.dbs.elki.parser.ParsingResult;
 import de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -178,7 +177,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
     }
 
     // parsers
-    if(optionHandler.isSet(PARSERS_PARAM)) {
+    if(PARSERS_PARAM.isSet()) {
       parsers = PARSERS_PARAM.instantiateClasses();
 
       if(parsers.size() != inputStreams.size()) {
@@ -201,22 +200,10 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
     // set parameters of parsers
     for(Parser<O> parser : this.parsers) {
       remainingParameters = parser.setParameters(remainingParameters);
+      addParameterizable(parser);
     }
+
     rememberParametersExcept(args, remainingParameters);
-
     return remainingParameters;
-  }
-
-  /**
-   * Calls the super method and adds to the returned attribute settings the
-   * attribute settings of all instances of {@link #parsers}.
-   */
-  @Override
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-    for(Parser<O> parser : parsers) {
-      attributeSettings.addAll(parser.getAttributeSettings());
-    }
-    return attributeSettings;
   }
 }

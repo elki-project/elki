@@ -23,7 +23,6 @@ import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.elki.preprocessing.ProjectedDBSCANPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.IndefiniteProgress;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
@@ -412,22 +411,11 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
         OptionUtil.addParameter(distanceFunctionParameters, MINPTS_ID, Integer.toString(minpts));
 
         distanceFunction.setParameters(distanceFunctionParameters.toArray(new String[distanceFunctionParameters.size()]));
+        addParameterizable(distanceFunction);
 
         rememberParametersExcept(args, remainingParameters);
         return remainingParameters;
 
-    }
-
-    /**
-     * Calls the super method
-     * and adds to the returned attribute settings the attribute settings of
-     * the {@link #distanceFunction}.
-     */
-    @Override
-    public List<AttributeSettings> getAttributeSettings() {
-        List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-        attributeSettings.addAll(distanceFunction.getAttributeSettings());
-        return attributeSettings;
     }
 
     /**

@@ -192,33 +192,6 @@ public class OptionHandler extends AbstractLoggable {
   }
 
   /**
-   * Returns true if the value of the given option is set, false otherwise.
-   * 
-   * @param option The option should be asked for without leading &quot;-&quot;
-   *        or closing &quot;:&quot;.
-   * @return boolean true if the value of the given option is set, false
-   *         otherwise
-   */
-  public boolean isSet(String option) {
-    if(parameters.containsKey(option)) {
-      return parameters.get(option).isSet();
-    }
-    return false;
-  }
-
-  /**
-   * Returns true if the value of the given option is set, false otherwise.
-   * 
-   * @param option The option should be asked for without leading &quot;-&quot;
-   *        or closing &quot;:&quot;.
-   * @return boolean true if the value of the given option is set, false
-   *         otherwise
-   */
-  public boolean isSet(Option<?> option) {
-    return isSet(option.getName());
-  }
-
-  /**
    * Returns an usage-String according to the descriptions given in the
    * constructor.
    * 
@@ -399,36 +372,7 @@ public class OptionHandler extends AbstractLoggable {
    * @return new array of options.
    */
   public Option<?>[] getOptions() {
-    return parameters.values().toArray(new Option[] {});
-  }
-
-  /**
-   * Adds the settings of the options assigned to this option handler to the
-   * specified attribute settings.
-   * 
-   * @param settings the attribute settings to add the settings of the options
-   *        assigned to this option handler to
-   */
-  public void addOptionSettings(AttributeSettings settings)  {
-    for(Option<?> option : parameters.values()) {
-      if(option instanceof Flag) {
-        settings.addSetting(option.getName(), Boolean.toString(isSet(option.getName())));
-      }
-      else {
-        Object value;
-        try {
-          value = option.getValue();
-        } catch (UnusedParameterException e) {
-          value = null;
-        }
-        if(value != null) {
-          settings.addSetting(option.getName(), value.toString());
-        }
-        else {
-          settings.addSetting(option.getName(), "null");
-        }
-      }
-    }
+    return parameters.values().toArray(new Option<?>[] {});
   }
 
   /**

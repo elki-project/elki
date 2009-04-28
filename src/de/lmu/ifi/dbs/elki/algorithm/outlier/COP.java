@@ -20,7 +20,6 @@ import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -193,6 +192,7 @@ public class COP<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, D
         // dependency derivator (currently hardcoded)
         dependencyDerivator = new DependencyDerivator<V, DoubleDistance>();
         remainingParameters = dependencyDerivator.setParameters(remainingParameters);
+        addParameterizable(dependencyDerivator);
 
         rememberParametersExcept(args, remainingParameters);
         return remainingParameters;
@@ -200,17 +200,5 @@ public class COP<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, D
 
     public MultiResult getResult() {
         return result;
-    }
-
-    /**
-     * Calls the super method
-     * and adds to the returned attribute settings the attribute settings of
-     * the {@link #dependencyDerivator}.
-     */
-    @Override
-    public List<AttributeSettings> getAttributeSettings() {
-        List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-        attributeSettings.addAll(dependencyDerivator.getAttributeSettings());
-        return attributeSettings;
     }
 }

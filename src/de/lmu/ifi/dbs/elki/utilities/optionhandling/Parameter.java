@@ -193,7 +193,7 @@ public abstract class Parameter<T, C> extends Option<T> {
     @Override
     public T getValue() throws UnusedParameterException {
         if (value == null && !optionalParameter) {
-            throw new UnusedParameterException("Value of parameter " + name + " has not been specified.");
+            throw new UnusedParameterException("Value of parameter " + getName() + " has not been specified.");
         }
 
         return value;

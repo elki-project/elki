@@ -1,16 +1,15 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 
 import java.util.Collection;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -122,26 +121,16 @@ public class PCAFilteredRunner<V extends RealVector<V, ?>> extends PCARunner<V> 
     // eigenPair filter
     eigenPairFilter = EIGENPAIR_FILTER_PARAM.instantiateClass();
     remainingParameters = eigenPairFilter.setParameters(remainingParameters);
+    addParameterizable(eigenPairFilter);
+    
     rememberParametersExcept(args, remainingParameters);
-
     return remainingParameters;
-  }
-
-  /**
-   * Calls the super method and adds to the returned attribute settings the
-   * attribute settings of the {@link #eigenPairFilter}.
-   */
-  @Override
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-    attributeSettings.addAll(eigenPairFilter.getAttributeSettings());
-    return attributeSettings;
   }
 
   /**
    * Run PCA on a collection of database IDs
    * 
-   * @param ids a colleciton of ids
+   * @param ids a collection of ids
    * @param database the database used
    * @return PCA result
    */

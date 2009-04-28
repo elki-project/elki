@@ -1,13 +1,12 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-
-import java.util.List;
 
 /**
  * The <code>CompositeEigenPairFilter</code> can be used to build a chain of
@@ -83,23 +82,10 @@ public class CompositeEigenPairFilter extends AbstractParameterizable implements
     filters = FILTERS_PARAM.instantiateClasses();
     for(EigenPairFilter filter : filters) {
       remainingParameters = filter.setParameters(remainingParameters);
+      addParameterizable(filter);
     }
 
     rememberParametersExcept(args, remainingParameters);
-
     return remainingParameters;
-  }
-
-  /**
-   * Calls the super method and adds to the returned attribute settings the
-   * attribute settings of each instance of {@link #filters}.
-   */
-  @Override
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-    for(EigenPairFilter filter : filters) {
-      attributeSettings.addAll(filter.getAttributeSettings());
-    }
-    return attributeSettings;
   }
 }

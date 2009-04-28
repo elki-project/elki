@@ -23,7 +23,6 @@ import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
@@ -564,17 +563,6 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
   }
 
   /**
-   * Calls the super method and adds to the returned attribute settings the
-   * attribute settings of the {@link #kernelFunction}.
-   */
-  @Override
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-    attributeSettings.addAll(kernelFunction.getAttributeSettings());
-    return attributeSettings;
-  }
-
-  /**
    * Calls the super method and sets parameters {@link #FAST_FLAG},
    * {@link #FAST_SAMPLE_PARAM} and {@link #KERNEL_FUNCTION_PARAM}. The
    * remaining parameters are then passed to the {@link #kernelFunction}.
@@ -596,7 +584,9 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
 
     kernelFunction = KERNEL_FUNCTION_PARAM.instantiateClass();
     remainingParameters = kernelFunction.setParameters(remainingParameters);
-
+    addParameterizable(kernelFunction);
+    
+    rememberParametersExcept(args, remainingParameters);
     return remainingParameters;
   }
 }

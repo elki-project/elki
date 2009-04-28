@@ -14,7 +14,6 @@ import java.util.Set;
 import de.lmu.ifi.dbs.elki.data.ExternalObject;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -162,20 +161,10 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
 
     distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
     remainingParameters = distanceFunction.setParameters(remainingParameters);
+    addParameterizable(distanceFunction);
+    
     rememberParametersExcept(args, remainingParameters);
-
     return remainingParameters;
-  }
-
-  /**
-   * Calls the super method and adds to the returned attribute settings the
-   * attribute settings of the {@link #distanceFunction}.
-   */
-  @Override
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-    attributeSettings.addAll(distanceFunction.getAttributeSettings());
-    return attributeSettings;
   }
 
   /**

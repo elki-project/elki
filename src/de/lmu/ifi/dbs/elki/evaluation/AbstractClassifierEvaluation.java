@@ -60,7 +60,7 @@ public abstract class AbstractClassifierEvaluation<O extends DatabaseObject, L e
         //writeHeader(outStream, settings, null);
         outStream.print("Evaluating ");
         outStream.println(classifier.getClass().getName());
-        outStream.println(classifier.getAttributeSettings());
+        //outStream.println(classifier.getAttributeSettings());
         if (testset != null) {
             outStream.println("used testset: ");
             outStream.print(" number of test instances: ");

@@ -2,6 +2,8 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+
 
 /**
  * Interface to define the required methods for command line interaction.
@@ -45,23 +47,16 @@ public interface Parameterizable {
   String[] getParameters();
 
   /**
-   * Returns the setting of the attributes of the parameterizable.
-   *
-   * @return the setting of the attributes of the parameterizable
-   */
-  public List<AttributeSettings> getAttributeSettings();
-  
-  /**
-   * Returns an array containing all options of this parameterizable object
-   * 
-   * @return the options of this parameterizable object
-   */
-  Option<?>[] getPossibleOptions();
-  
-  /**
    * Checks if all global parameter constraints are kept
    *
    * @throws ParameterException if the parameters don't satisfy the parameter constraints
    */
   void checkGlobalParameterConstraints() throws ParameterException;
+  
+  /**
+   * Fill the given collection with a list of available options.
+   *  
+   * @param collection collection to fill
+   */
+  public void collectOptions(List<Pair<Parameterizable, Option<?>>> collection);  
 }

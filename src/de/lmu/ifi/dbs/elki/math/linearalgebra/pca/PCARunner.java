@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 
 import java.util.Collection;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -11,7 +10,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -73,20 +71,10 @@ public class PCARunner<V extends RealVector<V, ?>> extends AbstractParameterizab
     // small value
     covarianceMatrixBuilder = COVARIANCE_PARAM.instantiateClass();
     remainingParameters = covarianceMatrixBuilder.setParameters(remainingParameters);
+    addParameterizable(covarianceMatrixBuilder);
+
     rememberParametersExcept(args, remainingParameters);
-
     return remainingParameters;
-  }
-
-  /**
-   * Calls the super method and adds to the returned attribute settings the
-   * attribute settings of the {@link #covarianceMatrixBuilder}.
-   */
-  @Override
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-    attributeSettings.addAll(covarianceMatrixBuilder.getAttributeSettings());
-    return attributeSettings;
   }
 
   /**

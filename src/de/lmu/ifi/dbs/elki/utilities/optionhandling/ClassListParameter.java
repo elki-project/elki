@@ -78,11 +78,11 @@ public class ClassListParameter<C> extends ListParameter<String> {
     for(String cl : classes) {
       try {
         if(!ClassParameter.satisfiesClassRestriction(restrictionClass, cl)) {
-          throw new WrongParameterValueException(this.name, cl, "Wrong parameter value for parameter \"" + getName() + "\". Given class " + cl + " does not extend restriction class " + restrictionClass + ".\n");
+          throw new WrongParameterValueException(this.getName(), cl, "Wrong parameter value for parameter \"" + getName() + "\". Given class " + cl + " does not extend restriction class " + restrictionClass + ".\n");
         }
       }
       catch(ClassNotFoundException e) {
-        throw new WrongParameterValueException(this.name, cl, "Wrong parameter value for parameter \"" + getName() + "\". Given class " + cl + " not found.\n", e);
+        throw new WrongParameterValueException(this.getName(), cl, "Wrong parameter value for parameter \"" + getName() + "\". Given class " + cl + " not found.\n", e);
       }
     }
 
@@ -113,7 +113,7 @@ public class ClassListParameter<C> extends ListParameter<String> {
    */
   public List<C> instantiateClasses() throws ParameterException {
     if(value == null && !optionalParameter) {
-      throw new UnusedParameterException("Value of parameter " + name + " has not been specified.");
+      throw new UnusedParameterException("Value of parameter " + getName() + " has not been specified.");
     }
     List<C> instances = new ArrayList<C>();
 
@@ -128,7 +128,7 @@ public class ClassListParameter<C> extends ListParameter<String> {
         }
       }
       catch(Exception e) {
-        throw new WrongParameterValueException(name, classname, getDescription(), e);
+        throw new WrongParameterValueException(getName(), classname, getDescription(), e);
       }
     }
 

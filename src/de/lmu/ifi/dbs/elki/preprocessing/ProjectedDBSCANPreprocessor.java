@@ -16,7 +16,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunc
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -168,7 +167,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
 
         rangeQueryDistanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
         remainingParameters = rangeQueryDistanceFunction.setParameters(remainingParameters);
-        rememberParametersExcept(args, remainingParameters);
+        addParameterizable(rangeQueryDistanceFunction);
 
         // epsilon
         epsilon = EPSILON_PARAM.getValue();
@@ -176,19 +175,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
         // minpts
         minpts = MINPTS_PARAM.getValue();
 
+        rememberParametersExcept(args, remainingParameters);
         return remainingParameters;
     }
-
-    /**
-     * Calls the super method
-     * and adds to the returned attribute settings the attribute settings of
-     * the {@link #rangeQueryDistanceFunction}.
-     */
-    @Override
-    public List<AttributeSettings> getAttributeSettings() {
-        List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-        attributeSettings.addAll(rangeQueryDistanceFunction.getAttributeSettings());
-        return attributeSettings;
-    }
-
 }

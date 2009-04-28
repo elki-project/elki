@@ -96,10 +96,10 @@ public class ClassParameter<C> extends Parameter<String, String> {
       does = satisfiesClassRestriction(restrictionClass, value);
     }
     catch(ClassNotFoundException e) {
-      throw new WrongParameterValueException(this.name, value, "Class not found. Expected subclass / implementing class of " + restrictionClass.getName(), e);
+      throw new WrongParameterValueException(this.getName(), value, "Class not found. Expected subclass / implementing class of " + restrictionClass.getName(), e);
     }
     if(!does) {
-      throw new WrongParameterValueException(this.name, value, "Class needs to be subclass / implementing class of " + restrictionClass.getName());
+      throw new WrongParameterValueException(this.getName(), value, "Class needs to be subclass / implementing class of " + restrictionClass.getName());
     }
     return does;
   }
@@ -158,7 +158,7 @@ public class ClassParameter<C> extends Parameter<String, String> {
       }
     }
     catch(ClassNotFoundException e) {
-      throw new WrongParameterValueException(this.name, value, "subclass of " + restrictionClass.getName());
+      throw new WrongParameterValueException(this.getName(), value, "subclass of " + restrictionClass.getName());
     }
   }
 
@@ -186,7 +186,7 @@ public class ClassParameter<C> extends Parameter<String, String> {
    */
   public C instantiateClass() throws ParameterException {
     if(value == null && !optionalParameter) {
-      throw new UnusedParameterException("Value of parameter " + name + " has not been specified.");
+      throw new UnusedParameterException("Value of parameter " + getName() + " has not been specified.");
     }
     C instance;
     try {
@@ -199,7 +199,7 @@ public class ClassParameter<C> extends Parameter<String, String> {
       }
     }
     catch(Exception e) {
-      throw new WrongParameterValueException(name, value, getDescription(), e);
+      throw new WrongParameterValueException(getName(), value, getDescription(), e);
     }
     return instance;
   }

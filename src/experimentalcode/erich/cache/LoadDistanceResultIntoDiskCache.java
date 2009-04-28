@@ -4,13 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.FileBasedDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -109,6 +107,8 @@ public class LoadDistanceResultIntoDiskCache extends AbstractWrapper {
 
     // Pass on parameters to distance function.
     remainingParameters = distance.setParameters(remainingParameters);
+    addParameterizable(distance);
+    
     super.rememberParametersExcept(args, remainingParameters);
 
     if(remainingParameters.length != 0) {
@@ -124,17 +124,6 @@ public class LoadDistanceResultIntoDiskCache extends AbstractWrapper {
     buf.append(super.parameterDescription());
     buf.append(distance.parameterDescription());
     return buf.toString();
-  }
-
-  /**
-   * Calls the super method and adds to the returned attribute settings the
-   * attribute settings of the {@link #distance}.
-   */
-  @Override
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-    attributeSettings.addAll(distance.getAttributeSettings());
-    return attributeSettings;
   }
 
   /**

@@ -22,7 +22,6 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.SharedNearestNeighborSimi
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.IndefiniteProgress;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -304,8 +303,9 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
         minpts = MINPTS_PARAM.getValue();
 
         remainingParameters = similarityFunction.setParameters(remainingParameters);
+        addParameterizable(similarityFunction);
+        
         rememberParametersExcept(args, remainingParameters);
-
         return remainingParameters;
     }
 
@@ -335,18 +335,4 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
         description.append(Description.NEWLINE);
         return description.toString();
     }
-
-    /**
-     * Calls the super method
-     * and adds to the returned attribute settings the attribute settings of
-     * the {@link #similarityFunction}.
-     */
-    @Override
-    public List<AttributeSettings> getAttributeSettings() {
-        List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-        attributeSettings.addAll(similarityFunction.getAttributeSettings());
-        return attributeSettings;
-    }
-
-
 }

@@ -12,7 +12,7 @@ public abstract class Option<T> {
     /**
      * The option name.
      */
-    protected final String name;
+    protected final OptionID optionid;
 
     /**
      * The short description of the option. An extended description
@@ -32,7 +32,7 @@ public abstract class Option<T> {
      * @param optionID the unique id of the option
      */
     public Option(OptionID optionID) {
-        this.name = optionID.getName();
+        this.optionid = optionID;
         this.shortDescription = optionID.getDescription();
     }
 
@@ -42,7 +42,7 @@ public abstract class Option<T> {
      * @return the option's name.
      */
     public String getName() {
-        return name;
+        return optionid.getName();
     }
 
     /**
@@ -105,4 +105,13 @@ public abstract class Option<T> {
      * @throws ParameterException if the given value is not a valid value for this option.
      */
     public abstract boolean isValid(String value) throws ParameterException;
+
+    /**
+     * Return the OptionID of this option.
+     * 
+     * @return Option ID
+     */
+    public OptionID getOptionID() {
+      return optionid;
+    }
 }

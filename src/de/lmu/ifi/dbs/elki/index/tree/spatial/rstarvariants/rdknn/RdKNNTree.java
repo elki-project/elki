@@ -18,7 +18,6 @@ import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
 import de.lmu.ifi.dbs.elki.utilities.KNNList;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -272,27 +271,17 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
     // distance function
     distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
     remainingParameters = distanceFunction.setParameters(remainingParameters);
-    rememberParametersExcept(args, remainingParameters);
+    addParameterizable(distanceFunction);
 
     // k_max
     k_max = K_PARAM.getValue();
 
+    rememberParametersExcept(args, remainingParameters);
     return remainingParameters;
   }
 
   /**
-   * Calls the super method and adds to the returned attribute settings the
-   * attribute settings of the {@link #distanceFunction}.
-   */
-  @Override
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-    attributeSettings.addAll(distanceFunction.getAttributeSettings());
-    return attributeSettings;
-  }
-
-  /**
-   * Sets the databse in the distance function of this index.
+   * Sets the database in the distance function of this index.
    * 
    * @param database the database
    */
@@ -306,7 +295,7 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
    * Adapts the knn distances before insertion of entry q.
    * 
    * @param q the entry to be inserted
-   * @param nodeEntry the entry representing the root of thge current subtree
+   * @param nodeEntry the entry representing the root of the current subtree
    * @param knns_q the knns of q
    */
   private void preInsert(RdKNNEntry<D, N> q, RdKNNEntry<D, N> nodeEntry, KNNList<D> knns_q) {

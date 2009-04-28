@@ -124,7 +124,7 @@ public abstract class KDDTaskWrapper<O extends DatabaseObject> extends AbstractW
     }
 
     // time
-    time = optionHandler.isSet(TIME_FLAG);
+    time = TIME_FLAG.isSet();
 
     return remainingParameters;
   }

@@ -262,7 +262,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
     helpOptionHandler.grabOptions(args);
 
     // description
-    if(helpOptionHandler.isSet(DESCRIPTION_PARAM)) {
+    if(DESCRIPTION_PARAM.isSet()) {
       String descriptionClass = DESCRIPTION_PARAM.getValue();
       Parameterizable p;
       try {
@@ -292,24 +292,28 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
     // algorithm
     algorithm = ALGORITHM_PARAM.instantiateClass();
     remainingParameters = algorithm.setParameters(remainingParameters);
+    addParameterizable(algorithm);
 
     // database connection
     databaseConnection = DATABASE_CONNECTION_PARAM.instantiateClass();
     remainingParameters = databaseConnection.setParameters(remainingParameters);
+    addParameterizable(databaseConnection);
 
     // result handler
     resulthandler = RESULT_HANDLER_PARAM.instantiateClass();
     remainingParameters = resulthandler.setParameters(remainingParameters);
+    addParameterizable(resulthandler);
 
     // normalization
     if(NORMALIZATION_PARAM.isSet()) {
       normalization = NORMALIZATION_PARAM.instantiateClass();
       normalizationUndo = NORMALIZATION_UNDO_FLAG.isSet();
       remainingParameters = normalization.setParameters(remainingParameters);
+      addParameterizable(normalization);
     }
 
     // help
-    if(helpOptionHandler.isSet(HELP_FLAG) || helpOptionHandler.isSet(HELP_LONG_FLAG)) {
+    if(HELP_FLAG.isSet() || HELP_LONG_FLAG.isSet()) {
       throw new AbortException(INFORMATION);
     }
 
@@ -319,23 +323,6 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
   }
 
   /**
-   * Calls the super method and adds to the returned attribute settings the
-   * attribute settings of the {@link #databaseConnection}, the
-   * {@link #normalization}, and {@link #algorithm}.
-   */
-  @Override
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> attributeSettings = super.getAttributeSettings();
-
-    attributeSettings.addAll(databaseConnection.getAttributeSettings());
-    if(normalization != null) {
-      attributeSettings.addAll(normalization.getAttributeSettings());
-    }
-    attributeSettings.addAll(algorithm.getAttributeSettings());
-
-    return attributeSettings;
-  }
-
   /**
    * Method to run the specified algorithm using the specified database
    * connection.

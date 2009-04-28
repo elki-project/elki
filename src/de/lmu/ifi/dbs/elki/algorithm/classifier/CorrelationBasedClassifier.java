@@ -22,7 +22,6 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
@@ -136,18 +135,6 @@ public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Di
 
     /**
      * Calls the super method
-     * and adds to the returned attribute settings the attribute settings of
-     * the {@link #dependencyDerivator}.
-     */
-    @Override
-    public List<AttributeSettings> getAttributeSettings() {
-        List<AttributeSettings> settings = super.getAttributeSettings();
-        settings.addAll(dependencyDerivator.getAttributeSettings());
-        return settings;
-    }
-
-    /**
-     * Calls the super method
      * and passes the remaining parameters to {@link #dependencyDerivator}.
      */
     @Override
@@ -160,6 +147,7 @@ public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Di
         dependencyDerivator.setVerbose(isVerbose());
         dependencyDerivator.setTime(isTime());
         remainingParameters = dependencyDerivator.setParameters(dependencyDerivatorParameters);
+        addParameterizable(dependencyDerivator);
 
         rememberParametersExcept(args, remainingParameters);
         return remainingParameters;
