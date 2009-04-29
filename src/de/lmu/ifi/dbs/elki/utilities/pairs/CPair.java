@@ -10,7 +10,7 @@ import java.util.Comparator;
  * @param <FIRST> first type
  * @param <SECOND> second type
  */
-public class CPair<FIRST extends Comparable<FIRST>, SECOND extends Comparable<SECOND>> extends FCPair<FIRST, SECOND> {
+public class CPair<FIRST extends Comparable<FIRST>, SECOND extends Comparable<SECOND>> extends Pair<FIRST, SECOND> implements Comparable<CPair<FIRST,SECOND>> {
   /**
    * Initialize pair
    * 
@@ -29,9 +29,17 @@ public class CPair<FIRST extends Comparable<FIRST>, SECOND extends Comparable<SE
    */
   public int compareTo(CPair<FIRST, SECOND> other) {
     // try comparing by first
-    int delta1 = super.compareTo(other);
-    if (delta1 != 0) {
-      return delta1;
+    if(this.first != null) {
+      if(other.first == null) {
+        return -1;
+      }
+      int delta1 = this.first.compareTo(other.first);
+      if(delta1 != 0) {
+        return delta1;
+      }
+    }
+    else if(other.first != null) {
+      return +1;
     }
     // try comparing by second
     if(this.second != null) {
@@ -70,7 +78,19 @@ public class CPair<FIRST extends Comparable<FIRST>, SECOND extends Comparable<SE
       return +1;
     }
     // try comparing by first
-    return super.compareTo(other);
+    if(this.first != null) {
+      if(other.first == null) {
+        return -1;
+      }
+      int delta1 = this.first.compareTo(other.first);
+      if(delta1 != 0) {
+        return delta1;
+      }
+    }
+    else if(other.first != null) {
+      return +1;
+    }
+    return 0;
   }
 
   /**
@@ -85,14 +105,14 @@ public class CPair<FIRST extends Comparable<FIRST>, SECOND extends Comparable<SE
   public static final <F extends Comparable<F>, S extends Comparable<S>> CPair<F, S>[] newArray(int size) {
     return new CPair[size];
   }
-  
+
   /**
    * Class to do a canonical swapped comparison on this class.
    * 
    * @param <FIRST>
    * @param <SECOND>
    */
-  public final static class CompareSwapped<FIRST extends Comparable<FIRST>, SECOND extends Comparable<SECOND>> implements Comparator<CPair<FIRST,SECOND>> {
+  public final static class CompareSwapped<FIRST extends Comparable<FIRST>, SECOND extends Comparable<SECOND>> implements Comparator<CPair<FIRST, SECOND>> {
     /**
      * Compare by second component, using the ComparableSwapped interface.
      * 
@@ -100,7 +120,7 @@ public class CPair<FIRST extends Comparable<FIRST>, SECOND extends Comparable<SE
      * @param o2 Second object
      */
     @Override
-    public int compare(CPair<FIRST,SECOND> o1, CPair<FIRST,SECOND> o2) {
+    public int compare(CPair<FIRST, SECOND> o1, CPair<FIRST, SECOND> o2) {
       return o1.compareSwappedTo(o2);
     }
 
