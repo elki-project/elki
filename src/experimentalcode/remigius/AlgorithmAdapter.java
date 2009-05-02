@@ -9,41 +9,43 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 
 public abstract class AlgorithmAdapter<O extends DatabaseObject, T> {
-	
-	protected Result result;
+
+	protected MultiResult result;
 	protected Database<O> database;
-	
+
 	protected AssociationID<T> asID;
-	
+
 	public AlgorithmAdapter(Database<O> database, Result result){
-		this.database = database;
-		this.result = result;
+
+		if (result instanceof MultiResult){
+			this.database = database;
+			this.result = (MultiResult)result;
+		} else {
+			throw new RuntimeException("No MultiResult");
+		}
+
 	}
-	
+
 	public Database<O> getDatabase(){
 		return database;
 	}
-	
-	public Result getResult(){
+
+	public MultiResult getResult(){
 		return this.result;
 	}
-	
+
 	public AssociationID<T> getAlgorithmID(){
 		return asID;
 	}
-	
+
 	protected T getScore(DatabaseObject dbo){
 		return getOutlierAnnotationResult().getValueFor(dbo.getID());
 	}
-	
+
 	private AnnotationResult<T> getOutlierAnnotationResult(){
-		if (result instanceof MultiResult){
-			return ResultUtil.findAnnotationResult((MultiResult)result, asID);
-		} else {
-			throw new IllegalArgumentException("No MultiResult.");
-		}
+		return ResultUtil.findAnnotationResult(result, asID);
 	}
-	
+
 	public abstract Double getUnnormalized(DatabaseObject dbo);
 	public abstract Double getNormalized(DatabaseObject dbo);
 
