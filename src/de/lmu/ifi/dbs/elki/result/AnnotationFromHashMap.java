@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.result;
 import java.util.HashMap;
 
 import de.lmu.ifi.dbs.elki.database.AssociationID;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Annotations backed by hashmaps.
@@ -32,19 +31,6 @@ public class AnnotationFromHashMap<T> implements AnnotationResult<T> {
   public AnnotationFromHashMap(AssociationID<T> assoc, HashMap<Integer,T> map) {
     this.map = map;
     this.assoc = assoc;
-  }
-
-  /**
-   * Retrieve the annotations for the given ID.  
-   */
-  @Deprecated
-  @Override
-  @SuppressWarnings("deprecation")
-  public Pair<String,T>[] getAnnotations(Integer objID) {
-    Pair<String,T>[] result = Pair.newArray(1);
-    T o = map.get(objID);
-    result[0] = new Pair<String, T>(assoc.getLabel(), o);
-    return result;
   }
 
   @Override

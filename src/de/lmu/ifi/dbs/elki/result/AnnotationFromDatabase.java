@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.result;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Class representing Annotations backed by a database using {@link AssociationID}s.
@@ -42,20 +41,6 @@ public class AnnotationFromDatabase<T, O extends DatabaseObject> implements Anno
    */
   public Database<O> getDatabase() {
     return this.database;
-  }
-
-  /**
-   * Retrieve the given annotations for this object from the Database.
-   * @deprecated
-   */
-  @Deprecated
-  @Override
-  @SuppressWarnings("deprecation")
-  public Pair<String,T>[] getAnnotations(Integer objID) {
-    Pair<String,T>[] result = Pair.newArray(1);
-    T o = getDatabase().getAssociation(assoc, objID);
-    result[0] = new Pair<String, T>(assoc.getLabel(), o);
-    return result;
   }
 
   @Override

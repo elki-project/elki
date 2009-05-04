@@ -71,8 +71,8 @@ public class ResultUtil {
    * @param assoc Association
    * @return First matching annotation result or null
    */
-  public static final <T> AnnotationResult<T> findAnnotationResult(MultiResult result, AssociationID<T> assoc) {
-    List<Result> anns = result.filterResults(AnnotationResult.class);
+  public static final <T> AnnotationResult<T> findAnnotationResult(Result result, AssociationID<T> assoc) {
+    List<AnnotationResult<?>> anns = getAnnotationResults(result);
     return findAnnotationResult(anns, assoc);
   }
 
@@ -85,23 +85,13 @@ public class ResultUtil {
    * @return First matching annotation result or null
    */
   @SuppressWarnings("unchecked")
-  public static final <T> AnnotationResult<T> findAnnotationResult(List<Result> anns, AssociationID<T> assoc) {
+  public static final <T> AnnotationResult<T> findAnnotationResult(List<AnnotationResult<?>> anns, AssociationID<T> assoc) {
     if(anns == null) {
       return null;
     }
-    for(Result r : anns) {
-      if(r instanceof AnnotationResult) {
-        AnnotationResult<?> a = (AnnotationResult<?>) r;
-        if(a.getAssociationID() == assoc) { // == should be okay - unique objects
-          return (AnnotationResult<T>) a;
-        }
-      }
-      // recurse into MultiResults - no loop detection!
-      if (r instanceof MultiResult) {
-        AnnotationResult<T> rec = findAnnotationResult((MultiResult)r, assoc); 
-        if (rec != null) {
-          return rec;
-        }
+    for(AnnotationResult<?> a : anns) {
+      if(a.getAssociationID() == assoc) { // == okay to use: association IDs are unique objects
+        return (AnnotationResult<T>) a;
       }
     }
     return null;
