@@ -20,7 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * <p/>
  * Algorithm to compute density-based local outlier factors in a database based
  * on a specified parameter minpts. The computed nearest neighbors and LOFs are persistently stored in
- * tables in order to enable insertions or deletions of database objects using the algorithm {@link de.lmu.ifi.dbs.elki.algorithm.outlier.OnlineLOF}.
+ * tables in order to enable insertions or deletions of database objects using the algorithm.
  * </p>
  * <p/>
  * Reference:

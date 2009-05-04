@@ -1,14 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Associations;
@@ -16,9 +7,9 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.connection.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelParser;
 import de.lmu.ifi.dbs.elki.parser.Parser;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
-import de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
@@ -28,6 +19,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Online algorithm to efficiently update density-based local
@@ -91,12 +91,12 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
      * Parameter to specify the parser to parse the insertion and/or deletion files,
      * must extend {@link Parser}.
      * <p>Key: {@code -onlinelof.parser} </p>
-     * <p>Default value: {@link RealVectorLabelParser} </p>
+     * <p>Default value: {@link DoubleVectorLabelParser} </p>
      */
     protected final ClassParameter<Parser<O>> PARSER_PARAM =
         new ClassParameter<Parser<O>>(PARSER_ID,
             Parser.class,
-            RealVectorLabelParser.class.getName());
+            DoubleVectorLabelParser.class.getName());
 
     /**
      * The objects to be inserted.

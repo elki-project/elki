@@ -70,6 +70,8 @@
 				<exclude name="experimentalcode/**"/>
 				<!-- not yet published & polished: COP -->
 				<exclude name="${basepackage}algorithm/outlier/COP.*"/>
+				<!-- status unclear: OnlineLOF -->
+				<exclude name="${basepackage}algorithm/outlier/OnlineLOF.*"/>
 				<exclude name="${basepackage}algorithm/classifier/**"/>
 				<exclude name="${basepackage}algorithm/clustering/biclustering/**"/>
 				<exclude name="${basepackage}algorithm/clustering/correlation/KernelFourC.*"/>
@@ -92,7 +94,7 @@
 				<exclude name="${basepackage}test/**"/>
 				<!-- dependency from outlier/LOFTable, outlier/NNTable ! -->
                 <!-- <exclude name="${basepackage}utilities/tree/btree/**"/> -->
-				<!-- why exclude wrappers currently? -->
+				<!-- exclude wrappers currently - those are merely internal convenience classes and are a bit arbitrary, need cleaning and careful inspection -->
 				<exclude name="${basepackage}wrapper/**"/>
 			</fileset>			
 		</copy>

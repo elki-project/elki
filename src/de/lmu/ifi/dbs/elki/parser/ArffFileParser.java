@@ -25,9 +25,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 public class ArffFileParser<O extends DatabaseObject & WekaObject<W>, W extends WekaAttribute> extends AbstractParser<O>
 {
     /**
-     * The default base parser ({@link RealVectorLabelParser}).
+     * The default base parser ({@link DoubleVectorLabelParser}).
      */
-    public static final String DEFAULT_PARSER = RealVectorLabelParser.class.getCanonicalName();
+    public static final String DEFAULT_PARSER = DoubleVectorLabelParser.class.getCanonicalName();
     
     /**
      * OptionID for {@link #BASE_PARSER_PARAM}

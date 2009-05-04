@@ -1,10 +1,7 @@
 package de.lmu.ifi.dbs.elki.parser;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.FloatVector;
-import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 import java.io.BufferedReader;
@@ -20,18 +17,18 @@ import java.util.List;
  * @author Arthur Zimek
  * @param <V> real vector type
  */
-public class RealVectorLabelTransposingParser<V extends RealVector<?, ?>> extends RealVectorLabelParser<V> {
+public class DoubleVectorLabelTransposingParser extends DoubleVectorLabelParser {
 
   /**
    * Provides a parser to read points transposed (per column).
    */
-  public RealVectorLabelTransposingParser() {
+  public DoubleVectorLabelTransposingParser() {
     super();
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public ParsingResult<V> parse(InputStream in) {
+  public ParsingResult<DoubleVector> parse(InputStream in) {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 0;
     List<Double>[] data = null;
@@ -78,19 +75,14 @@ public class RealVectorLabelTransposingParser<V extends RealVector<?, ?>> extend
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
 
-    List<Pair<V, List<String>>> objectAndLabelList = new ArrayList<Pair<V, List<String>>>(data.length);
+    List<Pair<DoubleVector, List<String>>> objectAndLabelList = new ArrayList<Pair<DoubleVector, List<String>>>(data.length);
     for (int i = 0; i < data.length; i++) {
       List<String> label = new ArrayList<String>();
       label.add(labels[i].toString());
 
-      V featureVector;
-      if (parseFloat) {
-        featureVector = (V) new FloatVector(Util.convertToFloat(data[i]));
-      }
-      else {
-        featureVector = (V) new DoubleVector(data[i]);
-      }
-      Pair<V, List<String>> objectAndLabels = new Pair<V, List<String>>(featureVector, label);
+      DoubleVector featureVector = new DoubleVector(data[i]);
+      
+      Pair<DoubleVector, List<String>> objectAndLabels = new Pair<DoubleVector, List<String>>(featureVector, label);
       objectAndLabelList.add(objectAndLabels);
     }
 

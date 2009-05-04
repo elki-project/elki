@@ -1,21 +1,21 @@
 package de.lmu.ifi.dbs.elki.database.connection;
 
-import java.io.InputStream;
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
+import de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelParser;
 import de.lmu.ifi.dbs.elki.parser.Parser;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
-import de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+
+import java.io.InputStream;
+import java.util.List;
 
 /**
  * Provides a database connection expecting input from standard in.
@@ -35,11 +35,11 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
     /**
      * Parameter to specify the parser to provide a database,
      * must extend {@link Parser}.
-     * <p>Default value: {@link RealVectorLabelParser} </p>
+     * <p>Default value: {@link DoubleVectorLabelParser} </p>
      * <p>Key: {@code -dbc.parser} </p>
      */
     private final ClassParameter<Parser<O>> PARSER_PARAM = new ClassParameter<Parser<O>>(
-        PARSER_ID, Parser.class, RealVectorLabelParser.class.getName());
+        PARSER_ID, Parser.class, DoubleVectorLabelParser.class.getName());
 
     /**
      * Holds the instance of the parser specified by {@link #PARSER_PARAM}.

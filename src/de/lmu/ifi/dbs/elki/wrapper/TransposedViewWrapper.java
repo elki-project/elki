@@ -1,21 +1,21 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
+import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelParser;
+import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.List;
-
-import de.lmu.ifi.dbs.elki.data.RealVector;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser;
-import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
  * This wrapper class reads s data file and writes the transposed view of the
@@ -67,7 +67,7 @@ public class TransposedViewWrapper<V extends RealVector<V, ?>> extends StandAlon
       FileBasedDatabaseConnection<V> dbConnection = new FileBasedDatabaseConnection<V>();
 
       List<String> dbParameters = getRemainingParameters();
-      OptionUtil.addParameter(dbParameters, FileBasedDatabaseConnection.PARSER_ID, RealVectorLabelParser.class.getName());
+      OptionUtil.addParameter(dbParameters, FileBasedDatabaseConnection.PARSER_ID, DoubleVectorLabelParser.class.getName());
       OptionUtil.addParameter(dbParameters, FileBasedDatabaseConnection.INPUT_ID, getInput().getPath());
       dbConnection.setParameters(dbParameters.toArray(new String[dbParameters.size()]));
 

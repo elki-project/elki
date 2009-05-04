@@ -1,21 +1,12 @@
 package de.lmu.ifi.dbs.elki.database.connection;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.MultiRepresentedObject;
 import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
+import de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelParser;
 import de.lmu.ifi.dbs.elki.parser.Parser;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
 import de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser;
@@ -27,6 +18,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Provides a database connection based on multiple files and parsers to be set.
@@ -40,12 +41,12 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
   /**
    * OptionID for {@link #PARSERS_PARAM}
    */
-  public static final OptionID PARSERS_ID = OptionID.getOrCreateOptionID("multipledbc.parsers", "Comma separated list of classnames specifying the parsers to provide a database. If this parameter is not set, " + RealVectorLabelParser.class.getName() + " is used as parser for all input files.");
+  public static final OptionID PARSERS_ID = OptionID.getOrCreateOptionID("multipledbc.parsers", "Comma separated list of classnames specifying the parsers to provide a database. If this parameter is not set, " + DoubleVectorLabelParser.class.getName() + " is used as parser for all input files.");
 
   /**
    * Optional parameter to specify the parsers to provide a database, must
    * extend {@link Parser}. If this parameter is not set,
-   * {@link RealVectorLabelParser} is used as parser for all input files.
+   * {@link DoubleVectorLabelParser} is used as parser for all input files.
    * <p>
    * Key: {@code -multipledbc.parsers}
    * </p>
@@ -188,7 +189,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
       this.parsers = new ArrayList<Parser<O>>(inputStreams.size());
       for(int i = 0; i < inputStreams.size(); i++) {
         try {
-          Parser<O> parser = ClassGenericsUtil.instantiateGenerics(Parser.class, RealVectorLabelParser.class.getName());
+          Parser<O> parser = ClassGenericsUtil.instantiateGenerics(Parser.class, DoubleVectorLabelParser.class.getName());
           this.parsers.add(i, parser);
         }
         catch(UnableToComplyException e) {

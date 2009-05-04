@@ -4,7 +4,7 @@ de.lmu.ifi.dbs.elki.algorithm.Algorithm=\
 		   de.lmu.ifi.dbs.elki.algorithm.outlier.COP,\
 		   de.lmu.ifi.dbs.elki.algorithm.outlier.GeneralizedLOF,\
 		   de.lmu.ifi.dbs.elki.algorithm.outlier.LOF,\
-		   de.lmu.ifi.dbs.elki.algorithm.outlier.OnlineLOF,\
+#		   de.lmu.ifi.dbs.elki.algorithm.outlier.OnlineLOF,\
 		   de.lmu.ifi.dbs.elki.algorithm.APRIORI,\
            de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator,\
            de.lmu.ifi.dbs.elki.algorithm.KNNDistanceOrder,\
@@ -93,7 +93,11 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction= de.lmu.ifi.dbs.e
            de.lmu.ifi.dbs.elki.distance.distancefunction.SharedMaximumDistanceFunction,\
            de.lmu.ifi.dbs.elki.distance.distancefunction.SharedUnitedDistanceFunction,\
            de.lmu.ifi.dbs.elki.distance.distancefunction.SquareRootSupportLengthDependentItemsetDistanceFunction,\
-           de.lmu.ifi.dbs.elki.distance.distancefunction.SupportLengthDependentItemsetDistanceFunction
+           de.lmu.ifi.dbs.elki.distance.distancefunction.SupportLengthDependentItemsetDistanceFunction,\
+           de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries.DTWDistanceFunction,\
+           de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries.EDRDistanceFunction,\
+           de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries.ERPDistanceFunction,\
+           de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries.LCSSDistanceFunction
 # #######################################################
 # locally weighted distance functions - default package: de.lmu.ifi.dbs.elki.distance.distancefunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractLocallyWeightedDistanceFunction=de.lmu.ifi.dbs.elki.distance.distancefunction.KernelBasedLocallyWeightedDistanceFunction,\
@@ -132,12 +136,14 @@ de.lmu.ifi.dbs.elki.normalization.Normalization=de.lmu.ifi.dbs.elki.normalizatio
 de.lmu.ifi.dbs.elki.parser.Parser=de.lmu.ifi.dbs.elki.parser.BitVectorLabelParser,\
            de.lmu.ifi.dbs.elki.parser.NumberDistanceParser,\
            de.lmu.ifi.dbs.elki.parser.ParameterizationFunctionLabelParser,\
-           de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser,\
-           de.lmu.ifi.dbs.elki.parser.RealVectorLabelTransposingParser,\
+           de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelParser,\
+           de.lmu.ifi.dbs.elki.parser.FloatDoubleVectorLabelParser,\
+           de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelTransposingParser,\
            de.lmu.ifi.dbs.elki.parser.SparseBitVectorLabelParser
 de.lmu.ifi.dbs.elki.parser.LinebasedParser=\
-           de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser,\
-           de.lmu.ifi.dbs.elki.parser.RealVectorLabelTransposingParser
+           de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelParser,\
+           de.lmu.ifi.dbs.elki.parser.FloatVectorLabelParser,\
+           de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelTransposingParser
 # #######################################################
 # Preprocessor - default package: de.lmu.ifi.dbs.elki.preprocessing
 de.lmu.ifi.dbs.elki.preprocessing.Preprocessor=de.lmu.ifi.dbs.elki.preprocessing.DiSHPreprocessor,\
