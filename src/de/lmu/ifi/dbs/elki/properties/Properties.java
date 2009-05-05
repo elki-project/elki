@@ -120,6 +120,10 @@ public final class Properties {
         info.append("Known classes (default package " + prefix + "):");
         info.append(FormatUtil.NEWLINE);
         for(String name : classNames) {
+          // skip commented classes.
+          if (name.charAt(0) == '#') {
+            continue;
+          }
           try {
             if(superclass.isAssignableFrom(Class.forName(name))) {
               info.append("->" + NONBREAKING_SPACE);

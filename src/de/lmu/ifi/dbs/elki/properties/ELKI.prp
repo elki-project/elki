@@ -3,8 +3,8 @@
 de.lmu.ifi.dbs.elki.algorithm.Algorithm=\
 		   de.lmu.ifi.dbs.elki.algorithm.outlier.COP,\
 		   de.lmu.ifi.dbs.elki.algorithm.outlier.GeneralizedLOF,\
-		   de.lmu.ifi.dbs.elki.algorithm.outlier.LOF,\
 #		   de.lmu.ifi.dbs.elki.algorithm.outlier.OnlineLOF,\
+		   de.lmu.ifi.dbs.elki.algorithm.outlier.LOF,\
 		   de.lmu.ifi.dbs.elki.algorithm.APRIORI,\
            de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator,\
            de.lmu.ifi.dbs.elki.algorithm.KNNDistanceOrder,\
@@ -137,7 +137,7 @@ de.lmu.ifi.dbs.elki.parser.Parser=de.lmu.ifi.dbs.elki.parser.BitVectorLabelParse
            de.lmu.ifi.dbs.elki.parser.NumberDistanceParser,\
            de.lmu.ifi.dbs.elki.parser.ParameterizationFunctionLabelParser,\
            de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelParser,\
-           de.lmu.ifi.dbs.elki.parser.FloatDoubleVectorLabelParser,\
+           de.lmu.ifi.dbs.elki.parser.FloatVectorLabelParser,\
            de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelTransposingParser,\
            de.lmu.ifi.dbs.elki.parser.SparseBitVectorLabelParser
 de.lmu.ifi.dbs.elki.parser.LinebasedParser=\
