@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
 /**
  * DeLiClu provides the DeLiClu algorithm, a hierarchical algorithm to find density-connected sets in a database.
  * <p>Reference:
- * <br>E. Achtert, C. Boehm, P. Kroeger:
+ * <br>E. Achtert, C. B&ouml;hm, P. Kr&ouml;ger:
  * DeLiClu: Boosting Robustness, Completeness, Usability, and Efficiency of Hierarchical Clustering by a Closest Pair Ranking.
  * <br>In Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD 2006), Singapore, 2006.
  * </p>

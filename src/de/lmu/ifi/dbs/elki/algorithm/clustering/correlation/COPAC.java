@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * Provides the COPAC algorithm, an algorithm to partition a database according to the correlation dimension of
  * its objects and to then perform an arbitrary clustering algorithm over the partitions.
  * <p>Reference:
- * Achtert E., Boehm C., Kriegel H.-P., Kroeger P., Zimek A.:
+ * Achtert E., B&ouml;hm C., Kriegel H.-P., Kr&ouml;ger P., Zimek A.:
  * Robust, Complete, and Efficient Correlation Clustering.
  * <br>In Proc. 7th SIAM International Conference on Data Mining (SDM'07), Minneapolis, MN, 2007
  * </p>
@@ -150,8 +150,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
         FiniteProgress partitionProgress = new FiniteProgress("Partitioning", database.size());
         int processed = 1;
 
-        for (Iterator<Integer> dbiter = database.iterator(); dbiter.hasNext();) {
-            Integer id = dbiter.next();
+        for (Integer id : database) {
             Integer corrdim = (database.getAssociation(AssociationID.LOCAL_PCA, id)).getCorrelationDimension();
 
             if (!partitionMap.containsKey(corrdim)) {

@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * partitioned according to local correlation dimensionality and builds
  * a hierarchy of correlation clusters that allows multiple inheritance from the clustering result.
  * <p>Reference:
- * E. Achtert, C. Boehm, H.-P. Kriegel, P. Kröger, and A. Zimek:
+ * E. Achtert, C. B&ouml;hm, H.-P. Kriegel, P. Kr&ouml;ger, and A. Zimek:
  * On Exploring Complex Relationships of Correlation Clusters.
  * <br>In Proc. 19th International Conference on Scientific and Statistical Database Management (SSDBM 2007), Banff, Canada, 2007.
  * </p>

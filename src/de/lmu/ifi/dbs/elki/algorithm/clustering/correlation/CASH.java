@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 /**
  * Provides the CASH algorithm, an subspace clustering algorithm based on the hough transform.
  * <p>Reference:
- * E. Achtert, C. Boehm, J. David, P. Kroeger, A. Zimek:
+ * E. Achtert, C. B&ouml;hm, J. David, P. Kr&ouml;ger, A. Zimek:
  * Robust clustering in arbitrarily oriented subspaces.
  * <br>In Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008
  * </p>

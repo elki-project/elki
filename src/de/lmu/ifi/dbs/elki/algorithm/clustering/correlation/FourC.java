@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.utilities.Description;
  * 4C identifies local subgroups of data objects sharing a uniform correlation.
  * The algorithm is based on a combination of PCA and density-based clustering (DBSCAN).
  * <p>Reference:
- * Christian Boehm, Karin Kailing, Peer Kroeger, Arthur Zimek:
+ * Christian B&ouml;hm, Karin Kailing, Peer Kr&ouml;ger, Arthur Zimek:
  * Computing Clusters of Correlation Connected Objects.
  * <br>In Proc. ACM SIGMOD Int. Conf. on Management of Data, Paris, France, 2004.
  * </p>

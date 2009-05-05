@@ -72,9 +72,10 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
   Set<Integer> randomSample(int k, long seed);
   
   /**
-   * Performs a range query for the given object ID with the given epsilon
-   * range and the according distance function. The query result is in
-   * ascending order to the distance to the query object.
+   * <p>Performs a range query for the given object ID with the given epsilon
+   * range and the according distance function.</p>
+   * 
+   * <p>The query result is sorted in ascending order w.r.t. the distance to the query object.</p>
    *
    * @param <D>              distance type
    * @param id               the ID of the query object
@@ -86,8 +87,9 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
   <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, D> distanceFunction);
 
   /**
-   * Performs a k-nearest neighbor query for the given object ID. The query
-   * result is in ascending order to the distance to the query object.
+   * <p>Performs a k-nearest neighbor query for the given object ID.</p>
+   * 
+   * <p>The query result is sorted in ascending order w.r.t. the distance to the query object.</p>
    *
    * @param <D>              distance type
    * @param id               the ID of the query object
@@ -99,8 +101,9 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
   <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction);
 
   /**
-   * Performs a k-nearest neighbor query for the given object. The query
-   * result is in ascending order to the distance to the query object.
+   * <p>Performs a k-nearest neighbor query for the given object.</p>
+   * 
+   * <p>The query result is sorted in ascending order w.r.t. the distance to the query object.</p>
    *
    * @param <D>              distance type
    * @param queryObject      the query object
@@ -112,8 +115,9 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
   <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, D> distanceFunction);
 
   /**
-   * Performs k-nearest neighbor queries for the given object IDs. The query
-   * result is in ascending order to the distance to the query object.
+   * <p>Performs k-nearest neighbor queries for the given object IDs.</p>
+   * 
+   * <p>The query result is sorted in ascending order w.r.t. the distance to the query object.</p>
    *
    * @param <D>              distance type
    * @param ids              the IDs of the query objects
@@ -125,8 +129,10 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
   <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction);
 
   /**
-   * Performs a reverse k-nearest neighbor query for the given object ID. The
-   * query result is in ascending order to the distance to the query object.
+   * <p>Performs a reverse k-nearest neighbor query for the given object ID.</p>
+   * 
+   * <p>The query result is sorted in ascending order w.r.t. the distance to the query object.</p>
+   * 
    *
    * @param <D>              distance type
    * @param id               the ID of the query object

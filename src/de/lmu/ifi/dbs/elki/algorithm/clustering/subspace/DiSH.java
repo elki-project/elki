@@ -400,6 +400,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
      * @param dimensionality the dimensionality of the data
      * @return a sorted list of the clusters
      */
+    // TODO: parameter dimensionality???
     private List<Cluster<AxesModel>> sortClusters(Map<BitSet, List<Pair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>>> clustersMap, int dimensionality) {
         // actualize the levels and indices
         List<Cluster<AxesModel>> clusters = new ArrayList<Cluster<AxesModel>>();
