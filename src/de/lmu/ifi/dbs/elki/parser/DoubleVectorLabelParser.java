@@ -11,7 +11,7 @@ import java.util.List;
  * </p>
  * <p>
  * Several labels may be given per point. A label must not be parseable as
- * double (or float). Lines starting with &quot;#&quot; will be ignored.
+ * double. Lines starting with &quot;#&quot; will be ignored.
  * </p>
  * <p/>
  * <p>
