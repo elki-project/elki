@@ -72,6 +72,15 @@ public abstract class Option<T> {
     public abstract String getDescription();
 
     /**
+     * Returns a string representation of the parameter's type
+     * (e.g. an {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter} should
+     * return {@code <int>}).
+     *
+     * @return a string representation of the parameter's type
+     */
+    public abstract String getSyntax();
+
+    /**
      * Returns true if the value of the option is set, false otherwise.
      *
      * @return true if the value of the option is set, false otherwise.

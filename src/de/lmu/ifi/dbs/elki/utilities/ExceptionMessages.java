@@ -6,7 +6,10 @@ package de.lmu.ifi.dbs.elki.utilities;
  * @author Arthur Zimek
  */
 public interface ExceptionMessages {
-  
+  /**
+   * Message when the user requested a help message.
+   */
+  public static final String USER_REQUESTED_HELP = "Aborted: User requested help message.";
   /**
    * Messages in case a database is unexpectedly empty.
    */

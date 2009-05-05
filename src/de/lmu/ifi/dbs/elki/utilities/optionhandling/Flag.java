@@ -78,4 +78,12 @@ public class Flag extends Option<Boolean> {
             + "\". Allowed values:\n" + SET + " or " + NOT_SET);
     }
 
+    /**
+     * A flag has no syntax, since it doesn't take extra options
+     */
+    @Override
+    public String getSyntax() {
+      return "";
+    }
+
 }

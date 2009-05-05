@@ -98,7 +98,7 @@ public class IntListParameter extends ListParameter<Integer> {
    * @return &quot;&lt;int_1,...,int_n&gt;&quot;
    */
   @Override
-  protected String getParameterType() {
+  public String getSyntax() {
     return "<int_1,...,int_n>";
   }
 

@@ -168,7 +168,7 @@ public class ClassParameter<C> extends Parameter<String, String> {
    * @return &quot;&lt;class&gt;&quot;
    */
   @Override
-  protected String getParameterType() {
+  public String getSyntax() {
     return "<class>";
   }
 

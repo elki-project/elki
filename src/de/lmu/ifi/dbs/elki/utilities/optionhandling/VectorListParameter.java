@@ -120,7 +120,7 @@ public class VectorListParameter extends ListParameter<List<Double>> {
    *         ;
    */
   @Override
-  protected String getParameterType() {
+  public String getSyntax() {
     return "<double_11,...,double_1n:...:double_m1,...,double_mn>";
   }
 }

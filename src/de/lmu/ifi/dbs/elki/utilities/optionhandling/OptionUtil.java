@@ -5,6 +5,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+
 /**
  * Utility functions related to Option handling.
  *
@@ -231,6 +234,35 @@ public final class OptionUtil {
       }
       buffer.append("]");
       return buffer.toString();
+  }
+
+  /**
+   * Format a list of options (and associated owning objects) for console help output.
+   * 
+   * @param buf Serialization buffer
+   * @param width Screen width
+   * @param indent Indentation string
+   * @param options List of options
+   */
+  public static void formatForConsole(StringBuffer buf, int width, String indent, List<Pair<Parameterizable, Option<?>>> options) {
+    for (Pair<Parameterizable, Option<?>> pair : options) {
+      String currentOption = pair.getSecond().getName();
+      String syntax = pair.getSecond().getSyntax();
+      String longDescription = pair.getSecond().getDescription();
+      
+      buf.append(OptionHandler.OPTION_PREFIX);
+      buf.append(currentOption);
+      buf.append(" ");
+      buf.append(syntax);
+      buf.append(OptionHandler.NEWLINE);
+      for (String line : FormatUtil.splitAtLastBlank(longDescription, width - indent.length())) {
+        buf.append(indent);
+        buf.append(line);
+        if (! line.endsWith(OptionHandler.NEWLINE)) {
+          buf.append(OptionHandler.NEWLINE);
+        }
+      }
+    }
   }
 
 }

@@ -95,7 +95,7 @@ public class ClassListParameter<C> extends ListParameter<String> {
    * @return &quot;&lt;class_1,...,class_n&gt;&quot;
    */
   @Override
-  protected String getParameterType() {
+  public String getSyntax() {
     return "<class_1,...,class_n>";
   }
 

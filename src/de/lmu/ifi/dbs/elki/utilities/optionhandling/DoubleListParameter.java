@@ -100,7 +100,7 @@ public class DoubleListParameter extends ListParameter<Double> {
    * @return &quot;&lt;double_1,...,double_n&gt;&quot;
    */
   @Override
-  protected String getParameterType() {
+  public String getSyntax() {
     return "<double_1,...,double_n>";
   }
 }

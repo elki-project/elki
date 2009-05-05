@@ -89,7 +89,7 @@ public class LongParameter extends NumberParameter<Long> {
      * @return &quot;&lt;long&gt;&quot;
      */
     @Override
-    protected String getParameterType() {
+    public String getSyntax() {
         return "<long>";
     }
 

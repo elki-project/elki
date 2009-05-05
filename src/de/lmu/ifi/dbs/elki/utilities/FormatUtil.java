@@ -1,7 +1,9 @@
 package de.lmu.ifi.dbs.elki.utilities;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -13,10 +15,12 @@ public final class FormatUtil {
    * Number Formatter (2 digits) for output purposes.
    */
   public static final NumberFormat NF2 = NumberFormat.getInstance(Locale.US);
+
   /**
    * Number Formatter (4 digits) for output purposes.
    */
   public static final NumberFormat NF4 = NumberFormat.getInstance(Locale.US);
+
   /**
    * Number Formatter (8 digits) for output purposes.
    */
@@ -35,6 +39,11 @@ public final class FormatUtil {
    * Whitespace. The string should cover the commonly used length.
    */
   private static final String WHITESPACE_BUFFER = "                                                                                ";
+
+  /**
+   * The system newline setting.
+   */
+  public static final String NEWLINE = System.getProperty("line.separator");
 
   /**
    * Formats the double d with the specified fraction digits.
@@ -160,10 +169,10 @@ public final class FormatUtil {
   }
 
   /**
-   * Formats the double array d with ', ' as separator
-   * and with the specified fraction digits.
-   *
-   * @param d      the double array to be formatted
+   * Formats the double array d with ', ' as separator and with the specified
+   * fraction digits.
+   * 
+   * @param d the double array to be formatted
    * @param digits the number of fraction digits
    * @return a String representing the double array d
    */
@@ -197,7 +206,7 @@ public final class FormatUtil {
    */
   public static String format(double[][] d, String sep1, String sep2, int digits) {
     StringBuffer buffer = new StringBuffer();
-  
+
     for(int i = 0; i < d.length; i++) {
       if(i < d.length - 1) {
         buffer.append(format(d[i], sep2, digits)).append(sep1);
@@ -206,7 +215,7 @@ public final class FormatUtil {
         buffer.append(format(d[i], sep2, digits));
       }
     }
-  
+
     return buffer.toString();
   }
 
@@ -414,19 +423,90 @@ public final class FormatUtil {
     // TODO: removed whitespace - hierarchy reading to be adapted!
     return format(bitSet, dim, ",");
   }
-  
+
+  /**
+   * Find the first space before position w or if there is none after w.
+   * 
+   * @param s String
+   * @param width Width
+   * @return index of best whitespace or <code>-1</code> if no whitespace was
+   *         found.
+   */
+  public static int findSplitpoint(String s, int width) {
+    // the newline (or EOS) is the fallback split position.
+    int in = s.indexOf(NEWLINE);
+    if (in < 0) {
+      in = s.length();
+    }
+    // Good enough?
+    if (in < width) {
+      return in;
+    }
+    // otherwise, search for whitespace
+    int iw = s.lastIndexOf(' ', width);
+    // good whitespace found?
+    if (iw > 0 && iw < width) {
+      return iw;
+    }
+    // sub-optimal splitpoint - retry AFTER the given position
+    iw = s.indexOf(' ', width);
+    if (iw > 0) {
+      return iw;
+    }
+    // even worse - can't split!
+    return s.length();
+  }
+
+  /**
+   * Splits the specified string at the last blank before width. If there is no
+   * blank before the given width, it is split at the next.
+   * 
+   * @param s the string to be splitted
+   * @param width int
+   * @return the splitted string
+   */
+  public static List<String> splitAtLastBlank(String s, int width) {
+    List<String> chunks = new ArrayList<String>();
+    if(s.length() <= width) {
+      chunks.add(s);
+      return chunks;
+    }
+
+    String tmp = s;
+    while(tmp.length() > 0) {
+      int index = findSplitpoint(tmp, width);
+      // store first part
+      chunks.add(tmp.substring(0, index));
+      // skip whitespace at beginning of line
+      while(index < tmp.length() && tmp.charAt(index) == ' ') {
+        index += 1;
+      }
+      // remove a newline
+      if (index < tmp.length() && tmp.regionMatches(index, NEWLINE, 0, NEWLINE.length())) {
+        index += NEWLINE.length();
+      }
+      if (index >= tmp.length()) {
+        break;
+      }
+      tmp = tmp.substring(index);
+      index = findSplitpoint(tmp, width);
+    }
+
+    return chunks;
+  }
+
   /**
    * Returns a string with the specified number of whitespace.
-   *
+   * 
    * @param n the number of whitespace characters
    * @return a string with the specified number of blanks
    */
   public static String whitespace(int n) {
-    if (n < WHITESPACE_BUFFER.length()) {
-      return WHITESPACE_BUFFER.substring(0,n);
+    if(n < WHITESPACE_BUFFER.length()) {
+      return WHITESPACE_BUFFER.substring(0, n);
     }
     char[] buf = new char[n];
-    for (int i = 0; i < n; i++) {
+    for(int i = 0; i < n; i++) {
       buf[i] = WHITESPACE_BUFFER.charAt(0);
     }
     return new String(buf);
@@ -440,10 +520,12 @@ public final class FormatUtil {
    * @return padded string of at least length len (and o otherwise)
    */
   public static String pad(String o, int len) {
-    if (o.length() >= len) { return o; }
+    if(o.length() >= len) {
+      return o;
+    }
     return o + whitespace(len - o.length());
   }
-  
+
   /**
    * Pad a string to a given length by adding whitespace to the left.
    * 
@@ -452,7 +534,9 @@ public final class FormatUtil {
    * @return padded string of at least length len (and o otherwise)
    */
   public static String padRightAligned(String o, int len) {
-    if (o.length() >= len) { return o; }
+    if(o.length() >= len) {
+      return o;
+    }
     return whitespace(len - o.length()) + o;
   }
 }

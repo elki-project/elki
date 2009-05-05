@@ -89,7 +89,7 @@ public class IntParameter extends NumberParameter<Integer> {
      * @return &quot;&lt;int&gt;&quot;
      */
     @Override
-    protected String getParameterType() {
+    public String getSyntax() {
         return "<int>";
     }
 }

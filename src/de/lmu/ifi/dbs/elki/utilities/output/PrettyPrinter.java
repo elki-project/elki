@@ -142,17 +142,7 @@ public class PrettyPrinter {
       return s;
     }
 
-    String tmp = s;
-    int index = tmp.lastIndexOf(' ', columnWidth[column]);
-    while(index > columnWidth[column]) {
-      tmp = tmp.substring(0, index);
-      index = tmp.lastIndexOf(' ');
-    }
-
-    if(index != -1) {
-      tmp = tmp.substring(0, index);
-    }
-
-    return tmp;
+    int index = FormatUtil.findSplitpoint(s, columnWidth[column]);
+    return s.substring(0, index);
   }
 }

@@ -78,7 +78,7 @@ public class PatternParameter extends Parameter<String, String> {
      * @return &quot;&lt;pattern&gt;&quot;
      */
     @Override
-    protected String getParameterType() {
+    public String getSyntax() {
         return "<pattern>";
     }
 }

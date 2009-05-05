@@ -87,7 +87,7 @@ public class FileListParameter extends ListParameter<File> {
      * @return &quot;&lt;file_1,...,file_n&gt;&quot;
      */
     @Override
-    protected String getParameterType() {
+    public String getSyntax() {
         return "<file_1,...,file_n>";
     }
 }

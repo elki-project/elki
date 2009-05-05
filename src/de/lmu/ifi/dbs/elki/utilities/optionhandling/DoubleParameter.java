@@ -159,7 +159,7 @@ public class DoubleParameter extends NumberParameter<Double> {
      * @return &quot;&lt;double&gt;&quot;
      */
     @Override
-    protected String getParameterType() {
+    public String getSyntax() {
         return "<double>";
     }
 }

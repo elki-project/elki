@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -22,19 +23,23 @@ import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.ResultWriter;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterFlagGlobalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Provides a KDDTask that can be used to perform any algorithm implementing
@@ -228,10 +233,16 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
    * @return a usage message with the specified message as leading line, and
    *         information as provided by optionHandler
    */
-  public String usage(String message) {
+  public String usage() {
     StringBuffer usage = new StringBuffer();
-    usage.append(message);
+    usage.append(INFORMATION);
     usage.append(NEWLINE);
+    
+    // Collect options
+    List<Pair<Parameterizable, Option<?>>> options = new ArrayList<Pair<Parameterizable, Option<?>>>();
+    collectOptions(options);
+    OptionUtil.formatForConsole(usage, 77, "   ", options);
+    /*
     usage.append(optionHandler.usage("", false));
     usage.append(NEWLINE);
     if(algorithm != null) {
@@ -247,7 +258,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
       usage.append(" ");
       usage.append(resulthandler.parameterDescription());
       usage.append(NEWLINE);
-    }
+    }*/
     return usage.toString();
   }
 
@@ -314,7 +325,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
 
     // help
     if(HELP_FLAG.isSet() || HELP_LONG_FLAG.isSet()) {
-      throw new AbortException(INFORMATION);
+      throw new AbortException(ExceptionMessages.USER_REQUESTED_HELP);
     }
 
     initialized = true;
@@ -395,12 +406,12 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
     catch(AbortException e) {
       // ensure we actually show the message:
       LoggingConfiguration.setVerbose(true);
-      logger.verbose(kddTask.usage("USAGE:"));
+      logger.verbose(kddTask.usage());
       logger.verbose(e.getMessage());
     }
     catch(UnspecifiedParameterException e) {
       LoggingConfiguration.setVerbose(true);
-      logger.verbose(kddTask.usage("USAGE:"));
+      logger.verbose(kddTask.usage());
       logger.warning(e.getMessage());
     }
     catch(ParameterException e) {
@@ -408,15 +419,15 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
       // supposedly only thrown with an already helpful message.
       if (kddTask.HELP_FLAG.isSet()) {
         LoggingConfiguration.setVerbose(true);
-        logger.verbose(kddTask.usage("USAGE:"));
+        logger.verbose(kddTask.usage());
       }
-      logger.warning(e.getMessage());
+      logger.warning(e.getMessage(), e);
     }
     // any other exception
     catch(Exception e) {
       if (kddTask.HELP_FLAG.isSet()) {
         LoggingConfiguration.setVerbose(true);
-        logger.verbose(kddTask.usage("USAGE:"));
+        logger.verbose(kddTask.usage());
       }
       LoggingUtil.exception(e.getMessage(), e);
     }

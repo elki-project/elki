@@ -89,7 +89,7 @@ public class FileParameter extends Parameter<File, Object> {
      * @return &quot;&lt;file_&gt;&quot;
      */
     @Override
-    protected String getParameterType() {
+    public String getSyntax() {
         return "<file>";
     }
 }

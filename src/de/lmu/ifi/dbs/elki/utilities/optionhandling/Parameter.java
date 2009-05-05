@@ -1,11 +1,11 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 
-import de.lmu.ifi.dbs.elki.properties.Properties;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
+
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 
 /**
  * Abstract class for specifying a parameter.
@@ -242,21 +242,21 @@ public abstract class Parameter<T, C> extends Option<T> {
     @Override
     public final String getDescription() {
         StringBuffer description = new StringBuffer();
-        description.append(getParameterType()).append(" ");
+        //description.append(getParameterType()).append(" ");
         description.append(shortDescription);
+        description.append(FormatUtil.NEWLINE);
         if (hasValuesDescription()) {
-          description.append("\n");
           description.append(getValuesDescription());
         }
         if (hasDefaultValue()) {
-            description.append("\nDefault:"+Properties.NONBREAKING_SPACE).append(getDefaultValue().toString()).append(".");
+            description.append("Default: ").append(getDefaultValue().toString()).append("." + FormatUtil.NEWLINE);
         }
         if (!constraints.isEmpty()) {
             if (constraints.size() == 1) {
-              description.append("\nConstraint: ");
+              description.append("Constraint: ");
             }
             else if (constraints.size() > 1) {
-              description.append("\nConstraints: ");
+              description.append("Constraints: ");
             }
             for (int i = 0; i < constraints.size(); i++) {
                 ParameterConstraint<C> constraint = constraints.get(i);
@@ -268,16 +268,8 @@ public abstract class Parameter<T, C> extends Option<T> {
                     description.append(".");
                 }
             }
+            description.append(FormatUtil.NEWLINE);
         }
         return description.toString();
     }
-
-    /**
-     * Returns a string representation of the parameter's type
-     * (e.g. an {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter} should
-     * return {@code <int>}).
-     *
-     * @return a string representation of the parameter's type
-     */
-    protected abstract String getParameterType();
 }
