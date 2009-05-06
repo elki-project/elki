@@ -96,4 +96,4 @@ de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:356: warning - Tag @l
 
 - Implementing classes von Parameterizable im Property-File aufnehmen
 
-
+- Indexe: mit fixer DistanceFunction erzeugen, nur dieselbe kann bei queries verwendet werden ?
