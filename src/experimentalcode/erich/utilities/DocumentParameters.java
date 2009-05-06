@@ -16,6 +16,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.w3c.dom.Comment;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -109,6 +110,10 @@ public class DocumentParameters {
     // body
     Element body = htmldoc.createElement(HTML_BODY_TAG);
     htmldoc.getDocumentElement().appendChild(body);
+    
+    // modification warning
+    Comment warn = htmldoc.createComment("WARNING: THIS DOCUMENT IS AUTOMATICALLY GENERATED. MODIFICATIONS MAY GET LOST.");
+    body.appendChild(warn);
 
     // Heading
     Element h1 = htmldoc.createElement(HTML_H1_TAG);
