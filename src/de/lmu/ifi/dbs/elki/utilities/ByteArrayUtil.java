@@ -1,4 +1,4 @@
-package experimentalcode.erich.cache;
+package de.lmu.ifi.dbs.elki.utilities;
 
 /**
  * Class with various utilities for manipulating byte arrays.

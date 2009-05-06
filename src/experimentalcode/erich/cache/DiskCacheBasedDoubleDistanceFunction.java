@@ -6,6 +6,7 @@ import java.io.IOException;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.utilities.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;

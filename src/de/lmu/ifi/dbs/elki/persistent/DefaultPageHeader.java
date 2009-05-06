@@ -3,7 +3,8 @@ package de.lmu.ifi.dbs.elki.persistent;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-import experimentalcode.erich.cache.ByteArrayUtil;
+import de.lmu.ifi.dbs.elki.utilities.ByteArrayUtil;
+
 
 /**
  * Default implementation of a page header.

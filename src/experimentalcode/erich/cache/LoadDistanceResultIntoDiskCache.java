@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.FileBasedDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.utilities.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
