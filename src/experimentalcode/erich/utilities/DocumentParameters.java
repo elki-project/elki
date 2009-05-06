@@ -3,8 +3,9 @@ package experimentalcode.erich.utilities;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map.Entry;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -41,6 +42,9 @@ public class DocumentParameters {
   private static final String HTML_TT_TAG = "tt";
   private static final String HTML_BR_TAG = "br";
   private static final String HTML_H1_TAG = "h1";
+  private static final String HTML_A_TAG = "a";
+  private static final String HTML_HREF_ATTRIBUTE = "href";
+  private static final String HTML_NAME_ATTRIBUTE = "name";
 
   /**
    * @param args
@@ -124,15 +128,24 @@ public class DocumentParameters {
     Element maindl = htmldoc.createElement(HTML_DL_TAG);
     body.appendChild(maindl);
     
-    for (Entry<Class<?>, List<Option<?>>> e : byclass.entrySet()) {
+    List<Class<?>> classes = new ArrayList<Class<?>>(byclass.keySet());
+    Collections.sort(classes, new SortByName());
+    
+    for (Class<?> cls : classes) {
       Element classdt = htmldoc.createElement(HTML_DT_TAG);
-      classdt.setTextContent("{@link " + e.getKey().getName() + "}");
+      Element classan = htmldoc.createElement(HTML_A_TAG);
+      classan.setAttribute(HTML_NAME_ATTRIBUTE, cls.getName());
+      classdt.appendChild(classan);
+      Element classa = htmldoc.createElement(HTML_A_TAG);
+      classa.setAttribute(HTML_HREF_ATTRIBUTE, linkForClassName(cls.getName()));
+      classa.setTextContent(cls.getName());
+      classdt.appendChild(classa);
       maindl.appendChild(classdt);
       Element classdd = htmldoc.createElement(HTML_DD_TAG);
       maindl.appendChild(classdd);
       Element classdl = htmldoc.createElement(HTML_DL_TAG);
       classdd.appendChild(classdl);
-      for (Option<?> opt : e.getValue()) {
+      for (Option<?> opt : byclass.get(cls)) {
         Element elemdt = htmldoc.createElement(HTML_DT_TAG);
         Element elemtt = htmldoc.createElement(HTML_TT_TAG);
         elemtt.setTextContent(OptionHandler.OPTION_PREFIX + opt.getName());
@@ -171,6 +184,18 @@ public class DocumentParameters {
     }
     catch(IOException e1) {
       throw new RuntimeException(e1);
+    }
+  }
+
+  private static String linkForClassName(String name) {
+    String link = name.replace(".","/") + ".html";
+    return link;
+  }
+  
+  protected static class SortByName implements Comparator<Class<?>> {
+    @Override
+    public int compare(Class<?> o1, Class<?> o2) {
+      return o1.getName().compareTo(o2.getName());
     }
   }
 }

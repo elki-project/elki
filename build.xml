@@ -112,6 +112,11 @@
             </footer>
 			<header>ELKI (internal version)</header>
 		</javadoc>
+		<copy todir="${windows.disk.prefix}${javadoc.destdir}">
+			<fileset dir="${source}">
+				<include name="parameters.html"/>
+			</fileset>
+		</copy>
 	</target>
 
 
