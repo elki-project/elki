@@ -1,4 +1,4 @@
-package experimentalcode.erich.visualization;
+package de.lmu.ifi.dbs.elki.visualization.svg;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -42,8 +42,7 @@ import org.w3c.dom.svg.SVGDocument;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.xml.XMLNodeListIterator;
-import experimentalcode.erich.visualization.svg.SVGUtil;
-import experimentalcode.erich.visualization.svg.css.CSSClassManager;
+import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager;
 
 /**
  * Base class for SVG plots. Provides some basic functionality such as element

@@ -1,4 +1,4 @@
-package experimentalcode.erich.visualization.svg;
+package de.lmu.ifi.dbs.elki.visualization.svg;
 
 import java.text.NumberFormat;
 import java.util.Locale;

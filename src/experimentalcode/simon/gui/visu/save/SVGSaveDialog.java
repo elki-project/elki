@@ -14,7 +14,8 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import org.apache.batik.transcoder.TranscoderException;
 
-import experimentalcode.erich.visualization.SVGPlot;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
+
 
 /**
  * A "generic" save dialog to save a SVG to disk. Supported formats:

@@ -1,8 +1,7 @@
-package experimentalcode.erich.visualization.svg;
+package de.lmu.ifi.dbs.elki.visualization.svg;
 
 import org.w3c.dom.Element;
 
-import experimentalcode.erich.visualization.SVGPlot;
 
 /**
  * A marker library is a class that can generate and draw various styles of markers.

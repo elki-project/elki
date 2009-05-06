@@ -2,4 +2,4 @@
  * <p>Package with generic SVG functionality.</p>
  * 
  */
-package experimentalcode.erich.visualization.svg;
+package de.lmu.ifi.dbs.elki.visualization.svg;

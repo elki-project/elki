@@ -4,11 +4,13 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 import org.w3c.dom.svg.SVGDocument;
 
+import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager;
+import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+
 import experimentalcode.erich.scales.LinearScale;
-import experimentalcode.erich.visualization.SVGPlot;
-import experimentalcode.erich.visualization.svg.css.CSSClass;
-import experimentalcode.erich.visualization.svg.css.CSSClassManager;
-import experimentalcode.erich.visualization.svg.css.CSSClassManager.CSSNamingConflict;
 
 /**
  * Class to draw a simple axis with tick marks on the plot.

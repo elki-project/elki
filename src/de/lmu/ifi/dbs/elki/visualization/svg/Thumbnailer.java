@@ -1,9 +1,10 @@
-package experimentalcode.erich.visualization;
+package de.lmu.ifi.dbs.elki.visualization.svg;
 
 import java.io.File;
 import java.io.IOException;
 
 import org.apache.batik.transcoder.TranscoderException;
+
 
 /**
  * Class that will render a {@link SVGPlot} into a {@link File} as thumbnail. 
@@ -11,7 +12,7 @@ import org.apache.batik.transcoder.TranscoderException;
  * @author Erich Schubert
  *
  */
-class Thumbnailer {
+public class Thumbnailer {
   /**
    * Default prefix
    */

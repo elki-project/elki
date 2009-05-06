@@ -1,9 +1,8 @@
-package experimentalcode.erich.visualization.svg;
+package de.lmu.ifi.dbs.elki.visualization.svg;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import experimentalcode.erich.visualization.SVGPlot;
 
 /**
  * Simple marker library that just draws colored crosses at the given coordinates.
