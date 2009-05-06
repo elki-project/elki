@@ -244,11 +244,4 @@ public class InspectionUtil {
       return this;
     }
   }
-
-  /*
-  public static void main(String[] args) {
-    for(Class<?> cls : findAllImplementations(Object.class)) {
-      System.err.println(cls.getCanonicalName());
-    }
-  } */
 }
