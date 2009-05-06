@@ -229,7 +229,6 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
    * information as provided by optionHandler. If an algorithm is specified, the
    * description of the algorithm is returned.
    * 
-   * @param message a message to be include in the usage message
    * @return a usage message with the specified message as leading line, and
    *         information as provided by optionHandler
    */
