@@ -1,24 +1,5 @@
 package de.lmu.ifi.dbs.elki.database.connection;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.data.MultiRepresentedObject;
-import de.lmu.ifi.dbs.elki.database.Associations;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
-import de.lmu.ifi.dbs.elki.normalization.Normalization;
-import de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelParser;
-import de.lmu.ifi.dbs.elki.parser.Parser;
-import de.lmu.ifi.dbs.elki.parser.ParsingResult;
-import de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassListParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileListParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -28,6 +9,24 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.MultiRepresentedObject;
+import de.lmu.ifi.dbs.elki.database.Associations;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
+import de.lmu.ifi.dbs.elki.normalization.Normalization;
+import de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelParser;
+import de.lmu.ifi.dbs.elki.parser.Parser;
+import de.lmu.ifi.dbs.elki.parser.ParsingResult;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassListParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileListParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Provides a database connection based on multiple files and parsers to be set.

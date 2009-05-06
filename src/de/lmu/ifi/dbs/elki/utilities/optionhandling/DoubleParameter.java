@@ -150,7 +150,11 @@ public class DoubleParameter extends NumberParameter<Double> {
         if (!(obj instanceof DoubleParameter)) {
             return false;
         }
-        return this.value.equals(((DoubleParameter) obj).value);
+        DoubleParameter oth = (DoubleParameter) obj;
+        if (this.value == null) {
+          return (oth.value == null);
+        }
+        return this.value.equals(oth.value);
     }
 
     /**

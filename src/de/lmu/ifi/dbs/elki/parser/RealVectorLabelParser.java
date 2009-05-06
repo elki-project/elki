@@ -100,7 +100,6 @@ public abstract class RealVectorLabelParser<V extends RealVector<?, ?>> extends 
   /*
    * Parse a single line into an object and labels
    */
-  @SuppressWarnings("unchecked")
   public Pair<V, List<String>> parseLine(String line) {
     String[] entries = WHITESPACE_PATTERN.split(line);
     List<Double> attributes = new ArrayList<Double>();

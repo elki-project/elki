@@ -195,6 +195,8 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
         // epsilon for distance function
         OptionUtil.addParameter(opticsParameters, DiSHDistanceFunction.EPSILON_ID, Double.toString(epsilon));
 
+        // FIXME: Doesn't the OMIT flag make configuring the preprocessor moot?
+        
         // omit flag
         OptionUtil.addFlag(opticsParameters, PreprocessorHandler.OMIT_PREPROCESSING_ID);
 

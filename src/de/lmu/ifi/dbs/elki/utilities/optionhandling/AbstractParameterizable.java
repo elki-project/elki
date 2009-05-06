@@ -85,7 +85,7 @@ public abstract class AbstractParameterizable extends AbstractLoggable implement
   /**
    * Remove a parameterizable from the list. Used for listing options and settings.
    * 
-   * @param p parametrizable to remove
+   * @param p parameterizable to remove
    */
   protected void removeParameterizable(Parameterizable p) {
     for (ListIterator<Pair<Parameterizable, List<OptionID>>> iter = this.parameterizables.listIterator(); iter.hasNext(); ) {
@@ -229,8 +229,17 @@ public abstract class AbstractParameterizable extends AbstractLoggable implement
           }
         }
         if (toremove.size() > 0) {
+          StringBuffer remainingOptions = new StringBuffer();
+          boolean first = true;
+          for (OptionID oid : toremove) {
+            if (!first) {
+              remainingOptions.append(", ");
+            }
+            remainingOptions.append(oid.getName());
+            first = false;
+          }
           // TODO: change to "debugFine"?
-          logger.warning("Options were given as ignore-because-predefined that were not found in the collected options.");
+          logger.warning("Options were given as ignore-because-predefined that were not found in the collected options: " + remainingOptions.toString(), new Throwable());
         }
       } else {
         p.getFirst().collectOptions(collection);
