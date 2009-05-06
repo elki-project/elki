@@ -182,7 +182,7 @@ de.lmu.ifi.dbs.elki.math.linearalgebra.pca.EigenPairFilter=de.lmu.ifi.dbs.elki.m
   de.lmu.ifi.dbs.elki.math.linearalgebra.pca.CompositeEigenPairFilter
 # #######################################################
 # CovarianceMatrixBuilder - default package: de.lmu.ifi.dbs.elki.math.linearalgebra.pca
-de.lmu.ifi.dbs.elki.math.linearalgebra.pca.CovarianceMatrixBuilder=de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PlainCovarianceMatrixBuilder,\
+de.lmu.ifi.dbs.elki.math.linearalgebra.pca.CovarianceMatrixBuilder=de.lmu.ifi.dbs.elki.math.linearalgebra.pca.StandardCovarianceMatrixBuilder,\
   de.lmu.ifi.dbs.elki.math.linearalgebra.pca.KernelCovarianceMatrixBuilder,\
   de.lmu.ifi.dbs.elki.math.linearalgebra.pca.WeightedCovarianceMatrixBuilder
 # #######################################################
