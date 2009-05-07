@@ -56,7 +56,11 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
   public static final OptionID K_ID = OptionID.getOrCreateOptionID("abod.k", "Parameter k for kNN queries.");
 
   /**
-   * Parameter for k
+   * Parameter for k, the number of neighbors used in kNN queries.
+   * 
+   * Key: {@code -abod.k}
+   * 
+   * Default value: 30
    */
   private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterEqualConstraint(1), 30);
 
@@ -71,7 +75,9 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
   public static final OptionID FAST_ID = OptionID.getOrCreateOptionID("abod.fast", "Flag to indicate that the algorithm should run the fast/approximative version.");
 
   /**
-   * Flag for fast mode
+   * Flag for fast mode.
+   * 
+   * Key: {@code -abod.fast}
    */
   private final Flag FAST_FLAG = new Flag(FAST_ID);
 
@@ -86,7 +92,9 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
   public static final OptionID FAST_SAMPLE_ID = OptionID.getOrCreateOptionID("abod.samplesize", "Sample size to use in fast mode.");
 
   /**
-   * Parameter for sample size
+   * Parameter for sample size to be used in fast mode.
+   * 
+   * Key: {@code -abod.samplesize}
    */
   private final IntParameter FAST_SAMPLE_PARAM = new IntParameter(FAST_SAMPLE_ID, new GreaterEqualConstraint(1), true);
 
@@ -101,7 +109,11 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
   public static final OptionID KERNEL_FUNCTION_ID = OptionID.getOrCreateOptionID("abod.kernelfunction", "Kernel function to use.");
 
   /**
-   * Parameter for Kernel Function
+   * Parameter for Kernel function.
+   * 
+   * Key: {@code -abod.kernelfunction}
+   * 
+   * Default: {@link PolynomialKernelFunction}
    */
   // TODO: is a Polynomial Kernel the best default?
   private final ClassParameter<KernelFunction<V, DoubleDistance>> KERNEL_FUNCTION_PARAM = new ClassParameter<KernelFunction<V, DoubleDistance>>(KERNEL_FUNCTION_ID, KernelFunction.class, PolynomialKernelFunction.class.getCanonicalName());
