@@ -58,9 +58,9 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
   /**
    * Parameter for k, the number of neighbors used in kNN queries.
    * 
-   * Key: {@code -abod.k}
+   * <p>Key: {@code -abod.k}</p>
    * 
-   * Default value: 30
+   * <p>Default value: 30</p>
    */
   private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterEqualConstraint(1), 30);
 
@@ -77,7 +77,7 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
   /**
    * Flag for fast mode.
    * 
-   * Key: {@code -abod.fast}
+   * <p>Key: {@code -abod.fast}</p>
    */
   private final Flag FAST_FLAG = new Flag(FAST_ID);
 
@@ -94,7 +94,7 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
   /**
    * Parameter for sample size to be used in fast mode.
    * 
-   * Key: {@code -abod.samplesize}
+   * <p>Key: {@code -abod.samplesize}</p>
    */
   private final IntParameter FAST_SAMPLE_PARAM = new IntParameter(FAST_SAMPLE_ID, new GreaterEqualConstraint(1), true);
 
@@ -111,9 +111,9 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
   /**
    * Parameter for Kernel function.
    * 
-   * Key: {@code -abod.kernelfunction}
+   * <p>Key: {@code -abod.kernelfunction}</p>
    * 
-   * Default: {@link PolynomialKernelFunction}
+   * <p>Default: {@link PolynomialKernelFunction}</p>
    */
   // TODO: is a Polynomial Kernel the best default?
   private final ClassParameter<KernelFunction<V, DoubleDistance>> KERNEL_FUNCTION_PARAM = new ClassParameter<KernelFunction<V, DoubleDistance>>(KERNEL_FUNCTION_ID, KernelFunction.class, PolynomialKernelFunction.class.getCanonicalName());
