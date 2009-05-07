@@ -85,7 +85,7 @@ public class VectorListParameter extends ListParameter<List<Double>> {
     String[] vectors = VECTOR_SPLIT.split(value);
     if(vectors.length == 0) {
 
-      throw new UnspecifiedParameterException("Wrong parameter format! Given list of vectors for parameter \"" + getName() + "\" is either empty or has the wrong format!\nParameter value required:\n" + getDescription());
+      throw new UnspecifiedParameterException("Wrong parameter format! Given list of vectors for parameter \"" + getName() + "\" is either empty or has the wrong format!\nParameter value required:\n" + getFullDescription());
     }
 
     List<List<Double>> vecList = new ArrayList<List<Double>>();

@@ -60,7 +60,7 @@ public class DoubleListParameter extends ListParameter<Double> {
     String[] values = SPLIT.split(value);
     if(values.length == 0) {
 
-      throw new UnspecifiedParameterException("Wrong parameter format! Given list of double values for parameter \"" + getName() + "\" is either empty or has the wrong format!\nParameter value required:\n" + getDescription());
+      throw new UnspecifiedParameterException("Wrong parameter format! Given list of double values for parameter \"" + getName() + "\" is either empty or has the wrong format!\nParameter value required:\n" + getFullDescription());
     }
 
     // list for checking the parameter constraints

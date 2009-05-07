@@ -14,6 +14,7 @@ import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
@@ -23,8 +24,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -45,6 +48,11 @@ public class DocumentParameters {
   private static final String HTML_A_TAG = "a";
   private static final String HTML_HREF_ATTRIBUTE = "href";
   private static final String HTML_NAME_ATTRIBUTE = "name";
+  private static final String HTML_P_TAG = "p";
+  private static final String HTML_META_TAG = "meta";
+  private static final String HTML_LINK_TAG = "link";
+  private static final String HTML_DOCTYPE_PUBLIC = "-//W3C//DTD XHTML 1.0 Transitional//EN";
+  private static final String HTML_DOCTYPE_SYSTEM = "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd";
 
   /**
    * @param args
@@ -107,6 +115,17 @@ public class DocumentParameters {
     // head
     Element head = htmldoc.createElement(HTML_HEAD_TAG);
     htmldoc.getDocumentElement().appendChild(head);
+    // meta with charset information
+    Element meta = htmldoc.createElement(HTML_META_TAG);
+    meta.setAttribute("http-equiv","Content-Type");
+    meta.setAttribute("content","text/html; charset=UTF-8");
+    head.appendChild(meta);
+    // stylesheet
+    Element css = htmldoc.createElement(HTML_LINK_TAG);
+    css.setAttribute("rel","stylesheet");
+    css.setAttribute("type","text/css");
+    css.setAttribute(HTML_HREF_ATTRIBUTE, "stylesheet.css");
+    head.appendChild(css);
     // title
     Element title = htmldoc.createElement(HTML_TITLE_TAG);
     title.setTextContent("Command line parameter overview.");
@@ -148,32 +167,67 @@ public class DocumentParameters {
       for (Option<?> opt : byclass.get(cls)) {
         Element elemdt = htmldoc.createElement(HTML_DT_TAG);
         Element elemtt = htmldoc.createElement(HTML_TT_TAG);
-        elemtt.setTextContent(OptionHandler.OPTION_PREFIX + opt.getName());
+        elemtt.setTextContent(OptionHandler.OPTION_PREFIX + opt.getName()+" "+opt.getSyntax());
         elemdt.appendChild(elemtt);
         classdl.appendChild(elemdt);
         Element elemdd = htmldoc.createElement(HTML_DD_TAG);
         //elemdd.setTextContent(opt.getDescription());
         int state = 0;
-        for (String line : opt.getDescription().split("\n")) {
+        Element elemp = htmldoc.createElement(HTML_P_TAG);
+        for (String line : opt.getShortDescription().split("\n")) {
           if (state == 1) {
-            elemdd.appendChild(htmldoc.createElement(HTML_BR_TAG));
+            elemp.appendChild(htmldoc.createElement(HTML_BR_TAG));
           }
           Text le = htmldoc.createTextNode(line);
-          elemdd.appendChild(le);
+          elemp.appendChild(le);
           state = 1;
+        }
+        elemdd.appendChild(elemp);
+        // class restriction?
+        if (opt instanceof ClassParameter<?>) {
+          Element p = htmldoc.createElement(HTML_P_TAG);
+          p.appendChild(htmldoc.createTextNode("Class Restriction: "));
+          Element defa = htmldoc.createElement(HTML_A_TAG);
+          defa.setAttribute(HTML_HREF_ATTRIBUTE, linkForClassName(((ClassParameter<?>) opt).getRestrictionClass().getName()));
+          defa.setTextContent(((ClassParameter<?>) opt).getRestrictionClass().getName());
+          p.appendChild(defa);
+          elemdd.appendChild(p);
+        }
+        // default value? completions?
+        if (opt instanceof Parameter<?,?>) {
+          Parameter<?,?> par = (Parameter<?, ?>) opt;
+          if (par.hasDefaultValue()) {
+            Element p = htmldoc.createElement(HTML_P_TAG);
+            Object def = par.getDefaultValue();
+            p.appendChild(htmldoc.createTextNode("Default: "));
+            if (opt instanceof ClassParameter<?>) {
+              Element defa = htmldoc.createElement(HTML_A_TAG);
+              defa.setAttribute(HTML_HREF_ATTRIBUTE, linkForClassName(((ClassParameter<?>) opt).getDefaultValue()));
+              defa.setTextContent(((ClassParameter<?>) opt).getDefaultValue());
+              p.appendChild(defa);
+            } else {
+              p.appendChild(htmldoc.createTextNode(def.toString()));
+            }
+            elemdd.appendChild(p);
+          }
         }
         classdl.appendChild(elemdd);
       }
     }
     
-    OutputStream out = System.out;
-    // TODO embed linked images.
+    writeXHTML(htmldoc, System.out);
+  }
+
+  private static void writeXHTML(Document htmldoc, OutputStream out) throws Error {
     javax.xml.transform.Result result = new StreamResult(out);
     // Use a transformer for pretty printing
     Transformer xformer;
     try {
       xformer = TransformerFactory.newInstance().newTransformer();
       xformer.setOutputProperty(OutputKeys.INDENT, "yes");
+      xformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+      xformer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, HTML_DOCTYPE_PUBLIC);
+      xformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, HTML_DOCTYPE_SYSTEM);
       xformer.transform(new DOMSource(htmldoc), result);
     }
     catch(TransformerException e1) {

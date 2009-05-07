@@ -64,7 +64,7 @@ public class FileParameter extends Parameter<File, Object> {
     public boolean isValid(String value) throws ParameterException {
         if (value == null) {
             throw new UnspecifiedParameterException("Parameter \"" + getName()
-                + "\": No filename given!\nParameter description: " + getDescription());
+                + "\": No filename given!\nParameter description: " + getFullDescription());
         }
 
         if (fileType.equals(FileType.INPUT_FILE)) {

@@ -223,7 +223,7 @@ public class OptionHandler extends AbstractLoggable {
 
       String currentOption = option.getKey();
 
-      String longDescription = option.getValue().getDescription();
+      String longDescription = option.getValue().getFullDescription();
 
       if (false) {
         if(option.getValue() instanceof ClassParameter) {

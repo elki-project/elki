@@ -37,7 +37,7 @@ public class Flag extends Option<Boolean> {
      * @return the short description of this flag
      */
     @Override
-    public String getDescription() {
+    public String getFullDescription() {
         return shortDescription;
     }
 

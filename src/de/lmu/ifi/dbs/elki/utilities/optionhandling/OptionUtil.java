@@ -248,7 +248,7 @@ public final class OptionUtil {
     for (Pair<Parameterizable, Option<?>> pair : options) {
       String currentOption = pair.getSecond().getName();
       String syntax = pair.getSecond().getSyntax();
-      String longDescription = pair.getSecond().getDescription();
+      String longDescription = pair.getSecond().getFullDescription();
       
       buf.append(OptionHandler.OPTION_PREFIX);
       buf.append(currentOption);

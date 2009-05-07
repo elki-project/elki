@@ -16,7 +16,7 @@ public abstract class Option<T> {
 
     /**
      * The short description of the option. An extended description
-     * is provided by the method {@link #getDescription()}
+     * is provided by the method {@link #getFullDescription()}
      */
     protected String shortDescription;
 
@@ -50,7 +50,7 @@ public abstract class Option<T> {
      *
      * @return the option's short description.
      */
-    protected String getShortDescription() {
+    public String getShortDescription() {
         return shortDescription;
     }
 
@@ -69,7 +69,7 @@ public abstract class Option<T> {
      *
      * @return the option's description.
      */
-    public abstract String getDescription();
+    public abstract String getFullDescription();
 
     /**
      * Returns a string representation of the parameter's type

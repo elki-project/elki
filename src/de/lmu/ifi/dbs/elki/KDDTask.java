@@ -286,7 +286,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
       catch(UnableToComplyException e) {
         // FIXME: log here?
         LoggingUtil.exception(e.getMessage(), e);
-        throw new WrongParameterValueException(DESCRIPTION_PARAM.getName(), descriptionClass, DESCRIPTION_PARAM.getDescription(), e);
+        throw new WrongParameterValueException(DESCRIPTION_PARAM.getName(), descriptionClass, DESCRIPTION_PARAM.getFullDescription(), e);
       }
       if(p instanceof Algorithm) {
         Algorithm<?, ?> a = (Algorithm<?, ?>) p;
