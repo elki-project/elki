@@ -114,7 +114,7 @@
 		</javadoc>
 		<copy todir="${windows.disk.prefix}${javadoc.destdir}">
 			<fileset dir="${source}">
-				<include name="parameters.html"/>
+				<include name="parameters*.html"/>
 			</fileset>
 		</copy>
 	</target>

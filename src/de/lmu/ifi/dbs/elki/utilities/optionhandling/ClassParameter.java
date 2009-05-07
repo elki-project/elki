@@ -1,7 +1,9 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.properties.PropertyName;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
  * Parameter class for a parameter specifying a class name.
@@ -10,11 +12,19 @@ import de.lmu.ifi.dbs.elki.properties.PropertyName;
  * @param <C> Class type
  */
 public class ClassParameter<C> extends Parameter<String, String> {
+  /**
+   * Logger
+   */
+  private Logging logger = Logging.getLogger(ClassParameter.class);
 
   /**
    * The restriction class for this class parameter.
    */
   private Class<C> restrictionClass;
+  /**
+   * Non-breaking unicode space character.
+   */
+  public static final String NONBREAKING_SPACE = "\u00a0";
 
   /**
    * Constructs a class parameter with the given optionID, and restriction
@@ -221,8 +231,79 @@ public class ClassParameter<C> extends Parameter<String, String> {
    */
   @Override
   public String getValuesDescription() {
-    return Properties.ELKI_PROPERTIES.restrictionString(getRestrictionClass());
+    return restrictionString(getRestrictionClass());
   }
 
-  
+  /**
+   * Provides a description string listing all classes for the given superclass
+   * or interface as specified in the properties.
+   * 
+   * @param superclass the class to be extended or interface to be implemented
+   * @return a description string listing all classes for the given superclass
+   *         or interface as specified in the properties
+   */
+  public String restrictionString(Class<?> superclass) {
+    String prefix = superclass.getPackage().getName() + ".";
+    StringBuilder info = new StringBuilder();
+    if(superclass.isInterface()) {
+      info.append("Implementing ");
+    }
+    else {
+      info.append("Extending ");
+    }
+    info.append(superclass.getName());
+    PropertyName propertyName = PropertyName.getOrCreatePropertyName(superclass);
+    if(propertyName == null) {
+      logger.warning("Could not create PropertyName for " + superclass.toString());
+    }
+    else {
+      String[] classNames = Properties.ELKI_PROPERTIES.getProperty(propertyName);
+      if(classNames.length > 0) {
+        info.append(FormatUtil.NEWLINE);
+        info.append("Known classes (default package " + prefix + "):");
+        info.append(FormatUtil.NEWLINE);
+        for(String name : classNames) {
+          // skip commented classes.
+          if (name.charAt(0) == '#') {
+            continue;
+          }
+          try {
+            if(superclass.isAssignableFrom(Class.forName(name))) {
+              info.append("->" + NONBREAKING_SPACE);
+              if(name.startsWith(prefix)) {
+                info.append(name.substring(prefix.length()));
+              }
+              else {
+                info.append(name);
+              }
+              info.append(FormatUtil.NEWLINE);
+            }
+            else {
+              logger.warning("Invalid classname \"" + name + "\" for property \"" + propertyName.getName() + "\" of class \"" + propertyName.getType().getName() + "\" in property-file\n");
+            }
+          }
+          catch(ClassNotFoundException e) {
+            logger.warning("Invalid classname \"" + name + "\" for property \"" + propertyName.getName() + "\" of class \"" + propertyName.getType().getName() + "\" in property-file - " + e.getMessage() + " - " + e.getClass().getName() + "\n");
+          }
+          catch(ClassCastException e) {
+            logger.warning("Invalid classname \"" + name + "\" for property \"" + propertyName.getName() + "\" of class \"" + propertyName.getType().getName() + "\" in property-file - " + e.getMessage() + " - " + e.getClass().getName() + "\n");
+          }
+          catch(NullPointerException e) {
+            if(logger.isDebuggingFinest()) {
+              logger.debugFinest(e.getClass().getName() + ": " + e.getMessage());
+            }
+          }
+          catch(Exception e) {
+            logger.exception("Exception building class restriction string.", e);
+          }
+        }
+      }
+      else {
+        if(logger.isDebugging()) {
+          logger.debug("Not found properties for property name: " + propertyName.getName() + "\n");
+        }
+      }
+    }
+    return info.toString();
+  }
 }

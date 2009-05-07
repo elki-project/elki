@@ -8,7 +8,6 @@ import java.util.Vector;
 import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.output.PrettyPrinter;
 
@@ -228,9 +227,9 @@ public class OptionHandler extends AbstractLoggable {
       if (false) {
         if(option.getValue() instanceof ClassParameter) {
           ClassParameter<?> c = (ClassParameter<?>) option.getValue();
-          longDescription = longDescription + "\n" + Properties.ELKI_PROPERTIES.restrictionString(c.getRestrictionClass());
+          longDescription = longDescription + NEWLINE + c.restrictionString(c.getRestrictionClass());
           if (c.getDefaultValue() != null) {
-            longDescription = longDescription + "\n" + "Default:" + Properties.NONBREAKING_SPACE + c.getDefaultValue();
+            longDescription = longDescription + NEWLINE + "Default: " + c.getDefaultValue();
           }
         }
       }

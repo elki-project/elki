@@ -8,7 +8,6 @@ import java.util.regex.Pattern;
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
@@ -26,31 +25,21 @@ public final class Properties {
   public static final Pattern PROPERTY_SEPARATOR = Pattern.compile(",");
 
   /**
-   * Non-breaking unicode space character.
+   * The Properties for ELKI.
    */
-  public static final String NONBREAKING_SPACE = "\u00a0";
-
-  /**
-     *
-     */
-  private static Properties temporalProperties;
+  public static final Properties ELKI_PROPERTIES;
 
   static {
     File propertiesfile = new File(Properties.class.getPackage().getName().replace('.', File.separatorChar) + File.separatorChar + "ELKI.prp");
     if(propertiesfile.exists() && propertiesfile.canRead()) {
-      temporalProperties = new Properties(propertiesfile.getAbsolutePath());
+      ELKI_PROPERTIES = new Properties(propertiesfile.getAbsolutePath());
     }
     else // otherwise, the property-file should at least be available within the
          // jar-archive
     {
-      temporalProperties = new Properties(Properties.class.getPackage().getName().replace('.', '/') + '/' + "ELKI.prp");
+      ELKI_PROPERTIES = new Properties(Properties.class.getPackage().getName().replace('.', '/') + '/' + "ELKI.prp");
     }
   }
-
-  /**
-   * The Properties for ELKI.
-   */
-  public static final Properties ELKI_PROPERTIES = temporalProperties;
 
   /**
    * Stores the properties as defined by a property-file.
@@ -89,79 +78,6 @@ public final class Properties {
   public String[] getProperty(PropertyName propertyName) {
     String property = propertyName == null ? null : PROPERTIES.getProperty(propertyName.getName());
     return property == null ? new String[0] : PROPERTY_SEPARATOR.split(property);
-  }
-
-  /**
-   * Provides a description string listing all classes for the given superclass
-   * or interface as specified in the properties.
-   * 
-   * @param superclass the class to be extended or interface to be implemented
-   * @return a description string listing all classes for the given superclass
-   *         or interface as specified in the properties
-   */
-  public String restrictionString(Class<?> superclass) {
-    String prefix = superclass.getPackage().getName() + ".";
-    StringBuilder info = new StringBuilder();
-    if(superclass.isInterface()) {
-      info.append("Implementing ");
-    }
-    else {
-      info.append("Extending ");
-    }
-    info.append(superclass.getName());
-    PropertyName propertyName = PropertyName.getOrCreatePropertyName(superclass);
-    if(propertyName == null) {
-      logger.warning("Could not create PropertyName for " + superclass.toString());
-    }
-    else {
-      String[] classNames = getProperty(propertyName);
-      if(classNames.length > 0) {
-        info.append(FormatUtil.NEWLINE);
-        info.append("Known classes (default package " + prefix + "):");
-        info.append(FormatUtil.NEWLINE);
-        for(String name : classNames) {
-          // skip commented classes.
-          if (name.charAt(0) == '#') {
-            continue;
-          }
-          try {
-            if(superclass.isAssignableFrom(Class.forName(name))) {
-              info.append("->" + NONBREAKING_SPACE);
-              if(name.startsWith(prefix)) {
-                info.append(name.substring(prefix.length()));
-              }
-              else {
-                info.append(name);
-              }
-              info.append(FormatUtil.NEWLINE);
-            }
-            else {
-              logger.warning("Invalid classname \"" + name + "\" for property \"" + propertyName.getName() + "\" of class \"" + propertyName.getType().getName() + "\" in property-file\n");
-            }
-          }
-          catch(ClassNotFoundException e) {
-            logger.warning("Invalid classname \"" + name + "\" for property \"" + propertyName.getName() + "\" of class \"" + propertyName.getType().getName() + "\" in property-file - " + e.getMessage() + " - " + e.getClass().getName() + "\n");
-          }
-          catch(ClassCastException e) {
-            logger.warning("Invalid classname \"" + name + "\" for property \"" + propertyName.getName() + "\" of class \"" + propertyName.getType().getName() + "\" in property-file - " + e.getMessage() + " - " + e.getClass().getName() + "\n");
-          }
-          catch(NullPointerException e) {
-            if(logger.isDebuggingFinest()) {
-              logger.debugFinest(e.getClass().getName() + ": " + e.getMessage());
-            }
-          }
-          catch(Exception e) {
-            logger.exception("Exception building class restriction string.", e);
-          }
-        }
-      }
-      else {
-        if(logger.isDebugging()) {
-          logger.debug("Not found properties for property name: " + propertyName.getName() + "\n");
-        }
-      }
-    }
-    return info.toString();
   }
 
   /**
