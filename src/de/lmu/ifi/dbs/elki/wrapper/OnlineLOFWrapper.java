@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.wrapper;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.outlier.OnlineLOF;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
@@ -11,6 +10,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import experimentalcode.elke.algorithm.lof.OnlineLOF;
 
 
 /**

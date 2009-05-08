@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.outlier;
+package experimentalcode.elke.algorithm.lof;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
