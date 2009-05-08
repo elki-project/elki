@@ -30,10 +30,15 @@ concerning the provided interfaces.
 
 <p>The main class {@link de.lmu.ifi.dbs.elki.KDDTask KDDTask} requires specification of an
 {@link de.lmu.ifi.dbs.elki.algorithm.Algorithm Algorithm}
-to use, a {@link de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection DatabaseConnection} to manage the input,
-and a filename where to deploy the output. However, by omitting specification of a filename for
-output, the results will be given to standard output, thus it may be piped directly to another
-application.</p>
+to use, a {@link de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection DatabaseConnection}
+to manage the input,
+and a {@link de.lmu.ifi.dbs.elki.result.ResultHandler ResultHandler} for output.</p>
+
+<p>The default is to read an input file (given by the <tt>-dbc.in</tt> option) via
+{@link de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection FileBasedDatabaseConnection}
+and output the resulting data to standard output (or a directory given by <tt>-out</tt>) via
+{@link de.lmu.ifi.dbs.elki.result.ResultWriter ResultWriter}.
+</p>
 
 <p>For more information on using files as data input see {@link de.lmu.ifi.dbs.elki.parser}.</p>
 
@@ -47,10 +52,8 @@ is to be defined via parameters specifically for a certain
 <p>The need for other parameters may differ from implementation to implementation. However,
 you need not to specify input nor output if you are going to implement an algorithm.</p>
 
-<h4>Command line options</h4>
-
-<p>An overview of command line options can be found <a href="parameters.html">sorted by class</a> or
-	<a href="parameters-byopt.html">sorted by option ID</a>.</p>
+<p>An extensive list of parameters can be browsed <a href="parameters.html">sorted by class</a>
+or <a href="parameters-byopt.html">sorted by option ID</a>.</p>
 
 </body>
 </html>

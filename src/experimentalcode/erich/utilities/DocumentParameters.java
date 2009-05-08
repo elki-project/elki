@@ -270,6 +270,10 @@ public class DocumentParameters {
         if(opt instanceof Parameter<?, ?>) {
           appendDefaultValueIfSet(htmldoc, (Parameter<?, ?>) opt, elemdd);
         }
+        // known values?
+        if(opt instanceof ClassParameter<?>) {
+          appendKnownImplementationsIfNonempty(htmldoc, (ClassParameter<?>) opt, elemdd);
+        }
         classdl.appendChild(elemdd);
       }
     }

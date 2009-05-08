@@ -19,8 +19,7 @@
  * containing {@link de.lmu.ifi.dbs.elki.data.DoubleVector}-Objects.</p>
  * 
  * <p>Thus, the standard procedure to use a data set of a real-valued vector space
- * is to prepare the data set
- * in a file of the following format
+ * is to prepare the data set in a file of the following format
  * (as suitable to {@link de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelParser}):
  * <ul>
  *  <li>One point per line, attributes separated by whitespace.</li>
@@ -28,6 +27,7 @@
  *  <li>Lines starting with &quot;#&quot; will be ignored.</li>
  *  <li>An index can be specified to identify an entry to be treated as class label.
  *      This index counts all entries (numeric and labels as well) starting with 0.</li>
+ *  <li>Files can be gzip compressed.</li>
  * </ul>
  * This file format is e.g. also suitable to gnuplot.
  * </p>
