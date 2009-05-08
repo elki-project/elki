@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 
-import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.properties.IterateKnownImplementations;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.properties.PropertyName;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
@@ -236,79 +236,15 @@ public class ClassParameter<C> extends Parameter<String, String> {
     return restrictionString(getRestrictionClass());
   }
   
+  /**
+   * Get an iterator over all known implementations of the class restriction.
+   * 
+   * @return {@link java.lang.Iterable<String>} and {@link java.util.Iterator<String>}
+   */
   public IterateKnownImplementations getKnownImplementations() {
     return new IterateKnownImplementations(getRestrictionClass());
   }
   
-  public static class IterateKnownImplementations implements Iterator<Class<?>>, Iterable<Class<?>> {
-    int index = 0;
-    String[] classNames = null;
-    Class<?> sclass = null;
-    Class<?> cur = null;
-    
-    public IterateKnownImplementations(Class<?> superclass) {
-      PropertyName propertyName = PropertyName.getOrCreatePropertyName(superclass);
-      if(propertyName == null) {
-        logger.warning("Could not create PropertyName for " + superclass.toString());
-        return;
-      }
-      this.sclass = superclass;
-      this.classNames = Properties.ELKI_PROPERTIES.getProperty(propertyName);
-      findNext();
-    }
-    
-    private void findNext() {
-      if (classNames == null) {
-        return;
-      }
-      cur = null;
-      for(;index < classNames.length; index++) {
-        // skip commented classes.
-        if (classNames[index].charAt(0) == '#') {
-          continue;
-        }
-        try {
-          cur = Class.forName(classNames[index]);
-        }
-        catch(ClassNotFoundException e) {
-          logger.warning("Class "+classNames[index]+" (from properties file) not found for superclass "+this.sclass.getName());
-          continue;
-        }
-        if(!this.sclass.isAssignableFrom(cur)) {
-          logger.warning("Class "+classNames[index]+" (from properties file) is not a subclass of "+this.sclass.getName());
-          continue;          
-        }
-        // last iteration - matched!
-        {
-          index++;
-          break;
-        }
-      }
-    }
-
-    @Override
-    public boolean hasNext() {
-      return cur != null;
-    }
-
-    @Override
-    public Class<?> next() {
-      Class<?> ret = cur;
-      findNext();
-      return ret;
-    }
-
-    @Override
-    public void remove() {
-      throw new UnsupportedOperationException(); 
-    }
-
-    @Override
-    public Iterator<Class<?>> iterator() {
-      return this;
-    }
-  }
-
   /**
    * Provides a description string listing all classes for the given superclass
    * or interface as specified in the properties.

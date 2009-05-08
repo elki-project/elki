@@ -21,6 +21,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.properties.IterateKnownImplementations;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
@@ -28,7 +29,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter.IterateKnownImplementations;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 public class DocumentParameters {
@@ -126,7 +126,7 @@ public class DocumentParameters {
   private static void buildParameterIndex(HashMapList<Class<?>, Option<?>> byclass, HashMapList<OptionID, Pair<Option<?>, Class<?>>> byopt) {
     List<Pair<Parameterizable, Option<?>>> options = new ArrayList<Pair<Parameterizable, Option<?>>>();
     String[] emptyargs = {};
-    for(Class<?> cls : InspectionUtil.findAllImplementations(Parameterizable.class)) {
+    for(Class<?> cls : InspectionUtil.findAllImplementations(Parameterizable.class, false)) {
       try {
         // try to parameterize the class.
         Parameterizable p = (Parameterizable) cls.newInstance();

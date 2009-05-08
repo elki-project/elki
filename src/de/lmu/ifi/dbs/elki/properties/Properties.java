@@ -1,14 +1,11 @@
 package de.lmu.ifi.dbs.elki.properties;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
-import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Provides management of properties.
@@ -44,7 +41,7 @@ public final class Properties {
   /**
    * Stores the properties as defined by a property-file.
    */
-  private final java.util.Properties PROPERTIES;
+  private final java.util.Properties properties;
 
   /**
    * Provides the properties as defined in the designated file.
@@ -53,17 +50,13 @@ public final class Properties {
    */
   private Properties(String filename) {
     LoggingConfiguration.assertConfigured();
-    this.PROPERTIES = new java.util.Properties();
+    this.properties = new java.util.Properties();
     try {
-      PROPERTIES.load(ClassLoader.getSystemResourceAsStream(filename));
+      properties.load(ClassLoader.getSystemResourceAsStream(filename));
     }
     catch(Exception e) {
       logger.warning("Unable to load properties file " + filename + ".\n");
     }
-    // if (PROPERTIES.containsKey(PropertyName.DEBUG_LEVEL.getName()) &&
-    // LoggingConfiguration.isChangeable()) {
-    // LoggingConfiguration.configureRoot(LoggingConfiguration.CLI);
-    // }
   }
 
   /**
@@ -76,98 +69,16 @@ public final class Properties {
    *         property is undefined, the returned array is of length 0
    */
   public String[] getProperty(PropertyName propertyName) {
-    String property = propertyName == null ? null : PROPERTIES.getProperty(propertyName.getName());
+    String property = propertyName == null ? null : properties.getProperty(propertyName.getName());
     return property == null ? new String[0] : PROPERTY_SEPARATOR.split(property);
   }
-
+  
   /**
-   * Returns an array of PropertyDescription for all entries for the given
-   * PropertyName.
+   * Get a collection of all property names in this object.
    * 
-   * @param propertyName the Propertyname of the property to retrieve
-   * @return PropertyDescriptins for all entries of the given PropertyName
+   * @return
    */
-  public PropertyDescription[] getProperties(PropertyName propertyName) {
-    String[] entries = getProperty(propertyName);
-    List<PropertyDescription> result = new ArrayList<PropertyDescription>();
-    for(String entry : entries) {
-      try {
-        String desc = "";
-        Object propertyInstance = propertyName.getType().cast(propertyName.classForName(entry).newInstance());
-        if(propertyInstance instanceof Algorithm) {
-          // TODO: description -- check whether this provides the
-          // desired result
-          desc = ((Algorithm<?, ?>) propertyInstance).getDescription().toString();
-        }
-        else if(propertyInstance instanceof Parameterizable) {
-          desc = ((Parameterizable) propertyInstance).parameterDescription();
-        }
-        result.add(new PropertyDescription(entry, desc));
-      }
-      catch(InstantiationException e) {
-        logger.warning("Invalid classname \"" + entry + "\" for property \"" + propertyName.getName() + "\" of class \"" + propertyName.getType().getName() + "\" in property-file: " + e.getMessage() + " - " + e.getClass().getName() + "\n");
-      }
-      catch(IllegalAccessException e) {
-        logger.warning("Invalid classname \"" + entry + "\" for property \"" + propertyName.getName() + "\" of class \"" + propertyName.getType().getName() + "\" in property-file: " + e.getMessage() + " - " + e.getClass().getName() + "\n");
-      }
-      catch(ClassNotFoundException e) {
-        logger.warning("Invalid classname \"" + entry + "\" for property \"" + propertyName.getName() + "\" of class \"" + propertyName.getType().getName() + "\" in property-file: " + e.getMessage() + " - " + e.getClass().getName() + "\n");
-      }
-    }
-    PropertyDescription[] propertyDescription = new PropertyDescription[result.size()];
-    result.toArray(propertyDescription);
-    return propertyDescription;
-
-  }
-
-  /**
-   * Provides a listing of all subclasses for the given superclass or interface
-   * as specified in the properties.
-   * 
-   * @param superclass the class to be extended or interface to be implemented
-   * @return a listing of all subclasses for the given superclass or interface
-   *         as specified in the properties
-   */
-  @SuppressWarnings("unchecked")
-  public List<Class<?>> subclasses(Class superclass) {
-    List<Class<?>> subclasses = new ArrayList<Class<?>>();
-    PropertyName propertyName = PropertyName.getOrCreatePropertyName(superclass);
-    if(propertyName == null) {
-      logger.warning("Could not create PropertyName for " + superclass.toString() + "\n");
-    }
-    else {
-      String[] classNames = getProperty(propertyName);
-      if(classNames.length > 0) {
-        for(String className : classNames) {
-          try {
-            if(superclass.isAssignableFrom(Class.forName(className))) {
-              subclasses.add(Class.forName(className));
-            }
-            else {
-              logger.warning("Invalid classname \"" + className + "\" for property \"" + propertyName.getName() + "\" of class \"" + propertyName.getType().getName() + "\" in property-file\n");
-            }
-          }
-          catch(ClassNotFoundException e) {
-            logger.warning("Invalid classname \"" + className + "\" for property \"" + propertyName.getName() + "\" of class \"" + propertyName.getType().getName() + "\" in property-file - " + e.getMessage() + " - " + e.getClass().getName() + "\n");
-          }
-          catch(ClassCastException e) {
-            logger.warning("Invalid classname \"" + className + "\" for property \"" + propertyName.getName() + "\" of class \"" + propertyName.getType().getName() + "\" in property-file - " + e.getMessage() + " - " + e.getClass().getName() + "\n");
-          }
-          catch(NullPointerException e) {
-            if(logger.isDebuggingFinest()) {
-
-              logger.debugFinest(e.getClass().getName() + ": " + e.getMessage());
-            }
-          }
-          catch(Exception e) {
-            logger.exception(e.getMessage(), e);
-          }
-        }
-      }
-      else {
-        logger.warning("Not found properties for property name: " + propertyName.getName() + "\n");
-      }
-    }
-    return subclasses;
+  public Set<String> getPropertyNames() {
+    return properties.stringPropertyNames();
   }
 }

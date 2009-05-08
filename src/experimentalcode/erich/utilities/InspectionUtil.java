@@ -2,6 +2,7 @@ package experimentalcode.erich.utilities;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -41,11 +42,12 @@ public class InspectionUtil {
    * Note: returned classes may be abstract.
    * 
    * @param c Class restriction
+   * @param everything include interfaces, abstract and private classes
    * @return List of found classes.
    */
-  public static List<Class<?>> findAllImplementations(Class<?> c) {
+  public static List<Class<?>> findAllImplementations(Class<?> c, boolean everything) {
     String[] classpath = System.getProperty("java.class.path").split(System.getProperty("path.separator"));
-    return findAllImplementations(classpath, c, DEFAULT_IGNORES);
+    return findAllImplementations(classpath, c, DEFAULT_IGNORES, everything);
   }
 
   /**
@@ -54,9 +56,10 @@ public class InspectionUtil {
    * @param classpath Classpath to use (JARs and folders supported)
    * @param c Class restriction
    * @param ignorepackages List of packages to ignore
+   * @param everything include interfaces, abstract and private classes
    * @return List of found classes.
    */
-  public static List<Class<?>> findAllImplementations(String[] classpath, Class<?> c, String[] ignorepackages) {
+  public static List<Class<?>> findAllImplementations(String[] classpath, Class<?> c, String[] ignorepackages, boolean everything) {
     // Collect iterators
     Vector<Iterable<String>> iters = new Vector<Iterable<String>>(classpath.length);
     for(String path : classpath) {
@@ -85,6 +88,10 @@ public class InspectionUtil {
         }
         try {
           Class<?> cls = cl.loadClass(classname);
+          // skip abstract / private classes.
+          if(!everything && (Modifier.isInterface(cls.getModifiers()) || Modifier.isAbstract(cls.getModifiers()) || Modifier.isPrivate(cls.getModifiers()))) {
+            continue;
+          }
           if(c.isAssignableFrom(cls)) {
             res.add(cls);
           }
