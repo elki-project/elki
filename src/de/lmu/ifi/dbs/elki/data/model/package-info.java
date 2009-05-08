@@ -1,6 +1,5 @@
 /**
- * <p>Package collects basic classes for different cluster models.</p>
- * 
+ * <p>Cluster models classes for various algorithms.</p>
  * 
  */
 package de.lmu.ifi.dbs.elki.data.model;

@@ -1,5 +1,5 @@
 /**
- * <p>Package collects clustering algorithms.</p>
+ * <p>Clustering algorithms</p>
  * 
  * Clustering algorithms are supposed to implement the {@link de.lmu.ifi.dbs.elki.algorithm.Algorithm}-Interface.
  * The more specialized interface {@link de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm}

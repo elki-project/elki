@@ -1,5 +1,5 @@
 /**
- * <p>Package collects basic classes for different data types, database object types and label types.</p>
+ * <p>Basic classes for different data types, database object types and label types.</p>
  * 
  * 
  */

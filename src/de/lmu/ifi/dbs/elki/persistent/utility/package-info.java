@@ -1,8 +1,9 @@
 /**
- * <p>Package containing utility applications for ELKI.
+ * <p>Utility applications for the persistence layer such as converters.
  * </p>
  * 
- * {@link LoadDistanceResultIntoDiskCache} is a conversion utility from a text-based distance
+ * {@link de.lmu.ifi.dbs.elki.persistent.utility.LoadDistanceResultIntoDiskCache}
+ * is a conversion utility from a text-based distance
  * cache to a binary distance cache (using
  * {@link de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix})
  */

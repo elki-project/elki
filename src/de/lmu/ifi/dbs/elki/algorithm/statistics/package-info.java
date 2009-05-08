@@ -1,4 +1,7 @@
 /**
- * <p>Package to collect algorithms that do a statistical analysis of the data set</p> 
+ * <p>Statistical analysis algorithms</p>
+ * 
+ *  The algorithms in this package perform statistical analysis of the data
+ *  (e.g. compute distributions, distance distributions etc.)
  */
 package de.lmu.ifi.dbs.elki.algorithm.statistics;

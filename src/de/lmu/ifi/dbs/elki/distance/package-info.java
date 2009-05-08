@@ -1,5 +1,5 @@
 /**
- * <p>Package collects distances and - in its subpackages - distance and similarity functions.</p>
+ * <p>Distances and (in subpackages) {@link de.lmu.ifi.dbs.elki.distance.distancefunction distance functions} and {@link de.lmu.ifi.dbs.elki.distance.similarityfunction similarity functions}.</p>
  * 
  * 
  */

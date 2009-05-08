@@ -1,4 +1,4 @@
 /**
- * <p>Classes for analysis of variance by different methods.</p> 
+ * <p>Principal Component Analysis (PCA) and Eigenvector processing.</p> 
  */
 package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;

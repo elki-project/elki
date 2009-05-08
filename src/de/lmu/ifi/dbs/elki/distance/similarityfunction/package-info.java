@@ -1,5 +1,5 @@
 /**
- * <p>Package collects similarity functions.</p>
+ * <p>Similarity functions.</p>
  * 
  * 
  */

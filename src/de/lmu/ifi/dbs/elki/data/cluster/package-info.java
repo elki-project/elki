@@ -1,5 +1,5 @@
 /**
- * <p>Package collects basic classes for cluster handling.</p>
+ * <p>Cluster classes.</p>
  * 
  * 
  */

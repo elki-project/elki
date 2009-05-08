@@ -1,5 +1,5 @@
 /**
- * <p>Package to collect algorithms suitable as a task for the {@link de.lmu.ifi.dbs.elki.KDDTask} main routine.</p>
+ * <p>Algorithms suitable as a task for the {@link de.lmu.ifi.dbs.elki.KDDTask} main routine.</p>
  * 
  *  The {@link de.lmu.ifi.dbs.elki.KDDTask} main routine expects an algorithm to implement
  *  the {@link de.lmu.ifi.dbs.elki.algorithm.Algorithm}-Interface.

@@ -1,5 +1,5 @@
 /**
- * <p>Package collects parser for different file formats and data types.</p>
+ * <p>Parsers for different file formats and data types.</p>
  * 
  * <p>The general use-case for any parser is to create
  * {@link de.lmu.ifi.dbs.elki.data.DatabaseObject}s out of an

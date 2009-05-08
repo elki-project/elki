@@ -1,4 +1,4 @@
 /**
- * <p>Package to support mathematical operations in various areas.</p> 
+ * <p>Mathematical operations and utilities used throughout the framework.</p> 
  */
 package de.lmu.ifi.dbs.elki.math;

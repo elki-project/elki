@@ -1,5 +1,5 @@
 /**
- * <p>Package collects kernel functions.</p>
+ * <p>Kernel functions.</p>
  * 
  * 
  */

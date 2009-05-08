@@ -1,6 +1,5 @@
 /**
- * <p>Package collects variants of databases and related classes.</p>
- * 
+ * <p>ELKI database layer - loading, storing, indexing and accessing data</p>
  * 
  */
 package de.lmu.ifi.dbs.elki.database;

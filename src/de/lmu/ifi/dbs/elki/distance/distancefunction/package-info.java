@@ -1,5 +1,5 @@
 /**
- * <p>Package collects distance functions.</p>
+ * <p>Distance functions for use within ELKI.</p>
  * 
  * 
  */

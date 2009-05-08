@@ -1,5 +1,5 @@
 /**
- * <p>Provides database connection classes.</p>
+ * <p>Database connections are classes implementing data sources.</p>
  * 
  * 
  */

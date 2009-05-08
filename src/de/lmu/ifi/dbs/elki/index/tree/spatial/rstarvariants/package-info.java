@@ -1,4 +1,4 @@
 /**
- * <p>Package collects variants of the R*-Tree.</p>
+ * <p>R*-Tree and variants.</p>
  */
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants;

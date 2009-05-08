@@ -1,5 +1,4 @@
 /**
- * <p>Package collects classes for persistent data management.
- * </p>
+ * <p>Persistent data management.</p>
  */
 package de.lmu.ifi.dbs.elki.persistent;
