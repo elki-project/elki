@@ -1,8 +1,11 @@
-package experimentalcode.erich.scales;
+package de.lmu.ifi.dbs.elki.test.visualization;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+
+import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
+
 
 /**
  * Test class to test rounding of the linear scale.
