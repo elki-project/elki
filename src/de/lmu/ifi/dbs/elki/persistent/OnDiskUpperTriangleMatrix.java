@@ -1,4 +1,4 @@
-package experimentalcode.erich.cache;
+package de.lmu.ifi.dbs.elki.persistent;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.utilities.ByteArrayUtil;
  * 
  * @author Erich Schubert
  */
-public class UpperTriangleMatrix {
+public class OnDiskUpperTriangleMatrix {
   /**
    * Serial number, also used for generating a magic 
    */
@@ -41,7 +41,7 @@ public class UpperTriangleMatrix {
    * @param writable flag to open writable
    * @throws IOException
    */
-  public UpperTriangleMatrix(File filename, int magicseed, int extraheadersize, int recordsize, boolean writable) throws IOException {
+  public OnDiskUpperTriangleMatrix(File filename, int magicseed, int extraheadersize, int recordsize, boolean writable) throws IOException {
     array = new OnDiskArray(filename, OnDiskArray.mixMagic((int)serialVersionUID, magicseed), extraheadersize + TRIANGLE_HEADER_SIZE, recordsize, writable);
     byte[] header = array.readExtraHeader();
     this.matrixsize = ByteArrayUtil.readInt(header, 0);
@@ -60,7 +60,7 @@ public class UpperTriangleMatrix {
    * @param matrixsize Size of matrix to store
    * @throws IOException
    */
-  public UpperTriangleMatrix(File filename, int magicseed, int extraheadersize, int recordsize, int matrixsize) throws IOException {
+  public OnDiskUpperTriangleMatrix(File filename, int magicseed, int extraheadersize, int recordsize, int matrixsize) throws IOException {
     if (matrixsize >= 0xFFFF) {
       throw new RuntimeException("Matrix size is too big and will overflow the integer datatype.");
     }

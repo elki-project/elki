@@ -1,17 +1,19 @@
-package experimentalcode.erich.cache;
+package de.lmu.ifi.dbs.elki.test.persistent;
 
 import java.io.File;
 import java.io.IOException;
 
 import org.junit.*;
 
+import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
+
 /**
- * Test the on-disk UpperTriangleMatrix class.
+ * Test the on-disk OnDiskUpperTriangleMatrix class.
  * @author Erich Schubert
  *
  */
 // TODO: also test with a static sample file.
-public class TestUpperTriangleMatrix {
+public class TestOnDiskUpperTriangleMatrix {
   File file = new File("UpperTriangleTestFile.test.dat");
 
   /**
@@ -47,7 +49,7 @@ public class TestUpperTriangleMatrix {
     int matsize = 2;
     // Only applicable to the version we are testing.
     final int ODR_HEADER_SIZE = 4 * 4 + 4;
-    UpperTriangleMatrix array = new UpperTriangleMatrix(file, 1, extraheadersize, recsize, matsize);
+    OnDiskUpperTriangleMatrix array = new OnDiskUpperTriangleMatrix(file, 1, extraheadersize, recsize, matsize);
     byte[] record1 = { 31, 41, 59 };
     byte[] record2 = { 26, 53, 58 };
     byte[] record3 = { 97, 93, 1 };
@@ -65,7 +67,7 @@ public class TestUpperTriangleMatrix {
     // validate file size
     Assert.assertEquals("File size doesn't match.", ODR_HEADER_SIZE + extraheadersize + recsize * matsize * (matsize + 1) / 2, file.length());
 
-    UpperTriangleMatrix roarray = new UpperTriangleMatrix(file, 1, extraheadersize, recsize, false);
+    OnDiskUpperTriangleMatrix roarray = new OnDiskUpperTriangleMatrix(file, 1, extraheadersize, recsize, false);
     Assert.assertEquals("Number of records incorrect.", matsize, roarray.getMatrixSize());
     
     Assert.assertArrayEquals("Record 0,0 doesn't match.", record1, roarray.readRecord(0,0));

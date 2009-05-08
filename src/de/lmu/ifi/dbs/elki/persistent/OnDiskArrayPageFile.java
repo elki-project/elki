@@ -1,4 +1,4 @@
-package experimentalcode.erich.cache;
+package de.lmu.ifi.dbs.elki.persistent;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -8,10 +8,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.persistent.Cache;
-import de.lmu.ifi.dbs.elki.persistent.Page;
-import de.lmu.ifi.dbs.elki.persistent.PageFile;
-import de.lmu.ifi.dbs.elki.persistent.PageHeader;
 
 /**
  * A OnDiskArrayPageFile stores objects persistently that implement the

@@ -1,4 +1,4 @@
-package experimentalcode.erich.cache;
+package de.lmu.ifi.dbs.elki.persistent;
 
 import java.io.File;
 import java.io.IOException;

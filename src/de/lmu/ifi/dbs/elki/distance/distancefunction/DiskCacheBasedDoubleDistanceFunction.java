@@ -1,11 +1,11 @@
-package experimentalcode.erich.cache;
+package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import java.io.File;
 import java.io.IOException;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
 import de.lmu.ifi.dbs.elki.utilities.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -38,7 +38,7 @@ public class DiskCacheBasedDoubleDistanceFunction<V extends DatabaseObject> exte
    */
   private final FileParameter MATRIX_PARAM = new FileParameter(MATRIX_ID, FileParameter.FileType.INPUT_FILE);
 
-  private UpperTriangleMatrix cache = null;
+  private OnDiskUpperTriangleMatrix cache = null;
   
   /**
    * Default constructor.
@@ -125,7 +125,7 @@ public class DiskCacheBasedDoubleDistanceFunction<V extends DatabaseObject> exte
     File matrixfile = MATRIX_PARAM.getValue();
 
     try {
-      cache = new UpperTriangleMatrix(matrixfile,DOUBLE_CACHE_MAGIC,0,8,false);
+      cache = new OnDiskUpperTriangleMatrix(matrixfile,DOUBLE_CACHE_MAGIC,0,8,false);
     }
     catch(IOException e) {
       throw new WrongParameterValueException(MATRIX_PARAM, matrixfile.toString(), e);      

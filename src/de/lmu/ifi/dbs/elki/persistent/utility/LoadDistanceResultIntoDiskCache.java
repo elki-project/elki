@@ -1,4 +1,4 @@
-package experimentalcode.erich.cache;
+package de.lmu.ifi.dbs.elki.persistent.utility;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,8 +7,10 @@ import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DiskCacheBasedDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.FileBasedDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
 import de.lmu.ifi.dbs.elki.utilities.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -69,9 +71,9 @@ public class LoadDistanceResultIntoDiskCache extends AbstractWrapper {
     catch(ParameterException e) {
       throw new AbortException("Output filename not given.", e);
     }
-    UpperTriangleMatrix matrix;
+    OnDiskUpperTriangleMatrix matrix;
     try {
-      matrix = new UpperTriangleMatrix(out, DiskCacheBasedDoubleDistanceFunction.DOUBLE_CACHE_MAGIC, 0, 8, matrixsize);
+      matrix = new OnDiskUpperTriangleMatrix(out, DiskCacheBasedDoubleDistanceFunction.DOUBLE_CACHE_MAGIC, 0, 8, matrixsize);
     }
     catch(IOException e) {
       throw new AbortException("Error creating output matrix: " + e.getMessage(), e);

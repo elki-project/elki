@@ -1,4 +1,4 @@
-package experimentalcode.erich.utilities;
+package de.lmu.ifi.dbs.elki.utilities;
 
 import java.util.ArrayList;
 import java.util.HashMap;

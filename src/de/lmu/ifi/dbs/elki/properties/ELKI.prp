@@ -108,6 +108,7 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction=\
   de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionsSelectingEuclideanDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.DirectSupportDependentItemsetDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.DiSHDistanceFunction,\
+  de.lmu.ifi.dbs.elki.distance.distancefunction.DiskCacheBasedDoubleDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.ERiCDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.FileBasedDoubleDistanceFunction,\

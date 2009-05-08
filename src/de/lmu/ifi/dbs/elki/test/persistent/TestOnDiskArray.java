@@ -1,9 +1,11 @@
-package experimentalcode.erich.cache;
+package de.lmu.ifi.dbs.elki.test.persistent;
 
 import java.io.File;
 import java.io.IOException;
 
 import org.junit.*;
+
+import de.lmu.ifi.dbs.elki.persistent.OnDiskArray;
 
 /**
  * Test to validate proper OnDiskArray operation.
