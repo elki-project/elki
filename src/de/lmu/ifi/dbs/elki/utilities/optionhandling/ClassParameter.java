@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 
+import java.util.Iterator;
+
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.properties.PropertyName;
@@ -15,7 +17,7 @@ public class ClassParameter<C> extends Parameter<String, String> {
   /**
    * Logger
    */
-  private Logging logger = Logging.getLogger(ClassParameter.class);
+  protected static Logging logger = Logging.getLogger(ClassParameter.class);
 
   /**
    * The restriction class for this class parameter.
@@ -233,6 +235,79 @@ public class ClassParameter<C> extends Parameter<String, String> {
   public String getValuesDescription() {
     return restrictionString(getRestrictionClass());
   }
+  
+  public IterateKnownImplementations getKnownImplementations() {
+    return new IterateKnownImplementations(getRestrictionClass());
+  }
+  
+  public static class IterateKnownImplementations implements Iterator<Class<?>>, Iterable<Class<?>> {
+    int index = 0;
+    String[] classNames = null;
+    Class<?> sclass = null;
+    Class<?> cur = null;
+    
+    public IterateKnownImplementations(Class<?> superclass) {
+      PropertyName propertyName = PropertyName.getOrCreatePropertyName(superclass);
+      if(propertyName == null) {
+        logger.warning("Could not create PropertyName for " + superclass.toString());
+        return;
+      }
+      this.sclass = superclass;
+      this.classNames = Properties.ELKI_PROPERTIES.getProperty(propertyName);
+      findNext();
+    }
+    
+    private void findNext() {
+      if (classNames == null) {
+        return;
+      }
+      cur = null;
+      for(;index < classNames.length; index++) {
+        // skip commented classes.
+        if (classNames[index].charAt(0) == '#') {
+          continue;
+        }
+        try {
+          cur = Class.forName(classNames[index]);
+        }
+        catch(ClassNotFoundException e) {
+          logger.warning("Class "+classNames[index]+" (from properties file) not found for superclass "+this.sclass.getName());
+          continue;
+        }
+        if(!this.sclass.isAssignableFrom(cur)) {
+          logger.warning("Class "+classNames[index]+" (from properties file) is not a subclass of "+this.sclass.getName());
+          continue;          
+        }
+        // last iteration - matched!
+        {
+          index++;
+          break;
+        }
+      }
+    }
+
+    @Override
+    public boolean hasNext() {
+      return cur != null;
+    }
+
+    @Override
+    public Class<?> next() {
+      Class<?> ret = cur;
+      findNext();
+      return ret;
+    }
+
+    @Override
+    public void remove() {
+      throw new UnsupportedOperationException(); 
+    }
+
+    @Override
+    public Iterator<Class<?>> iterator() {
+      return this;
+    }
+  }
 
   /**
    * Provides a description string listing all classes for the given superclass
@@ -252,56 +327,21 @@ public class ClassParameter<C> extends Parameter<String, String> {
       info.append("Extending ");
     }
     info.append(superclass.getName());
-    PropertyName propertyName = PropertyName.getOrCreatePropertyName(superclass);
-    if(propertyName == null) {
-      logger.warning("Could not create PropertyName for " + superclass.toString());
-    }
-    else {
-      String[] classNames = Properties.ELKI_PROPERTIES.getProperty(propertyName);
-      if(classNames.length > 0) {
-        info.append(FormatUtil.NEWLINE);
-        info.append("Known classes (default package " + prefix + "):");
-        info.append(FormatUtil.NEWLINE);
-        for(String name : classNames) {
-          // skip commented classes.
-          if (name.charAt(0) == '#') {
-            continue;
-          }
-          try {
-            if(superclass.isAssignableFrom(Class.forName(name))) {
-              info.append("->" + NONBREAKING_SPACE);
-              if(name.startsWith(prefix)) {
-                info.append(name.substring(prefix.length()));
-              }
-              else {
-                info.append(name);
-              }
-              info.append(FormatUtil.NEWLINE);
-            }
-            else {
-              logger.warning("Invalid classname \"" + name + "\" for property \"" + propertyName.getName() + "\" of class \"" + propertyName.getType().getName() + "\" in property-file\n");
-            }
-          }
-          catch(ClassNotFoundException e) {
-            logger.warning("Invalid classname \"" + name + "\" for property \"" + propertyName.getName() + "\" of class \"" + propertyName.getType().getName() + "\" in property-file - " + e.getMessage() + " - " + e.getClass().getName() + "\n");
-          }
-          catch(ClassCastException e) {
-            logger.warning("Invalid classname \"" + name + "\" for property \"" + propertyName.getName() + "\" of class \"" + propertyName.getType().getName() + "\" in property-file - " + e.getMessage() + " - " + e.getClass().getName() + "\n");
-          }
-          catch(NullPointerException e) {
-            if(logger.isDebuggingFinest()) {
-              logger.debugFinest(e.getClass().getName() + ": " + e.getMessage());
-            }
-          }
-          catch(Exception e) {
-            logger.exception("Exception building class restriction string.", e);
-          }
+    IterateKnownImplementations known = getKnownImplementations();
+    if (known.hasNext()) {
+      info.append(FormatUtil.NEWLINE);
+      info.append("Known classes (default package " + prefix + "):");
+      info.append(FormatUtil.NEWLINE);
+      for (Class<?> c : known) {
+        info.append("->" + NONBREAKING_SPACE);
+        String name = c.getName();
+        if(name.startsWith(prefix)) {
+          info.append(name.substring(prefix.length()));
         }
-      }
-      else {
-        if(logger.isDebugging()) {
-          logger.debug("Not found properties for property name: " + propertyName.getName() + "\n");
+        else {
+          info.append(name);
         }
+        info.append(FormatUtil.NEWLINE);
       }
     }
     return info.toString();

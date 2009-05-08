@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter.IterateKnownImplementations;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 public class DocumentParameters {
@@ -36,11 +37,21 @@ public class DocumentParameters {
 
   private static final String HEADER_DEFAULT_VALUE = "Default: ";
 
+  private static final String NO_DEFAULT_VALUE = "No default value.";
+
   private static final String HEADER_CLASS_RESTRICTION = "Class Restriction: ";
+
+  private static final String HEADER_CLASS_RESTRICTION_IMPLEMENTING = "implements ";
+
+  private static final String HEADER_CLASS_RESTRICTION_EXTENDING = "extends ";
+
+  private static final String NO_CLASS_RESTRICTION = "No class restriction.";
 
   private static final String CSSFILE = "stylesheet.css";
 
   private static final String MODIFICATION_WARNING = "WARNING: THIS DOCUMENT IS AUTOMATICALLY GENERATED. MODIFICATIONS MAY GET LOST.";
+
+  private static final String HEADER_KNOWN_IMPLEMENTATIONS = "Known implementations: ";
 
   /**
    * @param args
@@ -253,11 +264,11 @@ public class DocumentParameters {
         elemdd.appendChild(elemp);
         // class restriction?
         if(opt instanceof ClassParameter<?>) {
-          appendClassRestriction(htmldoc, opt, elemdd);
+          appendClassRestriction(htmldoc, (ClassParameter<?>) opt, elemdd);
         }
         // default value? completions?
         if(opt instanceof Parameter<?, ?>) {
-          appendDefaultValueIfSet(htmldoc, opt, elemdd);
+          appendDefaultValueIfSet(htmldoc, (Parameter<?, ?>) opt, elemdd);
         }
         classdl.appendChild(elemdd);
       }
@@ -350,41 +361,58 @@ public class DocumentParameters {
       }
       // class restriction?
       if(firstopt instanceof ClassParameter<?>) {
-        appendClassRestriction(htmldoc, firstopt, optdd);
+        appendClassRestriction(htmldoc, (ClassParameter<?>) firstopt, optdd);
       }
-      // default value? completions?
+      // default value?
       if(firstopt instanceof Parameter<?, ?>) {
-        appendDefaultValueIfSet(htmldoc, firstopt, optdd);
+        appendDefaultValueIfSet(htmldoc, (Parameter<?, ?>) firstopt, optdd);
+      }
+      // known values?
+      if(firstopt instanceof ClassParameter<?>) {
+        appendKnownImplementationsIfNonempty(htmldoc, (ClassParameter<?>) firstopt, optdd);
       }
       maindl.appendChild(optdd);
       // nested definition list for options
       Element classesul = htmldoc.createElement(HTMLUtil.HTML_UL_TAG);
-      optdd.appendChild(htmldoc.createTextNode(HEADER_PARAMETER_FOR));
+      {
+        Element p = htmldoc.createElement(HTMLUtil.HTML_P_TAG);
+        p.appendChild(htmldoc.createTextNode(HEADER_PARAMETER_FOR));
+        optdd.appendChild(p);
+      }
       optdd.appendChild(classesul);
-      for(Pair<Option<?>, Class<?>> cls : byopt.get(oid)) {
+      for(Pair<Option<?>, Class<?>> clinst : byopt.get(oid)) {
         // DT definition term: option name, in TT for typewriter optics
         Element classli = htmldoc.createElement(HTMLUtil.HTML_LI_TAG);
 
         // Link back to original class
         {
           Element classa = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
-          classa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkForClassName(cls.getSecond().getName()));
-          classa.setTextContent(cls.getSecond().getName());
+          classa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkForClassName(clinst.getSecond().getName()));
+          classa.setTextContent(clinst.getSecond().getName());
           classli.appendChild(classa);
         }
-        if(cls.getFirst() instanceof ClassParameter<?> && firstopt instanceof ClassParameter<?>) {
-          if(((ClassParameter<?>) cls.getFirst()).getRestrictionClass() != null) {
+        if(clinst.getFirst() instanceof ClassParameter<?> && firstopt instanceof ClassParameter<?>) {
+          ClassParameter<?> cls = (ClassParameter<?>) clinst.getFirst();
+          if(cls.getRestrictionClass() != null) {
             // TODO: if it is null, it could still be different!
-            if(!((ClassParameter<?>) cls.getFirst()).getRestrictionClass().equals(((ClassParameter<?>) firstopt).getRestrictionClass())) {
-              appendClassRestriction(htmldoc, cls.getFirst(), classli);
+            if(!cls.getRestrictionClass().equals(((ClassParameter<?>) firstopt).getRestrictionClass())) {
+              appendClassRestriction(htmldoc, cls, classli);
             }
           }
+          else {
+            appendNoClassRestriction(htmldoc, classli);
+          }
         }
-        if(cls.getFirst() instanceof Parameter<?, ?> && firstopt instanceof Parameter<?, ?>) {
-          if(((Parameter<?, ?>) cls.getFirst()).getDefaultValue() != null) {
-            // TODO: if it is null, it could still be different!
-            if(!((Parameter<?, ?>) cls.getFirst()).getDefaultValue().equals(((Parameter<?, ?>) firstopt).getDefaultValue())) {
-              appendDefaultValueIfSet(htmldoc, cls.getFirst(), classli);
+        if(clinst.getFirst() instanceof Parameter<?, ?> && firstopt instanceof Parameter<?, ?>) {
+          Parameter<?, ?> param = (Parameter<?, ?>) clinst.getFirst();
+          if(param.getDefaultValue() != null) {
+            if(!param.getDefaultValue().equals(((Parameter<?, ?>) firstopt).getDefaultValue())) {
+              appendDefaultValueIfSet(htmldoc, param, classli);
+            }
+          }
+          else {
+            if(((Parameter<?, ?>) firstopt).getDefaultValue() != null) {
+              appendNoDefaultValue(htmldoc, classli);
             }
           }
         }
@@ -402,30 +430,73 @@ public class DocumentParameters {
     p.appendChild(defa);
   }
 
-  private static void appendClassRestriction(Document htmldoc, Option<?> opt, Element elemdd) {
+  private static void appendClassRestriction(Document htmldoc, ClassParameter<?> opt, Element elemdd) {
     Element p = htmldoc.createElement(HTMLUtil.HTML_P_TAG);
     p.appendChild(htmldoc.createTextNode(HEADER_CLASS_RESTRICTION));
+    if(opt.getRestrictionClass().isInterface()) {
+      p.appendChild(htmldoc.createTextNode(HEADER_CLASS_RESTRICTION_IMPLEMENTING));
+    }
+    else {
+      p.appendChild(htmldoc.createTextNode(HEADER_CLASS_RESTRICTION_EXTENDING));
+    }
     Element defa = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
-    defa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkForClassName(((ClassParameter<?>) opt).getRestrictionClass().getName()));
-    defa.setTextContent(((ClassParameter<?>) opt).getRestrictionClass().getName());
+    defa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkForClassName(opt.getRestrictionClass().getName()));
+    defa.setTextContent(opt.getRestrictionClass().getName());
     p.appendChild(defa);
     elemdd.appendChild(p);
   }
 
-  private static void appendDefaultValueIfSet(Document htmldoc, Option<?> opt, Element optdd) {
-    Parameter<?, ?> par = (Parameter<?, ?>) opt;
+  private static void appendNoClassRestriction(Document htmldoc, Element elemdd) {
+    Element p = htmldoc.createElement(HTMLUtil.HTML_P_TAG);
+    p.appendChild(htmldoc.createTextNode(HEADER_CLASS_RESTRICTION));
+    p.appendChild(htmldoc.createTextNode(NO_CLASS_RESTRICTION));
+    elemdd.appendChild(p);
+  }
+
+  private static void appendKnownImplementationsIfNonempty(Document htmldoc, ClassParameter<?> opt, Element elemdd) {
+    IterateKnownImplementations iter = opt.getKnownImplementations();
+    if(iter.hasNext()) {
+      String prefix = opt.getRestrictionClass().getPackage().getName() + ".";
+      Element p = htmldoc.createElement(HTMLUtil.HTML_P_TAG);
+      p.appendChild(htmldoc.createTextNode(HEADER_KNOWN_IMPLEMENTATIONS));
+      elemdd.appendChild(p);
+      Element ul = htmldoc.createElement(HTMLUtil.HTML_UL_TAG);
+      for(Class<?> c : iter) {
+        Element li = htmldoc.createElement(HTMLUtil.HTML_LI_TAG);
+        Element defa = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
+        defa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkForClassName(c.getName()));
+        String visname = c.getName();
+        if(visname.startsWith(prefix)) {
+          visname = visname.substring(prefix.length());
+        }
+        defa.setTextContent(visname);
+        li.appendChild(defa);
+        ul.appendChild(li);
+      }
+      elemdd.appendChild(ul);
+    }
+  }
+
+  private static void appendDefaultValueIfSet(Document htmldoc, Parameter<?, ?> par, Element optdd) {
     if(par.hasDefaultValue()) {
       Element p = htmldoc.createElement(HTMLUtil.HTML_P_TAG);
-      Object def = par.getDefaultValue();
       p.appendChild(htmldoc.createTextNode(HEADER_DEFAULT_VALUE));
-      if(opt instanceof ClassParameter<?>) {
-        appendClassLink(htmldoc, opt, p);
+      if(par instanceof ClassParameter<?>) {
+        appendClassLink(htmldoc, par, p);
       }
       else {
+        Object def = par.getDefaultValue();
         p.appendChild(htmldoc.createTextNode(def.toString()));
       }
       optdd.appendChild(p);
     }
+  }
+
+  private static void appendNoDefaultValue(Document htmldoc, Element optdd) {
+    Element p = htmldoc.createElement(HTMLUtil.HTML_P_TAG);
+    p.appendChild(htmldoc.createTextNode(HEADER_DEFAULT_VALUE));
+    p.appendChild(htmldoc.createTextNode(NO_DEFAULT_VALUE));
+    optdd.appendChild(p);
   }
 
   private static String linkForClassName(String name) {
