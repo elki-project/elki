@@ -74,9 +74,9 @@ public final class Properties {
   }
   
   /**
-   * Get a collection of all property names in this object.
+   * Get a collection of all property names in this file.
    * 
-   * @return
+   * @return Property names in this file.
    */
   public Set<String> getPropertyNames() {
     return properties.stringPropertyNames();

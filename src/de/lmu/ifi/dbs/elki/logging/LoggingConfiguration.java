@@ -76,7 +76,8 @@ public final class LoggingConfiguration {
   /**
    * Load a configuration file.
    * 
-   * @param cfgfile
+   * @param pkg Package name to look in
+   * @param name File name
    */
   private void loadConfigurationPrivate(final String pkg, final String name) {
     final Logger logger = Logger.getLogger(LoggingConfiguration.class.getName());

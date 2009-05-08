@@ -239,7 +239,7 @@ public class ClassParameter<C> extends Parameter<String, String> {
   /**
    * Get an iterator over all known implementations of the class restriction.
    * 
-   * @return {@link java.lang.Iterable<String>} and {@link java.util.Iterator<String>}
+   * @return {@link java.lang.Iterable Iterable} and {@link java.util.Iterator Iterator} object
    */
   public IterateKnownImplementations getKnownImplementations() {
     return new IterateKnownImplementations(getRestrictionClass());

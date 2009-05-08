@@ -142,12 +142,12 @@ public class OutputStreamLogger extends OutputStreamWriter {
   }
 
   /**
-   * Count the number of non-newline character in the string.
+   * Count the number of non-newline characters before first newline in the string.
    * 
    * @param cbuf character buffer
    * @param off offset
    * @param len length
-   * @return
+   * @return number of non-newline characters
    */
   private int countNonNewline(char[] cbuf, int off, int len) {
     for(int cnt = 0; cnt < len; cnt++) {
@@ -163,12 +163,12 @@ public class OutputStreamLogger extends OutputStreamWriter {
   }
 
   /**
-   * Count the number of non-newline character in the string.
+   * Count the number of non-newline characters before first newline in the string.
    * 
    * @param str String
    * @param off offset
    * @param len length
-   * @return
+   * @return number of non-newline characters
    */
   private int countNonNewline(String str, int off, int len) {
     for(int cnt = 0; cnt < len; cnt++) {
