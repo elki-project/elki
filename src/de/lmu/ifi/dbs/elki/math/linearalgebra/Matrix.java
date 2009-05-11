@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 import de.lmu.ifi.dbs.elki.data.RationalNumber;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.math.Mathutil;
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 
 /**
  * The Matrix Class represents real-valued matrices.

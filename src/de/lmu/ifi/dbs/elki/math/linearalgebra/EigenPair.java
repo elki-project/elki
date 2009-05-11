@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 
 /**
  * Helper class which encapsulates an eigenvector and its corresponding

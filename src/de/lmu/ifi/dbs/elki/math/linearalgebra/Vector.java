@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
 import java.text.NumberFormat;
 
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 
 /**
  * Provides a vector object that encapsulates an m x 1 - matrix object.

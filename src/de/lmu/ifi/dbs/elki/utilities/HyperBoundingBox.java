@@ -7,6 +7,8 @@ import java.io.ObjectOutput;
 import java.text.NumberFormat;
 import java.util.Arrays;
 
+import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
+
 /**
  * HyperBoundingBox represents a hyperrectangle in the multidimensional space.
  *

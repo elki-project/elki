@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.utilities.output;
 import java.util.Vector;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
  * Class for formatting output into table.

@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.utilities;
 
+import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
+
 /**
  * Represents an interval in a certain dimension of the data space.
  *
