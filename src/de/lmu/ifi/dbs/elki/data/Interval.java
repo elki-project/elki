@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.utilities;
+package de.lmu.ifi.dbs.elki.data;
 
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 

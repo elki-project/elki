@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
+import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
 
 import java.util.ArrayList;
 import java.util.Collections;

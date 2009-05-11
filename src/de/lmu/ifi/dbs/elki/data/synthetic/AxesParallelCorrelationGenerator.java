@@ -12,7 +12,6 @@ import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.utilities.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
@@ -25,6 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalListSizeCo
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualGlobalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.wrapper.StandAloneWrapper;
 
 /**

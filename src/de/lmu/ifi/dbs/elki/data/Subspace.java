@@ -1,6 +1,5 @@
-package de.lmu.ifi.dbs.elki.utilities;
+package de.lmu.ifi.dbs.elki.data;
 
-import de.lmu.ifi.dbs.elki.data.RealVector;
 
 import java.util.Iterator;
 import java.util.SortedSet;

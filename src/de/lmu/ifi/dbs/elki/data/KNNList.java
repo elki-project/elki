@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.utilities;
+package de.lmu.ifi.dbs.elki.data;
 
 import java.util.ArrayList;
 import java.util.Iterator;

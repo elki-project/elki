@@ -10,13 +10,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
+import de.lmu.ifi.dbs.elki.data.Interval;
 import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.Subspace;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
-import de.lmu.ifi.dbs.elki.utilities.Interval;
-import de.lmu.ifi.dbs.elki.utilities.Subspace;
 
 /**
  * Represents a subspace of the original dataspace in the CLIQUE algorithm.

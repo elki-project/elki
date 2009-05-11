@@ -4,7 +4,10 @@ package de.lmu.ifi.dbs.elki.distance;
  * An abstract distance implements equals conveniently for any extending class.
  * At the same time any extending class is to implement hashCode properly.
  *
+ * See {@link de.lmu.ifi.dbs.elki.distance.DistanceUtil} for related utility functions such as <code>min</code>, <code>max</code>.
+ *
  * @author Arthur Zimek
+ * @see de.lmu.ifi.dbs.elki.distance.DistanceUtil
  * @param <D> the (final) type of Distance used
  */
 public abstract class AbstractDistance<D extends AbstractDistance<D>> implements Distance<D> {

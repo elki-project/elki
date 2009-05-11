@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.clique;
 
+import de.lmu.ifi.dbs.elki.data.Interval;
 import de.lmu.ifi.dbs.elki.data.RealVector;
-import de.lmu.ifi.dbs.elki.utilities.Interval;
 
 import java.util.Collection;
 import java.util.HashMap;

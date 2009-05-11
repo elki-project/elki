@@ -5,8 +5,11 @@ import java.io.Externalizable;
 
 /**
  * The interface Distance defines the requirements of any instance class.
+ * 
+ * See {@link de.lmu.ifi.dbs.elki.distance.DistanceUtil} for related utility functions such as <code>min</code>, <code>max</code>.
  *
  * @author Arthur Zimek
+ * @see de.lmu.ifi.dbs.elki.distance.DistanceUtil
  * @param <D> the type of Distance used
  */
 public interface Distance<D extends Distance<D>> extends Comparable<D>, Externalizable {

@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.utilities;
+package de.lmu.ifi.dbs.elki.utilities.progress;
 
 /**
  * A progress object for a given overall number of items to process. The number
