@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.evaluation.holdout;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public class LeaveOneOut<O extends DatabaseObject, L extends ClassLabel> extends
         this.database = database;
         setClassLabels(database);
         int size = database.size();
-        TrainingAndTestSet<O, L>[] partitions = TrainingAndTestSet.newArray(size);
+        TrainingAndTestSet<O, L>[] partitions = ClassGenericsUtil.newArrayOfNull(size);
         List<Integer> ids = database.getIDs();
         for (int i = 0; i < size; i++) {
             Map<Integer, List<Integer>> partition = new HashMap<Integer, List<Integer>>();

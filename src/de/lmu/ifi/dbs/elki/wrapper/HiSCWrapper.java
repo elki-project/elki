@@ -53,9 +53,8 @@ public class HiSCWrapper<O extends DatabaseObject> extends FileBasedDatabaseConn
      *
      * @param args the arguments to run this wrapper
      */
-    @SuppressWarnings("unchecked")
     public static void main(String[] args) {
-        new HiSCWrapper().runCLIWrapper(args);
+        new HiSCWrapper<DatabaseObject>().runCLIWrapper(args);
     }
 
     /**

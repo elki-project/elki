@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -68,7 +69,7 @@ public class ProvidedTestSet<O extends DatabaseObject, L extends ClassLabel> ext
         for (L label : this.labels) {
             joinedLabels.add(label);
         }
-        this.labels = joinedLabels.toArray((L[]) new ClassLabel[joinedLabels.size()]);
+        this.labels = ClassGenericsUtil.toArray((Set<L>)joinedLabels);
         Arrays.sort(this.labels);
         split[0] = new TrainingAndTestSet(this.database, testset, labels);
         return split;

@@ -70,9 +70,8 @@ public class ERiCWrapper<O extends DatabaseObject> extends NormalizationWrapper<
      *
      * @param args the arguments to run this wrapper
      */
-    @SuppressWarnings("unchecked")
     public static void main(String[] args) {
-        new ERiCWrapper().runCLIWrapper(args);
+        new ERiCWrapper<DatabaseObject>().runCLIWrapper(args);
     }
 
     /**

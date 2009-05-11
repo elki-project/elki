@@ -42,9 +42,8 @@ public class OPTICSWrapper<O extends DatabaseObject> extends NormalizationWrappe
      *
      * @param args the arguments to run this wrapper
      */
-    @SuppressWarnings("unchecked")
     public static void main(String[] args) {
-        new OPTICSWrapper().runCLIWrapper(args);
+        new OPTICSWrapper<DatabaseObject>().runCLIWrapper(args);
     }
 
     /**

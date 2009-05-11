@@ -52,9 +52,8 @@ public class ORCLUSWrapper<O extends DatabaseObject> extends FileBasedDatabaseCo
      *
      * @param args the arguments to run this wrapper
      */
-    @SuppressWarnings("unchecked")
     public static void main(String[] args) {
-        new ORCLUSWrapper().runCLIWrapper(args);
+        new ORCLUSWrapper<DatabaseObject>().runCLIWrapper(args);
     }
 
     /**

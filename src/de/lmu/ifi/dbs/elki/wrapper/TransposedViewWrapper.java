@@ -1,5 +1,13 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.util.Iterator;
+import java.util.List;
+
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
@@ -9,13 +17,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * This wrapper class reads s data file and writes the transposed view of the
@@ -44,9 +45,8 @@ public class TransposedViewWrapper<V extends RealVector<V, ?>> extends StandAlon
    * 
    * @param args the arguments to run this wrapper
    */
-  @SuppressWarnings("unchecked")
   public static void main(String[] args) {
-    new TransposedViewWrapper().runCLIWrapper(args);
+    new TransposedViewWrapper<DoubleVector>().runCLIWrapper(args);
   }
 
   /**

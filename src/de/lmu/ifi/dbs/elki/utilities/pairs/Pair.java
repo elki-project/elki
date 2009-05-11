@@ -2,6 +2,8 @@ package de.lmu.ifi.dbs.elki.utilities.pairs;
 
 import java.util.Comparator;
 
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+
 /**
  * Generic SimplePair<FIRST,SECOND> class.
  * 
@@ -87,9 +89,8 @@ public class Pair<FIRST, SECOND> {
    * @param size array size
    * @return empty array of the new type.
    */
-  @SuppressWarnings("unchecked")
   public static final <F, S> Pair<F, S>[] newArray(int size) {
-    return new Pair[size];
+    return ClassGenericsUtil.newArrayOfNull(size);
   }
 
   /**

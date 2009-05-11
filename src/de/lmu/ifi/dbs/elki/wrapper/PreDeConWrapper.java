@@ -51,9 +51,8 @@ public class PreDeConWrapper<O extends DatabaseObject> extends NormalizationWrap
      *
      * @param args the arguments to run this wrapper
      */
-    @SuppressWarnings("unchecked")
     public static void main(String[] args) {
-        new PreDeConWrapper().runCLIWrapper(args);
+        new PreDeConWrapper<DatabaseObject>().runCLIWrapper(args);
     }
 
     /**

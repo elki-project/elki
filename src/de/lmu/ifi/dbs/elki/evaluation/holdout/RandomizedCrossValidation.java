@@ -8,6 +8,7 @@ import java.util.Map;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -60,7 +61,7 @@ public class RandomizedCrossValidation<O extends DatabaseObject, L extends Class
     public TrainingAndTestSet<O, L>[] partition(Database<O> database) {
         this.database = database;
         setClassLabels(database);
-        TrainingAndTestSet<O, L>[] partitions = TrainingAndTestSet.newArray(nfold);
+        TrainingAndTestSet<O, L>[] partitions = ClassGenericsUtil.newArrayOfNull(nfold);
         List<Integer> ids = database.getIDs();
         for (int i = 0; i < nfold; i++) {
             List<Integer> training = new ArrayList<Integer>();

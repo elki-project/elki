@@ -31,7 +31,6 @@ public interface PreprocessorClient extends Parameterizable {
      *
      * @return the super class for the preprocessor parameter
      */
-    @SuppressWarnings("unchecked")
     Class<? extends Preprocessor> getPreprocessorSuperClass();
 
     /**

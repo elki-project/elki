@@ -76,9 +76,8 @@ public class HiCOWrapper<O extends DatabaseObject> extends NormalizationWrapper<
      *
      * @param args the arguments to run this wrapper
      */
-    @SuppressWarnings("unchecked")
     public static void main(String[] args) {
-        new HiCOWrapper().runCLIWrapper(args);
+        new HiCOWrapper<DatabaseObject>().runCLIWrapper(args);
     }
 
     /**

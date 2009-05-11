@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -40,10 +41,9 @@ public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Di
     // todo arthur comment
     private CorrelationAnalysisSolution<V>[] model;
 
-    @SuppressWarnings("unchecked")
     public void buildClassifier(Database<V> database, L[] classLabels) throws IllegalStateException {
         setLabels(classLabels);
-        model = new CorrelationAnalysisSolution[classLabels.length];
+        model = ClassGenericsUtil.newArrayOfNull(classLabels.length);
 
         // init partitions
         Map<Integer, List<Integer>> partitions = new Hashtable<Integer, List<Integer>>();

@@ -53,9 +53,8 @@ public class PROCLUSWrapper<O extends DatabaseObject> extends FileBasedDatabaseC
      *
      * @param args the arguments to run this wrapper
      */
-    @SuppressWarnings("unchecked")
     public static void main(String[] args) {
-        new PROCLUSWrapper().runCLIWrapper(args);
+        new PROCLUSWrapper<DatabaseObject>().runCLIWrapper(args);
     }
 
     /**

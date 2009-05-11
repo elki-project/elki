@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.evaluation.holdout;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 
 /**
  * Wrapper to hold a pair of training and test data sets.
@@ -79,8 +80,7 @@ public class TrainingAndTestSet<O extends DatabaseObject, L extends ClassLabel>
      * @param len array length
      * @return new array of the given size.
      */
-    @SuppressWarnings("unchecked")
     public static <O extends DatabaseObject, L extends ClassLabel> TrainingAndTestSet<O,L>[] newArray(int len) {
-      return (TrainingAndTestSet<O, L>[]) new TrainingAndTestSet<?,?>[len];
+      return ClassGenericsUtil.newArrayOfNull(len);
     }
 }

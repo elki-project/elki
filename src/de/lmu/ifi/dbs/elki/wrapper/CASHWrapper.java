@@ -41,9 +41,8 @@ public class CASHWrapper<O extends DatabaseObject> extends FileBasedDatabaseConn
      *
      * @param args the arguments to run this wrapper
      */
-    @SuppressWarnings("unchecked")
     public static void main(String[] args) {
-        new CASHWrapper().runCLIWrapper(args);
+        new CASHWrapper<DatabaseObject>().runCLIWrapper(args);
     }
 
     /**

@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.utilities.pairs;
 
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+
 /**
  * Triple with canonical comparison function.
  * 
@@ -69,8 +71,7 @@ public final class CTriple<FIRST extends Comparable<FIRST>,SECOND extends Compar
    * @param size Size of array to be constructed.
    * @return New array of requested size
    */
-  @SuppressWarnings("unchecked")
   public static final <F extends Comparable<F>,S extends Comparable<S>, T extends Comparable<T>> CTriple<F,S,T>[] newArray(int size) {
-    return new CTriple[size];
+    return ClassGenericsUtil.newArrayOfNull(size);
   }
 }

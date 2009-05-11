@@ -21,9 +21,8 @@ public class DependencyDerivatorWrapper<O extends DatabaseObject> extends FileBa
      *
      * @param args the arguments to run this wrapper
      */
-    @SuppressWarnings("unchecked")
     public static void main(String[] args) {
-        new DependencyDerivatorWrapper().runCLIWrapper(args);
+        new DependencyDerivatorWrapper<DatabaseObject>().runCLIWrapper(args);
     }
 
     @Override

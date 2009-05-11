@@ -48,9 +48,8 @@ public class DBSCANWrapper<O extends DatabaseObject> extends NormalizationWrappe
      *
      * @param args the arguments to run this wrapper
      */
-    @SuppressWarnings("unchecked")
     public static void main(String[] args) {
-        new DBSCANWrapper().runCLIWrapper(args);
+        new DBSCANWrapper<DatabaseObject>().runCLIWrapper(args);
     }
 
      /**

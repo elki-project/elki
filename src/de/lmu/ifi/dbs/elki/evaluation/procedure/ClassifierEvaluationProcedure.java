@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.evaluation.holdout.StratifiedCrossValidation;
 import de.lmu.ifi.dbs.elki.evaluation.holdout.TrainingAndTestSet;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
@@ -101,7 +102,7 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
   public EvaluationResult<O, C> evaluate(Database<O> test, C algorithm) throws IllegalStateException {
     SortedSet<ClassLabel> lbls = DatabaseUtil.getClassLabels(test);
     // todo: ugly cast.
-    this.labels = lbls.toArray((L[]) new Object[lbls.size()]);
+    this.labels = ClassGenericsUtil.toArray((SortedSet<L>)lbls);
     this.partition = holdout.partition(test);
     
     // TODO: add support for predefined test and training pairs!

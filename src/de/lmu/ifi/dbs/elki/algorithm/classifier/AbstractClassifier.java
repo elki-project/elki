@@ -6,6 +6,7 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 
 /**
@@ -22,8 +23,7 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
      * Holds the available labels. Should be set by the training method
      * {@link Classifier#buildClassifier(de.lmu.ifi.dbs.elki.database.Database,de.lmu.ifi.dbs.elki.data.ClassLabel[])}
      */
-    @SuppressWarnings("unchecked")
-    private L[] labels = (L[]) new ClassLabel[0];
+    private L[] labels = ClassGenericsUtil.newArrayOfNull(0);
 
     /**
      * Provides a classification for a given instance. The classification is the

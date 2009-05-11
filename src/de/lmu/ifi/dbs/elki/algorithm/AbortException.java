@@ -5,8 +5,12 @@ package de.lmu.ifi.dbs.elki.algorithm;
  * 
  * @author Arthur Zimek
  */
-@SuppressWarnings("serial")
 public class AbortException extends RuntimeException {
+  /**
+   * Serial UID.
+   */
+  private static final long serialVersionUID = -1128409354869276998L;
+
   /**
    * Exception for aborting some process and transporting a message.
    * 

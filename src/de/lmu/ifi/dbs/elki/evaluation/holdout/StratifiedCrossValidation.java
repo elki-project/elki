@@ -61,25 +61,19 @@ public class StratifiedCrossValidation<O extends DatabaseObject, L extends Class
         this.database = database;
         setClassLabels(database);
 
-        List<Integer>[] classBuckets = ClassGenericsUtil.newArrayOfArrayList(this.labels.length);
-        for (int i = 0; i < classBuckets.length; i++) {
-            classBuckets[i] = new ArrayList<Integer>();
-        }
+        List<Integer>[] classBuckets = ClassGenericsUtil.newArrayOfEmptyArrayList(this.labels.length);
         for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
             Integer id = iter.next();
             int classIndex = Arrays.binarySearch(labels, database.getAssociation(CLASS, id));
             classBuckets[classIndex].add(id);
         }
-        List<Integer>[] folds = ClassGenericsUtil.newArrayOfArrayList(nfold);
-        for (int i = 0; i < folds.length; i++) {
-            folds[i] = new ArrayList<Integer>();
-        }
+        List<Integer>[] folds = ClassGenericsUtil.newArrayOfEmptyArrayList(nfold);
         for (List<Integer> bucket : classBuckets) {
             for (int i = 0; i < bucket.size(); i++) {
                 folds[i % nfold].add(bucket.get(i));
             }
         }
-        TrainingAndTestSet<O, L>[] partitions = TrainingAndTestSet.newArray(nfold);
+        TrainingAndTestSet<O, L>[] partitions = ClassGenericsUtil.newArrayOfNull(nfold);
         for (int i = 0; i < nfold; i++) {
             Map<Integer, List<Integer>> partition = new HashMap<Integer, List<Integer>>();
             List<Integer> training = new ArrayList<Integer>();

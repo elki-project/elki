@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.utilities.pairs;
 
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+
 /**
  * Triple without comparison.
  * 
@@ -111,9 +113,8 @@ public class Triple<FIRST, SECOND, THIRD> {
    * @param size Size of array to be constructed.
    * @return new array of the requested size.
    */
-  @SuppressWarnings("unchecked")
   public static final <F, S, T> Triple<F, S, T>[] newArray(int size) {
-    return new Triple[size];
+    return ClassGenericsUtil.newArrayOfNull(size);
   }
 
   /**

@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.elki.utilities;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * <p>Utils for handling class instantiation especially with respect to Java generics.</p>
@@ -105,45 +105,64 @@ public final class ClassGenericsUtil {
   }
 
   /**
-   * Create an array of lists.
+   * Create an array (of null values) 
    * 
-   * This is a common unchecked cast we have to do due to Java generics limitations.
+   * This is a common unchecked cast we have to do due to Java Generics limitations.
    * 
-   * @param <T> Type the list elements have
+   * @param <T> Type the array elements have
    * @param len array size
-   * @return new array of lists
+   * @return new array of null pointers.
    */
   @SuppressWarnings("unchecked")
-  public static <T> List<T>[] newArrayOfList(int len) {
-    return new List[len];
+  public static <T> T[] newArrayOfNull(int len) {
+    return (T[]) new Object[len];
   }
 
   /**
-   * Create an array of ArrayLists.
+   * Convert a collection to an array.
    * 
-   * This is a common unchecked cast we have to do due to Java generics limitations.
-   * 
-   * @param <T> Type the list elements have
-   * @param len array size
-   * @return new array of arraylists
+   * @param <T> Type the array elements have
+   * @param coll collection to convert.
+   * @return new array with the collection contents.
    */
-  @SuppressWarnings("unchecked")
-  public static <T> ArrayList<T>[] newArrayOfArrayList(int len) {
-    return new ArrayList[len];
+  public static <T> T[] toArray(Collection<T> coll) {
+    T[] ret = newArrayOfNull(coll.size());
+    return coll.toArray(ret);
   }
 
   /**
-   * Create an array of sets.
+   * Create an array of <code>len</code> empty ArrayLists.
    * 
-   * This is a common unchecked cast we have to do due to Java generics limitations.
+   * This is a common unchecked cast we have to do due to Java Generics limitations.
    * 
    * @param <T> Type the list elements have
    * @param len array size
-   * @return new array of sets
+   * @return new array of ArrayLists
    */
   @SuppressWarnings("unchecked")
-  public static <T> Set<T>[] newArrayOfSet(int len) {
-    return new Set[len];
+  public static <T> ArrayList<T>[] newArrayOfEmptyArrayList(int len) {
+    ArrayList<T>[] result = new ArrayList[len];
+    for (int i=0; i < len; i++) {
+      result[i] = new ArrayList();
+    }
+    return result;
   }
-
+  
+  /**
+   * Create an array of <code>len</code> empty HashSets.
+   * 
+   * This is a common unchecked cast we have to do due to Java Generics limitations.
+   * 
+   * @param <T> Type the set elements have
+   * @param len array size
+   * @return new array of HashSets
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> HashSet<T>[] newArrayOfEmptyHashSet(int len) {
+    HashSet<T>[] result = new HashSet[len];
+    for (int i=0; i < len; i++) {
+      result[i] = new HashSet();
+    }
+    return result;
+  }
 }

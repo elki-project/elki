@@ -102,7 +102,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
     /**
      * Holds the instance of the partition database specified by {@link #PARTITION_DB_PARAM}.
      */
-    private Class<Database<V>> partitionDatabase;
+    private Class<? extends Database<V>> partitionDatabase;
 
     /**
      * Holds the parameters of the partition databases.
@@ -215,7 +215,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
             partitionDatabaseParameters = tmpDB.getParameters();
             // FIXME: we're leaking a reference here.
             addParameterizable(tmpDB);
-            partitionDatabase = (Class<Database<V>>) tmpDB.getClass();
+            partitionDatabase = (Class<? extends Database<V>>) tmpDB.getClass();
         }
 
         // preprocessor

@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -110,7 +111,6 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
      * {@link #MINPTS_PARAM} to the option handler
      * additionally to parameters of super class.
      */
-    @SuppressWarnings("unchecked")
     public DBSCAN() {
         super();
         // parameter epsilon
@@ -121,7 +121,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
 
         // global constraint
         // noinspection unchecked
-        GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint(EPSILON_PARAM, DISTANCE_FUNCTION_PARAM);
+        GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint<DistanceFunction<O, D>>(EPSILON_PARAM, DISTANCE_FUNCTION_PARAM);
         optionHandler.setGlobalParameterConstraint(gpc);
     }
 

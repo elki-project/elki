@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
@@ -37,571 +38,559 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 
-
 /**
  * <p/>
- * Implementation of the CLIQUE algorithm, a grid-based algorithm to identify dense clusters
- * in subspaces of maximum dimensionality.
+ * Implementation of the CLIQUE algorithm, a grid-based algorithm to identify
+ * dense clusters in subspaces of maximum dimensionality.
  * </p>
  * <p/>
- * The implementation consists of two steps:
- * <br> 1. Identification of subspaces that contain clusters
- * <br> 2. Identification of clusters
+ * The implementation consists of two steps: <br>
+ * 1. Identification of subspaces that contain clusters <br>
+ * 2. Identification of clusters
  * </p>
  * <p/>
  * The third step of the original algorithm (Generation of minimal description
  * for the clusters) is not (yet) implemented.
  * </p>
- * <p>Reference:
- * <br>R. Agrawal, J. Gehrke, D. Gunopulos, P. Raghavan::
- * Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications.
- * <br>In Proc. ACM SIGMOD Int. Conf. on Management of Data, Seattle, WA, 1998.
+ * <p>
+ * Reference: <br>
+ * R. Agrawal, J. Gehrke, D. Gunopulos, P. Raghavan:: Automatic Subspace
+ * Clustering of High Dimensional Data for Data Mining Applications. <br>
+ * In Proc. ACM SIGMOD Int. Conf. on Management of Data, Seattle, WA, 1998.
  * </p>
- *
+ * 
  * @author Elke Achtert
  * @param <V> the type of RealVector handled by this Algorithm
  */
-public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clustering<CLIQUESubspace<V>>> implements ClusteringAlgorithm<Clustering<CLIQUESubspace<V>>,V> {
-    /**
-     * OptionID for {@link #XSI_PARAM}
-     */
-    public static final OptionID XSI_ID = OptionID.getOrCreateOptionID(
-        "clique.xsi",
-        "The number of intervals (units) in each dimension."
-    );
+public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clustering<CLIQUESubspace<V>>> implements ClusteringAlgorithm<Clustering<CLIQUESubspace<V>>, V> {
+  /**
+   * OptionID for {@link #XSI_PARAM}
+   */
+  public static final OptionID XSI_ID = OptionID.getOrCreateOptionID("clique.xsi", "The number of intervals (units) in each dimension.");
 
-    /**
-     * Parameter to specify the number of intervals (units) in each dimension,
-     * must be an integer greater than 0.
-     * <p>Key: {@code -clique.xsi} </p>
-     */
-    private final IntParameter XSI_PARAM = new IntParameter(XSI_ID,
-        new GreaterConstraint(0));
+  /**
+   * Parameter to specify the number of intervals (units) in each dimension,
+   * must be an integer greater than 0.
+   * <p>
+   * Key: {@code -clique.xsi}
+   * </p>
+   */
+  private final IntParameter XSI_PARAM = new IntParameter(XSI_ID, new GreaterConstraint(0));
 
-    /**
-     * Holds the value of {@link #XSI_PARAM}.
-     */
-    private int xsi;
+  /**
+   * Holds the value of {@link #XSI_PARAM}.
+   */
+  private int xsi;
 
-    /**
-     * OptionID for {@link #TAU_PARAM}
-     */
-    public static final OptionID TAU_ID = OptionID.getOrCreateOptionID(
-        "clique.tau",
-        "The density threshold for the selectivity of a unit, where the selectivity is" +
-            "the fraction of total feature vectors contained in this unit."
-    );
+  /**
+   * OptionID for {@link #TAU_PARAM}
+   */
+  public static final OptionID TAU_ID = OptionID.getOrCreateOptionID("clique.tau", "The density threshold for the selectivity of a unit, where the selectivity is" + "the fraction of total feature vectors contained in this unit.");
 
-    /**
-     * Parameter to specify the density threshold for the selectivity of a unit,
-     * where the selectivity is the fraction of total feature vectors contained in this unit,
-     * must be a double greater than 0 and less than 1.
-     * <p>Key: {@code -clique.tau} </p>
-     */
-    private final DoubleParameter TAU_PARAM = new DoubleParameter(
-        TAU_ID,
-        new IntervalConstraint(0, IntervalConstraint.IntervalBoundary.OPEN, 1, IntervalConstraint.IntervalBoundary.OPEN));
+  /**
+   * Parameter to specify the density threshold for the selectivity of a unit,
+   * where the selectivity is the fraction of total feature vectors contained in
+   * this unit, must be a double greater than 0 and less than 1.
+   * <p>
+   * Key: {@code -clique.tau}
+   * </p>
+   */
+  private final DoubleParameter TAU_PARAM = new DoubleParameter(TAU_ID, new IntervalConstraint(0, IntervalConstraint.IntervalBoundary.OPEN, 1, IntervalConstraint.IntervalBoundary.OPEN));
 
-    /**
-     * Holds the value of {@link #TAU_PARAM}.
-     */
-    private double tau;
+  /**
+   * Holds the value of {@link #TAU_PARAM}.
+   */
+  private double tau;
 
-    /**
-     * OptionID for {@link #PRUNE_FLAG}
-     */
-    public static final OptionID PRUNE_ID = OptionID.getOrCreateOptionID(
-        "clique.prune",
-        "Flag to indicate that only subspaces with large coverage " +
-            "(i.e. the fraction of the database that is covered by the dense units) " +
-            "are selected, the rest will be pruned."
-    );
+  /**
+   * OptionID for {@link #PRUNE_FLAG}
+   */
+  public static final OptionID PRUNE_ID = OptionID.getOrCreateOptionID("clique.prune", "Flag to indicate that only subspaces with large coverage " + "(i.e. the fraction of the database that is covered by the dense units) " + "are selected, the rest will be pruned.");
 
-    /**
-     * Flag to indicate that that only subspaces with large coverage
-     * (i.e. the fraction of the database that is covered by the dense units)
-     * are selected, the rest will be pruned.
-     * <p>Key: {@code -clique.prune} </p>
-     */
-    private final Flag PRUNE_FLAG = new Flag(PRUNE_ID);
+  /**
+   * Flag to indicate that that only subspaces with large coverage (i.e. the
+   * fraction of the database that is covered by the dense units) are selected,
+   * the rest will be pruned.
+   * <p>
+   * Key: {@code -clique.prune}
+   * </p>
+   */
+  private final Flag PRUNE_FLAG = new Flag(PRUNE_ID);
 
-    /**
-     * Holds the value of {@link #PRUNE_FLAG}.
-     */
-    private boolean prune;
+  /**
+   * Holds the value of {@link #PRUNE_FLAG}.
+   */
+  private boolean prune;
 
-    /**
-     * The result of the algorithm;
-     */
-    private Clustering<CLIQUESubspace<V>> result;
+  /**
+   * The result of the algorithm;
+   */
+  private Clustering<CLIQUESubspace<V>> result;
 
-    /**
-     * Provides the CLIQUE algorithm,
-     * adding parameters
-     * {@link #XSI_PARAM},  {@link #TAU_PARAM}, and  flag {@link #PRUNE_FLAG}
-     * to the option handler additionally to parameters of super class.
-     */
-    public CLIQUE() {
-        super();
-//    this.debug = true;
+  /**
+   * Provides the CLIQUE algorithm, adding parameters {@link #XSI_PARAM},
+   * {@link #TAU_PARAM}, and flag {@link #PRUNE_FLAG} to the option handler
+   * additionally to parameters of super class.
+   */
+  public CLIQUE() {
+    super();
+    // this.debug = true;
 
-        //parameter xsi
-        addOption(XSI_PARAM);
+    // parameter xsi
+    addOption(XSI_PARAM);
 
-        //parameter tau
-        addOption(TAU_PARAM);
+    // parameter tau
+    addOption(TAU_PARAM);
 
-        //flag prune
-        addOption(PRUNE_FLAG);
+    // flag prune
+    addOption(PRUNE_FLAG);
+  }
+
+  /**
+   * Returns the result of the algorithm.
+   * 
+   * @return the result of the algorithm
+   */
+  public Clustering<CLIQUESubspace<V>> getResult() {
+    return result;
+  }
+
+  /**
+   * Returns a description of the algorithm.
+   * 
+   * @return a description of the algorithm
+   */
+  public Description getDescription() {
+    return new Description("CLIQUE", "Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications", "Grid-based algorithm to identify dense clusters in subspaces of maximum dimensionality. ", "R. Agrawal, J. Gehrke, D. Gunopulos, P. Raghavan: " + "Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications. " + "In Proc. SIGMOD Conference, Seattle, WA, 1998.");
+  }
+
+  /**
+   * Performs the CLIQUE algorithm on the given database.
+   * 
+   */
+  @Override
+  protected Clustering<CLIQUESubspace<V>> runInTime(Database<V> database) throws IllegalStateException {
+    Map<CLIQUESubspace<V>, Set<Integer>> modelsAndClusters = new HashMap<CLIQUESubspace<V>, Set<Integer>>();
+
+    // 1. Identification of subspaces that contain clusters
+    if(logger.isVerbose()) {
+      logger.verbose("*** 1. Identification of subspaces that contain clusters ***");
+    }
+    SortedMap<Integer, SortedSet<CLIQUESubspace<V>>> dimensionToDenseSubspaces = new TreeMap<Integer, SortedSet<CLIQUESubspace<V>>>();
+    SortedSet<CLIQUESubspace<V>> denseSubspaces = findOneDimensionalDenseSubspaces(database);
+    dimensionToDenseSubspaces.put(0, denseSubspaces);
+    if(logger.isVerbose()) {
+      logger.verbose("    1-dimensional dense subspaces: " + denseSubspaces.size());
     }
 
-    /**
-     * Returns the result of the algorithm.
-     *
-     * @return the result of the algorithm
-     */
-    public Clustering<CLIQUESubspace<V>> getResult() {
-        return result;
+    for(int k = 2; k <= database.dimensionality() && !denseSubspaces.isEmpty(); k++) {
+      denseSubspaces = findDenseSubspaces(database, denseSubspaces);
+      dimensionToDenseSubspaces.put(k - 1, denseSubspaces);
+      if(logger.isVerbose()) {
+        logger.verbose("    " + k + "-dimensional dense subspaces: " + denseSubspaces.size());
+      }
     }
 
-    /**
-     * Returns a description of the algorithm.
-     *
-     * @return a description of the algorithm
-     */
-    public Description getDescription() {
-        return new Description("CLIQUE",
-            "Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications",
-            "Grid-based algorithm to identify dense clusters in subspaces of maximum dimensionality. ",
-            "R. Agrawal, J. Gehrke, D. Gunopulos, P. Raghavan: " +
-                "Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications. " +
-                "In Proc. SIGMOD Conference, Seattle, WA, 1998.");
+    // 2. Identification of clusters
+    if(logger.isVerbose()) {
+      logger.verbose("*** 2. Identification of clusters ***");
     }
 
-    /**
-     * Performs the CLIQUE algorithm on the given database.
-     *
-     */
-    @Override
-    protected Clustering<CLIQUESubspace<V>> runInTime(Database<V> database) throws IllegalStateException {
-        Map<CLIQUESubspace<V>, Set<Integer>> modelsAndClusters = new HashMap<CLIQUESubspace<V>, Set<Integer>>();
+    for(Integer dim : dimensionToDenseSubspaces.keySet()) {
+      SortedSet<CLIQUESubspace<V>> subspaces = dimensionToDenseSubspaces.get(dim);
+      Map<CLIQUESubspace<V>, Set<Integer>> modelsToClusters = determineClusters(database, subspaces);
+      modelsAndClusters.putAll(modelsToClusters);
 
-        // 1. Identification of subspaces that contain clusters
-        if (logger.isVerbose()) {
-          logger.verbose("*** 1. Identification of subspaces that contain clusters ***");
-        }
-        SortedMap<Integer, SortedSet<CLIQUESubspace<V>>> dimensionToDenseSubspaces = new TreeMap<Integer, SortedSet<CLIQUESubspace<V>>>();
-        SortedSet<CLIQUESubspace<V>> denseSubspaces = findOneDimensionalDenseSubspaces(database);
-        dimensionToDenseSubspaces.put(0, denseSubspaces);
-        if (logger.isVerbose()) {
-          logger.verbose("    1-dimensional dense subspaces: " + denseSubspaces.size());
-        }
-
-        for (int k = 2; k <= database.dimensionality() && !denseSubspaces.isEmpty(); k++) {
-            denseSubspaces = findDenseSubspaces(database, denseSubspaces);
-            dimensionToDenseSubspaces.put(k - 1, denseSubspaces);
-            if (logger.isVerbose()) {
-              logger.verbose("    " + k + "-dimensional dense subspaces: " + denseSubspaces.size());
-            }
-        }
-
-        // 2. Identification of clusters
-        if (logger.isVerbose()) {
-          logger.verbose("*** 2. Identification of clusters ***");
-        }
-
-        for (Integer dim : dimensionToDenseSubspaces.keySet()) {
-            SortedSet<CLIQUESubspace<V>> subspaces = dimensionToDenseSubspaces.get(dim);
-            Map<CLIQUESubspace<V>, Set<Integer>> modelsToClusters = determineClusters(database, subspaces);
-            modelsAndClusters.putAll(modelsToClusters);
-
-            if (logger.isVerbose()) {
-              logger.verbose("    " + (dim + 1) + "-dimensionional clusters: " + modelsToClusters.size());
-            }
-        }
-
-        result = new Clustering<CLIQUESubspace<V>>();
-
-        for (Entry<CLIQUESubspace<V>, Set<Integer>> e : modelsAndClusters.entrySet()) {
-          DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(e.getValue());
-          result.addCluster(new Cluster<CLIQUESubspace<V>>(group, e.getKey()));
-        }
-        
-        return result;
+      if(logger.isVerbose()) {
+        logger.verbose("    " + (dim + 1) + "-dimensionional clusters: " + modelsToClusters.size());
+      }
     }
 
-    /**
-     * Calls the super method
-     * and sets additionally the value of the parameters
-     * {@link #XSI_PARAM}, {@link #TAU_PARAM}, and {flag @link #PRUNE_FLAG}.
-     */
-    @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    result = new Clustering<CLIQUESubspace<V>>();
 
-        // parameters xsi, tau and flag prune
-        xsi = XSI_PARAM.getValue();
-        tau = TAU_PARAM.getValue();
-        prune = PRUNE_FLAG.isSet();
-
-        return remainingParameters;
+    for(Entry<CLIQUESubspace<V>, Set<Integer>> e : modelsAndClusters.entrySet()) {
+      DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(e.getValue());
+      result.addCluster(new Cluster<CLIQUESubspace<V>>(group, e.getKey()));
     }
 
-    /**
-     * Determines the clusters in the specified dense subspaces.
-     *
-     * @param database       the database to run the algorithm on
-     * @param denseSubspaces the dense subspaces
-     * @return the clusters in the specified dense subspaces and the corresponding
-     *         cluster models
-     */
-    private Map<CLIQUESubspace<V>, Set<Integer>> determineClusters(Database<V> database,
-                                                                SortedSet<CLIQUESubspace<V>> denseSubspaces) {
-        Map<CLIQUESubspace<V>, Set<Integer>> result = new HashMap<CLIQUESubspace<V>, Set<Integer>>();
+    return result;
+  }
 
-        for (CLIQUESubspace<V> subspace : denseSubspaces) {
-            Map<CLIQUESubspace<V>, Set<Integer>> clusters = subspace.determineClusters(database);
-            if (logger.isDebugging()) {
-              logger.debugFine("Subspace " + subspace + " clusters " + clusters.size());
-            }
-            result.putAll(clusters);
-        }
-        return result;
+  /**
+   * Calls the super method and sets additionally the value of the parameters
+   * {@link #XSI_PARAM}, {@link #TAU_PARAM}, and {flag @link #PRUNE_FLAG}.
+   */
+  @Override
+  public String[] setParameters(String[] args) throws ParameterException {
+    String[] remainingParameters = super.setParameters(args);
+
+    // parameters xsi, tau and flag prune
+    xsi = XSI_PARAM.getValue();
+    tau = TAU_PARAM.getValue();
+    prune = PRUNE_FLAG.isSet();
+
+    return remainingParameters;
+  }
+
+  /**
+   * Determines the clusters in the specified dense subspaces.
+   * 
+   * @param database the database to run the algorithm on
+   * @param denseSubspaces the dense subspaces
+   * @return the clusters in the specified dense subspaces and the corresponding
+   *         cluster models
+   */
+  private Map<CLIQUESubspace<V>, Set<Integer>> determineClusters(Database<V> database, SortedSet<CLIQUESubspace<V>> denseSubspaces) {
+    Map<CLIQUESubspace<V>, Set<Integer>> result = new HashMap<CLIQUESubspace<V>, Set<Integer>>();
+
+    for(CLIQUESubspace<V> subspace : denseSubspaces) {
+      Map<CLIQUESubspace<V>, Set<Integer>> clusters = subspace.determineClusters(database);
+      if(logger.isDebugging()) {
+        logger.debugFine("Subspace " + subspace + " clusters " + clusters.size());
+      }
+      result.putAll(clusters);
+    }
+    return result;
+  }
+
+  /**
+   * Determines the one dimensional dense subspaces and performs a pruning if
+   * this option is chosen.
+   * 
+   * @param database the database to run the algorithm on
+   * @return the one dimensional dense subspaces
+   */
+  private SortedSet<CLIQUESubspace<V>> findOneDimensionalDenseSubspaces(Database<V> database) {
+    SortedSet<CLIQUESubspace<V>> denseSubspaceCandidates = findOneDimensionalDenseSubspaceCandidates(database);
+
+    if(prune) {
+      return pruneDenseSubspaces(denseSubspaceCandidates);
     }
 
-    /**
-     * Determines the one dimensional dense subspaces and performs
-     * a pruning if this option is chosen.
-     *
-     * @param database the database to run the algorithm on
-     * @return the one dimensional dense subspaces
-     */
-    private SortedSet<CLIQUESubspace<V>> findOneDimensionalDenseSubspaces(Database<V> database) {
-        SortedSet<CLIQUESubspace<V>> denseSubspaceCandidates = findOneDimensionalDenseSubspaceCandidates(database);
+    return denseSubspaceCandidates;
+  }
 
-        if (prune)
-            return pruneDenseSubspaces(denseSubspaceCandidates);
+  /**
+   * Determines the k>1 dimensional dense subspaces and performs a pruning if
+   * this option is chosen.
+   * 
+   * @param database the database to run the algorithm on
+   * @param denseSubspaces the (k-1)-dimensional dense subspaces
+   * @return the k-dimensional dense subspaces
+   */
+  private SortedSet<CLIQUESubspace<V>> findDenseSubspaces(Database<V> database, SortedSet<CLIQUESubspace<V>> denseSubspaces) {
+    SortedSet<CLIQUESubspace<V>> denseSubspaceCandidates = findDenseSubspaceCandidates(database, denseSubspaces);
 
-        return denseSubspaceCandidates;
+    if(prune) {
+      return pruneDenseSubspaces(denseSubspaceCandidates);
     }
 
-    /**
-     * Determines the k>1 dimensional dense subspaces and performs
-     * a pruning if this option is chosen.
-     *
-     * @param database       the database to run the algorithm on
-     * @param denseSubspaces the (k-1)-dimensional dense subspaces
-     * @return the k-dimensional dense subspaces
-     */
-    private SortedSet<CLIQUESubspace<V>> findDenseSubspaces(Database<V> database, SortedSet<CLIQUESubspace<V>> denseSubspaces) {
-        SortedSet<CLIQUESubspace<V>> denseSubspaceCandidates = findDenseSubspaceCandidates(database,
-            denseSubspaces);
+    return denseSubspaceCandidates;
+  }
 
-        if (prune)
-            return pruneDenseSubspaces(denseSubspaceCandidates);
-
-        return denseSubspaceCandidates;
+  /**
+   * Initializes and returns the one dimensional units.
+   * 
+   * @param database the database to run the algorithm on
+   * @return the created one dimensional units
+   */
+  private Collection<CLIQUEUnit<V>> initOneDimensionalUnits(Database<V> database) {
+    int dimensionality = database.dimensionality();
+    // initialize minima and maxima
+    double[] minima = new double[dimensionality];
+    double[] maxima = new double[dimensionality];
+    for(int d = 0; d < dimensionality; d++) {
+      maxima[d] = -Double.MAX_VALUE;
+      minima[d] = Double.MAX_VALUE;
+    }
+    // update minima and maxima
+    for(Iterator<Integer> it = database.iterator(); it.hasNext();) {
+      V featureVector = database.get(it.next());
+      updateMinMax(featureVector, minima, maxima);
+    }
+    for(int i = 0; i < maxima.length; i++) {
+      maxima[i] += 0.0001;
     }
 
-    /**
-     * Initializes and returns the one dimensional units.
-     *
-     * @param database the database to run the algorithm on
-     * @return the created one dimensional units
-     */
-    private Collection<CLIQUEUnit<V>> initOneDimensionalUnits(Database<V> database) {
-        int dimensionality = database.dimensionality();
-        // initialize minima and maxima
-        double[] minima = new double[dimensionality];
-        double[] maxima = new double[dimensionality];
-        for (int d = 0; d < dimensionality; d++) {
-            maxima[d] = -Double.MAX_VALUE;
-            minima[d] = Double.MAX_VALUE;
-        }
-        // update minima and maxima
-        for (Iterator<Integer> it = database.iterator(); it.hasNext();) {
-            V featureVector = database.get(it.next());
-            updateMinMax(featureVector, minima, maxima);
-        }
-        for (int i = 0; i < maxima.length; i++) {
-            maxima[i] += 0.0001;
-        }
-
-        // determine the unit length in each dimension
-        double[] unit_lengths = new double[dimensionality];
-        for (int d = 0; d < dimensionality; d++) {
-            unit_lengths[d] = (maxima[d] - minima[d]) / xsi;
-        }
-
-        if (logger.isDebuggingFiner()) {
-            StringBuffer msg = new StringBuffer();
-            msg.append("   minima: ").append(FormatUtil.format(minima, ", ", 2));
-            msg.append("\n   maxima: ").append(FormatUtil.format(maxima, ", ", 2));
-            msg.append("\n   unit lengths: ").append(FormatUtil.format(unit_lengths, ", ", 2));
-            logger.debugFiner(msg.toString());
-        }
-
-        // determine the boundaries of the units
-        double[][] unit_bounds = new double[xsi + 1][dimensionality];
-        for (int x = 0; x <= xsi; x++) {
-            for (int d = 0; d < dimensionality; d++) {
-                if (x < xsi)
-                    unit_bounds[x][d] = minima[d] + x * unit_lengths[d];
-                else
-                    unit_bounds[x][d] = maxima[d];
-            }
-        }
-        if (logger.isDebuggingFiner()) {
-            StringBuffer msg = new StringBuffer();
-            msg.append("   unit bounds ").append(new Matrix(unit_bounds).toString("   "));
-            logger.debugFiner(msg.toString());
-        }
-
-        // build the 1 dimensional units
-        List<CLIQUEUnit<V>> units = new ArrayList<CLIQUEUnit<V>>((xsi * dimensionality));
-        for (int x = 0; x < xsi; x++) {
-            for (int d = 0; d < dimensionality; d++) {
-                units.add(new CLIQUEUnit<V>(new Interval(d, unit_bounds[x][d], unit_bounds[x + 1][d])));
-            }
-        }
-
-        if (logger.isDebuggingFiner()) {
-            StringBuffer msg = new StringBuffer();
-            msg.append("   total number of 1-dim units: ").append(units.size());
-            logger.debugFiner(msg.toString());
-        }
-
-        return units;
+    // determine the unit length in each dimension
+    double[] unit_lengths = new double[dimensionality];
+    for(int d = 0; d < dimensionality; d++) {
+      unit_lengths[d] = (maxima[d] - minima[d]) / xsi;
     }
 
-    /**
-     * Updates the minima and maxima array according to the specified feature vector.
-     *
-     * @param featureVector the feature vector
-     * @param minima        the array of minima
-     * @param maxima        the array of maxima
-     */
-    private void updateMinMax(V featureVector, double[] minima, double[] maxima) {
-        if (minima.length != featureVector.getDimensionality()) {
-            throw new IllegalArgumentException("FeatureVectors differ in length.");
-        }
-        for (int d = 1; d <= featureVector.getDimensionality(); d++) {
-            if ((featureVector.getValue(d).doubleValue()) > maxima[d - 1]) {
-                maxima[d - 1] = (featureVector.getValue(d).doubleValue());
-            }
-            if ((featureVector.getValue(d).doubleValue()) < minima[d - 1]) {
-                minima[d - 1] = (featureVector.getValue(d).doubleValue());
-            }
-        }
+    if(logger.isDebuggingFiner()) {
+      StringBuffer msg = new StringBuffer();
+      msg.append("   minima: ").append(FormatUtil.format(minima, ", ", 2));
+      msg.append("\n   maxima: ").append(FormatUtil.format(maxima, ", ", 2));
+      msg.append("\n   unit lengths: ").append(FormatUtil.format(unit_lengths, ", ", 2));
+      logger.debugFiner(msg.toString());
     }
 
-    /**
-     * Determines the one-dimensional dense subspace candidates by making a pass over the database.
-     *
-     * @param database the database to run the algorithm on
-     * @return the one-dimensional dense subspace candidates
-     */
-    private SortedSet<CLIQUESubspace<V>> findOneDimensionalDenseSubspaceCandidates(Database<V> database) {
-        Collection<CLIQUEUnit<V>> units = initOneDimensionalUnits(database);
-        Collection<CLIQUEUnit<V>> denseUnits = new ArrayList<CLIQUEUnit<V>>();
-        Map<Integer, CLIQUESubspace<V>> denseSubspaces = new HashMap<Integer, CLIQUESubspace<V>>();
-
-        // identify dense units
-        double total = database.size();
-        for (Iterator<Integer> it = database.iterator(); it.hasNext();) {
-            V featureVector = database.get(it.next());
-            for (CLIQUEUnit<V> unit : units) {
-                unit.addFeatureVector(featureVector);
-                // unit is a dense unit
-                if (!it.hasNext() && unit.selectivity(total) >= tau) {
-                    denseUnits.add(unit);
-                    // add the dense unit to its subspace
-                    int dim = unit.getIntervals().iterator().next().getDimension();
-                    CLIQUESubspace<V> subspace_d = denseSubspaces.get(dim);
-                    if (subspace_d == null) {
-                        subspace_d = new CLIQUESubspace<V>(dim);
-                        denseSubspaces.put(dim, subspace_d);
-                    }
-                    subspace_d.addDenseUnit(unit);
-                }
-            }
+    // determine the boundaries of the units
+    double[][] unit_bounds = new double[xsi + 1][dimensionality];
+    for(int x = 0; x <= xsi; x++) {
+      for(int d = 0; d < dimensionality; d++) {
+        if(x < xsi) {
+          unit_bounds[x][d] = minima[d] + x * unit_lengths[d];
         }
-
-        if (logger.isDebugging()) {
-            StringBuffer msg = new StringBuffer();
-            msg.append("   number of 1-dim dense units: ").append(denseUnits.size());
-            msg.append("\n   number of 1-dim dense subspace candidates: ").append(denseSubspaces.size());
-            logger.debugFine(msg.toString());
+        else {
+          unit_bounds[x][d] = maxima[d];
         }
-
-        return new TreeSet<CLIQUESubspace<V>>(denseSubspaces.values());
+      }
+    }
+    if(logger.isDebuggingFiner()) {
+      StringBuffer msg = new StringBuffer();
+      msg.append("   unit bounds ").append(new Matrix(unit_bounds).toString("   "));
+      logger.debugFiner(msg.toString());
     }
 
-    /**
-     * Determines the k-dimensional dense subspace candidates.
-     *
-     * @param database       the database to run the algorithm on
-     * @param denseSubspaces the (k-1)-dimensional dense subspace
-     * @return the k-dimensional dense subspace candidates
-     */
-    private SortedSet<CLIQUESubspace<V>> findDenseSubspaceCandidates(Database<V> database, Set<CLIQUESubspace<V>> denseSubspaces) {
-        List<CLIQUESubspace<V>> denseSubspaceList = new ArrayList<CLIQUESubspace<V>>();
-        for (CLIQUESubspace<V> s : denseSubspaces) {
-            denseSubspaceList.add(s);
-        }
-
-        Comparator<CLIQUESubspace<V>> comparator = new Comparator<CLIQUESubspace<V>>() {
-            public int compare(CLIQUESubspace<V> s1, CLIQUESubspace<V> s2) {
-                SortedSet<Integer> dims1 = s1.getDimensions();
-                SortedSet<Integer> dims2 = s2.getDimensions();
-
-                if (dims1.size() != dims2.size()) {
-                    throw new IllegalArgumentException("different dimensions sizes!");
-                }
-
-                Iterator<Integer> it1 = dims1.iterator();
-                Iterator<Integer> it2 = dims2.iterator();
-                while (it1.hasNext()) {
-                    Integer d1 = it1.next();
-                    Integer d2 = it2.next();
-
-                    if (d1.equals(d2)) continue;
-                    return d1.compareTo(d2);
-                }
-                return 0;
-            }
-        };
-        Collections.sort(denseSubspaceList, comparator);
-
-        double all = database.size();
-        TreeSet<CLIQUESubspace<V>> subspaces = new TreeSet<CLIQUESubspace<V>>();
-
-        while (!denseSubspaceList.isEmpty()) {
-            CLIQUESubspace<V> s1 = denseSubspaceList.get(0);
-            for (int j = 1; j < denseSubspaceList.size(); j++) {
-                CLIQUESubspace<V> s2 = denseSubspaceList.get(j);
-                CLIQUESubspace<V> s = s1.join(s2, all, tau);
-                if (s != null) {
-                    subspaces.add(s);
-                }
-            }
-            denseSubspaceList.remove(s1);
-        }
-
-        return subspaces;
+    // build the 1 dimensional units
+    List<CLIQUEUnit<V>> units = new ArrayList<CLIQUEUnit<V>>((xsi * dimensionality));
+    for(int x = 0; x < xsi; x++) {
+      for(int d = 0; d < dimensionality; d++) {
+        units.add(new CLIQUEUnit<V>(new Interval(d, unit_bounds[x][d], unit_bounds[x + 1][d])));
+      }
     }
 
-    /**
-     * Performs a MDL-based pruning of the specified
-     * dense sunspaces as described in the CLIQUE algorithm.
-     *
-     * @param denseSubspaces the subspaces to be pruned
-     * @return the subspaces which are not pruned
-     */
-    private SortedSet<CLIQUESubspace<V>> pruneDenseSubspaces(SortedSet<CLIQUESubspace<V>> denseSubspaces) {
-        int[][] means = computeMeans(denseSubspaces);
-        double[][] diffs = computeDiffs(denseSubspaces, means[0], means[1]);
-        double[] codeLength = new double[denseSubspaces.size()];
-        double minCL = Double.MAX_VALUE;
-        int min_i = -1;
-
-        for (int i = 0; i < denseSubspaces.size(); i++) {
-            int mi = means[0][i];
-            int mp = means[1][i];
-            double log_mi = mi == 0 ? 0 : StrictMath.log(mi) / StrictMath.log(2);
-            double log_mp = mp == 0 ? 0 : StrictMath.log(mp) / StrictMath.log(2);
-            double diff_mi = diffs[0][i];
-            double diff_mp = diffs[1][i];
-            codeLength[i] = log_mi + diff_mi + log_mp + diff_mp;
-
-            if (codeLength[i] <= minCL) {
-                minCL = codeLength[i];
-                min_i = i;
-            }
-        }
-
-        SortedSet<CLIQUESubspace<V>> result = new TreeSet<CLIQUESubspace<V>>();
-        Iterator<CLIQUESubspace<V>> it = denseSubspaces.iterator();
-        for (int i = 0; i <= min_i; i++) {
-            result.add(it.next());
-        }
-        return result;
+    if(logger.isDebuggingFiner()) {
+      StringBuffer msg = new StringBuffer();
+      msg.append("   total number of 1-dim units: ").append(units.size());
+      logger.debugFiner(msg.toString());
     }
 
-    /**
-     * The specified sorted set of dense subspaces is divided into the selected set I
-     * and the pruned set P. For each set the mean of the cover fractions
-     * is computed.
-     *
-     * @param denseSubspaces the dense subspaces
-     * @return the mean of the cover fractions, the first value is the mean of the
-     *         selected set I, the second value is the mean of the pruned set P.
-     */
-    @SuppressWarnings("unchecked")
-    private int[][] computeMeans(SortedSet<CLIQUESubspace<V>> denseSubspaces) {
-        int n = denseSubspaces.size() - 1;
-        CLIQUESubspace<V>[] subspaces = denseSubspaces.toArray(new CLIQUESubspace[n + 1]);
+    return units;
+  }
 
-        int[] mi = new int[n + 1];
-        int[] mp = new int[n + 1];
+  /**
+   * Updates the minima and maxima array according to the specified feature
+   * vector.
+   * 
+   * @param featureVector the feature vector
+   * @param minima the array of minima
+   * @param maxima the array of maxima
+   */
+  private void updateMinMax(V featureVector, double[] minima, double[] maxima) {
+    if(minima.length != featureVector.getDimensionality()) {
+      throw new IllegalArgumentException("FeatureVectors differ in length.");
+    }
+    for(int d = 1; d <= featureVector.getDimensionality(); d++) {
+      if((featureVector.getValue(d).doubleValue()) > maxima[d - 1]) {
+        maxima[d - 1] = (featureVector.getValue(d).doubleValue());
+      }
+      if((featureVector.getValue(d).doubleValue()) < minima[d - 1]) {
+        minima[d - 1] = (featureVector.getValue(d).doubleValue());
+      }
+    }
+  }
 
-        double resultMI = 0;
-        double resultMP = 0;
+  /**
+   * Determines the one-dimensional dense subspace candidates by making a pass
+   * over the database.
+   * 
+   * @param database the database to run the algorithm on
+   * @return the one-dimensional dense subspace candidates
+   */
+  private SortedSet<CLIQUESubspace<V>> findOneDimensionalDenseSubspaceCandidates(Database<V> database) {
+    Collection<CLIQUEUnit<V>> units = initOneDimensionalUnits(database);
+    Collection<CLIQUEUnit<V>> denseUnits = new ArrayList<CLIQUEUnit<V>>();
+    Map<Integer, CLIQUESubspace<V>> denseSubspaces = new HashMap<Integer, CLIQUESubspace<V>>();
 
-        for (int i = 0; i < subspaces.length; i++) {
-            resultMI += subspaces[i].getCoverage();
-            resultMP += subspaces[n - i].getCoverage();
-            //noinspection NumericCastThatLosesPrecision
-            mi[i] = (int) Math.ceil(resultMI / (i + 1));
-            if (i != n)
-                //noinspection NumericCastThatLosesPrecision
-                mp[n - 1 - i] = (int) Math.ceil(resultMP / (i + 1));
+    // identify dense units
+    double total = database.size();
+    for(Iterator<Integer> it = database.iterator(); it.hasNext();) {
+      V featureVector = database.get(it.next());
+      for(CLIQUEUnit<V> unit : units) {
+        unit.addFeatureVector(featureVector);
+        // unit is a dense unit
+        if(!it.hasNext() && unit.selectivity(total) >= tau) {
+          denseUnits.add(unit);
+          // add the dense unit to its subspace
+          int dim = unit.getIntervals().iterator().next().getDimension();
+          CLIQUESubspace<V> subspace_d = denseSubspaces.get(dim);
+          if(subspace_d == null) {
+            subspace_d = new CLIQUESubspace<V>(dim);
+            denseSubspaces.put(dim, subspace_d);
+          }
+          subspace_d.addDenseUnit(unit);
         }
-
-        int[][] result = new int[2][];
-        result[0] = mi;
-        result[1] = mp;
-
-        return result;
+      }
     }
 
-    /**
-     * The specified sorted set of dense subspaces is divided into the selected set I
-     * and the pruned set P. For each set the difference from the specified mean values
-     * is computed.
-     *
-     * @param denseSubspaces the dense subspaces
-     * @param mi             the mean of the selected sets I
-     * @param mp             the mean of the pruned sets P
-     * @return the difference from the specified mean values, the first value is the
-     *         difference from the mean of the selected set I,
-     *         the second value is the difference from the mean of the pruned set P.
-     */
-    @SuppressWarnings("unchecked")
-    private double[][] computeDiffs(SortedSet<CLIQUESubspace<V>> denseSubspaces, int[] mi, int[] mp) {
-        int n = denseSubspaces.size() - 1;
-        CLIQUESubspace<V>[] subspaces = denseSubspaces.toArray(new CLIQUESubspace[n + 1]);
-
-        double[] diff_mi = new double[n + 1];
-        double[] diff_mp = new double[n + 1];
-
-        double resultMI = 0;
-        double resultMP = 0;
-
-        for (int i = 0; i < subspaces.length; i++) {
-            double diffMI = Math.abs(subspaces[i].getCoverage() - mi[i]);
-            resultMI += diffMI == 0.0 ? 0 : StrictMath.log(diffMI) / StrictMath.log(2);
-            double diffMP = (i != n) ? Math.abs(subspaces[n - i].getCoverage() - mp[n - 1 - i]) : 0;
-            resultMP += diffMP == 0.0 ? 0 : StrictMath.log(diffMP) / StrictMath.log(2);
-            diff_mi[i] = resultMI;
-            if (i != n) diff_mp[n - 1 - i] = resultMP;
-        }
-        double[][] result = new double[2][];
-        result[0] = diff_mi;
-        result[1] = diff_mp;
-
-        return result;
+    if(logger.isDebugging()) {
+      StringBuffer msg = new StringBuffer();
+      msg.append("   number of 1-dim dense units: ").append(denseUnits.size());
+      msg.append("\n   number of 1-dim dense subspace candidates: ").append(denseSubspaces.size());
+      logger.debugFine(msg.toString());
     }
 
+    return new TreeSet<CLIQUESubspace<V>>(denseSubspaces.values());
+  }
+
+  /**
+   * Determines the k-dimensional dense subspace candidates.
+   * 
+   * @param database the database to run the algorithm on
+   * @param denseSubspaces the (k-1)-dimensional dense subspace
+   * @return the k-dimensional dense subspace candidates
+   */
+  private SortedSet<CLIQUESubspace<V>> findDenseSubspaceCandidates(Database<V> database, Set<CLIQUESubspace<V>> denseSubspaces) {
+    List<CLIQUESubspace<V>> denseSubspaceList = new ArrayList<CLIQUESubspace<V>>();
+    for(CLIQUESubspace<V> s : denseSubspaces) {
+      denseSubspaceList.add(s);
+    }
+
+    Comparator<CLIQUESubspace<V>> comparator = new Comparator<CLIQUESubspace<V>>() {
+      public int compare(CLIQUESubspace<V> s1, CLIQUESubspace<V> s2) {
+        SortedSet<Integer> dims1 = s1.getDimensions();
+        SortedSet<Integer> dims2 = s2.getDimensions();
+
+        if(dims1.size() != dims2.size()) {
+          throw new IllegalArgumentException("different dimensions sizes!");
+        }
+
+        Iterator<Integer> it1 = dims1.iterator();
+        Iterator<Integer> it2 = dims2.iterator();
+        while(it1.hasNext()) {
+          Integer d1 = it1.next();
+          Integer d2 = it2.next();
+
+          if(d1.equals(d2)) {
+            continue;
+          }
+          return d1.compareTo(d2);
+        }
+        return 0;
+      }
+    };
+    Collections.sort(denseSubspaceList, comparator);
+
+    double all = database.size();
+    TreeSet<CLIQUESubspace<V>> subspaces = new TreeSet<CLIQUESubspace<V>>();
+
+    while(!denseSubspaceList.isEmpty()) {
+      CLIQUESubspace<V> s1 = denseSubspaceList.get(0);
+      for(int j = 1; j < denseSubspaceList.size(); j++) {
+        CLIQUESubspace<V> s2 = denseSubspaceList.get(j);
+        CLIQUESubspace<V> s = s1.join(s2, all, tau);
+        if(s != null) {
+          subspaces.add(s);
+        }
+      }
+      denseSubspaceList.remove(s1);
+    }
+
+    return subspaces;
+  }
+
+  /**
+   * Performs a MDL-based pruning of the specified dense sunspaces as described
+   * in the CLIQUE algorithm.
+   * 
+   * @param denseSubspaces the subspaces to be pruned
+   * @return the subspaces which are not pruned
+   */
+  private SortedSet<CLIQUESubspace<V>> pruneDenseSubspaces(SortedSet<CLIQUESubspace<V>> denseSubspaces) {
+    int[][] means = computeMeans(denseSubspaces);
+    double[][] diffs = computeDiffs(denseSubspaces, means[0], means[1]);
+    double[] codeLength = new double[denseSubspaces.size()];
+    double minCL = Double.MAX_VALUE;
+    int min_i = -1;
+
+    for(int i = 0; i < denseSubspaces.size(); i++) {
+      int mi = means[0][i];
+      int mp = means[1][i];
+      double log_mi = mi == 0 ? 0 : StrictMath.log(mi) / StrictMath.log(2);
+      double log_mp = mp == 0 ? 0 : StrictMath.log(mp) / StrictMath.log(2);
+      double diff_mi = diffs[0][i];
+      double diff_mp = diffs[1][i];
+      codeLength[i] = log_mi + diff_mi + log_mp + diff_mp;
+
+      if(codeLength[i] <= minCL) {
+        minCL = codeLength[i];
+        min_i = i;
+      }
+    }
+
+    SortedSet<CLIQUESubspace<V>> result = new TreeSet<CLIQUESubspace<V>>();
+    Iterator<CLIQUESubspace<V>> it = denseSubspaces.iterator();
+    for(int i = 0; i <= min_i; i++) {
+      result.add(it.next());
+    }
+    return result;
+  }
+
+  /**
+   * The specified sorted set of dense subspaces is divided into the selected
+   * set I and the pruned set P. For each set the mean of the cover fractions is
+   * computed.
+   * 
+   * @param denseSubspaces the dense subspaces
+   * @return the mean of the cover fractions, the first value is the mean of the
+   *         selected set I, the second value is the mean of the pruned set P.
+   */
+  private int[][] computeMeans(SortedSet<CLIQUESubspace<V>> denseSubspaces) {
+    int n = denseSubspaces.size() - 1;
+    CLIQUESubspace<V>[] subspaces = ClassGenericsUtil.toArray(denseSubspaces);
+
+    int[] mi = new int[n + 1];
+    int[] mp = new int[n + 1];
+
+    double resultMI = 0;
+    double resultMP = 0;
+
+    for(int i = 0; i < subspaces.length; i++) {
+      resultMI += subspaces[i].getCoverage();
+      resultMP += subspaces[n - i].getCoverage();
+      mi[i] = (int) Math.ceil(resultMI / (i + 1));
+      if(i != n) {
+        mp[n - 1 - i] = (int) Math.ceil(resultMP / (i + 1));
+      }
+    }
+
+    int[][] result = new int[2][];
+    result[0] = mi;
+    result[1] = mp;
+
+    return result;
+  }
+
+  /**
+   * The specified sorted set of dense subspaces is divided into the selected
+   * set I and the pruned set P. For each set the difference from the specified
+   * mean values is computed.
+   * 
+   * @param denseSubspaces the dense subspaces
+   * @param mi the mean of the selected sets I
+   * @param mp the mean of the pruned sets P
+   * @return the difference from the specified mean values, the first value is
+   *         the difference from the mean of the selected set I, the second
+   *         value is the difference from the mean of the pruned set P.
+   */
+  private double[][] computeDiffs(SortedSet<CLIQUESubspace<V>> denseSubspaces, int[] mi, int[] mp) {
+    int n = denseSubspaces.size() - 1;
+    CLIQUESubspace<V>[] subspaces = ClassGenericsUtil.toArray(denseSubspaces);
+
+    double[] diff_mi = new double[n + 1];
+    double[] diff_mp = new double[n + 1];
+
+    double resultMI = 0;
+    double resultMP = 0;
+
+    for(int i = 0; i < subspaces.length; i++) {
+      double diffMI = Math.abs(subspaces[i].getCoverage() - mi[i]);
+      resultMI += diffMI == 0.0 ? 0 : StrictMath.log(diffMI) / StrictMath.log(2);
+      double diffMP = (i != n) ? Math.abs(subspaces[n - i].getCoverage() - mp[n - 1 - i]) : 0;
+      resultMP += diffMP == 0.0 ? 0 : StrictMath.log(diffMP) / StrictMath.log(2);
+      diff_mi[i] = resultMI;
+      if(i != n) {
+        diff_mp[n - 1 - i] = resultMP;
+      }
+    }
+    double[][] result = new double[2][];
+    result[0] = diff_mi;
+    result[1] = diff_mp;
+
+    return result;
+  }
 
 }

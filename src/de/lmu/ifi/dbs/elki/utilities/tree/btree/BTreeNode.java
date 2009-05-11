@@ -9,6 +9,7 @@ import java.util.Arrays;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.AbstractPage;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 
 /**
  * BTreeNode denotes a node in a BTree.
@@ -66,7 +67,6 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
    * @param parentID the ID of the parent of this new node
    * @param file the page file that stores the pages
    */
-  @SuppressWarnings("unchecked")
   BTreeNode(int m, Integer parentID, PageFile<BTreeNode<K, V>> file) {
     super(file);
     if(m <= 0) {
@@ -76,7 +76,7 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
     this.parentID = parentID;
 
     // one more for overflow
-    this.data = new BTreeData[2 * m + 1];
+    this.data = ClassGenericsUtil.newArrayOfNull(2 * m + 1);
     this.childIDs = new Integer[2 * m + 2];
 
     // default is true

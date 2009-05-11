@@ -25,7 +25,6 @@ public class DoubleVectorLabelTransposingParser extends DoubleVectorLabelParser 
     super();
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public ParsingResult<DoubleVector> parse(InputStream in) {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
@@ -48,11 +47,11 @@ public class DoubleVectorLabelTransposingParser extends DoubleVectorLabelParser 
           }
 
           if (data == null) {
-            data = ClassGenericsUtil.newArrayOfArrayList(dimensionality);
+            data = ClassGenericsUtil.newArrayOfEmptyArrayList(dimensionality);
             for (int i = 0; i < data.length; i++) {
               data[i] = new ArrayList<Double>();
             }
-            labels = ClassGenericsUtil.newArrayOfArrayList(dimensionality);
+            labels = ClassGenericsUtil.newArrayOfEmptyArrayList(dimensionality);
             for (int i = 0; i < labels.length; i++) {
               labels[i] = new ArrayList<String>();
             }
@@ -85,6 +84,6 @@ public class DoubleVectorLabelTransposingParser extends DoubleVectorLabelParser 
       objectAndLabelList.add(objectAndLabels);
     }
 
-    return new ParsingResult(objectAndLabelList);
+    return new ParsingResult<DoubleVector>(objectAndLabelList);
   }
 }

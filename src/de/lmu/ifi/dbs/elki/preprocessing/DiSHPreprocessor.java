@@ -208,7 +208,7 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
                 }
 
                 // determine neighbors in each dimension
-                Set<Integer>[] allNeighbors = ClassGenericsUtil.newArrayOfSet(dim);
+                Set<Integer>[] allNeighbors = ClassGenericsUtil.newArrayOfNull(dim);
                 for (int d = 0; d < dim; d++) {
                     List<DistanceResultPair<DoubleDistance>> qrList = database.rangeQuery(id, epsString[d], distanceFunctions[d]);
                     allNeighbors[d] = new HashSet<Integer>(qrList.size());
@@ -500,10 +500,9 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
      *         preference vectors
      * @throws ParameterException
      */
-    @SuppressWarnings("unchecked")
     private DimensionSelectingDistanceFunction<N, V>[] initDistanceFunctions(Database<V> database, int dimensionality, boolean verbose,
                                                                              boolean time) throws ParameterException {
-        DimensionSelectingDistanceFunction<N, V>[] distanceFunctions = new DimensionSelectingDistanceFunction[dimensionality];
+        DimensionSelectingDistanceFunction<N, V>[] distanceFunctions = ClassGenericsUtil.newArrayOfNull(dimensionality);
         for (int d = 0; d < dimensionality; d++) {
             String[] parameters = new String[0];
             parameters = OptionUtil.addParameter(parameters, DimensionSelectingDistanceFunction.DIM_ID, Integer.toString(d + 1));

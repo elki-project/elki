@@ -2,6 +2,8 @@ package de.lmu.ifi.dbs.elki.utilities.pairs;
 
 import java.util.Comparator;
 
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+
 /**
  * Pair with canonical comparison function derived from generics.
  * 
@@ -101,9 +103,8 @@ public class CPair<FIRST extends Comparable<FIRST>, SECOND extends Comparable<SE
    * @param size Size of array to be constructed
    * @return New array of requested size
    */
-  @SuppressWarnings("unchecked")
   public static final <F extends Comparable<F>, S extends Comparable<S>> CPair<F, S>[] newArray(int size) {
-    return new CPair[size];
+    return ClassGenericsUtil.newArrayOfNull(size);
   }
 
   /**

@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.utilities.pairs;
 
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+
 /**
  * Pair that can only be compared by it's first component.
  * 
@@ -50,8 +52,7 @@ public class FCPair<FIRST extends Comparable<FIRST>, SECOND> extends Pair<FIRST,
    * @param size Size of array to be constructed
    * @return New array of requested size
    */
-  @SuppressWarnings("unchecked")
   public static final <F extends Comparable<F>, S> FCPair<F, S>[] newArray(int size) {
-    return new FCPair[size];
+    return ClassGenericsUtil.newArrayOfNull(size);
   }
 }

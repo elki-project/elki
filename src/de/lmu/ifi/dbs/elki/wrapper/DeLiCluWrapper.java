@@ -62,9 +62,8 @@ public class DeLiCluWrapper<O extends DatabaseObject> extends NormalizationWrapp
      *
      * @param args the arguments to run this wrapper
      */
-    @SuppressWarnings("unchecked")
     public static void main(String[] args) {
-        new DeLiCluWrapper().runCLIWrapper(args);
+        new DeLiCluWrapper<DatabaseObject>().runCLIWrapper(args);
     }
 
     /**
