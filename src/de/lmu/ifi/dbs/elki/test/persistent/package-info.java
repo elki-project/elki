@@ -1,5 +1,5 @@
 /**
- * <p>Package with unit tests of persistent data storage.</p>
+ * <p>Persistent data storage unit tests.</p>
  * 
  */
 package de.lmu.ifi.dbs.elki.test.persistent;

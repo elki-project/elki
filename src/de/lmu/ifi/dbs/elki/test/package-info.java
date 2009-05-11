@@ -1,5 +1,5 @@
 /**
- * <p>Package with various unit tests.</p>
+ * <p>Unit Tests.</p>
  * 
  */
 package de.lmu.ifi.dbs.elki.test;

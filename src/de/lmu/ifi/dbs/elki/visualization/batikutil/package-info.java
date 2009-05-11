@@ -1,5 +1,5 @@
 /**
- * <p>Package with some generic functionality useful for Batik.</p>
+ * <p>Commonly used functionality useful for Apache Batik.</p>
  * 
  */
 package de.lmu.ifi.dbs.elki.visualization.batikutil;

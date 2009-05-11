@@ -1,5 +1,5 @@
 /**
- * <p>Package with various unit tests.</p>
+ * <p>Unit tests for utility functions.</p>
  * 
  */
 package de.lmu.ifi.dbs.elki.test.utilities;

@@ -1,5 +1,4 @@
 /**
- * <p>Package collects wrapper classes for common algorithms.
- * </p>
+ * <p>Wrapper classes for simple invocation of common algorithms.</p>
  */
 package de.lmu.ifi.dbs.elki.wrapper;
