@@ -3,6 +3,9 @@ package de.lmu.ifi.dbs.elki.visualization.svg;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
+import de.lmu.ifi.dbs.elki.visualization.colors.PublicationColorLibrary;
+
 
 /**
  * Simple marker library that just draws colored crosses at the given coordinates.

@@ -1,10 +1,10 @@
-package de.lmu.ifi.dbs.elki.visualization.svg;
+package de.lmu.ifi.dbs.elki.visualization.colors;
 
 import org.apache.batik.util.SVGConstants;
 
 /**
  * Simple color library with a small number of hand-picked colors that provide sufficient
- * difference when printed.
+ * difference when printed (and that should work with all printers).
  * 
  * @author Erich Schubert
  */

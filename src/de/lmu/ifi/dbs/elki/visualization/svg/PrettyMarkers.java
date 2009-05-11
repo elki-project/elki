@@ -4,6 +4,9 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
+import de.lmu.ifi.dbs.elki.visualization.colors.PublicationColorLibrary;
+
 
 /**
  * Marker library achieving a larger number of styles by combining different shapes

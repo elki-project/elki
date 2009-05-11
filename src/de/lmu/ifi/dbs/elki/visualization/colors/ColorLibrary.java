@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.visualization.svg;
+package de.lmu.ifi.dbs.elki.visualization.colors;
 
 /**
  * Color scheme interface
