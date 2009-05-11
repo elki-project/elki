@@ -5,26 +5,26 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Utils for handling class instantiation especially with respect to Java generics.
+ * <p>Utils for handling class instantiation especially with respect to Java generics.</p>
  * 
- * Due to the way generics are implemented - via erasure - type safety cannot be guaranteed
+ * <p>Due to the way generics are implemented - via erasure - type safety cannot be guaranteed
  * properly at compile time here. These classes collect such cases using helper functions,
- * so that we have to suppress these warnings only in one place.
+ * so that we have to suppress these warnings only in one place.</p>
  * 
- * Note that many of these situations are still type safe, i.e. an <i>empty</i> array of
- * List<List<?>> can indeed be cast into a List<List<Whatever>>.
+ * <p>Note that many of these situations are still type safe, i.e. an <i>empty</i> array of
+ * List<List<?>> can indeed be cast into a List<List<Whatever>>.</p>
  * 
- * The only one potentially unsafe is {@link #instantiateGenerics}, since we can't verify
+ * <p>The only one potentially unsafe is {@link #instantiateGenerics}, since we can't verify
  * that the runtime type 'type' adhers to the compile time restriction T. When T is not generic,
- * such a check is possible, and then the developer should use {@link #instantiate} instead.
+ * such a check is possible, and then the developer should use {@link #instantiate} instead.</p>
  *
  */
 public final class ClassGenericsUtil {
   /**
-   * Returns a new instance of the given type for the specified className.
-   * <p/>
-   * If the Class for className is not found, the instantiation is tried using
-   * the package of the given type as package of the given className.
+   * <p>Returns a new instance of the given type for the specified className.</p>
+   * 
+   * <p>If the Class for className is not found, the instantiation is tried using
+   * the package of the given type as package of the given className.</p>
    * 
    * @param <T> Class type for compile time type checking
    * @param type desired Class type of the Object to retrieve
@@ -60,13 +60,13 @@ public final class ClassGenericsUtil {
   }
 
   /**
-   * Returns a new instance of the given type for the specified className.
-   * <p/>
-   * If the Class for className is not found, the instantiation is tried using
-   * the package of the given type as package of the given className.
+   * <p>Returns a new instance of the given type for the specified className.</p>
    * 
-   * This is a weaker type checked version of "instantiate" for use with
-   * generics.
+   * <p>If the Class for className is not found, the instantiation is tried using
+   * the package of the given type as package of the given className.</p>
+   * 
+   * <p>This is a weaker type checked version of "{@link #instantiate}" for use with
+   * Generics.</p>
    * 
    * @param <T> Class type for compile time type checking
    * @param type desired Class type of the Object to retrieve
@@ -105,8 +105,9 @@ public final class ClassGenericsUtil {
   }
 
   /**
-   * Create an array of lists. This is a common cast we have to do due to Java
-   * generics limitations.
+   * Create an array of lists.
+   * 
+   * This is a common unchecked cast we have to do due to Java generics limitations.
    * 
    * @param <T> Type the list elements have
    * @param len array size
@@ -114,13 +115,13 @@ public final class ClassGenericsUtil {
    */
   @SuppressWarnings("unchecked")
   public static <T> List<T>[] newArrayOfList(int len) {
-    List<?>[] result = new List<?>[len];
-    return (List<T>[]) result;
+    return new List[len];
   }
 
   /**
-   * Create an array of ArrayLists. This is a common cast we have to do due to
-   * Java generics limitations.
+   * Create an array of ArrayLists.
+   * 
+   * This is a common unchecked cast we have to do due to Java generics limitations.
    * 
    * @param <T> Type the list elements have
    * @param len array size
@@ -128,13 +129,13 @@ public final class ClassGenericsUtil {
    */
   @SuppressWarnings("unchecked")
   public static <T> ArrayList<T>[] newArrayOfArrayList(int len) {
-    ArrayList<?>[] result = new ArrayList<?>[len];
-    return (ArrayList<T>[]) result;
+    return new ArrayList[len];
   }
 
   /**
-   * Create an array of sets. This is a common cast we have to do due to Java
-   * generics limitations.
+   * Create an array of sets.
+   * 
+   * This is a common unchecked cast we have to do due to Java generics limitations.
    * 
    * @param <T> Type the list elements have
    * @param len array size
@@ -142,8 +143,7 @@ public final class ClassGenericsUtil {
    */
   @SuppressWarnings("unchecked")
   public static <T> Set<T>[] newArrayOfSet(int len) {
-    Set<?>[] result = new Set<?>[len];
-    return (Set<T>[]) result;
+    return new Set[len];
   }
 
 }
