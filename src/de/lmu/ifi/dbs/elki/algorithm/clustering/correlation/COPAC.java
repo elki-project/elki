@@ -203,7 +203,6 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
      * The remaining parameters are passed to the {@link #partitionAlgorithm},
      * then to the {@link #partitionDatabase} and afterwards to the {@link #preprocessor}.
      */
-    @SuppressWarnings("unchecked")
     @Override
     public String[] setParameters(String[] args) throws ParameterException {
         String[] remainingParameters = super.setParameters(args);
@@ -215,7 +214,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
             partitionDatabaseParameters = tmpDB.getParameters();
             // FIXME: we're leaking a reference here.
             addParameterizable(tmpDB);
-            partitionDatabase = (Class<? extends Database<V>>) tmpDB.getClass();
+            partitionDatabase = ClassGenericsUtil.uglyCrossCast(tmpDB.getClass(), Database.class);
         }
 
         // preprocessor

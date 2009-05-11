@@ -62,7 +62,7 @@ public class PreprocessorHandler<O extends DatabaseObject, P extends Preprocesso
   private boolean omit;
 
   /**
-   * The assocoiation ID for the association to be set by the preprocessor.
+   * The association ID for the association to be set by the preprocessor.
    */
   private AssociationID<?> associationID;
 
@@ -89,10 +89,11 @@ public class PreprocessorHandler<O extends DatabaseObject, P extends Preprocesso
    * 
    * @param preprocessorClient the class using this handler
    */
-  public PreprocessorHandler(PreprocessorClient preprocessorClient) {
+  public PreprocessorHandler(PreprocessorClient<P,O> preprocessorClient) {
 
     // preprocessor
-    PREPROCESSOR_PARAM = new ClassParameter<P>(PREPROCESSOR_ID, preprocessorClient.getPreprocessorSuperClass(), preprocessorClient.getDefaultPreprocessorClassName());
+    Class<P> pcls = preprocessorClient.getPreprocessorSuperClass();
+    PREPROCESSOR_PARAM = new ClassParameter<P>(PREPROCESSOR_ID, pcls, preprocessorClient.getDefaultPreprocessorClassName());
     PREPROCESSOR_PARAM.setShortDescription(preprocessorClient.getPreprocessorDescription());
     addOption(PREPROCESSOR_PARAM);
 

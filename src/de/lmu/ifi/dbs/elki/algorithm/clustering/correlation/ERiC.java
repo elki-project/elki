@@ -23,6 +23,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.ERiCDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
@@ -293,13 +294,20 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
         return parameters.toArray(new String[parameters.size()]);
     }
 
-    @SuppressWarnings("unchecked")
-    private void buildHierarchy(SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap) {
+    private void buildHierarchy(SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap) throws IllegalStateException {
 
         StringBuffer msg = new StringBuffer();
 
-        DBSCAN dbscan = (DBSCAN) copacAlgorithm.getPartitionAlgorithm();
-        ERiCDistanceFunction<V,?> distanceFunction = (ERiCDistanceFunction<V, ?>) dbscan.getDistanceFunction();
+        DBSCAN<V, ?> dbscan = ClassGenericsUtil.castWithGenericsOrNull(DBSCAN.class, copacAlgorithm.getPartitionAlgorithm());
+        if (dbscan == null) {
+          // TODO: appropriate exception class?
+          throw new IllegalArgumentException("ERiC was run without DBSCAN as COPAC algorithm!");
+        }
+        ERiCDistanceFunction<V,?> distanceFunction = ClassGenericsUtil.castWithGenericsOrNull(ERiCDistanceFunction.class, dbscan.getDistanceFunction());
+        if (distanceFunction == null) {
+          // TODO: appropriate exception class?
+          throw new IllegalArgumentException("ERiC was run without ERiCDistanceFunction as distance function!");
+        }
         Integer lambda_max = clusterMap.lastKey();
 
         for (Integer childCorrDim : clusterMap.keySet()) {

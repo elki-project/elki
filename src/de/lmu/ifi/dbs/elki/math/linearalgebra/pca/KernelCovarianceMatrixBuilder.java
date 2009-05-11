@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 
 /**
  * Kernel Covariance Matrix Builder.
@@ -23,10 +24,9 @@ public class KernelCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends C
    * Returns the local kernel matrix of the specified ids.
    */
   @Override
-  @SuppressWarnings("unchecked")
   public Matrix processIds(Collection<Integer> ids, Database<V> database) {
     //get global kernel Matrix
-    final KernelMatrix<V> kernelMatrix = (KernelMatrix<V>) database.getGlobalAssociation(AssociationID.KERNEL_MATRIX);
+    final KernelMatrix<V> kernelMatrix = ClassGenericsUtil.castWithGenericsOrNull(KernelMatrix.class, database.getGlobalAssociation(AssociationID.KERNEL_MATRIX));
     //get local submatrix
     final Matrix localKernelMatrix = kernelMatrix.getSubMatrix(ids);
     // return centered local kernel matrix

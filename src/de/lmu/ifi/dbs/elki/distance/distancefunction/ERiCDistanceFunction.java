@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -137,9 +138,8 @@ public class ERiCDistanceFunction<V extends RealVector<V, ?>, P extends Preproce
      * @return the super class for the preprocessor parameter,
      *         which is {@link de.lmu.ifi.dbs.elki.preprocessing.Preprocessor}
      */
-    @SuppressWarnings("unchecked")
-    public Class<? extends Preprocessor> getPreprocessorSuperClass() {
-        return Preprocessor.class;
+    public Class<P> getPreprocessorSuperClass() {
+        return ClassGenericsUtil.uglyCastIntoSubclass(Preprocessor.class);
     }
 
     /**

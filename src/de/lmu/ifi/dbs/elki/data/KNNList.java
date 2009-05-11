@@ -8,6 +8,7 @@ import java.util.TreeSet;
 
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 
 /**
  * A wrapper class for storing the k most similar comparable objects.
@@ -187,7 +188,6 @@ public class KNNList<D extends Distance<D>> {
    * @return <code>true</code> if this object is the same as the obj argument;
    *         <code>false</code> otherwise.
    */
-  @SuppressWarnings("unchecked")
   @Override
   public boolean equals(Object o) {
     if(this == o) {
@@ -196,8 +196,10 @@ public class KNNList<D extends Distance<D>> {
     if(o == null || getClass() != o.getClass()) {
       return false;
     }
-    // noinspection unchecked
-    final KNNList<D> knnList = (KNNList<D>) o;
+    final KNNList<D> knnList = ClassGenericsUtil.castWithGenericsOrNull(KNNList.class, o);
+    if(knnList == null) {
+      return false;
+    }
 
     if(k != knnList.k) {
       return false;
@@ -219,6 +221,7 @@ public class KNNList<D extends Distance<D>> {
 
   /**
    * Combine list hash code with the value of k.
+   * 
    * @see java.lang.Object#hashCode()
    */
   @Override

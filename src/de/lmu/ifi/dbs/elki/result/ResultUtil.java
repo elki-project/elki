@@ -5,6 +5,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 
 /**
  * Utilities for handling result objects
@@ -110,7 +111,7 @@ public class ResultUtil {
       return anns;
     }
     if(r instanceof MultiResult) {
-      return ((MultiResult)r).filterResults(AnnotationResult.class);
+      return ClassGenericsUtil.castWithGenericsOrNull(List.class, ((MultiResult)r).filterResults(AnnotationResult.class));
     }
     return null;
   }
@@ -146,7 +147,7 @@ public class ResultUtil {
       return crs;
     }
     if(r instanceof MultiResult) {
-      return ((MultiResult)r).filterResults(Clustering.class);
+      return ClassGenericsUtil.castWithGenericsOrNull(List.class, ((MultiResult)r).filterResults(Clustering.class));
     }
     return null;
   }
@@ -164,7 +165,7 @@ public class ResultUtil {
       return irs;
     }
     if(r instanceof MultiResult) {
-      return ((MultiResult)r).filterResults(IterableResult.class);
+      return ClassGenericsUtil.castWithGenericsOrNull(List.class, ((MultiResult)r).filterResults(IterableResult.class));
     }
     return null;
   }

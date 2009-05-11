@@ -66,13 +66,12 @@ public class MultiResult implements Result {
    * @return filtered results list
    */
   // We can't ensure that restrictionClass matches C.
-  @SuppressWarnings("unchecked")
-  public <C> ArrayList<C> filterResults(Class<?> restrictionClass) {
+  public <C> ArrayList<C> filterResults(Class<C> restrictionClass) {
     ArrayList<C> res = new ArrayList<C>();
     for(Result result : results) {
       if(result != null) {
         try {
-          res.add((C) restrictionClass.cast(result));
+          res.add(restrictionClass.cast(result));
         }
         catch(ClassCastException e) {
           // skip non-matching items
@@ -89,13 +88,11 @@ public class MultiResult implements Result {
    * @param restrictionClass
    * @return first matching result
    */
-  // We can't ensure that restrictionClass matches C.
-  @SuppressWarnings("unchecked")
-  public <C> C getFirstFilteredResult(Class<?> restrictionClass) {
+  public <C> C getFirstFilteredResult(Class<C> restrictionClass) {
     for(Result result : results) {
       if(result != null) {
         try {
-          return (C) restrictionClass.cast(result);
+          return restrictionClass.cast(result);
         }
         catch(ClassCastException e) {
           // skip non-matching items

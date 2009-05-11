@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.preprocessing;
 
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
@@ -10,7 +11,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  *
  * @author Elke Achtert
  */
-public interface PreprocessorClient extends Parameterizable {
+public interface PreprocessorClient<P extends Preprocessor<O>, O extends DatabaseObject> extends Parameterizable {
 
     /**
      * Returns the name of the default preprocessor.
@@ -31,7 +32,7 @@ public interface PreprocessorClient extends Parameterizable {
      *
      * @return the super class for the preprocessor parameter
      */
-    Class<? extends Preprocessor> getPreprocessorSuperClass();
+    Class<P> getPreprocessorSuperClass();
 
     /**
      * Returns the association ID for the association to be set by the preprocessor.

@@ -22,6 +22,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTree;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 import de.lmu.ifi.dbs.elki.utilities.Util;
@@ -102,7 +103,6 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
      * Performs the DeLiClu algorithm on the given database.
      *
      */
-    @SuppressWarnings("unchecked")
     @Override
     protected ClusterOrderResult<D> runInTime(Database<O> database) throws IllegalStateException {
         if (!(database instanceof SpatialIndexDatabase)) {
@@ -110,7 +110,7 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
                 "Database must be an instance of "
                     + SpatialIndexDatabase.class.getName());
         }
-        SpatialIndexDatabase<O, DeLiCluNode, DeLiCluEntry> db = (SpatialIndexDatabase<O, DeLiCluNode, DeLiCluEntry>) database;
+        SpatialIndexDatabase<O, DeLiCluNode, DeLiCluEntry> db = ClassGenericsUtil.castWithGenericsOrNull(SpatialIndexDatabase.class, database);
 
         if (!(db.getIndex() instanceof DeLiCluTree)) {
             throw new IllegalArgumentException("Index must be an instance of "

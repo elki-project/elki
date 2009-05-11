@@ -7,7 +7,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.preprocessing.HiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
-import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
  * @param <D> the type of CorrelationDistance used
  */
 // TODO: can we spec D differently so we don't get the unchecked warnings below?
-public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P extends Preprocessor<V>, D extends CorrelationDistance<D>>
+public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P extends HiCOPreprocessor<V>, D extends CorrelationDistance<D>>
     extends AbstractCorrelationDistanceFunction<V, P, D> {
 
     /**
@@ -288,9 +288,8 @@ public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P e
      * @return the super class for the preprocessor parameter,
      *         which is {@link HiCOPreprocessor}
      */
-    @SuppressWarnings("unchecked")
-    public Class<? extends Preprocessor> getPreprocessorSuperClass() {
-        return HiCOPreprocessor.class;
+    public Class<P> getPreprocessorSuperClass() {
+        return ClassGenericsUtil.uglyCastIntoSubclass(HiCOPreprocessor.class);
     }
 
     /**

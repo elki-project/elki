@@ -34,8 +34,7 @@ public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends
     /**
      * The association id to associate a subspace outlier degree.
      */
-    @SuppressWarnings("unchecked")
-    public static final AssociationID<SODModel> SOD_MODEL = AssociationID.getOrCreateAssociationID("SOD", SODModel.class);
+    public static final AssociationID<SODModel<?>> SOD_MODEL = AssociationID.getOrCreateAssociationIDGenerics("SOD", SODModel.class);
 
     /**
      * OptionID for {@link #KNN_PARAM}
@@ -121,7 +120,6 @@ public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends
     /**
      * Performs the PROCLUS algorithm on the given database.
      */
-    @SuppressWarnings("unchecked")
     @Override
     protected MultiResult runInTime(Database<V> database) throws IllegalStateException {
         FiniteProgress progress = new FiniteProgress("assigning SOD", database.size());
@@ -143,8 +141,8 @@ public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends
         }
         // combine results.
         sodResult = new MultiResult();
-        sodResult.addResult(new AnnotationFromDatabase<SODModel, V>(database, SOD_MODEL));
-        sodResult.addResult(new OrderingFromAssociation(database, SOD_MODEL, true));
+        sodResult.addResult(new AnnotationFromDatabase<SODModel<?>, V>(database, SOD_MODEL));
+        sodResult.addResult(new OrderingFromAssociation<SODModel<?>, V>(database, SOD_MODEL, true));
         return sodResult;
     }
 

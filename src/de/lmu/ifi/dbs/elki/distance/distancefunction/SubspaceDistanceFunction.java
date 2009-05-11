@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 
 /**
  * Provides a distance function to determine a kind of correlation distance
@@ -49,9 +50,8 @@ public class SubspaceDistanceFunction<V extends RealVector<V, ?>, P extends Prep
      * @return the super class for the preprocessor,
      *         which is {@link de.lmu.ifi.dbs.elki.preprocessing.Preprocessor}
      */
-    @SuppressWarnings("unchecked")
-    public Class<? extends Preprocessor> getPreprocessorSuperClass() {
-        return Preprocessor.class;
+    public Class<P> getPreprocessorSuperClass() {
+        return ClassGenericsUtil.uglyCastIntoSubclass(Preprocessor.class);
     }
 
     /**

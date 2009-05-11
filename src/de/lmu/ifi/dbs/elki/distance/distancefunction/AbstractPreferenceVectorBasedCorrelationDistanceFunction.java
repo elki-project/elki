@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.preprocessing.PreferenceVectorPreprocessor;
-import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
  * @param <V> the type of RealVector to compute the distances in between
  * @param <P> the type of Preprocessor used
  */
-public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P extends Preprocessor<V>>
+public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P extends PreferenceVectorPreprocessor<V>>
     extends AbstractCorrelationDistanceFunction<V, P, PreferenceVectorBasedCorrelationDistance> {
 
     /**
@@ -228,9 +228,8 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
      * @return the super class for the preprocessor parameter,
      *         which is {@link PreferenceVectorPreprocessor}
      */
-    @SuppressWarnings("unchecked")
-    public final Class<? extends Preprocessor> getPreprocessorSuperClass() {
-        return PreferenceVectorPreprocessor.class;
+    public final Class<P> getPreprocessorSuperClass() {
+        return ClassGenericsUtil.uglyCastIntoSubclass(PreferenceVectorPreprocessor.class);
     }
 
     public final String getPreprocessorDescription() {

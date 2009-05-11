@@ -279,9 +279,9 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
    *        id
    */
   @SuppressWarnings("unchecked")
-  protected <T> void setAssociations(final Integer id, final Associations idAssociations) {
+  protected void setAssociations(final Integer id, final Associations idAssociations) {
     for(AssociationID<?> associationID : idAssociations.keySet()) {
-      AssociationID<T> aID = (AssociationID<T>) associationID;
+      AssociationID<Object> aID = (AssociationID<Object>) associationID;
       associate(aID, id, idAssociations.get(aID));
     }
   }
@@ -290,10 +290,9 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     return partition(partitions, null, null);
   }
 
-  @SuppressWarnings("unchecked")
   public Map<Integer, Database<O>> partition(Map<Integer, List<Integer>> partitions, Class<? extends Database<O>> dbClass, String[] dbParameters) throws UnableToComplyException {
     if(dbClass == null) {
-      dbClass = (Class<? extends Database<O>>) this.getClass();
+      dbClass = ClassGenericsUtil.uglyCrossCast(this.getClass(), Database.class);
       dbParameters = getParameters();
     }
 

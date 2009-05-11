@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.preprocessing.DiSHPreprocessor;
-import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
+import de.lmu.ifi.dbs.elki.preprocessing.PreferenceVectorPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 
 /**
@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
  * @param <V> the type of RealVector to compute the distances in between
  * @param <P> the type of Preprocessor used
  */
-public class DiSHDistanceFunction<V extends RealVector<V, ?>, P extends Preprocessor<V>>
+public class DiSHDistanceFunction<V extends RealVector<V, ?>, P extends PreferenceVectorPreprocessor<V>>
     extends AbstractPreferenceVectorBasedCorrelationDistanceFunction<V, P> {
 
     /**

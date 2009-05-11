@@ -11,8 +11,8 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.SharedNearestNeighborsPreprocessor;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -152,9 +152,8 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O extends Databas
    * @return the super class for the preprocessor, which is
    *         {@link SharedNearestNeighborsPreprocessor}
    */
-  @SuppressWarnings("unchecked")
-  public Class<? extends Preprocessor> getPreprocessorSuperClass() {
-    return SharedNearestNeighborsPreprocessor.class;
+  public Class<SharedNearestNeighborsPreprocessor<O, D>> getPreprocessorSuperClass() {
+    return ClassGenericsUtil.uglyCastIntoSubclass(SharedNearestNeighborsPreprocessor.class);
   }
 
   @Override
