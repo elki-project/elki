@@ -24,7 +24,7 @@ import de.lmu.ifi.dbs.elki.wrapper.AbstractWrapper;
  * @author Erich Schubert
  * 
  */
-public class LoadDistanceResultIntoDiskCache extends AbstractWrapper {
+public class LoadDistanceResultIntoOnDiskMatrix extends AbstractWrapper {
   /**
    * OptionID for {@link #CACHE_PARAM}
    */
@@ -51,7 +51,7 @@ public class LoadDistanceResultIntoDiskCache extends AbstractWrapper {
   /**
    * Constructor.
    */
-  public LoadDistanceResultIntoDiskCache() {
+  public LoadDistanceResultIntoOnDiskMatrix() {
     super();
     addOption(CACHE_PARAM);
   }
@@ -135,6 +135,6 @@ public class LoadDistanceResultIntoDiskCache extends AbstractWrapper {
    * @param args
    */
   public static void main(String[] args) {
-    new LoadDistanceResultIntoDiskCache().runCLIWrapper(args);
+    new LoadDistanceResultIntoOnDiskMatrix().runCLIWrapper(args);
   }
 }
