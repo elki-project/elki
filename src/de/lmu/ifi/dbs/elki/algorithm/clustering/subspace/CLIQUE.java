@@ -530,7 +530,7 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clu
    */
   private int[][] computeMeans(SortedSet<CLIQUESubspace<V>> denseSubspaces) {
     int n = denseSubspaces.size() - 1;
-    CLIQUESubspace<V>[] subspaces = ClassGenericsUtil.toArray(denseSubspaces);
+    CLIQUESubspace<V>[] subspaces = ClassGenericsUtil.toArray(denseSubspaces, CLIQUESubspace.class);
 
     int[] mi = new int[n + 1];
     int[] mp = new int[n + 1];
@@ -568,7 +568,7 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clu
    */
   private double[][] computeDiffs(SortedSet<CLIQUESubspace<V>> denseSubspaces, int[] mi, int[] mp) {
     int n = denseSubspaces.size() - 1;
-    CLIQUESubspace<V>[] subspaces = ClassGenericsUtil.toArray(denseSubspaces);
+    CLIQUESubspace<V>[] subspaces = ClassGenericsUtil.toArray(denseSubspaces, CLIQUESubspace.class);
 
     double[] diff_mi = new double[n + 1];
     double[] diff_mp = new double[n + 1];

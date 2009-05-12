@@ -69,7 +69,7 @@ public class ProvidedTestSet<O extends DatabaseObject, L extends ClassLabel> ext
         for (L label : this.labels) {
             joinedLabels.add(label);
         }
-        this.labels = ClassGenericsUtil.toArray((Set<L>)joinedLabels);
+        this.labels = ClassGenericsUtil.toArray((Set<L>)joinedLabels, ClassLabel.class);
         Arrays.sort(this.labels);
         split[0] = new TrainingAndTestSet(this.database, testset, labels);
         return split;

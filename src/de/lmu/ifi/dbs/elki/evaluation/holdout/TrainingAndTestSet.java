@@ -81,6 +81,6 @@ public class TrainingAndTestSet<O extends DatabaseObject, L extends ClassLabel>
      * @return new array of the given size.
      */
     public static <O extends DatabaseObject, L extends ClassLabel> TrainingAndTestSet<O,L>[] newArray(int len) {
-      return ClassGenericsUtil.newArrayOfNull(len);
+      return ClassGenericsUtil.newArrayOfNull(len, TrainingAndTestSet.class);
     }
 }

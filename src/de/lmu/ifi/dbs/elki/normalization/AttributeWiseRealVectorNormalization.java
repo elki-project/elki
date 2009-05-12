@@ -114,7 +114,7 @@ public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ?>> ex
     }
 
     if(minima.length == 0 && maxima.length == 0) {
-      determineMinMax(ClassGenericsUtil.toArray(featureVectors));
+      determineMinMax(ClassGenericsUtil.toArray(featureVectors, RealVector.class));
     }
 
     int dim = featureVectors.get(0).getDimensionality();

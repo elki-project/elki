@@ -137,9 +137,8 @@ public final class ClassGenericsUtil {
    * @return new array of null pointers.
    */
   @SuppressWarnings("unchecked")
-  public static <T> T[] newArrayOfNull(int len, T... ts) {
-    // Varargs hack!
-    return (T[]) java.lang.reflect.Array.newInstance(ts.getClass().getComponentType(), len);
+  public static <B, T extends B> T[] newArrayOfNull(int len, Class<B> base) {
+    return (T[]) java.lang.reflect.Array.newInstance(base, len);
   }
 
   /**
@@ -147,12 +146,12 @@ public final class ClassGenericsUtil {
    * 
    * @param <T> Type the array elements have
    * @param coll collection to convert.
-   * @param ts Varargs hack - can be empty or "example" objects
+   * @param template Template class.
    * @return new array with the collection contents.
    */
-  public static <T> T[] toArray(Collection<T> coll, T... ts) {
-    // Varargs hack!
-    return coll.toArray(ts);
+  @SuppressWarnings("unchecked")
+  public static <B, T extends B> T[] toArray(Collection<T> coll, Class<B> base) {
+    return coll.toArray((T[]) java.lang.reflect.Array.newInstance(base, 0));
   }
 
   /**
@@ -208,17 +207,19 @@ public final class ClassGenericsUtil {
   }
 
   /**
-   * This class performs an ugly cast, from <code>Class&lt;F&gt;</code>
-   * to <code>Class&lt;T&gt;</code>, where both F and T need to extend B.
+   * This class performs an ugly cast, from <code>Class&lt;F&gt;</code> to
+   * <code>Class&lt;T&gt;</code>, where both F and T need to extend B.
    * 
    * The restrictions are there to avoid misuse of this cast helper.
    * 
    * While this sounds really ugly, the common use case will be something like
+   * 
    * <pre>
    * BASE = Class&lt;Database&gt;
    * FROM = Class&lt;Database&gt;
    * TO = Class&lt;Database&lt;V&gt;&gt;
    * </pre>
+   * 
    * i.e. the main goal is to add missing Generics to the compile time type.
    * 
    * @param <BASE> Base type
@@ -242,8 +243,9 @@ public final class ClassGenericsUtil {
   /**
    * Cast an object at a base class, but return a subclass (for Generics!).
    * 
-   * The main goal of this is to allow casting an object from e.g. "<code>List</code>" to
-   * "<code>List&lt;Something&gt;</code>" without having to add SuppressWarnings everywhere.
+   * The main goal of this is to allow casting an object from e.g. "
+   * <code>List</code>" to "<code>List&lt;Something&gt;</code>" without having
+   * to add SuppressWarnings everywhere.
    * 
    * @param <B> Base type to cast at
    * @param <T> Derived type returned

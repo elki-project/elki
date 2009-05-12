@@ -102,7 +102,7 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
   public EvaluationResult<O, C> evaluate(Database<O> test, C algorithm) throws IllegalStateException {
     SortedSet<ClassLabel> lbls = DatabaseUtil.getClassLabels(test);
     // todo: ugly cast.
-    this.labels = ClassGenericsUtil.toArray((SortedSet<L>)lbls);
+    this.labels = ClassGenericsUtil.toArray((SortedSet<L>)lbls, ClassLabel.class);
     this.partition = holdout.partition(test);
     
     // TODO: add support for predefined test and training pairs!

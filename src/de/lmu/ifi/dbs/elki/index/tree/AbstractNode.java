@@ -54,7 +54,7 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
   public AbstractNode(PageFile<N> file, int capacity, boolean isLeaf) {
     super(file);
     this.numEntries = 0;
-    this.entries = ClassGenericsUtil.newArrayOfNull(capacity);
+    this.entries = ClassGenericsUtil.newArrayOfNull(capacity, Entry.class);
     this.isLeaf = isLeaf;
   }
 
@@ -225,7 +225,7 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
    * Deletes all entries in this node.
    */
   protected final void deleteAllEntries() {
-    this.entries = ClassGenericsUtil.newArrayOfNull(entries.length);
+    this.entries = ClassGenericsUtil.newArrayOfNull(entries.length, Entry.class);
     this.numEntries = 0;
   }
 
@@ -234,7 +234,7 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
    */
   public final void increaseEntries() {
     E[] tmp = entries;
-    entries = ClassGenericsUtil.newArrayOfNull(tmp.length + 1);
+    entries = ClassGenericsUtil.newArrayOfNull(tmp.length + 1, Entry.class);
     System.arraycopy(tmp, 0, entries, 0, tmp.length);
   }
 

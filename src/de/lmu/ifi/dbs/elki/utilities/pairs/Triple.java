@@ -114,7 +114,7 @@ public class Triple<FIRST, SECOND, THIRD> {
    * @return new array of the requested size.
    */
   public static final <F, S, T> Triple<F, S, T>[] newArray(int size) {
-    return ClassGenericsUtil.newArrayOfNull(size);
+    return ClassGenericsUtil.newArrayOfNull(size, Triple.class);
   }
 
   /**

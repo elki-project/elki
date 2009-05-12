@@ -76,7 +76,7 @@ public class BTreeNode<K extends Comparable<K> & Externalizable, V extends Exter
     this.parentID = parentID;
 
     // one more for overflow
-    this.data = ClassGenericsUtil.newArrayOfNull(2 * m + 1);
+    this.data = ClassGenericsUtil.newArrayOfNull(2 * m + 1, BTreeData.class);
     this.childIDs = new Integer[2 * m + 2];
 
     // default is true

@@ -32,7 +32,7 @@ public abstract class AbstractHoldout<O extends DatabaseObject, L extends ClassL
    */
   @SuppressWarnings("unchecked")
   public void setClassLabels(Database<O> database) {
-    this.labels = ClassGenericsUtil.toArray((Collection<L>)DatabaseUtil.getClassLabels(database));
+    this.labels = ClassGenericsUtil.toArray((Collection<L>)DatabaseUtil.getClassLabels(database), ClassLabel.class);
     Arrays.sort(this.labels);
   }
 

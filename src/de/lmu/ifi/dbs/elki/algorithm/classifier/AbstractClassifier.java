@@ -23,7 +23,7 @@ public abstract class AbstractClassifier<O extends DatabaseObject, L extends Cla
      * Holds the available labels. Should be set by the training method
      * {@link Classifier#buildClassifier(de.lmu.ifi.dbs.elki.database.Database,de.lmu.ifi.dbs.elki.data.ClassLabel[])}
      */
-    private L[] labels = ClassGenericsUtil.newArrayOfNull(0);
+    private L[] labels = ClassGenericsUtil.newArrayOfNull(0, ClassLabel.class);
 
     /**
      * Provides a classification for a given instance. The classification is the
