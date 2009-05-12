@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
@@ -25,12 +24,28 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
 
 /**
  * Algorithm to compute density-based local outlier factors in a database based
- * on a specified parameter minpts.
+ * on a specified parameter {@link #K_ID}.
+ * 
+ * <p>This implementation diverts from the original LOF publication in that it allows the
+ * user to use a different distance function for the reachability distance and neighborhood
+ * determination (although the default is to use the same value.)</p>
+ * 
+ * <p>The k nearest neighbors are determined using the parameter
+ * {@link DistanceBasedAlgorithm#DISTANCE_FUNCTION_ID), while the reference set used in reachability
+ * distance computation is configured using {@link #REACHABILITY_DISTANCE_FUNCTION_ID}.</p>
+ * 
+ * <p/>
+ * Reference:
+ * <br>M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander:
+ * LOF: Identifying Density-Based Local Outliers.
+ * <br>In: Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00), Dallas, TX, 2000.
+ * </p>
  * 
  * @author Peer Kr&ouml;ger
  * @param <O> the type of DatabaseObjects handled by this Algorithm
@@ -51,7 +66,7 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
    * Key: {@code -genlof.reachdistfunction}
    * </p>
    */
-  private final ClassParameter<DistanceFunction<O, DoubleDistance>> REACHABILITY_DISTANCE_FUNCTION_PARAM = new ClassParameter<DistanceFunction<O, DoubleDistance>>(REACHABILITY_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class.getName());
+  private final ClassParameter<DistanceFunction<O, DoubleDistance>> REACHABILITY_DISTANCE_FUNCTION_PARAM = new ClassParameter<DistanceFunction<O, DoubleDistance>>(REACHABILITY_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
 
   /**
    * The association id to associate the LOF_SCORE of an object for the
@@ -95,9 +110,22 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
   MultiResult result;
 
   /**
-   * Preprocessor
+   * Preprocessor Step 1
    */
-  MaterializeKNNPreprocessor<O, DoubleDistance> preprocessor;
+  MaterializeKNNPreprocessor<O, DoubleDistance> preprocessor1;
+
+  /**
+   * Preprocessor Step 2
+   */
+  MaterializeKNNPreprocessor<O, DoubleDistance> preprocessor2;
+  
+  /**
+   * Include object itself in kNN neighborhood.
+   * 
+   * In the official LOF publication, the point itself is not considered to be
+   * part of its k nearest neighbors.
+   */
+  boolean objectIsInKNN = false;
 
   /**
    * Provides the Generalized LOF_SCORE algorithm, adding parameters
@@ -111,7 +139,8 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
     // parameter reachability distance function
     addOption(REACHABILITY_DISTANCE_FUNCTION_PARAM);
     
-    preprocessor = new MaterializeKNNPreprocessor<O, DoubleDistance>();
+    preprocessor1 = new MaterializeKNNPreprocessor<O, DoubleDistance>();
+    preprocessor2 = new MaterializeKNNPreprocessor<O, DoubleDistance>();
   }
 
   /**
@@ -123,44 +152,45 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
     reachabilityDistanceFunction.setDatabase(database, isVerbose(), isTime());
 
     // materialize neighborhoods
-    preprocessor.run(database, isVerbose(), isTime());
-    HashMap<Integer, List<DistanceResultPair<DoubleDistance>>> neigh = preprocessor.getMaterialized();
-
-    // TODO: use some abstraction to allow on-disk storage.
-    HashMap<Integer, List<DistanceResultPair<DoubleDistance>>> neigh2 = new HashMap<Integer, List<DistanceResultPair<DoubleDistance>>>();
-    {// computing reach dist function neighborhoods
-      if(logger.isVerbose()) {
-        logger.verbose("computing neighborhoods for reachability function");
-      }
-      FiniteProgress reachDistNeighborhoodsProgress = new FiniteProgress("Reachability Distance Neighborhoods", database.size());
-      int counter = 1;
-      for(Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
-        Integer id = iter.next();
-        List<DistanceResultPair<DoubleDistance>> neighbors = database.kNNQueryForID(id, k + 1, reachabilityDistanceFunction);
-        neighbors.remove(0);
-        neigh2.put(id, neighbors);
-        if(logger.isVerbose()) {
-          reachDistNeighborhoodsProgress.setProcessed(counter);
-          logger.progress(reachDistNeighborhoodsProgress);
-        }
-      }
+    HashMap<Integer, List<DistanceResultPair<DoubleDistance>>> neigh1;
+    HashMap<Integer, List<DistanceResultPair<DoubleDistance>>> neigh2;
+    if(logger.isVerbose()) {
+      logger.verbose("Materializing Neighborhoods with respect to primary distance.");
     }
+    preprocessor1.run(database, isVerbose(), isTime());
+    neigh1 = preprocessor1.getMaterialized();
+    if (getDistanceFunction() != reachabilityDistanceFunction) {
+      if(logger.isVerbose()) {
+        logger.verbose("Materializing Neighborhoods with respect to reachability distance.");
+      }
+      preprocessor2.run(database, isVerbose(), isTime());
+      neigh2 = preprocessor2.getMaterialized();
+    } else {
+      if(logger.isVerbose()) {
+        logger.verbose("Reusing neighborhoods of primary distance.");
+      }
+      neigh2 = neigh1;
+    }
+
     HashMap<Integer, Double> lrds = new HashMap<Integer, Double>();
     {// computing LRDs
       if(logger.isVerbose()) {
-        logger.verbose("computing LRDs");
+        logger.verbose("Computing LRDs");
       }
       FiniteProgress lrdsProgress = new FiniteProgress("LRD", database.size());
-      int counter = 1;
-      for(Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
-        Integer id = iter.next();
+      int counter = 0;
+      for(Integer id : database) {
+        counter ++;
         double sum = 0;
         List<DistanceResultPair<DoubleDistance>> neighbors = neigh2.get(id);
+        int nsize = neighbors.size() - (objectIsInKNN ? 0 : 1);
         for(DistanceResultPair<DoubleDistance> neighbor : neighbors) {
-          List<DistanceResultPair<DoubleDistance>> neighborsNeighbors = neigh2.get(neighbor.getID());
-          sum += Math.max(neighbor.getDistance().getValue(), neighborsNeighbors.get(neighborsNeighbors.size() - 1).getDistance().getValue());
+          if (objectIsInKNN || neighbor.getID() != id) {
+            List<DistanceResultPair<DoubleDistance>> neighborsNeighbors = neigh2.get(neighbor.getID());
+            sum += Math.max(neighbor.getDistance().getValue(), neighborsNeighbors.get(neighborsNeighbors.size() - 1).getDistance().getValue());
+          }
         }
-        Double lrd = neighbors.size() / sum;
+        Double lrd = nsize / sum;
         lrds.put(id, lrd);
         if(logger.isVerbose()) {
           lrdsProgress.setProcessed(counter);
@@ -168,8 +198,9 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
         }
       }
     }
-    // XXX: everything here appears to be stupid
+    // Compute final LOF values.
     HashMap<Integer, Double> lofs = new HashMap<Integer, Double>();
+    // track the maximum value for normalization.
     double lofmax = 0;
     {// compute LOF_SCORE of each db object
       if(logger.isVerbose()) {
@@ -177,26 +208,34 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
       }
 
       FiniteProgress progressLOFs = new FiniteProgress("LOF_SCORE for objects", database.size());
-      int counter = 1;
-      for(Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
-        Integer id = iter.next();
-        // computeLOF(database, id);
-        Double lrd = lrds.get(id);
-        List<DistanceResultPair<DoubleDistance>> neighbors = neigh.get(id);
-        neighbors.remove(0);
+      int counter = 0;
+      for(Integer id : database) {
+        counter ++;
+        double lrdp = lrds.get(id);
+        List<DistanceResultPair<DoubleDistance>> neighbors = neigh1.get(id);
+        int nsize = neighbors.size() - (objectIsInKNN ? 0 : 1);
+        // skip the point itself
+        //neighbors.remove(0);
         double sum = 0;
         for(DistanceResultPair<DoubleDistance> neighbor1 : neighbors) {
-          sum += lrds.get(neighbor1.getSecond()) / lrd;
+          if (objectIsInKNN || neighbor1.getID() != id) {
+            double lrdo = lrds.get(neighbor1.getSecond());
+            sum += lrdo / lrdp;
+          }
         }
-        Double lof = sum / neighbors.size();
+        Double lof = sum / nsize;
         lofs.put(id, lof);
+        // update maximum.
         lofmax = Math.max(lofmax, lof);
+        
         if(logger.isVerbose()) {
           progressLOFs.setProcessed(counter);
           logger.progress(progressLOFs);
         }
       }
     }
+    
+    // Build result representation.
     result = new MultiResult();
     result.addResult(new AnnotationFromHashMap<Double>(LOF_SCORE, lofs));
     result.addResult(new OrderingFromHashMap<Double>(lofs, true));
@@ -207,7 +246,14 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
   }
 
   public Description getDescription() {
-    return new Description("GeneralizedLOF", "Generalized Local Outlier Factor", "Algorithm to compute density-based local outlier factors in a database based on the parameter " + K_PARAM + " and different distance functions", "unpublished");
+    return new Description(
+        "LOF",
+        "Local Outlier Factor",
+        "Algorithm to compute density-based local outlier factors in a database based on the parameter " +
+            K_PARAM,
+        "M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander: " +
+            " LOF: Identifying Density-Based Local Outliers. " +
+            "In: Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00), Dallas, TX, 2000.");
   }
 
   /**
@@ -224,16 +270,34 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
     // k
     k = K_PARAM.getValue();
 
-    // reachabilityDistanceFunction
-    reachabilityDistanceFunction = REACHABILITY_DISTANCE_FUNCTION_PARAM.instantiateClass();
-    remainingParameters = reachabilityDistanceFunction.setParameters(remainingParameters);
-    addParameterizable(reachabilityDistanceFunction);
+    // reachabilityDistanceFunction - for parameter handling.
+    if (REACHABILITY_DISTANCE_FUNCTION_PARAM.isSet()) {
+      reachabilityDistanceFunction = REACHABILITY_DISTANCE_FUNCTION_PARAM.instantiateClass();
+      remainingParameters = reachabilityDistanceFunction.setParameters(remainingParameters);
+      addParameterizable(reachabilityDistanceFunction);
+    } else {
+      reachabilityDistanceFunction = getDistanceFunction();
+    }
     
-    List<String> preprocParams = new ArrayList<String>();
-    OptionUtil.addParameter(preprocParams, MaterializeKNNPreprocessor.K_ID, Integer.toString(k+1));
-    OptionUtil.addParameter(preprocParams, MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, getDistanceFunction().getClass().getCanonicalName());
-    preprocessor.setParameters(ClassGenericsUtil.toArray(preprocParams, String.class));
-    // TODO: assert that no parameters remain unused?
+    // configure first preprocessor
+    List<String> preprocParams1 = new ArrayList<String>();
+    OptionUtil.addParameter(preprocParams1, MaterializeKNNPreprocessor.K_ID, Integer.toString(k+(objectIsInKNN ? 0 : 1)));
+    OptionUtil.addParameter(preprocParams1, MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, getDistanceFunction().getClass().getCanonicalName());
+    OptionUtil.addParameters(preprocParams1, getDistanceFunction().getParameters());
+    String[] remaining1 = preprocessor1.setParameters(ClassGenericsUtil.toArray(preprocParams1, String.class));
+    if (remaining1.length > 0) {
+      throw new UnusedParameterException("First preprocessor did not use all parameters.");
+    }
+
+    // configure second preprocessor
+    List<String> preprocParams2 = new ArrayList<String>();
+    OptionUtil.addParameter(preprocParams2, MaterializeKNNPreprocessor.K_ID, Integer.toString(k+(objectIsInKNN ? 0 : 1)));
+    OptionUtil.addParameter(preprocParams2, MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, reachabilityDistanceFunction.getClass().getCanonicalName());
+    OptionUtil.addParameters(preprocParams2, reachabilityDistanceFunction.getParameters());
+    String[] remaining2 = preprocessor2.setParameters(ClassGenericsUtil.toArray(preprocParams2, String.class));
+    if (remaining2.length > 0) {
+      throw new UnusedParameterException("Second preprocessor did not use all parameters.");
+    }
 
     rememberParametersExcept(args, remainingParameters);
     return remainingParameters;
@@ -260,4 +324,6 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
   public MultiResult getResult() {
     return result;
   }
+  
+  
 }
