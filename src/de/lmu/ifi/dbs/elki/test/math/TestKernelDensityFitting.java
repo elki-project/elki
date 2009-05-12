@@ -105,7 +105,7 @@ public class TestKernelDensityFitting {
       mv.addData(d);
 
     params[0] = mv.getMean();
-    params[1] = Math.sqrt(mv.getVariance());
+    params[1] = mv.getStddev();
     // guess initial amplitude for an gaussian distribution.
     double c1 = ErrorFunctions.erf(Math.abs(data[0] - params[0]) / (params[1] * Math.sqrt(2)));
     double c2 = ErrorFunctions.erf(Math.abs(data[data.length - 1] - params[0]) / (params[1] * Math.sqrt(2)));

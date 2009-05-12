@@ -282,10 +282,10 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
 
     result.addHeader("Absolute minimum distance (abs): " + gmin);
     result.addHeader("Absolute maximum distance (abs): " + gmax);
-    result.addHeader("In-Cluster minimum distance (abs, avg, stddev): " + gimin + " " + mimin.getMean() + " " + mimin.getVariance());
-    result.addHeader("In-Cluster maximum distance (abs, avg, stddev): " + gimax + " " + mimax.getMean() + " " + mimax.getVariance());
-    result.addHeader("Other-Cluster minimum distance (abs, avg, stddev): " + gomin + " " + momin.getMean() + " " + momin.getVariance());
-    result.addHeader("Other-Cluster maximum distance (abs, avg, stddev): " + gomax + " " + momax.getMean() + " " + momax.getVariance());
+    result.addHeader("In-Cluster minimum distance (abs, avg, stddev): " + gimin + " " + mimin.getMean() + " " + mimin.getStddev());
+    result.addHeader("In-Cluster maximum distance (abs, avg, stddev): " + gimax + " " + mimax.getMean() + " " + mimax.getStddev());
+    result.addHeader("Other-Cluster minimum distance (abs, avg, stddev): " + gomin + " " + momin.getMean() + " " + momin.getStddev());
+    result.addHeader("Other-Cluster maximum distance (abs, avg, stddev): " + gomax + " " + momax.getMean() + " " + momax.getStddev());
     result.addHeader("Column description: bin center, in-cluster only frequency, in-cluster all frequency, other-cluster only frequency, other cluster all frequency");
     result.addHeader("In-cluster value count: " + inum + " other cluster value count: " + onum);
     return result;
