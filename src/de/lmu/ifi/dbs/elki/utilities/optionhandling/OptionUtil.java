@@ -76,6 +76,30 @@ public final class OptionUtil {
   }
 
   /**
+   * Appends the given options to the parameter list.
+   *
+   * @param parameters the list of parameters
+   * @param append Parameters to append.
+   */
+  public static void addParameters(List<String> parameters, Iterable<String> append) {
+    for (String par : append) {
+      parameters.add(par);
+    }
+  }
+
+  /**
+   * Appends the given options to the parameter list.
+   *
+   * @param parameters the list of parameters
+   * @param append Parameters to append.
+   */
+  public static void addParameters(List<String> parameters, String[] append) {
+    for (String par : append) {
+      parameters.add(par);
+    }
+  }
+
+  /**
    * Returns a string representation of the specified list of
    * options containing the names of the options.
    *
