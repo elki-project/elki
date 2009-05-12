@@ -113,4 +113,12 @@ public final class MeanVariance {
     double mu = sum / count;
     return (sqrSum / count) - (mu * mu);
   }
+  
+  /**
+   * Return standard deviation
+   * @return stddev
+   */
+  public double getStddev() {
+    return Math.sqrt(getVariance());
+  }
 }
