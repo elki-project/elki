@@ -133,11 +133,13 @@ public final class ClassGenericsUtil {
    * 
    * @param <T> Type the array elements have
    * @param len array size
+   * @param ts Varargs hack - can be empty or "example" objects
    * @return new array of null pointers.
    */
   @SuppressWarnings("unchecked")
-  public static <T> T[] newArrayOfNull(int len) {
-    return (T[]) new Object[len];
+  public static <T> T[] newArrayOfNull(int len, T... ts) {
+    // Varargs hack!
+    return (T[]) java.lang.reflect.Array.newInstance(ts.getClass().getComponentType(), len);
   }
 
   /**
@@ -145,11 +147,12 @@ public final class ClassGenericsUtil {
    * 
    * @param <T> Type the array elements have
    * @param coll collection to convert.
+   * @param ts Varargs hack - can be empty or "example" objects
    * @return new array with the collection contents.
    */
-  public static <T> T[] toArray(Collection<T> coll) {
-    T[] ret = newArrayOfNull(coll.size());
-    return coll.toArray(ret);
+  public static <T> T[] toArray(Collection<T> coll, T... ts) {
+    // Varargs hack!
+    return coll.toArray(ts);
   }
 
   /**
