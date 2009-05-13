@@ -1,14 +1,13 @@
 package de.lmu.ifi.dbs.elki.database;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.KNNList;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * SequentialDatabase is a simple implementation of a Database. <p/> It does not
@@ -25,6 +24,15 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
         super();
     }
 
+    /**
+     * Retrieves the k nearest neighbors for the query object.
+     * 
+     * The result contains always exactly k objects, including the query object if it is an element of the database.
+     * 
+     * Ties in case of equal distances are resolved by the underlying {@link KNNList}, see {@link KNNList#add(DistanceResultPair)}.
+     * 
+     * @see Database#kNNQueryForObject(DatabaseObject, int, DistanceFunction)
+     */
     public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForObject(O queryObject,
                                                                           int k,
                                                                           DistanceFunction<O, D> distanceFunction) {
@@ -36,21 +44,38 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
         return knnList.toList();
     }
 
+    
+    /**
+     * Retrieves the k nearest neighbors for the query object.
+     * 
+     * The result contains always exactly k objects.
+     * 
+     * Ties in case of equal distances are resolved by the underlying {@link KNNList}, see {@link KNNList#add(DistanceResultPair)}.
+     * 
+     * @see Database#kNNQueryForObject(DatabaseObject, int, DistanceFunction)
+     */
     public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForID(Integer id,
                                                                       int k,
                                                                       DistanceFunction<O, D> distanceFunction) {
         O object = get(id);
         KNNList<D> knnList = new KNNList<D>(k, distanceFunction.infiniteDistance());
 
-        Iterator<Integer> iterator = iterator();
-        while (iterator.hasNext()) {
-            Integer candidateID = iterator.next();
+        for(Integer candidateID : this) {
             O candidate = get(candidateID);
             knnList.add(new DistanceResultPair<D>(distanceFunction.distance(object, candidate), candidateID));
         }
         return knnList.toList();
     }
 
+    /**
+     * Retrieves the k nearest neighbors for the query objects.
+     * 
+     * The result contains always exactly k objects.
+     * 
+     * Ties in case of equal distances are resolved by the underlying {@link KNNList}, see {@link KNNList#add(DistanceResultPair)}.
+     * 
+     * @see Database#kNNQueryForObject(DatabaseObject, int, DistanceFunction)
+     */
     public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
       List<KNNList<D>> knnLists = new ArrayList<KNNList<D>>(ids.size());
       for(@SuppressWarnings("unused") Integer i : this) {
@@ -59,10 +84,11 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
 
       for(Integer candidateID : this) {
         O candidate = get(candidateID);
-        for (int i = 0; i < ids.size(); i++) {
-          Integer id = ids.get(i);
+        Integer index = -1;
+        for (Integer id : ids) {
+          index++;
           O object = get(id);
-          KNNList<D> knnList = knnLists.get(i);
+          KNNList<D> knnList = knnLists.get(index);
           knnList.add(new DistanceResultPair<D>(distanceFunction.distance(object, candidate), candidateID));
         }
       }
@@ -89,6 +115,9 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
       return result;
     }
 
+    /**
+     * 
+     */
     public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQuery(Integer id,
                                                                         int k,
                                                                         DistanceFunction<O, D> distanceFunction) {

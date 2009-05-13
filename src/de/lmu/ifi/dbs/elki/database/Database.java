@@ -90,6 +90,14 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
    * <p>Performs a k-nearest neighbor query for the given object ID.</p>
    * 
    * <p>The query result is sorted in ascending order w.r.t. the distance to the query object.</p>
+   * 
+   * <p>The general contract for the result of kNN queries in ELKI is
+   * that the resulting list contains exactly k nearest neighbors
+   * including the query object.
+   * Generally, ties will be resolved by the order of objects in the database.
+   * Any implementing method should inform about the exact policy of resolving ties.</p>
+   * 
+   * <p>Generally, it is assumed that the database does not contain less than k objects.</p>
    *
    * @param <D>              distance type
    * @param id               the ID of the query object
@@ -105,6 +113,14 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
    * 
    * <p>The query result is sorted in ascending order w.r.t. the distance to the query object.</p>
    *
+   * <p>The general contract for the result of kNN queries in ELKI is
+   * that the resulting list contains exactly k nearest neighbors
+   * including the query object if it is an element of this database.
+   * Generally, ties will be resolved by the order of objects in the database.
+   * Any implementing method should inform about the exact policy of resolving ties.</p>
+   * 
+   * <p>Generally, it is assumed that the database does not contain less than k objects.</p>
+   * 
    * @param <D>              distance type
    * @param queryObject      the query object
    * @param k                the number of nearest neighbors to be returned
@@ -118,7 +134,15 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
    * <p>Performs k-nearest neighbor queries for the given object IDs.</p>
    * 
    * <p>The query result is sorted in ascending order w.r.t. the distance to the query object.</p>
+   * 
+   * <p>The general contract for the result of kNN queries in ELKI is
+   * that the resulting lists contain exactly k nearest neighbors
+   * including the query objects.
+   * Generally, ties will be resolved by the order of objects in the database.
+   * Any implementing method should inform about the exact policy of resolving ties.</p>
    *
+   * <p>Generally, it is assumed that the database does not contain less than k objects.</p>
+   * 
    * @param <D>              distance type
    * @param ids              the IDs of the query objects
    * @param k                the number of nearest neighbors to be returned
@@ -133,10 +157,12 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
    * 
    * <p>The query result is sorted in ascending order w.r.t. the distance to the query object.</p>
    * 
+   * 
+   * <p>Generally, it is assumed that the database does not contain less than k objects.</p>
    *
    * @param <D>              distance type
    * @param id               the ID of the query object
-   * @param k                the number of nearest neighbors to be returned
+   * @param k                the size of k-nearest neighborhood of any database object <code>o</code> to contain a database object in order to include <code>o</code> in the result list
    * @param distanceFunction the distance function that computes the distances between the
    *                         objects
    * @return a List of the query results
