@@ -211,6 +211,10 @@ public class PLOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
       }
     }
     
+    if(logger.isVerbose()) {
+      logger.verbose("PLOF finished");
+    }
+    
     // Build result representation.
     result = new MultiResult();
     result.addResult(new AnnotationFromHashMap<Double>(PLOF_SCORE, plofs));
