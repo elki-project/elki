@@ -21,8 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
  * A preprocessor for annotation of the k nearest neighbors (and their
  * distances) to each database object.
  * 
- * For future use by
- * {@link de.lmu.ifi.dbs.elki.algorithm.outlier.GeneralizedLOF} and similar.
+ * Used for example by {@link de.lmu.ifi.dbs.elki.algorithm.outlier.LOF}.
  * 
  * @author Erich Schubert
  * @param <O> the type of database objects the preprocessor can be applied to

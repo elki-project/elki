@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
 
 /**
  * Algorithm to compute density-based local outlier factors in a database based
- * on a specified parameter {@link #K_ID}.
+ * on a specified parameter {@link #K_ID {@code -lof.k}}.
  * 
  * <p>This implementation diverts from the original LOF publication in that it allows the
  * user to use a different distance function for the reachability distance and neighborhood
@@ -40,14 +40,19 @@ import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
  * {@link DistanceBasedAlgorithm#DISTANCE_FUNCTION_ID), while the reference set used in reachability
  * distance computation is configured using {@link #REACHABILITY_DISTANCE_FUNCTION_ID}.</p>
  * 
+ * <p>The original LOF parameter was called "minPts". Since kNN queries in ELKI have slightly
+ * different semantics - exactly k neighbors are returned - we chose to rename the parameter to
+ * {@link #K_ID {@code -lof.k}} to reflect this difference.</p> 
+ * 
  * <p/>
  * Reference:
  * <br>M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander:
  * LOF: Identifying Density-Based Local Outliers.
  * <br>In: Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00), Dallas, TX, 2000.
  * </p>
- * 
+ *
  * @author Peer Kr&ouml;ger
+ * @author Erich Schubert
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  */
 public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, DoubleDistance, MultiResult> {
@@ -63,7 +68,7 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
    * Default value: {@link EuclideanDistanceFunction}
    * </p>
    * <p>
-   * Key: {@code -genlof.reachdistfunction}
+   * Key: {@code -lof.reachdistfunction}
    * </p>
    */
   private final ClassParameter<DistanceFunction<O, DoubleDistance>> REACHABILITY_DISTANCE_FUNCTION_PARAM = new ClassParameter<DistanceFunction<O, DoubleDistance>>(REACHABILITY_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
@@ -94,7 +99,7 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
    * Parameter to specify the number of nearest neighbors of an object to be
    * considered for computing its LOF_SCORE, must be an integer greater than 1.
    * <p>
-   * Key: {@code -genlof.k}
+   * Key: {@code -lof.k}
    * </p>
    */
   private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(1));
@@ -234,7 +239,11 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
         }
       }
     }
-    
+
+    if(logger.isVerbose()) {
+      logger.verbose("LOF finished");
+    }
+
     // Build result representation.
     result = new MultiResult();
     result.addResult(new AnnotationFromHashMap<Double>(LOF_SCORE, lofs));
@@ -249,7 +258,7 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
     return new Description(
         "LOF",
         "Local Outlier Factor",
-        "Algorithm to compute density-based local outlier factors in a database based on the parameter " +
+        "Algorithm to compute density-based local outlier factors in a database based on the neighborhood size parameter " +
             K_PARAM,
         "M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander: " +
             " LOF: Identifying Density-Based Local Outliers. " +
