@@ -109,8 +109,8 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
   }
 
   /**
-   * Sets the parameter values of {@link #NUMBER_OF_NEIGHBORS_PARAM} and
-   * {@link #DISTANCE_FUNCTION_PARAM} to {@link #numberOfNeighbors} and
+   * Sets the parameter values of {@link #K_PARAM} and
+   * {@link #DISTANCE_FUNCTION_PARAM} to {@link #k} and
    * {@link #distanceFunction}, respectively.
    */
   @Override

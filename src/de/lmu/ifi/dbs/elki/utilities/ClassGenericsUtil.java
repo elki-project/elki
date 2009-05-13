@@ -133,7 +133,7 @@ public final class ClassGenericsUtil {
    * 
    * @param <T> Type the array elements have
    * @param len array size
-   * @param ts Varargs hack - can be empty or "example" objects
+   * @param base template class for array creation.
    * @return new array of null pointers.
    */
   @SuppressWarnings("unchecked")
@@ -146,7 +146,7 @@ public final class ClassGenericsUtil {
    * 
    * @param <T> Type the array elements have
    * @param coll collection to convert.
-   * @param template Template class.
+   * @param base Template class for array creation.
    * @return new array with the collection contents.
    */
   @SuppressWarnings("unchecked")
@@ -227,7 +227,7 @@ public final class ClassGenericsUtil {
    * @param <FROM> Source type
    * @param cls Class to be cast
    * @param base Base class for type checking.
-   * @return
+   * @return Casted class.
    */
   @SuppressWarnings("unchecked")
   public static <BASE, FROM extends BASE, TO extends BASE> Class<TO> uglyCrossCast(Class<FROM> cls, Class<BASE> base) {
