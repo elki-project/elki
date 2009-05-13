@@ -221,13 +221,10 @@ public class PLOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
 
   public Description getDescription() {
     return new Description(
-        "LOF",
-        "Local Outlier Factor",
-        "Algorithm to compute density-based local outlier factors in a database based on the parameter " +
-            K_PARAM,
-        "M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander: " +
-            " LOF: Identifying Density-Based Local Outliers. " +
-            "In: Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00), Dallas, TX, 2000.");
+        "PLOF",
+        "Probabilistic Local Outlier Factor",
+        "Variant of the LOF algorithm normalized using statistical values.",
+        "unpublished");
   }
 
   /**
