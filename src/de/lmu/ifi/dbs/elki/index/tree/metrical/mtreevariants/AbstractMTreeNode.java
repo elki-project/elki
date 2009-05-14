@@ -39,8 +39,8 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
      *                 of this node
      * @param isLeaf   indicates whether this node is a leaf node
      */
-    public AbstractMTreeNode(PageFile<N> file, int capacity, boolean isLeaf) {
-        super(file, capacity, isLeaf);
+    public AbstractMTreeNode(PageFile<N> file, int capacity, boolean isLeaf, Class<? super E> eclass) {
+        super(file, capacity, isLeaf, eclass);
     }
 
     /**

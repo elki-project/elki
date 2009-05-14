@@ -40,7 +40,7 @@ public class FlatRStarTreeNode extends AbstractRStarTreeNode<FlatRStarTreeNode, 
    * @param isLeaf   indicates whether this node is a leaf node
    */
   public FlatRStarTreeNode(PageFile<FlatRStarTreeNode> file, int capacity, boolean isLeaf) {
-    super(file, capacity, isLeaf);
+    super(file, capacity, isLeaf, SpatialEntry.class);
   }
 
   @Override

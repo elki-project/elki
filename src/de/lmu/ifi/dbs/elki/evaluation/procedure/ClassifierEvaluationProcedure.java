@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.evaluation.procedure;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.SortedSet;
 
@@ -17,7 +18,6 @@ import de.lmu.ifi.dbs.elki.evaluation.holdout.StratifiedCrossValidation;
 import de.lmu.ifi.dbs.elki.evaluation.holdout.TrainingAndTestSet;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
@@ -75,7 +75,7 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
   /**
    * Holds the class labels.
    */
-  protected L[] labels;
+  protected ArrayList<ClassLabel> labels;
 
   /**
    * Holds the holdout.
@@ -102,7 +102,7 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
   public EvaluationResult<O, C> evaluate(Database<O> test, C algorithm) throws IllegalStateException {
     SortedSet<ClassLabel> lbls = DatabaseUtil.getClassLabels(test);
     // todo: ugly cast.
-    this.labels = ClassGenericsUtil.toArray((SortedSet<L>)lbls, ClassLabel.class);
+    this.labels = new ArrayList<ClassLabel>(lbls);
     this.partition = holdout.partition(test);
     
     // TODO: add support for predefined test and training pairs!
@@ -110,14 +110,14 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
     if(partition == null || partition.length < 1) {
       throw new IllegalStateException(ILLEGAL_STATE + " No dataset partition specified.");
     }
-    int[][] confusion = new int[labels.length][labels.length];
+    int[][] confusion = new int[labels.size()][labels.size()];
     for(int p = 0; p < this.partition.length; p++) {
       TrainingAndTestSet<O, L> partition = this.partition[p];
       if(logger.isVerbose()) {
         logger.verbose("building classifier for partition " + (p + 1));
       }
       long buildstart = System.currentTimeMillis();
-      algorithm.buildClassifier(partition.getTraining(), labels);
+      algorithm.buildClassifier(partition.getTraining(), (ArrayList<L>) labels);
       long buildend = System.currentTimeMillis();
       if(time) {
         logger.verbose("time for building classifier for partition " + (p + 1) + ": " + (buildend - buildstart) + " msec.");
@@ -130,7 +130,7 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
         Integer id = iter.next();
         // TODO: another evaluation could make use of distribution?
         int predicted = algorithm.classify(partition.getTest().get(id));
-        int real = Arrays.binarySearch(labels, partition.getTest().getAssociation(AssociationID.CLASS, id));
+        int real = Collections.binarySearch(labels, partition.getTest().getAssociation(AssociationID.CLASS, id));
         confusion[predicted][real]++;
       }
       long evalend = System.currentTimeMillis();
@@ -142,7 +142,7 @@ public class ClassifierEvaluationProcedure<O extends DatabaseObject, L extends C
     //  return new ConfusionMatrixBasedEvaluation<O, L, C>(new ConfusionMatrix(labels, confusion), algorithm, partition[0].getTraining(), partition[0].getTest(), this);
     //}
     //else {
-      algorithm.buildClassifier(holdout.completeData(), labels);
+      algorithm.buildClassifier(holdout.completeData(), (ArrayList<L>) labels);
       return new ConfusionMatrixBasedEvaluation<O, L, C>(new ConfusionMatrix(labels, confusion), algorithm, holdout.completeData(), null, this);
     //}
 

@@ -1,5 +1,9 @@
 package de.lmu.ifi.dbs.elki.algorithm.classifier;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
@@ -8,9 +12,6 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-
-import java.util.Arrays;
-import java.util.Iterator;
 
 /**
  * Classifier to classify instances based on the prior probability of classes in the database.
@@ -46,16 +47,14 @@ public class PriorProbabilityClassifier<O extends DatabaseObject, L extends Clas
     /**
      * Learns the prior probability for all classes.
      */
-    public void buildClassifier(Database<O> database, L[] classLabels) throws IllegalStateException {
+    public void buildClassifier(Database<O> database, ArrayList<L> classLabels) throws IllegalStateException {
         this.setLabels(classLabels);
         this.database = database;
-        distribution = new double[getLabels().length];
-        int[] occurences = new int[getLabels().length];
+        distribution = new double[getLabels().size()];
+        int[] occurences = new int[getLabels().size()];
         for (Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
-            // FIXME: I replaced AbstractClassifier.CLASS with AssociationID.LABEL
-            // because the latter one actually is a String. Correct replacement? -- erich
-            String label = database.getAssociation(AssociationID.LABEL, iter.next());
-            int index = Arrays.binarySearch(getLabels(), label);
+            ClassLabel label = database.getAssociation(AssociationID.CLASS, iter.next());
+            int index = Collections.binarySearch(getLabels(), label);
             if (index > -1) {
                 occurences[index]++;
             }
@@ -97,7 +96,7 @@ public class PriorProbabilityClassifier<O extends DatabaseObject, L extends Clas
     public String model() {
         StringBuffer output = new StringBuffer();
         for (int i = 0; i < distribution.length; i++) {
-            output.append(getLabels()[i]);
+            output.append(getLabels().get(i));
             output.append(" : ");
             output.append(distribution[i]);
             output.append('\n');

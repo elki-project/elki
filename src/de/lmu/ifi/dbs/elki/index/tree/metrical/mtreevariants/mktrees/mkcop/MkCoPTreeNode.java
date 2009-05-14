@@ -33,7 +33,7 @@ class MkCoPTreeNode<O extends DatabaseObject, D extends NumberDistance<D, N>, N 
      * @param isLeaf   indicates whether this node is a leaf node
      */
     public MkCoPTreeNode(PageFile<MkCoPTreeNode<O, D, N>> file, int capacity, boolean isLeaf) {
-        super(file, capacity, isLeaf);
+        super(file, capacity, isLeaf, MkCoPEntry.class);
     }
 
     /**

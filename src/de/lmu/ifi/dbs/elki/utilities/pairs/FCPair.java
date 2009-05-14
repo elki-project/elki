@@ -53,6 +53,7 @@ public class FCPair<FIRST extends Comparable<FIRST>, SECOND> extends Pair<FIRST,
    * @return New array of requested size
    */
   public static final <F extends Comparable<F>, S> FCPair<F, S>[] newArray(int size) {
-    return ClassGenericsUtil.newArrayOfNull(size, FCPair.class);
+    Class<FCPair<F,S>> paircls = ClassGenericsUtil.uglyCastIntoSubclass(FCPair.class);    
+    return ClassGenericsUtil.newArrayOfNull(size, paircls);
   }
 }

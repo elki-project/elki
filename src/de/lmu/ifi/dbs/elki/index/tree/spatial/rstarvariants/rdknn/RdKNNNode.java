@@ -31,7 +31,7 @@ public class RdKNNNode<D extends NumberDistance<D,N>, N extends Number> extends 
    * @param isLeaf   indicates whether this node is a leaf node
    */
   public RdKNNNode(PageFile<RdKNNNode<D,N>> file, int capacity, boolean isLeaf) {
-    super(file, capacity, isLeaf);
+    super(file, capacity, isLeaf, RdKNNEntry.class);
   }
 
   /**

@@ -114,7 +114,8 @@ public class Triple<FIRST, SECOND, THIRD> {
    * @return new array of the requested size.
    */
   public static final <F, S, T> Triple<F, S, T>[] newArray(int size) {
-    return ClassGenericsUtil.newArrayOfNull(size, Triple.class);
+    Class<Triple<F,S,T>> tripcls = ClassGenericsUtil.uglyCastIntoSubclass(Triple.class);
+    return ClassGenericsUtil.newArrayOfNull(size, tripcls);
   }
 
   /**

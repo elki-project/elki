@@ -208,7 +208,8 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
                 }
 
                 // determine neighbors in each dimension
-                Set<Integer>[] allNeighbors = ClassGenericsUtil.newArrayOfNull(dim, Set.class);
+                Class<Set<Integer>> intset = ClassGenericsUtil.uglyCastIntoSubclass(Set.class);
+                Set<Integer>[] allNeighbors = ClassGenericsUtil.newArrayOfNull(dim, intset);
                 for (int d = 0; d < dim; d++) {
                     List<DistanceResultPair<DoubleDistance>> qrList = database.rangeQuery(id, epsString[d], distanceFunctions[d]);
                     allNeighbors[d] = new HashSet<Integer>(qrList.size());
@@ -502,7 +503,8 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
      */
     private DimensionSelectingDistanceFunction<N, V>[] initDistanceFunctions(Database<V> database, int dimensionality, boolean verbose,
                                                                              boolean time) throws ParameterException {
-        DimensionSelectingDistanceFunction<N, V>[] distanceFunctions = ClassGenericsUtil.newArrayOfNull(dimensionality, DimensionSelectingDistanceFunction.class);
+        Class<DimensionSelectingDistanceFunction<N, V>> dfuncls = ClassGenericsUtil.uglyCastIntoSubclass(DimensionSelectingDistanceFunction.class);
+        DimensionSelectingDistanceFunction<N, V>[] distanceFunctions = ClassGenericsUtil.newArrayOfNull(dimensionality, dfuncls);
         for (int d = 0; d < dimensionality; d++) {
             String[] parameters = new String[0];
             parameters = OptionUtil.addParameter(parameters, DimensionSelectingDistanceFunction.DIM_ID, Integer.toString(d + 1));

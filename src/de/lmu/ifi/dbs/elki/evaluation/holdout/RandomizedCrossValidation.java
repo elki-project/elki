@@ -61,7 +61,8 @@ public class RandomizedCrossValidation<O extends DatabaseObject, L extends Class
     public TrainingAndTestSet<O, L>[] partition(Database<O> database) {
         this.database = database;
         setClassLabels(database);
-        TrainingAndTestSet<O, L>[] partitions = ClassGenericsUtil.newArrayOfNull(nfold, TrainingAndTestSet.class);
+        Class<TrainingAndTestSet<O,L>> tatscls = ClassGenericsUtil.uglyCastIntoSubclass(TrainingAndTestSet.class);
+        TrainingAndTestSet<O, L>[] partitions = ClassGenericsUtil.newArrayOfNull(nfold, tatscls);
         List<Integer> ids = database.getIDs();
         for (int i = 0; i < nfold; i++) {
             List<Integer> training = new ArrayList<Integer>();

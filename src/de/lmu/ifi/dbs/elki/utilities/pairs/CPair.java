@@ -104,7 +104,8 @@ public class CPair<FIRST extends Comparable<FIRST>, SECOND extends Comparable<SE
    * @return New array of requested size
    */
   public static final <F extends Comparable<F>, S extends Comparable<S>> CPair<F, S>[] newArray(int size) {
-    return ClassGenericsUtil.newArrayOfNull(size, CPair.class);
+    Class<CPair<F,S>> paircls = ClassGenericsUtil.uglyCastIntoSubclass(CPair.class);
+    return ClassGenericsUtil.newArrayOfNull(size, paircls);
   }
 
   /**

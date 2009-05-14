@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.algorithm.classifier;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
@@ -70,7 +71,7 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
      * labels available n the database. Holds the database to lazily classify
      * new instances later on.
      */
-    public void buildClassifier(Database<O> database, L[] labels) throws IllegalStateException {
+    public void buildClassifier(Database<O> database, ArrayList<L> labels) throws IllegalStateException {
         this.setLabels(labels);
         this.database = database;
     }
@@ -82,14 +83,14 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
      */
     public double[] classDistribution(O instance) throws IllegalStateException {
         try {
-            double[] distribution = new double[getLabels().length];
-            int[] occurences = new int[getLabels().length];
+            double[] distribution = new double[getLabels().size()];
+            int[] occurences = new int[getLabels().size()];
 
             List<DistanceResultPair<D>> query = database.kNNQueryForObject(instance,
                 k, getDistanceFunction());
             for (DistanceResultPair<D> neighbor : query) {
                 // noinspection unchecked
-                int index = Arrays.binarySearch(getLabels(),
+                int index = Collections.binarySearch(getLabels(),
                     (AssociationID.CLASS.getType().cast(database.getAssociation(AssociationID.CLASS, neighbor.getID()))));
                 if (index >= 0) {
                     occurences[index]++;

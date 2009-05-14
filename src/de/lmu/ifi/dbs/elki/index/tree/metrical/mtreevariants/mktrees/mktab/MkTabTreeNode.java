@@ -35,7 +35,7 @@ class MkTabTreeNode<O extends DatabaseObject, D extends Distance<D>> extends Abs
      * @param isLeaf   indicates whether this node is a leaf node
      */
     public MkTabTreeNode(PageFile<MkTabTreeNode<O, D>> file, int capacity, boolean isLeaf) {
-        super(file, capacity, isLeaf);
+        super(file, capacity, isLeaf, MkTabEntry.class);
     }
 
     /**

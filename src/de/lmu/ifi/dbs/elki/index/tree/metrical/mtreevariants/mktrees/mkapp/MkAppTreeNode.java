@@ -35,7 +35,7 @@ class MkAppTreeNode<O extends DatabaseObject, D extends NumberDistance<D, N>, N 
      * @param isLeaf   indicates whether this node is a leaf node
      */
     public MkAppTreeNode(PageFile<MkAppTreeNode<O, D, N>> file, int capacity, boolean isLeaf) {
-        super(file, capacity, isLeaf);
+        super(file, capacity, isLeaf, MkAppEntry.class);
     }
 
     /**

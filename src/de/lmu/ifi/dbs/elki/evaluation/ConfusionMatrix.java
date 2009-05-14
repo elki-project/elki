@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.evaluation;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 
 /**
  * Provides a confusion matrix with some prediction performance measures
@@ -25,7 +26,7 @@ public class ConfusionMatrix
     /**
      * Holds the class labels.
      */
-    private ClassLabel[] labels;
+    private ArrayList<ClassLabel> labels;
 
     /**
      * Provides a confusion matrix for the given values.
@@ -40,7 +41,7 @@ public class ConfusionMatrix
      * @throws IllegalArgumentException if the confusion matrix is not square or not complete
      * or if the length of class labels does not conform the length of the confusion matrix
      */
-    public ConfusionMatrix(ClassLabel[] labels, int[][] confusion) throws IllegalArgumentException
+    public ConfusionMatrix(ArrayList<ClassLabel> labels, int[][] confusion) throws IllegalArgumentException
     {
         for(int i = 0; i < confusion.length; i++)
         {
@@ -49,7 +50,7 @@ public class ConfusionMatrix
                 throw new IllegalArgumentException("Confusion matrix irregular: row-dimension = "+confusion.length+", col-dimension in col"+i+" = "+confusion[i].length);
             }
         }
-        if(confusion.length!=labels.length)
+        if(confusion.length!=labels.size())
         {
             throw new IllegalArgumentException("Number of class labels does not match row dimension of confusion matrix.");
         }
@@ -330,13 +331,13 @@ public class ConfusionMatrix
         String classPrefix = "C_";
         NumberFormat nf = NumberFormat.getInstance();
         nf.setParseIntegerOnly(true);
-        int labelLength = Integer.toString(labels.length).length();
+        int labelLength = Integer.toString(labels.size()).length();
         nf.setMaximumIntegerDigits(labelLength);
         nf.setMinimumIntegerDigits(labelLength);
         int cell = Math.max(Integer.toString(max).length(),labelLength+classPrefix.length());
         String separator = " ";
         StringBuffer representation = new StringBuffer();
-        for(int i = 1; i <= labels.length; i++)
+        for(int i = 1; i <= labels.size(); i++)
         {
             representation.append(separator);
             String label = classPrefix+nf.format(i);
@@ -365,7 +366,7 @@ public class ConfusionMatrix
             representation.append(classPrefix);
             representation.append(nf.format(row+1));
             representation.append(": ");
-            representation.append(labels[row]);
+            representation.append(labels.get(row));
             representation.append('\n');
         }
         return representation.toString();

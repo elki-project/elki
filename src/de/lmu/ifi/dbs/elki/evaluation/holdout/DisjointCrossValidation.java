@@ -61,9 +61,11 @@ public class DisjointCrossValidation<O extends DatabaseObject, L extends ClassLa
   public TrainingAndTestSet<O,L>[] partition(Database<O> database) {
     this.database = database;
     setClassLabels(database);
-    TrainingAndTestSet<O,L>[] partitions = ClassGenericsUtil.newArrayOfNull(nfold, TrainingAndTestSet.class);
+    Class<TrainingAndTestSet<O,L>> tatscls = ClassGenericsUtil.uglyCastIntoSubclass(TrainingAndTestSet.class);
+    TrainingAndTestSet<O,L>[] partitions = ClassGenericsUtil.newArrayOfNull(nfold, tatscls);
     List<Integer> ids = database.getIDs();
-    List<Integer>[] parts = ClassGenericsUtil.newArrayOfNull(nfold, List.class);
+    Class<List<Integer>> lclass = ClassGenericsUtil.uglyCastIntoSubclass(List.class);
+    List<Integer>[] parts = ClassGenericsUtil.newArrayOfNull(nfold, lclass);
     for (int i = 0; i < nfold; i++) {
       parts[i] = new ArrayList<Integer>();
     }

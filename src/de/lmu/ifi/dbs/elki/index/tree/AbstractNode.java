@@ -30,6 +30,11 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
    * The entries (children) of this node.
    */
   protected E[] entries;
+  
+  /**
+   * Entry class.
+   */
+  protected Class<E> eclass;
 
   /**
    * Indicates whether this node is a leaf node.
@@ -51,10 +56,11 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
    *        overflow) of this node
    * @param isLeaf indicates whether this node is a leaf node
    */
-  public AbstractNode(PageFile<N> file, int capacity, boolean isLeaf) {
+  public AbstractNode(PageFile<N> file, int capacity, boolean isLeaf, Class<? super E> eclass) {
     super(file);
     this.numEntries = 0;
-    this.entries = ClassGenericsUtil.newArrayOfNull(capacity, Entry.class);
+    this.eclass = ClassGenericsUtil.uglyCastIntoSubclass(eclass);
+    this.entries = ClassGenericsUtil.newArrayOfNull(capacity, this.eclass);
     this.isLeaf = isLeaf;
   }
 
@@ -225,7 +231,7 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
    * Deletes all entries in this node.
    */
   protected final void deleteAllEntries() {
-    this.entries = ClassGenericsUtil.newArrayOfNull(entries.length, Entry.class);
+    this.entries = ClassGenericsUtil.newArrayOfNull(entries.length, eclass);
     this.numEntries = 0;
   }
 
@@ -234,7 +240,7 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
    */
   public final void increaseEntries() {
     E[] tmp = entries;
-    entries = ClassGenericsUtil.newArrayOfNull(tmp.length + 1, Entry.class);
+    entries = ClassGenericsUtil.newArrayOfNull(tmp.length + 1, eclass);
     System.arraycopy(tmp, 0, entries, 0, tmp.length);
   }
 

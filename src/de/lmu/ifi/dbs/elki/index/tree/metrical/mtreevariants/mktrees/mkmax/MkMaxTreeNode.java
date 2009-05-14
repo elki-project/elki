@@ -35,7 +35,7 @@ class MkMaxTreeNode<O extends DatabaseObject, D extends Distance<D>>
      * @param isLeaf   indicates whether this node is a leaf node
      */
     public MkMaxTreeNode(PageFile<MkMaxTreeNode<O, D>> file, int capacity, boolean isLeaf) {
-        super(file, capacity, isLeaf);
+        super(file, capacity, isLeaf, MkMaxEntry.class);
     }
 
     /**

@@ -122,7 +122,8 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
       throw new IllegalArgumentException("Cache size of " + cacheSize + " Bytes is choosen too small for a" + " pagesize of " + pageSize + " Bytes!");
     }
 
-    this.cachePath = ClassGenericsUtil.newArrayOfNull(maxCacheSize, Deap.class);
+    Class<Deap<K,V>> deapcls = ClassGenericsUtil.uglyCastIntoSubclass(Deap.class);
+    this.cachePath = ClassGenericsUtil.newArrayOfNull(maxCacheSize, deapcls);
 
     // maximum index of a deap
     this.maxDeapIndex = (int) (Math.pow(2, maxCacheSize) - 2);

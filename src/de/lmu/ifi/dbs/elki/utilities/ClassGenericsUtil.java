@@ -137,7 +137,7 @@ public final class ClassGenericsUtil {
    * @return new array of null pointers.
    */
   @SuppressWarnings("unchecked")
-  public static <B, T extends B> T[] newArrayOfNull(int len, Class<B> base) {
+  public static <T> T[] newArrayOfNull(int len, Class<T> base) {
     return (T[]) java.lang.reflect.Array.newInstance(base, len);
   }
 
@@ -199,7 +199,13 @@ public final class ClassGenericsUtil {
    * any class! Still it is preferable to have this cast in one place than in
    * dozens without any explanation.
    * 
-   * We can't type check at runtime, since we don't know T.
+   * The reason this is needed is the following:
+   * There is no Class&lt;Set&lt;String&gt;&gt;.class. This method allows you to do
+   * <code>
+   * Class&lt;Set&lt;String&gt;&gt; setclass = uglyCastIntoSubclass(Set.class);
+   * </code>
+   * 
+   * We can't type check at runtime, since we don't have T.
    */
   @SuppressWarnings("unchecked")
   public static <D, T extends D> Class<T> uglyCastIntoSubclass(Class<D> cls) {

@@ -36,8 +36,8 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
    *                 of this node
    * @param isLeaf   indicates whether this node is a leaf node
    */
-  public AbstractRStarTreeNode(PageFile<N> file, int capacity, boolean isLeaf) {
-    super(file, capacity, isLeaf);
+  public AbstractRStarTreeNode(PageFile<N> file, int capacity, boolean isLeaf, Class<? super E> eclass) {
+    super(file, capacity, isLeaf, eclass);
   }
 
   public double getMin(int dimension) {

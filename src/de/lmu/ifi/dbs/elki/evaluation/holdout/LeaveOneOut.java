@@ -37,7 +37,8 @@ public class LeaveOneOut<O extends DatabaseObject, L extends ClassLabel> extends
         this.database = database;
         setClassLabels(database);
         int size = database.size();
-        TrainingAndTestSet<O, L>[] partitions = ClassGenericsUtil.newArrayOfNull(size, TrainingAndTestSet.class);
+        Class<TrainingAndTestSet<O,L>> tatscls = ClassGenericsUtil.uglyCastIntoSubclass(TrainingAndTestSet.class);
+        TrainingAndTestSet<O, L>[] partitions = ClassGenericsUtil.newArrayOfNull(size, tatscls);
         List<Integer> ids = database.getIDs();
         for (int i = 0; i < size; i++) {
             Map<Integer, List<Integer>> partition = new HashMap<Integer, List<Integer>>();

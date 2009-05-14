@@ -72,6 +72,7 @@ public final class CTriple<FIRST extends Comparable<FIRST>,SECOND extends Compar
    * @return New array of requested size
    */
   public static final <F extends Comparable<F>,S extends Comparable<S>, T extends Comparable<T>> CTriple<F,S,T>[] newArray(int size) {
-    return ClassGenericsUtil.newArrayOfNull(size, CTriple.class);
+    Class<CTriple<F,S,T>> tripcls = ClassGenericsUtil.uglyCastIntoSubclass(CTriple.class);
+    return ClassGenericsUtil.newArrayOfNull(size, tripcls);
   }
 }

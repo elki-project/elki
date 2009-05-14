@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -41,19 +40,20 @@ public class CorrelationBasedClassifier<V extends RealVector<V, ?>, D extends Di
     // todo arthur comment
     private CorrelationAnalysisSolution<V>[] model;
 
-    public void buildClassifier(Database<V> database, L[] classLabels) throws IllegalStateException {
+    public void buildClassifier(Database<V> database, ArrayList<L> classLabels) throws IllegalStateException {
         setLabels(classLabels);
-        model = ClassGenericsUtil.newArrayOfNull(classLabels.length, CorrelationAnalysisSolution.class);
+        Class<CorrelationAnalysisSolution<V>> vcls = ClassGenericsUtil.uglyCastIntoSubclass(CorrelationAnalysisSolution.class);
+        model = ClassGenericsUtil.newArrayOfNull(classLabels.size(), vcls);
 
         // init partitions
         Map<Integer, List<Integer>> partitions = new Hashtable<Integer, List<Integer>>();
-        for (int i = 0; i < getLabels().length; i++) {
+        for (int i = 0; i < getLabels().size(); i++) {
             partitions.put(i, new ArrayList<Integer>());
         }
         // add each db object to its class
         for (Iterator<Integer> it = database.iterator(); it.hasNext();) {
             Integer id = it.next();
-            Integer classID = Arrays.binarySearch(getLabels(), database.getAssociation(AssociationID.CLASS, id));
+            Integer classID = Collections.binarySearch(getLabels(), database.getAssociation(AssociationID.CLASS, id));
             partitions.get(classID).add(id);
         }
 

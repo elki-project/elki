@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.algorithm.classifier;
 
+import java.util.ArrayList;
+
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
@@ -25,7 +27,7 @@ public interface Classifier<O extends DatabaseObject, L extends ClassLabel, R ex
      * @throws IllegalStateException if the classifier is not properly initiated (e.g. parameters
      *                               are not set)
      */
-    public void buildClassifier(Database<O> database, L[] classLabels)
+    public void buildClassifier(Database<O> database, ArrayList<L> classLabels)
         throws IllegalStateException;
 
     /**
