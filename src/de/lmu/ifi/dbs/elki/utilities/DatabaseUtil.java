@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.utilities;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
@@ -9,7 +8,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -442,21 +440,6 @@ public final class DatabaseUtil {
           labels.add(database.getAssociation(AssociationID.CLASS, iter.next()));
       }
       return labels;
-  }
-
-  /**
-   * Returns a collection of the ids of the objects stored in the specified database.
-   *
-   * @param <O> Object type
-   * @param db the database storing the objects
-   * @return a collection of the ids of the objects stored in the specified database
-   */
-  public static <O extends DatabaseObject> Collection<Integer> getDatabaseIDs(Database<O> db) {
-      Collection<Integer> ids = new ArrayList<Integer>(db.size());
-      for (Iterator<Integer> it = db.iterator(); it.hasNext();) {
-          ids.add(it.next());
-      }
-      return ids;
   }
 
 }
