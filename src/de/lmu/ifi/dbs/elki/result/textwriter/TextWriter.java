@@ -6,7 +6,6 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -155,25 +154,29 @@ public class TextWriter<O extends DatabaseObject> {
     if(ra == null && ro == null && rc == null && ri == null) {
       throw new UnableToComplyException("No printable result found.");
     }
-
+    
     NamingScheme naming = null;
     // Process groups or all data in a flat manner?
     if(rc != null && rc.size() > 0) {
-      groups = new HashSet<DatabaseObjectGroup>(rc.get(0).getAllClusters());
+      groups = new ArrayList<DatabaseObjectGroup>(rc.get(0).getAllClusters());
       // force an update of cluster names.
       naming = new SimpleEnumeratingScheme(rc.get(0));
     }
     else {
-      groups = new ArrayList<DatabaseObjectGroup>();
-      groups.add(new DatabaseObjectGroupCollection<Collection<Integer>>(db.getIDs()));
+      // only 'magically' create a group if we don't have iterators either.
+      if (ri == null || ri.size() == 0) {
+        groups = new ArrayList<DatabaseObjectGroup>();
+        groups.add(new DatabaseObjectGroupCollection<Collection<Integer>>(db.getIDs()));
+      }
     }
     
     List<AttributeSettings> settings = ResultUtil.getGlobalAssociation((MultiResult)r, AssociationID.META_SETTINGS);
 
     if(ri != null && ri.size() > 0) {
+      // TODO: associations are not passed to ri results.
       writeIterableResult(db, streamOpener, ri.get(0), settings);
     }
-    if(groups != null) {
+    if(groups != null && groups.size() > 0) {
       for(DatabaseObjectGroup group : groups) {
         writeGroupResult(db, streamOpener, group, ra, ro, naming, settings);
       }
