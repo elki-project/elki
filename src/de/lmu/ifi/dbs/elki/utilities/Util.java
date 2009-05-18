@@ -1,10 +1,13 @@
 package de.lmu.ifi.dbs.elki.utilities;
 
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
+
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -41,7 +44,7 @@ public final class Util {
   }
 
   /**
-   * Returns a new double array containng the same objects as are contained in
+   * Returns a new double array containing the same objects as are contained in
    * the given array.
    * 
    * @param array an array to copy
@@ -289,6 +292,49 @@ public final class Util {
       }
     }
     return result.toString();
+  }
+  
+  /**
+   * Creates a new BitSet of fixed cardinality with randomly set bits.
+   * 
+   * @param cardinality the cardinality of the BitSet to create
+   * @param capacity the capacity of the BitSet to create - the randomly generated indices of the bits set to true will be uniformly distributed between 0 (inclusive) and capacity (exclusive)
+   * @param random a Random Object to create the sequence of indices set to true - the same number occurring twice or more is ignored but the already selected bit remains true
+   * @return a new BitSet with randomly set bits
+   */
+  public static BitSet randomBitSet(int cardinality, int capacity, Random random){
+    BitSet bitset = new BitSet(capacity);
+    while(bitset.cardinality() < cardinality){
+      bitset.set(random.nextInt(capacity));
+    }
+    return bitset;
+  }
+  
+  /**
+   * Provides a new DoubleVector as a projection on the specified attributes.
+   * 
+   * If the given DoubleVector has already an ID not <code>null</code>, the same ID is set in the returned new DoubleVector.
+   * Nevertheless, the returned DoubleVector is not backed by the given DoubleVector, i.e., any changes affecting <code>v</code> after calling this method will not affect the newly returned DoubleVector.
+   * 
+   * @param v a DoubleVector to project
+   * @param selectedAttributes the attributes selected for projection
+   * @return a new DoubleVector as a projection on the specified attributes
+   * @throws IllegalArgumentException if the given selected attributes specify an attribute as selected which is out of range for the given DoubleVector.
+   * @see DoubleVector#getValue(int)
+   */
+  public static DoubleVector project(DoubleVector v, BitSet selectedAttributes){
+    double[] newAttributes = new double[selectedAttributes.cardinality()];
+    int i = 0;
+    for (int d = selectedAttributes.nextSetBit(0); d >= 0; d = selectedAttributes.nextSetBit(d + 1)) {
+      newAttributes[i] = v.getValue(d+1);
+      i++;
+    }
+    DoubleVector projectedVector = new DoubleVector(newAttributes);
+    Integer id = v.getID();
+    if(id != null){
+      projectedVector.setID(id);
+    }
+    return projectedVector;
   }
 
   /**

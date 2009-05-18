@@ -53,4 +53,13 @@ public class ParsingResult<O extends DatabaseObject>
     {
         return objectAndLabelList.toString();
     }
+    
+    /**
+     * Provides the number of objects listed in this parsing result.
+     * 
+     * @return the number of objects listed in this parsing result
+     */
+    public int size(){
+      return this.objectAndLabelList.size();
+    }
 }

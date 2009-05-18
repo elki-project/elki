@@ -128,6 +128,13 @@ public class DoubleVector extends RealVector<DoubleVector,Double> {
     return values.length;
   }
 
+  /**
+   * Returns the value of the specified attribute.
+   * 
+   * @param dimension the selected attribute. Attributes are counted starting with 1.
+   * 
+   * @throws IllegalArgumentException if the specified dimension is out of range of the possible attributes
+   */
   public Double getValue(int dimension) {
     if (dimension < 1 || dimension > values.length) {
       throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
