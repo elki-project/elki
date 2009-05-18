@@ -23,6 +23,10 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
@@ -35,8 +39,6 @@ import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
  * random sorting. A value of 0 means the distance function is inverted, i.e. a
  * similarity.
  * 
- * TODO: Make number of bins configurable
- * 
  * TODO: Allow fixed binning range, configurable
  * 
  * TODO: Add sampling
@@ -48,11 +50,27 @@ public class EvaluateRankingQuality<V extends RealVector<V, ?>> extends Distance
   private CollectionResult<DoubleVector> result;
 
   /**
+   * OptionID for {@link #HISTOGRAM_BINS_OPTION}
+   */
+  public static final OptionID HISTOGRAM_BINS_ID = OptionID.getOrCreateOptionID("rankqual.bins", "Number of bins to use in the histogram");
+
+  /**
+   * Option to configure the number of bins to use.
+   */
+  private final IntParameter HISTOGRAM_BINS_OPTION = new IntParameter(HISTOGRAM_BINS_ID, new GreaterEqualConstraint(2), 20);
+  
+  /**
    * Empty constructor. Nothing to do.
    */
   public EvaluateRankingQuality() {
     super();
+    addOption(HISTOGRAM_BINS_OPTION);
   }
+  
+  /**
+   * Number of bins to use.
+   */
+  int numbins = 20;
 
   /**
    * Run the algorithm.
@@ -82,7 +100,7 @@ public class EvaluateRankingQuality<V extends RealVector<V, ?>> extends Distance
       averages.put(clus, cent);
     }
 
-    Histogram<MeanVariance> hist = Histogram.MeanVarianceHistogram(100, 0.0, 1.0);
+    Histogram<MeanVariance> hist = Histogram.MeanVarianceHistogram(numbins, 0.0, 1.0);
 
     if(logger.isVerbose()) {
       logger.verbose("Processing points...");
@@ -138,5 +156,18 @@ public class EvaluateRankingQuality<V extends RealVector<V, ?>> extends Distance
    */
   public CollectionResult<DoubleVector> getResult() {
     return result;
+  }
+
+  /* (non-Javadoc)
+   * @see de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm#setParameters(java.lang.String[])
+   */
+  @Override
+  public String[] setParameters(String[] args) throws ParameterException {
+    String[] remainingParameters = super.setParameters(args);
+    
+    numbins = HISTOGRAM_BINS_OPTION.getValue();
+
+    rememberParametersExcept(args, remainingParameters);
+    return remainingParameters;
   }
 }
