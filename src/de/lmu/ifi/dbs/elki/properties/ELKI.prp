@@ -5,7 +5,7 @@ de.lmu.ifi.dbs.elki.algorithm.Algorithm=\
 # de.lmu.ifi.dbs.elki.algorithm.DummyAlgorithm,\
   de.lmu.ifi.dbs.elki.algorithm.outlier.ABOD,\
   de.lmu.ifi.dbs.elki.algorithm.outlier.COP,\
-  de.lmu.ifi.dbs.elki.algorithm.outlier.GeneralizedLOF,\
+  de.lmu.ifi.dbs.elki.algorithm.outlier.LOF,\
   de.lmu.ifi.dbs.elki.algorithm.outlier.LOCI,\
   de.lmu.ifi.dbs.elki.algorithm.outlier.SOD,\
   de.lmu.ifi.dbs.elki.algorithm.APRIORI,\
