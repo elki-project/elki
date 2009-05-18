@@ -56,7 +56,7 @@ public abstract class RealVectorLabelParser<V extends RealVector<?, ?>> extends 
   /**
    * Keeps the index of an attribute to be treated as a string label.
    */
-  private int classLabelIndex;
+  protected int classLabelIndex;
 
   /**
    * Provides a parser for parsing one point per line, attributes separated by
@@ -139,7 +139,7 @@ public abstract class RealVectorLabelParser<V extends RealVector<?, ?>> extends 
    * @param attributes the attributes of the vector to create.
    * @return a RalVector of type V containing the given attribute values
    */
-  public abstract V createDBObject(List<Double> attributes);
+  protected abstract V createDBObject(List<Double> attributes);
 
   @Override
   public String parameterDescription() {
@@ -171,4 +171,6 @@ public abstract class RealVectorLabelParser<V extends RealVector<?, ?>> extends 
 
     return remainingParams;
   }
+  
+  
 }

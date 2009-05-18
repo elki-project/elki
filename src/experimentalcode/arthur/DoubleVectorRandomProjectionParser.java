@@ -22,34 +22,8 @@ import java.util.Random;
  * @author Arthur Zimek
  *
  */
-public class DoubleVectorRandomProjectionParser extends MetaParser<DoubleVector> {
-  
-  private int k;
-  
-  public static final OptionID NUMBER_SELECTED_ATTRIBUTES_ID = OptionID.getOrCreateOptionID("randomprojection.numberselected", "number of selected attributes");
-  
-  private final IntParameter NUMBER_SELECTED_ATTRIBUTES_PARAM = new IntParameter(NUMBER_SELECTED_ATTRIBUTES_ID, new GreaterEqualConstraint(1), 1);
-  
-  private final Random random = new Random();
-  
-  public DoubleVectorRandomProjectionParser(){
-    addOption(NUMBER_SELECTED_ATTRIBUTES_PARAM);
-  }
-  
-  /**
-   * Calls the super method
-   * and sets additionally the value of the parameter
-   * {@link #NUMBER_SELECTED_ATTRIBUTES_PARAM}.
-   */
-  @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-      String[] remainingParameters = super.setParameters(args);
+public class DoubleVectorRandomProjectionParser extends RandomProjectionParser<DoubleVector> {
 
-      // k
-      k = NUMBER_SELECTED_ATTRIBUTES_PARAM.getValue();
-
-      return remainingParameters;
-  }
 
   /**
    * @see de.lmu.ifi.dbs.elki.parser.Parser#parse(java.io.InputStream)

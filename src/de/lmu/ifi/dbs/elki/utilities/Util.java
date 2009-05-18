@@ -2,11 +2,15 @@ package de.lmu.ifi.dbs.elki.utilities;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 
+import experimentalcode.arthur.SparseFloatVector;
+
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -330,6 +334,32 @@ public final class Util {
       i++;
     }
     DoubleVector projectedVector = new DoubleVector(newAttributes);
+    Integer id = v.getID();
+    if(id != null){
+      projectedVector.setID(id);
+    }
+    return projectedVector;
+  }
+  
+  /**
+   * Provides a new SparseFloatVector as a projection on the specified attributes.
+   * 
+   * If the given SparseFloatVector has already an ID not <code>null</code>, the same ID is set in the returned new SparseFloatVector.
+   * Nevertheless, the returned SparseFloatVector is not backed by the given SparseFloatVector, i.e., any changes affecting <code>v</code> after calling this method will not affect the newly returned SparseFloatVector.
+   * 
+   * @param v a SparseFloatVector to project
+   * @param selectedAttributes the attributes selected for projection
+   * @return a new SparseFloatVector as a projection on the specified attributes
+   * @throws IllegalArgumentException if the given selected attributes specify an attribute as selected which is out of range for the given SparseFloatVector.
+   */
+  public static SparseFloatVector project(SparseFloatVector v, BitSet selectedAttributes){
+    Map<Integer, Float> values = new HashMap<Integer, Float>(selectedAttributes.cardinality(),1);
+    for (int d = selectedAttributes.nextSetBit(0); d >= 0; d = selectedAttributes.nextSetBit(d + 1)) {
+      if(v.getValue(d+1) != 0.0f){
+        values.put(d, v.getValue(d+1));
+      }
+    }
+    SparseFloatVector projectedVector = new SparseFloatVector(values,selectedAttributes.cardinality());
     Integer id = v.getID();
     if(id != null){
       projectedVector.setID(id);
