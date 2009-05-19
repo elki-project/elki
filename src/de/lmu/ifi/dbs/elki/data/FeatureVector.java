@@ -65,10 +65,10 @@ public interface FeatureVector<V extends FeatureVector<V, N>, N extends Number> 
   V randomInstance(V min, V max, Random random);
 
   /**
-   * The dimensionality of the vector space whereof this FeatureVector is an
+   * The dimensionality of the vector space where of this FeatureVector of V is an
    * element.
    * 
-   * @return the number of dimensions of this FeatureVector
+   * @return the number of dimensions of this FeatureVector of V
    */
   int getDimensionality();
 
@@ -83,65 +83,65 @@ public interface FeatureVector<V extends FeatureVector<V, N>, N extends Number> 
 
   /**
    * Returns a Vector representing in one column and
-   * <code>getDimensionality()</code> rows the values of this FeatureVector.
+   * <code>getDimensionality()</code> rows the values of this FeatureVector of V.
    * 
    * @return a Matrix representing in one column and
    *         <code>getDimensionality()</code> rows the values of this
-   *         FeatureVector
+   *         FeatureVector of V
    */
   Vector getColumnVector();
 
   /**
    * Returns a Matrix representing in one row and
-   * <code>getDimensionality()</code> columns the values of this FeatureVector.
+   * <code>getDimensionality()</code> columns the values of this FeatureVector of V.
    * 
    * @return a Matrix representing in one row and
    *         <code>getDimensionality()</code> columns the values of this
-   *         FeatureVector
+   *         FeatureVector of V
    */
   Matrix getRowVector();
 
   /**
-   * Returns a new FeatureVector that is the sum of this FeatureVector and the
-   * given FeatureVector.
+   * Returns a new FeatureVector of V that is the sum of this FeatureVector of V and the
+   * given FeatureVector of V.
    * 
-   * @param fv a FeatureVector to be added to this Featurevector
-   * @return a new FeatureVector that is the sum of this FeatureVector and the
-   *         given FeatureVector
+   * @param fv a FeatureVector of V to be added to this FeatureVector of V
+   * @return a new FeatureVector of V that is the sum of this FeatureVector of V and the
+   *         given FeatureVector of V
    */
   V plus(V fv);
 
   /**
    * Provides a null vector of the same Feature Vector Space as this
-   * FeatureVector (that is, of the same dimensionality).
+   * FeatureVector of V (that is, of the same dimensionality).
    * 
    * @return a null vector of the same Feature Vector Space as this
-   *         FeatureVector (that is, of the same dimensionality)
+   *         FeatureVector of V (that is, of the same dimensionality)
    */
   V nullVector();
 
   /**
-   * Returns the additive inverse to this FeatureVector.
+   * Returns the additive inverse to this FeatureVector of V.
    * 
-   * @return the additive inverse to this FeatureVector
+   * @return the additive inverse to this FeatureVector of V
    */
   V negativeVector();
 
   /**
-   * Returns a new FeatureVector that is the result of a scalar multiplication
+   * Returns a new FeatureVector of V that is the result of a scalar multiplication
    * with the given scalar.
    * 
-   * @param k a scalar to multiply this FeatureVector with
-   * @return a new FeatureVector that is the result of a scalar multiplication
+   * @param k a scalar to multiply this FeatureVector of V with
+   * @return a new FeatureVector of V that is the result of a scalar multiplication
    *         with the given scalar
    */
   V multiplicate(double k);
 
   /**
-   * Returns a String representation of the FeatureVector as a line that is
+   * Returns a String representation of the FeatureVector of V as a line that is
    * suitable to be printed in a sequential file.
    * 
-   * @return a String representation of the FeatureVector
+   * @return a String representation of the FeatureVector of V
    */
   String toString();
 }

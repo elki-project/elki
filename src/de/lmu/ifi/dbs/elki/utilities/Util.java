@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.elki.utilities;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
 
-import experimentalcode.arthur.SparseFloatVector;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
