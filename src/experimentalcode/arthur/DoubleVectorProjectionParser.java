@@ -1,6 +1,3 @@
-/**
- * 
- */
 package experimentalcode.arthur;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;

@@ -56,9 +56,11 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
       "derivator.accuracy", "Threshold for output accuracy fraction digits.");
 
   /**
-   * Parameter to specify the threshold for output accuracy fraction digits,
-   * must be an integer equal to or greater than 0. <p/> Default value: {@code
-   * 4} </p> <p/> Key: {@code -derivator.accuracy} </p>
+   * <p>Parameter to specify the threshold for output accuracy fraction digits,
+   * must be an integer equal to or greater than 0.</p>
+   * 
+   * <p>Default value: {@code 4}</p>
+   * <p>Key: {@code -derivator.accuracy} </p>
    */
   private final IntParameter OUTPUT_ACCURACY_PARAM = new IntParameter(OUTPUT_ACCURACY_ID, 
       new GreaterEqualConstraint(0), 4);
