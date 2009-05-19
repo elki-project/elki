@@ -23,7 +23,7 @@ public class DiskCacheBasedFloatDistanceFunction<V extends DatabaseObject> exten
   /**
    * Magic to identify double cache matrices
    */
-  public static final int DOUBLE_CACHE_MAGIC = 23423411;
+  public static final int FLOAT_CACHE_MAGIC = 23423411;
 
   /**
    * OptionID for {@link #MATRIX_PARAM}
@@ -130,7 +130,7 @@ public class DiskCacheBasedFloatDistanceFunction<V extends DatabaseObject> exten
     File matrixfile = MATRIX_PARAM.getValue();
 
     try {
-      cache = new OnDiskUpperTriangleMatrix(matrixfile,DOUBLE_CACHE_MAGIC,0,FLOAT_SIZE,false);
+      cache = new OnDiskUpperTriangleMatrix(matrixfile,FLOAT_CACHE_MAGIC,0,FLOAT_SIZE,false);
     }
     catch(IOException e) {
       throw new WrongParameterValueException(MATRIX_PARAM, matrixfile.toString(), e);      

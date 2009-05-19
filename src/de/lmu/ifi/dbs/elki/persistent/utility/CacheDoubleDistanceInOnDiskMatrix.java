@@ -7,11 +7,16 @@ import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
+import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DiskCacheBasedDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.FileBasedDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
 import de.lmu.ifi.dbs.elki.utilities.ByteArrayUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -24,7 +29,19 @@ import de.lmu.ifi.dbs.elki.wrapper.AbstractWrapper;
  * @author Erich Schubert
  * 
  */
-public class LoadDistanceResultIntoOnDiskMatrix extends AbstractWrapper {
+public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject> extends AbstractWrapper {
+  /**
+   * Parameter to specify the database connection to be used, must extend
+   * {@link de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection}.
+   * <p>
+   * Key: {@code -dbc}
+   * </p>
+   * <p>
+   * Default value: {@link FileBasedDatabaseConnection}
+   * </p>
+   */
+  private final ClassParameter<DatabaseConnection<O>> DATABASE_CONNECTION_PARAM = new ClassParameter<DatabaseConnection<O>>(OptionID.DATABASE_CONNECTION, DatabaseConnection.class, FileBasedDatabaseConnection.class.getName());
+  
   /**
    * OptionID for {@link #CACHE_PARAM}
    */
@@ -33,7 +50,7 @@ public class LoadDistanceResultIntoOnDiskMatrix extends AbstractWrapper {
   /**
    * Parameter that specifies the name of the directory to be re-parsed.
    * <p>
-   * Key: {@code -distance.matrix}
+   * Key: {@code -loader.diskcache}
    * </p>
    */
   private final FileParameter CACHE_PARAM = new FileParameter(CACHE_ID, FileParameter.FileType.OUTPUT_FILE);
@@ -44,21 +61,44 @@ public class LoadDistanceResultIntoOnDiskMatrix extends AbstractWrapper {
   private static final boolean debugExtraCheckWrites = false;
 
   /**
+   * OptionID for {@link #DISTANCE_PARAM}
+   */
+  public static final OptionID DISTANCE_ID = OptionID.getOrCreateOptionID("loader.distance", "Distance function to cache.");
+
+  /**
+   * Parameter that specifies the name of the directory to be re-parsed.
+   * <p>
+   * Key: {@code -loader.distance}
+   * </p>
+   */
+  private final ClassParameter<DistanceFunction<O,DoubleDistance>> DISTANCE_PARAM = new ClassParameter<DistanceFunction<O,DoubleDistance>>(DISTANCE_ID, DistanceFunction.class);
+
+  /**
+   * Holds the database connection to have the algorithm run with.
+   */
+  private DatabaseConnection<O> databaseConnection;
+
+  /**
    * Distance function that is to be cached.
    */
-  private FileBasedDoubleDistanceFunction<DatabaseObject> distance = new FileBasedDoubleDistanceFunction<DatabaseObject>();
+  private DistanceFunction<O,DoubleDistance> distance;
 
   /**
    * Constructor.
    */
-  public LoadDistanceResultIntoOnDiskMatrix() {
+  public CacheDoubleDistanceInOnDiskMatrix() {
     super();
+    addOption(DATABASE_CONNECTION_PARAM);
     addOption(CACHE_PARAM);
+    addOption(DISTANCE_PARAM);
   }
 
   @Override
   public void run() {
-    Collection<Integer> ids = distance.getIDs();
+    Database<O> database = databaseConnection.getDatabase(null);
+    distance.setDatabase(database, false, false);
+    
+    Collection<Integer> ids = database.getIDs();
     int matrixsize = 0;
     for(Integer id : ids) {
       matrixsize = Math.max(matrixsize, id + 1);
@@ -79,8 +119,8 @@ public class LoadDistanceResultIntoOnDiskMatrix extends AbstractWrapper {
       throw new AbortException("Error creating output matrix: " + e.getMessage(), e);
     }
 
-    for(Integer id1 : distance.getIDs()) {
-      for(Integer id2 : distance.getIDs()) {
+    for(Integer id1 : database) {
+      for(Integer id2 : database) {
         if(id2 >= id1) {
           byte[] data = new byte[8];
           double d = distance.distance(id1, id2).getValue();
@@ -108,16 +148,19 @@ public class LoadDistanceResultIntoOnDiskMatrix extends AbstractWrapper {
     super.setParameters(args);
     String[] remainingParameters = super.getRemainingParameters().toArray(new String[0]);
 
-    // Pass on parameters to distance function.
-    remainingParameters = distance.setParameters(remainingParameters);
-    addParameterizable(distance);
-    
-    super.rememberParametersExcept(args, remainingParameters);
+    // Setup database connection.
+    databaseConnection = DATABASE_CONNECTION_PARAM.instantiateClass();
+    remainingParameters = databaseConnection.setParameters(remainingParameters);
 
+    // Pass on parameters to distance function.
+    distance = DISTANCE_PARAM.instantiateClass();
+    remainingParameters = distance.setParameters(remainingParameters);
+    
     if(remainingParameters.length != 0) {
       LoggingUtil.warning("Unnecessary parameters specified: " + Arrays.asList(remainingParameters));
     }
 
+    super.rememberParametersExcept(args, remainingParameters);
     return remainingParameters;
   }
 
@@ -125,7 +168,9 @@ public class LoadDistanceResultIntoOnDiskMatrix extends AbstractWrapper {
   public String parameterDescription() {
     StringBuffer buf = new StringBuffer();
     buf.append(super.parameterDescription());
-    buf.append(distance.parameterDescription());
+    if (distance != null) {
+      buf.append(distance.parameterDescription());
+    }
     return buf.toString();
   }
 
@@ -135,6 +180,6 @@ public class LoadDistanceResultIntoOnDiskMatrix extends AbstractWrapper {
    * @param args
    */
   public static void main(String[] args) {
-    new LoadDistanceResultIntoOnDiskMatrix().runCLIWrapper(args);
+    new CacheDoubleDistanceInOnDiskMatrix<DatabaseObject>().runCLIWrapper(args);
   }
 }
