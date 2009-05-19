@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.FloatDistance;
 import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
 import de.lmu.ifi.dbs.elki.utilities.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
@@ -13,22 +13,27 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 
 /**
- * Provides a DistanceFunction that is based on double distances given by a
+ * Provides a DistanceFunction that is based on float distances given by a
  * distance matrix of an external file.
  * 
  * @author Erich Schubert
  * @param <V> object type
  */
-public class DiskCacheBasedDoubleDistanceFunction<V extends DatabaseObject> extends AbstractDoubleDistanceFunction<V> {
+public class DiskCacheBasedFloatDistanceFunction<V extends DatabaseObject> extends AbstractFloatDistanceFunction<V> {
   /**
    * Magic to identify double cache matrices
    */
-  public static final int DOUBLE_CACHE_MAGIC = 50902811;
+  public static final int DOUBLE_CACHE_MAGIC = 23423411;
 
   /**
    * OptionID for {@link #MATRIX_PARAM}
    */
   public static final OptionID MATRIX_ID = OptionID.getOrCreateOptionID("distance.matrix", "The name of the file containing the distance matrix.");
+
+  /**
+   * Storage required for a float value.
+   */
+  private static final int FLOAT_SIZE = 4;
 
   /**
    * Parameter that specifies the name of the directory to be re-parsed.
@@ -38,17 +43,12 @@ public class DiskCacheBasedDoubleDistanceFunction<V extends DatabaseObject> exte
    */
   private final FileParameter MATRIX_PARAM = new FileParameter(MATRIX_ID, FileParameter.FileType.INPUT_FILE);
 
-  /**
-   * Storage required for a double value.
-   */
-  private static final int DOUBLE_SIZE = 8;
-  
   private OnDiskUpperTriangleMatrix cache = null;
   
   /**
    * Default constructor.
    */
-  public DiskCacheBasedDoubleDistanceFunction() {
+  public DiskCacheBasedFloatDistanceFunction() {
     super();
     addOption(MATRIX_PARAM);
   }
@@ -62,7 +62,7 @@ public class DiskCacheBasedDoubleDistanceFunction<V extends DatabaseObject> exte
    * @return the distance between two given DatabaseObject according to this
    *         distance function
    */
-  public DoubleDistance distance(V o1, V o2) {
+  public FloatDistance distance(V o1, V o2) {
     return distance(o1.getID(), o2.getID());
   }
 
@@ -74,7 +74,7 @@ public class DiskCacheBasedDoubleDistanceFunction<V extends DatabaseObject> exte
    * @return the distance between the two objects specified by their objects ids
    */
   @Override
-  public DoubleDistance distance(Integer id1, V o2) {
+  public FloatDistance distance(Integer id1, V o2) {
     return distance(id1, o2.getID());
   }
 
@@ -89,7 +89,7 @@ public class DiskCacheBasedDoubleDistanceFunction<V extends DatabaseObject> exte
    * @return the distance between the two objects specified by their objects ids
    */
   @Override
-  public DoubleDistance distance(Integer id1, Integer id2) {
+  public FloatDistance distance(Integer id1, Integer id2) {
     if (id1 == null) {
       return undefinedDistance();
     }
@@ -101,15 +101,15 @@ public class DiskCacheBasedDoubleDistanceFunction<V extends DatabaseObject> exte
       return distance(id2, id1);
     }
 
-    double distance;
+    float distance;
     try {
       byte[] data = cache.readRecord(id1, id2);
-      distance = ByteArrayUtil.readDouble(data,0);
+      distance = ByteArrayUtil.readFloat(data,0);
     }
     catch(IOException e) {
       throw new RuntimeException("Read error when loading distance "+id1+","+id2+" from cache file.", e);
     }
-    return new DoubleDistance(distance);
+    return new FloatDistance(distance);
   }
   
   /**
@@ -130,7 +130,7 @@ public class DiskCacheBasedDoubleDistanceFunction<V extends DatabaseObject> exte
     File matrixfile = MATRIX_PARAM.getValue();
 
     try {
-      cache = new OnDiskUpperTriangleMatrix(matrixfile,DOUBLE_CACHE_MAGIC,0,DOUBLE_SIZE,false);
+      cache = new OnDiskUpperTriangleMatrix(matrixfile,DOUBLE_CACHE_MAGIC,0,FLOAT_SIZE,false);
     }
     catch(IOException e) {
       throw new WrongParameterValueException(MATRIX_PARAM, matrixfile.toString(), e);      
