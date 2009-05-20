@@ -249,6 +249,24 @@ public class Histogram<T> implements Iterable<Pair<Double, T>> {
   }
   
   /**
+   * Convenience constructor for Integer-based Histograms.
+   * Uses a constructor to initialize bins with Integer(0)
+   * 
+   * @param bins Number of bins
+   * @param min Minimum coordinate
+   * @param max Maximum coordinate
+   * @return New histogram for Integers.
+   */
+  public static final Histogram<Integer> IntHistogram(int bins, double min, double max) {
+    return new Histogram<Integer>(bins, min, max, new Constructor<Integer>() {
+      @Override
+      public Integer make() {
+        return new Integer(0);
+      }
+    });
+  }
+
+  /**
    * Convenience constructor for Double-based Histograms.
    * Uses a constructor to initialize bins with Double(0)
    * 
@@ -262,6 +280,42 @@ public class Histogram<T> implements Iterable<Pair<Double, T>> {
       @Override
       public Double make() {
         return new Double(0.0);
+      }
+    });
+  }
+
+  /**
+   * Convenience constructor for Histograms with pairs of Integers
+   * Uses a constructor to initialize bins with Pair(Integer(0),Integer(0))
+   * 
+   * @param bins Number of bins
+   * @param min Minimum coordinate
+   * @param max Maximum coordinate
+   * @return New histogram for Integer pairs.
+   */
+  public static final Histogram<Pair<Integer,Integer>> IntIntHistogram(int bins, double min, double max) {
+    return new Histogram<Pair<Integer,Integer>>(bins, min, max, new Constructor<Pair<Integer,Integer>>() {
+      @Override
+      public Pair<Integer,Integer> make() {
+        return new Pair<Integer,Integer>(0,0);
+      }
+    });
+  }
+
+  /**
+   * Convenience constructor for Histograms with pairs of Doubles
+   * Uses a constructor to initialize bins with Pair(Double(0),Double(0))
+   * 
+   * @param bins Number of bins
+   * @param min Minimum coordinate
+   * @param max Maximum coordinate
+   * @return New histogram for Double pairs.
+   */
+  public static final Histogram<Pair<Double,Double>> DoubleDoubleHistogram(int bins, double min, double max) {
+    return new Histogram<Pair<Double,Double>>(bins, min, max, new Constructor<Pair<Double,Double>>() {
+      @Override
+      public Pair<Double,Double> make() {
+        return new Pair<Double,Double>(0.0,0.0);
       }
     });
   }
