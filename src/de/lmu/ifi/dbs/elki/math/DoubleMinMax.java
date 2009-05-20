@@ -13,14 +13,14 @@ public class DoubleMinMax extends DoubleDoublePair {
   /**
    * Constructor without starting values.
    * 
-   * The minimum will be initialized to {@link Double#MAX_VALUE}.
+   * The minimum will be initialized to {@link Double#POSITIVE_INFINITY}.
    * 
-   * The maximum will be initialized to {@link Double#MIN_VALUE}.
+   * The maximum will be initialized to {@link Double#NEGATIVE_INFINITY}.
    * 
    * So that the first data added will replace both.
    */
   public DoubleMinMax() {
-    super(Double.MAX_VALUE, Double.MIN_VALUE);
+    super(Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY);
   }
 
   /**
