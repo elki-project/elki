@@ -129,4 +129,13 @@ public class MinMax<T extends Comparable<? super T>> extends Pair<T,T> {
   public boolean isValid() {
     return (this.getMin() != null) && (this.getMax() != null);
   }
+
+  /**
+   * Return minimum and maximum as array.
+   * 
+   * @return Minimum, Maximum
+   */
+  public Object[] asArray() {
+    return new Object[] { this.getMin(), this.getMax() };
+  }
 }

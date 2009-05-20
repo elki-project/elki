@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.data;
 
 import de.lmu.ifi.dbs.elki.converter.WekaNumericAttribute;
 import de.lmu.ifi.dbs.elki.converter.WekaObject;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 
 /**
  * NumberVector is an abstract implementation of FeatureVector. Provided is an
@@ -114,14 +115,12 @@ public abstract class NumberVector<V extends NumberVector<V, N>, N extends Numbe
    * @return [min, max]
    */
   public double[] getRange() {
-    double[] ret = { Double.MAX_VALUE, Double.MIN_VALUE };
+    DoubleMinMax minmax = new DoubleMinMax();
 
     for(int i = 0; i < getDimensionality(); i++) {
-      ret[0] = Math.min(ret[0], getValue(i + 1).doubleValue());
-
-      ret[1] = Math.max(ret[1], getValue(i + 1).doubleValue());
+      minmax.put(getValue(i+1).doubleValue());
     }
 
-    return ret;
+    return minmax.asArray();
   }
 }

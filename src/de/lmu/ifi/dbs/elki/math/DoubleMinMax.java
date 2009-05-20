@@ -156,4 +156,27 @@ public class DoubleMinMax extends DoubleDoublePair {
   public boolean isValid() {
     return (this.getMin() <= this.getMax());
   }
+
+  /**
+   * Return minimum and maximum as array.
+   * 
+   * @return Minimum, Maximum
+   */
+  public double[] asArray() {
+    return new double[] { this.getMin(), this.getMax() };
+  }
+
+  /**
+   * Generate a new array of initialized DoubleMinMax objects (with default constructor)
+   * 
+   * @param size Array size
+   * @return initialized array
+   */
+  public static DoubleMinMax[] newArray(int size) {
+    DoubleMinMax ret[] = new DoubleMinMax[size];
+    for (int i = 0; i < size; i++) {
+      ret[i] = new DoubleMinMax();
+    }
+    return ret;
+  }
 }
