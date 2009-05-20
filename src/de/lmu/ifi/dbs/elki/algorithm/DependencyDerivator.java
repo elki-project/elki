@@ -29,10 +29,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 
 /**
- * Dependency derivator computes quantitatively linear dependencies among
- * attributes of a given dataset based on a linear correlation PCA. <p/>
+ * <p>Dependency derivator computes quantitatively linear dependencies among
+ * attributes of a given dataset based on a linear correlation PCA.</p>
+ * 
  * Reference: <br>
- * E. Achtert, C. Boehm, H.-P. Kriegel, P. Kroeger, A. Zimek: Deriving
+ * E. Achtert, C. B&ouml;hm, H.-P. Kriegel, P. Kr&ouml;ger, A. Zimek: Deriving
  * Quantitative Dependencies for Correlation Clusters. <br>
  * In Proc. 12th Int. Conf. on Knowledge Discovery and Data Mining (KDD '06),
  * Philadelphia, PA 2006. </p>
@@ -130,7 +131,8 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
   }
 
   public Description getDescription() {
-    return new Description("DependencyDerivator", "Deriving numerical inter-dependencies on data", "Derives an equality-system describing dependencies between attributes in a correlation-cluster", "E. Achtert, C. Boehm, H.-P. Kriegel, P. Kroeger, A. Zimek: " + "Deriving Quantitative Dependencies for Correlation Clusters. " + "In Proc. 12th Int. Conf. on Knowledge Discovery and Data Mining (KDD '06), Philadelphia, PA 2006.");
+    return new Description("DependencyDerivator", "Deriving numerical inter-dependencies on data", "Derives an equality-system describing dependencies between attributes in a correlation-cluster",
+        "E. Achtert, C. B\u00f6hm, H.-P. Kriegel, P. Kr\u00f6ger, A. Zimek: Deriving Quantitative Dependencies for Correlation Clusters. In Proc. 12th Int. Conf. on Knowledge Discovery and Data Mining (KDD '06), Philadelphia, PA 2006.");
   }
 
   /**
