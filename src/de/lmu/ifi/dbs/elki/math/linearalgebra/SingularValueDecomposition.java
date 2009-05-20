@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
-import de.lmu.ifi.dbs.elki.math.Mathutil;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 
    /** Singular Value Decomposition.
    <P>
@@ -78,7 +78,7 @@ public class SingularValueDecomposition implements java.io.Serializable {
             // Compute 2-norm of k-th column without under/overflow.
             s[k] = 0;
             for (int i = k; i < m; i++) {
-               s[k] = Mathutil.hypotenuse(s[k],A[i][k]);
+               s[k] = MathUtil.hypotenuse(s[k],A[i][k]);
             }
             if (s[k] != 0.0) {
                if (A[k][k] < 0.0) {
@@ -127,7 +127,7 @@ public class SingularValueDecomposition implements java.io.Serializable {
             // Compute 2-norm without under/overflow.
             e[k] = 0;
             for (int i = k+1; i < n; i++) {
-               e[k] = Mathutil.hypotenuse(e[k],e[i]);
+               e[k] = MathUtil.hypotenuse(e[k],e[i]);
             }
             if (e[k] != 0.0) {
                if (e[k+1] < 0.0) {
@@ -309,7 +309,7 @@ public class SingularValueDecomposition implements java.io.Serializable {
                double f = e[p-2];
                e[p-2] = 0.0;
                for (int j = p-2; j >= k; j--) {
-                  double t = Mathutil.hypotenuse(s[j],f);
+                  double t = MathUtil.hypotenuse(s[j],f);
                   double cs = s[j]/t;
                   double sn = f/t;
                   s[j] = t;
@@ -334,7 +334,7 @@ public class SingularValueDecomposition implements java.io.Serializable {
                double f = e[k-1];
                e[k-1] = 0.0;
                for (int j = k; j < p; j++) {
-                  double t = Mathutil.hypotenuse(s[j],f);
+                  double t = MathUtil.hypotenuse(s[j],f);
                   double cs = s[j]/t;
                   double sn = f/t;
                   s[j] = t;
@@ -381,7 +381,7 @@ public class SingularValueDecomposition implements java.io.Serializable {
                // Chase zeros.
    
                for (int j = k; j < p-1; j++) {
-                  double t = Mathutil.hypotenuse(f,g);
+                  double t = MathUtil.hypotenuse(f,g);
                   double cs = f/t;
                   double sn = g/t;
                   if (j != k) {
@@ -398,7 +398,7 @@ public class SingularValueDecomposition implements java.io.Serializable {
                         V[i][j] = t;
                      }
                   }
-                  t = Mathutil.hypotenuse(f,g);
+                  t = MathUtil.hypotenuse(f,g);
                   cs = f/t;
                   sn = g/t;
                   s[j] = t;

@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
-import de.lmu.ifi.dbs.elki.math.Mathutil;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 
 /**
  * QR Decomposition.
@@ -71,7 +71,7 @@ public class QRDecomposition implements java.io.Serializable
             double nrm = 0;
             for (int i = k; i < m; i++)
             {
-                nrm = Mathutil.hypotenuse(nrm, QR[i][k]);
+                nrm = MathUtil.hypotenuse(nrm, QR[i][k]);
             }
 
             if (nrm != 0.0)
