@@ -183,7 +183,7 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
           if(nenner != 0) {
             double sqrtnenner = Math.sqrt(nenner);
             double tmp = calcNumerator(kernelMatrix, objKey, key1, key2) / nenner;
-            s.addData(tmp, 1 / sqrtnenner);
+            s.put(tmp, 1 / sqrtnenner);
           }
 
         }
@@ -274,7 +274,7 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
           if(nenner != 0) {
             double tmp = calcNumerator(kernelMatrix, aKey, bKey, cKey) / nenner;
             double sqrtNenner = Math.sqrt(nenner);
-            s.addData(tmp, 1 / sqrtNenner);
+            s.put(tmp, 1 / sqrtNenner);
           }
         }
       }
@@ -384,7 +384,7 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
           if(nenner != 0) {
             double tmp = calcNumerator(kernelMatrix, aKey, bKey, cKey) / nenner;
             double sqrtNenner = Math.sqrt(nenner);
-            s.addData(tmp, 1 / sqrtNenner);
+            s.put(tmp, 1 / sqrtNenner);
             partCounter += (1 / (sqrtNenner * nenner));
           }
         }
@@ -482,11 +482,11 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
           if(nenner != 0) {
             double tmp = calcNumerator(kernelMatrix, objKey, key1, key2) / nenner;
             double sqr = Math.sqrt(nenner);
-            s2.addData(tmp, 1 / sqr);
+            s2.put(tmp, 1 / sqr);
           }
         }
         explain.add(new FCPair<Double, Integer>(s2.getVariance(), key1));
-        s.addData(s2);
+        s.put(s2);
       }
       // build variance of the observed vectors
       pq.add(new FCPair<Double, Integer>(s.getVariance(), objKey));

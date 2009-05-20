@@ -123,7 +123,7 @@ public class EvaluateRankingQuality<V extends RealVector<V, ?>> extends Distance
         List<DistanceResultPair<DoubleDistance>> knn = database.kNNQueryForID(i1, size, distFunc);
         double result = ROCAUC.computeROCAUC(size, clus, knn);
 
-        hist.get(((double)ind) / clus.size()).addData(result);
+        hist.get(((double)ind) / clus.size()).put(result);
 
         if(logger.isVerbose()) {
           rocproc++;

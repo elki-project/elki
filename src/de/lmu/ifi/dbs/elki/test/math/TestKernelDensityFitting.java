@@ -102,7 +102,7 @@ public class TestKernelDensityFitting {
     // compute averages
     MeanVariance mv = new MeanVariance();
     for(double d : data)
-      mv.addData(d);
+      mv.put(d);
 
     params[0] = mv.getMean();
     params[1] = mv.getStddev();

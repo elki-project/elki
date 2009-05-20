@@ -63,7 +63,7 @@ public final class MeanVariance {
    * @param val data
    * @param weight weight
    */
-  public void addData(double val, double weight) {
+  public void put(double val, double weight) {
     sum    += weight * val;
     sqrSum += weight * val * val;
     count  += weight;
@@ -74,8 +74,8 @@ public final class MeanVariance {
    * 
    * @param val Value
    */
-  public void addData(double val) {
-    addData(val, 1.0);
+  public void put(double val) {
+    put(val, 1.0);
   }
 
   /**
@@ -83,7 +83,7 @@ public final class MeanVariance {
    * 
    * @param other
    */
-  public void addData(MeanVariance other) {
+  public void put(MeanVariance other) {
     this.sum += other.sum;
     this.sqrSum += other.sqrSum;
     this.count += other.count;
