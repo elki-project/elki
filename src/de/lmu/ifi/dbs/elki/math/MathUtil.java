@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.math;
 /**
  * A collection of math related utility functions.
  */
-public class Mathutil {
+public class MathUtil {
 
    /** 
     * Computes the square root of the sum of the squared arguments
