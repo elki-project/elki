@@ -19,7 +19,10 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ROCAUC;
 import de.lmu.ifi.dbs.elki.math.Histogram;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
@@ -93,11 +96,12 @@ public class EvaluateRankingQuality<V extends RealVector<V, ?>> extends Distance
     ByLabelClustering<V> split = new ByLabelClustering<V>();
     Set<Cluster<Model>> splitted = split.run(database).getAllClusters();
 
-    // Compute cluster averages
+    // Compute cluster averages and covariance matrix
     HashMap<Cluster<?>, V> averages = new HashMap<Cluster<?>, V>(splitted.size());
+    HashMap<Cluster<?>, Matrix> covmats = new HashMap<Cluster<?>, Matrix>(splitted.size());
     for(Cluster<?> clus : splitted) {
-      V cent = DatabaseUtil.centroid(database, clus.getIDs());
-      averages.put(clus, cent);
+      averages.put(clus, DatabaseUtil.centroid(database, clus.getIDs()));
+      covmats.put(clus, DatabaseUtil.covarianceMatrix(database, clus.getIDs()));
     }
 
     Histogram<MeanVariance> hist = Histogram.MeanVarianceHistogram(numbins, 0.0, 1.0);
@@ -107,13 +111,15 @@ public class EvaluateRankingQuality<V extends RealVector<V, ?>> extends Distance
     }
     FiniteProgress rocloop = new FiniteProgress("Computing ROC AUC values", size);
     int rocproc = 0;
-
+    
     // sort neighbors
     for(Cluster<?> clus : splitted) {
       ArrayList<FCPair<Double, Integer>> cmem = new ArrayList<FCPair<Double, Integer>>(clus.size());
-      V av = averages.get(clus);
+      Vector av = averages.get(clus).getColumnVector();
+      Matrix covm = covmats.get(clus);
+      
       for(Integer i1 : clus.getIDs()) {
-        Double d = distFunc.distance(database.get(i1), av).getValue();
+        Double d = MathUtil.mahalanobisDistance(covm, av.minus(database.get(i1).getColumnVector()));
         cmem.add(new FCPair<Double, Integer>(d, i1));
       }
       Collections.sort(cmem);
