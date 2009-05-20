@@ -1,11 +1,11 @@
-package de.lmu.ifi.dbs.elki.evaluation;
+package experimentalcode.shared.evaluation.classifier;
 
-import de.lmu.ifi.dbs.elki.algorithm.classifier.Classifier;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.evaluation.procedure.EvaluationProcedure;
 import de.lmu.ifi.dbs.elki.result.Result;
+import experimentalcode.shared.algorithm.classifier.Classifier;
+import experimentalcode.shared.evaluation.classifier.procedure.EvaluationProcedure;
 
 import java.io.PrintStream;
 

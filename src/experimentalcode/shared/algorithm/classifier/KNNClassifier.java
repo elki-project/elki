@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.classifier;
+package experimentalcode.shared.algorithm.classifier;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
 public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L extends ClassLabel>
     extends DistanceBasedClassifier<O, D, L> {
     /**
-     * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.classifier.KNNClassifier#K_PARAM}
+     * OptionID for {@link experimentalcode.shared.algorithm.classifier.KNNClassifier#K_PARAM}
      */
     public static final OptionID K_ID = OptionID.getOrCreateOptionID(
         "knnclassifier.k",

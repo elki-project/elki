@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.classifier;
+package experimentalcode.shared.algorithm.classifier;
 
 import java.util.ArrayList;
 

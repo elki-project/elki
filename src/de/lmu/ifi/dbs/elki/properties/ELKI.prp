@@ -16,9 +16,6 @@ de.lmu.ifi.dbs.elki.algorithm.Algorithm=\
   de.lmu.ifi.dbs.elki.algorithm.statistics.EvaluateRankingQuality,\
   de.lmu.ifi.dbs.elki.algorithm.statistics.RankingQualityHistogram,\
   de.lmu.ifi.dbs.elki.algorithm.statistics.DistanceStatisticsWithClasses,\
-  de.lmu.ifi.dbs.elki.algorithm.classifier.CorrelationBasedClassifier,\
-  de.lmu.ifi.dbs.elki.algorithm.classifier.KNNClassifier,\
-  de.lmu.ifi.dbs.elki.algorithm.classifier.PriorProbabilityClassifier,\
   de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN,\
   de.lmu.ifi.dbs.elki.algorithm.clustering.DeLiClu,\
   de.lmu.ifi.dbs.elki.algorithm.clustering.EM,\
@@ -40,7 +37,6 @@ de.lmu.ifi.dbs.elki.algorithm.Algorithm=\
   de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PreDeCon,\
   de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PROCLUS,\
 # de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.KernelFourC,\
-# de.lmu.ifi.dbs.elki.evaluation.ClassifierEvaluationWrapper,\
 # #######################################################
 # distance based algorithm - default package: de.lmu.ifi.dbs.elki.algorithm
 de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm=\
@@ -284,16 +280,4 @@ de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.WeightFunction=\
   de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.LinearWeight,\
   de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.QuadraticStddevWeight,\
   de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.QuadraticWeight,\
-# #######################################################
-# EvaluationProcedure - default package: de.lmu.ifi.dbs.elki.evaluation.procedure
-de.lmu.ifi.dbs.elki.evaluation.procedure.EvaluationProcedure=\
-  de.lmu.ifi.dbs.elki.evaluation.procedure.ClassifierEvaluationProcedure,\
-# #######################################################
-# Holdout - default package: de.lmu.ifi.dbs.elki.evaluation.holdout
-de.lmu.ifi.dbs.elki.evaluation.holdout.Holdout=\
-  de.lmu.ifi.dbs.elki.evaluation.holdout.DisjointCrossValidation,\
-  de.lmu.ifi.dbs.elki.evaluation.holdout.LeaveOneOut,\
-  de.lmu.ifi.dbs.elki.evaluation.holdout.ProvidedTestSet,\
-  de.lmu.ifi.dbs.elki.evaluation.holdout.RandomizedCrossValidation,\
-  de.lmu.ifi.dbs.elki.evaluation.holdout.StratifiedCrossValidation,\
 # #######################################################

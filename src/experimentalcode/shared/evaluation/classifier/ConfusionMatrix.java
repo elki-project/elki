@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.evaluation;
+package experimentalcode.shared.evaluation.classifier;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 
