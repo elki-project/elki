@@ -3,10 +3,10 @@ package de.lmu.ifi.dbs.elki.data;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.parser.FloatVectorLabelParser;
+import de.lmu.ifi.dbs.elki.parser.SparseFloatVectorLabelParser;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 
-import experimentalcode.arthur.SparseFloatVectorLabelParser;
 
 import java.util.ArrayList;
 import java.util.Collections;

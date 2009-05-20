@@ -277,7 +277,7 @@ public final class Util {
    * <code>BitSet</code>, while the first bit starts with 1. The selected bits
    * are separated by the specified separator <code>sep</code>.
    * 
-   * If <code>sep</code> is the empty String, the result is suitable as a
+   * If <code>sep</code> is &quot;,&quot;, the result is suitable as a
    * parameter for an IntListParameter.
    * 
    * @param b the bit set to be parsed

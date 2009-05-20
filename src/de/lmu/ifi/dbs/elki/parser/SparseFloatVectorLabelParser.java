@@ -1,8 +1,6 @@
-package experimentalcode.arthur;
+package de.lmu.ifi.dbs.elki.parser;
 
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
-import de.lmu.ifi.dbs.elki.parser.ParsingResult;
-import de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -39,6 +37,9 @@ import java.util.Map;
  */
 public class SparseFloatVectorLabelParser extends RealVectorLabelParser<SparseFloatVector> {
 
+  /**
+   * Holds the dimensionality of the parsed data which is the maximum occurring index of any attribute.
+   */
   private int dimensionality = -1;
   
   /**
@@ -51,12 +52,16 @@ public class SparseFloatVectorLabelParser extends RealVectorLabelParser<SparseFl
     return new SparseFloatVector(Util.unboxToFloat(ClassGenericsUtil.toArray(attributes, Double.class)));
   }
 
+  /**
+   * 
+   * @see de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser#descriptionLineType()
+   */
   @Override
   protected String descriptionLineType() {
     return "The values will be parsed as floats (resulting in a set of SparseFloatVectors). A line is expected in the following format: The first entry of each line is the number of attributes with coordinate value not zero. Subsequent entries are of the form (index, value), where index is the number of the corresponding dimension, and value is the value of the corresponding attribute.";
   }
 
-  /* (non-Javadoc)
+  /**
    * @see de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser#parseLine(java.lang.String)
    */
   @Override
@@ -92,6 +97,10 @@ public class SparseFloatVectorLabelParser extends RealVectorLabelParser<SparseFl
     return new Pair<SparseFloatVector, List<String>>(new SparseFloatVector(values,dimensionality),labels);
   }
   
+  /**
+   * 
+   * @see de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser#parse(java.io.InputStream)
+   */
   @Override
   public ParsingResult<SparseFloatVector> parse(InputStream in) {
     dimensionality = -1;
@@ -114,7 +123,7 @@ public class SparseFloatVectorLabelParser extends RealVectorLabelParser<SparseFl
     return new ParsingResult<SparseFloatVector>(objectAndLabelsList);
   }
 
-  /* (non-Javadoc)
+  /**
    * @see de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser#parameterDescription()
    */
   @Override

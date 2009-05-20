@@ -1,7 +1,4 @@
-/**
- * 
- */
-package experimentalcode.arthur;
+package de.lmu.ifi.dbs.elki.parser.meta;
 
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
@@ -13,12 +10,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * <p>Parser to project the ParsingResult obtained by a suitable base parser
+ * onto a selected subset of attributes.</p>
+ *
+ *
  * @author Arthur Zimek
  *
  */
 public class SparseFloatVectorProjectionParser extends ProjectionParser<SparseFloatVector> {
 
-  /* (non-Javadoc)
+  /**
+   * <p>Returns as ParsingResult a projection on a selected subset of attributes.</p>
+   * 
+   * The specified InputStream is parsed by a base parser, the resulting ParsingResult is projected
+   * on a selected subset of attributes.
    * @see de.lmu.ifi.dbs.elki.parser.Parser#parse(java.io.InputStream)
    */
   @Override
