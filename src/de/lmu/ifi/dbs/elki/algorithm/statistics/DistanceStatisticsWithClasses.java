@@ -18,10 +18,9 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.Histogram;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.math.Histogram.Constructor;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
@@ -121,12 +120,7 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
     MeanVariance momax = new MeanVariance();
     MeanVariance modif = new MeanVariance();
     // Histograms
-    Histogram<Pair<Integer, Integer>> hist = new Histogram<Pair<Integer, Integer>>(numbin, gminmax.getFirst(), gminmax.getSecond(), new Constructor<Pair<Integer, Integer>>() {
-      @Override
-      public Pair<Integer, Integer> make() {
-        return new Pair<Integer, Integer>(0, 0);
-      }
-    });
+    Histogram<Pair<Integer, Integer>> hist = Histogram.IntIntHistogram(numbin, gminmax.getFirst(), gminmax.getSecond());
 
     // iterate per cluster
     for(Cluster<?> c1 : splitted) {
@@ -140,8 +134,7 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
           }
           double d = distFunc.distance(id1, id2).getValue();
 
-          Pair<Integer, Integer> pair = hist.get(d);
-          pair.first += 1;
+          hist.get(d).first += 1;
 
           iminmax.put(d);
         }
@@ -166,8 +159,7 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
             }
             double d = distFunc.distance(id1, id2).getValue();
 
-            Pair<Integer, Integer> pair = hist.get(d);
-            pair.second += 1;
+            hist.get(d).second += 1;
 
             ominmax.put(d);
           }
