@@ -78,14 +78,12 @@ public final class OptionID extends ConstantObject<OptionID> {
 
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#VERBOSE_FLAG}
-     * and {@link de.lmu.ifi.dbs.elki.evaluation.procedure.ClassifierEvaluationProcedure#VERBOSE_FLAG}
      */
     public static final OptionID ALGORITHM_VERBOSE = new OptionID("verbose",
         "Enable verbose messages while performing the algorithm.");
 
     /**
      * OptionID for {@link de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#TIME_FLAG}
-     * and {@link de.lmu.ifi.dbs.elki.evaluation.procedure.ClassifierEvaluationProcedure#TIME_FLAG}
      */
     public static final OptionID ALGORITHM_TIME = new OptionID("time",
         "Request output of performance time.");

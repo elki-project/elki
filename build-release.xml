@@ -70,7 +70,6 @@
 				<exclude name="experimentalcode/**"/>
 				<!-- not yet published & polished: COP -->
 				<exclude name="${basepackage}algorithm/outlier/COP.*"/>
-				<exclude name="${basepackage}algorithm/classifier/**"/>
 				<exclude name="${basepackage}algorithm/clustering/biclustering/**"/>
 				<exclude name="${basepackage}algorithm/clustering/correlation/KernelFourC.*"/>
 				<exclude name="${basepackage}algorithm/clustering/correlation/SubspaceAggregation.*"/>
@@ -83,14 +82,11 @@
 				<exclude name="${basepackage}data/synthetic/AxesParallelCorrelationGenerator.*"/>
 				<exclude name="${basepackage}data/synthetic/PartiallySimilarVoxelObjectsGenerator.*"/>
 				<exclude name="${basepackage}distance/distancefunction/FractalDimensionBasedDistanceFunction"/>
-                <exclude name="${basepackage}evaluation/holdout/**"/>
-                <exclude name="${basepackage}evaluation/procedure/**"/>
-                <exclude name="${basepackage}evaluation/*.*"/>
                 <exclude name="${basepackage}index/tree/spatial/rstarvariants/flat/**"/>
                 <exclude name="${basepackage}math/analysis/**"/>
 				<exclude name="${basepackage}parser/ArffFileParser.**"/>
 				<exclude name="${basepackage}test/**"/>
-				<!-- used by oldLOF/OnlineLOF/LOFTable/NNTable -->
+				<!-- used only (?) by oldLOF/OnlineLOF/LOFTable/NNTable -->
                 <exclude name="${basepackage}utilities/tree/btree/**"/>
 				<!-- exclude wrappers currently - those are merely internal convenience classes and are a bit arbitrary, need cleaning and careful inspection -->
 				<exclude name="${basepackage}wrapper/**"/>
