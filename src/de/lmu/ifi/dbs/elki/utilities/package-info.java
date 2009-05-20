@@ -9,6 +9,7 @@
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.Util}: Miscellaneous utility functions.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil}: Managing parameter settings</li>
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.DatabaseUtil}: database utility functions (centroid etc.).</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.math.MathUtil}: Mathematics utility functions.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.distance.DistanceUtil}: distance functions related (min, max for {@link de.lmu.ifi.dbs.elki.distance.Distance}s).</li>
  * <li>{@link de.lmu.ifi.dbs.elki.result.ResultUtil}: result processing functions (e.g. extracting sub-results).</li>
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil}: Generic classes (instantiation, arrays of arrays, sets that require safe but unchecked casts).</li>
