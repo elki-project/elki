@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.utilities;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
 
-
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -16,7 +15,12 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 /**
- * @version 0.1
+ * This class collects various static helper methods.
+ * 
+ * For helper methods related to special application fields see other utilities classes.
+ * 
+ * 
+ * @see de.lmu.ifi.dbs.elki.utilities
  */
 public final class Util {
   /**
