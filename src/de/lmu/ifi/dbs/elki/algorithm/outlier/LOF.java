@@ -29,8 +29,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
 import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
 
 /**
- * Algorithm to compute density-based local outlier factors in a database based
- * on a specified parameter {@link #K_ID} ({@code -lof.k}).
+ * <p>Algorithm to compute density-based local outlier factors in a database based
+ * on a specified parameter {@link #K_ID} ({@code -lof.k}).</p>
  * 
  * <p>This implementation diverts from the original LOF publication in that it allows the
  * user to use a different distance function for the reachability distance and neighborhood
@@ -40,11 +40,11 @@ import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
  * {@link DistanceBasedAlgorithm#DISTANCE_FUNCTION_ID), while the reference set used in reachability
  * distance computation is configured using {@link #REACHABILITY_DISTANCE_FUNCTION_ID}.</p>
  * 
- * <p>The original LOF parameter was called "minPts". Since kNN queries in ELKI have slightly
+ * <p>The original LOF parameter was called &quot;minPts&quot;. Since kNN queries in ELKI have slightly
  * different semantics - exactly k neighbors are returned - we chose to rename the parameter to
  * {@link #K_ID} ({@code -lof.k}) to reflect this difference.</p> 
  * 
- * <p/>
+ * <p>
  * Reference:
  * <br>M. M. Breunig, H.-P. Kriegel, R. Ng, and J. Sander:
  * LOF: Identifying Density-Based Local Outliers.
