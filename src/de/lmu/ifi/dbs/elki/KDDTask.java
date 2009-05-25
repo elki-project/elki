@@ -55,7 +55,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
   /**
    * Information for citation and version.
    */
-  public static final String INFORMATION = "ELKI Version 0.1 (2008, July)\n\n" + "published in:\n" + "Elke Achtert, Hans-Peter Kriegel, Arthur Zimek:\n" + "ELKI: A Software System for Evaluation of Subspace Clustering Algorithms.\n" + "In Proc. 20th International Conference on Scientific and Statistical Database Management (SSDBM 2008), Hong Kong, China, 2008.";
+  public static final String INFORMATION = "ELKI Version 0.2 (2009, July)\n\n" + "published in:\n" + "Elke Achtert, Thomas Bernecker, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek:\n" + "ELKI in Time: ELKI 0.2 for the Performance Evaluation of Distance Measures for Time Series.\n" + "In Proc. 11th International Symposium on Spatial and Temporal Databases (SSTD 2009), Aalborg, Denmark, 2009.";
 
   /**
    * The String for calling this class' main routine on command line interface.
