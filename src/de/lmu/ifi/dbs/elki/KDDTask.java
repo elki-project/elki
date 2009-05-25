@@ -133,13 +133,13 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
   private final Flag NORMALIZATION_UNDO_FLAG = new Flag(OptionID.NORMALIZATION_UNDO);
 
   /**
-   * Parameter to specify the database connection to be used, must extend
-   * {@link de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection}.
+   * Parameter to specify the result handler to be used, must extend
+   * {@link ResultHandler}.
    * <p>
-   * Key: {@code -dbc}
+   * Key: {@code -resulthandler}
    * </p>
    * <p>
-   * Default value: {@link FileBasedDatabaseConnection}
+   * Default value: {@link ResultWriter}
    * </p>
    */
   private final ClassParameter<ResultHandler<O, Result>> RESULT_HANDLER_PARAM = new ClassParameter<ResultHandler<O, Result>>(OptionID.RESULT_HANDLER, ResultHandler.class, ResultWriter.class.getName());
