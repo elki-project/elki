@@ -87,7 +87,7 @@ public final class SVGUtil {
    */
   public static void addCSSClass(Element e, String cssclass) {
     String oldval = e.getAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE);
-    if (oldval == null) {
+    if (oldval == null || oldval.length() == 0) {
       setAtt(e, SVGConstants.SVG_CLASS_ATTRIBUTE, cssclass);
       return;
     }
