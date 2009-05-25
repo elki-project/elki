@@ -76,7 +76,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
   private HashMap<Integer, List<DistanceResultPair<D>>> materialized;
 
   /**
-   * Provides a SharedNearestNeighborPreprocessor.
+   * Provides a k nearest neighbors Preprocessor.
    */
   public MaterializeKNNPreprocessor() {
     super();
