@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
 import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
 
 /**
- * LoOPs: Local Outlier Probabilities
+ * LoOP: Local Outlier Probabilities
  * 
  * Distance/density based algorithm similar to LOF to detect outliers,
  * but with statistical methods to achieve better result stability.
@@ -39,11 +39,11 @@ import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
  * @author Erich Schubert
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  */
-public class LoOPs<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiResult> {
+public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiResult> {
   /**
    * OptionID for {@link #REFERENCE_DISTANCE_FUNCTION_PARAM}
    */
-  public static final OptionID REFERENCE_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("loops.referencedistfunction", "Distance function to determine the reference set of an object.");
+  public static final OptionID REFERENCE_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("loop.referencedistfunction", "Distance function to determine the reference set of an object.");
 
   /**
    * The distance function to determine the reachability distance between
@@ -52,7 +52,7 @@ public class LoOPs<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiR
    * Default value: {@link EuclideanDistanceFunction}
    * </p>
    * <p>
-   * Key: {@code -loops.referencedistfunction}
+   * Key: {@code -loop.referencedistfunction}
    * </p>
    */
   private final ClassParameter<DistanceFunction<O, DoubleDistance>> REFERENCE_DISTANCE_FUNCTION_PARAM = new ClassParameter<DistanceFunction<O, DoubleDistance>>(REFERENCE_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
@@ -60,7 +60,7 @@ public class LoOPs<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiR
   /**
    * OptionID for {@link #COMPARISON_DISTANCE_FUNCTION_PARAM}
    */
-  public static final OptionID COMPARISON_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("loops.comparedistfunction", "Distance function to determine the reference set of an object.");
+  public static final OptionID COMPARISON_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("loop.comparedistfunction", "Distance function to determine the reference set of an object.");
 
   /**
    * The distance function to determine the reachability distance between
@@ -69,27 +69,27 @@ public class LoOPs<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiR
    * Default value: {@link EuclideanDistanceFunction}
    * </p>
    * <p>
-   * Key: {@code -loops.comparedistfunction}
+   * Key: {@code -loop.comparedistfunction}
    * </p>
    */
   private final ClassParameter<DistanceFunction<O, DoubleDistance>> COMPARISON_DISTANCE_FUNCTION_PARAM = new ClassParameter<DistanceFunction<O, DoubleDistance>>(COMPARISON_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class.getCanonicalName());
 
   /**
-   * The association id to associate the LOOPS_SCORE of an object for the
-   * LOOPS_SCORE algorithm.
+   * The association id to associate the LOOP_SCORE of an object for the
+   * LOOP_SCORE algorithm.
    */
-  public static final AssociationID<Double> LOOPS_SCORE = AssociationID.getOrCreateAssociationID("loops", Double.class);
+  public static final AssociationID<Double> LOOP_SCORE = AssociationID.getOrCreateAssociationID("loop", Double.class);
 
   /**
    * OptionID for {@link #KCOMP_PARAM}
    */
-  public static final OptionID KCOMP_ID = OptionID.getOrCreateOptionID("loops.kcomp", "The number of nearest neighbors of an object to be considered for computing its LOOPS_SCORE.");
+  public static final OptionID KCOMP_ID = OptionID.getOrCreateOptionID("loop.kcomp", "The number of nearest neighbors of an object to be considered for computing its LOOP_SCORE.");
 
   /**
    * Parameter to specify the number of nearest neighbors of an object to be
-   * considered for computing its LOOPS_SCORE, must be an integer greater than 1.
+   * considered for computing its LOOP_SCORE, must be an integer greater than 1.
    * <p>
-   * Key: {@code -loops.kcomp}
+   * Key: {@code -loop.kcomp}
    * </p>
    */
   private final IntParameter KCOMP_PARAM = new IntParameter(KCOMP_ID, new GreaterConstraint(1));
@@ -97,13 +97,13 @@ public class LoOPs<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiR
   /**
    * OptionID for {@link #KCOMP_PARAM}
    */
-  public static final OptionID KREF_ID = OptionID.getOrCreateOptionID("loops.kref", "The number of nearest neighbors of an object to be used for the PRD value.");
+  public static final OptionID KREF_ID = OptionID.getOrCreateOptionID("loop.kref", "The number of nearest neighbors of an object to be used for the PRD value.");
 
   /**
    * Parameter to specify the number of nearest neighbors of an object to be
-   * considered for computing its LOOPS_SCORE, must be an integer greater than 1.
+   * considered for computing its LOOP_SCORE, must be an integer greater than 1.
    * <p>
-   * Key: {@code -loops.kref}
+   * Key: {@code -loop.kref}
    * </p>
    */
   private final IntParameter KREF_PARAM = new IntParameter(KREF_ID, new GreaterConstraint(1), true);
@@ -111,13 +111,13 @@ public class LoOPs<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiR
   /**
    * OptionID for {@link #LAMBDA_PARAM}
    */
-  public static final OptionID LAMBDA_ID = OptionID.getOrCreateOptionID("loops.lambda", "The number of standard deviations to consider for density computation.");
+  public static final OptionID LAMBDA_ID = OptionID.getOrCreateOptionID("loop.lambda", "The number of standard deviations to consider for density computation.");
 
   /**
    * Parameter to specify the number of nearest neighbors of an object to be
-   * considered for computing its LOOPS_SCORE, must be an integer greater than 1.
+   * considered for computing its LOOP_SCORE, must be an integer greater than 1.
    * <p>
-   * Key: {@code -loops.lambda}
+   * Key: {@code -loop.lambda}
    * </p>
    */
   private final DoubleParameter LAMBDA_PARAM = new DoubleParameter(LAMBDA_ID, new GreaterConstraint(0.0), 2.0);
@@ -158,9 +158,9 @@ public class LoOPs<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiR
   boolean objectIsInKNN = false;
 
   /**
-   * Provides the LoOPs algorithm.
+   * Provides the LoOP algorithm.
    */
-  public LoOPs() {
+  public LoOP() {
     super();
     addOption(KCOMP_PARAM);
     addOption(KREF_PARAM);
@@ -170,7 +170,7 @@ public class LoOPs<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiR
   }
 
   /**
-   * Performs the LoOPs algorithm on the given database.
+   * Performs the LoOP algorithm on the given database.
    */
   @Override
   protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
@@ -233,11 +233,11 @@ public class LoOPs<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiR
     if (logger.isVerbose()) {
       logger.verbose("nplof normalization factor is "+nplof);
     }
-    // Compute final LoOPs values.
+    // Compute final LoOP values.
     HashMap<Integer, Double> loops = new HashMap<Integer, Double>();
-    {// compute LOOPS_SCORE of each db object
+    {// compute LOOP_SCORE of each db object
       if(logger.isVerbose()) {
-        logger.verbose("Computing LoOPs");
+        logger.verbose("Computing LoOP");
       }
 
       FiniteProgress progressLOOPs = new FiniteProgress("LoOP for objects", database.size());
@@ -268,19 +268,19 @@ public class LoOPs<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiR
     }
 
     if(logger.isVerbose()) {
-      logger.verbose("LoOPs finished");
+      logger.verbose("LoOP finished");
     }
 
     // Build result representation.
     result = new MultiResult();
-    result.addResult(new AnnotationFromHashMap<Double>(LOOPS_SCORE, loops));
+    result.addResult(new AnnotationFromHashMap<Double>(LOOP_SCORE, loops));
     result.addResult(new OrderingFromHashMap<Double>(loops, true));
 
     return result;
   }
 
   public Description getDescription() {
-    return new Description("LooPs", "Local Outlier Probabilities", "Variant of the LOF algorithm normalized using statistical values.", "unpublished");
+    return new Description("LoOP", "Local Outlier Probabilities", "Variant of the LOF algorithm normalized using statistical values.", "unpublished");
   }
 
   /**
