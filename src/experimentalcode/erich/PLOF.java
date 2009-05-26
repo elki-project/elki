@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
@@ -72,15 +73,15 @@ public class PLOF<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
   private final ClassParameter<DistanceFunction<O, DoubleDistance>> COMPARISON_DISTANCE_FUNCTION_PARAM = new ClassParameter<DistanceFunction<O, DoubleDistance>>(COMPARISON_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class.getCanonicalName());
 
   /**
-   * The association id to associate the PLOF_SCORE of an object for the
-   * PLOF_SCORE algorithm.
+   * The association id to associate the LOOP_SCORE of an object for the
+   * LOOP_SCORE algorithm.
    */
-  public static final AssociationID<Double> PLOF_SCORE = AssociationID.getOrCreateAssociationID("plof", Double.class);
+  public static final AssociationID<Double> LOOP_SCORE = AssociationID.getOrCreateAssociationID("plof", Double.class);
 
   /**
    * OptionID for {@link #KCOMP_PARAM}
    */
-  public static final OptionID KCOMP_ID = OptionID.getOrCreateOptionID("plof.kcomp", "The number of nearest neighbors of an object to be considered for computing its PLOF_SCORE.");
+  public static final OptionID KCOMP_ID = OptionID.getOrCreateOptionID("plof.kcomp", "The number of nearest neighbors of an object to be considered for computing its LOOP_SCORE.");
 
   /**
    * Parameter to specify the number of nearest neighbors of an object to be
@@ -106,6 +107,20 @@ public class PLOF<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
   private final IntParameter KREF_PARAM = new IntParameter(KREF_ID, new GreaterConstraint(1), true);
 
   /**
+   * OptionID for {@link #LAMBDA_PARAM}
+   */
+  public static final OptionID LAMBDA_ID = OptionID.getOrCreateOptionID("plof.lambda", "The number of standard deviations to consider for density computation.");
+
+  /**
+   * Parameter to specify the number of nearest neighbors of an object to be
+   * considered for computing its LOF_SCORE, must be an integer greater than 1.
+   * <p>
+   * Key: {@code -plof.lambda}
+   * </p>
+   */
+  private final DoubleParameter LAMBDA_PARAM = new DoubleParameter(LAMBDA_ID, new GreaterConstraint(0.0), 2.0);
+
+  /**
    * Holds the value of {@link #KCOMP_PARAM}.
    */
   int kcomp;
@@ -114,6 +129,11 @@ public class PLOF<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
    * Holds the value of {@link #KREF_PARAM}.
    */
   int kref;
+  
+  /**
+   * Hold the value of {@link #LAMBDA_PARAM}.
+   */
+  double lambda;
 
   /**
    * Provides the result of the algorithm.
@@ -149,6 +169,7 @@ public class PLOF<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
     addOption(KREF_PARAM);
     addOption(COMPARISON_DISTANCE_FUNCTION_PARAM);
     addOption(REFERENCE_DISTANCE_FUNCTION_PARAM);
+    addOption(LAMBDA_PARAM);
   }
 
   /**
@@ -180,7 +201,7 @@ public class PLOF<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
 
     // Probabilistic distances
     HashMap<Integer, Double> pdists = new HashMap<Integer, Double>();
-    final double stddevs = 3;
+    MeanVariance pdmean = new MeanVariance();
     {// computing PRDs
       if(logger.isVerbose()) {
         logger.verbose("Computing pdists");
@@ -202,104 +223,67 @@ public class PLOF<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
             }
           }
         }
-        Double pdist = (mv.getMean() + mv.getStddev() * stddevs);
+        Double pdist = (mv.getMean() + lambda * mv.getStddev());
         pdists.put(id, pdist);
+        pdmean.put(pdist);
         if(logger.isVerbose()) {
           prdsProgress.setProcessed(counter);
           logger.progress(prdsProgress);
         }
       }
     }
-    // Probabilistic reachability densities.
-    HashMap<Integer, Double> prds = new HashMap<Integer, Double>();
-    MeanVariance prdmean = new MeanVariance();
-    {// computing PRDs
-      if(logger.isVerbose()) {
-        logger.verbose("Computing PRDs");
-      }
-      FiniteProgress prdsProgress = new FiniteProgress("PRD", database.size());
-      int counter = 0;
-      for(Integer id : database) {
-        counter++;
-        List<DistanceResultPair<DoubleDistance>> neighbors = neighref.get(id);
-        MeanVariance mv = new MeanVariance();
-        // use first kref neighbors as reference set
-        int ks = 0;
-        for(DistanceResultPair<DoubleDistance> neighbor : neighbors) {
-          if(objectIsInKNN || neighbor.getID() != id) {
-            double pdist = Math.max(pdists.get(neighbor.getID()), neighbor.getDistance().getValue());
-            mv.put(pdist);
-            ks++;
-            if(ks >= kref) {
-              break;
-            }
-          }
-        }
-        Double prd = 1 / mv.getMean();
-        prds.put(id, prd);
-        prdmean.put(prd);
-        if(logger.isVerbose()) {
-          prdsProgress.setProcessed(counter);
-          logger.progress(prdsProgress);
-        }
-      }
-    }
-    double prdstddev = ((prdmean.getMean() + stddevs*prdmean.getStddev()) / prdmean.getMean()) - 1;
+    double nplof = ((pdmean.getMean() + lambda * pdmean.getStddev()) / pdmean.getMean()) - 1;
     if (logger.isVerbose()) {
-      logger.verbose("PRD fluctuation is "+prdstddev);
+      logger.verbose("nplof normalization factor is "+nplof);
     }
     // Compute final PLOF values.
-    HashMap<Integer, Double> plofs = new HashMap<Integer, Double>();
-    {// compute PLOF_SCORE of each db object
+    HashMap<Integer, Double> loops = new HashMap<Integer, Double>();
+    {// compute LOOP_SCORE of each db object
       if(logger.isVerbose()) {
-        logger.verbose("computing PLOFs");
+        logger.verbose("Computing LoOPs");
       }
 
-      FiniteProgress progressPLOFs = new FiniteProgress("PLOF_SCORE for objects", database.size());
+      FiniteProgress progressLOOPs = new FiniteProgress("LoOP for objects", database.size());
       int counter = 0;
       for(Integer id : database) {
         counter++;
-        double prdp = prds.get(id);
         List<DistanceResultPair<DoubleDistance>> neighbors = neighcompare.get(id);
         MeanVariance mv = new MeanVariance();
         // use first kref neighbors as comparison set.
         int ks = 0;
         for(DistanceResultPair<DoubleDistance> neighbor1 : neighbors) {
           if(objectIsInKNN || neighbor1.getID() != id) {
-            mv.put(prds.get(neighbor1.getSecond()) / prdp);
+            mv.put(pdists.get(neighbor1.getSecond()));
             ks++;
             if(ks >= kcomp) {
               break;
             }
           }
         }
-        double plof = Math.max(mv.getMean() - 1, 0.0);
-        double stddev = prdstddev; //mv.getStddev(); //Math.max(1E-3, mv.getStddev());
-        //System.out.println(mv.getStddev());
-        plof = ErrorFunctions.erf(plof / (stddev * sqrt2));
-        plofs.put(id, plof);
+        double plof = Math.max(pdists.get(id) / mv.getMean(), 1.0);
+        loops.put(id, ErrorFunctions.erf((plof - 1) / (nplof * sqrt2)));
 
         if(logger.isVerbose()) {
-          progressPLOFs.setProcessed(counter);
-          logger.progress(progressPLOFs);
+          progressLOOPs.setProcessed(counter);
+          logger.progress(progressLOOPs);
         }
       }
     }
 
     if(logger.isVerbose()) {
-      logger.verbose("PLOF finished");
+      logger.verbose("LoOP finished");
     }
 
     // Build result representation.
     result = new MultiResult();
-    result.addResult(new AnnotationFromHashMap<Double>(PLOF_SCORE, plofs));
-    result.addResult(new OrderingFromHashMap<Double>(plofs, true));
+    result.addResult(new AnnotationFromHashMap<Double>(LOOP_SCORE, loops));
+    result.addResult(new OrderingFromHashMap<Double>(loops, true));
 
     return result;
   }
 
   public Description getDescription() {
-    return new Description("PLOF", "Probabilistic Local Outlier Factor", "Variant of the LOF algorithm normalized using statistical values.", "unpublished");
+    return new Description("LooP", "Local Outlier Probability", "Variant of the LOF algorithm normalized using statistical values.", "unpublished");
   }
 
   /**
@@ -368,6 +352,8 @@ public class PLOF<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
         throw new UnusedParameterException("Second preprocessor did not use all parameters.");
       }
     }
+    
+    lambda = LAMBDA_PARAM.getValue();
 
     rememberParametersExcept(args, remainingParameters);
     return remainingParameters;
