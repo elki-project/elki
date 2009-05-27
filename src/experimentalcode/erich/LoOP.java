@@ -208,19 +208,20 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
       for(Integer id : database) {
         counter++;
         List<DistanceResultPair<DoubleDistance>> neighbors = neighref.get(id);
-        MeanVariance mv = new MeanVariance();
+        double sqsum = 0.0;
         // use first kref neighbors as reference set
         int ks = 0;
         for(DistanceResultPair<DoubleDistance> neighbor : neighbors) {
           if(objectIsInKNN || neighbor.getID() != id) {
-            mv.put(neighbor.getDistance().getValue());
+            double d = neighbor.getDistance().getValue();
+            sqsum += d*d;
             ks++;
             if(ks >= kref) {
               break;
             }
           }
         }
-        Double pdist = (mv.getMean() + lambda * mv.getStddev());
+        Double pdist = lambda * Math.sqrt(sqsum / ks);
         pdists.put(id, pdist);
         pdmean.put(pdist);
         if(logger.isVerbose()) {
