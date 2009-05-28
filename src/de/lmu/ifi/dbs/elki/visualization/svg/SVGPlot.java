@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collection;
 import java.util.HashMap;
 
 import javax.xml.transform.OutputKeys;
@@ -43,6 +44,7 @@ import org.w3c.dom.svg.SVGDocument;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.xml.XMLNodeListIterator;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager;
+import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 
 /**
  * Base class for SVG plots. Provides some basic functionality such as element
@@ -359,5 +361,125 @@ public class SVGPlot {
   public Element getIdElement(String id) {
     WeakReference<Element> ref = objWithId.get(id);
     return (ref != null) ? ref.get() : null;
+  }
+  
+  /**
+   * Get all used DOM Ids in this plot.
+   * 
+   * @return Collection of DOM element IDs.
+   */
+  protected Collection<String> getAllIds() {
+    return objWithId.keySet();
+  }
+
+  /**
+   * Test whether it will be possible to merge two SVGPlots into one.
+   * 
+   * @param other Other plot
+   * @return <code>true</code> if the plots are mergeable
+   */
+  public boolean testMerge(SVGPlot other) {
+    // Check if there is a CSS class naming conflict.
+    if (!getCSSClassManager().testMergeable(other.getCSSClassManager())) {
+      return false;
+    }
+    // Check if there is any ID conflict
+    for (String id : other.getAllIds()) {
+      if (objWithId.containsKey(id)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Class to signal a merging conflict (usually some naming/id issue).
+   * 
+   */
+  public class MergeConflict extends Exception {
+    /**
+     * Serial version UID
+     */
+    private static final long serialVersionUID = 4163822727195636747L;
+    
+    /**
+     * Exception to signal a merging conflict.
+     * 
+     * @param msg Exception message
+     */
+    public MergeConflict(String msg) {
+      super(msg);
+    }
+    
+    /**
+     * Exception to signal a merging conflict.
+     * 
+     * @param msg Exception message
+     * @param e cause
+     */
+    public MergeConflict(String msg, Throwable e) {
+      super(msg, e);
+    }
+    
+    /**
+     * Exception to signal a merging conflict.
+     * 
+     * @param e cause
+     */
+    public MergeConflict(Throwable e) {
+      super(e);
+    }
+  }
+  
+  /**
+   * Merge two plots.
+   * Note that attributes of the root element are not imported.
+   * 
+   * @param other
+   * @throws MergeConflict
+   */
+  public void mergePlot(Element parent, SVGPlot other) throws MergeConflict {
+    // merge the CSS styles first
+    try {
+      this.getCSSClassManager().mergeCSSFrom(other.getCSSClassManager());
+    }
+    catch(CSSNamingConflict e) {
+      throw new MergeConflict(e);
+    }
+    // ID magic
+    HashMap<Element, String> inverseIds = new HashMap<Element, String>();
+    for (String id : other.getAllIds()) {
+      inverseIds.put(other.getIdElement(id), id);
+    }
+    // import defs contents.
+    for (Node n : new XMLNodeListIterator(other.getDefs().getChildNodes())) {
+      Node imported = getDocument().importNode(n, true);
+      getDefs().appendChild(imported);
+      if (n instanceof Element) {
+        String nid = inverseIds.get(n);
+        if (imported instanceof Element) {
+          if (nid != null) {
+            this.putIdElement(nid, (Element) imported);
+          }
+        } else {
+          throw new RuntimeException("XML importNode() imported an Element as non-Element - this should not happen.");
+        }
+      }
+    }
+    // import children of root node to parent
+    for (Node n : new XMLNodeListIterator(other.getRoot().getChildNodes())) {
+      Node imported = getDocument().importNode(n, true);
+      parent.appendChild(imported);
+      if (n instanceof Element) {
+        String nid = inverseIds.get(n);
+        if (imported instanceof Element) {
+          if (nid != null) {
+            this.putIdElement(nid, (Element) imported);
+          }
+        } else {
+          throw new RuntimeException("XML importNode() imported an Element as non-Element - this should not happen.");
+        }
+      }
+    }
   }
 }
