@@ -38,7 +38,7 @@ public abstract class AlgorithmAdapter<O extends DatabaseObject, T> {
 		return asID;
 	}
 
-	protected T getScore(DatabaseObject dbo){
+	protected T getScore(O dbo){
 		return getOutlierAnnotationResult().getValueFor(dbo.getID());
 	}
 
@@ -46,7 +46,7 @@ public abstract class AlgorithmAdapter<O extends DatabaseObject, T> {
 		return ResultUtil.findAnnotationResult(result, asID);
 	}
 
-	public abstract Double getUnnormalized(DatabaseObject dbo);
-	public abstract Double getNormalized(DatabaseObject dbo);
+	public abstract Double getUnnormalized(O dbo);
+	public abstract Double getNormalized(O dbo);
 
 }
