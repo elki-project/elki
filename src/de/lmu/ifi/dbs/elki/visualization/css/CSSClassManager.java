@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.visualization.css;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 import org.w3c.dom.Document;
@@ -14,7 +15,12 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * 
  * @author Erich Schubert
  */
-public class CSSClassManager extends HashMap<String, CSSClass> {
+public class CSSClassManager {
+  /**
+   * Store the contained CSS classes.
+   */
+  private HashMap<String, CSSClass> store = new HashMap<String, CSSClass>();
+  
   /**
    * Serial version.
    */
@@ -28,11 +34,11 @@ public class CSSClassManager extends HashMap<String, CSSClass> {
    * @throws CSSNamingConflict when a class of the same name but different owner object exists.
    */
   public CSSClass addClass(CSSClass clss) throws CSSNamingConflict {
-    CSSClass existing = super.get(clss.getName());
+    CSSClass existing = store.get(clss.getName());
     if (existing != null && existing.getOwner() != null && existing.getOwner() != clss.getOwner()) {
       throw new CSSNamingConflict("CSS class naming conflict between "+clss.getOwner().toString()+" and "+existing.getOwner().toString());
     }
-    return super.put(clss.getName(), clss);
+    return store.put(clss.getName(), clss);
   }
   
   /**
@@ -42,7 +48,7 @@ public class CSSClassManager extends HashMap<String, CSSClass> {
    * @return true if the class name is already used.
    */
   public boolean contains(String name) {
-    return containsKey(name);
+    return store.containsKey(name);
   }
 
   /**
@@ -51,9 +57,44 @@ public class CSSClassManager extends HashMap<String, CSSClass> {
    * @param buf String buffer
    */
   public void serialize(StringBuffer buf) {
-    for (CSSClass clss : values()) {
+    for (CSSClass clss : store.values()) {
       clss.appendCSSDefinition(buf);
     }
+  }
+  
+  /**
+   * Get all CSS classes in this manager.
+   * 
+   * @return CSS classes.
+   */
+  public Collection<CSSClass> getClasses() {
+    return store.values();
+  }
+  
+  /**
+   * Check compatibility
+   */
+  public boolean testMergeable(CSSClassManager other) {
+    for (CSSClass clss : other.getClasses()) {
+      CSSClass existing = store.get(clss.getName());
+      // Check for a naming conflict.
+      if (existing != null && existing.getOwner() != null && clss.getOwner() != null && existing.getOwner() != clss.getOwner()) {
+        return false;
+      }
+    }
+    return true;
+  }
+  
+  /**
+   * Merge CSS classes, for example to merge two plots.
+   * 
+   * @throws CSSNamingConflict If there is a naming conflict.
+   */
+  public boolean mergeCSSFrom(CSSClassManager other) throws CSSNamingConflict {
+    for (CSSClass clss : other.getClasses()) {
+      this.addClass(clss);
+    }
+    return true;
   }
   
   /**
