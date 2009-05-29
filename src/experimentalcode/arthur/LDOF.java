@@ -124,14 +124,14 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
         if (neighbor1.getID() != id) {
           dxp += neighbor1.getDistance().getValue();
           for(DistanceResultPair<DoubleDistance> neighbor2 : neighbors){
-            if (neighbor1.getID() != neighbor2.getID()){
+            if (neighbor1.getID() != neighbor2.getID() && neighbor2.getID() != id){
               Dxp += getDistanceFunction().distance(neighbor1.getID(), neighbor2.getID()).getValue();
             }
           }
         }
       }
       dxp /= nsize;
-      Dxp /= (nsize * nsize-1);
+      Dxp /= (nsize * (nsize-1));
       Double ldof = dxp / Dxp;
       ldofs.put(id, ldof);
       // update maximum
