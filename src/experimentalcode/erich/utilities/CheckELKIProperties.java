@@ -68,14 +68,6 @@ public class CheckELKIProperties {
     List<Class<?>> impls = InspectionUtil.findAllImplementations(cls, false);
     HashSet<String> names = new HashSet<String>();
     for(Class<?> c2 : impls) {
-      // skip interfaces
-      if(c2.isInterface()) {
-        continue;
-      }
-      // skip abstract and private classes.
-      if(Modifier.isAbstract(c2.getModifiers()) || Modifier.isPrivate(c2.getModifiers())) {
-        continue;
-      }
       boolean skip = false;
       for(String pkg : skippackages) {
         if(c2.getName().startsWith(pkg)) {
