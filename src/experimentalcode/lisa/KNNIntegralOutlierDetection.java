@@ -117,7 +117,7 @@ public class KNNIntegralOutlierDetection <O extends DatabaseObject, D extends Do
         
         AnnotationFromDatabase<Double, O> res1 = new AnnotationFromDatabase<Double, O>(database, KNNIO_ODEGREE);
             // Ordering
-            OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database, KNNIO_ODEGREE, true); 
+            OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database, KNNIO_ODEGREE, false); 
             // combine results.
             
             result = new MultiResult();
