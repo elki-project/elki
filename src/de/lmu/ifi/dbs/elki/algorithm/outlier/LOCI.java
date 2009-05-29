@@ -76,7 +76,8 @@ public class LOCI<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
 
   /**
    * Parameter to specify the minimum neighborhood size
-   * <p>Key: {@code -loci.alpha} </p>
+   * <p>Key: {@code -loci.nmin} </p>
+   * <p>Default: {@code 20}</p>
    */
   private final IntParameter NMIN_PARAM = new IntParameter(NMIN_ID, null, 20);
 
