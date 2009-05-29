@@ -200,7 +200,7 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
     // combine results.
     result = new MultiResult();
     result.addResult(new AnnotationFromHashMap<Double>(ABOD_SCORE, abodvalues));
-    result.addResult(new OrderingFromHashMap<Double>(abodvalues, true));
+    result.addResult(new OrderingFromHashMap<Double>(abodvalues, false));
     // store normalization information.
     ResultUtil.setGlobalAssociation(result, ABOD_NORM, maxabod);
     return result;
@@ -303,7 +303,7 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
     // ABOD values as result
     result = new MultiResult();
     result.addResult(new AnnotationFromHashMap<Double>(ABOD_SCORE, abodvalues));
-    result.addResult(new OrderingFromHashMap<Double>(abodvalues, true));
+    result.addResult(new OrderingFromHashMap<Double>(abodvalues, false));
     // store normalization information.
     ResultUtil.setGlobalAssociation(result, ABOD_NORM, maxabod);
     return result;
