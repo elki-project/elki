@@ -88,8 +88,9 @@ public class LOCI<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
   /**
    * Parameter to specify the averaging neighborhood scaling
    * <p>Key: {@code -loci.alpha} </p>
+   * <p>Default: {@code 0.5}</p>
    */
-  private final DoubleParameter ALPHA_PARAM = new DoubleParameter(ALPHA_ID);
+  private final DoubleParameter ALPHA_PARAM = new DoubleParameter(ALPHA_ID, 0.5);
 
   /**
    * Holds the value of {@link #ALPHA_PARAM}.
