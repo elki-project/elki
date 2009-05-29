@@ -1,6 +1,5 @@
 package experimentalcode.erich.utilities;
 
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
