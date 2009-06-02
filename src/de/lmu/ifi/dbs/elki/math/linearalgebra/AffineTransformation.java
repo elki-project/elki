@@ -84,13 +84,13 @@ public class AffineTransformation {
       {
         boolean search = true;
         while(search) {
+          search = false;
           for(int a : axes) {
             if(a == useddim) {
               search = true;
               useddim++;
               break;
             }
-            search = false;
           }
         }
       }
@@ -215,7 +215,7 @@ public class AffineTransformation {
     homTrans.set(axis - 1, axis - 1, -1);
     trans = homTrans.times(trans);
   }
-  
+
   /**
    * Simple linear (symmetric) scaling.
    * 
@@ -223,7 +223,7 @@ public class AffineTransformation {
    */
   public void addScaling(double scale) {
     inv = null;
-    trans.set(dim,dim,trans.get(dim, dim) / scale);
+    trans.set(dim, dim, trans.get(dim, dim) / scale);
   }
 
   /**
@@ -255,7 +255,7 @@ public class AffineTransformation {
   }
 
   /**
-   * Transform a vector into homogeneous coordinates.
+   * Transform an absolute vector into homogeneous coordinates.
    * 
    * @param v initial vector
    * @return vector of dim+1, with new column having the value 1.0
@@ -271,19 +271,18 @@ public class AffineTransformation {
   }
 
   /**
-   * Project an homogeneous vector back into the original space.
+   * Transform a relative vector into homogeneous coordinates.
    * 
-   * @param v homogeneous vector of dim+1
-   * @return vector of dimension dim
+   * @param v initial vector
+   * @return vector of dim+1, with new column having the value 0.0
    */
-  public Vector unhomogeneVector(Vector v) {
-    assert (v.getRowDimensionality() == dim + 1);
-    double[] dv = new double[dim];
-    double scale = v.get(dim);
-    assert (Math.abs(scale) > 0.0);
+  public Vector homogeneRelativeVector(Vector v) {
+    assert (v.getRowDimensionality() == dim);
+    double[] dv = new double[dim + 1];
     for(int i = 0; i < dim; i++) {
-      dv[i] = v.get(i) / scale;
+      dv[i] = v.get(i);
     }
+    dv[dim] = 0.0;
     return new Vector(dv);
   }
 
@@ -298,9 +297,27 @@ public class AffineTransformation {
     assert (v.getColumnDimensionality() == 1);
     double[] dv = new double[dim];
     double scale = v.get(dim, 0);
-    assert (Math.abs(scale) > 0.0);
+    assert(Math.abs(scale) > 0.0);
     for(int i = 0; i < dim; i++) {
       dv[i] = v.get(i, 0) / scale;
+    }
+    return new Vector(dv);
+  }
+
+  /**
+   * Project an homogeneous vector back into the original space.
+   * 
+   * @param v Matrix of 1 x dim+1 containing the homogeneous vector
+   * @return vector of dimension dim
+   */
+  public Vector unhomogeneRelativeVector(Matrix v) {
+    assert (v.getRowDimensionality() == dim + 1);
+    assert (v.getColumnDimensionality() == 1);
+    double[] dv = new double[dim];
+    double scale = v.get(dim, 0);
+    assert(Math.abs(scale) == 0.0);
+    for(int i = 0; i < dim; i++) {
+      dv[i] = v.get(i, 0);
     }
     return new Vector(dv);
   }
@@ -326,5 +343,28 @@ public class AffineTransformation {
       updateInverse();
     }
     return unhomogeneVector(inv.times(homogeneVector(v)));
+  }
+  
+  /**
+   * Apply the transformation onto a vector
+   * 
+   * @param v vector of dimensionality dim
+   * @return transformed vector of dimensionality dim
+   */
+  public Vector applyRelative(Vector v) {
+    return unhomogeneRelativeVector(trans.times(homogeneRelativeVector(v)));
+  }
+
+  /**
+   * Apply the inverse transformation onto a vector
+   * 
+   * @param v vector of dimensionality dim
+   * @return transformed vector of dimensionality dim
+   */
+  public Vector applyRelativeInverse(Vector v) {
+    if(inv == null) {
+      updateInverse();
+    }
+    return unhomogeneRelativeVector(inv.times(homogeneRelativeVector(v)));
   }
 }
