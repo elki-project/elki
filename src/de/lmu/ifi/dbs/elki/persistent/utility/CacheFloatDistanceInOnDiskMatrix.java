@@ -156,10 +156,12 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject> extends 
     // Setup database connection.
     databaseConnection = DATABASE_CONNECTION_PARAM.instantiateClass();
     remainingParameters = databaseConnection.setParameters(remainingParameters);
+    addParameterizable(databaseConnection);
 
     // Pass on parameters to distance function.
     distance = DISTANCE_PARAM.instantiateClass();
     remainingParameters = distance.setParameters(remainingParameters);
+    addParameterizable(distance);
     
     if(remainingParameters.length != 0) {
       LoggingUtil.warning("Unnecessary parameters specified: " + Arrays.asList(remainingParameters));
