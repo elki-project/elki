@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.evaluation.roc.ROCAUC;
+import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
 import de.lmu.ifi.dbs.elki.math.Histogram;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
@@ -80,7 +80,7 @@ public class RankingQualityHistogram<V extends RealVector<V, ?>> extends Distanc
     for(Cluster<?> clus : splitted) {
       for(Integer i1 : clus.getIDs()) {
         List<DistanceResultPair<DoubleDistance>> knn = database.kNNQueryForID(i1, size, distFunc);
-        double result = ROCAUC.computeROCAUC(size, clus, knn);
+        double result = ROC.computeROCAUCDistanceResult(size, clus, knn);
 
         hist.put(result, hist.get(result) + 1. / size);
 
