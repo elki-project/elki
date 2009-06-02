@@ -106,6 +106,9 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
         logger.progress(preprocessing);
       }
     }
+    if(logger.isVerbose()) {
+      logger.verbose("kNN materialization completed.");
+    }
   }
 
   /**
@@ -122,8 +125,9 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
     // distance function
     distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
     remainingParameters = distanceFunction.setParameters(remainingParameters);
+    addParameterizable(distanceFunction);
+    
     rememberParametersExcept(args, remainingParameters);
-
     return remainingParameters;
   }
 

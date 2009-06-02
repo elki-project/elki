@@ -124,7 +124,9 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
       // TODO: do we still need this, or will it be done automatically?
       for (DistanceFunction<O, D> distanceFunction : this.distanceFunctions) {
         remainingParameters = distanceFunction.setParameters(remainingParameters);
+        addParameterizable(distanceFunction);
       }
+      
       rememberParametersExcept(args, remainingParameters);
       return remainingParameters;
     }
@@ -137,6 +139,8 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
         throw new WrongParameterValueException(DISTANCE_FUNCTIONS_PARAM, DEFAULT_DISTANCE_FUNCTION, e);
       }
       remainingParameters = defaultDistanceFunction.setParameters(remainingParameters);
+      addParameterizable(defaultDistanceFunction);
+      
       rememberParametersExcept(args, remainingParameters);
       return remainingParameters;
     }

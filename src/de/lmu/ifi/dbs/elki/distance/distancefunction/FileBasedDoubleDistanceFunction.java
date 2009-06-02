@@ -147,6 +147,7 @@ public class FileBasedDoubleDistanceFunction<V extends DatabaseObject> extends A
     // database
     parser = PARSER_PARAM.instantiateClass();
     remainingParameters = parser.setParameters(remainingParameters);
+    addParameterizable(parser);
     
     try {
       loadCache(matrixfile);

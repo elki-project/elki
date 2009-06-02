@@ -66,7 +66,11 @@ public abstract class MetaParser<O extends DatabaseObject> extends AbstractParam
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     baseparser = BASEPARSER_PARAM.instantiateClass();
-    return baseparser.setParameters(remainingParameters);
+    remainingParameters = baseparser.setParameters(remainingParameters);
+    addParameterizable(baseparser);
+    
+    rememberParametersExcept(args, remainingParameters);
+    return remainingParameters;
   }
 
 

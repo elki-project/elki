@@ -127,8 +127,9 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
         // distance function
         distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
         remainingParameters = distanceFunction.setParameters(remainingParameters);
+        addParameterizable(distanceFunction);
+        
         rememberParametersExcept(args, remainingParameters);
-
         return remainingParameters;
     }
 
