@@ -59,7 +59,8 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
      */
     public ERiC() {
 //    this.debug = true;
-        copacAlgorithm = new COPAC<V>();
+      copacAlgorithm = new COPAC<V>();
+      addParameterizable(copacAlgorithm);
     }
 
     /**
@@ -184,7 +185,6 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
         copacAlgorithm.setVerbose(isVerbose());
         copacAlgorithm.setTime(isTime());
         remainingParameters = copacAlgorithm.setParameters(remainingParameters);
-        addParameterizable(copacAlgorithm);
         
         rememberParametersExcept(args, remainingParameters);
         return remainingParameters;

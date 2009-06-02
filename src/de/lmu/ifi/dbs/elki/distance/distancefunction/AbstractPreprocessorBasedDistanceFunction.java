@@ -35,6 +35,7 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
     public AbstractPreprocessorBasedDistanceFunction(Pattern pattern) {
         super(pattern);
         preprocessorHandler = new PreprocessorHandler<O, P>(this);
+        addParameterizable(preprocessorHandler);
     }
 
     /**
@@ -62,7 +63,6 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
         String[] remainingParameters = super.setParameters(args);
 
         remainingParameters = preprocessorHandler.setParameters(remainingParameters);
-        addParameterizable(preprocessorHandler);
         
         rememberParametersExcept(args, remainingParameters);
         return remainingParameters;

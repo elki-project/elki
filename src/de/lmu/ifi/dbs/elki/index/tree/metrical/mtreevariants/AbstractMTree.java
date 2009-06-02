@@ -206,8 +206,8 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
         String[] remainingParameters = super.setParameters(args);
 
         distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
-        remainingParameters = distanceFunction.setParameters(remainingParameters);
         addParameterizable(distanceFunction);
+        remainingParameters = distanceFunction.setParameters(remainingParameters);
         
         rememberParametersExcept(args, remainingParameters);
         return remainingParameters;

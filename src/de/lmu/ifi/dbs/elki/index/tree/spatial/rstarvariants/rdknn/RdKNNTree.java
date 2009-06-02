@@ -270,8 +270,8 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
 
     // distance function
     distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
-    remainingParameters = distanceFunction.setParameters(remainingParameters);
     addParameterizable(distanceFunction);
+    remainingParameters = distanceFunction.setParameters(remainingParameters);
 
     // k_max
     k_max = K_PARAM.getValue();

@@ -123,8 +123,8 @@ public class PreprocessorHandler<O extends DatabaseObject, P extends Preprocesso
     // preprocessor
     if(!omit) {
       preprocessor = PREPROCESSOR_PARAM.instantiateClass();
-      remainingParameters = preprocessor.setParameters(remainingParameters);
       addParameterizable(preprocessor);
+      remainingParameters = preprocessor.setParameters(remainingParameters);
     }
 
     rememberParametersExcept(args, remainingParameters);

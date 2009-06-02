@@ -139,8 +139,8 @@ public class FileBasedFloatDistanceFunction<V extends DatabaseObject> extends Ab
 
     // database
     parser = PARSER_PARAM.instantiateClass();
-    remainingParameters = parser.setParameters(remainingParameters);
     addParameterizable(parser);
+    remainingParameters = parser.setParameters(remainingParameters);
     
     try {
       loadCache(matrixfile);

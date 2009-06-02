@@ -30,6 +30,7 @@ public abstract class AbstractLocallyWeightedDistanceFunction<O extends RealVect
   protected AbstractLocallyWeightedDistanceFunction() {
     super();
     preprocessorHandler = new PreprocessorHandler<O, P>(this);
+    addParameterizable(preprocessorHandler);
   }
 
   @Override
@@ -49,7 +50,6 @@ public abstract class AbstractLocallyWeightedDistanceFunction<O extends RealVect
     String[] remainingParameters = super.setParameters(args);
 
     remainingParameters = preprocessorHandler.setParameters(remainingParameters);
-    addParameterizable(preprocessorHandler);
 
     rememberParametersExcept(args, remainingParameters);
     return remainingParameters;

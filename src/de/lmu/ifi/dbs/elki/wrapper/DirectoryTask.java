@@ -74,7 +74,6 @@ public class DirectoryTask extends StandAloneInputWrapper {
                 OptionUtil.addParameter(wrapperParameters, OUTPUT_ID, getOutput() + File.separator + inputFile.getName());
 
                 wrapper.setParameters(wrapperParameters.toArray(new String[wrapperParameters.size()]));
-                addParameterizable(wrapper);
                 wrapper.run();
             }
             catch (ParameterException e) {
@@ -93,6 +92,7 @@ public class DirectoryTask extends StandAloneInputWrapper {
         String[] remainingParameters = super.setParameters(args);
         // wrapper
         wrapper = WRAPPER_PARAM.instantiateClass();
+        addParameterizable(wrapper);
 
         return remainingParameters;
     }

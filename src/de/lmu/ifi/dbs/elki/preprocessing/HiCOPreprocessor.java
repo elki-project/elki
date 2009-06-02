@@ -64,6 +64,7 @@ public abstract class HiCOPreprocessor<V extends RealVector<V, ?>> extends Abstr
         super();
         // parameter pca distance function
         addOption(PCA_DISTANCE_PARAM);
+        addParameterizable(pca);
     }
 
     /**
@@ -119,11 +120,10 @@ public abstract class HiCOPreprocessor<V extends RealVector<V, ?>> extends Abstr
         String[] remainingParameters = super.setParameters(args);
 
         pcaDistanceFunction = PCA_DISTANCE_PARAM.instantiateClass();
-        remainingParameters = pcaDistanceFunction.setParameters(remainingParameters);
         addParameterizable(pcaDistanceFunction);
+        remainingParameters = pcaDistanceFunction.setParameters(remainingParameters);
         
         remainingParameters = pca.setParameters(remainingParameters);
-        addParameterizable(pca);
 
         rememberParametersExcept(args, remainingParameters);
         return remainingParameters;

@@ -210,26 +210,26 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
         // partition db
         if (PARTITION_DB_PARAM.isSet()) {
             Database<V> tmpDB = PARTITION_DB_PARAM.instantiateClass();
-            remainingParameters = tmpDB.setParameters(remainingParameters);
-            partitionDatabaseParameters = tmpDB.getParameters();
             // FIXME: we're leaking a reference here.
             addParameterizable(tmpDB);
+            remainingParameters = tmpDB.setParameters(remainingParameters);
+            partitionDatabaseParameters = tmpDB.getParameters();
             partitionDatabase = ClassGenericsUtil.uglyCrossCast(tmpDB.getClass(), Database.class);
         }
 
         // preprocessor
         preprocessor = PREPROCESSOR_PARAM.instantiateClass();
-        remainingParameters = preprocessor.setParameters(remainingParameters);
         addParameterizable(preprocessor);
+        remainingParameters = preprocessor.setParameters(remainingParameters);
 
         // partition algorithm
         partitionAlgorithm = PARTITION_ALGORITHM_PARAM.instantiateClass();
+        addParameterizable(partitionAlgorithm);
         String[] partitiongAlgorithmParameters = new String[remainingParameters.length];
         System.arraycopy(remainingParameters, 0, partitiongAlgorithmParameters, 0, remainingParameters.length);
         partitionAlgorithm.setTime(isTime());
         partitionAlgorithm.setVerbose(isVerbose());
         remainingParameters = partitionAlgorithm.setParameters(partitiongAlgorithmParameters);
-        addParameterizable(partitionAlgorithm);
 
         rememberParametersExcept(args, remainingParameters);
         return remainingParameters;

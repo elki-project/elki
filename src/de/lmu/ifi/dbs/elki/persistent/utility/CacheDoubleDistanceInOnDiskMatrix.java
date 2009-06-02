@@ -150,13 +150,13 @@ public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject> extends
 
     // Setup database connection.
     databaseConnection = DATABASE_CONNECTION_PARAM.instantiateClass();
-    remainingParameters = databaseConnection.setParameters(remainingParameters);
     addParameterizable(databaseConnection);
+    remainingParameters = databaseConnection.setParameters(remainingParameters);
 
     // Pass on parameters to distance function.
     distance = DISTANCE_PARAM.instantiateClass();
-    remainingParameters = distance.setParameters(remainingParameters);
     addParameterizable(distance);
+    remainingParameters = distance.setParameters(remainingParameters);
     
     if(remainingParameters.length != 0) {
       LoggingUtil.warning("Unnecessary parameters specified: " + Arrays.asList(remainingParameters));

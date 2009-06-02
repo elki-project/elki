@@ -99,6 +99,8 @@ public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends
         super();
         addOption(KNN_PARAM);
         addOption(ALPHA_PARAM);
+        
+        addParameterizable(similarityFunction);
     }
 
     /**
@@ -181,7 +183,6 @@ public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends
         alpha = ALPHA_PARAM.getValue();
 
         remainingParameters = similarityFunction.setParameters(remainingParameters);
-        addParameterizable(similarityFunction);
         
         rememberParametersExcept(args, remainingParameters);
         return remainingParameters;

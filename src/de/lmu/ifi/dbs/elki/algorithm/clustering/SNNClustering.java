@@ -122,6 +122,8 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
         super();
         addOption(EPSILON_PARAM);
         addOption(MINPTS_PARAM);
+        
+        addParameterizable(similarityFunction);
     }
 
     /**
@@ -303,7 +305,7 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
         minpts = MINPTS_PARAM.getValue();
 
         remainingParameters = similarityFunction.setParameters(remainingParameters);
-        addParameterizable(similarityFunction);
+        // addParameterizable(similarityFunction); is in constructor
         
         rememberParametersExcept(args, remainingParameters);
         return remainingParameters;
