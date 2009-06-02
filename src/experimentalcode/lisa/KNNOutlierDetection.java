@@ -106,7 +106,7 @@ public class KNNOutlierDetection <O extends DatabaseObject, D extends DoubleDist
 			  }
 			  AnnotationFromDatabase<Double, O> res1 = new AnnotationFromDatabase<Double, O>(database, KNNO_ODEGREE);
 		        // Ordering
-		        OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database,KNNO_ODEGREE, false); 
+		        OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database,KNNO_ODEGREE, true); 
 		        // combine results.
 		        result = new MultiResult();
 		        result.addResult(res1);
