@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.evaluation.roc.ROCAUC;
+import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
 import de.lmu.ifi.dbs.elki.math.Histogram;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
@@ -127,7 +127,7 @@ public class EvaluateRankingQuality<V extends RealVector<V, ?>> extends Distance
       for(int ind = 0; ind < cmem.size(); ind++) {
         Integer i1 = cmem.get(ind).getSecond();
         List<DistanceResultPair<DoubleDistance>> knn = database.kNNQueryForID(i1, size, distFunc);
-        double result = ROCAUC.computeROCAUC(size, clus, knn);
+        double result = ROC.computeROCAUCDistanceResult(size, clus, knn);
 
         hist.get(((double)ind) / clus.size()).put(result);
 
