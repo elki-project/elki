@@ -21,7 +21,7 @@ public interface ResultHandler<O extends DatabaseObject, R extends Result> exten
    * @param db Database the result is for
    * @param result Result object
    */
-  public abstract void processResult(Database<O> db, R result);
+  public abstract void processResult(Database<O> db, R result) throws IllegalStateException;
 
   /**
    * Setter for normalization
