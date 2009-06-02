@@ -28,8 +28,9 @@ public class TestAffineTransformation {
 
     // test application to a vector
     double[] dv = new double[testdim];
-    for(int i = 0; i < testdim; i++)
+    for(int i = 0; i < testdim; i++) {
       dv[i] = i * i + testdim;
+    }
     Vector v1 = new Vector(dv);
     Vector v2 = new Vector(dv);
 
@@ -54,14 +55,16 @@ public class TestAffineTransformation {
 
     // translation vector
     double[] tv = new double[testdim];
-    for(int i = 0; i < testdim; i++)
+    for(int i = 0; i < testdim; i++) {
       tv[i] = i + testdim;
+    }
     t.addTranslation(new Vector(tv));
 
     Matrix tm2 = t.getTransformation();
     // Manually do the same changes to the matrix tm
-    for(int i = 0; i < testdim; i++)
+    for(int i = 0; i < testdim; i++) {
       tm.set(i, testdim, i + testdim);
+    }
     // Compare the results
     assertEquals("Translation wasn't added correctly to matrix.", tm, tm2);
 
@@ -73,16 +76,27 @@ public class TestAffineTransformation {
       dv2[i] = i * i + i + 2 * testdim;
     }
     Vector v1 = new Vector(dv1);
-    Vector v2 = new Vector(dv2);
+    Vector v2t = new Vector(dv2);
 
-    Vector v3 = t.apply(v1);
-    assertEquals("Vector wasn't translated properly forward.", v2, v3);
-    Vector v4 = t.applyInverse(v2);
-    assertEquals("Vector wasn't translated properly backwards.", v1, v4);
-    Vector v5 = t.applyInverse(v3);
-    assertEquals("Vector wasn't translated properly back and forward.", v1, v5);
+    Vector v1t = t.apply(v1);
+    assertEquals("Vector wasn't translated properly forward.", v2t, v1t);
+    Vector v2b = t.applyInverse(v2t);
+    assertEquals("Vector wasn't translated properly backwards.", v1, v2b);
+    Vector v1b = t.applyInverse(v1t);
+    assertEquals("Vector wasn't translated properly back and forward.", v1, v1b);
+    
+    // Translation
+    Vector vd = v1.minus(v2b);
+    Vector vtd = v1t.minus(v2t);
+    assertEquals("Translation changed vector difference.", vd, vtd);
+    
+    // Translation shouldn't change relative vectors.
+    assertEquals("Relative vectors weren't left unchanged by translation!", v1, t.applyRelative(v1));
+    assertEquals("Relative vectors weren't left unchanged by translation!", v2t, t.applyRelative(v2t));
+    assertEquals("Relative vectors weren't left unchanged by translation!", v1t, t.applyRelative(v1t));
+    assertEquals("Relative vectors weren't left unchanged by translation!", v2b, t.applyRelative(v2b));
   }
-
+  
   /**
    * Test direct inclusion of matrices
    */
@@ -105,8 +119,9 @@ public class TestAffineTransformation {
 
     // rotation matrix
     double[][] rm = new double[testdim][testdim];
-    for(int i = 0; i < testdim; i++)
+    for(int i = 0; i < testdim; i++) {
       rm[i][i] = 1;
+    }
     // add the rotation
     rm[axis1][axis1] = +Math.cos(angle);
     rm[axis1][axis2] = -Math.sin(angle);
@@ -131,10 +146,21 @@ public class TestAffineTransformation {
       dv[i] = i * i + testdim;
     }
     Vector v1 = new Vector(dv);
-    Vector v3 = t.applyInverse(t.apply(v1));
+    Vector v2 = t.apply(v1);
+    Vector v3 = t.applyInverse(v2);
     assertTrue("Forward-Backward didn't work correctly.", v1.almostEquals(v3));
     Vector v4 = t.apply(t.apply(t.apply(v1)));
     assertTrue("Triple-Rotation by 120 degree didn't work", v1.almostEquals(v4));
+    
+    // Rotation shouldn't disagree for relative vectors.
+    // (they just are not affected by translation!)
+    assertEquals("Relative vectors were affected differently by pure rotation!", v2, t.applyRelative(v1));
+
+    // should do the same as built-in rotation!
+    AffineTransformation t2 = new AffineTransformation(testdim);
+    t2.addRotation(axis1, axis2, angle);
+    Vector t2v2 = t2.apply(v1);
+    assertTrue("Manual rotation and AffineTransformation.addRotation disagree.", v2.almostEquals(t2v2));
   }
 
   /**
