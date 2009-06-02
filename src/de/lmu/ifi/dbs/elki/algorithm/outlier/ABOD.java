@@ -595,8 +595,8 @@ public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, 
     }
 
     kernelFunction = KERNEL_FUNCTION_PARAM.instantiateClass();
-    remainingParameters = kernelFunction.setParameters(remainingParameters);
     addParameterizable(kernelFunction);
+    remainingParameters = kernelFunction.setParameters(remainingParameters);
     
     rememberParametersExcept(args, remainingParameters);
     return remainingParameters;

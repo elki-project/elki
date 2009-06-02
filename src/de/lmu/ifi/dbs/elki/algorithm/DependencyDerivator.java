@@ -128,6 +128,8 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
 
     // random sample
     addOption(RANDOM_SAMPLE_FLAG);
+    
+    addParameterizable(pca);    
   }
 
   public Description getDescription() {
@@ -287,7 +289,7 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
     }
 
     remainingParameters = pca.setParameters(remainingParameters);
-    addParameterizable(pca);
+    // addParameterizable(pca) is called in constructor
 
     rememberParametersExcept(args, remainingParameters);
     return remainingParameters;

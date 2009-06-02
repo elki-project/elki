@@ -172,7 +172,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
 
         // parameter distance function
         addOption(DISTANCE_FUNCTION_PARAM);
-
+        
         // global parameter constraint epsilon <-> distance function
         GlobalParameterConstraint con = new GlobalDistanceFunctionPatternConstraint<LocallyWeightedDistanceFunction<V, ?>>(EPSILON_PARAM, DISTANCE_FUNCTION_PARAM);
         optionHandler.setGlobalParameterConstraint(con);
@@ -384,6 +384,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
 
         // distance function
         distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
+        addParameterizable(distanceFunction);
 
         // epsilon
         epsilon = EPSILON_PARAM.getValue();
@@ -411,7 +412,6 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
         OptionUtil.addParameter(distanceFunctionParameters, MINPTS_ID, Integer.toString(minpts));
 
         distanceFunction.setParameters(distanceFunctionParameters.toArray(new String[distanceFunctionParameters.size()]));
-        addParameterizable(distanceFunction);
 
         rememberParametersExcept(args, remainingParameters);
         return remainingParameters;

@@ -140,8 +140,8 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
 
         // parser
         parser = PARSER_PARAM.instantiateClass();
-        remainingParameters = parser.setParameters(remainingParameters);
         addParameterizable(parser);
+        remainingParameters = parser.setParameters(remainingParameters);
         
         rememberParametersExcept(args, remainingParameters);
         return remainingParameters;

@@ -166,8 +166,8 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
         String[] remainingParameters = super.setParameters(args);
 
         rangeQueryDistanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
-        remainingParameters = rangeQueryDistanceFunction.setParameters(remainingParameters);
         addParameterizable(rangeQueryDistanceFunction);
+        remainingParameters = rangeQueryDistanceFunction.setParameters(remainingParameters);
 
         // epsilon
         epsilon = EPSILON_PARAM.getValue();

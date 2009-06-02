@@ -282,8 +282,8 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
     // reachabilityDistanceFunction - for parameter handling.
     if (REACHABILITY_DISTANCE_FUNCTION_PARAM.isSet()) {
       reachabilityDistanceFunction = REACHABILITY_DISTANCE_FUNCTION_PARAM.instantiateClass();
-      remainingParameters = reachabilityDistanceFunction.setParameters(remainingParameters);
       addParameterizable(reachabilityDistanceFunction);
+      remainingParameters = reachabilityDistanceFunction.setParameters(remainingParameters);
     } else {
       reachabilityDistanceFunction = getDistanceFunction();
     }

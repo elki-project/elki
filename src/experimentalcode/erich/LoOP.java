@@ -312,14 +312,14 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
     DistanceFunction<O, DoubleDistance> referenceDistanceFunction;
     
     comparisonDistanceFunction = COMPARISON_DISTANCE_FUNCTION_PARAM.instantiateClass();
-    remainingParameters = comparisonDistanceFunction.setParameters(remainingParameters);
     addParameterizable(comparisonDistanceFunction);
+    remainingParameters = comparisonDistanceFunction.setParameters(remainingParameters);
     
     // referenceDistanceFunction
     if(REFERENCE_DISTANCE_FUNCTION_PARAM.isSet()) {
       referenceDistanceFunction = REFERENCE_DISTANCE_FUNCTION_PARAM.instantiateClass();
-      remainingParameters = referenceDistanceFunction.setParameters(remainingParameters);
       addParameterizable(referenceDistanceFunction);
+      remainingParameters = referenceDistanceFunction.setParameters(remainingParameters);
     }
     else {
       referenceDistanceFunction = null;

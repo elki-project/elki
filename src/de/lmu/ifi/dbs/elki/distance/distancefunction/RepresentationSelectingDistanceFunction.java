@@ -120,11 +120,13 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
     // distance functions
     if (DISTANCE_FUNCTIONS_PARAM.isSet()) {
       distanceFunctions = DISTANCE_FUNCTIONS_PARAM.instantiateClasses();
+      for (DistanceFunction<O, D> distanceFunction : this.distanceFunctions) {
+        addParameterizable(distanceFunction);
+      }
 
       // TODO: do we still need this, or will it be done automatically?
       for (DistanceFunction<O, D> distanceFunction : this.distanceFunctions) {
         remainingParameters = distanceFunction.setParameters(remainingParameters);
-        addParameterizable(distanceFunction);
       }
       
       rememberParametersExcept(args, remainingParameters);
@@ -134,12 +136,12 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
       try {
           // todo
         defaultDistanceFunction = ClassGenericsUtil.instantiateGenerics(DistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
+        addParameterizable(defaultDistanceFunction);
       }
       catch (UnableToComplyException e) {
         throw new WrongParameterValueException(DISTANCE_FUNCTIONS_PARAM, DEFAULT_DISTANCE_FUNCTION, e);
       }
       remainingParameters = defaultDistanceFunction.setParameters(remainingParameters);
-      addParameterizable(defaultDistanceFunction);
       
       rememberParametersExcept(args, remainingParameters);
       return remainingParameters;

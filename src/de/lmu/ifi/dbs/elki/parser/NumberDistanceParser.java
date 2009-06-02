@@ -160,8 +160,8 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
     String[] remainingParameters = super.setParameters(args);
 
     distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
-    remainingParameters = distanceFunction.setParameters(remainingParameters);
     addParameterizable(distanceFunction);
+    remainingParameters = distanceFunction.setParameters(remainingParameters);
     
     rememberParametersExcept(args, remainingParameters);
     return remainingParameters;

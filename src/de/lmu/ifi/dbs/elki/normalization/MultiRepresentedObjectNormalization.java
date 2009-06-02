@@ -288,8 +288,10 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
       // Right now, the user needs to specify DummyNormalization.class.getName()
       this.normalizations = NORMALIZATION_PARAM.instantiateClasses();
       for (Normalization<O> normalization : normalizations) {
-        remainingOptions = normalization.setParameters(remainingOptions);
         addParameterizable(normalization);
+      }
+      for (Normalization<O> normalization : normalizations) {
+        remainingOptions = normalization.setParameters(remainingOptions);
       }
     }
 

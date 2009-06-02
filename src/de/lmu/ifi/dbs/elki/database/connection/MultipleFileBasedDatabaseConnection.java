@@ -179,6 +179,9 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
     // parsers
     if(PARSERS_PARAM.isSet()) {
       parsers = PARSERS_PARAM.instantiateClasses();
+      for (Parser<O> parser : parsers) {
+        addParameterizable(parser);
+      }
 
       if(parsers.size() != inputStreams.size()) {
         throw new WrongParameterValueException("Number of parsers and input files does not match (" + parsers.size() + " != " + inputStreams.size() + ")!");
@@ -200,7 +203,6 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
     // set parameters of parsers
     for(Parser<O> parser : this.parsers) {
       remainingParameters = parser.setParameters(remainingParameters);
-      addParameterizable(parser);
     }
 
     rememberParametersExcept(args, remainingParameters);

@@ -86,8 +86,8 @@ public class ArffFileParser<O extends DatabaseObject & WekaObject<W>, W extends 
     {
         String[] remainingParameters = super.setParameters(args);
         parser = BASE_PARSER_PARAM.instantiateClass();
-        remainingParameters = parser.setParameters(remainingParameters);
         addParameterizable(parser);
+        remainingParameters = parser.setParameters(remainingParameters);
 
         rememberParametersExcept(args, remainingParameters);
         return remainingParameters;

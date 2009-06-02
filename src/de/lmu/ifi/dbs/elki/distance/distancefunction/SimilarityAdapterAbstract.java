@@ -66,8 +66,8 @@ public abstract class SimilarityAdapterAbstract<V extends FeatureVector<V,?>> ex
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     similarityFunction = SIMILARITY_FUNCTION_PARAM.instantiateClass();
-    remainingParameters = similarityFunction.setParameters(remainingParameters);
     addParameterizable(similarityFunction);
+    remainingParameters = similarityFunction.setParameters(remainingParameters);
     
     rememberParametersExcept(args, remainingParameters);
     return remainingParameters;

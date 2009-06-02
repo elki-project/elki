@@ -69,8 +69,8 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
 
         // distance function
         distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
-        remainingParameters = distanceFunction.setParameters(remainingParameters);
         addParameterizable(distanceFunction);
+        remainingParameters = distanceFunction.setParameters(remainingParameters);
         
         rememberParametersExcept(args, remainingParameters);
         return remainingParameters;

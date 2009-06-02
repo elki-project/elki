@@ -301,25 +301,25 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
 
     // algorithm
     algorithm = ALGORITHM_PARAM.instantiateClass();
-    remainingParameters = algorithm.setParameters(remainingParameters);
     addParameterizable(algorithm);
+    remainingParameters = algorithm.setParameters(remainingParameters);
 
     // database connection
     databaseConnection = DATABASE_CONNECTION_PARAM.instantiateClass();
-    remainingParameters = databaseConnection.setParameters(remainingParameters);
     addParameterizable(databaseConnection);
+    remainingParameters = databaseConnection.setParameters(remainingParameters);
 
     // result handler
     resulthandler = RESULT_HANDLER_PARAM.instantiateClass();
-    remainingParameters = resulthandler.setParameters(remainingParameters);
     addParameterizable(resulthandler);
+    remainingParameters = resulthandler.setParameters(remainingParameters);
 
     // normalization
     if(NORMALIZATION_PARAM.isSet()) {
       normalization = NORMALIZATION_PARAM.instantiateClass();
       normalizationUndo = NORMALIZATION_UNDO_FLAG.isSet();
-      remainingParameters = normalization.setParameters(remainingParameters);
       addParameterizable(normalization);
+      remainingParameters = normalization.setParameters(remainingParameters);
     }
 
     // help
