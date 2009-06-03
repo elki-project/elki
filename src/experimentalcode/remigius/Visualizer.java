@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.visualization.colors.PublicationColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
 
-public abstract class VisualizationGenerator<O extends DoubleVector> {
+public abstract class Visualizer<O extends DoubleVector> {
 	
 	protected Database<O> database;
 	private LinearScale[] scales;
@@ -17,7 +17,7 @@ public abstract class VisualizationGenerator<O extends DoubleVector> {
 	protected static final CommonSVGShapes SHAPEGEN = new CommonSVGShapes();
 	protected static final ColorLibrary COLORS = new PublicationColorLibrary();
 	
-	public VisualizationGenerator(Database<O> db){
+	public Visualizer(Database<O> db){
 		this.database = db;
 		this.scales = Scales.calcScales(db);
 	}
