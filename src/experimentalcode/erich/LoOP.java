@@ -1,6 +1,7 @@
 package experimentalcode.erich;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -26,7 +27,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
 
@@ -73,6 +73,22 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
    * </p>
    */
   private final ClassParameter<DistanceFunction<O, DoubleDistance>> COMPARISON_DISTANCE_FUNCTION_PARAM = new ClassParameter<DistanceFunction<O, DoubleDistance>>(COMPARISON_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class.getCanonicalName());
+
+  /**
+   * OptionID for {@link #PREPROCESSOR_PARAM}
+   */
+  public static final OptionID PREPROCESSOR_ID = OptionID.getOrCreateOptionID("loop.preprocessor", "Preprocessor used to materialize the kNN neighborhoods.");
+
+  /**
+   * The preprocessor used to materialize the kNN neighborhoods.
+   * 
+   * Default value: {@link MaterializeKNNPreprocessor}
+   * </p>
+   * <p>
+   * Key: {@code -loop.preprocessor}
+   * </p>
+   */
+  private final ClassParameter<MaterializeKNNPreprocessor<O, DoubleDistance>> PREPROCESSOR_PARAM = new ClassParameter<MaterializeKNNPreprocessor<O, DoubleDistance>>(PREPROCESSOR_ID, MaterializeKNNPreprocessor.class, MaterializeKNNPreprocessor.class.getCanonicalName());
 
   /**
    * The association id to associate the LOOP_SCORE of an object for the
@@ -167,6 +183,7 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
     addOption(COMPARISON_DISTANCE_FUNCTION_PARAM);
     addOption(REFERENCE_DISTANCE_FUNCTION_PARAM);
     addOption(LAMBDA_PARAM);
+    addOption(PREPROCESSOR_PARAM);
   }
 
   /**
@@ -295,6 +312,9 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
 
+    // Lambda
+    lambda = LAMBDA_PARAM.getValue();
+
     // k
     kcomp = KCOMP_PARAM.getValue();
 
@@ -328,31 +348,29 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
     }
 
     // configure first preprocessor
-    preprocessorcompare = new MaterializeKNNPreprocessor<O, DoubleDistance>();
+    preprocessorcompare = PREPROCESSOR_PARAM.instantiateClass();
+    OptionID[] masked = { MaterializeKNNPreprocessor.K_ID, MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID };
+    addParameterizable(preprocessorcompare, Arrays.asList(masked));
     List<String> preprocParams1 = new ArrayList<String>();
     OptionUtil.addParameter(preprocParams1, MaterializeKNNPreprocessor.K_ID, Integer.toString(preprock + (objectIsInKNN ? 0 : 1)));
     OptionUtil.addParameter(preprocParams1, MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, comparisonDistanceFunction.getClass().getCanonicalName());
     OptionUtil.addParameters(preprocParams1, comparisonDistanceFunction.getParameters());
-    String[] remaining1 = preprocessorcompare.setParameters(ClassGenericsUtil.toArray(preprocParams1, String.class));
-    if(remaining1.length > 0) {
-      throw new UnusedParameterException("First preprocessor did not use all parameters.");
-    }
+    OptionUtil.addParameters(preprocParams1, remainingParameters);
+    remainingParameters = preprocessorcompare.setParameters(ClassGenericsUtil.toArray(preprocParams1, String.class));
 
     // configure second preprocessor
     if(referenceDistanceFunction != null) {
-      preprocessorref = new MaterializeKNNPreprocessor<O, DoubleDistance>();
+      preprocessorref = PREPROCESSOR_PARAM.instantiateClass();
+      OptionID[] masked2 = { MaterializeKNNPreprocessor.K_ID, MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID };
+      addParameterizable(preprocessorref, Arrays.asList(masked2));
       List<String> preprocParams2 = new ArrayList<String>();
       OptionUtil.addParameter(preprocParams2, MaterializeKNNPreprocessor.K_ID, Integer.toString(kcomp + (objectIsInKNN ? 0 : 1)));
       OptionUtil.addParameter(preprocParams2, MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, referenceDistanceFunction.getClass().getCanonicalName());
       OptionUtil.addParameters(preprocParams2, referenceDistanceFunction.getParameters());
-      String[] remaining2 = preprocessorref.setParameters(ClassGenericsUtil.toArray(preprocParams2, String.class));
-      if(remaining2.length > 0) {
-        throw new UnusedParameterException("Second preprocessor did not use all parameters.");
-      }
+      OptionUtil.addParameters(preprocParams2, remainingParameters);
+      remainingParameters = preprocessorref.setParameters(ClassGenericsUtil.toArray(preprocParams2, String.class));
     }
     
-    lambda = LAMBDA_PARAM.getValue();
-
     rememberParametersExcept(args, remainingParameters);
     return remainingParameters;
   }
