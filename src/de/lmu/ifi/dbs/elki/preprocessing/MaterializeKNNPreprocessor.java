@@ -45,7 +45,7 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
   /**
    * Holds the value of {@link #K_PARAM}.
    */
-  int k;
+  protected int k;
 
   /**
    * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
@@ -68,12 +68,12 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
   /**
    * Hold the distance function to be used.
    */
-  private DistanceFunction<O, D> distanceFunction;
+  protected DistanceFunction<O, D> distanceFunction;
   
   /**
    * Materialized neighborhood
    */
-  private HashMap<Integer, List<DistanceResultPair<D>>> materialized;
+  protected HashMap<Integer, List<DistanceResultPair<D>>> materialized;
 
   /**
    * Provides a k nearest neighbors Preprocessor.
