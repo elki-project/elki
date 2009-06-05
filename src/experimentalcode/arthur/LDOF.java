@@ -96,8 +96,8 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
   protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
     getDistanceFunction().setDatabase(database, isVerbose(), isTime());
     // materialize neighborhoods
-    if(logger.isVerbose()) {
-      logger.verbose("Materializing k nearest neighborhoods.");
+    if(this.isVerbose()) {
+      this.verbose("Materializing k nearest neighborhoods.");
     }
     knnPreprocessor.run(database, isVerbose(), isTime());
     HashMap<Integer, List<DistanceResultPair<DoubleDistance>>> kNearestNeighboorhoods = knnPreprocessor.getMaterialized();
@@ -107,8 +107,8 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
     // compute the ldof values
     HashMap<Integer, Double> ldofs = new HashMap<Integer, Double>();
     // compute LOF_SCORE of each db object
-    if(logger.isVerbose()) {
-      logger.verbose("computing LDOFs");
+    if(this.isVerbose()) {
+      this.verbose("computing LDOFs");
     }
 
     FiniteProgress progressLDOFs = new FiniteProgress("LDOF_SCORE for objects", database.size());
@@ -137,13 +137,13 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
       // update maximum
       ldofmax = Math.max(ldofmax, ldof);
       
-      if(logger.isVerbose()) {
+      if(this.isVerbose()) {
         progressLDOFs.setProcessed(counter);
-        logger.progress(progressLDOFs);
+        this.progress(progressLDOFs);
       }
     }
-    if(logger.isVerbose()) {
-      logger.verbose("LDOF finished");
+    if(this.isVerbose()) {
+      this.verbose("LDOF finished");
     }
     
     // Build result representation.
