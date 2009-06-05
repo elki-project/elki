@@ -25,6 +25,7 @@ import java.util.List;
  * Objects are put in a set of normal objects and the set of anomalous objects is empty. An iterative procedure then transfers 
  * objects from the ordinary set to the anomalous set as long as the transfer increases the overall likelihood of the data. 
  * 
+ * Based on 
  * @author lisa
  *
  * @param <V>

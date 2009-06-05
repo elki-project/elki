@@ -12,7 +12,12 @@ import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
-
+/**
+ * outlier have smallest GMOD_PROB. lowest probability. 
+ * @author lisa
+ *
+ * @param <V>
+ */
 public class GaussianModelOutlierDetection<V extends RealVector<V,Double>> extends AbstractAlgorithm<V,MultiResult> {
 	
   MultiResult result;

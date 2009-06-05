@@ -17,10 +17,20 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 
-
-
+/**
+ * Simple index- based algorithm
+ * 
+ * 
+ * Based on:
+ * E. M. Knorr, R.T. Ng:
+ * Algorithms for Mining Distance-Based Outliers in Large Datasets(3.1)
+ * @author lisa
+ *
+ * @param <O>
+ */
 public class DBOutlierDetection <O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O , D , MultiResult> {
-public static final OptionID D_ID = OptionID.getOrCreateOptionID(
+
+  public static final OptionID D_ID = OptionID.getOrCreateOptionID(
         "dbod.d",
         "size of the D-neighborhood"
     );
