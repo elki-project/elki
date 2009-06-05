@@ -15,7 +15,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 
-
+/**
+ * Outlier Detection based on the distance of a point from its kth nearest neighbor. 
+ * 
+ * 
+ * Based on:
+ * S. Ramaswamy, R. Rastogi, K. Shim:
+ * Efficient Algorithms for Mining Outliers from Large Data Sets
+ * @author lisa
+ *
+ * @param <O>
+ */
 
 public class KNNOutlierDetection <O extends DatabaseObject, D extends DoubleDistance> extends DistanceBasedAlgorithm<O , DoubleDistance , MultiResult> {
 	
