@@ -8,5 +8,5 @@ import de.lmu.ifi.dbs.elki.result.Result;
 
 public interface AlgorithmAdapter<O extends DoubleVector> {
 
-	public Collection<Visualizer<O>> getVisualizationGenerators(Database<O> db, Result r);
+	public Collection<Visualizer<O>> getVisualizationGenerators(Database<O> db, Result r, VisualizationManager<O> v);
 }

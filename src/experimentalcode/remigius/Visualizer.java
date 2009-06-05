@@ -14,12 +14,15 @@ public abstract class Visualizer<O extends DoubleVector> {
 	protected Database<O> database;
 	private LinearScale[] scales;
 	
+	protected VisualizationManager<O> visManager;
+	
 	protected static final CommonSVGShapes SHAPEGEN = new CommonSVGShapes();
 	protected static final ColorLibrary COLORS = new PublicationColorLibrary();
 	
-	public Visualizer(Database<O> db){
+	public Visualizer(Database<O> db, VisualizationManager<O> v){
 		this.database = db;
 		this.scales = Scales.calcScales(db);
+		this.visManager = v;
 	}
 	
 	public Double getPositioned(O o, int dimx){
