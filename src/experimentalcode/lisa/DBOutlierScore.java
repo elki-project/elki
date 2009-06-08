@@ -24,7 +24,6 @@ public abstract class DBOutlierScore<O extends DatabaseObject, D extends Distanc
 
   public static final OptionID D_ID = OptionID.getOrCreateOptionID("dbos.d", "size of the D-neighborhood");
 
- 
   /**
    * Parameter to specify the size of the D-neighborhood,
    * 
@@ -52,22 +51,20 @@ public abstract class DBOutlierScore<O extends DatabaseObject, D extends Distanc
     // neighborhood size
     addOption(D_PARAM);
   }
+
   /**
-   * Calls the super method
-   * and sets additionally the values of the parameter
-   * {@link #D_PARAM}, {@link #P_PARAM} 
+   * Calls the super method and sets additionally the values of the parameter
+   * {@link #D_PARAM}, {@link #P_PARAM}
    */
   @Override
   public String[] setParameters(String[] args) throws ParameterException {
-      String[] remainingParameters = super.setParameters(args);
+    String[] remainingParameters = super.setParameters(args);
 
-   // neighborhood size
-      d = D_PARAM.getValue();
-      
-      return remainingParameters;
+    // neighborhood size
+    d = D_PARAM.getValue();
+
+    return remainingParameters;
   }
-
-
 
   public static final AssociationID<Double> DBOS_ODEGREE = AssociationID.getOrCreateAssociationID("dbos.odegree", Double.class);
 
@@ -79,8 +76,8 @@ public abstract class DBOutlierScore<O extends DatabaseObject, D extends Distanc
     getDistanceFunction().setDatabase(database, isVerbose(), isTime());
     double n;
     for(Integer id : database) {
-      //compute percentage of neighbors in the given neighborhood with size d  
-     n  = (database.rangeQuery(id, d, getDistanceFunction()).size())/database.size();
+      // compute percentage of neighbors in the given neighborhood with size d
+      n = (database.rangeQuery(id, d, getDistanceFunction()).size()) / database.size();
 
       // flag as outlier
       database.associate(DBOS_ODEGREE, id, n);
