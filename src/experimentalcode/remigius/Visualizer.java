@@ -1,6 +1,7 @@
 package experimentalcode.remigius;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -12,7 +13,7 @@ import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
 public abstract class Visualizer<O extends DoubleVector> {
 	
 	protected Database<O> database;
-	private LinearScale[] scales;
+	protected LinearScale[] scales;
 	
 	protected VisualizationManager<O> visManager;
 	
@@ -29,5 +30,10 @@ public abstract class Visualizer<O extends DoubleVector> {
 			return scales[dimx].getScaled(o.getValue(dimx));
 	}
 	
-	public abstract Visualization visualize(Document doc, int dimx, int dimy);
+	public Visualization<O> visualize(Document doc, int dimx, int dimy){
+		Element layer = SHAPEGEN.createSVG(doc);
+		return visualizeElements(doc, layer, dimx, dimy);
+		
+	}
+	protected abstract Visualization<O> visualizeElements(Document doc, Element layer, int dimx, int dimy);
 }
