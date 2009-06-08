@@ -16,14 +16,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
+import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
 
 /**
- * Simple index- based algorithm
+ * 
  * 
  * 
  * Based on:
- * E. M. Knorr, R.T. Ng:
- * Algorithms for Mining Distance-Based Outliers in Large Datasets(3.1)
+ * E.M. Knorr, R. T. Ng:
+ * Algorithms for Mining Distance-Based Outliers in Large Datasets,
+ * In: Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998.
+ * 
+ * This paper presents several Distance Based Outlier Detection algorithms. Implemented here is a simple index based 
+ * algorithm as presented in section 3.1.
  * @author lisa
  *
  * @param <O>
@@ -106,10 +111,17 @@ public static final OptionID P_ID = OptionID.getOrCreateOptionID(
 			D neighborhoodSize = getDistanceFunction().valueOf(d);
 			//maximum number of objects in the D-neighborhood of an outlier 
 		    int m = (int) ((database.size())*(1- p));
-		    debugFine("maximum number of objects  " + m);
+		   
+		    if(this.isVerbose()) {
+		      this.verbose("computing outlier flag");
+		    }
+
+		    FiniteProgress progressOFlags = new FiniteProgress("DBOD_OFLAG for objects", database.size());
+		    int counter = 0;
 		    //if index exists, kNN query. if the distance to the mth nearest neighbor is more than d -> object is outlier  
 		    if (database instanceof IndexDatabase){
 		    	for(Integer id : database){
+		    	  counter++;
 		    	  debugFine("distance to mth nearest neighbour" + database.kNNQueryForID(id, m, getDistanceFunction()).toString());
 		    		if(database.kNNQueryForID(id, m , getDistanceFunction()).get(m-1).getFirst().compareTo(neighborhoodSize)  <= 0){
 		    			//flag as outlier
@@ -120,16 +132,21 @@ public static final OptionID P_ID = OptionID.getOrCreateOptionID(
 			    		database.associate(DBOD_OFLAG, id, 0.0);
 		    		}
 		    	}
+		    	if(this.isVerbose()) {
+		        progressOFlags.setProcessed(counter);
+		        this.progress(progressOFlags);
+		      }
 		    }
 		    else {
 		    	//range query for each object. stop if m objects are found
 		    	for (Integer id : database){
-			    	Iterator<Integer> iterator = database.iterator();
+			    	counter++;
+		    	  Iterator<Integer> iterator = database.iterator();
 			        int count = 0;  
 			    	while (iterator.hasNext()&& count < m) {
 			            Integer currentID = iterator.next();
 			            D currentDistance = getDistanceFunction().distance(id, currentID);
-			       debugFine("point " +id + "dcurrentdistance  " + currentDistance);
+			      
 			            if (currentDistance.compareTo(neighborhoodSize) <= 0) {
 			            	count ++;
 			            }
@@ -145,6 +162,11 @@ public static final OptionID P_ID = OptionID.getOrCreateOptionID(
 			    		database.associate(DBOD_OFLAG, id, 0.0);
 			    	}
 		    	}
+
+          if(this.isVerbose()) {
+            progressOFlags.setProcessed(counter);
+            this.progress(progressOFlags);
+          }
 		    }
 		    AnnotationFromDatabase<Double, O> res1 = new AnnotationFromDatabase<Double, O>(database, DBOD_OFLAG);
 	        // Ordering

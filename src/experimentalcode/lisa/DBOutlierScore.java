@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 
 import java.util.Iterator;
@@ -21,15 +22,14 @@ import java.util.List;
 
 public abstract class DBOutlierScore<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D, MultiResult> {
 
-  public static final OptionID D_ID = OptionID.getOrCreateOptionID("dbod.d", "size of the D-neighborhood");
+  public static final OptionID D_ID = OptionID.getOrCreateOptionID("dbos.d", "size of the D-neighborhood");
 
-  public static final OptionID P_ID = OptionID.getOrCreateOptionID("dbod.p", "minimum fraction of objects that must be outside the D-neigborhood of an outlier");
-
+ 
   /**
    * Parameter to specify the size of the D-neighborhood,
    * 
    * <p>
-   * Key: {@code -dbod.d}
+   * Key: {@code -dbos.d}
    * </p>
    */
   private final PatternParameter D_PARAM = new PatternParameter(D_ID);
@@ -52,8 +52,24 @@ public abstract class DBOutlierScore<O extends DatabaseObject, D extends Distanc
     // neighborhood size
     addOption(D_PARAM);
   }
+  /**
+   * Calls the super method
+   * and sets additionally the values of the parameter
+   * {@link #D_PARAM}, {@link #P_PARAM} 
+   */
+  @Override
+  public String[] setParameters(String[] args) throws ParameterException {
+      String[] remainingParameters = super.setParameters(args);
 
-  public static final AssociationID<Integer> DBOD_ODEGREE = AssociationID.getOrCreateAssociationID("dbod.odegree", Integer.class);
+   // neighborhood size
+      d = D_PARAM.getValue();
+      
+      return remainingParameters;
+  }
+
+
+
+  public static final AssociationID<Double> DBOS_ODEGREE = AssociationID.getOrCreateAssociationID("dbos.odegree", Double.class);
 
   /**
    * Runs the algorithm in the timed evaluation part.
@@ -61,17 +77,17 @@ public abstract class DBOutlierScore<O extends DatabaseObject, D extends Distanc
   @Override
   protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
     getDistanceFunction().setDatabase(database, isVerbose(), isTime());
-
+    double n;
     for(Integer id : database) {
-      // compute the number of neighbors in the given neighborhood with size d
-      int number = database.rangeQuery(id, d, getDistanceFunction()).size();
+      //compute percentage of neighbors in the given neighborhood with size d  
+     n  = (database.rangeQuery(id, d, getDistanceFunction()).size())/database.size();
 
       // flag as outlier
-      database.associate(DBOD_ODEGREE, id, number);
+      database.associate(DBOS_ODEGREE, id, n);
     }
-    AnnotationFromDatabase<Integer, O> res1 = new AnnotationFromDatabase<Integer, O>(database, DBOD_ODEGREE);
+    AnnotationFromDatabase<Double, O> res1 = new AnnotationFromDatabase<Double, O>(database, DBOS_ODEGREE);
     // Ordering
-    OrderingFromAssociation<Integer, O> res2 = new OrderingFromAssociation<Integer, O>(database, DBOD_ODEGREE, true);
+    OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database, DBOS_ODEGREE, true);
     // combine results.
     result = new MultiResult();
     result.addResult(res1);
