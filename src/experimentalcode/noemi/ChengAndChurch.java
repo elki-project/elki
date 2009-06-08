@@ -24,6 +24,12 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
  * Provides a biclustering algorithm which deletes or inserts rows/columns
  * dependent on their score and finds biclusters with correlated values.
  *
+ * <p>
+ * Reference: <br>
+ * Y. Cheng and G. M. Church. Biclustering of expression data. In Proceedings of the 8th International
+ * Conference on Intelligent Systems for Molecular Biology (ISMB), San Diego, CA, 2000.
+ * </p>
+ *
  * @author Noemi Andor
  * @param <V> a certain subtype of RealVector - the data matrix is supposed to
  * consist of rows where each row relates to an object of type V and
@@ -886,8 +892,7 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends AbstractBic
             "ChengAndChurch",
             "a biclustering method on row- and columnScoreBases",
             "finding correlated values in a subset of rows and a subset of columns",
-            "Y. Cheng and G. M. Church. Biclustering of expression data. In Proceedings of the 8th International"
-                + "Conference on Intelligent Systems for Molecular Biology (ISMB), San Diego, CA, 2000.");
+            "Y. Cheng and G. M. Church. Biclustering of expression data. In Proceedings of the 8th International Conference on Intelligent Systems for Molecular Biology (ISMB), San Diego, CA, 2000.");
 		return abs;
 	}
 
