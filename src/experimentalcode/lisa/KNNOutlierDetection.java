@@ -21,7 +21,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * 
  * Based on:
  * S. Ramaswamy, R. Rastogi, K. Shim:
- * Efficient Algorithms for Mining Outliers from Large Data Sets
+ * Efficient Algorithms for Mining Outliers from Large Data Sets.
+ * In: Proc. of the Int. Conf. on Management of Data, Dallas, Texas, 2000.
+ * 
+ * 
  * @author lisa
  *
  * @param <O>
@@ -130,8 +133,12 @@ public class KNNOutlierDetection <O extends DatabaseObject, D extends DoubleDist
 
 		@Override
 		public Description getDescription() {
-			// TODO Auto-generated method stub
-			return null;
+		  return new Description(
+		      "KNNOutlierDetection",
+		      "Efficient Algorithms for Mining Outliers from Large Data Sets",
+		      "Outlier Detection based on the distance of a point from its kth nearest neighbor.",
+		      "S. Ramaswamy, R. Rastogi, K. Shim: " +
+		      "Efficient Algorithms for Mining Outliers from Large Data Sets");
 		}
 
 		@Override
