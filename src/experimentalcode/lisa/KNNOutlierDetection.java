@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
 
 
 /**
@@ -37,12 +38,7 @@ public class KNNOutlierDetection <O extends DatabaseObject, D extends DoubleDist
 		      "kth nearest neighbor"
 		  );
 
-	/*public static final OptionID N_ID = OptionID.getOrCreateOptionID(
-				      "knno.n",
-				      "number of outliers that are searched"
-				  );*/
-		
-		public static final AssociationID<Double> KNNO_ODEGREE= AssociationID.getOrCreateAssociationID("knno_odegree", Double.class);
+		public static final AssociationID<Double> KNNO_KNNDISTANCE= AssociationID.getOrCreateAssociationID("knno_knndistance", Double.class);
 		 public static final AssociationID<Double> KNNO_MAXODEGREE = AssociationID.getOrCreateAssociationID("knno_maxodegree", Double.class);
 		/**
 		   * Parameter to specify the kth nearest neighbor,
@@ -51,20 +47,12 @@ public class KNNOutlierDetection <O extends DatabaseObject, D extends DoubleDist
 		   */
 		  private final IntParameter K_PARAM = new IntParameter(K_ID);
 		  
-		  /*
-		   * Parameter to specify the number of outliers
-		   * 
-		   * <p>Key: {@code -knno.n} </p>
-		   /
-		  private final IntParameter N_PARAM = new IntParameter(N_ID);*/
+		  
 		  /**
 		   * Holds the value of {@link #K_PARAM}.
 		   */
 		  private int k;
-		  /**
-		   * Holds the value of {@link #N_PARAM}.
-		   */
-		  //private int n;
+
 		  /**
 		   * Provides the result of the algorithm.
 		   */
@@ -78,8 +66,6 @@ public class KNNOutlierDetection <O extends DatabaseObject, D extends DoubleDist
 		    //debug = true;
 		    // kth nearest neighbor
 		    addOption(K_PARAM);
-		    // number of outliers
-		    //addOption(N_PARAM);
 		    }
 		  
 		  /**
@@ -91,7 +77,7 @@ public class KNNOutlierDetection <O extends DatabaseObject, D extends DoubleDist
 		  public String[] setParameters(String[] args) throws ParameterException {
 		      String[] remainingParameters = super.setParameters(args);
 		      k = K_PARAM.getValue();
-			 // n = N_PARAM.getValue(); 
+			 
 		      return remainingParameters;
 		  }
 
@@ -103,23 +89,32 @@ public class KNNOutlierDetection <O extends DatabaseObject, D extends DoubleDist
 		  protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
 			  double maxodegree = 0;
         getDistanceFunction().setDatabase(database, isVerbose(), isTime());
-			  
-				// compute distance to the k nearest neighbor. n objects with the highest distance are flagged as outliers
+
+        if(this.isVerbose()) {
+          this.verbose("computing outlier degree(distance to the k nearest neighbor");
+        }
+        FiniteProgress progressKNNDistance = new FiniteProgress("KNNOD_KNNDISTANCE for objects", database.size());
+        int counter = 0;
+        
+				// compute distance to the k nearest neighbor. 
         for(Integer id : database){
+          counter++;
 				  //distance to the kth nearest neighbor
 				 Double dkn = database.kNNQueryForID(id,  k, getDistanceFunction()).get(k-1).getDistance().getValue();
 
-				 if (logger.isDebugging()) {
-				   logger.debugFine(dkn + "  dkn");
-		        }
 		      if(dkn > maxodegree) {
 		        maxodegree = dkn;
 		      }
-				  database.associate(KNNO_ODEGREE, id, dkn);
-			  }
-			  AnnotationFromDatabase<Double, O> res1 = new AnnotationFromDatabase<Double, O>(database, KNNO_ODEGREE);
+				  database.associate(KNNO_KNNDISTANCE, id, dkn);
+
+          if(this.isVerbose()) {
+            progressKNNDistance.setProcessed(counter);
+            this.progress(progressKNNDistance);
+          }
+        }
+			  AnnotationFromDatabase<Double, O> res1 = new AnnotationFromDatabase<Double, O>(database, KNNO_KNNDISTANCE);
 		        // Ordering
-		        OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database,KNNO_ODEGREE, true); 
+		        OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database,KNNO_KNNDISTANCE, true); 
 		        // combine results.
 		        result = new MultiResult();
 		        result.addResult(res1);

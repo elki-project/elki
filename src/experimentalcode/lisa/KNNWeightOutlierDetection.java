@@ -18,12 +18,23 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import java.util.List;
 
 
+/**
+ * Outlier Detection based on the accumulated distance of a point to its kth nearest neighbors. 
+ * 
+ * 
+ * Based on:
+ * F. Angiulli, C. Pizzuti: Fast Outlier Detection in High Dimensional Spaces. 
+ * In: Proc. European Conference on Principles of Knowledge Discovery and Data Mining (PKDD'02), Helsinki, Finland, 2002.
+ * 
+ * @author lisa
+ *
+ * @param <O>
+ */
 
-
-public class KNNIntegralOutlierDetection <O extends DatabaseObject, D extends DoubleDistance> extends DistanceBasedAlgorithm<O , DoubleDistance , MultiResult> {
+public class KNNWeightOutlierDetection <O extends DatabaseObject, D extends DoubleDistance> extends DistanceBasedAlgorithm<O , DoubleDistance , MultiResult> {
   
   public static final OptionID K_ID = OptionID.getOrCreateOptionID(
-          "knnio.k",
+          "knnwod.k",
           "kth nearest neighbor"
       );
 
@@ -33,9 +44,9 @@ public class KNNIntegralOutlierDetection <O extends DatabaseObject, D extends Do
           );
    */
   
-    public static final AssociationID<Double> KNNIO_ODEGREE= AssociationID.getOrCreateAssociationID("knnio_odegree", Double.class);
+    public static final AssociationID<Double> KNNWOD_WEIGHT= AssociationID.getOrCreateAssociationID("knnwod_weight", Double.class);
    
-    public static final AssociationID<Double> KNNIO_MAXODEGREE = AssociationID.getOrCreateAssociationID("knnio_maxodegree", Double.class);
+    public static final AssociationID<Double> KNNWOD_MAXWEIGHT = AssociationID.getOrCreateAssociationID("knnwod_maxweight", Double.class);
     /**
        * Parameter to specify the kth nearest neighbor,
        * 
@@ -67,7 +78,7 @@ public class KNNIntegralOutlierDetection <O extends DatabaseObject, D extends Do
       /**
        * Constructor, adding options to option handler.
        */
-      public KNNIntegralOutlierDetection() {
+      public KNNWeightOutlierDetection() {
         super();
         // kth nearest neighbor
         addOption(K_PARAM);
@@ -94,7 +105,7 @@ public class KNNIntegralOutlierDetection <O extends DatabaseObject, D extends Do
 
       @Override
       protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
-        double maxodegree = 0;
+        double maxweight = 0;
         getDistanceFunction().setDatabase(database, isVerbose(), isTime());
         //compute distance to the k nearest neighbor. n objects with the highest distance are flagged as outliers
         for(Integer id : database){
@@ -109,21 +120,21 @@ public class KNNIntegralOutlierDetection <O extends DatabaseObject, D extends Do
             debugFine(skn + "  dkn");
             
           double doubleSkn = skn.getValue();
-          if(doubleSkn > maxodegree) {
-            maxodegree = doubleSkn;
+          if(doubleSkn > maxweight) {
+            maxweight = doubleSkn;
           }
-          database.associate(KNNIO_ODEGREE, id, doubleSkn);
+          database.associate(KNNWOD_WEIGHT, id, doubleSkn);
         }
         
-        AnnotationFromDatabase<Double, O> res1 = new AnnotationFromDatabase<Double, O>(database, KNNIO_ODEGREE);
+        AnnotationFromDatabase<Double, O> res1 = new AnnotationFromDatabase<Double, O>(database, KNNWOD_WEIGHT);
             // Ordering
-            OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database, KNNIO_ODEGREE, true); 
+            OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database, KNNWOD_WEIGHT, true); 
             // combine results.
             
             result = new MultiResult();
             result.addResult(res1);
             result.addResult(res2);
-            ResultUtil.setGlobalAssociation(result, KNNIO_MAXODEGREE, maxodegree);
+            ResultUtil.setGlobalAssociation(result, KNNWOD_MAXWEIGHT, maxweight);
             return result;
         
 
