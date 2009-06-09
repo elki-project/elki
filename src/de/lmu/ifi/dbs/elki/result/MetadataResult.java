@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.result;
 
+import java.util.Collection;
+
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.utilities.AnyMap;
 
@@ -12,13 +14,13 @@ public class MetadataResult implements Result {
   /**
    * Data store.
    */
-  private AnyMap<String> data;
+  private AnyMap<AssociationID<?>> data;
   
   /**
    * Constructor.
    */
   public MetadataResult() {
-    data = new AnyMap<String>();
+    data = new AnyMap<AssociationID<?>>();
   }
 
   /**
@@ -29,7 +31,7 @@ public class MetadataResult implements Result {
    * @param value data
    */
   public <M> void setAssociation(AssociationID<M> meta, M value) {
-    data.put(meta.getName(), value);
+    data.put(meta, value);
   }
   
   /**
@@ -40,7 +42,7 @@ public class MetadataResult implements Result {
    * @return stored meta data or null
    */
   public <M> M getAssociation(AssociationID<M> meta) {
-    return data.get(meta.getName(), meta.getType());
+    return data.get(meta, meta.getType());
   }
   
   /**
@@ -55,6 +57,15 @@ public class MetadataResult implements Result {
    */
   @SuppressWarnings("unchecked")
   public <M> M getAssociationGenerics(AssociationID<?> meta) {
-    return (M) data.getGenerics(meta.getName(), meta.getType());
+    return (M) data.getGenerics(meta, meta.getType());
+  }
+  
+  /**
+   * Get stored metadata associations.
+   * 
+   * @return Stored keys
+   */
+  public Collection<AssociationID<?>> getAssociations() {
+    return data.keySet();
   }
 }

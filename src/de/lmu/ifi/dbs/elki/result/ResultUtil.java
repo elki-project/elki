@@ -169,4 +169,22 @@ public class ResultUtil {
     }
     return null;
   }
+  
+  /**
+   * Return all Metadata results
+   * 
+   * @param r Result
+   * @return List of metadata results
+   */
+  public static List<MetadataResult> getMetadataResults(Result r) {
+    if (r instanceof MetadataResult) {
+      List<MetadataResult> irs = new ArrayList<MetadataResult>(1);
+      irs.add((MetadataResult) r);
+      return irs;
+    }
+    if(r instanceof MultiResult) {
+      return ClassGenericsUtil.castWithGenericsOrNull(List.class, ((MultiResult)r).filterResults(MetadataResult.class));
+    }
+    return null;
+  }
 }
