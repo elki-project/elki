@@ -22,12 +22,14 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.evaluation.ComputeROCCurve;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
+import de.lmu.ifi.dbs.elki.result.MetadataResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -35,6 +37,7 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterDatabaseObjectInline;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterObjectComment;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterObjectInline;
+import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterPair;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterTextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterTriple;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterVector;
@@ -48,7 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
  * Class to write a result to human-readable text output
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <O> Object type
  */
 @SuppressWarnings("unchecked")
@@ -84,6 +87,7 @@ public class TextWriter<O extends DatabaseObject> {
     writers.insertHandler(Distance.class, trivialwriter);
     writers.insertHandler(SimpleClassLabel.class, trivialwriter);
     writers.insertHandler(HierarchicalClassLabel.class, trivialwriter);
+    writers.insertHandler(Pair.class, new TextWriterPair());
     writers.insertHandler(Triple.class, new TextWriterTriple());
     // Objects that have an own writeToText method.
     writers.insertHandler(TextWriteable.class, new TextWriterTextWriteable());
@@ -143,6 +147,7 @@ public class TextWriter<O extends DatabaseObject> {
     List<OrderingResult> ro = null;
     List<Clustering<? extends Model>> rc = null;
     List<IterableResult<?>> ri = null;
+    List<MetadataResult> rm = null;
 
     Collection<DatabaseObjectGroup> groups = null;
 
@@ -150,11 +155,12 @@ public class TextWriter<O extends DatabaseObject> {
     ro = ResultUtil.getOrderingResults(r);
     rc = ResultUtil.getClusteringResults(r);
     ri = ResultUtil.getIterableResults(r);
-
+    rm = ResultUtil.getMetadataResults(r);
+    
     if(ra == null && ro == null && rc == null && ri == null) {
       throw new UnableToComplyException("No printable result found.");
     }
-    
+
     NamingScheme naming = null;
     // Process groups or all data in a flat manner?
     if(rc != null && rc.size() > 0) {
@@ -164,17 +170,17 @@ public class TextWriter<O extends DatabaseObject> {
     }
     else {
       // only 'magically' create a group if we don't have iterators either.
-      if (ri == null || ri.size() == 0) {
+      if(ri == null || ri.size() == 0) {
         groups = new ArrayList<DatabaseObjectGroup>();
         groups.add(new DatabaseObjectGroupCollection<Collection<Integer>>(db.getIDs()));
       }
     }
-    
-    List<AttributeSettings> settings = ResultUtil.getGlobalAssociation((MultiResult)r, AssociationID.META_SETTINGS);
+
+    List<AttributeSettings> settings = ResultUtil.getGlobalAssociation((MultiResult) r, AssociationID.META_SETTINGS);
 
     if(ri != null && ri.size() > 0) {
       // TODO: associations are not passed to ri results.
-      writeIterableResult(db, streamOpener, ri.get(0), settings);
+      writeIterableResult(db, streamOpener, ri.get(0), rm);
     }
     if(groups != null && groups.size() > 0) {
       for(DatabaseObjectGroup group : groups) {
@@ -241,8 +247,9 @@ public class TextWriter<O extends DatabaseObject> {
     if(ro != null && ro.size() > 0) {
       try {
         iter = ro.get(0).iter(ids);
-      } catch (Exception e) {
-        logger.warning("Exception while trying to sort results.",e);
+      }
+      catch(Exception e) {
+        logger.warning("Exception while trying to sort results.", e);
       }
     }
 
@@ -259,7 +266,7 @@ public class TextWriter<O extends DatabaseObject> {
       // do we have annotations to print?
       List<Pair<String, Object>> objs = new ArrayList<Pair<String, Object>>();
       if(ra != null) {
-        for (AnnotationResult a : ra) {
+        for(AnnotationResult a : ra) {
           objs.add(new Pair<String, Object>(a.getAssociationID().getLabel(), a.getValueFor(objID)));
         }
       }
@@ -270,11 +277,32 @@ public class TextWriter<O extends DatabaseObject> {
     out.flush();
   }
 
-  private void writeIterableResult(Database<O> db, StreamFactory streamOpener, IterableResult<?> ri, List<AttributeSettings> settings) throws UnableToComplyException, IOException {
+  private void writeIterableResult(Database<O> db, StreamFactory streamOpener, IterableResult<?> ri, List<MetadataResult> rm) throws UnableToComplyException, IOException {
     String filename = "list";
     PrintStream outStream = streamOpener.openStream(filename);
     TextWriterStream out = new TextWriterStreamNormalizing<O>(outStream, writers, getNormalization());
-    printSettings(db, out, settings);
+
+    if(rm != null) {
+      // TODO: this is an ugly hack!
+      out.setForceincomments(true);
+      for(MetadataResult meta : rm) {
+        for(AssociationID<?> assoc : meta.getAssociations()) {
+          // TODO: make generic!
+          if(assoc == AssociationID.META_SETTINGS) {
+            printSettings(db, out, meta.getAssociation(AssociationID.META_SETTINGS));
+            continue;
+          }
+          Object o = meta.getAssociation(assoc);
+          TextWriterWriterInterface<?> writer = out.getWriterFor(o);
+          if(writer != null) {
+            writer.writeObject(out, assoc.getLabel(), o);
+          }
+          out.flush();
+        }
+      }
+      // TODO: this is an ugly hack!
+      out.setForceincomments(false);
+    }
 
     // hack to print collectionResult header information
     if(ri instanceof CollectionResult<?>) {

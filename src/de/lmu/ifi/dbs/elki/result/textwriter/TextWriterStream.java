@@ -57,6 +57,12 @@ public class TextWriterStream {
    * Marker used in text serialization (and re-parsing)
    */
   public final static String SER_MARKER = "Serialization class:";
+  
+  /**
+   * Force incomments flag
+   */
+  // TODO: solve this more gracefully
+  private boolean forceincomments = false; 
 
   /**
    * Constructor.
@@ -113,15 +119,21 @@ public class TextWriterStream {
    * @param o object to print
    */
   public void inlinePrint(Object o) {
-    if (inline.length() > 0)
+    if (forceincomments) {
+      commentPrint(o);
+      return;
+    }
+    if (inline.length() > 0) {
       inline.append(SEPARATOR);
+    }
     // remove newlines
     String str = o.toString().replace(NEWLINE," ");
     // escaping
     str = str.replace("\\","\\\\").replace("\"","\\\"");
     // when needed, add quotes.
-    if (str.contains(SEPARATOR))
+    if (str.contains(SEPARATOR)) {
       str = "\""+str+"\"";
+    }
     inline.append(str);
   }
 
@@ -132,6 +144,10 @@ public class TextWriterStream {
    * @param o object to print.
    */
   public void inlinePrintNoQuotes(Object o) {
+    if (forceincomments) {
+      commentPrint(o);
+      return;
+    }
     if (inline.length() > 0) {
       inline.append(SEPARATOR);
     }
@@ -196,5 +212,23 @@ public class TextWriterStream {
    */
   public <O> O normalizationRestore(O v) throws NonNumericFeaturesException {
     return v;
+  }
+
+  /**
+   * Test force-in-comments flag.
+   * 
+   * @return flag value
+   */
+  protected boolean isForceincomments() {
+    return forceincomments;
+  }
+
+  /**
+   * Set the force-in-comments flag.
+   * 
+   * @param forceincomments the new flag value
+   */
+  protected void setForceincomments(boolean forceincomments) {
+    this.forceincomments = forceincomments;
   }
 }
