@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
 
 import java.util.List;
 
@@ -107,8 +108,16 @@ public class KNNWeightOutlierDetection <O extends DatabaseObject, D extends Doub
       protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
         double maxweight = 0;
         getDistanceFunction().setDatabase(database, isVerbose(), isTime());
+
+        if(this.isVerbose()) {
+          this.verbose("computing outlier degree(sum of the distances to the k nearest neighbors");
+        }
+        FiniteProgress progressKNNWeight = new FiniteProgress("KNNWOD_KNNWEIGHT for objects", database.size());
+        int counter = 0;
+        
         //compute distance to the k nearest neighbor. n objects with the highest distance are flagged as outliers
         for(Integer id : database){
+          counter++;
           //compute sum of the  distances to the k nearest neighbors
          
          List<DistanceResultPair<DoubleDistance>> knn = database.kNNQueryForID(id,  k, getDistanceFunction());
@@ -124,6 +133,11 @@ public class KNNWeightOutlierDetection <O extends DatabaseObject, D extends Doub
             maxweight = doubleSkn;
           }
           database.associate(KNNWOD_WEIGHT, id, doubleSkn);
+         
+          if(this.isVerbose()) {
+            progressKNNWeight.setProcessed(counter);
+            this.progress(progressKNNWeight);
+          }
         }
         
         AnnotationFromDatabase<Double, O> res1 = new AnnotationFromDatabase<Double, O>(database, KNNWOD_WEIGHT);
