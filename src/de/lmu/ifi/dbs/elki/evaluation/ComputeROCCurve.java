@@ -15,7 +15,6 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
-import de.lmu.ifi.dbs.elki.evaluation.roc.ROC.SimpleAdapter;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
@@ -29,6 +28,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
+/**
+ * Compute a ROC curve to evaluate a ranking algorithm and compute the corresponding ROCAUC value.
+ * 
+ * The parameter {@code -rocauc.positive} specifies the class label of "positive" hits.
+ * 
+ * The nested algorithm {@code -algorithm} will be run, the result will be searched for an
+ * iterable or ordering result, which then is compared with the clustering obtained via
+ * the given class label.
+ * 
+ * @author Erich Schubert
+ *
+ * @param <O> Database object type
+ */
 // TODO: maybe add a way to process clustering results as well?
 public class ComputeROCCurve<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiResult> {
   /**
