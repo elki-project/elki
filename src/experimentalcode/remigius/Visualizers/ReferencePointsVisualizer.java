@@ -13,6 +13,8 @@ import experimentalcode.remigius.Visualization;
 import experimentalcode.remigius.VisualizationManager;
 import experimentalcode.remigius.Visualizer;
 
+// TODO Fix CSS and replace Dots.  
+
 public class ReferencePointsVisualizer<O extends DoubleVector, V extends FeatureVector<V,N>,N extends Number> extends Visualizer<O> {
 
 	private CollectionResult<V> colResult;
