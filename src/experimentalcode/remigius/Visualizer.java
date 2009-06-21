@@ -1,6 +1,5 @@
 package experimentalcode.remigius;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
@@ -9,6 +8,7 @@ import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.colors.PublicationColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 
 public abstract class Visualizer<O extends DoubleVector> {
 	
@@ -30,10 +30,10 @@ public abstract class Visualizer<O extends DoubleVector> {
 			return scales[dimx].getScaled(o.getValue(dimx));
 	}
 	
-	public Visualization<O> visualize(Document doc, int dimx, int dimy){
-		Element layer = SHAPEGEN.createSVG(doc);
-		return visualizeElements(doc, layer, dimx, dimy);
+	public Visualization<O> visualize(SVGPlot svgp, int dimx, int dimy){
+		Element layer = SHAPEGEN.createSVG(svgp.getDocument());
+		return visualize(svgp, layer, dimx, dimy);
 		
 	}
-	protected abstract Visualization<O> visualizeElements(Document doc, Element layer, int dimx, int dimy);
+	protected abstract Visualization<O> visualize(SVGPlot svgp, Element layer, int dimx, int dimy);
 }

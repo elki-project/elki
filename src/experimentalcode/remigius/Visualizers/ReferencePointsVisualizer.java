@@ -2,18 +2,18 @@ package experimentalcode.remigius.Visualizers;
 
 import java.util.Iterator;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import experimentalcode.remigius.Visualization;
 import experimentalcode.remigius.VisualizationManager;
 import experimentalcode.remigius.Visualizer;
 
-// TODO Fix CSS and replace Dots.  
+// TODO Fix CSS, IDs and replace Dots.  
 
 public class ReferencePointsVisualizer<O extends DoubleVector, V extends FeatureVector<V,N>,N extends Number> extends Visualizer<O> {
 
@@ -35,14 +35,14 @@ public class ReferencePointsVisualizer<O extends DoubleVector, V extends Feature
 	}
 
 	@Override
-	public Visualization<O> visualizeElements(Document doc, Element layer, int dimx, int dimy) {
+	protected Visualization<O> visualize(SVGPlot svgp, Element layer, int dimx, int dimy) {
 
 		Iterator<V> iter = colResult.iter();
 		
 		while (iter.hasNext()){
 			V v = iter.next();
 			layer.appendChild(
-					SHAPEGEN.createDot(doc, v.getValue(dimx).doubleValue(), v.getValue(dimy).doubleValue(), (int)Math.random(), dimx, dimy)
+					SHAPEGEN.createDot(svgp.getDocument(), v.getValue(dimx).doubleValue(), v.getValue(dimy).doubleValue(), (int)Math.random(), dimx, dimy)
 			);
 		}
 		return new Visualization<O>(this, dimx, dimy, layer);
