@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
@@ -17,6 +16,7 @@ import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import experimentalcode.remigius.CommonSVGShapes;
 import experimentalcode.remigius.Visualization;
 import experimentalcode.remigius.VisualizationManager;
@@ -90,7 +90,7 @@ public class BubbleVisualizer<O extends DoubleVector> extends Visualizer<O> {
 	}
 
 	@Override
-	public Visualization<O> visualizeElements(Document doc, Element layer, int dimx, int dimy) {
+	protected Visualization<O> visualize(SVGPlot svgp, Element layer, int dimx, int dimy) {
 
 		Iterator<Cluster<Model>> iter = clustering.getAllClusters().iterator();
 		int clusterID = 0;
@@ -100,7 +100,7 @@ public class BubbleVisualizer<O extends DoubleVector> extends Visualizer<O> {
 			clusterID+=1;
 			for (int id : cluster.getIDs()){
 				layer.appendChild(
-						SHAPEGEN.createBubble(doc, getPositioned(database.get(id), dimx), 1 - getPositioned(database.get(id), dimy),
+						SHAPEGEN.createBubble(svgp.getDocument(), getPositioned(database.get(id), dimx), 1 - getPositioned(database.get(id), dimy),
 								getScaled(getValue(id)), clusterID, id, dimx, dimy)
 				);
 			}
