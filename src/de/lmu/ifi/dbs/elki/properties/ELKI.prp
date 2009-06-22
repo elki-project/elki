@@ -37,6 +37,7 @@ de.lmu.ifi.dbs.elki.algorithm.Algorithm=\
   de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PreDeCon,\
   de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PROCLUS,\
 # de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.KernelFourC,\
+  de.lmu.ifi.dbs.elki.evaluation.ComputeROCCurve,\
 # #######################################################
 # distance based algorithm - default package: de.lmu.ifi.dbs.elki.algorithm
 de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm=\
@@ -51,7 +52,7 @@ de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm=\
   de.lmu.ifi.dbs.elki.algorithm.clustering.SLINK,\
   de.lmu.ifi.dbs.elki.algorithm.outlier.ABOD,\
   de.lmu.ifi.dbs.elki.algorithm.outlier.COP,\
-  de.lmu.ifi.dbs.elki.algorithm.outlier.GeneralizedLOF,\
+  de.lmu.ifi.dbs.elki.algorithm.outlier.LOF,\
   de.lmu.ifi.dbs.elki.algorithm.outlier.LOCI,\
   de.lmu.ifi.dbs.elki.algorithm.statistics.RankingQualityHistogram,\
   de.lmu.ifi.dbs.elki.algorithm.statistics.DistanceStatisticsWithClasses,\
@@ -105,6 +106,7 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction=\
   de.lmu.ifi.dbs.elki.distance.distancefunction.DirectSupportDependentItemsetDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.DiSHDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.DiskCacheBasedDoubleDistanceFunction,\
+  de.lmu.ifi.dbs.elki.distance.distancefunction.DiskCacheBasedFloatDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.ERiCDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.FileBasedDoubleDistanceFunction,\
@@ -206,13 +208,19 @@ de.lmu.ifi.dbs.elki.parser.Parser=\
   de.lmu.ifi.dbs.elki.parser.FloatVectorLabelParser,\
   de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelTransposingParser,\
   de.lmu.ifi.dbs.elki.parser.SparseBitVectorLabelParser,\
-#  de.lmu.ifi.dbs.elki.parser.ArffFileParser,\
+# de.lmu.ifi.dbs.elki.parser.ArffFileParser,\
+  de.lmu.ifi.dbs.elki.parser.SparseFloatVectorLabelParser,\
+  de.lmu.ifi.dbs.elki.parser.meta.DoubleVectorProjectionParser,\
+  de.lmu.ifi.dbs.elki.parser.meta.DoubleVectorRandomProjectionParser,\
+  de.lmu.ifi.dbs.elki.parser.meta.SparseFloatVectorProjectionParser,\
+  de.lmu.ifi.dbs.elki.parser.meta.SparseFloatVectorRandomProjectionParser,\
 # #######################################################
 # Line based parsers
 de.lmu.ifi.dbs.elki.parser.LinebasedParser=\
   de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelParser,\
   de.lmu.ifi.dbs.elki.parser.FloatVectorLabelParser,\
-  de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelTransposingParser
+  de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelTransposingParser,\
+  de.lmu.ifi.dbs.elki.parser.SparseFloatVectorLabelParser,\
 # #######################################################
 # Preprocessor - default package: de.lmu.ifi.dbs.elki.preprocessing
 de.lmu.ifi.dbs.elki.preprocessing.Preprocessor=\
@@ -222,6 +230,8 @@ de.lmu.ifi.dbs.elki.preprocessing.Preprocessor=\
   de.lmu.ifi.dbs.elki.preprocessing.HiSCPreprocessor,\
   de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor,\
 # de.lmu.ifi.dbs.elki.preprocessing.KernelFourCPreprocessor,\
+  de.lmu.ifi.dbs.elki.preprocessing.MaterializeKNNPreprocessor,\
+  de.lmu.ifi.dbs.elki.preprocessing.SpatialApproximationMaterializeKNNPreprocessor,\
   de.lmu.ifi.dbs.elki.preprocessing.PreDeConPreprocessor,\
   de.lmu.ifi.dbs.elki.preprocessing.RangeQueryBasedHiCOPreprocessor,\
   de.lmu.ifi.dbs.elki.preprocessing.SharedNearestNeighborsPreprocessor,\
