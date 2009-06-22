@@ -8,8 +8,8 @@ import org.w3c.dom.events.EventTarget;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
-import experimentalcode.erich.visualization.svg.SVGAxis;
 import experimentalcode.remigius.Visualization;
 import experimentalcode.remigius.VisualizationManager;
 import experimentalcode.remigius.Visualizer;
@@ -27,8 +27,8 @@ public class DotVisualizer<O extends DoubleVector> extends Visualizer<O> {
 	protected Visualization<O> visualize(SVGPlot svgp, Element layer, int dimx,
 			int dimy) {
 		try {
-			SVGAxis.drawAxis(svgp, layer, scales[dimx], 0, 1, 1, 1, true, true);
-			SVGAxis.drawAxis(svgp, layer, scales[dimy], 0, 1, 0, 0, true, false);
+			SVGSimpleLinearAxis.drawAxis(svgp, layer, scales[dimx], 0, 1, 1, 1, true, true);
+			SVGSimpleLinearAxis.drawAxis(svgp, layer, scales[dimy], 0, 1, 0, 0, true, false);
 			svgp.updateStyleElement();
 			
 		} catch (CSSNamingConflict e) {
