@@ -178,6 +178,12 @@
 				&lt;/table&gt;
 			</header>
 		</javadoc>
+		<copy todir="${deploy.javadoc}">
+			<fileset dir="${source}">
+				<include name="parameters*.html"/>
+				<include name="examplecalls.html"/>
+			</fileset>
+		</copy>
 	</target>
 
 </project>
