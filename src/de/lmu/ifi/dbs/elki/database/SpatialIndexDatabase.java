@@ -230,12 +230,11 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
    * @return a description of the database
    */
   @Override
-  public String parameterDescription() {
+  public String shortDescription() {
     StringBuffer description = new StringBuffer();
     description.append(this.getClass().getName());
-    description.append(" holds all the data in a ");
-    description.append(index.getClass().getName()).append(" index structure.\n");
-    description.append(optionHandler.usage("", false));
+    description.append(" holds all the data in a spatial index structure");
+    description.append(" extending ").append(SpatialIndex.class.getName()).append(".\n");
     return description.toString();
   }
 }

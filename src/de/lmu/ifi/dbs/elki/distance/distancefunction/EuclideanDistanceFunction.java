@@ -44,8 +44,8 @@ public class EuclideanDistanceFunction<V extends NumberVector<V, ?>>
     }
 
     @Override
-    public String parameterDescription() {
-        return super.parameterDescription()+"\nEuclidean distance for FeatureVectors. No parameters.";
+    public String shortDescription() {
+        return "Euclidean distance for FeatureVectors. No parameters.\n";
     }
 
     public DoubleDistance minDist(HyperBoundingBox mbr, V v) {

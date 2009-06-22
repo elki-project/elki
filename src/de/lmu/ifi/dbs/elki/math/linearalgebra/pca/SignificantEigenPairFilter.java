@@ -104,11 +104,10 @@ public class SignificantEigenPairFilter extends AbstractParameterizable implemen
    * Get parameter description
    */
   @Override
-  public String parameterDescription() {
+  public String shortDescription() {
     StringBuffer description = new StringBuffer();
     description.append(SignificantEigenPairFilter.class.getName());
-    description.append(" sorts the eigenpairs in decending order " + "of their eigenvalues and looks for the maxmimum contrast of " + "current Eigenvalue / average of remaining Eigenvalues.\n");
-    description.append(optionHandler.usage("", false));
+    description.append(" sorts the eigenpairs in decending order of their eigenvalues and looks for the maxmimum contrast of " + "current Eigenvalue / average of remaining Eigenvalues.\n");
     return description.toString();
   }
 

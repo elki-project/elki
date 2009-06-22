@@ -81,11 +81,10 @@ public class FirstNEigenPairFilter extends AbstractParameterizable implements Ei
   }
 
   @Override
-  public String parameterDescription() {
+  public String shortDescription() {
     StringBuffer description = new StringBuffer();
     description.append(FirstNEigenPairFilter.class.getName());
-    description.append(" sorts the eigenpairs in decending order " + "of their eigenvalues and marks the first n eigenpairs " + "as strong eigenpairs.\n");
-    description.append(optionHandler.usage("", false));
+    description.append(" sorts the eigenpairs in decending order of their eigenvalues and marks the first n eigenpairs " + "as strong eigenpairs.\n");
     return description.toString();
   }
 

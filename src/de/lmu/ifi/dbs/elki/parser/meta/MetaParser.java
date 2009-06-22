@@ -73,18 +73,6 @@ public abstract class MetaParser<O extends DatabaseObject> extends AbstractParam
     return remainingParameters;
   }
 
-
-
-  /**
-   * Returns a usage string based on the usage of optionHandler.
-   *
-   * @param message a message string to be included in the usage string
-   * @return a usage string based on the usage of optionHandler
-   */
-  protected String usage(String message) {
-    return optionHandler.usage(message, false);
-  }
-
   /**
    * Returns a string representation of the object.
    * @return a string representation of the object.

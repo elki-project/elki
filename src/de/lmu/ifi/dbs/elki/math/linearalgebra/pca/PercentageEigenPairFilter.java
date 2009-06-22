@@ -106,11 +106,10 @@ public class PercentageEigenPairFilter extends AbstractParameterizable implement
   }
 
   @Override
-  public String parameterDescription() {
+  public String shortDescription() {
     StringBuffer description = new StringBuffer();
     description.append(PercentageEigenPairFilter.class.getName());
-    description.append(" sorts the eigenpairs in decending order " + "of their eigenvalues and returns the first eigenpairs, whose sum of" + "eigenvalues is higher than the given percentage of the sum of all eigenvalues.\n");
-    description.append(optionHandler.usage("", false));
+    description.append(" sorts the eigenpairs in decending order of their eigenvalues and returns the first eigenpairs, whose sum of" + "eigenvalues is higher than the given percentage of the sum of all eigenvalues.\n");
     return description.toString();
   }
 

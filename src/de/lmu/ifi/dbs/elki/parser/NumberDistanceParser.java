@@ -142,7 +142,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
   }
 
   @Override
-  public String parameterDescription() {
+  public String shortDescription() {
     StringBuffer description = new StringBuffer();
     description.append(NumberDistanceParser.class.getName());
     description.append(" expects following format of parsed lines:\n");
@@ -152,7 +152,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
     description.append(COMMENT);
     description.append("\" will be ignored.\n");
 
-    return usage(description.toString());
+    return description.toString();
   }
 
   @Override

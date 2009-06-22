@@ -7,8 +7,12 @@ import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * AbstractWrapper sets the values for flags verbose and help.
@@ -125,6 +129,23 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
     result.addAll(remainingParameters);
     return result;
   }
+  
+  /**
+   * Returns a usage message with the specified message as leading line, and
+   * information as provided by optionHandler. If an algorithm is specified, the
+   * description of the algorithm is returned.
+   * 
+   * @return a usage message with the specified message as leading line, and
+   *         information as provided by optionHandler
+   */
+  public String usage() {
+    StringBuffer usage = new StringBuffer();
+    // Collect options
+    List<Pair<Parameterizable, Option<?>>> options = new ArrayList<Pair<Parameterizable, Option<?>>>();
+    collectOptions(options);
+    OptionUtil.formatForConsole(usage, 77, "   ", options);
+    return usage.toString();
+  }  
 
   /**
    * Generic command line invocation. Refactored to have a central place for
@@ -138,7 +159,7 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
       this.setParameters(args);
       // help
       if(HELP_FLAG.isSet()) {
-        throw new AbortException("Usage:\n\n"+parameterDescription());
+        throw new AbortException("Usage:\n\n"+usage());
       }
       run();
     }
@@ -149,7 +170,7 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
     catch(ParameterException e) {
       if(HELP_FLAG.isSet()) {
         LoggingConfiguration.setVerbose(true);
-        logger.verbose("Usage:\n\n"+parameterDescription());
+        logger.verbose("Usage:\n\n"+usage());
       }
       logger.warning(e.toString());
     }

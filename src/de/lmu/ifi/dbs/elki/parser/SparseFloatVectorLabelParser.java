@@ -124,10 +124,10 @@ public class SparseFloatVectorLabelParser extends RealVectorLabelParser<SparseFl
   }
 
   /**
-   * @see de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser#parameterDescription()
+   * @see de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser#shortDescription()
    */
   @Override
-  public String parameterDescription() {
+  public String shortDescription() {
     StringBuffer description = new StringBuffer();
     description.append(this.getClass().getName());
     description.append(" expects following format of parsed lines:\n");
@@ -138,7 +138,7 @@ public class SparseFloatVectorLabelParser extends RealVectorLabelParser<SparseFl
     description.append(COMMENT);
     description.append("\" will be ignored. Having the file parsed completely, the maximum occuring dimensionality is set as dimensionality to all created SparseFloatvectors.\n");
 
-    return usage(description.toString());
+    return description.toString();
   }
 
   

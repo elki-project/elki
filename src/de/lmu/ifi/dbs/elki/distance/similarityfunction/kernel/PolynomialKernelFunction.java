@@ -47,10 +47,9 @@ public class PolynomialKernelFunction<O extends FeatureVector<O, ? >> extends Ab
   }
 
   @Override
-  public String parameterDescription() {
+  public String shortDescription() {
     StringBuffer description = new StringBuffer();
-    description.append(super.parameterDescription());
-    description.append("Polynomial Kernel for feature vectors. Default degree is " + DEFAULT_DEGREE + ".");
+    description.append("Polynomial Kernel for feature vectors. Default degree is " + DEFAULT_DEGREE + ".\n");
     return description.toString();
   }
 

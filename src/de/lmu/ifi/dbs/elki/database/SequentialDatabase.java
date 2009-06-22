@@ -138,10 +138,10 @@ public class SequentialDatabase<O extends DatabaseObject> extends AbstractDataba
      * Provides a description for SequentialDatabase.
      */
     @Override
-    public String parameterDescription() {
+    public String shortDescription() {
         StringBuffer description = new StringBuffer();
         description.append(SequentialDatabase.class.getName());
-        description.append(" holds all the data in main memory backed by a Hashtable.");
+        description.append(" holds all the data in main memory backed by a Hashtable.\n");
         return description.toString();
     }
 

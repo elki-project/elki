@@ -61,11 +61,10 @@ public class CompositeEigenPairFilter extends AbstractParameterizable implements
   }
 
   @Override
-  public String parameterDescription() {
+  public String shortDescription() {
     StringBuffer description = new StringBuffer();
     description.append(this.getClass().getName());
     description.append(" builds a chain of user specified eigen pair filters.\n");
-    description.append(optionHandler.usage("", false));
     return description.toString();
   }
 

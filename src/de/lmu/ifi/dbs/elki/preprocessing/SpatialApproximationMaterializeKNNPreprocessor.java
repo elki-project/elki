@@ -135,11 +135,10 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
    * Provides a short description of the purpose of this class.
    */
   @Override
-  public String parameterDescription() {
+  public String shortDescription() {
     StringBuffer description = new StringBuffer();
     description.append(SpatialApproximationMaterializeKNNPreprocessor.class.getName());
     description.append(" materializes the k nearest neighbors of objects of a database using a spatial approximation.\n");
-    description.append(super.parameterDescription());
     return description.toString();
   }
 }

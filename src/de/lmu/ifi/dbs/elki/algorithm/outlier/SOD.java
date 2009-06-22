@@ -104,22 +104,6 @@ public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends
     }
 
     /**
-     * Calls the super method
-     * and appends the parameter description of {@link #similarityFunction}.
-     */
-    @Override
-    public String parameterDescription() {
-        StringBuilder description = new StringBuilder();
-        description.append(super.parameterDescription());
-
-        // similarityFunction
-        description.append(Description.NEWLINE);
-        description.append(similarityFunction.parameterDescription());
-
-        return description.toString();
-    }
-
-    /**
      * Performs the PROCLUS algorithm on the given database.
      */
     @Override

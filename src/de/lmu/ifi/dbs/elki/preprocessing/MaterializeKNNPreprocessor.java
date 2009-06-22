@@ -135,11 +135,10 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
    * Provides a short description of the purpose of this class.
    */
   @Override
-  public String parameterDescription() {
+  public String shortDescription() {
     StringBuffer description = new StringBuffer();
     description.append(MaterializeKNNPreprocessor.class.getName());
     description.append(" materializes the k nearest neighbors of objects of a database.\n");
-    description.append(super.parameterDescription());
     return description.toString();
   }
 

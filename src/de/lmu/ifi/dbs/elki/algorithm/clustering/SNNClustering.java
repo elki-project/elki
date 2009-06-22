@@ -323,18 +323,4 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
     public IntegerDistance getEpsilon() {
         return epsilon;
     }
-
-     /**
-     * Calls the super method
-     * and appends the parameter description of {@link #similarityFunction}.
-     */
-    @Override
-    public String parameterDescription() {
-        StringBuilder description = new StringBuilder();
-        description.append(super.parameterDescription());
-        description.append(Description.NEWLINE);
-        description.append(similarityFunction.parameterDescription());
-        description.append(Description.NEWLINE);
-        return description.toString();
-    }
 }

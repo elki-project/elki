@@ -77,7 +77,7 @@ public class ParameterizationFunctionLabelParser extends AbstractParser<Paramete
     }
 
     @Override
-    public String parameterDescription() {
+    public String shortDescription() {
         StringBuffer description = new StringBuffer();
         description.append(ParameterizationFunctionLabelParser.class.getName());
         description.append(" expects following format of parsed lines:\n");
@@ -91,6 +91,6 @@ public class ParameterizationFunctionLabelParser extends AbstractParser<Paramete
         description.append("\" will be ignored. If any point differs in its dimensionality from other points, "
             + "the parse method will fail with an Exception.\n");
 
-        return usage(description.toString());
+        return description.toString();
     }
 }

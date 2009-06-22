@@ -121,11 +121,8 @@ public class EDRDistanceFunction<V extends NumberVector<V, ?>>
     }
 
     @Override
-    public String parameterDescription() {
-        StringBuffer description = new StringBuffer();
-        description.append(optionHandler.usage("Edit Distance on Real Sequence distance for FeatureVectors.", false));
-        description.append('\n');
-        return description.toString();
+    public String shortDescription() {
+        return "Edit Distance on Real Sequence distance for FeatureVectors.\n";
     }
 
     @Override

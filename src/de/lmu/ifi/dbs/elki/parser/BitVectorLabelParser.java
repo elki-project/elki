@@ -74,7 +74,7 @@ public class BitVectorLabelParser extends AbstractParser<BitVector> {
   }
 
   @Override
-  public String parameterDescription() {
+  public String shortDescription() {
     StringBuffer description = new StringBuffer();
     description.append(BitVectorLabelParser.class.getName());
     description.append(" expects following format of parsed lines:\n");
@@ -84,7 +84,7 @@ public class BitVectorLabelParser extends AbstractParser<BitVector> {
     description.append(COMMENT);
     description.append("\" will be ignored. If any BitVector differs in its dimensionality from other BitVectors, the parse method will fail with an Exception.\n");
 
-    return usage(description.toString());
+    return description.toString();
   }
 
 }

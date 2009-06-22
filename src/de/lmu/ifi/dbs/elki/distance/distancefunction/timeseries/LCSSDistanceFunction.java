@@ -177,11 +177,8 @@ public class LCSSDistanceFunction<V extends NumberVector<V, ?>> extends Abstract
   }
 
   @Override
-  public String parameterDescription() {
-    StringBuffer description = new StringBuffer();
-    description.append(optionHandler.usage("Longest Common Subsequence distance for FeatureVectors.", false));
-    description.append('\n');
-    return description.toString();
+  public String shortDescription() {
+    return "Longest Common Subsequence distance for FeatureVectors.\n";
   }
 
   @Override

@@ -6,7 +6,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
@@ -84,21 +83,4 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
     public DistanceFunction<O, D> getDistanceFunction() {
         return distanceFunction;
     }
-
-    /**
-     * Calls the super method
-     * and appends the parameter description of {@link #distanceFunction} if it is already initialized.
-     */
-    @Override
-    public String parameterDescription() {
-        StringBuilder description = new StringBuilder();
-        description.append(super.parameterDescription());
-        if (distanceFunction != null) {
-            description.append(OptionHandler.OPTION_PREFIX);
-            description.append(DISTANCE_FUNCTION_ID.getName());
-            description.append(" ");
-            description.append(distanceFunction.parameterDescription());
-        }
-        return description.toString();
-    }    
 }

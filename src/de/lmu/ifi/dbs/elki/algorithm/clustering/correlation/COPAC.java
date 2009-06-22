@@ -236,42 +236,6 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
     }
 
     /**
-     * Calls the super method
-     * and appends the parameter description of
-     * the {@link #preprocessor}, the {@link #partitionAlgorithm},
-     * and {@link #partitionDatabase} (if they are already initialized).
-     */
-    @Override
-    public String parameterDescription() {
-        StringBuilder description = new StringBuilder();
-        description.append(super.parameterDescription());
-
-        // preprocessor
-        if (preprocessor != null) {
-            description.append(Description.NEWLINE);
-            description.append(preprocessor.parameterDescription());
-        }
-        // partition algorithm
-        if (partitionAlgorithm != null) {
-            description.append(Description.NEWLINE);
-            description.append(partitionAlgorithm.parameterDescription());
-        }
-        // partition database
-        if (PARTITION_DB_PARAM.isSet()) {
-            try {
-                Database<V> tmpDB = ClassGenericsUtil.instantiateGenerics(Database.class, partitionDatabase.getName());
-                description.append(Description.NEWLINE);
-                description.append(tmpDB.parameterDescription());
-            }
-            catch (UnableToComplyException e) {
-                // tested before
-                throw new RuntimeException("This should never happen!", e);
-            }
-        }
-        return description.toString();
-    }
-
-    /**
      * Runs the partition algorithm and creates the result.
      *
      * @param database     the database to run this algorithm on

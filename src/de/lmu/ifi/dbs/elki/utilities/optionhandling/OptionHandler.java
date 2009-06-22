@@ -9,7 +9,6 @@ import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.output.PrettyPrinter;
 
 /**
  * Provides an OptionHandler for holding the given options.
@@ -37,11 +36,6 @@ public class OptionHandler extends AbstractLoggable {
   public static final String OPTION_PREFIX = "-";
 
   /**
-   * The programCall as it should be denoted in an eventual usage-message.
-   */
-  private String programCall;
-
-  /**
    * Holds the parameter array as given to the last call of
    * {@link #grabOptions(String[]) grabOptions(String[])}.
    */
@@ -51,12 +45,12 @@ public class OptionHandler extends AbstractLoggable {
    * Contains the optionHandler's options, the option names are used as the
    * map's keys
    */
-  private Map<String, Option<?>> parameters;
+  private Map<String, Option<?>> parameters = new TreeMap<String, Option<?>>();
 
   /**
    * Contains constraints addressing several parameters
    */
-  private List<GlobalParameterConstraint> globalParameterConstraints;
+  private List<GlobalParameterConstraint> globalParameterConstraints = new ArrayList<GlobalParameterConstraint>();
 
   /**
    * Provides an OptionHandler.
@@ -64,15 +58,9 @@ public class OptionHandler extends AbstractLoggable {
    * The options are specified in the given TreeMap with the option names being
    * as keys. Leading &quot;-&quot; do not have to be specified since
    * OptionHandler will provide them.
-   * 
-   * @param programCall String for the program-call using this OptionHandler
-   *        (for usage in usage(String))
    */
-  public OptionHandler(String programCall) {
+  public OptionHandler() {
     super(false);
-    this.parameters = new TreeMap<String, Option<?>>();
-    this.programCall = programCall;
-    this.globalParameterConstraints = new ArrayList<GlobalParameterConstraint>();
   }
 
   /**
@@ -191,116 +179,6 @@ public class OptionHandler extends AbstractLoggable {
   }
 
   /**
-   * Returns an usage-String according to the descriptions given in the
-   * constructor.
-   * 
-   * @param message some error-message, if needed (may be null or empty String)
-   * @param standalone whether the class using this OptionHandler provides a
-   *        main method
-   * @return an usage-String according to the descriptions given in the
-   *         constructor.
-   */
-  public String usage(String message, boolean standalone) {
-    final String space = " ";
-    int lineLength = 80;
-    String paramLineIndent = "    ";
-    StringBuffer messageBuffer = new StringBuffer();
-    if(!(message == null || message.equals(""))) {
-      messageBuffer.append(message).append(NEWLINE);
-    }
-
-    String[] options = new String[parameters.size()];
-
-    String[] longDescriptions = new String[options.length];
-
-    int longestShortline = 0;
-    StringBuffer paramLine = new StringBuffer();
-    int currentLength = programCall.length();
-
-    int counter = 0;
-    for(Map.Entry<String, Option<?>> option : parameters.entrySet()) {
-
-      String currentOption = option.getKey();
-
-      String longDescription = option.getValue().getFullDescription();
-
-      if (false) {
-        if(option.getValue() instanceof ClassParameter) {
-          ClassParameter<?> c = (ClassParameter<?>) option.getValue();
-          longDescription = longDescription + NEWLINE + c.restrictionString(c.getRestrictionClass());
-          if (c.getDefaultValue() != null) {
-            longDescription = longDescription + NEWLINE + "Default: " + c.getDefaultValue();
-          }
-        }
-      }
-      currentOption = OPTION_PREFIX + currentOption;
-      options[counter] = currentOption;
-      longDescriptions[counter] = longDescription;
-      longestShortline = Math.max(longestShortline, currentOption.length() + 1);
-      currentLength = currentLength + currentOption.length() + 1;
-      if(currentLength > lineLength) {
-        paramLine.append(NEWLINE);
-        paramLine.append(paramLineIndent);
-        currentLength = paramLineIndent.length();
-      }
-      paramLine.append(currentOption);
-      paramLine.append(space);
-
-      counter++;
-    }
-
-    String indent = "  ";
-    int firstCol = indent.length() + longestShortline;
-    StringBuffer descriptionIndent = new StringBuffer();
-    for(int i = 0; i < firstCol; i++) {
-      descriptionIndent.append(space);
-    }
-    int thirdCol = lineLength - firstCol;
-    // if the column would be zero-width, give up...
-    if(thirdCol < 0) {
-      thirdCol = lineLength;
-    }
-    int[] cols = { firstCol, thirdCol };
-    PrettyPrinter prettyPrinter = new PrettyPrinter(cols, "");
-    char fillchar = ' ';
-
-    if(standalone) {
-      messageBuffer.append("Usage: ");
-      messageBuffer.append(NEWLINE);
-    }
-    messageBuffer.append(programCall);
-    if(standalone) {
-      messageBuffer.append(space);
-      messageBuffer.append(paramLine);
-    }
-    messageBuffer.append(NEWLINE);
-
-    for(int i = 0; i < options.length; i++) {
-      StringBuffer option = new StringBuffer();
-      option.append(indent);
-      option.append(options[i]);
-      Vector<String> lines = prettyPrinter.breakLine(longDescriptions[i], 1);
-      String[] firstline = { option.toString(), lines.firstElement() };
-      messageBuffer.append(prettyPrinter.formattedLine(firstline, fillchar)).append(NEWLINE);
-      for(int l = 1; l < lines.size(); l++) {
-        messageBuffer.append(descriptionIndent).append(lines.get(l)).append(NEWLINE);
-      }
-    }
-
-    // global constraints
-    // todo arthur bitte richtig formatieren mit pretty printer
-    if(!globalParameterConstraints.isEmpty()) {
-      messageBuffer.append(NEWLINE).append("  Global parameter constraints:");
-      for(GlobalParameterConstraint gpc : globalParameterConstraints) {
-        messageBuffer.append(NEWLINE).append("  - ");
-        messageBuffer.append(gpc.getDescription());
-      }
-    }
-
-    return messageBuffer.toString();
-  }
-
-  /**
    * Returns a copy of the parameter array as given to the last call of
    * {@link #grabOptions(String[]) grabOptions(String[])}. The resulting array
    * will contain only those values that were recognized and needed by this
@@ -339,16 +217,6 @@ public class OptionHandler extends AbstractLoggable {
    */
   public void setGlobalParameterConstraint(GlobalParameterConstraint gpc) {
     globalParameterConstraints.add(gpc);
-  }
-
-  /**
-   * Sets the OptionHandler's programmCall (@link #programCall} to the given
-   * call.
-   * 
-   * @param call The new program call.
-   */
-  public void setProgrammCall(String call) {
-    programCall = call;
   }
 
   /**
@@ -419,5 +287,10 @@ public class OptionHandler extends AbstractLoggable {
     for(GlobalParameterConstraint gbc : globalParameterConstraints) {
       gbc.test();
     }
+  }
+
+  // TODO: immutable access?
+  public List<GlobalParameterConstraint> getGlobalParameterConstraints() {
+    return globalParameterConstraints;
   }
 }

@@ -166,16 +166,6 @@ public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject> extends
     return remainingParameters;
   }
 
-  @Override
-  public String parameterDescription() {
-    StringBuffer buf = new StringBuffer();
-    buf.append(super.parameterDescription());
-    if (distance != null) {
-      buf.append(distance.parameterDescription());
-    }
-    return buf.toString();
-  }
-
   /**
    * Main method, delegate to super class.
    * 

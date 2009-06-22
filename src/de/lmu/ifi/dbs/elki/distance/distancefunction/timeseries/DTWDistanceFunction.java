@@ -96,10 +96,7 @@ public class DTWDistanceFunction<V extends NumberVector<V, ?>>
     }
 
     @Override
-    public String parameterDescription() {
-        StringBuffer description = new StringBuffer();
-        description.append(optionHandler.usage("Dynamic Time Warping distance for FeatureVectors.", false));
-        description.append('\n');
-        return description.toString();
+    public String shortDescription() {
+        return "Dynamic Time Warping distance for FeatureVectors.\n";
     }
 }

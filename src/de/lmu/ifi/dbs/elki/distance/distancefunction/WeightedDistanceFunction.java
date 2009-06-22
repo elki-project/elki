@@ -51,9 +51,9 @@ public class WeightedDistanceFunction<V extends NumberVector<V, ? >>
 
   // todo: parameters required
   @Override
-  public String parameterDescription() {
+  public String shortDescription() {
     return "Weighted distance for feature vectors. " +
            "No parameters required. " +
-           "Pattern for defining a range: \"" + requiredInputPattern() + "\".";
+           "Pattern for defining a range: \"" + requiredInputPattern() + "\".\n";
   }
 }

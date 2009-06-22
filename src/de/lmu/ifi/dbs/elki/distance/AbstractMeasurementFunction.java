@@ -102,9 +102,7 @@ public abstract class AbstractMeasurementFunction<O extends DatabaseObject, D ex
      * Returns the required input pattern.
      */
     @Override
-    public String parameterDescription() {
-        StringBuffer description = new StringBuffer(super.parameterDescription());
-        description.append("Pattern for defining a range: \"" + requiredInputPattern() + "\".");
-        return description.toString();
+    public String shortDescription() {
+        return "Pattern for defining a range: \"" + requiredInputPattern() + "\".\n";
     }
 }

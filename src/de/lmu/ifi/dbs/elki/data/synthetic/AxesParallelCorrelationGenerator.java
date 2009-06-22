@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -267,10 +268,10 @@ public class AxesParallelCorrelationGenerator extends StandAloneWrapper {
         }
         catch (ParameterException e) {
             Throwable cause = e.getCause() != null ? e.getCause() : e;
-            LoggingUtil.exception(wrapper.optionHandler.usage(e.getMessage(), true), cause);
+            LoggingUtil.exception(OptionUtil.describeParameterizable(wrapper), cause);
         }
         catch (Exception e) {
-          LoggingUtil.exception(wrapper.optionHandler.usage(e.getMessage(), true), e);
+          LoggingUtil.exception(OptionUtil.describeParameterizable(wrapper), e);
         }
     }
 

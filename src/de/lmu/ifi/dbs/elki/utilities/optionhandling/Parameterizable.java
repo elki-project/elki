@@ -18,7 +18,7 @@ public interface Parameterizable {
    *
    * @return String a description of the class and the required parameters
    */
-  String parameterDescription();
+  String shortDescription();
   
   /**
    * Sets the attributes of the class accordingly to the given parameters.

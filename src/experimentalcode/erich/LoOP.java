@@ -375,18 +375,6 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
     return remainingParameters;
   }
 
-  /**
-   * Calls the super method and appends the parameter description of
-   * {@link #referenceDistanceFunction} (if it is already initialized).
-   */
-  @Override
-  public String parameterDescription() {
-    StringBuilder description = new StringBuilder();
-    description.append(super.parameterDescription());
-
-    return description.toString();
-  }
-
   public MultiResult getResult() {
     return result;
   }

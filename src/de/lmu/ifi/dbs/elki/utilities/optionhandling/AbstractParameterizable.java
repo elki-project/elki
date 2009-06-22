@@ -38,7 +38,7 @@ public abstract class AbstractParameterizable extends AbstractLoggable implement
    */
   public AbstractParameterizable() {
     super(LoggingConfiguration.DEBUG);
-    optionHandler = new OptionHandler(this.getClass().getName());
+    optionHandler = new OptionHandler();
   }
 
   /**
@@ -186,14 +186,12 @@ public abstract class AbstractParameterizable extends AbstractLoggable implement
   }
 
   /**
-   * Returns a description of the class and the required parameters by calling
-   * {@code optionHandler.usage("", false)}. Subclasses may need to overwrite
-   * this method for a more detailed description.
+   * Returns a short description of the class.
    * 
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler#usage
+   * @return Description of the class
    */
-  public String parameterDescription() {
-    return optionHandler.usage("", false);
+  public String shortDescription() {
+    return null;
   }
 
   /**

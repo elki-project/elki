@@ -92,12 +92,11 @@ public class RangeQueryBasedHiCOPreprocessor<V extends RealVector<V, ?>> extends
    * @return String a description of the class and the required parameters
    */
   @Override
-  public String parameterDescription() {
+  public String shortDescription() {
     StringBuffer description = new StringBuffer();
     description.append(RangeQueryBasedHiCOPreprocessor.class.getName());
     description.append(" computes the correlation dimension of objects of a certain database.\n");
     description.append("The PCA is based on epsilon range queries.\n");
-    description.append(optionHandler.usage("", false));
     return description.toString();
   }
 }

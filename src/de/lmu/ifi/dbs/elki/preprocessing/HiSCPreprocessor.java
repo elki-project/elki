@@ -152,11 +152,10 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
   }
 
   @Override
-  public String parameterDescription() {
+  public String shortDescription() {
     StringBuffer description = new StringBuffer();
     description.append(HiSCPreprocessor.class.getName());
     description.append(" computes the preference vector of objects of a certain database according to the HiSC algorithm.\n");
-    description.append(optionHandler.usage("", false));
     return description.toString();
   }
 

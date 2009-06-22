@@ -18,7 +18,7 @@ import java.io.InputStream;
 import java.util.List;
 
 /**
- * Provides a database connection expecting input from standard in.
+ * Provides a database connection expecting input from an input stream such as stdin.
  *
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObject to be provided by the implementing class as element of the supplied database
@@ -91,40 +91,10 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
     }
 
     @Override
-    public String parameterDescription() {
+    public String shortDescription() {
         StringBuffer description = new StringBuffer();
-        description.append(optionHandler.usage("", false));
-        description.append('\n');
-        description.append("Parsers available within this framework for database connection ");
         description.append(this.getClass().getName());
-        description.append(":");
-        description.append('\n');
-        // for (PropertyDescription pd :
-        // Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.getPropertyName(propertyPrefix()
-        // + PROPERTY_PARSER)))
-        // {
-        // description.append("Class: ");
-        // description.append(pd.getEntry());
-        // description.append('\n');
-        // description.append(pd.getDescription());
-        // description.append('\n');
-        // }
-        // description.append('\n');
-        // description.append("Databases available within this framework for
-        // database connection ");
-        // description.append(this.getClass().getName());
-        // description.append(":");
-        // description.append('\n');
-        // for (PropertyDescription pd :
-        // Properties.KDD_FRAMEWORK_PROPERTIES.getProperties(PropertyName.getPropertyName(propertyPrefix()
-        // + PROPERTY_DATABASE)))
-        // {
-        // description.append("Class: ");
-        // description.append(pd.getEntry());
-        // description.append('\n');
-        // description.append(pd.getDescription());
-        // description.append('\n');
-        // }
+        description.append(" parses an input stream such as STDIN into a database.\n");
         return description.toString();
     }
 

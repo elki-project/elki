@@ -247,11 +247,10 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
     }
 
     @Override
-    public String parameterDescription() {
+    public String shortDescription() {
         StringBuffer description = new StringBuffer();
         description.append(DiSHPreprocessor.class.getName());
         description.append(" computes the preference vector of objects of a certain database according to the DiSH algorithm.\n");
-        description.append(optionHandler.usage("", false));
         return description.toString();
     }
 

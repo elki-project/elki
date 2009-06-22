@@ -5,7 +5,6 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DatabaseEvent;
 import de.lmu.ifi.dbs.elki.database.DatabaseListener;
-import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
@@ -129,24 +128,6 @@ public class PreprocessorHandler<O extends DatabaseObject, P extends Preprocesso
 
     rememberParametersExcept(args, remainingParameters);
     return remainingParameters;
-  }
-
-  /**
-   * Calls the super method and appends the parameter description of
-   * {@link #preprocessor} (if it is already initialized).
-   */
-  @Override
-  public String parameterDescription() {
-    StringBuilder description = new StringBuilder();
-    description.append(super.parameterDescription());
-
-    // preprocessor
-    if(preprocessor != null) {
-      description.append(Description.NEWLINE);
-      description.append(preprocessor.parameterDescription());
-    }
-
-    return description.toString();
   }
 
   /**
