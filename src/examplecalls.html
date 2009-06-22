@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+<link href="stylesheet.css" rel="stylesheet" type="text/css"/>
+<title>Example calls of ELKI.</title>
+</head>
+<body>
+<h1>Some examples for completely parameterized calls of ELKI</h1>
+<p>Here, we provide just some examples of usage of ELKI for some algorithms. Hopefully, from here you can easily extend to other algorithms and data sets.
+Throughout all examples, we assume you have the executable jar-archive <code>elki.jar</code> in some directory locally reachable from your console as <code>mypath</code>,
+and downloaded the example data file from (<a href="http://www.dbs.ifi.lmu.de/research/KDD/ELKI/datasets/example/exampledata.txt">exampledata.txt</a>)
+to a location reachable from your console as <code>mydata/exampledata.txt</code>.
+</p>
+
+<h2>Example: DBSCAN</h2>
+<p>Call:
+<pre>
+java -jar mypath/elki.jar -algorithm clustering.DBSCAN -dbc.in mydata/exampledata.txt -dbscan.epsilon 20 -dbscan.minpts 10
+</pre>
+This requests the algorithm DBSCAN to cluster the data set using DBSCAN parameters <code>epsilon=20</code> and <code>minpts=10</code>. The clustering result is just printed to the console.
+</p>
+
+<p>Call:
+<pre>
+java -jar mypath/elki.jar -algorithm clustering.DBSCAN -dbc.in mydata/exampledata.txt -dbscan.epsilon 20 -dbscan.minpts 10 -out myresults/DBSCANeps20min10
+</pre>
+Same as before but this time, a directory for collecting the output is explicitely specified. This results in one file per cluster found by DBSCAN within the specified directory <code>myresults/DBSCANeps20min10</code>.
+</p>
+
+</body>
+</html>
