@@ -472,4 +472,20 @@ public final class Util {
       list.add(object);
     }
   }
+
+  /**
+   * Search an (unsorted) array linearly for an object.
+   * 
+   * @param arr Array to search
+   * @param ref Object to search for
+   * @return Index of object or -1 if not found.
+   */
+  public static int arrayFind(String[] arr, Object ref) {
+    for (int index = 0; index < arr.length; index++) {
+      if (ref.equals(arr[index])) {
+        return index;
+      }
+    }
+    return -1;
+  }
 }
