@@ -146,11 +146,10 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
      * Provides a short description of the purpose of this class.
      */
     @Override
-    public String parameterDescription() {
+    public String shortDescription() {
         StringBuffer description = new StringBuffer();
         description.append(SharedNearestNeighborsPreprocessor.class.getName());
         description.append(" computes the k nearest neighbors of objects of a certain database.\n");
-        description.append(super.parameterDescription());
         return description.toString();
     }
 

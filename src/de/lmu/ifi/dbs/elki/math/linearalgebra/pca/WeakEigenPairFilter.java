@@ -93,11 +93,10 @@ public class WeakEigenPairFilter extends AbstractParameterizable implements Eige
    * Get parameter description
    */
   @Override
-  public String parameterDescription() {
+  public String shortDescription() {
     StringBuffer description = new StringBuffer();
     description.append(WeakEigenPairFilter.class.getName());
     description.append(" sorts the eigenpairs in decending order " + "of their eigenvalues and returns those eigenpairs, whose eigenvalue is " + "above the average ('expected') eigenvalue.\n");
-    description.append(optionHandler.usage("", false));
     return description.toString();
   }
 

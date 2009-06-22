@@ -294,16 +294,4 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
     rememberParametersExcept(args, remainingParameters);
     return remainingParameters;
   }
-
-  /**
-   * Calls the super method and appends the parameter description of
-   * {@link #pca}.
-   */
-  @Override
-  public String parameterDescription() {
-    StringBuilder description = new StringBuilder();
-    description.append(super.parameterDescription());
-    description.append(pca.parameterDescription());
-    return description.toString();
-  }
 }

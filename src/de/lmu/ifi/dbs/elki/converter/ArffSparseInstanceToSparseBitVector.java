@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.parser.AbstractParser;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.wrapper.StandAloneInputWrapper;
 
@@ -111,17 +112,17 @@ public class ArffSparseInstanceToSparseBitVector extends StandAloneInputWrapper 
         }
         catch (UnableToComplyException e) {
             Throwable cause = e.getCause() != null ? e.getCause() : e;
-            LoggingUtil.exception(wrapper.optionHandler.usage(e.getMessage(), true), cause);
+            LoggingUtil.exception(OptionUtil.describeParameterizable(wrapper), cause);
         }
         catch (ParameterException e) {
             Throwable cause = e.getCause() != null ? e.getCause() : e;
-            LoggingUtil.exception(wrapper.optionHandler.usage(e.getMessage(), true), cause);
+            LoggingUtil.exception(OptionUtil.describeParameterizable(wrapper), cause);
         }
         catch (AbortException e) {
           LoggingUtil.message(e.getMessage());
         }
         catch (Exception e) {
-          LoggingUtil.exception(wrapper.optionHandler.usage(e.getMessage(), true), e);
+          LoggingUtil.exception(OptionUtil.describeParameterizable(wrapper), e);
         }
     }
 

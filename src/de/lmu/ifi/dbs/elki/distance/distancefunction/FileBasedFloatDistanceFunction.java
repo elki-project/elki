@@ -127,8 +127,8 @@ public class FileBasedFloatDistanceFunction<V extends DatabaseObject> extends Ab
    * @return String a description of the class and the required parameters
    */
   @Override
-  public String parameterDescription() {
-    return "File based float distance for database objects. No parameters required. " + "Pattern for defining a range: \"" + requiredInputPattern() + "\".";
+  public String shortDescription() {
+    return "File based float distance for database objects. No parameters required. " + "Pattern for defining a range: \"" + requiredInputPattern() + "\".\n";
   }
 
   @Override

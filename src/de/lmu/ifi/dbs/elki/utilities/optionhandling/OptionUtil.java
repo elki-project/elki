@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -287,6 +288,51 @@ public final class OptionUtil {
         }
       }
     }
+  }
+
+  /**
+   * Produce a description of a Parameterizable instance (including recursive options).
+   * 
+   * @param p Parameterizable to describe
+   * @return Formatted description
+   */
+  public static String describeParameterizable(Parameterizable p) {
+    StringBuffer usage = new StringBuffer();
+    describeParameterizable(usage, p, 77, "   ");
+    return usage.toString();    
+  }
+  
+  /**
+   * Format a description of a Parameterizable (including recursive options).
+   * 
+   * @param buf Buffer to append to.
+   * @param p Parameterizable to describe
+   * @param width Width
+   * @param indent Text indent
+   * @return Formatted description
+   */
+  public static StringBuffer describeParameterizable(StringBuffer buf, Parameterizable p, int width, String indent) {
+    buf.append("Description for class ");
+    buf.append(p.getClass().getName());
+    buf.append(":\n");
+  
+    if(p instanceof Algorithm) {
+      Algorithm<?, ?> a = (Algorithm<?, ?>) p;
+      buf.append(a.getDescription().toString());
+      buf.append("\n");
+    }
+  
+    String shortdesc = p.shortDescription();
+    if (shortdesc != null) {
+      buf.append(shortdesc);
+      buf.append("\n");
+    }
+    
+    // Collect options
+    List<Pair<Parameterizable, Option<?>>> options = new ArrayList<Pair<Parameterizable, Option<?>>>();
+    p.collectOptions(options);
+    OptionUtil.formatForConsole(buf, width, indent, options);
+    return buf;
   }
 
 }

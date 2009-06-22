@@ -142,23 +142,6 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
     }
 
     /**
-     * Calls the super method
-     * and appends the parameter description of
-     * the {@link #copacAlgorithm}.
-     */
-    @Override
-    public String parameterDescription() {
-        StringBuilder description = new StringBuilder();
-        description.append(super.parameterDescription());
-
-        // copac algorithm
-        description.append(Description.NEWLINE);
-        description.append(copacAlgorithm.parameterDescription());
-
-        return description.toString();
-    }
-
-    /**
      * Returns a description of the algorithm.
      *
      * @return a description of the algorithm

@@ -152,12 +152,11 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends RealVector<V,
   }
 
   @Override
-  public String parameterDescription() {
+  public String shortDescription() {
     StringBuffer description = new StringBuffer();
     description.append(PreDeConPreprocessor.class.getName());
     description.append(" computes the projected dimension of objects of a certain database according to the PreDeCon algorithm.\n");
     description.append("The variance analysis is based on epsilon range queries.\n");
-    description.append(optionHandler.usage("", false));
     return description.toString();
   }
 }

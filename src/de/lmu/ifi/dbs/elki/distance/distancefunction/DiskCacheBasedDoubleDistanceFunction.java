@@ -112,17 +112,6 @@ public class DiskCacheBasedDoubleDistanceFunction<V extends DatabaseObject> exte
     return new DoubleDistance(distance);
   }
   
-  /**
-   * Returns a description of the class and the required parameters. This
-   * description should be suitable for a usage description.
-   * 
-   * @return String a description of the class and the required parameters
-   */
-  @Override
-  public String parameterDescription() {
-    return super.parameterDescription();
-  }
-
   @Override
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);

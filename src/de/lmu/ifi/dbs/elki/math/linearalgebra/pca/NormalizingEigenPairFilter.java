@@ -59,14 +59,13 @@ public class NormalizingEigenPairFilter extends AbstractParameterizable
 
 
 	@Override
-	public String parameterDescription() {
+	public String shortDescription() {
 		final StringBuffer description = new StringBuffer();
 		description.append(PercentageEigenPairFilter.class.getName());
 		description.append(" normalizes all eigenpairs, "
 				+ " consisting of eigenvalue e and"
 				+ " eigenvector v s.t. <v,v> * e = 1,"
 				+ " where <,> is the standard dot product.\n");
-		description.append(optionHandler.usage("", false));
 		return description.toString();
 	}
 

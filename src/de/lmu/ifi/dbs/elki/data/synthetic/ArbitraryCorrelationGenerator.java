@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.VectorListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalListSizeConstraint;
@@ -125,10 +126,10 @@ public class ArbitraryCorrelationGenerator extends AxesParallelCorrelationGenera
         }
         catch (ParameterException e) {
             Throwable cause = e.getCause() != null ? e.getCause() : e;
-            LoggingUtil.exception(wrapper.optionHandler.usage(e.getMessage(), true), cause);
+            LoggingUtil.exception(OptionUtil.describeParameterizable(wrapper), cause);
         }
         catch (Exception e) {
-          LoggingUtil.exception(wrapper.optionHandler.usage(e.getMessage(), true), e);
+          LoggingUtil.exception(OptionUtil.describeParameterizable(wrapper), e);
         }
     }
 

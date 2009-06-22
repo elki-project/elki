@@ -49,8 +49,8 @@ public class FooKernelFunction<O extends FeatureVector<?,?>> extends AbstractDou
 	}
 
 	@Override
-	public String parameterDescription() {
-		return "Polynomial Kernel for FeatureVectors. Default max_degree is "+DEFAULT_MAX_DEGREE+".";
+	public String shortDescription() {
+		return "Polynomial Kernel for FeatureVectors. Default max_degree is "+DEFAULT_MAX_DEGREE+".\n";
 	}
 
 	@Override

@@ -45,8 +45,8 @@ public abstract class AbstractCorrelationDistanceFunction<V extends RealVector<V
     }
 
     @Override
-    public String parameterDescription() {
-        return "Correlation distance for real vectors. " + super.parameterDescription();
+    public String shortDescription() {
+        return "Correlation distance for real vectors.\n";
     }
 
     /**

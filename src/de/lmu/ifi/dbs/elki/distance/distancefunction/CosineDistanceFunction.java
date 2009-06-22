@@ -38,9 +38,8 @@ public class CosineDistanceFunction<V extends FeatureVector<V,?>> extends Abstra
   }
 
   @Override
-  public String parameterDescription() {
-    return "Cosine distance for feature vectors. No parameters required. " +
-        super.parameterDescription();
+  public String shortDescription() {
+    return "Cosine distance for feature vectors. No parameters required.\n";
   }
 
 }

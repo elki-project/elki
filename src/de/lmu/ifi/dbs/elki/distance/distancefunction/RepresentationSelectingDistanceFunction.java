@@ -108,9 +108,9 @@ public class RepresentationSelectingDistanceFunction<O extends DatabaseObject, M
   }
 
   @Override
-  public String parameterDescription() {
+  public String shortDescription() {
     return "Distance function for multirepresented objects that selects one represenation and " +
-           "computes the distances only within the selected representation.";
+           "computes the distances only within the selected representation.\n";
   }
 
   @Override

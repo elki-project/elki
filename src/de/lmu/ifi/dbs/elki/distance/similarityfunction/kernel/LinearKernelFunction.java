@@ -43,10 +43,9 @@ public class LinearKernelFunction<O extends FeatureVector<O, ? >> extends Abstra
   }
 
   @Override
-  public String parameterDescription() {
+  public String shortDescription() {
     StringBuffer description = new StringBuffer();
-		description.append(super.parameterDescription());
-		description.append("Linear Kernel for feature vectors. No parameters required.");
+		description.append("Linear Kernel for feature vectors. No parameters required.\n");
 		return description.toString();
   }
 }

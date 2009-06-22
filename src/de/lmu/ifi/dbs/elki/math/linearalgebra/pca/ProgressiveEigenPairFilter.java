@@ -168,11 +168,10 @@ public class ProgressiveEigenPairFilter extends AbstractParameterizable implemen
    * Parameter description.
    */
   @Override
-  public String parameterDescription() {
+  public String shortDescription() {
     StringBuffer description = new StringBuffer();
     description.append(ProgressiveEigenPairFilter.class.getName());
-    description.append(" sorts the eigenpairs in decending order " + "of their eigenvalues and returns the first eigenpairs, whose sum of " + "eigenvalues explains more than the given percentage of the unexpected variance.\n");
-    description.append(optionHandler.usage("", false));
+    description.append(" sorts the eigenpairs in decending order of their eigenvalues and returns the first eigenpairs, whose sum of " + "eigenvalues explains more than the given percentage of the unexpected variance.\n");
     return description.toString();
   }
 

@@ -253,14 +253,6 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
   List<Integer> getIDs();
 
   /**
-   * Returns a short description of the database.
-   * (Such as: efficiency in space and time, index structure...)
-   *
-   * @return a description of the database
-   */
-  String parameterDescription();
-
-  /**
    * Returns a Map of partition IDs to Databases of the specified class
    * according to the specified Map of partition IDs
    * to Lists of IDs.

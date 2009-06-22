@@ -142,7 +142,7 @@ public abstract class RealVectorLabelParser<V extends RealVector<?, ?>> extends 
   protected abstract V createDBObject(List<Double> attributes);
 
   @Override
-  public String parameterDescription() {
+  public String shortDescription() {
     StringBuffer description = new StringBuffer();
     description.append(this.getClass().getName());
     description.append(" expects following format of parsed lines:\n");
@@ -153,7 +153,7 @@ public abstract class RealVectorLabelParser<V extends RealVector<?, ?>> extends 
     description.append(COMMENT);
     description.append("\" will be ignored. If any point differs in its dimensionality from other points, " + "the parse method will fail with an Exception.\n");
 
-    return usage(description.toString());
+    return description.toString();
   }
   
   protected abstract String descriptionLineType();

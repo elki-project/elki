@@ -60,10 +60,10 @@ public class DimensionsSelectingEuclideanDistanceFunction<V extends NumberVector
     }
 
     @Override
-    public String parameterDescription() {
+    public String shortDescription() {
         return "Euclidean distance for feature vectors considering only specified dimensions. " +
             "No parameters required. " +
-            "Pattern for defining a range: \"" + requiredInputPattern() + "\".";
+            "Pattern for defining a range: \"" + requiredInputPattern() + "\".\n";
     }
 
     public DoubleDistance minDist(HyperBoundingBox mbr, V v) {

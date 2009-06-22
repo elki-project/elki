@@ -312,24 +312,6 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
     return remainingParameters;
   }
 
-  /**
-   * Calls the super method and appends the parameter description of
-   * {@link #reachabilityDistanceFunction} (if it is already initialized).
-   */
-  @Override
-  public String parameterDescription() {
-    StringBuilder description = new StringBuilder();
-    description.append(super.parameterDescription());
-
-    // reachabilityDistanceFunction
-    if(reachabilityDistanceFunction != null) {
-      description.append(Description.NEWLINE);
-      description.append(reachabilityDistanceFunction.parameterDescription());
-    }
-
-    return description.toString();
-  }
-
   public MultiResult getResult() {
     return result;
   }

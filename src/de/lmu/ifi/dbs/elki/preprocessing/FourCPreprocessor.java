@@ -178,12 +178,11 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
     }
 
     @Override
-    public String parameterDescription() {
+    public String shortDescription() {
         StringBuffer description = new StringBuffer();
         description.append(FourCPreprocessor.class.getName());
         description.append(" computes the local dimensionality and locally weighted matrix of objects of a certain database according to the 4C algorithm.\n");
         description.append("The PCA is based on epsilon range queries.\n");
-        description.append(optionHandler.usage("", false));
         return description.toString();
     }
 

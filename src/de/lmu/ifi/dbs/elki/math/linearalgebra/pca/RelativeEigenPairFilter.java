@@ -100,11 +100,10 @@ public class RelativeEigenPairFilter extends AbstractParameterizable implements 
    * Get parameter description.
    */
   @Override
-  public String parameterDescription() {
+  public String shortDescription() {
     StringBuffer description = new StringBuffer();
     description.append(RelativeEigenPairFilter.class.getName());
-    description.append(" sorts the eigenpairs in decending order " + "of their eigenvalues and returns those eigenpairs, whose eigenvalue is " + "above the average ('expected') eigenvalue of the remaining eigenvectors.\n");
-    description.append(optionHandler.usage("", false));
+    description.append(" sorts the eigenpairs in decending order of their eigenvalues and returns those eigenpairs, whose eigenvalue is " + "above the average ('expected') eigenvalue of the remaining eigenvectors.\n");
     return description.toString();
   }
 

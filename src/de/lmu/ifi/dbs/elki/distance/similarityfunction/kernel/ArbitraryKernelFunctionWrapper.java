@@ -61,8 +61,8 @@ public class ArbitraryKernelFunctionWrapper<O extends RealVector<O, ? >> extends
 	}
 
 	@Override
-	public String parameterDescription() {
-		return "Arbitrary kernel function wrapper for FeatureVectors. No parameters required.";
+	public String shortDescription() {
+		return "Arbitrary kernel function wrapper for FeatureVectors. No parameters required.\n";
 	}
 
   @Override

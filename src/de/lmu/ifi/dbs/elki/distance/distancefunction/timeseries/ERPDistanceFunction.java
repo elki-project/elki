@@ -133,11 +133,8 @@ public class ERPDistanceFunction<V extends NumberVector<V, ?>>
     }
 
     @Override
-    public String parameterDescription() {
-        StringBuffer description = new StringBuffer();
-        description.append(optionHandler.usage("Edit Distance With Real Penalty distance for FeatureVectors.", false));
-        description.append('\n');
-        return description.toString();
+    public String shortDescription() {
+        return "Edit Distance With Real Penalty distance for FeatureVectors.\n";
     }
 
     @Override

@@ -45,8 +45,8 @@ public class SharedUnitedDistanceFunction extends SharingDependentItemsetDistanc
   }
 
   @Override
-  public String parameterDescription() {
-    return "Distance is 1-ratio(i,cardUnited), where i is the number of bits shared by both BitVectors, cardUnited is the cardinality (number of set bits) of the union of both BitVector's BitSets, and ratio(i,cardUnited) is 1 if cardUnited is 0, i/cardUnited otherwise.";
+  public String shortDescription() {
+    return "Distance is 1-ratio(i,cardUnited), where i is the number of bits shared by both BitVectors, cardUnited is the cardinality (number of set bits) of the union of both BitVector's BitSets, and ratio(i,cardUnited) is 1 if cardUnited is 0, i/cardUnited otherwise.\n";
   }
 
 

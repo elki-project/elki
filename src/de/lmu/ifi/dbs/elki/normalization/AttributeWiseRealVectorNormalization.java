@@ -210,18 +210,6 @@ public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ?>> ex
   }
 
   /**
-   * Returns a description of the class and the required parameters.
-   * <p/>
-   * This description should be suitable for a usage description.
-   * 
-   * @return String a description of the class and the required parameters
-   */
-  @Override
-  public String parameterDescription() {
-    return optionHandler.usage("", false);
-  }
-
-  /**
    * Sets the attributes of the class accordingly to the given parameters.
    * Returns a new String array containing those entries of the given array that
    * are neither expected nor used by this Parameterizable.

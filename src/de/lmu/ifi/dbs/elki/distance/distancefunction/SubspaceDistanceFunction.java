@@ -135,7 +135,7 @@ public class SubspaceDistanceFunction<V extends RealVector<V, ?>, P extends Prep
     }
 
     @Override
-    public String parameterDescription() {
-        return "Subspace distance for real vectors. " + super.parameterDescription();
+    public String shortDescription() {
+        return "Subspace distance for real vectors.";
     }
 }

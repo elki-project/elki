@@ -38,9 +38,8 @@ public class ArcCosineDistanceFunction<V extends FeatureVector<V,?>> extends Abs
   }
 
   @Override
-  public String parameterDescription() {
-    return "Cosine distance for feature vectors. No parameters required. " +
-        super.parameterDescription();
+  public String shortDescription() {
+    return "Cosine distance for feature vectors. No parameters required.\n";
   }
 
 }

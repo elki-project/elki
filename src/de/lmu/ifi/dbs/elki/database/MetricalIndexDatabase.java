@@ -199,13 +199,11 @@ public class MetricalIndexDatabase<O extends DatabaseObject, D extends Distance<
      * @return a description of the database
      */
     @Override
-    public String parameterDescription() {
+    public String shortDescription() {
         StringBuffer description = new StringBuffer();
         description.append(this.getClass().getName());
-        description.append(" holds all the data in a ");
-        description.append("metrical index structure extending ").append(MetricalIndex.class.getName()).append(".\n");
-//    description.append(index.getClass().getName()).append(" index structure.\n");
-        description.append(optionHandler.usage("", false));
+        description.append(" holds all the data in a metrical index structure");
+        description.append(" extending ").append(MetricalIndex.class.getName()).append(".\n");
         return description.toString();
     }
 }

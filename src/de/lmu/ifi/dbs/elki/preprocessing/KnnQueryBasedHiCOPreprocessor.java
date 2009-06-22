@@ -102,12 +102,11 @@ public class KnnQueryBasedHiCOPreprocessor<V extends RealVector<V, ?>> extends H
   }
 
   @Override
-  public String parameterDescription() {
+  public String shortDescription() {
     StringBuffer description = new StringBuffer();
     description.append(KnnQueryBasedHiCOPreprocessor.class.getName());
     description.append(" computes the correlation dimension of objects of a certain database.\n");
     description.append("The PCA is based on k nearest neighbor queries.\n");
-    description.append(optionHandler.usage("", false));
     return description.toString();
   }
 }

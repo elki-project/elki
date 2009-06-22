@@ -56,14 +56,8 @@ public abstract class AbstractLocallyWeightedDistanceFunction<O extends RealVect
   }
 
   @Override
-  public String parameterDescription() {
-    StringBuilder description = new StringBuilder();
-    description.append(super.parameterDescription());
-
-    description.append(optionHandler.usage("Locally weighted distance function. Pattern for defining a range: \"" + requiredInputPattern() + "\".", false));
-    description.append("\nRequires parametrization of underlying preprocessor handler:\n");
-    description.append(preprocessorHandler.parameterDescription());
-    return description.toString();
+  public String shortDescription() {
+    return "Locally weighted distance function. Pattern for defining a range: \"" + requiredInputPattern() + "\".\n";
   }
 
   /**

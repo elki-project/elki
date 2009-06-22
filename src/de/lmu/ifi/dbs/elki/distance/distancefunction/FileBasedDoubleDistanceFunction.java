@@ -122,22 +122,6 @@ public class FileBasedDoubleDistanceFunction<V extends DatabaseObject> extends A
     return cache.get(new Pair<Integer, Integer>(id1, id2));
   }
   
-  /**
-   * Returns a description of the class and the required parameters. This
-   * description should be suitable for a usage description.
-   * 
-   * @return String a description of the class and the required parameters
-   */
-  @Override
-  public String parameterDescription() {
-    StringBuffer buf = new StringBuffer();
-    buf.append(super.parameterDescription());
-    if (parser != null) {
-      buf.append(parser.parameterDescription());
-    }
-    return buf.toString();
-  }
-
   @Override
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);

@@ -57,9 +57,8 @@ public abstract class SimilarityAdapterAbstract<V extends FeatureVector<V,?>> ex
   public abstract DoubleDistance distance(V v1, V v2);
 
   @Override
-  public String parameterDescription() {
-    return "SNN based distance for feature vectors. " +
-        super.parameterDescription();
+  public String shortDescription() {
+    return "SNN based distance for feature vectors.\n";
   }
 
   @Override

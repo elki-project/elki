@@ -8,7 +8,6 @@ import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.PreprocessorBasedMeasurementFunction;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
-import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
@@ -70,22 +69,5 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
 
     public final P getPreprocessor() {
         return preprocessorHandler.getPreprocessor();
-    }
-
-    /**
-     * Calls the super method
-     * and appends the parameter description of the {@link #preprocessorHandler}.
-     */
-    @Override
-    public String parameterDescription() {
-        StringBuilder description = new StringBuilder();
-        description.append(super.parameterDescription());
-
-        // preprocessor handler
-        description.append(Description.NEWLINE);
-        description.append("Requires parametrization of the underlying preprocessor handler: \n");
-        description.append(preprocessorHandler.parameterDescription());
-
-        return description.toString();
     }
 }

@@ -80,7 +80,7 @@ public class SparseBitVectorLabelParser extends AbstractParser<BitVector> {
   }
 
   @Override
-  public String parameterDescription() {
+  public String shortDescription() {
     StringBuffer description = new StringBuffer();
     description.append(SparseBitVectorLabelParser.class.getName());
     description.append(" expects following format of parsed lines:\n");
@@ -93,7 +93,7 @@ public class SparseBitVectorLabelParser extends AbstractParser<BitVector> {
     description.append(COMMENT);
     description.append("\" will be ignored. \n");
 
-    return usage(description.toString());
+    return description.toString();
   }
 
 }

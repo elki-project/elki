@@ -62,14 +62,6 @@ public class PartiallySimilarVoxelObjectsCreator extends AbstractParameterizable
     optionHandler.grabOptions(parameters);
   }
 
-  /**
-   * @param message
-   * @return usage description
-   */
-  public String usage(String message) {
-    return optionHandler.usage(message, true);
-  }
-
   // FIXME: unify main method with other wrappers?
   /**
    * @param args

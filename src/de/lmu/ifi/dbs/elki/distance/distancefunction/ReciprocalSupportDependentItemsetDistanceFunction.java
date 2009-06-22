@@ -46,7 +46,7 @@ public class ReciprocalSupportDependentItemsetDistanceFunction extends
   }
 
   @Override
-  public String parameterDescription() {
-    return "Distance is 1.0/support(%) * max{1-ratio(i,o1),1-ratio(i,o2)}, where i is the number of bits shared by both BitVectors, o is the number of bits in the respective BitVector, and ratio(i,o) is 1 if o is 0, i/o otherwise.";
+  public String shortDescription() {
+    return "Distance is 1.0/support(%) * max{1-ratio(i,o1),1-ratio(i,o2)}, where i is the number of bits shared by both BitVectors, o is the number of bits in the respective BitVector, and ratio(i,o) is 1 if o is 0, i/o otherwise.\n";
   }
 }

@@ -58,11 +58,6 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
   public static final String INFORMATION = "ELKI Version 0.2 (2009, July)\n\n" + "published in:\n" + "Elke Achtert, Thomas Bernecker, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek:\n" + "ELKI in Time: ELKI 0.2 for the Performance Evaluation of Distance Measures for Time Series.\n" + "In Proc. 11th International Symposium on Spatial and Temporal Databases (SSTD 2009), Aalborg, Denmark, 2009.";
 
   /**
-   * The String for calling this class' main routine on command line interface.
-   */
-  private static final String CALL = "java " + KDDTask.class.getName();
-
-  /**
    * The newline string according to system.
    */
   private static final String NEWLINE = System.getProperty("line.separator");
@@ -182,7 +177,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
    */
   public KDDTask() {
 
-    helpOptionHandler = new OptionHandler(this.getClass().getName());
+    helpOptionHandler = new OptionHandler();
     helpOptionHandler.put(HELP_FLAG);
     helpOptionHandler.put(HELP_LONG_FLAG);
     helpOptionHandler.put(DESCRIPTION_PARAM);
@@ -212,16 +207,6 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
     // normalization-undo depends on a defined normalization.
     GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint<String, String>(NORMALIZATION_PARAM, null, NORMALIZATION_UNDO_FLAG, true);
     optionHandler.setGlobalParameterConstraint(gpc);
-
-    optionHandler.setProgrammCall(CALL);
-  }
-
-  /**
-   * Returns a description for printing on command line interface.
-   */
-  @Override
-  public String parameterDescription() {
-    return optionHandler.usage("", true);
   }
 
   /**
@@ -241,23 +226,17 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
     List<Pair<Parameterizable, Option<?>>> options = new ArrayList<Pair<Parameterizable, Option<?>>>();
     collectOptions(options);
     OptionUtil.formatForConsole(usage, 77, "   ", options);
-    /*
-    usage.append(optionHandler.usage("", false));
-    usage.append(NEWLINE);
-    if(algorithm != null) {
-      usage.append(OptionHandler.OPTION_PREFIX);
-      usage.append(ALGORITHM_PARAM.getName());
-      usage.append(" ");
-      usage.append(algorithm.parameterDescription());
-      usage.append(NEWLINE);
-    }
-    if(resulthandler != null) {
-      usage.append(OptionHandler.OPTION_PREFIX);
-      usage.append(RESULT_HANDLER_PARAM.getName());
-      usage.append(" ");
-      usage.append(resulthandler.parameterDescription());
-      usage.append(NEWLINE);
-    }*/
+    
+    //TODO: cleanup:
+    List<GlobalParameterConstraint> globalParameterConstraints = optionHandler.getGlobalParameterConstraints();
+    if(!globalParameterConstraints.isEmpty()) {
+      usage.append(NEWLINE).append("Global parameter constraints:");
+      for(GlobalParameterConstraint gpc : globalParameterConstraints) {
+        usage.append(NEWLINE).append(" - ");
+        usage.append(gpc.getDescription());
+      }
+    }    
+    
     return usage.toString();
   }
 
@@ -288,13 +267,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
         LoggingUtil.exception(e.getMessage(), e);
         throw new WrongParameterValueException(DESCRIPTION_PARAM.getName(), descriptionClass, DESCRIPTION_PARAM.getFullDescription(), e);
       }
-      if(p instanceof Algorithm) {
-        Algorithm<?, ?> a = (Algorithm<?, ?>) p;
-        throw new AbortException(a.getDescription().toString() + '\n' + a.parameterDescription());
-      }
-      else {
-        throw new AbortException(p.parameterDescription());
-      }
+      throw new AbortException(OptionUtil.describeParameterizable(new StringBuffer(), p, 77, "   ").toString());
     }
 
     String[] remainingParameters = super.setParameters(args);
@@ -405,7 +378,9 @@ public class KDDTask<O extends DatabaseObject> extends AbstractParameterizable {
     catch(AbortException e) {
       // ensure we actually show the message:
       LoggingConfiguration.setVerbose(true);
-      logger.verbose(kddTask.usage());
+      if (kddTask.HELP_FLAG.isSet()) {
+        logger.verbose(kddTask.usage());
+      }
       logger.verbose(e.getMessage());
     }
     catch(UnspecifiedParameterException e) {
