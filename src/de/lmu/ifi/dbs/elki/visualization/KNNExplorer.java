@@ -68,32 +68,36 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterExceptio
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import de.lmu.ifi.dbs.elki.visualization.batikutil.LazyCanvasResizer;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.NodeReplacer;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.savedialog.SVGSaveDialog;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 
 /**
  * User application to explore the k Nearest Neighbors for a given data set and
- * distance function. When selecting one or more data entries, the nearest neighbors
- * each are determined and visualized.
+ * distance function. When selecting one or more data entries, the nearest
+ * neighbors each are determined and visualized.
  * 
  * Published in
  * 
- * Elke Achtert, Thomas Bernecker, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek:
+ * Elke Achtert, Thomas Bernecker, Hans-Peter Kriegel, Erich Schubert, Arthur
+ * Zimek:
  * 
- * ELKI in Time: ELKI 0.2 for the Performance Evaluation of Distance Measures for Time Series.
+ * ELKI in Time: ELKI 0.2 for the Performance Evaluation of Distance Measures
+ * for Time Series.
  * 
- * In Proc. 11th International Symposium on Spatial and Temporal Databases (SSTD 2009),
- * Aalborg, Denmark, 2009.
+ * In Proc. 11th International Symposium on Spatial and Temporal Databases (SSTD
+ * 2009), Aalborg, Denmark, 2009.
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <O> Object type
  */
-public class KNNExplorer<O extends NumberVector<O,?>> extends AbstractParameterizable {
+public class KNNExplorer<O extends NumberVector<O, ?>> extends AbstractParameterizable {
   /**
    * The newline string according to system.
    */
@@ -149,22 +153,21 @@ public class KNNExplorer<O extends NumberVector<O,?>> extends AbstractParameteri
   /**
    * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
    */
-  public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID(
-      "explorer.distancefunction",
-      "Distance function to determine the distance between database objects."
-  );
+  public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("explorer.distancefunction", "Distance function to determine the distance between database objects.");
 
   /**
-   * Parameter to specify the distance function to determine the distance between database objects,
-   * must extend {@link de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction}.
-   * <p>Key: {@code -algorithm.distancefunction} </p>
-   * <p>Default value: {@link de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction} </p>
+   * Parameter to specify the distance function to determine the distance
+   * between database objects, must extend
+   * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction}.
+   * <p>
+   * Key: {@code -algorithm.distancefunction}
+   * </p>
+   * <p>
+   * Default value:
+   * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction}
+   * </p>
    */
-  protected final ClassParameter<DistanceFunction<O, DoubleDistance>> DISTANCE_FUNCTION_PARAM =
-      new ClassParameter<DistanceFunction<O, DoubleDistance>>(
-          DISTANCE_FUNCTION_ID,
-          DistanceFunction.class,
-          EuclideanDistanceFunction.class.getName());
+  protected final ClassParameter<DistanceFunction<O, DoubleDistance>> DISTANCE_FUNCTION_PARAM = new ClassParameter<DistanceFunction<O, DoubleDistance>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class.getName());
 
   /**
    * Holds the database connection to have the algorithm run with.
@@ -172,7 +175,8 @@ public class KNNExplorer<O extends NumberVector<O,?>> extends AbstractParameteri
   private DatabaseConnection<O> databaseConnection;
 
   /**
-   * Holds the instance of the distance function specified by {@link #DISTANCE_FUNCTION_PARAM}.
+   * Holds the instance of the distance function specified by
+   * {@link #DISTANCE_FUNCTION_PARAM}.
    */
   private DistanceFunction<O, DoubleDistance> distanceFunction;
 
@@ -203,7 +207,7 @@ public class KNNExplorer<O extends NumberVector<O,?>> extends AbstractParameteri
 
     // Distance function
     addOption(DISTANCE_FUNCTION_PARAM);
-    
+
     // parameter normalization
     addOption(NORMALIZATION_PARAM);
   }
@@ -220,13 +224,13 @@ public class KNNExplorer<O extends NumberVector<O,?>> extends AbstractParameteri
     StringBuffer usage = new StringBuffer();
     usage.append(KDDTask.INFORMATION);
     usage.append(NEWLINE);
-    
+
     // Collect options
     List<Pair<Parameterizable, Option<?>>> options = new ArrayList<Pair<Parameterizable, Option<?>>>();
     collectOptions(options);
     OptionUtil.formatForConsole(usage, 77, "   ", options);
-    
-    //TODO: cleanup:
+
+    // TODO: cleanup:
     List<GlobalParameterConstraint> globalParameterConstraints = optionHandler.getGlobalParameterConstraints();
     if(!globalParameterConstraints.isEmpty()) {
       usage.append(NEWLINE).append("Global parameter constraints:");
@@ -234,8 +238,8 @@ public class KNNExplorer<O extends NumberVector<O,?>> extends AbstractParameteri
         usage.append(NEWLINE).append(" - ");
         usage.append(gpc.getDescription());
       }
-    }    
-    
+    }
+
     return usage.toString();
   }
 
@@ -279,7 +283,7 @@ public class KNNExplorer<O extends NumberVector<O,?>> extends AbstractParameteri
     // instanciate distance function.
     distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
     remainingParameters = distanceFunction.setParameters(remainingParameters);
-    
+
     // normalization
     if(NORMALIZATION_PARAM.isSet()) {
       normalization = NORMALIZATION_PARAM.instantiateClass();
@@ -320,7 +324,7 @@ public class KNNExplorer<O extends NumberVector<O,?>> extends AbstractParameteri
     catch(AbortException e) {
       // ensure we actually show the message:
       LoggingConfiguration.setVerbose(true);
-      if (explorer.HELP_FLAG.isSet()) {
+      if(explorer.HELP_FLAG.isSet()) {
         logger.verbose(explorer.usage());
       }
       logger.verbose(e.getMessage());
@@ -333,7 +337,7 @@ public class KNNExplorer<O extends NumberVector<O,?>> extends AbstractParameteri
     catch(ParameterException e) {
       // Note: the stack-trace is not included, since this exception is
       // supposedly only thrown with an already helpful message.
-      if (explorer.HELP_FLAG.isSet()) {
+      if(explorer.HELP_FLAG.isSet()) {
         LoggingConfiguration.setVerbose(true);
         logger.verbose(explorer.usage());
       }
@@ -341,20 +345,21 @@ public class KNNExplorer<O extends NumberVector<O,?>> extends AbstractParameteri
     }
     // any other exception
     catch(Exception e) {
-      if (explorer.HELP_FLAG.isSet()) {
+      if(explorer.HELP_FLAG.isSet()) {
         LoggingConfiguration.setVerbose(true);
         logger.verbose(explorer.usage());
       }
       LoggingUtil.exception(e.getMessage(), e);
     }
   }
-  
+
   class ExplorerWindow extends AbstractLoggable {
     /**
-     * Maximum resolution for plotted lines to improve performance for long time series.
+     * Maximum resolution for plotted lines to improve performance for long time
+     * series.
      */
     private static final int MAXRESOLUTION = 1000;
-    
+
     /**
      * SVG graph object ID (for replacing)
      */
@@ -365,10 +370,10 @@ public class KNNExplorer<O extends NumberVector<O,?>> extends AbstractParameteri
 
     // The spinner
     protected JSpinner spinner;
-    
+
     // The list of series
     private JList seriesList = new JList();
-    
+
     // The "Quit" button, to close the application.
     protected JButton quitButton = new JButton("Quit");
 
@@ -380,36 +385,40 @@ public class KNNExplorer<O extends NumberVector<O,?>> extends AbstractParameteri
 
     // The plot
     SVGPlot plot;
-    
+
     // Viewport
     Element viewport;
-    
+
     // Dimensionality
     protected int dim;
-    
+
     // k
     protected int k = 20;
-    
+
     // Scale
     protected LinearScale s;
-    
+
     // The current database
     protected Database<O> db;
-    
+
     // Distance cache
-    protected HashMap<Integer,Double> distancecache = new HashMap<Integer, Double>();
+    protected HashMap<Integer, Double> distancecache = new HashMap<Integer, Double>();
+    
+    // Canvas scaling ratio
+    protected double ratio;
 
     /**
-     * Holds the instance of the distance function specified by {@link #DISTANCE_FUNCTION_PARAM}.
+     * Holds the instance of the distance function specified by
+     * {@link #DISTANCE_FUNCTION_PARAM}.
      */
     private DistanceFunction<O, DoubleDistance> distanceFunction;
-    
+
     public ExplorerWindow() {
       super(false);
-      
+
       // Create a panel and add the button, status label and the SVG canvas.
       final JPanel bigpanel = new JPanel(new BorderLayout());
-      
+
       // set up spinner
       SpinnerModel model = new SpinnerNumberModel(k, 1, 1000, 1);
       spinner = new JSpinner(model);
@@ -421,40 +430,40 @@ public class KNNExplorer<O extends NumberVector<O,?>> extends AbstractParameteri
       JPanel buttonPanel = new JPanel(new BorderLayout());
       buttonPanel.add(BorderLayout.WEST, saveButton);
       buttonPanel.add(BorderLayout.EAST, quitButton);
-      
+
       // set up cell renderer
       seriesList.setCellRenderer(new SeriesLabelRenderer());
-      
+
       JPanel sidepanel = new JPanel(new BorderLayout());
       sidepanel.add(BorderLayout.NORTH, spinnerPanel);
       sidepanel.add(BorderLayout.CENTER, new JScrollPane(seriesList));
       sidepanel.add(BorderLayout.SOUTH, buttonPanel);
-      
+
       bigpanel.add(BorderLayout.WEST, sidepanel);
       bigpanel.add(BorderLayout.CENTER, svgCanvas);
-      
+
       frame.getContentPane().add(bigpanel);
-      
+
       spinner.addChangeListener(new ChangeListener() {
         @Override
         public void stateChanged(@SuppressWarnings("unused") ChangeEvent e) {
-          k = (Integer) (spinner.getValue());    
+          k = (Integer) (spinner.getValue());
           updateSelection();
         }
       });
-      
+
       seriesList.addListSelectionListener(new ListSelectionListener() {
         @Override
         public void valueChanged(ListSelectionEvent e) {
-          if (!e.getValueIsAdjusting()) {
-            updateSelection();          
+          if(!e.getValueIsAdjusting()) {
+            updateSelection();
           }
         }
       });
 
       saveButton.addActionListener(new ActionListener() {
         public void actionPerformed(@SuppressWarnings("unused") ActionEvent ae) {
-          SVGSaveDialog.showSaveDialog(plot,512,512);
+          SVGSaveDialog.showSaveDialog(plot, 512, 512);
         }
       });
 
@@ -472,38 +481,48 @@ public class KNNExplorer<O extends NumberVector<O,?>> extends AbstractParameteri
         }
       });
       // display
-      frame.setSize(600, 600);    
+      frame.setSize(600, 600);
+
+      // resize listener
+      LazyCanvasResizer listener = new LazyCanvasResizer(frame) {
+        @Override
+        public void executeResize(double newratio) {
+          ratio = newratio;
+          updateSize();
+          updateSelection();
+        }
+      };
+      ratio = listener.getActiveRatio();
+      frame.addComponentListener(listener);
     }
     
+    public void updateSize() {
+      SVGUtil.setAtt(plot.getRoot(), SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 "+ratio+" 1");
+      SVGUtil.setAtt(viewport, SVGConstants.SVG_WIDTH_ATTRIBUTE, ratio);
+      SVGUtil.setAtt(viewport, SVGConstants.SVG_HEIGHT_ATTRIBUTE, "1");
+      SVGUtil.setAtt(viewport, SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "-0.05 -0.05 "+(ratio+0.1)+" 1.1");     
+    }
+
     public void run(Database<O> db, DistanceFunction<O, DoubleDistance> distanceFunction) {
       this.db = db;
       this.dim = db.dimensionality();
       this.distanceFunction = distanceFunction;
-      
+
       double min = Double.MAX_VALUE;
       double max = Double.MIN_VALUE;
-      for (Integer objID : db) {
+      for(Integer objID : db) {
         O vec = db.get(objID);
         double[] mm = vec.getRange();
         min = Math.min(min, mm[0]);
         max = Math.max(max, mm[1]);
       }
       this.s = new LinearScale(min, max);
-      
+
       plot = new SVGPlot();
-      plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 1 1");
-      // plotDatabase(ax1, ax2);
       viewport = plot.svgElement(SVGConstants.SVG_SVG_TAG);
-      viewport.setAttribute(SVGConstants.SVG_WIDTH_ATTRIBUTE, "1");
-      viewport.setAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE, "1");
-      viewport.setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "-0.1 -0.1 1.2 1.2");
-      plot.getRoot().appendChild(viewport);
-      
-      Element egroup = plot.svgElement(SVGConstants.SVG_G_TAG);
-      egroup.setAttribute(SVGConstants.SVG_ID_ATTRIBUTE, SERIESID);
-      viewport.appendChild(egroup);
-      plot.putIdElement(SERIESID, egroup);
-      
+      plot.getRoot().appendChild(viewport);      
+      updateSize();
+
       try {
         SVGSimpleLinearAxis.drawAxis(plot, viewport, this.s, 0.0, 1.0, 0.0, 0.0, true, false);
       }
@@ -511,16 +530,22 @@ public class KNNExplorer<O extends NumberVector<O,?>> extends AbstractParameteri
         logger.exception(e);
       }
       plot.updateStyleElement();
-    
+
+      // insert the actual data series.
+      Element egroup = plot.svgElement(SVGConstants.SVG_G_TAG);
+      SVGUtil.setAtt(egroup, SVGConstants.SVG_ID_ATTRIBUTE, SERIESID);
+      viewport.appendChild(egroup);
+      plot.putIdElement(SERIESID, egroup);
+      
       svgCanvas.setDocumentState(AbstractJSVGComponent.ALWAYS_DYNAMIC);
       svgCanvas.setDocument(plot.getDocument());
-    
+
       DefaultListModel m = new DefaultListModel();
-      for (Integer dbid : db) {
+      for(Integer dbid : db) {
         m.addElement(dbid);
       }
       seriesList.setModel(m);
-      
+
       frame.setVisible(true);
     }
 
@@ -528,33 +553,33 @@ public class KNNExplorer<O extends NumberVector<O,?>> extends AbstractParameteri
       Object[] sel = seriesList.getSelectedValues();
       // prepare replacement tag.
       Element newe = plot.svgElement(SVGConstants.SVG_G_TAG);
-      newe.setAttribute(SVGConstants.SVG_ID_ATTRIBUTE, SERIESID);
-      
+      SVGUtil.setAtt(newe, SVGConstants.SVG_ID_ATTRIBUTE, SERIESID);
+
       distancecache.clear();
 
-      for (Object o : sel) {
+      for(Object o : sel) {
         int idx = (Integer) o;
-        
+
         List<DistanceResultPair<DoubleDistance>> knn = db.kNNQueryForID(idx, k, distanceFunction);
 
-        double maxdist = knn.get(knn.size()-1).getDistance().getValue();
+        double maxdist = knn.get(knn.size() - 1).getDistance().getValue();
         // avoid division by zero.
-        if (maxdist == 0) {
+        if(maxdist == 0) {
           maxdist = 1;
         }
 
-        for (ListIterator<DistanceResultPair<DoubleDistance>> iter = knn.listIterator(knn.size()); iter.hasPrevious(); ) {
+        for(ListIterator<DistanceResultPair<DoubleDistance>> iter = knn.listIterator(knn.size()); iter.hasPrevious();) {
           DistanceResultPair<DoubleDistance> pair = iter.previous();
           Element line = plotSeries(pair.getID(), MAXRESOLUTION);
           double dist = pair.getDistance().getValue() / maxdist;
           Color color = getColor(dist);
           String colstr = "#" + Integer.toHexString(color.getRGB()).substring(2);
           String width = (pair.getID() == idx) ? "0.2%" : "0.1%";
-          line.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "stroke: "+colstr+"; stroke-width: "+width+"; fill: none");
+          SVGUtil.setAtt(line, SVGConstants.SVG_STYLE_ATTRIBUTE, "stroke: " + colstr + "; stroke-width: " + width + "; fill: none");
           newe.appendChild(line);
           // put into cache
           Double known = distancecache.get(pair.getID());
-          if (known == null || dist < known) {
+          if(known == null || dist < known) {
             distancecache.put(pair.getID(), dist);
           }
         }
@@ -563,41 +588,41 @@ public class KNNExplorer<O extends NumberVector<O,?>> extends AbstractParameteri
     }
 
     Color getColor(double dist) {
-      Color color = new Color((int)(255 * dist), 0, (int)(255 * (1.0 - dist)));
+      Color color = new Color((int) (255 * dist), 0, (int) (255 * (1.0 - dist)));
       return color;
     }
-    
+
     private Element plotSeries(int idx, int resolution) {
       O series = db.get(idx);
-      
+
       double step = 1.0;
-      if (resolution < dim) {
-        step = (double)dim / (double)resolution;
+      if(resolution < dim) {
+        step = (double) dim / (double) resolution;
       }
-      
+
       StringBuffer path = new StringBuffer();
-      for (double id = 0; id < dim; id += step) {
+      for(double id = 0; id < dim; id += step) {
         int i = (int) Math.floor(id);
-        if (i == 0) {
+        if(i == 0) {
           path.append(SVGConstants.PATH_MOVE);
         }
-        path.append(((double)i) / (dim-1));
+        path.append(ratio * (((double) i) / (dim - 1)));
         path.append(" ");
-        path.append(1.0 - s.getScaled(series.getValue(i+1).doubleValue()));
+        path.append(1.0 - s.getScaled(series.getValue(i + 1).doubleValue()));
         path.append(" ");
-        if (i == 0) {
-          path.append(SVGConstants.PATH_LINE_TO);        
+        if(i == 0) {
+          path.append(SVGConstants.PATH_LINE_TO);
         }
       }
-      //path.append(SVGConstants.PATH_CLOSE);
+      // path.append(SVGConstants.PATH_CLOSE);
       Element p = plot.svgElement(SVGConstants.SVG_PATH_TAG);
       p.setAttribute(SVGConstants.SVG_D_ATTRIBUTE, path.toString());
       return p;
     }
-    
+
     private class SeriesLabelRenderer extends DefaultListCellRenderer {
       /**
-       * Serial version 
+       * Serial version
        */
       private static final long serialVersionUID = 1L;
 
@@ -607,27 +632,27 @@ public class KNNExplorer<O extends NumberVector<O,?>> extends AbstractParameteri
       public SeriesLabelRenderer() {
         super();
       }
-      
+
       @Override
       public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
         String label = null;
-        if (label == null || label == "") {
+        if(label == null || label == "") {
           label = db.getAssociation(AssociationID.LABEL, (Integer) value);
         }
-        if (label == null || label == "") {
+        if(label == null || label == "") {
           label = db.getAssociation(AssociationID.CLASS, (Integer) value).toString();
         }
-        if (label == null || label == "") {
-          label = Integer.toString((Integer)value);
-        }      
-        //setText(label);
+        if(label == null || label == "") {
+          label = Integer.toString((Integer) value);
+        }
+        // setText(label);
         Component renderer = super.getListCellRendererComponent(list, label, index, isSelected, cellHasFocus);
         Double known = distancecache.get(value);
-        if (known != null) {
+        if(known != null) {
           setBackground(getColor(known));
         }
         return renderer;
-      }    
+      }
     }
-  }  
+  }
 }
