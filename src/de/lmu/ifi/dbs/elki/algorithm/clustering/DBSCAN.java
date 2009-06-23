@@ -68,7 +68,7 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
      */
     public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID(
         "dbscan.minpts",
-        " Threshold for minimum number of points in the epsilon-neighborhood of a point."
+        "Threshold for minimum number of points in the epsilon-neighborhood of a point."
     );
 
     /**
