@@ -75,7 +75,25 @@ import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 
-public class DistanceExplorer<O extends NumberVector<O,?>> extends AbstractParameterizable {
+/**
+ * User application to explore the k Nearest Neighbors for a given data set and
+ * distance function. When selecting one or more data entries, the nearest neighbors
+ * each are determined and visualized.
+ * 
+ * Published in
+ * 
+ * Elke Achtert, Thomas Bernecker, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek:
+ * 
+ * ELKI in Time: ELKI 0.2 for the Performance Evaluation of Distance Measures for Time Series.
+ * 
+ * In Proc. 11th International Symposium on Spatial and Temporal Databases (SSTD 2009),
+ * Aalborg, Denmark, 2009.
+ * 
+ * @author Erich Schubert
+ *
+ * @param <O> Object type
+ */
+public class KNNExplorer<O extends NumberVector<O,?>> extends AbstractParameterizable {
   /**
    * The newline string according to system.
    */
@@ -165,7 +183,7 @@ public class DistanceExplorer<O extends NumberVector<O,?>> extends AbstractParam
 
   private OptionHandler helpOptionHandler;
 
-  public DistanceExplorer() {
+  public KNNExplorer() {
     super();
 
     helpOptionHandler = new OptionHandler();
@@ -280,7 +298,6 @@ public class DistanceExplorer<O extends NumberVector<O,?>> extends AbstractParam
 
   public void run() throws IllegalStateException {
     Database<O> db = databaseConnection.getDatabase(normalization);
-    
     (new ExplorerWindow()).run(db, distanceFunction);
   }
 
@@ -292,7 +309,7 @@ public class DistanceExplorer<O extends NumberVector<O,?>> extends AbstractParam
   public static void main(String[] args) {
     LoggingConfiguration.assertConfigured();
     Logging logger = Logging.getLogger(KDDTask.class);
-    DistanceExplorer<DoubleVector> explorer = new DistanceExplorer<DoubleVector>();
+    KNNExplorer<DoubleVector> explorer = new KNNExplorer<DoubleVector>();
     try {
       String[] remainingParameters = explorer.setParameters(args);
       if(remainingParameters.length != 0) {
@@ -344,7 +361,7 @@ public class DistanceExplorer<O extends NumberVector<O,?>> extends AbstractParam
     private static final String SERIESID = "series";
 
     // The frame.
-    protected JFrame frame = new JFrame("ELKI distance function visualization");
+    protected JFrame frame = new JFrame("ELKI k Nearest Neighbors Explorer");
 
     // The spinner
     protected JSpinner spinner;
