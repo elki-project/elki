@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
  * determination (although the default is to use the same value.)</p>
  * 
  * <p>The k nearest neighbors are determined using the parameter
- * {@link DistanceBasedAlgorithm#DISTANCE_FUNCTION_ID), while the reference set used in reachability
+ * {@link DistanceBasedAlgorithm#DISTANCE_FUNCTION_ID}, while the reference set used in reachability
  * distance computation is configured using {@link #REACHABILITY_DISTANCE_FUNCTION_ID}.</p>
  * 
  * <p>The original LOF parameter was called &quot;minPts&quot;. Since kNN queries in ELKI have slightly
