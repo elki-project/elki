@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObjects handled by this Result
  */
-public class SODModel<O extends RealVector<O, Double>> implements TextWriteable, Comparable<SODModel<O>> {
+public class SODModel<O extends RealVector<O, Double>> implements TextWriteable, Comparable<SODModel<?>> {
     private final DimensionsSelectingEuclideanDistanceFunction<O> DISTANCE_FUNCTION = new DimensionsSelectingEuclideanDistanceFunction<O>();
 
     private double[] centerValues;
@@ -117,7 +117,7 @@ public class SODModel<O extends RealVector<O, Double>> implements TextWriteable,
     }
 
     @Override
-    public int compareTo(SODModel<O> o) {
+    public int compareTo(SODModel<?> o) {
       return Double.compare(this.getSod(), o.getSod());
     }
 
