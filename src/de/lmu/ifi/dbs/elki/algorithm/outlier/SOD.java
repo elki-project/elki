@@ -104,7 +104,7 @@ public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends
     }
 
     /**
-     * Performs the PROCLUS algorithm on the given database.
+     * Performs the SOD algorithm on the given database.
      */
     @Override
     protected MultiResult runInTime(Database<V> database) throws IllegalStateException {
