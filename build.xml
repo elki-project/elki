@@ -151,7 +151,7 @@
 		</javac>
 	</target>
 
-	<target name="copy4jar" description="copies all classes and descriptors together" depends="init">
+	<target name="copy4jar" description="copies all classes and descriptors together" depends="recompile">
 		<copy todir="${buildpath}">
 			<fileset dir="bin">
 				<exclude name="**/*.class" />
