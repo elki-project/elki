@@ -103,7 +103,6 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction=\
   de.lmu.ifi.dbs.elki.distance.distancefunction.CosineDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionSelectingDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionsSelectingEuclideanDistanceFunction,\
-  de.lmu.ifi.dbs.elki.distance.distancefunction.DirectSupportDependentItemsetDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.DiSHDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.DiskCacheBasedDoubleDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.DiskCacheBasedFloatDistanceFunction,\
@@ -111,23 +110,17 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction=\
   de.lmu.ifi.dbs.elki.distance.distancefunction.ERiCDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.FileBasedDoubleDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.FileBasedFloatDistanceFunction,\
-# de.lmu.ifi.dbs.elki.distance.distancefunction.FractalDimensionBasedDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.HiSCDistanceFunction,\
 # de.lmu.ifi.dbs.elki.distance.distancefunction.KernelBasedLocallyWeightedDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.ManhattanDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.PCABasedCorrelationDistanceFunction,\
-  de.lmu.ifi.dbs.elki.distance.distancefunction.ReciprocalSupportDependentItemsetDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.RepresentationSelectingDistanceFunction,\
-  de.lmu.ifi.dbs.elki.distance.distancefunction.SharedMaximumDistanceFunction,\
-  de.lmu.ifi.dbs.elki.distance.distancefunction.SharedUnitedDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.SimilarityAdapterArccos,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.SimilarityAdapterLn,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.SimilarityAdapterLinear,\
-  de.lmu.ifi.dbs.elki.distance.distancefunction.SquareRootSupportLengthDependentItemsetDistanceFunction,\
 # de.lmu.ifi.dbs.elki.distance.distancefunction.SubspaceDistanceFunction,\
-  de.lmu.ifi.dbs.elki.distance.distancefunction.SupportLengthDependentItemsetDistanceFunction,\
 # de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries.DTWDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries.EDRDistanceFunction,\
