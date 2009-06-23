@@ -114,7 +114,7 @@ public class SparseFloatVector extends RealVector<SparseFloatVector, Float> {
 
   /**
    * 
-   * @see de.lmu.ifi.dbs.elki.data.FeatureVector#newInstance(N[])
+   * @see de.lmu.ifi.dbs.elki.data.FeatureVector#newInstance(Number[])
    */
   public SparseFloatVector newInstance(Float[] values) {
     return new SparseFloatVector(Util.unboxToFloat(values));

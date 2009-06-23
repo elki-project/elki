@@ -302,11 +302,7 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
   }
 
   /**
-   * Calls the super method and sets additionally the value of the parameter
-   * {@link #KCOMP_PARAM} and instantiates {@link #referenceDistanceFunction}
-   * according to the value of parameter
-   * {@link #REFERENCE_DISTANCE_FUNCTION_PARAM}. The remaining parameters are
-   * passed to the {@link #referenceDistanceFunction}.
+   * Setup algorithm parameters.
    */
   @Override
   public String[] setParameters(String[] args) throws ParameterException {

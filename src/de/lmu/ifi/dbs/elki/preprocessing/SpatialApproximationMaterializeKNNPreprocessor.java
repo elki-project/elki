@@ -116,7 +116,7 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
 
   /**
    * Do some (limited) type checking, then cast the database into a spatial database.
-   * @param Database
+   * @param database Database
    * @return Spatial database.
    * @throws IllegalStateException when the cast fails.
    */

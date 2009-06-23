@@ -17,6 +17,9 @@ and their development.</p>
 <code>java -jar elki.jar -h</code>.
 You may find some older <a href="../archive">executable versions</a> in our archive.</p>
 
+<p>The {@link de.lmu.ifi.dbs.elki.visualization.KNNExplorer KNNExplorer} application is
+explained on its own page.</p>
+
 <h3>Development of new applications</h3>
 
 <h4>Extension</h4>
@@ -34,9 +37,9 @@ to use, a {@link de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection Data
 to manage the input,
 and a {@link de.lmu.ifi.dbs.elki.result.ResultHandler ResultHandler} for output.</p>
 
-<p>The default is to read an input file (given by the <tt>-dbc.in</tt> option) via
+<p>The default is to read an input file (given by the <code>-dbc.in</code> option) via
 {@link de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection FileBasedDatabaseConnection}
-and output the resulting data to standard output (or a directory given by <tt>-out</tt>) via
+and output the resulting data to standard output (or a directory given by <code>-out</code>) via
 {@link de.lmu.ifi.dbs.elki.result.ResultWriter ResultWriter}.
 </p>
 

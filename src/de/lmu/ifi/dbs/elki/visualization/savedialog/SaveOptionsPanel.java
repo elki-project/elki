@@ -108,8 +108,8 @@ public class SaveOptionsPanel extends JPanel {
    * Construct a new Save Options Panel.
    * 
    * @param fc File chooser to display in
-   * @param width Default image width
-   * @param height Default image height
+   * @param w Default image width
+   * @param h Default image height
    */
   public SaveOptionsPanel(JFileChooser fc, int w, int h) {
     this.width = w;

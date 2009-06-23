@@ -82,16 +82,26 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * distance function. When selecting one or more data entries, the nearest
  * neighbors each are determined and visualized.
  * 
- * Published in
+ * <p>Reference:<br/>
  * 
  * Elke Achtert, Thomas Bernecker, Hans-Peter Kriegel, Erich Schubert, Arthur
- * Zimek:
+ * Zimek:<br/>
  * 
  * ELKI in Time: ELKI 0.2 for the Performance Evaluation of Distance Measures
- * for Time Series.
+ * for Time Series.<br/>
  * 
  * In Proc. 11th International Symposium on Spatial and Temporal Databases (SSTD
- * 2009), Aalborg, Denmark, 2009.
+ * 2009), Aalborg, Denmark, 2009.</p>
+ * 
+ * <h3>Usage example:</h3>
+ * 
+ * <p>Main invocation:<br/>
+ * 
+ * <code>java -cp elki.jar de.lmu.ifi.dbs.elki.visualization.KNNExplorer</code></p>
+ * 
+ * <p>The application supports the usual parametrization, in particular parameters
+ * <code>-dbc.in</code> and <code>-explorer.distancefunction</code> to select an input file
+ * and the distance function to explore.</p>
  * 
  * @author Erich Schubert
  * 
@@ -160,7 +170,7 @@ public class KNNExplorer<O extends NumberVector<O, ?>> extends AbstractParameter
    * between database objects, must extend
    * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction}.
    * <p>
-   * Key: {@code -algorithm.distancefunction}
+   * Key: {@code -explorer.distancefunction}
    * </p>
    * <p>
    * Default value:

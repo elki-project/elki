@@ -128,7 +128,7 @@ public class ComputeROCCurve<O extends DatabaseObject> extends AbstractAlgorithm
    * 
    * @param database Database to search in
    * @param class_name Cluster name
-   * @return
+   * @return found cluster or it throws an exception.
    */
   private Cluster<Model> getReferenceCluster(Database<O> database, String class_name) {
     ByLabelHierarchicalClustering<O> reference = new ByLabelHierarchicalClustering<O>();
