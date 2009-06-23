@@ -1,32 +1,30 @@
-package de.lmu.ifi.dbs.elki.distance.distancefunction;
+package de.lmu.ifi.dbs.elki.distance.distancefunction.external;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.elki.distance.FloatDistance;
-import de.lmu.ifi.dbs.elki.parser.DistanceParser;
-import de.lmu.ifi.dbs.elki.parser.DistanceParsingResult;
-import de.lmu.ifi.dbs.elki.parser.NumberDistanceParser;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
+import de.lmu.ifi.dbs.elki.utilities.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
- * Provides a DistanceFunction that is based on float distances given by a
+ * Provides a DistanceFunction that is based on double distances given by a
  * distance matrix of an external file.
  * 
- * @author Elke Achtert
+ * @author Erich Schubert
  * @param <V> object type
  */
-public class FileBasedFloatDistanceFunction<V extends DatabaseObject> extends AbstractFloatDistanceFunction<V> {
+public class DiskCacheBasedDoubleDistanceFunction<V extends DatabaseObject> extends AbstractDoubleDistanceFunction<V> {
+  /**
+   * Magic to identify double cache matrices
+   */
+  public static final int DOUBLE_CACHE_MAGIC = 50902811;
 
   /**
    * OptionID for {@link #MATRIX_PARAM}
@@ -42,31 +40,18 @@ public class FileBasedFloatDistanceFunction<V extends DatabaseObject> extends Ab
   private final FileParameter MATRIX_PARAM = new FileParameter(MATRIX_ID, FileParameter.FileType.INPUT_FILE);
 
   /**
-   * OptionID for {@link #PARSER_PARAM}
+   * Storage required for a double value.
    */
-  public static final OptionID PARSER_ID = OptionID.getOrCreateOptionID("distance.parser", "Parser used to load the distance matrix.");
-
-  /**
-   * Optional parameter to specify the parsers to provide a database, must
-   * extend {@link DistanceParser}. If this parameter is not set,
-   * {@link NumberDistanceParser} is used as parser for all input files.
-   * <p>
-   * Key: {@code -distance.parser}
-   * </p>
-   */
-  private final ClassParameter<DistanceParser<V, FloatDistance>> PARSER_PARAM = new ClassParameter<DistanceParser<V, FloatDistance>>(PARSER_ID, DistanceParser.class, NumberDistanceParser.class.getName());
-
-  private DistanceParser<V, FloatDistance> parser = null;
-
-  private Map<Pair<Integer, Integer>, FloatDistance> cache = null;
+  private static final int DOUBLE_SIZE = 8;
+  
+  private OnDiskUpperTriangleMatrix cache = null;
   
   /**
-   * Constructor
+   * Default constructor.
    */
-  public FileBasedFloatDistanceFunction() {
+  public DiskCacheBasedDoubleDistanceFunction() {
     super();
     addOption(MATRIX_PARAM);
-    addOption(PARSER_PARAM);
   }
 
   /**
@@ -78,7 +63,7 @@ public class FileBasedFloatDistanceFunction<V extends DatabaseObject> extends Ab
    * @return the distance between two given DatabaseObject according to this
    *         distance function
    */
-  public FloatDistance distance(V o1, V o2) {
+  public DoubleDistance distance(V o1, V o2) {
     return distance(o1.getID(), o2.getID());
   }
 
@@ -90,7 +75,7 @@ public class FileBasedFloatDistanceFunction<V extends DatabaseObject> extends Ab
    * @return the distance between the two objects specified by their objects ids
    */
   @Override
-  public FloatDistance distance(Integer id1, V o2) {
+  public DoubleDistance distance(Integer id1, V o2) {
     return distance(id1, o2.getID());
   }
 
@@ -105,7 +90,7 @@ public class FileBasedFloatDistanceFunction<V extends DatabaseObject> extends Ab
    * @return the distance between the two objects specified by their objects ids
    */
   @Override
-  public FloatDistance distance(Integer id1, Integer id2) {
+  public DoubleDistance distance(Integer id1, Integer id2) {
     if (id1 == null) {
       return undefinedDistance();
     }
@@ -117,33 +102,25 @@ public class FileBasedFloatDistanceFunction<V extends DatabaseObject> extends Ab
       return distance(id2, id1);
     }
 
-    return cache.get(new Pair<Integer, Integer>(id1, id2));
+    double distance;
+    try {
+      byte[] data = cache.readRecord(id1, id2);
+      distance = ByteArrayUtil.readDouble(data,0);
+    }
+    catch(IOException e) {
+      throw new RuntimeException("Read error when loading distance "+id1+","+id2+" from cache file.", e);
+    }
+    return new DoubleDistance(distance);
   }
   
-  /**
-   * Returns a description of the class and the required parameters. This
-   * description should be suitable for a usage description.
-   * 
-   * @return String a description of the class and the required parameters
-   */
-  @Override
-  public String shortDescription() {
-    return "File based float distance for database objects. No parameters required. " + "Pattern for defining a range: \"" + requiredInputPattern() + "\".\n";
-  }
-
   @Override
   public String[] setParameters(String[] args) throws ParameterException {
     String[] remainingParameters = super.setParameters(args);
     
     File matrixfile = MATRIX_PARAM.getValue();
 
-    // database
-    parser = PARSER_PARAM.instantiateClass();
-    addParameterizable(parser);
-    remainingParameters = parser.setParameters(remainingParameters);
-    
     try {
-      loadCache(matrixfile);
+      cache = new OnDiskUpperTriangleMatrix(matrixfile,DOUBLE_CACHE_MAGIC,0,DOUBLE_SIZE,false);
     }
     catch(IOException e) {
       throw new WrongParameterValueException(MATRIX_PARAM, matrixfile.toString(), e);      
@@ -151,11 +128,5 @@ public class FileBasedFloatDistanceFunction<V extends DatabaseObject> extends Ab
 
     rememberParametersExcept(args, remainingParameters);
     return remainingParameters;
-  }
-
-  private void loadCache(File matrixfile) throws IOException {
-    InputStream in = FileBasedDatabaseConnection.tryGzipInput(new FileInputStream(matrixfile));
-    DistanceParsingResult<V, FloatDistance> res = parser.parse(in);
-    cache = res.getDistanceCache();
   }
 }
