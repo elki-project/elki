@@ -15,14 +15,16 @@ to a location reachable from your console as <code>mydata/exampledata.txt</code>
 </p>
 
 <h2>Example: DBSCAN</h2>
-<p>Basic Call:
+<h3>Basic Call:</h3>
+<p>
 <pre>
 java -jar mypath/elki.jar -algorithm clustering.DBSCAN -dbc.in mydata/exampledata.txt -dbscan.epsilon 20 -dbscan.minpts 10
 </pre>
 This requests the algorithm DBSCAN to cluster the data set using DBSCAN parameters <code>epsilon=20</code> and <code>minpts=10</code>. The clustering result is just printed to the console.
 </p>
 
-<p>Call with specified output file/directory:
+<h3>Call with specified output file/directory:</h3>
+<p>
 <pre>
 java -jar mypath/elki.jar -algorithm clustering.DBSCAN -dbc.in mydata/exampledata.txt -dbscan.epsilon 20 -dbscan.minpts 10 -out myresults/DBSCANeps20min10
 </pre>
@@ -78,7 +80,91 @@ For example, in this case, the file for cluster 1 starts like:
 # Model class: de.lmu.ifi.dbs.elki.data.model.ClusterModel
 ###############################################################
 </pre>
+<p>Most of the parameters shown here are set implicitly with default values or not used
+(default <code>false</code> or <code>null</code>).
+For example, it is possible to additionally request verbose messages during the computation
+by setting the flag <code>-verbose</code>
+or to request the time used by the core computations by setting the flag <code>-time</code>.
+This is possible for all algorithms.
 </p>
 
+<p>Unused was also the possibility of normalizing the data. Via the option <code>-norm</code>,
+a normalization procedure can be performed prior to the analysis performed by the algorithm.
+As option value, a class is expected. ELKI provides the
+<a href="de/lmu/ifi/dbs/elki/normalization/AttributeWiseRealVectorNormalization.html">AttributeWiseRealVectorNormalization</a> as a possibility.
+Other normalization procedures could easily be provided by any user by implementing the interface
+<a href="de/lmu/ifi/dbs/elki/normalization/Normalization.html">de.lmu.ifi.dbs.elki.normalization.Normalization</a>.
+Setting the flag <code>-normUndo</code> will revert the normalization before writing the result,
+otherwise, the resulting files will list the normalized data vectors.
+</p>
+
+<h3>Example call requesting time and verbose messages and using a normalization:</h3>
+<p>
+<pre>
+java -jar mypath/elki.jar -algorithm clustering.DBSCAN -dbc.in mydata/exampledata.txt -dbscan.epsilon 0.02 -dbscan.minpts 10 -out myresults/DBSCANeps20min10 -verbose -time -norm AttributeWiseRealVectorNormalization -normUndo
+</pre>
+Note that the value for <code>dbscan.epsilon</code> is decreased considerably to suit the normalized data
+(the AttributeWiseRealVectorNormalization normalizes all attribute values to the range <code>[0:1]</code>).
+</p>
+
+<h2>Different algorithms</h2>
+To become acquainted with an unknown algorithm, try the option <code>-description</code>. For example, here, we request a description of how to use
+the algorithm <a href="de/lmu/ifi/dbs/elki/algorithm/clustering/correlation/FourC.html">clustering.correlation.FourC</a>:
+<pre>
+java -jar mypath/elki.jar -description de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.FourC
+</pre>
+The output describes the general parameters for any KDDTask and additionally the parameters required for FourC.</p>
+
+<p>Note that we here gave the full name of the class <code>FourC</code> (i.e., including the complete package name),
+while we ommitted the prefix <code>de.lmu.ifi.dbs.elki.algorithm.</code> for <code>clustering.DBSCAN</code> above.
+The reason for this difference is as follows:</p>
+<p>If as a parameter value a class name is expected, usually also a restriction class is known,
+i.e., an interface or a class which must be implemented or extended by the specified parameter value.
+For example, the restriction class for the parameter value of <code>-description</code> is
+<a href="de/lmu/ifi/dbs/elki/utilities/optionhandling/Parameterizable">de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable</a>,
+the restriction class for the parameter value of <code>-agorithm</code> is
+<a href="de/lmu/ifi/dbs/elki/algorithm/Algorithm.html">de.lmu.ifi.dbs.elki.algorithm.Algorithm</a>.
+If the specified class cannot be initialized by the given name, the initialization tries the same class name using as prefix the
+package of the restriction class. Thus, the value <code>clustering.DBSCAN</code> (which is not a valid class name per se)
+will be automatically completed with the prefix
+<code>de.lmu.ifi.dbs.elki.algorithm.</code>, the corresponding incomplete value <code>clustering.correlation.FourC</code>,
+however, would be automatically completed with the prefix
+<code>de.lmu.ifi.dbs.elki.utilities.optionhandling.</code>, which does not result in a valid class name. Hence, here, we are
+to specify the complete class name in the first place.</p>
+<p>On the other hand, would we like to use FourC as algorithm, as parameter value for <code>-algorithm</code> the specification
+<code>clustering.correlation.FourC</code> would suffice.
+</p>
+<p>The restriction class and already available implementations (suitable as possible values for the parameter)
+are listed in the parameter description. See, e.g., the description of <code>-algorithm</code> (as provided after using <code>-description</code> as above or using <code>-help</code>):
+<!-- TODO : insert current state of release -->
+<pre>
+-algorithm <class>
+   Algorithm to run.
+   Implementing de.lmu.ifi.dbs.elki.algorithm.Algorithm
+   Known classes (default package de.lmu.ifi.dbs.elki.algorithm.):
+   -> APRIORI
+   -> DependencyDerivator
+   -> KNNDistanceOrder
+   -> KNNJoin
+   -> clustering.DBSCAN
+   -> clustering.DeLiClu
+   -> clustering.EM
+   -> clustering.KMeans
+   -> clustering.OPTICS
+   -> clustering.SLINK
+   -> clustering.SNNClustering
+   -> clustering.ByLabelClustering
+   -> clustering.TrivialAllInOne
+   -> clustering.TrivialAllNoise
+   -> clustering.correlation.CASH
+   -> clustering.correlation.COPAC
+   -> clustering.correlation.ERiC
+   -> clustering.correlation.FourC
+   -> clustering.correlation.ORCLUS
+   -> clustering.subspace.CLIQUE
+   -> clustering.subspace.DiSH
+   -> clustering.subspace.PreDeCon
+   -> clustering.subspace.PROCLUS
+</pre>
 </body>
 </html>
