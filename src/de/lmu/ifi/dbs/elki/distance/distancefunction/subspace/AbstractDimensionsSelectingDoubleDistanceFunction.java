@@ -1,9 +1,10 @@
-package de.lmu.ifi.dbs.elki.distance.distancefunction;
+package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 
 import java.util.BitSet;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;

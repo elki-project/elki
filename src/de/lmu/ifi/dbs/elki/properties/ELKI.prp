@@ -101,26 +101,26 @@ de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection=\
 de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction=\
   de.lmu.ifi.dbs.elki.distance.distancefunction.ArcCosineDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.CosineDistanceFunction,\
-  de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionSelectingDistanceFunction,\
-  de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionsSelectingEuclideanDistanceFunction,\
-  de.lmu.ifi.dbs.elki.distance.distancefunction.DiSHDistanceFunction,\
-  de.lmu.ifi.dbs.elki.distance.distancefunction.DiskCacheBasedDoubleDistanceFunction,\
-  de.lmu.ifi.dbs.elki.distance.distancefunction.DiskCacheBasedFloatDistanceFunction,\
+  de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionSelectingDistanceFunction,\
+  de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction,\
+  de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DiSHDistanceFunction,\
+  de.lmu.ifi.dbs.elki.distance.distancefunction.external.DiskCacheBasedDoubleDistanceFunction,\
+  de.lmu.ifi.dbs.elki.distance.distancefunction.external.DiskCacheBasedFloatDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction,\
-  de.lmu.ifi.dbs.elki.distance.distancefunction.ERiCDistanceFunction,\
-  de.lmu.ifi.dbs.elki.distance.distancefunction.FileBasedDoubleDistanceFunction,\
-  de.lmu.ifi.dbs.elki.distance.distancefunction.FileBasedFloatDistanceFunction,\
-  de.lmu.ifi.dbs.elki.distance.distancefunction.HiSCDistanceFunction,\
+  de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.ERiCDistanceFunction,\
+  de.lmu.ifi.dbs.elki.distance.distancefunction.external.FileBasedDoubleDistanceFunction,\
+  de.lmu.ifi.dbs.elki.distance.distancefunction.external.FileBasedFloatDistanceFunction,\
+  de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.HiSCDistanceFunction,\
 # de.lmu.ifi.dbs.elki.distance.distancefunction.KernelBasedLocallyWeightedDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.ManhattanDistanceFunction,\
-  de.lmu.ifi.dbs.elki.distance.distancefunction.PCABasedCorrelationDistanceFunction,\
+  de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.PCABasedCorrelationDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.RepresentationSelectingDistanceFunction,\
-  de.lmu.ifi.dbs.elki.distance.distancefunction.SimilarityAdapterArccos,\
-  de.lmu.ifi.dbs.elki.distance.distancefunction.SimilarityAdapterLn,\
-  de.lmu.ifi.dbs.elki.distance.distancefunction.SimilarityAdapterLinear,\
-# de.lmu.ifi.dbs.elki.distance.distancefunction.SubspaceDistanceFunction,\
+  de.lmu.ifi.dbs.elki.distance.distancefunction.adapter.SimilarityAdapterArccos,\
+  de.lmu.ifi.dbs.elki.distance.distancefunction.adapter.SimilarityAdapterLn,\
+  de.lmu.ifi.dbs.elki.distance.distancefunction.adapter.SimilarityAdapterLinear,\
+# de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceDistanceFunction,\
 # de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries.DTWDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries.EDRDistanceFunction,\
@@ -133,8 +133,8 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction=\
 # #######################################################
 # spatial distance functions - default package: de.lmu.ifi.dbs.elki.index.tree.spatial
 de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction=\
-  de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionSelectingDistanceFunction,\
-  de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionsSelectingEuclideanDistanceFunction,\
+  de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionSelectingDistanceFunction,\
+  de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction,\
   de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction,\
 # #######################################################
@@ -168,8 +168,8 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractLocallyWeightedDistanceFun
   de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction,\
 # #######################################################
 # dimensions selecting distance functions - default package: de.lmu.ifi.dbs.elki.distance.distancefunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDimensionsSelectingDoubleDistanceFunction=\
-  de.lmu.ifi.dbs.elki.distance.distancefunction.DimensionsSelectingEuclideanDistanceFunction,\
+de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.AbstractDimensionsSelectingDoubleDistanceFunction=\
+  de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction,\
 # #######################################################
 # MetricalIndex - default package: de.lmu.ifi.dbs.elki.index.tree.metrical
 de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndex=\

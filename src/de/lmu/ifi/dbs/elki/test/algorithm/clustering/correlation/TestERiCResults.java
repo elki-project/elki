@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.data.model.CorrelationModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.ERiCDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.ERiCDistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;

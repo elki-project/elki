@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.distance.distancefunction;
+package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
 
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;

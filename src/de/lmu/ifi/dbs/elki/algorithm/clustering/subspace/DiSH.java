@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.AxesModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.PreferenceVectorBasedCorrelationDistance;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DiSHDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DiSHDistanceFunction;
 import de.lmu.ifi.dbs.elki.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;

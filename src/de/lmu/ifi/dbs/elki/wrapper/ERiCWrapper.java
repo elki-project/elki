@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.COPAC;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.ERiC;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.ERiCDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.ERiCDistanceFunction;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;

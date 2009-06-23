@@ -1,7 +1,8 @@
-package de.lmu.ifi.dbs.elki.distance.distancefunction;
+package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;

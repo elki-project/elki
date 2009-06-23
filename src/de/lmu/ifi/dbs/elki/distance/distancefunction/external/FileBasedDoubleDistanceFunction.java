@@ -1,29 +1,35 @@
-package de.lmu.ifi.dbs.elki.distance.distancefunction;
+package de.lmu.ifi.dbs.elki.distance.distancefunction.external;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collection;
+import java.util.Map;
+import java.util.TreeSet;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
-import de.lmu.ifi.dbs.elki.utilities.ByteArrayUtil;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.parser.DistanceParser;
+import de.lmu.ifi.dbs.elki.parser.DistanceParsingResult;
+import de.lmu.ifi.dbs.elki.parser.NumberDistanceParser;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Provides a DistanceFunction that is based on double distances given by a
  * distance matrix of an external file.
  * 
- * @author Erich Schubert
- * @param <V> object type
+ * @author Elke Achtert
+ * @param <V> Vector type
  */
-public class DiskCacheBasedDoubleDistanceFunction<V extends DatabaseObject> extends AbstractDoubleDistanceFunction<V> {
-  /**
-   * Magic to identify double cache matrices
-   */
-  public static final int DOUBLE_CACHE_MAGIC = 50902811;
+public class FileBasedDoubleDistanceFunction<V extends DatabaseObject> extends AbstractDoubleDistanceFunction<V> {
 
   /**
    * OptionID for {@link #MATRIX_PARAM}
@@ -39,18 +45,31 @@ public class DiskCacheBasedDoubleDistanceFunction<V extends DatabaseObject> exte
   private final FileParameter MATRIX_PARAM = new FileParameter(MATRIX_ID, FileParameter.FileType.INPUT_FILE);
 
   /**
-   * Storage required for a double value.
+   * OptionID for {@link #PARSER_PARAM}
    */
-  private static final int DOUBLE_SIZE = 8;
-  
-  private OnDiskUpperTriangleMatrix cache = null;
+  public static final OptionID PARSER_ID = OptionID.getOrCreateOptionID("distance.parser", "Parser used to load the distance matrix.");
+
+  /**
+   * Optional parameter to specify the parsers to provide a database, must
+   * extend {@link DistanceParser}. If this parameter is not set,
+   * {@link NumberDistanceParser} is used as parser for all input files.
+   * <p>
+   * Key: {@code -distance.parser}
+   * </p>
+   */
+  private final ClassParameter<DistanceParser<V, DoubleDistance>> PARSER_PARAM = new ClassParameter<DistanceParser<V, DoubleDistance>>(PARSER_ID, DistanceParser.class, NumberDistanceParser.class.getName());
+
+  private DistanceParser<V, DoubleDistance> parser = null;
+
+  private Map<Pair<Integer, Integer>, DoubleDistance> cache = null;
   
   /**
-   * Default constructor.
+   * Constructor
    */
-  public DiskCacheBasedDoubleDistanceFunction() {
+  public FileBasedDoubleDistanceFunction() {
     super();
     addOption(MATRIX_PARAM);
+    addOption(PARSER_PARAM);
   }
 
   /**
@@ -101,15 +120,7 @@ public class DiskCacheBasedDoubleDistanceFunction<V extends DatabaseObject> exte
       return distance(id2, id1);
     }
 
-    double distance;
-    try {
-      byte[] data = cache.readRecord(id1, id2);
-      distance = ByteArrayUtil.readDouble(data,0);
-    }
-    catch(IOException e) {
-      throw new RuntimeException("Read error when loading distance "+id1+","+id2+" from cache file.", e);
-    }
-    return new DoubleDistance(distance);
+    return cache.get(new Pair<Integer, Integer>(id1, id2));
   }
   
   @Override
@@ -118,8 +129,13 @@ public class DiskCacheBasedDoubleDistanceFunction<V extends DatabaseObject> exte
     
     File matrixfile = MATRIX_PARAM.getValue();
 
+    // database
+    parser = PARSER_PARAM.instantiateClass();
+    addParameterizable(parser);
+    remainingParameters = parser.setParameters(remainingParameters);
+    
     try {
-      cache = new OnDiskUpperTriangleMatrix(matrixfile,DOUBLE_CACHE_MAGIC,0,DOUBLE_SIZE,false);
+      loadCache(matrixfile);
     }
     catch(IOException e) {
       throw new WrongParameterValueException(MATRIX_PARAM, matrixfile.toString(), e);      
@@ -127,5 +143,25 @@ public class DiskCacheBasedDoubleDistanceFunction<V extends DatabaseObject> exte
 
     rememberParametersExcept(args, remainingParameters);
     return remainingParameters;
+  }
+
+  private void loadCache(File matrixfile) throws IOException {
+    InputStream in = FileBasedDatabaseConnection.tryGzipInput(new FileInputStream(matrixfile));
+    DistanceParsingResult<V, DoubleDistance> res = parser.parse(in);
+    cache = res.getDistanceCache();
+  }
+  
+  /**
+   * Return a collection of all IDs in the cache.
+   * 
+   * @return Collection of all IDs in the cache.
+   */
+  public Collection<Integer> getIDs() {
+    TreeSet<Integer> ids = new TreeSet<Integer>();
+    for (Pair<Integer, Integer> pair : cache.keySet()) {
+      ids.add(pair.first);
+      ids.add(pair.second);
+    }
+    return ids;
   }
 }

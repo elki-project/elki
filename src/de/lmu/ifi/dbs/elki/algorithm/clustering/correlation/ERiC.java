@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.elki.data.model.DimensionModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.BitDistance;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.ERiCDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.ERiCDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;

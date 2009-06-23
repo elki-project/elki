@@ -1,7 +1,8 @@
-package de.lmu.ifi.dbs.elki.distance.distancefunction;
+package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
 
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.distance.CorrelationDistance;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
 
 import java.util.regex.Pattern;
