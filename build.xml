@@ -144,6 +144,7 @@
 			<exclude name="*.xsd" />
 			<exclude name="**/zelki/**" />
 			<exclude name="**/test/**"/>
+			<exclude name="**/experimentalcode/noemi/**"/>
 			<exclude name="**/experimentalcode/tobias/**"/>
 			<exclude name="**/experimentalcode/simon/tests/**"/>
 			<src path="${source}" />
