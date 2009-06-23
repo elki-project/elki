@@ -118,7 +118,7 @@ public class InspectionUtil {
     /**
      * Constructor from Jar file.
      * 
-     * @param jarentries Jar file entries to iterate over.
+     * @param path Jar file entries to iterate over.
      */
     public JarClassIterator(String path) {
       try {
