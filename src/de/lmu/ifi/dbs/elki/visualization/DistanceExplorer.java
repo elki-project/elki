@@ -9,6 +9,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -338,7 +339,7 @@ public class DistanceExplorer<O extends NumberVector<O,?>> extends AbstractParam
     private static final int MAXRESOLUTION = 1000;
     
     /**
-     * SVG Object ID prefix
+     * SVG graph object ID (for replacing)
      */
     private static final String SERIESID = "series";
 
@@ -376,7 +377,10 @@ public class DistanceExplorer<O extends NumberVector<O,?>> extends AbstractParam
     protected LinearScale s;
     
     // The current database
-    protected Database<O> db;    
+    protected Database<O> db;
+    
+    // Distance cache
+    protected HashMap<Integer,Double> distancecache = new HashMap<Integer, Double>();
 
     /**
      * Holds the instance of the distance function specified by {@link #DISTANCE_FUNCTION_PARAM}.
@@ -452,13 +456,64 @@ public class DistanceExplorer<O extends NumberVector<O,?>> extends AbstractParam
       });
       // display
       frame.setSize(600, 600);    
-    }    
+    }
     
+    public void run(Database<O> db, DistanceFunction<O, DoubleDistance> distanceFunction) {
+      this.db = db;
+      this.dim = db.dimensionality();
+      this.distanceFunction = distanceFunction;
+      
+      double min = Double.MAX_VALUE;
+      double max = Double.MIN_VALUE;
+      for (Integer objID : db) {
+        O vec = db.get(objID);
+        double[] mm = vec.getRange();
+        min = Math.min(min, mm[0]);
+        max = Math.max(max, mm[1]);
+      }
+      this.s = new LinearScale(min, max);
+      
+      plot = new SVGPlot();
+      plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 1 1");
+      // plotDatabase(ax1, ax2);
+      viewport = plot.svgElement(SVGConstants.SVG_SVG_TAG);
+      viewport.setAttribute(SVGConstants.SVG_WIDTH_ATTRIBUTE, "1");
+      viewport.setAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE, "1");
+      viewport.setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "-0.1 -0.1 1.2 1.2");
+      plot.getRoot().appendChild(viewport);
+      
+      Element egroup = plot.svgElement(SVGConstants.SVG_G_TAG);
+      egroup.setAttribute(SVGConstants.SVG_ID_ATTRIBUTE, SERIESID);
+      viewport.appendChild(egroup);
+      plot.putIdElement(SERIESID, egroup);
+      
+      try {
+        SVGSimpleLinearAxis.drawAxis(plot, viewport, this.s, 0.0, 1.0, 0.0, 0.0, true, false);
+      }
+      catch(CSSNamingConflict e) {
+        logger.exception(e);
+      }
+      plot.updateStyleElement();
+    
+      svgCanvas.setDocumentState(AbstractJSVGComponent.ALWAYS_DYNAMIC);
+      svgCanvas.setDocument(plot.getDocument());
+    
+      DefaultListModel m = new DefaultListModel();
+      for (Integer dbid : db) {
+        m.addElement(dbid);
+      }
+      seriesList.setModel(m);
+      
+      frame.setVisible(true);
+    }
+
     protected void updateSelection() {
       Object[] sel = seriesList.getSelectedValues();
       // prepare replacement tag.
       Element newe = plot.svgElement(SVGConstants.SVG_G_TAG);
       newe.setAttribute(SVGConstants.SVG_ID_ATTRIBUTE, SERIESID);
+      
+      distancecache.clear();
 
       for (Object o : sel) {
         int idx = (Integer) o;
@@ -475,14 +530,24 @@ public class DistanceExplorer<O extends NumberVector<O,?>> extends AbstractParam
           DistanceResultPair<DoubleDistance> pair = iter.previous();
           Element line = plotSeries(pair.getID(), MAXRESOLUTION);
           double dist = pair.getDistance().getValue() / maxdist;
-          Color color = new Color((int)(255 * dist), 0, (int)(255 * (1.0 - dist)));
+          Color color = getColor(dist);
           String colstr = "#" + Integer.toHexString(color.getRGB()).substring(2);
           String width = (pair.getID() == idx) ? "0.2%" : "0.1%";
           line.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "stroke: "+colstr+"; stroke-width: "+width+"; fill: none");
           newe.appendChild(line);
+          // put into cache
+          Double known = distancecache.get(pair.getID());
+          if (known == null || dist < known) {
+            distancecache.put(pair.getID(), dist);
+          }
         }
       }
       new NodeReplacer(newe, plot, SERIESID).hook(svgCanvas);
+    }
+
+    Color getColor(double dist) {
+      Color color = new Color((int)(255 * dist), 0, (int)(255 * (1.0 - dist)));
+      return color;
     }
     
     private Element plotSeries(int idx, int resolution) {
@@ -539,57 +604,13 @@ public class DistanceExplorer<O extends NumberVector<O,?>> extends AbstractParam
           label = Integer.toString((Integer)value);
         }      
         //setText(label);
-        return super.getListCellRendererComponent(list, label, index, isSelected, cellHasFocus);
+        Component renderer = super.getListCellRendererComponent(list, label, index, isSelected, cellHasFocus);
+        Double known = distancecache.get(value);
+        if (known != null) {
+          setBackground(getColor(known));
+        }
+        return renderer;
       }    
-    }
-    
-    public void run(Database<O> db, DistanceFunction<O, DoubleDistance> distanceFunction) {
-      this.db = db;
-      this.dim = db.dimensionality();
-      this.distanceFunction = distanceFunction;
-      
-      double min = Double.MAX_VALUE;
-      double max = Double.MIN_VALUE;
-      for (Integer objID : db) {
-        O vec = db.get(objID);
-        double[] mm = vec.getRange();
-        min = Math.min(min, mm[0]);
-        max = Math.max(max, mm[1]);
-      }
-      this.s = new LinearScale(min, max);
-      
-      plot = new SVGPlot();
-      plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 1 1");
-      // plotDatabase(ax1, ax2);
-      viewport = plot.svgElement(SVGConstants.SVG_SVG_TAG);
-      viewport.setAttribute(SVGConstants.SVG_WIDTH_ATTRIBUTE, "1");
-      viewport.setAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE, "1");
-      viewport.setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "-0.1 -0.1 1.2 1.2");
-      plot.getRoot().appendChild(viewport);
-      
-      Element egroup = plot.svgElement(SVGConstants.SVG_G_TAG);
-      egroup.setAttribute(SVGConstants.SVG_ID_ATTRIBUTE, SERIESID);
-      viewport.appendChild(egroup);
-      plot.putIdElement(SERIESID, egroup);
-      
-      try {
-        SVGSimpleLinearAxis.drawAxis(plot, viewport, this.s, 0.0, 1.0, 0.0, 0.0, true, false);
-      }
-      catch(CSSNamingConflict e) {
-        logger.exception(e);
-      }
-      plot.updateStyleElement();
-
-      svgCanvas.setDocumentState(AbstractJSVGComponent.ALWAYS_DYNAMIC);
-      svgCanvas.setDocument(plot.getDocument());
-
-      DefaultListModel m = new DefaultListModel();
-      for (Integer dbid : db) {
-        m.addElement(dbid);
-      }
-      seriesList.setModel(m);
-      
-      frame.setVisible(true);
     }
   }  
 }
