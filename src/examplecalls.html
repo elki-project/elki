@@ -90,8 +90,8 @@ This is possible for all algorithms.
 
 <p>Unused was also the possibility of normalizing the data. Via the option <code>-norm</code>,
 a normalization procedure can be performed prior to the analysis performed by the algorithm.
-As option value, a class is expected. ELKI provides the
-<a href="de/lmu/ifi/dbs/elki/normalization/AttributeWiseRealVectorNormalization.html">AttributeWiseRealVectorNormalization</a> as a possibility.
+As option value, a class is expected. ELKI provides for example the
+<a href="de/lmu/ifi/dbs/elki/normalization/AttributeWiseMinMaxNormalization.html">AttributeWiseMinMaxNormalization</a> as a possibility.
 Other normalization procedures could easily be provided by any user by implementing the interface
 <a href="de/lmu/ifi/dbs/elki/normalization/Normalization.html">de.lmu.ifi.dbs.elki.normalization.Normalization</a>.
 Setting the flag <code>-normUndo</code> will revert the normalization before writing the result,
@@ -101,10 +101,10 @@ otherwise, the resulting files will list the normalized data vectors.
 <h3>Example call requesting time and verbose messages and using a normalization:</h3>
 <p>
 <pre>
-java -jar mypath/elki.jar -algorithm clustering.DBSCAN -dbc.in mydata/exampledata.txt -dbscan.epsilon 0.02 -dbscan.minpts 10 -out myresults/DBSCANeps20min10 -verbose -time -norm AttributeWiseRealVectorNormalization -normUndo
+java -jar mypath/elki.jar -algorithm clustering.DBSCAN -dbc.in mydata/exampledata.txt -dbscan.epsilon 0.02 -dbscan.minpts 10 -out myresults/DBSCANeps20min10 -verbose -time -norm AttributeWiseMinMaxNormalization -normUndo
 </pre>
 Note that the value for <code>dbscan.epsilon</code> is decreased considerably to suit the normalized data
-(the AttributeWiseRealVectorNormalization normalizes all attribute values to the range <code>[0:1]</code>).
+(the AttributeWiseMinMaxNormalization normalizes all attribute values to the range <code>[0:1]</code>).
 </p>
 
 <h2>Different algorithms</h2>
@@ -142,29 +142,29 @@ are listed in the parameter description. See, e.g., the description of <code>-al
    Algorithm to run.
    Implementing de.lmu.ifi.dbs.elki.algorithm.Algorithm
    Known classes (default package de.lmu.ifi.dbs.elki.algorithm.):
-   -> APRIORI
-   -> DependencyDerivator
-   -> KNNDistanceOrder
-   -> KNNJoin
-   -> clustering.DBSCAN
-   -> clustering.DeLiClu
-   -> clustering.EM
-   -> clustering.KMeans
-   -> clustering.OPTICS
-   -> clustering.SLINK
-   -> clustering.SNNClustering
-   -> clustering.ByLabelClustering
-   -> clustering.TrivialAllInOne
-   -> clustering.TrivialAllNoise
-   -> clustering.correlation.CASH
-   -> clustering.correlation.COPAC
-   -> clustering.correlation.ERiC
-   -> clustering.correlation.FourC
-   -> clustering.correlation.ORCLUS
-   -> clustering.subspace.CLIQUE
-   -> clustering.subspace.DiSH
-   -> clustering.subspace.PreDeCon
-   -> clustering.subspace.PROCLUS
+   ->ï¿½APRIORI
+   ->ï¿½DependencyDerivator
+   ->ï¿½KNNDistanceOrder
+   ->ï¿½KNNJoin
+   ->ï¿½clustering.DBSCAN
+   ->ï¿½clustering.DeLiClu
+   ->ï¿½clustering.EM
+   ->ï¿½clustering.KMeans
+   ->ï¿½clustering.OPTICS
+   ->ï¿½clustering.SLINK
+   ->ï¿½clustering.SNNClustering
+   ->ï¿½clustering.ByLabelClustering
+   ->ï¿½clustering.TrivialAllInOne
+   ->ï¿½clustering.TrivialAllNoise
+   ->ï¿½clustering.correlation.CASH
+   ->ï¿½clustering.correlation.COPAC
+   ->ï¿½clustering.correlation.ERiC
+   ->ï¿½clustering.correlation.FourC
+   ->ï¿½clustering.correlation.ORCLUS
+   ->ï¿½clustering.subspace.CLIQUE
+   ->ï¿½clustering.subspace.DiSH
+   ->ï¿½clustering.subspace.PreDeCon
+   ->ï¿½clustering.subspace.PROCLUS
 </pre>
 </body>
 </html>

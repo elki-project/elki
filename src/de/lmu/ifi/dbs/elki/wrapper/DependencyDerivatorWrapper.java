@@ -34,7 +34,7 @@ public class DependencyDerivatorWrapper<O extends DatabaseObject> extends FileBa
 
         // normalization
 //    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_P);
-//    parameters.add(AttributeWiseRealVectorNormalization.class.getName());
+//    parameters.add(AttributeWiseMinMaxNormalization.class.getName());
 //    parameters.add(OptionHandler.OPTION_PREFIX + KDDTask.NORMALIZATION_UNDO_F);
 
         return parameters;

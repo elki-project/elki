@@ -25,16 +25,16 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Elke Achtert
  * @param <V> vector type
  */
-public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ?>> extends AbstractNormalization<V> {
+public class AttributeWiseMinMaxNormalization<V extends RealVector<V, ?>> extends AbstractNormalization<V> {
   /**
    * OptionID for {@link #MINIMA_PARAM}
    */
-  public static final OptionID MINIMA_ID = OptionID.getOrCreateOptionID("normalize.min", "a comma separated concatenation " + "of the minimum values in each dimension that are mapped to 0. " + "If no value is specified, the minimum value of the attribute " + "range in this dimension will be taken.");
+  public static final OptionID MINIMA_ID = OptionID.getOrCreateOptionID("normalize.min", "a comma separated concatenation of the minimum values in each dimension that are mapped to 0. If no value is specified, the minimum value of the attribute range in this dimension will be taken.");
 
   /**
    * OptionID for {@link #MAXIMA_PARAM}
    */
-  public static final OptionID MAXIMA_ID = OptionID.getOrCreateOptionID("normalize.max", "a comma separated concatenation " + "of the maximum values in each dimension that are mapped to 1 " + "If no value is specified, the maximum value of the attribute " + "range in this dimension will be taken.");
+  public static final OptionID MAXIMA_ID = OptionID.getOrCreateOptionID("normalize.max", "a comma separated concatenation of the maximum values in each dimension that are mapped to 1. If no value is specified, the maximum value of the attribute range in this dimension will be taken.");
 
   /**
    * Parameter for minimum.
@@ -59,7 +59,7 @@ public class AttributeWiseRealVectorNormalization<V extends RealVector<V, ?>> ex
   /**
    * Sets minima and maxima parameter to the optionhandler.
    */
-  public AttributeWiseRealVectorNormalization() {
+  public AttributeWiseMinMaxNormalization() {
     addOption(MINIMA_PARAM);
     addOption(MAXIMA_PARAM);
 

@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.normalization.AttributeWiseRealVectorNormalization;
+import de.lmu.ifi.dbs.elki.normalization.AttributeWiseMinMaxNormalization;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
@@ -361,7 +361,7 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Cluster
             // are in the same range as the vectors in the database
             // XXX perhaps this can be done more conveniently?
             V randomBase = database.get(database.iterator().next());
-            AttributeWiseRealVectorNormalization<V> normalization = new AttributeWiseRealVectorNormalization<V>();
+            AttributeWiseMinMaxNormalization<V> normalization = new AttributeWiseMinMaxNormalization<V>();
             List<V> list = new ArrayList<V>(database.size());
             for (Integer id : database) {
                 list.add(database.get(id));
