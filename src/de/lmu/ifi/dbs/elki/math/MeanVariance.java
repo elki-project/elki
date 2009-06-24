@@ -121,4 +121,39 @@ public final class MeanVariance {
   public double getStddev() {
     return Math.sqrt(getVariance());
   }
+  
+  /**
+   * Return the normalized value
+   * (centered at the mean, distance normalized by standard deviation)
+   * 
+   * @param val original value
+   * @return normalized value
+   */
+  public double normalizeValue(double val) {
+    return (val - getMean()) / getStddev();
+  }
+  
+  /**
+   * Return the unnormalized value
+   * (centered at the mean, distance normalized by standard deviation)
+   * 
+   * @param val normalized value
+   * @return de-normalized value
+   */
+  public double denormalizeValue(double val) {
+    return (val * getStddev()) + getMean();
+  }
+
+  /**
+   * Create and initialize a new array of MeanVariance
+   * @param dimensionality Dimensionality
+   * @return New and initialized Array
+   */
+  public static MeanVariance[] newArray(int dimensionality) {
+    MeanVariance[] arr = new MeanVariance[dimensionality];
+    for (int i = 0; i < dimensionality; i++) {
+      arr[i] = new MeanVariance();
+    }
+    return arr;
+  }
 }
