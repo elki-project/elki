@@ -56,7 +56,7 @@
 	<property name="deploy.javadoc" value="${deploy.basedir}/doc"/>
 
 	
-	<target name="preliminary" depends="copy4release,compile,javadoc,jar"/>
+	<target name="preliminary" depends="copy4release,compile,javadocparams,jar"/>
 	
 	<target name="complete" depends="preliminary">
 		<copy todir="${deploy.target}">
@@ -180,10 +180,15 @@
 		</javadoc>
 		<copy todir="${deploy.javadoc}">
 			<fileset dir="${source}">
-				<include name="parameters*.html"/>
 				<include name="examplecalls.html"/>
 			</fileset>
 		</copy>
 	</target>
 
+	<target name="javadocparams" depends="copy4jar,javadoc">
+	    <java classpath="${classpath}" dir="${deploy.srcdir}/bin" classname="de.lmu.ifi.dbs.elki.properties.DocumentParameters" fork="true">
+	   		<arg value="${deploy.javadoc}/parameters-byclass.html"/>
+	   		<arg value="${deploy.javadoc}/parameters-byopt.html"/>
+	   	</java>
+	</target>
 </project>

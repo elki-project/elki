@@ -69,7 +69,7 @@
 		<dirset dir="${source}" />
 	</path>
 	
-	<target name="complete" description="creates javadoc and builds the project" depends="javadoc,build" />
+	<target name="complete" description="creates javadoc and builds the project" depends="javadocparams,build" />
 
 	<target name="javadoc">
 		<javadoc destdir="${windows.disk.prefix}${javadoc.destdir}"
@@ -114,11 +114,18 @@
 		</javadoc>
 		<copy todir="${windows.disk.prefix}${javadoc.destdir}">
 			<fileset dir="${source}">
-				<include name="parameters*.html"/>
+				<include name="examplecalls.html"/>
 			</fileset>
 		</copy>
 	</target>
 
+	<target name="javadocparams" depends="copy4jar,javadoc">
+	    <java dir="${buildpath}" classname="de.lmu.ifi.dbs.elki.properties.DocumentParameters" fork="true">
+	    	<classpath refid="compileClasspath"/>
+	   		<arg value="${windows.disk.prefix}${javadoc.destdir}/parameters-byclass.html"/>
+	   		<arg value="${windows.disk.prefix}${javadoc.destdir}/parameters-byopt.html"/>
+	   	</java>
+	</target>
 
 	<target name="build" description="build project" depends="init,recompile,copy4jar,createjar,copy,delete_inproject" />
 
@@ -133,7 +140,6 @@
 	<target name="recompile" description="cleaning up classpath, recompiling all classes" depends="init">
 		<delete dir="${classpath}" />
 		<mkdir dir="${classpath}" />
-		
 
 		<javac destdir="${classpath}" deprecation="false" debug="false" optimize="true" source="1.6" debuglevel="">
 			<!--<compilerarg value="-Xlint:all"/>-->
