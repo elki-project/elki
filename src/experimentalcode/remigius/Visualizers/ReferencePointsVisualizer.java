@@ -9,13 +9,13 @@ import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
-import experimentalcode.remigius.Visualization;
+import experimentalcode.remigius.NumberVisualization;
+import experimentalcode.remigius.NumberVisualizer;
 import experimentalcode.remigius.VisualizationManager;
-import experimentalcode.remigius.Visualizer;
 
 // TODO Fix CSS, IDs and replace Dots.  
 
-public class ReferencePointsVisualizer<O extends DoubleVector, V extends FeatureVector<V,N>,N extends Number> extends Visualizer<O> {
+public class ReferencePointsVisualizer<O extends DoubleVector, V extends FeatureVector<V,N>,N extends Number> extends NumberVisualizer<O> {
 
 	private CollectionResult<V> colResult;
 
@@ -35,7 +35,7 @@ public class ReferencePointsVisualizer<O extends DoubleVector, V extends Feature
 	}
 
 	@Override
-	protected Visualization<O> visualize(SVGPlot svgp, Element layer, int dimx, int dimy) {
+	protected NumberVisualization visualize(SVGPlot svgp, Element layer, int dimx, int dimy) {
 
 		Iterator<V> iter = colResult.iter();
 		
@@ -45,7 +45,7 @@ public class ReferencePointsVisualizer<O extends DoubleVector, V extends Feature
 					SHAPEGEN.createDot(svgp.getDocument(), v.getValue(dimx).doubleValue(), v.getValue(dimy).doubleValue(), (int)Math.random(), dimx, dimy)
 			);
 		}
-		return new Visualization<O>(this, dimx, dimy, layer);
+		return new NumberVisualization(dimx, dimy, layer);
 	}
 	
 	public String toString(){
