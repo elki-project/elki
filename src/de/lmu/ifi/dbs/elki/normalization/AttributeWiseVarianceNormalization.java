@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Erich Schubert
  * @param <V> vector type
  */
+// TODO: extract superclass AbstractAttributeWiseNormalization
 public class AttributeWiseVarianceNormalization<V extends RealVector<V, ?>> extends AbstractNormalization<V> {
   /**
    * OptionID for {@link #MEAN_PARAM}
