@@ -17,12 +17,12 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
+import experimentalcode.lisa.scale.DoubleScale;
+import experimentalcode.lisa.scale.LinearScale;
 import experimentalcode.remigius.CommonSVGShapes;
 import experimentalcode.remigius.NumberVisualization;
 import experimentalcode.remigius.NumberVisualizer;
 import experimentalcode.remigius.VisualizationManager;
-import experimentalcode.remigius.Scales.DoubleScale;
-import experimentalcode.remigius.Scales.LinearScale;
 
 public class BubbleVisualizer<O extends DoubleVector> extends NumberVisualizer<O> {
 

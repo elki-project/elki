@@ -1,4 +1,5 @@
-package experimentalcode.remigius.Scales;
+package experimentalcode.lisa.scale;
+
 
 public class LinearScale implements DoubleScale {
 	
