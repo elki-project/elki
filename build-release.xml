@@ -110,9 +110,10 @@
 			<exclude name="*.jar" />
 			<exclude name="*.xsd" />
 			<exclude name="*.prp" />
+			<exclude name="*.properties" />
 			<src path="${deploy.srcdir}/src" />
 		</javac>
-		<copy file="${deploy.srcdir}/src/${basepackage}properties/KDDFramework.prp" tofile="${deploy.srcdir}/${basepackage}properties/KDDFramework.prp"/>
+		<copy file="${deploy.srcdir}/src/${basepackage}properties/ELKI.properties" tofile="${deploy.srcdir}/${basepackage}properties/ELKI.properties"/>
 	</target>
 	
 	<target name="jar" depends="compile">
