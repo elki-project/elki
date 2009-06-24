@@ -188,7 +188,8 @@ de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex=\
 # #######################################################
 # Normalization - default package: de.lmu.ifi.dbs.elki.normalization
 de.lmu.ifi.dbs.elki.normalization.Normalization=\
-  de.lmu.ifi.dbs.elki.normalization.AttributeWiseRealVectorNormalization,\
+  de.lmu.ifi.dbs.elki.normalization.AttributeWiseMinMaxNormalization,\
+  de.lmu.ifi.dbs.elki.normalization.AttributeWiseVarianceNormalization,\
   de.lmu.ifi.dbs.elki.normalization.DummyNormalization,\
   de.lmu.ifi.dbs.elki.normalization.MultiRepresentedObjectNormalization,\
 # #######################################################

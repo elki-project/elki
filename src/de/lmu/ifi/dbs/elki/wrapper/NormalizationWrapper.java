@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.wrapper;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.normalization.AttributeWiseRealVectorNormalization;
+import de.lmu.ifi.dbs.elki.normalization.AttributeWiseMinMaxNormalization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
@@ -24,7 +24,7 @@ public abstract class NormalizationWrapper<O extends DatabaseObject> extends Fil
         List<String> parameters = super.getKDDTaskParameters();
 
         // normalization
-        OptionUtil.addParameter(parameters, OptionID.NORMALIZATION, AttributeWiseRealVectorNormalization.class.getName());
+        OptionUtil.addParameter(parameters, OptionID.NORMALIZATION, AttributeWiseMinMaxNormalization.class.getName());
         OptionUtil.addFlag(parameters, OptionID.NORMALIZATION_UNDO);
 
         return parameters;

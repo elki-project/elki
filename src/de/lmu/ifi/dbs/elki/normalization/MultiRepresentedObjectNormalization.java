@@ -28,7 +28,7 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
   /**
    * Default normalization.
    */
-  public final static String DEFAULT_NORMALIZATION = AttributeWiseRealVectorNormalization.class
+  public final static String DEFAULT_NORMALIZATION = AttributeWiseMinMaxNormalization.class
   .getName();
 
   /**
