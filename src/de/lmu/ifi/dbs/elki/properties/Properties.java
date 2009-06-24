@@ -30,14 +30,14 @@ public final class Properties {
   public static final Properties ELKI_PROPERTIES;
 
   static {
-    File propertiesfile = new File(Properties.class.getPackage().getName().replace('.', File.separatorChar) + File.separatorChar + "ELKI.prp");
+    File propertiesfile = new File(Properties.class.getPackage().getName().replace('.', File.separatorChar) + File.separatorChar + "ELKI.properties");
     if(propertiesfile.exists() && propertiesfile.canRead()) {
       ELKI_PROPERTIES = new Properties(propertiesfile.getAbsolutePath());
     }
     else // otherwise, the property-file should at least be available within the
          // jar-archive
     {
-      ELKI_PROPERTIES = new Properties(Properties.class.getPackage().getName().replace('.', '/') + '/' + "ELKI.prp");
+      ELKI_PROPERTIES = new Properties(Properties.class.getPackage().getName().replace('.', '/') + '/' + "ELKI.properties");
     }
   }
 
