@@ -1,4 +1,4 @@
-package experimentalcode.erich.utilities;
+package de.lmu.ifi.dbs.elki.utilities;
 
 import java.io.File;
 import java.io.IOException;
