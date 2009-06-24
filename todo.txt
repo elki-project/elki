@@ -69,18 +69,18 @@ de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:356: warning - Tag @l
 
 # laengerfristig: ##########################################
 
-- RTreeDatabase: fileName hashCode anhängen für Partition
+- RTreeDatabase: fileName hashCode anhï¿½ngen fï¿½r Partition
 
 - RealVector abstract und neu: DoubleVector, IntegerVector, BitVector
 (Arthur) (done: DoubleVector, BitVector)
 
 - AttributeSettings: ueberall einfuegen (wo benoetigt, evtl. im Parametrizable Interface)
-  und im AbstractResult im Constructor übergeben (dann aus writeHeader(...) rausnehmen)
+  und im AbstractResult im Constructor ï¿½bergeben (dann aus writeHeader(...) rausnehmen)
 
 - Key-Object statt Integer als ID in Database: Key is ConstantObject(?) and Comparable
 
 - Logger mit DEBUG-Flag, ein Logger wird an alle Klassen durchgereicht, jede Klasse kann aber den zentralen debug-level ueberschreiben
-  Logger können auch verbose-output aufsammeln - dann weiterreichen an Konsole oder einen GUI-Frame
+  Logger kï¿½nnen auch verbose-output aufsammeln - dann weiterreichen an Konsole oder einen GUI-Frame
   das sollte System.out.prints ueberfluessig machen (ebenso System.err.prints)
 (Arthur)
 
@@ -97,3 +97,7 @@ de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:356: warning - Tag @l
 - Implementing classes von Parameterizable im Property-File aufnehmen
 
 - Indexe: mit fixer DistanceFunction erzeugen, nur dieselbe kann bei queries verwendet werden ?
+
+# nicht so wichtig: #####################################
+
+- PseudoRandomDistance: Distanz aus Hashwerten der Vektoren ableiten, um eine generische "wertlose" Distanz fÃ¼r Benchmarks zu haben?
