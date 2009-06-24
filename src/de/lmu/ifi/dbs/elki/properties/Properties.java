@@ -1,6 +1,9 @@
 package de.lmu.ifi.dbs.elki.properties;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -51,11 +54,23 @@ public final class Properties {
   private Properties(String filename) {
     LoggingConfiguration.assertConfigured();
     this.properties = new java.util.Properties();
+    InputStream stream = null;
     try {
-      properties.load(ClassLoader.getSystemResourceAsStream(filename));
+      stream = new FileInputStream(filename);
+    }
+    catch(FileNotFoundException e) {
+      // try with classloader
+      stream = ClassLoader.getSystemResourceAsStream(filename);
+    }
+    if (stream == null) {
+      logger.warning("Unable to get properties file " + filename + ".\n");
+      return;
+    }
+    try {
+      properties.load(stream);
     }
     catch(Exception e) {
-      logger.warning("Unable to load properties file " + filename + ".\n");
+      logger.warning("Error loading properties file " + filename + ".\n", e);
     }
   }
 
