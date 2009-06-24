@@ -18,13 +18,13 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import experimentalcode.remigius.CommonSVGShapes;
-import experimentalcode.remigius.Visualization;
+import experimentalcode.remigius.NumberVisualization;
+import experimentalcode.remigius.NumberVisualizer;
 import experimentalcode.remigius.VisualizationManager;
-import experimentalcode.remigius.Visualizer;
 import experimentalcode.remigius.Scales.DoubleScale;
 import experimentalcode.remigius.Scales.LinearScale;
 
-public class BubbleVisualizer<O extends DoubleVector> extends Visualizer<O> {
+public class BubbleVisualizer<O extends DoubleVector> extends NumberVisualizer<O> {
 
 	private DoubleScale normalizationScale;
 	private DoubleScale plotScale;
@@ -90,7 +90,7 @@ public class BubbleVisualizer<O extends DoubleVector> extends Visualizer<O> {
 	}
 
 	@Override
-	protected Visualization<O> visualize(SVGPlot svgp, Element layer, int dimx, int dimy) {
+	protected NumberVisualization visualize(SVGPlot svgp, Element layer, int dimx, int dimy) {
 
 		Iterator<Cluster<Model>> iter = clustering.getAllClusters().iterator();
 		int clusterID = 0;
@@ -106,7 +106,7 @@ public class BubbleVisualizer<O extends DoubleVector> extends Visualizer<O> {
 			}
 		}
 
-		return new Visualization<O>(this, dimx, dimy, layer);
+		return new NumberVisualization(dimx, dimy, layer);
 	}
 	
 	public String toString(){

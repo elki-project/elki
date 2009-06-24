@@ -8,13 +8,13 @@ import org.w3c.dom.events.EventTarget;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
-import experimentalcode.remigius.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
+import experimentalcode.remigius.NumberVisualization;
+import experimentalcode.remigius.NumberVisualizer;
 import experimentalcode.remigius.VisualizationManager;
-import experimentalcode.remigius.Visualizer;
 
-public class DotVisualizer<O extends DoubleVector> extends Visualizer<O> {
+public class DotVisualizer<O extends DoubleVector> extends NumberVisualizer<O> {
 
 	private EventListener hoverer;
 	
@@ -24,7 +24,7 @@ public class DotVisualizer<O extends DoubleVector> extends Visualizer<O> {
 	}
 
 	@Override
-	protected Visualization<O> visualize(SVGPlot svgp, Element layer, int dimx,
+	protected NumberVisualization visualize(SVGPlot svgp, Element layer, int dimx,
 			int dimy) {
 		try {
 			SVGSimpleLinearAxis.drawAxis(svgp, layer, scales[dimx], 0, 1, 1, 1, true, true);
@@ -50,7 +50,7 @@ public class DotVisualizer<O extends DoubleVector> extends Visualizer<O> {
 					dot
 			);
 		}
-		return new Visualization<O>(this, dimx, dimy, layer);
+		return new NumberVisualization(dimx, dimy, layer);
 	}
 	
 	public String toString(){

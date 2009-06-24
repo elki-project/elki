@@ -9,11 +9,11 @@ import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import experimentalcode.remigius.CommonSVGShapes;
-import experimentalcode.remigius.Visualization;
+import experimentalcode.remigius.NumberVisualization;
+import experimentalcode.remigius.NumberVisualizer;
 import experimentalcode.remigius.VisualizationManager;
-import experimentalcode.remigius.Visualizer;
 
-public class TextVisualizer<O extends DoubleVector> extends Visualizer<O> {
+public class TextVisualizer<O extends DoubleVector> extends NumberVisualizer<O> {
 
 	AnnotationResult<Double> anResult;
 	
@@ -36,7 +36,7 @@ public class TextVisualizer<O extends DoubleVector> extends Visualizer<O> {
 	}
 
 	@Override
-	protected Visualization<O> visualize(SVGPlot svgp, Element layer, int dimx, int dimy) {
+	protected NumberVisualization visualize(SVGPlot svgp, Element layer, int dimx, int dimy) {
 
 		for (int id : database.getIDs()){
 			layer.appendChild(
@@ -44,7 +44,7 @@ public class TextVisualizer<O extends DoubleVector> extends Visualizer<O> {
 							svgp.getDocument(), getPositioned(database.get(id), dimx), (1 - getPositioned(database.get(id), dimy)),
 							getValue(id), id, dimx, dimy));
 		}
-		return new Visualization<O>(this, dimx, dimy, layer);
+		return new NumberVisualization(dimx, dimy, layer);
 	}
 	
 	@Override
