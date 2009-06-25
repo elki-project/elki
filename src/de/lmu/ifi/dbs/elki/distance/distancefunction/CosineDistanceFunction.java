@@ -21,6 +21,8 @@ public class CosineDistanceFunction<V extends FeatureVector<V,?>> extends Abstra
 
   /**
    * Computes the cosine distance for two given feature vectors.
+   * 
+   * The cosine distance is computed from the cosine similarity by <code>1-(cosine similarity)</code>.
    *
    * @param v1 first feature vector
    * @param v2 second feature vector
