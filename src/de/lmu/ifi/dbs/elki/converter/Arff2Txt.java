@@ -54,6 +54,7 @@ public class Arff2Txt extends StandAloneInputApplication {
     /**
      * Runs the wrapper with the specified arguments.
      */
+    @Override
     public void run() throws UnableToComplyException {
         try {
             File inputFile = getInput();

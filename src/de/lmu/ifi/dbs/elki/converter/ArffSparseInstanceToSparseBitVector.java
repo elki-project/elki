@@ -129,6 +129,7 @@ public class ArffSparseInstanceToSparseBitVector extends StandAloneInputApplicat
     /**
      * Runs the wrapper with the specified arguments.
      */
+    @Override
     public void run() throws UnableToComplyException {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(

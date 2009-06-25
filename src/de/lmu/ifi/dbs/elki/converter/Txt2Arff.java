@@ -67,6 +67,7 @@ public class Txt2Arff<W extends WekaAttribute> extends StandAloneInputApplicatio
    * Runs the wrapper with the specified arguments.
    */
   @SuppressWarnings("unchecked")
+  @Override
   public void run() throws UnableToComplyException {
     try {
       File inputFile = getInput();
