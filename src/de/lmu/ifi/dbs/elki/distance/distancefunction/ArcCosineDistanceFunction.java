@@ -6,6 +6,9 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 
 /**
  * Cosine distance function for feature vectors.
+ * 
+ * The cosine distance is computed as the arcus from the cosine similarity value,
+ * i.e., <code>arccos(&lt;v1,v2&gt;)</code>.
  *
  * @author Arthur Zimek
  * @param <V> the type of FeatureVector to compute the distances in between
