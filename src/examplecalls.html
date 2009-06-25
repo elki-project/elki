@@ -120,18 +120,29 @@ while we ommitted the prefix <code>de.lmu.ifi.dbs.elki.algorithm.</code> for <co
 The reason for this difference is as follows:</p>
 <p>If as a parameter value a class name is expected, usually also a restriction class is known,
 i.e., an interface or a class which must be implemented or extended by the specified parameter value.
-For example, the restriction class for the parameter value of <code>-description</code> is
-<a href="de/lmu/ifi/dbs/elki/utilities/optionhandling/Parameterizable">de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable</a>,
-the restriction class for the parameter value of <code>-agorithm</code> is
-<a href="de/lmu/ifi/dbs/elki/algorithm/Algorithm.html">de.lmu.ifi.dbs.elki.algorithm.Algorithm</a>.
+For example,
+<ul>
+	<li>the restriction class for the parameter value of <code>-description</code> is
+		<a href="de/lmu/ifi/dbs/elki/utilities/optionhandling/Parameterizable">de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable</a>,</li>
+	<li>the restriction class for the parameter value of <code>-agorithm</code> is
+<a href="de/lmu/ifi/dbs/elki/algorithm/Algorithm.html">de.lmu.ifi.dbs.elki.algorithm.Algorithm</a>.</li>
+</ul>
 If the specified class cannot be initialized by the given name, the initialization tries the same class name using as prefix the
-package of the restriction class. Thus, the value <code>clustering.DBSCAN</code> (which is not a valid class name per se)
-will be automatically completed with the prefix
-<code>de.lmu.ifi.dbs.elki.algorithm.</code>, the corresponding incomplete value <code>clustering.correlation.FourC</code>,
-however, would be automatically completed with the prefix
-<code>de.lmu.ifi.dbs.elki.utilities.optionhandling.</code>, which does not result in a valid class name. Hence, here, we are
-to specify the complete class name in the first place.</p>
-<p>On the other hand, would we like to use FourC as algorithm, as parameter value for <code>-algorithm</code> the specification
+package of the restriction class. Thus,
+<ul>
+	<li>the value for parameter <code>-algorithm</code>, <code>clustering.DBSCAN</code>
+		(which is not a valid class name per se),
+		will be automatically completed with the prefix
+		<code>de.lmu.ifi.dbs.elki.algorithm.</code>,</li>
+	<li>the corresponding incomplete value for parameter <code>-description</code>,
+		<code>clustering.correlation.FourC</code>,
+		however, would be automatically completed with the prefix
+		<code>de.lmu.ifi.dbs.elki.utilities.optionhandling.</code>, which does not result in a valid class name.</li>
+</ul>
+Hence, here
+(i.e., for parameter <code>-description</code>), we are
+to specify the complete class name in the first place.
+On the other hand, would we like to use FourC as algorithm, as parameter value for <code>-algorithm</code> the specification
 <code>clustering.correlation.FourC</code> would suffice.
 </p>
 <p>The restriction class and already available implementations (suitable as possible values for the parameter)
