@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
  */
 public class EuclideanDistanceFunction<V extends NumberVector<V, ?>>
     extends AbstractDoubleDistanceFunction<V>
-    implements SpatialDistanceFunction<V, DoubleDistance>,MetricDistanceFunction<V, DoubleDistance> {
+    implements SpatialDistanceFunction<V, DoubleDistance> {
 
     /**
      * Provides a Euclidean distance function that can compute the Euclidean
