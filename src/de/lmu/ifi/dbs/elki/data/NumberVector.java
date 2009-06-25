@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.data;
 
-import de.lmu.ifi.dbs.elki.converter.WekaNumericAttribute;
-import de.lmu.ifi.dbs.elki.converter.WekaObject;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 
 /**
@@ -18,7 +16,7 @@ import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
  *        NumberVector {@code v} of type {@code V} and dimensionality {@code d}
  *        is an element of {@code N}<sup>{@code d}</sup>)
  */
-public abstract class NumberVector<V extends NumberVector<V, N>, N extends Number> extends AbstractDatabaseObject implements FeatureVector<V, N>, WekaObject<WekaNumericAttribute> {
+public abstract class NumberVector<V extends NumberVector<V, N>, N extends Number> extends AbstractDatabaseObject implements FeatureVector<V, N> {
 
   /**
    * The String to separate attribute values in a String that represents the
@@ -78,19 +76,6 @@ public abstract class NumberVector<V extends NumberVector<V, N>, N extends Numbe
     else {
       return false;
     }
-  }
-
-  /**
-   * Returns the attributes as array of WekaNumericAttributes.
-   * 
-   * @return the attributes as array of WekaNumericAttributes
-   */
-  public WekaNumericAttribute[] getAttributes() {
-    WekaNumericAttribute[] attributes = new WekaNumericAttribute[this.getDimensionality()];
-    for(int d = 1; d <= this.getDimensionality(); d++) {
-      attributes[d - 1] = new WekaNumericAttribute(this.getValue(d).doubleValue());
-    }
-    return attributes;
   }
 
   /**
