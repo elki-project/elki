@@ -101,3 +101,5 @@ de\lmu\ifi\dbs\elki\utilities\optionhandling\OptionID.java:356: warning - Tag @l
 # nicht so wichtig: #####################################
 
 - PseudoRandomDistance: Distanz aus Hashwerten der Vektoren ableiten, um eine generische "wertlose" Distanz für Benchmarks zu haben?
+
+- on release build: rewrite ELKI.properties to not contain classes not included.
