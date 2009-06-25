@@ -58,7 +58,6 @@ public abstract class Option<T> {
      * Sets the short description of the option.
      * @param description the short description to be set
      */
-    @Deprecated
     public void setShortDescription(String description) {
         this.shortDescription = description;
     }
