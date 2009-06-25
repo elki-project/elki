@@ -15,12 +15,13 @@
 	<property name="release.official" value="true" />
 	<property name="release.version" value="0.2" />
 	<property name="release.extraversion" value="(${now})"/>
+	<property name="doc.dir" value="doc/release${release.version}"/>
 	-->
 
 	<!-- defaults -->	
 	<property name="release.version" value="INTERNAL-${now}"/>
 	<property name="release.extraversion" value=""/>
-	<property name="release.overview" value="overview.html"/>
+	<property name="doc.srcdir" value="doc/internal"/>
 	
 	<!-- source parameters -->
 	<property name="source" value="src" />
@@ -50,7 +51,7 @@
 	<!-- ******************* FOLDER CONFIGURATION ******************* -->
 
 	<!-- Release output folders -->
-	<condition property="deploy.output" value="${sharedfolder}/releases/${release.version}/${release.extraversion}/output">
+	<condition property="deploy.output" value="${sharedfolder}/releases/${release.version}/${now}/output">
 		<isset property="release.official" />
 	</condition>
 	<condition property="javadoc.destdir" value="${deploy.output}/doc">
@@ -61,7 +62,7 @@
 	</condition>
 		
 	<!-- Output folders -->
-	<property name="deploy.output" value="${sharedfolder}/archive/version-${now}" />
+	<property name="deploy.output" value="${sharedfolder}/archive/${release.version}" />
 	<property name="deploy.latest" value="${sharedfolder}/executable" />
 	<property name="javadoc.destdir" value="${sharedfolder}/doc" />
 
@@ -171,7 +172,7 @@
 		<!-- defaults - for internal builds -->
 		<property name="javadoc.version" value="true" />
 		<property name="javadoc.header.extra" value="&lt;tr&gt;&lt;td colspan=&quot;3&quot; align=&quot;center&quot; style=&quot;font-size: x-small; font-weight: normal;&quot;&gt;Internal Version&lt;/td&gt;&lt;/tr&gt;" />
-		<property name="javadoc.footer.extra" value="&lt;tr&gt;&lt;td align=&quot;right&quot;&gt;by&lt;/td&gt;&lt;td align=&quot;left&quot;&gt;${user.name}&lt;/td&gt;&lt;/tr&gt;" />
+		<property name="javadoc.footer.extra" value="&lt;tr&gt;&lt;td align=&quot;right&quot;&gt;built by&lt;/td&gt;&lt;td align=&quot;left&quot;&gt;${user.name}&lt;/td&gt;&lt;/tr&gt;" />
 		<javadoc
 			destdir="${javadoc.destdir}"
 			access="private"
@@ -185,7 +186,7 @@
 			nodeprecatedlist="false"
 			nodeprecated="false"
 			link="http://java.sun.com/javase/6/docs/api/"
-			overview="${source}/${release.overview}"
+			overview="${doc.srcdir}/overview.html"
 			doctitle="${ELKI_SHORT}"
 			windowtitle="${ELKI_LONG}">
 			<classpath refid="build.classpath" />
@@ -232,8 +233,8 @@
 	<!-- Install extra documentation -->
 	<target name="doc_extra">
 		<copy todir="${javadoc.destdir}">
-			<fileset dir="${source}">
-				<include name="examplecalls.html" />
+			<fileset dir="${doc.srcdir}">
+				<exclude name="overview.html" />
 			</fileset>
 		</copy>
 	</target>
