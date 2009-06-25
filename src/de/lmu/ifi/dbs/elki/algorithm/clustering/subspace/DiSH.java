@@ -228,10 +228,11 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
      * @param database     the database holding the objects
      * @param clusterOrder the cluster order
      */
+    @SuppressWarnings("unchecked")
     private void computeClusters(Database<V> database, ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> clusterOrder) {
         int dimensionality = database.dimensionality();
 
-        DiSHDistanceFunction<V, DiSHPreprocessor<V, ?>> distanceFunction = (DiSHDistanceFunction<V, DiSHPreprocessor<V, ?>>) optics.getDistanceFunction();
+        DiSHDistanceFunction<V, DiSHPreprocessor<V, ?>> distanceFunction = (DiSHDistanceFunction) optics.getDistanceFunction();
 
         // extract clusters
         Map<BitSet, List<Pair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>>> clustersMap = extractClusters(database, distanceFunction, clusterOrder);
