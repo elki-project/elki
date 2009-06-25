@@ -83,12 +83,13 @@ public class InvertedListDatabase<N extends Number, O extends FeatureVector<O, N
      *                         objects
      * @return a List of the query results
      */
+    @SuppressWarnings("unchecked")
     @Override
     public <D extends Distance<D>> List<DistanceResultPair<D>> rangeQuery(Integer id, String epsilon, DistanceFunction<O, D> distanceFunction) {
         List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
 
         if (distanceFunction instanceof DimensionSelectingDistanceFunction) {
-            DimensionSelectingDistanceFunction df = (DimensionSelectingDistanceFunction) distanceFunction;
+            DimensionSelectingDistanceFunction<N,O> df = (DimensionSelectingDistanceFunction<N,O>) distanceFunction;
             double eps = df.valueOf(epsilon).getValue();
             int dim = df.getSelectedDimension();
             SortedMap<Double, List<Integer>> invertedList = invertedLists.get(dim);
