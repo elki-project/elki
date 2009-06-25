@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.data.synthetic.bymodel;
+package de.lmu.ifi.dbs.elki.application;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,7 +23,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
-import de.lmu.ifi.dbs.elki.application.StandAloneApplication;
+import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorMain;
+import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorSingleCluster;
+import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorStatic;
 import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution.UniformDistribution;
@@ -536,6 +538,7 @@ public class GeneratorXMLSpec extends StandAloneApplication {
   /**
    * Runs the wrapper with the specified arguments.
    */
+  @Override
   public void run() throws UnableToComplyException {
     if(logger.isVerbose()) {
       logger.verbose("Loading specification ...");

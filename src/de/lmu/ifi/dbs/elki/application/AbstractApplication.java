@@ -100,8 +100,8 @@ public abstract class AbstractApplication extends AbstractParameterizable {
       LoggingConfiguration.setVerbose(true);
     }
 
-    rememberParametersExcept(args, new String[0]);
-    return new String[0];
+    rememberParametersExcept(args, remainingParameters);
+    return remainingParameters;
   }
 
   /**

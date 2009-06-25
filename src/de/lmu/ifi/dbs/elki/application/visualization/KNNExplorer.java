@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.visualization;
+package de.lmu.ifi.dbs.elki.application.visualization;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -7,8 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
@@ -34,9 +32,7 @@ import org.apache.batik.swing.svg.AbstractJSVGComponent;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.KDDTask;
-import de.lmu.ifi.dbs.elki.algorithm.AbortException;
-import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
+import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
@@ -48,26 +44,10 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
-import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.LazyCanvasResizer;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.NodeReplacer;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
@@ -107,38 +87,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * 
  * @param <O> Object type
  */
-public class KNNExplorer<O extends NumberVector<O, ?>> extends AbstractParameterizable {
-  /**
-   * The newline string according to system.
-   */
-  private static final String NEWLINE = System.getProperty("line.separator");
-
-  /**
-   * Flag to obtain help-message.
-   * <p>
-   * Key: {@code -h}
-   * </p>
-   */
-  private final Flag HELP_FLAG = new Flag(OptionID.HELP);
-
-  /**
-   * Flag to obtain help-message.
-   * <p>
-   * Key: {@code -help}
-   * </p>
-   */
-  private final Flag HELP_LONG_FLAG = new Flag(OptionID.HELP_LONG);
-
-  /**
-   * Optional Parameter to specify a class to obtain a description for, must
-   * extend {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * .
-   * <p>
-   * Key: {@code -description}
-   * </p>
-   */
-  private final ClassParameter<Parameterizable> DESCRIPTION_PARAM = new ClassParameter<Parameterizable>(OptionID.DESCRIPTION, Parameterizable.class, true);
-
+public class KNNExplorer<O extends NumberVector<O, ?>> extends AbstractApplication {
   /**
    * Parameter to specify the database connection to be used, must extend
    * {@link de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection}.
@@ -195,22 +144,8 @@ public class KNNExplorer<O extends NumberVector<O, ?>> extends AbstractParameter
    */
   private Normalization<O> normalization = null;
 
-  private OptionHandler helpOptionHandler;
-
   public KNNExplorer() {
     super();
-
-    helpOptionHandler = new OptionHandler();
-    helpOptionHandler.put(HELP_FLAG);
-    helpOptionHandler.put(HELP_LONG_FLAG);
-    helpOptionHandler.put(DESCRIPTION_PARAM);
-
-    // help flag
-    addOption(HELP_FLAG);
-    addOption(HELP_LONG_FLAG);
-
-    // description parameter
-    addOption(DESCRIPTION_PARAM);
 
     // parameter database connection
     addOption(DATABASE_CONNECTION_PARAM);
@@ -223,66 +158,10 @@ public class KNNExplorer<O extends NumberVector<O, ?>> extends AbstractParameter
   }
 
   /**
-   * Returns a usage message with the specified message as leading line, and
-   * information as provided by optionHandler. If an algorithm is specified, the
-   * description of the algorithm is returned.
-   * 
-   * @return a usage message with the specified message as leading line, and
-   *         information as provided by optionHandler
-   */
-  public String usage() {
-    StringBuffer usage = new StringBuffer();
-    usage.append(KDDTask.INFORMATION);
-    usage.append(NEWLINE);
-
-    // Collect options
-    List<Pair<Parameterizable, Option<?>>> options = new ArrayList<Pair<Parameterizable, Option<?>>>();
-    collectOptions(options);
-    OptionUtil.formatForConsole(usage, 77, "   ", options);
-
-    // TODO: cleanup:
-    List<GlobalParameterConstraint> globalParameterConstraints = optionHandler.getGlobalParameterConstraints();
-    if(!globalParameterConstraints.isEmpty()) {
-      usage.append(NEWLINE).append("Global parameter constraints:");
-      for(GlobalParameterConstraint gpc : globalParameterConstraints) {
-        usage.append(NEWLINE).append(" - ");
-        usage.append(gpc.getDescription());
-      }
-    }
-
-    return usage.toString();
-  }
-
-  /**
    * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters(java.lang.String[])
    */
   @Override
   public String[] setParameters(String[] args) throws ParameterException {
-    if(args.length == 0) {
-      throw new AbortException("No options specified. Try flag -h to gain more information.");
-    }
-    helpOptionHandler.grabOptions(args);
-
-    // description
-    if(DESCRIPTION_PARAM.isSet()) {
-      String descriptionClass = DESCRIPTION_PARAM.getValue();
-      Parameterizable p;
-      try {
-        try {
-          p = ClassGenericsUtil.instantiate(Algorithm.class, descriptionClass);
-        }
-        catch(UnableToComplyException e) {
-          p = ClassGenericsUtil.instantiate(Parameterizable.class, descriptionClass);
-        }
-      }
-      catch(UnableToComplyException e) {
-        // FIXME: log here?
-        LoggingUtil.exception(e.getMessage(), e);
-        throw new WrongParameterValueException(DESCRIPTION_PARAM.getName(), descriptionClass, DESCRIPTION_PARAM.getFullDescription(), e);
-      }
-      throw new AbortException(OptionUtil.describeParameterizable(new StringBuffer(), p, 77, "   ").toString());
-    }
-
     String[] remainingParameters = super.setParameters(args);
 
     // database connection
@@ -301,67 +180,25 @@ public class KNNExplorer<O extends NumberVector<O, ?>> extends AbstractParameter
       remainingParameters = normalization.setParameters(remainingParameters);
     }
 
-    // help
-    if(HELP_FLAG.isSet() || HELP_LONG_FLAG.isSet()) {
-      throw new AbortException(ExceptionMessages.USER_REQUESTED_HELP);
-    }
-
     rememberParametersExcept(args, remainingParameters);
     return remainingParameters;
   }
 
+  @Override
   public void run() throws IllegalStateException {
     Database<O> db = databaseConnection.getDatabase(normalization);
     (new ExplorerWindow()).run(db, distanceFunction);
   }
-
+  
   /**
-   * Runs a KDD task accordingly to the specified parameters.
+   * Main method to run this wrapper.
    * 
-   * @param args parameter list according to description
+   * @param args the arguments to run this wrapper
    */
   public static void main(String[] args) {
-    LoggingConfiguration.assertConfigured();
-    Logging logger = Logging.getLogger(KDDTask.class);
-    KNNExplorer<DoubleVector> explorer = new KNNExplorer<DoubleVector>();
-    try {
-      String[] remainingParameters = explorer.setParameters(args);
-      if(remainingParameters.length != 0) {
-        logger.warning("Unnecessary parameters specified: " + Arrays.asList(remainingParameters) + "\n");
-      }
-      explorer.run();
-    }
-    catch(AbortException e) {
-      // ensure we actually show the message:
-      LoggingConfiguration.setVerbose(true);
-      if(explorer.HELP_FLAG.isSet()) {
-        logger.verbose(explorer.usage());
-      }
-      logger.verbose(e.getMessage());
-    }
-    catch(UnspecifiedParameterException e) {
-      LoggingConfiguration.setVerbose(true);
-      logger.verbose(explorer.usage());
-      logger.warning(e.getMessage());
-    }
-    catch(ParameterException e) {
-      // Note: the stack-trace is not included, since this exception is
-      // supposedly only thrown with an already helpful message.
-      if(explorer.HELP_FLAG.isSet()) {
-        LoggingConfiguration.setVerbose(true);
-        logger.verbose(explorer.usage());
-      }
-      logger.warning(e.getMessage(), e);
-    }
-    // any other exception
-    catch(Exception e) {
-      if(explorer.HELP_FLAG.isSet()) {
-        LoggingConfiguration.setVerbose(true);
-        logger.verbose(explorer.usage());
-      }
-      LoggingUtil.exception(e.getMessage(), e);
-    }
+    new KNNExplorer<DoubleVector>().runCLIApplication(args);
   }
+
 
   class ExplorerWindow extends AbstractLoggable {
     /**

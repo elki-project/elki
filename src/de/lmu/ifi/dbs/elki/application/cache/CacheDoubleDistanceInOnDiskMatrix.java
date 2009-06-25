@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.persistent.utility;
+package de.lmu.ifi.dbs.elki.application.cache;
 
 import java.io.File;
 import java.io.IOException;
