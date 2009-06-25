@@ -74,17 +74,12 @@
 				<exclude name="${basepackage}algorithm/clustering/correlation/KernelFourC.*"/>
 				<exclude name="${basepackage}algorithm/clustering/correlation/SubspaceAggregation.*"/>
 				<exclude name="${basepackage}algorithm/clustering/correlation/SubspaceEM.*"/>
-				<exclude name="${basepackage}application/converter/Arff2Txt.*"/>
-				<exclude name="${basepackage}application/converter/ArffSparseInstanceToSparseBitVector.*"/>
-				<exclude name="${basepackage}application/converter/Database2Arff.*"/>
-				<exclude name="${basepackage}application/converter/Txt2Arff.*"/>
 				<exclude name="${basepackage}data/synthetic/ArbitraryCorrelationGenerator.*"/>
 				<exclude name="${basepackage}data/synthetic/AxesParallelCorrelationGenerator.*"/>
 				<exclude name="${basepackage}data/synthetic/PartiallySimilarVoxelObjectsGenerator.*"/>
 				<exclude name="${basepackage}distance/distancefunction/FractalDimensionBasedDistanceFunction"/>
                 <exclude name="${basepackage}index/tree/spatial/rstarvariants/flat/**"/>
                 <exclude name="${basepackage}math/analysis/**"/>
-				<exclude name="${basepackage}parser/ArffFileParser.**"/>
 				<exclude name="${basepackage}test/**"/>
 				<!-- used only (?) by oldLOF/OnlineLOF/LOFTable/NNTable -->
                 <exclude name="${basepackage}utilities/tree/btree/**"/>

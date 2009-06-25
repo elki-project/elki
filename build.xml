@@ -97,9 +97,6 @@
 		<exclude name="${ELKI_DIR}/algorithm/clustering/biclustering/**"/>
 		<!-- Kernel 4C -->
 		<exclude name="${ELKI_DIR}/algorithm/clustering/correlation/KernelFourC.*"/>
-		<!-- Arff file format support -->
-		<exclude name="${ELKI_DIR}/application/converter/**"/>
-		<exclude name="${ELKI_DIR}/parser/ArffFileParser.**"/>
 		<!-- Flat Rstar tree -->
         <exclude name="${ELKI_DIR}/index/tree/spatial/rstarvariants/flat/**"/>
 		<!-- currently empty -->
