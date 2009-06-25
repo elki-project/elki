@@ -21,6 +21,9 @@ public class ArcCosineDistanceFunction<V extends FeatureVector<V,?>> extends Abs
 
   /**
    * Computes the cosine distance for two given feature vectors.
+   * 
+   * The cosine distance is computed as the arcus from the cosine similarity value,
+   * i.e., <code>arccos(&lt;v1,v2&gt;)</code>.
    *
    * @param v1 first feature vector
    * @param v2 second feature vector
