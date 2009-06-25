@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
@@ -20,7 +21,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.wrapper.AbstractWrapper;
 
 /**
  * Wrapper to convert a traditional text-serialized result into a on-disk matrix
@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.wrapper.AbstractWrapper;
  * @author Erich Schubert
  * 
  */
-public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject> extends AbstractWrapper {
+public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject> extends AbstractApplication {
   /**
    * Parameter to specify the database connection to be used, must extend
    * {@link de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection}.
@@ -172,6 +172,6 @@ public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject> extends
    * @param args
    */
   public static void main(String[] args) {
-    new CacheDoubleDistanceInOnDiskMatrix<DatabaseObject>().runCLIWrapper(args);
+    new CacheDoubleDistanceInOnDiskMatrix<DatabaseObject>().runCLIApplication(args);
   }
 }

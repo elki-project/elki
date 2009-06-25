@@ -11,19 +11,19 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import de.lmu.ifi.dbs.elki.application.StandAloneInputApplication;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.parser.AbstractParser;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.wrapper.StandAloneInputWrapper;
 
 /**
  * Converts an arff file into a whitespace separated txt file.
  *
  * @author Elke Achtert
  */
-public class Arff2Txt extends StandAloneInputWrapper {
+public class Arff2Txt extends StandAloneInputApplication {
     /**
      * Main method to run this wrapper.
      *

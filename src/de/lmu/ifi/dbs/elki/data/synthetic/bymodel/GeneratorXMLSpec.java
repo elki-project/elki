@@ -23,6 +23,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import de.lmu.ifi.dbs.elki.application.StandAloneApplication;
 import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution.UniformDistribution;
@@ -34,14 +35,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.xml.XMLNodeIterator;
-import de.lmu.ifi.dbs.elki.wrapper.StandAloneWrapper;
 
 /**
  * Generate a data set based on a specified model (using an XML specification)
  * 
  * @author Erich Schubert
  */
-public class GeneratorXMLSpec extends StandAloneWrapper {
+public class GeneratorXMLSpec extends StandAloneApplication {
   /**
    * A pattern defining whitespace.
    */
@@ -530,7 +530,7 @@ public class GeneratorXMLSpec extends StandAloneWrapper {
    * @param args the arguments to run this wrapper
    */
   public static void main(String[] args) {
-    new GeneratorXMLSpec().runCLIWrapper(args);
+    new GeneratorXMLSpec().runCLIApplication(args);
   }
 
   /**

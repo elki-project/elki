@@ -93,22 +93,24 @@
 		<exclude name="experimentalcode/**"/>
 		<!-- not yet published & polished: COP -->
 		<exclude name="${ELKI_DIR}/algorithm/outlier/COP.*"/>
+		<!-- currently only contains an abstract biclustering algorithm -->
 		<exclude name="${ELKI_DIR}/algorithm/clustering/biclustering/**"/>
+		<!-- Kernel 4C -->
 		<exclude name="${ELKI_DIR}/algorithm/clustering/correlation/KernelFourC.*"/>
-		<exclude name="${ELKI_DIR}/algorithm/clustering/correlation/SubspaceAggregation.*"/>
-		<exclude name="${ELKI_DIR}/algorithm/clustering/correlation/SubspaceEM.*"/>
+		<!-- Arff file format support -->
 		<exclude name="${ELKI_DIR}/converter/Arff2Txt.*"/>
 		<exclude name="${ELKI_DIR}/converter/ArffSparseInstanceToSparseBitVector.*"/>
 		<exclude name="${ELKI_DIR}/converter/Database2Arff.*"/>
 		<exclude name="${ELKI_DIR}/converter/Txt2Arff.*"/>
-        <exclude name="${ELKI_DIR}/index/tree/spatial/rstarvariants/flat/**"/>
-        <exclude name="${ELKI_DIR}/math/analysis/**"/>
 		<exclude name="${ELKI_DIR}/parser/ArffFileParser.**"/>
+		<!-- Flat Rstar tree -->
+        <exclude name="${ELKI_DIR}/index/tree/spatial/rstarvariants/flat/**"/>
+		<!-- currently empty -->
+        <exclude name="${ELKI_DIR}/math/analysis/**"/>
+		<!-- Unit tests -->
 		<exclude name="${ELKI_DIR}/test/**"/>
 		<!-- used only (?) by oldLOF/OnlineLOF/LOFTable/NNTable -->
         <exclude name="${ELKI_DIR}/utilities/tree/btree/**"/>
-		<!-- exclude wrappers currently - those are merely internal convenience classes and are a bit arbitrary, need cleaning and careful inspection -->
-		<exclude name="${ELKI_DIR}/wrapper/**"/>
 	</patternset>
 	<!-- use exclude.release only for release builds -->
 	<condition property="build.patternset" value="exclude.release">
