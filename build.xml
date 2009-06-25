@@ -240,7 +240,13 @@
 	<!-- Compile all java code -->
 	<target name="compile_java">
 		<mkdir dir="${build.output}" />
-		<javac destdir="${build.output}" deprecation="false" debug="false" optimize="true" source="1.6" debuglevel="">
+		<javac
+			destdir="${build.output}"
+			deprecation="false"
+			debug="false"
+			optimize="true"
+			source="1.6"
+			debuglevel="">
 			<compilerarg value="-Xlint:all"/>
 			<classpath refid="build.classpath" />
 			<patternset refid="${build.patternset}"/>
@@ -265,6 +271,35 @@
 		<!-- TODO: install figures for release -->
 	</target>
 
+	<!-- Validate build -->
+	<target name="validate_standalone" description="Validate a to be released source code by trying a build in a sandbox environment" depends="clean">
+		<mkdir dir="${build.output}/src" />
+		<!-- copy included parts of the source only! -->
+		<copy todir="${build.output}/src">
+			<fileset dir="${source}">
+				<patternset refid="${build.patternset}"/>
+			</fileset>
+		</copy>
+		<!-- try a build -->
+		<javac
+			destdir="${build.output}"
+			deprecation="false"
+			debug="false"
+			optimize="true"
+			source="1.6"
+			debuglevel="">
+			<compilerarg value="-Xlint:all"/>
+			<classpath>
+				<fileset dir="${build.lib}">
+					<include name="**/*.jar" />
+				</fileset>
+				<dirset dir="${build.output}/src" />
+			</classpath>
+			<patternset refid="${build.patternset}"/>
+			<src path="${build.output}/src" />
+		</javac>
+	</target>
+	
 	<!-- +++++++++++++++++++ JAR GENERATION TARGETS +++++++++++++++++++ -->
 	
 	<!-- Jar building -->
@@ -369,4 +404,5 @@
 			<fileset dir="${deploy.output}"/>
 		</copy>
 	</target>
+	
 </project>
