@@ -6,7 +6,9 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 
 /**
  * Cosine distance function for feature vectors.
- *
+ * 
+ * The cosine distance is computed from the cosine similarity by <code>1-(cosine similarity)</code>.
+ * 
  * @author Arthur Zimek
  * @param <V> the type of FeatureVector to compute the distances in between
  */
