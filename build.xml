@@ -98,10 +98,7 @@
 		<!-- Kernel 4C -->
 		<exclude name="${ELKI_DIR}/algorithm/clustering/correlation/KernelFourC.*"/>
 		<!-- Arff file format support -->
-		<exclude name="${ELKI_DIR}/converter/Arff2Txt.*"/>
-		<exclude name="${ELKI_DIR}/converter/ArffSparseInstanceToSparseBitVector.*"/>
-		<exclude name="${ELKI_DIR}/converter/Database2Arff.*"/>
-		<exclude name="${ELKI_DIR}/converter/Txt2Arff.*"/>
+		<exclude name="${ELKI_DIR}/application/converter/**"/>
 		<exclude name="${ELKI_DIR}/parser/ArffFileParser.**"/>
 		<!-- Flat Rstar tree -->
         <exclude name="${ELKI_DIR}/index/tree/spatial/rstarvariants/flat/**"/>

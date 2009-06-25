@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.converter;
+package de.lmu.ifi.dbs.elki.application.converter;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;

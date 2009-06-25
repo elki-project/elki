@@ -1,5 +1,7 @@
-package de.lmu.ifi.dbs.elki.converter;
+package de.lmu.ifi.dbs.elki.application.converter;
 
+import de.lmu.ifi.dbs.elki.converter.WekaAttribute;
+import de.lmu.ifi.dbs.elki.converter.WekaObject;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
