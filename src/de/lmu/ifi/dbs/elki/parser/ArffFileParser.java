@@ -5,9 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import de.lmu.ifi.dbs.elki.converter.Arff2Txt;
-import de.lmu.ifi.dbs.elki.converter.WekaAttribute;
-import de.lmu.ifi.dbs.elki.converter.WekaObject;
+import de.lmu.ifi.dbs.elki.application.converter.Arff2Txt;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -20,9 +18,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * 
  * @author Arthur Zimek
  * @param <O> object type
- * @param <W> attribute type
  */
-public class ArffFileParser<O extends DatabaseObject & WekaObject<W>, W extends WekaAttribute> extends AbstractParser<O>
+public class ArffFileParser<O extends DatabaseObject> extends AbstractParser<O>
 {
     /**
      * The default base parser ({@link DoubleVectorLabelParser}).
