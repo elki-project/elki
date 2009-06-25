@@ -4,7 +4,6 @@ import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.MetricDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -20,7 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * TODO: implement SpatialDistanceFunction
  */
 public class SparseLPNormDistanceFunction<V extends SparseFeatureVector<V, N>, N extends Number>
-    extends AbstractDoubleDistanceFunction<V> implements MetricDistanceFunction<V, DoubleDistance> {
+    extends AbstractDoubleDistanceFunction<V> {
 
     /**
      * OptionID for {@link #P_PARAM}
