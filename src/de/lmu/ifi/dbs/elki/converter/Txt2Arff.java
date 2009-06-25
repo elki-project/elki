@@ -19,13 +19,13 @@ import java.util.Map;
 import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import de.lmu.ifi.dbs.elki.application.StandAloneInputApplication;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.parser.AbstractParser;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.wrapper.StandAloneInputWrapper;
 
 /**
  * Converts a txt file to an arff file. All attributes that can be parsed as
@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.wrapper.StandAloneInputWrapper;
  * as nominal attributes. The values for a nominal attribute are sorted.
  * @author Arthur Zimek
  */
-public class Txt2Arff<W extends WekaAttribute> extends StandAloneInputWrapper {
+public class Txt2Arff<W extends WekaAttribute> extends StandAloneInputApplication {
 
   /**
    * Main method to run this wrapper.

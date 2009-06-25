@@ -14,12 +14,12 @@ import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import de.lmu.ifi.dbs.elki.application.StandAloneInputApplication;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.parser.AbstractParser;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.wrapper.StandAloneInputWrapper;
 
 /**
  * Converts an arff sparse instance file to a file readable with a
@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.wrapper.StandAloneInputWrapper;
  *
  * @author Elke Achtert
  */
-public class ArffSparseInstanceToSparseBitVector extends StandAloneInputWrapper {
+public class ArffSparseInstanceToSparseBitVector extends StandAloneInputApplication {
     /**
      * A keyword used to denote a relation declaration.
      */

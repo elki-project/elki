@@ -1,10 +1,11 @@
-package de.lmu.ifi.dbs.elki.wrapper;
+package de.lmu.ifi.dbs.elki.application;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
@@ -15,7 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
- * AbstractWrapper sets the values for flags verbose and help.
+ * AbstractApplication sets the values for flags verbose and help.
  * <p/>
  * Any Wrapper class that makes use of these flags may extend this class. Beware
  * to make correct use of parameter settings via optionHandler as commented with
@@ -24,7 +25,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Elke Achtert
  */
 
-public abstract class AbstractWrapper extends AbstractParameterizable implements Wrapper {
+public abstract class AbstractApplication extends AbstractParameterizable {
   /**
    * Flag to obtain help-message.
    * <p>
@@ -42,7 +43,7 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
   private final Flag HELP_LONG_FLAG = new Flag(OptionID.HELP_LONG);
 
   /**
-   * Flag to allow verbose messages while performing the wrapper.
+   * Flag to allow verbose messages while running the application.
    * <p>
    * Key: {@code -verbose}
    * </p>
@@ -56,7 +57,7 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
 
   /**
    * The remaining parameters after the option handler grabbed the options for
-   * this wrapper.
+   * this application.
    */
   private List<String> remainingParameters;
 
@@ -65,7 +66,7 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
    * handler. Any extending class should call this constructor, then add further
    * parameters.
    */
-  protected AbstractWrapper() {
+  protected AbstractApplication() {
     // verbose
     addOption(VERBOSE_FLAG);
 
@@ -105,10 +106,10 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
 
   /**
    * Returns whether verbose messages should be printed while executing the
-   * wrapper.
+   * application.
    * 
    * @return whether verbose messages should be printed while executing the
-   *         wrapper
+   *         application
    */
   public final boolean isVerbose() {
     return verbose;
@@ -116,7 +117,7 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
 
   /**
    * Returns a copy of the remaining parameters after the option handler grabbed
-   * the options for this wrapper.
+   * the options for this application.
    * 
    * @return the remaining parameters
    */
@@ -148,12 +149,13 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
   }  
 
   /**
-   * Generic command line invocation. Refactored to have a central place for
-   * outermost exception handling.
+   * Generic command line invocation.
    * 
-   * @param args the arguments to run this wrapper
+   * Refactored to have a central place for outermost exception handling.
+   * 
+   * @param args the arguments to run this application
    */
-  public void runCLIWrapper(String[] args) {
+  public void runCLIApplication(String[] args) {
     LoggingConfiguration.assertConfigured();
     try {
       this.setParameters(args);
@@ -179,4 +181,10 @@ public abstract class AbstractWrapper extends AbstractParameterizable implements
       logger.exception(e.toString(), cause);
     }
   }
+  
+  /**
+   * Runs the application.
+   * @throws de.lmu.ifi.dbs.elki.utilities.UnableToComplyException if an error occurs during running the application
+   */
+  public abstract void run() throws UnableToComplyException;
 }
