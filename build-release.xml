@@ -74,10 +74,10 @@
 				<exclude name="${basepackage}algorithm/clustering/correlation/KernelFourC.*"/>
 				<exclude name="${basepackage}algorithm/clustering/correlation/SubspaceAggregation.*"/>
 				<exclude name="${basepackage}algorithm/clustering/correlation/SubspaceEM.*"/>
-				<exclude name="${basepackage}converter/Arff2Txt.*"/>
-				<exclude name="${basepackage}converter/ArffSparseInstanceToSparseBitVector.*"/>
-				<exclude name="${basepackage}converter/Database2Arff.*"/>
-				<exclude name="${basepackage}converter/Txt2Arff.*"/>
+				<exclude name="${basepackage}application/converter/Arff2Txt.*"/>
+				<exclude name="${basepackage}application/converter/ArffSparseInstanceToSparseBitVector.*"/>
+				<exclude name="${basepackage}application/converter/Database2Arff.*"/>
+				<exclude name="${basepackage}application/converter/Txt2Arff.*"/>
 				<exclude name="${basepackage}data/synthetic/ArbitraryCorrelationGenerator.*"/>
 				<exclude name="${basepackage}data/synthetic/AxesParallelCorrelationGenerator.*"/>
 				<exclude name="${basepackage}data/synthetic/PartiallySimilarVoxelObjectsGenerator.*"/>

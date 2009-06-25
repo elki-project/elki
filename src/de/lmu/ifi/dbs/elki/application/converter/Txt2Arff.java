@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.converter;
+package de.lmu.ifi.dbs.elki.application.converter;
 
 
 import java.io.BufferedReader;
@@ -20,6 +20,8 @@ import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.application.StandAloneInputApplication;
+import de.lmu.ifi.dbs.elki.converter.WekaAttribute;
+import de.lmu.ifi.dbs.elki.converter.WekaAttributeFactory;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.parser.AbstractParser;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
