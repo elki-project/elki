@@ -4,7 +4,7 @@ import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 
 /**
- * Adapter from a normalized similarity function to a distance function using arccos(sim)
+ * Adapter from a normalized similarity function to a distance function using <code>arccos(sim)</code>.
  * 
  * @author Erich Schubert
  *

@@ -4,7 +4,7 @@ import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 
 /**
- * Adapter from a normalized similarity function to a distance function using 1 - sim
+ * Adapter from a normalized similarity function to a distance function using <code>1 - sim</code>.
  * 
  * @author Erich Schubert
  *
