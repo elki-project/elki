@@ -187,7 +187,7 @@
 	</target>
 
 	<target name="javadocparams" depends="copy4jar,javadoc">
-	    <java classpath="${classpath}" dir="${deploy.srcdir}/bin" classname="de.lmu.ifi.dbs.elki.properties.DocumentParameters" fork="true">
+	    <java classpath="${classpath}" dir="${deploy.srcdir}/bin" classname="de.lmu.ifi.dbs.elki.application.internal.DocumentParameters" fork="true">
 	   		<arg value="${deploy.javadoc}/parameters-byclass.html"/>
 	   		<arg value="${deploy.javadoc}/parameters-byopt.html"/>
 	   	</java>

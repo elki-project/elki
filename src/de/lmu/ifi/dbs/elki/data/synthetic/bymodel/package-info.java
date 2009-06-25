@@ -1,7 +1,7 @@
 /**
  * <p>Generator using a distribution model specified in an XML configuration file.</p>
  * 
- * <p>{@link de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorXMLSpec} is a standalone wrapper
+ * <p>{@link de.lmu.ifi.dbs.elki.application.GeneratorXMLSpec} is a standalone application
  * that loads an XML specification file and generates a synthetic data set according to the
  * specifications given.</p>
  * 

@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.properties;
+package de.lmu.ifi.dbs.elki.application.internal;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,6 +9,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.properties.Properties;
+import de.lmu.ifi.dbs.elki.properties.PropertyName;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 
