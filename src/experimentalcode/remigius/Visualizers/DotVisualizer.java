@@ -17,7 +17,7 @@ import experimentalcode.remigius.VisualizationManager;
 public class DotVisualizer<O extends DoubleVector> extends NumberVisualizer<O> {
 
 	private EventListener hoverer;
-	
+
 	public DotVisualizer(Database<O> database, VisualizationManager<O> v){
 		super(database, v);
 //		this.hoverer = new ToolTipListener(v.getDocument());
@@ -30,21 +30,21 @@ public class DotVisualizer<O extends DoubleVector> extends NumberVisualizer<O> {
 			SVGSimpleLinearAxis.drawAxis(svgp, layer, scales[dimx], 0, 1, 1, 1, true, true);
 			SVGSimpleLinearAxis.drawAxis(svgp, layer, scales[dimy], 0, 1, 0, 0, true, false);
 			svgp.updateStyleElement();
-			
+
 		} catch (CSSNamingConflict e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
+
+
 		for (int id : database.getIDs()){
 
 			Element dot = SHAPEGEN.createDot(svgp.getDocument(), getPositioned(database.get(id), dimx), (1 - getPositioned(database.get(id), dimy)), id, dimx, dimy);	
-						EventTarget targ = (EventTarget) dot;
-						targ.addEventListener(SVGConstants.SVG_MOUSEOVER_EVENT_TYPE, hoverer, false);
-						targ.addEventListener(SVGConstants.SVG_MOUSEOUT_EVENT_TYPE, hoverer, false);
-						targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, hoverer, false);
-						layer.appendChild(dot);
+			EventTarget targ = (EventTarget) dot;
+			targ.addEventListener(SVGConstants.SVG_MOUSEOVER_EVENT_TYPE, hoverer, false);
+			targ.addEventListener(SVGConstants.SVG_MOUSEOUT_EVENT_TYPE, hoverer, false);
+			targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, hoverer, false);
+			layer.appendChild(dot);
 
 			layer.appendChild(
 					dot
@@ -52,7 +52,7 @@ public class DotVisualizer<O extends DoubleVector> extends NumberVisualizer<O> {
 		}
 		return new NumberVisualization(dimx, dimy, layer);
 	}
-	
+
 	public String toString(){
 		return "Dots";
 	}
