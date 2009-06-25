@@ -97,6 +97,10 @@ public class Pair<FIRST, SECOND> {
   /**
    * Simple equals statement.
    * 
+   * This Pair equals another Object if they are identical or
+   * if the other Object is also a Pair and the {@link #first} and {@link #second} element
+   * of this Pair equal the {@link #first} and {@link #second} element, respectively, of the other Pair. 
+   * 
    * @param obj Object to compare to
    */
   @SuppressWarnings("unchecked")
