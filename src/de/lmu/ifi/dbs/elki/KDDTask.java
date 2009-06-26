@@ -110,6 +110,11 @@ public class KDDTask<O extends DatabaseObject> extends AbstractApplication {
    * Output handler.
    */
   private ResultHandler<O, Result> resulthandler = null;
+  
+  /**
+   * Store the result.
+   */
+  MultiResult result = null;
 
   /**
    * Provides a KDDTask.
@@ -184,7 +189,6 @@ public class KDDTask<O extends DatabaseObject> extends AbstractApplication {
   public void run() throws IllegalStateException {
     Database<O> db = databaseConnection.getDatabase(normalization);
     algorithm.run(db);
-    MultiResult result;
     Result res = algorithm.getResult();
 
     // standard annotations from the source file
@@ -215,6 +219,15 @@ public class KDDTask<O extends DatabaseObject> extends AbstractApplication {
       resulthandler.setNormalization(normalization);
     }
     resulthandler.processResult(db, result);
+  }
+  
+  /**
+   * Get the algorithms result.
+   * 
+   * @return the result
+   */
+  public MultiResult getResult() {
+    return result;
   }
 
   /**
