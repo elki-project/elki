@@ -72,17 +72,17 @@ public class ClassListParameter<C> extends ListParameter<String> {
   public boolean isValid(String value) throws ParameterException {
     String[] classes = SPLIT.split(value);
     if(classes.length == 0) {
-      throw new UnspecifiedParameterException("Wrong parameter format! Given list of classes for paramter \"" + getName() + "\" is either empty or has the wrong format!\nParameter value required:\n" + getFullDescription());
+      throw new UnspecifiedParameterException("Wrong parameter format! Given list of classes for parameter \"" + getName() + "\" is either empty or has the wrong format!\nParameter value required:\n" + getFullDescription());
     }
 
     for(String cl : classes) {
       try {
         if(!ClassParameter.satisfiesClassRestriction(restrictionClass, cl)) {
-          throw new WrongParameterValueException(this.getName(), cl, "Wrong parameter value for parameter \"" + getName() + "\". Given class " + cl + " does not extend restriction class " + restrictionClass + ".\n");
+          throw new WrongParameterValueException(this, cl, "Class \"" + cl + "\" does not extend/implement restriction class " + restrictionClass + ".\n");
         }
       }
       catch(ClassNotFoundException e) {
-        throw new WrongParameterValueException(this.getName(), cl, "Wrong parameter value for parameter \"" + getName() + "\". Given class " + cl + " not found.\n", e);
+        throw new WrongParameterValueException(this, cl, "Class \"" + cl + "\" not found.\n", e);
       }
     }
 
@@ -128,7 +128,7 @@ public class ClassListParameter<C> extends ListParameter<String> {
         }
       }
       catch(Exception e) {
-        throw new WrongParameterValueException(getName(), classname, getFullDescription(), e);
+        throw new WrongParameterValueException(this, classname, e);
       }
     }
 
