@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.test.math;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import junit.framework.TestCase;
 
 import org.junit.Test;
 
@@ -11,7 +12,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * JUnit test to test the {@link Histogram} class.
  * @author Erich Schubert
  */
-public class TestHistogram {
+public class TestHistogram extends TestCase {
   Histogram<Double> hist;
 
   /**

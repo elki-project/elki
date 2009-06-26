@@ -3,7 +3,12 @@ package de.lmu.ifi.dbs.elki.test.persistent;
 import java.io.File;
 import java.io.IOException;
 
-import org.junit.*;
+import junit.framework.TestCase;
+
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
 
@@ -13,7 +18,7 @@ import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
  *
  */
 // TODO: also test with a static sample file.
-public class TestOnDiskUpperTriangleMatrix {
+public class TestOnDiskUpperTriangleMatrix extends TestCase {
   File file = new File("UpperTriangleTestFile.test.dat");
 
   /**

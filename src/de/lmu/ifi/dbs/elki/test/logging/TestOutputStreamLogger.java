@@ -1,10 +1,10 @@
 package de.lmu.ifi.dbs.elki.test.logging;
 
-import static org.junit.Assert.*;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Writer;
+
+import junit.framework.TestCase;
 
 import org.junit.Test;
 
@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.logging.OutputStreamLogger;
  * @author Erich Schubert
  * 
  */
-public class TestOutputStreamLogger {
+public class TestOutputStreamLogger extends TestCase {
   /**
    * Write a couple of messages to the console output writer and compare the
    * resulting characters.

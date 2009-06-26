@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.test.visualization;
 
-import static org.junit.Assert.*;
+import junit.framework.TestCase;
 
 import org.junit.Test;
 
@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
  * @author Erich Schubert
  *
  */
-public class TestLinearScale {
+public class TestLinearScale extends TestCase {
 
   /**
    * Produces a simple linear scale and verifies the tick lines are placed as expected.

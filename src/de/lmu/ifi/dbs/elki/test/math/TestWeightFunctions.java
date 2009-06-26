@@ -1,17 +1,24 @@
 package de.lmu.ifi.dbs.elki.test.math;
 
-import static org.junit.Assert.*;
+import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.*;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ConstantWeight;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ErfcStddevWeight;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ErfcWeight;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ExponentialWeight;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.GaussStddevWeight;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.GaussWeight;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.LinearWeight;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.WeightFunction;
 
 /**
  * JUnit test to assert consistency of a couple of Weight functions
  * @author Erich Schubert
  *
  */
-public class TestWeightFunctions {
+public class TestWeightFunctions extends TestCase {
   /**
    * Just a 'boring' value test for completeness.
    */

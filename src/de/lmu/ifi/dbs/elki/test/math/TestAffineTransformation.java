@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.test.math;
 
-import static org.junit.Assert.*;
+import junit.framework.TestCase;
 
 import org.junit.Test;
 
@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * @author Erich Schubert
  * 
  */
-public class TestAffineTransformation {
+public class TestAffineTransformation extends TestCase {
   /**
    * Test identity transform
    */

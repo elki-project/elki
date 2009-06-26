@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.test.math;
 
-import static org.junit.Assert.*;
+import junit.framework.TestCase;
 
 import org.junit.Test;
 
@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.LevenbergMarquardtMethod;
  * @author Erich Schubert
  * 
  */
-public class TestLevenbergMarquardtGaussianFitting {
+public class TestLevenbergMarquardtGaussianFitting extends TestCase {
   /**
    * Evaluate on a symmetric Gaussian distribution. Traditional estimation
    * already has the mean quite good, but is far off on the stddev. The improved
