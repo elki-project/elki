@@ -159,6 +159,25 @@ public class Logging {
   }
 
   /**
+   * Log a message at the 'severe' level.
+   * 
+   * @param message Warning log message.
+   * @param e Exception
+   */
+  public void error(String message, Throwable e) {
+    log(Level.SEVERE, message, e);
+  }
+
+  /**
+   * Log a message at the 'severe' level.
+   * 
+   * @param message Warning log message.
+   */
+  public void error(String message) {
+    log(Level.SEVERE, message);
+  }
+
+  /**
    * Log a message at the 'warning' level.
    * 
    * @param message Warning log message.
