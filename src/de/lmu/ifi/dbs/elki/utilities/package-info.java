@@ -18,6 +18,7 @@
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.xml.HTMLUtil}: HTML (with XML DOM) generation.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil}: SVG generation (XML DOM based).</li>
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.ByteArrayUtil}: byte array processing (low-level IO via byte arrays)</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.utilities.FileUtil}: File and file name utility functions.</li>
  * </ul>
  */
 package de.lmu.ifi.dbs.elki.utilities;
