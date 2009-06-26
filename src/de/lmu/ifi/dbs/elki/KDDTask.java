@@ -177,10 +177,9 @@ public class KDDTask<O extends DatabaseObject> extends AbstractApplication {
   }
 
   /**
-   * /** Method to run the specified algorithm using the specified database
+   * Method to run the specified algorithm using the specified database
    * connection.
    * 
-   * @return the result of the specified algorithm
    * @throws IllegalStateException if initialization has not been done properly
    *         (i.e. {@link #setParameters(String[]) setParameters(String[])} has
    *         not been called before calling this method)
