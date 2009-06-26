@@ -1,18 +1,25 @@
 package de.lmu.ifi.dbs.elki.application;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -23,9 +30,20 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * constructor and methods.
  * 
  * @author Elke Achtert
+ * @author Erich Schubert
  */
 
 public abstract class AbstractApplication extends AbstractParameterizable {
+  /**
+   * The newline string according to system.
+   */
+  private static final String NEWLINE = System.getProperty("line.separator");
+
+  /**
+   * Information for citation and version.
+   */
+  public static final String INFORMATION = "ELKI Version 0.2 (2009, July)" + NEWLINE + NEWLINE + "published in:" + NEWLINE + "Elke Achtert, Thomas Bernecker, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek:\n" + "ELKI in Time: ELKI 0.2 for the Performance Evaluation of Distance Measures for Time Series.\n" + "In Proc. 11th International Symposium on Spatial and Temporal Databases (SSTD 2009), Aalborg, Denmark, 2009." + NEWLINE;
+
   /**
    * Flag to obtain help-message.
    * <p>
@@ -41,6 +59,16 @@ public abstract class AbstractApplication extends AbstractParameterizable {
    * </p>
    */
   private final Flag HELP_LONG_FLAG = new Flag(OptionID.HELP_LONG);
+
+  /**
+   * Optional Parameter to specify a class to obtain a description for, must
+   * extend {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * .
+   * <p>
+   * Key: {@code -description}
+   * </p>
+   */
+  private final ClassParameter<Parameterizable> DESCRIPTION_PARAM = new ClassParameter<Parameterizable>(OptionID.DESCRIPTION, Parameterizable.class, true);
 
   /**
    * Flag to allow verbose messages while running the application.
@@ -73,6 +101,9 @@ public abstract class AbstractApplication extends AbstractParameterizable {
     // help
     addOption(HELP_FLAG);
     addOption(HELP_LONG_FLAG);
+
+    // description parameter
+    addOption(DESCRIPTION_PARAM);
   }
 
   /**
@@ -130,23 +161,34 @@ public abstract class AbstractApplication extends AbstractParameterizable {
     result.addAll(remainingParameters);
     return result;
   }
-  
+
   /**
-   * Returns a usage message with the specified message as leading line, and
-   * information as provided by optionHandler. If an algorithm is specified, the
-   * description of the algorithm is returned.
+   * Returns a usage message, explaining all known options
    * 
-   * @return a usage message with the specified message as leading line, and
-   *         information as provided by optionHandler
+   * @return a usage message explaining all known options
    */
   public String usage() {
     StringBuffer usage = new StringBuffer();
+    usage.append(INFORMATION);
+
     // Collect options
     List<Pair<Parameterizable, Option<?>>> options = new ArrayList<Pair<Parameterizable, Option<?>>>();
     collectOptions(options);
+    usage.append(NEWLINE).append("Parameters:").append(NEWLINE);
     OptionUtil.formatForConsole(usage, 77, "   ", options);
+
+    // TODO: cleanup:
+    List<GlobalParameterConstraint> globalParameterConstraints = optionHandler.getGlobalParameterConstraints();
+    if(!globalParameterConstraints.isEmpty()) {
+      usage.append(NEWLINE).append("Global parameter constraints:");
+      for(GlobalParameterConstraint gpc : globalParameterConstraints) {
+        usage.append(NEWLINE).append(" - ");
+        usage.append(gpc.getDescription());
+      }
+    }
+
     return usage.toString();
-  }  
+  }
 
   /**
    * Generic command line invocation.
@@ -156,35 +198,106 @@ public abstract class AbstractApplication extends AbstractParameterizable {
    * @param args the arguments to run this application
    */
   public void runCLIApplication(String[] args) {
-    LoggingConfiguration.assertConfigured();
+    boolean stop = false;
+
+    Exception error = null;
     try {
-      this.setParameters(args);
-      // help
-      if(HELP_FLAG.isSet()) {
-        throw new AbortException("Usage:\n\n"+usage());
+      String[] remainingParameters = this.setParameters(args);
+      if(remainingParameters.length > 0) {
+        logger.warning("Unused parameters specified: " + Arrays.asList(remainingParameters) + "\n");
       }
-      run();
     }
-    catch(AbortException e) {
+    catch(Exception t) {
+      // we do error handling below.
+      stop = true;
+      error = t;
+    }
+
+    // When help was requested, print the usage statement.
+    if(HELP_FLAG.isSet() || HELP_LONG_FLAG.isSet()) {
+      stop = true;
+      printHelp();
+    }
+
+    // When a description is requested, give the requested description next.
+    if(DESCRIPTION_PARAM.isSet()) {
+      stop = true;
+      printDescription();
+    }
+
+    // If we didn't have to stop yet, run the algorithm.
+    if(!stop && error == null) {
+      try {
+        // Try to run the actual algorithms.
+        run();
+      }
+      catch(Exception t) {
+        stop = true;
+        error = t;
+      }
+    }
+
+    if(error != null) {
+      printErrorMessage(error);
+    }
+  }
+
+  /**
+   * Print an error message for the given error.
+   * 
+   * @param error Error Exception.
+   */
+  private void printErrorMessage(Exception e) {
+    if(e instanceof AbortException) {
+      // ensure we actually show the message:
       LoggingConfiguration.setVerbose(true);
       logger.verbose(e.getMessage());
     }
-    catch(ParameterException e) {
-      if(HELP_FLAG.isSet()) {
-        LoggingConfiguration.setVerbose(true);
-        logger.verbose("Usage:\n\n"+usage());
-      }
-      logger.warning(e.toString());
+    else if(e instanceof UnspecifiedParameterException) {
+      logger.warning(e.getMessage());
     }
-    catch(Exception e) {
-      Throwable cause = e.getCause() != null ? e.getCause() : e;
-      logger.exception(e.toString(), cause);
+    else if(e instanceof ParameterException) {
+      logger.warning(e.getMessage());
+    }
+    else {
+      LoggingUtil.exception(e.getMessage(), e);
     }
   }
-  
+
+  /**
+   * Print the help message.
+   */
+  private void printHelp() {
+    LoggingConfiguration.setVerbose(true);
+    logger.verbose(usage());
+  }
+
+  /**
+   * Print the description for the given parameter
+   */
+  private void printDescription() {
+    String descriptionClass;
+    try {
+      descriptionClass = DESCRIPTION_PARAM.getValue();
+    }
+    catch(UnusedParameterException e) {
+      return;
+    }
+    try {
+      Parameterizable p = ClassGenericsUtil.instantiate(Parameterizable.class, descriptionClass);
+      LoggingConfiguration.setVerbose(true);
+      logger.verbose(OptionUtil.describeParameterizable(new StringBuffer(), p, 77, "   ").toString());
+    }
+    catch(UnableToComplyException e) {
+      LoggingUtil.exception(e.getMessage(), e);
+    }
+  }
+
   /**
    * Runs the application.
-   * @throws de.lmu.ifi.dbs.elki.utilities.UnableToComplyException if an error occurs during running the application
+   * 
+   * @throws de.lmu.ifi.dbs.elki.utilities.UnableToComplyException if an error
+   *         occurs during running the application
    */
   public abstract void run() throws UnableToComplyException;
 }
