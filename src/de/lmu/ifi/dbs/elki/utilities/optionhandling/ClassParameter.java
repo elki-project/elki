@@ -211,7 +211,7 @@ public class ClassParameter<C> extends Parameter<String, String> {
       }
     }
     catch(Exception e) {
-      throw new WrongParameterValueException(getName(), value, getFullDescription(), e);
+      throw new WrongParameterValueException(this, value, e);
     }
     return instance;
   }
