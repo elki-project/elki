@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.test.evaluation;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -13,6 +14,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.PairCountingFMeasure;
+import de.lmu.ifi.dbs.elki.test.JUnit4Test;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
@@ -21,7 +23,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * 
  * @author Erich Schubert
  */
-public class TestPairCountingFMeasure extends TestCase {
+public class TestPairCountingFMeasure implements JUnit4Test {
   // the following values depend on the data set used!
   String dataset = "data/testdata/unittests/hierarchical-3d2d1d.csv";
   // size of the data set

@@ -1,18 +1,19 @@
 package de.lmu.ifi.dbs.elki.test.math;
 
 import static org.junit.Assert.assertArrayEquals;
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.math.Histogram;
+import de.lmu.ifi.dbs.elki.test.JUnit4Test;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * JUnit test to test the {@link Histogram} class.
  * @author Erich Schubert
  */
-public class TestHistogram extends TestCase {
+public class TestHistogram implements JUnit4Test {
   Histogram<Double> hist;
 
   /**

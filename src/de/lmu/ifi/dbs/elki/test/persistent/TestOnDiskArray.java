@@ -3,27 +3,27 @@ package de.lmu.ifi.dbs.elki.test.persistent;
 import java.io.File;
 import java.io.IOException;
 
-import junit.framework.TestCase;
-
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.persistent.OnDiskArray;
+import de.lmu.ifi.dbs.elki.test.JUnit4Test;
 
 /**
  * Test to validate proper OnDiskArray operation.
  * @author Erich Schubert
  */
 // TODO: also test with a static sample file.
-public class TestOnDiskArray extends TestCase {
+public class TestOnDiskArray implements JUnit4Test {
   File file = new File("OnDiskArrayTestFile.test.dat");
 
   /**
    * Check that we don't overwrite any file.
    */
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
+  @Before
+  public void safetyCheck() throws Exception {
     if(file.exists()) {
       Assert.fail("Could not run test - test file already exists.");
     }
@@ -32,14 +32,13 @@ public class TestOnDiskArray extends TestCase {
   /**
    * Clean up afterwards
    */
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void cleanup() throws Exception {
     if(file != null && file.exists()) {
       if(!file.delete()) {
         Assert.fail("Error cleaning up: can't remove test file.");
       }
     }
-    super.tearDown();
   }
   
   /**
@@ -47,7 +46,7 @@ public class TestOnDiskArray extends TestCase {
    * @throws IOException
    */
   @Test
-  public void testOnDiskArray() throws IOException {
+  public void dotestOnDiskArray() throws IOException {
     final int extraheadersize = 2;
     final int recsize = 3;
     int numrec = 4;

@@ -1,9 +1,10 @@
 package de.lmu.ifi.dbs.elki.test.visualization;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.test.JUnit4Test;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 
 
@@ -13,7 +14,7 @@ import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
  * @author Erich Schubert
  *
  */
-public class TestLinearScale extends TestCase {
+public class TestLinearScale implements JUnit4Test {
 
   /**
    * Produces a simple linear scale and verifies the tick lines are placed as expected.
