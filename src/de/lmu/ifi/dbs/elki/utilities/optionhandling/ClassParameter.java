@@ -108,10 +108,10 @@ public class ClassParameter<C> extends Parameter<String, String> {
       does = satisfiesClassRestriction(restrictionClass, value);
     }
     catch(ClassNotFoundException e) {
-      throw new WrongParameterValueException(this.getName(), value, "Class not found. Expected subclass / implementing class of " + restrictionClass.getName(), e);
+      throw new WrongParameterValueException(this, value, "Given class \"" + value + "\" not found.", e);
     }
     if(!does) {
-      throw new WrongParameterValueException(this.getName(), value, "Class needs to be subclass / implementing class of " + restrictionClass.getName());
+      throw new WrongParameterValueException(this, value, "Given class \"" + value + "\" not a subclass / implementing class of " + restrictionClass.getName());
     }
     return does;
   }
@@ -170,7 +170,7 @@ public class ClassParameter<C> extends Parameter<String, String> {
       }
     }
     catch(ClassNotFoundException e) {
-      throw new WrongParameterValueException(this.getName(), value, "subclass of " + restrictionClass.getName());
+      throw new WrongParameterValueException(this, value, "Class not found \"" + value + "\"");
     }
   }
 

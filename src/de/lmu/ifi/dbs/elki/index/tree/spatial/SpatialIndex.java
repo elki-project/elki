@@ -81,7 +81,7 @@ public abstract class SpatialIndex<O extends NumberVector<O, ?>, N extends Spati
         bulkLoadStrategy = BulkSplit.Strategy.ZCURVE;
       }
       else {
-        throw new WrongParameterValueException(BULK_LOAD_STRATEGY_PARAM, strategy, null);
+        throw new WrongParameterValueException(BULK_LOAD_STRATEGY_PARAM, strategy);
       }
     }
 

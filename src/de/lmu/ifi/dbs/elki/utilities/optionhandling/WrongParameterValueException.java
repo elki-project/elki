@@ -15,22 +15,9 @@ public class WrongParameterValueException extends ParameterException {
    * 
    * @param parameter the parameter that has a wrong value
    * @param read the value of the parameter read by the option handler
-   * @param expected the value that has been expected
    */
-  public WrongParameterValueException(String parameter, String read, String expected) {
-    super("Wrong value of parameter " + parameter + ".\nRead " + read + ".\nExpected: " + expected);
-  }
-
-  /**
-   * Thrown by a Parameterizable object in case of wrong parameter format.
-   * 
-   * @param parameter the parameter that has a wrong value
-   * @param read the value of the parameter read by the option handler
-   * @param expected the value that has been expected
-   * @param cause the cause
-   */
-  public WrongParameterValueException(String parameter, String read, String expected, Throwable cause) {
-    super("Wrong value of parameter " + parameter + ".\n" + "Read: " + read + ".\n" + "Expected: " + expected, cause);
+  public WrongParameterValueException(Parameter<?, ?> parameter, String read) {
+    this("Wrong value of parameter " + parameter.getName() + ".\n" + "Read: " + read + ".\n" + "Expected: " + parameter.getFullDescription());
   }
 
   /**
@@ -41,7 +28,30 @@ public class WrongParameterValueException extends ParameterException {
    * @param cause the cause
    */
   public WrongParameterValueException(Parameter<?, ?> parameter, String read, Throwable cause) {
-    super("Wrong value of parameter " + parameter.getName() + ".\n" + "Read: " + read + ".\n" + "Expected: " + parameter.getFullDescription(), cause);
+    this("Wrong value of parameter " + parameter.getName() + ".\n" + "Read: " + read + ".\n" + "Expected: " + parameter.getFullDescription(), cause);
+  }
+
+  /**
+   * Thrown by a Parameterizable object in case of wrong parameter format.
+   * 
+   * @param parameter the parameter that has a wrong value
+   * @param read the value of the parameter read by the option handler
+   * @param reason detailed error description
+   * @param cause the cause
+   */
+  public WrongParameterValueException(Parameter<?, ?> parameter, String read, String reason, Throwable cause) {
+    this("Wrong value of parameter " + parameter.getName() + ".\n" + "Read: " + read + ".\n" + "Expected: " + parameter.getFullDescription()+"\n"+reason, cause);
+  }
+
+  /**
+   * Thrown by a Parameterizable object in case of wrong parameter format.
+   * 
+   * @param parameter the parameter that has a wrong value
+   * @param read the value of the parameter read by the option handler
+   * @param reason detailed error description
+   */
+  public WrongParameterValueException(Parameter<?, ?> parameter, String read, String reason) {
+    this("Wrong value of parameter " + parameter.getName() + ".\n" + "Read: " + read + ".\n" + "Expected: " + parameter.getFullDescription()+"\n"+reason);
   }
 
   /**

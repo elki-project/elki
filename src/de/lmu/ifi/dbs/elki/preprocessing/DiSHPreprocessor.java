@@ -269,7 +269,7 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
             for (int d = 0; d < eps_list.size(); d++) {
                 epsilon[d] = new DoubleDistance(eps_list.get(d));
                 if (epsilon[d].getValue() < 0) {
-                    throw new WrongParameterValueException(EPSILON_PARAM, eps_list.toString(), null);
+                    throw new WrongParameterValueException(EPSILON_PARAM, eps_list.toString());
                 }
             }
 
@@ -283,7 +283,7 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
             strategy = Strategy.MAX_INTERSECTION;
         }
         else
-            throw new WrongParameterValueException(STRATEGY_PARAM, strategyString, null);
+            throw new WrongParameterValueException(STRATEGY_PARAM, strategyString);
 
         return remainingParameters;
     }

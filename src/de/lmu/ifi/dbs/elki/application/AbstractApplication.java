@@ -254,10 +254,10 @@ public abstract class AbstractApplication extends AbstractParameterizable {
       logger.verbose(e.getMessage());
     }
     else if(e instanceof UnspecifiedParameterException) {
-      logger.warning(e.getMessage());
+      logger.error(e.getMessage());
     }
     else if(e instanceof ParameterException) {
-      logger.warning(e.getMessage());
+      logger.error(e.getMessage());
     }
     else {
       LoggingUtil.exception(e.getMessage(), e);
