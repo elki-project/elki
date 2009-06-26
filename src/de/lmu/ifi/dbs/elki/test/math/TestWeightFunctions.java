@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.test.math;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
@@ -12,13 +12,14 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.GaussStddevWei
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.GaussWeight;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.LinearWeight;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.WeightFunction;
+import de.lmu.ifi.dbs.elki.test.JUnit4Test;
 
 /**
  * JUnit test to assert consistency of a couple of Weight functions
  * @author Erich Schubert
  *
  */
-public class TestWeightFunctions extends TestCase {
+public class TestWeightFunctions implements JUnit4Test {
   /**
    * Just a 'boring' value test for completeness.
    */

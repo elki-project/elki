@@ -1,12 +1,15 @@
 package de.lmu.ifi.dbs.elki.test.math;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.test.JUnit4Test;
 
 /**
  * JUnit Test for the class {@link AffineTransformation}
@@ -14,7 +17,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * @author Erich Schubert
  * 
  */
-public class TestAffineTransformation extends TestCase {
+public class TestAffineTransformation implements JUnit4Test {
   /**
    * Test identity transform
    */

@@ -1,8 +1,9 @@
 package de.lmu.ifi.dbs.elki.test.math;
 
-import java.util.Arrays;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-import junit.framework.TestCase;
+import java.util.Arrays;
 
 import org.junit.Test;
 
@@ -15,6 +16,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.FittingFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.GaussianFittingFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.LevenbergMarquardtMethod;
 import de.lmu.ifi.dbs.elki.math.statistics.KernelDensityEstimator;
+import de.lmu.ifi.dbs.elki.test.JUnit4Test;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
@@ -23,7 +25,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * 
  * @author Erich Schubert
  */
-public class TestKernelDensityFitting extends TestCase {
+public class TestKernelDensityFitting implements JUnit4Test {
   // the following values depend on the data set used!
   String dataset = "data/testdata/unittests/gaussian-1d-for-fitting.csv";
 

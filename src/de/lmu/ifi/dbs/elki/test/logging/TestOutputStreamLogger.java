@@ -1,14 +1,15 @@
 package de.lmu.ifi.dbs.elki.test.logging;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Writer;
 
-import junit.framework.TestCase;
-
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.logging.OutputStreamLogger;
+import de.lmu.ifi.dbs.elki.test.JUnit4Test;
 
 /**
  * Small experiment to assert the console output logger works as expected.
@@ -16,7 +17,7 @@ import de.lmu.ifi.dbs.elki.logging.OutputStreamLogger;
  * @author Erich Schubert
  * 
  */
-public class TestOutputStreamLogger extends TestCase {
+public class TestOutputStreamLogger implements JUnit4Test {
   /**
    * Write a couple of messages to the console output writer and compare the
    * resulting characters.

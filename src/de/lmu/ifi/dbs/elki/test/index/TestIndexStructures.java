@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.elki.test.index;
 
-import java.util.List;
+import static junit.framework.Assert.assertTrue;
 
-import junit.framework.TestCase;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTree;
+import de.lmu.ifi.dbs.elki.test.JUnit4Test;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
@@ -30,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * 
  * @author Erich Schubert
  */
-public class TestIndexStructures extends TestCase {
+public class TestIndexStructures implements JUnit4Test {
   // the following values depend on the data set used!
   String dataset = "data/testdata/unittests/hierarchical-3d2d1d.csv";
 

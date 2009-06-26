@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.elki.test.algorithm.clustering.correlation;
 
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import junit.framework.TestCase;
 
 import org.junit.Test;
 
@@ -26,6 +26,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.WeightedCovarianceMatrixBuilde
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ErfcWeight;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
+import de.lmu.ifi.dbs.elki.test.JUnit4Test;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
@@ -38,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * @author Erich Schubert
  * 
  */
-public class TestERiCResults extends TestCase {
+public class TestERiCResults implements JUnit4Test {
   // the following values depend on the data set used!
   String dataset = "data/testdata/unittests/hierarchical-3d2d1d.csv";
 
