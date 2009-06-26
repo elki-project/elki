@@ -5,9 +5,7 @@ import java.io.IOException;
 
 import junit.framework.TestCase;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
@@ -19,13 +17,14 @@ import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
  */
 // TODO: also test with a static sample file.
 public class TestOnDiskUpperTriangleMatrix extends TestCase {
-  File file = new File("UpperTriangleTestFile.test.dat");
+  static File file = new File("UpperTriangleTestFile.test.dat");
 
   /**
    * Check that we don't overwrite any file.
    */
-  @Before
-  public void checkTestFile() {
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
     if(file.exists()) {
       Assert.fail("Could not run test - test file already exists.");
     }
@@ -34,13 +33,14 @@ public class TestOnDiskUpperTriangleMatrix extends TestCase {
   /**
    * Clean up afterwards
    */
-  @After
-  public void removeTestFile() {
-    if(file.exists()) {
+  @Override
+  protected void tearDown() throws Exception {
+    if(file != null && file.exists()) {
       if(!file.delete()) {
         Assert.fail("Error cleaning up: can't remove test file.");
       }
     }
+    super.tearDown();
   }
 
   /**
@@ -48,7 +48,7 @@ public class TestOnDiskUpperTriangleMatrix extends TestCase {
    * @throws IOException
    */
   @Test
-  public void testUpperTriangleMatrix() throws IOException {
+  public static void testUpperTriangleMatrix() throws IOException {
     final int extraheadersize = 2;
     final int recsize = 3;
     int matsize = 2;
