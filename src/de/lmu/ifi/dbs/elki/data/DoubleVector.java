@@ -119,7 +119,7 @@ public class DoubleVector extends RealVector<DoubleVector,Double> {
   public DoubleVector randomInstance(DoubleVector min, DoubleVector max, Random random) {
     double[] randomValues = new double[getDimensionality()];
     for (int i = 0; i < randomValues.length; i++) {
-      randomValues[i] = random.nextDouble() * (max.getValue(i+1) - min.getValue(i+1)) + max.getValue(i+1);
+      randomValues[i] = random.nextDouble() * (max.getValue(i+1) - min.getValue(i+1)) + min.getValue(i+1);
     }
     return new DoubleVector(randomValues);
   }
