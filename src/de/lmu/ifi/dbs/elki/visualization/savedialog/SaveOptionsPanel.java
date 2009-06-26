@@ -21,7 +21,6 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 
 /**
@@ -96,11 +95,6 @@ public class SaveOptionsPanel extends JPanel {
 
   protected JComboBox formatSelector;
 
-  String[] formats = { "svg", "png", "jpeg", "jpg", "pdf", "ps", "eps" };
-
-  // TODO: JPEG isn't working right on the Java side yet!
-  String[] visibleformats = { "auto", "svg", "png", /* "jpeg", */"pdf", "ps", "eps" };
-
   // Not particularly useful for most - hide it for now.
   private final boolean hasResetButton = false;
 
@@ -127,7 +121,7 @@ public class SaveOptionsPanel extends JPanel {
     // *** Format panel
     mainPanel.add(new JLabel(STR_CHOOSE_FORMAT));
 
-    formatSelector = new JComboBox(visibleformats);
+    formatSelector = new JComboBox(SVGSaveDialog.getVisibleFormats());
     formatSelector.setSelectedIndex(0);
     formatSelector.addItemListener(new ItemListener() {
       @Override
@@ -207,7 +201,7 @@ public class SaveOptionsPanel extends JPanel {
     qualPanel.setVisible(false);
     qualPanel.setLayout(new BoxLayout(qualPanel, BoxLayout.Y_AXIS));
     qualPanel.setBorder(BorderFactory.createTitledBorder(STR_JPEG_QUALITY));
-    modelQuality = new SpinnerNumberModel(1.0, 0.1, 1.0, 0.1);
+    modelQuality = new SpinnerNumberModel(0.7, 0.1, 1.0, 0.1);
     spinnerQual = new JSpinner(modelQuality);
     // spinnerQual.addChangeListener(x);
     qualPanel.add(spinnerQual);
@@ -222,12 +216,9 @@ public class SaveOptionsPanel extends JPanel {
       public void propertyChange(PropertyChangeEvent e) {
         if(e.getPropertyName().equals(JFileChooser.SELECTED_FILE_CHANGED_PROPERTY)) {
           File file = (File) e.getNewValue();
-          String ext = getFilenameExtension(file);
-          if(Util.arrayFind(formats, ext) >= 0) {
-            setFormat(ext);
-          }
-          else {
-            LoggingUtil.warning("Unrecognized file extension seen: " + ext);
+          String format = SVGSaveDialog.guessFormat(file.getName());
+          if(format != null) {
+            setFormat(format);
           }
         }
       }
@@ -235,7 +226,7 @@ public class SaveOptionsPanel extends JPanel {
   }
 
   protected void setFormat(String format) {
-    int index = Util.arrayFind(visibleformats, format);
+    int index = Util.arrayFind(SVGSaveDialog.getVisibleFormats(), format);
     if (index != formatSelector.getSelectedIndex() && index >= 0) {
       formatSelector.setSelectedIndex(index);
     }
@@ -269,29 +260,8 @@ public class SaveOptionsPanel extends JPanel {
     }
     else {
       // TODO: what to do on unknown formats?
-      LoggingUtil.warning("Unrecognized file extension seen: " + format);
+      //LoggingUtil.warning("Unrecognized file extension seen: " + format);
     }
-  }
-
-  /**
-   * Returns the normalized extension of the selected file.
-   * 
-   * Example: "test.PnG" => <code>png</code>
-   * 
-   * If no file is selected, <code>null</code> is returned.
-   * 
-   * @return Returns the extension of the selected file in lower case or
-   *         <code>null</code>
-   */
-  protected String getFilenameExtension(File file) {
-    if(file == null) {
-      return null;
-    }
-    int index = file.getName().lastIndexOf(".");
-    if(index >= file.getName().length() - 1) {
-      return null;
-    }
-    return file.getName().substring(file.getName().lastIndexOf(".") + 1).toLowerCase();
   }
 
   /**
@@ -299,11 +269,8 @@ public class SaveOptionsPanel extends JPanel {
    * 
    * @return file format identification
    */
-  public String getFormat() {
+  public String getSelectedFormat() {
     String format = (String) formatSelector.getSelectedItem();
-    if (format.equals("auto")) {
-      return formats[0];
-    }
     return format;
   }
 
@@ -315,7 +282,7 @@ public class SaveOptionsPanel extends JPanel {
    * @return Quality value for JPEG.
    */
   public double getJPEGQuality() {
-    Double qual = 1.0;
+    Double qual = 0.7;
     qual = modelQuality.getNumber().doubleValue();
     if(qual > 1.0) {
       qual = 1.0;
