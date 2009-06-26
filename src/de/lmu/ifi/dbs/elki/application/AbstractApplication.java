@@ -245,7 +245,7 @@ public abstract class AbstractApplication extends AbstractParameterizable {
   /**
    * Print an error message for the given error.
    * 
-   * @param error Error Exception.
+   * @param e Error Exception.
    */
   private void printErrorMessage(Exception e) {
     if(e instanceof AbortException) {
