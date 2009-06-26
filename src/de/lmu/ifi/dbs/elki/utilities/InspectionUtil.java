@@ -32,8 +32,9 @@ public class InspectionUtil {
   // W3C / SVG / XML classes
   "org.w3c.", "org.xml.",
   // JUnit
-  "org.junit.", "junit.", "org.hamcrest."
-  //
+  "org.junit.", "junit.", "org.hamcrest.",
+  // Eclipse
+  "org.eclipse",
   };
 
   /**
