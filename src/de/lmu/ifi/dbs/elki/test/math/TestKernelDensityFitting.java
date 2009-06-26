@@ -1,8 +1,9 @@
 package de.lmu.ifi.dbs.elki.test.math;
 
-import static org.junit.Assert.*;
-
 import java.util.Arrays;
+
+import junit.framework.TestCase;
+
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
@@ -22,7 +23,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * 
  * @author Erich Schubert
  */
-public class TestKernelDensityFitting {
+public class TestKernelDensityFitting extends TestCase {
   // the following values depend on the data set used!
   String dataset = "data/testdata/unittests/gaussian-1d-for-fitting.csv";
 

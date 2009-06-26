@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.elki.test.algorithm.clustering.correlation;
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import junit.framework.TestCase;
 
 import org.junit.Test;
 
@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * @author Erich Schubert
  * 
  */
-public class TestERiCResults {
+public class TestERiCResults extends TestCase {
   // the following values depend on the data set used!
   String dataset = "data/testdata/unittests/hierarchical-3d2d1d.csv";
 

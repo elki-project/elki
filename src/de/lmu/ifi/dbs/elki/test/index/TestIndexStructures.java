@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.elki.test.index;
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.List;
+
+import junit.framework.TestCase;
 
 import org.junit.Test;
 
@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * 
  * @author Erich Schubert
  */
-public class TestIndexStructures {
+public class TestIndexStructures extends TestCase {
   // the following values depend on the data set used!
   String dataset = "data/testdata/unittests/hierarchical-3d2d1d.csv";
 

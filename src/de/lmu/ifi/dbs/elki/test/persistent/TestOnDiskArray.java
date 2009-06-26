@@ -3,7 +3,12 @@ package de.lmu.ifi.dbs.elki.test.persistent;
 import java.io.File;
 import java.io.IOException;
 
-import org.junit.*;
+import junit.framework.TestCase;
+
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.persistent.OnDiskArray;
 
@@ -12,7 +17,7 @@ import de.lmu.ifi.dbs.elki.persistent.OnDiskArray;
  * @author Erich Schubert
  */
 // TODO: also test with a static sample file.
-public class TestOnDiskArray {
+public class TestOnDiskArray extends TestCase {
   File file = new File("OnDiskArrayTestFile.test.dat");
 
   /**
