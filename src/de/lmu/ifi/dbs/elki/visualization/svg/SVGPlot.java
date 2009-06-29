@@ -182,7 +182,12 @@ public class SVGPlot {
    * CSS styles.
    */
   public void updateStyleElement() {
-    cssman.updateStyleElement(document, style);
+    // TODO: this should be sufficient - why does Batik occasionally not pick up the 
+    // changes unless we actually replace the style element itself?
+    //cssman.updateStyleElement(document, style);
+    Element newstyle = cssman.makeStyleElement(document);
+    style.getParentNode().replaceChild(newstyle, style);
+    style = newstyle;
   }
 
   /**
