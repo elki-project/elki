@@ -27,21 +27,21 @@ public interface Parameterizable {
    * Parameterizable.
    *
    * @param args parameters to set the attributes accordingly to
-   * @return String[] an array containing the unused parameters
+   * @return a list containing the unused parameters
    * @throws ParameterException in case of wrong parameter-setting
    */
   List<String> setParameters(List<String> args) throws ParameterException;
   
   /**
    * Returns the parameter array as given to the last call
-   * of {@link #setParameters(ArrayList<String>) setParameters(ArrayList<String>)}
+   * of {@link #setParameters(List) setParameters(List)}
    * but without unnecessary entries.
    * The provided array should be suitable to call
-   * {@link #setParameters(ArrayList<String>) setParameters(ArrayList<String>)}
+   * {@link #setParameters(List) setParameters(List)}
    * with it resulting in the identical parameterization.
    * 
    * @return the parameter array as given to the last call
-   * of {@link #setParameters(ArrayList<String>) setParameters(ArrayList<String>)}
+   * of {@link #setParameters(List) setParameters(List)}
    * but without unnecessary entries
    */
   List<String> getParameters();

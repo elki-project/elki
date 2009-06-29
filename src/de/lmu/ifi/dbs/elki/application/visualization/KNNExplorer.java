@@ -158,7 +158,7 @@ public class KNNExplorer<O extends NumberVector<O, ?>> extends AbstractApplicati
   }
 
   /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters(java.lang.String[])
+   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters
    */
   @Override
   public List<String> setParameters(List<String> args) throws ParameterException {

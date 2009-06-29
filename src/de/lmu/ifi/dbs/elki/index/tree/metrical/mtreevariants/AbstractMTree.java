@@ -195,8 +195,8 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.index.tree.TreeIndex#setParameters(String[])
-     * TreeIndex#setParameters(args)}
+     * Calls {@link de.lmu.ifi.dbs.elki.index.tree.TreeIndex#setParameters
+     * TreeIndex#setParameters}
      * and instantiates {@link #distanceFunction} according to the value of parameter
      * {@link #DISTANCE_FUNCTION_PARAM}.
      * The remaining parameters are passed to the {@link #distanceFunction}.
