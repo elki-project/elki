@@ -2,8 +2,8 @@ package de.lmu.ifi.dbs.elki.application.cache;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
@@ -149,9 +149,8 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject> extends 
   }
 
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    super.setParameters(args);
-    String[] remainingParameters = super.getRemainingParameters().toArray(new String[0]);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
 
     // Setup database connection.
     databaseConnection = DATABASE_CONNECTION_PARAM.instantiateClass();
@@ -163,8 +162,8 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject> extends 
     addParameterizable(distance);
     remainingParameters = distance.setParameters(remainingParameters);
     
-    if(remainingParameters.length != 0) {
-      LoggingUtil.warning("Unnecessary parameters specified: " + Arrays.asList(remainingParameters));
+    if(remainingParameters.size() != 0) {
+      LoggingUtil.warning("Unnecessary parameters specified: " + remainingParameters);
     }
 
     super.rememberParametersExcept(args, remainingParameters);

@@ -30,21 +30,21 @@ public interface Parameterizable {
    * @return String[] an array containing the unused parameters
    * @throws ParameterException in case of wrong parameter-setting
    */
-  String[] setParameters(String[] args) throws ParameterException;
+  List<String> setParameters(List<String> args) throws ParameterException;
   
   /**
    * Returns the parameter array as given to the last call
-   * of {@link #setParameters(String[]) setParameters(String[])}
+   * of {@link #setParameters(ArrayList<String>) setParameters(ArrayList<String>)}
    * but without unnecessary entries.
    * The provided array should be suitable to call
-   * {@link #setParameters(String[]) setParameters(String[])}
+   * {@link #setParameters(ArrayList<String>) setParameters(ArrayList<String>)}
    * with it resulting in the identical parameterization.
    * 
    * @return the parameter array as given to the last call
-   * of {@link #setParameters(String[]) setParameters(String[])}
+   * of {@link #setParameters(ArrayList<String>) setParameters(ArrayList<String>)}
    * but without unnecessary entries
    */
-  String[] getParameters();
+  List<String> getParameters();
 
   /**
    * Checks if all global parameter constraints are kept

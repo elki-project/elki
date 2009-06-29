@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.external;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
@@ -114,8 +115,8 @@ public class DiskCacheBasedDoubleDistanceFunction<V extends DatabaseObject> exte
   }
   
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
     
     File matrixfile = MATRIX_PARAM.getValue();
 

@@ -379,8 +379,8 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
      * The remaining parameters are passed to the {@link #distanceFunction}.
      */
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
 
         // distance function
         distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
@@ -397,7 +397,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
 
         // parameters for the distance function
         // todo provide setters
-        List<String> distanceFunctionParameters = new ArrayList<String>();
+        ArrayList<String> distanceFunctionParameters = new ArrayList<String>();
         for (String p: remainingParameters) {
             distanceFunctionParameters.add(p);
         }
@@ -411,7 +411,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
         // preprocessor minpts
         OptionUtil.addParameter(distanceFunctionParameters, MINPTS_ID, Integer.toString(minpts));
 
-        distanceFunction.setParameters(distanceFunctionParameters.toArray(new String[distanceFunctionParameters.size()]));
+        distanceFunction.setParameters(distanceFunctionParameters);
 
         rememberParametersExcept(args, remainingParameters);
         return remainingParameters;

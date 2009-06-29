@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 
 import java.util.Collection;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -110,8 +111,8 @@ public class PCAFilteredRunner<V extends RealVector<V, ?>> extends PCARunner<V> 
    * Set Parameters.
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
 
     // big and small params
     big = BIG_PARAM.getValue();

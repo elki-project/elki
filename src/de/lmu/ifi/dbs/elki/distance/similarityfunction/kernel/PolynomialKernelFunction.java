@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -54,8 +56,8 @@ public class PolynomialKernelFunction<O extends FeatureVector<O, ? >> extends Ab
   }
 
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
     // degree
     degree = DEGREE_PARAM.getValue();
 

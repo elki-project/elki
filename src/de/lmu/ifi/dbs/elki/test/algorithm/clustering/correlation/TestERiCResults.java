@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.test.algorithm.clustering.correlation;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,9 +55,9 @@ public class TestERiCResults implements JUnit4Test {
   public void testERiCResults() throws ParameterException {
     FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>();
 
-    String[] inputparams = new String[0];
+    List<String> inputparams = new ArrayList<String>();
     // Set up database input file:
-    inputparams = OptionUtil.addParameter(inputparams, FileBasedDatabaseConnection.INPUT_ID, dataset);
+    OptionUtil.addParameter(inputparams, FileBasedDatabaseConnection.INPUT_ID, dataset);
     inputparams = dbconn.setParameters(inputparams);
     // get database
     Database<DoubleVector> db = dbconn.getDatabase(null);
@@ -69,7 +69,7 @@ public class TestERiCResults implements JUnit4Test {
     ERiC<DoubleVector> eric = new ERiC<DoubleVector>();
 
     // prepare parameters
-    List<String> ericparams = new ArrayList<String>();
+    ArrayList<String> ericparams = new ArrayList<String>();
     eric.setVerbose(false);
     OptionUtil.addParameter(ericparams, COPAC.PARTITION_ALGORITHM_ID, DBSCAN.class.getCanonicalName());
     OptionUtil.addParameter(ericparams, DBSCAN.MINPTS_ID, Integer.toString(30));
@@ -88,12 +88,12 @@ public class TestERiCResults implements JUnit4Test {
     OptionUtil.addParameter(ericparams, PCAFilteredRunner.PCA_EIGENPAIR_FILTER, RelativeEigenPairFilter.class.getCanonicalName());
     OptionUtil.addParameter(ericparams, RelativeEigenPairFilter.EIGENPAIR_FILTER_RALPHA, Double.toString(1.60));
     // Set parameters
-    String[] remainingparams = eric.setParameters(ericparams.toArray(new String[0]));
+    List<String> remainingparams = eric.setParameters(ericparams);
     for(String s : remainingparams) {
       System.err.println("Remaining parameter: " + s);
     }
     //System.err.println(eric.getAttributeSettings().toString());
-    assertTrue("Some parameters were ignored by the algorithm.", remainingparams.length == 0);
+    assertTrue("Some parameters were ignored by the algorithm.", remainingparams.size() == 0);
     // run ERiC on database
     Clustering<CorrelationModel<DoubleVector>> result = eric.run(db);
 

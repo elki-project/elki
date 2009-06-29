@@ -107,7 +107,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
     /**
      * Holds the parameters of the partition databases.
      */
-    private String[] partitionDatabaseParameters;
+    private List<String> partitionDatabaseParameters;
 
     /**
      * Holds the result.
@@ -204,8 +204,8 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
      * then to the {@link #partitionDatabase} and afterwards to the {@link #preprocessor}.
      */
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
 
         // partition db
         if (PARTITION_DB_PARAM.isSet()) {
@@ -225,8 +225,7 @@ public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clus
         // partition algorithm
         partitionAlgorithm = PARTITION_ALGORITHM_PARAM.instantiateClass();
         addParameterizable(partitionAlgorithm);
-        String[] partitiongAlgorithmParameters = new String[remainingParameters.length];
-        System.arraycopy(remainingParameters, 0, partitiongAlgorithmParameters, 0, remainingParameters.length);
+        ArrayList<String> partitiongAlgorithmParameters = new ArrayList<String>(remainingParameters);
         partitionAlgorithm.setTime(isTime());
         partitionAlgorithm.setVerbose(isVerbose());
         remainingParameters = partitionAlgorithm.setParameters(partitiongAlgorithmParameters);

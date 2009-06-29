@@ -150,8 +150,8 @@ public class LimitEigenPairFilter extends AbstractParameterizable implements Eig
      * {@link #ABSOLUTE_FLAG} and the parameter {@link #DELTA_PARAM}.
      */
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-		String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+		List<String> remainingParameters = super.setParameters(args);
 
 		// absolute
 		absolute = ABSOLUTE_FLAG.isSet();

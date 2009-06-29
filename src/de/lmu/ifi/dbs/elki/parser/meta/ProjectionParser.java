@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.elki.parser.meta;
 
+import java.util.BitSet;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
 import de.lmu.ifi.dbs.elki.utilities.Util;
@@ -7,9 +10,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListGreaterEqualConstraint;
-
-import java.util.BitSet;
-import java.util.List;
 
 /**
  * <p>A ProjectionParser projects the {@link ParsingResult} of its base parser
@@ -54,8 +54,8 @@ public abstract class ProjectionParser<V extends RealVector<V,?>> extends MetaPa
    * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters(java.lang.String[])
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
     if (SELECTED_ATTRIBUTES_PARAM.isSet()) {
       this.getSelectedAttributes().clear();
       List<Integer> dimensionList = SELECTED_ATTRIBUTES_PARAM.getValue();

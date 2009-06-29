@@ -69,8 +69,8 @@ public class FracClusPreprocessor<V extends RealVector<V, ?>> extends AbstractPa
     }
 
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
         k = NUMBER_OF_SUPPORTERS_PARAM.getValue();
         return remainingParameters;
     }

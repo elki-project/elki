@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.algorithm;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.IndexDatabase;
@@ -65,8 +67,8 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Resu
      * {@link #VERBOSE_FLAG} and {@link #TIME_FLAG}.
      */
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
         setVerbose(VERBOSE_FLAG.isSet());
         setTime(TIME_FLAG.isSet());
         rememberParametersExcept(args, remainingParameters);

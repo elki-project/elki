@@ -162,8 +162,8 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
     protected abstract void runVarianceAnalysis(Integer id, List<DistanceResultPair<D>> neighbors, Database<V> database);
 
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
 
         rangeQueryDistanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
         addParameterizable(rangeQueryDistanceFunction);

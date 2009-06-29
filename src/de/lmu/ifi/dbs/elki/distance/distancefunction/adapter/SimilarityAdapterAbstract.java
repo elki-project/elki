@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.adapter;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
@@ -63,8 +65,8 @@ public abstract class SimilarityAdapterAbstract<V extends FeatureVector<V,?>> ex
   }
 
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
     similarityFunction = SIMILARITY_FUNCTION_PARAM.instantiateClass();
     addParameterizable(similarityFunction);
     remainingParameters = similarityFunction.setParameters(remainingParameters);

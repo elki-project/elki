@@ -117,8 +117,8 @@ public class MaterializeKNNPreprocessor<O extends DatabaseObject, D extends Dist
    * {@link #distanceFunction}, respectively.
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
     // number of neighbors
     k = K_PARAM.getValue();
 

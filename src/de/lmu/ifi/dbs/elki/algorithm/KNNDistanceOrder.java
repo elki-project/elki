@@ -123,8 +123,8 @@ public class KNNDistanceOrder<O extends DatabaseObject, D extends Distance<D>>
      * {@link #K_PARAM} and {@link #PERCENTAGE_PARAM}.
      */
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
 
         //k and percentage
         k = K_PARAM.getValue();

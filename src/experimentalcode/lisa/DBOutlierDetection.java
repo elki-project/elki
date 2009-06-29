@@ -1,6 +1,7 @@
 package experimentalcode.lisa;
 
 import java.util.Iterator;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
@@ -88,8 +89,8 @@ public static final OptionID P_ID = OptionID.getOrCreateOptionID(
      * {@link #D_PARAM}, {@link #P_PARAM} 
      */
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
 
      // neighborhood size
         d = D_PARAM.getValue();

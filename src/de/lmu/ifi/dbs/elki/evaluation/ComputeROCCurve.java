@@ -184,8 +184,8 @@ public class ComputeROCCurve<O extends DatabaseObject> extends AbstractAlgorithm
    * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#setParameters(java.lang.String[])
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
     
     positive_class_name = POSITIVE_CLASS_NAME_PARAM.getValue();
 

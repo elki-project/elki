@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
@@ -45,11 +47,11 @@ public abstract class AbstractEditDistanceFunction<V extends NumberVector<V, ?>>
   }
 
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingOptions = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
 
     bandSize = BANDSIZE_PARAM.getValue();
 
-    return remainingOptions;
+    return remainingParameters;
   }
 }

@@ -17,7 +17,6 @@ import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
@@ -273,8 +272,8 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
    * passed to the {@link #reachabilityDistanceFunction}.
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
 
     // k
     k = K_PARAM.getValue();
@@ -289,22 +288,22 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
     }
     
     // configure first preprocessor
-    List<String> preprocParams1 = new ArrayList<String>();
+    ArrayList<String> preprocParams1 = new ArrayList<String>();
     OptionUtil.addParameter(preprocParams1, MaterializeKNNPreprocessor.K_ID, Integer.toString(k+(objectIsInKNN ? 0 : 1)));
     OptionUtil.addParameter(preprocParams1, MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, getDistanceFunction().getClass().getCanonicalName());
     OptionUtil.addParameters(preprocParams1, getDistanceFunction().getParameters());
-    String[] remaining1 = preprocessor1.setParameters(ClassGenericsUtil.toArray(preprocParams1, String.class));
-    if (remaining1.length > 0) {
+    List<String> remaining1 = preprocessor1.setParameters(preprocParams1);
+    if (remaining1.size() > 0) {
       throw new UnusedParameterException("First preprocessor did not use all parameters.");
     }
 
     // configure second preprocessor
-    List<String> preprocParams2 = new ArrayList<String>();
+    ArrayList<String> preprocParams2 = new ArrayList<String>();
     OptionUtil.addParameter(preprocParams2, MaterializeKNNPreprocessor.K_ID, Integer.toString(k+(objectIsInKNN ? 0 : 1)));
     OptionUtil.addParameter(preprocParams2, MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, reachabilityDistanceFunction.getClass().getCanonicalName());
     OptionUtil.addParameters(preprocParams2, reachabilityDistanceFunction.getParameters());
-    String[] remaining2 = preprocessor2.setParameters(ClassGenericsUtil.toArray(preprocParams2, String.class));
-    if (remaining2.length > 0) {
+    List<String> remaining2 = preprocessor2.setParameters(preprocParams2);
+    if (remaining2.size() > 0) {
       throw new UnusedParameterException("Second preprocessor did not use all parameters.");
     }
 

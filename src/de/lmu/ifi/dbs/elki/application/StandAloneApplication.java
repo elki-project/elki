@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.application;
 
 import java.io.File;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -50,8 +51,8 @@ public abstract class StandAloneApplication extends AbstractApplication {
    * {@link #OUTPUT_PARAM}.
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
 
     // output
     output = OUTPUT_PARAM.getValue();

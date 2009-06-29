@@ -115,8 +115,8 @@ public class PercentageEigenPairFilter extends AbstractParameterizable implement
 
   // todo comment
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
 
     // alpha
     alpha = ALPHA_PARAM.getValue();

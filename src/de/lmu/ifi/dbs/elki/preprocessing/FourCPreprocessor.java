@@ -119,8 +119,8 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
      * specified. If the parameters are not specified default values are set.
      */
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
 
         // absolute
         absolute = ABSOLUTE_PARAM.isSet();
@@ -152,23 +152,22 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
 //		}
 
         // save parameters for pca
-        List<String> tmpPCAParameters = new ArrayList<String>();
+        ArrayList<String> pcaParameters = new ArrayList<String>();
         // eigen pair filter
-        OptionUtil.addParameter(tmpPCAParameters, PCAFilteredRunner.PCA_EIGENPAIR_FILTER, LimitEigenPairFilter.class.getName());
+        OptionUtil.addParameter(pcaParameters, PCAFilteredRunner.PCA_EIGENPAIR_FILTER, LimitEigenPairFilter.class.getName());
         // abs
         if (absolute) {
-            OptionUtil.addFlag(tmpPCAParameters, LimitEigenPairFilter.EIGENPAIR_FILTER_ABSOLUTE);
+            OptionUtil.addFlag(pcaParameters, LimitEigenPairFilter.EIGENPAIR_FILTER_ABSOLUTE);
         }
         // delta
-        OptionUtil.addParameter(tmpPCAParameters, LimitEigenPairFilter.EIGENPAIR_FILTER_DELTA, Double.toString(delta));
+        OptionUtil.addParameter(pcaParameters, LimitEigenPairFilter.EIGENPAIR_FILTER_DELTA, Double.toString(delta));
 
         // big value
-        OptionUtil.addParameter(tmpPCAParameters, PCAFilteredRunner.BIG_ID, "50");
+        OptionUtil.addParameter(pcaParameters, PCAFilteredRunner.BIG_ID, "50");
 
         // small value
-        OptionUtil.addParameter(tmpPCAParameters, PCAFilteredRunner.SMALL_ID, "1");
+        OptionUtil.addParameter(pcaParameters, PCAFilteredRunner.SMALL_ID, "1");
 
-        String[] pcaParameters = tmpPCAParameters.toArray(new String[tmpPCAParameters.size()]);
         pca.setParameters(pcaParameters);
         // no pass-through.
         //addParameterizable(pca);

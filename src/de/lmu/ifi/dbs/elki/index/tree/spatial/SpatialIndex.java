@@ -66,8 +66,8 @@ public abstract class SpatialIndex<O extends NumberVector<O, ?>, N extends Spati
    * todo
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
 
     bulk = BULK_LOAD_FLAG.isSet();
 

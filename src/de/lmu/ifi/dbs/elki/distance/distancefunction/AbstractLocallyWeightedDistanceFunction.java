@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
@@ -46,8 +48,8 @@ public abstract class AbstractLocallyWeightedDistanceFunction<O extends RealVect
    * parameters to the {@link #preprocessorHandler}.
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
 
     remainingParameters = preprocessorHandler.setParameters(remainingParameters);
 

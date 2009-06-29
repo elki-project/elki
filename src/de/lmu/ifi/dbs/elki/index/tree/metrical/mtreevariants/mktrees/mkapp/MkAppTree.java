@@ -173,8 +173,8 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
   }
 
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
 
     k_max = K_PARAM.getValue();
     p = P_PARAM.getValue();

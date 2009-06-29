@@ -184,8 +184,8 @@ public class COP<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, D
      * The remaining parameters are passed to {@link #dependencyDerivator}.
      */
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
 
         k = K_PARAM.getValue();
 

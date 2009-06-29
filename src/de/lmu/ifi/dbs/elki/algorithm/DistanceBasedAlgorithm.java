@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.algorithm;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -63,8 +65,8 @@ public abstract class DistanceBasedAlgorithm<O extends DatabaseObject, D extends
      * The remaining parameters are passed to the {@link #distanceFunction}.
      */
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
 
         // distance function
         distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();

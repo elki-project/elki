@@ -77,17 +77,17 @@ public class OptionHandler extends AbstractLoggable {
    *         required, has none (e.g. because the next value is itself some
    *         option)
    */
-  public String[] grabOptions(String[] currentOptions) throws ParameterException {
-    List<String> unexpectedParameters = new ArrayList<String>();
-    List<String> parameterArray = new ArrayList<String>();
+  public List<String> grabOptions(List<String> currentOptions) throws ParameterException {
+    ArrayList<String> unexpectedParameters = new ArrayList<String>();
+    ArrayList<String> parameterArray = new ArrayList<String>();
 
-    for(int i = 0; i < currentOptions.length; i++) {
-      if(!currentOptions[i].startsWith(OPTION_PREFIX)) {
-        throw new NoParameterValueException(currentOptions[i] + " is no parameter!");
+    for(int i = 0; i < currentOptions.size(); i++) {
+      if(!currentOptions.get(i).startsWith(OPTION_PREFIX)) {
+        throw new NoParameterValueException(currentOptions.get(i) + " is no parameter!");
       }
 
       // get the option without the option prefix -
-      String noPrefixOption = currentOptions[i].substring(OPTION_PREFIX.length());
+      String noPrefixOption = currentOptions.get(i).substring(OPTION_PREFIX.length());
 
       // check if parameter-Map contains the current option
       if(parameters.containsKey(noPrefixOption)) {
@@ -98,27 +98,27 @@ public class OptionHandler extends AbstractLoggable {
 
           // check if there is a next element in the option array and
           // if it's indeed an option value
-          if(i + 1 < currentOptions.length /*
+          if(i + 1 < currentOptions.size() /*
                                             * && !currentOptions[i +
                                             * 1].startsWith(OPTION_PREFIX)
                                             */) {
 
             // set the parameter value if the value is not already set
             if(!current.isSet()) {
-              current.setValue(currentOptions[i + 1]);
-              parameterArray.add(currentOptions[i]);
-              parameterArray.add(currentOptions[i + 1]);
+              current.setValue(currentOptions.get(i + 1));
+              parameterArray.add(currentOptions.get(i));
+              parameterArray.add(currentOptions.get(i + 1));
               i++;
             }
             else { // parameter is already set!!
-              unexpectedParameters.add(currentOptions[i]);
-              unexpectedParameters.add(currentOptions[i + 1]);
+              unexpectedParameters.add(currentOptions.get(i));
+              unexpectedParameters.add(currentOptions.get(i + 1));
               i++;
             }
           }
           // next element seems to be a parameter of flag identifier!
           else {
-            throw new NoParameterValueException("Parameter " + currentOptions[i] + " requires a parameter value!");
+            throw new NoParameterValueException("Parameter " + currentOptions.get(i) + " requires a parameter value!");
           }
         }
         // option is of type flag
@@ -128,16 +128,16 @@ public class OptionHandler extends AbstractLoggable {
 
             // check if the next element is wrongly a parameter
             // value
-            if(i + 1 < currentOptions.length && !currentOptions[i + 1].startsWith(OPTION_PREFIX)) {
-              throw new NoParameterValueException("Flag " + currentOptions[i] + " requires no parameter-value! " + "(read parameter-value: " + currentOptions[i + 1] + ")");
+            if(i + 1 < currentOptions.size() && !currentOptions.get(i + 1).startsWith(OPTION_PREFIX)) {
+              throw new NoParameterValueException("Flag " + currentOptions.get(i) + " requires no parameter-value! " + "(read parameter-value: " + currentOptions.get(i + 1) + ")");
             }
             // set the flag
             current.setValue(Flag.SET);
-            parameterArray.add(currentOptions[i]);
+            parameterArray.add(currentOptions.get(i));
 
           }
           else { // flag was already set!
-            unexpectedParameters.add(currentOptions[i]);
+            unexpectedParameters.add(currentOptions.get(i));
 
           }
         }
@@ -151,9 +151,9 @@ public class OptionHandler extends AbstractLoggable {
 
       // unexpected option
       else {
-        unexpectedParameters.add(currentOptions[i]);
-        if(i + 1 < currentOptions.length && !currentOptions[i + 1].startsWith(OPTION_PREFIX)) {
-          unexpectedParameters.add(currentOptions[i + 1]);
+        unexpectedParameters.add(currentOptions.get(i));
+        if(i + 1 < currentOptions.size() && !currentOptions.get(i + 1).startsWith(OPTION_PREFIX)) {
+          unexpectedParameters.add(currentOptions.get(i + 1));
           i++;
         }
       }
@@ -161,8 +161,6 @@ public class OptionHandler extends AbstractLoggable {
 
     currentParameters = new String[parameterArray.size()];
     currentParameters = parameterArray.toArray(currentParameters);
-    String[] remain = new String[unexpectedParameters.size()];
-    unexpectedParameters.toArray(remain);
 
     if(logger.isDebuggingFiner()) {
       for(Map.Entry<String, Option<?>> option : parameters.entrySet()) {
@@ -175,7 +173,7 @@ public class OptionHandler extends AbstractLoggable {
     checkNonOptionalParameters();
     checkGlobalParameterConstraints();
 
-    return remain;
+    return unexpectedParameters;
   }
 
   /**

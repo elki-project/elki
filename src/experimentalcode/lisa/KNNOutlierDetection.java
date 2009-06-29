@@ -1,5 +1,7 @@
 package experimentalcode.lisa;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
@@ -74,8 +76,8 @@ public class KNNOutlierDetection <O extends DatabaseObject, D extends DoubleDist
 		   * {@link #K_PARAM}, {@link #N_PARAM} 
 		   */
 		  @Override
-		  public String[] setParameters(String[] args) throws ParameterException {
-		      String[] remainingParameters = super.setParameters(args);
+		  public List<String> setParameters(List<String> args) throws ParameterException {
+		      List<String> remainingParameters = super.setParameters(args);
 		      k = K_PARAM.getValue();
 			 
 		      return remainingParameters;

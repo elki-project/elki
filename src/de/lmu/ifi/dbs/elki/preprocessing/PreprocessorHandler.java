@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.preprocessing;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -113,8 +115,8 @@ public class PreprocessorHandler<O extends DatabaseObject, P extends Preprocesso
    * {@link #preprocessor}.
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
 
     // omit
     omit = OMIT_PREPROCESSING_FLAG.isSet();

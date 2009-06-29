@@ -276,8 +276,8 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
      * {@link #MINFREQ_PARAM} and {@link #MINSUPP_PARAM}.
      */
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
 
         if (MINFREQ_PARAM.isSet()) {
             minfreq = MINFREQ_PARAM.getValue();

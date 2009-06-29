@@ -3,7 +3,9 @@ package de.lmu.ifi.dbs.elki.test.math;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -49,9 +51,9 @@ public class TestKernelDensityFitting implements JUnit4Test {
     // This data was generated with a mean of 0.0 and stddev 1.23,
     FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>();
 
-    String[] inputparams = new String[0];
+    List<String> inputparams = new ArrayList<String>();
     // Set up database input file:
-    inputparams = OptionUtil.addParameter(inputparams, FileBasedDatabaseConnection.INPUT_ID, dataset);
+    OptionUtil.addParameter(inputparams, FileBasedDatabaseConnection.INPUT_ID, dataset);
     inputparams = dbconn.setParameters(inputparams);
     // get database
     Database<DoubleVector> db = dbconn.getDatabase(null);

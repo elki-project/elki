@@ -159,8 +159,8 @@ public abstract class RealVectorLabelParser<V extends RealVector<?, ?>> extends 
   protected abstract String descriptionLineType();
 
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParams = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParams = super.setParameters(args);
     //parseFloat = FLOAT_FLAG.isSet();
     if(CLASS_LABEL_INDEX_PARAM.isSet()) {
       classLabelIndex = CLASS_LABEL_INDEX_PARAM.getValue();

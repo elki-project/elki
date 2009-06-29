@@ -175,8 +175,8 @@ public class PROCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> 
      * {@link #M_I_PARAM}.
      */
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
 
         // m_i
         m_i = M_I_PARAM.getValue();

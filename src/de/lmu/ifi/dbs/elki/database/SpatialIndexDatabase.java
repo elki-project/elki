@@ -180,8 +180,8 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
    * the default value is set.
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
 
     index = INDEX_PARAM.instantiateClass();
     addParameterizable(index);

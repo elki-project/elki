@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
@@ -124,8 +125,8 @@ public class FileBasedDoubleDistanceFunction<V extends DatabaseObject> extends A
   }
   
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
     
     File matrixfile = MATRIX_PARAM.getValue();
 

@@ -281,8 +281,8 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
      * {@link #EPSILON_PARAM} and {@link #MINPTS_PARAM}.
      */
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
 
         // epsilon, minpts
         epsilon = EPSILON_PARAM.getValue();

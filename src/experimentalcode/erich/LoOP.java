@@ -19,7 +19,6 @@ import de.lmu.ifi.dbs.elki.preprocessing.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
@@ -305,8 +304,8 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
    * Setup algorithm parameters.
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
 
     // Lambda
     lambda = LAMBDA_PARAM.getValue();
@@ -347,24 +346,24 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
     preprocessorcompare = PREPROCESSOR_PARAM.instantiateClass();
     OptionID[] masked = { MaterializeKNNPreprocessor.K_ID, MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID };
     addParameterizable(preprocessorcompare, Arrays.asList(masked));
-    List<String> preprocParams1 = new ArrayList<String>();
+    ArrayList<String> preprocParams1 = new ArrayList<String>();
     OptionUtil.addParameter(preprocParams1, MaterializeKNNPreprocessor.K_ID, Integer.toString(preprock + (objectIsInKNN ? 0 : 1)));
     OptionUtil.addParameter(preprocParams1, MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, comparisonDistanceFunction.getClass().getCanonicalName());
     OptionUtil.addParameters(preprocParams1, comparisonDistanceFunction.getParameters());
     OptionUtil.addParameters(preprocParams1, remainingParameters);
-    remainingParameters = preprocessorcompare.setParameters(ClassGenericsUtil.toArray(preprocParams1, String.class));
+    remainingParameters = preprocessorcompare.setParameters(preprocParams1);
 
     // configure second preprocessor
     if(referenceDistanceFunction != null) {
       preprocessorref = PREPROCESSOR_PARAM.instantiateClass();
       OptionID[] masked2 = { MaterializeKNNPreprocessor.K_ID, MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID };
       addParameterizable(preprocessorref, Arrays.asList(masked2));
-      List<String> preprocParams2 = new ArrayList<String>();
+      ArrayList<String> preprocParams2 = new ArrayList<String>();
       OptionUtil.addParameter(preprocParams2, MaterializeKNNPreprocessor.K_ID, Integer.toString(kcomp + (objectIsInKNN ? 0 : 1)));
       OptionUtil.addParameter(preprocParams2, MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, referenceDistanceFunction.getClass().getCanonicalName());
       OptionUtil.addParameters(preprocParams2, referenceDistanceFunction.getParameters());
       OptionUtil.addParameters(preprocParams2, remainingParameters);
-      remainingParameters = preprocessorref.setParameters(ClassGenericsUtil.toArray(preprocParams2, String.class));
+      remainingParameters = preprocessorref.setParameters(preprocParams2);
     }
     
     rememberParametersExcept(args, remainingParameters);

@@ -229,8 +229,8 @@ public class AttributeWiseVarianceNormalization<V extends RealVector<V, ?>> exte
    * @throws IllegalArgumentException in case of wrong parameter-setting
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
 
     if(MEAN_PARAM.isSet() || STDDEV_PARAM.isSet()) {
       List<Double> mean_list = MEAN_PARAM.getValue();

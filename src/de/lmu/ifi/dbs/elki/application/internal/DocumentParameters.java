@@ -34,6 +34,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.utilities.xml.HTMLUtil;
 
+/**
+ * Class to generate HTML parameter descriptions for all classes implementing
+ * the {@link Parametrizable} interface. Used in documentation generation only.
+ * 
+ * @author Erich Schubert
+ *
+ */
 public class DocumentParameters {
 
   private static final String HEADER_PARAMETER_FOR = "Parameter for: ";
@@ -128,7 +135,7 @@ public class DocumentParameters {
 
   private static void buildParameterIndex(HashMapList<Class<?>, Option<?>> byclass, HashMapList<OptionID, Pair<Option<?>, Class<?>>> byopt) {
     List<Pair<Parameterizable, Option<?>>> options = new ArrayList<Pair<Parameterizable, Option<?>>>();
-    String[] emptyargs = {};
+    ArrayList<String> emptyargs = new ArrayList<String>(0);
     for(Class<?> cls : InspectionUtil.findAllImplementations(Parameterizable.class, false)) {
       try {
         // try to parameterize the class.

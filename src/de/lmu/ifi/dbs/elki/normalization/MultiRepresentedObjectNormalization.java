@@ -279,8 +279,8 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
    * @throws IllegalArgumentException in case of wrong parameter-setting
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingOptions = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
 
     // normalizations
     if (NORMALIZATION_PARAM.isSet()) {
@@ -291,11 +291,11 @@ extends AbstractNormalization<MultiRepresentedObject<O>> {
         addParameterizable(normalization);
       }
       for (Normalization<O> normalization : normalizations) {
-        remainingOptions = normalization.setParameters(remainingOptions);
+        remainingParameters = normalization.setParameters(remainingParameters);
       }
     }
 
-    rememberParametersExcept(args, remainingOptions);
-    return remainingOptions;
+    rememberParametersExcept(args, remainingParameters);
+    return remainingParameters;
   }
 }

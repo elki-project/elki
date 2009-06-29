@@ -3,6 +3,9 @@ package de.lmu.ifi.dbs.elki.test.evaluation;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
@@ -37,10 +40,9 @@ public class TestPairCountingFMeasure implements JUnit4Test {
   public void testCompareDatabases() throws ParameterException {
     FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>();
 
-    String[] inputparams = new String[0];
+    List<String> inputparams = new ArrayList<String>();
     // Set up database input file:
-    inputparams = OptionUtil.addParameter(inputparams,
-        FileBasedDatabaseConnection.INPUT_ID, dataset);
+    OptionUtil.addParameter(inputparams, FileBasedDatabaseConnection.INPUT_ID, dataset);
     inputparams = dbconn.setParameters(inputparams);
     // get database
     Database<DoubleVector> db = dbconn.getDatabase(null);

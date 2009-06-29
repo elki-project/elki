@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -123,8 +125,8 @@ public abstract class ProjectedClustering<V extends RealVector<V, ?>>
      * {@link #K_PARAM}, {@link #K_I_PARAM}, and {@link #L_PARAM}.
      */
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
 
         // k
         k = K_PARAM.getValue();
