@@ -188,6 +188,26 @@ public class CSSClass {
   }
 
   /**
+   * Set a CSS statement.
+   * 
+   * @param key Statement key.
+   * @param value Value
+   */
+  public void setStatement(String key, int value) {
+    setStatement(key, Integer.toString(value));
+  }
+
+  /**
+   * Set a CSS statement.
+   * 
+   * @param key Statement key.
+   * @param value Value
+   */
+  public void setStatement(String key, double value) {
+    setStatement(key, Double.toString(value));
+  }
+
+  /**
    * Remove a CSS statement.
    * 
    * @param key Statement key.
