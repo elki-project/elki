@@ -15,9 +15,13 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import experimentalcode.lisa.scale.DoubleScale;
+import experimentalcode.lisa.scale.GammaFunction;
 import experimentalcode.lisa.scale.LinearScale;
 import experimentalcode.remigius.CommonSVGShapes;
 import experimentalcode.remigius.NumberVisualization;
@@ -25,9 +29,13 @@ import experimentalcode.remigius.NumberVisualizer;
 import experimentalcode.remigius.VisualizationManager;
 
 public class BubbleVisualizer<O extends DoubleVector> extends NumberVisualizer<O> {
+	
+	public static final OptionID GAMMA_ID = OptionID.getOrCreateOptionID("bubble.gamma", "gamma-correction.");
+	private final DoubleParameter GAMMA_PARAM = new DoubleParameter(GAMMA_ID);
 
 	private DoubleScale normalizationScale;
 	private DoubleScale plotScale;
+	private GammaFunction gammaFunction;
 
 	private AnnotationResult<Double> anResult;
 	private Result result;
@@ -36,11 +44,15 @@ public class BubbleVisualizer<O extends DoubleVector> extends NumberVisualizer<O
 
 	public BubbleVisualizer(Database<O> database, AnnotationResult<Double> anResult, Result r, DoubleScale normalizationScale, VisualizationManager<O> v){
 		super(database, v);
+		
+		addOption(GAMMA_PARAM);
+		
 		this.anResult = anResult;
 
 		this.normalizationScale = normalizationScale;
 		this.plotScale = new LinearScale();
-
+		this.gammaFunction = new GammaFunction();
+		
 		setupClustering();
 		setupCSS();
 	}
@@ -80,13 +92,20 @@ public class BubbleVisualizer<O extends DoubleVector> extends NumberVisualizer<O
 			visManager.registerCSSClass(bubble);
 		}
 	}
+	
+	@Override
+	public List<String> setParameters(List<String> args) throws ParameterException {
+		List<String> remainingParameters = super.setParameters(args);
+		gammaFunction.setGamma(GAMMA_PARAM.getValue());
+		return remainingParameters;
+	}
 
 	private Double getValue(int id){
 		return anResult.getValueFor(id);
 	}
 
 	private Double getScaled(Double d){
-		return plotScale.getScaled(normalizationScale.getScaled(d));
+		return gammaFunction.getScaled(plotScale.getScaled(normalizationScale.getScaled(d)));
 	}
 
 	@Override
