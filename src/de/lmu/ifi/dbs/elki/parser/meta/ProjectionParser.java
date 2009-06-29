@@ -51,7 +51,7 @@ public abstract class ProjectionParser<V extends RealVector<V,?>> extends MetaPa
   }
   
   /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters(java.lang.String[])
+   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters
    */
   @Override
   public List<String> setParameters(List<String> args) throws ParameterException {
@@ -95,7 +95,4 @@ public abstract class ProjectionParser<V extends RealVector<V,?>> extends MetaPa
   public BitSet getSelectedAttributes() {
     return selectedAttributes;
   }
-  
-  
-
 }

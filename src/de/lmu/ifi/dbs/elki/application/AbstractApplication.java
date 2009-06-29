@@ -106,13 +106,6 @@ public abstract class AbstractApplication extends AbstractParameterizable {
     addOption(DESCRIPTION_PARAM);
   }
 
-  /**
-   * Calls
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters(String[])
-   * AbstractParameterizable#setParameters(args)} and sets additionally the
-   * values of the flags {@link #VERBOSE_FLAG} and {@link #HELP_FLAG}.
-   * 
-   */
   @Override
   public List<String> setParameters(List<String> args) throws ParameterException {
     if(args.size() == 0) {

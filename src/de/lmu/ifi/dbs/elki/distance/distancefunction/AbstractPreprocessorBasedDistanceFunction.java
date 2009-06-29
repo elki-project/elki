@@ -54,8 +54,8 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
     }
 
     /**
-     * Calls {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters(String[])
-     * AbstractParameterizable#setParameters(args)}
+     * Calls {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters
+     * AbstractParameterizable#setParameters}
      * and passes the remaining parameters to the {@link #preprocessorHandler}.
      */
     @Override

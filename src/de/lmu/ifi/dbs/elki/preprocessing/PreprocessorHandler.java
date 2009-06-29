@@ -107,8 +107,8 @@ public class PreprocessorHandler<O extends DatabaseObject, P extends Preprocesso
 
   /**
    * Calls
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters(String[])
-   * AbstractParameterizable#setParameters(args)} and sets additionally the
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters
+   * AbstractParameterizable#setParameters} and sets additionally the
    * value of flag {@link #OMIT_PREPROCESSING_FLAG} and instantiates
    * {@link #preprocessor} according to the value of parameter
    * {@link #PREPROCESSOR_PARAM} The remaining parameters are passed to the

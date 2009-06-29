@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.xml.HTMLUtil;
 
 /**
  * Class to generate HTML parameter descriptions for all classes implementing
- * the {@link Parametrizable} interface. Used in documentation generation only.
+ * the {@link Parameterizable} interface. Used in documentation generation only.
  * 
  * @author Erich Schubert
  *

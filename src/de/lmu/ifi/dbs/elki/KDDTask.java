@@ -143,7 +143,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractApplication {
   }
 
   /**
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters(java.lang.String[])
+   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters
    */
   @Override
   public List<String> setParameters(List<String> args) throws ParameterException {
@@ -179,10 +179,6 @@ public class KDDTask<O extends DatabaseObject> extends AbstractApplication {
   /**
    * Method to run the specified algorithm using the specified database
    * connection.
-   * 
-   * @throws IllegalStateException if initialization has not been done properly
-   *         (i.e. {@link #setParameters(String[]) setParameters(String[])} has
-   *         not been called before calling this method)
    */
   @Override
   public void run() throws IllegalStateException {

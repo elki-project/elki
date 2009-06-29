@@ -43,8 +43,8 @@ public abstract class AbstractLocallyWeightedDistanceFunction<O extends RealVect
 
   /**
    * Calls
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters(String[])
-   * AbstractParameterizable#setParameters(args)} and passes the remaining
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters
+   * AbstractParameterizable#setParameters} and passes the remaining
    * parameters to the {@link #preprocessorHandler}.
    */
   @Override
