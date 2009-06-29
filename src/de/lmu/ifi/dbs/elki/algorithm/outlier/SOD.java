@@ -161,8 +161,8 @@ public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends
      * The remaining parameters are passed to the {@link #similarityFunction}.
      */
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
         knn = KNN_PARAM.getValue();
         alpha = ALPHA_PARAM.getValue();
 

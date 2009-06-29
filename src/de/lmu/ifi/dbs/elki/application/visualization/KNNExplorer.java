@@ -161,8 +161,8 @@ public class KNNExplorer<O extends NumberVector<O, ?>> extends AbstractApplicati
    * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters(java.lang.String[])
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
 
     // database connection
     databaseConnection = DATABASE_CONNECTION_PARAM.instantiateClass();

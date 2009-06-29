@@ -119,8 +119,8 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
      * {@link #distanceFunction}, respectively.
      */
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
         // number of neighbors
         numberOfNeighbors = NUMBER_OF_NEIGHBORS_PARAM.getValue();
 

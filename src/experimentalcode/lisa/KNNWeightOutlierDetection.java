@@ -93,8 +93,8 @@ public class KNNWeightOutlierDetection <O extends DatabaseObject, D extends Doub
        * {@link #K_PARAM}, {@link #N_PARAM} 
        */
       @Override
-      public String[] setParameters(String[] args) throws ParameterException {
-          String[] remainingParameters = super.setParameters(args);
+      public List<String> setParameters(List<String> args) throws ParameterException {
+          List<String> remainingParameters = super.setParameters(args);
           k = K_PARAM.getValue();
         //n = N_PARAM.getValue(); 
           return remainingParameters;

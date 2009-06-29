@@ -114,16 +114,12 @@ public abstract class AbstractApplication extends AbstractParameterizable {
    * 
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    if(args.length == 0) {
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    if(args.size() == 0) {
       throw new AbortException("No options specified. Try flag -h to gain more information.");
     }
 
-    String[] remainingParameters = super.setParameters(args);
-    this.remainingParameters = new ArrayList<String>(remainingParameters.length);
-    for(String s : remainingParameters) {
-      this.remainingParameters.add(s);
-    }
+    this.remainingParameters = super.setParameters(args);
 
     // verbose
     verbose = VERBOSE_FLAG.isSet();
@@ -199,12 +195,14 @@ public abstract class AbstractApplication extends AbstractParameterizable {
    */
   public void runCLIApplication(String[] args) {
     boolean stop = false;
+    
+    List<String> argslist = Arrays.asList(args);
 
     Exception error = null;
     try {
-      String[] remainingParameters = this.setParameters(args);
-      if(remainingParameters.length > 0) {
-        logger.warning("Unused parameters specified: " + Arrays.asList(remainingParameters) + "\n");
+      List<String> remainingParameters = this.setParameters(argslist);
+      if(remainingParameters.size() > 0) {
+        logger.warning("Unused parameters specified: " + remainingParameters + "\n");
       }
     }
     catch(Exception t) {

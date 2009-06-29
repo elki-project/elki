@@ -153,8 +153,8 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
    * and sets additionally the value of the parameter {@link #ALPHA_PARAM}.
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
 
     // alpha
     alpha = ALPHA_PARAM.getValue();

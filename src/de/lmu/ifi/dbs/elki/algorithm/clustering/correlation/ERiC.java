@@ -161,8 +161,8 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
      * Calls the super method and passes remaining parameters to the {@link #copacAlgorithm}.
      */
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
 
         // copac algorithm
         copacAlgorithm.setVerbose(isVerbose());
@@ -265,8 +265,8 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
      * @param correlationDimension the correlation dimension
      * @return the parameters for the PCA for the specified correlation dimension
      */
-    private String[] pcaParameters(int correlationDimension) {
-        List<String> parameters = new ArrayList<String>();
+    private ArrayList<String> pcaParameters(int correlationDimension) {
+        ArrayList<String> parameters = new ArrayList<String>();
 
         // eigenpair filter
         OptionUtil.addParameter(parameters, PCAFilteredRunner.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
@@ -274,7 +274,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
         // n
         OptionUtil.addParameter(parameters, FirstNEigenPairFilter.EIGENPAIR_FILTER_N, Integer.toString(correlationDimension));
 
-        return parameters.toArray(new String[parameters.size()]);
+        return parameters;
     }
 
     private void buildHierarchy(SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap) throws IllegalStateException {

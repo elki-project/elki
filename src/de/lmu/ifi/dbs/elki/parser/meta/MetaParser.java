@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.elki.parser.meta;
 
+import java.io.InputStream;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelParser;
 import de.lmu.ifi.dbs.elki.parser.Parser;
@@ -8,8 +11,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-
-import java.io.InputStream;
 
 /**
  * A MetaParser uses any {@link Parser} as specified by the user via parameter setting
@@ -63,8 +64,8 @@ public abstract class MetaParser<O extends DatabaseObject> extends AbstractParam
    * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters(java.lang.String[])
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
     baseparser = BASEPARSER_PARAM.instantiateClass();
     addParameterizable(baseparser);
     remainingParameters = baseparser.setParameters(remainingParameters);

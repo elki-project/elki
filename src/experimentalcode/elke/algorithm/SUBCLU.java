@@ -210,8 +210,8 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
      * The remaining parameters are passed to the {@link #distanceFunction}.
      */
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
 
         // epsilon
         epsilon = EPSILON_PARAM.getValue();
@@ -236,7 +236,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
      */
     private DBSCAN<V, D> initDBSCAN(BitSet selectedDimensions) throws ParameterException {
         DBSCAN<V, D> dbscan = new DBSCAN<V, D>();
-        List<String> parameters = new ArrayList<String>();
+        ArrayList<String> parameters = new ArrayList<String>();
 
         // distance function
         OptionUtil.addParameter(parameters, DISTANCE_FUNCTION_PARAM, distanceFunction.getClass().getName());
@@ -246,7 +246,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
         parameters.add(Util.parseSelectedBits(selectedDimensions, ","));
 
         // additional distance function parameters
-        String[] distanceFunctionParams = distanceFunction.getParameters();
+        ArrayList<String> distanceFunctionParams = distanceFunction.getParameters();
         for (String param : distanceFunctionParams) {
             parameters.add(param);
         }
@@ -257,7 +257,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
         // minpts
         OptionUtil.addParameter(parameters, MINPTS_PARAM, Integer.toString(minpts));
 
-        dbscan.setParameters(parameters.toArray(new String[parameters.size()]));
+        dbscan.setParameters(parameters);
         return dbscan;
     }
 }

@@ -296,8 +296,8 @@ public class SNNClustering<O extends DatabaseObject, D extends Distance<D>> exte
      * The remaining parameters are passed to the {@link #similarityFunction}.
      */
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
 
         epsilon = new IntegerDistance(EPSILON_PARAM.getValue());
 

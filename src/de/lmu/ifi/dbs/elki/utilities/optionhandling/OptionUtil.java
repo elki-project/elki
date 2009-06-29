@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -157,23 +156,23 @@ public final class OptionUtil {
    *                                  <code>part</code>, contains entries that are not contained
    *                                  by the first, <code>complete</code>
    */
-  public static String[] parameterDifference(String[] complete, String[] part) throws IllegalArgumentException {
-      if (complete.length < part.length) {
+  public static List<String> parameterDifference(List<String> complete, List<String> part) throws IllegalArgumentException {
+      if (complete.size() < part.size()) {
           throw new IllegalArgumentException("First array must be at least as long as second array.\n" +
-              "First array:  " + Arrays.asList(complete) + "\n" +
-              "Second array: " + Arrays.asList(part));
+              "First array:  " + complete + "\n" +
+              "Second array: " + part);
       }
   
-      if (complete.length == 0) {
-          return new String[0];
+      if (complete.size() == 0) {
+          return new ArrayList<String>(0);
       }
   
       List<String> completeArray = new ArrayList<String>();
-      for (int i = 0; i < complete.length; i++) {
-          String param = complete[i];
+      for (int i = 0; i < complete.size(); i++) {
+          String param = complete.get(i);
           if (param.startsWith(OptionHandler.OPTION_PREFIX)) {
-              if (i < complete.length - 1) {
-                  String key = complete[i + 1];
+              if (i < complete.size() - 1) {
+                  String key = complete.get(i + 1);
                   if (!key.startsWith(OptionHandler.OPTION_PREFIX)) {
                       completeArray.add(param + " " + key);
                       i++;
@@ -186,11 +185,11 @@ public final class OptionUtil {
       }
   
       List<String> partArray = new ArrayList<String>();
-      for (int i = 0; i < part.length; i++) {
-          String param = part[i];
+      for (int i = 0; i < part.size(); i++) {
+          String param = part.get(i);
           if (param.startsWith(OptionHandler.OPTION_PREFIX)) {
-              if (i < part.length - 1) {
-                  String key = part[i + 1];
+              if (i < part.size() - 1) {
+                  String key = part.get(i + 1);
                   if (!key.startsWith(OptionHandler.OPTION_PREFIX)) {
                       partArray.add(param + " " + key);
                       i++;
@@ -203,7 +202,7 @@ public final class OptionUtil {
       }
   
       Pattern pattern = Pattern.compile(" ");
-      List<String> result = new ArrayList<String>();
+      ArrayList<String> result = new ArrayList<String>();
       int first = 0;
       int second = 0;
       while (first < completeArray.size() && second < partArray.size()) {
@@ -222,8 +221,8 @@ public final class OptionUtil {
       if (second < partArray.size()) {
           throw new IllegalArgumentException("second array contains entries that are not " +
               "contained in the first array.\n" +
-              "First array:  " + Arrays.asList(complete) + "\n" +
-              "Second array: " + Arrays.asList(part));
+              "First array:  " + complete + "\n" +
+              "Second array: " + part);
       }
       while (first < completeArray.size()) {
           String[] params = pattern.split(completeArray.get(first));
@@ -234,8 +233,7 @@ public final class OptionUtil {
       }
   
   
-      String[] resultArray = new String[result.size()];
-      return result.toArray(resultArray);
+      return result;
   }
 
   /**

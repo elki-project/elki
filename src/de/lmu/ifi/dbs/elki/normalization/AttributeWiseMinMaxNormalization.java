@@ -220,8 +220,8 @@ public class AttributeWiseMinMaxNormalization<V extends RealVector<V, ?>> extend
    * @throws IllegalArgumentException in case of wrong parameter-setting
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
 
     if(MINIMA_PARAM.isSet() || MAXIMA_PARAM.isSet()) {
       List<Double> min_list = MINIMA_PARAM.getValue();

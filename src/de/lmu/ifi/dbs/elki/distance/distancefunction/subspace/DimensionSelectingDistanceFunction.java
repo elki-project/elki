@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
@@ -153,8 +155,8 @@ public class DimensionSelectingDistanceFunction<N extends Number, V extends Feat
     }
 
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
 
         // dim
         dim = DIM_PARAM.getValue();

@@ -221,8 +221,8 @@ public class CLIQUE<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * {@link #XSI_PARAM}, {@link #TAU_PARAM}, and {flag @link #PRUNE_FLAG}.
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
 
     // parameters xsi, tau and flag prune
     xsi = XSI_PARAM.getValue();

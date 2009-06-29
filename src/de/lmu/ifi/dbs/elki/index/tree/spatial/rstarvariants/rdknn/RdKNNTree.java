@@ -265,8 +265,8 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
   }
 
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
 
     // distance function
     distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();

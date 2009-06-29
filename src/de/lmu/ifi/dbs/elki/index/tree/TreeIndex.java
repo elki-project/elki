@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.index.tree;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.persistent.LRUCache;
@@ -147,8 +149,8 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
    * {@link #PAGE_SIZE_PARAM}.
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = optionHandler.grabOptions(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = optionHandler.grabOptions(args);
 
     // filename
     if(FILE_PARAM.isSet()) {

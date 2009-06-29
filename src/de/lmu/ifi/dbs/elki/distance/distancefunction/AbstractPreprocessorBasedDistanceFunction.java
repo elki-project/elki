@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
@@ -58,8 +59,8 @@ public abstract class AbstractPreprocessorBasedDistanceFunction<O extends Databa
      * and passes the remaining parameters to the {@link #preprocessorHandler}.
      */
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
 
         remainingParameters = preprocessorHandler.setParameters(remainingParameters);
         

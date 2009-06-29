@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
@@ -58,8 +59,8 @@ public abstract class AbstractPreprocessorBasedSimilarityFunction<O extends Data
      *
      */
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
 
         remainingParameters = preprocessorHandler.setParameters(remainingParameters);
         

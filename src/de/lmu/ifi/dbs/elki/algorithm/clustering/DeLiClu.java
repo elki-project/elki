@@ -25,7 +25,6 @@ import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.Identifiable;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeapNode;
 import de.lmu.ifi.dbs.elki.utilities.heap.Heap;
@@ -203,20 +202,20 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
      * are passed to the {@link #knnJoin}.
      */
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
 
         // minpts
         int minpts = MINPTS_PARAM.getValue();
 
         // knn join
-        List<String> kNNJoinParameters = new ArrayList<String>();
+        ArrayList<String> kNNJoinParameters = new ArrayList<String>();
         // parameter k
         OptionUtil.addParameter(kNNJoinParameters, KNNJoin.K_ID, Integer.toString(minpts));
         // parameter distance function
         OptionUtil.addParameter(kNNJoinParameters, KNNJoin.DISTANCE_FUNCTION_ID, getDistanceFunction().getClass().getName());
-        Util.addToList(kNNJoinParameters, getDistanceFunction().getParameters());
-        knnJoin.setParameters(kNNJoinParameters.toArray(new String[kNNJoinParameters.size()]));
+        kNNJoinParameters.addAll(getDistanceFunction().getParameters());
+        knnJoin.setParameters(kNNJoinParameters);
         // TODO: do we want to have knnJoin listed via addParametrizable somehow?
 
         return remainingParameters;

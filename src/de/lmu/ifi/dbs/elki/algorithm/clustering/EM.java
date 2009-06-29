@@ -411,8 +411,8 @@ public class EM<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Cluster
      * {@link #K_PARAM} and {@link #DELTA_PARAM}.
      */
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
 
         // k and delta
         k = K_PARAM.getValue();

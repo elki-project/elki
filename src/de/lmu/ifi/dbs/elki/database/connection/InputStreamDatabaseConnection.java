@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.elki.database.connection;
 
+import java.io.InputStream;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -13,9 +16,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-
-import java.io.InputStream;
-import java.util.List;
 
 /**
  * Provides a database connection expecting input from an input stream such as stdin.
@@ -105,8 +105,8 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
      * The remaining parameters are passed to the {@link #parser}.
      */
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
 
         // parser
         parser = PARSER_PARAM.instantiateClass();

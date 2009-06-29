@@ -158,8 +158,8 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
    * are passed to all instances of {@link #parsers}.
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
 
     // input files
     List<File> inputFiles = INPUT_PARAM.getValue();

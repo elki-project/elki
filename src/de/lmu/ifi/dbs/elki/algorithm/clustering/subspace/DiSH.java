@@ -165,8 +165,8 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
      * Then the parameters for the algorithm {@link #optics} are set.
      */
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
 
         // epsilon
         epsilon = EPSILON_PARAM.getValue();
@@ -181,7 +181,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
 
         // todo provide setters
         // parameters for optics
-        List<String> opticsParameters = new ArrayList<String>();
+        ArrayList<String> opticsParameters = new ArrayList<String>();
 
         // epsilon for OPTICS
         OptionUtil.addParameter(opticsParameters, OPTICS.EPSILON_ID, DiSHDistanceFunction.INFINITY_PATTERN);
@@ -214,7 +214,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
             opticsParameters.add(parameter);
         }
 
-        remainingParameters = optics.setParameters(opticsParameters.toArray(new String[opticsParameters.size()]));
+        remainingParameters = optics.setParameters(opticsParameters);
         OptionID[] masked = { OPTICS.EPSILON_ID, OPTICS.MINPTS_ID, OPTICS.DISTANCE_FUNCTION_ID, DiSHDistanceFunction.EPSILON_ID, PreprocessorHandler.OMIT_PREPROCESSING_ID, PreprocessorHandler.PREPROCESSOR_ID, DiSHPreprocessor.EPSILON_ID, DiSHPreprocessor.MINPTS_ID};
         addParameterizable(optics, Arrays.asList(masked));
         

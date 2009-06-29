@@ -295,8 +295,8 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
      * and the flag {@link #ADJUST_FLAG}.
      */
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
         // minpts
         minPts = MINPTS_PARAM.getValue();
 
@@ -771,10 +771,10 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
 
         DependencyDerivator<DoubleVector, DoubleDistance> derivator = new DependencyDerivator<DoubleVector, DoubleDistance>();
         // set the parameters
-        List<String> parameters = new ArrayList<String>();
+        ArrayList<String> parameters = new ArrayList<String>();
         OptionUtil.addParameter(parameters, PCAFilteredRunner.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
         OptionUtil.addParameter(parameters, FirstNEigenPairFilter.EIGENPAIR_FILTER_N, Integer.toString(dim - 1));
-        derivator.setParameters(parameters.toArray(new String[parameters.size()]));
+        derivator.setParameters(parameters);
 
         derivator.run(derivatorDB);
         CorrelationAnalysisSolution<DoubleVector> model = derivator.getResult();
@@ -850,10 +850,10 @@ public class CASH extends AbstractAlgorithm<ParameterizationFunction, Clustering
 
             DependencyDerivator<DoubleVector, DoubleDistance> derivator = new DependencyDerivator<DoubleVector, DoubleDistance>();
 
-            List<String> parameters = new ArrayList<String>();
+            ArrayList<String> parameters = new ArrayList<String>();
             OptionUtil.addParameter(parameters, PCAFilteredRunner.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
             OptionUtil.addParameter(parameters, FirstNEigenPairFilter.EIGENPAIR_FILTER_N, Integer.toString(dimensionality));
-            derivator.setParameters(parameters.toArray(new String[parameters.size()]));
+            derivator.setParameters(parameters);
 
             derivator.run(derivatorDB);
             CorrelationAnalysisSolution<DoubleVector> model = derivator.getResult();

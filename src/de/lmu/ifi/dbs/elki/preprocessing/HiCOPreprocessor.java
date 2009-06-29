@@ -116,8 +116,8 @@ public abstract class HiCOPreprocessor<V extends RealVector<V, ?>> extends Abstr
      *
      */
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
 
         pcaDistanceFunction = PCA_DISTANCE_PARAM.instantiateClass();
         addParameterizable(pcaDistanceFunction);

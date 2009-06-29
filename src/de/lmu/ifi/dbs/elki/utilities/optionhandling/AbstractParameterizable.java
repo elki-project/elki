@@ -25,7 +25,7 @@ public abstract class AbstractParameterizable extends AbstractLoggable implement
   /**
    * Holds the currently set parameter array.
    */
-  private String[] currentParameterArray = new String[0];
+  private List<String> currentParameterArrayList = new ArrayList<String>(0);
   
   /**
    * Hold parameterizables contained
@@ -106,7 +106,7 @@ public abstract class AbstractParameterizable extends AbstractLoggable implement
    * 
    * <pre>
    * {
-   *   String[] remainingParameters = super.setParameters(args);
+   *   List<String> remainingParameters = super.setParameters(args);
    *   // set parameters for your class
    *   // for example like this:
    *   if(isSet(MY_PARAM_VALUE_PARAM))
@@ -122,8 +122,8 @@ public abstract class AbstractParameterizable extends AbstractLoggable implement
    * }
    * </pre>
    */
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = optionHandler.grabOptions(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = optionHandler.grabOptions(args);
     rememberParametersExcept(args, remainingParameters);
     return remainingParameters;
   }
@@ -135,29 +135,15 @@ public abstract class AbstractParameterizable extends AbstractLoggable implement
    * @param complete the complete array
    * @param part an array that contains only elements of the first array
    */
-  protected final void rememberParametersExcept(String[] complete, String[] part) {
-    currentParameterArray = OptionUtil.parameterDifference(complete, part);
-  }
-
-  /**
-   * Compatibility wrapper for not yet adapted code.
-   * 
-   * Depreciated: Renamed to {@link #rememberParametersExcept}
-   * 
-   * @param complete the complete array
-   * @param part parameters to not set from the first array (only!)
-   */
-  @Deprecated
-  protected final void setParameters(String[] complete, String[] part) {
-    rememberParametersExcept(complete, part);
+  protected final void rememberParametersExcept(List<String> complete, List<String> part) {
+    currentParameterArrayList = OptionUtil.parameterDifference(complete, part);
   }
 
   /*
    * See: {@link Parameterizable#getParameters()}
    */
-  public final String[] getParameters() {
-    String[] param = new String[currentParameterArray.length];
-    System.arraycopy(currentParameterArray, 0, param, 0, currentParameterArray.length);
+  public final ArrayList<String> getParameters() {
+    ArrayList<String> param = new ArrayList<String>(currentParameterArrayList);
     return param;
   }
 

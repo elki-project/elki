@@ -224,8 +224,8 @@ public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends D
      * {@link #K_PARAM}.
      */
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
 
         // k
         k = K_PARAM.getValue();

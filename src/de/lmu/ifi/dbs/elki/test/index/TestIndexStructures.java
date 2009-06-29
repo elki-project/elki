@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.test.index;
 
 import static junit.framework.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
@@ -58,16 +59,16 @@ public class TestIndexStructures implements JUnit4Test {
    */
   @Test
   public void testFileBasedDatabaseConnection() throws ParameterException {
-    testFileBasedDatabaseConnection(new String[] {});
+    testFileBasedDatabaseConnection(new ArrayList<String>());
 
-    String[] metopts = new String[0];
-    metopts = OptionUtil.addParameter(metopts, AbstractDatabaseConnection.DATABASE_ID, MetricalIndexDatabase.class.getCanonicalName());
-    metopts = OptionUtil.addParameter(metopts, MetricalIndexDatabase.INDEX_ID, MTree.class.getCanonicalName());
+    ArrayList<String> metopts = new ArrayList<String>();
+    OptionUtil.addParameter(metopts, AbstractDatabaseConnection.DATABASE_ID, MetricalIndexDatabase.class.getCanonicalName());
+    OptionUtil.addParameter(metopts, MetricalIndexDatabase.INDEX_ID, MTree.class.getCanonicalName());
     testFileBasedDatabaseConnection(metopts);
 
-    String[] spatopts = new String[0];
-    spatopts = OptionUtil.addParameter(spatopts, AbstractDatabaseConnection.DATABASE_ID, SpatialIndexDatabase.class.getCanonicalName());
-    spatopts = OptionUtil.addParameter(spatopts, SpatialIndexDatabase.INDEX_ID, RStarTree.class.getCanonicalName());
+    ArrayList<String> spatopts = new ArrayList<String>();
+    OptionUtil.addParameter(spatopts, AbstractDatabaseConnection.DATABASE_ID, SpatialIndexDatabase.class.getCanonicalName());
+    OptionUtil.addParameter(spatopts, SpatialIndexDatabase.INDEX_ID, RStarTree.class.getCanonicalName());
     testFileBasedDatabaseConnection(metopts);
   }
 
@@ -77,12 +78,12 @@ public class TestIndexStructures implements JUnit4Test {
    * @param inputparams
    * @throws ParameterException
    */
-  void testFileBasedDatabaseConnection(String[] inputparams) throws ParameterException {
+  void testFileBasedDatabaseConnection(List<String> inputparams) throws ParameterException {
     DistanceFunction<DoubleVector, DoubleDistance> dist = new EuclideanDistanceFunction<DoubleVector>();
     FileBasedDatabaseConnection<DoubleVector> dbconn = new FileBasedDatabaseConnection<DoubleVector>();
 
     // Set up database input file:
-    inputparams = OptionUtil.addParameter(inputparams, FileBasedDatabaseConnection.INPUT_ID, dataset);
+    OptionUtil.addParameter(inputparams, FileBasedDatabaseConnection.INPUT_ID, dataset);
     inputparams = dbconn.setParameters(inputparams);
     // get database
     Database<DoubleVector> db = dbconn.getDatabase(null);

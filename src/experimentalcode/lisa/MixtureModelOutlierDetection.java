@@ -82,8 +82,8 @@ private static final double SINGULARITY_CHEAT = 1E-9;
        * {@link #K_PARAM}
        */
       @Override
-      public String[] setParameters(String[] args) throws ParameterException {
-          String[] remainingParameters = super.setParameters(args);
+      public List<String> setParameters(List<String> args) throws ParameterException {
+          List<String> remainingParameters = super.setParameters(args);
 
           // l fraction of expected outliers
           l = L_PARAM.getValue();

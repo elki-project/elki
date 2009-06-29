@@ -74,8 +74,8 @@ public class CompositeEigenPairFilter extends AbstractParameterizable implements
    * passed to each instance of {@link #filters}.
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
 
     // filters
     filters = FILTERS_PARAM.instantiateClasses();

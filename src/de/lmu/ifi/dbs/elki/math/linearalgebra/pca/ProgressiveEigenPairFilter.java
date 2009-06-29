@@ -179,8 +179,8 @@ public class ProgressiveEigenPairFilter extends AbstractParameterizable implemen
    * Set parameters
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
 
     // palpha
     palpha = PALPHA_PARAM.getValue();

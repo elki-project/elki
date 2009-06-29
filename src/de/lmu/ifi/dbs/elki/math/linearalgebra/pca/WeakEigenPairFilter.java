@@ -104,8 +104,8 @@ public class WeakEigenPairFilter extends AbstractParameterizable implements Eige
    * Set parameters
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
 
     // alpha
     walpha = WALPHA_PARAM.getValue();

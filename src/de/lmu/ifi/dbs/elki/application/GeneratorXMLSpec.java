@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 import java.util.regex.Pattern;
 
@@ -123,8 +124,8 @@ public class GeneratorXMLSpec extends StandAloneApplication {
    * Sets the file parameter.
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
 
     specfile = CONFIGFILE_PARAM.getValue();
     sizescale = SIZE_SCALE_PARAM.getValue();

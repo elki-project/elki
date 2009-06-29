@@ -1,5 +1,9 @@
 package experimentalcode.arthur;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
@@ -11,7 +15,6 @@ import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -20,10 +23,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * <p>Computes the LDOF (Local Distance-Based Outlier Factor) for all objects of a Database.</p>
@@ -162,20 +161,20 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
    * 
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
 
     // k
     k = K_PARAM.getValue();
 
     
     // configure preprocessor
-    List<String> preprocParams1 = new ArrayList<String>();
+    ArrayList<String> preprocParams1 = new ArrayList<String>();
     OptionUtil.addParameter(preprocParams1, MaterializeKNNPreprocessor.K_ID, Integer.toString(k+1));
     OptionUtil.addParameter(preprocParams1, MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, getDistanceFunction().getClass().getCanonicalName());
     OptionUtil.addParameters(preprocParams1, getDistanceFunction().getParameters());
-    String[] remaining1 = knnPreprocessor.setParameters(ClassGenericsUtil.toArray(preprocParams1, String.class));
-    if (remaining1.length > 0) {
+    List<String> remaining1 = knnPreprocessor.setParameters(preprocParams1);
+    if (remaining1.size() > 0) {
       throw new UnusedParameterException("First preprocessor did not use all parameters.");
     }
     rememberParametersExcept(args, remainingParameters);

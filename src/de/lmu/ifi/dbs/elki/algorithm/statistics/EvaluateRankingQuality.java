@@ -168,8 +168,8 @@ public class EvaluateRankingQuality<V extends RealVector<V, ?>> extends Distance
    * @see de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm#setParameters(java.lang.String[])
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
     
     numbins = HISTOGRAM_BINS_OPTION.getValue();
 

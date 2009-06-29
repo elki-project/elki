@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
@@ -133,8 +134,8 @@ public class FileBasedFloatDistanceFunction<V extends DatabaseObject> extends Ab
   }
 
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
     
     File matrixfile = MATRIX_PARAM.getValue();
 

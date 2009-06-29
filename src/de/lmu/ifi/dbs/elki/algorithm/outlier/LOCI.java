@@ -137,8 +137,8 @@ public class LOCI<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
    * {@link #RMAX_PARAM}, {@link #NMIN_PARAM} and {@link #ALPHA_PARAM} 
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-      String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+      List<String> remainingParameters = super.setParameters(args);
 
       // maximum query radius
       rmax = RMAX_PARAM.getValue();

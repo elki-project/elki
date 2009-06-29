@@ -49,8 +49,8 @@ public class EMOutlierDetection<V extends RealVector<V, ?>> extends AbstractAlgo
    * {@link #K_PARAM}, {@link #N_PARAM} 
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-      String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+      List<String> remainingParameters = super.setParameters(args);
       remainingParameters= emClustering.setParameters(remainingParameters);
       return remainingParameters;
   }

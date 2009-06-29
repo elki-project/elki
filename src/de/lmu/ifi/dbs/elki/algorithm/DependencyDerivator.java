@@ -275,8 +275,8 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
    * remaining parameters are passed to the {@link #pca}.
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
 
     // accuracy
     int accuracy = OUTPUT_ACCURACY_PARAM.getValue();

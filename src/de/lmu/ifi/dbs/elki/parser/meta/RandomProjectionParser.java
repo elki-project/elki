@@ -1,12 +1,13 @@
 package de.lmu.ifi.dbs.elki.parser.meta;
 
+import java.util.List;
+import java.util.Random;
+
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-
-import java.util.Random;
 
 /**
  * <p>A RandomProjectionParser selects a subset of attributes randomly for projection of a ParsingResult.</p>
@@ -57,8 +58,8 @@ public abstract class RandomProjectionParser<V extends RealVector<V,?>> extends 
    * {@link #NUMBER_SELECTED_ATTRIBUTES_PARAM}.
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-      String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+      List<String> remainingParameters = super.setParameters(args);
 
       // k
       k = NUMBER_SELECTED_ATTRIBUTES_PARAM.getValue();

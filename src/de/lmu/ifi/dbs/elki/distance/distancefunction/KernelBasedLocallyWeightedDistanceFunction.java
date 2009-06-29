@@ -99,8 +99,8 @@ public class KernelBasedLocallyWeightedDistanceFunction<V extends RealVector<V, 
     }
 
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
 
         // kernel function
         kernelFunction = KERNEL_FUNCTION_PARAM.instantiateClass();

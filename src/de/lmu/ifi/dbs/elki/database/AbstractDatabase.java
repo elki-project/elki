@@ -290,7 +290,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     return partition(partitions, null, null);
   }
 
-  public Map<Integer, Database<O>> partition(Map<Integer, List<Integer>> partitions, Class<? extends Database<O>> dbClass, String[] dbParameters) throws UnableToComplyException {
+  public Map<Integer, Database<O>> partition(Map<Integer, List<Integer>> partitions, Class<? extends Database<O>> dbClass, List<String> dbParameters) throws UnableToComplyException {
     if(dbClass == null) {
       dbClass = ClassGenericsUtil.uglyCrossCast(this.getClass(), Database.class);
       dbParameters = getParameters();

@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
 
 import java.util.BitSet;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
@@ -196,8 +197,8 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
      * {@link #EPSILON_PARAM}.
      */
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
 
         // epsilon
         epsilon = EPSILON_PARAM.getValue();

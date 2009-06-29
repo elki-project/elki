@@ -179,8 +179,8 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
      * {@link #LOF_PARAM}, {@link #NN_PARAM}, {@link #INSERTIONS_PARAM}, and {@link #PARSER_PARAM}.
      */
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
 
         // lofTable
         try {

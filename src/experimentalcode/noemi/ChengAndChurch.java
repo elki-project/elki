@@ -3,6 +3,7 @@ package experimentalcode.noemi;
 import java.util.BitSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -314,8 +315,8 @@ public class ChengAndChurch<V extends RealVector<V, Double>> extends AbstractBic
      * end.
      */
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-        String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+        List<String> remainingParameters = super.setParameters(args);
         long seed = SEED_PARAM.getValue();
         random = new Random(seed);
         sigma = SIGMA_PARAM.getValue();

@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.result;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -90,8 +91,8 @@ public class ResultWriter<O extends DatabaseObject> extends AbstractParameteriza
    * set Parameters
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
 
     // output
     if(OUTPUT_PARAM.isSet()) {

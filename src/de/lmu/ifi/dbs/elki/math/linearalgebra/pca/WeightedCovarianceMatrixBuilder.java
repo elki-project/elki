@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -20,11 +21,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 /**
  * {@link CovarianceMatrixBuilder} with weights.
  * 
- * This builder uses a weight function to weight points differently duing build a covariance matrix.
+ * This builder uses a weight function to weight points differently during build a covariance matrix.
  * Covariance can be canonically extended with weights, as shown in the article
  * 
  * A General Framework for Increasing the Robustness of PCA-Based Correlation Clustering Algorithms
- * Hans-Peter Kriegel and Peer Kröger and Erich Schubert and Arthur Zimek
+ * Hans-Peter Kriegel and Peer Kr&ouml;ger and Erich Schubert and Arthur Zimek
  * In: Proc. 20th Int. Conf. on Scientific and Statistical Database Management (SSDBM), 2008, Hong Kong
  * Lecture Notes in Computer Science 5069, Springer
  * 
@@ -73,8 +74,8 @@ public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends
    * Parse parameters.
    */
   @Override
-  public String[] setParameters(String[] args) throws ParameterException {
-    String[] remainingParameters = super.setParameters(args);
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
     weightfunction = WEIGHT_PARAM.instantiateClass();
     rememberParametersExcept(args, remainingParameters);
     return remainingParameters;

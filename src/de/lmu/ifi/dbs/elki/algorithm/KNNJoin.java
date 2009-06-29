@@ -221,8 +221,8 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
     }
 
     @Override
-    public String[] setParameters(String[] args) throws ParameterException {
-      String[] remainingParameters = super.setParameters(args);
+    public List<String> setParameters(List<String> args) throws ParameterException {
+      List<String> remainingParameters = super.setParameters(args);
       k = K_PARAM.getValue();
       
       rememberParametersExcept(args, remainingParameters);
