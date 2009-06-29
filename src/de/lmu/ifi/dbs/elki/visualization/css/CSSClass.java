@@ -52,13 +52,24 @@ public class CSSClass {
   }
   
   /**
-   * Simplified constructor, empty statments list.
+   * Simplified constructor, empty statements list.
    * 
    * @param owner Class owner.
    * @param name Class name.
    */
   public CSSClass(Object owner, String name) {
-    this(owner, name, null);
+    this(owner, name, (Collection<Pair<String,String>>) null);
+  }
+  
+  /**
+   * Cloning constructor
+   * 
+   * @param owner Class owner.
+   * @param name Class name.
+   * @param other Class to clone
+   */
+  public CSSClass(Object owner, String name, CSSClass other) {
+    this(owner, name, new ArrayList<Pair<String,String>>(other.statements));
   }
   
   /**

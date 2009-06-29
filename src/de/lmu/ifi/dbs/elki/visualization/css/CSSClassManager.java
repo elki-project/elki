@@ -40,6 +40,19 @@ public class CSSClassManager {
     }
     return store.put(clss.getName(), clss);
   }
+
+  /**
+   * Remove a single CSS class from the map.
+   * Note that classes are removed by reference, not by name!
+   * 
+   * @param clss Class to remove
+   */
+  public synchronized void removeClass(CSSClass clss) {
+    CSSClass existing = store.get(clss.getName());
+    if (existing == clss) {
+      store.remove(existing.getName());
+    }
+  }
   
   /**
    * Retrieve a single class by name and owner
