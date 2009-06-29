@@ -36,12 +36,6 @@ public class OptionHandler extends AbstractLoggable {
   public static final String OPTION_PREFIX = "-";
 
   /**
-   * Holds the parameter array as given to the last call of
-   * {@link #grabOptions(String[]) grabOptions(String[])}.
-   */
-  private String[] currentParameters = new String[0];
-
-  /**
    * Contains the optionHandler's options, the option names are used as the
    * map's keys
    */
@@ -159,9 +153,6 @@ public class OptionHandler extends AbstractLoggable {
       }
     }
 
-    currentParameters = new String[parameterArray.size()];
-    currentParameters = parameterArray.toArray(currentParameters);
-
     if(logger.isDebuggingFiner()) {
       for(Map.Entry<String, Option<?>> option : parameters.entrySet()) {
         logger.debugFiner("option " + option.getKey() + " has value " + option.getValue().getValue());
@@ -174,21 +165,6 @@ public class OptionHandler extends AbstractLoggable {
     checkGlobalParameterConstraints();
 
     return unexpectedParameters;
-  }
-
-  /**
-   * Returns a copy of the parameter array as given to the last call of
-   * {@link #grabOptions(String[]) grabOptions(String[])}. The resulting array
-   * will contain only those values that were recognized and needed by this
-   * OptionHandler.
-   * 
-   * @return a copy of the parameter array as given to the last call of
-   *         {@link #grabOptions(String[]) grabOptions(String[])}
-   */
-  public String[] getParameterArray() {
-    String[] parameterArray = new String[currentParameters.length];
-    System.arraycopy(currentParameters, 0, parameterArray, 0, currentParameters.length);
-    return parameterArray;
   }
 
   /**
