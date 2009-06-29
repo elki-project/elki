@@ -42,6 +42,37 @@ public class CSSClassManager {
   }
   
   /**
+   * Retrieve a single class by name and owner
+   * 
+   * @param name
+   * @param owner
+   * @return existing (old) class
+   * @throws CSSNamingConflict if an owner was specified and doesn't match
+   */
+  public CSSClass getClass(String name, Object owner) throws CSSNamingConflict {
+    CSSClass existing = store.get(name);
+    // Not found.
+    if (existing == null) {
+      return null;
+    }
+    // Different owner
+    if (owner != null && existing.getOwner() != owner) {
+      throw new CSSNamingConflict("CSS class naming conflict between "+owner.toString()+" and "+existing.getOwner().toString());
+    }
+    return existing;
+  }
+  
+  /**
+   * Retrieve a single class by name only
+   * 
+   * @param name
+   * @return existing (old) class
+   */
+  public CSSClass getClass(String name) {
+    return store.get(name);
+  }
+  
+  /**
    * Check if a name is already used in the classes.
    * 
    * @param name
