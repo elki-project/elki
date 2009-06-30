@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.MetadataResult;
-import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -175,7 +174,7 @@ public class TextWriter<O extends DatabaseObject> {
       }
     }
 
-    List<AttributeSettings> settings = ResultUtil.getGlobalAssociation((MultiResult) r, AssociationID.META_SETTINGS);
+    List<AttributeSettings> settings = ResultUtil.getGlobalAssociation(r, AssociationID.META_SETTINGS);
 
     if(ri != null && ri.size() > 0) {
       // TODO: associations are not passed to ri results.
