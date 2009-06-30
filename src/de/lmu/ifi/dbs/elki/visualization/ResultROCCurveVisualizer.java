@@ -1,4 +1,4 @@
-package experimentalcode.erich.visualization;
+package de.lmu.ifi.dbs.elki.visualization;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -53,13 +53,13 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * @param <O> Database object type
  */
 // TODO: maybe add a way to process clustering results as well?
-public class VisualizeROCCurve<O extends DatabaseObject> extends AbstractParameterizable implements ResultHandler<O, MultiResult> {
+public class ResultROCCurveVisualizer<O extends DatabaseObject> extends AbstractParameterizable implements ResultHandler<O, MultiResult> {
   /**
    * OptionID for {@link #POSITIVE_CLASS_NAME_PARAM}
    */
   public static final OptionID POSITIVE_CLASS_NAME_ID = OptionID.getOrCreateOptionID("rocauc.positive", "Class label for the 'positive' class.");
 
-  public VisualizeROCCurve() {
+  public ResultROCCurveVisualizer() {
     super();
   }
 
