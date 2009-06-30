@@ -14,46 +14,54 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 /**
  * Compute ROC (Receiver Operating Characteristics) curves.
  * 
- * A ROC curve compares the true positive rate (y-axis) and false positive rate (x-axis).
+ * A ROC curve compares the true positive rate (y-axis) and false positive rate
+ * (x-axis).
  * 
- * It was first used in radio signal detection, but has since found widespread use in
- * information retrieval, in particular for evaluating binary classification problems.
+ * It was first used in radio signal detection, but has since found widespread
+ * use in information retrieval, in particular for evaluating binary
+ * classification problems.
  * 
- * ROC curves are particularly useful to evaluate a ranking of objects with respect to a
- * binary classification problem: a random sampling will approximately achieve a ROC value
- * of 0.5, while a perfect separation will achieve 1.0 (all positives first) or
- * 0.0 (all negatives first). In most use cases, a score significantly below 0.5 indicates
- * that the algorithm result has been used the wrong way, and should be used backwards.
+ * ROC curves are particularly useful to evaluate a ranking of objects with
+ * respect to a binary classification problem: a random sampling will
+ * approximately achieve a ROC value of 0.5, while a perfect separation will
+ * achieve 1.0 (all positives first) or 0.0 (all negatives first). In most use
+ * cases, a score significantly below 0.5 indicates that the algorithm result
+ * has been used the wrong way, and should be used backwards.
  * 
- * <a href="http://en.wikipedia.org/wiki/Receiver_operating_characteristic">Receiver
- * operating characteristic at Wikipedia</a> is an introductory read to the use and
- * meaning of ROC curves.
+ * <a href="http://en.wikipedia.org/wiki/Receiver_operating_characteristic">
+ * Receiver operating characteristic at Wikipedia</a> is an introductory read to
+ * the use and meaning of ROC curves.
  * 
  * @author Erich Schubert
  */
-// TODO: add lazy Iterator<> based results that do not require full materialization 
+// TODO: add lazy Iterator<> based results that do not require full
+// materialization
 public class ROC {
   /**
-   * Compute a ROC curve given a set of positive IDs and a sorted list of (comparable, ID)s, where
-   * the comparable object is used to decided when two objects are interchangeable.
+   * Compute a ROC curve given a set of positive IDs and a sorted list of
+   * (comparable, ID)s, where the comparable object is used to decided when two
+   * objects are interchangeable.
    * 
    * @param size Database size
    * @param ids Collection of positive IDs, should support efficient contains()
-   * @param nei List of neighbors along with some comparable object to detect 'same positions'.
+   * @param nei List of neighbors along with some comparable object to detect
+   *        'same positions'.
    * @return area under curve
    */
   public static <C extends Comparable<? super C>> List<Pair<Double, Double>> materializeROC(int size, Collection<Integer> ids, Iterator<Pair<C, Integer>> nei) {
+    final double DELTA = 0.1 / (size*size);
+    
     int postot = ids.size();
     int negtot = size - postot;
     int poscnt = 0;
     int negcnt = 0;
-    ArrayList<Pair<Double, Double>> res = new ArrayList<Pair<Double, Double>>(postot+2);
+    ArrayList<Pair<Double, Double>> res = new ArrayList<Pair<Double, Double>>(postot + 2);
 
     // start in bottom left
     res.add(new Pair<Double, Double>(0.0, 0.0));
-    
+
     Pair<C, Integer> prev = null;
-    while (nei.hasNext()) {
+    while(nei.hasNext()) {
       Pair<C, Integer> cur = nei.next();
       // positive or negative match?
       if(ids.contains(cur.getSecond())) {
@@ -69,6 +77,24 @@ public class ROC {
         double curpos = ((double) poscnt) / postot;
         // negative rate - x axis
         double curneg = ((double) negcnt) / negtot;
+        // simplify curve when possible:
+        if(res.size() >= 2) {
+          Pair<Double, Double> last1 = res.get(res.size() - 2);
+          Pair<Double, Double> last2 = res.get(res.size() - 1);
+          // vertical simplification
+          if((last1.getFirst() == last2.getFirst()) && (last2.getFirst() == curneg)) {
+            res.remove(res.size() - 1);
+          }
+          // horizontal simplification
+          else if((last1.getSecond() == last2.getSecond()) && (last2.getSecond() == curpos)) {
+            res.remove(res.size() - 1);
+          }
+          // diagonal simplification
+          // TODO: Make a test.
+          else if(Math.abs((last2.getFirst() - last1.getFirst()) - (curneg - last2.getFirst())) < DELTA && Math.abs((last2.getSecond() - last1.getSecond()) - (curpos - last2.getSecond())) < DELTA) {
+            res.remove(res.size() - 1);
+          }
+        }
         res.add(new Pair<Double, Double>(curneg, curpos));
       }
       prev = cur;
@@ -76,8 +102,8 @@ public class ROC {
     // ensure we end up in the top right corner.
     {
       Pair<Double, Double> last = res.get(res.size() - 1);
-      if (last.getFirst() < 1.0 || last.getSecond() < 1.0) {
-        res.add(new Pair<Double, Double>(1.0,1.0));
+      if(last.getFirst() < 1.0 || last.getSecond() < 1.0) {
+        res.add(new Pair<Double, Double>(1.0, 1.0));
       }
     }
     return res;
@@ -98,7 +124,7 @@ public class ROC {
      * Original Iterator
      */
     private Iterator<Integer> iter;
-    
+
     /**
      * Constructor
      * 
@@ -117,7 +143,7 @@ public class ROC {
     @Override
     public Pair<Integer, Integer> next() {
       Integer id = this.iter.next();
-      return new Pair<Integer, Integer>(id,id);
+      return new Pair<Integer, Integer>(id, id);
     }
 
     @Override
@@ -125,7 +151,7 @@ public class ROC {
       throw new UnsupportedOperationException();
     }
   }
-  
+
   /**
    * This adapter can be used for an arbitrary collection of Integers, and uses
    * that id1.compareTo(id2) != 0 for id1 != id2 to satisfy the comparability.
@@ -141,7 +167,7 @@ public class ROC {
      * Original Iterator
      */
     private Iterator<DistanceResultPair<D>> iter;
-    
+
     /**
      * Constructor
      * 
@@ -160,7 +186,7 @@ public class ROC {
     @Override
     public Pair<D, Integer> next() {
       DistanceResultPair<D> d = this.iter.next();
-      return new Pair<D, Integer>(d.getDistance(),d.getID());
+      return new Pair<D, Integer>(d.getDistance(), d.getID());
     }
 
     @Override
@@ -170,24 +196,27 @@ public class ROC {
   }
 
   /**
-   * compute the Area Under Curve (difference to y axis) for an arbitrary polygon
+   * compute the Area Under Curve (difference to y axis) for an arbitrary
+   * polygon
+   * 
    * @param curve Iterable list of points (x,y)
    * @return area und curve
    */
   public static double computeAUC(Iterable<Pair<Double, Double>> curve) {
     double result = 0.0;
     Iterator<Pair<Double, Double>> iter = curve.iterator();
-    // it doesn't make sense to speak about the "area under a curve" when there is no curve.
-    if (!iter.hasNext()) {
+    // it doesn't make sense to speak about the "area under a curve" when there
+    // is no curve.
+    if(!iter.hasNext()) {
       return Double.NaN;
     }
     // starting point
     Pair<Double, Double> prev = iter.next();
     // check there is at least a second point
-    if (!iter.hasNext()) {
+    if(!iter.hasNext()) {
       return Double.NaN;
     }
-    while (iter.hasNext()) {
+    while(iter.hasNext()) {
       Pair<Double, Double> next = iter.next();
       // width * height at half way.
       double width = next.getFirst() - prev.getFirst();
@@ -207,7 +236,7 @@ public class ROC {
    * @return area under curve
    */
   public static double computeROCAUCDistanceResult(int size, Cluster<?> clus, List<DistanceResultPair<DoubleDistance>> nei) {
-    // TODO: ensure the collection has efficient "contains".    
+    // TODO: ensure the collection has efficient "contains".
     return ROC.computeROCAUCDistanceResult(size, clus.getIDs(), nei);
   }
 
