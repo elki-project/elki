@@ -310,7 +310,7 @@ public class TextWriter<O extends DatabaseObject> {
       }
       out.flush();
     }
-    Iterator<?> i = ri.iter();
+    Iterator<?> i = ri.iterator();
     while(i.hasNext()) {
       Object o = i.next();
       TextWriterWriterInterface<?> writer = out.getWriterFor(o);

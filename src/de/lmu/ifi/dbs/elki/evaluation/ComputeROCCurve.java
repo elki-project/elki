@@ -155,10 +155,10 @@ public class ComputeROCCurve<O extends DatabaseObject> extends AbstractAlgorithm
     // try iterable results first
     if (iterables.size() >= 1) {
       for (IterableResult<?> ir : iterables) {
-        Iterator<?> testit = ir.iter();
+        Iterator<?> testit = ir.iterator();
         if (testit.hasNext() && (testit.next() instanceof Integer)) {
           // note: we DO want a fresh iterator here!
-          return (Iterator<Integer>) ir.iter();
+          return (Iterator<Integer>) ir.iterator();
         }
       }
     }

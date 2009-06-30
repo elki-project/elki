@@ -65,7 +65,7 @@ public class CollectionResult<O> implements IterableResult<O> {
    * Implementation of the {@link IterableResult} interface, using the backing collection.
    */
   @Override
-  public Iterator<O> iter() {
+  public Iterator<O> iterator() {
     return col.iterator();
   }
 }
