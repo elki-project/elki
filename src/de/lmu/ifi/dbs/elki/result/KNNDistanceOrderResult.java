@@ -30,7 +30,7 @@ public class KNNDistanceOrderResult<D extends Distance<D>> implements IterableRe
    * Return an iterator.
    */
   @Override
-  public Iterator<D> iter() {
+  public Iterator<D> iterator() {
     return knnDistances.iterator();
   }
 }

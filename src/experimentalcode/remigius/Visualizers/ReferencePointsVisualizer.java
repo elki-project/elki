@@ -37,7 +37,7 @@ public class ReferencePointsVisualizer<O extends DoubleVector, V extends Feature
 	@Override
 	protected NumberVisualization visualize(SVGPlot svgp, Element layer, int dimx, int dimy) {
 
-		Iterator<V> iter = colResult.iter();
+		Iterator<V> iter = colResult.iterator();
 		
 		while (iter.hasNext()){
 			V v = iter.next();

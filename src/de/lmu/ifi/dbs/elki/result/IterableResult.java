@@ -10,11 +10,11 @@ import java.util.Iterator;
  *
  * @param <O> object class.
  */
-public interface IterableResult<O> extends Result {
+public interface IterableResult<O> extends Result, Iterable<O> {
   /**
    * Retrieve an iterator for the result.
    * 
    * @return iterator
    */
-  public Iterator<O> iter();
+  public Iterator<O> iterator();
 }
