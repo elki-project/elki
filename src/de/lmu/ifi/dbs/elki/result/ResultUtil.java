@@ -53,8 +53,8 @@ public class ResultUtil {
    * @param meta Association
    * @return first match or null
    */
-  public static final <M> M getGlobalAssociation(MultiResult result, AssociationID<M> meta) {
-    ArrayList<MetadataResult> mrs = result.filterResults(MetadataResult.class);
+  public static final <M> M getGlobalAssociation(Result result, AssociationID<M> meta) {
+    List<MetadataResult> mrs = getMetadataResults(result);
     for(MetadataResult mr : mrs) {
       M res = mr.getAssociation(meta);
       if(res != null) {
