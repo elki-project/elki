@@ -263,9 +263,10 @@ public class ClassParameter<C> extends Parameter<String, String> {
       info.append("Extending ");
     }
     info.append(superclass.getName());
+    info.append(FormatUtil.NEWLINE);
+    
     IterateKnownImplementations known = getKnownImplementations();
     if (known.hasNext()) {
-      info.append(FormatUtil.NEWLINE);
       info.append("Known classes (default package " + prefix + "):");
       info.append(FormatUtil.NEWLINE);
       for (Class<?> c : known) {
