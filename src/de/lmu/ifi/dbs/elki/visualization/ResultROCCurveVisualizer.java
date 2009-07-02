@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.LazyCanvasResizer;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.NodeReplacer;
@@ -38,15 +37,9 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 
 /**
- * Compute and visualize a ROC curve to evaluate a ranking algorithm and compute
- * the corresponding ROCAUC value.
+ * Visualize a ROC curve.
  * 
- * The parameter {@code -rocauc.positive} specifies the class label of
- * "positive" hits.
- * 
- * The nested algorithm {@code -algorithm} will be run, the result will be
- * searched for an iterable or ordering result, which then is compared with the
- * clustering obtained via the given class label.
+ * Use as {@code -outputhandler} for {@link de.lmu.ifi.dbs.elki.evaluation.ComputeROCCurve}
  * 
  * @author Erich Schubert
  * 
@@ -54,11 +47,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  */
 // TODO: maybe add a way to process clustering results as well?
 public class ResultROCCurveVisualizer<O extends DatabaseObject> extends AbstractParameterizable implements ResultHandler<O, MultiResult> {
-  /**
-   * OptionID for {@link #POSITIVE_CLASS_NAME_PARAM}
-   */
-  public static final OptionID POSITIVE_CLASS_NAME_ID = OptionID.getOrCreateOptionID("rocauc.positive", "Class label for the 'positive' class.");
-
   public ResultROCCurveVisualizer() {
     super();
   }
