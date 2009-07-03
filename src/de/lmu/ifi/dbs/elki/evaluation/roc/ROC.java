@@ -28,9 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * cases, a score significantly below 0.5 indicates that the algorithm result
  * has been used the wrong way, and should be used backwards.
  * 
- * <a href="http://en.wikipedia.org/wiki/Receiver_operating_characteristic">
- * Receiver operating characteristic at Wikipedia</a> is an introductory read to
- * the use and meaning of ROC curves.
+ * 
  * 
  * @author Erich Schubert
  */
