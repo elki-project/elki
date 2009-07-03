@@ -8,12 +8,6 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  * operation (of dimensionality dim+1), and also the construction of an inverse
  * transformation.
  * 
- * See also:
- * 
- * <a href="http://en.wikipedia.org/wiki/Homogeneous_coordinates">Wikipedia on
- * Homogeneous Coordinates</a> for an introduction to their use for affine
- * transformations.
- * 
  * @author Erich Schubert
  * 
  */

@@ -8,8 +8,6 @@ import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
  * 
  * erfc(1 / sqrt(2) * distance / stddev)
  * 
- * See also: <a href="http://en.wikipedia.org/wiki/Error_function">Error Function [wikipedia]</a>
- * 
  * @author Erich Schubert
  */
 public final class ErfcStddevWeight implements WeightFunction {
