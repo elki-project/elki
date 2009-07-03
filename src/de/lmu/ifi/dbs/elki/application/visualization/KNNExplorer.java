@@ -171,6 +171,7 @@ public class KNNExplorer<O extends NumberVector<O, ?>> extends AbstractApplicati
 
     // instanciate distance function.
     distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
+    addParameterizable(distanceFunction);
     remainingParameters = distanceFunction.setParameters(remainingParameters);
 
     // normalization
