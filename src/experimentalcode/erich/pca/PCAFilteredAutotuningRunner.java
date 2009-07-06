@@ -8,7 +8,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
  * @author Erich Schubert
  * @param <V> vector type
  */
-public class PCAFilteredAutotuningRunner<V extends RealVector<V, ?>> extends PCAFilteredRunner<V> {
+public class PCAFilteredAutotuningRunner<V extends RealVector<V, ?>, D extends NumberDistance<D,?>> extends PCAFilteredRunner<V,D> {
   /**
    * Default constructor
    */
@@ -58,7 +58,7 @@ public class PCAFilteredAutotuningRunner<V extends RealVector<V, ?>> extends PCA
    * @return PCA result
    */
   @Override
-  public PCAFilteredResult processQueryResult(Collection<DistanceResultPair<DoubleDistance>> results, Database<V> database) {
+  public PCAFilteredResult processQueryResult(Collection<DistanceResultPair<D>> results, Database<V> database) {
     assertSortedByDistance(results);
     int dim = database.dimensionality();
 
@@ -166,15 +166,15 @@ public class PCAFilteredAutotuningRunner<V extends RealVector<V, ?>> extends PCA
    * 
    * @param results
    */
-  private void assertSortedByDistance(Collection<DistanceResultPair<DoubleDistance>> results) {
+  private void assertSortedByDistance(Collection<DistanceResultPair<D>> results) {
     // TODO: sort results instead?
     double dist = -1.0;
-    for(Iterator<DistanceResultPair<DoubleDistance>> it = results.iterator(); it.hasNext();) {
-      DistanceResultPair<DoubleDistance> qr = it.next();
-      if(qr.getDistance().getValue() < dist) {
+    for(Iterator<DistanceResultPair<D>> it = results.iterator(); it.hasNext();) {
+      DistanceResultPair<D> qr = it.next();
+      if(qr.getDistance().getValue().doubleValue() < dist) {
         System.err.println("WARNING: results not sorted by distance!");
       }
-      dist = qr.getDistance().getValue();
+      dist = qr.getDistance().getValue().doubleValue();
     }
   }
 }
