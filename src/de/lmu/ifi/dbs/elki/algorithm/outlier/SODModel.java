@@ -80,7 +80,7 @@ public class SODModel<O extends RealVector<O, Double>> implements TextWriteable,
     }
 
     /**
-     * TODO arthur comment
+     * 
      * 
      * @param queryObject
      * @param center

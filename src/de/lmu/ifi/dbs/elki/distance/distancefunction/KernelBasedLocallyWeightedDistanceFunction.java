@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * @author Simon Paradies
  * @param <V> the type of RealVector to compute the distances in between
  * @param <P> the type of Preprocessor used
- * todo parameter
+ * 
  */
 public class KernelBasedLocallyWeightedDistanceFunction<V extends RealVector<V, ?>, P extends Preprocessor<V>>
     extends AbstractLocallyWeightedDistanceFunction<V, P> {
