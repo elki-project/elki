@@ -92,12 +92,8 @@
 	<!-- Code not to be release -->
 	<patternset id="exclude.release">
 		<exclude name="experimentalcode/**"/>
-		<!-- not yet published & polished: COP -->
-		<exclude name="${ELKI_DIR}/algorithm/outlier/COP.*"/>
 		<!-- currently only contains an abstract biclustering algorithm -->
 		<exclude name="${ELKI_DIR}/algorithm/clustering/biclustering/**"/>
-		<!-- Kernel 4C -->
-		<exclude name="${ELKI_DIR}/algorithm/clustering/correlation/KernelFourC.*"/>
 		<!-- Flat Rstar tree -->
         <exclude name="${ELKI_DIR}/index/tree/spatial/rstarvariants/flat/**"/>
 		<!-- currently empty -->
@@ -187,9 +183,9 @@
 			doctitle="${ELKI_SHORT}"
 			windowtitle="${ELKI_LONG}">
 			<classpath refid="build.classpath" />
-			<fileset dir="${source}">
+			<packageset dir="${source}">
 				<patternset refid="${build.patternset}"/>
-			</fileset>
+			</packageset>
 			<header><![CDATA[
 				<table cellspacing="0" cellpadding="0" style="font-weight:bold; font-style:normal; font-size:small"> 
 				  <tr>
@@ -401,6 +397,7 @@
 	<target name="release" description="Publish a new release to the web site">
 		<fail unless="release.official" message="Only official builds can be released. Use 'deploy'." />
 		<fail unless="release.target" message="No release target folder given." />
+		<antcall target="clean" />
 		<antcall target="deploy" />
 		<mkdir dir="${release.target}" />
 		<copy todir="${release.target}">
