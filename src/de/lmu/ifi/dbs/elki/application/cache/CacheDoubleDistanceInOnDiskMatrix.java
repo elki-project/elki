@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.external.DiskCacheBasedDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
@@ -29,7 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * @author Erich Schubert
  * 
  */
-public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject> extends AbstractApplication {
+public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject, N extends NumberDistance<N,D>, D extends Number> extends AbstractApplication {
   /**
    * Parameter to specify the database connection to be used, must extend
    * {@link de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection}.
@@ -76,7 +77,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject> extends
    * Key: {@code -loader.distance}
    * </p>
    */
-  private final ClassParameter<DistanceFunction<O,DoubleDistance>> DISTANCE_PARAM = new ClassParameter<DistanceFunction<O,DoubleDistance>>(DISTANCE_ID, DistanceFunction.class);
+  private final ClassParameter<DistanceFunction<O,N>> DISTANCE_PARAM = new ClassParameter<DistanceFunction<O,N>>(DISTANCE_ID, DistanceFunction.class);
 
   /**
    * Holds the database connection to have the algorithm run with.
@@ -86,7 +87,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject> extends
   /**
    * Distance function that is to be cached.
    */
-  private DistanceFunction<O,DoubleDistance> distance;
+  private DistanceFunction<O,N> distance;
 
   /**
    * Constructor.
@@ -128,9 +129,9 @@ public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject> extends
       for(Integer id2 : database) {
         if(id2 >= id1) {
           byte[] data = new byte[8];
-          double d = distance.distance(id1, id2).getValue();
+          double d = distance.distance(id1, id2).getValue().doubleValue();
           if(debugExtraCheckSymmetry) {
-            double d2 = distance.distance(id2, id1).getValue();
+            double d2 = distance.distance(id2, id1).getValue().doubleValue();
             if(Math.abs(d-d2) > 0.0000001) {
               logger.warning("Distance function doesn't appear to be symmetric!");
             }            
@@ -182,6 +183,6 @@ public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject> extends
    * @param args
    */
   public static void main(String[] args) {
-    new CacheDoubleDistanceInOnDiskMatrix<DatabaseObject>().runCLIApplication(args);
+    new CacheDoubleDistanceInOnDiskMatrix<DatabaseObject,DoubleDistance,Double>().runCLIApplication(args);
   }
 }
