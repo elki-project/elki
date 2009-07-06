@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.LimitEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
@@ -60,7 +61,7 @@ public class FourCPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>
     /**
      * The Filtered PCA Runner
      */
-    private PCAFilteredRunner<V> pca = new PCAFilteredRunner<V>();
+    private PCAFilteredRunner<V, ?> pca = new PCAFilteredRunner<V, DoubleDistance>();
 
     /**
      * Constructor

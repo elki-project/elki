@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.preprocessing.MaterializeKNNPreprocessor;
@@ -54,7 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
  * @author Erich Schubert
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  */
-public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, DoubleDistance, MultiResult> {
+public class LOF<O extends DatabaseObject, D extends NumberDistance<D,?>> extends DistanceBasedAlgorithm<O, D, MultiResult> {
   /**
    * OptionID for {@link #REACHABILITY_DISTANCE_FUNCTION_PARAM}
    */
@@ -70,7 +70,7 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
    * Key: {@code -lof.reachdistfunction}
    * </p>
    */
-  private final ClassParameter<DistanceFunction<O, DoubleDistance>> REACHABILITY_DISTANCE_FUNCTION_PARAM = new ClassParameter<DistanceFunction<O, DoubleDistance>>(REACHABILITY_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
+  private final ClassParameter<DistanceFunction<O, D>> REACHABILITY_DISTANCE_FUNCTION_PARAM = new ClassParameter<DistanceFunction<O, D>>(REACHABILITY_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
 
   /**
    * The association id to associate the LOF_SCORE of an object for the
@@ -87,7 +87,7 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
    * Holds the instance of the reachability distance function specified by
    * {@link #REACHABILITY_DISTANCE_FUNCTION_PARAM}.
    */
-  private DistanceFunction<O, DoubleDistance> reachabilityDistanceFunction;
+  private DistanceFunction<O, D> reachabilityDistanceFunction;
 
   /**
    * OptionID for {@link #K_PARAM}
@@ -116,12 +116,12 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
   /**
    * Preprocessor Step 1
    */
-  MaterializeKNNPreprocessor<O, DoubleDistance> preprocessor1;
+  MaterializeKNNPreprocessor<O, D> preprocessor1;
 
   /**
    * Preprocessor Step 2
    */
-  MaterializeKNNPreprocessor<O, DoubleDistance> preprocessor2;
+  MaterializeKNNPreprocessor<O, D> preprocessor2;
   
   /**
    * Include object itself in kNN neighborhood.
@@ -143,8 +143,8 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
     // parameter reachability distance function
     addOption(REACHABILITY_DISTANCE_FUNCTION_PARAM);
     
-    preprocessor1 = new MaterializeKNNPreprocessor<O, DoubleDistance>();
-    preprocessor2 = new MaterializeKNNPreprocessor<O, DoubleDistance>();
+    preprocessor1 = new MaterializeKNNPreprocessor<O, D>();
+    preprocessor2 = new MaterializeKNNPreprocessor<O, D>();
   }
 
   /**
@@ -156,8 +156,8 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
     reachabilityDistanceFunction.setDatabase(database, isVerbose(), isTime());
 
     // materialize neighborhoods
-    HashMap<Integer, List<DistanceResultPair<DoubleDistance>>> neigh1;
-    HashMap<Integer, List<DistanceResultPair<DoubleDistance>>> neigh2;
+    HashMap<Integer, List<DistanceResultPair<D>>> neigh1;
+    HashMap<Integer, List<DistanceResultPair<D>>> neigh2;
     if(logger.isVerbose()) {
       logger.verbose("Materializing Neighborhoods with respect to primary distance.");
     }
@@ -186,12 +186,12 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
       for(Integer id : database) {
         counter ++;
         double sum = 0;
-        List<DistanceResultPair<DoubleDistance>> neighbors = neigh2.get(id);
+        List<DistanceResultPair<D>> neighbors = neigh2.get(id);
         int nsize = neighbors.size() - (objectIsInKNN ? 0 : 1);
-        for(DistanceResultPair<DoubleDistance> neighbor : neighbors) {
+        for(DistanceResultPair<D> neighbor : neighbors) {
           if (objectIsInKNN || neighbor.getID() != id) {
-            List<DistanceResultPair<DoubleDistance>> neighborsNeighbors = neigh2.get(neighbor.getID());
-            sum += Math.max(neighbor.getDistance().getValue(), neighborsNeighbors.get(neighborsNeighbors.size() - 1).getDistance().getValue());
+            List<DistanceResultPair<D>> neighborsNeighbors = neigh2.get(neighbor.getID());
+            sum += Math.max(neighbor.getDistance().getValue().doubleValue(), neighborsNeighbors.get(neighborsNeighbors.size() - 1).getDistance().getValue().doubleValue());
           }
         }
         Double lrd = nsize / sum;
@@ -216,12 +216,12 @@ public class LOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Dou
       for(Integer id : database) {
         counter ++;
         double lrdp = lrds.get(id);
-        List<DistanceResultPair<DoubleDistance>> neighbors = neigh1.get(id);
+        List<DistanceResultPair<D>> neighbors = neigh1.get(id);
         int nsize = neighbors.size() - (objectIsInKNN ? 0 : 1);
         // skip the point itself
         //neighbors.remove(0);
         double sum = 0;
-        for(DistanceResultPair<DoubleDistance> neighbor1 : neighbors) {
+        for(DistanceResultPair<D> neighbor1 : neighbors) {
           if (objectIsInKNN || neighbor1.getID() != id) {
             double lrdo = lrds.get(neighbor1.getSecond());
             sum += lrdo / lrdp;

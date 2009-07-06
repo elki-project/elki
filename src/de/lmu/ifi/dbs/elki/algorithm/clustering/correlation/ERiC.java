@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.data.model.DimensionModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.BitDistance;
+import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.ERiCDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
@@ -200,7 +201,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
               if (clus.getModel() != null && clus.getModel() instanceof DimensionModel) {
                 int correlationDimension = ((DimensionModel) clus.getModel()).getDimension();
                 
-                PCAFilteredRunner<V> pca = new PCAFilteredRunner<V>();
+                PCAFilteredRunner<V, DoubleDistance> pca = new PCAFilteredRunner<V, DoubleDistance>();
                 pca.setParameters(pcaParameters(correlationDimension));
 
                 // get cluster list for this dimension.
@@ -240,7 +241,7 @@ public class ERiC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
                 correlationClusters = new ArrayList<Cluster<CorrelationModel<V>>>();
                 clusterMap.put(dimensionality, correlationClusters);
               }
-              PCAFilteredRunner<V> pca = new PCAFilteredRunner<V>();
+              PCAFilteredRunner<V, DoubleDistance> pca = new PCAFilteredRunner<V, DoubleDistance>();
               pca.setParameters(pcaParameters(dimensionality));
               PCAFilteredResult pcares = pca.processIds(noise.getGroup().getIDs(), database);
 

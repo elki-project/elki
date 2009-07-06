@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
  * @author Erich Schubert
  * @param <V> the type of Realvector handled by this Algorithm
  */
-public class COP<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, DoubleDistance, MultiResult> {
+public class COP<V extends RealVector<V, ?>, D extends NumberDistance<D,?>> extends DistanceBasedAlgorithm<V, D, MultiResult> {
     /**
      * OptionID for {@link #K_PARAM}
      */
@@ -58,7 +58,7 @@ public class COP<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, D
     /**
      * Holds the object performing the dependency derivation
      */
-    private DependencyDerivator<V, DoubleDistance> dependencyDerivator;
+    private DependencyDerivator<V, D> dependencyDerivator;
 
     /**
      * Provides the result of the algorithm.
@@ -119,11 +119,11 @@ public class COP<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, D
             double sqrt2 = Math.sqrt(2.0);
             for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
                 Integer id = iter.next();
-                List<DistanceResultPair<DoubleDistance>> neighbors = database.kNNQueryForID(id, k + 1, getDistanceFunction());
+                List<DistanceResultPair<D>> neighbors = database.kNNQueryForID(id, k + 1, getDistanceFunction());
                 neighbors.remove(0);
 
                 List<Integer> ids = new ArrayList<Integer>(neighbors.size());
-                for (DistanceResultPair<DoubleDistance> n : neighbors) {
+                for (DistanceResultPair<D> n : neighbors) {
                     ids.add(n.getID());
                 }
 
@@ -190,7 +190,7 @@ public class COP<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, D
         k = K_PARAM.getValue();
 
         // dependency derivator (currently hardcoded)
-        dependencyDerivator = new DependencyDerivator<V, DoubleDistance>();
+        dependencyDerivator = new DependencyDerivator<V, D>();
         addParameterizable(dependencyDerivator);
         remainingParameters = dependencyDerivator.setParameters(remainingParameters);
 

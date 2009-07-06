@@ -5,7 +5,7 @@ import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.CTriple;
  * @author Erich Schubert
  * @param <V> Vector type
  */
-public class MaterializeDistances<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, DoubleDistance, CollectionResult<CTriple<Integer, Integer, Double>>> {
+public class MaterializeDistances<V extends RealVector<V, ?>, D extends NumberDistance<D,N>, N extends Number> extends DistanceBasedAlgorithm<V, D, CollectionResult<CTriple<Integer, Integer, Double>>> {
   private CollectionResult<CTriple<Integer, Integer, Double>> result;
 
   /**
@@ -43,7 +43,7 @@ public class MaterializeDistances<V extends RealVector<V, ?>> extends DistanceBa
    */
   @Override
   protected CollectionResult<CTriple<Integer, Integer, Double>> runInTime(Database<V> database) throws IllegalStateException {
-    DistanceFunction<V, DoubleDistance> distFunc = getDistanceFunction();
+    DistanceFunction<V, D> distFunc = getDistanceFunction();
     distFunc.setDatabase(database, isVerbose(), isTime());
     int size = database.size();
 
@@ -55,7 +55,7 @@ public class MaterializeDistances<V extends RealVector<V, ?>> extends DistanceBa
         if(id2 < id1) {
           continue;
         }
-        double d = distFunc.distance(id1, id2).getValue();
+        double d = distFunc.distance(id1, id2).getValue().doubleValue();
         r.add(new CTriple<Integer, Integer, Double>(id1, id2, d));
       }
     }

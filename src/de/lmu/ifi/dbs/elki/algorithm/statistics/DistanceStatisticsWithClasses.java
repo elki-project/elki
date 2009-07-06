@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.Histogram;
@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Erich Schubert
  * @param <V> Vector type
  */
-public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, DoubleDistance, CollectionResult<DoubleVector>> {
+public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>, D extends NumberDistance<D,?>> extends DistanceBasedAlgorithm<V, D, CollectionResult<DoubleVector>> {
   private CollectionResult<DoubleVector> result;
 
   /**
@@ -90,7 +90,7 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
    */
   @Override
   protected CollectionResult<DoubleVector> runInTime(Database<V> database) throws IllegalStateException {
-    DistanceFunction<V, DoubleDistance> distFunc = getDistanceFunction();
+    DistanceFunction<V, D> distFunc = getDistanceFunction();
     distFunc.setDatabase(database, isVerbose(), isTime());
     int size = database.size();
 
@@ -133,7 +133,7 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
           if(id1 == id2) {
             continue;
           }
-          double d = distFunc.distance(id1, id2).getValue();
+          double d = distFunc.distance(id1, id2).getValue().doubleValue();
 
           hist.get(d).first += 1;
 
@@ -158,7 +158,7 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
             if(id1 == id2) {
               continue;
             }
-            double d = distFunc.distance(id1, id2).getValue();
+            double d = distFunc.distance(id1, id2).getValue().doubleValue();
 
             hist.get(d).second += 1;
 
@@ -207,7 +207,7 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
     return result;
   }
   
-  private DoubleMinMax sampleMinMax(Database<V> database, DistanceFunction<V, DoubleDistance> distFunc) {
+  private DoubleMinMax sampleMinMax(Database<V> database, DistanceFunction<V, D> distFunc) {
     int size = database.size();
     Random rnd = new Random();
     // estimate minimum and maximum.
@@ -236,12 +236,12 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
         if(id1 == id2) {
           continue;
         }
-        double d = distFunc.distance(id1, id2).getValue();
+        double d = distFunc.distance(id1, id2).getValue().doubleValue();
         np.add(new FCPair<Double, Integer>(d, id1));
         np.add(new FCPair<Double, Integer>(d, id2));
       }
       for(Integer id2 : randomset) {
-        double d = distFunc.distance(id1, id2).getValue();
+        double d = distFunc.distance(id1, id2).getValue().doubleValue();
         np.add(new FCPair<Double, Integer>(d, id1));
         np.add(new FCPair<Double, Integer>(d, id2));
       }
@@ -256,12 +256,12 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
         if(id1 == id2) {
           continue;
         }
-        double d = distFunc.distance(id1, id2).getValue();
+        double d = distFunc.distance(id1, id2).getValue().doubleValue();
         np2.add(new FCPair<Double, Integer>(d, id1));
         np2.add(new FCPair<Double, Integer>(d, id2));
       }
       for(Integer id2 : randomset) {
-        double d = distFunc.distance(id1, id2).getValue();
+        double d = distFunc.distance(id1, id2).getValue().doubleValue();
         np.add(new FCPair<Double, Integer>(d, id1));
         np.add(new FCPair<Double, Integer>(d, id2));
       }
@@ -278,7 +278,7 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
     return new DoubleMinMax(minhotset.first().getFirst(),maxhotset.first().getFirst());
   }
   
-  private DoubleMinMax exactMinMax(Database<V> database, DistanceFunction<V, DoubleDistance> distFunc) {
+  private DoubleMinMax exactMinMax(Database<V> database, DistanceFunction<V, D> distFunc) {
     DoubleMinMax minmax = new DoubleMinMax();
     // find exact minimum and maximum first.
     for(Integer id1 : database.getIDs()) {
@@ -287,7 +287,7 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>> extends D
         if(id1 == id2) {
           continue;
         }
-        double d = distFunc.distance(id1, id2).getValue();
+        double d = distFunc.distance(id1, id2).getValue().doubleValue();
         minmax.put(d);
       }
     }    

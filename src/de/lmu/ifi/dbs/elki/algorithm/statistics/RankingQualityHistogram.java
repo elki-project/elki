@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
 import de.lmu.ifi.dbs.elki.math.Histogram;
@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
  * @author Erich Schubert
  * @param <V> Vector type
  */
-public class RankingQualityHistogram<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, DoubleDistance, CollectionResult<DoubleVector>> {
+public class RankingQualityHistogram<V extends RealVector<V, ?>, D extends NumberDistance<D,?>> extends DistanceBasedAlgorithm<V, D, CollectionResult<DoubleVector>> {
   private CollectionResult<DoubleVector> result;
 
   /**
@@ -52,7 +52,7 @@ public class RankingQualityHistogram<V extends RealVector<V, ?>> extends Distanc
    */
   @Override
   protected CollectionResult<DoubleVector> runInTime(Database<V> database) throws IllegalStateException {
-    DistanceFunction<V, DoubleDistance> distFunc = getDistanceFunction();
+    DistanceFunction<V, D> distFunc = getDistanceFunction();
     distFunc.setDatabase(database, isVerbose(), isTime());
 
     // local copy, not entirely necessary. I just like control, guaranteed
@@ -79,7 +79,7 @@ public class RankingQualityHistogram<V extends RealVector<V, ?>> extends Distanc
     // sort neighbors
     for(Cluster<?> clus : splitted) {
       for(Integer i1 : clus.getIDs()) {
-        List<DistanceResultPair<DoubleDistance>> knn = database.kNNQueryForID(i1, size, distFunc);
+        List<DistanceResultPair<D>> knn = database.kNNQueryForID(i1, size, distFunc);
         double result = ROC.computeROCAUCDistanceResult(size, clus, knn);
 
         hist.put(result, hist.get(result) + 1. / size);

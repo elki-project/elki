@@ -5,6 +5,7 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -19,7 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
  *
  * @param <V> Vector class to use.
  */
-public class KernelCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends CovarianceMatrixBuilder<V> {
+public class KernelCovarianceMatrixBuilder<V extends RealVector<V, ?>, D extends NumberDistance<D,?>> extends CovarianceMatrixBuilder<V,D> {
   /**
    * Returns the local kernel matrix of the specified ids.
    */

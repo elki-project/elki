@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.ArbitraryKernelFunctionWrapper;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.LinearKernelFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.CompositeEigenPairFilter;
@@ -80,7 +81,7 @@ public class KernelFourCPreprocessor<D extends Distance<D>, V extends RealVector
   /**
    * PCA utility object
    */
-  private PCAFilteredRunner<V> pca = new PCAFilteredRunner<V>();
+  private PCAFilteredRunner<V, DoubleDistance> pca = new PCAFilteredRunner<V, DoubleDistance>();
 
   /**
    * Default Constructor
