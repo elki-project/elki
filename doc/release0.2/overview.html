@@ -18,13 +18,6 @@ For background, contact-information, and contributors see
  2009), Aalborg, Denmark, 2009.
 </p>
 
-<h1>Architecture</h1>
-<h2>Parameters and Parameter-Passing</h2>
-<p>The core class is {@link de.lmu.ifi.dbs.elki.KDDTask KDDTask} for command line interaction.
-This class' main method manages the reading of parameters from the standard input and passes the parameters to the
-corresponding classes which, in turn, could have parameters that expect parameterization.</p>
-
-<p align="center"><img src="figures/parameterization.png" alt="visualization of parameterization" border="1"></p>
 
 <h2>Workflow - Where Do Which Objects Go?</h2>
 <p>The database connection manages reading of input files or databases and provides a {@link de.lmu.ifi.dbs.elki.database.Database Database}-Object as a virtual database to the KDDTask.
@@ -33,17 +26,9 @@ Finally, KDDTask hands on the obtained result to a {@link de.lmu.ifi.dbs.elki.re
 The default-handler is  {@link de.lmu.ifi.dbs.elki.result.ResultWriter ResultWriter}, writing the result to STDOUT or,
 if specified, into a file.</p>
 
-<p align="center"><img src="figures/passingOfObjects.png" alt="visualization of passing of objects" border="1"></p>
+<p align="center"><img src="figures/passingOfObjects.png" alt="visualization of passing of objects" border="1" width="70%"></p>
 
 <h2>How to make use of this framework</h2>
-
-<h3>Usage</h3>
-<p>To use the KDD-Framework we recommend an executable .jar-file:
-<a href="../elki.jar">elki.jar</a>. You get a description of usage by calling
-<code>java -jar elki.jar -h</code>.</p>
-
-<p>The {@link de.lmu.ifi.dbs.elki.application.visualization.KNNExplorer KNNExplorer} application is
-explained on its own page.</p>
 
 <h3>Development of new applications</h3>
 
@@ -53,17 +38,35 @@ There are interfaces for a broad range of targets of development. Compare the
 <a href="overview-tree.html">tree of interfaces</a> to get an overview
 concerning the provided interfaces.
 
+<h3>Usage</h3>
+<p>To use the KDD-Framework we recommend an executable .jar-file:
+<a href="../elki.jar">elki.jar</a>. You get a description of usage by calling
+<code>java -jar elki.jar -h</code>.</p>
 
-<h4>Where are what parameters used for which purpose?</h4>
+<p>The {@link de.lmu.ifi.dbs.elki.application.visualization.KNNExplorer KNNExplorer} application is
+explained on its own page.</p>
+
+
+
+<h2>Parameters and Parameter-Passing</h2>
+<p>The core class is {@link de.lmu.ifi.dbs.elki.KDDTask KDDTask} for command line interaction.
+This class' main method manages the reading of parameters from the standard input and passes the parameters to the
+corresponding classes which, in turn, could have parameters that expect parameterization.</p>
+
+<p align="center"><img src="figures/parameterization.png" alt="visualization of parameterization" border="1" width="95%"></p>
+
 
 <p>The main class {@link de.lmu.ifi.dbs.elki.KDDTask KDDTask} requires specification of an
 {@link de.lmu.ifi.dbs.elki.algorithm.Algorithm Algorithm}
-to use, a {@link de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection DatabaseConnection} to manage the input,
-and a filename where to deploy the output. However, by omitting specification of a filename for
+to use, and a {@link de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection DatabaseConnection} to manage the input.
+It can get assigned a specialized {@link de.lmu.ifi.dbs.elki.result.ResultHandler ResultHander}.
+The default ResultHandler {@link de.lmu.ifi.dbs.elki.result.ResultWriter ResultWriter} expects
+a filename where to deploy the output. However, by omitting specification of a filename for
 output, the results will be given to standard output, thus it may be piped directly to another
 application.</p>
 
-<p>For more information on using files as data input see {@link de.lmu.ifi.dbs.elki.parser}.</p>
+<p>For more information on using files and available formats
+as data input see {@link de.lmu.ifi.dbs.elki.parser}.</p>
 
 <p>Furthermore a normalization can be specified for the input.
 You can additionally require to restore the original values for the output.</p>
