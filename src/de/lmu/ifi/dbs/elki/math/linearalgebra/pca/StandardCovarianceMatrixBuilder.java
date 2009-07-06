@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 
@@ -15,7 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
  *
  * @param <V> Vector class to use.
  */
-public class StandardCovarianceMatrixBuilder<V extends RealVector<V, ?>> extends CovarianceMatrixBuilder<V> {
+public class StandardCovarianceMatrixBuilder<V extends RealVector<V, ?>, D extends NumberDistance<D,?>> extends CovarianceMatrixBuilder<V,D> {
   /**
    * Compute Covariance Matrix for a complete database
    * 

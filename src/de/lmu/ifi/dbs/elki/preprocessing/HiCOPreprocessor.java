@@ -54,7 +54,7 @@ public abstract class HiCOPreprocessor<V extends RealVector<V, ?>> extends Abstr
     /**
      * PCA utility object
      */
-    private PCAFilteredRunner<V> pca = new PCAFilteredRunner<V>();
+    private PCAFilteredRunner<V, DoubleDistance> pca = new PCAFilteredRunner<V, DoubleDistance>();
 
     /**
      * Provides a new Preprocessor that computes the correlation dimension of

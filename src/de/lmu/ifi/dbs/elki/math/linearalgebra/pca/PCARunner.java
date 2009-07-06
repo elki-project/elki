@@ -6,7 +6,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  *
  * @param <V>
  */
-public class PCARunner<V extends RealVector<V, ?>> extends AbstractParameterizable {
+public class PCARunner<V extends RealVector<V, ?>, D extends NumberDistance<D,?>> extends AbstractParameterizable {
   /**
    * OptionID for {@link #COVARIANCE_PARAM}
    */
@@ -45,14 +45,14 @@ public class PCARunner<V extends RealVector<V, ?>> extends AbstractParameterizab
    * Key: {@code -pca.covariance}
    * </p>
    */
-  private ClassParameter<CovarianceMatrixBuilder<V>> COVARIANCE_PARAM = 
-    new ClassParameter<CovarianceMatrixBuilder<V>>(PCA_COVARIANCE_MATRIX, 
+  private ClassParameter<CovarianceMatrixBuilder<V,D>> COVARIANCE_PARAM = 
+    new ClassParameter<CovarianceMatrixBuilder<V,D>>(PCA_COVARIANCE_MATRIX, 
         CovarianceMatrixBuilder.class, StandardCovarianceMatrixBuilder.class.getName());
 
   /**
    * The covariance computation class.
    */
-  protected CovarianceMatrixBuilder<V> covarianceMatrixBuilder;
+  protected CovarianceMatrixBuilder<V,D> covarianceMatrixBuilder;
 
   /**
    * Constructor for the covariance runner.
@@ -106,7 +106,7 @@ public class PCARunner<V extends RealVector<V, ?>> extends AbstractParameterizab
    * @param database the database used
    * @return PCA result
    */
-  public PCAResult processQueryResult(Collection<DistanceResultPair<DoubleDistance>> results, Database<V> database) {
+  public PCAResult processQueryResult(Collection<DistanceResultPair<D>> results, Database<V> database) {
     return processCovarMatrix(covarianceMatrixBuilder.processQueryResults(results, database));
   }
 
@@ -138,7 +138,7 @@ public class PCARunner<V extends RealVector<V, ?>> extends AbstractParameterizab
    * 
    * @return covariance matrix builder in use
    */
-  public CovarianceMatrixBuilder<V> getCovarianceMatrixBuilder() {
+  public CovarianceMatrixBuilder<V,D> getCovarianceMatrixBuilder() {
     return covarianceMatrixBuilder;
   }
 
@@ -147,7 +147,7 @@ public class PCARunner<V extends RealVector<V, ?>> extends AbstractParameterizab
    * 
    * @param covarianceBuilder New covariance matrix builder.
    */
-  public void setCovarianceMatrixBuilder(CovarianceMatrixBuilder<V> covarianceBuilder) {
+  public void setCovarianceMatrixBuilder(CovarianceMatrixBuilder<V,D> covarianceBuilder) {
     this.covarianceMatrixBuilder = covarianceBuilder;
   }
 }

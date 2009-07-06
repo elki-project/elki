@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDatabase;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.CPair;
  *
  * @param <O>
  */
-public class LOCI<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, DoubleDistance, MultiResult> {
+public class LOCI<O extends DatabaseObject, D extends NumberDistance<D,?>> extends DistanceBasedAlgorithm<O, D, MultiResult> {
   /**
    * OptionID for {@link #RMAX_PARAM}
    */
@@ -160,14 +160,14 @@ public class LOCI<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
     getDistanceFunction().setDatabase(database, isVerbose(), isTime());
     // LOCI preprocessing step
     for (Integer id : database.getIDs()) {
-      List<DistanceResultPair<DoubleDistance>> neighbors = database.rangeQuery(id, rmax, getDistanceFunction());
+      List<DistanceResultPair<D>> neighbors = database.rangeQuery(id, rmax, getDistanceFunction());
       // build list of critical distances
       ArrayList<CPair<Double,Integer>> cdist = new ArrayList<CPair<Double,Integer>>(neighbors.size() * 2);
       {
         int i = 0;
-        for (DistanceResultPair<DoubleDistance> r : neighbors) {
-          cdist.add(new CPair<Double,Integer>(r.getDistance().getValue(), i));
-          cdist.add(new CPair<Double,Integer>(r.getDistance().getValue() / alpha, null));
+        for (DistanceResultPair<D> r : neighbors) {
+          cdist.add(new CPair<Double,Integer>(r.getDistance().getValue().doubleValue(), i));
+          cdist.add(new CPair<Double,Integer>(r.getDistance().getValue().doubleValue() / alpha, null));
           i++;
         }
       }
@@ -200,9 +200,9 @@ public class LOCI<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
         double nhat_r_alpha = 0.0;
         double sigma_nhat_r_alpha = 0.0;
         // note that the query range is c.first
-        List<DistanceResultPair<DoubleDistance>> rneighbors = database.rangeQuery(id, Double.toString(c.first), getDistanceFunction());
+        List<DistanceResultPair<D>> rneighbors = database.rangeQuery(id, Double.toString(c.first), getDistanceFunction());
         if (rneighbors.size() < nmin) continue;
-        for (DistanceResultPair<DoubleDistance> rn : rneighbors) {
+        for (DistanceResultPair<D> rn : rneighbors) {
           List<CPair<Double,Integer>> rncdist = database.getAssociation(LOCI_CRITICALDIST, rn.getID());
           int rn_alphar = 0;
           for (CPair<Double,Integer> c2 : rncdist) {

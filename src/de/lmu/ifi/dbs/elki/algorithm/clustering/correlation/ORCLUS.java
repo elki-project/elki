@@ -67,7 +67,7 @@ public class ORCLUS<V extends RealVector<V, ?>> extends ProjectedClustering<V> {
   /**
    * The PCA utility object.
    */
-  private PCARunner<V> pca;
+  private PCARunner<V, DoubleDistance> pca;
 
   /**
    * Provides the ORCLUS algorithm, adding parameter {@link #ALPHA_PARAM} to the

@@ -8,7 +8,6 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
-import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -233,7 +232,7 @@ public class ROC {
    * @param nei Query result
    * @return area under curve
    */
-  public static double computeROCAUCDistanceResult(int size, Cluster<?> clus, List<DistanceResultPair<DoubleDistance>> nei) {
+  public static <D extends Distance<D>> double computeROCAUCDistanceResult(int size, Cluster<?> clus, List<DistanceResultPair<D>> nei) {
     // TODO: ensure the collection has efficient "contains".
     return ROC.computeROCAUCDistanceResult(size, clus.getIDs(), nei);
   }

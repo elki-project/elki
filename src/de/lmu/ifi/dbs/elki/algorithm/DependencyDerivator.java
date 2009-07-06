@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -97,7 +98,7 @@ public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<
   /**
    * Holds the object performing the pca.
    */
-  private PCAFilteredRunner<V> pca = new PCAFilteredRunner<V>();
+  private PCAFilteredRunner<V, DoubleDistance> pca = new PCAFilteredRunner<V, DoubleDistance>();
 
   /**
    * Holds the solution.
