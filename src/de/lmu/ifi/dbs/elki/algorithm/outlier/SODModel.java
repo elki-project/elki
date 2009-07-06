@@ -10,8 +10,10 @@ import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
+//TODO: arthur comment
+
 /**
- * todo arthur comment
+ *
  *
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObjects handled by this Result
@@ -32,7 +34,7 @@ public class SODModel<O extends RealVector<O, Double>> implements TextWriteable,
     private double sod;
     
     /**
-     * TODO: arthur comment
+     * 
      * 
      * @param database
      * @param neighborhood
