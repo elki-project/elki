@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * Beware to make correct use of parameter settings via optionHandler as
  * commented with constructor and methods.
  * 
- * @author Elke Achtert todo parameter
+ * @author Elke Achtert
  */
 public abstract class StandAloneApplication extends AbstractApplication {
   /**
