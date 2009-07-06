@@ -16,7 +16,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListGreaterEqual
  *
  * @author Elke Achtert
  * @param <V> the type of NumberVector to compute the distances in between
- * todo parameter
  */
 public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extends NumberVector<V, ?>>
     extends AbstractDoubleDistanceFunction<V> {

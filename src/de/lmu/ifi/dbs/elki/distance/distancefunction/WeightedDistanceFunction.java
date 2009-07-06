@@ -6,11 +6,13 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
+//todo weight matrix as parameter
+
 /**
  * Provides the Weighted distance for feature vectors.
  *
  * @author Elke Achtert 
- *         todo weight matrix as parameter
+ *         
  * @param <V> the type of NumberVector to compute the distances in between
  */
 public class WeightedDistanceFunction<V extends NumberVector<V, ? >>
