@@ -6,10 +6,11 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 
 /**
+ * Wraps a list containing the knn distances.
+ * 
  * @author Arthur Zimek
  * @param <D> the type of Distance used by this Result
  * 
- * TODO: arthur comment
  */
 public class KNNDistanceOrderResult<D extends Distance<D>> implements IterableResult<D> {
   /**
