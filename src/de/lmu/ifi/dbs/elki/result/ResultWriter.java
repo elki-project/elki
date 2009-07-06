@@ -37,22 +37,26 @@ public class ResultWriter<O extends DatabaseObject> extends AbstractParameteriza
   private final FileParameter OUTPUT_PARAM = new FileParameter(OptionID.OUTPUT, FileParameter.FileType.OUTPUT_FILE, true);
 
   /**
-   * GZIP compression flag
+   * GZIP compression flag.
+   * 
    */
   private final OptionID GZIP_OUTPUT = OptionID.getOrCreateOptionID("out.gzip", "Enable gzip compression of output files.");
   
   /**
    * Flag to control GZIP compression.
+   * <p>Key: {@code -out.gzip}</p>
    */
   private final Flag GZIP_FLAG = new Flag(GZIP_OUTPUT);
   
   /**
-   * Suppress overwrite warning
+   * Suppress overwrite warning.
+   * 
    */
   private final OptionID OVERWRITE_OPTION = OptionID.getOrCreateOptionID("out.silentoverwrite", "Silently overwrite output files.");
   
   /**
    * Flag to suppress overwrite warning.
+   * <p>Key: {@code -out.silentoverwrite}</p>
    */
   private final Flag OVERWRITE_FLAG = new Flag(OVERWRITE_OPTION);
   
