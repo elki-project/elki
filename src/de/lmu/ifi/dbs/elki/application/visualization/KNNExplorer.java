@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
@@ -87,7 +88,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * 
  * @param <O> Object type
  */
-public class KNNExplorer<O extends NumberVector<O, ?>> extends AbstractApplication {
+public class KNNExplorer<O extends NumberVector<O, ?>, N extends NumberDistance<N, D>, D extends Number> extends AbstractApplication {
   /**
    * Parameter to specify the database connection to be used, must extend
    * {@link de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection}.
@@ -126,7 +127,7 @@ public class KNNExplorer<O extends NumberVector<O, ?>> extends AbstractApplicati
    * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction}
    * </p>
    */
-  protected final ClassParameter<DistanceFunction<O, DoubleDistance>> DISTANCE_FUNCTION_PARAM = new ClassParameter<DistanceFunction<O, DoubleDistance>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class.getName());
+  protected final ClassParameter<DistanceFunction<O, N>> DISTANCE_FUNCTION_PARAM = new ClassParameter<DistanceFunction<O, N>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class.getName());
 
   /**
    * Holds the database connection to have the algorithm run with.
@@ -137,7 +138,7 @@ public class KNNExplorer<O extends NumberVector<O, ?>> extends AbstractApplicati
    * Holds the instance of the distance function specified by
    * {@link #DISTANCE_FUNCTION_PARAM}.
    */
-  private DistanceFunction<O, DoubleDistance> distanceFunction;
+  private DistanceFunction<O, N> distanceFunction;
 
   /**
    * A normalization - per default no normalization is used.
@@ -197,7 +198,7 @@ public class KNNExplorer<O extends NumberVector<O, ?>> extends AbstractApplicati
    * @param args the arguments to run this wrapper
    */
   public static void main(String[] args) {
-    new KNNExplorer<DoubleVector>().runCLIApplication(args);
+    new KNNExplorer<DoubleVector, DoubleDistance, Double>().runCLIApplication(args);
   }
 
 
@@ -259,7 +260,7 @@ public class KNNExplorer<O extends NumberVector<O, ?>> extends AbstractApplicati
      * Holds the instance of the distance function specified by
      * {@link #DISTANCE_FUNCTION_PARAM}.
      */
-    private DistanceFunction<O, DoubleDistance> distanceFunction;
+    private DistanceFunction<O, N> distanceFunction;
 
     public ExplorerWindow() {
       super(false);
@@ -351,7 +352,7 @@ public class KNNExplorer<O extends NumberVector<O, ?>> extends AbstractApplicati
       SVGUtil.setAtt(viewport, SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "-0.05 -0.05 "+(ratio+0.1)+" 1.1");     
     }
 
-    public void run(Database<O> db, DistanceFunction<O, DoubleDistance> distanceFunction) {
+    public void run(Database<O> db, DistanceFunction<O, N> distanceFunction) {
       this.db = db;
       this.dim = db.dimensionality();
       this.distanceFunction = distanceFunction;
@@ -408,21 +409,21 @@ public class KNNExplorer<O extends NumberVector<O, ?>> extends AbstractApplicati
       for(Object o : sel) {
         int idx = (Integer) o;
 
-        List<DistanceResultPair<DoubleDistance>> knn = db.kNNQueryForID(idx, k, distanceFunction);
+        List<DistanceResultPair<N>> knn = db.kNNQueryForID(idx, k, distanceFunction);
 
-        double maxdist = knn.get(knn.size() - 1).getDistance().getValue();
+        double maxdist = knn.get(knn.size() - 1).getDistance().getValue().doubleValue();
         // avoid division by zero.
         if(maxdist == 0) {
           maxdist = 1;
         }
 
-        for(ListIterator<DistanceResultPair<DoubleDistance>> iter = knn.listIterator(knn.size()); iter.hasPrevious();) {
-          DistanceResultPair<DoubleDistance> pair = iter.previous();
+        for(ListIterator<DistanceResultPair<N>> iter = knn.listIterator(knn.size()); iter.hasPrevious();) {
+          DistanceResultPair<N> pair = iter.previous();
           Element line = plotSeries(pair.getID(), MAXRESOLUTION);
-          double dist = pair.getDistance().getValue() / maxdist;
+          double dist = pair.getDistance().getValue().doubleValue() / maxdist;
           Color color = getColor(dist);
           String colstr = "#" + Integer.toHexString(color.getRGB()).substring(2);
-          String width = (pair.getID() == idx) ? "0.2%" : "0.1%";
+          String width = (pair.getID() == idx) ? "0.5%" : "0.2%";
           SVGUtil.setAtt(line, SVGConstants.SVG_STYLE_ATTRIBUTE, "stroke: " + colstr + "; stroke-width: " + width + "; fill: none");
           newe.appendChild(line);
           // put into cache
