@@ -9,6 +9,7 @@
 	<property name="ELKI_DIR" value="de/lmu/ifi/dbs/elki" />	
 	<property name="ELKI_SHORT" value="ELKI"/>
 	<property name="ELKI_LONG" value="ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures"/>
+	<property name="ELKI_URL" value="http://www.dbs.ifi.lmu.de/research/KDD/ELKI/"/>
 	
 	<!-- for official builds: -->
 	<!-- XXX
@@ -186,9 +187,9 @@
 			doctitle="${ELKI_SHORT}"
 			windowtitle="${ELKI_LONG}">
 			<classpath refid="build.classpath" />
-			<packageset dir="${source}">
+			<fileset dir="${source}">
 				<patternset refid="${build.patternset}"/>
-			</packageset>
+			</fileset>
 			<header><![CDATA[
 				<table cellspacing="0" cellpadding="0" style="font-weight:bold; font-style:normal; font-size:small"> 
 				  <tr>
@@ -370,7 +371,7 @@
 
 	<!-- create Jar file from jar directory -->
 	<target name="jar" description="Creates jar file in base dir" depends="jar_prepare">
-		<jar basedir="${build.jardir}/" jarfile="${build.jarfile}">
+		<jar basedir="${build.jardir}/" jarfile="${build.jarfile}" manifest="${source}/META-INF/MANIFEST.MF">
 			<manifest>
 				<attribute name="Main-class" value="${main-class}" />
 				<attribute name="Manifest-Version" value="${release.version}"/>
@@ -378,6 +379,7 @@
 				<attribute name="Built-By" value="${user.name}"/>
 				<attribute name="Implementation-Title" value="${ELKI_LONG}" />
 				<attribute name="Implementation-Version" value="${release.version}" />
+				<attribute name="Implementation-URL" value="${ELKI_URL}" />
 			</manifest>
 		</jar>
 	</target>
@@ -405,5 +407,4 @@
 			<fileset dir="${deploy.output}"/>
 		</copy>
 	</target>
-	
 </project>

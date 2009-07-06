@@ -1,0 +1,81 @@
+Comment: ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures
+
+Name: junit
+Comment: JUnit 4.5
+Implementation-Title: JUnit
+Implementation-Version: 4.5
+Implementation-Vendor: JUnit Contributors http://junit.sourceforge.net/
+Implementation-URL: http://junit.sourceforge.net/
+
+Name: org/junit
+Comment: JUnit 4.5
+Implementation-Title: JUnit
+Implementation-Version: 4.5
+Implementation-Vendor: JUnit Contributors http://junit.sourceforge.net/
+Implementation-URL: http://junit.sourceforge.net/
+
+Name: org/hamcrest
+Comment: JUnit 4.5
+Implementation-Title: JUnit
+Implementation-Version: 4.5
+Implementation-Vendor: JUnit Contributors http://junit.sourceforge.net/
+Implementation-URL: http://junit.sourceforge.net/
+
+Name: org/apache/batik
+Comment: Apache Batik http://xmlgraphics.apache.org/batik/
+Implementation-Title: Batik all-in-one JAR
+Implementation-Version: 1.7+r608262
+Implementation-Vendor: Apache Software Foundation
+Implementation-URL: http://xmlgraphics.apache.org/batik/
+
+Name: org/apache/xmlcommons/Version
+Comment: XmlCommonsExternal for http://xml.apache.org/ subproject's use
+Implementation-Title: org.apache.xmlcommons.Version
+Implementation-Version: 1.3.04
+Implementation-Vendor: Apache Software Foundation
+Implementation-URL: http://xml.apache.org/commons/
+
+Name: org/w3c/dom/
+Comment: xml-commons for http://xml.apache.org/ subproject's use
+Specification-Title: Document Object Model (DOM) Level 3 Core
+Specification-Vendor: World Wide Web Consortium
+Specification-Version: 1.0
+Implementation-Title: org.w3c.dom
+Implementation-Version: 1.0
+Implementation-Vendor: World Wide Web Consortium
+Implementation-URL: http://www.w3c.org/DOM/
+
+Name: org/w3c/dom/ls/
+Comment: xml-commons for http://xml.apache.org/ subproject's use
+Specification-Title: Document Object Model (DOM) Level 3 Load and Save
+Specification-Vendor: World Wide Web Consortium
+Specification-Version: 1.0
+Implementation-Title: org.w3c.dom.ls
+Implementation-Version: 1.0
+Implementation-Vendor: World Wide Web Consortium
+Implementation-URL: http://www.w3c.org/DOM/
+
+Name: org/apache/avalon
+Comment: Apache Avalon from FOP PDF Transcoder package
+Implementation-Title: Apache Avalon
+Implementation-Vendor: Apache Software Foundation
+Implementation-URL: http://avalon.apache.org/
+
+Name: org/apache/fop
+Comment: FOP PDF Transcoder package for Apache Batik
+Implementation-Title: FOP PDF Transcoder package
+Implementation-Version: 1.0beta2
+Implementation-Vendor: Apache Software Foundation
+Implementation-URL: http://xmlgraphics.apache.org/fop/
+
+Name: org/apache/commons/io
+Comment: Apache Commons IO from FOP Transcoder package
+Implementation-Title: Apache Commons IO
+Implementation-Vendor: Apache Software Foundation
+Implementation-URL: http://commons.apache.org/io/
+
+Name: org/apache/commons/logging
+Comment: Apache Commons Logging from FOP Transcoder package
+Implementation-Title: Apache Commons Logging
+Implementation-Vendor: Apache Software Foundation
+Implementation-URL: http://commons.apache.org/logging/
