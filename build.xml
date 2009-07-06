@@ -11,12 +11,12 @@
 	<property name="ELKI_LONG" value="ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures"/>
 	
 	<!-- for official builds: -->
-	<!--
+	<!-- XXX
 	<property name="release.official" value="true" />
-	<property name="release.version" value="0.2" />
+	<property name="release.version" value="0.2.x" />
 	<property name="release.extraversion" value="(${now})"/>
-	<property name="doc.dir" value="doc/release${release.version}"/>
-	-->
+	<property name="doc.srcdir" value="doc/release${release.version}"/>
+	XXX -->
 
 	<!-- defaults -->	
 	<property name="release.version" value="INTERNAL-${now}"/>
@@ -385,7 +385,7 @@
 	<!-- +++++++++++++++++++ DEPLOYMENT and RELEASE TARGETS +++++++++++++++++++ -->
 	
 	<!-- Deployment -->
-	<target name="deploy" description="Copies the executable jar file to archive and executable directories" depends="jar">
+	<target name="deploy" description="Copies the executable jar file to archive and executable directories" depends="jar,doc">
 		<mkdir dir="${deploy.output}" />
 		<copy todir="${deploy.output}">
 			<fileset file="${build.jarfile}" />
@@ -400,6 +400,7 @@
 		<fail unless="release.official" message="Only official builds can be released. Use 'deploy'." />
 		<fail unless="release.target" message="No release target folder given." />
 		<antcall target="deploy" />
+		<mkdir dir="${release.target}" />
 		<copy todir="${release.target}">
 			<fileset dir="${deploy.output}"/>
 		</copy>
