@@ -19,15 +19,19 @@ For background, contact-information, and contributors see
 </p>
 
 <h1>Architecture</h1>
+<h2>Parameters and Parameter-Passing</h2>
 <p>The core class is {@link de.lmu.ifi.dbs.elki.KDDTask KDDTask} for command line interaction.
 This class' main method manages the reading of parameters from the standard input and passes the parameters to the
-corresponding classes which, in turn, could have parameters that expect parametrization.</p>
+corresponding classes which, in turn, could have parameters that expect parameterization.</p>
 
 <p align="center"><img src="figures/parameterization.png" alt="visualization of parameterization" border="1"></p>
 
-<p>The database connection manages reading of inputfiles or databases and provides a {@link de.lmu.ifi.dbs.elki.database.Database Database}-Object as a virtual database to the KDDTask.
+<h2>Workflow - Where Do Which Objects Go?</h2>
+<p>The database connection manages reading of input files or databases and provides a {@link de.lmu.ifi.dbs.elki.database.Database Database}-Object as a virtual database to the KDDTask.
 The KDDTask applies a specified algorithm on this database and collects the result from the algorithm.
-Finally, KDDTask prints the obtained result to a specified location.</p>
+Finally, KDDTask hands on the obtained result to a {@link de.lmu.ifi.dbs.elki.result.ResultHandler ResultHander}.
+The default-handler is  {@link de.lmu.ifi.dbs.elki.result.ResultWriter ResultWriter}, writing the result to STDOUT or,
+if specified, into a file.</p>
 
 <p align="center"><img src="figures/passingOfObjects.png" alt="visualization of passing of objects" border="1"></p>
 
