@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.outlier;
+package experimentalcode.erich;
 
 import java.util.ArrayList;
 import java.util.Iterator;
