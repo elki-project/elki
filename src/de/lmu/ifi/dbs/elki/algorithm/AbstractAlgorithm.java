@@ -17,7 +17,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * <p/>
  * <p>This class serves also as a model of implementing an algorithm within this framework.
  * Any Algorithm that makes use of these flags may extend this class. Beware to make
- * correct use of parameter settings via optionHandler as commented with
+ * correct use of parameter settings via the facilities provided within
+ * {@link AbstractParameterizable} as commented with
  * constructor and methods.</p>
  *
  * @author Arthur Zimek
