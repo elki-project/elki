@@ -61,6 +61,11 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject> extends 
   private static final boolean debugExtraCheckWrites = false;
 
   /**
+   * Debug flag, to double-check all write operations.
+   */
+  private static final boolean debugExtraCheckSymmetry = false;
+
+  /**
    * OptionID for {@link #DISTANCE_PARAM}
    */
   public static final OptionID DISTANCE_ID = OptionID.getOrCreateOptionID("loader.distance", "Distance function to cache.");
@@ -130,13 +135,19 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject> extends 
           byte[] data = new byte[8];
           float d = distance.distance(id1, id2).getValue();
           ByteArrayUtil.writeFloat(data, 0, d);
+          if(debugExtraCheckSymmetry) {
+            double d2 = distance.distance(id2, id1).getValue();
+            if(Math.abs(d-d2) > 0.0000001) {
+              logger.warning("Distance function doesn't appear to be symmetric!");
+            }            
+          }
           try {
             matrix.writeRecord(id1, id2, data);
             if(debugExtraCheckWrites) {
               byte[] data2 = matrix.readRecord(id1, id2);
               float test = ByteArrayUtil.readFloat(data2, 0);
               if(test != d) {
-                logger.warning("Distance read from file differs!" + test + " vs. " + d);
+                logger.warning("Distance read from file differs: " + test + " vs. " + d);
               }
             }
           }
