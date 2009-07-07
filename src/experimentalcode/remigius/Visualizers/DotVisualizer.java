@@ -18,9 +18,14 @@ public class DotVisualizer<O extends DoubleVector> extends NumberVisualizer<O> {
 
 	private EventListener hoverer;
 
-	public DotVisualizer(Database<O> database, VisualizationManager<O> v){
-		super(database, v);
-//		this.hoverer = new ToolTipListener(v.getDocument());
+	// TODO: Make a visualizer dedicated to drawing axes.
+	// TODO: Fix ToolTips (change IDs to be unique & add visibility-modifier per layer to the GUI)  
+	public DotVisualizer(){
+	}
+
+
+	public void setup(Database<O> database, VisualizationManager<O> v){
+		init(database, v);
 	}
 
 	@Override
@@ -40,20 +45,16 @@ public class DotVisualizer<O extends DoubleVector> extends NumberVisualizer<O> {
 		for (int id : database.getIDs()){
 
 			Element dot = SHAPEGEN.createDot(svgp.getDocument(), getPositioned(database.get(id), dimx), (1 - getPositioned(database.get(id), dimy)), id, dimx, dimy);	
-			EventTarget targ = (EventTarget) dot;
-			targ.addEventListener(SVGConstants.SVG_MOUSEOVER_EVENT_TYPE, hoverer, false);
-			targ.addEventListener(SVGConstants.SVG_MOUSEOUT_EVENT_TYPE, hoverer, false);
-			targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, hoverer, false);
+//			EventTarget targ = (EventTarget) dot;
+//			targ.addEventListener(SVGConstants.SVG_MOUSEOVER_EVENT_TYPE, hoverer, false);
+//			targ.addEventListener(SVGConstants.SVG_MOUSEOUT_EVENT_TYPE, hoverer, false);
+//			targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, hoverer, false);
 			layer.appendChild(dot);
-
-			layer.appendChild(
-					dot
-			);
 		}
 		return new NumberVisualization(dimx, dimy, layer);
 	}
 
-	public String toString(){
+	public String getName(){
 		return "Dots";
 	}
 }
