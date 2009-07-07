@@ -16,39 +16,46 @@ import experimentalcode.remigius.VisualizationManager;
 public class TextVisualizer<O extends DoubleVector> extends NumberVisualizer<O> {
 
 	AnnotationResult<Double> anResult;
-	
-	public TextVisualizer(Database<O> database, AnnotationResult<Double> anResult, VisualizationManager<O> v) {
-		super(database, v);
+
+	public TextVisualizer() {
+
+	}
+
+	public void setup(Database<O> database, AnnotationResult<Double> anResult,
+			VisualizationManager<O> v) {
+
+		init(database, v);
 		this.anResult = anResult;
-		
 		setupCSS();
 	}
 
-	private void setupCSS(){
+	private void setupCSS() {
 
 		CSSClass tooltip = visManager.createCSSClass(CommonSVGShapes.CSS_TOOLTIP_CLASS);
 		tooltip.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, "0.1%");
 		visManager.registerCSSClass(tooltip);
 	}
 
-	private Double getValue(int id){
+	private Double getValue(int id) {
+
 		return anResult.getValueFor(id);
 	}
 
 	@Override
 	protected NumberVisualization visualize(SVGPlot svgp, Element layer, int dimx, int dimy) {
 
-		for (int id : database.getIDs()){
-			layer.appendChild(
-					SHAPEGEN.createToolTip(
-							svgp.getDocument(), getPositioned(database.get(id), dimx), (1 - getPositioned(database.get(id), dimy)),
-							getValue(id), id, dimx, dimy));
+		for (int id : database.getIDs()) {
+			layer.appendChild(SHAPEGEN.createToolTip(svgp.getDocument(),
+					getPositioned(database.get(id), dimx), (1 - getPositioned(
+							database.get(id), dimy)), getValue(id), id, dimx,
+					dimy));
 		}
 		return new NumberVisualization(dimx, dimy, layer);
 	}
-	
+
 	@Override
-	public String toString(){
+	public String getName() {
+
 		return "Text";
 	}
 }

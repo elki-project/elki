@@ -8,4 +8,5 @@ public interface Visualizer<O extends DatabaseObject> extends Parameterizable {
 	
 	public Double getPositioned(O o, int dimx);
 	public Visualization visualize(SVGPlot svgp, int dimx, int dimy);
+	public String getName();
 }

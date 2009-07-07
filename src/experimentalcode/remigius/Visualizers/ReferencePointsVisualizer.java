@@ -19,10 +19,13 @@ public class ReferencePointsVisualizer<O extends DoubleVector, V extends Feature
 
 	private CollectionResult<V> colResult;
 
-	public ReferencePointsVisualizer(Database<O> database, CollectionResult<V> colResult, VisualizationManager<O> v){
-		super(database, v);
-		this.colResult = colResult;
+	public ReferencePointsVisualizer(){
 
+	}
+	
+	public void setup(Database<O> database, CollectionResult<V> colResult, VisualizationManager<O> v){
+		init(database, v);
+		this.colResult = colResult;
 		setupCSS();
 	}
 
@@ -48,7 +51,7 @@ public class ReferencePointsVisualizer<O extends DoubleVector, V extends Feature
 		return new NumberVisualization(dimx, dimy, layer);
 	}
 	
-	public String toString(){
+	public String getName(){
 		return "ReferencePoints";
 	}
 }

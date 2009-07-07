@@ -8,5 +8,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 
 public interface AlgorithmAdapter<O extends DatabaseObject> {
 
-	public Collection<Visualizer<O>> getVisualizationGenerators(Database<O> db, Result r, VisualizationManager<O> v);
+	public boolean canVisualize(Result result);
+	public Collection<Visualizer<O>> getVisualizers();
+	public void init(Database<O> database, Result result, VisualizationManager<O> visManager);
 }

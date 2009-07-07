@@ -1,25 +1,29 @@
 package experimentalcode.remigius.Adapter;
 
-import java.util.Collection;
-import java.util.HashSet;
-
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
-import experimentalcode.remigius.AlgorithmAdapter;
+import experimentalcode.remigius.AbstractAlgorithmAdapter;
 import experimentalcode.remigius.VisualizationManager;
-import experimentalcode.remigius.Visualizer;
 import experimentalcode.remigius.Visualizers.DotVisualizer;
 
-public class DefaultAdapter<O extends DoubleVector> implements AlgorithmAdapter<O>{
+public class DefaultAdapter<O extends DoubleVector> extends AbstractAlgorithmAdapter<O>{
 
-	public Collection<Visualizer<O>> getVisualizationGenerators(
-			Database<O> db, Result r, VisualizationManager<O> v) {
-		
-		Collection<Visualizer<O>> col = new HashSet<Visualizer<O>>();
+private DotVisualizer<O> dotVisualizer;
+	
+	public DefaultAdapter(){
+		super();
+		dotVisualizer = new DotVisualizer<O>();
+		visualizers.add(dotVisualizer);
+	}
 
-		col.add(new DotVisualizer<O>(db, v));
-
-		return col;
+	@Override
+	public boolean canVisualize(Result r){
+		return true;
+	}
+	
+	@Override
+	protected void initVisualizer(Database<O> database, Result result, VisualizationManager<O> visManager) {
+		dotVisualizer.setup(database, visManager);
 	}
 }

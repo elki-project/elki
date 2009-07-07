@@ -31,8 +31,9 @@ import experimentalcode.remigius.VisualizationManager;
 public class BubbleVisualizer<O extends DoubleVector> extends NumberVisualizer<O> {
 	
 	public static final OptionID GAMMA_ID = OptionID.getOrCreateOptionID("bubble.gamma", "gamma-correction.");
-	private final DoubleParameter GAMMA_PARAM = new DoubleParameter(GAMMA_ID);
-
+	private final DoubleParameter GAMMA_PARAM = new DoubleParameter(GAMMA_ID, 1.0);
+	private Double gamma;
+	
 	private DoubleScale normalizationScale;
 	private DoubleScale plotScale;
 	private GammaFunction gammaFunction;
@@ -42,21 +43,22 @@ public class BubbleVisualizer<O extends DoubleVector> extends NumberVisualizer<O
 
 	private Clustering<Model> clustering;
 
-	public BubbleVisualizer(Database<O> database, AnnotationResult<Double> anResult, Result r, DoubleScale normalizationScale, VisualizationManager<O> v){
-		super(database, v);
-		
+	public BubbleVisualizer(){
 		addOption(GAMMA_PARAM);
-		
+	}
+	
+	public void setup(Database<O> database, AnnotationResult<Double> anResult, Result r, DoubleScale normalizationScale, VisualizationManager<O> v){
+		init(database, v);
 		this.anResult = anResult;
 
 		this.normalizationScale = normalizationScale;
 		this.plotScale = new LinearScale();
-		this.gammaFunction = new GammaFunction();
+		this.gammaFunction = new GammaFunction(this.gamma);
 		
 		setupClustering();
 		setupCSS();
 	}
-
+	
 	private void setupClustering(){
 		List<Clustering<?>> clusterings = ResultUtil.getClusteringResults(result);
 
@@ -96,7 +98,8 @@ public class BubbleVisualizer<O extends DoubleVector> extends NumberVisualizer<O
 	@Override
 	public List<String> setParameters(List<String> args) throws ParameterException {
 		List<String> remainingParameters = super.setParameters(args);
-		gammaFunction.setGamma(GAMMA_PARAM.getValue());
+		this.gamma = GAMMA_PARAM.getValue();
+		rememberParametersExcept(args, remainingParameters);
 		return remainingParameters;
 	}
 
@@ -105,12 +108,11 @@ public class BubbleVisualizer<O extends DoubleVector> extends NumberVisualizer<O
 	}
 
 	private Double getScaled(Double d){
-		return gammaFunction.getScaled(plotScale.getScaled(normalizationScale.getScaled(d)));
+		return plotScale.getScaled(gammaFunction.getScaled(normalizationScale.getScaled(d)));
 	}
 
 	@Override
 	protected NumberVisualization visualize(SVGPlot svgp, Element layer, int dimx, int dimy) {
-
 		Iterator<Cluster<Model>> iter = clustering.getAllClusters().iterator();
 		int clusterID = 0;
 
@@ -128,7 +130,7 @@ public class BubbleVisualizer<O extends DoubleVector> extends NumberVisualizer<O
 		return new NumberVisualization(dimx, dimy, layer);
 	}
 	
-	public String toString(){
+	public String getName(){
 		return "Bubbles";
 	}
 }
