@@ -5,7 +5,7 @@ package de.lmu.ifi.dbs.elki.data;
  *
  * @param <V> the concrete type of this RealVector
  * @param <N> the type of number, this RealVector consists of (i.e., a RealVector {@code v} of type {@code V}
- *  and dimensionality {@code d} is an element of {@code N<sup>d</sup>})
+ *  and dimensionality {@code d} is an element of {@code N}<sup><code>d</code></sup>)
  * 
  * @author Elke Achtert
  */
