@@ -23,8 +23,8 @@ public class ReferencePointsVisualizer<O extends DoubleVector, V extends Feature
 
 	}
 	
-	public void setup(Database<O> database, CollectionResult<V> colResult, VisualizationManager<O> v){
-		init(database, v);
+	public void setup(Database<O> database, CollectionResult<V> colResult, VisualizationManager<O> visManager){
+		init(database, visManager);
 		this.colResult = colResult;
 		setupCSS();
 	}

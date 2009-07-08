@@ -47,8 +47,8 @@ public class BubbleVisualizer<O extends DoubleVector> extends NumberVisualizer<O
 		addOption(GAMMA_PARAM);
 	}
 	
-	public void setup(Database<O> database, AnnotationResult<Double> anResult, Result r, DoubleScale normalizationScale, VisualizationManager<O> v){
-		init(database, v);
+	public void setup(Database<O> database, AnnotationResult<Double> anResult, Result r, DoubleScale normalizationScale, VisualizationManager<O> visManager){
+		init(database, visManager);
 		this.anResult = anResult;
 
 		this.normalizationScale = normalizationScale;

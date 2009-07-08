@@ -21,10 +21,9 @@ public class TextVisualizer<O extends DoubleVector> extends NumberVisualizer<O> 
 
 	}
 
-	public void setup(Database<O> database, AnnotationResult<Double> anResult,
-			VisualizationManager<O> v) {
+	public void setup(Database<O> database, AnnotationResult<Double> anResult, VisualizationManager<O> vvisManager) {
 
-		init(database, v);
+		init(database, visManager);
 		this.anResult = anResult;
 		setupCSS();
 	}
