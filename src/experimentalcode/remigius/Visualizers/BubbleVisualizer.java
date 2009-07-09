@@ -107,7 +107,6 @@ public class BubbleVisualizer<O extends DoubleVector> extends NumberVisualizer<O
 		List<String> remainingParameters = super.setParameters(args);
 		gamma = GAMMA_PARAM.getValue();
 		fill = FILL_FLAG.getValue();
-		System.out.println(fill);
 		rememberParametersExcept(args, remainingParameters);
 		return remainingParameters;
 	}
