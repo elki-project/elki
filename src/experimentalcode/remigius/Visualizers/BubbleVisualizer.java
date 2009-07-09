@@ -83,7 +83,7 @@ public class BubbleVisualizer<O extends DoubleVector> extends NumberVisualizer<O
 		while (iter.hasNext()){
 
 			// just need to consume a cluster; creating IDs manually because cluster often return a null-ID.
-			Cluster<Model> cluster = iter.next();
+			iter.next();
 			clusterID+=1;
 
 			CSSClass bubble = visManager.createCSSClass(CommonSVGShapes.CSS_BUBBLE_PREFIX + clusterID);
