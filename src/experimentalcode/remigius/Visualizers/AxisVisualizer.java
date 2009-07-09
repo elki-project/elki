@@ -17,7 +17,6 @@ public class AxisVisualizer<O extends DoubleVector> extends NumberVisualizer<O> 
 	
 	}
 
-
 	public void setup(Database<O> database, VisualizationManager<O> visManager){
 		// We don't need the Database. Maybe another superclass / inheritance hierarchy would serve us better.
 		init(database, visManager);
@@ -40,7 +39,7 @@ public class AxisVisualizer<O extends DoubleVector> extends NumberVisualizer<O> 
 	}
 
 	public String getName(){
-		return "Axis";
+		return "Axes";
 	}
 
 }
