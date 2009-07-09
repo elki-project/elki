@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -30,9 +31,13 @@ import experimentalcode.remigius.VisualizationManager;
 
 public class BubbleVisualizer<O extends DoubleVector> extends NumberVisualizer<O> {
 	
-	public static final OptionID GAMMA_ID = OptionID.getOrCreateOptionID("bubble.gamma", "gamma-correction.");
+	public static final OptionID GAMMA_ID = OptionID.getOrCreateOptionID("bubble.gamma", "gamma-correction");
 	private final DoubleParameter GAMMA_PARAM = new DoubleParameter(GAMMA_ID, 1.0);
 	private Double gamma;
+	
+	public static final OptionID FILL_ID = OptionID.getOrCreateOptionID("bubble.fill", "fill");
+	private final Flag FILL_FLAG = new Flag(FILL_ID);
+	private Boolean fill;
 	
 	private DoubleScale normalizationScale;
 	private DoubleScale plotScale;
@@ -45,6 +50,7 @@ public class BubbleVisualizer<O extends DoubleVector> extends NumberVisualizer<O
 
 	public BubbleVisualizer(){
 		addOption(GAMMA_PARAM);
+		addOption(FILL_FLAG);
 	}
 	
 	public void setup(Database<O> database, AnnotationResult<Double> anResult, Result r, DoubleScale normalizationScale, VisualizationManager<O> visManager){
@@ -82,15 +88,16 @@ public class BubbleVisualizer<O extends DoubleVector> extends NumberVisualizer<O
 
 			CSSClass bubble = visManager.createCSSClass(CommonSVGShapes.CSS_BUBBLE_PREFIX + clusterID);
 			bubble.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, "0.001");
-
-			// fill bubbles
-			bubble.setStatement(SVGConstants.CSS_FILL_PROPERTY, COLORS.getColor(clusterID));
-			bubble.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0.5");
-
-			// or don't fill them.
-//							bubble.setStatement(SVGConstants.CSS_STROKE_VALUE, COLORS.getColor(clusterID));
-//							bubble.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0");
-
+			
+			if (fill){
+				// fill bubbles
+				bubble.setStatement(SVGConstants.CSS_FILL_PROPERTY, COLORS.getColor(clusterID));
+				bubble.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0.5");
+			} else {
+				// or don't fill them.
+				bubble.setStatement(SVGConstants.CSS_STROKE_VALUE, COLORS.getColor(clusterID));
+				bubble.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0");
+			}
 			visManager.registerCSSClass(bubble);
 		}
 	}
@@ -98,7 +105,9 @@ public class BubbleVisualizer<O extends DoubleVector> extends NumberVisualizer<O
 	@Override
 	public List<String> setParameters(List<String> args) throws ParameterException {
 		List<String> remainingParameters = super.setParameters(args);
-		this.gamma = GAMMA_PARAM.getValue();
+		gamma = GAMMA_PARAM.getValue();
+		fill = FILL_FLAG.getValue();
+		System.out.println(fill);
 		rememberParametersExcept(args, remainingParameters);
 		return remainingParameters;
 	}
