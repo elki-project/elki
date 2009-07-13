@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.test.algorithm.clustering.correlation;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -53,7 +54,7 @@ public class TestFourCResults implements JUnit4Test {
     Database<DoubleVector> db = dbconn.getDatabase(null);
 
     // verify data set size.
-    assertTrue(db.size() == shoulds);
+    assertEquals("Database size doesn't match expected size.", shoulds, db.size());
 
     // setup algorithm
     FourC<DoubleVector> fourc = new FourC<DoubleVector>();
@@ -72,7 +73,7 @@ public class TestFourCResults implements JUnit4Test {
       System.err.println("Remaining parameter: " + s);
     }
     //System.err.println(fourc.getAttributeSettings().toString());
-    assertTrue("Some parameters were ignored by the algorithm.", remainingparams.size() == 0);
+    assertEquals("Some parameters were ignored by the algorithm.", 0, remainingparams.size());
     // run 4C on database
     Clustering<Model> result = fourc.run(db);
 

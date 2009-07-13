@@ -30,13 +30,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * @author Erich Schubert
  * 
  */
-// TODO: use an appropriate data set with actual results.
 public class TestPreDeConResults implements JUnit4Test {
   // the following values depend on the data set used!
-  String dataset = "data/testdata/unittests/hierarchical-3d2d1d.csv";
+  String dataset = "data/testdata/unittests/axis-parallel-subspace-clusters-6d.csv.gz";
 
   // size of the data set
-  int shoulds = 600;
+  int shoulds = 2500;
 
   /**
    * Run PreDeCon with fixed parameters and compare the result to a golden standard.
@@ -50,6 +49,7 @@ public class TestPreDeConResults implements JUnit4Test {
     List<String> inputparams = new ArrayList<String>();
     // Set up database input file:
     OptionUtil.addParameter(inputparams, FileBasedDatabaseConnection.INPUT_ID, dataset);
+    OptionUtil.addParameter(inputparams, FileBasedDatabaseConnection.CLASS_LABEL_INDEX_ID, "1");
     inputparams = dbconn.setParameters(inputparams);
     // get database
     Database<DoubleVector> db = dbconn.getDatabase(null);
@@ -64,8 +64,8 @@ public class TestPreDeConResults implements JUnit4Test {
     ArrayList<String> predeconparams = new ArrayList<String>();
     predecon.setVerbose(false);
     // these parameters are not picked too smartly - room for improvement.
-    OptionUtil.addParameter(predeconparams, ProjectedDBSCAN.EPSILON_ID, Double.toString(0.50));
-    OptionUtil.addParameter(predeconparams, ProjectedDBSCAN.MINPTS_ID, Integer.toString(30));
+    OptionUtil.addParameter(predeconparams, ProjectedDBSCAN.EPSILON_ID, Double.toString(50));
+    OptionUtil.addParameter(predeconparams, ProjectedDBSCAN.MINPTS_ID, Integer.toString(50));
     OptionUtil.addParameter(predeconparams, ProjectedDBSCAN.LAMBDA_ID, Integer.toString(5));
     
     // Set parameters
@@ -74,7 +74,7 @@ public class TestPreDeConResults implements JUnit4Test {
       System.err.println("Remaining parameter: " + s);
     }
     //System.err.println(fourc.getAttributeSettings().toString());
-    assertTrue("Some parameters were ignored by the algorithm.", remainingparams.size() == 0);
+    assertEquals("Some parameters were ignored by the algorithm.", 0, remainingparams.size());
     // run 4C on database
     Clustering<Model> result = predecon.run(db);
 
@@ -84,8 +84,8 @@ public class TestPreDeConResults implements JUnit4Test {
     Clustering<Model> rbl = bylabel.getResult();
 
     double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0);
-    assertTrue("PreDeCon score on test dataset too low: " + score, score > 0.11716);
-    System.out.println("PreDeCon score: " + score + " > " + 0.11716);
+    assertTrue("PreDeCon score on test dataset too low: " + score, score > 0.52106);
+    System.out.println("PreDeCon score: " + score + " > " + 0.52106);
   }
 
 }
