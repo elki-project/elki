@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.Description;
  * </p>
  *
  * @author Peer Kr&ouml;ger
- * @param <V> the type of Realvector handled by this Algorithm
+ * @param <V> the type of RealVector handled by this Algorithm
  */
 public class PreDeCon<V extends RealVector<V, ?>> extends ProjectedDBSCAN<V> {
 
