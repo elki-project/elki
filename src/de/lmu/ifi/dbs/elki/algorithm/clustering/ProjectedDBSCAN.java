@@ -23,7 +23,6 @@ import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.elki.preprocessing.ProjectedDBSCANPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -383,10 +382,6 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
     public List<String> setParameters(List<String> args) throws ParameterException {
         List<String> remainingParameters = super.setParameters(args);
 
-        // distance function
-        distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
-        addParameterizable(distanceFunction);
-
         // epsilon
         epsilon = EPSILON_PARAM.getValue();
 
@@ -407,11 +402,18 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
         // preprocessor
         OptionUtil.addParameter(distanceFunctionParameters, PreprocessorHandler.PREPROCESSOR_ID, preprocessorClass().getName());
         // preprocessor epsilon
-        distanceFunctionParameters.add(3, OptionHandler.OPTION_PREFIX + ProjectedDBSCANPreprocessor.EPSILON_PARAM.getName());
-        distanceFunctionParameters.add(4,epsilon);
+        OptionUtil.addParameter(distanceFunctionParameters, DBSCAN.EPSILON_ID, epsilon);
         // preprocessor minpts
         OptionUtil.addParameter(distanceFunctionParameters, MINPTS_ID, Integer.toString(minpts));
 
+        List<OptionID> overriddenParameters = new ArrayList<OptionID>();
+        overriddenParameters.add(PreprocessorHandler.OMIT_PREPROCESSING_ID);
+        overriddenParameters.add(PreprocessorHandler.PREPROCESSOR_ID);
+        overriddenParameters.add(DBSCAN.EPSILON_ID);
+        overriddenParameters.add(MINPTS_ID);
+        // distance function
+        distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
+        addParameterizable(distanceFunction, overriddenParameters);
         distanceFunction.setParameters(distanceFunctionParameters);
 
         rememberParametersExcept(args, remainingParameters);
