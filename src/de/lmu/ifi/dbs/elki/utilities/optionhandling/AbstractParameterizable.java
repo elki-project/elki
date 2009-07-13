@@ -212,6 +212,8 @@ public abstract class AbstractParameterizable extends AbstractLoggable implement
             i2.remove();
           }
         }
+        // add remaining options to collection
+        collection.addAll(col);
         if (toremove.size() > 0) {
           StringBuffer remainingOptions = new StringBuffer();
           boolean first = true;
