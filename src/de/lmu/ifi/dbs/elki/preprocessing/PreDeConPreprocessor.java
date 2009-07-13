@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
  * Preprocessor for PreDeCon local dimensionality and locally weighted matrix
  * assignment to objects of a certain database.
  *
- * @author Peer Kröger
+ * @author Peer Kr&ouml;ger
  * @param <D> Distance type
  * @param <V> Vector type
  */
