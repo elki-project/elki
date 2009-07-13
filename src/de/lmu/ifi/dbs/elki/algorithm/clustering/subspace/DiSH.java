@@ -210,9 +210,7 @@ public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clust
         OptionUtil.addParameter(opticsParameters, DiSHPreprocessor.MINPTS_ID, Integer.toString(minpts));
 
         // remaining parameters
-        for (String parameter : remainingParameters) {
-            opticsParameters.add(parameter);
-        }
+        opticsParameters.addAll(remainingParameters);
 
         remainingParameters = optics.setParameters(opticsParameters);
         OptionID[] masked = { OPTICS.EPSILON_ID, OPTICS.MINPTS_ID, OPTICS.DISTANCE_FUNCTION_ID, DiSHDistanceFunction.EPSILON_ID, PreprocessorHandler.OMIT_PREPROCESSING_ID, PreprocessorHandler.PREPROCESSOR_ID, DiSHPreprocessor.EPSILON_ID, DiSHPreprocessor.MINPTS_ID};
