@@ -394,9 +394,6 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
         // parameters for the distance function
         // todo provide setters
         ArrayList<String> distanceFunctionParameters = new ArrayList<String>();
-        for (String p: remainingParameters) {
-            distanceFunctionParameters.add(p);
-        }
         // omit preprocessing flag
         OptionUtil.addFlag(distanceFunctionParameters, PreprocessorHandler.OMIT_PREPROCESSING_ID);
         // preprocessor
@@ -405,16 +402,19 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
         OptionUtil.addParameter(distanceFunctionParameters, DBSCAN.EPSILON_ID, epsilon);
         // preprocessor minpts
         OptionUtil.addParameter(distanceFunctionParameters, MINPTS_ID, Integer.toString(minpts));
+        // merge remaining parameters
+        distanceFunctionParameters.addAll(remainingParameters);
 
         List<OptionID> overriddenParameters = new ArrayList<OptionID>();
         overriddenParameters.add(PreprocessorHandler.OMIT_PREPROCESSING_ID);
         overriddenParameters.add(PreprocessorHandler.PREPROCESSOR_ID);
         overriddenParameters.add(DBSCAN.EPSILON_ID);
         overriddenParameters.add(MINPTS_ID);
+        
         // distance function
         distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
         addParameterizable(distanceFunction, overriddenParameters);
-        distanceFunction.setParameters(distanceFunctionParameters);
+        remainingParameters = distanceFunction.setParameters(distanceFunctionParameters);
 
         rememberParametersExcept(args, remainingParameters);
         return remainingParameters;
