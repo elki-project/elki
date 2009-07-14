@@ -166,6 +166,18 @@ public class SVGPlot {
   }
 
   /**
+   * Create a SVG text element.
+   * 
+   * @param x first point x
+   * @param y first point y
+   * @param text Content of text element.
+   * @return New text element.
+   */
+  public Element svgText(double x, double y, String text) {
+    return SVGUtil.svgText(document, x, y, text);
+  }
+  
+  /**
    * Retrieve the SVG document.
    * 
    * @return resulting document.

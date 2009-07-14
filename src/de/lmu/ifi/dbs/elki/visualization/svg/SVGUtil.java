@@ -168,11 +168,11 @@ public final class SVGUtil {
    * @return new element
    */
   public static Element svgCircle(Document document, double cx, double cy, double r) {
-    Element rect = SVGUtil.svgElement(document, SVGConstants.SVG_CIRCLE_TAG);
-    SVGUtil.setAtt(rect, SVGConstants.SVG_CX_ATTRIBUTE, cx);
-    SVGUtil.setAtt(rect, SVGConstants.SVG_CY_ATTRIBUTE, cy);
-    SVGUtil.setAtt(rect, SVGConstants.SVG_R_ATTRIBUTE, r);
-    return rect;
+    Element circ = SVGUtil.svgElement(document, SVGConstants.SVG_CIRCLE_TAG);
+    SVGUtil.setAtt(circ, SVGConstants.SVG_CX_ATTRIBUTE, cx);
+    SVGUtil.setAtt(circ, SVGConstants.SVG_CY_ATTRIBUTE, cy);
+    SVGUtil.setAtt(circ, SVGConstants.SVG_R_ATTRIBUTE, r);
+    return circ;
   }
   
   /**
@@ -186,11 +186,28 @@ public final class SVGUtil {
    * @return new element
    */
   public static Element svgLine(Document document, double x1, double y1, double x2, double y2) {
-    Element rect = SVGUtil.svgElement(document, SVGConstants.SVG_LINE_TAG);
-    SVGUtil.setAtt(rect, SVGConstants.SVG_X1_ATTRIBUTE, x1);
-    SVGUtil.setAtt(rect, SVGConstants.SVG_Y1_ATTRIBUTE, y1);
-    SVGUtil.setAtt(rect, SVGConstants.SVG_X2_ATTRIBUTE, x2);
-    SVGUtil.setAtt(rect, SVGConstants.SVG_Y2_ATTRIBUTE, y2);
-    return rect;
+    Element line = SVGUtil.svgElement(document, SVGConstants.SVG_LINE_TAG);
+    SVGUtil.setAtt(line, SVGConstants.SVG_X1_ATTRIBUTE, x1);
+    SVGUtil.setAtt(line, SVGConstants.SVG_Y1_ATTRIBUTE, y1);
+    SVGUtil.setAtt(line, SVGConstants.SVG_X2_ATTRIBUTE, x2);
+    SVGUtil.setAtt(line, SVGConstants.SVG_Y2_ATTRIBUTE, y2);
+    return line;
+  }
+  
+  /**
+   * Create a SVG text element.
+   * 
+   * @param document document to create in (factory)
+   * @param x first point x
+   * @param y first point y
+   * @param text Content of text element.
+   * @return New text element.
+   */
+  public static Element svgText(Document document, double x, double y, String text) {
+    Element elem = SVGUtil.svgElement(document, SVGConstants.SVG_TEXT_TAG);
+    SVGUtil.setAtt(elem, SVGConstants.SVG_X_ATTRIBUTE, x);
+    SVGUtil.setAtt(elem, SVGConstants.SVG_Y_ATTRIBUTE, y);
+    elem.setTextContent(text);
+    return elem;
   }
 }
