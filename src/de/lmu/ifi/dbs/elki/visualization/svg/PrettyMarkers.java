@@ -64,36 +64,20 @@ public class PrettyMarkers implements MarkerLibrary {
     switch(style % 8){
     case 0: {
       // + cross
-      Element line1 = plot.svgElement(SVGConstants.SVG_LINE_TAG);
-      SVGUtil.setAtt(line1, SVGConstants.SVG_X1_ATTRIBUTE, x);
-      SVGUtil.setAtt(line1, SVGConstants.SVG_Y1_ATTRIBUTE, y - size / 2);
-      SVGUtil.setAtt(line1, SVGConstants.SVG_X2_ATTRIBUTE, x);
-      SVGUtil.setAtt(line1, SVGConstants.SVG_Y2_ATTRIBUTE, y + size / 2);
+      Element line1 = plot.svgLine(x, y - size / 2, x, y + size / 2);
       SVGUtil.setAtt(line1, SVGConstants.SVG_STYLE_ATTRIBUTE, "stroke:" + colorstr + "; stroke-width:" + SVGUtil.fmt(size / 6));
       parent.appendChild(line1);
-      Element line2 = plot.svgElement(SVGConstants.SVG_LINE_TAG);
-      SVGUtil.setAtt(line2, SVGConstants.SVG_X1_ATTRIBUTE, x - size / 2);
-      SVGUtil.setAtt(line2, SVGConstants.SVG_Y1_ATTRIBUTE, y);
-      SVGUtil.setAtt(line2, SVGConstants.SVG_X2_ATTRIBUTE, x + size / 2);
-      SVGUtil.setAtt(line2, SVGConstants.SVG_Y2_ATTRIBUTE, y);
+      Element line2 = plot.svgLine(x - size / 2, y, x + size / 2, y);
       SVGUtil.setAtt(line2, SVGConstants.SVG_STYLE_ATTRIBUTE, "stroke:" + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
       parent.appendChild(line2);
       break;
     }
     case 1: {
       // X cross
-      Element line1 = plot.svgElement(SVGConstants.SVG_LINE_TAG);
-      SVGUtil.setAtt(line1, SVGConstants.SVG_X1_ATTRIBUTE, x - size / 2.828427);
-      SVGUtil.setAtt(line1, SVGConstants.SVG_Y1_ATTRIBUTE, y - size / 2.828427);
-      SVGUtil.setAtt(line1, SVGConstants.SVG_X2_ATTRIBUTE, x + size / 2.828427);
-      SVGUtil.setAtt(line1, SVGConstants.SVG_Y2_ATTRIBUTE, y + size / 2.828427);
+      Element line1 = plot.svgLine(x - size / 2.828427, y - size / 2.828427, x + size / 2.828427, y + size / 2.828427);
       SVGUtil.setAtt(line1, SVGConstants.SVG_STYLE_ATTRIBUTE, "stroke:" + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
       parent.appendChild(line1);
-      Element line2 = plot.svgElement(SVGConstants.SVG_LINE_TAG);
-      SVGUtil.setAtt(line2, SVGConstants.SVG_X1_ATTRIBUTE, x - size / 2.828427);
-      SVGUtil.setAtt(line2, SVGConstants.SVG_Y1_ATTRIBUTE, y + size / 2.828427);
-      SVGUtil.setAtt(line2, SVGConstants.SVG_X2_ATTRIBUTE, x + size / 2.828427);
-      SVGUtil.setAtt(line2, SVGConstants.SVG_Y2_ATTRIBUTE, y - size / 2.828427);
+      Element line2 = plot.svgLine(x - size / 2.828427, y + size / 2.828427, x + size / 2.828427, y - size / 2.828427);
       SVGUtil.setAtt(line2, SVGConstants.SVG_STYLE_ATTRIBUTE, "stroke:" + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
       parent.appendChild(line2);
       break;

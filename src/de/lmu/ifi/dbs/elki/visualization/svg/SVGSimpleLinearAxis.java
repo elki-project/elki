@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.visualization.svg;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
-import org.w3c.dom.svg.SVGDocument;
 
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager;
@@ -85,13 +84,8 @@ public class SVGSimpleLinearAxis {
    * @throws CSSNamingConflict when a conflict occurs in CSS
    */
   public static void drawAxis(SVGPlot plot, Element parent, LinearScale scale, double x1, double y1, double x2, double y2, boolean labels, boolean righthanded) throws CSSNamingConflict {
-    SVGDocument document = plot.getDocument();
     assert (parent != null);
-    Element line = SVGUtil.svgElement(document, SVGConstants.SVG_LINE_TAG);
-    SVGUtil.setAtt(line, SVGConstants.SVG_X1_ATTRIBUTE, x1);
-    SVGUtil.setAtt(line, SVGConstants.SVG_Y1_ATTRIBUTE, y1);
-    SVGUtil.setAtt(line, SVGConstants.SVG_X2_ATTRIBUTE , x2);
-    SVGUtil.setAtt(line, SVGConstants.SVG_Y2_ATTRIBUTE, y2);
+    Element line = plot.svgLine(x1, y1, x2, y2);
     SVGUtil.setAtt(line, SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_AXIS);
     parent.appendChild(line);
   
@@ -128,18 +122,14 @@ public class SVGSimpleLinearAxis {
   
     // draw ticks on x axis
     for(double tick = scale.getMin(); tick <= scale.getMax(); tick += scale.getRes()) {
-      Element tickline = SVGUtil.svgElement(document, SVGConstants.SVG_LINE_TAG);
       double x = x1 + tx * scale.getScaled(tick);
       double y = y1 + ty * scale.getScaled(tick);
-      SVGUtil.setAtt(tickline, SVGConstants.SVG_X1_ATTRIBUTE, x - tw);
-      SVGUtil.setAtt(tickline, SVGConstants.SVG_Y1_ATTRIBUTE, y - th);
-      SVGUtil.setAtt(tickline, SVGConstants.SVG_X2_ATTRIBUTE, x + tw);
-      SVGUtil.setAtt(tickline, SVGConstants.SVG_Y2_ATTRIBUTE, y + th);
+      Element tickline = plot.svgLine(x - tw, y - th, x + tw, y + th);
       SVGUtil.setAtt(tickline, SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_AXIS_TICK);
       parent.appendChild(tickline);
       // draw labels
       if(labels) {
-        Element text = SVGUtil.svgElement(document, SVGConstants.SVG_TEXT_TAG);
+        Element text = plot.svgElement(SVGConstants.SVG_TEXT_TAG);
         SVGUtil.setAtt(text, SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_AXIS_LABEL);
         SVGUtil.setAtt(text, SVGConstants.SVG_TEXT_RENDERING_ATTRIBUTE, SVGConstants.SVG_OPTIMIZE_LEGIBILITY_VALUE);
         switch(pos){
