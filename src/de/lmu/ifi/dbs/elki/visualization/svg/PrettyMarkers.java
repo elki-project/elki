@@ -60,25 +60,26 @@ public class PrettyMarkers implements MarkerLibrary {
     assert (parent != null);
     // TODO: add more styles.
     String colorstr = colors.getColor(style);
+    String strokestyle = "stroke:" + colorstr + ";stroke-width:" + SVGUtil.fmt(size / 6);
 
     switch(style % 8){
     case 0: {
       // + cross
       Element line1 = plot.svgLine(x, y - size / 2, x, y + size / 2);
-      SVGUtil.setStyle(line1, "stroke:" + colorstr + "; stroke-width:" + SVGUtil.fmt(size / 6));
+      SVGUtil.setStyle(line1, strokestyle);
       parent.appendChild(line1);
       Element line2 = plot.svgLine(x - size / 2, y, x + size / 2, y);
-      SVGUtil.setStyle(line2, "stroke:" + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
+      SVGUtil.setStyle(line2, strokestyle);
       parent.appendChild(line2);
       break;
     }
     case 1: {
       // X cross
       Element line1 = plot.svgLine(x - size / 2.828427, y - size / 2.828427, x + size / 2.828427, y + size / 2.828427);
-      SVGUtil.setStyle(line1, "stroke:" + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
+      SVGUtil.setStyle(line1, strokestyle);
       parent.appendChild(line1);
       Element line2 = plot.svgLine(x - size / 2.828427, y + size / 2.828427, x + size / 2.828427, y - size / 2.828427);
-      SVGUtil.setStyle(line2, "stroke:" + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
+      SVGUtil.setStyle(line2, strokestyle);
       parent.appendChild(line2);
       break;
     }
@@ -107,21 +108,21 @@ public class PrettyMarkers implements MarkerLibrary {
     case 5: {
       // O hollow circle
       Element circ = plot.svgCircle(x, y, size / 2);
-      SVGUtil.setStyle(circ, "fill: none; stroke: " + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
+      SVGUtil.setStyle(circ, "fill: none;" + strokestyle);
       parent.appendChild(circ);
       break;
     }
     case 6: {
       // [] hollow rectangle
       Element rect = plot.svgRect(x - size / 2, y - size / 2, size, size);
-      SVGUtil.setStyle(rect, "fill: none; stroke: " + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
+      SVGUtil.setStyle(rect, "fill: none;" + strokestyle);
       parent.appendChild(rect);
       break;
     }
     case 7: {
       // <> hollow diamond
       Element rect = plot.svgRect(x - size / 2, y - size / 2, size, size);
-      SVGUtil.setStyle(rect, "fill: none; stroke: " + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
+      SVGUtil.setStyle(rect, "fill: none;" + strokestyle);
       SVGUtil.setAtt(rect, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "rotate(45," + SVGUtil.fmt(x) + "," + SVGUtil.fmt(y) + ")");
       parent.appendChild(rect);
       break;
