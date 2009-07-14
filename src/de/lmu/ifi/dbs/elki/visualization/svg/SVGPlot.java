@@ -128,6 +128,31 @@ public class SVGPlot {
   }
 
   /**
+   * Create a SVG rectangle
+   * 
+   * @param x X coordinate
+   * @param y Y coordinate
+   * @param w Width
+   * @param h Height
+   * @return new element
+   */
+  public Element svgRect(double x, double y, double w, double h) {
+    return SVGUtil.svgRect(document, x, y, w, h);
+  }
+  
+  /**
+   * Create a SVG circle
+   * 
+   * @param cx center X
+   * @param cy center Y
+   * @param r radius
+   * @return
+   */
+  public Element svgCircle(double cx, double cy, double r) {
+    return SVGUtil.svgCircle(document, cx, cy, r);
+  }
+
+  /**
    * Retrieve the SVG document.
    * 
    * @return resulting document.
