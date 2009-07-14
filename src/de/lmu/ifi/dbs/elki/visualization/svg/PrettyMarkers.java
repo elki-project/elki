@@ -65,41 +65,41 @@ public class PrettyMarkers implements MarkerLibrary {
     case 0: {
       // + cross
       Element line1 = plot.svgLine(x, y - size / 2, x, y + size / 2);
-      SVGUtil.setAtt(line1, SVGConstants.SVG_STYLE_ATTRIBUTE, "stroke:" + colorstr + "; stroke-width:" + SVGUtil.fmt(size / 6));
+      SVGUtil.setStyle(line1, "stroke:" + colorstr + "; stroke-width:" + SVGUtil.fmt(size / 6));
       parent.appendChild(line1);
       Element line2 = plot.svgLine(x - size / 2, y, x + size / 2, y);
-      SVGUtil.setAtt(line2, SVGConstants.SVG_STYLE_ATTRIBUTE, "stroke:" + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
+      SVGUtil.setStyle(line2, "stroke:" + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
       parent.appendChild(line2);
       break;
     }
     case 1: {
       // X cross
       Element line1 = plot.svgLine(x - size / 2.828427, y - size / 2.828427, x + size / 2.828427, y + size / 2.828427);
-      SVGUtil.setAtt(line1, SVGConstants.SVG_STYLE_ATTRIBUTE, "stroke:" + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
+      SVGUtil.setStyle(line1, "stroke:" + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
       parent.appendChild(line1);
       Element line2 = plot.svgLine(x - size / 2.828427, y + size / 2.828427, x + size / 2.828427, y - size / 2.828427);
-      SVGUtil.setAtt(line2, SVGConstants.SVG_STYLE_ATTRIBUTE, "stroke:" + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
+      SVGUtil.setStyle(line2, "stroke:" + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
       parent.appendChild(line2);
       break;
     }
     case 2: {
       // O filled circle
       Element circ = plot.svgCircle( x, y, size / 2);
-      SVGUtil.setAtt(circ, SVGConstants.SVG_STYLE_ATTRIBUTE, "fill:" + colorstr);
+      SVGUtil.setStyle(circ, "fill:" + colorstr);
       parent.appendChild(circ);
       break;
     }
     case 3: {
       // [] filled rectangle
       Element rect = plot.svgRect(x - size / 2, y - size / 2, size, size);
-      SVGUtil.setAtt(rect, SVGConstants.SVG_STYLE_ATTRIBUTE, "fill:" + colorstr);
+      SVGUtil.setStyle(rect, "fill:" + colorstr);
       parent.appendChild(rect);
       break;
     }
     case 4: {
       // <> filled diamond
       Element rect = plot.svgRect(x - size / 2, y - size / 2, size, size);
-      SVGUtil.setAtt(rect, SVGConstants.SVG_STYLE_ATTRIBUTE, "fill:" + colorstr);
+      SVGUtil.setStyle(rect, "fill:" + colorstr);
       SVGUtil.setAtt(rect, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "rotate(45," + SVGUtil.fmt(x) + "," + SVGUtil.fmt(y) + ")");
       parent.appendChild(rect);
       break;
@@ -107,21 +107,21 @@ public class PrettyMarkers implements MarkerLibrary {
     case 5: {
       // O hollow circle
       Element circ = plot.svgCircle(x, y, size / 2);
-      SVGUtil.setAtt(circ, SVGConstants.SVG_STYLE_ATTRIBUTE, "fill: none; stroke: " + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
+      SVGUtil.setStyle(circ, "fill: none; stroke: " + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
       parent.appendChild(circ);
       break;
     }
     case 6: {
       // [] hollow rectangle
       Element rect = plot.svgRect(x - size / 2, y - size / 2, size, size);
-      SVGUtil.setAtt(rect, SVGConstants.SVG_STYLE_ATTRIBUTE, "fill: none; stroke: " + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
+      SVGUtil.setStyle(rect, "fill: none; stroke: " + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
       parent.appendChild(rect);
       break;
     }
     case 7: {
       // <> hollow diamond
       Element rect = plot.svgRect(x - size / 2, y - size / 2, size, size);
-      SVGUtil.setAtt(rect, SVGConstants.SVG_STYLE_ATTRIBUTE, "fill: none; stroke: " + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
+      SVGUtil.setStyle(rect, "fill: none; stroke: " + colorstr + "; stroke-width: " + SVGUtil.fmt(size / 6));
       SVGUtil.setAtt(rect, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "rotate(45," + SVGUtil.fmt(x) + "," + SVGUtil.fmt(y) + ")");
       parent.appendChild(rect);
       break;
