@@ -85,7 +85,7 @@ public class SVGSimpleLinearAxis {
   public static void drawAxis(SVGPlot plot, Element parent, LinearScale scale, double x1, double y1, double x2, double y2, boolean labels, boolean righthanded) throws CSSNamingConflict {
     assert (parent != null);
     Element line = plot.svgLine(x1, y1, x2, y2);
-    SVGUtil.setAtt(line, SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_AXIS);
+    SVGUtil.setCSSClass(line, CSS_AXIS);
     parent.appendChild(line);
 
     double tx = x2 - x1;

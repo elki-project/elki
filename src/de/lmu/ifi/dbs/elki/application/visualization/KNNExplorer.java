@@ -424,7 +424,7 @@ public class KNNExplorer<O extends NumberVector<O, ?>, N extends NumberDistance<
           Color color = getColor(dist);
           String colstr = "#" + Integer.toHexString(color.getRGB()).substring(2);
           String width = (pair.getID() == idx) ? "0.5%" : "0.2%";
-          SVGUtil.setAtt(line, SVGConstants.SVG_STYLE_ATTRIBUTE, "stroke: " + colstr + "; stroke-width: " + width + "; fill: none");
+          SVGUtil.setStyle(line, "stroke: " + colstr + "; stroke-width: " + width + "; fill: none");
           newe.appendChild(line);
           // put into cache
           Double known = distancecache.get(pair.getID());

@@ -81,6 +81,26 @@ public final class SVGUtil {
   }
 
   /**
+   * Set a SVG style attribute
+   * 
+   * @param el element
+   * @param d style value
+   */
+  public static void setStyle(Element el, String d) {
+    el.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, d);
+  }
+
+  /**
+   * Set the CSS class of an Element. See also {@link #addCSSClass} and {@link #removeCSSClass}.
+   * 
+   * @param e Element
+   * @param cssclass class to set.
+   */
+  public static void setCSSClass(Element e, String cssclass) {
+    setAtt(e, SVGConstants.SVG_CLASS_ATTRIBUTE, cssclass);
+  }
+
+  /**
    * Add a CSS class to an Element.
    * 
    * @param e Element
