@@ -153,6 +153,24 @@ public class ResultUtil {
   }
 
   /**
+   * Collect all collection results from a Result
+   * 
+   * @param r Result
+   * @return List of collection results
+   */
+  public static List<CollectionResult<?>> getCollectionResults(Result r) {
+    if (r instanceof CollectionResult) {
+      List<CollectionResult<?>> crs = new ArrayList<CollectionResult<?>>(1);
+      crs.add((CollectionResult<?>) r);
+      return crs;
+    }
+    if(r instanceof MultiResult) {
+      return ClassGenericsUtil.castWithGenericsOrNull(List.class, ((MultiResult)r).filterResults(CollectionResult.class));
+    }
+    return null;
+  }
+
+  /**
    * Return all Iterable results
    * 
    * @param r Result
