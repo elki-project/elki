@@ -8,12 +8,11 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 
-
 /**
  * Class to draw a simple axis with tick marks on the plot.
  * 
  * @author Erich Schubert
- *
+ * 
  */
 public class SVGSimpleLinearAxis {
 
@@ -49,19 +48,19 @@ public class SVGSimpleLinearAxis {
    * @throws CSSNamingConflict when a name clash occurs
    */
   public static void setupCSSClasses(Object owner, CSSClassManager manager) throws CSSNamingConflict {
-    if (!manager.contains(CSS_AXIS)) {
+    if(!manager.contains(CSS_AXIS)) {
       CSSClass axis = new CSSClass(owner, CSS_AXIS);
       axis.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_SILVER_VALUE);
       axis.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, "0.2%");
       manager.addClass(axis);
     }
-    if (!manager.contains(CSS_AXIS_TICK)) {
+    if(!manager.contains(CSS_AXIS_TICK)) {
       CSSClass tick = new CSSClass(owner, CSS_AXIS_TICK);
       tick.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_SILVER_VALUE);
       tick.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, "0.1%");
       manager.addClass(tick);
     }
-    if (!manager.contains(CSS_AXIS_LABEL)) {
+    if(!manager.contains(CSS_AXIS_LABEL)) {
       CSSClass label = new CSSClass(owner, CSS_AXIS_LABEL);
       label.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, "0.2%");
       manager.addClass(label);
@@ -88,18 +87,18 @@ public class SVGSimpleLinearAxis {
     Element line = plot.svgLine(x1, y1, x2, y2);
     SVGUtil.setAtt(line, SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_AXIS);
     parent.appendChild(line);
-  
+
     double tx = x2 - x1;
     double ty = y2 - y1;
     // ticks are orthogonal
     double tw = ty * 0.01;
-    double th = - tx * 0.01;
-  
+    double th = -tx * 0.01;
+
     // choose where to print labels.
     ALIGNMENT pos = ALIGNMENT.LL;
     if(labels) {
       double angle = Math.atan2(ty, tx);
-      //System.err.println(tx + " " + (-ty) + " " + angle);
+      // System.err.println(tx + " " + (-ty) + " " + angle);
       if(angle > 2.6) { // pi .. 2.6 = 180 .. 150
         pos = righthanded ? ALIGNMENT.RC : ALIGNMENT.LC;
       }
@@ -119,7 +118,7 @@ public class SVGSimpleLinearAxis {
     // vertical text offset; align approximately with middle instead of
     // baseline.
     double textvoff = 0.007;
-  
+
     // draw ticks on x axis
     for(double tick = scale.getMin(); tick <= scale.getMax(); tick += scale.getRes()) {
       double x = x1 + tx * scale.getScaled(tick);
@@ -129,22 +128,24 @@ public class SVGSimpleLinearAxis {
       parent.appendChild(tickline);
       // draw labels
       if(labels) {
-        Element text = plot.svgElement(SVGConstants.SVG_TEXT_TAG);
-        SVGUtil.setAtt(text, SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_AXIS_LABEL);
-        SVGUtil.setAtt(text, SVGConstants.SVG_TEXT_RENDERING_ATTRIBUTE, SVGConstants.SVG_OPTIMIZE_LEGIBILITY_VALUE);
+        double tex = x;
+        double tey = y;
         switch(pos){
         case LL:
         case LC:
         case LR:
-          SVGUtil.setAtt(text, SVGConstants.SVG_X_ATTRIBUTE, x + tw * 1.5);
-          SVGUtil.setAtt(text, SVGConstants.SVG_Y_ATTRIBUTE, y + th * 1.5 + textvoff);
+          tex = x + tw * 1.5;
+          tey = y + th * 1.5 + textvoff;
           break;
         case RL:
         case RC:
         case RR:
-          SVGUtil.setAtt(text, SVGConstants.SVG_X_ATTRIBUTE, x - tw * 1.5);
-          SVGUtil.setAtt(text, SVGConstants.SVG_Y_ATTRIBUTE, y - th * 1.5 + textvoff);
+          tex = x - tw * 1.5;
+          tey = y - th * 1.5 + textvoff;
         }
+        Element text = plot.svgText(tex, tey, scale.formatValue(tick));
+        SVGUtil.setAtt(text, SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_AXIS_LABEL);
+        SVGUtil.setAtt(text, SVGConstants.SVG_TEXT_RENDERING_ATTRIBUTE, SVGConstants.SVG_OPTIMIZE_LEGIBILITY_VALUE);
         switch(pos){
         case LL:
         case RL:
@@ -159,7 +160,6 @@ public class SVGSimpleLinearAxis {
           SVGUtil.setAtt(text, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_END_VALUE);
           break;
         }
-        text.setTextContent(scale.formatValue(tick));
         parent.appendChild(text);
       }
     }
