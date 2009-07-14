@@ -146,10 +146,23 @@ public class SVGPlot {
    * @param cx center X
    * @param cy center Y
    * @param r radius
-   * @return
+   * @return new element
    */
   public Element svgCircle(double cx, double cy, double r) {
     return SVGUtil.svgCircle(document, cx, cy, r);
+  }
+  
+  /**
+   * Create a SVG line element
+   * 
+   * @param x1 first point x
+   * @param y1 first point y
+   * @param x2 second point x
+   * @param y2 second point y
+   * @return new element
+   */
+  public Element svgLine(double x1, double y1, double x2, double y2) {
+    return SVGUtil.svgLine(document, x1, y1, x2, y2);
   }
 
   /**

@@ -174,4 +174,23 @@ public final class SVGUtil {
     SVGUtil.setAtt(rect, SVGConstants.SVG_R_ATTRIBUTE, r);
     return rect;
   }
+  
+  /**
+   * Create a SVG line element. Do not confuse this with path elements.
+   * 
+   * @param document document to create in (factory)
+   * @param x1 first point x
+   * @param y1 first point y
+   * @param x2 second point x
+   * @param y2 second point y
+   * @return new element
+   */
+  public static Element svgLine(Document document, double x1, double y1, double x2, double y2) {
+    Element rect = SVGUtil.svgElement(document, SVGConstants.SVG_LINE_TAG);
+    SVGUtil.setAtt(rect, SVGConstants.SVG_X1_ATTRIBUTE, x1);
+    SVGUtil.setAtt(rect, SVGConstants.SVG_Y1_ATTRIBUTE, y1);
+    SVGUtil.setAtt(rect, SVGConstants.SVG_X2_ATTRIBUTE, x2);
+    SVGUtil.setAtt(rect, SVGConstants.SVG_Y2_ATTRIBUTE, y2);
+    return rect;
+  }
 }
