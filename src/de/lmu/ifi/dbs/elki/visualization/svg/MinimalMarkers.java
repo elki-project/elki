@@ -16,13 +16,21 @@ public class MinimalMarkers implements MarkerLibrary {
   /**
    * Color library
    */
-  private ColorLibrary colors = new PublicationColorLibrary();
+  private ColorLibrary colors;
   
   /**
    * Constructor
    */
-  public MinimalMarkers() {
+  public MinimalMarkers(ColorLibrary colors) {
     super();
+    this.colors = colors;
+  }
+
+  /**
+   * Constructor
+   */
+  public MinimalMarkers() {
+    this(new PublicationColorLibrary());
   }
 
   /**
@@ -33,5 +41,15 @@ public class MinimalMarkers implements MarkerLibrary {
     SVGUtil.setStyle(marker, "fill:" + colors.getColor(style));
     parent.appendChild(marker);
     return marker;
+  }
+
+  @Override
+  public void setColorLibrary(ColorLibrary colors) {
+    this.colors = colors;
+  }
+
+  @Override
+  public ColorLibrary setColorLibrary() {
+    return this.colors;
   }
 }
