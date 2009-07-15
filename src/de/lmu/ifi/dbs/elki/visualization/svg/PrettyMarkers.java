@@ -16,7 +16,7 @@ public class PrettyMarkers implements MarkerLibrary {
   /**
    * Color library
    */
-  private ColorLibrary colors = new PublicationColorLibrary();
+  private ColorLibrary colors;
 
   /**
    * Default prefix to use.
@@ -31,17 +31,39 @@ public class PrettyMarkers implements MarkerLibrary {
   /**
    * Constructor
    * 
-   * @param prefix Prefix to use.
+   * @param prefix prefix to use.
+   * @param colors color library to use
    */
-  public PrettyMarkers(String prefix) {
+  public PrettyMarkers(String prefix, ColorLibrary colors) {
     this.prefix = prefix;
+    this.colors = colors;
   }
 
   /**
-   * Constructor without arguments, will use {@link #DEFAULT_PREFIX} as prefix.
+   * Constructor without prefix argument, will use {@link #DEFAULT_PREFIX} as prefix.
+   * 
+   * @param colors color library to use
+   */
+  public PrettyMarkers(ColorLibrary colors) {
+    this(DEFAULT_PREFIX, colors);
+  }
+
+  /**
+   * Constructor without a a {@link ColorLibrary}, will use
+   * {@link PublicationColorLibrary} as color library.
+   * 
+   * @param prefix prefix to use.
+   */
+  public PrettyMarkers(String prefix) {
+    this(prefix, new PublicationColorLibrary());
+  }
+
+  /**
+   * Constructor without arguments, will use {@link #DEFAULT_PREFIX} as prefix
+   * and a {@link PublicationColorLibrary} as color library.
    */
   public PrettyMarkers() {
-    this(DEFAULT_PREFIX);
+    this(DEFAULT_PREFIX, new PublicationColorLibrary());
   }
 
   /**
@@ -152,5 +174,15 @@ public class PrettyMarkers implements MarkerLibrary {
       parent.appendChild(use);
     }
     return use;
+  }
+
+  @Override
+  public void setColorLibrary(ColorLibrary colors) {
+    this.colors = colors;
+  }
+
+  @Override
+  public ColorLibrary setColorLibrary() {
+    return this.colors;
   }
 }

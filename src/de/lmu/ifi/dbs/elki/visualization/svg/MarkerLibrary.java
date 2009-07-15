@@ -2,6 +2,8 @@ package de.lmu.ifi.dbs.elki.visualization.svg;
 
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
+
 
 /**
  * A marker library is a class that can generate and draw various styles of markers.
@@ -26,5 +28,19 @@ public interface MarkerLibrary {
    * @param size size
    * @return Element node generated.
    */
-  public abstract Element useMarker(SVGPlot plot, Element parent, double x, double y, int style, double size);
+  public Element useMarker(SVGPlot plot, Element parent, double x, double y, int style, double size);
+  
+  /**
+   * Set the color library for this marker library.
+   * 
+   * @param colors New color library to use.
+   */
+  public void setColorLibrary(ColorLibrary colors);
+  
+  /**
+   * Get the color library of this marker library.
+   * 
+   * @return Color library in use.
+   */
+  public ColorLibrary setColorLibrary();
 }
