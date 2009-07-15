@@ -18,10 +18,10 @@ public class GreyscaleColorLibrary implements ColorLibrary {
     SVGConstants.CSS_GRAY_VALUE,
     // silver - C0 = 75% white
     SVGConstants.CSS_SILVER_VALUE,
-    // dim gray - 69 = 41% white
-    SVGConstants.CSS_DIMGRAY_VALUE,
     // dark gray - A9 = 66% white
     SVGConstants.CSS_DARKGRAY_VALUE,
+    // dim gray - 69 = 41% white
+    SVGConstants.CSS_DIMGRAY_VALUE,
     /* TOO BRIGHT: */
     // light gray - D3 = 82% white
     /* SVGConstants.CSS_LIGHTGRAY_VALUE, */
