@@ -79,6 +79,11 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D,?>> extend
   public static final AssociationID<Double> LOF_SCORE = AssociationID.getOrCreateAssociationID("lof", Double.class);
 
   /**
+   * The association id to associate the minimum LOF_SCORE of an algorithm run.
+   */
+  public static final AssociationID<Double> LOF_MIN = AssociationID.getOrCreateAssociationID("lof min", Double.class);
+
+  /**
    * The association id to associate the maximum LOF_SCORE of an algorithm run.
    */
   public static final AssociationID<Double> LOF_MAX = AssociationID.getOrCreateAssociationID("lof max", Double.class);
@@ -205,6 +210,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D,?>> extend
     // Compute final LOF values.
     HashMap<Integer, Double> lofs = new HashMap<Integer, Double>();
     // track the maximum value for normalization.
+    double lofmin = 0;
     double lofmax = 0;
     {// compute LOF_SCORE of each db object
       if(logger.isVerbose()) {
@@ -229,6 +235,8 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D,?>> extend
         }
         Double lof = sum / nsize;
         lofs.put(id, lof);
+        // update minimum.
+        lofmin = Math.min(lofmin, lof);
         // update maximum.
         lofmax = Math.max(lofmax, lof);
         
@@ -249,6 +257,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D,?>> extend
     result.addResult(new OrderingFromHashMap<Double>(lofs, true));
 
     ResultUtil.setGlobalAssociation(result, LOF_MAX, lofmax);
+    ResultUtil.setGlobalAssociation(result, LOF_MIN, lofmin);
 
     return result;
   }
