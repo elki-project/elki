@@ -37,7 +37,7 @@ public class Histogram<T> implements Iterable<Pair<Double, T>> {
   /**
    * Size of array storage.
    */
-  protected int size = 0;
+  protected int size;
 
   /**
    * Array 'base', i.e. the point of 0.0.
@@ -142,7 +142,7 @@ public class Histogram<T> implements Iterable<Pair<Double, T>> {
    * @param coord
    * @param d
    */
-  public void put(double coord, T d) {
+  public synchronized void put(double coord, T d) {
     int bin = getBinNr(coord);
     putBin(bin, d);
   }
@@ -154,7 +154,7 @@ public class Histogram<T> implements Iterable<Pair<Double, T>> {
    * @param coord Coordinate
    * @return bin number
    */
-  private int getBinNr(double coord) {
+  protected int getBinNr(double coord) {
     if (coord == max) {
       //System.err.println("Triggered special case: "+ (Math.floor((coord - base) / binsize) + offset) + " vs. " + (size - 1));
       return size - 1;
@@ -257,7 +257,7 @@ public class Histogram<T> implements Iterable<Pair<Double, T>> {
    * @param max Maximum coordinate
    * @return New histogram for Integers.
    */
-  public static final HistogramInteger IntHistogram(int bins, double min, double max) {
+  public static HistogramInteger IntHistogram(int bins, double min, double max) {
     return new HistogramInteger(bins, min, max);
   }
 
@@ -270,7 +270,7 @@ public class Histogram<T> implements Iterable<Pair<Double, T>> {
    * @param max Maximum coordinate
    * @return New histogram for Doubles.
    */
-  public static final Histogram<Double> DoubleHistogram(int bins, double min, double max) {
+  public static Histogram<Double> DoubleHistogram(int bins, double min, double max) {
     return new Histogram<Double>(bins, min, max, new Constructor<Double>() {
       @Override
       public Double make() {
@@ -288,7 +288,7 @@ public class Histogram<T> implements Iterable<Pair<Double, T>> {
    * @param max Maximum coordinate
    * @return New histogram for Integer pairs.
    */
-  public static final Histogram<Pair<Integer,Integer>> IntIntHistogram(int bins, double min, double max) {
+  public static Histogram<Pair<Integer,Integer>> IntIntHistogram(int bins, double min, double max) {
     return new Histogram<Pair<Integer,Integer>>(bins, min, max, new Constructor<Pair<Integer,Integer>>() {
       @Override
       public Pair<Integer,Integer> make() {
@@ -306,7 +306,7 @@ public class Histogram<T> implements Iterable<Pair<Double, T>> {
    * @param max Maximum coordinate
    * @return New histogram for Double pairs.
    */
-  public static final Histogram<Pair<Double,Double>> DoubleDoubleHistogram(int bins, double min, double max) {
+  public static Histogram<Pair<Double,Double>> DoubleDoubleHistogram(int bins, double min, double max) {
     return new Histogram<Pair<Double,Double>>(bins, min, max, new Constructor<Pair<Double,Double>>() {
       @Override
       public Pair<Double,Double> make() {
@@ -324,7 +324,7 @@ public class Histogram<T> implements Iterable<Pair<Double, T>> {
    * @param max Maximum coordinate
    * @return New histogram for {@link MeanVariance}.
    */
-  public static final Histogram<MeanVariance> MeanVarianceHistogram(int bins, double min, double max) {
+  public static Histogram<MeanVariance> MeanVarianceHistogram(int bins, double min, double max) {
     return new Histogram<MeanVariance>(bins, min, max, new Constructor<MeanVariance>() {
       @Override
       public MeanVariance make() {
