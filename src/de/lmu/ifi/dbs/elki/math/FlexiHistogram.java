@@ -202,7 +202,7 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
    * @param max Maximum coordinate
    * @return New histogram for Integer.
    */
-  public static FlexiHistogram<Integer, Integer> IntegerSumHistogram(int bins) {
+  public static FlexiHistogram<Integer, Integer> IntSumHistogram(int bins) {
     return new FlexiHistogram<Integer, Integer>(bins, new Adapter<Integer, Integer>() {
       @Override
       public Integer make() {
