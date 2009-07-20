@@ -101,14 +101,14 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
     }
     // re-insert data we have
     for(Pair<Double, T> pair : tempcache) {
-      super.put(pair.first, pair.second);
+      super.replace(pair.first, pair.second);
     }
     // delete cache, signal that we're initialized
     tempcache = null;
   }
 
   @Override
-  public synchronized void put(double coord, T d) {
+  public synchronized void replace(double coord, T d) {
     if(tempcache != null) {
       if(tempcache.size() < this.destsize * 2) {
         tempcache.add(new Pair<Double, T>(coord, maker.cloneForCache(d)));
@@ -120,7 +120,7 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
       }
     }
     // super class put will already handle histogram resizing
-    super.put(coord, d);
+    super.replace(coord, d);
     // but not resampling
     testResample();
   }

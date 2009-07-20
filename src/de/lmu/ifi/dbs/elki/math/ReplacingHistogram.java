@@ -123,7 +123,7 @@ public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
    * @param coord
    * @param d
    */
-  public void put(double coord, T d) {
+  public void replace(double coord, T d) {
     int bin = getBinNr(coord);
     putBin(bin, d);
   }

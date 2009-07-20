@@ -14,7 +14,7 @@ public class AggregatingHistogram<T, D> extends ReplacingHistogram<T> {
   }
   
   public void add(double coord, D value) {
-    super.put(coord, putter.add(super.get(coord), value));
+    super.replace(coord, putter.add(super.get(coord), value));
   }
 
   /**
