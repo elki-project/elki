@@ -21,7 +21,7 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
   /**
    * Cache for elements when not yet initialized.
    */
-  private ArrayList<Pair<Double, T>> tempcache = null;
+  private ArrayList<Pair<Double, D>> tempcache = null;
 
   /**
    * Destination (minimum) size of the structure. At most 2*destsize bins are
@@ -54,7 +54,7 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
      * @param data Data to be cloned
      * @return cloned data
      */
-    public abstract T cloneForCache(T data);
+    public abstract D cloneForCache(D data);
   }
 
   /**
@@ -70,7 +70,7 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
     super(bins, 0.0, 1.0, adapter);
     this.destsize = bins;
     this.downsampler = adapter;
-    tempcache = new ArrayList<Pair<Double, T>>(this.destsize * 2);
+    tempcache = new ArrayList<Pair<Double, D>>(this.destsize * 2);
   }
 
   private synchronized void materialize() {
@@ -86,11 +86,11 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
     }
     double min = Double.MAX_VALUE;
     double max = Double.MIN_VALUE;
-    for(Pair<Double, T> pair : tempcache) {
+    for(Pair<Double, D> pair : tempcache) {
       min = Math.min(min, pair.first);
       max = Math.max(max, pair.first);
     }
-    // TODO: auto-adjust min/max by some magic value?
+    // TODO: auto-adjust min/max by some magic margin/rounding?
     this.base = min;
     this.max = max;
     this.binsize = (max - min) / this.destsize;
@@ -100,8 +100,8 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
       this.data.add(downsampler.make());
     }
     // re-insert data we have
-    for(Pair<Double, T> pair : tempcache) {
-      super.replace(pair.first, pair.second);
+    for(Pair<Double, D> pair : tempcache) {
+      super.aggregate(pair.first, pair.second);
     }
     // delete cache, signal that we're initialized
     tempcache = null;
@@ -109,16 +109,7 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
 
   @Override
   public synchronized void replace(double coord, T d) {
-    if(tempcache != null) {
-      if(tempcache.size() < this.destsize * 2) {
-        tempcache.add(new Pair<Double, T>(coord, downsampler.cloneForCache(d)));
-        return;
-      }
-      else {
-        materialize();
-        // .. and continue below!
-      }
-    }
+    materialize();
     // super class put will already handle histogram resizing
     super.replace(coord, d);
     // but not resampling
@@ -189,8 +180,20 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
 
   @Override
   public void aggregate(double coord, D value) {
-    materialize();
+    if(tempcache != null) {
+      if(tempcache.size() < this.destsize * 2) {
+        tempcache.add(new Pair<Double, D>(coord, downsampler.cloneForCache(value)));
+        return;
+      }
+      else {
+        materialize();
+        // .. and continue below!
+      }
+    }
+    // super class put will already handle histogram resizing
     super.aggregate(coord, value);
+    // but not resampling
+    testResample();
   }
 
   /**
@@ -278,8 +281,8 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
       }
 
       @Override
-      public MeanVariance cloneForCache(MeanVariance data) {
-        return new MeanVariance(data);
+      public Double cloneForCache(Double data) {
+        return data;
       }
 
       @Override

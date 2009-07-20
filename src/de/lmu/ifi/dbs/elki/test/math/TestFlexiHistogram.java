@@ -8,6 +8,7 @@ import org.junit.Test;
 import de.lmu.ifi.dbs.elki.math.FlexiHistogram;
 import de.lmu.ifi.dbs.elki.math.ReplacingHistogram;
 import de.lmu.ifi.dbs.elki.test.JUnit4Test;
+import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -28,19 +29,20 @@ public class TestFlexiHistogram implements JUnit4Test {
     Double[] expanded = { 1., 0.0, 0.0, 0.0, 0.0, 0.0, 29.59 };
     hist = FlexiHistogram.DoubleSumHistogram(5);
     hist.aggregate(0.0, 0.0);
-    hist.aggregate(0.5, 0.0);
     hist.aggregate(0.15, 1.23);
     hist.aggregate(0.25, 4.56);
     hist.aggregate(0.35, 7.89);
+    hist.aggregate(0.5, 0.0);
     assertArrayEquals("Filled histogram doesn't match", filled, hist.getData().toArray(new Double[0]));
-    hist.aggregate(0.15, 0.12 + hist.get(0.15));
-    hist.aggregate(0.25, 3.45 + hist.get(0.25));
-    hist.aggregate(0.35, 6.78 + hist.get(0.35));
-    hist.aggregate(0.45, 9.01 + hist.get(0.45));
-    hist.aggregate(0.55, 2.34 + hist.get(0.55));
+    hist.aggregate(0.15, 0.12);
+    hist.aggregate(0.25, 3.45);
+    hist.aggregate(0.35, 6.78);
+    hist.aggregate(0.45, 9.01);
+    hist.aggregate(0.55, 2.34);
+    System.out.println(FormatUtil.format(hist.getData().toArray(new Double[0])));
     assertArrayEquals("Changed histogram doesn't match", changed, hist.getData().toArray(new Double[0]));
-    hist.aggregate(-.13, -1.23 + hist.get(-.13));
-    hist.aggregate(1.13, -4.56 + hist.get(1.13));
+    hist.aggregate(-.13, -1.23);
+    hist.aggregate(1.13, -4.56);
     assertArrayEquals("Resized histogram doesn't match", resized, hist.getData().toArray(new Double[0]));
     
     // compare results via Iterator.
