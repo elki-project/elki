@@ -257,13 +257,8 @@ public class Histogram<T> implements Iterable<Pair<Double, T>> {
    * @param max Maximum coordinate
    * @return New histogram for Integers.
    */
-  public static final Histogram<Integer> IntHistogram(int bins, double min, double max) {
-    return new Histogram<Integer>(bins, min, max, new Constructor<Integer>() {
-      @Override
-      public Integer make() {
-        return new Integer(0);
-      }
-    });
+  public static final HistogramInteger IntHistogram(int bins, double min, double max) {
+    return new HistogramInteger(bins, min, max);
   }
 
   /**
