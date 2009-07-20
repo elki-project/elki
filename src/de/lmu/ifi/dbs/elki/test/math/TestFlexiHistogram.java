@@ -8,7 +8,6 @@ import org.junit.Test;
 import de.lmu.ifi.dbs.elki.math.FlexiHistogram;
 import de.lmu.ifi.dbs.elki.math.ReplacingHistogram;
 import de.lmu.ifi.dbs.elki.test.JUnit4Test;
-import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -39,7 +38,6 @@ public class TestFlexiHistogram implements JUnit4Test {
     hist.aggregate(0.35, 6.78);
     hist.aggregate(0.45, 9.01);
     hist.aggregate(0.55, 2.34);
-    System.out.println(FormatUtil.format(hist.getData().toArray(new Double[0])));
     assertArrayEquals("Changed histogram doesn't match", changed, hist.getData().toArray(new Double[0]));
     hist.aggregate(-.13, -1.23);
     hist.aggregate(1.13, -4.56);
