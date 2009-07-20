@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
-import de.lmu.ifi.dbs.elki.math.Histogram;
+import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -104,7 +104,7 @@ public class EvaluateRankingQuality<V extends RealVector<V, ?>, D extends Number
       covmats.put(clus, DatabaseUtil.covarianceMatrix(database, clus.getIDs()));
     }
 
-    Histogram<MeanVariance> hist = Histogram.MeanVarianceHistogram(numbins, 0.0, 1.0);
+    AggregatingHistogram<MeanVariance, Double> hist = AggregatingHistogram.MeanVarianceHistogram(numbins, 0.0, 1.0);
 
     if(logger.isVerbose()) {
       logger.verbose("Processing points...");
@@ -129,7 +129,7 @@ public class EvaluateRankingQuality<V extends RealVector<V, ?>, D extends Number
         List<DistanceResultPair<D>> knn = database.kNNQueryForID(i1, size, distFunc);
         double result = ROC.computeROCAUCDistanceResult(size, clus, knn);
 
-        hist.get(((double)ind) / clus.size()).put(result);
+        hist.add(((double)ind) / clus.size(), result);
 
         if(logger.isVerbose()) {
           rocproc++;

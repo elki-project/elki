@@ -20,7 +20,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.math.Histogram;
+import de.lmu.ifi.dbs.elki.math.ReplacingHistogram;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
@@ -121,7 +121,7 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>, D extends
     MeanVariance momax = new MeanVariance();
     MeanVariance modif = new MeanVariance();
     // Histograms
-    Histogram<Pair<Integer, Integer>> hist = Histogram.IntIntHistogram(numbin, gminmax.getFirst(), gminmax.getSecond());
+    ReplacingHistogram<Pair<Integer, Integer>> hist = ReplacingHistogram.IntIntHistogram(numbin, gminmax.getFirst(), gminmax.getSecond());
 
     // iterate per cluster
     for(Cluster<?> c1 : splitted) {

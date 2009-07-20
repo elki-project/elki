@@ -6,16 +6,16 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.math.FlexiHistogram;
-import de.lmu.ifi.dbs.elki.math.Histogram;
+import de.lmu.ifi.dbs.elki.math.ReplacingHistogram;
 import de.lmu.ifi.dbs.elki.test.JUnit4Test;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
- * JUnit test to test the {@link Histogram} class.
+ * JUnit test to test the {@link ReplacingHistogram} class.
  * @author Erich Schubert
  */
 public class TestFlexiHistogram implements JUnit4Test {
-  FlexiHistogram<Double> hist;
+  FlexiHistogram<Double, Double> hist;
 
   /**
    * Test that adds some data to the histogram and compares results. 

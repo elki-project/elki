@@ -12,16 +12,15 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  *
  * @param <T> Histogram data type.
  */
-// TODO: Add resizing strategy: when size >> 2*initial size, do a downsampling.
-public class Histogram<T> implements Iterable<Pair<Double, T>> {
+public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
   /**
-   * Interface to plug in constructors for type T.
+   * Interface to plug in a data type T.
    * 
    * @author Erich Schubert
    *
    * @param <T>
    */
-  public static abstract class Constructor<T> {
+  public static abstract class Adapter<T> {
     /**
      * Construct a new T when needed.
      * @return new T
@@ -63,7 +62,7 @@ public class Histogram<T> implements Iterable<Pair<Double, T>> {
   /**
    * Constructor for new elements
    */
-  private Constructor<T> maker;
+  private Adapter<T> maker;
 
   /**
    * Histogram constructor
@@ -73,7 +72,7 @@ public class Histogram<T> implements Iterable<Pair<Double, T>> {
    * @param max Maximum Value
    * @param maker Constructor for new elements.
    */
-  public Histogram(int bins, double min, double max, Constructor<T> maker) {
+  public ReplacingHistogram(int bins, double min, double max, Adapter<T> maker) {
     this.base = min;
     this.max = max;
     this.binsize = (max - min) / bins;
@@ -81,7 +80,7 @@ public class Histogram<T> implements Iterable<Pair<Double, T>> {
     this.data = new ArrayList<T>(bins);
     this.maker = maker;
     for (int i = 0; i < bins; i++) {
-      this.data.add(make());
+      this.data.add(maker.make());
     }
   }
 
@@ -93,22 +92,10 @@ public class Histogram<T> implements Iterable<Pair<Double, T>> {
    * @param min Minimum value
    * @param max Maximum value.
    */
-  public Histogram(int bins, double min, double max) {
+  public ReplacingHistogram(int bins, double min, double max) {
     this(bins, min, max, null);
   }
   
-  /**
-   * Call the constructor to produce a new element, if possible.
-   * 
-   * @return new element or null.
-   */
-  private T make() {
-    if (maker != null) {
-      return maker.make();
-    }
-    return null;
-  }
-
   /**
    * Get the data at a given Coordinate.
    * 
@@ -119,17 +106,11 @@ public class Histogram<T> implements Iterable<Pair<Double, T>> {
     int bin = getBinNr(coord);
     // compare with allocated area
     if(bin < 0) {
-      T n = make();
-      if (n != null) {
-        putBin(bin, n);
-      }
+      T n = maker.make();
       return n;
     }
     if(bin >= size) {
-      T n = make();
-      if (n != null) {
-        putBin(bin, n);
-      }
+      T n = maker.make();
       return n;
     }
     return data.get(bin);
@@ -142,7 +123,7 @@ public class Histogram<T> implements Iterable<Pair<Double, T>> {
    * @param coord
    * @param d
    */
-  public synchronized void put(double coord, T d) {
+  public void put(double coord, T d) {
     int bin = getBinNr(coord);
     putBin(bin, d);
   }
@@ -176,7 +157,7 @@ public class Histogram<T> implements Iterable<Pair<Double, T>> {
       data.add(0, d);
       // fill the gap. Note that bin < 0.
       for(int i = bin + 1; i < 0; i++) {
-        data.add(1, make());
+        data.add(1, maker.make());
       }
       // We still have bin < 0, thus (size - bin) > size!
       assert (data.size() == size - bin);
@@ -188,7 +169,7 @@ public class Histogram<T> implements Iterable<Pair<Double, T>> {
     else if(bin >= size) {
       this.data.ensureCapacity(bin + 1);
       while (data.size() < bin) {
-        data.add(make());
+        data.add(maker.make());
       }
       // add the new data.
       data.add(d);
@@ -202,6 +183,42 @@ public class Histogram<T> implements Iterable<Pair<Double, T>> {
     }
   }
   
+  /**
+   * Get the number of bins actually in use.
+   * 
+   * @return number of bins
+   */
+  public int getNumBins() {
+    return size;
+  }
+
+  /**
+   * Get the size (width) of a bin.
+   * 
+   * @return bin size
+   */
+  public double getBinsize() {
+    return binsize;
+  }
+
+  /**
+   * Get minimum (covered by bins, not data!)
+   * 
+   * @return minimum
+   */
+  public double getCoverMinimum() {
+    return base - offset * binsize;
+  }
+
+  /**
+   * Get maximum (covered by bins, not data!)
+   * 
+   * @return maximum
+   */
+  public double getCoverMaximum() {
+    return base + (size - offset) * binsize;
+  }
+
   /**
    * Get the raw data. Note that this does NOT include the coordinates.
    * 
@@ -257,8 +274,13 @@ public class Histogram<T> implements Iterable<Pair<Double, T>> {
    * @param max Maximum coordinate
    * @return New histogram for Integers.
    */
-  public static HistogramInteger IntHistogram(int bins, double min, double max) {
-    return new HistogramInteger(bins, min, max);
+  public static ReplacingHistogram<Integer> IntHistogram(int bins, double min, double max) {
+    return new ReplacingHistogram<Integer>(bins, min, max, new Adapter<Integer>() {
+      @Override
+      public Integer make() {
+        return new Integer(0);
+      }
+    });
   }
 
   /**
@@ -270,8 +292,8 @@ public class Histogram<T> implements Iterable<Pair<Double, T>> {
    * @param max Maximum coordinate
    * @return New histogram for Doubles.
    */
-  public static Histogram<Double> DoubleHistogram(int bins, double min, double max) {
-    return new Histogram<Double>(bins, min, max, new Constructor<Double>() {
+  public static ReplacingHistogram<Double> DoubleHistogram(int bins, double min, double max) {
+    return new ReplacingHistogram<Double>(bins, min, max, new Adapter<Double>() {
       @Override
       public Double make() {
         return new Double(0.0);
@@ -288,8 +310,8 @@ public class Histogram<T> implements Iterable<Pair<Double, T>> {
    * @param max Maximum coordinate
    * @return New histogram for Integer pairs.
    */
-  public static Histogram<Pair<Integer,Integer>> IntIntHistogram(int bins, double min, double max) {
-    return new Histogram<Pair<Integer,Integer>>(bins, min, max, new Constructor<Pair<Integer,Integer>>() {
+  public static ReplacingHistogram<Pair<Integer,Integer>> IntIntHistogram(int bins, double min, double max) {
+    return new ReplacingHistogram<Pair<Integer,Integer>>(bins, min, max, new Adapter<Pair<Integer,Integer>>() {
       @Override
       public Pair<Integer,Integer> make() {
         return new Pair<Integer,Integer>(0,0);
@@ -306,67 +328,12 @@ public class Histogram<T> implements Iterable<Pair<Double, T>> {
    * @param max Maximum coordinate
    * @return New histogram for Double pairs.
    */
-  public static Histogram<Pair<Double,Double>> DoubleDoubleHistogram(int bins, double min, double max) {
-    return new Histogram<Pair<Double,Double>>(bins, min, max, new Constructor<Pair<Double,Double>>() {
+  public static ReplacingHistogram<Pair<Double,Double>> DoubleDoubleHistogram(int bins, double min, double max) {
+    return new ReplacingHistogram<Pair<Double,Double>>(bins, min, max, new Adapter<Pair<Double,Double>>() {
       @Override
       public Pair<Double,Double> make() {
         return new Pair<Double,Double>(0.0,0.0);
       }
     });
   }
-
-  /**
-   * Convenience constructor for {@link MeanVariance}-based Histograms.
-   * Uses a constructor to initialize bins with new {@link MeanVariance} objects
-   * 
-   * @param bins Number of bins
-   * @param min Minimum coordinate
-   * @param max Maximum coordinate
-   * @return New histogram for {@link MeanVariance}.
-   */
-  public static Histogram<MeanVariance> MeanVarianceHistogram(int bins, double min, double max) {
-    return new Histogram<MeanVariance>(bins, min, max, new Constructor<MeanVariance>() {
-      @Override
-      public MeanVariance make() {
-        return new MeanVariance();
-      }
-    });
-  }
-
-  /**
-   * Get the number of bins actually in use.
-   * 
-   * @return number of bins
-   */
-  public int getNumBins() {
-    return size;
-  }
-
-  /**
-   * Get the size (width) of a bin.
-   * 
-   * @return bin size
-   */
-  public double getBinsize() {
-    return binsize;
-  }
-  
-  /**
-   * Get minimum (covered by bins, not data!)
-   * 
-   * @return minimum
-   */
-  public double getCoverMinimum() {
-    return base - offset * binsize;
-  }
-
-  /**
-   * Get maximum (covered by bins, not data!)
-   * 
-   * @return maximum
-   */
-  public double getCoverMaximum() {
-    return base + (size - offset) * binsize;
-  }
-
 }

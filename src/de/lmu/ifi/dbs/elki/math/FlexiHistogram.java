@@ -12,11 +12,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @param <T>
  */
-public class FlexiHistogram<T> extends Histogram<T> {
+public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
   /**
    * Adapter class, extended "maker".
    */
-  private Adapter<T> maker;
+  private Adapter<T,D> maker;
 
   /**
    * Cache for elements when not yet initialized.
@@ -36,7 +36,7 @@ public class FlexiHistogram<T> extends Histogram<T> {
    * 
    * @param <T>
    */
-  public static abstract class Adapter<T> extends Constructor<T> {
+  public static abstract class Adapter<T,D> extends AggregatingHistogram.Adapter<T,D> {
     /**
      * Rule to combine two bins into one.
      * 
@@ -66,7 +66,7 @@ public class FlexiHistogram<T> extends Histogram<T> {
    * @param bins Target number of bins
    * @param maker Adapter for data types and combination rules.
    */
-  public FlexiHistogram(int bins, Adapter<T> maker) {
+  public FlexiHistogram(int bins, Adapter<T,D> maker) {
     super(bins, 0.0, 1.0, maker);
     this.destsize = bins;
     this.maker = maker;
@@ -187,6 +187,12 @@ public class FlexiHistogram<T> extends Histogram<T> {
     return super.iterator();
   }
 
+  @Override
+  public void add(double coord, D value) {
+    materialize();
+    super.add(coord, value);
+  }
+
   /**
    * Convenience constructor for Integer-based Histograms. Uses a constructor to
    * initialize bins with Integer(0)
@@ -196,8 +202,8 @@ public class FlexiHistogram<T> extends Histogram<T> {
    * @param max Maximum coordinate
    * @return New histogram for Integer.
    */
-  public static FlexiHistogram<Integer> IntegerHistogram(int bins) {
-    return new FlexiHistogram<Integer>(bins, new Adapter<Integer>() {
+  public static FlexiHistogram<Integer, Integer> IntegerSumHistogram(int bins) {
+    return new FlexiHistogram<Integer, Integer>(bins, new Adapter<Integer, Integer>() {
       @Override
       public Integer make() {
         return new Integer(0);
@@ -213,6 +219,11 @@ public class FlexiHistogram<T> extends Histogram<T> {
       public Integer combine(Integer first, Integer second) {
         return first + second;
       }
+
+      @Override
+      public Integer add(Integer existing, Integer data) {
+        return existing + data;
+      }
     });
   }
 
@@ -225,8 +236,8 @@ public class FlexiHistogram<T> extends Histogram<T> {
    * @param max Maximum coordinate
    * @return New histogram for Doubles.
    */
-  public static FlexiHistogram<Double> DoubleSumHistogram(int bins) {
-    return new FlexiHistogram<Double>(bins, new Adapter<Double>() {
+  public static FlexiHistogram<Double, Double> DoubleSumHistogram(int bins) {
+    return new FlexiHistogram<Double, Double>(bins, new Adapter<Double, Double>() {
       @Override
       public Double make() {
         return new Double(0.0);
@@ -242,34 +253,10 @@ public class FlexiHistogram<T> extends Histogram<T> {
       public Double combine(Double first, Double second) {
         return first + second;
       }
-    });
-  }
-
-  /**
-   * Convenience constructor for Double-based Histograms. Uses a constructor to
-   * initialize bins with Double(0), and downsampling is done by averaging.
-   * 
-   * @param bins Number of bins
-   * @param min Minimum coordinate
-   * @param max Maximum coordinate
-   * @return New histogram for Doubles.
-   */
-  public static FlexiHistogram<Double> DoubleMeanHistogram(int bins) {
-    return new FlexiHistogram<Double>(bins, new Adapter<Double>() {
-      @Override
-      public Double make() {
-        return new Double(0.0);
-      }
 
       @Override
-      public Double cloneForCache(Double data) {
-        // no need to clone, Doubles are singletons
-        return data;
-      }
-
-      @Override
-      public Double combine(Double first, Double second) {
-        return (first + second) / 2;
+      public Double add(Double existing, Double data) {
+        return existing + data;
       }
     });
   }
@@ -283,8 +270,8 @@ public class FlexiHistogram<T> extends Histogram<T> {
    * @param max Maximum coordinate
    * @return New histogram for {@link MeanVariance}.
    */
-  public static FlexiHistogram<MeanVariance> MeanVarianceHistogram(int bins) {
-    return new FlexiHistogram<MeanVariance>(bins, new Adapter<MeanVariance>() {
+  public static FlexiHistogram<MeanVariance, Double> MeanVarianceHistogram(int bins) {
+    return new FlexiHistogram<MeanVariance, Double>(bins, new Adapter<MeanVariance, Double>() {
       @Override
       public MeanVariance make() {
         return new MeanVariance();
@@ -299,6 +286,12 @@ public class FlexiHistogram<T> extends Histogram<T> {
       public MeanVariance combine(MeanVariance first, MeanVariance second) {
         first.put(second);
         return first;
+      }
+
+      @Override
+      public MeanVariance add(MeanVariance existing, Double data) {
+        existing.put(data);
+        return existing;
       }
     });
   }
