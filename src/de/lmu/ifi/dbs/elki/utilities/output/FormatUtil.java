@@ -220,6 +220,39 @@ public final class FormatUtil {
   }
 
   /**
+   * Formats the Double array f with the specified separator and the specified
+   * fraction digits.
+   * 
+   * @param f the Double array to be formatted
+   * @param sep the separator between the single values of the Double array, e.g.
+   *        ','
+   * @param digits the number of fraction digits
+   * @return a String representing the Double array f
+   */
+  public static String format(Double[] f, String sep, int digits) {
+    StringBuffer buffer = new StringBuffer();
+    for(int i = 0; i < f.length; i++) {
+      if(i < f.length - 1) {
+        buffer.append(format(f[i], digits)).append(sep);
+      }
+      else {
+        buffer.append(format(f[i], digits));
+      }
+    }
+    return buffer.toString();
+  }
+
+  /**
+   * Formats the Double array f with ',' as separator and 2 fraction digits.
+   * 
+   * @param f the Double array to be formatted
+   * @return a String representing the Double array f
+   */
+  public static String format(Double[] f) {
+    return format(f, ", ", 2);
+  }
+
+  /**
    * Formats the float array f with the specified separator and the specified
    * fraction digits.
    * 
