@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
-import de.lmu.ifi.dbs.elki.math.Histogram;
+import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -68,7 +68,7 @@ public class RankingQualityHistogram<V extends RealVector<V, ?>, D extends Numbe
     ByLabelClustering<V> split = new ByLabelClustering<V>();
     Set<Cluster<Model>> splitted = split.run(database).getAllClusters();
 
-    Histogram<Double> hist = Histogram.DoubleHistogram(100, 0.0, 1.0);
+    AggregatingHistogram<Double, Double> hist = AggregatingHistogram.DoubleSumHistogram(100, 0.0, 1.0);
 
     if(logger.isVerbose()) {
       logger.verbose("Processing points...");
@@ -82,7 +82,7 @@ public class RankingQualityHistogram<V extends RealVector<V, ?>, D extends Numbe
         List<DistanceResultPair<D>> knn = database.kNNQueryForID(i1, size, distFunc);
         double result = ROC.computeROCAUCDistanceResult(size, clus, knn);
 
-        hist.put(result, hist.get(result) + 1. / size);
+        hist.add(result, 1. / size);
 
         if(logger.isVerbose()) {
           rocproc++;

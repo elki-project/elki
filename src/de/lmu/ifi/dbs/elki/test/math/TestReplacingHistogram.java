@@ -5,16 +5,16 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.math.Histogram;
+import de.lmu.ifi.dbs.elki.math.ReplacingHistogram;
 import de.lmu.ifi.dbs.elki.test.JUnit4Test;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
- * JUnit test to test the {@link Histogram} class.
+ * JUnit test to test the {@link ReplacingHistogram} class.
  * @author Erich Schubert
  */
-public class TestHistogram implements JUnit4Test {
-  Histogram<Double> hist;
+public class TestReplacingHistogram implements JUnit4Test {
+  ReplacingHistogram<Double> hist;
 
   /**
    * Test that adds some data to the histogram and compares results. 
@@ -25,7 +25,7 @@ public class TestHistogram implements JUnit4Test {
     Double[] filled = { 0.0, 1.23, 4.56, 7.89, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
     Double[] changed = { 0.0, 1.35, 8.01, 14.67, 9.01, 2.34, 0.0, 0.0, 0.0, 0.0 };
     Double[] resized = { -1.23, 0.0, 0.0, 1.35, 8.01, 14.67, 9.01, 2.34, 0.0, 0.0, 0.0, 0.0, 0.0, -4.56 };
-    hist = Histogram.DoubleHistogram(10, 0.0, 1.0);
+    hist = ReplacingHistogram.DoubleHistogram(10, 0.0, 1.0);
     assertArrayEquals("Empty histogram doesn't match", initial, hist.getData().toArray(new Double[0]));
     hist.put(0.15, 1.23);
     hist.put(0.25, 4.56);
