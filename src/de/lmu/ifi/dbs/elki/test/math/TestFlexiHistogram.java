@@ -27,20 +27,20 @@ public class TestFlexiHistogram implements JUnit4Test {
     Double[] resized = { -1.23, 1.35, 22.68, 11.35, 0.0, 0.0, -4.56 };
     Double[] expanded = { 1., 0.0, 0.0, 0.0, 0.0, 0.0, 29.59 };
     hist = FlexiHistogram.DoubleSumHistogram(5);
-    hist.put(0.0, 0.0);
-    hist.put(0.5, 0.0);
-    hist.put(0.15, 1.23);
-    hist.put(0.25, 4.56);
-    hist.put(0.35, 7.89);
+    hist.aggregate(0.0, 0.0);
+    hist.aggregate(0.5, 0.0);
+    hist.aggregate(0.15, 1.23);
+    hist.aggregate(0.25, 4.56);
+    hist.aggregate(0.35, 7.89);
     assertArrayEquals("Filled histogram doesn't match", filled, hist.getData().toArray(new Double[0]));
-    hist.put(0.15, 0.12 + hist.get(0.15));
-    hist.put(0.25, 3.45 + hist.get(0.25));
-    hist.put(0.35, 6.78 + hist.get(0.35));
-    hist.put(0.45, 9.01 + hist.get(0.45));
-    hist.put(0.55, 2.34 + hist.get(0.55));
+    hist.aggregate(0.15, 0.12 + hist.get(0.15));
+    hist.aggregate(0.25, 3.45 + hist.get(0.25));
+    hist.aggregate(0.35, 6.78 + hist.get(0.35));
+    hist.aggregate(0.45, 9.01 + hist.get(0.45));
+    hist.aggregate(0.55, 2.34 + hist.get(0.55));
     assertArrayEquals("Changed histogram doesn't match", changed, hist.getData().toArray(new Double[0]));
-    hist.put(-.13, -1.23 + hist.get(-.13));
-    hist.put(1.13, -4.56 + hist.get(1.13));
+    hist.aggregate(-.13, -1.23 + hist.get(-.13));
+    hist.aggregate(1.13, -4.56 + hist.get(1.13));
     assertArrayEquals("Resized histogram doesn't match", resized, hist.getData().toArray(new Double[0]));
     
     // compare results via Iterator.
@@ -52,7 +52,7 @@ public class TestFlexiHistogram implements JUnit4Test {
     }
     
     // totally break out of the data range
-    hist.put(-10., 1.);
+    hist.aggregate(-10., 1.);
     assertArrayEquals("Expanded histogram doesn't match", expanded, hist.getData().toArray(new Double[0]));
   }
 }

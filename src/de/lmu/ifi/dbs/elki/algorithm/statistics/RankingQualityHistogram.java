@@ -82,7 +82,7 @@ public class RankingQualityHistogram<V extends RealVector<V, ?>, D extends Numbe
         List<DistanceResultPair<D>> knn = database.kNNQueryForID(i1, size, distFunc);
         double result = ROC.computeROCAUCDistanceResult(size, clus, knn);
 
-        hist.add(result, 1. / size);
+        hist.aggregate(result, 1. / size);
 
         if(logger.isVerbose()) {
           rocproc++;
