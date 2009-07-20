@@ -148,6 +148,8 @@ public class PreDeConPreprocessor<D extends Distance<D>, V extends RealVector<V,
   public List<String> setParameters(List<String> args) throws ParameterException {
     List<String> remainingParameters = super.setParameters(args);
     delta = DELTA_PARAM.getValue();
+    
+    rememberParametersExcept(args, remainingParameters);
     return remainingParameters;
   }
 
