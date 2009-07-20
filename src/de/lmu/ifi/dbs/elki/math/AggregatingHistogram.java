@@ -1,25 +1,65 @@
 package de.lmu.ifi.dbs.elki.math;
 
-
+/**
+ * Class for the typical case of an aggregating (e.g. counting, averaging)
+ * Histogram.
+ * 
+ * @author Erich Schubert
+ * 
+ * @param <T> Type of data in histogram
+ * @param <D> Type of input data
+ */
 public class AggregatingHistogram<T, D> extends ReplacingHistogram<T> {
+  /**
+   * The class we are using for putting data.
+   */
   private Adapter<T, D> putter;
 
+  /**
+   * Adapter class for an AggregatingHistogram
+   * 
+   * @author Erich Schubert
+   *
+   * @param <T> Histogram bin type
+   * @param <D> Incoming data type
+   */
   public static abstract class Adapter<T, D> extends ReplacingHistogram.Adapter<T> {
-    public abstract T add(T existing, D data);
+    /**
+     * Update an existing histogram value with new data.
+     * 
+     * @param existing Existing histogram data
+     * @param data New value
+     * @return Aggregated value
+     */
+    public abstract T aggregate(T existing, D data);
   }
 
+  /**
+   * Constructor with Adapter. 
+   * 
+   * @param bins Number of bins
+   * @param min Minimum value
+   * @param max Maximum value
+   * @param adapter Adapter
+   */
   public AggregatingHistogram(int bins, double min, double max, Adapter<T, D> adapter) {
     super(bins, min, max, adapter);
     this.putter = adapter;
   }
-  
-  public void add(double coord, D value) {
-    super.replace(coord, putter.add(super.get(coord), value));
+
+  /**
+   * Add a value to the histogram using the aggregation adapter.
+   * 
+   * @param coord Coordinate
+   * @param value New value
+   */
+  public void aggregate(double coord, D value) {
+    super.replace(coord, putter.aggregate(super.get(coord), value));
   }
 
   /**
-   * Convenience constructor for {@link MeanVariance}-based Histograms.
-   * Uses a constructor to initialize bins with new {@link MeanVariance} objects
+   * Convenience constructor for {@link MeanVariance}-based Histograms. Uses a
+   * constructor to initialize bins with new {@link MeanVariance} objects
    * 
    * @param bins Number of bins
    * @param min Minimum coordinate
@@ -34,17 +74,16 @@ public class AggregatingHistogram<T, D> extends ReplacingHistogram<T> {
       }
 
       @Override
-      public MeanVariance add(MeanVariance existing, Double data) {
+      public MeanVariance aggregate(MeanVariance existing, Double data) {
         existing.put(data);
         return existing;
       }
     });
   }
-  
+
   /**
-   * Convenience constructor for Integer-based Histograms.
-   * Uses a constructor to initialize bins with Integer(0).
-   * Aggregation is done by adding the values
+   * Convenience constructor for Integer-based Histograms. Uses a constructor to
+   * initialize bins with Integer(0). Aggregation is done by adding the values
    * 
    * @param bins Number of bins
    * @param min Minimum coordinate
@@ -59,16 +98,15 @@ public class AggregatingHistogram<T, D> extends ReplacingHistogram<T> {
       }
 
       @Override
-      public Integer add(Integer existing, Integer data) {
+      public Integer aggregate(Integer existing, Integer data) {
         return existing + data;
       }
     });
   }
-  
+
   /**
-   * Convenience constructor for Integer-based Histograms.
-   * Uses a constructor to initialize bins with Double(0.0).
-   * Aggregation is done by adding the values
+   * Convenience constructor for Integer-based Histograms. Uses a constructor to
+   * initialize bins with Double(0.0). Aggregation is done by adding the values
    * 
    * @param bins Number of bins
    * @param min Minimum coordinate
@@ -83,7 +121,7 @@ public class AggregatingHistogram<T, D> extends ReplacingHistogram<T> {
       }
 
       @Override
-      public Double add(Double existing, Double data) {
+      public Double aggregate(Double existing, Double data) {
         return existing + data;
       }
     });

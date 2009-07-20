@@ -16,7 +16,7 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
   /**
    * Adapter class, extended "maker".
    */
-  private Adapter<T,D> maker;
+  private Adapter<T,D> downsampler;
 
   /**
    * Cache for elements when not yet initialized.
@@ -46,7 +46,7 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
      * @param second Second bin value
      * @return combined bin value
      */
-    public abstract T combine(T first, T second);
+    public abstract T downsample(T first, T second);
 
     /**
      * Clone a data passed to the algorithm for computing the initial size.
@@ -64,12 +64,12 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
    * {@code 2*bins} bins in length.
    * 
    * @param bins Target number of bins
-   * @param maker Adapter for data types and combination rules.
+   * @param adapter Adapter for data types and combination rules.
    */
-  public FlexiHistogram(int bins, Adapter<T,D> maker) {
-    super(bins, 0.0, 1.0, maker);
+  public FlexiHistogram(int bins, Adapter<T,D> adapter) {
+    super(bins, 0.0, 1.0, adapter);
     this.destsize = bins;
-    this.maker = maker;
+    this.downsampler = adapter;
     tempcache = new ArrayList<Pair<Double, T>>(this.destsize * 2);
   }
 
@@ -97,7 +97,7 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
     // initialize array
     this.data = new ArrayList<T>(this.destsize * 2);
     for(int i = 0; i < this.destsize; i++) {
-      this.data.add(maker.make());
+      this.data.add(downsampler.make());
     }
     // re-insert data we have
     for(Pair<Double, T> pair : tempcache) {
@@ -111,7 +111,7 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
   public synchronized void replace(double coord, T d) {
     if(tempcache != null) {
       if(tempcache.size() < this.destsize * 2) {
-        tempcache.add(new Pair<Double, T>(coord, maker.cloneForCache(d)));
+        tempcache.add(new Pair<Double, T>(coord, downsampler.cloneForCache(d)));
         return;
       }
       else {
@@ -130,7 +130,7 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
       // Resampling.
       ArrayList<T> newdata = new ArrayList<T>(this.destsize * 2);
       for(int i = 0; i < super.size; i += 2) {
-        newdata.add(maker.combine(super.data.get(i), super.data.get(i + 1)));
+        newdata.add(downsampler.downsample(super.data.get(i), super.data.get(i + 1)));
       }
       // recalculate histogram base.
       double base = super.base - super.offset * super.binsize;
@@ -188,9 +188,9 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
   }
 
   @Override
-  public void add(double coord, D value) {
+  public void aggregate(double coord, D value) {
     materialize();
-    super.add(coord, value);
+    super.aggregate(coord, value);
   }
 
   /**
@@ -216,12 +216,12 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
       }
 
       @Override
-      public Integer combine(Integer first, Integer second) {
+      public Integer downsample(Integer first, Integer second) {
         return first + second;
       }
 
       @Override
-      public Integer add(Integer existing, Integer data) {
+      public Integer aggregate(Integer existing, Integer data) {
         return existing + data;
       }
     });
@@ -250,12 +250,12 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
       }
 
       @Override
-      public Double combine(Double first, Double second) {
+      public Double downsample(Double first, Double second) {
         return first + second;
       }
 
       @Override
-      public Double add(Double existing, Double data) {
+      public Double aggregate(Double existing, Double data) {
         return existing + data;
       }
     });
@@ -283,13 +283,13 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
       }
 
       @Override
-      public MeanVariance combine(MeanVariance first, MeanVariance second) {
+      public MeanVariance downsample(MeanVariance first, MeanVariance second) {
         first.put(second);
         return first;
       }
 
       @Override
-      public MeanVariance add(MeanVariance existing, Double data) {
+      public MeanVariance aggregate(MeanVariance existing, Double data) {
         existing.put(data);
         return existing;
       }
