@@ -45,7 +45,7 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
      * <p>Default value: 1</p>
      * <p>Key: {@code sharedNearestNeighbors}</p>
      */
-    private static final IntParameter NUMBER_OF_NEIGHBORS_PARAM = new IntParameter(NUMBER_OF_NEIGHBORS_ID, new GreaterEqualConstraint(1), 1);
+    private final IntParameter NUMBER_OF_NEIGHBORS_PARAM = new IntParameter(NUMBER_OF_NEIGHBORS_ID, new GreaterEqualConstraint(1), 1);
 
     /**
      * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
@@ -60,7 +60,7 @@ public class SharedNearestNeighborsPreprocessor<O extends DatabaseObject, D exte
      * <p>Default value: {@link EuclideanDistanceFunction}</p>
      * <p>Key: {@code SNNDistanceFunction}</p>
      */
-    public final ClassParameter<DistanceFunction<O,D>> DISTANCE_FUNCTION_PARAM =
+    private final ClassParameter<DistanceFunction<O,D>> DISTANCE_FUNCTION_PARAM =
       new ClassParameter<DistanceFunction<O,D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class,
         EuclideanDistanceFunction.class.getName());
 

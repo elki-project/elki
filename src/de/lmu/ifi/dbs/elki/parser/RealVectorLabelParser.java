@@ -32,14 +32,10 @@ import java.util.List;
  * @param <V> the type of RealVector expected in the {@link ParsingResult}
  */
 public abstract class RealVectorLabelParser<V extends RealVector<?, ?>> extends AbstractParser<V> implements LinebasedParser<V> {
-  
-
   /**
    * OptionID for {@link #CLASS_LABEL_INDEX_PARAM}
    */
   private static final OptionID CLASS_LABEL_INDEX_ID = OptionID.getOrCreateOptionID("parser.classLabelIndex", "Index of a class label (may be numeric), " + "counting whitespace separated entries in a line starting with 0 - " + "the corresponding entry will be treated as a label. ");
-
-  
 
   /**
    * The parameter for an index of a numerical class label. The corresponding
@@ -51,7 +47,7 @@ public abstract class RealVectorLabelParser<V extends RealVector<?, ?>> extends 
    * <p/>
    * The parameter is optional and the default value is set to -1.
    */
-  public static final IntParameter CLASS_LABEL_INDEX_PARAM = new IntParameter(CLASS_LABEL_INDEX_ID, null, -1);
+  private final IntParameter CLASS_LABEL_INDEX_PARAM = new IntParameter(CLASS_LABEL_INDEX_ID, null, -1);
 
   /**
    * Keeps the index of an attribute to be treated as a string label.
