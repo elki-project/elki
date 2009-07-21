@@ -43,7 +43,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
    * Key: {@code -epsilon}
    * </p>
    */
-  public static final PatternParameter EPSILON_PARAM = new PatternParameter(DBSCAN.EPSILON_ID, "the maximum radius of the neighborhood " + "to be considered, must be suitable to " + LocallyWeightedDistanceFunction.class.getName());
+  public final PatternParameter EPSILON_PARAM = new PatternParameter(DBSCAN.EPSILON_ID, "the maximum radius of the neighborhood " + "to be considered, must be suitable to " + LocallyWeightedDistanceFunction.class.getName());
 
   /**
    * Parameter to specify the threshold for minimum number of points in the
