@@ -99,7 +99,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
             ids.add(id2);
           }
           catch(IllegalArgumentException e) {
-            throw new IllegalArgumentException("Error in line " + lineNumber + ":" + e.getMessage());
+            throw new IllegalArgumentException("Error in line " + lineNumber + ":" + e.getMessage(), e);
           }
         }
       }

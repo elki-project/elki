@@ -130,7 +130,6 @@ public class OnDiskArrayPageFile<P extends Page<P>> extends PageFile<P> {
 
     }
     catch(IOException e) {
-      e.fillInStackTrace();
       throw new RuntimeException("IOException occurred during reading of page " + pageID, e);
     }
   }
@@ -153,7 +152,6 @@ public class OnDiskArrayPageFile<P extends Page<P>> extends PageFile<P> {
       file.writeRecord(pageID, array);
     }
     catch(IOException e) {
-      e.fillInStackTrace();
       throw new RuntimeException(e);
     }
   }
@@ -173,7 +171,6 @@ public class OnDiskArrayPageFile<P extends Page<P>> extends PageFile<P> {
         file.writeRecord(page.getID(), array);
       }
       catch(IOException e) {
-        e.fillInStackTrace();
         throw new RuntimeException(e);
       }
     }
@@ -189,7 +186,6 @@ public class OnDiskArrayPageFile<P extends Page<P>> extends PageFile<P> {
       file.close();
     }
     catch(IOException e) {
-      e.fillInStackTrace();
       throw new RuntimeException(e);
     }
   }
@@ -204,7 +200,6 @@ public class OnDiskArrayPageFile<P extends Page<P>> extends PageFile<P> {
       file.resizeFile(0);
     }
     catch(IOException e) {
-      e.fillInStackTrace();
       throw new RuntimeException(e);
     }
   }

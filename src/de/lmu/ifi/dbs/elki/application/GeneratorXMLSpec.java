@@ -568,10 +568,10 @@ public class GeneratorXMLSpec extends StandAloneApplication {
       outStream.close();
     }
     catch(FileNotFoundException e) {
-      throw new UnableToComplyException(e.getMessage(), e);
+      throw new UnableToComplyException(e);
     }
     catch(IOException e) {
-      throw new UnableToComplyException(e.getMessage(), e);
+      throw new UnableToComplyException(e);
     }
     if(logger.isVerbose())
       logger.verbose("Done.");

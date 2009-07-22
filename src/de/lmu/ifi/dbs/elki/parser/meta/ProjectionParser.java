@@ -79,7 +79,7 @@ public abstract class ProjectionParser<V extends RealVector<V,?>> extends MetaPa
       this.SELECTED_ATTRIBUTES_PARAM.setValue(Util.parseSelectedBits(selectedAttributes, ","));
     }
     catch(ParameterException e) {
-      exception(e.getMessage(),e);
+      logger.exception(e);
     }
     this.selectedAttributes.clear();
     this.selectedAttributes.or(selectedAttributes);

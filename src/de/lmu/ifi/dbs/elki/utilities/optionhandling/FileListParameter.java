@@ -66,15 +66,13 @@ public class FileListParameter extends ListParameter<File> {
                 File file = new File(f);
                 try {
                     if (!file.exists()) {
-
                         throw new WrongParameterValueException("Given file " + file.getPath() + " for parameter \"" + getName()
                             + "\" does not exist!\n");
                     }
                 }
 
                 catch (SecurityException e) {
-                    throw new WrongParameterValueException("Given file \"" + file.getPath() + "\" cannot be read, access denied!\n"
-                        + e.getMessage());
+                    throw new WrongParameterValueException("Given file \"" + file.getPath() + "\" cannot be read, access denied!", e);
                 }
             }
         }

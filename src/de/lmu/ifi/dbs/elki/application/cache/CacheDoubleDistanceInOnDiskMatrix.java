@@ -122,7 +122,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject, N exten
       matrix = new OnDiskUpperTriangleMatrix(out, DiskCacheBasedDoubleDistanceFunction.DOUBLE_CACHE_MAGIC, 0, 8, matrixsize);
     }
     catch(IOException e) {
-      throw new AbortException("Error creating output matrix: " + e.getMessage(), e);
+      throw new AbortException("Error creating output matrix.", e);
     }
 
     for(Integer id1 : database) {
@@ -148,7 +148,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject, N exten
             }
           }
           catch(IOException e) {
-            throw new AbortException("Error writing distance record " + id1 + "," + id2 + " to matrix: " + e.getMessage(), e);
+            throw new AbortException("Error writing distance record " + id1 + "," + id2 + " to matrix.", e);
           }
         }
       }
