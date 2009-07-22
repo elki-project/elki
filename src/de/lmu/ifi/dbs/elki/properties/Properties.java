@@ -45,13 +45,13 @@ public final class Properties {
    * Stores the properties as defined by a property-file.
    */
   private final java.util.Properties properties;
-
+  
   /**
    * Provides the properties as defined in the designated file.
    * 
    * @param filename name of a file to provide property-definitions.
    */
-  private Properties(String filename) {
+  public Properties(String filename) {
     LoggingConfiguration.assertConfigured();
     this.properties = new java.util.Properties();
     InputStream stream = null;

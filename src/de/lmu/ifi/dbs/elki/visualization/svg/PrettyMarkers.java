@@ -4,7 +4,7 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
-import de.lmu.ifi.dbs.elki.visualization.colors.PublicationColorLibrary;
+import de.lmu.ifi.dbs.elki.visualization.colors.PropertiesBasedColorLibrary;
 
 /**
  * Marker library achieving a larger number of styles by combining different
@@ -55,7 +55,7 @@ public class PrettyMarkers implements MarkerLibrary {
    * @param prefix prefix to use.
    */
   public PrettyMarkers(String prefix) {
-    this(prefix, new PublicationColorLibrary());
+    this(prefix, new PropertiesBasedColorLibrary());
   }
 
   /**
@@ -63,7 +63,7 @@ public class PrettyMarkers implements MarkerLibrary {
    * and a {@link PublicationColorLibrary} as color library.
    */
   public PrettyMarkers() {
-    this(DEFAULT_PREFIX, new PublicationColorLibrary());
+    this(DEFAULT_PREFIX, new PropertiesBasedColorLibrary());
   }
 
   /**

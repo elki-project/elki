@@ -3,8 +3,7 @@ package de.lmu.ifi.dbs.elki.visualization.svg;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
-import de.lmu.ifi.dbs.elki.visualization.colors.PublicationColorLibrary;
-
+import de.lmu.ifi.dbs.elki.visualization.colors.PropertiesBasedColorLibrary;
 
 /**
  * Simple marker library that just draws colored crosses at the given coordinates.
@@ -30,7 +29,7 @@ public class MinimalMarkers implements MarkerLibrary {
    * Constructor
    */
   public MinimalMarkers() {
-    this(new PublicationColorLibrary());
+    this(new PropertiesBasedColorLibrary());
   }
 
   /**
