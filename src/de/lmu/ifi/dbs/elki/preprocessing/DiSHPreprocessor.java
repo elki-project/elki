@@ -219,10 +219,10 @@ public class DiSHPreprocessor<V extends RealVector<V, N>, N extends Number> exte
       }
     }
     catch(ParameterException e) {
-      throw new IllegalStateException(e.getMessage(), e);
+      throw new IllegalStateException(e);
     }
     catch(UnableToComplyException e) {
-      throw new IllegalStateException(e.getMessage(), e);
+      throw new IllegalStateException(e);
     }
 
   }

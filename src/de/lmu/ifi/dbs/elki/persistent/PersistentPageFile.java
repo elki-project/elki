@@ -141,8 +141,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
 
     }
     catch(IOException e) {
-      e.fillInStackTrace();
-      throw new RuntimeException("IOException occurred during reading of page " + pageID + "\n" + e);
+      throw new RuntimeException("IOException occurred during reading of page " + pageID + "\n", e);
     }
   }
 
@@ -166,7 +165,6 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
       file.write(array);
     }
     catch(IOException e) {
-      e.fillInStackTrace();
       throw new RuntimeException(e);
     }
   }
@@ -188,7 +186,6 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
         file.write(array);
       }
       catch(IOException e) {
-        e.fillInStackTrace();
         throw new RuntimeException(e);
       }
     }
@@ -204,7 +201,6 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
       file.close();
     }
     catch(IOException e) {
-      e.fillInStackTrace();
       throw new RuntimeException(e);
     }
   }
@@ -219,7 +215,6 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
       file.setLength(header.size());
     }
     catch(IOException e) {
-      e.fillInStackTrace();
       throw new RuntimeException(e);
     }
   }

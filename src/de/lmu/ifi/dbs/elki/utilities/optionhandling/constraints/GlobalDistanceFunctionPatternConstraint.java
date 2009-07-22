@@ -64,8 +64,7 @@ public class GlobalDistanceFunctionPatternConstraint<D extends DistanceFunction<
         catch (IllegalArgumentException e) {
             throw new WrongParameterValueException("Global parameter constraint error.\n" +
                 "Pattern parameter " + pattern.getName() + " is no valid pattern for " +
-                "distance function " + restrictionClass.getValue() + ".\n" +
-                e.getMessage());
+                "distance function " + restrictionClass.getValue() + ".", e);
         }
         catch (UnableToComplyException e) {
             throw new WrongParameterValueException("Global Parameter Constraint Error.\n" +

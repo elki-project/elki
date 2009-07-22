@@ -103,9 +103,7 @@ public class KNNClassifier<O extends DatabaseObject, D extends Distance<D>, L ex
             return distribution;
         }
         catch (NullPointerException e) {
-            IllegalArgumentException iae = new IllegalArgumentException(e);
-            iae.fillInStackTrace();
-            throw iae;
+            throw new IllegalArgumentException(e);
         }
     }
 

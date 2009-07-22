@@ -60,16 +60,16 @@ public final class ClassGenericsUtil {
       }
     }
     catch(InstantiationException e) {
-      throw new UnableToComplyException("InstantiationException: " + e.getMessage(), e);
+      throw new UnableToComplyException(e);
     }
     catch(IllegalAccessException e) {
-      throw new UnableToComplyException("IllegalAccessException: " + e.getMessage(), e);
+      throw new UnableToComplyException(e);
     }
     catch(ClassNotFoundException e) {
-      throw new UnableToComplyException("ClassNotFoundException: " + e.getMessage(), e);
+      throw new UnableToComplyException(e);
     }
     catch(ClassCastException e) {
-      throw new UnableToComplyException("ClassCastException: " + e.getMessage(), e);
+      throw new UnableToComplyException(e);
     }
     return instance;
   }
@@ -111,16 +111,16 @@ public final class ClassGenericsUtil {
       }
     }
     catch(InstantiationException e) {
-      throw new UnableToComplyException("InstantiationException: " + e.getMessage(), e);
+      throw new UnableToComplyException(e);
     }
     catch(IllegalAccessException e) {
-      throw new UnableToComplyException("IllegalAccessException: " + e.getMessage(), e);
+      throw new UnableToComplyException(e);
     }
     catch(ClassNotFoundException e) {
-      throw new UnableToComplyException("ClassNotFoundException: " + e.getMessage(), e);
+      throw new UnableToComplyException(e);
     }
     catch(ClassCastException e) {
-      throw new UnableToComplyException("ClassCastException: " + e.getMessage(), e);
+      throw new UnableToComplyException(e);
     }
     return instance;
   }

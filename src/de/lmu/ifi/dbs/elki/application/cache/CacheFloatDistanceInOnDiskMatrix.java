@@ -127,7 +127,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, N extend
       matrix = new OnDiskUpperTriangleMatrix(out, DiskCacheBasedFloatDistanceFunction.FLOAT_CACHE_MAGIC, 0, FLOAT_SIZE, matrixsize);
     }
     catch(IOException e) {
-      throw new AbortException("Error creating output matrix: " + e.getMessage(), e);
+      throw new AbortException("Error creating output matrix.", e);
     }
 
     for(Integer id1 : database) {
@@ -153,7 +153,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, N extend
             }
           }
           catch(IOException e) {
-            throw new AbortException("Error writing distance record " + id1 + "," + id2 + " to matrix: " + e.getMessage(), e);
+            throw new AbortException("Error writing distance record " + id1 + "," + id2 + " to matrix.", e);
           }
         }
       }

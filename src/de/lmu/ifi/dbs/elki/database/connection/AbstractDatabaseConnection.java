@@ -236,8 +236,9 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
       StringBuffer label = new StringBuffer();
       for(int i = 0; i < labels.size(); i++) {
         String l = labels.get(i).trim();
-        if(l.length() == 0)
+        if(l.length() == 0) {
           continue;
+        }
 
         if(classLabelIndex != null && i == classLabelIndex) {
           classLabel = l;
@@ -257,8 +258,9 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
       }
 
       Associations associationMap = new Associations();
-      if(label.length() != 0)
+      if(label.length() != 0) {
         associationMap.put(AssociationID.LABEL, label.toString());
+      }
 
       if(classLabel != null) {
         try {
@@ -268,17 +270,14 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
         }
         catch(InstantiationException e) {
           IllegalStateException ise = new IllegalStateException(e);
-          ise.fillInStackTrace();
           throw ise;
         }
         catch(IllegalAccessException e) {
           IllegalStateException ise = new IllegalStateException(e);
-          ise.fillInStackTrace();
           throw ise;
         }
         catch(ClassNotFoundException e) {
           IllegalStateException ise = new IllegalStateException(e);
-          ise.fillInStackTrace();
           throw ise;
         }
       }

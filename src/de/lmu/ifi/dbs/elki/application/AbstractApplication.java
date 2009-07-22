@@ -6,7 +6,6 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
@@ -251,7 +250,7 @@ public abstract class AbstractApplication extends AbstractParameterizable {
       logger.error(e.getMessage());
     }
     else {
-      LoggingUtil.exception(e.getMessage(), e);
+      logger.exception(e);
     }
   }
 
@@ -280,7 +279,7 @@ public abstract class AbstractApplication extends AbstractParameterizable {
       logger.verbose(OptionUtil.describeParameterizable(new StringBuffer(), p, 77, "   ").toString());
     }
     catch(UnableToComplyException e) {
-      LoggingUtil.exception(e.getMessage(), e);
+      logger.exception(e);
     }
   }
 
