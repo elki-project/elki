@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import experimentalcode.remigius.NumberVisualization;
 import experimentalcode.remigius.NumberVisualizer;
+import experimentalcode.remigius.ShapeLibrary;
 import experimentalcode.remigius.VisualizationManager;
 
 // TODO Fix CSS, IDs and replace Dots.  
@@ -45,7 +46,7 @@ public class ReferencePointsVisualizer<O extends DoubleVector, V extends Feature
 		while (iter.hasNext()){
 			V v = iter.next();
 			layer.appendChild(
-					SHAPEGEN.createDot(svgp.getDocument(), v.getValue(dimx).doubleValue(), v.getValue(dimy).doubleValue(), (int)Math.random(), dimx, dimy)
+					ShapeLibrary.createRef(svgp.getDocument(), v.getValue(dimx).doubleValue(), v.getValue(dimy).doubleValue(), (int)Math.random(), dimx, dimy, toString())
 			);
 		}
 		return new NumberVisualization(dimx, dimy, layer);
