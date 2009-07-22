@@ -40,4 +40,6 @@ public interface Visualizer<O extends DatabaseObject> extends Parameterizable {
    * @return a short string characterizing the visualizer.
    */
   public String getName();
+
+  public int getPriority();
 }

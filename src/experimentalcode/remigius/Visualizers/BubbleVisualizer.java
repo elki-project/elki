@@ -24,7 +24,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import experimentalcode.lisa.scale.DoubleScale;
 import experimentalcode.lisa.scale.GammaFunction;
 import experimentalcode.lisa.scale.LinearScale;
-import experimentalcode.remigius.CommonSVGShapes;
+import experimentalcode.remigius.ShapeLibrary;
 import experimentalcode.remigius.NumberVisualization;
 import experimentalcode.remigius.NumberVisualizer;
 import experimentalcode.remigius.VisualizationManager;
@@ -86,7 +86,7 @@ public class BubbleVisualizer<O extends DoubleVector> extends NumberVisualizer<O
 			iter.next();
 			clusterID+=1;
 
-			CSSClass bubble = visManager.createCSSClass(CommonSVGShapes.CSS_BUBBLE_PREFIX + clusterID);
+			CSSClass bubble = visManager.createCSSClass(ShapeLibrary.BUBBLE + clusterID);
 			bubble.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, "0.001");
 			
 			if (fill){
@@ -129,8 +129,8 @@ public class BubbleVisualizer<O extends DoubleVector> extends NumberVisualizer<O
 			clusterID+=1;
 			for (int id : cluster.getIDs()){
 				layer.appendChild(
-						SHAPEGEN.createBubble(svgp.getDocument(), getPositioned(database.get(id), dimx), 1 - getPositioned(database.get(id), dimy),
-								getScaled(getValue(id)), clusterID, id, dimx, dimy)
+						ShapeLibrary.createBubble(svgp.getDocument(), getPositioned(database.get(id), dimx), 1 - getPositioned(database.get(id), dimy),
+								getScaled(getValue(id)), clusterID, id, dimx, dimy, toString())
 				);
 			}
 		}

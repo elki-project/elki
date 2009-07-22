@@ -4,6 +4,7 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
@@ -31,8 +32,7 @@ public class AxisVisualizer<O extends DoubleVector> extends NumberVisualizer<O> 
 			svgp.updateStyleElement();
 
 		} catch (CSSNamingConflict e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		  LoggingUtil.exception(e);
 		}
 
 		return new NumberVisualization(dimx, dimy, layer);
@@ -41,5 +41,4 @@ public class AxisVisualizer<O extends DoubleVector> extends NumberVisualizer<O> 
 	public String getName(){
 		return "Axes";
 	}
-
 }
