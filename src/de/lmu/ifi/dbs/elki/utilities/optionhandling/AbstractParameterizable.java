@@ -193,7 +193,6 @@ public abstract class AbstractParameterizable extends AbstractLoggable implement
    * 
    * @param collection existing collection to add to.
    */
-  // TODO: not yet used.
   public void collectOptions(List<Pair<Parameterizable, Option<?>>> collection) {
     Option<?>[] opts = this.optionHandler.getOptions();
     for(Option<?> o : opts) {
