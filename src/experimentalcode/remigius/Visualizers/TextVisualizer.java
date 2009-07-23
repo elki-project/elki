@@ -1,8 +1,13 @@
 package experimentalcode.remigius.Visualizers;
 
+import java.io.IOException;
+
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 import org.w3c.dom.events.EventTarget;
+
+import com.sun.org.apache.xml.internal.serialize.OutputFormat;
+import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -51,10 +56,20 @@ public class TextVisualizer<O extends DoubleVector> extends NumberVisualizer<O> 
               database.get(id), dimy)), getValue(id), id, dimx,
               dimy, toString());
 
-      
-      
+
+//      if (svgp == visManager.getSinglePlot()){
+//        XMLSerializer xml =  new XMLSerializer(System.out, new OutputFormat());
+//        try {
+//          xml.serialize(svgp.getDocument());
+//        }
+//        catch(IOException e) {
+//          e.printStackTrace();
+//        }
+//      }
+
+
       String dotID = ShapeLibrary.createID(ShapeLibrary.MARKER, id, dimx, dimy);
-      System.out.println(dotID);
+
       Element dot = svgp.getDocument().getElementById(dotID);
       if (dot != null){
         EventTarget targ = (EventTarget) dot;
@@ -65,8 +80,8 @@ public class TextVisualizer<O extends DoubleVector> extends NumberVisualizer<O> 
       } else {
         LoggingUtil.message("Attaching ToolTip to non-existing Object: " + dotID);
       }
-      
-      
+
+
       layer.appendChild(tooltip);
     }
 
@@ -78,5 +93,10 @@ public class TextVisualizer<O extends DoubleVector> extends NumberVisualizer<O> 
   @Override
   public String getName() {
     return "Text";
+  }
+
+  @Override
+  public int getPriority(){
+    return Integer.MAX_VALUE;
   }
 }
