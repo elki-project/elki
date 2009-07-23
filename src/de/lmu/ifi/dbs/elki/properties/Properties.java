@@ -51,7 +51,7 @@ public final class Properties {
    * 
    * @param filename name of a file to provide property-definitions.
    */
-  public Properties(String filename) {
+  private Properties(String filename) {
     LoggingConfiguration.assertConfigured();
     this.properties = new java.util.Properties();
     InputStream stream = null;
