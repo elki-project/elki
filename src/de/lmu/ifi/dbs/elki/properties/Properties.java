@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.properties;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Set;
@@ -9,6 +8,7 @@ import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.utilities.FileUtil;
 
 /**
  * Provides management of properties.
@@ -30,15 +30,8 @@ public final class Properties {
   public static final Properties ELKI_PROPERTIES;
 
   static {
-    File propertiesfile = new File(Properties.class.getPackage().getName().replace('.', File.separatorChar) + File.separatorChar + "ELKI.properties");
-    if(propertiesfile.exists() && propertiesfile.canRead()) {
-      ELKI_PROPERTIES = new Properties(propertiesfile.getAbsolutePath());
-    }
-    else // otherwise, the property-file should at least be available within the
-         // jar-archive
-    {
-      ELKI_PROPERTIES = new Properties(Properties.class.getPackage().getName().replace('.', '/') + '/' + "ELKI.properties");
-    }
+    String name = Properties.class.getPackage().getName().replace('.', File.separatorChar) + File.separatorChar + "ELKI.properties";
+    ELKI_PROPERTIES = new Properties(name);
   }
 
   /**
@@ -54,20 +47,13 @@ public final class Properties {
   private Properties(String filename) {
     LoggingConfiguration.assertConfigured();
     this.properties = new java.util.Properties();
-    InputStream stream = null;
     try {
-      stream = new FileInputStream(filename);
+      InputStream stream = FileUtil.openSystemFile(filename);
+      properties.load(stream);
     }
     catch(FileNotFoundException e) {
-      // try with classloader
-      stream = ClassLoader.getSystemResourceAsStream(filename);
-    }
-    if (stream == null) {
       logger.warning("Unable to get properties file " + filename + ".\n");
       return;
-    }
-    try {
-      properties.load(stream);
     }
     catch(Exception e) {
       logger.warning("Error loading properties file " + filename + ".\n", e);
