@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.visualization.svg;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
@@ -47,21 +48,22 @@ public class SVGSimpleLinearAxis {
    * @param manager Manager to register the classes with
    * @throws CSSNamingConflict when a name clash occurs
    */
-  public static void setupCSSClasses(Object owner, CSSClassManager manager) throws CSSNamingConflict {
+  private static void setupCSSClasses(Object owner, CSSClassManager manager, ColorLibrary colors) throws CSSNamingConflict {
     if(!manager.contains(CSS_AXIS)) {
       CSSClass axis = new CSSClass(owner, CSS_AXIS);
-      axis.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_SILVER_VALUE);
+      axis.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getNamedColor(ColorLibrary.COLOR_AXIS_LINE));
       axis.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, "0.2%");
       manager.addClass(axis);
     }
     if(!manager.contains(CSS_AXIS_TICK)) {
       CSSClass tick = new CSSClass(owner, CSS_AXIS_TICK);
-      tick.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_SILVER_VALUE);
+      tick.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getNamedColor(ColorLibrary.COLOR_AXIS_TICK));
       tick.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, "0.1%");
       manager.addClass(tick);
     }
     if(!manager.contains(CSS_AXIS_LABEL)) {
       CSSClass label = new CSSClass(owner, CSS_AXIS_LABEL);
+      label.setStatement(SVGConstants.CSS_FILL_PROPERTY, colors.getNamedColor(ColorLibrary.COLOR_AXIS_LABEL));
       label.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, "0.2%");
       manager.addClass(label);
     }
@@ -163,7 +165,7 @@ public class SVGSimpleLinearAxis {
         parent.appendChild(text);
       }
     }
-    setupCSSClasses(plot, plot.getCSSClassManager());
+    setupCSSClasses(plot, plot.getCSSClassManager(), plot.getColorLibrary());
   }
 
 }
