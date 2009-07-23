@@ -1,4 +1,4 @@
-package experimentalcode.arthur;
+package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import java.util.ArrayList;
 import java.util.HashMap;
