@@ -40,6 +40,10 @@ public interface ColorLibrary {
    */
   final static String COLOR_KEY_LABEL = "key.label";
   /**
+   * Background color for plot area
+   */
+  final static String COLOR_PLOT_BACKGROUND = "plot.background";
+  /**
    * Return the number of native colors available. These are guaranteed to be unique.
    * 
    * @return number of native colors
