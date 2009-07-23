@@ -43,6 +43,8 @@ import org.w3c.dom.svg.SVGDocument;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.xml.XMLNodeListIterator;
+import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
+import de.lmu.ifi.dbs.elki.visualization.colors.PropertiesBasedColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager;
 
 /**
@@ -77,6 +79,11 @@ public class SVGPlot {
    * CSS class manager
    */
   private CSSClassManager cssman;
+  
+  /**
+   * Default color library
+   */
+  private ColorLibrary colors;
 
   /**
    * Manage objects with an id.
@@ -115,6 +122,9 @@ public class SVGPlot {
 
     // create a CSS class manager.
     cssman = new CSSClassManager();
+    
+    // create a default color library
+    colors = new PropertiesBasedColorLibrary();
   }
 
   /**
@@ -225,6 +235,21 @@ public class SVGPlot {
    */
   public CSSClassManager getCSSClassManager() {
     return cssman;
+  }
+
+  /**
+   * @return The color library
+   */
+  protected ColorLibrary getColorLibrary() {
+    return colors;
+  }
+
+  /**
+   * @param new color library
+   */
+  protected void setColorLibrary(ColorLibrary colors) {
+    // TODO: update existing content, e.g. background color?
+    this.colors = colors;
   }
 
   /**
