@@ -1,10 +1,12 @@
-package experimentalcode.remigius;
+package experimentalcode.remigius.Adapter;
 
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
+import experimentalcode.remigius.VisualizationManager;
+import experimentalcode.remigius.Visualizers.Visualizer;
 
 /**
  * Defines the requirements for an algorithm-adapter.
@@ -32,7 +34,7 @@ public interface AlgorithmAdapter<O extends DatabaseObject> {
    * 
    * @return a collection of {@link Visualizer}s this adapter provides.
    */
-  public Collection<Visualizer<O>> getVisualizers();
+  public Collection<Visualizer<O, ?>> getVisualizers();
 
   /**
    * Initializes all provided {@link Visualizer}s.

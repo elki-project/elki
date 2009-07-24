@@ -8,11 +8,10 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
-import experimentalcode.remigius.NumberVisualization;
-import experimentalcode.remigius.NumberVisualizer;
 import experimentalcode.remigius.VisualizationManager;
+import experimentalcode.remigius.visualization.PlanarVisualization;
 
-public class AxisVisualizer<O extends DoubleVector> extends NumberVisualizer<O> {
+public class AxisVisualizer<O extends DoubleVector> extends PlanarVisualizer<O>{
 	
 	public AxisVisualizer(){
 	
@@ -24,7 +23,7 @@ public class AxisVisualizer<O extends DoubleVector> extends NumberVisualizer<O> 
 	}
 
 	@Override
-	protected NumberVisualization visualize(SVGPlot svgp, Element layer, int dimx,
+	protected PlanarVisualization visualize(SVGPlot svgp, Element layer, int dimx,
 			int dimy) {
 		try {
 			SVGSimpleLinearAxis.drawAxis(svgp, layer, scales[dimx], 0, 1, 1, 1, true, true);
@@ -35,7 +34,7 @@ public class AxisVisualizer<O extends DoubleVector> extends NumberVisualizer<O> 
 		  LoggingUtil.exception(e);
 		}
 
-		return new NumberVisualization(dimx, dimy, layer);
+		return new PlanarVisualization(dimx, dimy, layer);
 	}
 
 	public String getName(){
