@@ -54,7 +54,7 @@ public class BubbleVisualizer<O extends DoubleVector> extends NumberVisualizer<O
 	}
 	
 	public void setup(Database<O> database, AnnotationResult<Double> anResult, Result r, DoubleScale normalizationScale, VisualizationManager<O> visManager){
-		init(database, visManager);
+		init(database, visManager, 1000);
 		this.anResult = anResult;
 
 		this.normalizationScale = normalizationScale;

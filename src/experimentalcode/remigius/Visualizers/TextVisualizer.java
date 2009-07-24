@@ -1,13 +1,8 @@
 package experimentalcode.remigius.Visualizers;
 
-import java.io.IOException;
-
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 import org.w3c.dom.events.EventTarget;
-
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -23,7 +18,7 @@ import experimentalcode.remigius.VisualizationManager;
 
 public class TextVisualizer<O extends DoubleVector> extends NumberVisualizer<O> {
 
-  AnnotationResult<Double> anResult;
+  private AnnotationResult<Double> anResult;
 
   public TextVisualizer() {
   }
@@ -56,18 +51,6 @@ public class TextVisualizer<O extends DoubleVector> extends NumberVisualizer<O> 
               database.get(id), dimy)), getValue(id), id, dimx,
               dimy, toString());
 
-
-//      if (svgp == visManager.getSinglePlot()){
-//        XMLSerializer xml =  new XMLSerializer(System.out, new OutputFormat());
-//        try {
-//          xml.serialize(svgp.getDocument());
-//        }
-//        catch(IOException e) {
-//          e.printStackTrace();
-//        }
-//      }
-
-
       String dotID = ShapeLibrary.createID(ShapeLibrary.MARKER, id, dimx, dimy);
 
       Element dot = svgp.getDocument().getElementById(dotID);
@@ -96,7 +79,7 @@ public class TextVisualizer<O extends DoubleVector> extends NumberVisualizer<O> 
   }
 
   @Override
-  public int getPriority(){
+  public int getLevel(){
     return Integer.MAX_VALUE;
   }
 }
