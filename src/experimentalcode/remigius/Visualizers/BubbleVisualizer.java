@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
+import experimentalcode.lisa.scale.CutOffScale;
 import experimentalcode.lisa.scale.DoubleScale;
 import experimentalcode.lisa.scale.GammaFunction;
 import experimentalcode.lisa.scale.LinearScale;
@@ -39,9 +40,15 @@ public class BubbleVisualizer<O extends DoubleVector> extends NumberVisualizer<O
 	private final Flag FILL_FLAG = new Flag(FILL_ID);
 	private Boolean fill;
 	
+	public static final OptionID CUTOFF_ID = OptionID.getOrCreateOptionID("bubble.cutoff", "cut-off");
+	private final DoubleParameter CUTOFF_PARAM = new DoubleParameter(CUTOFF_ID, 0.0);
+  private Double cutOff;
+	
+	
 	private DoubleScale normalizationScale;
 	private DoubleScale plotScale;
 	private GammaFunction gammaFunction;
+	private CutOffScale cutOffScale;
 
 	private AnnotationResult<Double> anResult;
 	private Result result;
@@ -51,6 +58,7 @@ public class BubbleVisualizer<O extends DoubleVector> extends NumberVisualizer<O
 	public BubbleVisualizer(){
 		addOption(GAMMA_PARAM);
 		addOption(FILL_FLAG);
+		addOption(CUTOFF_PARAM);
 	}
 	
 	public void setup(Database<O> database, AnnotationResult<Double> anResult, Result r, DoubleScale normalizationScale, VisualizationManager<O> visManager){
@@ -59,7 +67,8 @@ public class BubbleVisualizer<O extends DoubleVector> extends NumberVisualizer<O
 
 		this.normalizationScale = normalizationScale;
 		this.plotScale = new LinearScale();
-		this.gammaFunction = new GammaFunction(this.gamma);
+		this.gammaFunction = new GammaFunction(gamma);
+		this.cutOffScale = new CutOffScale(cutOff);
 		
 		setupClustering();
 		setupCSS();
@@ -107,6 +116,7 @@ public class BubbleVisualizer<O extends DoubleVector> extends NumberVisualizer<O
 		List<String> remainingParameters = super.setParameters(args);
 		gamma = GAMMA_PARAM.getValue();
 		fill = FILL_FLAG.getValue();
+		cutOff = CUTOFF_PARAM.getValue();
 		rememberParametersExcept(args, remainingParameters);
 		return remainingParameters;
 	}
@@ -116,7 +126,7 @@ public class BubbleVisualizer<O extends DoubleVector> extends NumberVisualizer<O
 	}
 
 	private Double getScaled(Double d){
-		return plotScale.getScaled(gammaFunction.getScaled(normalizationScale.getScaled(d)));
+		return plotScale.getScaled(gammaFunction.getScaled(cutOffScale.getScaled(normalizationScale.getScaled(d))));
 	}
 
 	@Override
