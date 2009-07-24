@@ -19,8 +19,7 @@ public class DotVisualizer<O extends DoubleVector> extends PlanarVisualizer<O> {
 	}
 
 	@Override
-	protected PlanarVisualization visualize(SVGPlot svgp, Element layer, int dimx,
-			int dimy) {
+	protected PlanarVisualization visualize(SVGPlot svgp, Element layer) {
 
 		for (int id : database.getIDs()){
 

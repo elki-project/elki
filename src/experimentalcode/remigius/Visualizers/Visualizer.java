@@ -16,16 +16,6 @@ import experimentalcode.remigius.visualization.Visualization;
 public interface Visualizer<O extends DatabaseObject, V extends Visualization> extends Parameterizable {
 
   /**
-   * Returns a Double representing a position where the object will be placed
-   * 
-   * @param o the object to be positioned.
-   * @param dimx the dimension in which the position will be calculated
-   * @return a Double representing the normalized position of the object in the
-   *         given dimension.
-   */
-  public Double getPositioned(O o, int dimx);
-
-  /**
    * Returns a two-dimensional Visualization.
    * 
    * @param svgp the {@link SVGPlot} the Visualization will be used.
@@ -33,7 +23,7 @@ public interface Visualizer<O extends DatabaseObject, V extends Visualization> e
    * @param dimy the dimension to appear as vertical (y-) dimension.
    * @return a two-dimensional {@link Visualization}.
    */
-  public V visualize(SVGPlot svgp, int dimx, int dimy);
+  public V visualize(SVGPlot svgp);
 
   /**
    * Returns a name for the visualizer. Intended to be used for displaying a
