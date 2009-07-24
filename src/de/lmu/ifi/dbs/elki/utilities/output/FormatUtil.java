@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.utilities.output;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
@@ -457,6 +458,28 @@ public final class FormatUtil {
     return format(bitSet, dim, ",");
   }
 
+  /**
+   * Formats the String cCollection with the specified separator.
+   * 
+   * @param d the String Collection to format
+   * @param sep the separator between the single values of the double array,
+   *        e.g. ' '
+   * @return a String representing the String Collection d
+   */
+  public static String format(Collection<String> d, String sep) {
+    StringBuffer buffer = new StringBuffer();
+    boolean first = true;
+    for(String str : d) {
+      if (!first) {
+        buffer.append(sep);
+      }
+      buffer.append(str);
+      first = false;
+    }
+    return buffer.toString();
+  }
+
+  
   /**
    * Find the first space before position w or if there is none after w.
    * 
