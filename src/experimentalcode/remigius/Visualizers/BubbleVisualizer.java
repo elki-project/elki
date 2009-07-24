@@ -26,11 +26,10 @@ import experimentalcode.lisa.scale.DoubleScale;
 import experimentalcode.lisa.scale.GammaFunction;
 import experimentalcode.lisa.scale.LinearScale;
 import experimentalcode.remigius.ShapeLibrary;
-import experimentalcode.remigius.NumberVisualization;
-import experimentalcode.remigius.NumberVisualizer;
 import experimentalcode.remigius.VisualizationManager;
+import experimentalcode.remigius.visualization.PlanarVisualization;
 
-public class BubbleVisualizer<O extends DoubleVector> extends NumberVisualizer<O> {
+public class BubbleVisualizer<O extends DoubleVector> extends PlanarVisualizer<O> {
 	
 	public static final OptionID GAMMA_ID = OptionID.getOrCreateOptionID("bubble.gamma", "gamma-correction");
 	private final DoubleParameter GAMMA_PARAM = new DoubleParameter(GAMMA_ID, 1.0);
@@ -130,7 +129,7 @@ public class BubbleVisualizer<O extends DoubleVector> extends NumberVisualizer<O
 	}
 
 	@Override
-	protected NumberVisualization visualize(SVGPlot svgp, Element layer, int dimx, int dimy) {
+	protected PlanarVisualization visualize(SVGPlot svgp, Element layer, int dimx, int dimy) {
 		Iterator<Cluster<Model>> iter = clustering.getAllClusters().iterator();
 		int clusterID = 0;
 
@@ -145,7 +144,7 @@ public class BubbleVisualizer<O extends DoubleVector> extends NumberVisualizer<O
 			}
 		}
 
-		return new NumberVisualization(dimx, dimy, layer);
+		return new PlanarVisualization(dimx, dimy, layer);
 	}
 	
 	public String getName(){

@@ -10,13 +10,12 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
-import experimentalcode.remigius.NumberVisualization;
-import experimentalcode.remigius.NumberVisualizer;
 import experimentalcode.remigius.ShapeLibrary;
-import experimentalcode.remigius.ToolTipListener;
 import experimentalcode.remigius.VisualizationManager;
+import experimentalcode.remigius.gui.ToolTipListener;
+import experimentalcode.remigius.visualization.PlanarVisualization;
 
-public class TextVisualizer<O extends DoubleVector> extends NumberVisualizer<O> {
+public class TextVisualizer<O extends DoubleVector> extends PlanarVisualizer<O> {
 
   private AnnotationResult<Double> anResult;
 
@@ -43,7 +42,7 @@ public class TextVisualizer<O extends DoubleVector> extends NumberVisualizer<O> 
   }
 
   @Override
-  protected NumberVisualization visualize(SVGPlot svgp, Element layer, int dimx, int dimy) {
+  protected PlanarVisualization visualize(SVGPlot svgp, Element layer, int dimx, int dimy) {
 
     for (int id : database.getIDs()) {
       Element tooltip = ShapeLibrary.createToolTip(svgp.getDocument(),
@@ -70,7 +69,7 @@ public class TextVisualizer<O extends DoubleVector> extends NumberVisualizer<O> 
 
 
 
-    return new NumberVisualization(dimx, dimy, layer);
+    return new PlanarVisualization(dimx, dimy, layer);
   }
 
   @Override

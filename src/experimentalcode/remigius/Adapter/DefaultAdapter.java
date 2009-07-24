@@ -3,7 +3,6 @@ package experimentalcode.remigius.Adapter;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
-import experimentalcode.remigius.AbstractAlgorithmAdapter;
 import experimentalcode.remigius.VisualizationManager;
 import experimentalcode.remigius.Visualizers.AxisVisualizer;
 import experimentalcode.remigius.Visualizers.DotVisualizer;

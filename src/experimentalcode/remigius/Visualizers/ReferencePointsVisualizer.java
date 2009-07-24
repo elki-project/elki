@@ -9,14 +9,13 @@ import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
-import experimentalcode.remigius.NumberVisualization;
-import experimentalcode.remigius.NumberVisualizer;
 import experimentalcode.remigius.ShapeLibrary;
 import experimentalcode.remigius.VisualizationManager;
+import experimentalcode.remigius.visualization.PlanarVisualization;
 
 // TODO Fix CSS, IDs and replace Dots.  
 
-public class ReferencePointsVisualizer<O extends DoubleVector, V extends FeatureVector<V,N>,N extends Number> extends NumberVisualizer<O> {
+public class ReferencePointsVisualizer<O extends DoubleVector, V extends FeatureVector<V,N>,N extends Number> extends PlanarVisualizer<O> {
 
 	private CollectionResult<V> colResult;
 
@@ -39,7 +38,7 @@ public class ReferencePointsVisualizer<O extends DoubleVector, V extends Feature
 	}
 
 	@Override
-	protected NumberVisualization visualize(SVGPlot svgp, Element layer, int dimx, int dimy) {
+	protected PlanarVisualization visualize(SVGPlot svgp, Element layer, int dimx, int dimy) {
 
 		Iterator<V> iter = colResult.iterator();
 		
@@ -49,7 +48,7 @@ public class ReferencePointsVisualizer<O extends DoubleVector, V extends Feature
 					ShapeLibrary.createRef(svgp.getDocument(), v.getValue(dimx).doubleValue(), v.getValue(dimy).doubleValue(), (int)Math.random(), dimx, dimy, toString())
 			);
 		}
-		return new NumberVisualization(dimx, dimy, layer);
+		return new PlanarVisualization(dimx, dimy, layer);
 	}
 	
 	public String getName(){
