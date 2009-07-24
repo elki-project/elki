@@ -41,5 +41,5 @@ public interface Visualizer<O extends DatabaseObject> extends Parameterizable {
    */
   public String getName();
 
-  public int getPriority();
+  public int getLevel();
 }

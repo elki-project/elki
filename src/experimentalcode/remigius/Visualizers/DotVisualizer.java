@@ -16,7 +16,7 @@ public class DotVisualizer<O extends DoubleVector> extends NumberVisualizer<O> {
 	}
 
 	public void setup(Database<O> database, VisualizationManager<O> v){
-		init(database, v);
+		init(database, v, Integer.MAX_VALUE-1000);
 	}
 
 	@Override
