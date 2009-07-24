@@ -2,24 +2,19 @@ package experimentalcode.remigius.Visualizers;
 
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.colors.PropertiesBasedColorLibrary;
-import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import experimentalcode.remigius.ShapeLibrary;
 import experimentalcode.remigius.VisualizationManager;
-import experimentalcode.remigius.visualization.ScalarVisualization;
 import experimentalcode.remigius.visualization.Visualization;
 
-// TODO: Replace DoubleVector with NumberVector
-public abstract class NumberVectorVisualizer<O extends DoubleVector, V extends Visualization> extends AbstractParameterizable implements Visualizer<O,V> {
+public abstract class AbstractVisualizer<O extends DatabaseObject, V extends Visualization> extends AbstractParameterizable implements Visualizer<O,V> {
 
   protected Database<O> database;
-  protected LinearScale[] scales;
   
   protected VisualizationManager<O> visManager;
 
@@ -34,7 +29,6 @@ public abstract class NumberVectorVisualizer<O extends DoubleVector, V extends V
   
   public void init(Database<O> db, VisualizationManager<O> v, int level){
     this.database = db;
-    this.scales = Scales.calcScales(db);
     this.visManager = v;
     this.level = level;
   }
@@ -50,16 +44,11 @@ public abstract class NumberVectorVisualizer<O extends DoubleVector, V extends V
   }
 
   @Override
-  public Double getPositioned(O o, int dimx) {
-    return scales[dimx].getScaled(o.getValue(dimx));
-  }
-
-  @Override
-  public V visualize(SVGPlot svgp, int dimx, int dimy){
+  public V visualize(SVGPlot svgp){
     
     Element layer = ShapeLibrary.createSVG(svgp.getDocument());
-    return visualize(svgp, layer, dimx, dimy);
+    return visualize(svgp, layer);
   }
   
-  protected abstract V visualize(SVGPlot svgp, Element layer, int dimx, int dimy);
+  protected abstract V visualize(SVGPlot svgp, Element layer);
 }

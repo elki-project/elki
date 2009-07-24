@@ -129,7 +129,7 @@ public class BubbleVisualizer<O extends DoubleVector> extends PlanarVisualizer<O
 	}
 
 	@Override
-	protected PlanarVisualization visualize(SVGPlot svgp, Element layer, int dimx, int dimy) {
+	protected PlanarVisualization visualize(SVGPlot svgp, Element layer) {
 		Iterator<Cluster<Model>> iter = clustering.getAllClusters().iterator();
 		int clusterID = 0;
 

@@ -38,7 +38,7 @@ public class ReferencePointsVisualizer<O extends DoubleVector, V extends Feature
 	}
 
 	@Override
-	protected PlanarVisualization visualize(SVGPlot svgp, Element layer, int dimx, int dimy) {
+	protected PlanarVisualization visualize(SVGPlot svgp, Element layer) {
 
 		Iterator<V> iter = colResult.iterator();
 		

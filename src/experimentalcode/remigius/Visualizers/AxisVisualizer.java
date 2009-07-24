@@ -23,8 +23,7 @@ public class AxisVisualizer<O extends DoubleVector> extends PlanarVisualizer<O>{
 	}
 
 	@Override
-	protected PlanarVisualization visualize(SVGPlot svgp, Element layer, int dimx,
-			int dimy) {
+	protected PlanarVisualization visualize(SVGPlot svgp, Element layer) {
 		try {
 			SVGSimpleLinearAxis.drawAxis(svgp, layer, scales[dimx], 0, 1, 1, 1, true, true);
 			SVGSimpleLinearAxis.drawAxis(svgp, layer, scales[dimy], 0, 1, 0, 0, true, false);
