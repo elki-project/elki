@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
 
@@ -97,7 +98,7 @@ public class MiniGUI extends JPanel {
     buttonPanel.add(setButton);
 
     // button to evaluate settings
-    JButton helpButton = new JButton("Help");
+    JButton helpButton = new JButton("Request usage help");
     helpButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
@@ -107,7 +108,7 @@ public class MiniGUI extends JPanel {
     buttonPanel.add(helpButton);
 
     // button to launch the task
-    JButton runButton = new JButton("Run");
+    JButton runButton = new JButton("Run Task");
     runButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
@@ -135,22 +136,32 @@ public class MiniGUI extends JPanel {
 
   protected void runSetParameters(boolean help) {
     ArrayList<String> params = serializeParameters();
+    if(!help) {
+      outputArea.setText("Testing parameters: " + FormatUtil.format(params, " ") + NEWLINE);
+    }
+    else {
+      outputArea.setText("");
+    }
     KDDTask<DatabaseObject> task = new KDDTask<DatabaseObject>();
     try {
       task.setParameters(params);
+      if(!help) {
+        outputArea.append("Test ok." + NEWLINE);
+      }
     }
     catch(ParameterException e) {
-      outputArea.setText(e.getMessage());
+      outputArea.append("Parameter Error: " + e.getMessage() + NEWLINE);
     }
-
-    //LoggingUtil.warning("TEST!");
+    catch(Exception e) {
+      logger.exception(e);
+    }
 
     if(help) {
       // Collect options
       List<Pair<Parameterizable, Option<?>>> options = new ArrayList<Pair<Parameterizable, Option<?>>>();
       task.collectOptions(options);
       StringBuffer buf = new StringBuffer();
-      buf.append(NEWLINE).append("Parameters:").append(NEWLINE);
+      buf.append("Parameters:").append(NEWLINE);
       OptionUtil.formatForConsole(buf, 100, "   ", options);
 
       // TODO: global parameter constraints
@@ -174,6 +185,7 @@ public class MiniGUI extends JPanel {
 
   protected void runTask() {
     ArrayList<String> params = serializeParameters();
+    outputArea.setText("Running: " + FormatUtil.format(params, " ") + NEWLINE);
     KDDTask<DatabaseObject> task = new KDDTask<DatabaseObject>();
     try {
       task.setParameters(params);
@@ -181,6 +193,9 @@ public class MiniGUI extends JPanel {
     }
     catch(ParameterException e) {
       outputArea.setText(e.getMessage());
+    }
+    catch(Exception e) {
+      logger.exception(e);
     }
   }
 
@@ -411,7 +426,8 @@ public class MiniGUI extends JPanel {
       }
       if(logReceiver != null) {
         logReceiver.publish(m, record.getLevel());
-      } else {
+      }
+      else {
         // fall back to standard error.
         System.err.println(m);
       }
