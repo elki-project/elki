@@ -5,8 +5,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
@@ -264,6 +262,8 @@ public class KNNExplorer<O extends NumberVector<O, ?>, N extends NumberDistance<
 
     public ExplorerWindow() {
       super(false);
+      
+      frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
       // Create a panel and add the button, status label and the SVG canvas.
       final JPanel bigpanel = new JPanel(new BorderLayout());
@@ -318,17 +318,11 @@ public class KNNExplorer<O extends NumberVector<O, ?>, N extends NumberDistance<
 
       quitButton.addActionListener(new ActionListener() {
         public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
-          System.exit(0);
+          frame.setVisible(false);
+          frame.dispose();
         }
       });
 
-      // close handler
-      frame.addWindowListener(new WindowAdapter() {
-        @Override
-        public void windowClosing(@SuppressWarnings("unused") WindowEvent e) {
-          System.exit(0);
-        }
-      });
       // display
       frame.setSize(600, 600);
 

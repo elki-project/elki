@@ -191,7 +191,7 @@ public class MiniGUI extends JPanel {
   protected static void createAndShowGUI() {
     // Create and set up the window.
     JFrame frame = new JFrame("ELKI MiniGUI");
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
     // Create and set up the content pane.
     MiniGUI newContentPane = new MiniGUI();

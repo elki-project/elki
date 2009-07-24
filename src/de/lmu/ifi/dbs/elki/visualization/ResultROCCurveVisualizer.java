@@ -3,8 +3,6 @@ package de.lmu.ifi.dbs.elki.visualization;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.Iterator;
 import java.util.List;
 
@@ -146,17 +144,13 @@ public class ResultROCCurveVisualizer<O extends DatabaseObject> extends Abstract
 
       quitButton.addActionListener(new ActionListener() {
         public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
-          System.exit(0);
+          frame.setVisible(false);
+          frame.dispose();
         }
       });
 
       // close handler
-      frame.addWindowListener(new WindowAdapter() {
-        @Override
-        public void windowClosing(@SuppressWarnings("unused") WindowEvent e) {
-          System.exit(0);
-        }
-      });
+      frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
       // display
       frame.setSize(600, 600);
 
