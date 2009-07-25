@@ -25,6 +25,7 @@ public class HistogramVisualizer<O extends DatabaseObject> extends ScalarVisuali
 
   private void setupCSS() {
 
+    // TODO: Set CSS
   }
   
   @Override
@@ -33,6 +34,7 @@ public class HistogramVisualizer<O extends DatabaseObject> extends ScalarVisuali
     Iterator<Pair<Double, O>> iter = histResult.getHistogram().iterator();
     while (iter.hasNext()){
       Pair<Double, O> p = iter.next();
+      // TODO: Introduce a proper shape
       layer.appendChild(ShapeLibrary.createBubble(svgp.getDocument(), dim, 0, p.getFirst(), 0, (int)Math.random(), dim, 0, toString()));
     }
     return new ScalarVisualization(layer, dim);
