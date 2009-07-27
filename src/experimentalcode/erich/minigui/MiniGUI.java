@@ -30,8 +30,10 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.logging.MessageFormatter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
@@ -46,9 +48,11 @@ public class MiniGUI extends JPanel {
 
   public static final int BIT_INCOMPLETE = 0;
 
-  public static final int BIT_NO_DASH = 1;
+  public static final int BIT_INVALID = 1;
 
-  public static final int BIT_NO_NAME_BUT_VALUE = 2;
+  public static final int BIT_FLAG_INVALID = 2;
+
+  public static final int BIT_NO_NAME_BUT_VALUE = 3;
 
   static final String[] columns = { "Parameter", "Value" };
 
@@ -58,27 +62,23 @@ public class MiniGUI extends JPanel {
 
   protected JTextArea outputArea;
 
-  protected ArrayList<Triple<String, String, BitSet>> parameters;
+  protected ArrayList<Triple<Option<?>, String, BitSet>> parameters;
+
+  protected JTable parameterTable;
 
   public MiniGUI() {
     super();
     this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-    parameters = new ArrayList<Triple<String, String, BitSet>>();
+    parameters = new ArrayList<Triple<Option<?>, String, BitSet>>();
 
-    parameters.add(new Triple<String, String, BitSet>("-algorithm", "clustering.DBSCAN", new BitSet()));
-    parameters.add(new Triple<String, String, BitSet>("-dbscan.minpts", "10", new BitSet()));
-    parameters.add(new Triple<String, String, BitSet>("-dbscan.epsilon", "0.3", new BitSet()));
-    parameters.add(new Triple<String, String, BitSet>("-dbc.in", "data/testdata/unittests/hierarchical-3d2d1d.csv", new BitSet()));
-    parameters.add(new Triple<String, String, BitSet>("-resulthandler", "experimentalcode.erich.ResultVisualizeScatterplot", new BitSet()));
-
-    final JTable table = new JTable(new ParametersModel(parameters));
-    table.setPreferredScrollableViewportSize(new Dimension(600, 200));
-    table.setFillsViewportHeight(true);
-    table.setDefaultRenderer(String.class, new HighlightingRenderer(parameters));
+    parameterTable = new JTable(new ParametersModel(parameters));
+    parameterTable.setPreferredScrollableViewportSize(new Dimension(600, 200));
+    parameterTable.setFillsViewportHeight(true);
+    parameterTable.setDefaultRenderer(String.class, new HighlightingRenderer(parameters));
 
     // Create the scroll pane and add the table to it.
-    JScrollPane scrollPane = new JScrollPane(table);
+    JScrollPane scrollPane = new JScrollPane(parameterTable);
 
     // Add the scroll pane to this panel.
     add(scrollPane);
@@ -132,6 +132,11 @@ public class MiniGUI extends JPanel {
     // reconfigure logging
     LogHandler.setReceiver(this);
     LoggingConfiguration.reconfigureLogging(MiniGUI.class.getPackage().getName(), "logging-minigui.properties");
+
+    // refresh Parameters
+    ArrayList<String> ps = new ArrayList<String>();
+    ps.add("-algorithm XXX");
+    doSetParameters(false, ps);
   }
 
   protected void runSetParameters(boolean help) {
@@ -142,6 +147,20 @@ public class MiniGUI extends JPanel {
     else {
       outputArea.setText("");
     }
+    List<Pair<Parameterizable, Option<?>>> options = doSetParameters(help, params);
+
+    if(help) {
+      StringBuffer buf = new StringBuffer();
+      buf.append("Parameters:").append(NEWLINE);
+      OptionUtil.formatForConsole(buf, 100, "   ", options);
+
+      // TODO: global parameter constraints
+
+      outputArea.append(buf.toString());
+    }
+  }
+
+  private List<Pair<Parameterizable, Option<?>>> doSetParameters(boolean help, ArrayList<String> params) {
     KDDTask<DatabaseObject> task = new KDDTask<DatabaseObject>();
     try {
       task.setParameters(params);
@@ -156,30 +175,70 @@ public class MiniGUI extends JPanel {
       logger.exception(e);
     }
 
-    if(help) {
-      // Collect options
-      List<Pair<Parameterizable, Option<?>>> options = new ArrayList<Pair<Parameterizable, Option<?>>>();
-      task.collectOptions(options);
-      StringBuffer buf = new StringBuffer();
-      buf.append("Parameters:").append(NEWLINE);
-      OptionUtil.formatForConsole(buf, 100, "   ", options);
+    // Collect options
+    ArrayList<Pair<Parameterizable, Option<?>>> options = task.collectOptions();
 
-      // TODO: global parameter constraints
-
-      outputArea.append(buf.toString());
+    // update table:
+    parameterTable.setEnabled(false);
+    parameters.clear();
+    for(Pair<Parameterizable, Option<?>> p : options) {
+      Option<?> option = p.getSecond();
+      String value = option.getGivenValue();
+      if(value == null) {
+        if(option instanceof Flag) {
+          value = Flag.NOT_SET;
+        }
+        else {
+          value = "";
+        }
+      }
+      BitSet bits = new BitSet();
+      boolean optional = false;
+      if(option instanceof Parameter<?, ?>) {
+        Parameter<?, ?> par = (Parameter<?, ?>) option;
+        optional = par.isOptional();
+      }
+      else if(option instanceof Flag) {
+        optional = true;
+      }
+      if (value == "" && !optional) {
+        bits.set(BIT_INCOMPLETE);
+      }
+      if(value != "") {
+        try {
+          if(!option.isValid(value)) {
+            bits.set(BIT_INVALID);
+          }
+        }
+        catch(ParameterException e) {
+          bits.set(BIT_INVALID);
+        }
+      }
+      Triple<Option<?>, String, BitSet> t = new Triple<Option<?>, String, BitSet>(option, value, bits);
+      parameters.add(t);
     }
+    parameterTable.revalidate();
+    parameterTable.setEnabled(true);
+    return options;
   }
 
   private ArrayList<String> serializeParameters() {
+    parameterTable.setEnabled(false);
     ArrayList<String> p = new ArrayList<String>(2 * parameters.size());
-    for(Triple<String, String, BitSet> t : parameters) {
-      if(t.getFirst() != null && t.getFirst().length() > 0) {
-        p.add(t.getFirst());
-      }
-      if(t.getSecond() != null && t.getSecond().length() > 0) {
-        p.add(t.getSecond());
+    for(Triple<Option<?>, String, BitSet> t : parameters) {
+      if(t.getFirst() != null) {
+        if(t.getFirst() instanceof Parameter<?, ?> && t.getSecond() != null && t.getSecond().length() > 0) {
+          p.add("-" + t.getFirst().getOptionID().getName());
+          p.add(t.getSecond());
+        }
+        else if(t.getFirst() instanceof Flag) {
+          if(t.getSecond() == Flag.SET) {
+            p.add("-" + t.getFirst().getOptionID().getName());
+          }
+        }
       }
     }
+    parameterTable.setEnabled(true);
     return p;
   }
 
@@ -232,9 +291,9 @@ public class MiniGUI extends JPanel {
      */
     private static final long serialVersionUID = 1L;
 
-    private ArrayList<Triple<String, String, BitSet>> parameters;
+    private ArrayList<Triple<Option<?>, String, BitSet>> parameters;
 
-    public ParametersModel(ArrayList<Triple<String, String, BitSet>> parameters) {
+    public ParametersModel(ArrayList<Triple<Option<?>, String, BitSet>> parameters) {
       super();
       this.parameters = parameters;
     }
@@ -252,14 +311,22 @@ public class MiniGUI extends JPanel {
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
       if(rowIndex < parameters.size()) {
-        Triple<String, String, BitSet> p = parameters.get(rowIndex);
+        Triple<Option<?>, String, BitSet> p = parameters.get(rowIndex);
         if(columnIndex == 0) {
-          return p.getFirst();
+          String ret = p.getFirst().getOptionID().getName();
+          if(ret == null) {
+            ret = "";
+          }
+          return ret;
         }
         else if(columnIndex == 1) {
-          return p.getSecond();
+          String ret = p.getSecond();
+          if(ret == null) {
+            ret = "";
+          }
+          return ret;
         }
-        return null;
+        return "";
       }
       else {
         return "";
@@ -285,37 +352,41 @@ public class MiniGUI extends JPanel {
     public void setValueAt(Object value, int rowIndex, int columnIndex) {
       if(value instanceof String) {
         String s = (String) value;
-        Triple<String, String, BitSet> p;
+        Triple<Option<?>, String, BitSet> p;
         if(rowIndex < parameters.size()) {
           p = parameters.get(rowIndex);
         }
         else {
           BitSet flags = new BitSet();
           // flags.set(BIT_INCOMPLETE);
-          p = new Triple<String, String, BitSet>("", "", flags);
+          p = new Triple<Option<?>, String, BitSet>(null, "", flags);
           parameters.add(p);
         }
         BitSet flags = p.getThird();
         if(columnIndex == 0) {
-          p.setFirst(s);
-          if(s.length() <= 0 || s.charAt(0) != '-') {
-            flags.set(BIT_NO_DASH);
-          }
-          else {
-            flags.clear(BIT_NO_DASH);
-          }
+          p.setFirst(null); // TODO: allow editing!
         }
         else if(columnIndex == 1) {
           p.setSecond(s);
-        }
-        // set flag when we have a key but no value
-        flags.set(BIT_NO_NAME_BUT_VALUE, (p.getFirst().length() == 0 && p.getSecond().length() > 0));
-        // no data at all?
-        if(p.getFirst() == null || p.getFirst() == "") {
-          if(p.getSecond() == null || p.getSecond() == "") {
-            flags.clear();
+
+          if(p.getFirst() instanceof Flag) {
+            if((!Flag.SET.equals(s)) && (!Flag.NOT_SET.equals(s))) {
+              flags.set(BIT_FLAG_INVALID);
+            }
+            else {
+              flags.clear(BIT_FLAG_INVALID);
+            }
           }
         }
+        // set flag when we have a key but no value
+        // flags.set(BIT_NO_NAME_BUT_VALUE, (p.getFirst().length() == 0 &&
+        // p.getSecond().length() > 0));
+        // no data at all?
+        // if(p.getFirst() == null || p.getFirst() == "") {
+        // if(p.getSecond() == null || p.getSecond() == "") {
+        // flags.clear();
+        // }
+        // }
         p.setThird(flags);
       }
       else {
@@ -330,13 +401,13 @@ public class MiniGUI extends JPanel {
      */
     private static final long serialVersionUID = 1L;
 
-    private ArrayList<Triple<String, String, BitSet>> parameters;
+    private ArrayList<Triple<Option<?>, String, BitSet>> parameters;
 
     private static final Color COLOR_INCOMPLETE = new Color(0x7F7FFF);
 
     private static final Color COLOR_SYNTAX_ERROR = new Color(0xFF7F7F);
 
-    public HighlightingRenderer(ArrayList<Triple<String, String, BitSet>> parameters) {
+    public HighlightingRenderer(ArrayList<Triple<Option<?>, String, BitSet>> parameters) {
       super();
       this.parameters = parameters;
     }
@@ -352,8 +423,11 @@ public class MiniGUI extends JPanel {
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
       Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
       if(row < parameters.size()) {
-        Triple<String, String, BitSet> p = parameters.get(row);
-        if((p.getThird().get(BIT_NO_DASH))) {
+        Triple<Option<?>, String, BitSet> p = parameters.get(row);
+        if((p.getThird().get(BIT_INVALID))) {
+          c.setBackground(COLOR_SYNTAX_ERROR);
+        }
+        else if((p.getThird().get(BIT_FLAG_INVALID))) {
           c.setBackground(COLOR_SYNTAX_ERROR);
         }
         else if((p.getThird().get(BIT_NO_NAME_BUT_VALUE))) {
