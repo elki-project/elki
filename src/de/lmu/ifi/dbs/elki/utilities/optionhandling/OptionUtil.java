@@ -327,8 +327,7 @@ public final class OptionUtil {
     }
     
     // Collect options
-    List<Pair<Parameterizable, Option<?>>> options = new ArrayList<Pair<Parameterizable, Option<?>>>();
-    p.collectOptions(options);
+    ArrayList<Pair<Parameterizable, Option<?>>> options = p.collectOptions();
     OptionUtil.formatForConsole(buf, width, indent, options);
     return buf;
   }

@@ -160,8 +160,7 @@ public abstract class AbstractApplication extends AbstractParameterizable {
     usage.append(INFORMATION);
 
     // Collect options
-    List<Pair<Parameterizable, Option<?>>> options = new ArrayList<Pair<Parameterizable, Option<?>>>();
-    collectOptions(options);
+    ArrayList<Pair<Parameterizable, Option<?>>> options = collectOptions();
     usage.append(NEWLINE).append("Parameters:").append(NEWLINE);
     OptionUtil.formatForConsole(usage, 77, "   ", options);
 

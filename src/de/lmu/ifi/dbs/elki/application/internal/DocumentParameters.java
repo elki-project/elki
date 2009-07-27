@@ -134,7 +134,7 @@ public class DocumentParameters {
   }
 
   private static void buildParameterIndex(HashMapList<Class<?>, Option<?>> byclass, HashMapList<OptionID, Pair<Option<?>, Class<?>>> byopt) {
-    List<Pair<Parameterizable, Option<?>>> options = new ArrayList<Pair<Parameterizable, Option<?>>>();
+    ArrayList<Pair<Parameterizable, Option<?>>> options = new ArrayList<Pair<Parameterizable, Option<?>>>();
     ArrayList<String> emptyargs = new ArrayList<String>(0);
     for(Class<?> cls : InspectionUtil.findAllImplementations(Parameterizable.class, false)) {
       try {
@@ -149,7 +149,7 @@ public class DocumentParameters {
         catch(Exception e) {
           // this is expected to happen.
         }
-        p.collectOptions(options);
+        options.addAll(p.collectOptions());
       }
       catch(LinkageError e) {
         continue;

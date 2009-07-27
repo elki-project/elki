@@ -30,7 +30,7 @@ public abstract class AbstractParameterizable extends AbstractLoggable implement
   /**
    * Hold parameterizables contained
    */
-  private List<Pair<Parameterizable, List<OptionID>>> parameterizables = new ArrayList<Pair<Parameterizable, List<OptionID>>>(0);
+  private ArrayList<Pair<Parameterizable, List<OptionID>>> parameterizables = new ArrayList<Pair<Parameterizable, List<OptionID>>>(0);
 
   /**
    * Creates a new AbstractParameterizable that provides the option handler and
@@ -155,8 +155,7 @@ public abstract class AbstractParameterizable extends AbstractLoggable implement
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> settings = new ArrayList<AttributeSettings>();
     // collect all options
-    List<Pair<Parameterizable, Option<?>>> collection = new ArrayList<Pair<Parameterizable, Option<?>>>();
-    this.collectOptions(collection);
+    ArrayList<Pair<Parameterizable, Option<?>>> collection = this.collectOptions();
     // group by parameterizable
     HashMap<Parameterizable, AttributeSettings> map = new HashMap<Parameterizable, AttributeSettings>();
     for (Pair<Parameterizable, Option<?>> pair : collection) {
@@ -193,17 +192,17 @@ public abstract class AbstractParameterizable extends AbstractLoggable implement
    * 
    * @param collection existing collection to add to.
    */
-  public void collectOptions(List<Pair<Parameterizable, Option<?>>> collection) {
-    Option<?>[] opts = this.optionHandler.getOptions();
-    for(Option<?> o : opts) {
-      collection.add(new Pair<Parameterizable, Option<?>>(this, o));
+  public ArrayList<Pair<Parameterizable, Option<?>>> collectOptions() {
+    ArrayList<Pair<Parameterizable, Option<?>>> r = new ArrayList<Pair<Parameterizable, Option<?>>>();
+    for(Option<?> o : this.optionHandler.getOptions()) {
+      r.add(new Pair<Parameterizable, Option<?>>(this, o));
       // TODO: recurse into ClassParameters?
     }
-    for (Pair<Parameterizable,List<OptionID>> p : parameterizables) {
+    for (int i = 0; i < parameterizables.size(); i++) {
+      Pair<Parameterizable,List<OptionID>> p = parameterizables.get(i);
       if (p.getSecond() != null) {
         // remove any of the given parameters
-        ArrayList<Pair<Parameterizable, Option<?>>> col = new ArrayList<Pair<Parameterizable, Option<?>>>();
-        p.getFirst().collectOptions(col);
+        ArrayList<Pair<Parameterizable, Option<?>>> col = p.getFirst().collectOptions();
         ArrayList<OptionID> toremove = new ArrayList<OptionID>(p.getSecond());
         for (ListIterator<Pair<Parameterizable, Option<?>>> i2 = col.listIterator(); i2.hasNext(); ) {
           Pair<Parameterizable, Option<?>> p2 = i2.next();
@@ -212,7 +211,7 @@ public abstract class AbstractParameterizable extends AbstractLoggable implement
           }
         }
         // add remaining options to collection
-        collection.addAll(col);
+        r.addAll(col);
         if (toremove.size() > 0) {
           StringBuffer remainingOptions = new StringBuffer();
           boolean first = true;
@@ -227,8 +226,9 @@ public abstract class AbstractParameterizable extends AbstractLoggable implement
           logger.warning("Options were given as ignore-because-predefined that were not found in the collected options: " + remainingOptions.toString(), new Throwable());
         }
       } else {
-        p.getFirst().collectOptions(collection);
+        r.addAll(p.getFirst().collectOptions());
       }
     }
+    return r;
   }
 }
