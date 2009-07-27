@@ -21,6 +21,11 @@ public abstract class Option<T> {
     protected String shortDescription;
 
     /**
+     * The value last passed to this option.
+     */
+    protected String givenValue = null;
+
+    /**
      * The value of this option.
      */
     protected T value;
@@ -93,7 +98,16 @@ public abstract class Option<T> {
      * @param value the option's value to be set
      * @throws ParameterException if the given value is not a valid value for this option.
      */
-    public abstract void setValue(String value) throws ParameterException;
+    public void setValue(String value) throws ParameterException {
+      this.givenValue = value;
+    }
+    
+    /**
+     * Get the last given value. May return {@code null}
+     */
+    public String getGivenValue() {
+      return this.givenValue;
+    }
 
     /**
      * Returns the value of the option.

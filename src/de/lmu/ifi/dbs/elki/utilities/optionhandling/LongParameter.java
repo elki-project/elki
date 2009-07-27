@@ -78,6 +78,7 @@ public class LongParameter extends NumberParameter<Long> {
 
     @Override
     public void setValue(String value) throws ParameterException {
+        super.setValue(value);
         if (isValid(value)) {
             this.value = Long.parseLong(value);
         }

@@ -106,6 +106,7 @@ public class DoubleParameter extends NumberParameter<Double> {
 
     @Override
     public void setValue(String value) throws ParameterException {
+        super.setValue(value);
         if (isValid(value)) {
             this.value = Double.parseDouble(value);
         }

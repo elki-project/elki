@@ -56,6 +56,7 @@ public class IntParameter extends NumberParameter<Integer> {
 
     @Override
     public void setValue(String value) throws ParameterException {
+        super.setValue(value);
         if (isValid(value)) {
             this.value = Integer.parseInt(value);
         }

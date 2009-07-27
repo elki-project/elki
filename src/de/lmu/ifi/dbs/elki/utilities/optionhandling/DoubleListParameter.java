@@ -45,6 +45,7 @@ public class DoubleListParameter extends ListParameter<Double> {
 
   @Override
   public void setValue(String value) throws ParameterException {
+    super.setValue(value);
     if(isValid(value)) {
       String[] values = SPLIT.split(value);
       Vector<Double> doubleValue = new Vector<Double>();

@@ -43,6 +43,7 @@ public class FileListParameter extends ListParameter<File> {
 
     @Override
     public void setValue(String value) throws ParameterException {
+        super.setValue(value);
         if (isValid(value)) {
             String[] files = SPLIT.split(value);
             Vector<File> fileValue = new Vector<File>();

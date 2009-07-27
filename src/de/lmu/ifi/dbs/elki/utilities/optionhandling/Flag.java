@@ -55,6 +55,7 @@ public class Flag extends Option<Boolean> {
      */
     @Override
     public void setValue(String value) throws ParameterException {
+        super.setValue(value);
         if (isValid(value)) {
             this.value = value.equals(SET);
         }
