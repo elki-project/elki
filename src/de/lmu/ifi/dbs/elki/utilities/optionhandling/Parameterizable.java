@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -58,5 +59,5 @@ public interface Parameterizable {
    *  
    * @param collection collection to fill
    */
-  public void collectOptions(List<Pair<Parameterizable, Option<?>>> collection);  
+  public ArrayList<Pair<Parameterizable, Option<?>>> collectOptions();  
 }
