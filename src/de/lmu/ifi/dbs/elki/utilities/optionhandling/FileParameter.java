@@ -55,6 +55,7 @@ public class FileParameter extends Parameter<File, Object> {
 
     @Override
     public void setValue(String value) throws ParameterException {
+        super.setValue(value);
         if (isValid(value)) {
             this.value = new File(value);
         }

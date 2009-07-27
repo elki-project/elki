@@ -32,7 +32,7 @@ public abstract class Parameter<T, C> extends Option<T> {
    * Specifies if this parameter is an optional parameter.
    */
   protected boolean optionalParameter = false;
-
+  
   /**
    * Holds parameter constraints for this parameter.
    */

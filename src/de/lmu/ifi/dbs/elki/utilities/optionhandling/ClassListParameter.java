@@ -49,6 +49,7 @@ public class ClassListParameter<C> extends ListParameter<String> {
 
   @Override
   public void setValue(String value) throws ParameterException {
+    super.setValue(value);
     if(isValid(value)) {
       String[] classes = SPLIT.split(value);
       this.value = Arrays.asList(classes);

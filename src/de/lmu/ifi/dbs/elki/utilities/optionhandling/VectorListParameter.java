@@ -44,6 +44,7 @@ public class VectorListParameter extends ListParameter<List<Double>> {
 
   @Override
   public void setValue(String value) throws ParameterException {
+    super.setValue(value);
     if(isValid(value)) {
       String[] vectors = VECTOR_SPLIT.split(value);
       ArrayList<List<Double>> vecs = new ArrayList<List<Double>>();

@@ -45,6 +45,7 @@ public class IntListParameter extends ListParameter<Integer> {
 
   @Override
   public void setValue(String value) throws ParameterException {
+    super.setValue(value);
     if(isValid(value)) {
       String[] values = SPLIT.split(value);
       Vector<Integer> intValue = new Vector<Integer>();
