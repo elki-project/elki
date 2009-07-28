@@ -36,6 +36,10 @@ public class ReferencePointsVisualizer<O extends DoubleVector, V extends Feature
 
 			visManager.registerCSSClass(refpoint);
 	}
+	
+	private Double getPositioned(V v, int dim){
+		return scales[dim].getScaled(v.getValue(dim).doubleValue());
+	}
 
 	@Override
 	protected PlanarVisualization visualize(SVGPlot svgp, Element layer) {
@@ -45,7 +49,7 @@ public class ReferencePointsVisualizer<O extends DoubleVector, V extends Feature
 		while (iter.hasNext()){
 			V v = iter.next();
 			layer.appendChild(
-					ShapeLibrary.createRef(svgp.getDocument(), v.getValue(dimx).doubleValue(), v.getValue(dimy).doubleValue(), 0, dimx, dimy, toString())
+					ShapeLibrary.createRef(svgp.getDocument(), getPositioned(v, dimx), getPositioned(v, dimy), 0, dimx, dimy, toString())
 			);
 		}
 		return new PlanarVisualization(dimx, dimy, layer);
