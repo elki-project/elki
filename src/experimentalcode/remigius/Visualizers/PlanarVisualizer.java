@@ -30,8 +30,8 @@ public abstract class PlanarVisualizer<O extends DoubleVector> extends AbstractV
    * @return a Double representing the normalized position of the object in the
    *         given dimension.
    */
-  public Double getPositioned(O o, int dimx) {
-    return scales[dimx].getScaled(o.getValue(dimx));
+  public Double getPositioned(O o, int dim) {
+    return scales[dim].getScaled(o.getValue(dim));
   }
   
   @Override
