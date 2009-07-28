@@ -87,7 +87,7 @@
 	<patternset id="exclude.internal">
 		<!--<exclude name="**/experimentalcode/noemi/**"/>-->
 		<exclude name="experimentalcode/tobias/**" />
-		<exclude name="experimentalcode/simon/tests/**" />
+		<exclude name="experimentalcode/simon/**" />
 	</patternset>
 	<!-- Code not to be release -->
 	<patternset id="exclude.release">
