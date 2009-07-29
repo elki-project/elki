@@ -201,8 +201,6 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
    * initialize bins with Integer(0)
    * 
    * @param bins Number of bins
-   * @param min Minimum coordinate
-   * @param max Maximum coordinate
    * @return New histogram for Integer.
    */
   public static FlexiHistogram<Integer, Integer> IntSumHistogram(int bins) {
@@ -235,8 +233,6 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
    * initialize bins with Double(0), and downsampling is done by summation.
    * 
    * @param bins Number of bins
-   * @param min Minimum coordinate
-   * @param max Maximum coordinate
    * @return New histogram for Doubles.
    */
   public static FlexiHistogram<Double, Double> DoubleSumHistogram(int bins) {
@@ -269,8 +265,6 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
    * constructor to initialize bins with new {@link MeanVariance} objects
    * 
    * @param bins Number of bins
-   * @param min Minimum coordinate
-   * @param max Maximum coordinate
    * @return New histogram for {@link MeanVariance}.
    */
   public static FlexiHistogram<MeanVariance, Double> MeanVarianceHistogram(int bins) {
@@ -298,6 +292,4 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
       }
     });
   }
-
-  // TODO: MeanVariance
 }
