@@ -435,6 +435,7 @@ public class KNNExplorer<O extends NumberVector<O, ?>, N extends NumberDistance<
         }
       }
       new NodeReplacer(newe, plot, SERIESID).hook(svgCanvas);
+      seriesList.repaint();
     }
 
     Color getColor(double dist) {
