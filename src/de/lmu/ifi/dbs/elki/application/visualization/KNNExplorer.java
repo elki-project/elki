@@ -49,6 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.LazyCanvasResizer;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.NodeReplacer;
+import de.lmu.ifi.dbs.elki.visualization.batikutil.UpdateRunner;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.savedialog.SVGSaveDialog;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
@@ -238,6 +239,9 @@ public class KNNExplorer<O extends NumberVector<O, ?>, N extends NumberDistance<
     // The plot
     SVGPlot plot;
 
+    // The update handler
+    UpdateRunner updateRunner = new UpdateRunner();
+    
     // Viewport
     Element viewport;
 
@@ -388,6 +392,7 @@ public class KNNExplorer<O extends NumberVector<O, ?>, N extends NumberDistance<
       plot.putIdElement(SERIESID, egroup);
       
       svgCanvas.setDocumentState(AbstractJSVGComponent.ALWAYS_DYNAMIC);
+      updateRunner.attachComponent(svgCanvas);
       svgCanvas.setDocument(plot.getDocument());
 
       DefaultListModel m = new DefaultListModel();
@@ -434,7 +439,7 @@ public class KNNExplorer<O extends NumberVector<O, ?>, N extends NumberDistance<
           }
         }
       }
-      new NodeReplacer(newe, plot, SERIESID).hook(svgCanvas);
+      updateRunner.invokeLater(new NodeReplacer(newe, plot, SERIESID));
       seriesList.repaint();
     }
 
