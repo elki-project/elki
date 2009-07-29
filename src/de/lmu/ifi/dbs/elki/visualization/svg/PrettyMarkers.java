@@ -49,8 +49,8 @@ public class PrettyMarkers implements MarkerLibrary {
   }
 
   /**
-   * Constructor without a a {@link ColorLibrary}, will use
-   * {@link PublicationColorLibrary} as color library.
+   * Constructor without a a {@link ColorLibrary}, will use a default
+   * {@link PropertiesBasedColorLibrary} as color library.
    * 
    * @param prefix prefix to use.
    */
@@ -60,7 +60,7 @@ public class PrettyMarkers implements MarkerLibrary {
 
   /**
    * Constructor without arguments, will use {@link #DEFAULT_PREFIX} as prefix
-   * and a {@link PublicationColorLibrary} as color library.
+   * and a default {@link PropertiesBasedColorLibrary} as color library.
    */
   public PrettyMarkers() {
     this(DEFAULT_PREFIX, new PropertiesBasedColorLibrary());
@@ -71,7 +71,7 @@ public class PrettyMarkers implements MarkerLibrary {
    * multiple times, you should consider using the {@link #useMarker} method
    * instead, which exploits the SVG features of symbol definition and use
    * 
-   * @param document containing document
+   * @param plot containing plot
    * @param parent parent node
    * @param x position
    * @param y position

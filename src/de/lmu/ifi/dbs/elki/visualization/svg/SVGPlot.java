@@ -245,7 +245,7 @@ public class SVGPlot {
   }
 
   /**
-   * @param new color library
+   * @param colors new color library
    */
   protected void setColorLibrary(ColorLibrary colors) {
     // TODO: update existing content, e.g. background color?
