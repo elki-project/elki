@@ -8,6 +8,11 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunct
  * Pearson correlation distance function for feature vectors.
  * 
  * The Pearson correlation distance is computed from the Pearson correlation coefficient <code>r</code> as: <code>1-r</code>.
+ * Hence, possible values of this distance are between 0 and 2.
+ * 
+ * The distance between two vectors will be low (near 0), if their attribute values are dimension-wise strictly positively correlated,
+ * it will be high (near 2), if their attribute values are dimension-wise strictly negatively correlated.
+ * For Features with uncorrelated attributes, the distance value will be intermediate (around 1).
  * 
  * @author Arthur Zimek
  * @param <V> the type of FeatureVector to compute the distances in between
