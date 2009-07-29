@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
  * @author Erich Schubert
  *
  */
-public class NodeReplacer extends RunWhenReadyAndVisible {
+public class NodeReplacer implements Runnable {
   private SVGPlot plot;
   private String id;
   private Element newe;

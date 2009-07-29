@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.LazyCanvasResizer;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.NodeReplacer;
+import de.lmu.ifi.dbs.elki.visualization.batikutil.UpdateRunner;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.savedialog.SVGSaveDialog;
@@ -111,6 +112,9 @@ public class ResultROCCurveVisualizer<O extends DatabaseObject> extends Abstract
     // The plot
     SVGPlot plot;
 
+    // The update handler
+    UpdateRunner updateRunner = new UpdateRunner();
+    
     // Viewport
     Element viewport;
 
@@ -214,6 +218,7 @@ public class ResultROCCurveVisualizer<O extends DatabaseObject> extends Abstract
       updateCurve();
 
       svgCanvas.setDocumentState(AbstractJSVGComponent.ALWAYS_DYNAMIC);
+      updateRunner.attachComponent(svgCanvas);
       svgCanvas.setDocument(plot.getDocument());
 
       this.frame.setVisible(true);
@@ -243,7 +248,7 @@ public class ResultROCCurveVisualizer<O extends DatabaseObject> extends Abstract
       line.setAttribute(SVGConstants.SVG_D_ATTRIBUTE, path.toString());
       line.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, SERIESID);
       newe.appendChild(line);
-      new NodeReplacer(newe, plot, SERIESID).hook(svgCanvas);
+      updateRunner.invokeLater(new NodeReplacer(newe, plot, SERIESID));
     }
     
     public void updateFrame() {
@@ -252,7 +257,7 @@ public class ResultROCCurveVisualizer<O extends DatabaseObject> extends Abstract
       SVGUtil.setAtt(newe, SVGConstants.SVG_ID_ATTRIBUTE, FRAMEID);
       SVGUtil.setAtt(newe, SVGConstants.SVG_CLASS_ATTRIBUTE, FRAMEID);
       newe.setAttribute(SVGConstants.SVG_D_ATTRIBUTE, SVGConstants.PATH_MOVE + "0 0 " + SVGConstants.PATH_LINE_TO + ratio + " 0 " + ratio + " 1 0 1 0 0");
-      new NodeReplacer(newe, plot, FRAMEID).hook(svgCanvas);
+      updateRunner.invokeLater(new NodeReplacer(newe, plot, FRAMEID));
     }
   }  
 }
