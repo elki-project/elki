@@ -202,6 +202,11 @@ public class KNNExplorer<O extends NumberVector<O, ?>, N extends NumberDistance<
 
   class ExplorerWindow extends AbstractLoggable {
     /**
+     * Default Window Title
+     */
+    private static final String WINDOW_TITLE_BASE = "ELKI k Nearest Neighbors Explorer";
+
+    /**
      * Maximum resolution for plotted lines to improve performance for long time
      * series.
      */
@@ -213,7 +218,7 @@ public class KNNExplorer<O extends NumberVector<O, ?>, N extends NumberDistance<
     private static final String SERIESID = "series";
 
     // The frame.
-    protected JFrame frame = new JFrame("ELKI k Nearest Neighbors Explorer");
+    protected JFrame frame = new JFrame(WINDOW_TITLE_BASE);
 
     // The spinner
     protected JSpinner spinner;
@@ -360,6 +365,8 @@ public class KNNExplorer<O extends NumberVector<O, ?>, N extends NumberDistance<
         max = Math.max(max, mm[1]);
       }
       this.s = new LinearScale(min, max);
+      
+      this.frame.setTitle(distanceFunction.getClass().getSimpleName() + " - " + WINDOW_TITLE_BASE);
 
       plot = new SVGPlot();
       viewport = plot.svgElement(SVGConstants.SVG_SVG_TAG);
