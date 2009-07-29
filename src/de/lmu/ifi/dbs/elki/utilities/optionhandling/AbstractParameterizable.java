@@ -28,7 +28,7 @@ public abstract class AbstractParameterizable extends AbstractLoggable implement
   private List<String> currentParameterArrayList = new ArrayList<String>(0);
   
   /**
-   * Hold parameterizables contained
+   * Hold parameterizable contained
    */
   private ArrayList<Pair<Parameterizable, List<OptionID>>> parameterizables = new ArrayList<Pair<Parameterizable, List<OptionID>>>(0);
 
@@ -190,7 +190,7 @@ public abstract class AbstractParameterizable extends AbstractLoggable implement
   /**
    * Get all possible options.
    * 
-   * @param collection existing collection to add to.
+   * @return list of parameterizable and options.
    */
   public ArrayList<Pair<Parameterizable, Option<?>>> collectOptions() {
     ArrayList<Pair<Parameterizable, Option<?>>> r = new ArrayList<Pair<Parameterizable, Option<?>>>();

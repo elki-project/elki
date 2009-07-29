@@ -10,11 +10,11 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
  * Line style library featuring solid lines for default styles only
  * (combine with a color library to obtain enough classes!)
  * 
- * {@link #LineStyleLibrary.FLAG_STRONG} will result in thicker lines.
+ * {@link LineStyleLibrary#FLAG_STRONG} will result in thicker lines.
  * 
- * {@link #LineStyleLibrary.FLAG_WEAK} will result in thinner and semi-transparent lines.
+ * {@link LineStyleLibrary#FLAG_WEAK} will result in thinner and semi-transparent lines.
  * 
- * {@link #LineStyleLibrary.FLAG_INTERPOLATED} will result in dashed lines.
+ * {@link LineStyleLibrary#FLAG_INTERPOLATED} will result in dashed lines.
  * 
  * @author Erich Schubert
  *
