@@ -1,25 +1,19 @@
 package experimentalcode.remigius.Visualizers;
 
-import java.util.Iterator;
-
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
-import experimentalcode.lisa.HistogramResult;
 import experimentalcode.remigius.ShapeLibrary;
 import experimentalcode.remigius.VisualizationManager;
 import experimentalcode.remigius.visualization.ScalarVisualization;
 
-public class HistogramVisualizer<O extends DatabaseObject> extends ScalarVisualizer<O>{
+public class HistogramVisualizer<O extends DoubleVector> extends ScalarVisualizer<O>{
 
-  private HistogramResult<O> histResult;
-
-  public void setup(Database<O> database, HistogramResult<O> histResult, VisualizationManager<O> visManager) {
+  public void setup(Database<O> database, VisualizationManager<O> visManager) {
     init(database, visManager);
-    this.histResult = histResult;
     setupCSS();
   }
 
@@ -27,16 +21,20 @@ public class HistogramVisualizer<O extends DatabaseObject> extends ScalarVisuali
 
     // TODO: Set CSS
   }
-  
+
   @Override
   protected ScalarVisualization visualize(SVGPlot svgp, Element layer) {
-    
-    Iterator<Pair<Double, O>> iter = histResult.getHistogram().iterator();
-    while (iter.hasNext()){
-      Pair<Double, O> p = iter.next();
-      // TODO: Introduce a proper shape
-      layer.appendChild(ShapeLibrary.createBubble(svgp.getDocument(), dim, 0, p.getFirst(), 0, (int)Math.random(), dim, 0, toString()));
+
+    AggregatingHistogram<Double, Double> hist = AggregatingHistogram.DoubleSumHistogram(5, 0, 100);
+    for (Integer id : database.getIDs()){
+      hist.aggregate(database.get(id).getValue(dim), 0.5);
     }
+
+    // TODO: Introduce a proper shape
+    for (Integer id : database.getIDs()){
+      layer.appendChild(ShapeLibrary.createBubble(svgp.getDocument(), database.get(id).getValue(dim), 1, 0.001*hist.get(database.get(id).getValue(dim)), 0, id, dim, 0, toString()));
+    }
+    
     return new ScalarVisualization(layer, dim);
   }
 }
