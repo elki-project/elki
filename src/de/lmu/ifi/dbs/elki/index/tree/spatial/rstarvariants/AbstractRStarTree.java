@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -9,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.data.KNNList;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
@@ -21,9 +25,11 @@ import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialComparator;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.Enlargement;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
@@ -56,6 +62,11 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * The height of this R*-Tree.
    */
   private int height;
+
+  /**
+   * For counting the number of distance computations.
+   */
+  public int distanceCalcs = 0;
 
   /**
    * Inserts the specified reel vector object into this index.
@@ -439,16 +450,41 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
 
   @Override
   protected void initializeCapacities(O object, boolean verbose) {
-    int dimensionality = object.getDimensionality();
-
-    // overhead = numEntries(4), id(4), isLeaf(0.125)
-    double overhead = 8.125;
-    if(pageSize - overhead < 0) {
-      throw new IllegalArgumentException("Node size of " + pageSize + " Bytes is chosen too small!");
+    /* Simulate the creation of a leaf page to get the page capacity */
+    try {
+      int cap = 0;
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      ObjectOutputStream oos = new ObjectOutputStream(baos);
+      SpatialLeafEntry sl = new SpatialLeafEntry(0, new double[object.getDimensionality()]);
+      while(baos.size() <= pageSize) {
+        sl.writeExternal(oos);
+        oos.flush();
+        cap++;
+      }
+      // the last one caused the page to overflow.
+      leafCapacity = cap - 1;
+    }
+    catch(IOException e) {
+      throw new AbortException("Error determining page sizes.", e);
     }
 
-    // dirCapacity = (pageSize - overhead) / (childID + childMBR) + 1
-    dirCapacity = (int) (pageSize - overhead) / (4 + 16 * dimensionality) + 1;
+    /* Simulate the creation of a directory page to get the capacity */
+    try {
+      int cap = 0;
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      ObjectOutputStream oos = new ObjectOutputStream(baos);
+      HyperBoundingBox hb = new HyperBoundingBox(new double[object.getDimensionality()], new double[object.getDimensionality()]);
+      SpatialDirectoryEntry sl = new SpatialDirectoryEntry(0, hb);
+      while(baos.size() <= pageSize) {
+        sl.writeExternal(oos);
+        oos.flush();
+        cap++;
+      }
+      dirCapacity = cap - 1;
+    }
+    catch(IOException e) {
+      throw new AbortException("Error determining page sizes.", e);
+    }
 
     if(dirCapacity <= 1) {
       throw new IllegalArgumentException("Node size of " + pageSize + " Bytes is chosen too small!");
@@ -463,9 +499,6 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     if(dirMinimum < 2) {
       dirMinimum = 2;
     }
-
-    // leafCapacity = (pageSize - overhead) / (childID + childValues) + 1
-    leafCapacity = (int) (pageSize - overhead) / (4 + 8 * dimensionality) + 1;
 
     if(leafCapacity <= 1) {
       throw new IllegalArgumentException("Node size of " + pageSize + " Bytes is chosen too small!");
@@ -520,7 +553,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
         for(int i = 0; i < node.getNumEntries(); i++) {
           E entry = node.getEntry(i);
           D distance = object instanceof Integer ? distanceFunction.minDist(entry.getMBR(), (Integer) object) : distanceFunction.minDist(entry.getMBR(), (O) object);
-
+          distanceCalcs++;
           if(distance.compareTo(maxDist) <= 0) {
             knnList.add(new DistanceResultPair<D>(distance, entry.getID()));
             maxDist = knnList.getKNNDistance();
@@ -532,6 +565,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
         for(int i = 0; i < node.getNumEntries(); i++) {
           E entry = node.getEntry(i);
           D distance = object instanceof Integer ? distanceFunction.minDist(entry.getMBR(), (Integer) object) : distanceFunction.minDist(entry.getMBR(), (O) object);
+          distanceCalcs++;
           if(distance.compareTo(maxDist) <= 0) {
             pq.addNode(new DefaultHeapNode<D, Identifiable>(distance, new DefaultIdentifiable(entry.getID())));
           }
@@ -1011,7 +1045,8 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     // define, how many entries will be reinserted
     int start = (int) (0.3 * node.getNumEntries());
 
-    // initialize the reinsertion operation: move the remaining entries forward
+    // initialize the reinsertion operation: move the remaining entries
+    // forward
     node.initReInsert(start, reInsertEntries);
     file.writePage(node);
 
@@ -1065,7 +1100,8 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
 
       // node was splitted
       if(split != null) {
-        // if root was split: create a new root that points the two split nodes
+        // if root was split: create a new root that points the two
+        // split nodes
         if(node.getID() == getRootEntry().getID()) {
           TreeIndexPath<E> newRootPath = createNewRoot(node, split);
           height++;
@@ -1078,11 +1114,12 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
           if(logger.isDebugging()) {
             logger.debugFine("parent " + parent);
           }
-          parent.addDirectoryEntry(createNewDirectoryEntry(split));
+          int i = parent.addDirectoryEntry(createNewDirectoryEntry(split));
 
-          // adjust the entry representing the (old) node, that has been
+          // adjust the entry representing the (old) node, that has
+          // been
           // splitted
-          node.adjustEntry(subtree.getLastPathComponent().getEntry());
+          node.adjustEntry(parent.getEntry(i));
 
           // write changes in parent to file
           file.writePage(parent);
@@ -1090,7 +1127,8 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
         }
       }
     }
-    // no overflow, only adjust parameters of the entry representing the node
+    // no overflow, only adjust parameters of the entry representing the
+    // node
     else {
       if(node.getID() != getRootEntry().getID()) {
         N parent = getNode(subtree.getParentPath().getLastPathComponent().getEntry());

@@ -1,9 +1,5 @@
 package de.lmu.ifi.dbs.elki.index.tree;
 
-import de.lmu.ifi.dbs.elki.persistent.AbstractPage;
-import de.lmu.ifi.dbs.elki.persistent.PageFile;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
@@ -12,6 +8,10 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.NoSuchElementException;
+
+import de.lmu.ifi.dbs.elki.persistent.AbstractPage;
+import de.lmu.ifi.dbs.elki.persistent.PageFile;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 
 /**
  * Abstract superclass for nodes in an tree based index structure.
@@ -102,8 +102,9 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
   @Override
   public void writeExternal(ObjectOutput out) throws IOException {
     super.writeExternal(out);
+    out.writeBoolean(isLeaf);
     out.writeInt(numEntries);
-    out.writeObject(entries);
+    // Entries will be written in subclasses
   }
 
   /**
@@ -116,11 +117,11 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
    *         cannot be found.
    */
   @Override
-  @SuppressWarnings("unchecked")
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     super.readExternal(in);
+    isLeaf = in.readBoolean();
     numEntries = in.readInt();
-    entries = (E[]) in.readObject();
+    // Entries will be read in subclasses
   }
 
   /**
@@ -231,7 +232,7 @@ public abstract class AbstractNode<N extends AbstractNode<N, E>, E extends Entry
    * Deletes all entries in this node.
    */
   protected final void deleteAllEntries() {
-    this.entries = ClassGenericsUtil.newArrayOfNull(entries.length, eclass);
+    Arrays.fill(entries, null);
     this.numEntries = 0;
   }
 
