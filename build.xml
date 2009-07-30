@@ -2,11 +2,11 @@
 <project name="ELKI" default="complete" basedir=".">
 	<!-- Timestamp for version number generation -->
 	<tstamp>
-		<format property="now" pattern="yyyy-MM-dd_HHmm" />
+		<format property="now" pattern="yyyy-MM-dd_HHmm"/>
 	</tstamp>
 
-	<property name="ELKI" value="de.lmu.ifi.dbs.elki" />
-	<property name="ELKI_DIR" value="de/lmu/ifi/dbs/elki" />	
+	<property name="ELKI" value="de.lmu.ifi.dbs.elki"/>
+	<property name="ELKI_DIR" value="de/lmu/ifi/dbs/elki"/>	
 	<property name="ELKI_SHORT" value="ELKI"/>
 	<property name="ELKI_LONG" value="ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures"/>
 	<property name="ELKI_URL" value="http://www.dbs.ifi.lmu.de/research/KDD/ELKI/"/>
@@ -25,60 +25,60 @@
 	<property name="doc.srcdir" value="doc/internal"/>
 	
 	<!-- source parameters -->
-	<property name="source" value="src" />
-	<property name="build.lib" value="lib" />
+	<property name="source" value="src"/>
+	<property name="build.lib" value="lib"/>
 
 	<!-- build parameters -->
-	<property name="build.jardir" value="jar" />
-	<property name="build.output" value="build" />
+	<property name="build.jardir" value="jar"/>
+	<property name="build.output" value="build"/>
 
 	<!-- output configuration -->
-	<property name="build.jarfile" value="elki.jar" />
-	<property name="main-class" value="${ELKI}.KDDTask" />
+	<property name="build.jarfile" value="elki.jar"/>
+	<property name="main-class" value="${ELKI}.KDDTask"/>
 
 	<!-- ******************* USER-/SYSTEM-SPECIFIC SETUP ******************* -->
 	<!-- Default "Public" drive for windows users -->
 	<condition property="sharedfolder" value="P:/nfs/infdbs/WissProj/KDD-Framework">
-		<os family="windows" />
+		<os family="windows"/>
 	</condition>
 	<!-- Default "Web" drive for windows users -->
 	<condition property="webfolder" value="W:/Forschung/KDD/ELKI">
-		<os family="windows" />
+		<os family="windows"/>
 	</condition>
 	<!-- Default - Unix -->
-	<property name="sharedfolder" value="/nfs/infdbs/WissProj/KDD-Framework" />
-	<property name="webfolder" value="/nfs/www/Forschung/KDD/ELKI" />
+	<property name="sharedfolder" value="/nfs/infdbs/WissProj/KDD-Framework"/>
+	<property name="webfolder" value="/nfs/www/Forschung/KDD/ELKI"/>
 
 	<!-- ******************* FOLDER CONFIGURATION ******************* -->
 
 	<!-- Release output folders -->
 	<condition property="deploy.output" value="${sharedfolder}/releases/${release.version}/${now}/output">
-		<isset property="release.official" />
+		<isset property="release.official"/>
 	</condition>
 	<condition property="javadoc.destdir" value="${deploy.output}/doc">
-		<isset property="release.official" />
+		<isset property="release.official"/>
 	</condition>
 	<condition property="release.target" value="${webfolder}/release${release.version}">
-		<isset property="release.official" />
+		<isset property="release.official"/>
 	</condition>
 		
 	<!-- Output folders -->
-	<property name="deploy.output" value="${sharedfolder}/archive/${release.version}" />
-	<property name="deploy.latest" value="${sharedfolder}/executable" />
-	<property name="javadoc.destdir" value="${sharedfolder}/doc" />
+	<property name="deploy.output" value="${sharedfolder}/archive/${release.version}"/>
+	<property name="deploy.latest" value="${sharedfolder}/executable"/>
+	<property name="javadoc.destdir" value="${sharedfolder}/doc"/>
 
 	<!-- Prepare classpath -->
 	<path id="build.classpath">
 		<fileset dir="${build.lib}">
-			<include name="**/*.jar" />
+			<include name="**/*.jar"/>
 		</fileset>
-		<dirset dir="${source}" />
+		<dirset dir="${source}"/>
 	</path>
 	<path id="build.classpath.built">
 		<fileset dir="${build.lib}">
-			<include name="**/*.jar" />
+			<include name="**/*.jar"/>
 		</fileset>
-		<dirset dir="${build.output}" />
+		<dirset dir="${build.output}"/>
 	</path>
 
 	<!-- ******************* FILE (IGNORE) PATTERNS ******************* -->
@@ -86,8 +86,8 @@
 	<!-- Experimentalcode to exclude because it's too buggy -->
 	<patternset id="exclude.internal">
 		<!--<exclude name="**/experimentalcode/noemi/**"/>-->
-		<exclude name="experimentalcode/tobias/**" />
-		<exclude name="experimentalcode/simon/**" />
+		<exclude name="experimentalcode/tobias/**"/>
+		<exclude name="experimentalcode/simon/**"/>
 	</patternset>
 	<!-- Code not to be release -->
 	<patternset id="exclude.release">
@@ -105,47 +105,47 @@
 	</patternset>
 	<!-- use exclude.release only for release builds -->
 	<condition property="build.patternset" value="exclude.release">
-		<isset property="release.official" />
+		<isset property="release.official"/>
 	</condition>
-	<property name="build.patternset" value="exclude.internal" />
+	<property name="build.patternset" value="exclude.internal"/>
 
 	<!-- ******************* BUILD META TARGETS ******************* -->
 
 	<!--- User / meta targets -->
-	<target name="complete" description="Builds the projects jar file and documentation" depends="doc,jar" />
+	<target name="complete" description="Builds the projects jar file and documentation" depends="doc,jar"/>
 
-	<target name="doc" description="Refresh documentation" depends="doc_javadoc,doc_params, doc_extra" />
+	<target name="doc" description="Refresh documentation" depends="doc_javadoc,doc_params, doc_extra"/>
 
-	<target name="compile" description="Compile everything" depends="compile_java,compile_install" />
+	<target name="compile" description="Compile everything" depends="compile_java,compile_install"/>
 
 	<target name="rebuild deploy and clean" description="Deploys a new version and cleans up afterwards">
 		<sequential>
-			<antcall target="rebuild" />
-			<antcall target="deploy" />
-			<antcall target="clean" />
+			<antcall target="rebuild"/>
+			<antcall target="deploy"/>
+			<antcall target="clean"/>
 		</sequential>
 	</target>
 
 	<target name="rebuild" description="Clean and build the jar">
 		<sequential>
-			<antcall target="clean" />
-			<antcall target="jar" />
+			<antcall target="clean"/>
+			<antcall target="jar"/>
 		</sequential>
 	</target>
 
 	<target name="recompile" description="Clean and recompile">
 		<sequential>
-			<antcall target="clean" />
-			<antcall target="compile" />
+			<antcall target="clean"/>
+			<antcall target="compile"/>
 		</sequential>
 	</target>
 
 	<!-- ******************* BUILD MAIN TARGETS ******************* -->
 
 	<target name="clean" description="Clean output directories">
-		<delete file="${build.jarfile}" />
-		<delete dir="${build.jardir}" />
-		<delete dir="${build.output}" />
+		<delete file="${build.jarfile}"/>
+		<delete dir="${build.jardir}"/>
+		<delete dir="${build.output}"/>
 	</target>
 
 	<!-- +++++++++++++++++++ DOCUMENTATION TARGETS +++++++++++++++++++ -->
@@ -163,9 +163,9 @@
 			<isset property="release.official"/>
 		</condition>
 		<!-- defaults - for internal builds -->
-		<property name="javadoc.version" value="true" />
-		<property name="javadoc.header.extra" value="&lt;tr&gt;&lt;td colspan=&quot;3&quot; align=&quot;center&quot; style=&quot;font-size: x-small; font-weight: normal;&quot;&gt;Internal Version&lt;/td&gt;&lt;/tr&gt;" />
-		<property name="javadoc.footer.extra" value="&lt;tr&gt;&lt;td align=&quot;right&quot;&gt;built by&lt;/td&gt;&lt;td align=&quot;left&quot;&gt;${user.name}&lt;/td&gt;&lt;/tr&gt;" />
+		<property name="javadoc.version" value="true"/>
+		<property name="javadoc.header.extra" value="&lt;tr&gt;&lt;td colspan=&quot;3&quot; align=&quot;center&quot; style=&quot;font-size: x-small; font-weight: normal;&quot;&gt;Internal Version&lt;/td&gt;&lt;/tr&gt;"/>
+		<property name="javadoc.footer.extra" value="&lt;tr&gt;&lt;td align=&quot;right&quot;&gt;built by&lt;/td&gt;&lt;td align=&quot;left&quot;&gt;${user.name}&lt;/td&gt;&lt;/tr&gt;"/>
 		<javadoc
 			destdir="${javadoc.destdir}"
 			access="private"
@@ -182,12 +182,11 @@
 			overview="${doc.srcdir}/overview.html"
 			doctitle="${ELKI_SHORT}"
 			windowtitle="${ELKI_LONG}">
-			<classpath refid="build.classpath" />
+			<classpath refid="build.classpath"/>
 			<packageset dir="${source}">
 				<patternset refid="${build.patternset}"/>
 			</packageset>
-			<header><![CDATA[
-				<table cellspacing="0" cellpadding="0" style="font-weight:bold; font-style:normal; font-size:small"> 
+			<!-- Before escaping: <table cellspacing="0" cellpadding="0" style="font-weight:bold; font-style:normal; font-size:small"> 
 				  <tr>
 				    <td align="right"></td><td align="center"><font color="#ff0000">E</font></td><td align="left">nvironment for</td>
 				  </tr>
@@ -201,25 +200,47 @@
 				    <td align="right">Supported by&nbsp;</td><td align="center"><font color="#ff0000">I</font></td><td align="left">ndex-Structures</td>
 				  </tr>
 				  ${javadoc.header.extra}
-				</table>
-			]]></header>
-			<footer><![CDATA[
-                <table style="font-size:small;">
+				</table> -->
+			<header>
+				&lt;table cellspacing="0" cellpadding="0" style="font-weight:bold; font-style:normal; font-size:small"&gt; 
+				  &lt;tr&gt;
+				    &lt;td align="right"&gt;&lt;/td&gt;&lt;td align="center"&gt;&lt;font color="#ff0000"&gt;E&lt;/font&gt;&lt;/td&gt;&lt;td align="left"&gt;nvironment for&lt;/td&gt;
+				  &lt;/tr&gt;
+				  &lt;tr&gt;
+				    &lt;td align="right"&gt;Deve&lt;/td&gt;&lt;td align="center"&gt;&lt;font color="#ff0000"&gt;L&lt;/font&gt;&lt;/td&gt;&lt;td align="left"&gt;oping&lt;/td&gt;
+				  &lt;/tr&gt;
+				  &lt;tr&gt;
+				    &lt;td align="right"&gt;&lt;/td&gt;&lt;td align="center"&gt;&lt;font color="#ff0000"&gt;K&lt;/font&gt;&lt;/td&gt;&lt;td align="left"&gt;DD-Applications&lt;/td&gt;
+				  &lt;/tr&gt;
+				  &lt;tr&gt;
+				    &lt;td align="right"&gt;Supported by&amp;nbsp;&lt;/td&gt;&lt;td align="center"&gt;&lt;font color="#ff0000"&gt;I&lt;/font&gt;&lt;/td&gt;&lt;td align="left"&gt;ndex-Structures&lt;/td&gt;
+				  &lt;/tr&gt;
+				  ${javadoc.header.extra}
+				&lt;/table&gt;
+			</header>
+			<!-- Before escaping: <table style="font-size:small;">
                 <tr>
                   <td colspan="2" align="left">Release ${release.version} ${release.extraversion}</td>
                 </tr>
 				${javadoc.footer.extra}
-                </table>
-			]]></footer>
+                </table> -->
+			<footer>
+                &lt;table style="font-size:small;"&gt;
+                &lt;tr&gt;
+                  &lt;td colspan="2" align="left"&gt;Release ${release.version} ${release.extraversion}&lt;/td&gt;
+                &lt;/tr&gt;
+				${javadoc.footer.extra}
+                &lt;/table&gt;
+			</footer>
 		</javadoc>
 	</target>
 
 	<!-- Build the parameter documentation -->
 	<target name="doc_params" depends="compile">
 		<java dir="${build.output}" classname="${ELKI}.application.internal.DocumentParameters" fork="true">
-			<classpath refid="build.classpath.built" />
-			<arg value="${javadoc.destdir}/parameters-byclass.html" />
-			<arg value="${javadoc.destdir}/parameters-byopt.html" />
+			<classpath refid="build.classpath.built"/>
+			<arg value="${javadoc.destdir}/parameters-byclass.html"/>
+			<arg value="${javadoc.destdir}/parameters-byopt.html"/>
 		</java>
 	</target>
 
@@ -227,7 +248,7 @@
 	<target name="doc_extra">
 		<copy todir="${javadoc.destdir}">
 			<fileset dir="${doc.srcdir}">
-				<exclude name="overview.html" />
+				<exclude name="overview.html"/>
 			</fileset>
 		</copy>
 	</target>
@@ -236,7 +257,7 @@
 	
 	<!-- Compile all java code -->
 	<target name="compile_java">
-		<mkdir dir="${build.output}" />
+		<mkdir dir="${build.output}"/>
 		<javac
 			destdir="${build.output}"
 			deprecation="false"
@@ -245,9 +266,9 @@
 			source="1.6"
 			debuglevel="">
 			<compilerarg value="-Xlint:all"/>
-			<classpath refid="build.classpath" />
+			<classpath refid="build.classpath"/>
 			<patternset refid="${build.patternset}"/>
-			<src path="${source}" />
+			<src path="${source}"/>
 		</javac>
 	</target>
 	
@@ -255,13 +276,13 @@
 	<target name="compile_install">
 		<copy todir="${build.output}">
 			<fileset dir="${source}">
-				<include name="**/*.properties" />
-				<include name="**/*.gif" />
-				<include name="**/*.jpg" />
-				<include name="**/*.jpeg" />
-				<include name="**/*.png" />
-				<include name="**/*.xml" />
-				<include name="**/*.xsd" />
+				<include name="**/*.properties"/>
+				<include name="**/*.gif"/>
+				<include name="**/*.jpg"/>
+				<include name="**/*.jpeg"/>
+				<include name="**/*.png"/>
+				<include name="**/*.xml"/>
+				<include name="**/*.xsd"/>
 				<patternset refid="${build.patternset}"/>
 			</fileset>
 		</copy>
@@ -270,7 +291,7 @@
 
 	<!-- Validate build -->
 	<target name="validate_standalone" description="Validate a to be released source code by trying a build in a sandbox environment" depends="clean">
-		<mkdir dir="${build.output}/src" />
+		<mkdir dir="${build.output}/src"/>
 		<!-- copy included parts of the source only! -->
 		<copy todir="${build.output}/src">
 			<fileset dir="${source}">
@@ -288,12 +309,12 @@
 			<compilerarg value="-Xlint:all"/>
 			<classpath>
 				<fileset dir="${build.lib}">
-					<include name="**/*.jar" />
+					<include name="**/*.jar"/>
 				</fileset>
-				<dirset dir="${build.output}/src" />
+				<dirset dir="${build.output}/src"/>
 			</classpath>
 			<patternset refid="${build.patternset}"/>
-			<src path="${build.output}/src" />
+			<src path="${build.output}/src"/>
 		</javac>
 	</target>
 	
@@ -301,62 +322,62 @@
 	
 	<!-- Jar building -->
 	<target name="jar_prepare" description="Copies all classes and descriptors together" depends="compile">
-		<delete dir="${build.jardir}" />
+		<delete dir="${build.jardir}"/>
 		<!-- install compiled classes -->
 		<copy todir="${build.jardir}">
-			<fileset dir="${build.output}" />
+			<fileset dir="${build.output}"/>
 		</copy>
 		<!-- Install Apache Batik -->
 		<unjar dest="${build.jardir}" src="${build.lib}/batik-all-1.7.jar" overwrite="false">
 			<patternset>
-				<include name="org/apache/batik/**" />
-				<include name="org/w3c/dom/**" />
-				<include name="META-INF/services/**" />
-				<include name="META-INF/LICENSE" />
-				<include name="META-INF/NOTICE" />
+				<include name="org/apache/batik/**"/>
+				<include name="org/w3c/dom/**"/>
+				<include name="META-INF/services/**"/>
+				<include name="META-INF/LICENSE"/>
+				<include name="META-INF/NOTICE"/>
 			</patternset>
 			<mapper>
-				<globmapper from="META-INF/LICENSE" to="legal/batik-LICENSE.txt" />
-				<globmapper from="META-INF/NOTICE" to="legal/batik-NOTICE.txt" />
+				<globmapper from="META-INF/LICENSE" to="legal/batik-LICENSE.txt"/>
+				<globmapper from="META-INF/NOTICE" to="legal/batik-NOTICE.txt"/>
 			</mapper>
 		</unjar>
 		<!-- Install JUnit -->
 		<unjar dest="${build.jardir}" src="${build.lib}/junit-4.5.jar" overwrite="false">
 			<patternset>
-				<include name="junit/**" />
-				<include name="org/junit/**" />
-				<include name="org/hamcrest/**" />
-				<include name="LICENSE.txt" />
+				<include name="junit/**"/>
+				<include name="org/junit/**"/>
+				<include name="org/hamcrest/**"/>
+				<include name="LICENSE.txt"/>
 			</patternset>
 			<mapper>
-				<globmapper from="LICENSE.txt" to="legal/junit-LICENSE.txt" />
+				<globmapper from="LICENSE.txt" to="legal/junit-LICENSE.txt"/>
 			</mapper>
 		</unjar>
 		<!-- Install PDF Transcoder (from Apache Batik / Apache FOP) -->
 		<unjar dest="${build.jardir}" src="${build.lib}/pdf-transcoder.jar" overwrite="false">
 			<patternset>
-				<include name="legal/**" />
-				<include name="org/apache/**" />
-				<include name="META-INF/LICENSE" />
-				<include name="META-INF/NOTICE" />
+				<include name="legal/**"/>
+				<include name="org/apache/**"/>
+				<include name="META-INF/LICENSE"/>
+				<include name="META-INF/NOTICE"/>
 			</patternset>
 			<mapper>
-				<globmapper from="META-INF/LICENSE" to="legal/pdf-transcoder-LICENSE.txt" />
-				<globmapper from="META-INF/NOTICE" to="legal/pdf-transcoder-NOTICE.txt" />
+				<globmapper from="META-INF/LICENSE" to="legal/pdf-transcoder-LICENSE.txt"/>
+				<globmapper from="META-INF/NOTICE" to="legal/pdf-transcoder-NOTICE.txt"/>
 			</mapper>
 		</unjar>
 		<!-- Install XML Commons External -->
 		<unjar dest="${build.jardir}" src="${build.lib}/xml-commons-external-1.3.04.jar" overwrite="false">
 			<patternset>
-				<include name="org/apache/xmlcommons/**" />
-				<include name="org/w3c/**" />
+				<include name="org/apache/xmlcommons/**"/>
+				<include name="org/w3c/**"/>
 			</patternset>
 		</unjar>
 		<!-- add extra licence file for XML Commons External -->
-		<copy file="${build.lib}/xml-commons-external-1.3.04.jar.LICENSE.txt" tofile="${build.jardir}/legal/xml-commons-external-LICENSE.txt" />
+		<copy file="${build.lib}/xml-commons-external-1.3.04.jar.LICENSE.txt" tofile="${build.jardir}/legal/xml-commons-external-LICENSE.txt"/>
 
 		<!-- Source code -->
-		<mkdir dir="${build.jardir}/src" />
+		<mkdir dir="${build.jardir}/src"/>
 		<copy todir="${build.jardir}/src">
 			<fileset dir="${source}">
 				<patternset refid="${build.patternset}"/>
@@ -369,13 +390,13 @@
 	<target name="jar" description="Creates jar file in base dir" depends="jar_prepare">
 		<jar basedir="${build.jardir}/" jarfile="${build.jarfile}" manifest="${source}/META-INF/MANIFEST.MF">
 			<manifest>
-				<attribute name="Main-class" value="${main-class}" />
+				<attribute name="Main-class" value="${main-class}"/>
 				<attribute name="Manifest-Version" value="${release.version}"/>
 				<attribute name="Release-Date" value="${now}"/>
 				<attribute name="Built-By" value="${user.name}"/>
-				<attribute name="Implementation-Title" value="${ELKI_LONG}" />
-				<attribute name="Implementation-Version" value="${release.version}" />
-				<attribute name="Implementation-URL" value="${ELKI_URL}" />
+				<attribute name="Implementation-Title" value="${ELKI_LONG}"/>
+				<attribute name="Implementation-Version" value="${release.version}"/>
+				<attribute name="Implementation-URL" value="${ELKI_URL}"/>
 			</manifest>
 		</jar>
 	</target>
@@ -384,22 +405,22 @@
 	
 	<!-- Deployment -->
 	<target name="deploy" description="Copies the executable jar file to archive and executable directories" depends="jar,doc">
-		<mkdir dir="${deploy.output}" />
+		<mkdir dir="${deploy.output}"/>
 		<copy todir="${deploy.output}">
-			<fileset file="${build.jarfile}" />
+			<fileset file="${build.jarfile}"/>
 		</copy>
 		<copy todir="${deploy.latest}">
-			<fileset file="${build.jarfile}" />
+			<fileset file="${build.jarfile}"/>
 		</copy>
 	</target>
 	
 	<!-- Release -->
 	<target name="release" description="Publish a new release to the web site">
-		<fail unless="release.official" message="Only official builds can be released. Use 'deploy'." />
-		<fail unless="release.target" message="No release target folder given." />
-		<antcall target="clean" />
-		<antcall target="deploy" />
-		<mkdir dir="${release.target}" />
+		<fail unless="release.official" message="Only official builds can be released. Use 'deploy'."/>
+		<fail unless="release.target" message="No release target folder given."/>
+		<antcall target="clean"/>
+		<antcall target="deploy"/>
+		<mkdir dir="${release.target}"/>
 		<copy todir="${release.target}">
 			<fileset dir="${deploy.output}"/>
 		</copy>
