@@ -216,7 +216,7 @@ public class UpdateRunner {
     /**
      * Find out which component we are waiting for.
      * 
-     * @return
+     * @return component
      */
     public JSVGComponent getAttachedTo() {
       return attachedTo;
