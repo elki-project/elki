@@ -114,4 +114,13 @@ public class DefaultPageHeader implements PageHeader {
     public int getPageSize() {
         return pageSize;
     }
+    
+    /**
+     * Returns the number of pages necessary for the header
+     *
+     * @return the number of pages
+     */
+    public int getReservedPages() {
+  	  return size()/getPageSize()+1;
+    }
 }

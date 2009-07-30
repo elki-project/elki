@@ -8,6 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.RandomAccessFile;
 
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 
 /**
@@ -70,7 +71,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
         // reading empty nodes in Stack
         int i = 0;
         while(file.getFilePointer() + pageSize <= file.length()) {
-          int offset = header.size() + pageSize * i;
+          int offset = (header.getReservedPages() + i) * pageSize;
           byte[] buffer = new byte[pageSize];
           file.seek(offset);
           file.read(buffer);
@@ -126,7 +127,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
       // get from file and put to cache
       if(page == null) {
         readAccess++;
-        int offset = header.size() + pageSize * pageID;
+        int offset = (header.getReservedPages() + pageID) * pageSize;
         byte[] buffer = new byte[pageSize];
         file.seek(offset);
         file.read(buffer);
@@ -160,7 +161,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
       // delete from file
       writeAccess++;
       byte[] array = pageToByteArray(null);
-      int offset = header.size() + pageSize * pageID;
+      int offset =  (header.getReservedPages() + pageID) * pageSize;
       file.seek(offset);
       file.write(array);
     }
@@ -181,7 +182,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
         page.setDirty(false);
         writeAccess++;
         byte[] array = pageToByteArray(page);
-        int offset = header.size() + pageSize * page.getID();
+        int offset = (header.getReservedPages() + page.getID()) * pageSize;
         file.seek(offset);
         file.write(array);
       }
@@ -235,7 +236,9 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
         return null;
       }
       else if(type == FILLED_PAGE) {
-        return (P) ois.readObject();
+    	RStarTreeNode page = new RStarTreeNode();
+    	page.readExternal(ois);
+    	return (P) page;
       }
       else {
         throw new IllegalArgumentException("Unknown type: " + type);
@@ -276,7 +279,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(baos);
         oos.writeInt(FILLED_PAGE);
-        oos.writeObject(page);
+        page.writeExternal(oos);
         oos.close();
         baos.close();
         byte[] array = baos.toByteArray();
