@@ -1,8 +1,9 @@
-package experimentalcode.arthur;
+package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 
 /**
  * Squared Pearson correlation distance function for feature vectors.
