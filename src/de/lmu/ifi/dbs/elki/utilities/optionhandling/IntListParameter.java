@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Vector;
 
 /**
- * Paramter class for a parameter specifying a list of integer values.
+ * Parameter class for a parameter specifying a list of integer values.
  * 
  * @author Elke Achtert
  */
