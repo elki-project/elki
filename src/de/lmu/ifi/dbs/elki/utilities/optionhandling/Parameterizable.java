@@ -57,7 +57,7 @@ public interface Parameterizable {
   /**
    * Fill the given collection with a list of available options.
    *  
-   * @param collection collection to fill
+   * @return array of parameterizable and options
    */
   public ArrayList<Pair<Parameterizable, Option<?>>> collectOptions();  
 }
