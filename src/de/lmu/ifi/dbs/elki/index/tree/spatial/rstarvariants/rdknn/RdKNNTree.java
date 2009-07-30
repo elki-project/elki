@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -463,5 +464,15 @@ public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D,
   @Override
   protected RdKNNEntry<D, N> createRootEntry() {
     return new RdKNNDirectoryEntry<D, N>(0, null, null);
+  }
+  
+  /**
+   * Return the node base class.
+   * 
+   * @return node base class
+   */
+  @Override
+  protected Class<RdKNNNode<D, N>> getNodeClass() {
+    return ClassGenericsUtil.uglyCastIntoSubclass(RdKNNNode.class);
   }
 }

@@ -83,4 +83,14 @@ public class RStarTree<O extends NumberVector<O,? >> extends NonFlatRStarTree<O,
   protected void postDelete(O o) {
     // do nothing
   }
+  
+  /**
+   * Return the node base class.
+   * 
+   * @return node base class
+   */
+  @Override
+  protected Class<RStarTreeNode> getNodeClass() {
+    return RStarTreeNode.class;
+  }
 }

@@ -95,7 +95,7 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
    * The file storing the entries of this index.
    */
   protected PageFile<N> file;
-
+  
   /**
    * True if this index is already initialized.
    */
@@ -245,7 +245,7 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
 
     // init the file
     TreeIndexHeader header = createHeader();
-    this.file = new PersistentPageFile<N>(header, cacheSize, new LRUCache<N>(), fileName);
+    this.file = new PersistentPageFile<N>(header, cacheSize, new LRUCache<N>(), fileName, getNodeClass());
 
     this.dirCapacity = header.getDirCapacity();
     this.leafCapacity = header.getLeafCapacity();
@@ -282,7 +282,7 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
     	  initializeFromFile();
       }else{
 
-    	 this.file = new PersistentPageFile<N>(createHeader(), cacheSize, new LRUCache<N>(), fileName);
+    	 this.file = new PersistentPageFile<N>(createHeader(), cacheSize, new LRUCache<N>(), fileName, getNodeClass());
       }
     }
 
@@ -373,4 +373,10 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
    * @param o the object to be deleted
    */
   abstract protected void postDelete(O o);
+  
+  /**
+   * Get the node class of this index
+   * @return
+   */
+  abstract protected Class<N> getNodeClass();
 }

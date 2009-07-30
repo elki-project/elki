@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.util.PQNode;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.Identifiable;
 import de.lmu.ifi.dbs.elki.utilities.QueryStatistic;
 import de.lmu.ifi.dbs.elki.utilities.heap.DefaultHeap;
@@ -789,5 +790,15 @@ public class MkCoPTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
   @Override
   protected MkCoPEntry<D, N> createRootEntry() {
     return new MkCoPDirectoryEntry<D, N>(null, null, 0, null, null);
+  }
+  
+  /**
+   * Return the node base class.
+   * 
+   * @return node base class
+   */
+  @Override
+  protected Class<MkCoPTreeNode<O, D, N>> getNodeClass() {
+    return ClassGenericsUtil.uglyCastIntoSubclass(MkCoPTreeNode.class);
   }
 }
