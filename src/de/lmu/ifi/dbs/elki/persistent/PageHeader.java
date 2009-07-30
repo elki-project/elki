@@ -52,4 +52,11 @@ public interface PageHeader {
      * @return the size of a page in Bytes
      */
     int getPageSize();
+    
+    /**
+     * Returns the number of pages necessary for the header
+     *
+     * @return the number of pages
+     */
+    public int getReservedPages();
 }
