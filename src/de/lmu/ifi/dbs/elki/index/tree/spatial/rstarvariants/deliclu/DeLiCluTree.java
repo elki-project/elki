@@ -212,4 +212,14 @@ public class DeLiCluTree<O extends NumberVector<O, ?>> extends NonFlatRStarTree<
     protected void postDelete(O o) {
         // do nothing
     }
+    
+    /**
+     * Return the node base class.
+     * 
+     * @return node base class
+     */
+    @Override
+    protected Class<DeLiCluNode> getNodeClass() {
+      return DeLiCluNode.class;
+    }
 }

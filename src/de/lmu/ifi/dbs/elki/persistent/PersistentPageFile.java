@@ -8,7 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.RandomAccessFile;
 
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
+import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 
 /**
@@ -40,6 +40,11 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
    * The header of this page file.
    */
   protected final PageHeader header;
+  
+  /**
+   * The type of pages we use.
+   */
+  protected final Class<? extends P> pageclass;
 
   /**
    * Creates a new PersistentPageFile from an existing file.
@@ -48,9 +53,11 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
    * @param fileName the name of the file
    * @param cacheSize the size of the cache in Byte
    * @param cache the class of the cache to be used
+   * @param pageclass the class of pages to be used
    */
-  public PersistentPageFile(PageHeader header, int cacheSize, Cache<P> cache, String fileName) {
+  public PersistentPageFile(PageHeader header, int cacheSize, Cache<P> cache, String fileName, Class<? extends P> pageclass) {
     super();
+    this.pageclass = pageclass;
 
     try {
       // init the file
@@ -226,7 +233,6 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
    * @param array the byte array from which the object should be reconstructed
    * @return a serialized object from the specified byte array
    */
-  @SuppressWarnings("unchecked")
   private P byteArrayToPage(byte[] array) {
     try {
       ByteArrayInputStream bais = new ByteArrayInputStream(array);
@@ -236,9 +242,18 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
         return null;
       }
       else if(type == FILLED_PAGE) {
-    	RStarTreeNode page = new RStarTreeNode();
-    	page.readExternal(ois);
-    	return (P) page;
+    	  P page;
+        try {
+          page = pageclass.newInstance();
+        }
+        catch(InstantiationException e) {
+          throw new AbortException("Error instanciating an index page", e);
+        }
+        catch(IllegalAccessException e) {
+          throw new AbortException("Error instanciating an index page", e);
+        }
+    	  page.readExternal(ois);
+    	  return page;
       }
       else {
         throw new IllegalArgumentException("Unknown type: " + type);

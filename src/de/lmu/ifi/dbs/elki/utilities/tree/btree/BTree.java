@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.persistent.LRUCache;
 import de.lmu.ifi.dbs.elki.persistent.MemoryPageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PersistentPageFile;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.output.ObjectPrinter;
 
 /**
@@ -87,7 +88,8 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
   public BTree(int cacheSize, String fileName) {
     this();
     // init the file
-    this.file = new PersistentPageFile<BTreeNode<K, V>>(new DefaultPageHeader(), cacheSize, new LRUCache<BTreeNode<K, V>>(), fileName);
+    Class<BTreeNode<K,V>> nodeclass = ClassGenericsUtil.uglyCastIntoSubclass(BTreeNode.class);
+    this.file = new PersistentPageFile<BTreeNode<K, V>>(new DefaultPageHeader(), cacheSize, new LRUCache<BTreeNode<K, V>>(), fileName, nodeclass);
 
     if(getRoot() == null) {
       throw new IllegalArgumentException("No root specified in file " + fileName);
@@ -109,7 +111,8 @@ public class BTree<K extends Comparable<K> & Externalizable, V extends Externali
     this();
     int m = determineOrder(pageSize, keySize, valueSize);
 
-    this.file = new PersistentPageFile<BTreeNode<K, V>>(new DefaultPageHeader(pageSize), cacheSize, new LRUCache<BTreeNode<K, V>>(), fileName);
+    Class<BTreeNode<K,V>> nodeclass = ClassGenericsUtil.uglyCastIntoSubclass(BTreeNode.class);
+    this.file = new PersistentPageFile<BTreeNode<K, V>>(new DefaultPageHeader(pageSize), cacheSize, new LRUCache<BTreeNode<K, V>>(), fileName, nodeclass);
 
     BTreeNode<K, V> root = new BTreeNode<K, V>(m, null, file);
     file.writePage(root);

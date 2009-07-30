@@ -213,4 +213,14 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
   protected void postDelete(O o) {
     // do nothing
   }
+  
+  /**
+   * Return the node base class.
+   * 
+   * @return node base class
+   */
+  @Override
+  protected Class<FlatRStarTreeNode> getNodeClass() {
+    return FlatRStarTreeNode.class;
+  }
 }

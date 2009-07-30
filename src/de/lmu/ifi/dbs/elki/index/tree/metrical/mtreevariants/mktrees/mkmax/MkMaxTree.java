@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.QueryStatistic;
 
 /**
@@ -342,5 +343,15 @@ public class MkMaxTree<O extends DatabaseObject, D extends Distance<D>> extends 
   @Override
   protected MkMaxEntry<D> createRootEntry() {
     return new MkMaxDirectoryEntry<D>(null, null, 0, null, null);
+  }
+  
+  /**
+   * Return the node base class.
+   * 
+   * @return node base class
+   */
+  @Override
+  protected Class<MkMaxTreeNode<O, D>> getNodeClass() {
+    return ClassGenericsUtil.uglyCastIntoSubclass(MkMaxTreeNode.class);
   }
 }

@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 
 /**
@@ -155,5 +156,15 @@ public class MTree<O extends DatabaseObject, D extends Distance<D>> extends Abst
   @Override
   protected MTreeNode<O, D> createNewDirectoryNode(int capacity) {
     return new MTreeNode<O, D>(file, capacity, false);
+  }
+  
+  /**
+   * Return the node base class.
+   * 
+   * @return node base class
+   */
+  @Override
+  protected Class<MTreeNode<O, D>> getNodeClass() {
+    return ClassGenericsUtil.uglyCastIntoSubclass(MTreeNode.class);
   }
 }

@@ -142,7 +142,8 @@ public class PersistentHeap<K extends Comparable<K> & Serializable, V extends Id
       this.file = new MemoryPageFile<Deap<K, V>>(pageSize, maxCacheSize * pageSize, new LRUCache<Deap<K, V>>());
     }
     else {
-      this.file = new PersistentPageFile<Deap<K, V>>(new DefaultPageHeader(pageSize), maxCacheSize * pageSize, new LRUCache<Deap<K, V>>(), fileName);
+      Class<Deap<K,V>> deapclass = ClassGenericsUtil.uglyCastIntoSubclass(Deap.class);
+      this.file = new PersistentPageFile<Deap<K, V>>(new DefaultPageHeader(pageSize), maxCacheSize * pageSize, new LRUCache<Deap<K, V>>(), fileName, deapclass);
     }
 
     if(logger.isDebugging()) {
