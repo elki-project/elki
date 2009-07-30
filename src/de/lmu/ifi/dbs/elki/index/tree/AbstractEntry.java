@@ -54,7 +54,7 @@ public abstract class AbstractEntry implements Entry {
      * represented by this entry to the specified stream.
      */
     public void writeExternal(ObjectOutput out) throws IOException {
-        out.write(id);
+        out.writeInt(id);
     }
 
     /**

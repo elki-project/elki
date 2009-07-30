@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.index.tree;
 
+import java.io.File;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
@@ -270,14 +271,19 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
     // determine minimum and maximum entries in a node
     // todo verbose flag as parameter
     // initializeCapacities(object, true);
-    initializeCapacities(object, false);
+ 	 initializeCapacities(object, false);
 
     // init the file
     if(fileName == null) {
       this.file = new MemoryPageFile<N>(pageSize, cacheSize, new LRUCache<N>());
     }
-    else {
-      this.file = new PersistentPageFile<N>(createHeader(), cacheSize, new LRUCache<N>(), fileName);
+    else { 
+      if(new File(fileName).exists()){
+    	  initializeFromFile();
+      }else{
+
+    	 this.file = new PersistentPageFile<N>(createHeader(), cacheSize, new LRUCache<N>(), fileName);
+      }
     }
 
     // create empty root

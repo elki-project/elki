@@ -92,7 +92,7 @@ public class SpatialDirectoryEntry extends AbstractEntry implements SpatialEntry
   @Override
   public void writeExternal(ObjectOutput out) throws IOException {
     super.writeExternal(out);
-    out.writeObject(mbr);
+    mbr.writeExternal(out);
   }
 
   /**
@@ -107,6 +107,7 @@ public class SpatialDirectoryEntry extends AbstractEntry implements SpatialEntry
   @Override
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     super.readExternal(in);
-    this.mbr = (HyperBoundingBox) in.readObject();
+    this.mbr = new HyperBoundingBox();
+    this.mbr.readExternal(in);
   }
 }

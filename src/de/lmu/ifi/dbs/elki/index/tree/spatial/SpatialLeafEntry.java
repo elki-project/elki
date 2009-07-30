@@ -100,7 +100,10 @@ public class SpatialLeafEntry extends AbstractEntry implements SpatialEntry {
   @Override
   public void writeExternal(ObjectOutput out) throws IOException {
     super.writeExternal(out);
-    out.writeObject(values);
+    out.writeInt(values.length);
+    for(double v : values) {
+      out.writeDouble(v);
+    }
   }
 
   /**
@@ -114,7 +117,10 @@ public class SpatialLeafEntry extends AbstractEntry implements SpatialEntry {
   @Override
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     super.readExternal(in);
-    this.values = (double[]) in.readObject();
+    values = new double[in.readInt()];
+    for(int d = 0; d<values.length;d++) {
+      values[d] = in.readDouble();
+    }
   }
 
 
