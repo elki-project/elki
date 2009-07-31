@@ -50,9 +50,13 @@ public class MiniGUI extends JPanel {
 
   public static final int BIT_INVALID = 1;
 
-  public static final int BIT_FLAG_INVALID = 2;
+  public static final int BIT_SYNTAX_ERROR = 2;
 
   public static final int BIT_NO_NAME_BUT_VALUE = 3;
+
+  public static final int BIT_OPTIONAL = 4;
+
+  public static final int BIT_DEFAULT_VALUE = 5;
 
   static final String[] columns = { "Parameter", "Value" };
 
@@ -193,16 +197,24 @@ public class MiniGUI extends JPanel {
         }
       }
       BitSet bits = new BitSet();
-      boolean optional = false;
       if(option instanceof Parameter<?, ?>) {
         Parameter<?, ?> par = (Parameter<?, ?>) option;
-        optional = par.isOptional();
+        if (par.isOptional()) {
+          bits.set(BIT_OPTIONAL);
+        }
+        if (par.hasDefaultValue() && par.tookDefaultValue()) {
+          bits.set(BIT_DEFAULT_VALUE);
+        }
       }
       else if(option instanceof Flag) {
-        optional = true;
+        bits.set(BIT_OPTIONAL);
+      } else {
+        logger.warning("Option is neither Parameter nor Flag!");
       }
-      if (value == "" && !optional) {
-        bits.set(BIT_INCOMPLETE);
+      if(value == "") {
+        if (!bits.get(BIT_DEFAULT_VALUE) && !bits.get(BIT_OPTIONAL)) {
+          bits.set(BIT_INCOMPLETE);
+        }
       }
       if(value != "") {
         try {
@@ -305,7 +317,7 @@ public class MiniGUI extends JPanel {
 
     @Override
     public int getRowCount() {
-      return parameters.size() + 1;
+      return parameters.size();
     }
 
     @Override
@@ -344,8 +356,8 @@ public class MiniGUI extends JPanel {
     }
 
     @Override
-    public boolean isCellEditable(@SuppressWarnings("unused") int rowIndex, @SuppressWarnings("unused") int columnIndex) {
-      return true;
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+      return (columnIndex == 1) || (rowIndex > parameters.size());
     }
 
     @Override
@@ -371,10 +383,10 @@ public class MiniGUI extends JPanel {
 
           if(p.getFirst() instanceof Flag) {
             if((!Flag.SET.equals(s)) && (!Flag.NOT_SET.equals(s))) {
-              flags.set(BIT_FLAG_INVALID);
+              flags.set(BIT_SYNTAX_ERROR);
             }
             else {
-              flags.clear(BIT_FLAG_INVALID);
+              flags.clear(BIT_SYNTAX_ERROR);
             }
           }
         }
@@ -403,9 +415,13 @@ public class MiniGUI extends JPanel {
 
     private ArrayList<Triple<Option<?>, String, BitSet>> parameters;
 
-    private static final Color COLOR_INCOMPLETE = new Color(0x7F7FFF);
+    private static final Color COLOR_INCOMPLETE = new Color(0xAFAFFF);
 
-    private static final Color COLOR_SYNTAX_ERROR = new Color(0xFF7F7F);
+    private static final Color COLOR_SYNTAX_ERROR = new Color(0xFFAFAF);
+
+    private static final Color COLOR_OPTIONAL = new Color(0xAFFFAF);
+
+    private static final Color COLOR_DEFAULT_VALUE = new Color(0xBFBFBF);
 
     public HighlightingRenderer(ArrayList<Triple<Option<?>, String, BitSet>> parameters) {
       super();
@@ -427,7 +443,7 @@ public class MiniGUI extends JPanel {
         if((p.getThird().get(BIT_INVALID))) {
           c.setBackground(COLOR_SYNTAX_ERROR);
         }
-        else if((p.getThird().get(BIT_FLAG_INVALID))) {
+        else if((p.getThird().get(BIT_SYNTAX_ERROR))) {
           c.setBackground(COLOR_SYNTAX_ERROR);
         }
         else if((p.getThird().get(BIT_NO_NAME_BUT_VALUE))) {
@@ -435,6 +451,12 @@ public class MiniGUI extends JPanel {
         }
         else if((p.getThird().get(BIT_INCOMPLETE))) {
           c.setBackground(COLOR_INCOMPLETE);
+        }
+        else if((p.getThird().get(BIT_OPTIONAL))) {
+          c.setBackground(COLOR_OPTIONAL);
+        }
+        else if((p.getThird().get(BIT_DEFAULT_VALUE))) {
+          c.setBackground(COLOR_DEFAULT_VALUE);
         }
         else {
           c.setBackground(null);
