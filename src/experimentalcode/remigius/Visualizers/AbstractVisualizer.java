@@ -23,14 +23,15 @@ public abstract class AbstractVisualizer<O extends DatabaseObject, V extends Vis
   private int level;
   private String name;
   
-  public void init(Database<O> db, VisualizationManager<O> v){
-    init(db, v, 0);
+  public void init(Database<O> db, VisualizationManager<O> v, String name){
+    init(db, v, 0, name);
   }
   
-  public void init(Database<O> db, VisualizationManager<O> v, int level){
+  public void init(Database<O> db, VisualizationManager<O> v, int level, String name){
     this.database = db;
     this.visManager = v;
     this.level = level;
+    this.name = name;
   }
   
   @Override
