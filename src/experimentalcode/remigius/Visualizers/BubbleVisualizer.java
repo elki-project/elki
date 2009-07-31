@@ -53,6 +53,8 @@ public class BubbleVisualizer<O extends DoubleVector> extends PlanarVisualizer<O
 	private Result result;
 
 	private Clustering<Model> clustering;
+	
+	private static final String NAME = "Bubbles";
 
 	public BubbleVisualizer(){
 		addOption(GAMMA_PARAM);
@@ -61,7 +63,7 @@ public class BubbleVisualizer<O extends DoubleVector> extends PlanarVisualizer<O
 	}
 	
 	public void setup(Database<O> database, AnnotationResult<Double> anResult, Result r, DoubleScale normalizationScale, VisualizationManager<O> visManager){
-		init(database, visManager, 1000);
+		init(database, visManager, 1000, NAME);
 		this.anResult = anResult;
 
 		this.normalizationScale = normalizationScale;
@@ -145,9 +147,5 @@ public class BubbleVisualizer<O extends DoubleVector> extends PlanarVisualizer<O
 		}
 
 		return new PlanarVisualization(dimx, dimy, layer);
-	}
-	
-	public String getName(){
-		return "Bubbles";
 	}
 }

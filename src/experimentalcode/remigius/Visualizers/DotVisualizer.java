@@ -11,11 +11,13 @@ import experimentalcode.remigius.visualization.PlanarVisualization;
 
 public class DotVisualizer<O extends DoubleVector> extends PlanarVisualizer<O> {
   
+  private static final String NAME = "Dots";
+  
 	public DotVisualizer(){
 	}
 
 	public void setup(Database<O> database, VisualizationManager<O> v){
-		init(database, v, Integer.MAX_VALUE-1000);
+		init(database, v, Integer.MAX_VALUE-1000, NAME);
 	}
 
 	@Override
@@ -27,9 +29,5 @@ public class DotVisualizer<O extends DoubleVector> extends PlanarVisualizer<O> {
 			layer.appendChild(dot);
 		}
 		return new PlanarVisualization(dimx, dimy, layer);
-	}
-
-	public String getName(){
-		return "Dots";
 	}
 }

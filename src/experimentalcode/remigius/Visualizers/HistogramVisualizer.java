@@ -12,27 +12,30 @@ import experimentalcode.remigius.visualization.ScalarVisualization;
 
 public class HistogramVisualizer<O extends DoubleVector> extends ScalarVisualizer<O>{
 
+  private static final String NAME = "Histograms";
+  
   public void setup(Database<O> database, VisualizationManager<O> visManager) {
-    init(database, visManager);
+    init(database, visManager, NAME);
     setupCSS();
   }
 
   private void setupCSS() {
 
-    // TODO: Set CSS
+    // TODO: Set CSS.
   }
 
   @Override
   protected ScalarVisualization visualize(SVGPlot svgp, Element layer) {
-
+    
+    // TODO: Fix Min, Max, Bins. 
     AggregatingHistogram<Double, Double> hist = AggregatingHistogram.DoubleSumHistogram(5, 0, 100);
     for (Integer id : database.getIDs()){
       hist.aggregate(database.get(id).getValue(dim), 0.5);
     }
 
-    // TODO: Introduce a proper shape
+    // TODO: Introduce a proper shape & scaling.
     for (Integer id : database.getIDs()){
-      layer.appendChild(ShapeLibrary.createBubble(svgp.getDocument(), database.get(id).getValue(dim), 1, 0.001*hist.get(database.get(id).getValue(dim)), 0, id, dim, 0, toString()));
+      layer.appendChild(ShapeLibrary.createBubble(svgp.getDocument(), database.get(id).getValue(dim), 1, 0.0001*hist.get(database.get(id).getValue(dim)), 0, id, dim, 0, toString()));
     }
     
     return new ScalarVisualization(layer, dim);

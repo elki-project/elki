@@ -12,14 +12,16 @@ import experimentalcode.remigius.VisualizationManager;
 import experimentalcode.remigius.visualization.PlanarVisualization;
 
 public class AxisVisualizer<O extends DoubleVector> extends PlanarVisualizer<O>{
-	
+
+  private static final String NAME = "Axes";
+  
 	public AxisVisualizer(){
 	
 	}
 
 	public void setup(Database<O> database, VisualizationManager<O> visManager){
 		// We don't need the Database. Maybe another superclass / inheritance hierarchy would serve us better.
-		init(database, visManager);
+		init(database, visManager, NAME);
 	}
 
 	@Override
@@ -34,9 +36,5 @@ public class AxisVisualizer<O extends DoubleVector> extends PlanarVisualizer<O>{
 		}
 
 		return new PlanarVisualization(dimx, dimy, layer);
-	}
-
-	public String getName(){
-		return "Axes";
 	}
 }

@@ -18,13 +18,14 @@ import experimentalcode.remigius.visualization.PlanarVisualization;
 public class ReferencePointsVisualizer<O extends DoubleVector, V extends FeatureVector<V,N>,N extends Number> extends PlanarVisualizer<O> {
 
 	private CollectionResult<V> colResult;
+	private static final String NAME = "ReferencePoints";
 
 	public ReferencePointsVisualizer(){
 
 	}
 	
 	public void setup(Database<O> database, CollectionResult<V> colResult, VisualizationManager<O> visManager){
-		init(database, visManager, Integer.MAX_VALUE-2000);
+		init(database, visManager, Integer.MAX_VALUE-2000, NAME);
 		this.colResult = colResult;
 		setupCSS();
 	}
@@ -53,9 +54,5 @@ public class ReferencePointsVisualizer<O extends DoubleVector, V extends Feature
 			);
 		}
 		return new PlanarVisualization(dimx, dimy, layer);
-	}
-	
-	public String getName(){
-		return "ReferencePoints";
 	}
 }

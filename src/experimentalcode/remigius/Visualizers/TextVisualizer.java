@@ -18,13 +18,14 @@ import experimentalcode.remigius.visualization.PlanarVisualization;
 public class TextVisualizer<O extends DoubleVector> extends PlanarVisualizer<O> {
 
   private AnnotationResult<Double> anResult;
+  private static final String NAME = "ToolTips";
 
   public TextVisualizer() {
   }
 
   public void setup(Database<O> database, AnnotationResult<Double> anResult, VisualizationManager<O> visManager) {
 
-    init(database, visManager);
+    init(database, visManager, NAME);
     this.anResult = anResult;
     setupCSS();
   }
@@ -70,11 +71,6 @@ public class TextVisualizer<O extends DoubleVector> extends PlanarVisualizer<O> 
 
 
     return new PlanarVisualization(dimx, dimy, layer);
-  }
-
-  @Override
-  public String getName() {
-    return "Text";
   }
 
   @Override
