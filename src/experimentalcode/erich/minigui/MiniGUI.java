@@ -16,7 +16,9 @@ import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
 
 import javax.swing.BoxLayout;
+import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -30,6 +32,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.logging.MessageFormatter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
@@ -80,6 +83,7 @@ public class MiniGUI extends JPanel {
     parameterTable.setPreferredScrollableViewportSize(new Dimension(600, 200));
     parameterTable.setFillsViewportHeight(true);
     parameterTable.setDefaultRenderer(String.class, new HighlightingRenderer(parameters));
+    parameterTable.setDefaultEditor(String.class, new SelfadjustingRenderer(parameters, new JComboBox()));
 
     // Create the scroll pane and add the table to it.
     JScrollPane scrollPane = new JScrollPane(parameterTable);
@@ -460,6 +464,54 @@ public class MiniGUI extends JPanel {
         }
         else {
           c.setBackground(null);
+        }
+      }
+      return c;
+    }
+  }
+
+  protected static class SelfadjustingRenderer extends DefaultCellEditor {
+    /**
+     * Serial Version
+     */
+    private static final long serialVersionUID = 1L;
+
+    private ArrayList<Triple<Option<?>, String, BitSet>> parameters;
+    
+    private final JComboBox comboBox;
+
+    public SelfadjustingRenderer(ArrayList<Triple<Option<?>, String, BitSet>> parameters, JComboBox comboBox) {
+      super(comboBox);
+      this.comboBox = comboBox;
+      this.parameters = parameters;
+    }
+
+    /* (non-Javadoc)
+     * @see javax.swing.DefaultCellEditor#getTableCellEditorComponent(javax.swing.JTable, java.lang.Object, boolean, int, int)
+     */
+    @Override
+    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+      Component c = super.getTableCellEditorComponent(table, value, isSelected, row, column);
+      comboBox.removeAllItems();
+      if(row < parameters.size()) {
+        Triple<Option<?>, String, BitSet> p = parameters.get(row);
+        if (p.getFirst() instanceof ClassParameter<?>) {
+          ClassParameter<?> cp = (ClassParameter<?>) p.getFirst();
+          String prefix = cp.getRestrictionClass().getPackage().getName() + ".";
+          for (Class<?> impl : cp.getKnownImplementations()) {
+            String name = impl.getName();
+            if(name.startsWith(prefix)) {
+              comboBox.addItem(name.substring(prefix.length()));
+            }
+            else {
+              comboBox.addItem(name);
+            }
+          }
+        } else if (p.getFirst() instanceof Flag) {
+          comboBox.addItem(Flag.SET);
+          comboBox.addItem(Flag.NOT_SET);
+        } else if (p.getFirst() instanceof Parameter<?,?>) {
+          // no completion.
         }
       }
       return c;
