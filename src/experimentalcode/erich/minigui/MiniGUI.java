@@ -1,10 +1,12 @@
 package experimentalcode.erich.minigui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -15,17 +17,21 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
 
+import javax.swing.AbstractCellEditor;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellEditor;
 
 import de.lmu.ifi.dbs.elki.KDDTask;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
@@ -33,12 +39,14 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.logging.MessageFormatter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
@@ -60,6 +68,10 @@ public class MiniGUI extends JPanel {
   public static final int BIT_OPTIONAL = 4;
 
   public static final int BIT_DEFAULT_VALUE = 5;
+
+  private static final String STRING_USE_DEFAULT = "(use default)";
+
+  private static final String STRING_OPTIONAL = "(optional)";
 
   static final String[] columns = { "Parameter", "Value" };
 
@@ -83,7 +95,8 @@ public class MiniGUI extends JPanel {
     parameterTable.setPreferredScrollableViewportSize(new Dimension(600, 200));
     parameterTable.setFillsViewportHeight(true);
     parameterTable.setDefaultRenderer(String.class, new HighlightingRenderer(parameters));
-    parameterTable.setDefaultEditor(String.class, new SelfadjustingRenderer(parameters, new JComboBox()));
+    final AdjustingEditor editor = new AdjustingEditor(parameters);
+    parameterTable.setDefaultEditor(String.class, editor);
 
     // Create the scroll pane and add the table to it.
     JScrollPane scrollPane = new JScrollPane(parameterTable);
@@ -171,7 +184,9 @@ public class MiniGUI extends JPanel {
   private List<Pair<Parameterizable, Option<?>>> doSetParameters(boolean help, ArrayList<String> params) {
     KDDTask<DatabaseObject> task = new KDDTask<DatabaseObject>();
     try {
-      task.setParameters(params);
+      if(params.size() > 0) {
+        task.setParameters(params);
+      }
       if(!help) {
         outputArea.append("Test ok." + NEWLINE);
       }
@@ -203,20 +218,21 @@ public class MiniGUI extends JPanel {
       BitSet bits = new BitSet();
       if(option instanceof Parameter<?, ?>) {
         Parameter<?, ?> par = (Parameter<?, ?>) option;
-        if (par.isOptional()) {
+        if(par.isOptional()) {
           bits.set(BIT_OPTIONAL);
         }
-        if (par.hasDefaultValue() && par.tookDefaultValue()) {
+        if(par.hasDefaultValue() && par.tookDefaultValue()) {
           bits.set(BIT_DEFAULT_VALUE);
         }
       }
       else if(option instanceof Flag) {
         bits.set(BIT_OPTIONAL);
-      } else {
+      }
+      else {
         logger.warning("Option is neither Parameter nor Flag!");
       }
       if(value == "") {
-        if (!bits.get(BIT_DEFAULT_VALUE) && !bits.get(BIT_OPTIONAL)) {
+        if(!bits.get(BIT_DEFAULT_VALUE) && !bits.get(BIT_OPTIONAL)) {
           bits.set(BIT_INCOMPLETE);
         }
       }
@@ -244,8 +260,10 @@ public class MiniGUI extends JPanel {
     for(Triple<Option<?>, String, BitSet> t : parameters) {
       if(t.getFirst() != null) {
         if(t.getFirst() instanceof Parameter<?, ?> && t.getSecond() != null && t.getSecond().length() > 0) {
-          p.add("-" + t.getFirst().getOptionID().getName());
-          p.add(t.getSecond());
+          if(t.getSecond() != STRING_USE_DEFAULT && t.getSecond() != STRING_OPTIONAL) {
+            p.add("-" + t.getFirst().getOptionID().getName());
+            p.add(t.getSecond());
+          }
         }
         else if(t.getFirst() instanceof Flag) {
           if(t.getSecond() == Flag.SET) {
@@ -404,6 +422,7 @@ public class MiniGUI extends JPanel {
         // }
         // }
         p.setThird(flags);
+        runSetParameters(false);
       }
       else {
         logger.warning("Edited value is not a String!");
@@ -470,35 +489,50 @@ public class MiniGUI extends JPanel {
     }
   }
 
-  protected static class SelfadjustingRenderer extends DefaultCellEditor {
+  protected static class DropdownEditor extends DefaultCellEditor {
     /**
      * Serial Version
      */
     private static final long serialVersionUID = 1L;
 
     private ArrayList<Triple<Option<?>, String, BitSet>> parameters;
-    
+
     private final JComboBox comboBox;
 
-    public SelfadjustingRenderer(ArrayList<Triple<Option<?>, String, BitSet>> parameters, JComboBox comboBox) {
+    public DropdownEditor(ArrayList<Triple<Option<?>, String, BitSet>> parameters, JComboBox comboBox) {
       super(comboBox);
       this.comboBox = comboBox;
       this.parameters = parameters;
     }
 
-    /* (non-Javadoc)
-     * @see javax.swing.DefaultCellEditor#getTableCellEditorComponent(javax.swing.JTable, java.lang.Object, boolean, int, int)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * javax.swing.DefaultCellEditor#getTableCellEditorComponent(javax.swing
+     * .JTable, java.lang.Object, boolean, int, int)
      */
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
       Component c = super.getTableCellEditorComponent(table, value, isSelected, row, column);
       comboBox.removeAllItems();
+      Object val = table.getValueAt(row, column);
+      if(val != null) {
+        comboBox.addItem(val);
+        comboBox.setSelectedIndex(0);
+      }
       if(row < parameters.size()) {
         Triple<Option<?>, String, BitSet> p = parameters.get(row);
-        if (p.getFirst() instanceof ClassParameter<?>) {
+        if(p.getFirst() instanceof ClassParameter<?>) {
           ClassParameter<?> cp = (ClassParameter<?>) p.getFirst();
+          if(cp.hasDefaultValue()) {
+            comboBox.addItem(STRING_USE_DEFAULT);
+          }
+          else if(cp.isOptional()) {
+            comboBox.addItem(STRING_OPTIONAL);
+          }
           String prefix = cp.getRestrictionClass().getPackage().getName() + ".";
-          for (Class<?> impl : cp.getKnownImplementations()) {
+          for(Class<?> impl : cp.getKnownImplementations()) {
             String name = impl.getName();
             if(name.startsWith(prefix)) {
               comboBox.addItem(name.substring(prefix.length()));
@@ -507,14 +541,142 @@ public class MiniGUI extends JPanel {
               comboBox.addItem(name);
             }
           }
-        } else if (p.getFirst() instanceof Flag) {
-          comboBox.addItem(Flag.SET);
-          comboBox.addItem(Flag.NOT_SET);
-        } else if (p.getFirst() instanceof Parameter<?,?>) {
+        }
+        else if(p.getFirst() instanceof Flag) {
+          if(!Flag.SET.equals(val)) {
+            comboBox.addItem(Flag.SET);
+          }
+          if(!Flag.NOT_SET.equals(val)) {
+            comboBox.addItem(Flag.NOT_SET);
+          }
+        }
+        else if(p.getFirst() instanceof Parameter<?, ?>) {
           // no completion.
         }
       }
       return c;
+    }
+  }
+
+  protected static class FileNameEditor extends AbstractCellEditor implements TableCellEditor, ActionListener {
+    /**
+     * Serial version number
+     */
+    private static final long serialVersionUID = 1L;
+
+    final JPanel panel = new JPanel();
+    
+    final JTextField textfield = new JTextField();
+    
+    final JButton button = new JButton("...");
+    
+    final JFileChooser fc = new JFileChooser();
+
+    private ArrayList<Triple<Option<?>, String, BitSet>> parameters;
+    
+    public FileNameEditor(ArrayList<Triple<Option<?>, String, BitSet>> parameters) {
+      this.parameters = parameters;
+      button.addActionListener(this);
+      panel.setLayout(new BorderLayout());
+      panel.add(textfield, BorderLayout.CENTER);
+      panel.add(button, BorderLayout.EAST);
+    }
+
+    public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
+      int returnVal = fc.showOpenDialog(button);
+
+      if(returnVal == JFileChooser.APPROVE_OPTION) {
+        textfield.setText(fc.getSelectedFile().getPath());
+      }
+      else {
+        // Do nothing on cancel.
+      }
+      fireEditingStopped();
+    }
+
+    public Object getCellEditorValue() {
+      return textfield.getText();
+    }
+
+    public Component getTableCellEditorComponent(@SuppressWarnings("unused") JTable table, @SuppressWarnings("unused") Object value, @SuppressWarnings("unused") boolean isSelected, int row, @SuppressWarnings("unused") int column) {
+      if(row < parameters.size()) {
+        Triple<Option<?>, String, BitSet> p = parameters.get(row);
+        if(p.getFirst() instanceof FileParameter) {
+          FileParameter fp = (FileParameter) p.getFirst();
+          File f;
+          try {
+            f = fp.getValue();
+          }
+          catch(UnusedParameterException e) {
+            f = null;
+          }
+          if (f != null) {
+            String fn = f.getPath();
+            textfield.setText(fn);
+            fc.setSelectedFile(f);
+          } else {
+            textfield.setText("");
+            fc.setSelectedFile(null);
+          }
+        }
+      }
+      return panel;
+    }
+
+  }
+
+  protected static class AdjustingEditor extends AbstractCellEditor implements TableCellEditor {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 1L;
+
+    private final DropdownEditor dropdownEditor;
+
+    private final DefaultCellEditor defaultEditor;
+    
+    private final FileNameEditor fileNameEditor;
+
+    private TableCellEditor activeEditor;
+
+    private final ArrayList<Triple<Option<?>, String, BitSet>> parameters;
+
+    public AdjustingEditor(ArrayList<Triple<Option<?>, String, BitSet>> parameters) {
+      final JComboBox combobox = new JComboBox();
+      combobox.setEditable(true);
+      this.parameters = parameters;
+      this.dropdownEditor = new DropdownEditor(parameters, combobox);
+      this.defaultEditor = new DefaultCellEditor(new JTextField());
+      this.fileNameEditor = new FileNameEditor(parameters);
+    }
+
+    @Override
+    public Object getCellEditorValue() {
+      if(activeEditor == null) {
+        return null;
+      }
+      return activeEditor.getCellEditorValue();
+    }
+
+    @Override
+    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+      if(row < parameters.size()) {
+        Triple<Option<?>, String, BitSet> p = parameters.get(row);
+        if(p.getFirst() instanceof Flag) {
+          activeEditor = dropdownEditor;
+          return dropdownEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
+        }
+        if(p.getFirst() instanceof ClassParameter) {
+          activeEditor = dropdownEditor;
+          return dropdownEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
+        }
+        if (p.getFirst() instanceof FileParameter) {
+          activeEditor = fileNameEditor;
+          return fileNameEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
+        }
+      }
+      activeEditor = defaultEditor;
+      return defaultEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
     }
   }
 
