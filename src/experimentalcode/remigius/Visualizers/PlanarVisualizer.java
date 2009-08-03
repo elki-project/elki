@@ -1,15 +1,11 @@
 package experimentalcode.remigius.Visualizers;
 
-import org.w3c.dom.Element;
-
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
-import experimentalcode.remigius.visualization.PlanarVisualization;
 
 // TODO: Replace DoubleVector with NumberVector? - No, as long as we need DoubleVector for calcScales. 
-public abstract class PlanarVisualizer<O extends DoubleVector> extends AbstractVisualizer<O, PlanarVisualization> {
+public abstract class PlanarVisualizer<O extends DoubleVector> extends AbstractVisualizer<O> {
 
   protected int dimx;
   protected int dimy;
@@ -33,7 +29,4 @@ public abstract class PlanarVisualizer<O extends DoubleVector> extends AbstractV
   public Double getPositioned(O o, int dim) {
     return scales[dim].getScaled(o.getValue(dim));
   }
-  
-  @Override
-  protected abstract PlanarVisualization visualize(SVGPlot svgp, Element layer);
 }

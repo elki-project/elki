@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import experimentalcode.remigius.ShapeLibrary;
 import experimentalcode.remigius.VisualizationManager;
-import experimentalcode.remigius.visualization.PlanarVisualization;
 
 public class ReferencePointsVisualizer<O extends DoubleVector, V extends FeatureVector<V,N>,N extends Number> extends PlanarVisualizer<O> {
 
@@ -43,8 +42,8 @@ public class ReferencePointsVisualizer<O extends DoubleVector, V extends Feature
 	}
 
 	@Override
-	protected PlanarVisualization visualize(SVGPlot svgp, Element layer) {
-
+	public Element visualize(SVGPlot svgp) {
+	  Element layer = ShapeLibrary.createSVG(svgp.getDocument());
 		Iterator<V> iter = colResult.iterator();
 		
 		while (iter.hasNext()){
@@ -53,6 +52,6 @@ public class ReferencePointsVisualizer<O extends DoubleVector, V extends Feature
 					ShapeLibrary.createRef(svgp.getDocument(), getPositioned(v, dimx), getPositioned(v, dimy), 0, dimx, dimy, toString())
 			);
 		}
-		return new PlanarVisualization(dimx, dimy, layer);
+		return layer;
 	}
 }

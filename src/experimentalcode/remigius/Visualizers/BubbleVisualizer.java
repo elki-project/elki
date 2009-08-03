@@ -27,7 +27,6 @@ import experimentalcode.lisa.scale.GammaFunction;
 import experimentalcode.lisa.scale.LinearScale;
 import experimentalcode.remigius.ShapeLibrary;
 import experimentalcode.remigius.VisualizationManager;
-import experimentalcode.remigius.visualization.PlanarVisualization;
 
 public class BubbleVisualizer<O extends DoubleVector> extends PlanarVisualizer<O> {
 	
@@ -131,7 +130,8 @@ public class BubbleVisualizer<O extends DoubleVector> extends PlanarVisualizer<O
 	}
 
 	@Override
-	protected PlanarVisualization visualize(SVGPlot svgp, Element layer) {
+	public Element visualize(SVGPlot svgp) {
+	  Element layer = ShapeLibrary.createSVG(svgp.getDocument());
 		Iterator<Cluster<Model>> iter = clustering.getAllClusters().iterator();
 		int clusterID = 0;
 
@@ -145,7 +145,6 @@ public class BubbleVisualizer<O extends DoubleVector> extends PlanarVisualizer<O
 				);
 			}
 		}
-
-		return new PlanarVisualization(dimx, dimy, layer);
+		return layer;
 	}
 }

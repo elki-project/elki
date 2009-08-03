@@ -1,9 +1,10 @@
 package experimentalcode.remigius.Visualizers;
 
+import org.w3c.dom.Element;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
-import experimentalcode.remigius.visualization.Visualization;
 
 /**
  * Defines the requirements for a visualizer.
@@ -11,9 +12,8 @@ import experimentalcode.remigius.visualization.Visualization;
  * @author Remigius Wojdanowski
  *
  * @param <O> the type of objects this visualizer will process.
- * @param <V> the type of Visualization this visualizer will produce.
  */
-public interface Visualizer<O extends DatabaseObject, V extends Visualization> extends Parameterizable {
+public interface Visualizer<O extends DatabaseObject> extends Parameterizable {
 
   /**
    * Returns a two-dimensional Visualization.
@@ -21,9 +21,9 @@ public interface Visualizer<O extends DatabaseObject, V extends Visualization> e
    * @param svgp the {@link SVGPlot} the Visualization will be used.
    * @param dimx the dimension to appear as horizontal (x-) dimension
    * @param dimy the dimension to appear as vertical (y-) dimension.
-   * @return a two-dimensional {@link Visualization}.
+   * @return a two-dimensional {@link Element} representing a plot.
    */
-  public V visualize(SVGPlot svgp);
+  public Element visualize(SVGPlot svgp);
 
   /**
    * Returns a name for the visualizer. Intended to be used for displaying a

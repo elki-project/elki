@@ -7,7 +7,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import experimentalcode.remigius.ShapeLibrary;
 import experimentalcode.remigius.VisualizationManager;
-import experimentalcode.remigius.visualization.PlanarVisualization;
 
 public class DotVisualizer<O extends DoubleVector> extends PlanarVisualizer<O> {
   
@@ -21,13 +20,14 @@ public class DotVisualizer<O extends DoubleVector> extends PlanarVisualizer<O> {
 	}
 
 	@Override
-	protected PlanarVisualization visualize(SVGPlot svgp, Element layer) {
-
+	public Element visualize(SVGPlot svgp) {
+	  
+	  Element layer = ShapeLibrary.createSVG(svgp.getDocument()); 
 		for (int id : database.getIDs()){
-
 			Element dot = ShapeLibrary.createDot(svgp.getDocument(), getPositioned(database.get(id), dimx), (1 - getPositioned(database.get(id), dimy)), id, dimx, dimy);
 			layer.appendChild(dot);
+			svgp.putIdElement(ShapeLibrary.createID(ShapeLibrary.MARKER, id, dimx, dimy), dot);
 		}
-		return new PlanarVisualization(dimx, dimy, layer);
+		return layer;
 	}
 }
