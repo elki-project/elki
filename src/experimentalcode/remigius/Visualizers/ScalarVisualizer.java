@@ -6,9 +6,8 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
-import experimentalcode.remigius.visualization.ScalarVisualization;
 
-public abstract class ScalarVisualizer<O extends DoubleVector> extends AbstractVisualizer<O, ScalarVisualization> {
+public abstract class ScalarVisualizer<O extends DoubleVector> extends AbstractVisualizer<O> {
   
   protected int dim;
   
@@ -32,5 +31,5 @@ public abstract class ScalarVisualizer<O extends DoubleVector> extends AbstractV
   }
   
   @Override
-  protected abstract ScalarVisualization visualize(SVGPlot svgp, Element layer);
+  public abstract Element visualize(SVGPlot svgp);
 }

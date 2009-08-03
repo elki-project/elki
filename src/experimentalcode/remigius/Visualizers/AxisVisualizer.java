@@ -8,8 +8,8 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
+import experimentalcode.remigius.ShapeLibrary;
 import experimentalcode.remigius.VisualizationManager;
-import experimentalcode.remigius.visualization.PlanarVisualization;
 
 public class AxisVisualizer<O extends DoubleVector> extends PlanarVisualizer<O>{
 
@@ -25,7 +25,8 @@ public class AxisVisualizer<O extends DoubleVector> extends PlanarVisualizer<O>{
 	}
 
 	@Override
-	protected PlanarVisualization visualize(SVGPlot svgp, Element layer) {
+	public Element visualize(SVGPlot svgp) {
+	  Element layer = ShapeLibrary.createSVG(svgp.getDocument());
 		try {
 			SVGSimpleLinearAxis.drawAxis(svgp, layer, scales[dimx], 0, 1, 1, 1, true, true);
 			SVGSimpleLinearAxis.drawAxis(svgp, layer, scales[dimy], 0, 1, 0, 0, true, false);
@@ -35,6 +36,6 @@ public class AxisVisualizer<O extends DoubleVector> extends PlanarVisualizer<O>{
 		  LoggingUtil.exception(e);
 		}
 
-		return new PlanarVisualization(dimx, dimy, layer);
+		return layer;
 	}
 }

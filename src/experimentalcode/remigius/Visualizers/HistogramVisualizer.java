@@ -8,7 +8,6 @@ import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import experimentalcode.remigius.ShapeLibrary;
 import experimentalcode.remigius.VisualizationManager;
-import experimentalcode.remigius.visualization.ScalarVisualization;
 
 public class HistogramVisualizer<O extends DoubleVector> extends ScalarVisualizer<O>{
 
@@ -25,8 +24,8 @@ public class HistogramVisualizer<O extends DoubleVector> extends ScalarVisualize
   }
 
   @Override
-  protected ScalarVisualization visualize(SVGPlot svgp, Element layer) {
-    
+  public Element visualize(SVGPlot svgp) {
+    Element layer = ShapeLibrary.createSVG(svgp.getDocument());
     // TODO: Fix Min, Max, Bins. 
     AggregatingHistogram<Double, Double> hist = AggregatingHistogram.DoubleSumHistogram(5, 0, 100);
     for (Integer id : database.getIDs()){
@@ -38,6 +37,6 @@ public class HistogramVisualizer<O extends DoubleVector> extends ScalarVisualize
       layer.appendChild(ShapeLibrary.createBubble(svgp.getDocument(), database.get(id).getValue(dim), 1, 0.0001*hist.get(database.get(id).getValue(dim)), 0, id, dim, 0, toString()));
     }
     
-    return new ScalarVisualization(layer, dim);
+    return layer;
   }
 }

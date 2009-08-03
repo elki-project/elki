@@ -13,13 +13,12 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import experimentalcode.remigius.ShapeLibrary;
 import experimentalcode.remigius.VisualizationManager;
 import experimentalcode.remigius.gui.ToolTipListener;
-import experimentalcode.remigius.visualization.PlanarVisualization;
 
 public class TextVisualizer<O extends DoubleVector> extends PlanarVisualizer<O> {
 
   private AnnotationResult<Double> anResult;
   private static final String NAME = "ToolTips";
-
+  
   public TextVisualizer() {
   }
 
@@ -43,8 +42,10 @@ public class TextVisualizer<O extends DoubleVector> extends PlanarVisualizer<O> 
   }
 
   @Override
-  protected PlanarVisualization visualize(SVGPlot svgp, Element layer) {
+  public Element visualize(SVGPlot svgp) {
 
+    Element layer = ShapeLibrary.createSVG(svgp.getDocument());
+    
     for (int id : database.getIDs()) {
       Element tooltip = ShapeLibrary.createToolTip(svgp.getDocument(),
           getPositioned(database.get(id), dimx), (1 - getPositioned(
@@ -53,7 +54,7 @@ public class TextVisualizer<O extends DoubleVector> extends PlanarVisualizer<O> 
 
       String dotID = ShapeLibrary.createID(ShapeLibrary.MARKER, id, dimx, dimy);
 
-      Element dot = svgp.getDocument().getElementById(dotID);
+      Element dot = svgp.getIdElement(dotID);
       if (dot != null){
         EventTarget targ = (EventTarget) dot;
         ToolTipListener hoverer = new ToolTipListener(svgp.getDocument(), tooltip.getAttribute("id"));
@@ -67,10 +68,7 @@ public class TextVisualizer<O extends DoubleVector> extends PlanarVisualizer<O> 
 
       layer.appendChild(tooltip);
     }
-
-
-
-    return new PlanarVisualization(dimx, dimy, layer);
+    return layer;
   }
 
   @Override
