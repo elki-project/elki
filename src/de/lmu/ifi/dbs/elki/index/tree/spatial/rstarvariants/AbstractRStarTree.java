@@ -495,7 +495,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     }
 
     // minimum entries per directory node
-    dirMinimum = (int) Math.round((dirCapacity - 1) * 0.5);
+    dirMinimum = (int) Math.round((dirCapacity - 1) * 0.4);
     if(dirMinimum < 2) {
       dirMinimum = 2;
     }
@@ -509,7 +509,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     }
 
     // minimum entries per leaf node
-    leafMinimum = (int) Math.round((leafCapacity - 1) * 0.5);
+    leafMinimum = (int) Math.round((leafCapacity - 1) * 0.4);
     if(leafMinimum < 2) {
       leafMinimum = 2;
     }
@@ -1040,7 +1040,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
       DoubleDistance dist = distFunction.centerDistance(mbr, entry.getMBR());
       reInsertEntries[i] = new DistanceEntry<DoubleDistance, E>(entry, dist, i);
     }
-    Arrays.sort(reInsertEntries);
+    Arrays.sort(reInsertEntries, Collections.reverseOrder());
 
     // define, how many entries will be reinserted
     int start = (int) (0.3 * node.getNumEntries());
@@ -1114,11 +1114,20 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
           if(logger.isDebugging()) {
             logger.debugFine("parent " + parent);
           }
-          int i = parent.addDirectoryEntry(createNewDirectoryEntry(split));
+          parent.addDirectoryEntry(createNewDirectoryEntry(split));
 
           // adjust the entry representing the (old) node, that has
           // been
           // splitted
+          
+          //This does not work in the persistent version
+          // node.adjustEntry(subtree.getLastPathComponent().getEntry());
+          int i = 0;
+          for(; i < parent.getNumEntries(); i++) {
+            if(parent.getEntry(i).getID() == subtree.getLastPathComponent().getEntry().getID()) {
+              break;
+            }
+          }
           node.adjustEntry(parent.getEntry(i));
 
           // write changes in parent to file
