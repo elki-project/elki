@@ -4,18 +4,18 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 
 /**
- * Manhattan distance function to compute the Manhattan distance for a pair of
+ * Maximum distance function to compute the Minimum distance for a pair of
  * NumberVectors.
  * 
- * @author Arthur Zimek
+ * @author Erich Schubert
  * @param <V> the type of NumberVector to compute the distances in between
  */
-public class ManhattanDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDoubleDistanceFunction<V> {
+public class MinimumDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDoubleDistanceFunction<V> {
   /**
-   * Provides a Manhattan distance function that can compute the Manhattan
+   * Provides a Minimum distance function that can compute the Minimum
    * distance (that is a DoubleDistance) for FeatureVectors.
    */
-  public ManhattanDistanceFunction() {
+  public MinimumDistanceFunction() {
     super();
   }
 
@@ -23,10 +23,11 @@ public class ManhattanDistanceFunction<V extends NumberVector<V, ?>> extends Abs
     if(v1.getDimensionality() != v2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of NumberVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
     }
-    double sum = 0;
+    double min = Double.MAX_VALUE;
     for(int i = 1; i <= v1.getDimensionality(); i++) {
-      sum += Math.abs(v1.getValue(i).doubleValue() - v2.getValue(i).doubleValue());
+      double d = Math.abs(v1.getValue(i).doubleValue() - v2.getValue(i).doubleValue());
+      min = Math.min(d, min);
     }
-    return new DoubleDistance(sum);
+    return new DoubleDistance(min);
   }
 }
