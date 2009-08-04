@@ -212,7 +212,7 @@ public class ClassParameter<C> extends Parameter<String, String> {
       }
     }
     catch(Exception e) {
-      throw new WrongParameterValueException(this, value, e);
+      throw new WrongParameterValueException(this, value, "Error instanciating class: " + e.getMessage(), e);
     }
     return instance;
   }
