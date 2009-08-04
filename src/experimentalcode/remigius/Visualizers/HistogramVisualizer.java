@@ -27,15 +27,17 @@ public class HistogramVisualizer<O extends DoubleVector> extends ScalarVisualize
   public Element visualize(SVGPlot svgp) {
     Element layer = ShapeLibrary.createSVG(svgp.getDocument());
     // TODO: Fix Bins & aggregated values.
-    int bins = 5;
+    int bins = 20;
+    double frac = 1. / database.size();
     AggregatingHistogram<Double, Double> hist = AggregatingHistogram.DoubleSumHistogram(bins, scales[dim].getMin(), scales[dim].getMax());
-    for (Integer id : database.getIDs()){
-      hist.aggregate(database.get(id).getValue(dim), 0.5);
+    for (Integer id : database){
+      hist.aggregate(database.get(id).getValue(dim), frac);
     }
 
     // TODO: Introduce a proper shape & scaling.
-    for (Integer id : database.getIDs()){
-      layer.appendChild(ShapeLibrary.createRow(svgp.getDocument(), database.get(id).getValue(dim), 1, 0.009/bins, hist.get(database.get(id).getValue(dim)), dim, id));
+    for (Integer id : database){
+      double val = hist.get(database.get(id).getValue(dim));
+      layer.appendChild(ShapeLibrary.createRow(svgp.getDocument(), database.get(id).getValue(dim), 1 - val, 0.009/bins, val, dim, id));
     }
     
     return layer;

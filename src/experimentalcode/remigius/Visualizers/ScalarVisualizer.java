@@ -7,7 +7,7 @@ import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 
-public abstract class ScalarVisualizer<O extends DoubleVector> extends AbstractVisualizer<O> {
+public abstract class ScalarVisualizer<O extends DoubleVector> extends DoubleVectorVisualizer<O> {
   
   protected int dim;
   
