@@ -5,7 +5,7 @@ import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
 
 // TODO: Replace DoubleVector with NumberVector? - No, as long as we need DoubleVector for calcScales. 
-public abstract class PlanarVisualizer<O extends DoubleVector> extends AbstractVisualizer<O> {
+public abstract class PlanarVisualizer<O extends DoubleVector> extends DoubleVectorVisualizer<O> {
 
   protected int dimx;
   protected int dimy;
