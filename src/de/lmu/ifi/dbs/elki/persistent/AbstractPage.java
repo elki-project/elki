@@ -166,7 +166,7 @@ public abstract class AbstractPage<P extends AbstractPage<P>> implements Page<P>
 
     final P that = (P) o;
 
-    return id.equals(that.id);
+    return id.equals(that.getID());
   }
 
   /**

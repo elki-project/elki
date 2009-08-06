@@ -107,10 +107,13 @@ public abstract class ConstantObject<D extends ConstantObject<D>> implements Com
 
     final D that = (D) o;
 
-    if(hashCode != that.hashCode) {
+    if(hashCode != that.hashCode()) {
       return false;
     }
-    return !(name != null ? !name.equals(that.name) : that.name != null);
+    if (name == null) {
+      return (that.getName() == null);
+    }
+    return name.equals(that.getName());
   }
 
   /**
