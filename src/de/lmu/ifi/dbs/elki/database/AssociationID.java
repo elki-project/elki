@@ -189,10 +189,9 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
    * @param name the name of the desired AssociationID
    * @return the AssociationID for the given name if it exists, null otherwise
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "cast" })
   public static AssociationID<?> getAssociationID(final String name) {
-    AssociationID res = AssociationID.lookup(AssociationID.class, name);
-    return res;
+    return (AssociationID<?>) AssociationID.lookup(AssociationID.class, name);
   }
 
   /**
