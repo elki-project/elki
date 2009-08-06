@@ -1117,18 +1117,11 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
           parent.addDirectoryEntry(createNewDirectoryEntry(split));
 
           // adjust the entry representing the (old) node, that has
-          // been
-          // splitted
+          // been splitted
           
           //This does not work in the persistent version
           // node.adjustEntry(subtree.getLastPathComponent().getEntry());
-          int i = 0;
-          for(; i < parent.getNumEntries(); i++) {
-            if(parent.getEntry(i).getID() == subtree.getLastPathComponent().getEntry().getID()) {
-              break;
-            }
-          }
-          node.adjustEntry(parent.getEntry(i));
+          node.adjustEntry(parent.getEntry(subtree.getLastPathComponent().getIndex()));
 
           // write changes in parent to file
           file.writePage(parent);
