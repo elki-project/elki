@@ -19,17 +19,20 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.math.ReplacingHistogram;
+import de.lmu.ifi.dbs.elki.math.FlexiHistogram;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.OnlyOneIsAllowedToBeSetGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -44,14 +47,27 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>, D extends
   private CollectionResult<DoubleVector> result;
 
   /**
-   * OptionID for {@link #SAMPLING_FLAG}
+   * OptionID for {@link #EXACT_FLAG}
    */
-  public static final OptionID SAMPLING_ID = OptionID.getOrCreateOptionID("diststat.sampling", "Enable sampling to reduce runtime from O(2*n*n) to O(n*n)+O(n) " + "at the cost of evenutally having more than the configured number of bins.");
+  public static final OptionID EXACT_ID = OptionID.getOrCreateOptionID("diststat.exact", "In a first pass, compute the exact minimum and maximum, at the cost of O(2*n*n) instead of O(n*n). The number of resulting bins is guaranteed to be as requested.");
 
   /**
    * Flag to enable sampling
    * <p>
-   * Key: {@code -h}
+   * Key: {@code -diststat.exact}
+   * </p>
+   */
+  private final Flag EXACT_FLAG = new Flag(EXACT_ID);
+
+  /**
+   * OptionID for {@link #SAMPLING_FLAG}
+   */
+  public static final OptionID SAMPLING_ID = OptionID.getOrCreateOptionID("diststat.sampling", "Enable sampling of O(n) size to determine the minimum and maximum distances approximately. The resulting number of bins can be larger than the given n.");
+
+  /**
+   * Flag to enable sampling
+   * <p>
+   * Key: {@code -diststat.sampling}
    * </p>
    */
   private final Flag SAMPLING_FLAG = new Flag(SAMPLING_ID);
@@ -59,10 +75,13 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>, D extends
   /**
    * OptionID for {@link #HISTOGRAM_BINS_OPTION}
    */
-  public static final OptionID HISTOGRAM_BINS_ID = OptionID.getOrCreateOptionID("rankqual.bins", "Number of bins to use in the histogram");
+  public static final OptionID HISTOGRAM_BINS_ID = OptionID.getOrCreateOptionID("diststat.bins", "Number of bins to use in the histogram. By default, it is only guaranteed to be within 1*n and 2*n of the given number.");
 
   /**
    * Option to configure the number of bins to use.
+   * <p>
+   * Key: {@code -diststat.bins}
+   * </p>
    */
   private final IntParameter HISTOGRAM_BINS_OPTION = new IntParameter(HISTOGRAM_BINS_ID, new GreaterEqualConstraint(2), 20);
   
@@ -77,12 +96,21 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>, D extends
   private boolean sampling = false;
 
   /**
+   * Sampling
+   */
+  private boolean exact = false;
+
+  /**
    * Empty constructor. Nothing to do.
    */
   public DistanceStatisticsWithClasses() {
     super();
-    addOption(SAMPLING_FLAG);
     addOption(HISTOGRAM_BINS_OPTION);
+    addOption(EXACT_FLAG);
+    addOption(SAMPLING_FLAG);
+    
+    ArrayList<Option<?>> exclusive = new ArrayList<Option<?>>();
+    optionHandler.setGlobalParameterConstraint(new OnlyOneIsAllowedToBeSetGlobalConstraint(exclusive));
   }
 
   /**
@@ -95,14 +123,7 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>, D extends
     int size = database.size();
 
     // determine binning ranges.
-    DoubleMinMax gminmax;
-
-    if(sampling) {
-      gminmax = sampleMinMax(database, distFunc);
-    }
-    else {
-      gminmax = exactMinMax(database, distFunc);
-    }
+    DoubleMinMax gminmax = new DoubleMinMax();
 
     // Cluster by labels
     ByLabelClustering<V> split = new ByLabelClustering<V>();
@@ -120,10 +141,21 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>, D extends
     MeanVariance momin = new MeanVariance();
     MeanVariance momax = new MeanVariance();
     MeanVariance modif = new MeanVariance();
-    // Histograms
-    ReplacingHistogram<Pair<Integer, Integer>> hist = ReplacingHistogram.IntIntHistogram(numbin, gminmax.getFirst(), gminmax.getSecond());
+    // Histogram
+    final AggregatingHistogram<Pair<Integer, Integer>, Pair<Integer, Integer>> histogram;
+    if (exact) {
+      gminmax = exactMinMax(database, distFunc);
+      histogram = AggregatingHistogram.IntSumIntSumHistogram(numbin, gminmax.getMin(), gminmax.getMax());
+    } else if (sampling) {
+      gminmax = sampleMinMax(database, distFunc);
+      histogram = AggregatingHistogram.IntSumIntSumHistogram(numbin, gminmax.getMin(), gminmax.getMax());
+    } else {
+      histogram = FlexiHistogram.IntSumIntSumHistogram(numbin);
+    }
 
     // iterate per cluster
+    final Pair<Integer,Integer> incFirst = new Pair<Integer,Integer>(1, 0);
+    final Pair<Integer,Integer> incSecond = new Pair<Integer,Integer>(0, 1);
     for(Cluster<?> c1 : splitted) {
       for(Integer id1 : c1) {
         // in-cluster distances
@@ -135,7 +167,7 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>, D extends
           }
           double d = distFunc.distance(id1, id2).getValue().doubleValue();
 
-          hist.get(d).first += 1;
+          histogram.aggregate(d, incFirst);
 
           iminmax.put(d);
         }
@@ -160,7 +192,7 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>, D extends
             }
             double d = distFunc.distance(id1, id2).getValue().doubleValue();
 
-            hist.get(d).second += 1;
+            histogram.aggregate(d, incSecond);
 
             ominmax.put(d);
           }
@@ -181,7 +213,7 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>, D extends
     // count the number of samples we have in the data
     int inum = 0;
     int onum = 0;
-    for(Pair<Double, Pair<Integer, Integer>> ppair : hist) {
+    for(Pair<Double, Pair<Integer, Integer>> ppair : histogram) {
       inum += ppair.getSecond().getFirst();
       onum += ppair.getSecond().getSecond();
     }
@@ -190,8 +222,8 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>, D extends
     assert (bnum == size * (size - 1));
 
     Collection<DoubleVector> binstat = new ArrayList<DoubleVector>(numbin);
-    for(Pair<Double, Pair<Integer, Integer>> ppair : hist) {
-      DoubleVector row = new DoubleVector(new double[] { ppair.getFirst(), ((double) ppair.getSecond().getFirst()) / inum / hist.getBinsize(), ((double) ppair.getSecond().getFirst()) / bnum / hist.getBinsize(), ((double) ppair.getSecond().getSecond()) / onum / hist.getBinsize(), ((double) ppair.getSecond().getSecond()) / bnum / hist.getBinsize() });
+    for(Pair<Double, Pair<Integer, Integer>> ppair : histogram) {
+      DoubleVector row = new DoubleVector(new double[] { ppair.getFirst(), ((double) ppair.getSecond().getFirst()) / inum / histogram.getBinsize(), ((double) ppair.getSecond().getFirst()) / bnum / histogram.getBinsize(), ((double) ppair.getSecond().getSecond()) / onum / histogram.getBinsize(), ((double) ppair.getSecond().getSecond()) / bnum / histogram.getBinsize() });
       binstat.add(row);
     }
     result = new CollectionResult<DoubleVector>(binstat);
@@ -327,6 +359,10 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>, D extends
   public List<String> setParameters(List<String> args) throws ParameterException {
     List<String> remainingParameters = super.setParameters(args);
 
+    // exact
+    if(EXACT_FLAG.isSet()) {
+      exact = true;
+    }
     // sampling
     if(SAMPLING_FLAG.isSet()) {
       sampling = true;
