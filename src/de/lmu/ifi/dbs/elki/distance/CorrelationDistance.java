@@ -52,15 +52,18 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
   }
 
   @SuppressWarnings("unchecked")
+  @Override
   public D plus(D distance) {
     return (D) new CorrelationDistance<D>(this.correlationValue + distance.getCorrelationValue(), this.euclideanValue + distance.getEuclideanValue());
   }
 
   @SuppressWarnings("unchecked")
+  @Override
   public D minus(D distance) {
     return (D) new CorrelationDistance<D>(this.correlationValue - distance.getCorrelationValue(), this.euclideanValue - distance.getEuclideanValue());
   }
 
+  @Override
   public String description() {
     return "CorrelationDistance.correlationValue CorrelationDistance.euclideanValue";
   }
@@ -88,12 +91,12 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
    *         otherwise
    */
   public int compareTo(D other) {
-    int compare = new Integer(this.correlationValue).compareTo(other.correlationValue);
+    int compare = new Integer(this.correlationValue).compareTo(other.getCorrelationValue());
     if(compare != 0) {
       return compare;
     }
     else {
-      return Double.compare(this.euclideanValue, other.euclideanValue);
+      return Double.compare(this.euclideanValue, other.getEuclideanValue());
     }
   }
 
@@ -105,6 +108,24 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
     temp = euclideanValue != +0.0d ? Double.doubleToLongBits(euclideanValue) : 0l;
     result = 29 * result + (int) (temp ^ (temp >>> 32));
     return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    final CorrelationDistance<D> other = (CorrelationDistance<D>) obj;
+    if (this.correlationValue != other.correlationValue) {
+      return false;
+    }
+    if (this.euclideanValue != other.euclideanValue) {
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -129,6 +150,7 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
    * Writes the correlation value and the euclidean value of this
    * CorrelationDistance to the specified stream.
    */
+  @Override
   public void writeExternal(ObjectOutput out) throws IOException {
     out.writeInt(correlationValue);
     out.writeDouble(euclideanValue);
@@ -138,6 +160,7 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
    * Reads the correlation value and the euclidean value of this
    * CorrelationDistance from the specified stream.
    */
+  @Override
   public void readExternal(ObjectInput in) throws IOException {
     correlationValue = in.readInt();
     euclideanValue = in.readDouble();
@@ -149,6 +172,7 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
    * 
    * @return 12 (4 Byte for an integer, 8 Byte for a double value)
    */
+  @Override
   public int externalizableSize() {
     return 12;
   }
