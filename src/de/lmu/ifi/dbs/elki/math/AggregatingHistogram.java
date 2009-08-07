@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.math;
 
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+
 /**
  * Class for the typical case of an aggregating (e.g. counting, averaging)
  * Histogram.
@@ -123,6 +125,28 @@ public class AggregatingHistogram<T, D> extends ReplacingHistogram<T> {
       @Override
       public Double aggregate(Double existing, Double data) {
         return existing + data;
+      }
+    });
+  }
+
+  /**
+   * Histograms that work like two IntSumHistogram, component wise.
+   * 
+   * @param bins Number of bins.
+   * @return
+   */
+  public static AggregatingHistogram<Pair<Integer, Integer>, Pair<Integer, Integer>> IntSumIntSumHistogram(int bins, double min, double max) {
+    return new AggregatingHistogram<Pair<Integer, Integer>, Pair<Integer, Integer>>(bins, min, max, new Adapter<Pair<Integer, Integer>, Pair<Integer, Integer>>() {
+      @Override
+      public Pair<Integer, Integer> make() {
+        return new Pair<Integer, Integer>(0,0);
+      }
+
+      @Override
+      public Pair<Integer, Integer> aggregate(Pair<Integer, Integer> existing, Pair<Integer, Integer> data) {
+        existing.setFirst(existing.getFirst() + data.getFirst());
+        existing.setSecond(existing.getSecond() + data.getSecond());
+        return existing;
       }
     });
   }
