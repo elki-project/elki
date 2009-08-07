@@ -14,8 +14,8 @@ import de.lmu.ifi.dbs.elki.result.AprioriResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
@@ -112,7 +112,7 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
         addOption(MINSUPP_PARAM);
 
         // global parameter constraints
-        ArrayList<Parameter<?, ?>> globalConstraints = new ArrayList<Parameter<?, ?>>();
+        ArrayList<Option<?>> globalConstraints = new ArrayList<Option<?>>();
         globalConstraints.add(MINFREQ_PARAM);
         globalConstraints.add(MINSUPP_PARAM);
         optionHandler.setGlobalParameterConstraint(new OnlyOneIsAllowedToBeSetGlobalConstraint(globalConstraints));
