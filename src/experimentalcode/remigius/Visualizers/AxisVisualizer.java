@@ -11,14 +11,18 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import experimentalcode.remigius.ShapeLibrary;
 import experimentalcode.remigius.VisualizationManager;
 
+/**
+ * Generates a SVG-Element containing axes, including descriptions.
+ * 
+ * @author Remigius Wojdanowski
+ *
+ * @param <O> the type of object to be processed.
+ */
 public class AxisVisualizer<O extends DoubleVector> extends PlanarVisualizer<O>{
-
+  
+  // TODO: we have two name-attributes, maybe that's one too much. 
   private static final String NAME = "Axes";
   
-	public AxisVisualizer(){
-	
-	}
-
 	public void setup(Database<O> database, VisualizationManager<O> visManager){
 		// We don't need the Database. Maybe another superclass / inheritance hierarchy would serve us better.
 		init(database, visManager, NAME);
