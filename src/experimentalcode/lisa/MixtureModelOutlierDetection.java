@@ -22,8 +22,8 @@ import java.util.List;
 /**
  * Likelyhood-based outlier detection
  * Assuming that a data set contains objects from a mixture of two probability distributions. 
- * Objects are put in a set of normal objects and the set of anomalous objects is empty. An iterative procedure then transfers 
- * objects from the ordinary set to the anomalous set as long as the transfer increases the overall likelihood of the data. 
+ * At first all Objects are in the  set of normal objects and the set of anomalous objects is empty. An iterative procedure then transfers 
+ * objects from the ordinary set to the anomalous set if the transfer increases the overall likelihood of the data. 
  * 
  * Based on 
  * @author lisa
@@ -102,7 +102,7 @@ private static final double SINGULARITY_CHEAT = 1E-9;
     //compute loglikelyhood
     double logLike = database.size()*Math.log(1-l) + loglikelihoodNormal(normalObjs, database);
     debugFine("normalsize   " + normalObjs.size()+ " anormalsize  " + anomalousObjs.size() + " all " + (anomalousObjs.size()+normalObjs.size()) );
-    
+    debugFine(logLike +" loglike beginning" + loglikelihoodNormal(normalObjs, database));
     for(int i= 0; i< normalObjs.size()&& normalObjs.size() > 0; i++){
       debugFine("i     " + i);
       //move object to anomalousObjs and test if the loglikelyhood increases significantly
@@ -112,14 +112,14 @@ private static final double SINGULARITY_CHEAT = 1E-9;
       double currentLogLike = normalObjs.size()*Math.log(1-l) + loglikelihoodNormal(normalObjs, database) + anomalousObjs.size()*Math.log(l) + loglikelihoodAnomalous(anomalousObjs);
  
       double deltaLog =Math.abs(logLike- currentLogLike) ;
-      //debugFine( "delta   " + deltaLog);
-      //threshold
-      if(deltaLog > c) {
+      debugFine(deltaLog + " deltalog +++++++++++++++++++++++++++++++");
+
+      //if the loglike increases more than a threshold, object stays in anomalous set and is flagged as outlier
+      if(deltaLog > c && currentLogLike > logLike) {
         //flag as outlier 
         debugFine("outlier id" + x);
         database.associate(MMOD_OFLAG, x, 1.0);
         logLike = currentLogLike;
-       
         i--;
       }
       else{
