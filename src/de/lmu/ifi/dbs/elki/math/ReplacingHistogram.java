@@ -229,6 +229,15 @@ public class ReplacingHistogram<T> implements Iterable<Pair<Double, T>> {
   }
   
   /**
+   * Make a new bin.
+   * 
+   * @return new bin.
+   */
+  protected T make() {
+    return maker.make();
+  }
+  
+  /**
    * Iterator class to iterate over all bins.
    * 
    * @author Erich Schubert
