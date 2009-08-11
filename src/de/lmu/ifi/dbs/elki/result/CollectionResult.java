@@ -68,4 +68,9 @@ public class CollectionResult<O> implements IterableResult<O> {
   public Iterator<O> iterator() {
     return col.iterator();
   }
+  
+  @Override
+  public String getName() {
+    return "collection";
+  }
 }

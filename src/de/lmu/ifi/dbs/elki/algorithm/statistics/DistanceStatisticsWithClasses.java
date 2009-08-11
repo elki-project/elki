@@ -24,6 +24,7 @@ import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.FlexiHistogram;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
+import de.lmu.ifi.dbs.elki.result.HistogramResult;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
@@ -44,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <V> Vector type
  */
 public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>, D extends NumberDistance<D,?>> extends DistanceBasedAlgorithm<V, D, CollectionResult<DoubleVector>> {
-  private CollectionResult<DoubleVector> result;
+  private HistogramResult<DoubleVector> result;
 
   /**
    * OptionID for {@link #EXACT_FLAG}
@@ -228,7 +229,7 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>, D extends
       DoubleVector row = new DoubleVector(new double[] { ppair.getFirst(), ((double) ppair.getSecond().getFirst()) / inum / histogram.getBinsize(), ((double) ppair.getSecond().getFirst()) / bnum / histogram.getBinsize(), ((double) ppair.getSecond().getSecond()) / onum / histogram.getBinsize(), ((double) ppair.getSecond().getSecond()) / bnum / histogram.getBinsize() });
       binstat.add(row);
     }
-    result = new CollectionResult<DoubleVector>(binstat);
+    result = new HistogramResult<DoubleVector>(binstat);
 
     result.addHeader("Absolute minimum distance (abs): " + gminmax.getMin());
     result.addHeader("Absolute maximum distance (abs): " + gminmax.getMax());

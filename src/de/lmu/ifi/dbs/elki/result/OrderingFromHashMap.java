@@ -110,4 +110,8 @@ public class OrderingFromHashMap<T extends Comparable<T>> implements OrderingRes
     return sorted.iterator();
   }
 
+  @Override
+  public String getName() {
+    return "order";
+  }
 }

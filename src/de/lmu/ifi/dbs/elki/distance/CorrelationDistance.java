@@ -110,6 +110,7 @@ public class CorrelationDistance<D extends CorrelationDistance<D>> extends Abstr
     return result;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public boolean equals(Object obj) {
     if (obj == null) {

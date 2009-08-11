@@ -64,4 +64,9 @@ public class ConfusionMatrixBasedEvaluation<O extends DatabaseObject, L extends 
         out.println(confusionmatrix.toString());
     }
 
+
+    @Override
+    public String getName() {
+      return "confusionmatrixresult";
+    }
 }

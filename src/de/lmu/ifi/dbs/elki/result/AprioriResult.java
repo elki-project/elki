@@ -51,5 +51,10 @@ public class AprioriResult implements Result {
       return supports;
   }
   
+  @Override
+  public String getName() {
+    return "apriori";
+  }
+  
   // TODO: text writer for AprioriResult!
 }

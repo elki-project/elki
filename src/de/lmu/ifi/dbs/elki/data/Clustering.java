@@ -74,4 +74,9 @@ public class Clustering<M extends Model> implements Result {
       }
     return clu;
   }
+
+  @Override
+  public String getName() {
+    return "clustering";
+  }
 }
