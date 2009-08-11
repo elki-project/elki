@@ -165,6 +165,7 @@ public abstract class AbstractApplication extends AbstractParameterizable {
     OptionUtil.formatForConsole(usage, 77, "   ", options);
 
     // TODO: cleanup:
+    // FIXME: this doesn't recurse yet - list will be incomplete!
     List<GlobalParameterConstraint> globalParameterConstraints = optionHandler.getGlobalParameterConstraints();
     if(!globalParameterConstraints.isEmpty()) {
       usage.append(NEWLINE).append("Global parameter constraints:");
