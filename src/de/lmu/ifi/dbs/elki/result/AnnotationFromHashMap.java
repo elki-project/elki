@@ -42,4 +42,9 @@ public class AnnotationFromHashMap<T> implements AnnotationResult<T> {
   public T getValueFor(Integer objID) {
     return map.get(objID);
   }
+
+  @Override
+  public String getName() {
+    return "annotation";
+  }
 }

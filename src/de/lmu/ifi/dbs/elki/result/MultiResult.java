@@ -101,4 +101,9 @@ public class MultiResult implements Result {
     }
     return null;
   }
+
+  @Override
+  public String getName() {
+    return "multi";
+  }
 }

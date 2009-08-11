@@ -154,7 +154,7 @@ public class TextWriter<O extends DatabaseObject> {
     rc = ResultUtil.getClusteringResults(r);
     ri = ResultUtil.getIterableResults(r);
     rm = ResultUtil.getMetadataResults(r);
-    
+
     if(ra == null && ro == null && rc == null && ri == null) {
       throw new UnableToComplyException("No printable result found.");
     }
@@ -222,6 +222,11 @@ public class TextWriter<O extends DatabaseObject> {
         filename = filenameFromLabel(naming.getNameFor(group));
       }
     }
+    if (filename == null) {
+      if(ro != null && ro.size() > 0) {
+        filename = ro.get(0).getName();
+      }
+    }
 
     PrintStream outStream = streamOpener.openStream(filename);
     TextWriterStream out = new TextWriterStreamNormalizing<O>(outStream, writers, getNormalization());
@@ -276,7 +281,11 @@ public class TextWriter<O extends DatabaseObject> {
   }
 
   private void writeIterableResult(Database<O> db, StreamFactory streamOpener, IterableResult<?> ri, List<MetadataResult> rm) throws UnableToComplyException, IOException {
-    String filename = "list";
+    String filename = ri.getName();
+    logger.verbose("Filename is "+filename);
+    if (filename == null) {
+      filename = "list";
+    }
     PrintStream outStream = streamOpener.openStream(filename);
     TextWriterStream out = new TextWriterStreamNormalizing<O>(outStream, writers, getNormalization());
 

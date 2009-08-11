@@ -369,4 +369,9 @@ public class CorrelationAnalysisSolution<V extends RealVector<V, ?>> implements 
     }
   }
 
+
+  @Override
+  public String getName() {
+    return "correlationanalysissolution";
+  }
 }

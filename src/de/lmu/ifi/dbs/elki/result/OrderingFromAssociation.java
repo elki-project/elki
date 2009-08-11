@@ -127,4 +127,9 @@ public class OrderingFromAssociation<T extends Comparable<T>, O extends Database
     }
     return sorted.iterator();
   }
+
+  @Override
+  public String getName() {
+    return "order";
+  }
 }

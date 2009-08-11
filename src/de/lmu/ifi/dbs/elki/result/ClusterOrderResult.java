@@ -108,4 +108,8 @@ public class ClusterOrderResult<D extends Distance<D>> implements OrderingResult
     return anns;
   }
 
+  @Override
+  public String getName() {
+    return "optics";
+  }
 }

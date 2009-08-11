@@ -52,4 +52,9 @@ public class AnnotationFromDatabase<T, O extends DatabaseObject> implements Anno
   public T getValueFor(Integer objID) {
     return getDatabase().getAssociation(assoc, objID);
   }
+
+  @Override
+  public String getName() {
+    return "annotation";
+  }
 }

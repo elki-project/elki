@@ -506,4 +506,8 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     fireObjectsRemoved(objectIDs);
   }
 
+  @Override
+  public String getName() {
+    return "database";
+  }
 }

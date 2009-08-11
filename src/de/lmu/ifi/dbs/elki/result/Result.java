@@ -11,5 +11,11 @@ package de.lmu.ifi.dbs.elki.result;
  *
  */
 public interface Result {
-  // no requirements currently.
+  /**
+   * Get a user-understandable name for this result.
+   * Defaults may be returned such as "list" for a list result.
+   * 
+   * @return result name
+   */
+  public String getName();
 }

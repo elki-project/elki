@@ -68,4 +68,9 @@ public class MetadataResult implements Result {
   public Collection<AssociationID<?>> getAssociations() {
     return data.keySet();
   }
+
+  @Override
+  public String getName() {
+    return "meta";
+  }
 }
