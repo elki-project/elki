@@ -1,8 +1,5 @@
 package de.lmu.ifi.dbs.elki.database.connection;
 
-import java.io.InputStream;
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -13,9 +10,15 @@ import de.lmu.ifi.dbs.elki.parser.Parser;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.LongParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+
+import java.io.InputStream;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Provides a database connection expecting input from an input stream such as stdin.
@@ -31,6 +34,25 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
         "dbc.parser",
         "Parser to provide the database."
     );
+    
+    /**
+     * OptionID for {@link #SEED_PARAM}.
+     */
+    public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("dbc.seed", "Seed for randomly shuffling the rows for the database. If the parameter is not set or is explicitely set to the default value, no shuffling is performed.");
+    
+    /**
+     * The default value of the seed for the random object used for shuffling.
+     */
+    private static final long SEED_DEFAULT = Long.MIN_VALUE;
+    
+    /**
+     * Parameter to specify a seed for randomly shuffling the rows of the database.
+     * If unused or explicitly set to the default value {@link #SEED_DEFAULT}, no shuffling is performed.
+     * Shuffling takes time linearly dependent from the size of the database.
+     * <p>Default value: {@link #SEED_DEFAULT}</p>
+     * <p>Key: {@code -dbc.seed}</p>
+     */
+    private final LongParameter SEED_PARAM = new LongParameter(SEED_ID, true, SEED_DEFAULT);
 
     /**
      * Parameter to specify the parser to provide a database,
@@ -52,13 +74,15 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
     InputStream in = System.in;
 
     /**
-     * Adds parameter
+     * Adds parameters
      * {@link #PARSER_PARAM}
+     * and {@link #SEED_PARAM}
      * to the option handler additionally to parameters of super class.
      */
     public InputStreamDatabaseConnection() {
         super();
         addOption(PARSER_PARAM);
+        addOption(SEED_PARAM);
     }
 
     public Database<O> getDatabase(Normalization<O> normalization) {
@@ -73,10 +97,18 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
             List<Pair<O, Associations>> objectAndAssociationsList = normalizeAndTransformLabels(parsingResult.getObjectAndLabelList(),
                 normalization);
 
+            long seed = SEED_PARAM.getNumberValue();
+            if(seed!=SEED_DEFAULT){
+              if (logger.isDebugging()) {
+                logger.debugFine("*** shuffle");
+              }
+              Random random = new Random(seed);
+              Collections.shuffle(objectAndAssociationsList,random);
+            }
+            
             if (logger.isDebugging()) {
               logger.debugFine("*** insert");
             }
-
             // insert into database
             database.insert(objectAndAssociationsList);
 
