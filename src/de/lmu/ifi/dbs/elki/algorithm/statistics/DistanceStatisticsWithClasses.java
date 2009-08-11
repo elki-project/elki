@@ -110,6 +110,8 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>, D extends
     addOption(SAMPLING_FLAG);
     
     ArrayList<Option<?>> exclusive = new ArrayList<Option<?>>();
+    exclusive.add(EXACT_FLAG);
+    exclusive.add(SAMPLING_FLAG);
     optionHandler.setGlobalParameterConstraint(new OnlyOneIsAllowedToBeSetGlobalConstraint(exclusive));
   }
 
@@ -142,20 +144,20 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>, D extends
     MeanVariance momax = new MeanVariance();
     MeanVariance modif = new MeanVariance();
     // Histogram
-    final AggregatingHistogram<Pair<Integer, Integer>, Pair<Integer, Integer>> histogram;
+    final AggregatingHistogram<Pair<Long, Long>, Pair<Long, Long>> histogram;
     if (exact) {
       gminmax = exactMinMax(database, distFunc);
-      histogram = AggregatingHistogram.IntSumIntSumHistogram(numbin, gminmax.getMin(), gminmax.getMax());
+      histogram = AggregatingHistogram.LongSumLongSumHistogram(numbin, gminmax.getMin(), gminmax.getMax());
     } else if (sampling) {
       gminmax = sampleMinMax(database, distFunc);
-      histogram = AggregatingHistogram.IntSumIntSumHistogram(numbin, gminmax.getMin(), gminmax.getMax());
+      histogram = AggregatingHistogram.LongSumLongSumHistogram(numbin, gminmax.getMin(), gminmax.getMax());
     } else {
-      histogram = FlexiHistogram.IntSumIntSumHistogram(numbin);
+      histogram = FlexiHistogram.LongSumLongSumHistogram(numbin);
     }
 
     // iterate per cluster
-    final Pair<Integer,Integer> incFirst = new Pair<Integer,Integer>(1, 0);
-    final Pair<Integer,Integer> incSecond = new Pair<Integer,Integer>(0, 1);
+    final Pair<Long,Long> incFirst = new Pair<Long,Long>(1L, 0L);
+    final Pair<Long,Long> incSecond = new Pair<Long,Long>(0L, 1L);
     for(Cluster<?> c1 : splitted) {
       for(Integer id1 : c1) {
         // in-cluster distances
@@ -211,18 +213,18 @@ public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>, D extends
     gminmax.setSecond(Math.max(giminmax.getMax(), gominmax.getMax()));
 
     // count the number of samples we have in the data
-    int inum = 0;
-    int onum = 0;
-    for(Pair<Double, Pair<Integer, Integer>> ppair : histogram) {
+    long inum = 0;
+    long onum = 0;
+    for(Pair<Double, Pair<Long, Long>> ppair : histogram) {
       inum += ppair.getSecond().getFirst();
       onum += ppair.getSecond().getSecond();
     }
-    int bnum = inum + onum;
+    long bnum = inum + onum;
     // Note: when full sampling is added, this assertion won't hold anymore.
     assert (bnum == size * (size - 1));
 
     Collection<DoubleVector> binstat = new ArrayList<DoubleVector>(numbin);
-    for(Pair<Double, Pair<Integer, Integer>> ppair : histogram) {
+    for(Pair<Double, Pair<Long, Long>> ppair : histogram) {
       DoubleVector row = new DoubleVector(new double[] { ppair.getFirst(), ((double) ppair.getSecond().getFirst()) / inum / histogram.getBinsize(), ((double) ppair.getSecond().getFirst()) / bnum / histogram.getBinsize(), ((double) ppair.getSecond().getSecond()) / onum / histogram.getBinsize(), ((double) ppair.getSecond().getSecond()) / bnum / histogram.getBinsize() });
       binstat.add(row);
     }
