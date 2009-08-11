@@ -121,7 +121,11 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
       // Resampling.
       ArrayList<T> newdata = new ArrayList<T>(this.destsize * 2);
       for(int i = 0; i < super.size; i += 2) {
-        newdata.add(downsampler.downsample(super.data.get(i), super.data.get(i + 1)));
+        if (i + 1 < super.size) {
+          newdata.add(downsampler.downsample(super.data.get(i), super.data.get(i + 1)));
+        } else {
+          newdata.add(downsampler.downsample(super.data.get(i), super.make()));
+        }
       }
       // recalculate histogram base.
       double base = super.base - super.offset * super.binsize;
