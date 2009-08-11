@@ -107,6 +107,29 @@ public class AggregatingHistogram<T, D> extends ReplacingHistogram<T> {
   }
 
   /**
+   * Convenience constructor for Long-based Histograms. Uses a constructor to
+   * initialize bins with Long(0L). Aggregation is done by adding the values
+   * 
+   * @param bins Number of bins
+   * @param min Minimum coordinate
+   * @param max Maximum coordinate
+   * @return New histogram for Integers.
+   */
+  public static AggregatingHistogram<Long, Long> LongSumHistogram(int bins, double min, double max) {
+    return new AggregatingHistogram<Long, Long>(bins, min, max, new Adapter<Long, Long>() {
+      @Override
+      public Long make() {
+        return new Long(0L);
+      }
+
+      @Override
+      public Long aggregate(Long existing, Long data) {
+        return existing + data;
+      }
+    });
+  }
+
+  /**
    * Convenience constructor for Integer-based Histograms. Uses a constructor to
    * initialize bins with Double(0.0). Aggregation is done by adding the values
    * 
@@ -130,7 +153,7 @@ public class AggregatingHistogram<T, D> extends ReplacingHistogram<T> {
   }
 
   /**
-   * Histograms that work like two IntSumHistogram, component wise.
+   * Histograms that work like two {@link #IntSumHistogram}, component wise.
    * 
    * @param bins Number of bins.
    * @return
@@ -144,6 +167,28 @@ public class AggregatingHistogram<T, D> extends ReplacingHistogram<T> {
 
       @Override
       public Pair<Integer, Integer> aggregate(Pair<Integer, Integer> existing, Pair<Integer, Integer> data) {
+        existing.setFirst(existing.getFirst() + data.getFirst());
+        existing.setSecond(existing.getSecond() + data.getSecond());
+        return existing;
+      }
+    });
+  }
+  
+  /**
+   * Histograms that work like two {@link #LongSumHistogram}, component wise.
+   * 
+   * @param bins Number of bins.
+   * @return
+   */
+  public static AggregatingHistogram<Pair<Long, Long>, Pair<Long, Long>> LongSumLongSumHistogram(int bins, double min, double max) {
+    return new AggregatingHistogram<Pair<Long, Long>, Pair<Long, Long>>(bins, min, max, new Adapter<Pair<Long, Long>, Pair<Long, Long>>() {
+      @Override
+      public Pair<Long, Long> make() {
+        return new Pair<Long, Long>(0L,0L);
+      }
+
+      @Override
+      public Pair<Long, Long> aggregate(Pair<Long, Long> existing, Pair<Long, Long> data) {
         existing.setFirst(existing.getFirst() + data.getFirst());
         existing.setSecond(existing.getSecond() + data.getSecond());
         return existing;

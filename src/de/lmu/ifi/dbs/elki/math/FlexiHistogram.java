@@ -229,6 +229,38 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
   }
 
   /**
+   * Convenience constructor for Long-based Histograms. Uses a constructor to
+   * initialize bins with Long(0)
+   * 
+   * @param bins Number of bins
+   * @return New histogram for Long.
+   */
+  public static FlexiHistogram<Long, Long> LongSumHistogram(int bins) {
+    return new FlexiHistogram<Long, Long>(bins, new Adapter<Long, Long>() {
+      @Override
+      public Long make() {
+        return new Long(0);
+      }
+
+      @Override
+      public Long cloneForCache(Long data) {
+        // no need to clone, Long are singletons
+        return data;
+      }
+
+      @Override
+      public Long downsample(Long first, Long second) {
+        return first + second;
+      }
+
+      @Override
+      public Long aggregate(Long existing, Long data) {
+        return existing + data;
+      }
+    });
+  }
+
+  /**
    * Convenience constructor for Double-based Histograms. Uses a constructor to
    * initialize bins with Double(0), and downsampling is done by summation.
    * 
@@ -294,7 +326,7 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
   }
 
   /**
-   * Histograms that work like two IntSumHistogram, component wise.
+   * Histograms that work like two {@link #IntSumHistogram}, component wise.
    * 
    * @param bins Number of bins.
    * @return
@@ -318,6 +350,38 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
 
       @Override
       public Pair<Integer, Integer> aggregate(Pair<Integer, Integer> existing, Pair<Integer, Integer> data) {
+        existing.setFirst(existing.getFirst() + data.getFirst());
+        existing.setSecond(existing.getSecond() + data.getSecond());
+        return existing;
+      }
+    });
+  }
+  
+  /**
+   * Histograms that work like two {@link #LongSumHistogram}, component wise.
+   * 
+   * @param bins Number of bins.
+   * @return
+   */
+  public static FlexiHistogram<Pair<Long, Long>, Pair<Long, Long>> LongSumLongSumHistogram(int bins) {
+    return new FlexiHistogram<Pair<Long, Long>, Pair<Long, Long>>(bins, new Adapter<Pair<Long, Long>, Pair<Long, Long>>() {
+      @Override
+      public Pair<Long, Long> make() {
+        return new Pair<Long, Long>(0L,0L);
+      }
+
+      @Override
+      public Pair<Long, Long> cloneForCache(Pair<Long, Long> data) {
+        return new Pair<Long, Long>(data.getFirst(), data.getSecond());
+      }
+
+      @Override
+      public Pair<Long, Long> downsample(Pair<Long, Long> first, Pair<Long, Long> second) {
+        return new Pair<Long, Long>(first.getFirst() + second.getFirst(), first.getSecond() + second.getSecond());
+      }
+
+      @Override
+      public Pair<Long, Long> aggregate(Pair<Long, Long> existing, Pair<Long, Long> data) {
         existing.setFirst(existing.getFirst() + data.getFirst());
         existing.setSecond(existing.getSecond() + data.getSecond());
         return existing;
