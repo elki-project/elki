@@ -69,6 +69,15 @@ public class CollectionResult<O> implements IterableResult<O> {
     return col.iterator();
   }
   
+  /**
+   * Get the collection size.
+   * 
+   * @return Collection size
+   */
+  public int size() {
+    return col.size();
+  }
+  
   @Override
   public String getName() {
     return "collection";
