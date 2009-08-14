@@ -75,7 +75,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    */
   public final void insert(O object) {
     if(logger.isDebugging()) {
-      logger.debugFine("insert object " + object.getID() + "\n");
+      logger.debug("insert object " + object.getID() + "\n");
     }
 
     if(!initialized) {
@@ -100,7 +100,10 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @param objects the objects to be inserted
    */
   public final void insert(List<O> objects) {
-    if(objects.isEmpty()) {
+    // empty input file
+    if(objects.isEmpty() || (objects.size() == 1 && (objects.get(0) == null || objects.get(0).getDimensionality() == 0))) {
+      // FIXME: abusing this empty-insert for re-loading an on-disk tree is an ugly hack.
+      initializeFromFile();
       return;
     }
 
