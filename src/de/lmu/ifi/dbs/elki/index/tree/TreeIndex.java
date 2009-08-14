@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.persistent.PersistentPageFile;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.LongParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -84,12 +85,12 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
    * Key: {@code -treeindex.cachesize}
    * </p>
    */
-  private final IntParameter CACHE_SIZE_PARAM = new IntParameter(CACHE_SIZE_ID, new GreaterEqualConstraint(0), Integer.MAX_VALUE);
+  private final LongParameter CACHE_SIZE_PARAM = new LongParameter(CACHE_SIZE_ID, new GreaterEqualConstraint(0), Integer.MAX_VALUE);
 
   /**
    * Holds the value of {@link #CACHE_SIZE_PARAM}.
    */
-  protected int cacheSize;
+  protected long cacheSize;
 
   /**
    * The file storing the entries of this index.
