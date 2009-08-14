@@ -55,7 +55,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
    * @param cache the class of the cache to be used
    * @param pageclass the class of pages to be used
    */
-  public PersistentPageFile(PageHeader header, int cacheSize, Cache<P> cache, String fileName, Class<? extends P> pageclass) {
+  public PersistentPageFile(PageHeader header, long cacheSize, Cache<P> cache, String fileName, Class<? extends P> pageclass) {
     super();
     this.pageclass = pageclass;
 
@@ -78,7 +78,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
         // reading empty nodes in Stack
         int i = 0;
         while(file.getFilePointer() + pageSize <= file.length()) {
-          int offset = (header.getReservedPages() + i) * pageSize;
+          long offset = ((long)(header.getReservedPages() + i)) * (long)pageSize;
           byte[] buffer = new byte[pageSize];
           file.seek(offset);
           file.read(buffer);
@@ -134,7 +134,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
       // get from file and put to cache
       if(page == null) {
         readAccess++;
-        int offset = (header.getReservedPages() + pageID) * pageSize;
+        long offset = ((long)(header.getReservedPages() + pageID)) * (long)pageSize;
         byte[] buffer = new byte[pageSize];
         file.seek(offset);
         file.read(buffer);
@@ -168,7 +168,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
       // delete from file
       writeAccess++;
       byte[] array = pageToByteArray(null);
-      int offset =  (header.getReservedPages() + pageID) * pageSize;
+      long offset =  ((long)(header.getReservedPages() + pageID)) * (long)pageSize;
       file.seek(offset);
       file.write(array);
     }
@@ -189,7 +189,8 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
         page.setDirty(false);
         writeAccess++;
         byte[] array = pageToByteArray(page);
-        int offset = (header.getReservedPages() + page.getID()) * pageSize;
+        long offset = ((long)(header.getReservedPages() + page.getID())) * (long)pageSize;
+        assert offset>=0: header.getReservedPages()+" "+page.getID()+" "+pageSize + " " + offset;
         file.seek(offset);
         file.write(array);
       }

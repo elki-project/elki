@@ -25,7 +25,7 @@ public class MemoryPageFile<P extends Page<P>> extends PageFile<P> {
    * @param cacheSize the size of the cache in Byte
    * @param cache the class of the cache to be used
    */
-  public MemoryPageFile(int pageSize, int cacheSize, Cache<P> cache) {
+  public MemoryPageFile(int pageSize, long cacheSize, Cache<P> cache) {
     super();
     initCache(pageSize, cacheSize, cache);
     this.file = new HashMap<Integer, P>();

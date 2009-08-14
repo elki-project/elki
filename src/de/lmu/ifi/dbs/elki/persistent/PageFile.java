@@ -177,12 +177,12 @@ public abstract class PageFile<P extends Page<P>> implements CachedFile<P> {
    * @param cacheSize the size of the cache in Byte
    * @param cache the class of the cache to be used
    */
-  protected void initCache(int pageSize, int cacheSize, Cache<P> cache) {
+  protected void initCache(int pageSize, long cacheSize, Cache<P> cache) {
     if(pageSize <= 0) {
       throw new IllegalStateException("pagesize <= 0!");
     }
 
-    int pagesInCache = cacheSize / pageSize;
+    long pagesInCache = cacheSize / pageSize;
     if(LoggingConfiguration.DEBUG) {
       Logger.getLogger(this.getClass().getName()).fine("Number of pages in cache " + pagesInCache);
     }

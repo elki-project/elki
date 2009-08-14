@@ -19,7 +19,7 @@ public class LRUCache<P extends Page<P>> implements Cache<P> {
   /**
    * The maximum number of objects in this cache.
    */
-  protected int cacheSize;
+  protected long cacheSize;
 
   /**
    * The map holding the objects of this cache.
@@ -52,9 +52,10 @@ public class LRUCache<P extends Page<P>> implements Cache<P> {
    *        written to the file
    */
   @SuppressWarnings("serial")
-  public void initialize(int cacheSize, CachedFile<P> file) {
+  public void initialize(long cacheSize, CachedFile<P> file) {
     this.file = file;
-    this.cacheSize = cacheSize;
+    assert(cacheSize <= Integer.MAX_VALUE);
+    this.cacheSize = (int) cacheSize;
     this.pageAccess = 0;
 
     float hashTableLoadFactor = 0.75f;
@@ -157,20 +158,15 @@ public class LRUCache<P extends Page<P>> implements Cache<P> {
   public void setCacheSize(int cacheSize) {
     this.cacheSize = cacheSize;
 
-    int toDelete = map.size() - this.cacheSize;
+    long toDelete = map.size() - this.cacheSize;
     if(toDelete <= 0) {
       return;
     }
 
-    Integer[] delete = new Integer[toDelete];
     List<Integer> keys = new ArrayList<Integer>(map.keySet());
     Collections.reverse(keys);
 
-    for(int i = 0; i < toDelete; i++) {
-      delete[i] = keys.get(i);
-    }
-
-    for(Integer id : delete) {
+    for(Integer id : keys) {
       P page = map.remove(id);
       pageAccess++;
       file.objectRemoved(page);

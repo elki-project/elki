@@ -16,7 +16,7 @@ public interface Cache<P extends Page<P>> {
    * @param file the underlying file of this cache, if a page is dropped it is
    *        written to the file
    */
-  void initialize(int cacheSize, CachedFile<P> file);
+  void initialize(long cacheSize, CachedFile<P> file);
 
   /**
    * Retrieves a page from this cache.
