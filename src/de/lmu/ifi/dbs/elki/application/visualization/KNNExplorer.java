@@ -63,7 +63,8 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * distance function. When selecting one or more data entries, the nearest
  * neighbors each are determined and visualized.
  * 
- * <p>Reference:<br/>
+ * <p>
+ * Reference:<br/>
  * 
  * Elke Achtert, Thomas Bernecker, Hans-Peter Kriegel, Erich Schubert, Arthur
  * Zimek:<br/>
@@ -72,17 +73,22 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * for Time Series.<br/>
  * 
  * In Proc. 11th International Symposium on Spatial and Temporal Databases (SSTD
- * 2009), Aalborg, Denmark, 2009.</p>
+ * 2009), Aalborg, Denmark, 2009.
+ * </p>
  * 
  * <h3>Usage example:</h3>
  * 
- * <p>Main invocation:<br/>
+ * <p>
+ * Main invocation:<br/>
  * 
- * <code>java -cp elki.jar de.lmu.ifi.dbs.elki.visualization.KNNExplorer</code></p>
+ * <code>java -cp elki.jar de.lmu.ifi.dbs.elki.visualization.KNNExplorer</code>
+ * </p>
  * 
- * <p>The application supports the usual parametrization, in particular parameters
- * <code>-dbc.in</code> and <code>-explorer.distancefunction</code> to select an input file
- * and the distance function to explore.</p>
+ * <p>
+ * The application supports the usual parametrization, in particular parameters
+ * <code>-dbc.in</code> and <code>-explorer.distancefunction</code> to select an
+ * input file and the distance function to explore.
+ * </p>
  * 
  * @author Erich Schubert
  * 
@@ -191,7 +197,7 @@ public class KNNExplorer<O extends NumberVector<O, ?>, N extends NumberDistance<
     Database<O> db = databaseConnection.getDatabase(normalization);
     (new ExplorerWindow()).run(db, distanceFunction);
   }
-  
+
   /**
    * Main method to run this wrapper.
    * 
@@ -200,7 +206,6 @@ public class KNNExplorer<O extends NumberVector<O, ?>, N extends NumberDistance<
   public static void main(String[] args) {
     new KNNExplorer<DoubleVector, DoubleDistance, Double>().runCLIApplication(args);
   }
-
 
   class ExplorerWindow extends AbstractLoggable {
     /**
@@ -242,7 +247,7 @@ public class KNNExplorer<O extends NumberVector<O, ?>, N extends NumberDistance<
 
     // The update handler
     UpdateRunner updateRunner = new UpdateRunner();
-    
+
     // Viewport
     Element viewport;
 
@@ -260,7 +265,7 @@ public class KNNExplorer<O extends NumberVector<O, ?>, N extends NumberDistance<
 
     // Distance cache
     protected HashMap<Integer, Double> distancecache = new HashMap<Integer, Double>();
-    
+
     // Canvas scaling ratio
     protected double ratio;
 
@@ -272,7 +277,7 @@ public class KNNExplorer<O extends NumberVector<O, ?>, N extends NumberDistance<
 
     public ExplorerWindow() {
       super(false);
-      
+
       frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
       // Create a panel and add the button, status label and the SVG canvas.
@@ -348,12 +353,12 @@ public class KNNExplorer<O extends NumberVector<O, ?>, N extends NumberDistance<
       ratio = listener.getActiveRatio();
       frame.addComponentListener(listener);
     }
-    
+
     public void updateSize() {
-      SVGUtil.setAtt(plot.getRoot(), SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 "+ratio+" 1");
+      SVGUtil.setAtt(plot.getRoot(), SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 " + ratio + " 1");
       SVGUtil.setAtt(viewport, SVGConstants.SVG_WIDTH_ATTRIBUTE, ratio);
       SVGUtil.setAtt(viewport, SVGConstants.SVG_HEIGHT_ATTRIBUTE, "1");
-      SVGUtil.setAtt(viewport, SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "-0.05 -0.05 "+(ratio+0.1)+" 1.1");     
+      SVGUtil.setAtt(viewport, SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "-0.05 -0.05 " + (ratio + 0.1) + " 1.1");
     }
 
     public void run(Database<O> db, DistanceFunction<O, N> distanceFunction) {
@@ -370,12 +375,12 @@ public class KNNExplorer<O extends NumberVector<O, ?>, N extends NumberDistance<
         max = Math.max(max, mm[1]);
       }
       this.s = new LinearScale(min, max);
-      
+
       this.frame.setTitle(distanceFunction.getClass().getSimpleName() + " - " + WINDOW_TITLE_BASE);
 
       plot = new SVGPlot();
       viewport = plot.svgElement(SVGConstants.SVG_SVG_TAG);
-      plot.getRoot().appendChild(viewport);      
+      plot.getRoot().appendChild(viewport);
       updateSize();
 
       try {
@@ -391,7 +396,7 @@ public class KNNExplorer<O extends NumberVector<O, ?>, N extends NumberDistance<
       SVGUtil.setAtt(egroup, SVGConstants.SVG_ID_ATTRIBUTE, SERIESID);
       viewport.appendChild(egroup);
       plot.putIdElement(SERIESID, egroup);
-      
+
       svgCanvas.setDocumentState(AbstractJSVGComponent.ALWAYS_DYNAMIC);
       updateRunner.attachComponent(svgCanvas);
       svgCanvas.setDocument(plot.getDocument());
@@ -498,7 +503,9 @@ public class KNNExplorer<O extends NumberVector<O, ?>, N extends NumberDistance<
         }
         if(label == null || label == "") {
           ClassLabel cls = db.getAssociation(AssociationID.CLASS, (Integer) value);
-          label = cls.toString();
+          if(cls != null) {
+            label = cls.toString();
+          }
         }
         if(label == null || label == "") {
           label = Integer.toString((Integer) value);
