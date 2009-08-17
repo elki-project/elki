@@ -31,6 +31,7 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
+import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
@@ -496,7 +497,8 @@ public class KNNExplorer<O extends NumberVector<O, ?>, N extends NumberDistance<
           label = db.getAssociation(AssociationID.LABEL, (Integer) value);
         }
         if(label == null || label == "") {
-          label = db.getAssociation(AssociationID.CLASS, (Integer) value).toString();
+          ClassLabel cls = db.getAssociation(AssociationID.CLASS, (Integer) value);
+          label = cls.toString();
         }
         if(label == null || label == "") {
           label = Integer.toString((Integer) value);
