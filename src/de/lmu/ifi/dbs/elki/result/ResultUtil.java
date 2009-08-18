@@ -27,17 +27,19 @@ public class ResultUtil {
   public static final <M> void setGlobalAssociation(MultiResult result, AssociationID<M> meta, M value) {
     ArrayList<MetadataResult> mrs = result.filterResults(MetadataResult.class);
     // first try to overwrite an existing result.
-    for(MetadataResult mri : mrs) {
-      M res = mri.getAssociation(meta);
-      if(res != null) {
-        mri.setAssociation(meta, value);
+    if(mrs != null) {
+      for(MetadataResult mri : mrs) {
+        M res = mri.getAssociation(meta);
+        if(res != null) {
+          mri.setAssociation(meta, value);
+          return;
+        }
+      }
+      // otherwise, set in first
+      if(mrs.size() > 0) {
+        mrs.get(0).setAssociation(meta, value);
         return;
       }
-    }
-    // otherwise, set in first
-    if(mrs.size() > 0) {
-      mrs.get(0).setAssociation(meta, value);
-      return;
     }
     // or create a new MetadataResult.
     MetadataResult mr = new MetadataResult();
@@ -55,10 +57,12 @@ public class ResultUtil {
    */
   public static final <M> M getGlobalAssociation(Result result, AssociationID<M> meta) {
     List<MetadataResult> mrs = getMetadataResults(result);
-    for(MetadataResult mr : mrs) {
-      M res = mr.getAssociation(meta);
-      if(res != null) {
-        return res;
+    if(mrs != null) {
+      for(MetadataResult mr : mrs) {
+        M res = mr.getAssociation(meta);
+        if(res != null) {
+          return res;
+        }
       }
     }
     return null;
@@ -91,7 +95,8 @@ public class ResultUtil {
       return null;
     }
     for(AnnotationResult<?> a : anns) {
-      if(a.getAssociationID() == assoc) { // == okay to use: association IDs are unique objects
+      if(a.getAssociationID() == assoc) { // == okay to use: association IDs are
+        // unique objects
         return (AnnotationResult<T>) a;
       }
     }
@@ -105,13 +110,13 @@ public class ResultUtil {
    * @return List of all annotation results
    */
   public static List<AnnotationResult<?>> getAnnotationResults(Result r) {
-    if (r instanceof AnnotationResult) {
+    if(r instanceof AnnotationResult) {
       List<AnnotationResult<?>> anns = new ArrayList<AnnotationResult<?>>(1);
       anns.add((AnnotationResult<?>) r);
       return anns;
     }
     if(r instanceof MultiResult) {
-      return ClassGenericsUtil.castWithGenericsOrNull(List.class, ((MultiResult)r).filterResults(AnnotationResult.class));
+      return ClassGenericsUtil.castWithGenericsOrNull(List.class, ((MultiResult) r).filterResults(AnnotationResult.class));
     }
     return null;
   }
@@ -123,13 +128,13 @@ public class ResultUtil {
    * @return List of ordering results
    */
   public static List<OrderingResult> getOrderingResults(Result r) {
-    if (r instanceof OrderingResult) {
+    if(r instanceof OrderingResult) {
       List<OrderingResult> ors = new ArrayList<OrderingResult>(1);
       ors.add((OrderingResult) r);
       return ors;
     }
     if(r instanceof MultiResult) {
-      return ((MultiResult)r).filterResults(OrderingResult.class);
+      return ((MultiResult) r).filterResults(OrderingResult.class);
     }
     return null;
   }
@@ -141,13 +146,13 @@ public class ResultUtil {
    * @return List of clustering results
    */
   public static List<Clustering<?>> getClusteringResults(Result r) {
-    if (r instanceof Clustering) {
+    if(r instanceof Clustering) {
       List<Clustering<?>> crs = new ArrayList<Clustering<?>>(1);
       crs.add((Clustering<?>) r);
       return crs;
     }
     if(r instanceof MultiResult) {
-      return ClassGenericsUtil.castWithGenericsOrNull(List.class, ((MultiResult)r).filterResults(Clustering.class));
+      return ClassGenericsUtil.castWithGenericsOrNull(List.class, ((MultiResult) r).filterResults(Clustering.class));
     }
     return null;
   }
@@ -159,13 +164,13 @@ public class ResultUtil {
    * @return List of collection results
    */
   public static List<CollectionResult<?>> getCollectionResults(Result r) {
-    if (r instanceof CollectionResult) {
+    if(r instanceof CollectionResult) {
       List<CollectionResult<?>> crs = new ArrayList<CollectionResult<?>>(1);
       crs.add((CollectionResult<?>) r);
       return crs;
     }
     if(r instanceof MultiResult) {
-      return ClassGenericsUtil.castWithGenericsOrNull(List.class, ((MultiResult)r).filterResults(CollectionResult.class));
+      return ClassGenericsUtil.castWithGenericsOrNull(List.class, ((MultiResult) r).filterResults(CollectionResult.class));
     }
     return null;
   }
@@ -177,17 +182,17 @@ public class ResultUtil {
    * @return List of iterable results
    */
   public static List<IterableResult<?>> getIterableResults(Result r) {
-    if (r instanceof IterableResult) {
+    if(r instanceof IterableResult) {
       List<IterableResult<?>> irs = new ArrayList<IterableResult<?>>(1);
       irs.add((IterableResult<?>) r);
       return irs;
     }
     if(r instanceof MultiResult) {
-      return ClassGenericsUtil.castWithGenericsOrNull(List.class, ((MultiResult)r).filterResults(IterableResult.class));
+      return ClassGenericsUtil.castWithGenericsOrNull(List.class, ((MultiResult) r).filterResults(IterableResult.class));
     }
     return null;
   }
-  
+
   /**
    * Return all Metadata results
    * 
@@ -195,13 +200,13 @@ public class ResultUtil {
    * @return List of metadata results
    */
   public static List<MetadataResult> getMetadataResults(Result r) {
-    if (r instanceof MetadataResult) {
+    if(r instanceof MetadataResult) {
       List<MetadataResult> irs = new ArrayList<MetadataResult>(1);
       irs.add((MetadataResult) r);
       return irs;
     }
     if(r instanceof MultiResult) {
-      return ClassGenericsUtil.castWithGenericsOrNull(List.class, ((MultiResult)r).filterResults(MetadataResult.class));
+      return ClassGenericsUtil.castWithGenericsOrNull(List.class, ((MultiResult) r).filterResults(MetadataResult.class));
     }
     return null;
   }
