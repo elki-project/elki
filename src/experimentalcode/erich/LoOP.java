@@ -214,7 +214,6 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
 
     // Probabilistic distances
     HashMap<Integer, Double> pdists = new HashMap<Integer, Double>();
-    MeanVariance pdmean = new MeanVariance();
     {// computing PRDs
       if(logger.isVerbose()) {
         logger.verbose("Computing pdists");
@@ -239,17 +238,53 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
         }
         Double pdist = lambda * Math.sqrt(sqsum / ks);
         pdists.put(id, pdist);
-        pdmean.put(pdist);
         if(logger.isVerbose()) {
           prdsProgress.setProcessed(counter);
           logger.progress(prdsProgress);
         }
       }
     }
-    double nplof = ((pdmean.getMean() + lambda * pdmean.getStddev()) / pdmean.getMean()) - 1;
-    if (logger.isVerbose()) {
-      logger.verbose("nplof normalization factor is "+nplof);
+    // Compute PLOF values.
+    HashMap<Integer, Double> plofs = new HashMap<Integer, Double>();
+    MeanVariance mvplof = new MeanVariance();
+    {// compute LOOP_SCORE of each db object
+      if(logger.isVerbose()) {
+        logger.verbose("Computing PLOF");
+      }
+
+      FiniteProgress progressPLOFs = new FiniteProgress("PLOFs for objects", database.size());
+      int counter = 0;
+      for(Integer id : database) {
+        counter++;
+        List<DistanceResultPair<DoubleDistance>> neighbors = neighcompare.get(id);
+        MeanVariance mv = new MeanVariance();
+        // use first kref neighbors as comparison set.
+        int ks = 0;
+        for(DistanceResultPair<DoubleDistance> neighbor1 : neighbors) {
+          if(objectIsInKNN || neighbor1.getID() != id) {
+            mv.put(pdists.get(neighbor1.getSecond()));
+            ks++;
+            if(ks >= kcomp) {
+              break;
+            }
+          }
+        }
+        double plof = Math.max(pdists.get(id) / mv.getMean(), 1.0);
+        plofs.put(id, plof);
+        mvplof.put((plof - 1.0)*(plof - 1.0));
+
+        if(logger.isVerbose()) {
+          progressPLOFs.setProcessed(counter);
+          logger.progress(progressPLOFs);
+        }
+      }
     }
+
+    double nplof = lambda * Math.sqrt(mvplof.getMean());
+    if (logger.isVerbose()) {
+      logger.verbose("nplof normalization factor is "+nplof+" "+mvplof.getMean()+" "+mvplof.getStddev());
+    }
+
     // Compute final LoOP values.
     HashMap<Integer, Double> loops = new HashMap<Integer, Double>();
     {// compute LOOP_SCORE of each db object
