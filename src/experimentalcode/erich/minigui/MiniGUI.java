@@ -10,12 +10,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
-import java.util.logging.ErrorManager;
-import java.util.logging.Formatter;
-import java.util.logging.Handler;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.SimpleFormatter;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.BoxLayout;
@@ -27,7 +22,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -37,12 +31,11 @@ import de.lmu.ifi.dbs.elki.KDDTask;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.logging.MessageFormatter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
@@ -79,7 +72,7 @@ public class MiniGUI extends JPanel {
 
   protected Logging logger = Logging.getLogger(MiniGUI.class);
 
-  protected JTextArea outputArea;
+  protected LogPane outputArea;
 
   protected ArrayList<Triple<Option<?>, String, BitSet>> parameters;
 
@@ -92,8 +85,9 @@ public class MiniGUI extends JPanel {
     parameters = new ArrayList<Triple<Option<?>, String, BitSet>>();
 
     parameterTable = new JTable(new ParametersModel(parameters));
-    parameterTable.setPreferredScrollableViewportSize(new Dimension(600, 200));
+    parameterTable.setPreferredScrollableViewportSize(new Dimension(800, 400));
     parameterTable.setFillsViewportHeight(true);
+    parameterTable.setDefaultRenderer(Option.class, new HighlightingRenderer(parameters));
     parameterTable.setDefaultRenderer(String.class, new HighlightingRenderer(parameters));
     final AdjustingEditor editor = new AdjustingEditor(parameters);
     parameterTable.setDefaultEditor(String.class, editor);
@@ -108,26 +102,6 @@ public class MiniGUI extends JPanel {
     JPanel buttonPanel = new JPanel();
     buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
 
-    // button to evaluate settings
-    JButton setButton = new JButton("Test Settings");
-    setButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
-        runSetParameters(false);
-      }
-    });
-    buttonPanel.add(setButton);
-
-    // button to evaluate settings
-    JButton helpButton = new JButton("Request usage help");
-    helpButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
-        runSetParameters(true);
-      }
-    });
-    buttonPanel.add(helpButton);
-
     // button to launch the task
     JButton runButton = new JButton("Run Task");
     runButton.addActionListener(new ActionListener() {
@@ -141,58 +115,41 @@ public class MiniGUI extends JPanel {
     add(buttonPanel);
 
     // setup text output area
-    outputArea = new JTextArea();
+    outputArea = new LogPane();
 
     // Create the scroll pane and add the table to it.
     JScrollPane outputPane = new JScrollPane(outputArea);
-    outputPane.setPreferredSize(new Dimension(600, 200));
+    outputPane.setPreferredSize(new Dimension(800, 400));
 
     // Add the output pane to the bottom
     add(outputPane);
 
     // reconfigure logging
-    LogHandler.setReceiver(this);
+    GUILogHandler.setReceiver(outputArea);
     LoggingConfiguration.reconfigureLogging(MiniGUI.class.getPackage().getName(), "logging-minigui.properties");
 
     // refresh Parameters
     ArrayList<String> ps = new ArrayList<String>();
     ps.add("-algorithm XXX");
-    doSetParameters(false, ps);
+    doSetParameters(ps);
   }
 
-  protected void runSetParameters(boolean help) {
+  protected void runSetParameters() {
     ArrayList<String> params = serializeParameters();
-    if(!help) {
-      outputArea.setText("Testing parameters: " + FormatUtil.format(params, " ") + NEWLINE);
-    }
-    else {
-      outputArea.setText("");
-    }
-    List<Pair<Parameterizable, Option<?>>> options = doSetParameters(help, params);
-
-    if(help) {
-      StringBuffer buf = new StringBuffer();
-      buf.append("Parameters:").append(NEWLINE);
-      OptionUtil.formatForConsole(buf, 100, "   ", options);
-
-      // TODO: global parameter constraints
-
-      outputArea.append(buf.toString());
-    }
+    outputArea.clear();
+    outputArea.publishLogMessage("Parameters: " + FormatUtil.format(params, " ") + NEWLINE, Level.INFO);
+    doSetParameters(params);
   }
 
-  private List<Pair<Parameterizable, Option<?>>> doSetParameters(boolean help, ArrayList<String> params) {
+  private List<Pair<Parameterizable, Option<?>>> doSetParameters(ArrayList<String> params) {
     KDDTask<DatabaseObject> task = new KDDTask<DatabaseObject>();
     try {
       if(params.size() > 0) {
         task.setParameters(params);
       }
-      if(!help) {
-        outputArea.append("Test ok." + NEWLINE);
-      }
     }
     catch(ParameterException e) {
-      outputArea.append("Parameter Error: " + e.getMessage() + NEWLINE);
+      logger.error("Parameter Error: " + e.getMessage());
     }
     catch(Exception e) {
       logger.exception(e);
@@ -246,6 +203,13 @@ public class MiniGUI extends JPanel {
           bits.set(BIT_INVALID);
         }
       }
+      // SKIP these options, they should be moved out of KDDTask:
+      if (option.getOptionID() == OptionID.HELP || option.getOptionID() == OptionID.HELP_LONG) {
+        continue;
+      }
+      if (option.getOptionID() == OptionID.DESCRIPTION) {
+        continue;
+      }
       Triple<Option<?>, String, BitSet> t = new Triple<Option<?>, String, BitSet>(option, value, bits);
       parameters.add(t);
     }
@@ -278,14 +242,15 @@ public class MiniGUI extends JPanel {
 
   protected void runTask() {
     ArrayList<String> params = serializeParameters();
-    outputArea.setText("Running: " + FormatUtil.format(params, " ") + NEWLINE);
+    outputArea.clear();
+    outputArea.publishLogMessage("Running: " + FormatUtil.format(params, " ") + NEWLINE, Level.INFO);
     KDDTask<DatabaseObject> task = new KDDTask<DatabaseObject>();
     try {
       task.setParameters(params);
       task.run();
     }
     catch(ParameterException e) {
-      outputArea.setText(e.getMessage());
+      outputArea.publishLogMessage(e.getMessage(), Level.WARNING);
     }
     catch(Exception e) {
       logger.exception(e);
@@ -347,10 +312,7 @@ public class MiniGUI extends JPanel {
       if(rowIndex < parameters.size()) {
         Triple<Option<?>, String, BitSet> p = parameters.get(rowIndex);
         if(columnIndex == 0) {
-          String ret = p.getFirst().getOptionID().getName();
-          if(ret == null) {
-            ret = "";
-          }
+          Option<?> ret = p.getFirst();
           return ret;
         }
         else if(columnIndex == 1) {
@@ -373,7 +335,10 @@ public class MiniGUI extends JPanel {
     }
 
     @Override
-    public Class<?> getColumnClass(@SuppressWarnings("unused") int columnIndex) {
+    public Class<?> getColumnClass(int columnIndex) {
+      if(columnIndex == 0) {
+        return Option.class;
+      }
       return String.class;
     }
 
@@ -422,7 +387,7 @@ public class MiniGUI extends JPanel {
         // }
         // }
         p.setThird(flags);
-        runSetParameters(false);
+        runSetParameters();
       }
       else {
         logger.warning("Edited value is not a String!");
@@ -454,8 +419,18 @@ public class MiniGUI extends JPanel {
     @Override
     public void setValue(Object value) {
       if(value instanceof String) {
-        setText((value == null) ? "" : (String) value);
+        setText((String) value);
+        setToolTipText("");
+        return;
       }
+      if(value instanceof Option<?>) {
+        Option<?> o = (Option<?>) value;
+        setText(o.getOptionID().getName());
+        setToolTipText(o.getOptionID().getDescription());
+        return;
+      }
+      setText("");
+      setToolTipText("");
     }
 
     @Override
@@ -565,15 +540,15 @@ public class MiniGUI extends JPanel {
     private static final long serialVersionUID = 1L;
 
     final JPanel panel = new JPanel();
-    
+
     final JTextField textfield = new JTextField();
-    
+
     final JButton button = new JButton("...");
-    
+
     final JFileChooser fc = new JFileChooser();
 
     private ArrayList<Triple<Option<?>, String, BitSet>> parameters;
-    
+
     public FileNameEditor(ArrayList<Triple<Option<?>, String, BitSet>> parameters) {
       this.parameters = parameters;
       button.addActionListener(this);
@@ -610,11 +585,12 @@ public class MiniGUI extends JPanel {
           catch(UnusedParameterException e) {
             f = null;
           }
-          if (f != null) {
+          if(f != null) {
             String fn = f.getPath();
             textfield.setText(fn);
             fc.setSelectedFile(f);
-          } else {
+          }
+          else {
             textfield.setText("");
             fc.setSelectedFile(null);
           }
@@ -634,7 +610,7 @@ public class MiniGUI extends JPanel {
     private final DropdownEditor dropdownEditor;
 
     private final DefaultCellEditor defaultEditor;
-    
+
     private final FileNameEditor fileNameEditor;
 
     private TableCellEditor activeEditor;
@@ -670,7 +646,7 @@ public class MiniGUI extends JPanel {
           activeEditor = dropdownEditor;
           return dropdownEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
         }
-        if (p.getFirst() instanceof FileParameter) {
+        if(p.getFirst() instanceof FileParameter) {
           activeEditor = fileNameEditor;
           return fileNameEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
         }
@@ -678,81 +654,5 @@ public class MiniGUI extends JPanel {
       activeEditor = defaultEditor;
       return defaultEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
     }
-  }
-
-  public static class LogHandler extends Handler {
-    private static MiniGUI logReceiver = null;
-
-    /**
-     * Formatter for regular messages (informational records)
-     */
-    private Formatter msgformat = new MessageFormatter();
-
-    /**
-     * Formatter for debugging messages
-     */
-    private Formatter debugformat = new SimpleFormatter();
-
-    /**
-     * Formatter for error messages
-     */
-    private Formatter errformat = new SimpleFormatter();
-
-    @Override
-    public void close() throws SecurityException {
-      // Do nothing
-    }
-
-    @Override
-    public void flush() {
-      // Do nothing
-    }
-
-    @Override
-    public void publish(LogRecord record) {
-      // choose an appropriate formatter
-      final Formatter fmt;
-      // always format progress messages using the progress formatter.
-      if(record.getLevel().intValue() >= Level.WARNING.intValue()) {
-        // format errors using the error formatter
-        fmt = errformat;
-      }
-      else if(record.getLevel().intValue() <= Level.FINE.intValue()) {
-        // format debug statements using the debug formatter.
-        fmt = debugformat;
-      }
-      else {
-        // default to the message formatter.
-        fmt = msgformat;
-      }
-      // format
-      final String m;
-      try {
-        m = fmt.format(record);
-      }
-      catch(Exception ex) {
-        reportError(null, ex, ErrorManager.FORMAT_FAILURE);
-        return;
-      }
-      if(logReceiver != null) {
-        logReceiver.publish(m, record.getLevel());
-      }
-      else {
-        // fall back to standard error.
-        System.err.println(m);
-      }
-    }
-
-    protected static void setReceiver(MiniGUI receiver) {
-      logReceiver = receiver;
-    }
-  }
-
-  /**
-   * @param record log message.
-   * @param level unused for now
-   */
-  protected void publish(String record, Level level) {
-    outputArea.append(record);
   }
 }
