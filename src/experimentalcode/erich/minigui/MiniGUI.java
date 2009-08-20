@@ -403,7 +403,7 @@ public class MiniGUI extends JPanel {
 
     private ArrayList<Triple<Option<?>, String, BitSet>> parameters;
 
-    private static final Color COLOR_INCOMPLETE = new Color(0xAFAFFF);
+    private static final Color COLOR_INCOMPLETE = new Color(0xFFFFAF);
 
     private static final Color COLOR_SYNTAX_ERROR = new Color(0xFFAFAF);
 
