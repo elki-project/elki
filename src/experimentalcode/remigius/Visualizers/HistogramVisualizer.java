@@ -22,7 +22,7 @@ public class HistogramVisualizer<O extends DoubleVector> extends ScalarVisualize
 
     // TODO: Set CSS.
   }
-
+  
   @Override
   public Element visualize(SVGPlot svgp) {
     Element layer = ShapeLibrary.createSVG(svgp.getDocument());
@@ -37,7 +37,7 @@ public class HistogramVisualizer<O extends DoubleVector> extends ScalarVisualize
     // TODO: Introduce a proper shape & scaling.
     for (Integer id : database){
       double val = hist.get(database.get(id).getValue(dim));
-      layer.appendChild(ShapeLibrary.createRow(svgp.getDocument(), database.get(id).getValue(dim), 1 - val, 0.009/bins, val, dim, id));
+      layer.appendChild(ShapeLibrary.createRow(svgp.getDocument(), getPositioned(database.get(id), dim), 1 - val, 0.009/bins, val, dim, id));
     }
     
     return layer;
