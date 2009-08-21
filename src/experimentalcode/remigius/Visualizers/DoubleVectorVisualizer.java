@@ -4,7 +4,6 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
-import experimentalcode.remigius.Scale;
 import experimentalcode.remigius.VisualizationManager;
 
 /**
@@ -18,12 +17,9 @@ import experimentalcode.remigius.VisualizationManager;
 public abstract class DoubleVectorVisualizer<O extends DoubleVector> extends AbstractVisualizer<O> {
   
   /**
-   * Array of {@link Scale}-objects to calculate normalized positions of objects
+   * Array of {@link LinearScale}-objects to calculate normalized positions of objects
    */
   protected LinearScale[] scales;
-  
-  public DoubleVectorVisualizer(){
-  }
   
   /**
    * Convenience method, initializing the Visualizer with a default level of 0.
