@@ -30,7 +30,6 @@ import javax.swing.table.TableCellEditor;
 import de.lmu.ifi.dbs.elki.KDDTask;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
@@ -125,8 +124,7 @@ public class MiniGUI extends JPanel {
     add(outputPane);
 
     // reconfigure logging
-    GUILogHandler.setReceiver(outputArea);
-    LoggingConfiguration.reconfigureLogging(MiniGUI.class.getPackage().getName(), "logging-minigui.properties");
+    outputArea.becomeDefaultLogger();
 
     // refresh Parameters
     ArrayList<String> ps = new ArrayList<String>();
@@ -137,7 +135,7 @@ public class MiniGUI extends JPanel {
   protected void runSetParameters() {
     ArrayList<String> params = serializeParameters();
     outputArea.clear();
-    outputArea.publishLogMessage("Parameters: " + FormatUtil.format(params, " ") + NEWLINE, Level.INFO);
+    outputArea.publish("Parameters: " + FormatUtil.format(params, " ") + NEWLINE, Level.INFO);
     doSetParameters(params);
   }
 
@@ -243,14 +241,14 @@ public class MiniGUI extends JPanel {
   protected void runTask() {
     ArrayList<String> params = serializeParameters();
     outputArea.clear();
-    outputArea.publishLogMessage("Running: " + FormatUtil.format(params, " ") + NEWLINE, Level.INFO);
+    outputArea.publish("Running: " + FormatUtil.format(params, " ") + NEWLINE, Level.INFO);
     KDDTask<DatabaseObject> task = new KDDTask<DatabaseObject>();
     try {
       task.setParameters(params);
       task.run();
     }
     catch(ParameterException e) {
-      outputArea.publishLogMessage(e.getMessage(), Level.WARNING);
+      outputArea.publish(e.getMessage(), Level.WARNING);
     }
     catch(Exception e) {
       logger.exception(e);
