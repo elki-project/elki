@@ -36,7 +36,7 @@ public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractR
    * Initializes the flat RTree from an existing persistent file.
    */
   @Override
-  protected void initializeFromFile() {
+  public void initializeFromFile() {
     super.initializeFromFile();
 
     // reconstruct root

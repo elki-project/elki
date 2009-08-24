@@ -239,7 +239,7 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
   /**
    * Initializes this index from an existing persistent file.
    */
-  protected void initializeFromFile() {
+  public void initializeFromFile() {
     if(fileName == null) {
       throw new IllegalArgumentException("Parameter file name is not specified.");
     }
