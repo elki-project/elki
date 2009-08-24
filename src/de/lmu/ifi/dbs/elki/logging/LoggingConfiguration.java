@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -119,5 +120,32 @@ public final class LoggingConfiguration {
         logger.setLevel(Level.WARNING);
       }
     }
+  }
+
+  /**
+   * Add a handler to the root logger.
+   * 
+   * @param handler
+   */
+  public static void addHandler(Handler handler) {
+    LogManager.getLogManager().getLogger("").addHandler(handler);
+  }
+
+  /**
+   * Replace the default log handler with the given log handler.
+   * 
+   * This will remove all {@link CLISmartHandler} found on the root logger.
+   * It will leave any other handlers in place.
+   * 
+   * @param handler Logging handler.
+   */
+  public static void replaceDefaultHandler(Handler handler) {
+    Logger rootlogger = LogManager.getLogManager().getLogger("");
+    for (Handler h : rootlogger.getHandlers()) {
+      if (h instanceof CLISmartHandler) {
+        rootlogger.removeHandler(h);
+      }
+    }
+    addHandler(handler);
   }
 }
