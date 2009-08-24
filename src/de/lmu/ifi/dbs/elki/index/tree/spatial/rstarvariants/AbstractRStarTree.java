@@ -438,7 +438,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * Initializes this R*-Tree from an existing persistent file.
    */
   @Override
-  protected void initializeFromFile() {
+  public void initializeFromFile() {
     super.initializeFromFile();
     // compute height
     this.height = computeHeight();
