@@ -5,7 +5,7 @@ import java.util.Comparator;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 
 /**
- * Pair with canonical comparison function derived from generics.
+ * Pair with canonical comparison function derived from the components comparable interfaces.
  * 
  * @author Erich Schubert
  * 
