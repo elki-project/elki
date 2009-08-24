@@ -5,8 +5,8 @@ import java.util.Iterator;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import experimentalcode.remigius.ShapeLibrary;
 import experimentalcode.remigius.VisualizationManager;
 
-public class ReferencePointsVisualizer<O extends DoubleVector, V extends FeatureVector<V,N>,N extends Number> extends PlanarVisualizer<O> {
+public class ReferencePointsVisualizer<NV extends NumberVector<NV, N>, V extends FeatureVector<V,N>, N extends Number> extends PlanarVisualizer<NV, N> {
 
 	private CollectionResult<V> colResult;
 	private static final String NAME = "ReferencePoints";
@@ -23,7 +23,7 @@ public class ReferencePointsVisualizer<O extends DoubleVector, V extends Feature
 
 	}
 	
-	public void setup(Database<O> database, CollectionResult<V> colResult, VisualizationManager<O> visManager){
+	public void setup(Database<NV> database, CollectionResult<V> colResult, VisualizationManager<NV> visManager){
 		init(database, visManager, Integer.MAX_VALUE-2000, NAME);
 		this.colResult = colResult;
 		setupCSS();

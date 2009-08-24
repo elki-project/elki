@@ -4,7 +4,7 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 import org.w3c.dom.events.EventTarget;
 
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
@@ -14,7 +14,7 @@ import experimentalcode.remigius.ShapeLibrary;
 import experimentalcode.remigius.VisualizationManager;
 import experimentalcode.remigius.gui.ToolTipListener;
 
-public class TextVisualizer<O extends DoubleVector> extends PlanarVisualizer<O> {
+public class TextVisualizer<NV extends NumberVector<NV, N>, N extends Number> extends PlanarVisualizer<NV, N> {
 
   private AnnotationResult<Double> anResult;
   private static final String NAME = "ToolTips";
@@ -22,7 +22,7 @@ public class TextVisualizer<O extends DoubleVector> extends PlanarVisualizer<O> 
   public TextVisualizer() {
   }
 
-  public void setup(Database<O> database, AnnotationResult<Double> anResult, VisualizationManager<O> visManager) {
+  public void setup(Database<NV> database, AnnotationResult<Double> anResult, VisualizationManager<NV> visManager) {
 
     init(database, visManager, NAME);
     this.anResult = anResult;

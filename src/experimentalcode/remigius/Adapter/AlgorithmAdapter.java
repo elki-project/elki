@@ -15,7 +15,7 @@ import experimentalcode.remigius.Visualizers.Visualizer;
  * 
  * @author Remigius Wojdanowski
  * 
- * @param <O> the type of {@link DatabaseObject}s the adapter will handle.
+ * @param <NV> the type of {@link DatabaseObject}s the adapter will handle.
  */
 public interface AlgorithmAdapter<O extends DatabaseObject> {
 

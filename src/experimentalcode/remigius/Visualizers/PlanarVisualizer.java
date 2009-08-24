@@ -1,6 +1,6 @@
 package experimentalcode.remigius.Visualizers;
 
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 
 /**
  * Produces 2-dimensional visualizations.
@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
  * @param <O> The type of object to process.
  */
 // TODO: Replace DoubleVector with NumberVector? - No, as long as we need DoubleVector for calcScales. 
-public abstract class PlanarVisualizer<O extends DoubleVector> extends DoubleVectorVisualizer<O> {
+public abstract class PlanarVisualizer<NV extends NumberVector<NV, N>, N extends Number> extends DoubleVectorVisualizer<NV, N> {
   
   /**
    * the dimension to appear as horizontal dimension.

@@ -2,7 +2,7 @@ package experimentalcode.remigius.Visualizers;
 
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
@@ -18,12 +18,12 @@ import experimentalcode.remigius.VisualizationManager;
  *
  * @param <O> the type of object to be processed.
  */
-public class AxisVisualizer<O extends DoubleVector> extends PlanarVisualizer<O>{
+public class AxisVisualizer<NV extends NumberVector<NV, N>, N extends Number> extends PlanarVisualizer<NV, N>{
   
   // TODO: we have two name-attributes, maybe that's one too much. 
   private static final String NAME = "Axes";
   
-	public void setup(Database<O> database, VisualizationManager<O> visManager){
+	public void setup(Database<NV> database, VisualizationManager<NV> visManager){
 		// We don't need the Database. Maybe another superclass / inheritance hierarchy would serve us better.
 		init(database, visManager, NAME);
 	}

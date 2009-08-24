@@ -1,6 +1,6 @@
 package experimentalcode.remigius.Adapter;
 
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
 import experimentalcode.remigius.VisualizationManager;
@@ -8,17 +8,17 @@ import experimentalcode.remigius.Visualizers.AxisVisualizer;
 import experimentalcode.remigius.Visualizers.DotVisualizer;
 import experimentalcode.remigius.Visualizers.HistogramVisualizer;
 
-public class DefaultAdapter<O extends DoubleVector> extends AbstractAlgorithmAdapter<O>{
+public class DefaultAdapter<NV extends NumberVector<NV, N>, N extends Number> extends AbstractAlgorithmAdapter<NV>{
 
-	private DotVisualizer<O> dotVisualizer;
-	private AxisVisualizer<O> axisVisualizer;
-	private HistogramVisualizer<O> histoVisualizer;
+	private DotVisualizer<NV, N> dotVisualizer;
+	private AxisVisualizer<NV, N> axisVisualizer;
+	private HistogramVisualizer<NV, N> histoVisualizer;
 
 	public DefaultAdapter(){
 		super();
-		dotVisualizer = new DotVisualizer<O>();
-		axisVisualizer = new AxisVisualizer<O>();
-		histoVisualizer = new HistogramVisualizer<O>();
+		dotVisualizer = new DotVisualizer<NV, N>();
+		axisVisualizer = new AxisVisualizer<NV, N>();
+		histoVisualizer = new HistogramVisualizer<NV, N>();
 		visualizers.add(dotVisualizer);
 		visualizers.add(axisVisualizer);
 		visualizers.add(histoVisualizer);
@@ -30,7 +30,7 @@ public class DefaultAdapter<O extends DoubleVector> extends AbstractAlgorithmAda
 	}
 
 	@Override
-	protected void initVisualizer(Database<O> database, Result result, VisualizationManager<O> visManager) {
+	protected void initVisualizer(Database<NV> database, Result result, VisualizationManager<NV> visManager) {
 		axisVisualizer.setup(database, visManager);
 		dotVisualizer.setup(database, visManager);
 		histoVisualizer.setup(database, visManager);
