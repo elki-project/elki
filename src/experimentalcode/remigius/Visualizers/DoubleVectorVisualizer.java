@@ -55,6 +55,6 @@ public abstract class DoubleVectorVisualizer<O extends DoubleVector> extends Abs
    *         given dimension.
    */
   public Double getPositioned(O o, int dim) {
-    return scales[dim].getScaled(o.getValue(dim));
+    return scales[dim].getScaled(o.getValue(dim).doubleValue());
   }
 }
