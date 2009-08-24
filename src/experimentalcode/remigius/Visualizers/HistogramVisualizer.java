@@ -12,9 +12,12 @@ import experimentalcode.remigius.VisualizationManager;
 public class HistogramVisualizer<O extends DoubleVector> extends ScalarVisualizer<O>{
 
   private static final String NAME = "Histograms";
+  private static final int BINS = 20;
+  private double frac;
   
   public void setup(Database<O> database, VisualizationManager<O> visManager) {
     init(database, visManager, NAME);
+    this.frac = 1. / database.size();
     setupCSS();
   }
 
@@ -26,18 +29,17 @@ public class HistogramVisualizer<O extends DoubleVector> extends ScalarVisualize
   @Override
   public Element visualize(SVGPlot svgp) {
     Element layer = ShapeLibrary.createSVG(svgp.getDocument());
-    // TODO: Fix Bins & aggregated values.
-    int bins = 20;
-    double frac = 1. / database.size();
-    AggregatingHistogram<Double, Double> hist = AggregatingHistogram.DoubleSumHistogram(bins, scales[dim].getMin(), scales[dim].getMax());
+    
+    // Creating a histogram.
+    AggregatingHistogram<Double, Double> hist = AggregatingHistogram.DoubleSumHistogram(BINS, scales[dim].getMin(), scales[dim].getMax());
     for (Integer id : database){
       hist.aggregate(database.get(id).getValue(dim), frac);
     }
-
-    // TODO: Introduce a proper shape & scaling.
+    
+    // Visualizing a histogram.
     for (Integer id : database){
       double val = hist.get(database.get(id).getValue(dim));
-      layer.appendChild(ShapeLibrary.createRow(svgp.getDocument(), getPositioned(database.get(id), dim), 1 - val, 0.009/bins, val, dim, id));
+      layer.appendChild(ShapeLibrary.createRow(svgp.getDocument(), getPositioned(database.get(id), dim), 1 - val, frac, val, dim, id));
     }
     
     return layer;
