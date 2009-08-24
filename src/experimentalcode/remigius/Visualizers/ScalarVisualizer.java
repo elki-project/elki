@@ -2,10 +2,10 @@ package experimentalcode.remigius.Visualizers;
 
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 
-public abstract class ScalarVisualizer<O extends DoubleVector> extends DoubleVectorVisualizer<O> {
+public abstract class ScalarVisualizer<NV extends NumberVector<NV, N>, N extends Number> extends DoubleVectorVisualizer<NV, N> {
   
   protected int dim;
   

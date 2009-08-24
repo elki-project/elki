@@ -8,7 +8,7 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -28,7 +28,7 @@ import experimentalcode.lisa.scale.LinearScale;
 import experimentalcode.remigius.ShapeLibrary;
 import experimentalcode.remigius.VisualizationManager;
 
-public class BubbleVisualizer<O extends DoubleVector> extends PlanarVisualizer<O> {
+public class BubbleVisualizer<NV extends NumberVector<NV, N>, N extends Number> extends PlanarVisualizer<NV, N> {
 	
 	public static final OptionID GAMMA_ID = OptionID.getOrCreateOptionID("bubble.gamma", "gamma-correction");
 	private final DoubleParameter GAMMA_PARAM = new DoubleParameter(GAMMA_ID, 1.0);
@@ -61,7 +61,7 @@ public class BubbleVisualizer<O extends DoubleVector> extends PlanarVisualizer<O
 		addOption(CUTOFF_PARAM);
 	}
 	
-	public void setup(Database<O> database, AnnotationResult<Double> anResult, Result r, DoubleScale normalizationScale, VisualizationManager<O> visManager){
+	public void setup(Database<NV> database, AnnotationResult<Double> anResult, Result r, DoubleScale normalizationScale, VisualizationManager<NV> visManager){
 		init(database, visManager, 1000, NAME);
 		this.anResult = anResult;
 
@@ -80,7 +80,7 @@ public class BubbleVisualizer<O extends DoubleVector> extends PlanarVisualizer<O
 		if (clusterings != null && clusterings.size() > 0) {
 			clustering = (Clustering<Model>) clusterings.get(0);
 		} else {
-			clustering = new ByLabelClustering<O>().run(database);
+			clustering = new ByLabelClustering<NV>().run(database);
 		}
 	}
 
