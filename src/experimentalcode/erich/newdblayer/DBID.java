@@ -13,7 +13,7 @@ package experimentalcode.erich.newdblayer;
  * 
  * @author Erich Schubert
  */
-public final class DBID {
+public final class DBID implements ObjectRepresentation {
   /**
    * The actual object ID.
    */
