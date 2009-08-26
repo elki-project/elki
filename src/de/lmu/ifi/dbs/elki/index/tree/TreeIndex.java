@@ -96,7 +96,7 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
    * The file storing the entries of this index.
    */
   protected PageFile<N> file;
-  
+
   /**
    * True if this index is already initialized.
    */
@@ -206,7 +206,7 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
    * @param nodeID the page id of the node to be returned
    * @return the node with the specified id
    */
-  public final N getNode(int nodeID) {
+  public N getNode(int nodeID) {
     if(nodeID == rootEntry.getID()) {
       return getRoot();
     }
@@ -272,18 +272,19 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
     // determine minimum and maximum entries in a node
     // todo verbose flag as parameter
     // initializeCapacities(object, true);
- 	 initializeCapacities(object, false);
+    initializeCapacities(object, false);
 
     // init the file
     if(fileName == null) {
       this.file = new MemoryPageFile<N>(pageSize, cacheSize, new LRUCache<N>());
     }
-    else { 
-      if(new File(fileName).exists()){
-    	  initializeFromFile();
-      }else{
+    else {
+      if(new File(fileName).exists()) {
+        initializeFromFile();
+      }
+      else {
 
-    	 this.file = new PersistentPageFile<N>(createHeader(), cacheSize, new LRUCache<N>(), fileName, getNodeClass());
+        this.file = new PersistentPageFile<N>(createHeader(), cacheSize, new LRUCache<N>(), fileName, getNodeClass());
       }
     }
 
@@ -374,10 +375,18 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
    * @param o the object to be deleted
    */
   abstract protected void postDelete(O o);
-  
+
   /**
    * Get the node class of this index
+   * 
    * @return
    */
   abstract protected Class<N> getNodeClass();
+
+  /**
+   * @return filename of the underlying persistence layer
+   */
+  public String getFileName() {
+    return fileName;
+  }
 }

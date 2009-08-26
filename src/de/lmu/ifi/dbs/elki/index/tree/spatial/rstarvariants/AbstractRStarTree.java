@@ -56,12 +56,12 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * was already a reinsert operation in this level during the current insert /
    * delete operation.
    */
-  private final Map<Integer, Boolean> reinsertions = new HashMap<Integer, Boolean>();
+  protected final Map<Integer, Boolean> reinsertions = new HashMap<Integer, Boolean>();
 
   /**
    * The height of this R*-Tree.
    */
-  private int height;
+  protected int height;
 
   /**
    * For counting the number of distance computations.
@@ -102,7 +102,8 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
   public final void insert(List<O> objects) {
     // empty input file
     if(objects.isEmpty() || (objects.size() == 1 && (objects.get(0) == null || objects.get(0).getDimensionality() == 0))) {
-      // FIXME: abusing this empty-insert for re-loading an on-disk tree is an ugly hack.
+      // FIXME: abusing this empty-insert for re-loading an on-disk tree is an
+      // ugly hack.
       initializeFromFile();
       return;
     }
@@ -826,6 +827,37 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
   abstract protected E createNewDirectoryEntry(N node);
 
   /**
+   * Test on whether or not any child of <code>node</code> contains
+   * <code>mbr</code>. If there are several containing children, the child with
+   * the minimum volume is chosen in order to get compact pages.
+   * 
+   * @param newEntry
+   * @return the child of <code>node</code> containing <code>mbr</code> with the
+   *         minimum volume or <code>null</code> if none exists
+   */
+  protected TreeIndexPathComponent<E> containedTest(N node, HyperBoundingBox mbr) {
+    E containingEntry = null;
+    int index = -1, tempIndex = 0;
+    double cEVol = Double.MAX_VALUE;
+    E ei;
+    for(int i = 0; i < node.getNumEntries(); i++) {
+      ei = node.getEntry(i);
+      // skip test on pairwise overlaps
+      if(ei.getMBR().contains(mbr)) {
+        double tempVol = ei.getMBR().volume();
+        // take containing node with lowest volume
+        if(tempVol < cEVol) {
+          cEVol = tempVol;
+          containingEntry = ei;
+          index = tempIndex;
+        }
+      }
+      tempIndex++;
+    }
+    return (containingEntry == null ? null : new TreeIndexPathComponent<E>(containingEntry, index));
+  }
+
+  /**
    * Chooses the best path of the specified subtree for insertion of the given
    * mbr at the specified level.
    * 
@@ -835,7 +867,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    *        indicates leaf-level)
    * @return the path of the appropriate subtree to insert the given mbr
    */
-  private TreeIndexPath<E> choosePath(TreeIndexPath<E> subtree, HyperBoundingBox mbr, int level) {
+  protected TreeIndexPath<E> choosePath(TreeIndexPath<E> subtree, HyperBoundingBox mbr, int level) {
     if(logger.isDebuggingFiner()) {
       logger.debugFiner("node " + subtree + ", level " + level);
     }
@@ -843,6 +875,17 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     N node = getNode(subtree.getLastPathComponent().getEntry());
     if(node.isLeaf()) {
       return subtree;
+    }
+    // first test on containment
+    TreeIndexPathComponent<E> containingEntry = containedTest(node, mbr);
+    if(containingEntry != null) {
+      TreeIndexPath<E> newSubtree = subtree.pathByAddingChild(containingEntry);
+      if(height - subtree.getPathCount() == level) {
+        return newSubtree;
+      }
+      else {
+        return choosePath(newSubtree, mbr, level);
+      }
     }
 
     N childNode = getNode(node.getEntry(0));
@@ -943,7 +986,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @param mbr2 the second MBR
    * @return the union of the two specified MBRs
    */
-  private HyperBoundingBox union(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
+  protected HyperBoundingBox union(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
     if(mbr1 == null && mbr2 == null)
       return null;
     if(mbr1 == null)
@@ -1031,7 +1074,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @param path the path to the node
    */
   @SuppressWarnings("unchecked")
-  private void reInsert(N node, int level, TreeIndexPath<E> path) {
+  protected void reInsert(N node, int level, TreeIndexPath<E> path) {
     HyperBoundingBox mbr = node.mbr();
     EuclideanDistanceFunction<O> distFunction = new EuclideanDistanceFunction<O>();
     DistanceEntry<DoubleDistance, E>[] reInsertEntries = new DistanceEntry[node.getNumEntries()];
@@ -1088,7 +1131,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * 
    * @param subtree the subtree to be adjusted
    */
-  private void adjustTree(TreeIndexPath<E> subtree) {
+  protected void adjustTree(TreeIndexPath<E> subtree) {
     if(logger.isDebugging()) {
       logger.debugFine("Adjust tree " + subtree + "\n");
     }
@@ -1120,9 +1163,9 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
           parent.addDirectoryEntry(createNewDirectoryEntry(split));
 
           // adjust the entry representing the (old) node, that has
-          // been splitted
-          
-          //This does not work in the persistent version
+          // been split
+
+          // This does not work in the persistent version
           // node.adjustEntry(subtree.getLastPathComponent().getEntry());
           node.adjustEntry(parent.getEntry(subtree.getLastPathComponent().getIndex()));
 
@@ -1234,7 +1277,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @return the path to the new root node that points to the two specified
    *         child nodes
    */
-  private TreeIndexPath<E> createNewRoot(final N oldRoot, final N newNode) {
+  protected TreeIndexPath<E> createNewRoot(final N oldRoot, final N newNode) {
     N root = createNewDirectoryNode(dirCapacity);
     file.writePage(root);
 
