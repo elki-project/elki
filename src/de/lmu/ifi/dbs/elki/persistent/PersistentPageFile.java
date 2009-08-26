@@ -40,7 +40,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
    * The header of this page file.
    */
   protected final PageHeader header;
-  
+
   /**
    * The type of pages we use.
    */
@@ -78,7 +78,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
         // reading empty nodes in Stack
         int i = 0;
         while(file.getFilePointer() + pageSize <= file.length()) {
-          long offset = ((long)(header.getReservedPages() + i)) * (long)pageSize;
+          long offset = ((long) (header.getReservedPages() + i)) * (long) pageSize;
           byte[] buffer = new byte[pageSize];
           file.seek(offset);
           file.read(buffer);
@@ -134,7 +134,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
       // get from file and put to cache
       if(page == null) {
         readAccess++;
-        long offset = ((long)(header.getReservedPages() + pageID)) * (long)pageSize;
+        long offset = ((long) (header.getReservedPages() + pageID)) * (long) pageSize;
         byte[] buffer = new byte[pageSize];
         file.seek(offset);
         file.read(buffer);
@@ -168,7 +168,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
       // delete from file
       writeAccess++;
       byte[] array = pageToByteArray(null);
-      long offset =  ((long)(header.getReservedPages() + pageID)) * (long)pageSize;
+      long offset = ((long) (header.getReservedPages() + pageID)) * (long) pageSize;
       file.seek(offset);
       file.write(array);
     }
@@ -189,8 +189,8 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
         page.setDirty(false);
         writeAccess++;
         byte[] array = pageToByteArray(page);
-        long offset = ((long)(header.getReservedPages() + page.getID())) * (long)pageSize;
-        assert offset>=0: header.getReservedPages()+" "+page.getID()+" "+pageSize + " " + offset;
+        long offset = ((long) (header.getReservedPages() + page.getID())) * (long) pageSize;
+        assert offset >= 0 : header.getReservedPages() + " " + page.getID() + " " + pageSize + " " + offset;
         file.seek(offset);
         file.write(array);
       }
@@ -243,7 +243,7 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
         return null;
       }
       else if(type == FILLED_PAGE) {
-    	  P page;
+        P page;
         try {
           page = pageclass.newInstance();
         }
@@ -253,8 +253,8 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
         catch(IllegalAccessException e) {
           throw new AbortException("Error instanciating an index page", e);
         }
-    	  page.readExternal(ois);
-    	  return page;
+        page.readExternal(ois);
+        return page;
       }
       else {
         throw new IllegalArgumentException("Unknown type: " + type);
@@ -315,6 +315,47 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
     }
     catch(IOException e) {
       throw new RuntimeException("IOException occurred! ", e);
+    }
+  }
+
+  /** @return the random access file storing the pages. */
+  public RandomAccessFile getFile() {
+    return file;
+  }
+
+  /**
+   * Get the header of this persistent page file.
+   * 
+   * @return the header used by this page file
+   */
+  public PageHeader getHeader() {
+    return header;
+  }
+
+  /** Increases the {@link PageFile#readAccess readAccess} counter by one. */
+  public void increaseReadAccess() {
+    readAccess++;
+  }
+
+  /** Increases the {@link PageFile#writeAccess writeAccess} counter by one. */
+  public void increaseWriteAccess() {
+    writeAccess++;
+  }
+
+  /**
+   * Set the next page id to the given value. If this means that any page ids
+   * stored in <code>emptyPages</code> are smaller than
+   * <code>next_page_id</code>, they are removed from this file's observation
+   * stack.
+   * 
+   * @param next_page_id the id of the next page to be inserted (if there are no
+   *        more empty pages to be filled)
+   */
+  @Override
+  public void setNextPageID(int next_page_id) {
+    this.nextPageID = next_page_id;
+    while(!emptyPages.isEmpty() && emptyPages.peek() >= this.nextPageID) {
+      emptyPages.pop();
     }
   }
 }

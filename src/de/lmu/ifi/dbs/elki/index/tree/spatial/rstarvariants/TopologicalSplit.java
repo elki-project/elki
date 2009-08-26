@@ -204,7 +204,7 @@ class TopologicalSplit<E extends SpatialEntry> {
       max[d - 1] = entries.get(from).getMBR().getMax(d);
     }
 
-    for (int i = from; i < to; i++) {
+    for (int i = from + 1; i < to; i++) {
       HyperBoundingBox currMBR = entries.get(i).getMBR();
       for (int d = 1; d <= min.length; d++) {
         if (min[d - 1] > currMBR.getMin(d)) {

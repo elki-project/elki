@@ -119,7 +119,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
    * @param splitPoint the split point of the entries
    * @return the newly created split node
    */
-  protected N splitEntries(List<E> sorting, int splitPoint) {
+  public N splitEntries(List<E> sorting, int splitPoint) {
     StringBuffer msg = new StringBuffer("\n");
 
     if(isLeaf()) {
