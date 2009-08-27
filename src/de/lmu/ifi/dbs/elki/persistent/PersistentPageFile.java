@@ -9,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.io.RandomAccessFile;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 
 /**
@@ -76,26 +77,37 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
         initCache(header.getPageSize(), cacheSize, cache);
 
         // reading empty nodes in Stack
-        int i = 0;
-        while(file.getFilePointer() + pageSize <= file.length()) {
-          long offset = ((long) (header.getReservedPages() + i)) * (long) pageSize;
-          byte[] buffer = new byte[pageSize];
-          file.seek(offset);
-          file.read(buffer);
+        if(header instanceof TreeIndexHeader) {
+          TreeIndexHeader tiHeader = (TreeIndexHeader) header;
+          try {
+            emptyPages = tiHeader.readEmptyPages(file);
+          }
+          catch(ClassNotFoundException e) {
+            throw new RuntimeException("ClassNotFoundException occurred when reading empty pages.", e);
+          }
+        }
+        else { // must scan complete file
+          int i = 0;
+          while(file.getFilePointer() + pageSize <= file.length()) {
+            long offset = ((long) (header.getReservedPages() + i)) * (long) pageSize;
+            byte[] buffer = new byte[pageSize];
+            file.seek(offset);
+            file.read(buffer);
 
-          ByteArrayInputStream bais = new ByteArrayInputStream(buffer);
-          ObjectInputStream ois = new ObjectInputStream(bais);
-          int type = ois.readInt();
-          if(type == EMPTY_PAGE) {
-            emptyPages.push(i);
+            ByteArrayInputStream bais = new ByteArrayInputStream(buffer);
+            ObjectInputStream ois = new ObjectInputStream(bais);
+            int type = ois.readInt();
+            if(type == EMPTY_PAGE) {
+              emptyPages.push(i);
+            }
+            else if(type == FILLED_PAGE) {
+              nextPageID = i + 1;
+            }
+            else {
+              throw new IllegalArgumentException("Unknown type: " + type);
+            }
+            i++;
           }
-          else if(type == FILLED_PAGE) {
-            nextPageID = i + 1;
-          }
-          else {
-            throw new IllegalArgumentException("Unknown type: " + type);
-          }
-          i++;
         }
       }
       // create new file
@@ -207,6 +219,11 @@ public class PersistentPageFile<P extends Page<P>> extends PageFile<P> {
   public void close() {
     try {
       super.close();
+      if (!emptyPages.isEmpty() && header instanceof TreeIndexHeader) {
+        // write the list of empty pages to the end of the file
+        ((TreeIndexHeader) header).writeEmptyPages(emptyPages, file);
+      }
+      header.writeHeader(file);
       file.close();
     }
     catch(IOException e) {
