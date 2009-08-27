@@ -236,15 +236,15 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
   @Override
   protected int computeHeight() {
     N node = getRoot();
-    int height = 1;
+    int tHeight = 1;
 
     // compute height
     while(!node.isLeaf() && node.getNumEntries() != 0) {
       E entry = node.getEntry(0);
       node = getNode(entry.getID());
-      height++;
+      tHeight++;
     }
-    return height;
+    return tHeight;
   }
 
   /**
@@ -502,9 +502,9 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     XTreeHeader ph = (XTreeHeader) ((PersistentPageFile<N>) super.file).getHeader();
     long offset = (ph.getReservedPages() + npid) * ph.getPageSize();
     ph.setSupernode_offset(npid * ph.getPageSize());
-    RandomAccessFile file = ((PersistentPageFile<N>) super.file).getFile();
-    ph.writeHeader(file);
-    file.seek(offset);
+    RandomAccessFile ra_file = ((PersistentPageFile<N>) super.file).getFile();
+    ph.writeHeader(ra_file);
+    ra_file.seek(offset);
     long nBytes = 0;
     for(Iterator<N> iterator = supernodes.values().iterator(); iterator.hasNext();) {
       N supernode = iterator.next();
@@ -519,7 +519,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
         throw new IllegalStateException("Supernode is too large for fitting in " + ((int) Math.ceil((double) supernode.getCapacity() / dirCapacity)) + " pages of total size " + sn_array.length);
       System.arraycopy(array, 0, sn_array, 0, array.length);
       ((PersistentPageFile<N>) super.file).increaseWriteAccess();
-      file.write(sn_array);
+      ra_file.write(sn_array);
       nBytes += sn_array.length;
     }
     return nBytes;
@@ -572,7 +572,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
 
     // read supernodes (if there are any)
     if(superNodeOffset > 0) {
-      RandomAccessFile file = ((PersistentPageFile<N>) super.file).getFile();
+      RandomAccessFile ra_file = ((PersistentPageFile<N>) super.file).getFile();
       long offset = header.getReservedPages() * pageSize + superNodeOffset;
       int bs = 0 // omit this: 4 // EMPTY_PAGE or FILLED_PAGE ?
           + 4 // id
@@ -583,10 +583,10 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
       byte[] buffer = new byte[bs];
       try {
         // go to supernode region
-        file.seek(offset);
-        while(file.getFilePointer() + pageSize <= file.length()) {
+        ra_file.seek(offset);
+        while(ra_file.getFilePointer() + pageSize <= ra_file.length()) {
           ((PersistentPageFile<N>) super.file).increaseReadAccess();
-          file.read(buffer);
+          ra_file.read(buffer);
           ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(buffer));
           int id = ois.readInt();
           ois.readBoolean(); // iLeaf
@@ -607,11 +607,11 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
             throw new AbortException("InstantiationException instantiating a supernode", e);
           }
           ((PersistentPageFile<N>) super.file).increaseReadAccess();
-          file.seek(offset);
+          ra_file.seek(offset);
           byte[] superbuffer = new byte[pageSize * (int) Math.ceil((double) capacity / dirCapacity)];
           // increase offset for the next position seek
           offset += superbuffer.length;
-          file.read(superbuffer);
+          ra_file.read(superbuffer);
           ois = new ObjectInputStream(new ByteArrayInputStream(buffer));
           try {
             // read from file and add to supernode map

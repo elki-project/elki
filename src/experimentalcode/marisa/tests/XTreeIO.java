@@ -26,16 +26,18 @@ public class XTreeIO {
 
   public static int VERBOSE_STEP = 1000;
 
-  public static XTree<DoubleVector> buildXTree(String csvInputFile, String outputFile, int pageSize, double maxOverlap, double minFanoutFraction, long numInstances) throws ParameterException, NumberFormatException, IOException {
+  public static XTree<DoubleVector> buildXTree(String csvInputFile, String outputFile, int pageSize, double maxOverlap, double minFanoutFraction, long numInstances, boolean commit) throws ParameterException, NumberFormatException, IOException {
 
     // parameters
-    String paramStr = "-treeindex.pagesize " + pageSize + " " + "-treeindex.file " + outputFile + " " + "-treeindex.cachesize " + CACHE_SIZE + " -xtree.max_overlap_fraction " + maxOverlap;
+    String paramStr = "-treeindex.pagesize " + pageSize + " " + "-treeindex.cachesize " + CACHE_SIZE + " -xtree.max_overlap_fraction " + maxOverlap;
+    if(outputFile != null && outputFile.length() > 0)
+      paramStr += " -treeindex.file " + outputFile;
     if(REINSERT_FRACTION != -1)
       paramStr += " -xtree.reinsert_fraction " + REINSERT_FRACTION;
     if(DATA_OVERLAP)
       paramStr += " -xtree.overlap_type DataOverlap";
     if(!Double.isNaN(minFanoutFraction))
-      paramStr += " -xtree.min_fanout_fraction "+minFanoutFraction;
+      paramStr += " -xtree.min_fanout_fraction " + minFanoutFraction;
     String[] split = paramStr.split("\\s");
 
     // init xTree
@@ -45,7 +47,7 @@ public class XTreeIO {
 
     xTree.initializeTree(new DoubleVector(new double[15]));
     System.out.println(xTree.toString());
-    
+
     FileInputStream fis = new FileInputStream(csvInputFile);
     DataInputStream in = new DataInputStream(fis);
 
@@ -62,7 +64,8 @@ public class XTreeIO {
     }
     in.close();
     fis.close();
-    xTree.commit();
+    if(commit)
+      xTree.commit();
     if(VERBOSE)
       System.out.println("took " + Zeit.wieLange(jetzt));
     return xTree;
@@ -108,7 +111,7 @@ public class XTreeIO {
               }
               if(VERBOSE)
                 System.out.println("Building XTree '" + fn + "'");
-              XTree<DoubleVector> xt = buildXTree(csvInputFile, fn, pageSizes[i], maxOverlaps[j], minFanoutFractions[l], numInstances[m]);
+              XTree<DoubleVector> xt = buildXTree(csvInputFile, fn, pageSizes[i], maxOverlaps[j], minFanoutFractions[l], numInstances[m], true);
               if(VERBOSE)
                 System.out.println(xt.toString());
               xt.commit();
@@ -122,15 +125,17 @@ public class XTreeIO {
 
   public static void main(String[] args) throws NumberFormatException, ParameterException, IOException {
     LoggingConfiguration.reconfigureLogging("experimentalcode.marisa.tests", "logging-cli.properties");
-//    LoggingConfiguration.setVerbose(true);
+    // LoggingConfiguration.setVerbose(true);
     // String inputCSV = "C:/WORK/Theseus/data/synthetic/15DUniform.csv";
     // String outputPrefix = "C:/WORK/Theseus/Experimente/xtrees/15DUniformXT";
     // String inputCSV = "/theseus/data/synthetic/15DUniform.csv";
     String inputCSV = "/tmp/marisa/15DUniform.csv";
     String outputPrefix = "/theseus/data/Experimente/index/xTree/elki/15DUniformXT/";
-//    buildTrees(inputCSV, outputPrefix, new int[] { 4096, 8192 }, new double[] { 1, .9, .5, .2, .1 }, new double[] { 0, .15, .3 }, new double[]{.2, .3, .4}, new long[] { 1000000 });
+    // buildTrees(inputCSV, outputPrefix, new int[] { 4096, 8192 }, new double[]
+    // { 1, .9, .5, .2, .1 }, new double[] { 0, .15, .3 }, new double[]{.2, .3,
+    // .4}, new long[] { 1000000 });
     outputPrefix += "DO";
     DATA_OVERLAP = true;
-    buildTrees(inputCSV, outputPrefix, new int[] { 4096, 8192 }, new double[] { 1, .9, .5, .2, .1 }, new double[] { 0, .15, .3 }, new double[]{.2, .3, .4}, new long[] { 1000000 });
+    buildTrees(inputCSV, outputPrefix, new int[] { 4096, 8192 }, new double[] { 1, .9, .5, .2, .1 }, new double[] { 0, .15, .3 }, new double[] { .2, .3, .4 }, new long[] { 1000000 });
   }
 }

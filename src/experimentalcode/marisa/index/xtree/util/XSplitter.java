@@ -162,13 +162,19 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
   /**
    * Determine the common split dimensions from a list of entries.
    * 
-   * @param entries entries for which to determine the common split dimensions
+   * @param entries directory entries for which to determine the common split
+   *        dimensions
    * @return common split dimensions
    */
-  private <XDE extends XDirectoryEntry> Collection<Integer> getCommonSplitDimensions(Collection<XDE> entries) {
+  private Collection<Integer> getCommonSplitDimensions(Collection<ET> entries) {
     Collection<SplitHistory> splitHistories = new ArrayList<SplitHistory>(entries.size());
-    for(XDE entry : entries) {
-      splitHistories.add(entry.getSplitHistory());
+    for(ET entry : entries) {
+      if(entry instanceof XDirectoryEntry) {
+        splitHistories.add(((XDirectoryEntry) entry).getSplitHistory());
+      }
+      else {
+        throw new RuntimeException("Wrong entry type to derive split dimension from: " + entry.getClass().getName());
+      }
     }
     return SplitHistory.getCommonDimensions(splitHistories);
   }
@@ -321,7 +327,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
       if(!entries.get(0).isLeafEntry() && tree.get_max_overlap() < 1) { // test
         // overlap
         if(maxOverlapStrategy == XTreeBase.DATA_OVERLAP) {
-          double overlap = getRatioOfDataInIntersectionVolume(this.generateDistribution(optDistribution), optMBRs, tree);
+          double overlap = getRatioOfDataInIntersectionVolume(this.generateDistribution(optDistribution), optMBRs);
           if(tree.get_max_overlap() < overlap) {
             logger.finest(String.format(Locale.ENGLISH, "No %s split found%s; best data overlap was %.3f", (minEntries == tree.get_min_fanout() ? "minimum overlap" : "topological"), (maxEntries < entries.size() / 2 ? " in " + (revert ? "second" : "first") + " range" : ""), overlap));
             return null;
@@ -416,7 +422,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
       Iterable<Integer> dimensionListing;
       if(entries.get(0) instanceof XDirectoryEntry) {
         // filter common split dimensions
-        dimensionListing = getCommonSplitDimensions((List<XDirectoryEntry>) entries);
+        dimensionListing = getCommonSplitDimensions(entries);
       }
       else {
         // test all dimensions
@@ -576,15 +582,17 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    * @return the ration of data objects in the intersection volume as value
    *         between 0 and 1
    */
-  public static <E extends SpatialEntry, ET extends E, N extends XNode<E, N>, T extends XTreeBase<?, N, E>> double getRatioOfDataInIntersectionVolume(List<ET>[] split, HyperBoundingBox[] mbrs, T tree) {
+  public double getRatioOfDataInIntersectionVolume(List<ET>[] split, HyperBoundingBox[] mbrs) {
     final HyperBoundingBox xMBR = getIntersection(mbrs[0], mbrs[1]);
     if(xMBR == null) {
       return 0.;
     }
-    final int[] numOf1 = countXingDataEntries(split[0], xMBR, tree);
-    final int[] numOf2 = countXingDataEntries(split[1], xMBR, tree);
+    // Total number of entries, intersecting entries
+    int[] numOf = { 0, 0 };
+    countXingDataEntries(split[0], xMBR, numOf);
+    countXingDataEntries(split[1], xMBR, numOf);
 
-    return ((double) numOf1[1] + numOf2[1]) / ((double) numOf1[0] + numOf2[0]);
+    return ((double) numOf[1]) / ((double) numOf[0]);
   }
 
   /**
@@ -596,10 +604,8 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    * @return array of two integers, the first one is the total number of data
    *         objects, the second one the number of data objects intersecting MBR
    */
-  private static <E extends SpatialEntry, ET extends E, N extends XNode<E, N>, T extends XTreeBase<?, N, E>> int[] countXingDataEntries(final Collection<ET> entries, final HyperBoundingBox mbr, T tree) {
-    // Total number of entries, intersecting entries
-    int[] numOf = { 0, 0 };
-    for(ET entry : entries) {
+  private <ET2 extends SpatialEntry> int[] countXingDataEntries(final Collection<ET2> entries, final HyperBoundingBox mbr, int[] numOf) {
+    for(ET2 entry : entries) {
       if(entry.isLeafEntry()) {
         numOf[0]++;
         if(mbr.intersects(entry.getMBR())) {
@@ -607,10 +613,8 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
         }
       }
       else {
-        N node = tree.getNode(entry);
-        final int[] v = countXingDataEntries(node.getChildren(), mbr, tree);
-        numOf[0] += v[0];
-        numOf[1] += v[1];
+        N node = tree.getNode(entry.getID());
+         countXingDataEntries(node.getChildren(), mbr, numOf);
       }
     }
     return numOf;
