@@ -113,7 +113,17 @@ public class LinearScale {
   public double getScaled(double val) {
     return (val - min) / delta;
   }
- 
+
+  /**
+   * Covert a scale position to the actual value
+   * 
+   * @param val scale position in the interval [0:1]
+   * @return value on the original scale
+   */
+  public double getUnscaled(double val) {
+    return val * delta + min;
+  }
+
   /**
    * Format value according to the scales resolution (i.e. appropriate number of digits)
    * 
