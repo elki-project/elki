@@ -14,7 +14,7 @@ import experimentalcode.remigius.VisualizationManager;
  *
  * @param <O> the type of object this visualizer will process.
  */
-public abstract class DoubleVectorVisualizer<NV extends NumberVector<NV, N>, N extends Number> extends AbstractVisualizer<NV> {
+public abstract class NumberVectorVisualizer<NV extends NumberVector<NV, N>, N extends Number> extends AbstractVisualizer<NV> {
   
   /**
    * Array of {@link LinearScale}-objects to calculate normalized positions of objects
@@ -55,6 +55,10 @@ public abstract class DoubleVectorVisualizer<NV extends NumberVector<NV, N>, N e
    *         given dimension.
    */
   public Double getPositioned(NV nv, int dim) {
-    return scales[dim].getScaled(nv.getValue(dim).doubleValue());
+    return getPositioned(nv.getValue(dim).doubleValue(), dim);
+  }
+  
+  public Double getPositioned(Number n, int dim) {
+    return scales[dim].getScaled(n.doubleValue());
   }
 }

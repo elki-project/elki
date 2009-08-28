@@ -12,7 +12,7 @@ import experimentalcode.remigius.VisualizationManager;
 public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Number> extends ScalarVisualizer<NV, N>{
 
   private static final String NAME = "Histograms";
-  private static final int BINS = 20;
+  private static final int BINS = 50;
   private double frac;
   
   public void setup(Database<NV> database, VisualizationManager<NV> visManager) {
@@ -36,10 +36,11 @@ public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Numbe
       hist.aggregate(database.get(id).getValue(dim).doubleValue(), frac);
     }
     
-    // Visualizing a histogram.
-    for (Integer id : database){
-      double val = hist.get(database.get(id).getValue(dim).doubleValue());
-      layer.appendChild(ShapeLibrary.createRow(svgp.getDocument(), getPositioned(database.get(id), dim), 1 - val, frac, val, dim, id));
+//    // 1 row per bin
+    for (int bin = 0; bin < hist.getNumBins(); bin++){
+      // TODO: calculating the value *must* be simpler. Something is wrong here.
+      double val = hist.get(bin*(scales[dim].getMax() - scales[dim].getMin())/BINS);
+      layer.appendChild(ShapeLibrary.createRow(svgp.getDocument(), getPositioned(bin*hist.getBinsize(), dim), 1 - val, hist.getBinsize(), val, dim, bin));
     }
     
     return layer;
