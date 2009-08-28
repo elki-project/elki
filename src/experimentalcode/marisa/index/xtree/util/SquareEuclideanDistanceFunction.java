@@ -82,7 +82,7 @@ public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> exten
         r = mbr.getMin(d);
       else if(value > mbr.getMax(d))
         r = mbr.getMax(d);
-      else
+      else // zero distance in dimension d
         continue;
 
       double manhattanI = value - r;
@@ -134,7 +134,7 @@ public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> exten
         m1 = mbr1.getMin(d);
         m2 = mbr2.getMax(d);
       }
-      else { // The mbrs intersect!
+      else { // The ranges intersect
         continue;
       }
       double manhattanI = m1 - m2;

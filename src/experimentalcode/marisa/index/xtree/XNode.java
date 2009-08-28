@@ -10,7 +10,6 @@ import java.util.logging.Logger;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 
@@ -67,8 +66,9 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
    * @return the new page capacity of this node
    */
   public int growSuperNode() {
-    if(getNumEntries() < getCapacity())
+    if(getNumEntries() < getCapacity()) {
       throw new IllegalStateException("This node is not yet overflowing (only " + getNumEntries() + " of " + getCapacity() + " entries)");
+    }
     E[] old_nodes = super.entries.clone();
     assert old_nodes[old_nodes.length - 1] != null;
     super.entries = (E[]) java.util.Arrays.copyOfRange(old_nodes, 0, getCapacity() * 2 - 1, entries.getClass());
@@ -86,8 +86,9 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
    * and {@link #readExternal(ObjectInput)} .
    */
   public void makeSuperNode() {
-    if(isSuperNode())
+    if(isSuperNode()) {
       throw new IllegalStateException("This node already is a supernode");
+    }
     supernode = true;
     growSuperNode();
   }
@@ -101,16 +102,19 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
    * @param dirCapacity The regular directory capacity
    */
   public int shrinkSuperNode(int dirCapacity) {
-    if(!isSuperNode())
+    if(!isSuperNode()) {
       throw new IllegalStateException("Cannot shrink a non-super node");
+    }
     int newCapacity = getCapacity() / 2 + 1;
-    if(numEntries >= newCapacity)
+    if(numEntries >= newCapacity) {
       throw new IllegalStateException("This node is not yet underflowing and cannot be shrunken yet.");
+    }
     E[] new_entries = java.util.Arrays.copyOfRange(super.entries, 0, newCapacity);
     assert new_entries[newCapacity - 1] == null;
     super.entries = new_entries;
-    if(dirCapacity == getCapacity())
+    if(dirCapacity == getCapacity()) {
       supernode = false; // this node is no more a supernode
+    }
     return getCapacity();
   }
 
@@ -165,10 +169,12 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
     }
     // the following causes a null pointer -- something is obviously missing
     // entries = (E[]) java.lang.reflect.Array.newInstance(eclass, capacity);
-    if(isLeaf)
+    if(isLeaf) {
       entries = (E[]) new SpatialLeafEntry[capacity];
-    else
+    }
+    else {
       entries = (E[]) new XDirectoryEntry[capacity];
+    }
     for(int i = 0; i < numEntries; i++) {
       E s;
       try {
@@ -184,31 +190,16 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
         throw new UnsupportedOperationException("Cannot access class " + eclass.getName(), e);
       }
       catch(NullPointerException e) {
-        if(isLeaf)
+        if(isLeaf) {
           s = (E) new SpatialLeafEntry();
-        else
+        }
+        else {
           s = (E) new XDirectoryEntry();
+        }
       }
       s.readExternal(in);
       entries[i] = s;
     }
-    // this would be the old way:
-    // if(isLeaf) {
-    // entries = (E[]) new SpatialLeafEntry[capacity];
-    // for(int i = 0; i < numEntries; i++) {
-    // SpatialLeafEntry s = new SpatialLeafEntry();
-    // s.readExternal(in);
-    // entries[i] = (E) s;
-    // }
-    // }
-    // else {
-    // entries = (E[]) new XDirectoryEntry[capacity];
-    // for(int i = 0; i < numEntries; i++) {
-    // XDirectoryEntry s = new XDirectoryEntry();
-    // s.readExternal(in);
-    // entries[i] = (E) s;
-    // }
-    // }
   }
 
   /**
@@ -217,8 +208,9 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
    * {@link #readSuperNode(ObjectInput)}.
    */
   public void writeSuperNode(ObjectOutput out) throws IOException {
-    if(!isSuperNode())
+    if(!isSuperNode()) {
       throw new IllegalStateException("Cannot write as non-super node via writeSuperNode()");
+    }
     // write header
     writeExternal(out);
     for(SpatialEntry entry : entries) {
@@ -323,16 +315,19 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
     E entry = parent.getEntry(index);
     HyperBoundingBox mbr = mbr();
 
-    if(entry.getMBR() == null && mbr == null)
+    if(entry.getMBR() == null && mbr == null) {
       return;
+    }
     if(!entry.getMBR().equals(mbr)) {
       String soll = mbr.toString();
       String ist = entry.getMBR().toString();
       throw new RuntimeException("Wrong MBR in node " + parent.getID() + " at index " + index + " (child " + entry + ")" + "\nsoll: " + soll + ",\n ist: " + ist);
     }
-    if(isSuperNode() && isLeaf)
+    if(isSuperNode() && isLeaf) {
       throw new RuntimeException("Node " + toString() + " is a supernode and a leaf");
-    if(isSuperNode() && !parent.isSuperNode() && parent.getCapacity() >= getCapacity())
+    }
+    if(isSuperNode() && !parent.isSuperNode() && parent.getCapacity() >= getCapacity()) {
       throw new RuntimeException("Supernode " + toString() + " has capacity " + getCapacity() + "; its non-super parent node has capacity " + parent.getCapacity());
+    }
   }
 }

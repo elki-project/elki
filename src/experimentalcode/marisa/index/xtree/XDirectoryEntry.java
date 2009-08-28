@@ -23,8 +23,9 @@ public class XDirectoryEntry extends SpatialDirectoryEntry implements SplitHisto
 
   public XDirectoryEntry(int id, HyperBoundingBox mbr) {
     super(id, mbr);
-    if (mbr != null)
+    if(mbr != null) {
       splitHistory = new SplitHistory(mbr.getDimensionality());
+    }
   }
 
   @Override
@@ -39,9 +40,9 @@ public class XDirectoryEntry extends SpatialDirectoryEntry implements SplitHisto
 
   @Override
   public void setSplitHistory(SplitHistory splitHistory) {
-   this.splitHistory = splitHistory;
+    this.splitHistory = splitHistory;
   }
-  
+
   /**
    * Calls the super method and writes the MBR object of this entry to the
    * specified output stream.

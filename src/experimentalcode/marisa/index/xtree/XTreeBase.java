@@ -7,7 +7,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.RandomAccessFile;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,10 +21,8 @@ import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialObject;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
 import de.lmu.ifi.dbs.elki.persistent.LRUCache;
@@ -181,8 +178,9 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
    */
   @Override
   protected boolean hasOverflow(N node) {
-    if(node.isLeaf())
+    if(node.isLeaf()) {
       return node.getNumEntries() == leafCapacity;
+    }
     else {
       if(node.isSuperNode()) // supernode capacity differs from normal capacity
         return node.getNumEntries() == node.getCapacity();
@@ -204,8 +202,9 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
    */
   @Override
   protected boolean hasUnderflow(N node) {
-    if(node.isLeaf())
+    if(node.isLeaf()) {
       return node.getNumEntries() < leafMinimum;
+    }
     else {
       if(node.isSuperNode()) {
         if(node.getCapacity() - node.getNumEntries() >= dirCapacity) {
@@ -213,8 +212,9 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
           if(newCapacity == dirCapacity) {
             assert !node.isSuperNode();
             // convert into a normal node (and insert into the index file)
-            if(node.isSuperNode())
+            if(node.isSuperNode()) {
               throw new IllegalStateException("This node should not be a supernode anymore");
+            }
             N n = supernodes.remove(new Long(node.getID()));
             assert (n != null);
             // update the old reference in the file
@@ -258,8 +258,9 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
   @Override
   public N getNode(int nodeID) {
     N nID = supernodes.get(new Long(nodeID));
-    if(nID != null)
+    if(nID != null) {
       return nID;
+    }
     N n = super.getNode(nodeID);
     assert !n.isSuperNode(); // we should have them ALL in #supernodes
     return n;
@@ -282,135 +283,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
    */
   @Override
   protected void bulkLoad(List<O> objects) {
-    if(true)
-      throw new UnsupportedOperationException("Bulk Load not supported for XTree");
-    StringBuffer msg = new StringBuffer();
-    List<SpatialObject> spatialObjects = new ArrayList<SpatialObject>(objects);
-
-    // root is leaf node
-    double size = objects.size();
-    if(size / (leafCapacity - 1.0) <= 1) {
-      N root = createNewLeafNode(leafCapacity);
-      root.setID(getRootEntry().getID());
-      file.writePage(root);
-      createRoot(root, spatialObjects);
-      setHeight(1);
-      if(logger.isDebugging()) {
-        msg.append("\n  numNodes = 1");
-      }
-    }
-
-    // root is directory node
-    else {
-      N root = createNewDirectoryNode(dirCapacity);
-      root.setID(getRootEntry().getID());
-      file.writePage(root);
-
-      // create leaf nodes
-      List<N> nodes = createLeafNodes(objects);
-
-      int numNodes = nodes.size();
-      if(logger.isDebugging()) {
-        msg.append("\n  numLeafNodes = ").append(numNodes);
-      }
-      setHeight(1);
-
-      // create directory nodes
-      while(nodes.size() > (dirCapacity - 1)) {
-        // TODO: catch potential supernode
-        nodes = createDirectoryNodes(nodes);
-        numNodes += nodes.size();
-        setHeight(getHeight() + 1);
-      }
-
-      // create root
-      createRoot(root, new ArrayList<SpatialObject>(nodes));
-      numNodes++;
-      setHeight(getHeight() + 1);
-      if(logger.isDebugging()) {
-        msg.append("\n  numNodes = ").append(numNodes);
-      }
-    }
-    if(logger.isDebugging()) {
-      msg.append("\n  height = ").append(getHeight());
-      msg.append("\n  root " + getRoot());
-      logger.debugFine(msg.toString() + "\n");
-    }
-  }
-
-  /**
-   * TODO: This does not work at all for supernodes!
-   * 
-   * Creates and returns the directory nodes for bulk load.
-   * 
-   * @param nodes the nodes to be inserted
-   * @return the directory nodes containing the nodes
-   */
-  private List<N> createDirectoryNodes(List<N> nodes) {
-    if(true)
-      throw new UnsupportedOperationException("Bulk Load not supported for XTree");
-    int minEntries = dirMinimum;
-    int maxEntries = dirCapacity - 1;
-
-    ArrayList<N> result = new ArrayList<N>();
-    BulkSplit<N> split = new BulkSplit<N>();
-    List<List<N>> partitions = split.partition(nodes, minEntries, maxEntries, bulkLoadStrategy);
-
-    for(List<N> partition : partitions) {
-      // create node
-      N dirNode = createNewDirectoryNode(dirCapacity);
-      file.writePage(dirNode);
-      result.add(dirNode);
-
-      // insert nodes
-      for(N o : partition) {
-        dirNode.addDirectoryEntry(createNewDirectoryEntry(o));
-      }
-
-      // write to file
-      file.writePage(dirNode);
-      if(logger.isDebuggingFiner()) {
-        StringBuffer msg = new StringBuffer();
-        msg.append("\npageNo ").append(dirNode.getID());
-        logger.debugFiner(msg.toString() + "\n");
-      }
-    }
-
-    return result;
-  }
-
-  /**
-   * Returns a root node for bulk load. If the objects are data objects a leaf
-   * node will be returned, if the objects are nodes a directory node will be
-   * returned.
-   * 
-   * @param root the new root node
-   * @param objects the spatial objects to be inserted
-   * @return the root node
-   */
-  @SuppressWarnings("unchecked")
-  private N createRoot(N root, List<SpatialObject> objects) {
-    if(true)
-      throw new UnsupportedOperationException("Bulk Load not supported for XTree");
-    // insert data
-    for(SpatialObject object : objects) {
-      if(object instanceof NumberVector) {
-        root.addLeafEntry(createNewLeafEntry((O) object));
-      }
-      else {
-        root.addDirectoryEntry(createNewDirectoryEntry((N) object));
-      }
-    }
-
-    // write to file
-    file.writePage(root);
-    if(logger.isDebuggingFiner()) {
-      StringBuffer msg = new StringBuffer();
-      msg.append("pageNo ").append(root.getID());
-      logger.debugFiner(msg.toString() + "\n");
-    }
-
-    return root;
+    throw new UnsupportedOperationException("Bulk Load not supported for XTree");
   }
 
   /**
@@ -496,8 +369,9 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
    *         supernodes
    */
   public long commit() throws IOException {
-    if(!(super.file instanceof PersistentPageFile))
+    if(!(super.file instanceof PersistentPageFile)) {
       throw new IllegalStateException("Trying to commit a non-persistent XTree");
+    }
     long npid = super.file.getNextPageID();
     XTreeHeader ph = (XTreeHeader) ((PersistentPageFile<N>) super.file).getHeader();
     long offset = (ph.getReservedPages() + npid) * ph.getPageSize();
@@ -515,8 +389,9 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
       baos.close();
       byte[] array = baos.toByteArray();
       byte[] sn_array = new byte[pageSize * (int) Math.ceil((double) supernode.getCapacity() / dirCapacity)];
-      if(array.length > sn_array.length)
+      if(array.length > sn_array.length) {
         throw new IllegalStateException("Supernode is too large for fitting in " + ((int) Math.ceil((double) supernode.getCapacity() / dirCapacity)) + " pages of total size " + sn_array.length);
+      }
       System.arraycopy(array, 0, sn_array, 0, array.length);
       ((PersistentPageFile<N>) super.file).increaseWriteAccess();
       ra_file.write(sn_array);
@@ -591,8 +466,9 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
           int id = ois.readInt();
           ois.readBoolean(); // iLeaf
           boolean supernode = ois.readBoolean();
-          if(!supernode)
+          if(!supernode) {
             throw new IllegalStateException("Non-supernode at supernode position '" + superNodeOffset + "'");
+          }
           int numEntries = ois.readInt();
           int capacity = ois.readInt();
           ois.close();
@@ -760,12 +636,15 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     catch(UnusedParameterException e) {// defaults to 'volume overlap'
       mOType = OVERLAP_TYPE_PARAMETER.getDefaultValue();
     }
-    if(mOType.equals("DataOverlap"))
+    if(mOType.equals("DataOverlap")) {
       overlap_type = DATA_OVERLAP;
-    else if(mOType.equals("VolumeOverlap"))
+    }
+    else if(mOType.equals("VolumeOverlap")) {
       overlap_type = VOLUME_OVERLAP;
-    else
+    }
+    else {
       throw new IllegalArgumentException("Wrong input parameter for overlap type '" + mOType + "'");
+    }
     return remainingParameters;
   }
 
@@ -804,10 +683,12 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     TreeIndexPathComponent<E> containingEntry = containedTest(node, mbr);
     if(containingEntry != null) {
       TreeIndexPath<E> newSubtree = subtree.pathByAddingChild(containingEntry);
-      if(height - subtree.getPathCount() == level)
+      if(height - subtree.getPathCount() == level) {
         return newSubtree;
-      else
+      }
+      else {
         return choosePath(newSubtree, mbr, level);
+      }
     }
 
     TreeIndexPathComponent<E> optEntry = null;
@@ -833,8 +714,9 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
       double multiOverlapInc;
       if(isLeafContainer) {
         multiOverlapInc = calculateOverlapIncrease(entries, child, testMBR);
-        if(Double.isInfinite(multiOverlapInc) || Double.isNaN(multiOverlapInc))
+        if(Double.isInfinite(multiOverlapInc) || Double.isNaN(multiOverlapInc)) {
           throw new IllegalStateException("an entry's MBR is too large to calculate its overlap increase: " + multiOverlapInc + "; \nplease re-scale your data s.t. it can be dealt with");
+        }
       }
       else {
         // no need to examine overlap increase?
@@ -848,11 +730,13 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
           // If there are also multiple entries with the same volume increase
           // choose the one with the minimum volume.
           volume = childMBR.volume();
-          if(Double.isInfinite(volume) || Double.isNaN(volume))
+          if(Double.isInfinite(volume) || Double.isNaN(volume)) {
             throw new IllegalStateException("an entry's MBR is too large to calculate its volume: " + volume + "; \nplease re-scale your data s.t. it can be dealt with");
+          }
           tempVolume = testMBR.volume();
-          if(Double.isInfinite(tempVolume) || Double.isNaN(tempVolume))
+          if(Double.isInfinite(tempVolume) || Double.isNaN(tempVolume)) {
             throw new IllegalStateException("an entry's MBR is too large to calculate its volume: " + tempVolume + "; \nplease re-scale your data s.t. it can be dealt with");
+          }
           double volumeInc = tempVolume - volume;
 
           if(Double.isNaN(optVolumeInc)) { // has not yet been calculated
@@ -991,11 +875,13 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     XSplitter.SplitSorting split = splitter.topologicalSplit();
     double minOv = splitter.getPastOverlap();
     if(split == null) { // topological split failed
-      if(node.isLeaf())
+      if(node.isLeaf()) {
         throw new IllegalStateException("The topological split must be successful in leaves.");
+      }
       split = splitter.minimumOverlapSplit();
-      if(splitter.getPastOverlap() < minOv)
+      if(splitter.getPastOverlap() < minOv) {
         minOv = splitter.getPastOverlap();
+      }
     }
     if(split != null) {// do the split
       N newNode;
@@ -1147,7 +1033,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     // choose node for insertion of o
     HyperBoundingBox mbr = entry.getMBR();
     if(entry.isLeafEntry() && level != 1) {
-//      logger.warning("level = " + level + " for leaf entry -- setting to 1");
+      // logger.warning("level = " + level + " for leaf entry -- setting to 1");
       level = 1;
     }
     TreeIndexPath<E> subtree = choosePath(getRootPath(), mbr, level);
@@ -1156,13 +1042,15 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     }
     N parent = getNode(subtree.getLastPathComponent().getEntry());
     if(entry.isLeafEntry()) {
-      if(!parent.isLeaf())
+      if(!parent.isLeaf()) {
         throw new IllegalStateException("Require the end of the selected path to be a leaf node for leave entries!");
+      }
       parent.addLeafEntry(entry);
     }
     else {
-      if(parent.isLeaf())
+      if(parent.isLeaf()) {
         throw new IllegalStateException("Require the end of the selected path to be a directory node for directory entries!");
+      }
       parent.addDirectoryEntry(entry);
     }
     file.writePage(parent);
@@ -1235,8 +1123,9 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
                 sh.setDim(splitAxis[0]);
                 ((SplitHistorySpatialEntry) oldEntry).setSplitHistory(sh);
               }
-              else
+              else {
                 ((SplitHistorySpatialEntry) oldEntry).addSplitDimension(splitAxis[0]);
+              }
               try {
                 ((SplitHistorySpatialEntry) newEntry).setSplitHistory((SplitHistory) sh.clone());
               }
@@ -1294,8 +1183,9 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     SplitHistory sh = null;
     if(!oldRoot.isLeaf()) {
       sh = ((XDirectoryEntry) getRootEntry()).getSplitHistory();
-      if(sh == null)
+      if(sh == null) {
         sh = new SplitHistory(oldRoot.getDimensionality());
+      }
       sh.setDim(splitAxis);
     }
 
@@ -1417,10 +1307,12 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
           else {
             if(node.isSuperNode()) {
               superNodes++;
-              if(node.getCapacity() > maxSuperCapacity)
+              if(node.getCapacity() > maxSuperCapacity) {
                 maxSuperCapacity = node.getCapacity();
-              if(node.getCapacity() < minSuperCapacity)
+              }
+              if(node.getCapacity() < minSuperCapacity) {
                 minSuperCapacity = node.getCapacity();
+              }
             }
             else {
               dirNodes++;

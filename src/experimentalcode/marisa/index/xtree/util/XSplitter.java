@@ -199,8 +199,9 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    */
   private int chooseSplitAxis(Iterable<Integer> dimensionIterable, int minEntries, int maxEntries) {
     // assert that there ARE dimensions to be tested
-    if(!dimensionIterable.iterator().hasNext())
+    if(!dimensionIterable.iterator().hasNext()) {
       return -1;
+    }
 
     int numOfEntries = entries.size();
 
@@ -368,10 +369,12 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
     distibution[0] = new ArrayList<ET>();
     distibution[1] = new ArrayList<ET>();
     List<ET> sorted_entries = sorting.getSortedEntries();
-    for(int i = 0; i < sorting.getSplitPoint(); i++)
+    for(int i = 0; i < sorting.getSplitPoint(); i++) {
       distibution[0].add(sorted_entries.get(i));
-    for(int i = sorting.getSplitPoint(); i < entries.size(); i++)
+    }
+    for(int i = sorting.getSplitPoint(); i < entries.size(); i++) {
       distibution[1].add(sorted_entries.get(i));
+    }
     return distibution;
   }
 
@@ -388,34 +391,40 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    */
   private SplitSorting generateSplitSorting(Integer[] entrySorting, int limit) {
     List<ET> sorting = new ArrayList<ET>();
-    for(int i = 0; i < entries.size(); i++)
+    for(int i = 0; i < entries.size(); i++) {
       sorting.add(entries.get(entrySorting[i]));
-    return new SplitSorting(sorting, limit);
+    }
+    return new SplitSorting(sorting, limit, splitAxis);
   }
 
   /**
-   * Perform an minimum overlap split. The minimum overlap split calculates the
-   * minimum overlap split for all legal partitions for the dimensions fitting
-   * the split dimension of range
-   * <code>{minFanout, ..., maxEntries - minFanout + 1}</code>. In part, this
-   * range has been tested before, but for the minimum overlap test we need to
+   * Perform an minimum overlap split. The
+   * {@link #chooseMinimumOverlapSplit(int, int, int, boolean) minimum overlap
+   * split} calculates the partition for the split dimension determined by
+   * {@link #chooseSplitAxis(Iterable, int, int) chooseSplitAxis}
+   * <code>(common split
+   * history, minFanout, maxEntries - minFanout + 1)</code> with the minimum
+   * overlap. This range may have been tested before (by the
+   * {@link #topologicalSplit()}), but for the minimum overlap test we need to
    * test that anew. Note that this method returns <code>null</code>, if the
    * minimum overlap split has a volume which is larger than the allowed
-   * <code>maxOverlap</code> ratio
+   * <code>maxOverlap</code> ratio or if the tree's minimum fanout is not larger
+   * than the minimum directory size.
    * 
    * @return distribution resulting from the minimum overlap split
    */
-  @SuppressWarnings("unchecked")
   public SplitSorting minimumOverlapSplit() {
-    if(entries.get(0).isLeafEntry())
+    if(entries.get(0).isLeafEntry()) {
       throw new IllegalArgumentException("The minimum overlap split will only be performed on directory nodes");
+    }
     if(entries.size() < 2) {
       throw new IllegalArgumentException("Splitting less than two entries is pointless.");
     }
     int maxEntries = tree.getDirCapacity();
     int minFanout = tree.get_min_fanout();
-    if(entries.size() < maxEntries)
+    if(entries.size() < maxEntries) {
       throw new IllegalArgumentException("This entry list has not yet reached the maximum limit: " + entries.size() + "<=" + maxEntries);
+    }
     assert !entries.get(0).isLeafEntry();
 
     if((minFanout < tree.getDirMinimum())) {
@@ -438,8 +447,9 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
         double minOverlap = Double.MAX_VALUE;
         // test {minFanout, ..., minEntries - 1}
         SplitSorting ret1 = chooseMinimumOverlapSplit(splitAxis, minFanout, tree.getDirMinimum() - 1, false);
-        if(ret1 != null && pastOverlap < minOverlap)
+        if(ret1 != null && pastOverlap < minOverlap) {
           minOverlap = pastOverlap; // this is a valid choice
+        }
         // test {maxEntries - minEntries + 2, ..., maxEntries - minFanout + 1}
         SplitSorting ret2 = chooseMinimumOverlapSplit(splitAxis, minFanout, tree.getDirMinimum(), true);
         if(ret2 == null) {
@@ -447,8 +457,9 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
           pastOverlap = minOverlap;
           return ret1;
         }
-        if(pastOverlap < minOverlap) // the second range is better
+        if(pastOverlap < minOverlap) { // the second range is better
           return ret2;
+        }
         pastOverlap = minOverlap; // the first range is better
         return ret1;
       }
@@ -485,8 +496,9 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
     }
     int minEntries = (entries.get(0).isLeafEntry() ? tree.getLeafMinimum() : tree.getDirMinimum());
     int maxEntries = (entries.get(0).isLeafEntry() ? tree.getLeafCapacity() : tree.getDirCapacity());
-    if(entries.size() < maxEntries)
+    if(entries.size() < maxEntries) {
       throw new IllegalArgumentException("This entry list has not yet reached the maximum limit: " + entries.size() + "<=" + maxEntries);
+    }
 
     maxEntries = maxEntries + 1 - minEntries;
 
@@ -597,12 +609,16 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
 
   /**
    * Count all data objects under entries and whether they intersect the given
-   * MBR <code>mbr</code>.
+   * MBR <code>mbr</code> into <code>numOf</code>.
    * 
    * @param entries
    * @param mbr
-   * @return array of two integers, the first one is the total number of data
-   *         objects, the second one the number of data objects intersecting MBR
+   * @param numOf array of two integers, the first one is to be filled with the
+   *        total number of data objects, the second one with the number of data
+   *        objects intersecting <code>mbr</code>
+   * @return == the (probably modified) integer array <code>numOf</code>: the
+   *         first field is the total number of data objects, the second the
+   *         number of data objects intersecting <code>mbr</code>
    */
   private <ET2 extends SpatialEntry> int[] countXingDataEntries(final Collection<ET2> entries, final HyperBoundingBox mbr, int[] numOf) {
     for(ET2 entry : entries) {
@@ -614,7 +630,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
       }
       else {
         N node = tree.getNode(entry.getID());
-         countXingDataEntries(node.getChildren(), mbr, numOf);
+        countXingDataEntries(node.getChildren(), mbr, numOf);
       }
     }
     return numOf;
@@ -626,7 +642,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    */
   class Range implements Iterable<Integer> {
 
-    private int from, to;
+    protected int from, to;
 
     public Range(int from, int to) {
       this.from = from;
@@ -636,7 +652,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
     @Override
     public Iterator<Integer> iterator() {
       return new Iterator<Integer>() {
-        int i = from;
+        private int i = from;
 
         @Override
         public boolean hasNext() {
@@ -667,11 +683,12 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
   public class SplitSorting {
     private List<ET> sortedEntries;
 
-    private int splitPoint;
+    private int splitPoint, splitAxis;
 
-    public SplitSorting(List<ET> sortedEntries, int splitPoint) {
+    public SplitSorting(List<ET> sortedEntries, int splitPoint, int splitAxis) {
       this.sortedEntries = sortedEntries;
       this.splitPoint = splitPoint;
+      this.splitAxis = splitAxis;
     }
 
     public List<ET> getSortedEntries() {

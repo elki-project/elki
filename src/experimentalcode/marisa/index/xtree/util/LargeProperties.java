@@ -86,29 +86,26 @@ public class LargeProperties implements Serializable, Cloneable, Iterable<Boolea
     int intProperty;
     for(Iterator<Integer> iterator = set.iterator(); iterator.hasNext();) {
       intProperty = iterator.next();
-      if(intProperty >= size)
+      if(intProperty >= size) {
         throw new IllegalArgumentException("Property '" + intProperty + "' cannot be set for LongProperty of size " + size + " (" + toString() + ", for " + set.toString() + ")");
-      // propArray[intProperty / LONG_STEP] |= (((long) 1) << ((long)
-      // (intProperty
-      // % LONG_STEP - 1)));
+      }
       int index = intProperty / LONG_STEP;
       propArray[index] |= (((long) 1) << ((long) ((intProperty - index * LONG_STEP) - 1)));
     }
   }
 
   public void setProperty(int property) {
-    if(property >= size)
+    if(property >= size) {
       throw new IllegalArgumentException("Property '" + property + "' cannot be set for LongProperty of size " + size);
-    // propArray[property / LONG_STEP] |= (((long) 1) << ((long) (property
-    // % LONG_STEP - 1)));
-
+    }
     int index = property / LONG_STEP;
     propArray[index] |= (((long) 1) << ((long) ((property - index * LONG_STEP) - 1)));
   }
 
   public void removeProperty(int property) {
-    if(property >= size)
+    if(property >= size) {
       throw new IllegalArgumentException("Property '" + property + "' cannot be removed for LongProperty of size " + size);
+    }
     int index = property / LONG_STEP;
     propArray[index] &= ~(((long) 1) << ((long) (property - index * LONG_STEP - 1)));
   }
@@ -119,17 +116,21 @@ public class LargeProperties implements Serializable, Cloneable, Iterable<Boolea
   }
 
   public void join(LargeProperties lp) {
-    if(lp.size != size)
+    if(lp.size != size) {
       throw new IllegalArgumentException("cannot join this (size " + size + ") with property set (" + lp.size + ")");
-    for(int i = 0; i < propArray.length; i++)
+    }
+    for(int i = 0; i < propArray.length; i++) {
       propArray[i] |= lp.propArray[i];
+    }
   }
 
   public void intersect(LargeProperties lp) {
-    if(lp.size != size)
+    if(lp.size != size) {
       throw new IllegalArgumentException("cannot intersect this (size" + size + ") with property set (" + lp.size + ")");
-    for(int i = 0; i < propArray.length; i++)
+    }
+    for(int i = 0; i < propArray.length; i++) {
       propArray[i] &= lp.propArray[i];
+    }
   }
 
   public void reset() {
@@ -137,23 +138,28 @@ public class LargeProperties implements Serializable, Cloneable, Iterable<Boolea
   }
 
   public boolean contains(LargeProperties lp) {
-    if(lp.size != size)
+    if(lp.size != size) {
       throw new IllegalArgumentException("query property set (size " + lp.size + ") is larger than this (" + size + ")");
+    }
     for(int i = 0; i < propArray.length; i++) {
-      if((lp.propArray[i] & propArray[i]) != lp.propArray[i])
+      if((lp.propArray[i] & propArray[i]) != lp.propArray[i]) {
         return false;
+      }
     }
     return true;
   }
 
   public boolean contains(LargeProperties lp, LargeProperties wild_cards) {
-    if(lp.size != size)
+    if(lp.size != size) {
       throw new IllegalArgumentException("query property set (size " + lp.size + ") is larger than this (" + size + ")");
-    if(wild_cards.size != size)
+    }
+    if(wild_cards.size != size) {
       throw new IllegalArgumentException("wild_card property set (size " + wild_cards.size + ") is larger than this (" + size + ")");
+    }
     for(int i = 0; i < propArray.length; i++) {
-      if((lp.propArray[i] & (propArray[i] | wild_cards.propArray[i])) != lp.propArray[i])
+      if((lp.propArray[i] & (propArray[i] | wild_cards.propArray[i])) != lp.propArray[i]) {
         return false;
+      }
     }
     return true;
   }
@@ -171,25 +177,31 @@ public class LargeProperties implements Serializable, Cloneable, Iterable<Boolea
   @Override
   public boolean equals(Object obj) {
     LargeProperties lp = (LargeProperties) obj;
-    if(lp.size != size)
+    if(lp.size != size) {
       return false;
+    }
     for(int i = 0; i < propArray.length; i++) {
-      if(propArray[i] != lp.propArray[i])
+      if(propArray[i] != lp.propArray[i]) {
         return false;
+      }
     }
     return true;
   }
 
   public boolean equals(LargeProperties lp, LargeProperties wild_cards) {
-    if(wild_cards == null)
+    if(wild_cards == null) {
       return equals(lp);
-    if(lp.size != size)
+    }
+    if(lp.size != size) {
       return false;
-    if(size != wild_cards.size)
+    }
+    if(size != wild_cards.size) {
       throw new IllegalArgumentException("wild_card property set (size " + wild_cards.size + ") is larger than this (" + size + ")");
+    }
     for(int i = 0; i < propArray.length; i++) {
-      if((propArray[i] | wild_cards.propArray[i]) != (lp.propArray[i] | wild_cards.propArray[i]))
+      if((propArray[i] | wild_cards.propArray[i]) != (lp.propArray[i] | wild_cards.propArray[i])) {
         return false;
+      }
     }
     return true;
   }
@@ -214,8 +226,9 @@ public class LargeProperties implements Serializable, Cloneable, Iterable<Boolea
       if(i == propArray.length - 1) {
         partialComplement = toSet(~(propArray[i] | finalEntryFilter));
       }
-      else
+      else {
         partialComplement = toSet(~propArray[i]);
+      }
       for(Iterator<Integer> iterator = partialComplement.iterator(); iterator.hasNext();) {
         complement.add(iterator.next() + LONG_STEP * i);
       }
@@ -227,8 +240,9 @@ public class LargeProperties implements Serializable, Cloneable, Iterable<Boolea
     Set<Integer> outSet = new HashSet<Integer>();
     for(int i = 0; i < 64; i++) {
       long target = (((long) 1) << ((long) i - 1));
-      if((set & target) == target)
+      if((set & target) == target) {
         outSet.add(i);
+      }
     }
     return outSet;
   }
@@ -237,10 +251,12 @@ public class LargeProperties implements Serializable, Cloneable, Iterable<Boolea
   public String toString() {
     char[] chars = new char[size];
     for(int i = 0; i < chars.length; i++) {
-      if(hasProperty(i))
+      if(hasProperty(i)) {
         chars[i] = '1';
-      else
+      }
+      else {
         chars[i] = '0';
+      }
     }
     return new String(chars);
   }
@@ -326,13 +342,16 @@ public class LargeProperties implements Serializable, Cloneable, Iterable<Boolea
 
   @Override
   public int compareTo(LargeProperties lp) {
-    if(lp.size != size)
+    if(lp.size != size) {
       throw new IllegalArgumentException("ZOrder not implemented here: property objects must be of the same size; " + lp.size + "!=" + size + ".");
+    }
     for(int i = 0; i < propArray.length; i++) {
-      if(propArray[i] < lp.propArray[i])
+      if(propArray[i] < lp.propArray[i]) {
         return -1;
-      if(propArray[i] > lp.propArray[i])
+      }
+      if(propArray[i] > lp.propArray[i]) {
         return 1;
+      }
     }
     return 0;
   }
@@ -393,9 +412,9 @@ public class LargeProperties implements Serializable, Cloneable, Iterable<Boolea
   /**
    * FIXME: this is more efficient than {@link #writeExternal(ObjectOutput)},
    * however, due to the usage of the sign offset, there are some difficulties.
-   * Writes the split history to the specified output stream.
-   * Reads the properties from the specified input stream into a new
-   * LargeProperties object.
+   * Writes the split history to the specified output stream. Reads the
+   * properties from the specified input stream into a new LargeProperties
+   * object.
    * 
    * @param in the stream to read data from in order to restore the object
    * @return the properties read from <code>in</code>
@@ -412,11 +431,13 @@ public class LargeProperties implements Serializable, Cloneable, Iterable<Boolea
     for(int i = 0; i < lp.propArray.length; i++) {
       lp.propArray[i] = 0x0L; // init
       int stopPos = 7;
-      if(bytes.length - i * 8 < 8)
+      if(bytes.length - i * 8 < 8) {
         stopPos = bytes.length - i * 8;
-      else
+      }
+      else {
         // init with special case (sign bit)
         lp.propArray[i] = (((long) bytes[i * 8 + 7]) << 56);
+      }
       for(int j = 0; j < stopPos; j++) {
         lp.propArray[i] += ((bytes[i * 8 + j] & 0xFFL) << (8 * j));
       }
