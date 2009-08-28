@@ -9,8 +9,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
  *
  * @param <O> The type of object to process.
  */
-// TODO: Replace DoubleVector with NumberVector? - No, as long as we need DoubleVector for calcScales. 
-public abstract class PlanarVisualizer<NV extends NumberVector<NV, N>, N extends Number> extends DoubleVectorVisualizer<NV, N> {
+public abstract class PlanarVisualizer<NV extends NumberVector<NV, N>, N extends Number> extends NumberVectorVisualizer<NV, N> {
   
   /**
    * the dimension to appear as horizontal dimension.
