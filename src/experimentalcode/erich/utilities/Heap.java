@@ -1,5 +1,6 @@
 package experimentalcode.erich.utilities;
 
+import java.io.Serializable;
 import java.util.AbstractQueue;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -13,15 +14,19 @@ import java.util.NoSuchElementException;
  * 
  * @author Erich Schubert
  * 
- * @param <E> Element type. Should be {@link Comparable} or a {@link Comparator} needs to be given.
+ * @param <E> Element type. Should be {@link Comparable} or a {@link Comparator}
+ *        needs to be given.
  */
-public class Heap<E> extends AbstractQueue<E> {
-  // TODO: make serializable?
-  
+public class Heap<E> extends AbstractQueue<E> implements Serializable {
+  /**
+   * Serial version
+   */
+  private static final long serialVersionUID = 1L;
+
   /**
    * Heap storage
    */
-  private transient Object[] queue;
+  private Object[] queue;
 
   /**
    * Current number of objects
@@ -61,6 +66,7 @@ public class Heap<E> extends AbstractQueue<E> {
 
   /**
    * Constructor with {@link Comparator}.
+   * 
    * @param comparator Comparator
    */
   public Heap(Comparator<? super E> comparator) {
@@ -69,6 +75,7 @@ public class Heap<E> extends AbstractQueue<E> {
 
   /**
    * Constructor with initial capacity and {@link Comparator}.
+   * 
    * @param size initial capacity
    * @param comparator Comparator
    */
@@ -86,7 +93,7 @@ public class Heap<E> extends AbstractQueue<E> {
     final int parent = parent(size);
     // append element
     modCount++;
-    queue[size] = e;
+    putInQueue(size, e);
     this.size = size + 1;
     heapifyUp(parent);
     // We have changed - return true according to {@link Collection#put}
@@ -102,13 +109,8 @@ public class Heap<E> extends AbstractQueue<E> {
   }
 
   @Override
-  public synchronized E poll() {
-    if(size == 0) {
-      return null;
-    }
-    E ret = castQueueElement(0);
-    removeAt(0);
-    return ret;
+  public E poll() {
+    return removeAt(0);
   }
 
   /**
@@ -116,14 +118,19 @@ public class Heap<E> extends AbstractQueue<E> {
    * 
    * @param pos Element position.
    */
-  protected synchronized void removeAt(int pos) {
+  protected synchronized E removeAt(int pos) {
+    if(pos < 0 || pos >= size) {
+      return null;
+    }
     modCount++;
+    E ret = castQueueElement(0);
     // remove!
+    putInQueue(pos, queue[size-1]);
     size = size - 1;
-    queue[pos] = queue[size];
     // avoid dangling references!
-    queue[size] = null;
+    putInQueue(size, null);
     heapifyDown(pos);
+    return ret;
   }
 
   /**
@@ -161,7 +168,7 @@ public class Heap<E> extends AbstractQueue<E> {
    * 
    * @param pos insertion position
    */
-  private void heapifyUp(int pos) {
+  protected void heapifyUp(int pos) {
     if(pos < 0 || pos >= size) {
       return;
     }
@@ -182,11 +189,7 @@ public class Heap<E> extends AbstractQueue<E> {
       }
     }
     if(min != pos) {
-      // swap with minimal element
-      Object tmp = queue[pos];
-      queue[pos] = queue[min];
-      queue[min] = tmp;
-      modCount++;
+      swap(pos, min);
       heapifyUp(parent);
     }
   }
@@ -196,7 +199,7 @@ public class Heap<E> extends AbstractQueue<E> {
    * 
    * @param pos re-insertion position
    */
-  private void heapifyDown(int pos) {
+  protected void heapifyDown(int pos) {
     if(pos < 0 || pos >= size) {
       return;
     }
@@ -216,13 +219,35 @@ public class Heap<E> extends AbstractQueue<E> {
     }
     if(min != pos) {
       // swap with minimal element
-      Object tmp = queue[pos];
-      queue[pos] = queue[min];
-      queue[min] = tmp;
-      modCount++;
+      swap(pos, min);
       // recruse down
       heapifyDown(min);
     }
+  }
+
+  /**
+   * Put an element into the queue at a given position. This allows subclasses
+   * to index the queue.
+   * 
+   * @param index Index
+   * @param e Element
+   */
+  protected void putInQueue(int index, Object e) {
+    queue[index] = e;
+  }
+
+  /**
+   * Swap two elements in the heap.
+   * 
+   * @param a Element
+   * @param b Element
+   */
+  protected void swap(int a, int b) {
+    Object oa = queue[a];
+    Object ob = queue[b];
+    putInQueue(a, ob);
+    putInQueue(b, oa);
+    modCount++;
   }
 
   @SuppressWarnings("unchecked")
@@ -333,7 +358,7 @@ public class Heap<E> extends AbstractQueue<E> {
    * Iterator over queue elements. No particular order (i.e. heap order!)
    * 
    * @author Erich Schubert
-   *
+   * 
    */
   protected final class Itr implements Iterator<E> {
     /**

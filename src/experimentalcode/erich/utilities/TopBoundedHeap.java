@@ -10,8 +10,12 @@ import java.util.Comparator;
  *
  * @param <E> Element type. Should be {@link Comparable} or a {@link Comparator} needs to be given.
  */
+// FIXME: ties are not handled correctly yet.
 public class TopBoundedHeap<E> extends Heap<E> {
-  // FIXME: ties are not handled correctly yet.
+  /**
+   * Serial version
+   */
+  private static final long serialVersionUID = 1L;
   
   /**
    * Maximum size, may be 0 or below for unbounded heaps
