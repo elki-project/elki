@@ -33,6 +33,6 @@ public class DefaultAdapter<NV extends NumberVector<NV, N>, N extends Number> ex
 	protected void initVisualizer(Database<NV> database, Result result, VisualizationManager<NV> visManager) {
 		axisVisualizer.setup(database, visManager);
 		dotVisualizer.setup(database, visManager);
-		histoVisualizer.setup(database, visManager);
+		histoVisualizer.setup(database, result, visManager);
 	}
 }
