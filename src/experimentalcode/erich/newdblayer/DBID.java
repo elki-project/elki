@@ -1,6 +1,5 @@
 package experimentalcode.erich.newdblayer;
 
-
 /**
  * Database ID object.
  * 
@@ -18,7 +17,7 @@ public final class DBID implements ObjectRepresentation {
   /**
    * The actual object ID.
    */
-  int id;
+  protected int id;
 
   /**
    * Constructor from integer id.
@@ -47,5 +46,24 @@ public final class DBID implements ObjectRepresentation {
    */
   public int getIntegerID() {
     return this.id;
+  }
+
+  @Override
+  public String toString() {
+    return Integer.toString(id);
+  }
+
+  @Override
+  public int hashCode() {
+    return id;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if(!(obj instanceof DBID)) {
+      return false;
+    }
+    DBID other = (DBID) obj;
+    return this.id == other.id;
   }
 }
