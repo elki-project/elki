@@ -15,6 +15,16 @@ public class StaticDBIDs implements DBIDs, Collection<DBID> {
    */
   private int[] ids;
 
+  /**
+   * Constructor
+   * 
+   * @param ids Array of ids.
+   */
+  public StaticDBIDs(int[] ids) {
+    super();
+    this.ids = ids;
+  }
+
   @Override
   public Collection<DBID> asCollection() {
     return this;
