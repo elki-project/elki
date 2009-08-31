@@ -34,7 +34,9 @@ public interface AlgorithmAdapter<O extends DatabaseObject> {
    * 
    * @return a collection of {@link Visualizer}s this adapter provides.
    */
-  public Collection<Visualizer> getVisualizers();
+  public Collection<Visualizer> getProvidedVisualizers();
+  
+  public Collection<Visualizer> getUsableVisualizers();
 
   /**
    * Initializes all provided {@link Visualizer}s.
