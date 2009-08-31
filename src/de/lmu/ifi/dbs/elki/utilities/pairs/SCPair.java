@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
  * @param <FIRST> first type (comparable)
  * @param <SECOND> second type
  */
-public class SCPair<FIRST, SECOND extends Comparable<SECOND>> extends Pair<FIRST, SECOND> implements Comparable<SCPair<FIRST, SECOND>> {
+public class SCPair<FIRST, SECOND extends Comparable<? super SECOND>> extends Pair<FIRST, SECOND> implements Comparable<SCPair<FIRST, SECOND>> {
   /**
    * Initialize pair
    * 
@@ -52,7 +52,7 @@ public class SCPair<FIRST, SECOND extends Comparable<SECOND>> extends Pair<FIRST
    * @param size Size of array to be constructed
    * @return New array of requested size
    */
-  public static final <F, S extends Comparable<S>> SCPair<F, S>[] newArray(int size) {
+  public static final <F, S extends Comparable<? super S>> SCPair<F, S>[] newArray(int size) {
     Class<SCPair<F,S>> paircls = ClassGenericsUtil.uglyCastIntoSubclass(SCPair.class);    
     return ClassGenericsUtil.newArrayOfNull(size, paircls);
   }

@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
  * @param <FIRST> first type (comparable)
  * @param <SECOND> second type
  */
-public class FCPair<FIRST extends Comparable<FIRST>, SECOND> extends Pair<FIRST, SECOND> implements Comparable<FCPair<FIRST, SECOND>> {
+public class FCPair<FIRST extends Comparable<? super FIRST>, SECOND> extends Pair<FIRST, SECOND> implements Comparable<FCPair<FIRST, SECOND>> {
   /**
    * Initialize pair
    * 
@@ -52,7 +52,7 @@ public class FCPair<FIRST extends Comparable<FIRST>, SECOND> extends Pair<FIRST,
    * @param size Size of array to be constructed
    * @return New array of requested size
    */
-  public static final <F extends Comparable<F>, S> FCPair<F, S>[] newArray(int size) {
+  public static final <F extends Comparable<? super F>, S> FCPair<F, S>[] newArray(int size) {
     Class<FCPair<F,S>> paircls = ClassGenericsUtil.uglyCastIntoSubclass(FCPair.class);    
     return ClassGenericsUtil.newArrayOfNull(size, paircls);
   }
