@@ -19,9 +19,9 @@ public class DefaultAdapter<NV extends NumberVector<NV, N>, N extends Number> ex
 		dotVisualizer = new DotVisualizer<NV, N>();
 		axisVisualizer = new AxisVisualizer<NV, N>();
 		histoVisualizer = new HistogramVisualizer<NV, N>();
-		visualizers.add(dotVisualizer);
-		visualizers.add(axisVisualizer);
-		visualizers.add(histoVisualizer);
+		providedVisualizers.add(dotVisualizer);
+		providedVisualizers.add(axisVisualizer);
+		providedVisualizers.add(histoVisualizer);
 	}
 
 	@Override

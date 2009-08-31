@@ -105,6 +105,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, N>, N extends Number> 
 				bubble.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0.5");
 			} else {
 				// or don't fill them.
+			  // for diamond-shaped strokes, see bugs.sun.com, bug ID 6294396  
 				bubble.setStatement(SVGConstants.CSS_STROKE_VALUE, COLORS.getColor(clusterID));
 				bubble.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0");
 			}
