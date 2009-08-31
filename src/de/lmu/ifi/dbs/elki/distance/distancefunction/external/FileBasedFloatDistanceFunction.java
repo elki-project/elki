@@ -8,12 +8,12 @@ import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.FloatDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractFloatDistanceFunction;
 import de.lmu.ifi.dbs.elki.parser.DistanceParser;
 import de.lmu.ifi.dbs.elki.parser.DistanceParsingResult;
 import de.lmu.ifi.dbs.elki.parser.NumberDistanceParser;
+import de.lmu.ifi.dbs.elki.utilities.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -156,7 +156,7 @@ public class FileBasedFloatDistanceFunction<V extends DatabaseObject> extends Ab
   }
 
   private void loadCache(File matrixfile) throws IOException {
-    InputStream in = FileBasedDatabaseConnection.tryGzipInput(new FileInputStream(matrixfile));
+    InputStream in = FileUtil.tryGzipInput(new FileInputStream(matrixfile));
     DistanceParsingResult<V, FloatDistance> res = parser.parse(in);
     cache = res.getDistanceCache();
   }
