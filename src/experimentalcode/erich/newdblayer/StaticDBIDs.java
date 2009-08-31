@@ -13,7 +13,7 @@ public class StaticDBIDs implements DBIDs, Collection<DBID> {
   /**
    * The actual storage.
    */
-  private int[] ids;
+  protected int[] ids;
 
   /**
    * Constructor
@@ -32,7 +32,33 @@ public class StaticDBIDs implements DBIDs, Collection<DBID> {
 
   @Override
   public Iterator<DBID> iterator() {
-    return null;
+    return new Itr();
+  }
+  
+  /**
+   * Iterator class.
+   * 
+   * @author Erich Schubert
+   */
+  protected class Itr implements Iterator<DBID> {
+    int off = 0;
+
+    @Override
+    public boolean hasNext() {
+      return off < ids.length;
+    }
+
+    @Override
+    public DBID next() {
+      DBID ret = new DBID(ids[off]);
+      off++;
+      return ret;
+    }
+
+    @Override
+    public void remove() {
+      throw new UnsupportedOperationException("StaticDBIDs is read-only.");
+    }
   }
 
   @Override
