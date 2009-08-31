@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.elki.parser.DoubleVectorLabelParser;
 import de.lmu.ifi.dbs.elki.parser.Parser;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileListParameter;
@@ -166,7 +167,7 @@ public class MultipleFileBasedDatabaseConnection<O extends DatabaseObject> exten
     inputStreams = new ArrayList<InputStream>(inputFiles.size());
     for(File inputFile : inputFiles) {
       try {
-        inputStreams.add(FileBasedDatabaseConnection.tryGzipInput(new FileInputStream(inputFile)));
+        inputStreams.add(FileUtil.tryGzipInput(new FileInputStream(inputFile)));
       }
       catch(FileNotFoundException e) {
         throw new WrongParameterValueException(INPUT_PARAM, inputFiles.toString(), e);
