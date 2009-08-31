@@ -3,7 +3,10 @@ package de.lmu.ifi.dbs.elki.utilities;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.PushbackInputStream;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Various static helper methods to deal with files and file names.
@@ -63,5 +66,40 @@ public final class FileUtil {
       }
       return result;
     }
+  }
+
+  /**
+   * Try to open a stream as gzip, if it starts with the gzip magic.
+   * 
+   * TODO: move to utils package.
+   * 
+   * @param in original input stream
+   * @return old input stream or a {@link GZIPInputStream} if appropriate.
+   * @throws IOException
+   */
+  public static InputStream tryGzipInput(InputStream in) throws IOException {
+    // try autodetecting gzip compression.
+    if (!in.markSupported()) {
+      PushbackInputStream pb = new PushbackInputStream(in, 16);
+      in = pb;
+      // read a magic from the file header
+      byte[] magic = {0, 0};
+      pb.read(magic);
+      pb.unread(magic);
+      if (magic[0] == 31 && magic[1] == -117) {
+        in = new GZIPInputStream(pb);
+      }
+    } else
+    if (in.markSupported()) {
+      in.mark(16);
+      if (in.read() == 31 && in.read() == -117) {
+        in.reset();
+        in = new GZIPInputStream(in);
+      } else {
+        // just rewind the stream
+        in.reset();
+      }
+    }
+    return in;
   }
 }
