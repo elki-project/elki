@@ -9,39 +9,35 @@ import java.io.Serializable;
  * 
  * @param <K> Key type
  * @param <V> Value type
- * @author Elke Achtert 
+ * @author Elke Achtert
  */
-public interface HeapNode<K extends Comparable<K>, V extends Identifiable>
-        extends Comparable<HeapNode<K, V>>, Serializable
-{
+public interface HeapNode<K extends Comparable<K>, V extends Identifiable> extends Comparable<HeapNode<K, V>>, Serializable {
 
-    /**
-     * Returns the key of this HeapNode.
-     * 
-     * @return the key of this HeapNode
-     */
-    K getKey();
+  /**
+   * Returns the key of this HeapNode.
+   * 
+   * @return the key of this HeapNode
+   */
+  K getKey();
 
-    /**
-     * Sets the key of this HeapNode.
-     * 
-     * @param key
-     *            the key to be set
-     */
-    void setKey(K key);
+  /**
+   * Sets the key of this HeapNode.
+   * 
+   * @param key the key to be set
+   */
+  void setKey(K key);
 
-    /**
-     * Returns the value of this HeapNode.
-     * 
-     * @return the value of this HeapNode
-     */
-    V getValue();
+  /**
+   * Returns the value of this HeapNode.
+   * 
+   * @return the value of this HeapNode
+   */
+  V getValue();
 
-    /**
-     * Sets the value of this HeapNode.
-     * 
-     * @param value
-     *            the value to be set
-     */
-    void setValue(V value);
+  /**
+   * Sets the value of this HeapNode.
+   * 
+   * @param value the value to be set
+   */
+  void setValue(V value);
 }

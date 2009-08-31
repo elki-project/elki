@@ -10,14 +10,14 @@ import java.util.Vector;
  * according to their natural order. Elements stored in this heap must be
  * instances of <code>HeapNode<\code>
  * (@see HeapNode).
- *
+ * 
  * @param <K> Key type
  * @param <V> Value type
- * @author Elke Achtert 
+ * @author Elke Achtert
  */
 public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implements Heap<K, V> {
   /**
-   * Serial version number. 
+   * Serial version number.
    */
   private static final long serialVersionUID = 499701873654975438L;
 
@@ -37,8 +37,7 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
   private Hashtable<Integer, Integer> indices;
 
   /**
-   * Indicates weather this heap is organized in ascending or descending
-   * order.
+   * Indicates weather this heap is organized in ascending or descending order.
    */
   private boolean ascending = true;
 
@@ -51,9 +50,9 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
 
   /**
    * Creates a new heap that stores the elements in the specified order.
-   *
-   * @param ascending if true, the heap is organized in ascending order, otherwise
-   *                  the heap is organized in descending other
+   * 
+   * @param ascending if true, the heap is organized in ascending order,
+   *        otherwise the heap is organized in descending other
    */
   public DefaultHeap(boolean ascending) {
     this.heap = new Vector<HeapNode<K, V>>();
@@ -63,13 +62,13 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
 
   /**
    * Adds a node to this heap.
-   *
+   * 
    * @param node the node to be added
    */
   public void addNode(final HeapNode<K, V> node) {
-    if (indices.containsKey(node.getValue().getID()))
-      throw new IllegalArgumentException("Node " + node
-                                         + " already exists in this heap!");
+    if(indices.containsKey(node.getValue().getID())) {
+      throw new IllegalArgumentException("Node " + node + " already exists in this heap!");
+    }
 
     int lastIndex = heap.size();
     heap.add(node);
@@ -79,20 +78,21 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
   }
 
   /**
-   * Retrieves and removes the minimum node of this heap. If the heap is
-   * empty, null will be returned.
-   *
+   * Retrieves and removes the minimum node of this heap. If the heap is empty,
+   * null will be returned.
+   * 
    * @return the minimum node of this heap, null in case of emptiness
    */
   public HeapNode<K, V> getMinNode() {
-    if (isEmpty())
+    if(isEmpty()) {
       return null;
+    }
     return removeMin();
   }
 
   /**
    * Indicates whether this heap is empty.
-   *
+   * 
    * @return true if this heap is empty, false otherwise
    */
   public final boolean isEmpty() {
@@ -101,7 +101,7 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
 
   /**
    * Returns the current index of the specified value in this heap.
-   *
+   * 
    * @param value the value for which the index should be returned
    * @return the current index of the specified value in this heap
    */
@@ -111,7 +111,7 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
 
   /**
    * Returns the node at the specified index.
-   *
+   * 
    * @param index the index of the node to be returned
    * @return the node at the specified index
    */
@@ -121,13 +121,13 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
 
   /**
    * Moves up a node at the specified index until it satisfies the heaporder.
-   *
+   * 
    * @param index the index of the node to be moved up.
    */
   public void flowUp(int index) {
     // swap the key at index with its parents along the path to the root
     // until it finds the place, where the heaporder is fulfilled.
-    while (parent(index) != NULL_INDEX && isLowerThan(index, parent(index))) {
+    while(parent(index) != NULL_INDEX && isLowerThan(index, parent(index))) {
       swap(parent(index), index);
       index = parent(index);
     }
@@ -135,7 +135,7 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
 
   /**
    * Returns the size of this heap.
-   *
+   * 
    * @return the size of this heap
    */
   public int size() {
@@ -152,23 +152,24 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
 
   /**
    * Returns a copy of the vector holding this heap.
+   * 
    * @return a copy of the vector holding this heap
    */
   @SuppressWarnings("unchecked")
-  public Vector<HeapNode<K,V>> copy() {
-    return (Vector<HeapNode<K,V>>) heap.clone();
+  public Vector<HeapNode<K, V>> copy() {
+    return (Vector<HeapNode<K, V>>) heap.clone();
   }
 
   /**
    * Moves down a node at index i until it satisfies the heaporder.
-   *
+   * 
    * @param i The index of the node to be moved down.
    */
   protected final void flowDown(int i) {
     // swap the key at i with its parents along the path to the root
     // until it finds the place, where the heaporder is fulfilled.
 
-    while (minChild(i) != NULL_INDEX && isGreaterThan(i, minChild(i))) {
+    while(minChild(i) != NULL_INDEX && isGreaterThan(i, minChild(i))) {
       int minChild = minChild(i);
       swap(minChild(i), i);
       i = minChild;
@@ -176,9 +177,9 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
   }
 
   /**
-   * Removes and returns the minimum node from this heap and restores the
-   * heap. Returns The minimum node of this heap.
-   *
+   * Removes and returns the minimum node from this heap and restores the heap.
+   * Returns The minimum node of this heap.
+   * 
    * @return the minimum node from this heap
    */
   protected HeapNode<K, V> removeMin() {
@@ -199,7 +200,7 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
 
   /**
    * Swaps the nodes at the indices i1 and i2 in the array.
-   *
+   * 
    * @param i1 the first index
    * @param i2 the second index
    */
@@ -220,12 +221,12 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
   /**
    * Heapifies the subtree located at i. Precondition: i's both childtrees are
    * heapordered
-   *
+   * 
    * @param i the index of the subtree to be heapified
    */
   protected final void heapify(int i) {
     // move the key down the tree till we're done.
-    while (i != NULL_INDEX) {
+    while(i != NULL_INDEX) {
       i = heapifyLocally(i);
     }
   }
@@ -234,19 +235,19 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
    * Heap order node at index i with respect to its both children. If keys had
    * to be swapped return the new index of the node formerly located at i,
    * nullIndex otherwise
-   *
+   * 
    * @param i The index of the node to be heapified.
    * @return The new index of the node formerly located at i if keys had to be
    *         swapped, nullIndex otherwise
    */
   protected final int heapifyLocally(final int i) {
     final int min = minChild(i);
-    if (min == NULL_INDEX) {
+    if(min == NULL_INDEX) {
       return NULL_INDEX;
     } // i is leaf. we're done.
 
     // if max child has bigger key then swap
-    if (isLowerThan(min, i)) {
+    if(isLowerThan(min, i)) {
       swap(i, min);
       return min;
     }
@@ -258,7 +259,7 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
   /**
    * Returns the index of the smaller child of the node at index i. Returns
    * nullIndex if the node is a leaf.
-   *
+   * 
    * @param i The index of the node
    * @return nullIndex if the node is a leaf, the index of the smaller child
    *         otherwise.
@@ -267,7 +268,7 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
     final int right = rightChild(i);
     final int left = leftChild(i);
 
-    if (right == NULL_INDEX) {
+    if(right == NULL_INDEX) {
       return left;
     }
     else { // because heap is complete there must be a left child
@@ -276,12 +277,12 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
   }
 
   /**
-   * Return the index of the left child of of the node at index i, nullIndex
-   * if there is no such child.
-   *
+   * Return the index of the left child of of the node at index i, nullIndex if
+   * there is no such child.
+   * 
    * @param i The index of the node.
-   * @return The index of the left child of of the node at index i, nullIndex
-   *         if there is no such child.
+   * @return The index of the left child of of the node at index i, nullIndex if
+   *         there is no such child.
    */
   protected final int leftChild(final int i) {
     return indexOf(2 * i + 1); // Because root is at 0. Root at 1 gives
@@ -289,9 +290,9 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
   }
 
   /**
-   * Return the index of the right child of of the node at index i, nullIndex
-   * if there is no such child.
-   *
+   * Return the index of the right child of of the node at index i, nullIndex if
+   * there is no such child.
+   * 
    * @param i The index of the node.
    * @return The index of the right child of of the node at index i, nullIndex
    *         if there is no such child.
@@ -304,7 +305,7 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
   /**
    * Returns the index of the parent of the node at index k, nullIndex if k is
    * the root.
-   *
+   * 
    * @param k The index of the node.
    * @return The parent of the node at index k, nullIndex if k is the root
    */
@@ -318,7 +319,7 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
   /**
    * Return the index of the node at index i in this heap if i is in heap,
    * otherwise nullIndex.
-   *
+   * 
    * @param i The index of the node.
    * @return i if the index is in heap, otherwise nullIndex
    */
@@ -328,37 +329,41 @@ public class DefaultHeap<K extends Comparable<K>, V extends Identifiable> implem
 
   /**
    * Return true if the node at index i1 is lower than the node at index i2.
-   *
+   * 
    * @param i1 The index of the first node to be tested.
    * @param i2 The index of the second node to be tested.
    * @return True if the node at index i1 is lower than the node at index i2,
    *         false otherwise.
    */
   protected final boolean isLowerThan(final int i1, final int i2) {
-    if (ascending)
+    if(ascending) {
       return heap.get(i1).compareTo(heap.get(i2)) < 0;
-    else
+    }
+    else {
       return heap.get(i1).compareTo(heap.get(i2)) > 0;
+    }
   }
 
   /**
    * Return true if the node at index i1 is lower than the node at index i2.
-   *
+   * 
    * @param i1 The index of the first node to be tested.
    * @param i2 The index of the second node to be tested.
    * @return True if the node at index i1 is lower than the node at index i2,
    *         false otherwise.
    */
   protected final boolean isGreaterThan(final int i1, final int i2) {
-    if (ascending)
+    if(ascending) {
       return heap.get(i1).compareTo(heap.get(i2)) > 0;
-    else
+    }
+    else {
       return heap.get(i1).compareTo(heap.get(i2)) < 0;
+    }
   }
 
   /**
    * Returns a string representation of this heap.
-   *
+   * 
    * @return a string representation of this heap
    */
   @Override
