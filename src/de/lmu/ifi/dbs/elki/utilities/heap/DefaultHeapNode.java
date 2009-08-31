@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.utilities.heap;
 
 import de.lmu.ifi.dbs.elki.utilities.Identifiable;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * A default implementation of an object that can be stored in a heap.
@@ -10,23 +11,12 @@ import de.lmu.ifi.dbs.elki.utilities.Identifiable;
  * @author Elke Achtert 
  */
 @SuppressWarnings("serial")
-public class DefaultHeapNode<K extends Comparable<K>, V extends Identifiable> implements HeapNode<K, V> {
-
-  /**
-   * The key of this heap node.
-   */
-  private K key;
-
-  /**
-   * The value of this heap node.
-   */
-  private V value;
-
+public class DefaultHeapNode<K extends Comparable<K>, V extends Identifiable> extends Pair<K,V> implements HeapNode<K, V> {
   /**
    * Empty constructor for serialization purposes.
    */
   public DefaultHeapNode() {
-	  // empty constructor
+	  this(null,null);
   }
 
   /**
@@ -36,8 +26,7 @@ public class DefaultHeapNode<K extends Comparable<K>, V extends Identifiable> im
    * @param value the value of this heap node
    */
   public DefaultHeapNode(final K key, final V value) {
-    this.key = key;
-    this.value = value;
+    super(key,value);
   }
 
   /**
@@ -48,11 +37,12 @@ public class DefaultHeapNode<K extends Comparable<K>, V extends Identifiable> im
    *         less than, equal to, or greater than the specified object.
    */
   public int compareTo(HeapNode<K, V> heapNode) {
-    int comp = this.key.compareTo(heapNode.getKey());
-    if (comp != 0)
+    int comp = this.getKey().compareTo(heapNode.getKey());
+    if (comp != 0) {
       return comp;
+    }
 
-    return this.value.getID().compareTo(heapNode.getValue().getID());
+    return this.getValue().getID().compareTo(heapNode.getValue().getID());
   }
 
   /**
@@ -61,7 +51,7 @@ public class DefaultHeapNode<K extends Comparable<K>, V extends Identifiable> im
    * @return the value of this heap node
    */
   public V getValue() {
-    return value;
+    return getSecond();
   }
 
   /**
@@ -70,7 +60,7 @@ public class DefaultHeapNode<K extends Comparable<K>, V extends Identifiable> im
    * @param value the value to be set
    */
   public void setValue(V value) {
-    this.value = value;
+    this.setSecond(value);
   }
 
   /**
@@ -79,7 +69,7 @@ public class DefaultHeapNode<K extends Comparable<K>, V extends Identifiable> im
    * @return the key of this heap node
    */
   public K getKey() {
-    return key;
+    return getFirst();
   }
 
   /**
@@ -88,7 +78,7 @@ public class DefaultHeapNode<K extends Comparable<K>, V extends Identifiable> im
    * @param key the key to be set
    */
   public void setKey(K key) {
-    this.key = key;
+    this.setFirst(key);
   }
 
   /**
@@ -98,6 +88,6 @@ public class DefaultHeapNode<K extends Comparable<K>, V extends Identifiable> im
    */
   @Override
   public String toString() {
-    return key + ":" + value;
+    return getKey() + ":" + getValue();
   }
 }

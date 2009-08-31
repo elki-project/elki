@@ -9,11 +9,12 @@ import java.io.ObjectOutput;
 
 /**
  * Default implementation of the identifiable interface.
- *
- * @author Elke Achtert 
+ * 
+ * @author Elke Achtert
  */
 public class DefaultIdentifiable implements Identifiable, Comparable<DefaultIdentifiable>, Externalizable {
   private static final long serialVersionUID = 1;
+
   /**
    * The unique id of this Identifiable.
    */
@@ -23,12 +24,12 @@ public class DefaultIdentifiable implements Identifiable, Comparable<DefaultIden
    * Empty constructor for serialization purposes.
    */
   public DefaultIdentifiable() {
-	  // empty constructor
+    // empty constructor
   }
 
   /**
    * Creates a new Identifiable object.
-   *
+   * 
    * @param id the unique id of this Identifiable
    */
   public DefaultIdentifiable(Integer id) {
@@ -37,7 +38,7 @@ public class DefaultIdentifiable implements Identifiable, Comparable<DefaultIden
 
   /**
    * Returns the unique id of this object.
-   *
+   * 
    * @return the unique id of this object
    */
   public Integer getID() {
@@ -46,9 +47,9 @@ public class DefaultIdentifiable implements Identifiable, Comparable<DefaultIden
 
   /**
    * Compares this object with the specified object for order. Returns a
-   * negative integer, zero, or a positive integer as this object is less
-   * than, equal to, or greater than the specified object.
-   *
+   * negative integer, zero, or a positive integer as this object is less than,
+   * equal to, or greater than the specified object.
+   * 
    * @param o the Object to be compared.
    * @return a negative integer, zero, or a positive integer as this object is
    *         less than, equal to, or greater than the specified object.
@@ -59,7 +60,7 @@ public class DefaultIdentifiable implements Identifiable, Comparable<DefaultIden
 
   /**
    * Returns a string representation of the object.
-   *
+   * 
    * @return a string representation of the object.
    */
   @Override
@@ -69,15 +70,17 @@ public class DefaultIdentifiable implements Identifiable, Comparable<DefaultIden
 
   /**
    * Indicates whether some other object is "equal to" this one.
-   *
+   * 
    * @param o the reference object with which to compare.
    */
   @Override
   public boolean equals(Object o) {
-    if (this == o)
+    if(this == o) {
       return true;
-    if (o == null || getClass() != o.getClass())
+    }
+    if(o == null || getClass() != o.getClass()) {
       return false;
+    }
 
     final DefaultIdentifiable that = (DefaultIdentifiable) o;
 
@@ -86,7 +89,7 @@ public class DefaultIdentifiable implements Identifiable, Comparable<DefaultIden
 
   /**
    * Returns a hash code value for the object.
-   *
+   * 
    * @return a hash code value for the object
    */
   @Override
@@ -95,11 +98,10 @@ public class DefaultIdentifiable implements Identifiable, Comparable<DefaultIden
   }
 
   /**
-   * The object implements the writeExternal method to save its contents
-   * by calling the methods of DataOutput for its primitive values or
-   * calling the writeObject method of ObjectOutput for objects, strings,
-   * and arrays.
-   *
+   * The object implements the writeExternal method to save its contents by
+   * calling the methods of DataOutput for its primitive values or calling the
+   * writeObject method of ObjectOutput for objects, strings, and arrays.
+   * 
    * @param out the stream to write the object to
    * @throws IOException on write errors
    */
@@ -108,12 +110,12 @@ public class DefaultIdentifiable implements Identifiable, Comparable<DefaultIden
   }
 
   /**
-   * The object implements the readExternal method to restore its
-   * contents by calling the methods of DataInput for primitive
-   * types and readObject for objects, strings and arrays.  The
-   * readExternal method must read the values in the same sequence
-   * and with the same types as were written by writeExternal.
-   *
+   * The object implements the readExternal method to restore its contents by
+   * calling the methods of DataInput for primitive types and readObject for
+   * objects, strings and arrays. The readExternal method must read the values
+   * in the same sequence and with the same types as were written by
+   * writeExternal.
+   * 
    * @param in the stream to read data from in order to restore the object
    * @throws IOException on read errors
    */
