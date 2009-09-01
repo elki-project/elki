@@ -259,7 +259,7 @@ public class ERiCDistanceFunction<V extends RealVector<V, ?>, P extends Preproce
             Matrix v2_i = v2_strong.getColumn(i);
             // check, if distance of v2_i to the space of pca_1 > delta
             // (i.e., if v2_i spans up a new dimension)
-            double dist = Math.sqrt(v2_i.transpose().times(v2_i).get(0, 0) - v2_i.transpose().times(m1_czech).times(v2_i).get(0, 0));
+            double dist = Math.sqrt(v2_i.transposeTimes(v2_i).get(0, 0) - v2_i.transposeTimes(m1_czech).times(v2_i).get(0, 0));
 
             // if so, return false
             if (dist > delta) {

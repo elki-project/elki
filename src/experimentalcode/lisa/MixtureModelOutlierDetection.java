@@ -185,7 +185,7 @@ private static final double SINGULARITY_CHEAT = 1E-9;
        for (Integer id: normalObjs) {
                V x = database.get(id);
                Vector x_minus_mean = x.plus(meanNeg).getColumnVector();
-               double mDist = x_minus_mean.transpose().times(covInv).times(x_minus_mean).get(0,0);
+               double mDist = x_minus_mean.transposeTimes(covInv).times(x_minus_mean).get(0,0);
                prob += Math.log(fakt * Math.exp(- mDist/2.0));
                
        }

@@ -130,8 +130,8 @@ public class PCAFilteredResult extends PCAResult {
     // TODO: unnecessary copy.
     Matrix V = getEigenvectors();
     adapatedStrongEigenvectors = V.times(e_czech).times(Matrix.identity(dim, localdim));
-    m_hat = V.times(e_hat).times(V.transpose());
-    m_czech = V.times(e_czech).times(V.transpose());
+    m_hat = V.times(e_hat).timesTranspose(V);
+    m_czech = V.times(e_czech).timesTranspose(V);
   }
 
   /**

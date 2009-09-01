@@ -37,7 +37,7 @@ public class CosineDistanceFunction<V extends FeatureVector<V, ?>> extends Abstr
     Matrix m2 = v2.getColumnVector();
     m2.normalizeColumns();
 
-    double d = 1 - m1.transpose().times(m2).get(0, 0);
+    double d = 1 - m1.transposeTimes(m2).get(0, 0);
     if(d < 0) {
       d = 0;
     }

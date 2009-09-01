@@ -146,10 +146,10 @@ public class KernelBasedLocallyWeightedDistanceFunction<V extends RealVector<V, 
         final Matrix delta = kernel_o1.minus(kernel_o2);
 
         //project objects on principal components of kernel space
-        final Matrix delta_projected = delta.transpose().times(strongEigenvectorMatrix);
+        final Matrix delta_projected = delta.transposeTimes(strongEigenvectorMatrix);
 
         //compute the squared distance on the principal components of the projected objects
-        final double distS = delta_projected.times(delta_projected.transpose()).get(0, 0);
+        final double distS = delta_projected.timesTranspose(delta_projected).get(0, 0);
 
         //compute the square of the complete kernel derived distance
         //final double distC = Math.pow(kernelFunction.distance(o1, o2).getDoubleValue(),2.0);

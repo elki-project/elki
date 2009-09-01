@@ -171,13 +171,13 @@ public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P e
       Matrix v2_i = v2_strong.getColumn(i);
       // check, if distance of v2_i to the space of rv1 > delta
       // (i.e., if v2_i spans up a new dimension)
-      double dist = Math.sqrt(v2_i.transpose().times(v2_i).get(0, 0) - v2_i.transpose().times(m1_czech).times(v2_i).get(0, 0));
+      double dist = Math.sqrt(v2_i.transposeTimes(v2_i).get(0, 0) - v2_i.transposeTimes(m1_czech).times(v2_i).get(0, 0));
 
       // if so, insert v2_i into v1 and adjust v1
       // and compute m1_czech new, increase lambda1
       if(lambda1 < dimensionality && dist > delta) {
         adjust(v1, e1_czech, v2_i, lambda1++);
-        m1_czech = v1.times(e1_czech).times(v1.transpose());
+        m1_czech = v1.times(e1_czech).timesTranspose(v1);
       }
     }
 
@@ -187,13 +187,13 @@ public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P e
       Matrix v1_i = v1_strong.getColumn(i);
       // check, if distance of v1_i to the space of rv2 > delta
       // (i.e., if v1_i spans up a new dimension)
-      double dist = Math.sqrt(v1_i.transpose().times(v1_i).get(0, 0) - v1_i.transpose().times(m2_czech).times(v1_i).get(0, 0));
+      double dist = Math.sqrt(v1_i.transposeTimes(v1_i).get(0, 0) - v1_i.transposeTimes(m2_czech).times(v1_i).get(0, 0));
 
       // if so, insert v1_i into v2 and adjust v2
       // and compute m2_czech new , increase lambda2
       if(lambda2 < dimensionality && dist > delta) {
         adjust(v2, e2_czech, v1_i, lambda2++);
-        m2_czech = v2.times(e2_czech).times(v2.transpose());
+        m2_czech = v2.times(e2_czech).timesTranspose(v2);
       }
     }
 

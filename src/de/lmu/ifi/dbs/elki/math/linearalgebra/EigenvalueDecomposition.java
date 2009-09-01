@@ -7,7 +7,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * <P>
  * If A is symmetric, then A = V*D*V' where the eigenvalue matrix D is diagonal
  * and the eigenvector matrix V is orthogonal. I.e. A =
- * V.times(D.times(V.transpose())) and V.times(V.transpose()) equals the
+ * V.times(D.timesTranspose(V)) and V.timesTranspose(V) equals the
  * identity matrix.
  * <P>
  * If A is not symmetric, then the eigenvalue matrix D is block diagonal with

@@ -37,7 +37,7 @@ public class ArcCosineDistanceFunction<V extends FeatureVector<V, ?>> extends Ab
     Matrix m2 = v2.getColumnVector();
     m2.normalizeColumns();
 
-    double d = Math.acos(m1.transpose().times(m2).get(0, 0));
+    double d = Math.acos(m1.transposeTimes(m2).get(0, 0));
     if(d < 0) {
       d = 0;
     }
