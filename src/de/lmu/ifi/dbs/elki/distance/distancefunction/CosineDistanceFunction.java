@@ -7,13 +7,13 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 /**
  * Cosine distance function for feature vectors.
  * 
- * The cosine distance is computed from the cosine similarity by <code>1-(cosine similarity)</code>.
+ * The cosine distance is computed from the cosine similarity by
+ * <code>1-(cosine similarity)</code>.
  * 
  * @author Arthur Zimek
  * @param <V> the type of FeatureVector to compute the distances in between
  */
-public class CosineDistanceFunction<V extends FeatureVector<V,?>> extends AbstractDoubleDistanceFunction<V> {
-
+public class CosineDistanceFunction<V extends FeatureVector<V, ?>> extends AbstractDoubleDistanceFunction<V> {
   /**
    * Provides a CosineDistanceFunction.
    */
@@ -24,8 +24,9 @@ public class CosineDistanceFunction<V extends FeatureVector<V,?>> extends Abstra
   /**
    * Computes the cosine distance for two given feature vectors.
    * 
-   * The cosine distance is computed from the cosine similarity by <code>1-(cosine similarity)</code>.
-   *
+   * The cosine distance is computed from the cosine similarity by
+   * <code>1-(cosine similarity)</code>.
+   * 
    * @param v1 first feature vector
    * @param v2 second feature vector
    * @return the cosine distance for two given feature vectors v1 and v2
@@ -37,7 +38,9 @@ public class CosineDistanceFunction<V extends FeatureVector<V,?>> extends Abstra
     m2.normalizeColumns();
 
     double d = 1 - m1.transpose().times(m2).get(0, 0);
-    if (d < 0) d = 0;
+    if(d < 0) {
+      d = 0;
+    }
     return new DoubleDistance(d);
   }
 
