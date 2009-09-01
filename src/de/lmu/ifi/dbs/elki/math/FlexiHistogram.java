@@ -333,7 +333,7 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
    * Histograms that work like two {@link #IntSumHistogram}, component wise.
    * 
    * @param bins Number of bins.
-   * @return
+   * @return New Histogram object
    */
   public static FlexiHistogram<Pair<Integer, Integer>, Pair<Integer, Integer>> IntSumIntSumHistogram(int bins) {
     return new FlexiHistogram<Pair<Integer, Integer>, Pair<Integer, Integer>>(bins, new Adapter<Pair<Integer, Integer>, Pair<Integer, Integer>>() {
@@ -365,7 +365,7 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
    * Histograms that work like two {@link #LongSumHistogram}, component wise.
    * 
    * @param bins Number of bins.
-   * @return
+   * @return New Histogram object
    */
   public static FlexiHistogram<Pair<Long, Long>, Pair<Long, Long>> LongSumLongSumHistogram(int bins) {
     return new FlexiHistogram<Pair<Long, Long>, Pair<Long, Long>>(bins, new Adapter<Pair<Long, Long>, Pair<Long, Long>>() {

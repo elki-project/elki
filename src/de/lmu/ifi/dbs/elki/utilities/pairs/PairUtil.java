@@ -51,7 +51,7 @@ public final class PairUtil {
    * 
    * @param <FIRST> First type
    * @param <SECOND> Second type
-   * @param c1 First comparator
+   * @param c1 Comparator for first
    * @return Comparator
    */
   public static <FIRST,SECOND> Comparator<Pair<FIRST,SECOND>> comparatorFirst(Comparator<FIRST> c1) {
@@ -75,7 +75,7 @@ public final class PairUtil {
    * 
    * @param <FIRST> First type
    * @param <SECOND> Second type
-   * @param c1 First comparator
+   * @param c2 Comparator for second
    * @return Comparator
    */
   public static <FIRST,SECOND> Comparator<Pair<FIRST,SECOND>> comparatorSecond(Comparator<SECOND> c2) {

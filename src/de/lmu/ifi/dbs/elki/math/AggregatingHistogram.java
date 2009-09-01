@@ -156,7 +156,7 @@ public class AggregatingHistogram<T, D> extends ReplacingHistogram<T> {
    * Histograms that work like two {@link #IntSumHistogram}, component wise.
    * 
    * @param bins Number of bins.
-   * @return
+   * @return Histogram object
    */
   public static AggregatingHistogram<Pair<Integer, Integer>, Pair<Integer, Integer>> IntSumIntSumHistogram(int bins, double min, double max) {
     return new AggregatingHistogram<Pair<Integer, Integer>, Pair<Integer, Integer>>(bins, min, max, new Adapter<Pair<Integer, Integer>, Pair<Integer, Integer>>() {
@@ -178,7 +178,7 @@ public class AggregatingHistogram<T, D> extends ReplacingHistogram<T> {
    * Histograms that work like two {@link #LongSumHistogram}, component wise.
    * 
    * @param bins Number of bins.
-   * @return
+   * @return Histogram object
    */
   public static AggregatingHistogram<Pair<Long, Long>, Pair<Long, Long>> LongSumLongSumHistogram(int bins, double min, double max) {
     return new AggregatingHistogram<Pair<Long, Long>, Pair<Long, Long>>(bins, min, max, new Adapter<Pair<Long, Long>, Pair<Long, Long>>() {

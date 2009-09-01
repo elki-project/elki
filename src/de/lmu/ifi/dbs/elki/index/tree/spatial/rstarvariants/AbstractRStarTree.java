@@ -831,7 +831,8 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * <code>mbr</code>. If there are several containing children, the child with
    * the minimum volume is chosen in order to get compact pages.
    * 
-   * @param newEntry
+   * @param node subtree
+   * @param mbr MBR to test for
    * @return the child of <code>node</code> containing <code>mbr</code> with the
    *         minimum volume or <code>null</code> if none exists
    */
