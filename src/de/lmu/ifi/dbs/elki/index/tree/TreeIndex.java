@@ -379,7 +379,7 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
   /**
    * Get the node class of this index
    * 
-   * @return
+   * @return node class
    */
   abstract protected Class<N> getNodeClass();
 
