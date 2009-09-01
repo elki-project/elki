@@ -7,14 +7,13 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 /**
  * Cosine distance function for feature vectors.
  * 
- * The cosine distance is computed as the arcus from the cosine similarity value,
- * i.e., <code>arccos(&lt;v1,v2&gt;)</code>.
- *
+ * The cosine distance is computed as the arcus from the cosine similarity
+ * value, i.e., <code>arccos(&lt;v1,v2&gt;)</code>.
+ * 
  * @author Arthur Zimek
  * @param <V> the type of FeatureVector to compute the distances in between
  */
-public class ArcCosineDistanceFunction<V extends FeatureVector<V,?>> extends AbstractDoubleDistanceFunction<V> {
-
+public class ArcCosineDistanceFunction<V extends FeatureVector<V, ?>> extends AbstractDoubleDistanceFunction<V> {
   /**
    * Provides a CosineDistanceFunction.
    */
@@ -25,9 +24,9 @@ public class ArcCosineDistanceFunction<V extends FeatureVector<V,?>> extends Abs
   /**
    * Computes the cosine distance for two given feature vectors.
    * 
-   * The cosine distance is computed as the arcus from the cosine similarity value,
-   * i.e., <code>arccos(&lt;v1,v2&gt;)</code>.
-   *
+   * The cosine distance is computed as the arcus from the cosine similarity
+   * value, i.e., <code>arccos(&lt;v1,v2&gt;)</code>.
+   * 
    * @param v1 first feature vector
    * @param v2 second feature vector
    * @return the cosine distance for two given feature vectors v1 and v2
@@ -39,7 +38,9 @@ public class ArcCosineDistanceFunction<V extends FeatureVector<V,?>> extends Abs
     m2.normalizeColumns();
 
     double d = Math.acos(m1.transpose().times(m2).get(0, 0));
-    if (d < 0) d = 0;
+    if(d < 0) {
+      d = 0;
+    }
     return new DoubleDistance(d);
   }
 
