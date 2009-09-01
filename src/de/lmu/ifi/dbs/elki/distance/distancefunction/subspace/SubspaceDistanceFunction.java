@@ -125,7 +125,7 @@ public class SubspaceDistanceFunction<V extends RealVector<V, ?>, P extends Prep
 
         Matrix strong_ev1 = pca1.getStrongEigenvectors();
         Matrix weak_ev2 = pca2.getWeakEigenvectors();
-        Matrix m1 = weak_ev2.getColumnDimensionality() == 0 ? strong_ev1.transpose() : strong_ev1.transpose().times(weak_ev2);
+        Matrix m1 = weak_ev2.getColumnDimensionality() == 0 ? strong_ev1.transpose() : strong_ev1.transposeTimes(weak_ev2);
         double d1 = m1.norm2();
 
         WeightedDistanceFunction<V> df1 = new WeightedDistanceFunction<V>(pca1.similarityMatrix());

@@ -39,7 +39,7 @@ public class GaussianModelOutlierDetection<V extends RealVector<V,Double>> exten
 		 for (Integer id : database) {
              V x = database.get(id);
              Vector x_minus_mean = x.plus(meanNeg).getColumnVector();
-             double mDist = x_minus_mean.transpose().times(covarianceTransposed).times(x_minus_mean).get(0,0);
+             double mDist = x_minus_mean.transposeTimes(covarianceTransposed).times(x_minus_mean).get(0,0);
              double prob = fakt * Math.exp(- mDist/2.0);
              if(prob > maxProb) {
                maxProb = prob;

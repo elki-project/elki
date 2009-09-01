@@ -88,8 +88,8 @@ public class MultipleLinearRegression {
         y_mean = sum / y.getDimensionality();
 
         // estimate b, e
-        xx_inverse = (x.transpose().times(x)).inverse();
-        b = new Vector(xx_inverse.times(x.transpose()).times(y).getColumnPackedCopy());
+        xx_inverse = (x.transposeTimes(x)).inverse();
+        b = new Vector(xx_inverse.timesTranspose(x).times(y).getColumnPackedCopy());
 //    b = new Vector(x.solve(y).getColumnPackedCopy());
         e = new Vector(y.minus(x.times(b)).getColumnPackedCopy());
 

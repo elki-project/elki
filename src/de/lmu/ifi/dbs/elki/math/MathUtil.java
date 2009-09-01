@@ -32,7 +32,7 @@ public class MathUtil {
    }
 
   public static double mahalanobisDistance(Matrix weightMatrix, Vector o1_minus_o2) {
-    double sqrDist = o1_minus_o2.transpose().times(weightMatrix).times(o1_minus_o2).get(0, 0);
+    double sqrDist = o1_minus_o2.transposeTimes(weightMatrix).times(o1_minus_o2).get(0, 0);
   
     if (sqrDist < 0 && Math.abs(sqrDist) < 0.000000001) {
       sqrDist = Math.abs(sqrDist);

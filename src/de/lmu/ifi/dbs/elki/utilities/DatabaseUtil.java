@@ -224,7 +224,7 @@ public final class DatabaseUtil {
       }
     }
     Matrix centeredMatrix = new Matrix(matrixArray);
-    return centeredMatrix.transpose().times(centeredMatrix);
+    return centeredMatrix.transposeTimes(centeredMatrix);
   }
 
   /**
@@ -271,7 +271,7 @@ public final class DatabaseUtil {
     }
     Matrix centeredMatrix = new Matrix(matrixArray);
     // covariance matrix
-    Matrix cov = centeredMatrix.transpose().times(centeredMatrix);
+    Matrix cov = centeredMatrix.transposeTimes(centeredMatrix);
     cov = cov.times(1.0 / database.size());
 
     return cov;
@@ -297,7 +297,7 @@ public final class DatabaseUtil {
     }
     Matrix centeredMatrix = new Matrix(matrixArray);
     // covariance matrix
-    Matrix cov = centeredMatrix.times(centeredMatrix.transpose());
+    Matrix cov = centeredMatrix.timesTranspose(centeredMatrix);
     cov = cov.times(1.0 / data.getColumnDimensionality());
 
     return cov;

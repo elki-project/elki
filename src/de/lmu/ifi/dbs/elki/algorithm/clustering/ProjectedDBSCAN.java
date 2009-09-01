@@ -172,70 +172,65 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
 
   @Override
   protected Clustering<Model> runInTime(Database<V> database) throws IllegalStateException {
-    try {
-      FiniteProgress objprog = new FiniteProgress("Processing objects", database.size());
-      IndefiniteProgress clusprog = new IndefiniteProgress("Number of clusters");
-      resultList = new ArrayList<List<Integer>>();
-      noise = new HashSet<Integer>();
-      processedIDs = new HashSet<Integer>(database.size());
-      distanceFunction.setDatabase(database, isVerbose(), isTime());
-      if(logger.isVerbose()) {
-        logger.verbose("Clustering:");
-      }
-      if(database.size() >= minpts) {
-        for(Integer id : database) {
-          if(!processedIDs.contains(id)) {
-            expandCluster(database, id, objprog, clusprog);
-            if(processedIDs.size() == database.size() && noise.size() == 0) {
-              break;
-            }
-          }
-          if(isVerbose()) {
-            objprog.setProcessed(processedIDs.size());
-            clusprog.setProcessed(resultList.size());
-            logger.progress(objprog, clusprog);
+    FiniteProgress objprog = new FiniteProgress("Processing objects", database.size());
+    IndefiniteProgress clusprog = new IndefiniteProgress("Number of clusters");
+    resultList = new ArrayList<List<Integer>>();
+    noise = new HashSet<Integer>();
+    processedIDs = new HashSet<Integer>(database.size());
+    distanceFunction.setDatabase(database, isVerbose(), isTime());
+    if(logger.isVerbose()) {
+      logger.verbose("Clustering:");
+    }
+    if(database.size() >= minpts) {
+      for(Integer id : database) {
+        if(!processedIDs.contains(id)) {
+          expandCluster(database, id, objprog, clusprog);
+          if(processedIDs.size() == database.size() && noise.size() == 0) {
+            break;
           }
         }
-      }
-      else {
-        for(Integer id : database) {
-          noise.add(id);
-          if(isVerbose()) {
-            objprog.setProcessed(processedIDs.size());
-            clusprog.setProcessed(resultList.size());
-            logger.progress(objprog, clusprog);
-          }
+        if(isVerbose()) {
+          objprog.setProcessed(processedIDs.size());
+          clusprog.setProcessed(resultList.size());
+          logger.progress(objprog, clusprog);
         }
       }
-
-      if(isVerbose()) {
-        objprog.setProcessed(processedIDs.size());
-        clusprog.setProcessed(resultList.size());
-        logger.progress(objprog, clusprog);
-      }
-
-      result = new Clustering<Model>();
-      for(Iterator<List<Integer>> resultListIter = resultList.iterator(); resultListIter.hasNext();) {
-        DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(resultListIter.next());
-        Cluster<Model> c = new Cluster<Model>(group, ClusterModel.CLUSTER);
-        result.addCluster(c);
-      }
-
-      DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(noise);
-      Cluster<Model> n = new Cluster<Model>(group, true, ClusterModel.CLUSTER);
-      result.addCluster(n);
-
-      if(isVerbose()) {
-        objprog.setProcessed(processedIDs.size());
-        clusprog.setProcessed(resultList.size());
-        logger.progress(objprog, clusprog);
-      }
-      // Signal that the progress has completed.
-      clusprog.setCompleted();
     }
-    catch(Exception e) {
-      throw new IllegalStateException(e);
+    else {
+      for(Integer id : database) {
+        noise.add(id);
+        if(isVerbose()) {
+          objprog.setProcessed(processedIDs.size());
+          clusprog.setProcessed(resultList.size());
+          logger.progress(objprog, clusprog);
+        }
+      }
     }
+
+    if(isVerbose()) {
+      objprog.setProcessed(processedIDs.size());
+      clusprog.setProcessed(resultList.size());
+      logger.progress(objprog, clusprog);
+    }
+
+    result = new Clustering<Model>();
+    for(Iterator<List<Integer>> resultListIter = resultList.iterator(); resultListIter.hasNext();) {
+      DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(resultListIter.next());
+      Cluster<Model> c = new Cluster<Model>(group, ClusterModel.CLUSTER);
+      result.addCluster(c);
+    }
+
+    DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(noise);
+    Cluster<Model> n = new Cluster<Model>(group, true, ClusterModel.CLUSTER);
+    result.addCluster(n);
+
+    if(isVerbose()) {
+      objprog.setProcessed(processedIDs.size());
+      clusprog.setProcessed(resultList.size());
+      logger.progress(objprog, clusprog);
+    }
+    // Signal that the progress has completed.
+    clusprog.setCompleted();
     return result;
   }
 
@@ -396,7 +391,7 @@ public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends Abstra
     OptionUtil.addParameter(distanceFunctionParameters, MINPTS_ID, Integer.toString(minpts));
     // merge remaining parameters
     distanceFunctionParameters.addAll(remainingParameters);
-    
+
     List<OptionID> overriddenParameters = new ArrayList<OptionID>();
     overriddenParameters.add(PreprocessorHandler.OMIT_PREPROCESSING_ID);
     overriddenParameters.add(PreprocessorHandler.PREPROCESSOR_ID);

@@ -51,8 +51,8 @@ public class LocallyWeightedDistanceFunction<V extends RealVector<V, ?>, P exten
     // noinspection unchecked
     Matrix v2Mv1 = v2.plus(v1.negativeVector()).getColumnVector();
 
-    double dist1 = v1Mv2.transpose().times(m1).times(v1Mv2).get(0, 0);
-    double dist2 = v2Mv1.transpose().times(m2).times(v2Mv1).get(0, 0);
+    double dist1 = v1Mv2.transposeTimes(m1).times(v1Mv2).get(0, 0);
+    double dist2 = v2Mv1.transposeTimes(m2).times(v2Mv1).get(0, 0);
 
     if(dist1 < 0) {
       if(-dist1 < 0.000000000001)
@@ -90,7 +90,7 @@ public class LocallyWeightedDistanceFunction<V extends RealVector<V, ?>, P exten
     Matrix m = getDatabase().getAssociation(AssociationID.LOCALLY_WEIGHTED_MATRIX, v.getID());
     // noinspection unchecked
     Matrix rv1Mrv2 = v.plus(mbrVector.negativeVector()).getColumnVector();
-    double dist = rv1Mrv2.transpose().times(m).times(rv1Mrv2).get(0, 0);
+    double dist = rv1Mrv2.transposeTimes(m).times(rv1Mrv2).get(0, 0);
 
     return new DoubleDistance(Math.sqrt(dist));
   }
