@@ -9,13 +9,13 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * Basic in-memory heap structure. Closely related to a {@link PriorityQueue},
+ * Basic in-memory heap structure. Closely related to a {@link java.util.PriorityQueue},
  * but here we can override methods to obtain e.g. a {@link TopBoundedHeap}
  * 
  * @author Erich Schubert
  * 
- * @param <E> Element type. Should be {@link Comparable} or a {@link Comparator}
- *        needs to be given.
+ * @param <E> Element type. Should be {@link java.lang.Comparable} or a
+ *        {@link java.util.Comparator} needs to be given.
  */
 public class Heap<E> extends AbstractQueue<E> implements Serializable {
   /**
@@ -125,7 +125,7 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
     modCount++;
     E ret = castQueueElement(0);
     // remove!
-    putInQueue(pos, queue[size-1]);
+    putInQueue(pos, queue[size - 1]);
     size = size - 1;
     // avoid dangling references!
     putInQueue(size, null);
