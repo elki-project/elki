@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.utilities;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -151,7 +152,7 @@ public final class ClassGenericsUtil {
    */
   @SuppressWarnings("unchecked")
   public static <B, T extends B> T[] toArray(Collection<T> coll, Class<B> base) {
-    return coll.toArray((T[]) java.lang.reflect.Array.newInstance(base, 0));
+    return coll.toArray((T[])newArray(base, 0));
   }
 
   /**
@@ -199,9 +200,8 @@ public final class ClassGenericsUtil {
    * any class! Still it is preferable to have this cast in one place than in
    * dozens without any explanation.
    * 
-   * The reason this is needed is the following:
-   * There is no Class&lt;Set&lt;String&gt;&gt;.class. This method allows you to do
-   * <code>
+   * The reason this is needed is the following: There is no
+   * Class&lt;Set&lt;String&gt;&gt;.class. This method allows you to do <code>
    * Class&lt;Set&lt;String&gt;&gt; setclass = uglyCastIntoSubclass(Set.class);
    * </code>
    * 
@@ -267,5 +267,120 @@ public final class ClassGenericsUtil {
     catch(ClassCastException e) {
       return null;
     }
+  }
+
+  /**
+   * Generic newInstance that tries to clone an object.
+   * 
+   * @param <T> Object type, generic
+   * @param obj Master copy - must not be null.
+   * @return New instance, if possible
+   * @throws InstantiationException
+   * @throws IllegalAccessException
+   * @throws InvocationTargetException
+   * @throws NoSuchMethodException
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> T newInstance(T obj) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    try {
+      Object n = obj.getClass().getConstructor().newInstance();
+      return (T) n;
+    }
+    catch(NullPointerException e) {
+      throw new IllegalArgumentException("Null pointer exception in newInstance()", e);
+    }
+  }
+
+  /**
+   * Retrieve the component type of a given array. For cloning.
+   * 
+   * @param <T> Array type, generic
+   * @param a Existing array
+   * @return Component type of the given array.
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> Class<? extends T> getComponentType(T[] a) {
+    Class<?> k = a.getClass().getComponentType();
+    return (Class<? extends T>) k;
+  }
+
+  /**
+   * Make a new array of the given class and size.
+   * 
+   * @param <T> Generic type
+   * @param k Class
+   * @param size Size
+   * @return new array of the given type
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> T[] newArray(Class<? extends T> k, int size) {
+    if(k.isPrimitive()) {
+      throw new IllegalArgumentException("Argument cannot be primitive: " + k);
+    }
+    Object a = java.lang.reflect.Array.newInstance(k, size);
+    return (T[]) a;
+  }
+
+  /**
+   * Clone an array of the given type.
+   * 
+   * @param <T> Generic type
+   * @param a existing array
+   * @param size array size
+   * @return new array
+   */
+  public static <T> T[] newArray(T[] a, int size) {
+    return newArray(getComponentType(a), size);
+  }
+
+  /**
+   * Clone a collection. Collection must have an empty constructor!
+   * 
+   * @param <T>
+   * @param <C>
+   * @param coll
+   * @return
+   */
+  public static <T, C extends Collection<T>> C cloneCollection(C coll) {
+    try {
+      C copy = newInstance(coll);
+      copy.addAll(coll);
+      return copy;
+    }
+    catch(InstantiationException e) {
+      throw new RuntimeException(e);
+    }
+    catch(IllegalAccessException e) {
+      throw new RuntimeException(e);
+    }
+    catch(InvocationTargetException e) {
+      throw new RuntimeException(e);
+    }
+    catch(NoSuchMethodException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  /**
+   * Transform a collection to an Array
+   * 
+   * @param <T> object type
+   * @param c Collection
+   * @param a Array to write to or replace (i.e. sample array)
+   * @return
+   */
+  public static <T> T[] collectionToArray(Collection<T> c, T[] a) {
+    if(a.length < c.size()) {
+      a = newArray(a, c.size());
+    }
+    int i = 0;
+    for(T x : c) {
+      a[i] = x;
+      i++;
+    }
+    if(i < a.length) {
+      a[i] = null;
+    }
+    return a;
   }
 }
