@@ -6,14 +6,12 @@ import java.util.Collections;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
-
 /**
  * Test the in-memory bounded heap class.
  * 
  * @author Erich Schubert
  */
-public class TestTopBoundedHeap implements JUnit4Test {
+public class TestTopBoundedHeap {
   /**
    * Test bounded heap
    */
