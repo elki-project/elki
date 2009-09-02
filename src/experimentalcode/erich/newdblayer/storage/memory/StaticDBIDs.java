@@ -1,4 +1,4 @@
-package experimentalcode.erich.newdblayer.staticdb;
+package experimentalcode.erich.newdblayer.storage.memory;
 
 import java.util.Collection;
 import java.util.Iterator;
