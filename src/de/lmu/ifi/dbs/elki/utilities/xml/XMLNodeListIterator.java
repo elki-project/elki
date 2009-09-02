@@ -6,6 +6,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.IterableIterator;
 
 /**
  * Simple adapter class to iterate over a DOM tree nodes children.
@@ -13,7 +14,7 @@ import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
  * @author Erich Schubert
  *
  */
-public final class XMLNodeListIterator implements Iterable<Node>, Iterator<Node> {
+public final class XMLNodeListIterator implements IterableIterator<Node> {
   /**
    * Store the next node
    */

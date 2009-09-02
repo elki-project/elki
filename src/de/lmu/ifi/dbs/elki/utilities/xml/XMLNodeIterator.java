@@ -5,6 +5,7 @@ import java.util.Iterator;
 import org.w3c.dom.Node;
 
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.IterableIterator;
 
 /**
  * Simple adapter class to iterate over a DOM tree nodes children.
@@ -12,7 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
  * @author Erich Schubert
  *
  */
-public final class XMLNodeIterator implements Iterable<Node>, Iterator<Node> {
+public final class XMLNodeIterator implements IterableIterator<Node> {
   /**
    * Store the next node
    */
@@ -55,7 +56,7 @@ public final class XMLNodeIterator implements Iterable<Node>, Iterator<Node> {
   }
 
   /**
-   * Iterable interface adapter - clone.
+   * Iterator interface adapter - clone.
    */
   @Override
   public Iterator<Node> iterator() {
