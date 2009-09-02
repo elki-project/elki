@@ -6,7 +6,7 @@
 	</tstamp>
 
 	<property name="ELKI" value="de.lmu.ifi.dbs.elki" />
-	<property name="ELKI_DIR" value="de/lmu/ifi/dbs/elki" />	
+	<property name="ELKI_DIR" value="de/lmu/ifi/dbs/elki" />
 	<property name="ELKI_SHORT" value="ELKI"/>
 	<property name="ELKI_LONG" value="ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures"/>
 	<property name="ELKI_URL" value="http://www.dbs.ifi.lmu.de/research/KDD/ELKI/"/>
@@ -26,6 +26,7 @@
 	
 	<!-- source parameters -->
 	<property name="source" value="src" />
+	<property name="source.test" value="test" />
 	<property name="build.lib" value="lib" />
 
 	<!-- build parameters -->
@@ -51,7 +52,7 @@
 
 	<!-- ******************* FOLDER CONFIGURATION ******************* -->
 
-	<!-- Release output folders -->
+	<!-- Release output folders and targets -->
 	<condition property="deploy.output" value="${sharedfolder}/releases/${release.version}/${now}/output">
 		<isset property="release.official" />
 	</condition>
@@ -61,11 +62,15 @@
 	<condition property="release.target" value="${webfolder}/release${release.version}">
 		<isset property="release.official" />
 	</condition>
+	<condition property="target.compile.tests" value="nothing">
+		<isset property="release.official" />
+	</condition>
 		
-	<!-- Output folders -->
+	<!-- Output folders and default targets -->
 	<property name="deploy.output" value="${sharedfolder}/archive/${release.version}" />
 	<property name="deploy.latest" value="${sharedfolder}/executable" />
 	<property name="javadoc.destdir" value="${sharedfolder}/doc" />
+	<property name="target.compile.tests" value="compile_tests" />
 
 	<!-- Prepare classpath -->
 	<path id="build.classpath">
@@ -82,10 +87,8 @@
 	</path>
 
 	<!-- ******************* FILE (IGNORE) PATTERNS ******************* -->
-	
-	<!-- Experimentalcode to exclude because it's too buggy -->
+	<!-- Experimentalcode is sometimes excluded - if it prevents an internal build -->
 	<patternset id="exclude.internal">
-		<!--<exclude name="**/experimentalcode/noemi/**"/>-->
 		<exclude name="experimentalcode/tobias/**" />
 		<exclude name="experimentalcode/simon/**" />
 	</patternset>
@@ -98,8 +101,6 @@
         <exclude name="${ELKI_DIR}/index/tree/spatial/rstarvariants/flat/**"/>
 		<!-- currently empty -->
         <exclude name="${ELKI_DIR}/math/analysis/**"/>
-		<!-- Unit tests -->
-		<exclude name="${ELKI_DIR}/test/**"/>
 		<!-- used only (?) by oldLOF/OnlineLOF/LOFTable/NNTable -->
         <exclude name="${ELKI_DIR}/utilities/tree/btree/**"/>
 	</patternset>
@@ -116,7 +117,13 @@
 
 	<target name="doc" description="Refresh documentation" depends="doc_javadoc,doc_params, doc_extra" />
 
-	<target name="compile" description="Compile everything" depends="compile_java,compile_install" />
+	<target name="compile" description="Compile everything">
+		<sequential>
+			<antcall target="compile_java" />
+			<antcall target="compile_install" />
+			<antcall target="${target.compile.tests}" />
+		</sequential>
+	</target>
 
 	<target name="rebuild deploy and clean" description="Deploys a new version and cleans up afterwards">
 		<sequential>
@@ -138,6 +145,10 @@
 			<antcall target="clean" />
 			<antcall target="compile" />
 		</sequential>
+	</target>
+	
+	<target name="nothing">
+		<!-- Empty target -->
 	</target>
 
 	<!-- ******************* BUILD MAIN TARGETS ******************* -->
@@ -251,6 +262,23 @@
 		</javac>
 	</target>
 	
+	<!-- Compile all java tests -->
+	<target name="compile_tests">
+		<mkdir dir="${build.output}" />
+		<javac
+			destdir="${build.output}"
+			deprecation="false"
+			debug="false"
+			optimize="true"
+			source="1.6"
+			debuglevel="">
+			<compilerarg value="-Xlint:all"/>
+			<classpath refid="build.classpath" />
+			<patternset refid="${build.patternset}"/>
+			<src path="${source.test}" />
+		</javac>
+	</target>
+	
 	<!-- Install non-java files -->
 	<target name="compile_install">
 		<copy todir="${build.output}">
@@ -359,6 +387,13 @@
 		<mkdir dir="${build.jardir}/src" />
 		<copy todir="${build.jardir}/src">
 			<fileset dir="${source}">
+				<patternset refid="${build.patternset}"/>
+				<exclude name="*.html"/>
+			</fileset>
+		</copy>
+		<mkdir dir="${build.jardir}/test" />
+		<copy todir="${build.jardir}/test">
+			<fileset dir="${source.test}">
 				<patternset refid="${build.patternset}"/>
 				<exclude name="*.html"/>
 			</fileset>
