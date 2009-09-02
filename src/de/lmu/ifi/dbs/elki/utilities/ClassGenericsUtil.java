@@ -336,10 +336,10 @@ public final class ClassGenericsUtil {
   /**
    * Clone a collection. Collection must have an empty constructor!
    * 
-   * @param <T>
-   * @param <C>
-   * @param coll
-   * @return
+   * @param <T> Data type
+   * @param <C> Collection type
+   * @param coll Existing collection
+   * @return Cloned collection
    */
   public static <T, C extends Collection<T>> C cloneCollection(C coll) {
     try {
@@ -367,7 +367,7 @@ public final class ClassGenericsUtil {
    * @param <T> object type
    * @param c Collection
    * @param a Array to write to or replace (i.e. sample array)
-   * @return
+   * @return new array containing the collection elements
    */
   public static <T> T[] collectionToArray(Collection<T> c, T[] a) {
     if(a.length < c.size()) {
