@@ -6,14 +6,12 @@ import java.util.Collections;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
-
 /**
  * Test the in-memory heap class.
  * 
  * @author Erich Schubert
  */
-public class TestHeap implements JUnit4Test {
+public class TestHeap {
   /**
    * Puts 10 integers into both an ascending and a descending heap and verifies
    * they come out in sequence.
