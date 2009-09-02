@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.IterableIterator;
 
 /**
  * Iterator over all instanciable classes of a given superclass/interface.
@@ -13,7 +14,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * 
  * @author Erich Schubert
  */
-public class IterateKnownImplementations implements Iterator<Class<?>>, Iterable<Class<?>> {
+public class IterateKnownImplementations implements IterableIterator<Class<?>> {
   /**
    * Logger
    */
@@ -122,7 +123,7 @@ public class IterateKnownImplementations implements Iterator<Class<?>>, Iterable
   }
 
   /**
-   * Adapter for Iterable interface for foreach statements
+   * Adapter for {@link java.lang.Iterable} interface for foreach statements
    */
   @Override
   public Iterator<Class<?>> iterator() {
