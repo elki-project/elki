@@ -38,7 +38,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
     /**
      * OptionID for {@link #SEED_PARAM}.
      */
-    public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("dbc.seed", "Seed for randomly shuffling the rows for the database. If the parameter is not set or is explicitely set to the default value, no shuffling is performed.");
+    public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("dbc.seed", "Seed for randomly shuffling the rows for the database. If the parameter is not set, no shuffling will be performed.");
     
     /**
      * The default value of the seed for the random object used for shuffling.
@@ -47,7 +47,7 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
     
     /**
      * Parameter to specify a seed for randomly shuffling the rows of the database.
-     * If unused or explicitly set to the default value {@link #SEED_DEFAULT}, no shuffling is performed.
+     * If unused, no shuffling will be performed.
      * Shuffling takes time linearly dependent from the size of the database.
      * <p>Default value: {@link #SEED_DEFAULT}</p>
      * <p>Key: {@code -dbc.seed}</p>
@@ -97,12 +97,11 @@ public class InputStreamDatabaseConnection<O extends DatabaseObject> extends Abs
             List<Pair<O, Associations>> objectAndAssociationsList = normalizeAndTransformLabels(parsingResult.getObjectAndLabelList(),
                 normalization);
 
-            long seed = SEED_PARAM.getNumberValue();
-            if(seed!=SEED_DEFAULT){
+            if(SEED_PARAM.isSet()){
               if (logger.isDebugging()) {
                 logger.debugFine("*** shuffle");
               }
-              Random random = new Random(seed);
+              Random random = new Random(SEED_PARAM.getNumberValue());
               Collections.shuffle(objectAndAssociationsList,random);
             }
             
