@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import experimentalcode.remigius.ShapeLibrary;
-import experimentalcode.remigius.VisualizationManager;
 
 /**
  * Generates a SVG-Element containing axes, including descriptions.
@@ -23,9 +22,9 @@ public class AxisVisualizer<NV extends NumberVector<NV, N>, N extends Number> ex
   // TODO: we have two name-attributes, maybe that's one too much. 
   private static final String NAME = "Axes";
   
-	public void setup(Database<NV> database, VisualizationManager<NV> visManager){
+	public void setup(Database<NV> database){
 		// We don't need the Database. Maybe another superclass / inheritance hierarchy would serve us better.
-		init(database, visManager, NAME);
+		init(database, NAME);
 	}
 
 	@Override

@@ -6,7 +6,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import experimentalcode.remigius.ShapeLibrary;
-import experimentalcode.remigius.VisualizationManager;
 
 public class DotVisualizer<NV extends NumberVector<NV, N>, N extends Number> extends PlanarVisualizer<NV, N> {
   
@@ -15,8 +14,8 @@ public class DotVisualizer<NV extends NumberVector<NV, N>, N extends Number> ext
 	public DotVisualizer(){
 	}
 
-	public void setup(Database<NV> database, VisualizationManager<NV> v){
-		init(database, v, Integer.MAX_VALUE-1000, NAME);
+	public void setup(Database<NV> database){
+		init(database, Integer.MAX_VALUE-1000, NAME);
 	}
 
 	@Override

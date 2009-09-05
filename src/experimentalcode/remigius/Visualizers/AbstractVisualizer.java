@@ -5,7 +5,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.colors.PropertiesBasedColorLibrary;
-import experimentalcode.remigius.VisualizationManager;
 
 /**
  * Abstract superclass for Visualizers.
@@ -21,10 +20,6 @@ public abstract class AbstractVisualizer<O extends DatabaseObject> extends Abstr
    */
   protected Database<O> database;
 
-  /**
-   * Used to receive and publish any kind of information.
-   */
-  protected VisualizationManager<O> visManager;
 
   /**
    * Provides colors which can be used by elements of the visualization.
@@ -50,11 +45,10 @@ public abstract class AbstractVisualizer<O extends DatabaseObject> extends Abstr
    * @param v used to receive and publish different information.
    * @param name a short name characterizing this Visualizer
    */
-  public void init(Database<O> db, VisualizationManager<O> v, int level, String name) {
+  public void init(Database<O> db, int level, String name) {
     this.database = db;
     this.level = level;
     this.name = name;
-    this.visManager = v;
   }
 
   @Override

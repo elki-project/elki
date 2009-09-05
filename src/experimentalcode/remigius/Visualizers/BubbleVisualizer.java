@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -20,13 +21,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import experimentalcode.lisa.scale.CutOffScale;
 import experimentalcode.lisa.scale.DoubleScale;
 import experimentalcode.lisa.scale.GammaFunction;
 import experimentalcode.lisa.scale.LinearScale;
 import experimentalcode.remigius.ShapeLibrary;
-import experimentalcode.remigius.VisualizationManager;
 
 public class BubbleVisualizer<NV extends NumberVector<NV, N>, N extends Number> extends PlanarVisualizer<NV, N> {
 	
@@ -61,8 +62,8 @@ public class BubbleVisualizer<NV extends NumberVector<NV, N>, N extends Number> 
 		addOption(CUTOFF_PARAM);
 	}
 	
-	public void setup(Database<NV> database, AnnotationResult<Double> anResult, Result result, DoubleScale normalizationScale, VisualizationManager<NV> visManager){
-		init(database, visManager, 1000, NAME);
+	public void setup(Database<NV> database, AnnotationResult<Double> anResult, Result result, DoubleScale normalizationScale){
+		init(database, 1000, NAME);
 		this.anResult = anResult;
 		this.result = result;
 
@@ -72,7 +73,6 @@ public class BubbleVisualizer<NV extends NumberVector<NV, N>, N extends Number> 
 		this.cutOffScale = new CutOffScale(cutOff);
 		
 		setupClustering();
-		setupCSS();
 	}
 	
 	private void setupClustering(){
@@ -85,7 +85,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, N>, N extends Number> 
 		}
 	}
 
-	private void setupCSS(){
+	private void setupCSS(SVGPlot svgp){
 
 		Iterator<Cluster<Model>> iter = clustering.getAllClusters().iterator();
 		int clusterID = 0;
@@ -95,8 +95,8 @@ public class BubbleVisualizer<NV extends NumberVector<NV, N>, N extends Number> 
 			// just need to consume a cluster; creating IDs manually because cluster often return a null-ID.
 			iter.next();
 			clusterID+=1;
-
-			CSSClass bubble = visManager.createCSSClass(ShapeLibrary.BUBBLE + clusterID);
+			
+			CSSClass bubble = new CSSClass(svgp, ShapeLibrary.BUBBLE + clusterID);
 			bubble.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, "0.001");
 			
 			if (fill){
@@ -109,7 +109,15 @@ public class BubbleVisualizer<NV extends NumberVector<NV, N>, N extends Number> 
 				bubble.setStatement(SVGConstants.CSS_STROKE_VALUE, COLORS.getColor(clusterID));
 				bubble.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0");
 			}
-			visManager.registerCSSClass(bubble);
+			
+			// TODO: try/catch-structure is equal for almost all Visualizers, maybe put that into a superclass. 
+			try {
+        svgp.getCSSClassManager().addClass(bubble);
+        svgp.updateStyleElement();
+      }
+      catch(CSSNamingConflict e) {
+        LoggingUtil.exception("Equally-named CSSClass with different owner already exists", e);
+      }
 		}
 	}
 	
@@ -133,6 +141,8 @@ public class BubbleVisualizer<NV extends NumberVector<NV, N>, N extends Number> 
 
 	@Override
 	public Element visualize(SVGPlot svgp) {
+	  // TODO: We have to call this almost every time, maybe put it into a superclass.
+	  setupCSS(svgp);
 	  Element layer = ShapeLibrary.createSVG(svgp.getDocument());
 		Iterator<Cluster<Model>> iter = clustering.getAllClusters().iterator();
 		int clusterID = 0;

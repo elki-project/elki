@@ -47,5 +47,5 @@ public interface AlgorithmAdapter<O extends DatabaseObject> {
    * @param visManager the {@link VisualizationManager} needed by the provided
    *        {@link Visualizer}s.
    */
-  public void init(Database<O> database, Result result, VisualizationManager<O> visManager);
+  public void init(Database<O> database, Result result);
 }

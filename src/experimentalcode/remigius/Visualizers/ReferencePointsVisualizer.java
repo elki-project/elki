@@ -8,11 +8,12 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import experimentalcode.remigius.ShapeLibrary;
-import experimentalcode.remigius.VisualizationManager;
 
 public class ReferencePointsVisualizer<NV extends NumberVector<NV, N>, V extends FeatureVector<V,N>, N extends Number> extends PlanarVisualizer<NV, N> {
 
@@ -23,18 +24,23 @@ public class ReferencePointsVisualizer<NV extends NumberVector<NV, N>, V extends
 
 	}
 	
-	public void setup(Database<NV> database, CollectionResult<V> colResult, VisualizationManager<NV> visManager){
-		init(database, visManager, Integer.MAX_VALUE-2000, NAME);
+	public void setup(Database<NV> database, CollectionResult<V> colResult){
+		init(database, Integer.MAX_VALUE-2000, NAME);
 		this.colResult = colResult;
-		setupCSS();
 	}
 
-	private void setupCSS(){
+	private void setupCSS(SVGPlot svgp){
 
-			CSSClass refpoint = visManager.createCSSClass(ShapeLibrary.REFPOINT);
+			CSSClass refpoint = new CSSClass(svgp, ShapeLibrary.REFPOINT);
 			refpoint.setStatement(SVGConstants.CSS_FILL_PROPERTY, "red");
 
-			visManager.registerCSSClass(refpoint);
+			try {
+        svgp.getCSSClassManager().addClass(refpoint);
+        svgp.updateStyleElement();
+      }
+      catch(CSSNamingConflict e) {
+        LoggingUtil.exception("Equally-named CSSClass with different owner already exists", e);
+      }
 	}
 	
 	private Double getPositioned(V v, int dim){
@@ -43,6 +49,7 @@ public class ReferencePointsVisualizer<NV extends NumberVector<NV, N>, V extends
 
 	@Override
 	public Element visualize(SVGPlot svgp) {
+	  setupCSS(svgp);
 	  Element layer = ShapeLibrary.createSVG(svgp.getDocument());
 		Iterator<V> iter = colResult.iterator();
 		
