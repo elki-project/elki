@@ -3,7 +3,6 @@ package experimentalcode.remigius.Adapter;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
-import experimentalcode.remigius.VisualizationManager;
 import experimentalcode.remigius.Visualizers.AxisVisualizer;
 import experimentalcode.remigius.Visualizers.DotVisualizer;
 import experimentalcode.remigius.Visualizers.HistogramVisualizer;
@@ -30,10 +29,10 @@ public class DefaultAdapter<NV extends NumberVector<NV, N>, N extends Number> ex
 	}
 
 	@Override
-	protected void initVisualizer(Database<NV> database, Result result, VisualizationManager<NV> visManager) {
-		axisVisualizer.setup(database, visManager);
-		dotVisualizer.setup(database, visManager);
-		histoVisualizer.setup(database, result, visManager);
+	protected void initVisualizer(Database<NV> database, Result result) {
+		axisVisualizer.setup(database);
+		dotVisualizer.setup(database);
+		histoVisualizer.setup(database, result);
 		usableVisualizers.addAll(providedVisualizers);
 	}
 }

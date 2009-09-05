@@ -29,8 +29,8 @@ public abstract class NumberVectorVisualizer<NV extends NumberVector<NV, N>, N e
    * @param v used to receive and publish different information.
    * @param name a short name characterizing this Visualizer
    */
-  public void init(Database<NV> db, VisualizationManager<NV> v, String name) {
-    init(db, v, 0, name);
+  public void init(Database<NV> db, String name) {
+    init(db, 0, name);
   }
   
   /**
@@ -41,8 +41,8 @@ public abstract class NumberVectorVisualizer<NV extends NumberVector<NV, N>, N e
    * @param v used to receive and publish different information.
    * @param name a short name characterizing this Visualizer
    */
-  public void init(Database<NV> db, VisualizationManager<NV> v, int level, String name) {
-    super.init(db, v, 0, name);
+  public void init(Database<NV> db, int level, String name) {
+    super.init(db, 0, name);
     this.scales = Scales.calcScales(database);
   }
   

@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -20,9 +21,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import experimentalcode.remigius.ShapeLibrary;
-import experimentalcode.remigius.VisualizationManager;
 
 public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Number> extends ScalarVisualizer<NV, N>{
 
@@ -51,8 +52,8 @@ public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Numbe
     return remainingParameters;
   }
 
-  public void setup(Database<NV> database, Result result, VisualizationManager<NV> visManager) {
-    init(database, visManager, NAME);
+  public void setup(Database<NV> database, Result result) {
+    init(database, NAME);
     this.frac = 1. / database.size();
     this.result = result;
     setupClustering();
@@ -80,11 +81,18 @@ public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Numbe
   //    }
   //  }
 
-  private void setupCSS(int clusterID) {
-    CSSClass bin = visManager.createCSSClass(ShapeLibrary.BIN + clusterID);
+  private void setupCSS(SVGPlot svgp, int clusterID) {
+    CSSClass bin = new CSSClass(svgp, ShapeLibrary.BIN + clusterID);
     bin.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0.5");
     bin.setStatement(SVGConstants.CSS_FILL_PROPERTY, COLORS.getColor(clusterID));
-    visManager.registerCSSClass(bin);
+    
+    try {
+      svgp.getCSSClassManager().addClass(bin);
+      svgp.updateStyleElement();
+    }
+    catch(CSSNamingConflict e) {
+      LoggingUtil.exception("Equally-named CSSClass with different owner already exists", e);
+    }
   }
 
   @Override
@@ -102,7 +110,7 @@ public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Numbe
         hist.aggregate(database.get(id).getValue(dim).doubleValue(), frac);
       }
       hists.put(clusterID, hist);
-      setupCSS(clusterID);
+      setupCSS(svgp, clusterID);
     }
 
     // Visualizing

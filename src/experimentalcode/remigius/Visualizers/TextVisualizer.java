@@ -9,9 +9,9 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import experimentalcode.remigius.ShapeLibrary;
-import experimentalcode.remigius.VisualizationManager;
 import experimentalcode.remigius.gui.ToolTipListener;
 
 public class TextVisualizer<NV extends NumberVector<NV, N>, N extends Number> extends PlanarVisualizer<NV, N> {
@@ -22,18 +22,24 @@ public class TextVisualizer<NV extends NumberVector<NV, N>, N extends Number> ex
   public TextVisualizer() {
   }
 
-  public void setup(Database<NV> database, AnnotationResult<Double> anResult, VisualizationManager<NV> visManager) {
+  public void setup(Database<NV> database, AnnotationResult<Double> anResult) {
 
-    init(database, visManager, NAME);
+    init(database, NAME);
     this.anResult = anResult;
-    setupCSS();
   }
 
-  private void setupCSS() {
+  private void setupCSS(SVGPlot svgp) {
 
-    CSSClass tooltip = visManager.createCSSClass(ShapeLibrary.TOOLTIP);
+    CSSClass tooltip = new CSSClass(svgp, ShapeLibrary.TOOLTIP);
     tooltip.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, "0.1%");
-    visManager.registerCSSClass(tooltip);
+    
+    try {
+      svgp.getCSSClassManager().addClass(tooltip);
+      svgp.updateStyleElement();
+    }
+    catch(CSSNamingConflict e) {
+      LoggingUtil.exception("Equally-named CSSClass with different owner already exists", e);
+    }
   }
 
   private Double getValue(int id) {
@@ -43,7 +49,7 @@ public class TextVisualizer<NV extends NumberVector<NV, N>, N extends Number> ex
 
   @Override
   public Element visualize(SVGPlot svgp) {
-
+    setupCSS(svgp);
     Element layer = ShapeLibrary.createSVG(svgp.getDocument());
     
     for (int id : database.getIDs()) {
