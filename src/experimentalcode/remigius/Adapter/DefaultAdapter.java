@@ -30,9 +30,9 @@ public class DefaultAdapter<NV extends NumberVector<NV, N>, N extends Number> ex
 
 	@Override
 	protected void initVisualizer(Database<NV> database, Result result) {
-		axisVisualizer.setup(database);
-		dotVisualizer.setup(database);
-		histoVisualizer.setup(database, result);
+		axisVisualizer.init(database);
+		dotVisualizer.init(database);
+		histoVisualizer.init(database, result);
 		usableVisualizers.addAll(providedVisualizers);
 	}
 }

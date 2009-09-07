@@ -22,8 +22,7 @@ public class TextVisualizer<NV extends NumberVector<NV, N>, N extends Number> ex
   public TextVisualizer() {
   }
 
-  public void setup(Database<NV> database, AnnotationResult<Double> anResult) {
-
+  public void init(Database<NV> database, AnnotationResult<Double> anResult) {
     init(database, NAME);
     this.anResult = anResult;
   }

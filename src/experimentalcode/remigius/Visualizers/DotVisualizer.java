@@ -11,10 +11,7 @@ public class DotVisualizer<NV extends NumberVector<NV, N>, N extends Number> ext
   
   private static final String NAME = "Dots";
   
-	public DotVisualizer(){
-	}
-
-	public void setup(Database<NV> database){
+	public void init(Database<NV> database){
 		init(database, Integer.MAX_VALUE-1000, NAME);
 	}
 

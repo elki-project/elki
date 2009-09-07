@@ -25,7 +25,7 @@ public abstract class NumberVectorVisualizer<NV extends NumberVector<NV, N>, N e
   protected LinearScale[] scales;
 
   /**
-   * Convenience method, initializing the Visualizer with a default level of 0.
+   * Convenience method, initializing this Visualizer with a default level of 0.
    * 
    * @see #init(Database, VisualizationManager, int, String)
    * 
@@ -38,7 +38,7 @@ public abstract class NumberVectorVisualizer<NV extends NumberVector<NV, N>, N e
   }
 
   /**
-   * Initializes the Visualizer, especially its scales. <br>
+   * Initializes this Visualizer, especially its scales. <br>
    * This method acts as a replacement for the constructor, which can't take any
    * arguments due to restrictions imposed by the way parameters are collected.
    * 

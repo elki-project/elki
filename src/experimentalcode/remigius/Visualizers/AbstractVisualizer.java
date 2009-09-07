@@ -38,7 +38,7 @@ public abstract class AbstractVisualizer<O extends DatabaseObject> extends Abstr
   protected String name;
 
   /**
-   * Initializes the Visualizer.
+   * Initializes this Visualizer.
    * 
    * @param db contains all objects to be processed.
    * @param level indicates when to execute this Visualizer.
