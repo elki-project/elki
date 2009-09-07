@@ -13,33 +13,34 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 public interface Visualizer extends Parameterizable {
 
   /**
-   * Returns a Element representing a visualization.
+   * Returns an Element representing a visualization.
    * 
    * @param svgp the SVGPlot which will act as owner for the returned Element.
    * @param dimx the dimension to appear as horizontal (x-) dimension
    * @param dimy the dimension to appear as vertical (y-) dimension.
-   * @return an {@link Element} representing a 2-dimensional visualization..
+   * @return an Element representing a 2-dimensional visualization.
    */
   public Element visualize(SVGPlot svgp);
 
   /**
-   * Returns a short name for the visualizer. Intended to be used for displaying
-   * a representation of this Visualizer in the UI.
+   * Returns a <b>short</b> name for the visualizer. Intended to be used for
+   * displaying a representation of this Visualizer in the UI.
    * 
    * @return a short string characterizing the visualizer.
    */
   public String getName();
 
   /**
-   * Returns an integer describing on which level the Visualization should be
-   * placed. Lower numbers will result in a placing at the bottom, while higher
-   * numbers will result in a placing at the top. If more Visualizers have the
+   * Returns an integer indicating the "temporal position" of this Visualizer.
+   * It is intended to impose an ordering on the execution of Visualizers as a
+   * Visualizer may depend on another Visualizer running earlier. <br>
+   * Lower numbers should result in a earlier use of this Visualizer, while
+   * higher numbers should result in a later use. If more Visualizers have the
    * same level, no ordering is guaranteed. <br>
    * Note that this value is only a recommendation, as it is totally up to the
    * framework do ignore it.
    * 
-   * @return an integer describing on which level the Visualization should be
-   *         placed.
+   * @return an integer indicating the "temporal position" of this Visualizer.
    */
   public int getLevel();
 }

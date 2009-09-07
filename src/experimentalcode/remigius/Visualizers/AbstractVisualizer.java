@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.visualization.colors.PropertiesBasedColorLibrary;
  * 
  * @author Remigius Wojdanowski
  * 
- * @param <O> the type of object this visualizer will process.
+ * @param <O> the type of object this Visualizer will process.
  */
 public abstract class AbstractVisualizer<O extends DatabaseObject> extends AbstractParameterizable implements Visualizer {
 
@@ -20,29 +20,28 @@ public abstract class AbstractVisualizer<O extends DatabaseObject> extends Abstr
    */
   protected Database<O> database;
 
-
   /**
    * Provides colors which can be used by elements of the visualization.
    */
   protected static final ColorLibrary COLORS = new PropertiesBasedColorLibrary();
 
   /**
-   * Indicates on which level the visualization will be placed.
+   * Indicates when to execute this Visualizer.
+   * @see #getLevel()
    */
   private int level;
 
   /**
    * Short characterization of this Visualizer.
+   * @see #getName()
    */
-  private String name;
+  protected String name;
 
   /**
-   * Initializes the Visualizer. <br>
-   * Note that calling only this method might not be sufficient to be able to
-   * run a visualizer.
+   * Initializes the Visualizer.
    * 
    * @param db contains all objects to be processed.
-   * @param v used to receive and publish different information.
+   * @param level indicates when to execute this Visualizer.
    * @param name a short name characterizing this Visualizer
    */
   public void init(Database<O> db, int level, String name) {
