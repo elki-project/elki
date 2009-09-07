@@ -62,7 +62,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, N>, N extends Number> 
 		addOption(CUTOFF_PARAM);
 	}
 	
-	public void setup(Database<NV> database, AnnotationResult<Double> anResult, Result result, DoubleScale normalizationScale){
+	public void init(Database<NV> database, AnnotationResult<Double> anResult, Result result, DoubleScale normalizationScale){
 		init(database, 1000, NAME);
 		this.anResult = anResult;
 		this.result = result;

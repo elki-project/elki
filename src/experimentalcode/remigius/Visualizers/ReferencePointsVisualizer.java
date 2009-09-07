@@ -24,7 +24,7 @@ public class ReferencePointsVisualizer<NV extends NumberVector<NV, N>, V extends
 
 	}
 	
-	public void setup(Database<NV> database, CollectionResult<V> colResult){
+	public void init(Database<NV> database, CollectionResult<V> colResult){
 		init(database, Integer.MAX_VALUE-2000, NAME);
 		this.colResult = colResult;
 	}
