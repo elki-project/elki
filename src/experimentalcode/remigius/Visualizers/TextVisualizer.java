@@ -14,24 +14,71 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import experimentalcode.remigius.ShapeLibrary;
 import experimentalcode.remigius.gui.ToolTipListener;
 
+/**
+ * Generates a SVG-Element containing ToolTips. ToolTips remain invisible
+ * until their corresponding Marker is touched by the cursor and stay visible as
+ * long as the cursor lingers on the marker. This implementation uses
+ * {@link ToolTipListener} to achieve this behavior.
+ * 
+ * @see ToolTipListener
+ * 
+ * @author Remigius Wojdanowski
+ * 
+ * @param <NV>
+ * @param <N>
+ */
 public class TextVisualizer<NV extends NumberVector<NV, N>, N extends Number> extends PlanarVisualizer<NV, N> {
 
-  private AnnotationResult<Double> anResult;
+  /**
+   * A short name characterizing this Visualizer.
+   */
   private static final String NAME = "ToolTips";
-  
-  public TextVisualizer() {
+
+  /**
+   * Contains the "outlierness-scores" to be displayed as ToolTips. If this
+   * result does not contain <b>all</b> IDs the database contains,
+   * behavior is undefined.
+   */
+  private AnnotationResult<Double> anResult;
+
+  @Override
+  public int getLevel() {
+    return Integer.MAX_VALUE;
   }
 
+  /**
+   * Returns the outlierness-score for a given ID. If there is no corresponding
+   * score, behavior is undefined.
+   * 
+   * @param id an ID which has to exist in both the database and the result.
+   * @return the outlierness-score for a given ID.
+   */
+  private Double getValue(int id) {
+
+    return anResult.getValueFor(id);
+  }
+
+  /**
+   * Initializes this Visualizer.
+   * 
+   * @param database contains all objects to be processed.
+   * @param anResult contains "outlierness-scores", corresponding to the database.
+   */
   public void init(Database<NV> database, AnnotationResult<Double> anResult) {
     init(database, NAME);
     this.anResult = anResult;
   }
 
+  /**
+   * Registers the ToolTip-CSS-Class at a SVGPlot.
+   * 
+   * @param svgp the SVGPlot to register the ToolTip-CSS-Class.
+   */
   private void setupCSS(SVGPlot svgp) {
 
     CSSClass tooltip = new CSSClass(svgp, ShapeLibrary.TOOLTIP);
     tooltip.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, "0.1%");
-    
+
     try {
       svgp.getCSSClassManager().addClass(tooltip);
       svgp.updateStyleElement();
@@ -40,44 +87,31 @@ public class TextVisualizer<NV extends NumberVector<NV, N>, N extends Number> ex
       LoggingUtil.exception("Equally-named CSSClass with different owner already exists", e);
     }
   }
-
-  private Double getValue(int id) {
-
-    return anResult.getValueFor(id);
-  }
-
+  
   @Override
   public Element visualize(SVGPlot svgp) {
     setupCSS(svgp);
     Element layer = ShapeLibrary.createSVG(svgp.getDocument());
-    
-    for (int id : database.getIDs()) {
-      Element tooltip = ShapeLibrary.createToolTip(svgp.getDocument(),
-          getPositioned(database.get(id), dimx), (1 - getPositioned(
-              database.get(id), dimy)), getValue(id), id, dimx,
-              dimy, toString());
+
+    for(int id : database.getIDs()) {
+      Element tooltip = ShapeLibrary.createToolTip(svgp.getDocument(), getPositioned(database.get(id), dimx), (1 - getPositioned(database.get(id), dimy)), getValue(id), id, dimx, dimy, toString());
 
       String dotID = ShapeLibrary.createID(ShapeLibrary.MARKER, id, dimx, dimy);
 
       Element dot = svgp.getIdElement(dotID);
-      if (dot != null){
+      if(dot != null) {
         EventTarget targ = (EventTarget) dot;
         ToolTipListener hoverer = new ToolTipListener(svgp.getDocument(), tooltip.getAttribute("id"));
         targ.addEventListener(SVGConstants.SVG_MOUSEOVER_EVENT_TYPE, hoverer, false);
         targ.addEventListener(SVGConstants.SVG_MOUSEOUT_EVENT_TYPE, hoverer, false);
         targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, hoverer, false);
-      } else {
+      }
+      else {
         LoggingUtil.message("Attaching ToolTip to non-existing Object: " + dotID);
       }
-
 
       layer.appendChild(tooltip);
     }
     return layer;
-  }
-
-  @Override
-  public int getLevel(){
-    return Integer.MAX_VALUE;
   }
 }

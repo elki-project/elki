@@ -29,134 +29,267 @@ import experimentalcode.lisa.scale.GammaFunction;
 import experimentalcode.lisa.scale.LinearScale;
 import experimentalcode.remigius.ShapeLibrary;
 
+/**
+ * Generates a SVG-Element containing bubbles. A Bubble is a circle visualizing
+ * an outlierness-score, with its center at the position of the visualized
+ * object and its radius depending on the objects score.
+ * 
+ * @author Remigius Wojdanowski
+ * 
+ * @param <NV>
+ * @param <N>
+ */
 public class BubbleVisualizer<NV extends NumberVector<NV, N>, N extends Number> extends PlanarVisualizer<NV, N> {
-	
-	public static final OptionID GAMMA_ID = OptionID.getOrCreateOptionID("bubble.gamma", "gamma-correction");
-	private final DoubleParameter GAMMA_PARAM = new DoubleParameter(GAMMA_ID, 1.0);
-	private Double gamma;
-	
-	public static final OptionID FILL_ID = OptionID.getOrCreateOptionID("bubble.fill", "fill");
-	private final Flag FILL_FLAG = new Flag(FILL_ID);
-	private Boolean fill;
-	
-	public static final OptionID CUTOFF_ID = OptionID.getOrCreateOptionID("bubble.cutoff", "cut-off");
-	private final DoubleParameter CUTOFF_PARAM = new DoubleParameter(CUTOFF_ID, 0.0);
+
+  /**
+   * OptionID for {@link #GAMMA_PARAM}.
+   */
+  public static final OptionID GAMMA_ID = OptionID.getOrCreateOptionID("bubble.gamma", "A gamma-correction.");
+
+  /**
+   * Parameter for the gamma-correction.
+   * 
+   * <p>
+   * Key: {@code -bubble.gamma}
+   * </p>
+   * 
+   * <p>
+   * Default value: 1.0
+   * < /p>
+   */
+  private final DoubleParameter GAMMA_PARAM = new DoubleParameter(GAMMA_ID, 1.0);
+
+  /**
+   * Gamma parameter.
+   */
+  private Double gamma;
+
+  /**
+   * OptionID for {@link #FILL_FLAG}.
+   */
+  public static final OptionID FILL_ID = OptionID.getOrCreateOptionID("bubble.fill", "Half-transparent filling of bubbles.");
+
+  /**
+   * Flag for half-transparent filling of bubbles.
+   * 
+   * <p>
+   * Key: {@code -bubble.fill}
+   * </p>
+   */
+  private final Flag FILL_FLAG = new Flag(FILL_ID);
+
+  /**
+   * Fill parameter.
+   */
+  private Boolean fill;
+
+  /**
+   * OptionID for {@link #CUTOFF_PARAM}.
+   */
+  public static final OptionID CUTOFF_ID = OptionID.getOrCreateOptionID("bubble.cutoff", "Cut-off on normalized data.");
+
+  /**
+   * Parameter for the cutoff on normalized data. <br>
+   * Negative values will have the same effect as 0 (no cut-off at all), while
+   * values &gt; 1.0 will have the same effect as 1.0 (cut off everything).
+   * 
+   * <p>
+   * Key: {@code -bubble.cutoff}
+   * </p>
+   * 
+   * <p>
+   * Default value: 0.0
+   * < /p>
+   */
+  private final DoubleParameter CUTOFF_PARAM = new DoubleParameter(CUTOFF_ID, 0.0);
+
+  /**
+   * Cut-off parameter.
+   */
   private Double cutOff;
-	
-	
-	private DoubleScale normalizationScale;
-	private DoubleScale plotScale;
-	private GammaFunction gammaFunction;
-	private CutOffScale cutOffScale;
 
-	private AnnotationResult<Double> anResult;
-	private Result result;
+  /**
+   * Used for normalizing coordinates.
+   */
+  private DoubleScale normalizationScale;
 
-	private Clustering<Model> clustering;
-	
-	private static final String NAME = "Bubbles";
+  /**
+   * TODO: Find out & document what this scale was for. I can't remember, but it
+   * seems essential.
+   */
+  private DoubleScale plotScale;
 
-	public BubbleVisualizer(){
-		addOption(GAMMA_PARAM);
-		addOption(FILL_FLAG);
-		addOption(CUTOFF_PARAM);
-	}
-	
-	public void init(Database<NV> database, AnnotationResult<Double> anResult, Result result, DoubleScale normalizationScale){
-		init(database, 1000, NAME);
-		this.anResult = anResult;
-		this.result = result;
+  /**
+   * Used for Gamma-Correction.
+   * 
+   * TODO: Make the gamma-function exchangeable (inc. Parameter etc.).
+   */
+  private GammaFunction gammaFunction;
 
-		this.normalizationScale = normalizationScale;
-		this.plotScale = new LinearScale();
-		this.gammaFunction = new GammaFunction(gamma);
-		this.cutOffScale = new CutOffScale(cutOff);
-		
-		setupClustering();
-	}
-	
-	private void setupClustering(){
-		List<Clustering<?>> clusterings = ResultUtil.getClusteringResults(result);
+  /**
+   * Used for cut-off on normalized data.
+   * 
+   * @see #CUTOFF_ID
+   * @see #CUTOFF_PARAM
+   * @see #cutOff
+   */
+  private CutOffScale cutOffScale;
 
-		if (clusterings != null && clusterings.size() > 0) {
-			clustering = (Clustering<Model>) clusterings.get(0);
-		} else {
-			clustering = new ByLabelClustering<NV>().run(database);
-		}
-	}
+  /**
+   * Contains the "outlierness-scores" to be displayed as ToolTips. If this
+   * result does not contain <b>all</b> IDs the database contains, behavior is
+   * undefined.
+   */
+  private AnnotationResult<Double> anResult;
 
-	private void setupCSS(SVGPlot svgp){
+  /**
+   * The complete Result, as returned by an algorithm.
+   * 
+   * TODO: We don't need the whole result. In fact, it only serves a clustering,
+   * which should be searched outside of the Visualizer and set by
+   * {@link #init(Database, AnnotationResult, Result, DoubleScale)}
+   */
+  private Result result;
 
-		Iterator<Cluster<Model>> iter = clustering.getAllClusters().iterator();
-		int clusterID = 0;
+  /**
+   * A clustering of the database's objects.
+   */
+  private Clustering<Model> clustering;
 
-		while (iter.hasNext()){
+  /**
+   * A short name characterizing this Visualizer.
+   */
+  private static final String NAME = "Bubbles";
 
-			// just need to consume a cluster; creating IDs manually because cluster often return a null-ID.
-			iter.next();
-			clusterID+=1;
-			
-			CSSClass bubble = new CSSClass(svgp, ShapeLibrary.BUBBLE + clusterID);
-			bubble.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, "0.001");
-			
-			if (fill){
-				// fill bubbles
-				bubble.setStatement(SVGConstants.CSS_FILL_PROPERTY, COLORS.getColor(clusterID));
-				bubble.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0.5");
-			} else {
-				// or don't fill them.
-			  // for diamond-shaped strokes, see bugs.sun.com, bug ID 6294396  
-				bubble.setStatement(SVGConstants.CSS_STROKE_VALUE, COLORS.getColor(clusterID));
-				bubble.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0");
-			}
-			
-			// TODO: try/catch-structure is equal for almost all Visualizers, maybe put that into a superclass. 
-			try {
+  /**
+   * The default constructor only registers parameters.
+   */
+  public BubbleVisualizer() {
+    addOption(GAMMA_PARAM);
+    addOption(FILL_FLAG);
+    addOption(CUTOFF_PARAM);
+  }
+
+  /**
+   * Initializes this Visualizer.
+   * 
+   * @param database contains all objects to be processed.
+   * @param anResult contains "outlierness-scores", corresponding to the
+   *        database.
+   * @param result complete result for further information.
+   * @param normalizationScale
+   */
+  public void init(Database<NV> database, AnnotationResult<Double> anResult, Result result, DoubleScale normalizationScale) {
+    init(database, 1000, NAME);
+    this.anResult = anResult;
+    this.result = result;
+
+    this.normalizationScale = normalizationScale;
+    this.plotScale = new LinearScale();
+    this.gammaFunction = new GammaFunction(gamma);
+    this.cutOffScale = new CutOffScale(cutOff);
+
+    setupClustering();
+  }
+
+  /**
+   * Finds or creates a clustering of the database's objects.
+   */
+  private void setupClustering() {
+    List<Clustering<?>> clusterings = ResultUtil.getClusteringResults(result);
+
+    if(clusterings != null && clusterings.size() > 0) {
+      clustering = (Clustering<Model>) clusterings.get(0);
+    }
+    else {
+      clustering = new ByLabelClustering<NV>().run(database);
+    }
+  }
+
+  /**
+   * Registers the Bubble-CSS-Class at a SVGPlot. This class depends on the
+   * {@link #FILL_FLAG}.
+   * 
+   * @param svgp the SVGPlot to register the ToolTip-CSS-Class.
+   */
+  private void setupCSS(SVGPlot svgp) {
+
+    Iterator<Cluster<Model>> iter = clustering.getAllClusters().iterator();
+    int clusterID = 0;
+
+    while(iter.hasNext()) {
+
+      // just need to consume a cluster; creating IDs manually because cluster
+      // often return a null-ID.
+      iter.next();
+      clusterID += 1;
+
+      CSSClass bubble = new CSSClass(svgp, ShapeLibrary.BUBBLE + clusterID);
+      bubble.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, "0.001");
+
+      if(fill) {
+        // fill bubbles
+        bubble.setStatement(SVGConstants.CSS_FILL_PROPERTY, COLORS.getColor(clusterID));
+        bubble.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0.5");
+      }
+      else {
+        // or don't fill them.
+        // for diamond-shaped strokes, see bugs.sun.com, bug ID 6294396
+        bubble.setStatement(SVGConstants.CSS_STROKE_VALUE, COLORS.getColor(clusterID));
+        bubble.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0");
+      }
+
+      // TODO: try/catch-structure is equal for almost all Visualizers, maybe
+      // put that into a superclass.
+      try {
         svgp.getCSSClassManager().addClass(bubble);
         svgp.updateStyleElement();
       }
       catch(CSSNamingConflict e) {
         LoggingUtil.exception("Equally-named CSSClass with different owner already exists", e);
       }
-		}
-	}
-	
-	@Override
-	public List<String> setParameters(List<String> args) throws ParameterException {
-		List<String> remainingParameters = super.setParameters(args);
-		gamma = GAMMA_PARAM.getValue();
-		fill = FILL_FLAG.getValue();
-		cutOff = CUTOFF_PARAM.getValue();
-		rememberParametersExcept(args, remainingParameters);
-		return remainingParameters;
-	}
+    }
+  }
 
-	private Double getValue(int id){
-		return anResult.getValueFor(id);
-	}
+  @Override
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
+    gamma = GAMMA_PARAM.getValue();
+    fill = FILL_FLAG.getValue();
+    cutOff = CUTOFF_PARAM.getValue();
+    rememberParametersExcept(args, remainingParameters);
+    return remainingParameters;
+  }
 
-	private Double getScaled(Double d){
-		return plotScale.getScaled(gammaFunction.getScaled(cutOffScale.getScaled(normalizationScale.getScaled(d))));
-	}
+  private Double getValue(int id) {
+    return anResult.getValueFor(id);
+  }
 
-	@Override
-	public Element visualize(SVGPlot svgp) {
-	  // TODO: We have to call this almost every time, maybe put it into a superclass.
-	  setupCSS(svgp);
-	  Element layer = ShapeLibrary.createSVG(svgp.getDocument());
-		Iterator<Cluster<Model>> iter = clustering.getAllClusters().iterator();
-		int clusterID = 0;
+  /**
+   * Convenience method to apply scalings in the right order.
+   * 
+   * @param d representing a outlierness-score to be scaled.
+   * @return a Double representing a outlierness-score, after it has modified by
+   *         the given scales.
+   */
+  private Double getScaled(Double d) {
+    return plotScale.getScaled(gammaFunction.getScaled(cutOffScale.getScaled(normalizationScale.getScaled(d))));
+  }
 
-		while (iter.hasNext()){
-			Cluster<Model> cluster = iter.next();
-			clusterID+=1;
-			for (int id : cluster.getIDs()){
-				layer.appendChild(
-						ShapeLibrary.createBubble(svgp.getDocument(), getPositioned(database.get(id), dimx), 1 - getPositioned(database.get(id), dimy),
-								getScaled(getValue(id)), clusterID, id, dimx, dimy, toString())
-				);
-			}
-		}
-		return layer;
-	}
+  @Override
+  public Element visualize(SVGPlot svgp) {
+    setupCSS(svgp);
+    Element layer = ShapeLibrary.createSVG(svgp.getDocument());
+    Iterator<Cluster<Model>> iter = clustering.getAllClusters().iterator();
+    int clusterID = 0;
+
+    while(iter.hasNext()) {
+      Cluster<Model> cluster = iter.next();
+      clusterID += 1;
+      for(int id : cluster.getIDs()) {
+        layer.appendChild(ShapeLibrary.createBubble(svgp.getDocument(), getPositioned(database.get(id), dimx), 1 - getPositioned(database.get(id), dimy), getScaled(getValue(id)), clusterID, id, dimx, dimy, toString()));
+      }
+    }
+    return layer;
+  }
 }

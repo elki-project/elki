@@ -38,7 +38,7 @@ public interface Visualizer extends Parameterizable {
    * higher numbers should result in a later use. If more Visualizers have the
    * same level, no ordering is guaranteed. <br>
    * Note that this value is only a recommendation, as it is totally up to the
-   * framework do ignore it.
+   * framework to ignore it.
    * 
    * @return an integer indicating the "temporal position" of this Visualizer.
    */

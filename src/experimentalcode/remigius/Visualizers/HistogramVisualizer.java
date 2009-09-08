@@ -25,8 +25,16 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import experimentalcode.remigius.ShapeLibrary;
 
+/**
+ * Generates a SVG-Element containing a histogram representing the distribution of the database's objects.
+ * 
+ * @author Remigius Wojdanowski
+ * 
+ * @param <NV>
+ * @param <N>
+ */
 public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Number> extends ScalarVisualizer<NV, N> {
-
+  
   public static final OptionID STYLE_ROW_ID = OptionID.getOrCreateOptionID("histogram.row", "Alternative style: Rows.");
 
   private final Flag STYLE_ROW_PARAM = new Flag(STYLE_ROW_ID);
