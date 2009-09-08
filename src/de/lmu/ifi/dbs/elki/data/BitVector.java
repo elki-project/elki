@@ -12,7 +12,7 @@ import java.util.Random;
  * 
  * @author Arthur Zimek
  */
-public class BitVector extends NumberVector<BitVector, Bit> {
+public class BitVector extends AbstractNumberVector<BitVector, Bit> {
   /**
    * Storing the bits.
    */
@@ -96,7 +96,7 @@ public class BitVector extends NumberVector<BitVector, Bit> {
    * @param random an instance of random to facilitate random values
    * @return a new instance of this BitVector with random values
    * 
-   * @see de.lmu.ifi.dbs.elki.data.FeatureVector#randomInstance(java.util.Random)
+   * @see de.lmu.ifi.dbs.elki.data.NumberVector#randomInstance(java.util.Random)
    */
   public BitVector randomInstance(Random random) {
     Bit[] randomBits = new Bit[getDimensionality()];
@@ -136,7 +136,7 @@ public class BitVector extends NumberVector<BitVector, Bit> {
    * The dimensionality of the binary vector space of which this BitVector is an
    * element.
    * 
-   * @see de.lmu.ifi.dbs.elki.data.FeatureVector#getDimensionality()
+   * @see de.lmu.ifi.dbs.elki.data.NumberVector#getDimensionality()
    */
   public int getDimensionality() {
     return dimensionality;
@@ -149,7 +149,7 @@ public class BitVector extends NumberVector<BitVector, Bit> {
    *        <code>this.getDimensionality()</code>
    * @return the value in the specified dimension
    * 
-   * @see de.lmu.ifi.dbs.elki.data.FeatureVector#getValue(int)
+   * @see de.lmu.ifi.dbs.elki.data.NumberVector#getValue(int)
    */
   public Bit getValue(int dimension) {
     if(dimension < 1 || dimension > dimensionality) {
@@ -167,7 +167,7 @@ public class BitVector extends NumberVector<BitVector, Bit> {
    *         <code>getDimensionality()</code> rows the values of this BitVector
    *         as double values
    * 
-   * @see de.lmu.ifi.dbs.elki.data.FeatureVector#getColumnVector()
+   * @see de.lmu.ifi.dbs.elki.data.NumberVector#getColumnVector()
    */
   public Vector getColumnVector() {
     double[] values = new double[dimensionality];
@@ -186,7 +186,7 @@ public class BitVector extends NumberVector<BitVector, Bit> {
    *         <code>getDimensionality()</code> columns the values of this
    *         BitVector as double values
    * 
-   * @see de.lmu.ifi.dbs.elki.data.FeatureVector#getRowVector()
+   * @see de.lmu.ifi.dbs.elki.data.NumberVector#getRowVector()
    */
   public Matrix getRowVector() {
     double[] values = new double[dimensionality];

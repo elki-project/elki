@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.database;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
@@ -389,11 +389,11 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     Iterator<Integer> iter = this.iterator();
     if(iter.hasNext()) {
       O entry = this.get(iter.next());
-      if(entry instanceof FeatureVector) {
-        return ((FeatureVector<?, ?>) entry).getDimensionality();
+      if(entry instanceof NumberVector) {
+        return ((NumberVector<?, ?>) entry).getDimensionality();
       }
       else {
-        throw new UnsupportedOperationException("Database entries are not implementing interface " + FeatureVector.class.getName() + ".");
+        throw new UnsupportedOperationException("Database entries are not implementing interface " + NumberVector.class.getName() + ".");
       }
     }
     else {

@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries;
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 
 /**
@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
  * @author Thomas Bernecker
  * @param <V> the type of FeatureVector to compute the distances in between
  */
-public class DTWDistanceFunction<V extends FeatureVector<V, ?>>
+public class DTWDistanceFunction<V extends NumberVector<V, ?>>
     extends AbstractEditDistanceFunction<V> {
 
 	/**

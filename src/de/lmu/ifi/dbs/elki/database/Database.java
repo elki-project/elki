@@ -314,11 +314,11 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
   
   /**
    * Returns the dimensionality of the data contained by this database
-   * in case of {@link Database O} extends {@link de.lmu.ifi.dbs.elki.data.FeatureVector FeatureVector}.
+   * in case of {@link Database O} extends {@link de.lmu.ifi.dbs.elki.data.NumberVector FeatureVector}.
    *
    * @return the dimensionality of the data contained by this database
    *         in case of O extends FeatureVector
-   * @throws UnsupportedOperationException if {@link Database O} does not extend {@link de.lmu.ifi.dbs.elki.data.FeatureVector FeatureVector}
+   * @throws UnsupportedOperationException if {@link Database O} does not extend {@link de.lmu.ifi.dbs.elki.data.NumberVector FeatureVector}
    *                                       or the database is empty
    */
   public int dimensionality() throws UnsupportedOperationException;

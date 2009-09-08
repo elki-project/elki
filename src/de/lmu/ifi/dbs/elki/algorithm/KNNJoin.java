@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.KNNList;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.progress.IndefiniteProgress;
  * @param <N> the type of node used in the spatial index structure
  * @param <E> the type of entry used in the spatial node
  */
-public class KNNJoin<V extends FeatureVector<V, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry>
+public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry>
     extends DistanceBasedAlgorithm<V, D, AnnotationFromHashMap<KNNList<D>>> {
 
     /**

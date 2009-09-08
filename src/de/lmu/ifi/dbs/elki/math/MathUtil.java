@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.math;
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
@@ -50,7 +50,7 @@ public class MathUtil {
    * @param y second FeatureVector
    * @return the Pearson product-moment correlation coefficient for x and y
    */
-  public static <V extends FeatureVector<V, N>, N extends Number> double pearsonCorrelationCoefficient(FeatureVector<V,N> x, FeatureVector<V,N> y){
+  public static <V extends NumberVector<V, N>, N extends Number> double pearsonCorrelationCoefficient(NumberVector<V,N> x, NumberVector<V,N> y){
     if(x.getDimensionality()!=y.getDimensionality()){
       throw new IllegalArgumentException("Invalid arguments: feature vectors differ in dimensionality.");
     }

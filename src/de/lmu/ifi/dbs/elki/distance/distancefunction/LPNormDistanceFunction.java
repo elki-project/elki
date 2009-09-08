@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * @param <V> the type of FeatureVector to compute the distances in between
  * @param <N> number type TODO: implement SpatialDistanceFunction
  */
-public class LPNormDistanceFunction<V extends FeatureVector<V, N>, N extends Number> extends AbstractDoubleDistanceFunction<V> {
+public class LPNormDistanceFunction<V extends NumberVector<V, N>, N extends Number> extends AbstractDoubleDistanceFunction<V> {
 
   /**
    * OptionID for {@link #P_PARAM}

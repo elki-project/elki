@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar;
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
  * @author Elke Achtert 
  * @param <O> Object type
  */
-public class RStarTree<O extends FeatureVector<O,? >> extends NonFlatRStarTree<O, RStarTreeNode, SpatialEntry> {
+public class RStarTree<O extends NumberVector<O,? >> extends NonFlatRStarTree<O, RStarTreeNode, SpatialEntry> {
 
   /**
    * Creates a new RStar-Tree.

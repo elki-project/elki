@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.flat;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
  * @author Elke Achtert 
  * @param <O> object type
  */
-public final class FlatRStarTree<O extends FeatureVector<O,? >> extends AbstractRStarTree<O, FlatRStarTreeNode, SpatialEntry> {
+public final class FlatRStarTree<O extends NumberVector<O,? >> extends AbstractRStarTree<O, FlatRStarTreeNode, SpatialEntry> {
 
   /**
    * The root of this flat RTree.

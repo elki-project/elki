@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.adapter;
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 
 /**
@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
  *
  * @param <V> Vector class to process.
  */
-public class SimilarityAdapterArccos<V extends FeatureVector<V,?>> extends SimilarityAdapterAbstract<V> {
+public class SimilarityAdapterArccos<V extends NumberVector<V,?>> extends SimilarityAdapterAbstract<V> {
   /**
    * Distance implementation
    */

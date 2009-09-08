@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * @author Simon Paradies
  * @param <O> vector type
  */
-public class FooKernelFunction<O extends FeatureVector<?,?>> extends AbstractDoubleKernelFunction<O>{
+public class FooKernelFunction<O extends NumberVector<?,?>> extends AbstractDoubleKernelFunction<O>{
 
 	/**
 	 * The default max_degree.

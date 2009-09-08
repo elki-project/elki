@@ -25,7 +25,7 @@ import java.util.Random;
  * 
  * @author Arthur Zimek
  */
-public class SparseFloatVector extends RealVector<SparseFloatVector, Float> {
+public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, Float> implements RealVector<SparseFloatVector, Float> {
 
   /**
    * Mapping of indices and corresponding values. Only non-zero values will to
@@ -105,7 +105,7 @@ public class SparseFloatVector extends RealVector<SparseFloatVector, Float> {
   }
 
   /**
-   * @see de.lmu.ifi.dbs.elki.data.FeatureVector#newInstance(java.util.List)
+   * @see de.lmu.ifi.dbs.elki.data.NumberVector#newInstance(java.util.List)
    */
   @Override
   public SparseFloatVector newInstance(List<Float> values) {
@@ -114,7 +114,7 @@ public class SparseFloatVector extends RealVector<SparseFloatVector, Float> {
 
   /**
    * 
-   * @see de.lmu.ifi.dbs.elki.data.FeatureVector#newInstance(Number[])
+   * @see de.lmu.ifi.dbs.elki.data.NumberVector#newInstance(Number[])
    */
   public SparseFloatVector newInstance(Float[] values) {
     return new SparseFloatVector(Util.unboxToFloat(values));
@@ -122,7 +122,7 @@ public class SparseFloatVector extends RealVector<SparseFloatVector, Float> {
 
   /**
    * 
-   * @see de.lmu.ifi.dbs.elki.data.FeatureVector#randomInstance(java.util.Random)
+   * @see de.lmu.ifi.dbs.elki.data.NumberVector#randomInstance(java.util.Random)
    */
   public SparseFloatVector randomInstance(Random random) {
     return randomInstance(0.0f, 1.0f, random);
@@ -130,7 +130,7 @@ public class SparseFloatVector extends RealVector<SparseFloatVector, Float> {
 
   /**
    * 
-   * @see de.lmu.ifi.dbs.elki.data.FeatureVector#randomInstance(java.lang.Number, java.lang.Number, java.util.Random)
+   * @see de.lmu.ifi.dbs.elki.data.NumberVector#randomInstance(java.lang.Number, java.lang.Number, java.util.Random)
    */
   public SparseFloatVector randomInstance(Float min, Float max, Random random) {
     float[] randomValues = new float[dimensionality];
@@ -142,8 +142,8 @@ public class SparseFloatVector extends RealVector<SparseFloatVector, Float> {
 
   /**
    * 
-   * @see de.lmu.ifi.dbs.elki.data.FeatureVector#randomInstance(de.lmu.ifi.dbs.elki.data.FeatureVector,
-   *      de.lmu.ifi.dbs.elki.data.FeatureVector, java.util.Random)
+   * @see de.lmu.ifi.dbs.elki.data.NumberVector#randomInstance(de.lmu.ifi.dbs.elki.data.NumberVector,
+   *      de.lmu.ifi.dbs.elki.data.NumberVector, java.util.Random)
    */
   public SparseFloatVector randomInstance(SparseFloatVector min, SparseFloatVector max, Random random) {
     float[] randomValues = new float[dimensionality];
@@ -173,7 +173,7 @@ public class SparseFloatVector extends RealVector<SparseFloatVector, Float> {
 
   /**
    * 
-   * @see de.lmu.ifi.dbs.elki.data.FeatureVector#getValue(int)
+   * @see de.lmu.ifi.dbs.elki.data.NumberVector#getValue(int)
    */
   public Float getValue(int dimension) {
     Float d = values.get(dimension);
@@ -187,7 +187,7 @@ public class SparseFloatVector extends RealVector<SparseFloatVector, Float> {
 
   /**
    * 
-   * @see de.lmu.ifi.dbs.elki.data.FeatureVector#getColumnVector()
+   * @see de.lmu.ifi.dbs.elki.data.NumberVector#getColumnVector()
    */
   public Vector getColumnVector() {
     double[] values = getValues();
@@ -196,7 +196,7 @@ public class SparseFloatVector extends RealVector<SparseFloatVector, Float> {
 
   /**
    * 
-   * @see de.lmu.ifi.dbs.elki.data.FeatureVector#getRowVector()
+   * @see de.lmu.ifi.dbs.elki.data.NumberVector#getRowVector()
    */
   public Matrix getRowVector() {
     double[] values = getValues();
@@ -205,7 +205,7 @@ public class SparseFloatVector extends RealVector<SparseFloatVector, Float> {
 
   /**
    * 
-   * @see de.lmu.ifi.dbs.elki.data.FeatureVector#plus(de.lmu.ifi.dbs.elki.data.FeatureVector)
+   * @see de.lmu.ifi.dbs.elki.data.NumberVector#plus(de.lmu.ifi.dbs.elki.data.NumberVector)
    */
   public SparseFloatVector plus(SparseFloatVector fv) {
     if(fv.getDimensionality() != this.getDimensionality()) {
@@ -226,7 +226,7 @@ public class SparseFloatVector extends RealVector<SparseFloatVector, Float> {
 
   /**
    * 
-   * @see de.lmu.ifi.dbs.elki.data.FeatureVector#nullVector()
+   * @see de.lmu.ifi.dbs.elki.data.NumberVector#nullVector()
    */
   public SparseFloatVector nullVector() {
     return new SparseFloatVector(new HashMap<Integer, Float>(), dimensionality);
@@ -234,7 +234,7 @@ public class SparseFloatVector extends RealVector<SparseFloatVector, Float> {
 
   /**
    * 
-   * @see de.lmu.ifi.dbs.elki.data.FeatureVector#negativeVector()
+   * @see de.lmu.ifi.dbs.elki.data.NumberVector#negativeVector()
    */
   public SparseFloatVector negativeVector() {
     return multiplicate(-1);
@@ -284,7 +284,7 @@ public class SparseFloatVector extends RealVector<SparseFloatVector, Float> {
    * {@link SparseFloatVectorLabelParser}.</p>
    * 
    * <p>The returned String is a single line with entries separated by
-   * {@link NumberVector#ATTRIBUTE_SEPARATOR}. The first entry gives the number
+   * {@link AbstractNumberVector#ATTRIBUTE_SEPARATOR}. The first entry gives the number
    * of values actually not zero. Following entries are pairs of Integer and
    * Float where the Integer gives the index of the dimensionality and the Float
    * gives the corresponding value.</p>
