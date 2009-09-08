@@ -62,7 +62,7 @@ public class DimensionSelectingDistanceFunction<N extends Number, V extends Feat
     public DoubleDistance distance(V v1, V v2) {
         if (dim > v1.getDimensionality() || dim > v2.getDimensionality()) {
             throw new IllegalArgumentException("Specified dimension to be considered " +
-                "is larger that dimensionality of NumberVectors:" +
+                "is larger that dimensionality of FeatureVectors:" +
                 "\n  first argument: " + v1.toString() +
                 "\n  second argument: " + v2.toString() +
                 "\n  dimension: " + dim);
@@ -81,13 +81,13 @@ public class DimensionSelectingDistanceFunction<N extends Number, V extends Feat
      */
     @Override
     public String shortDescription() {
-        return "Distance within one specified dimension for NumberVectors.\n";
+        return "Distance within one specified dimension for FeatureVectors.\n";
     }
 
     public DoubleDistance minDist(HyperBoundingBox mbr, V v) {
         if (dim > mbr.getDimensionality() || dim > v.getDimensionality()) {
             throw new IllegalArgumentException("Specified dimension to be considered " +
-                "is larger that dimensionality of NumberVectors:" +
+                "is larger that dimensionality of FeatureVectors:" +
                 "\n  first argument: " + mbr.toString() +
                 "\n  second argument: " + v.toString() +
                 "\n  dimension: " + dim);
@@ -113,7 +113,7 @@ public class DimensionSelectingDistanceFunction<N extends Number, V extends Feat
     public DoubleDistance distance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
         if (dim > mbr1.getDimensionality() || dim > mbr2.getDimensionality()) {
             throw new IllegalArgumentException("Specified dimension to be considered " +
-                "is larger that dimensionality of NumberVectors:" +
+                "is larger that dimensionality of FeatureVectors:" +
                 "\n  first argument: " + mbr1.toString() +
                 "\n  second argument: " + mbr2.toString() +
                 "\n  dimension: " + dim);
@@ -140,7 +140,7 @@ public class DimensionSelectingDistanceFunction<N extends Number, V extends Feat
     public DoubleDistance centerDistance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
         if (dim > mbr1.getDimensionality() || dim > mbr2.getDimensionality()) {
             throw new IllegalArgumentException("Specified dimension to be considered " +
-                "is larger that dimensionality of NumberVectors:" +
+                "is larger that dimensionality of FeatureVectors:" +
                 "\n  first argument: " + mbr1.toString() +
                 "\n  second argument: " + mbr2.toString() +
                 "\n  dimension: " + dim);

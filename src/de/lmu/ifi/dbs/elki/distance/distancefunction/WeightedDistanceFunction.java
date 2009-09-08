@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -13,9 +13,9 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  *
  * @author Elke Achtert 
  *         
- * @param <V> the type of NumberVector to compute the distances in between
+ * @param <V> the type of FeatureVector to compute the distances in between
  */
-public class WeightedDistanceFunction<V extends NumberVector<V, ? >>
+public class WeightedDistanceFunction<V extends FeatureVector<V, ? >>
     extends AbstractDoubleDistanceFunction<V> {
 
   /**
@@ -40,7 +40,7 @@ public class WeightedDistanceFunction<V extends NumberVector<V, ? >>
    */
   public DoubleDistance distance(V o1, V o2) {
     if (o1.getDimensionality() != o2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of NumberVectors" +
+      throw new IllegalArgumentException("Different dimensionality of FeatureVectors" +
                                          "\n  first argument: " + o1.toString() +
                                          "\n  second argument: " + o2.toString());
     }

@@ -1,20 +1,20 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 
 /**
- * Provides the Euclidean distance for NumberVectors.
+ * Provides the Euclidean distance for FeatureVectors.
  * 
  * @author Arthur Zimek
- * @param <V> the type of NumberVector to compute the distances in between
+ * @param <V> the type of FeatureVector to compute the distances in between
  */
-public class EuclideanDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDoubleDistanceFunction<V> implements SpatialDistanceFunction<V, DoubleDistance> {
+public class EuclideanDistanceFunction<V extends FeatureVector<V, ?>> extends AbstractDoubleDistanceFunction<V> implements SpatialDistanceFunction<V, DoubleDistance> {
   /**
    * Provides a Euclidean distance function that can compute the Euclidean
-   * distance (that is a DoubleDistance) for NumberVectors.
+   * distance (that is a DoubleDistance) for FeatureVectors.
    */
   public EuclideanDistanceFunction() {
     super();
@@ -29,7 +29,7 @@ public class EuclideanDistanceFunction<V extends NumberVector<V, ?>> extends Abs
   @Override
   public DoubleDistance distance(V v1, V v2) {
     if(v1.getDimensionality() != v2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of NumberVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString()+"\n"+v1.getDimensionality() +"!="+ v2.getDimensionality());
+      throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString()+"\n"+v1.getDimensionality() +"!="+ v2.getDimensionality());
     }
     double sqrDist = 0;
     for(int i = 1; i <= v1.getDimensionality(); i++) {

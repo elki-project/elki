@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstrai
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
 
 /**
- * Provides the Longest Common Subsequence distance for NumberVectors.
+ * Provides the Longest Common Subsequence distance for FeatureVectors.
  * 
  * 
  * Adapted for Java, based on Matlab Code by Michalis Vlachos. Original
@@ -41,9 +41,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstrai
  * 
  * 
  * @author Thomas Bernecker
- * @param <V> the type of NumberVector to compute the distances in between
+ * @param <V> the type of FeatureVector to compute the distances in between
  */
-public class LCSSDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDoubleDistanceFunction<V> {
+public class LCSSDistanceFunction<V extends FeatureVector<V, ?>> extends AbstractDoubleDistanceFunction<V> {
 
   protected enum Step {
     NONE, INS, DEL, MATCH
@@ -82,7 +82,7 @@ public class LCSSDistanceFunction<V extends NumberVector<V, ?>> extends Abstract
   /**
    * Provides a Longest Common Subsequence distance function that can compute
    * the Dynamic Time Warping distance (that is a DoubleDistance) for
-   * NumberVectors.
+   * FeatureVectors.
    */
   public LCSSDistanceFunction() {
     super();

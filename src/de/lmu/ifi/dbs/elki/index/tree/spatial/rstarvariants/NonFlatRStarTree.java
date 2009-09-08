@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialObject;
@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialObject;
  * @param <N> Node type
  * @param <E> Entry type
  */
-public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends AbstractRStarTreeNode<N, E>, E
+public abstract class NonFlatRStarTree<O extends FeatureVector<O,?>, N extends AbstractRStarTreeNode<N, E>, E
     extends SpatialEntry> extends AbstractRStarTree<O, N, E> {
 
 	/**
@@ -203,7 +203,7 @@ public abstract class NonFlatRStarTree<O extends NumberVector<O,?>, N extends Ab
   private N createRoot(N root, List<SpatialObject> objects) {
 		// insert data
 		for (SpatialObject object : objects) {
-			if (object instanceof NumberVector) {
+			if (object instanceof FeatureVector) {
 				root.addLeafEntry(createNewLeafEntry((O) object));
 			} else {
 				root.addDirectoryEntry(createNewDirectoryEntry((N) object));

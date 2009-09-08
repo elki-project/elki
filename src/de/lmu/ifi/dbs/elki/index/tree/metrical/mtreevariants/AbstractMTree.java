@@ -272,7 +272,7 @@ public abstract class AbstractMTree<O extends DatabaseObject, D extends Distance
     }
 
     /**
-     * Performs a k-nearest neighbor query for the given NumberVector with the
+     * Performs a k-nearest neighbor query for the given FeatureVector with the
      * given parameter k and the according distance function. The query result
      * is in ascending order to the distance to the query object.
      *

@@ -2,12 +2,12 @@ package de.lmu.ifi.dbs.elki.algorithm;
 
 import java.util.Iterator;
 
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 
 /**
@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.Description;
  * @author Erich Schubert
  * @param <V> Vector type
  */
-public class DummyAlgorithm<V extends NumberVector<V,?>> extends AbstractAlgorithm<V,Result> {
+public class DummyAlgorithm<V extends FeatureVector<V,?>> extends AbstractAlgorithm<V,Result> {
 
   /**
    * Empty constructor. Nothing to do.

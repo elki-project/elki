@@ -13,8 +13,8 @@ import java.util.Map;
 import java.util.Stack;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.KNNList;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.heap.HeapNode;
  * @param <N> Node type
  * @param <E> Entry type
  */
-public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends SpatialIndex<O, N, E> {
+public abstract class AbstractRStarTree<O extends FeatureVector<O, ?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends SpatialIndex<O, N, E> {
   protected final static boolean extraIntegrityChecks = false;
 
   /**
@@ -284,7 +284,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
   }
 
   /**
-   * Performs a k-nearest neighbor query for the given NumberVector with the
+   * Performs a k-nearest neighbor query for the given FeatureVector with the
    * given parameter k and the according distance function. The query result is
    * in ascending order to the distance to the query object.
    * 
@@ -524,7 +524,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
   }
 
   /**
-   * Performs a k-nearest neighbor query for the given NumberVector with the
+   * Performs a k-nearest neighbor query for the given FeatureVector with the
    * given parameter k and the according distance function. The query result is
    * in ascending order to the distance to the query object.
    * 

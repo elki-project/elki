@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
@@ -23,11 +23,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * spatial index structure.
  * 
  * @author Elke Achtert
- * @param <O> the type of NumberVector as element of the database
+ * @param <O> the type of FeatureVector as element of the database
  * @param <N> the type of SpatialNode stored in the index
  * @param <E> the type of SpatialEntry stored in the index
  */
-public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends IndexDatabase<O> {
+public class SpatialIndexDatabase<O extends FeatureVector<O, ?>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends IndexDatabase<O> {
 
   /**
    * OptionID for {@link #INDEX_PARAM}

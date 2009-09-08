@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
@@ -10,9 +10,9 @@ import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
  * between feature vectors only in specified dimensions.
  *
  * @author Elke Achtert
- * @param <V> the type of NumberVector to compute the distances in between
+ * @param <V> the type of FeatureVector to compute the distances in between
  */
-public class DimensionsSelectingEuclideanDistanceFunction<V extends NumberVector<V, ?>>
+public class DimensionsSelectingEuclideanDistanceFunction<V extends FeatureVector<V, ?>>
     extends AbstractDimensionsSelectingDoubleDistanceFunction<V>
     implements SpatialDistanceFunction<V, DoubleDistance> {
 
@@ -36,7 +36,7 @@ public class DimensionsSelectingEuclideanDistanceFunction<V extends NumberVector
      */
     public DoubleDistance distance(V v1, V v2) {
         if (v1.getDimensionality() != v2.getDimensionality()) {
-            throw new IllegalArgumentException("Different dimensionality of NumberVectors\n  " +
+            throw new IllegalArgumentException("Different dimensionality of FeatureVectors\n  " +
                 "first argument: " + v1 + "\n  " +
                 "second argument: " + v2);
         }

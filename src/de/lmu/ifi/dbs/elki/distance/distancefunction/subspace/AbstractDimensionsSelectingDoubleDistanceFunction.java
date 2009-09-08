@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 import java.util.BitSet;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -15,9 +15,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListGreaterEqual
  * (which is a double distance) between feature vectors only in specified dimensions.
  *
  * @author Elke Achtert
- * @param <V> the type of NumberVector to compute the distances in between
+ * @param <V> the type of FeatureVector to compute the distances in between
  */
-public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extends NumberVector<V, ?>>
+public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extends FeatureVector<V, ?>>
     extends AbstractDoubleDistanceFunction<V> {
 
   /**
