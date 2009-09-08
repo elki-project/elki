@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.preprocessing;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
@@ -21,7 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterC
  * @author Elke Achtert
  * @param <V> Vector type
  */
-public class RangeQueryBasedHiCOPreprocessor<V extends RealVector<V, ?>> extends HiCOPreprocessor<V> {
+public class RangeQueryBasedHiCOPreprocessor<V extends FeatureVector<V, ? extends Number>> extends HiCOPreprocessor<V> {
   /**
    * OptionID for {@link #EPSILON_PARAM}
    */
@@ -33,7 +33,7 @@ public class RangeQueryBasedHiCOPreprocessor<V extends RealVector<V, ?>> extends
    * Key: {@code -preprocessor.epsilon}
    */
   protected final PatternParameter EPSILON_PARAM = new PatternParameter(EPSILON_ID);
-  
+
   /**
    * Epsilon.
    */
@@ -86,8 +86,9 @@ public class RangeQueryBasedHiCOPreprocessor<V extends RealVector<V, ?>> extends
   }
 
   /**
-   * Returns a description of the class and the required parameters. <p/> This
-   * description should be suitable for a usage description.
+   * Returns a description of the class and the required parameters.
+   * <p/>
+   * This description should be suitable for a usage description.
    * 
    * @return String a description of the class and the required parameters
    */

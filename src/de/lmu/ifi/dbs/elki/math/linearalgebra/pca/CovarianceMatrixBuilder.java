@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
  *
  * @param <V> Vector class in use
  */
-public abstract class CovarianceMatrixBuilder<V extends RealVector<V, ?>, D extends NumberDistance<D,?>> extends AbstractParameterizable {
+public abstract class CovarianceMatrixBuilder<V extends FeatureVector<V, ? extends Number>, D extends NumberDistance<D,?>> extends AbstractParameterizable {
   /**
    * Compute Covariance Matrix for a complete database
    * 

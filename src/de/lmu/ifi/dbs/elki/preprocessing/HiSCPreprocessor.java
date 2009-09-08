@@ -5,7 +5,7 @@ import java.util.BitSet;
 import java.util.Iterator;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
@@ -27,12 +27,11 @@ import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
 /**
  * Preprocessor for HiSC preference vector assignment to objects of a certain
  * database.
- *
- * @author Elke Achtert 
+ * 
+ * @author Elke Achtert
  * @param <V> Vector type
  */
-public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParameterizable implements PreferenceVectorPreprocessor<V> {
-
+public class HiSCPreprocessor<V extends FeatureVector<V, ? extends Number>> extends AbstractParameterizable implements PreferenceVectorPreprocessor<V> {
   /**
    * The default value for alpha.
    */
@@ -41,25 +40,17 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
   /**
    * OptionID for {@link #ALPHA_PARAM}
    */
-  public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID(
-      "hisc.alpha", "a double between 0 and 1 specifying the "
-      + "maximum absolute variance along a coordinate axis.");
+  public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("hisc.alpha", "a double between 0 and 1 specifying the " + "maximum absolute variance along a coordinate axis.");
 
   /**
    * Alpha parameter
    */
-  private final DoubleParameter ALPHA_PARAM = new DoubleParameter(ALPHA_ID,
-      new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.OPEN,
-          1.0, IntervalConstraint.IntervalBoundary.OPEN), DEFAULT_ALPHA);
+  private final DoubleParameter ALPHA_PARAM = new DoubleParameter(ALPHA_ID, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.OPEN, 1.0, IntervalConstraint.IntervalBoundary.OPEN), DEFAULT_ALPHA);
 
   /**
    * OptionID for {@link #K_PARAM}
    */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID(
-      "hisc.k", "a positive integer specifying the number of "
-      + "nearest neighbors considered to determine the preference vector. " 
-      + "If this value is not defined, k ist set to three "
-      + "times of the dimensionality of the database objects.");
+  public static final OptionID K_ID = OptionID.getOrCreateOptionID("hisc.k", "a positive integer specifying the number of " + "nearest neighbors considered to determine the preference vector. " + "If this value is not defined, k ist set to three " + "times of the dimensionality of the database objects.");
 
   /**
    * k Parameter
@@ -83,7 +74,7 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
    */
   public HiSCPreprocessor() {
     super();
-//    this.debug = true;
+    // this.debug = true;
 
     // parameter alpha
     addOption(ALPHA_PARAM);
@@ -93,7 +84,7 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
   }
 
   public void run(Database<V> database, boolean verbose, boolean time) {
-    if (database == null || database.size() <= 0) {
+    if(database == null || database.size() <= 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
 
@@ -102,7 +93,7 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
     long start = System.currentTimeMillis();
     FiniteProgress progress = new FiniteProgress("Preprocessing preference vector", database.size());
 
-    if (k == null) {
+    if(k == null) {
       V obj = database.get(database.iterator().next());
       k = 3 * obj.getDimensionality();
     }
@@ -112,10 +103,10 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
 
     Iterator<Integer> it = database.iterator();
     int processed = 1;
-    while (it.hasNext()) {
+    while(it.hasNext()) {
       Integer id = it.next();
 
-      if (logger.isDebugging()) {
+      if(logger.isDebugging()) {
         msg.append("\n\nid = ").append(id);
         msg.append(" ").append(database.getAssociation(AssociationID.LABEL, id));
         msg.append("\n knns: ");
@@ -123,9 +114,9 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
 
       List<DistanceResultPair<DoubleDistance>> knns = database.kNNQueryForID(id, k, distanceFunction);
       List<Integer> knnIDs = new ArrayList<Integer>(knns.size());
-      for (DistanceResultPair<DoubleDistance> knn : knns) {
+      for(DistanceResultPair<DoubleDistance> knn : knns) {
         knnIDs.add(knn.getID());
-        if (logger.isDebugging()) {
+        if(logger.isDebugging()) {
           msg.append(database.getAssociation(AssociationID.LABEL, knn.getID())).append(" ");
         }
       }
@@ -134,17 +125,17 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
       database.associate(AssociationID.PREFERENCE_VECTOR, id, preferenceVector);
       progress.setProcessed(processed++);
 
-      if (logger.isVerbose()) {
+      if(logger.isVerbose()) {
         logger.progress(progress);
       }
     }
 
-    if (logger.isDebugging()) {
+    if(logger.isDebugging()) {
       logger.debugFine(msg.toString());
     }
 
     long end = System.currentTimeMillis();
-    if (time) {
+    if(time) {
       long elapsedTime = end - start;
       logger.verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
     }
@@ -167,16 +158,17 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
     alpha = ALPHA_PARAM.getValue();
 
     // k
-    if (K_PARAM.isSet())
+    if(K_PARAM.isSet()) {
       k = K_PARAM.getValue();
+    }
 
     return remainingParameters;
   }
 
   /**
-   * Returns the value of the alpha parameter (i.e. the maximum allowed
-   * variance along a coordinate axis).
-   *
+   * Returns the value of the alpha parameter (i.e. the maximum allowed variance
+   * along a coordinate axis).
+   * 
    * @return the value of the alpha parameter
    */
   public double getAlpha() {
@@ -184,9 +176,9 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
   }
 
   /**
-   * Returns the value of the k parameter (i.e. the number of nearest
-   * neighbors considered to determine the preference vector).
-   *
+   * Returns the value of the k parameter (i.e. the number of nearest neighbors
+   * considered to determine the preference vector).
+   * 
    * @return the value of the k parameter
    */
   public int getK() {
@@ -195,12 +187,12 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
 
   /**
    * Determines the preference vector according to the specified neighbor ids.
-   *
-   * @param database    the database storing the objects
-   * @param id          the id of the object for which the preference vector should be
-   *                    determined
+   * 
+   * @param database the database storing the objects
+   * @param id the id of the object for which the preference vector should be
+   *        determined
    * @param neighborIDs the ids of the neighbors
-   * @param msg         a string buffer for debug messages
+   * @param msg a string buffer for debug messages
    * @return the preference vector
    */
   private BitSet determinePreferenceVector(Database<V> database, Integer id, List<Integer> neighborIDs, StringBuffer msg) {
@@ -209,14 +201,14 @@ public class HiSCPreprocessor<V extends RealVector<V,? >> extends AbstractParame
 
     // preference vector
     BitSet preferenceVector = new BitSet(variances.length);
-    for (int d = 0; d < variances.length; d++) {
-      if (variances[d] < alpha) {
+    for(int d = 0; d < variances.length; d++) {
+      if(variances[d] < alpha) {
         preferenceVector.set(d);
       }
     }
 
-    if (msg != null && logger.isDebugging()) {
-      msg.append("\nalpha "+alpha);
+    if(msg != null && logger.isDebugging()) {
+      msg.append("\nalpha " + alpha);
       msg.append("\nvariances ");
       msg.append(FormatUtil.format(variances, ", ", 4));
       msg.append("\npreference ");

@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
  * @author Arthur Zimek
  * @param <V> the type of RealVector handled by this Result
  */
-public class CorrelationAnalysisSolution<V extends RealVector<V, ?>> implements TextWriteable, Result, Model {
+public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implements TextWriteable, Result, Model {
   /**
    * Stores the solution equations.
    */

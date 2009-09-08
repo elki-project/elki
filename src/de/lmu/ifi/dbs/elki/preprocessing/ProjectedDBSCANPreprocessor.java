@@ -6,7 +6,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ProjectedDBSCAN;
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
@@ -33,8 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
  * @param <D> Distance type
  * @param <V> Vector type
  */
-public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V extends RealVector<V, ?>> extends AbstractParameterizable implements Preprocessor<V> {
-
+public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V extends FeatureVector<V, ?>> extends AbstractParameterizable implements Preprocessor<V> {
   /**
    * Parameter to specify the maximum radius of the neighborhood to be
    * considered, must be suitable to {@link LocallyWeightedDistanceFunction

@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.preprocessing;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
@@ -19,27 +19,24 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * @author Elke Achtert
  * @param <V> Vector type
  */
-public class KnnQueryBasedHiCOPreprocessor<V extends RealVector<V, ?>> extends HiCOPreprocessor<V> {
+public class KnnQueryBasedHiCOPreprocessor<V extends FeatureVector<V, ? extends Number>> extends HiCOPreprocessor<V> {
   /**
    * OptionID for {@link #K_PARAM}
    */
-  public static final OptionID KNN_HICO_PREPROCESSOR_K = OptionID.getOrCreateOptionID(
-    "hicopreprocessor.k",
-    "The number of nearest neighbors considered in the PCA. " +
-    "If this parameter is not set, k ist set to three " +
-    "times of the dimensionality of the database objects."
-  );
-
+  public static final OptionID KNN_HICO_PREPROCESSOR_K = OptionID.getOrCreateOptionID("hicopreprocessor.k", "The number of nearest neighbors considered in the PCA. " + "If this parameter is not set, k ist set to three " + "times of the dimensionality of the database objects.");
 
   /**
-   * Optional parameter to specify the number of nearest neighbors considered in the PCA,
-   * must be an integer greater than 0. If this parameter is not set, k ist set to three
-   * times of the dimensionality of the database objects.
-   * <p>Key: {@code -hicopreprocessor.k} </p>
-   * <p>Default value: three times of the dimensionality of the database objects </p>
+   * Optional parameter to specify the number of nearest neighbors considered in
+   * the PCA, must be an integer greater than 0. If this parameter is not set, k
+   * ist set to three times of the dimensionality of the database objects.
+   * <p>
+   * Key: {@code -hicopreprocessor.k}
+   * </p>
+   * <p>
+   * Default value: three times of the dimensionality of the database objects
+   * </p>
    */
-  private final IntParameter K_PARAM = new IntParameter(KNN_HICO_PREPROCESSOR_K,
-    new GreaterConstraint(0), true);
+  private final IntParameter K_PARAM = new IntParameter(KNN_HICO_PREPROCESSOR_K, new GreaterConstraint(0), true);
 
   /**
    * Holds the value of parameter k.

@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 
 import java.util.BitSet;
 
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.AbstractPreferenceVectorBasedCorrelationDistanceFunction;
@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
  * @param <V> the type of RealVector to compute the distances in between
  * @param <P> the type of Preprocessor used
  */
-public class DiSHDistanceFunction<V extends RealVector<V, ?>, P extends PreferenceVectorPreprocessor<V>>
+public class DiSHDistanceFunction<V extends FeatureVector<V, ? extends Number>, P extends PreferenceVectorPreprocessor<V>>
     extends AbstractPreferenceVectorBasedCorrelationDistanceFunction<V, P> {
 
     /**

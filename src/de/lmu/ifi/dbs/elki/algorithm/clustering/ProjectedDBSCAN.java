@@ -40,7 +40,6 @@ import de.lmu.ifi.dbs.elki.utilities.progress.IndefiniteProgress;
  * @param <V> the type of Realvector handled by this Algorithm
  */
 public abstract class ProjectedDBSCAN<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, V> {
-
   /**
    * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
    */

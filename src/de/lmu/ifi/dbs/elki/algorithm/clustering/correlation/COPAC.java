@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.DimensionModel;
@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
  * @author Arthur Zimek
  * @param <V> the type of RealVector handled by this Algorithm
  */
-public class COPAC<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>,V> {
+public class COPAC<V extends FeatureVector<V, ? extends Number>> extends AbstractAlgorithm<V, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>,V> {
 
     /**
      * OptionID for {@link #PREPROCESSOR_PARAM}

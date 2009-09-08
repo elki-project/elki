@@ -5,7 +5,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
@@ -18,9 +18,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * like {@link PROCLUS} and {@link de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.ORCLUS}.
  *
  * @author Elke Achtert
- * @param <V> the type of Realvector handled by this Algorithm
+ * @param <V> the type of FeatureVector handled by this Algorithm
  */
-public abstract class ProjectedClustering<V extends RealVector<V, ?>>
+public abstract class ProjectedClustering<V extends FeatureVector<V, ? extends Number>>
     extends AbstractAlgorithm<V, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>,V> {
 
     /**

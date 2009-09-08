@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
  * 
  * @param <V> Vector type
  */
-public class ABOD<V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, DoubleDistance, MultiResult> {
+public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V, DoubleDistance, MultiResult> {
   /**
    * OptionID for {@link #K_PARAM}
    */

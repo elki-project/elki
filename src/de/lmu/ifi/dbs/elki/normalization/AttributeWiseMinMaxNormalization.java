@@ -25,7 +25,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Elke Achtert
  * @param <V> vector type
  */
-//TODO: extract superclass AbstractAttributeWiseNormalization
+// TODO: extract superclass AbstractAttributeWiseNormalization
 public class AttributeWiseMinMaxNormalization<V extends RealVector<V, ?>> extends AbstractNormalization<V> {
   /**
    * OptionID for {@link #MINIMA_PARAM}

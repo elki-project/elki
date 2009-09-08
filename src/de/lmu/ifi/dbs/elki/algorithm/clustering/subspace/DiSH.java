@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
  * </p>
  *
  * @author Elke Achtert
- * @param <V> the type of Realvector handled by this Algorithm
+ * @param <V> the type of RealVector handled by this Algorithm
  */
 public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clustering<AxesModel>> implements ClusteringAlgorithm<Clustering<AxesModel>,V> {
     /**
