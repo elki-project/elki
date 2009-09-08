@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
@@ -44,6 +45,7 @@ import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -94,7 +96,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * 
  * @param <O> Object type
  */
-public class KNNExplorer<O extends FeatureVector<O, ?>, N extends NumberDistance<N, D>, D extends Number> extends AbstractApplication {
+public class KNNExplorer<O extends FeatureVector<?, ?>, N extends NumberDistance<N, D>, D extends Number> extends AbstractApplication {
   /**
    * Parameter to specify the database connection to be used, must extend
    * {@link de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection}.
@@ -370,9 +372,9 @@ public class KNNExplorer<O extends FeatureVector<O, ?>, N extends NumberDistance
       double max = Double.MIN_VALUE;
       for(Integer objID : db) {
         O vec = db.get(objID);
-        double[] mm = vec.getRange();
-        min = Math.min(min, mm[0]);
-        max = Math.max(max, mm[1]);
+        DoubleMinMax mm = VectorUtil.getRangeDouble(vec);
+        min = Math.min(min, mm.getMin());
+        max = Math.max(max, mm.getMax());
       }
       this.s = new LinearScale(min, max);
 
