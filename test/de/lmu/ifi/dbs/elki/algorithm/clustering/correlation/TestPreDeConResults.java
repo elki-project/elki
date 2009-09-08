@@ -84,8 +84,8 @@ public class TestPreDeConResults implements JUnit4Test {
     Clustering<Model> rbl = bylabel.getResult();
 
     double score = PairCountingFMeasure.compareClusterings(result, rbl, 1.0);
-    assertTrue("PreDeCon score on test dataset too low: " + score, score > 0.52106);
-    System.out.println("PreDeCon score: " + score + " > " + 0.52106);
+    assertTrue("PreDeCon score on test dataset too low: " + score, score > 0.520489);
+    System.out.println("PreDeCon score: " + score + " > " + 0.520489);
   }
 
 }
