@@ -10,14 +10,12 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
  * Provides the Weighted distance for feature vectors.
- *
- * @author Elke Achtert 
- *         
+ * 
+ * @author Elke Achtert
+ * 
  * @param <V> the type of FeatureVector to compute the distances in between
  */
-public class WeightedDistanceFunction<V extends NumberVector<V, ? >>
-    extends AbstractDoubleDistanceFunction<V> {
-
+public class WeightedDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDoubleDistanceFunction<V> {
   /**
    * The weight matrix.
    */
@@ -25,6 +23,7 @@ public class WeightedDistanceFunction<V extends NumberVector<V, ? >>
 
   /**
    * Provides the Weighted distance for feature vectors.
+   * 
    * @param weightMatrix weight matrix
    */
   public WeightedDistanceFunction(Matrix weightMatrix) {
@@ -34,15 +33,14 @@ public class WeightedDistanceFunction<V extends NumberVector<V, ? >>
 
   /**
    * Provides the Weighted distance for feature vectors.
-   *
-   * @return the Weighted distance between the given two vectors as an
-   *         instance of {@link de.lmu.ifi.dbs.elki.distance.DoubleDistance DoubleDistance}.
+   * 
+   * @return the Weighted distance between the given two vectors as an instance
+   *         of {@link de.lmu.ifi.dbs.elki.distance.DoubleDistance
+   *         DoubleDistance}.
    */
   public DoubleDistance distance(V o1, V o2) {
-    if (o1.getDimensionality() != o2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of FeatureVectors" +
-                                         "\n  first argument: " + o1.toString() +
-                                         "\n  second argument: " + o2.toString());
+    if(o1.getDimensionality() != o2.getDimensionality()) {
+      throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + o1.toString() + "\n  second argument: " + o2.toString());
     }
 
     Vector o1_minus_o2 = o1.plus(o2.negativeVector()).getColumnVector();
@@ -54,8 +52,6 @@ public class WeightedDistanceFunction<V extends NumberVector<V, ? >>
   // todo: parameters required
   @Override
   public String shortDescription() {
-    return "Weighted distance for feature vectors. " +
-           "No parameters required. " +
-           "Pattern for defining a range: \"" + requiredInputPattern() + "\".\n";
+    return "Weighted distance for feature vectors. " + "No parameters required. " + "Pattern for defining a range: \"" + requiredInputPattern() + "\".\n";
   }
 }

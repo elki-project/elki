@@ -9,7 +9,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Bicluster;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -24,8 +24,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.PairUtil;
  * corresponding values within a database of RealVectors.
  * <p/>
  * The database is supposed to present a data matrix with a row representing an
- * entry ({@link RealVector}), a column representing a dimension (attribute) of
- * the {@link RealVector}s.
+ * entry ({@link FeatureVector}), a column representing a dimension (attribute) of
+ * the {@link FeatureVector}s.
  * 
  * @author Arthur Zimek
  * @param <V> a certain subtype of RealVector - the data matrix is supposed to
@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.PairUtil;
  *        columns relate to the attribute values of these objects
  * @param <M> Cluster model type
  */
-public abstract class AbstractBiclustering<V extends RealVector<V, Double>, M extends Bicluster<V>> extends AbstractAlgorithm<V, Clustering<M>> implements ClusteringAlgorithm<Clustering<M>, V> {
+public abstract class AbstractBiclustering<V extends FeatureVector<V, ? extends Number>, M extends Bicluster<V>> extends AbstractAlgorithm<V, Clustering<M>> implements ClusteringAlgorithm<Clustering<M>, V> {
   /**
    * Keeps the currently set database.
    */
@@ -260,7 +260,7 @@ public abstract class AbstractBiclustering<V extends RealVector<V, Double>, M ex
    *         <code>database.get(rowIDs[row]).getValue(colIDs[col])</code>
    */
   protected double valueAt(int row, int col) {
-    return getDatabase().get(rowIDs[row]).getValue(colIDs[col]);
+    return getDatabase().get(rowIDs[row]).getValue(colIDs[col]).doubleValue();
   }
 
   /**

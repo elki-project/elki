@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
  * Publication pending
  *
  * @author Erich Schubert
- * @param <V> the type of Realvector handled by this Algorithm
+ * @param <V> the type of RealVector handled by this Algorithm
  */
 public class COP<V extends RealVector<V, ?>, D extends NumberDistance<D,?>> extends DistanceBasedAlgorithm<V, D, MultiResult> {
     /**

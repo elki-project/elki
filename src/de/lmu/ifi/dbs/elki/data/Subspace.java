@@ -11,7 +11,7 @@ import java.util.TreeSet;
  * @author Elke Achtert
  * @param <V> Vector class
  */
-public class Subspace<V extends RealVector<V, ?>> {
+public class Subspace<V extends FeatureVector<V, ?>> {
   /**
    * The dimensions building this subspace.
    */

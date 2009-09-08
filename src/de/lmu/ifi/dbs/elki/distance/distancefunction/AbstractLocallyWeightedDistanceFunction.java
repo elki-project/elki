@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.preprocessing.KnnQueryBasedHiCOPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
@@ -19,8 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * @param <O> the type of DatabaseObject to compute the distances in between
  * @param <P> preprocessor type
  */
-public abstract class AbstractLocallyWeightedDistanceFunction<O extends RealVector<O, ?>, P extends Preprocessor<O>> extends AbstractDoubleDistanceFunction<O> implements PreprocessorClient<P, O> {
-
+public abstract class AbstractLocallyWeightedDistanceFunction<O extends FeatureVector<O, ?>, P extends Preprocessor<O>> extends AbstractDoubleDistanceFunction<O> implements PreprocessorClient<P, O> {
   /**
    * The handler class for the preprocessor.
    */
@@ -44,8 +43,8 @@ public abstract class AbstractLocallyWeightedDistanceFunction<O extends RealVect
   /**
    * Calls
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable#setParameters
-   * AbstractParameterizable#setParameters} and passes the remaining
-   * parameters to the {@link #preprocessorHandler}.
+   * AbstractParameterizable#setParameters} and passes the remaining parameters
+   * to the {@link #preprocessorHandler}.
    */
   @Override
   public List<String> setParameters(List<String> args) throws ParameterException {

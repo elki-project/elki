@@ -2,21 +2,21 @@ package de.lmu.ifi.dbs.elki.data.model;
 
 import java.util.Arrays;
 
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 
 /**
- * This code was factored out of the Bicluster class, since not all biclusters have inverted rows.
- * TODO: shouldn't that be inverted columns?
+ * This code was factored out of the Bicluster class, since not all biclusters
+ * have inverted rows. TODO: shouldn't that be inverted columns?
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <V>
  */
-public class BiclusterWithInverted<V extends RealVector<V, Double>> extends Bicluster<V> {
+public class BiclusterWithInverted<V extends FeatureVector<V, ?>> extends Bicluster<V> {
   /**
    * The ids of inverted rows.
    */
@@ -33,12 +33,12 @@ public class BiclusterWithInverted<V extends RealVector<V, Double>> extends Bicl
 
   /**
    * Sets the ids of the inverted rows.
-   *
+   * 
    * @param invertedRows the ids of the inverted rows
    */
   public void setInvertedRows(int[] invertedRows) {
-      this.invertedRows = new int[invertedRows.length];
-      System.arraycopy(invertedRows, 0, this.invertedRows, 0, invertedRows.length);
+    this.invertedRows = new int[invertedRows.length];
+    System.arraycopy(invertedRows, 0, this.invertedRows, 0, invertedRows.length);
   }
 
   /**
@@ -52,17 +52,16 @@ public class BiclusterWithInverted<V extends RealVector<V, Double>> extends Bicl
     return columnIDs;
   }
 
-
   /**
-   * Sorts the row and column ids (and - if applicable - the ids of inverted rows)
-   * in ascending order.
+   * Sorts the row and column ids (and - if applicable - the ids of inverted
+   * rows) in ascending order.
    */
   @Override
   public void sortIDs() {
-      super.sortIDs();
-      if (this.invertedRows != null) {
-          Arrays.sort(this.invertedRows);
-      }
+    super.sortIDs();
+    if(this.invertedRows != null) {
+      Arrays.sort(this.invertedRows);
+    }
   }
 
   /**
@@ -71,8 +70,8 @@ public class BiclusterWithInverted<V extends RealVector<V, Double>> extends Bicl
   @Override
   public void writeToText(TextWriterStream out, String label) {
     super.writeToText(out, label);
-    if (this.invertedRows != null) {
+    if(this.invertedRows != null) {
       out.commentPrintLn("inverted rows (row IDs): " + FormatUtil.format(this.invertedRows));
-    }      
+    }
   }
 }

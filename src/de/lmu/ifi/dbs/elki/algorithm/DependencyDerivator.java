@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
  * Philadelphia, PA 2006. </p>
  * 
  * @author Arthur Zimek
- * @param <V> the type of RealVector handled by this Algorithm
+ * @param <V> the type of FeatureVector handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  */
 public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<D>> extends DistanceBasedAlgorithm<V, D, CorrelationAnalysisSolution<V>> {

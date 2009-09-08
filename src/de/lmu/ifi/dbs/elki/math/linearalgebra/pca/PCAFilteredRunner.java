@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 import java.util.Collection;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessGlobalConstr
  *
  * @param <V> Vector class to use
  */
-public class PCAFilteredRunner<V extends RealVector<V, ?>, D extends NumberDistance<D,?>> extends PCARunner<V, D> {
+public class PCAFilteredRunner<V extends FeatureVector<V, ? extends Number>, D extends NumberDistance<D,?>> extends PCARunner<V, D> {
   /**
    * OptionID for
    * {@link #EIGENPAIR_FILTER_PARAM}

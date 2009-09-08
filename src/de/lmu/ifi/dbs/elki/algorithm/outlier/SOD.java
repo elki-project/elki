@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
  * @param <D> the type of Distance used by this Algorithm
  */
 // todo arthur comment
-public class SOD<V extends RealVector<V, Double>, D extends Distance<D>> extends AbstractAlgorithm<V, MultiResult> {
+public class SOD<V extends RealVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<V, MultiResult> {
 
     /**
      * The association id to associate a subspace outlier degree.

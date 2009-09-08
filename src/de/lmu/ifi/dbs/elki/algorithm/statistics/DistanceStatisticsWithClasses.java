@@ -12,8 +12,8 @@ import java.util.TreeSet;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Erich Schubert
  * @param <V> Vector type
  */
-public class DistanceStatisticsWithClasses<V extends RealVector<V, ?>, D extends NumberDistance<D,?>> extends DistanceBasedAlgorithm<V, D, CollectionResult<DoubleVector>> {
+public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends NumberDistance<D,?>> extends DistanceBasedAlgorithm<V, D, CollectionResult<DoubleVector>> {
   private HistogramResult<DoubleVector> result;
 
   /**

@@ -22,41 +22,42 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 /**
  * {@link CovarianceMatrixBuilder} with weights.
  * 
- * This builder uses a weight function to weight points differently during build a covariance matrix.
- * Covariance can be canonically extended with weights, as shown in the article
+ * This builder uses a weight function to weight points differently during build
+ * a covariance matrix. Covariance can be canonically extended with weights, as
+ * shown in the article
  * 
- * A General Framework for Increasing the Robustness of PCA-Based Correlation Clustering Algorithms
- * Hans-Peter Kriegel and Peer Kr&ouml;ger and Erich Schubert and Arthur Zimek
- * In: Proc. 20th Int. Conf. on Scientific and Statistical Database Management (SSDBM), 2008, Hong Kong
- * Lecture Notes in Computer Science 5069, Springer
+ * A General Framework for Increasing the Robustness of PCA-Based Correlation
+ * Clustering Algorithms Hans-Peter Kriegel and Peer Kr&ouml;ger and Erich
+ * Schubert and Arthur Zimek In: Proc. 20th Int. Conf. on Scientific and
+ * Statistical Database Management (SSDBM), 2008, Hong Kong Lecture Notes in
+ * Computer Science 5069, Springer
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <V> Vector class to use
  */
-public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>, D extends NumberDistance<D,?>> extends CovarianceMatrixBuilder<V, D> {
+public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>, D extends NumberDistance<D, ?>> extends CovarianceMatrixBuilder<V, D> {
   /**
    * OptionID for {@link #WEIGHT_PARAM}
    */
-  public static final OptionID WEIGHT_ID = OptionID.getOrCreateOptionID("pca.weight", 
-      "Weight function to use in weighted PCA.");
+  public static final OptionID WEIGHT_ID = OptionID.getOrCreateOptionID("pca.weight", "Weight function to use in weighted PCA.");
 
   /**
    * Parameter to specify the weight function to use in weighted PCA, must
-   * implement {@link de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.WeightFunction}.
+   * implement
+   * {@link de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.WeightFunction}
+   * .
    * <p>
    * Key: {@code -pca.weight}
    * </p>
    */
-  private final ClassParameter<WeightFunction> WEIGHT_PARAM = 
-    new ClassParameter<WeightFunction>(WEIGHT_ID, WeightFunction.class, 
-        ConstantWeight.class.getName());
+  private final ClassParameter<WeightFunction> WEIGHT_PARAM = new ClassParameter<WeightFunction>(WEIGHT_ID, WeightFunction.class, ConstantWeight.class.getName());
 
   /**
    * Holds the weight function.
    */
   public WeightFunction weightfunction;
-  
+
   /**
    * Holds the distance function used for weight calculation
    */
@@ -108,10 +109,13 @@ public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>, D exten
         V obj = database.get(it.next());
         double distance = weightDistance.distance(centroid, obj).getValue();
         stddev += distance * distance;
-        if(distance > maxdist) maxdist = distance;
+        if(distance > maxdist) {
+          maxdist = distance;
+        }
       }
-      if(maxdist == 0.0)
+      if(maxdist == 0.0) {
         maxdist = 1.0;
+      }
       // compute standard deviation.
       stddev = Math.sqrt(stddev / ids.size());
     }
@@ -160,8 +164,10 @@ public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>, D exten
     double weightsum = 0.0;
 
     // avoid bad parameters
-    if (k > results.size()) k = results.size();
-    
+    if(k > results.size()) {
+      k = results.size();
+    }
+
     // find maximum distance
     double maxdist = 0.0;
     double stddev = 0.0;
@@ -171,11 +177,13 @@ public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>, D exten
         DistanceResultPair<D> res = it.next();
         double dist = res.getDistance().getValue().doubleValue();
         stddev += dist * dist;
-        if(dist > maxdist)
+        if(dist > maxdist) {
           maxdist = dist;
+        }
       }
-      if(maxdist == 0.0)
+      if(maxdist == 0.0) {
         maxdist = 1.0;
+      }
       stddev = Math.sqrt(stddev / k);
     }
 
@@ -201,12 +209,13 @@ public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>, D exten
    * Finish the Covariance matrix in array "squares".
    * 
    * @param sums Sums of values.
-   * @param squares Sums of squares. Contents are destroyed and replaced with Covariance Matrix!
+   * @param squares Sums of squares. Contents are destroyed and replaced with
+   *        Covariance Matrix!
    * @param weightsum Sum of weights.
    * @return modified squares array
    */
   private double[][] finishCovarianceMatrix(double[] sums, double[][] squares, double weightsum) {
-    if (weightsum > 0) {
+    if(weightsum > 0) {
       // reasonable weights - finish up matrix.
       for(int d1 = 0; d1 < sums.length; d1++) {
         for(int d2 = d1; d2 < sums.length; d2++) {
@@ -215,12 +224,14 @@ public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>, D exten
           squares[d2][d1] = squares[d1][d2];
         }
       }
-    } else {
+    }
+    else {
       // No weights = no data. Use identity.
       // TODO: Warn about a bad weight function? Fail?
       for(int d1 = 0; d1 < sums.length; d1++) {
-        for(int d2 = d1 + 1; d2 < sums.length; d2++)
+        for(int d2 = d1 + 1; d2 < sums.length; d2++) {
           squares[d1][d2] = 0;
+        }
         squares[d1][d1] = 1;
       }
     }

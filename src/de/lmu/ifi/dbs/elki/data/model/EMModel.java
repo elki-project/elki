@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.data.model;
 
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  *
  * @param <V>
  */
-public class EMModel<V extends RealVector<V, ?>> extends BaseModel {
+public class EMModel<V extends FeatureVector<V, ?>> extends BaseModel {
   /**
    * Cluster mean
    */

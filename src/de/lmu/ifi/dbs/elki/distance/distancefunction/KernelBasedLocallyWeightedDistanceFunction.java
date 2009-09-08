@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * @param <P> the type of Preprocessor used
  * 
  */
-public class KernelBasedLocallyWeightedDistanceFunction<V extends RealVector<V, ?>, P extends Preprocessor<V>>
+public class KernelBasedLocallyWeightedDistanceFunction<V extends FeatureVector<V, ? extends Number>, P extends Preprocessor<V>>
     extends AbstractLocallyWeightedDistanceFunction<V, P> {
 
     /**

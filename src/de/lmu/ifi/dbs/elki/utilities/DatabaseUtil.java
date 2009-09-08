@@ -11,6 +11,7 @@ import java.util.TreeSet;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.RealVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -253,7 +254,7 @@ public final class DatabaseUtil {
    * @param centroid the centroid of the database
    * @return the covariance matrix of the specified objects
    */
-  public static <O extends RealVector<O, ?>> Matrix covarianceMatrix(Database<O> database, O centroid) {
+  public static <O extends FeatureVector<O, ? extends Number>> Matrix covarianceMatrix(Database<O> database, O centroid) {
 
     // centered matrix
     int columns = centroid.getDimensionality();
@@ -263,7 +264,7 @@ public final class DatabaseUtil {
     Iterator<Integer> it = database.iterator();
     int i = 0;
     while(it.hasNext()) {
-      RealVector<?, ?> obj = database.get(it.next());
+      FeatureVector<?, ? extends Number> obj = database.get(it.next());
       for(int d = 0; d < columns; d++) {
         matrixArray[i][d] = obj.getValue(d + 1).doubleValue() - centroid.getValue(d + 1).doubleValue();
       }
@@ -354,7 +355,7 @@ public final class DatabaseUtil {
    * @param centroid the centroid or reference vector of the ids
    * @return the variances in each dimension of the specified objects
    */
-  public static <V extends RealVector<V, ?>> double[] variances(Database<V> database, V centroid, Collection<Integer> ids) {
+  public static <V extends FeatureVector<V, ? extends Number>> double[] variances(Database<V> database, V centroid, Collection<Integer> ids) {
     double[] variances = new double[centroid.getDimensionality()];
 
     for(int d = 1; d <= centroid.getDimensionality(); d++) {
@@ -409,7 +410,7 @@ public final class DatabaseUtil {
    *         maximum values in each dimension of all objects stored in the given
    *         database
    */
-  public static double[][] min_max(Database<RealVector<?, ?>> database) {
+  public static double[][] min_max(Database<FeatureVector<?, ? extends Number>> database) {
     int dim = database.dimensionality();
     double[] min = new double[dim];
     double[] max = new double[dim];
@@ -417,7 +418,7 @@ public final class DatabaseUtil {
     Arrays.fill(max, -Double.MAX_VALUE);
 
     for(Iterator<Integer> it = database.iterator(); it.hasNext();) {
-      RealVector<?, ?> o = database.get(it.next());
+      FeatureVector<?, ? extends Number> o = database.get(it.next());
       for(int d = 1; d <= dim; d++) {
         double v = o.getValue(d).doubleValue();
         min[d] = Math.min(min[d], v);

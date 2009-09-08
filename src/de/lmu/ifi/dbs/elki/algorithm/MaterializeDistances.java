@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.algorithm;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.CTriple;
  * @author Erich Schubert
  * @param <V> Vector type
  */
-public class MaterializeDistances<V extends RealVector<V, ?>, D extends NumberDistance<D,N>, N extends Number> extends DistanceBasedAlgorithm<V, D, CollectionResult<CTriple<Integer, Integer, Double>>> {
+public class MaterializeDistances<V extends DatabaseObject, D extends NumberDistance<D,N>, N extends Number> extends DistanceBasedAlgorithm<V, D, CollectionResult<CTriple<Integer, Integer, Double>>> {
   private CollectionResult<CTriple<Integer, Integer, Double>> result;
 
   /**

@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Bit;
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.BitDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPreprocessorBasedDistanceFunction;
@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
  * @param <V> the type of RealVector to compute the distances in between
  * @param <P> the type of Preprocessor used
  */
-public class ERiCDistanceFunction<V extends RealVector<V, ?>, P extends Preprocessor<V>>
+public class ERiCDistanceFunction<V extends NumberVector<V, ?>, P extends Preprocessor<V>>
     extends AbstractPreprocessorBasedDistanceFunction<V, P, BitDistance> {
 
     /**

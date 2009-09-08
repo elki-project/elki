@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
 
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
@@ -11,8 +11,7 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
  * @author Simon Paradies
  * @param <O> object type
  */
-public class ArbitraryKernelFunctionWrapper<O extends RealVector<O, ? >> extends AbstractDoubleKernelFunction<O>{
-
+public class ArbitraryKernelFunctionWrapper<O extends FeatureVector<O, ? >> extends AbstractDoubleKernelFunction<O>{
 	/**
 	 * The global kernel Matrix.
 	 */

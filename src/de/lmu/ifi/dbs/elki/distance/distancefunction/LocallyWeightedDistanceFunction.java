@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
  * 
  * result = max{dist<sub>P</sub>(P,Q), dist<sub>Q</sub>(Q,P)}
  * where dist<sub>X</sub>(X,Y) = (X-Y)*<b>M<sub>X</sub></b>*(X-Y)<b><sup>T</sup></b>
- * and <b>M<sub>X</sub></b>  is the weight matrix of vector X.
+ * and <b>M<sub>X</sub></b> is the weight matrix of vector X.
  * 
  * @author Arthur Zimek
  * @param <V> the type of RealVector to compute the distances in between
@@ -55,16 +55,20 @@ public class LocallyWeightedDistanceFunction<V extends RealVector<V, ?>, P exten
     double dist2 = v2Mv1.transposeTimes(m2).times(v2Mv1).get(0, 0);
 
     if(dist1 < 0) {
-      if(-dist1 < 0.000000000001)
+      if(-dist1 < 0.000000000001) {
         dist1 = 0;
-      else
+      }
+      else {
         throw new IllegalArgumentException("dist1 " + dist1 + "  < 0!");
+      }
     }
     if(dist2 < 0) {
-      if(-dist2 < 0.000000000001)
+      if(-dist2 < 0.000000000001) {
         dist2 = 0;
-      else
+      }
+      else {
         throw new IllegalArgumentException("dist2 " + dist2 + "  < 0!");
+      }
     }
 
     return new DoubleDistance(Math.max(Math.sqrt(dist1), Math.sqrt(dist2)));
@@ -78,12 +82,15 @@ public class LocallyWeightedDistanceFunction<V extends RealVector<V, ?>, P exten
     double[] r = new double[v.getDimensionality()];
     for(int d = 1; d <= v.getDimensionality(); d++) {
       double value = v.getValue(d).doubleValue();
-      if(value < mbr.getMin(d))
+      if(value < mbr.getMin(d)) {
         r[d - 1] = mbr.getMin(d);
-      else if(value > mbr.getMax(d))
+      }
+      else if(value > mbr.getMax(d)) {
         r[d - 1] = mbr.getMax(d);
-      else
+      }
+      else {
         r[d - 1] = value;
+      }
     }
 
     V mbrVector = v.newInstance(r);

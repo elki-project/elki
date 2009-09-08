@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.data.model;
 
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
  *
  * @param <V>
  */
-public class CorrelationModel<V extends RealVector<V, ?>> extends BaseModel implements TextWriteable {
+public class CorrelationModel<V extends FeatureVector<V, ?>> extends BaseModel implements TextWriteable {
   /**
    * The computed PCA result of this cluster.
    */
