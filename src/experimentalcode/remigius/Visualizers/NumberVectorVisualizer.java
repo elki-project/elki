@@ -11,9 +11,7 @@ import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
  * @author Remigius Wojdanowski
  * 
  *         TODO: Add missing documentation for the parameters. This also
- *         includes (all) sub-classes. <br>
- *         TODO: As NumberVectors subclass FeatureVectors and seem to offer
- *         everything we need, maybe we should generalize this class.
+ *         includes (all) sub-classes.
  * 
  * @param <NV>
  * @param <N>
