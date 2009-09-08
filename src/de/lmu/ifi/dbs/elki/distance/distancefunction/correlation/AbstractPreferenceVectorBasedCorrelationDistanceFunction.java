@@ -136,7 +136,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
      */
     public double weightedDistance(V v1, V v2, BitSet weightVector) {
         if (v1.getDimensionality() != v2.getDimensionality()) {
-            throw new IllegalArgumentException("Different dimensionality of NumberVectors\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
+            throw new IllegalArgumentException("Different dimensionality of FeatureVectors\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
         }
 
         double sqrDist = 0;

@@ -1,20 +1,20 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 
 /**
- * Provides the Dynamic Time Warping distance for NumberVectors.
+ * Provides the Dynamic Time Warping distance for FeatureVectors.
  *
  * @author Thomas Bernecker
- * @param <V> the type of NumberVector to compute the distances in between
+ * @param <V> the type of FeatureVector to compute the distances in between
  */
-public class DTWDistanceFunction<V extends NumberVector<V, ?>>
+public class DTWDistanceFunction<V extends FeatureVector<V, ?>>
     extends AbstractEditDistanceFunction<V> {
 
 	/**
      * Provides a Dynamic Time Warping distance function that can compute the Dynamic Time Warping
-     * distance (that is a DoubleDistance) for NumberVectors.
+     * distance (that is a DoubleDistance) for FeatureVectors.
      */
     public DTWDistanceFunction() {
         super();

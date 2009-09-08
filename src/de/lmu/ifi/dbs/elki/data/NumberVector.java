@@ -79,6 +79,8 @@ public abstract class NumberVector<V extends NumberVector<V, N>, N extends Numbe
   }
 
   /**
+   * Get Minimum - implementation of the SpatialComparable interface
+   * 
    * @return the value at the specified dimension
    * @see #getValue(int)
    */
@@ -87,6 +89,8 @@ public abstract class NumberVector<V extends NumberVector<V, N>, N extends Numbe
   }
 
   /**
+   * Get Maximum - implementation of the SpatialComparable interface
+   * 
    * @return the value at the specified dimension
    * @see #getValue(int)
    */

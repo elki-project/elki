@@ -74,7 +74,7 @@ public class FooKernelFunction<O extends FeatureVector<?,?>> extends AbstractDou
 	 */
 	public DoubleDistance similarity(final O o1, final O o2) {
 		if (o1.getDimensionality() != o2.getDimensionality()) {
-			throw new IllegalArgumentException("Different dimensionality of NumberVectors\n  first argument: " + o1.toString() + "\n  second argument: " + o2.toString());
+			throw new IllegalArgumentException("Different dimensionality of FeatureVectors\n  first argument: " + o1.toString() + "\n  second argument: " + o2.toString());
 		}
 		double sim = 0.0;
 		//iterate over differently powered dimensions

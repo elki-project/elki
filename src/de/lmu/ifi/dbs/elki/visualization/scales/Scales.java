@@ -1,7 +1,7 @@
 package de.lmu.ifi.dbs.elki.visualization.scales;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 
@@ -22,7 +22,7 @@ public class Scales {
    * @param db Database
    * @return Scales, indexed starting with 1 (just like the database)
    */
-  public static <O extends NumberVector<?,?>> LinearScale[] calcScales(Database<O> db) {
+  public static <O extends FeatureVector<?,?>> LinearScale[] calcScales(Database<O> db) {
     if (db == null) {
       throw new AbortException("No database was given to Scales.calcScales.");
     }
@@ -32,7 +32,7 @@ public class Scales {
   
     // analyze data
     for(Integer objId : db.getIDs()) {
-      NumberVector<?,?> v = db.get(objId);
+      FeatureVector<?,?> v = db.get(objId);
       for(int d = 0; d < dim; d++) {
         minmax[d].put(v.getValue(d+1).doubleValue());
       }

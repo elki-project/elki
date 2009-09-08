@@ -7,8 +7,8 @@ import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.KNNJoin;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.KNNList;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.elki.distance.Distance;
@@ -45,10 +45,10 @@ import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
  * </p>
  *
  * @author Elke Achtert
- * @param <O> the type of NumberVector handled by this Algorithm
+ * @param <O> the type of FeatureVector handled by this Algorithm
  * @param <D> the type of Distance used
  */
-public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extends
+public class DeLiClu<O extends FeatureVector<O, ?>, D extends Distance<D>> extends
     DistanceBasedAlgorithm<O, D, ClusterOrderResult<D>> {
 
     /**

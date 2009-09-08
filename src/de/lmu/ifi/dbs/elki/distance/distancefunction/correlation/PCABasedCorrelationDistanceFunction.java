@@ -243,13 +243,13 @@ public class PCABasedCorrelationDistanceFunction<V extends RealVector<V, ?>, P e
   /**
    * Computes the Euclidean distance between the given two vectors.
    * 
-   * @param dv1 first NumberVector
-   * @param dv2 second NumberVector
+   * @param dv1 first FeatureVector
+   * @param dv2 second FeatureVector
    * @return the Euclidean distance between the given two vectors
    */
   private double euclideanDistance(V dv1, V dv2) {
     if(dv1.getDimensionality() != dv2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of NumberVectors\n  first argument: " + dv1.toString() + "\n  second argument: " + dv2.toString());
+      throw new IllegalArgumentException("Different dimensionality of FeatureVectors\n  first argument: " + dv1.toString() + "\n  second argument: " + dv2.toString());
     }
 
     double sqrDist = 0;
