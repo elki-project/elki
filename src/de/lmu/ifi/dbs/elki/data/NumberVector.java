@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.data;
 
-import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-
 /**
  * NumberVector is an abstract implementation of FeatureVector. Provided is an
  * attribute separator (space), and the ID-methods as required for a
@@ -96,20 +94,5 @@ public abstract class NumberVector<V extends NumberVector<V, N>, N extends Numbe
    */
   public double getMax(int dimension) {
     return getValue(dimension).doubleValue();
-  }
-
-  /**
-   * Return the range across all dimensions. Sensible for time series.
-   * 
-   * @return [min, max]
-   */
-  public double[] getRange() {
-    DoubleMinMax minmax = new DoubleMinMax();
-
-    for(int i = 0; i < getDimensionality(); i++) {
-      minmax.put(getValue(i+1).doubleValue());
-    }
-
-    return minmax.asArray();
   }
 }

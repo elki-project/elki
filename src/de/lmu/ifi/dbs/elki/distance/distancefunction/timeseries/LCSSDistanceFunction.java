@@ -3,8 +3,10 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -101,9 +103,9 @@ public class LCSSDistanceFunction<V extends FeatureVector<V, ?>> extends Abstrac
 
     final int delta = (int) Math.ceil(v2.getDimensionality() * pDelta);
 
-    double[] extrema1 = v1.getRange();
-    double[] extrema2 = v2.getRange();
-    double range = Math.max(extrema1[1], extrema2[1]) - Math.min(extrema1[0], extrema2[0]);
+    DoubleMinMax extrema1 = VectorUtil.getRangeDouble(v1);
+    DoubleMinMax extrema2 = VectorUtil.getRangeDouble(v1);
+    double range = Math.max(extrema1.getMax(), extrema2.getMax()) - Math.min(extrema1.getMin(), extrema2.getMin());
     final double epsilon = range * pEpsilon;
 
     int m = -1;

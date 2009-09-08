@@ -144,11 +144,4 @@ public interface FeatureVector<V extends FeatureVector<V, N>, N extends Number> 
    * @return a String representation of the FeatureVector of V
    */
   String toString();
-
-  /**
-   * Return the (double valued) range across all dimensions. Sensible for time series.
-   * 
-   * @return [min, max]
-   */
-  public double[] getRange();
 }
