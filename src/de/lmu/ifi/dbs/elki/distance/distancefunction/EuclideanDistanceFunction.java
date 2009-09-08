@@ -26,9 +26,10 @@ public class EuclideanDistanceFunction<V extends NumberVector<V, ?>> extends Abs
    * @return the Euclidean distance between the given two vectors as an instance
    *         of {@link DoubleDistance DoubleDistance}.
    */
+  @Override
   public DoubleDistance distance(V v1, V v2) {
     if(v1.getDimensionality() != v2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of NumberVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
+      throw new IllegalArgumentException("Different dimensionality of NumberVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString()+"\n"+v1.getDimensionality() +"!="+ v2.getDimensionality());
     }
     double sqrDist = 0;
     for(int i = 1; i <= v1.getDimensionality(); i++) {
@@ -43,9 +44,10 @@ public class EuclideanDistanceFunction<V extends NumberVector<V, ?>> extends Abs
     return "Euclidean distance for FeatureVectors. No parameters.\n";
   }
 
+  @Override
   public DoubleDistance minDist(HyperBoundingBox mbr, V v) {
     if(mbr.getDimensionality() != v.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + v.toString());
+      throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + v.toString()+"\n"+mbr.getDimensionality() +"!="+ v.getDimensionality());
     }
 
     double sqrDist = 0;
