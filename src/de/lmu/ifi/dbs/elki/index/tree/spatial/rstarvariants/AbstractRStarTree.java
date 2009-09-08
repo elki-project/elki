@@ -43,12 +43,18 @@ import de.lmu.ifi.dbs.elki.utilities.heap.HeapNode;
 /**
  * Abstract superclass for index structures based on a R*-Tree.
  * 
+ * Implementation Note: The restriction on NumberVector (as opposed to e.g.
+ * FeatureVector) is intentional, because we have spatial requirements.
+ * 
  * @author Elke Achtert
  * @param <O> Object type
  * @param <N> Node type
  * @param <E> Entry type
  */
 public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends SpatialIndex<O, N, E> {
+  /**
+   * Development flag: This will enable some extra integrity checks on the tree.
+   */
   protected final static boolean extraIntegrityChecks = false;
 
   /**
@@ -284,7 +290,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
   }
 
   /**
-   * Performs a k-nearest neighbor query for the given FeatureVector with the
+   * Performs a k-nearest neighbor query for the given NumberVector with the
    * given parameter k and the according distance function. The query result is
    * in ascending order to the distance to the query object.
    * 
@@ -524,7 +530,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
   }
 
   /**
-   * Performs a k-nearest neighbor query for the given FeatureVector with the
+   * Performs a k-nearest neighbor query for the given NumberVector with the
    * given parameter k and the according distance function. The query result is
    * in ascending order to the distance to the query object.
    * 
@@ -988,12 +994,15 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @return the union of the two specified MBRs
    */
   protected HyperBoundingBox union(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
-    if(mbr1 == null && mbr2 == null)
+    if(mbr1 == null && mbr2 == null) {
       return null;
-    if(mbr1 == null)
-      return new HyperBoundingBox(mbr2.getMin().clone(), mbr2.getMax().clone());
-    if(mbr2 == null)
-      return new HyperBoundingBox(mbr1.getMin().clone(), mbr1.getMax().clone());
+    }
+    if(mbr1 == null) {
+      return new HyperBoundingBox(mbr2.getMin(), mbr2.getMax());
+    }
+    if(mbr2 == null) {
+      return new HyperBoundingBox(mbr1.getMin(), mbr1.getMax());
+    }
     return mbr1.union(mbr2);
   }
 
