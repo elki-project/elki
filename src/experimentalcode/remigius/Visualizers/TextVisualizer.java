@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import experimentalcode.remigius.ShapeLibrary;
+import experimentalcode.remigius.UpdatableSVGPlot;
 import experimentalcode.remigius.gui.ToolTipListener;
 
 /**
@@ -87,30 +88,34 @@ public class TextVisualizer<NV extends NumberVector<NV, N>, N extends Number> ex
       LoggingUtil.exception("Equally-named CSSClass with different owner already exists", e);
     }
   }
-  
+
   @Override
   public Element visualize(SVGPlot svgp) {
     setupCSS(svgp);
     Element layer = ShapeLibrary.createSVG(svgp.getDocument());
 
-    for(int id : database.getIDs()) {
-      Element tooltip = ShapeLibrary.createToolTip(svgp.getDocument(), getPositioned(database.get(id), dimx), (1 - getPositioned(database.get(id), dimy)), getValue(id), id, dimx, dimy, toString());
+    if (svgp instanceof UpdatableSVGPlot){
+      for(int id : database.getIDs()) {
+        Element tooltip = ShapeLibrary.createToolTip(svgp.getDocument(), getPositioned(database.get(id), dimx), (1 - getPositioned(database.get(id), dimy)), getValue(id), id, dimx, dimy, toString());
 
-      String dotID = ShapeLibrary.createID(ShapeLibrary.MARKER, id, dimx, dimy);
+        String dotID = ShapeLibrary.createID(ShapeLibrary.MARKER, id, dimx, dimy);
 
-      Element dot = svgp.getIdElement(dotID);
-      if(dot != null) {
-        EventTarget targ = (EventTarget) dot;
-        ToolTipListener hoverer = new ToolTipListener(svgp.getDocument(), tooltip.getAttribute("id"));
-        targ.addEventListener(SVGConstants.SVG_MOUSEOVER_EVENT_TYPE, hoverer, false);
-        targ.addEventListener(SVGConstants.SVG_MOUSEOUT_EVENT_TYPE, hoverer, false);
-        targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, hoverer, false);
+        Element dot = svgp.getIdElement(dotID);
+        if(dot != null) {
+
+          EventTarget targ = (EventTarget) dot;
+          ToolTipListener hoverer = new ToolTipListener((UpdatableSVGPlot)svgp, tooltip.getAttribute("id"));
+          targ.addEventListener(SVGConstants.SVG_MOUSEOVER_EVENT_TYPE, hoverer, false);
+          targ.addEventListener(SVGConstants.SVG_MOUSEOUT_EVENT_TYPE, hoverer, false);
+          targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, hoverer, false);
+        }
+        else {
+          LoggingUtil.message("Attaching ToolTip to non-existing Object: " + dotID);
+        }
+        layer.appendChild(tooltip);
       }
-      else {
-        LoggingUtil.message("Attaching ToolTip to non-existing Object: " + dotID);
-      }
-
-      layer.appendChild(tooltip);
+    } else {
+      LoggingUtil.message("This SVGPlot doesn't contain an UpdateRunner.");
     }
     return layer;
   }
