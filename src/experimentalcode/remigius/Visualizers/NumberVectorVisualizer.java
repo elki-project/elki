@@ -4,14 +4,16 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
-import experimentalcode.remigius.VisualizationManager;
 
 /**
  * Abstract superclass for Visualizers which process NumberVectors.
  * 
  * @author Remigius Wojdanowski
  * 
- * TODO: Add missing documentation for the parameters. This todo also includes (all) sub-classes.
+ *         TODO: Add missing documentation for the parameters. This also
+ *         includes (all) sub-classes. <br>
+ *         TODO: As NumberVectors subclass FeatureVectors and seem to offer
+ *         everything we need, maybe we should generalize this class.
  * 
  * @param <NV>
  * @param <N>
@@ -27,7 +29,7 @@ public abstract class NumberVectorVisualizer<NV extends NumberVector<NV, N>, N e
   /**
    * Convenience method, initializing this Visualizer with a default level of 0.
    * 
-   * @see #init(Database, VisualizationManager, int, String)
+   * @see #init(Database, int, String)
    * 
    * @param db contains all objects to be processed.
    * @param v used to receive and publish different information.
@@ -42,10 +44,9 @@ public abstract class NumberVectorVisualizer<NV extends NumberVector<NV, N>, N e
    * This method acts as a replacement for the constructor, which can't take any
    * arguments due to restrictions imposed by the way parameters are collected.
    * 
-   * @see AbstractVisualizer#init(Database, VisualizationManager, int, String)
+   * @see AbstractVisualizer#init(Database, int, String)
    * 
    * @param db contains all objects to be processed.
-   * @param v used to receive and publish different information.
    */
   public void init(Database<NV> db, int level, String name) {
     super.init(db, level, name);
