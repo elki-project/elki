@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstrai
  * @author Thomas Bernecker
  * @param <V> the type of FeatureVector to compute the distances in between
  */
-public abstract class AbstractEditDistanceFunction<V extends FeatureVector<V, ?>> extends AbstractDoubleDistanceFunction<V> {
+public abstract class AbstractEditDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDoubleDistanceFunction<V> {
 
   protected enum Step {
     NONE, INS, DEL, MATCH

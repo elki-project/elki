@@ -9,7 +9,7 @@ public final class VectorUtil {
    * 
    * @return [min, max]
    */
-  public static <V extends FeatureVector<?, ?>> DoubleMinMax getRangeDouble(V vec) {
+  public static <V extends NumberVector<?, ?>> DoubleMinMax getRangeDouble(V vec) {
     DoubleMinMax minmax = new DoubleMinMax();
 
     for(int i = 0; i < vec.getDimensionality(); i++) {

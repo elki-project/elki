@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -96,7 +96,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * 
  * @param <O> Object type
  */
-public class KNNExplorer<O extends FeatureVector<?, ?>, N extends NumberDistance<N, D>, D extends Number> extends AbstractApplication {
+public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<N, D>, D extends Number> extends AbstractApplication {
   /**
    * Parameter to specify the database connection to be used, must extend
    * {@link de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection}.

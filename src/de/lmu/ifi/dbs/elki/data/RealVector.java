@@ -9,7 +9,7 @@ package de.lmu.ifi.dbs.elki.data;
  * 
  * @author Elke Achtert
  */
-public abstract class RealVector<V extends RealVector<V,N>,N extends Number> extends NumberVector<V,N> {
+public interface RealVector<V extends RealVector<V,N>,N extends Number> extends NumberVector<V,N> {
   /**
    * Returns a new RealVector of N for the given values.
    *

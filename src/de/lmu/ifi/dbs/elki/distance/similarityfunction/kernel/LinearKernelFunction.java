@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 
 /**
@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
  * @author Simon Paradies
  * @param <O> vector type
  */
-public class LinearKernelFunction<O extends FeatureVector<O, ? >> extends AbstractDoubleKernelFunction<O> {
+public class LinearKernelFunction<O extends NumberVector<O, ? >> extends AbstractDoubleKernelFunction<O> {
 
   /**
    * Provides a linear Kernel function that computes

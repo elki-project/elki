@@ -12,7 +12,7 @@ import java.util.Random;
  *
  * @author Arthur Zimek
  */
-public class DoubleVector extends RealVector<DoubleVector,Double> {
+public class DoubleVector extends AbstractNumberVector<DoubleVector,Double> implements RealVector<DoubleVector,Double> {
 
   /**
    * Keeps the values of the real vector
@@ -114,7 +114,7 @@ public class DoubleVector extends RealVector<DoubleVector,Double> {
   
   /**
    * 
-   * @see de.lmu.ifi.dbs.elki.data.FeatureVector#randomInstance(de.lmu.ifi.dbs.elki.data.FeatureVector, de.lmu.ifi.dbs.elki.data.FeatureVector, java.util.Random)
+   * @see de.lmu.ifi.dbs.elki.data.NumberVector#randomInstance(de.lmu.ifi.dbs.elki.data.NumberVector, de.lmu.ifi.dbs.elki.data.NumberVector, java.util.Random)
    */
   public DoubleVector randomInstance(DoubleVector min, DoubleVector max, Random random) {
     double[] randomValues = new double[getDimensionality()];

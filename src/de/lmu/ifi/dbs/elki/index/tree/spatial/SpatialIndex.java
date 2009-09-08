@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualStringConst
  * @param <N> Node type
  * @param <E> Entry type
  */
-public abstract class SpatialIndex<O extends FeatureVector<O, ?>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends TreeIndex<O, N, E> {
+public abstract class SpatialIndex<O extends NumberVector<O, ?>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends TreeIndex<O, N, E> {
   /**
    * OptionID for {@link #BULK_LOAD_FLAG}
    */

@@ -13,7 +13,7 @@ import java.util.Random;
  *
  * @author Elke Achtert
  */
-public class FloatVector extends RealVector<FloatVector, Float> {
+public class FloatVector extends AbstractNumberVector<FloatVector, Float> implements RealVector<FloatVector, Float> {
 
     /**
      * Keeps the values of the float vector
@@ -93,7 +93,7 @@ public class FloatVector extends RealVector<FloatVector, Float> {
 
     /**
      * 
-     * @see de.lmu.ifi.dbs.elki.data.FeatureVector#randomInstance(de.lmu.ifi.dbs.elki.data.FeatureVector, de.lmu.ifi.dbs.elki.data.FeatureVector, java.util.Random)
+     * @see de.lmu.ifi.dbs.elki.data.NumberVector#randomInstance(de.lmu.ifi.dbs.elki.data.NumberVector, de.lmu.ifi.dbs.elki.data.NumberVector, java.util.Random)
      */
     public FloatVector randomInstance(FloatVector min, FloatVector max, Random random) {
         float[] randomValues = new float[getDimensionality()];

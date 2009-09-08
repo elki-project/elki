@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.KNNList;
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.Distance;
@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * @param <D> Distance type
  * @param <N> Number type
  */
-public class RdKNNTree<O extends FeatureVector<O, ?>, D extends NumberDistance<D, N>, N extends Number> extends NonFlatRStarTree<O, RdKNNNode<D, N>, RdKNNEntry<D, N>> {
+public class RdKNNTree<O extends NumberVector<O, ?>, D extends NumberDistance<D, N>, N extends Number> extends NonFlatRStarTree<O, RdKNNNode<D, N>, RdKNNEntry<D, N>> {
 
   /**
    * OptionID for {@link #K_PARAM}

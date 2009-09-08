@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial;
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
  * @param <V> the type of FeatureVector to compute the distances in between
  * @param <D> distance type
  */
-public interface SpatialDistanceFunction<V extends FeatureVector<V, ?>, D extends Distance<D>> extends DistanceFunction<V, D> {
+public interface SpatialDistanceFunction<V extends NumberVector<V, ?>, D extends Distance<D>> extends DistanceFunction<V, D> {
 
     /**
      * Computes the minimum distance between the given MBR and the FeatureVector object
