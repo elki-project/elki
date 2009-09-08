@@ -174,7 +174,7 @@ public class CSSClassManager {
     while (style.hasChildNodes()) {
       style.removeChild(style.getFirstChild());
     }
-    style.appendChild(cont);    
+    style.appendChild(cont);
   }
   
   /**
