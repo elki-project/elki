@@ -1,18 +1,18 @@
 package de.lmu.ifi.dbs.elki.parser;
 
-import de.lmu.ifi.dbs.elki.data.RealVector;
-import de.lmu.ifi.dbs.elki.database.connection.AbstractDatabaseConnection;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.connection.AbstractDatabaseConnection;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * <p>
@@ -29,9 +29,9 @@ import java.util.List;
  * </p>
  * 
  * @author Arthur Zimek
- * @param <V> the type of RealVector expected in the {@link ParsingResult}
+ * @param <V> the type of NumberVector expected in the {@link ParsingResult}
  */
-public abstract class RealVectorLabelParser<V extends RealVector<?, ?>> extends AbstractParser<V> implements LinebasedParser<V> {
+public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> extends AbstractParser<V> implements LinebasedParser<V> {
   /**
    * OptionID for {@link #CLASS_LABEL_INDEX_PARAM}
    */
@@ -61,7 +61,7 @@ public abstract class RealVectorLabelParser<V extends RealVector<?, ?>> extends 
    * Several labels may be given per point. A label must not be parseable as
    * double (or float). Lines starting with &quot;#&quot; will be ignored.
    */
-  public RealVectorLabelParser() {
+  public NumberVectorLabelParser() {
     super();
     //debug = true;
     addOption(CLASS_LABEL_INDEX_PARAM);

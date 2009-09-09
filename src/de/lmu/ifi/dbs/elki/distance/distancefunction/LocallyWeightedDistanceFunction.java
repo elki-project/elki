@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
@@ -17,10 +17,10 @@ import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
  * and <b>M<sub>X</sub></b> is the weight matrix of vector X.
  * 
  * @author Arthur Zimek
- * @param <V> the type of RealVector to compute the distances in between
+ * @param <V> the type of NumberVector to compute the distances in between
  * @param <P> the type of Preprocessor used
  */
-public class LocallyWeightedDistanceFunction<V extends RealVector<V, ?>, P extends Preprocessor<V>> extends AbstractLocallyWeightedDistanceFunction<V, P> implements SpatialDistanceFunction<V, DoubleDistance> {
+public class LocallyWeightedDistanceFunction<V extends NumberVector<V, ?>, P extends Preprocessor<V>> extends AbstractLocallyWeightedDistanceFunction<V, P> implements SpatialDistanceFunction<V, DoubleDistance> {
 
   /**
    * Provides a locally weighted distance function.
@@ -33,8 +33,8 @@ public class LocallyWeightedDistanceFunction<V extends RealVector<V, ?>, P exten
    * Computes the distance between two given real vectors according to this
    * distance function.
    * 
-   * @param v1 first RealVector
-   * @param v2 second RealVector
+   * @param v1 first vector
+   * @param v2 second vector
    * @return the distance between two given real vectors according to this
    *         distance function
    */

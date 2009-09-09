@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
@@ -36,10 +36,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * @author Arthur Zimek
  * @param <D> a type of {@link Distance} as returned by the used distance
  *        function
- * @param <V> a type of {@link RealVector} as a suitable datatype for this
+ * @param <V> a type of {@link NumberVector} as a suitable datatype for this
  *        algorithm
  */
-public class KMeans<D extends Distance<D>, V extends RealVector<V, ?>> extends DistanceBasedAlgorithm<V, D, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, V> {
+public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V, D, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, V> {
 
   /**
    * OptionID for {@link #K_PARAM}

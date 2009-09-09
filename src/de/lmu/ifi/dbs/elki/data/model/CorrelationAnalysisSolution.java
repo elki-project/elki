@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
  * dependencies.
  * 
  * @author Arthur Zimek
- * @param <V> the type of RealVector handled by this Result
+ * @param <V> the type of NumberVector handled by this Result
  */
 public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implements TextWriteable, Result, Model {
   /**
@@ -191,7 +191,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
   }
 
   /**
-   * Returns the distance of RealVector p from the hyperplane underlying this
+   * Returns the distance of NumberVector p from the hyperplane underlying this
    * solution.
    * 
    * @param p a vector in the space underlying this solution

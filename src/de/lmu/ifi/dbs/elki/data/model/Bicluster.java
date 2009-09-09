@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
  * Wrapper class to provide the basic properties of a bicluster.
  * 
  * @author Arthur Zimek
- * @param <V> the type of RealVector handled by this Result
+ * @param <V> the type of NumberVector handled by this Result
  */
 public class Bicluster<V extends FeatureVector<V, ?>> implements TextWriteable, Model {
   /**

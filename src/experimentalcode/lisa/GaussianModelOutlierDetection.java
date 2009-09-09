@@ -1,7 +1,7 @@
 package experimentalcode.lisa;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.elki.utilities.Description;
  *
  * @param <V>
  */
-public class GaussianModelOutlierDetection<V extends RealVector<V,Double>> extends AbstractAlgorithm<V,MultiResult> {
+public class GaussianModelOutlierDetection<V extends NumberVector<V,Double>> extends AbstractAlgorithm<V,MultiResult> {
 	
   MultiResult result;
 	

@@ -21,7 +21,7 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
  * affine distance between the two subspaces.
  * 
  * @author Elke Achtert
- * @param <V> the type of RealVector to compute the distances in between
+ * @param <V> the type of NumberVector to compute the distances in between
  * @param <P> the type of Preprocessor used
  */
 public class SubspaceDistanceFunction<V extends NumberVector<V, ?>, P extends Preprocessor<V>> extends AbstractPreprocessorBasedDistanceFunction<V, P, SubspaceDistance> {

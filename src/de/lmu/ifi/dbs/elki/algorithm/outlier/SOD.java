@@ -5,7 +5,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.KNNList;
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
@@ -25,11 +25,11 @@ import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
 
 /**
  * @author Arthur Zimek
- * @param <V> the type of RealVector handled by this Algorithm
+ * @param <V> the type of NumberVector handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  */
 // todo arthur comment
-public class SOD<V extends RealVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<V, MultiResult> {
+public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<V, MultiResult> {
 
     /**
      * The association id to associate a subspace outlier degree.

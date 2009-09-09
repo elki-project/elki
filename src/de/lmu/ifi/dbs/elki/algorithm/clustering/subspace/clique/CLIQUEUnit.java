@@ -9,16 +9,16 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.Interval;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 
 /**
  * Represents a unit in the CLIQUE algorithm.
  * 
  * @author Elke Achtert
- * @param <V> the type of RealVector handled by this Algorithm
+ * @param <V> the type of NumberVector handled by this Algorithm
  */
-public class CLIQUEUnit<V extends FeatureVector<V, ? extends Number>> {
+public class CLIQUEUnit<V extends NumberVector<V,?>> {
   /**
    * The one-dimensional intervals of which this unit is build.
    */

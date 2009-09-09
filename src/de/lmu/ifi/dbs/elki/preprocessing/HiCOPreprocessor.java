@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.preprocessing;
 import java.util.Iterator;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
  * @author Elke Achtert
  * @param <V> Vector type
  */
-public abstract class HiCOPreprocessor<V extends FeatureVector<V, ? extends Number>> extends AbstractParameterizable implements Preprocessor<V> {
+public abstract class HiCOPreprocessor<V extends NumberVector<V,?>> extends AbstractParameterizable implements Preprocessor<V> {
     /**
      * The default distance function for the PCA.
      */

@@ -9,7 +9,7 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering.AbstractBiclustering;
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.BiclusterWithInverted;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
@@ -32,12 +32,12 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
  * </p>
  *
  * @author Noemi Andor
- * @param <V> a certain subtype of RealVector - the data matrix is supposed to
+ * @param <V> a certain subtype of NumberVector - the data matrix is supposed to
  * consist of rows where each row relates to an object of type V and
  * the columns relate to the attribute values of these objects
  */
 
-public class ChengAndChurch<V extends RealVector<V, Double>> extends AbstractBiclustering<V, BiclusterWithInverted<V>> {
+public class ChengAndChurch<V extends NumberVector<V, Double>> extends AbstractBiclustering<V, BiclusterWithInverted<V>> {
 
     /**
      * OptionID for the parameter {@link #SEED_PARAM}.

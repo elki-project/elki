@@ -13,7 +13,7 @@ import java.util.Random;
  *
  * @author Elke Achtert
  */
-public class FloatVector extends AbstractNumberVector<FloatVector, Float> implements RealVector<FloatVector, Float> {
+public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
 
     /**
      * Keeps the values of the float vector

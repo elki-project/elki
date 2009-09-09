@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.normalization;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <V> vector type
  */
 // TODO: extract superclass AbstractAttributeWiseNormalization
-public class AttributeWiseMinMaxNormalization<V extends RealVector<V, ?>> extends AbstractNormalization<V> {
+public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> extends AbstractNormalization<V> {
   /**
    * OptionID for {@link #MINIMA_PARAM}
    */
@@ -115,7 +115,7 @@ public class AttributeWiseMinMaxNormalization<V extends RealVector<V, ?>> extend
     }
 
     if(minima.length == 0 && maxima.length == 0) {
-      determineMinMax(ClassGenericsUtil.toArray(featureVectors, RealVector.class));
+      determineMinMax(ClassGenericsUtil.toArray(featureVectors, NumberVector.class));
     }
 
     int dim = featureVectors.get(0).getDimensionality();

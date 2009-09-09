@@ -35,7 +35,7 @@ import java.util.Map;
  * 
  * @author Arthur Zimek
  */
-public class SparseFloatVectorLabelParser extends RealVectorLabelParser<SparseFloatVector> {
+public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<SparseFloatVector> {
 
   /**
    * Holds the dimensionality of the parsed data which is the maximum occurring index of any attribute.
@@ -45,7 +45,7 @@ public class SparseFloatVectorLabelParser extends RealVectorLabelParser<SparseFl
   /**
    * Creates a DoubleVector out of the given attribute values.
    * 
-   * @see de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser#createDBObject(java.util.List)
+   * @see de.lmu.ifi.dbs.elki.parser.NumberVectorLabelParser#createDBObject(java.util.List)
    */
   @Override
   public SparseFloatVector createDBObject(List<Double> attributes) {
@@ -54,7 +54,7 @@ public class SparseFloatVectorLabelParser extends RealVectorLabelParser<SparseFl
 
   /**
    * 
-   * @see de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser#descriptionLineType()
+   * @see de.lmu.ifi.dbs.elki.parser.NumberVectorLabelParser#descriptionLineType()
    */
   @Override
   protected String descriptionLineType() {
@@ -62,7 +62,7 @@ public class SparseFloatVectorLabelParser extends RealVectorLabelParser<SparseFl
   }
 
   /**
-   * @see de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser#parseLine(java.lang.String)
+   * @see de.lmu.ifi.dbs.elki.parser.NumberVectorLabelParser#parseLine(java.lang.String)
    */
   @Override
   public Pair<SparseFloatVector, List<String>> parseLine(String line) {
@@ -99,7 +99,7 @@ public class SparseFloatVectorLabelParser extends RealVectorLabelParser<SparseFl
   
   /**
    * 
-   * @see de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser#parse(java.io.InputStream)
+   * @see de.lmu.ifi.dbs.elki.parser.NumberVectorLabelParser#parse(java.io.InputStream)
    */
   @Override
   public ParsingResult<SparseFloatVector> parse(InputStream in) {
@@ -124,7 +124,7 @@ public class SparseFloatVectorLabelParser extends RealVectorLabelParser<SparseFl
   }
 
   /**
-   * @see de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser#shortDescription()
+   * @see de.lmu.ifi.dbs.elki.parser.NumberVectorLabelParser#shortDescription()
    */
   @Override
   public String shortDescription() {

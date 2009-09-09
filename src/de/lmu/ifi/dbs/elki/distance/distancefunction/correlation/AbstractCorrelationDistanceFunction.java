@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.preprocessing.Preprocessor;
  * correlation distance for real valued vectors.
  * 
  * @author Elke Achtert
- * @param <V> the type of RealVector used
+ * @param <V> the type of NumberVector used
  * @param <P> the type of Preprocessor used
  * @param <D> the type of CorrelationDistance used
  */
@@ -34,8 +34,7 @@ public abstract class AbstractCorrelationDistanceFunction<V extends FeatureVecto
 
   /**
    * Provides the Correlation distance between the given two vectors by calling
-   * {@link #correlationDistance(de.lmu.ifi.dbs.elki.data.RealVector,de.lmu.ifi.dbs.elki.data.RealVector)
-   * correlationDistance(v1, v2)}.
+   * {@link #correlationDistance correlationDistance(v1, v2)}.
    * 
    * @return the Correlation distance between the given two vectors as an
    *         instance of {@link CorrelationDistance CorrelationDistance}.
@@ -52,8 +51,8 @@ public abstract class AbstractCorrelationDistanceFunction<V extends FeatureVecto
   /**
    * Computes the correlation distance between the two specified vectors.
    * 
-   * @param v1 first RealVector
-   * @param v2 second RealVector
+   * @param v1 first vector
+   * @param v2 second vector
    * @return the correlation distance between the two specified vectors
    */
   abstract D correlationDistance(V v1, V v2);

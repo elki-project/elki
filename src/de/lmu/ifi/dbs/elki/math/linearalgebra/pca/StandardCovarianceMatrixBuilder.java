@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 
 import java.util.Collection;
 
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
  *
  * @param <V> Vector class to use.
  */
-public class StandardCovarianceMatrixBuilder<V extends RealVector<V, ?>, D extends NumberDistance<D,?>> extends CovarianceMatrixBuilder<V,D> {
+public class StandardCovarianceMatrixBuilder<V extends NumberVector<V, ?>, D extends NumberDistance<D,?>> extends CovarianceMatrixBuilder<V,D> {
   /**
    * Compute Covariance Matrix for a complete database
    * 

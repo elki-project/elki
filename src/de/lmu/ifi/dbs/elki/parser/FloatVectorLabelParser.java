@@ -23,12 +23,12 @@ import java.util.List;
  * 
  * @author Arthur Zimek
  */
-public class FloatVectorLabelParser extends RealVectorLabelParser<FloatVector> {
+public class FloatVectorLabelParser extends NumberVectorLabelParser<FloatVector> {
 
   /**
    * Creates a FloatVector out of the given attribute values.
    * 
-   * @see de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser#createDBObject(java.util.List)
+   * @see de.lmu.ifi.dbs.elki.parser.NumberVectorLabelParser#createDBObject(java.util.List)
    */
   @Override
   public FloatVector createDBObject(List<Double> attributes) {

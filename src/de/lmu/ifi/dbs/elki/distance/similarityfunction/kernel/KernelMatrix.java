@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -179,7 +180,7 @@ public class KernelMatrix<O extends FeatureVector<O, ?>> extends AbstractParamet
    * @param kernelMatrix the kernel matrix to be centered
    * @return centered kernelMatrix (for convenience)
    */
-  public static Matrix centerKernelMatrix(final KernelMatrix<? extends FeatureVector<?, ? extends Number>> kernelMatrix) {
+  public static Matrix centerKernelMatrix(final KernelMatrix<? extends NumberVector<?,?>> kernelMatrix) {
     return centerMatrix(kernelMatrix.getKernel());
   }
 }

@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.CorrelationDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -19,12 +19,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
  * Provides the correlation distance for real valued vectors.
  * 
  * @author Elke Achtert
- * @param <V> the type of RealVector to compute the distances in between
+ * @param <V> the type of NumberVector to compute the distances in between
  * @param <P> the type of Preprocessor used
  * @param <D> the type of CorrelationDistance used
  */
 // TODO: can we spec D differently so we don't get the unchecked warnings below?
-public class PCABasedCorrelationDistanceFunction<V extends FeatureVector<V, ? extends Number>, P extends HiCOPreprocessor<V>, D extends CorrelationDistance<D>> extends AbstractCorrelationDistanceFunction<V, P, D> {
+public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V,?>, P extends HiCOPreprocessor<V>, D extends CorrelationDistance<D>> extends AbstractCorrelationDistanceFunction<V, P, D> {
   /**
    * OptionID for {@link #DELTA_PARAM}
    */

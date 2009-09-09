@@ -367,4 +367,16 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
     }
   }
 
+  @Override
+  public BitVector newInstance(double[] values) {
+    int dim = values.length;
+    bits = new BitSet(dim);
+    for (int i = 0; i < dim; i++) {
+      if (values[i] >= 0.5) {
+        bits.set(i);
+      }
+    }
+    return new BitVector(bits, dim);
+  }
+
 }

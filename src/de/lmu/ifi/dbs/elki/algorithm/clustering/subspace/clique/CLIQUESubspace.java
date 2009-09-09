@@ -10,8 +10,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.Interval;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.Subspace;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -22,9 +22,9 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * Represents a subspace of the original data space in the CLIQUE algorithm.
  * 
  * @author Elke Achtert
- * @param <V> the type of RealVector handled by this Algorithm
+ * @param <V> the type of NumberVector handled by this Algorithm
  */
-public class CLIQUESubspace<V extends FeatureVector<V, ? extends Number>> extends Subspace<V> implements Comparable<CLIQUESubspace<V>>, Model, TextWriteable {
+public class CLIQUESubspace<V extends NumberVector<V,?>> extends Subspace<V> implements Comparable<CLIQUESubspace<V>>, Model, TextWriteable {
   /**
    * The dense units belonging to this subspace.
    */

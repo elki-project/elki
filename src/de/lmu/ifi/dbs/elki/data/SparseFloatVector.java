@@ -25,7 +25,7 @@ import java.util.Random;
  * 
  * @author Arthur Zimek
  */
-public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, Float> implements RealVector<SparseFloatVector, Float> {
+public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, Float> {
 
   /**
    * Mapping of indices and corresponding values. Only non-zero values will to
@@ -97,7 +97,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
   }
 
   /**
-   * @see RealVector#newInstance(double[])
+   * @see NumberVector#newInstance(double[])
    */
   @Override
   public SparseFloatVector newInstance(double[] values) {

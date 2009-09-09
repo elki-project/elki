@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * 
  * @param <V> Vector class to use
  */
-public class WeightedCovarianceMatrixBuilder<V extends RealVector<V, ?>, D extends NumberDistance<D, ?>> extends CovarianceMatrixBuilder<V, D> {
+public class WeightedCovarianceMatrixBuilder<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends CovarianceMatrixBuilder<V, D> {
   /**
    * OptionID for {@link #WEIGHT_PARAM}
    */

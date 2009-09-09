@@ -22,8 +22,8 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.clique.CLIQUEUnit;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.Interval;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -60,9 +60,9 @@ import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
  * </p>
  * 
  * @author Elke Achtert
- * @param <V> the type of RealVector handled by this Algorithm
+ * @param <V> the type of NumberVector handled by this Algorithm
  */
-public class CLIQUE<V extends FeatureVector<V, ? extends Number>> extends AbstractAlgorithm<V, Clustering<CLIQUESubspace<V>>> implements ClusteringAlgorithm<Clustering<CLIQUESubspace<V>>, V> {
+public class CLIQUE<V extends NumberVector<V,?>> extends AbstractAlgorithm<V, Clustering<CLIQUESubspace<V>>> implements ClusteringAlgorithm<Clustering<CLIQUESubspace<V>>, V> {
   /**
    * OptionID for {@link #XSI_PARAM}
    */

@@ -1,16 +1,13 @@
 package experimentalcode.lisa;
 
 
-import de.lmu.ifi.dbs.elki.result.CollectionResult;
-import de.lmu.ifi.dbs.elki.result.IterableResult;
-
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
+
+import de.lmu.ifi.dbs.elki.result.CollectionResult;
 
 /**
  * Simple 'collection' type of result.
- * For example, a list of RealVectors.
+ * For example, a list of NumberVectors.
  * 
  * @author Erich Schubert
  *

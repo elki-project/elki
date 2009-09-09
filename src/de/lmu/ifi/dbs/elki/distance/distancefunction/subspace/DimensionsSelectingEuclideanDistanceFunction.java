@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
  * @author Elke Achtert
  * @param <V> the type of FeatureVector to compute the distances in between
  */
-public class DimensionsSelectingEuclideanDistanceFunction<V extends FeatureVector<V, ? extends Number>> extends AbstractDimensionsSelectingDoubleDistanceFunction<V> implements SpatialDistanceFunction<V, DoubleDistance> {
+public class DimensionsSelectingEuclideanDistanceFunction<V extends NumberVector<V,?>> extends AbstractDimensionsSelectingDoubleDistanceFunction<V> implements SpatialDistanceFunction<V, DoubleDistance> {
 
   /**
    * Provides a distance function that computes the Euclidean distance between

@@ -1,7 +1,10 @@
 package experimentalcode.lisa;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -12,13 +15,8 @@ import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 /**
  * Likelyhood-based outlier detection
  * Assuming that a data set contains objects from a mixture of two probability distributions. 
@@ -30,7 +28,7 @@ import java.util.List;
  *
  * @param <V>
  */
-public class MixtureModelOutlierDetection<V extends RealVector<V,Double>> extends AbstractAlgorithm<V,MultiResult> {
+public class MixtureModelOutlierDetection<V extends NumberVector<V,Double>> extends AbstractAlgorithm<V,MultiResult> {
   public static final AssociationID<Double> MMOD_OFLAG = AssociationID.getOrCreateAssociationID("mmod.oflag", Double.class);
 public static final OptionID L_ID = OptionID.getOrCreateOptionID("mmo.l", "expected fraction of outliers");
 public static final OptionID C_ID = OptionID.getOrCreateOptionID("mmo.c", "cutoff");

@@ -12,7 +12,7 @@ import java.util.Random;
  *
  * @author Arthur Zimek
  */
-public class DoubleVector extends AbstractNumberVector<DoubleVector,Double> implements RealVector<DoubleVector,Double> {
+public class DoubleVector extends AbstractNumberVector<DoubleVector,Double> {
 
   /**
    * Keeps the values of the real vector

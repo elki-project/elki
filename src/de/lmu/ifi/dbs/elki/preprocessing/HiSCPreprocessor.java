@@ -5,7 +5,7 @@ import java.util.BitSet;
 import java.util.Iterator;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
  * @author Elke Achtert
  * @param <V> Vector type
  */
-public class HiSCPreprocessor<V extends FeatureVector<V, ? extends Number>> extends AbstractParameterizable implements PreferenceVectorPreprocessor<V> {
+public class HiSCPreprocessor<V extends NumberVector<V,?>> extends AbstractParameterizable implements PreferenceVectorPreprocessor<V> {
   /**
    * The default value for alpha.
    */

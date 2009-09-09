@@ -21,12 +21,12 @@ import java.util.List;
  * 
  * @author Arthur Zimek
  */
-public class DoubleVectorLabelParser extends RealVectorLabelParser<DoubleVector> {
+public class DoubleVectorLabelParser extends NumberVectorLabelParser<DoubleVector> {
 
   /**
    * Creates a DoubleVector out of the given attribute values.
    * 
-   * @see de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser#createDBObject(java.util.List)
+   * @see de.lmu.ifi.dbs.elki.parser.NumberVectorLabelParser#createDBObject(java.util.List)
    */
   @Override
   public DoubleVector createDBObject(List<Double> attributes) {

@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.AxesModel;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -47,9 +47,9 @@ import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
  * </p>
  *
  * @author Elke Achtert
- * @param <V> the type of RealVector handled by this Algorithm
+ * @param <V> the type of NumberVector handled by this Algorithm
  */
-public class DiSH<V extends RealVector<V, ?>> extends AbstractAlgorithm<V, Clustering<AxesModel>> implements ClusteringAlgorithm<Clustering<AxesModel>,V> {
+public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<AxesModel>> implements ClusteringAlgorithm<Clustering<AxesModel>,V> {
     /**
      * OptionID for {@link #EPSILON_PARAM}
      */
