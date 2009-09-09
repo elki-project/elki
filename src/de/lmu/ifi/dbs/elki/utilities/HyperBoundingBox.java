@@ -20,12 +20,12 @@ public class HyperBoundingBox implements Externalizable {
   /**
    * The coordinates of the 'lower left' (= minimum) hyper point.
    */
-  private double[] min;
+  protected double[] min;
 
   /**
    * The coordinates of the 'upper right' (= maximum) hyper point.
    */
-  private double[] max;
+  protected double[] max;
 
   /**
    * Empty constructor for Externalizable interface.
