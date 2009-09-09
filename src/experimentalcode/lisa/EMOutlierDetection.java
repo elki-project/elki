@@ -66,12 +66,13 @@ public class EMOutlierDetection<V extends RealVector<V, ?>> extends AbstractAlgo
     double globmax = 0.0; 
     for (Integer id : database) {
       Double maxProb = 0.0;
-      List<Double> probs = database.getAssociation(AssociationID.PROBABILITY_CLUSTER_I_GIVEN_X, id);
+      List<Double> probs = database.getAssociation(AssociationID.PROBABILITY_X_GIVEN_CLUSTER_I, id);
       for (Double prob : probs){
+        logger.debug("bl  " + prob);
          maxProb = Math.max(prob, maxProb);
       }
-      database.associate(DBOD_MAXCPROB, id, 1 - maxProb);     
-      globmax = Math.max(1 - maxProb, globmax);
+      database.associate(DBOD_MAXCPROB, id, maxProb);     
+      globmax = Math.max(maxProb, globmax);
     }
     result = new MultiResult();
     result.addResult(new AnnotationFromDatabase<Double, V>(database, DBOD_MAXCPROB));
