@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
  * @param <E> the type of Entry used in the index
  */
 public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, E extends Entry> extends AbstractParameterizable implements Index<O> {
-
   /**
    * OptionID for {@link #FILE_PARAM}
    */
@@ -46,7 +45,7 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
    * Holds the name of the file storing the index specified by
    * {@link #FILE_PARAM}, null if {@link #FILE_PARAM} is not specified.
    */
-  private String fileName;
+  private String fileName = null;
 
   /**
    * OptionID for {@link #PAGE_SIZE_PARAM}
@@ -283,7 +282,6 @@ public abstract class TreeIndex<O extends DatabaseObject, N extends Node<N, E>, 
         initializeFromFile();
       }
       else {
-
         this.file = new PersistentPageFile<N>(createHeader(), cacheSize, new LRUCache<N>(), fileName, getNodeClass());
       }
     }
