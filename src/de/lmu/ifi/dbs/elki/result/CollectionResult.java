@@ -6,7 +6,7 @@ import java.util.Iterator;
 
 /**
  * Simple 'collection' type of result.
- * For example, a list of RealVectors.
+ * For example, a list of NumberVectors.
  * 
  * @author Erich Schubert
  *

@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.preprocessing;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterFlagGlo
  * @param <D> Distance type
  * @param <V> Vector type
  */
-public class FourCPreprocessor<D extends Distance<D>, V extends FeatureVector<V, ? extends Number>> extends ProjectedDBSCANPreprocessor<D, V> {
+public class FourCPreprocessor<D extends Distance<D>, V extends NumberVector<V,?>> extends ProjectedDBSCANPreprocessor<D, V> {
   /**
    * Flag for marking parameter delta as an absolute value.
    */

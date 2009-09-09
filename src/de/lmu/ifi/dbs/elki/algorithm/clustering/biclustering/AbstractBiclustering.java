@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Bicluster;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -21,19 +22,19 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.PairUtil;
  * Abstract class as a convenience for different biclustering approaches.
  * <p/>
  * The typically required values describing submatrices are computed using the
- * corresponding values within a database of RealVectors.
+ * corresponding values within a database of NumberVectors.
  * <p/>
  * The database is supposed to present a data matrix with a row representing an
  * entry ({@link FeatureVector}), a column representing a dimension (attribute) of
  * the {@link FeatureVector}s.
  * 
  * @author Arthur Zimek
- * @param <V> a certain subtype of RealVector - the data matrix is supposed to
+ * @param <V> a certain subtype of NumberVector - the data matrix is supposed to
  *        consist of rows where each row relates to an object of type V and the
  *        columns relate to the attribute values of these objects
  * @param <M> Cluster model type
  */
-public abstract class AbstractBiclustering<V extends FeatureVector<V, ? extends Number>, M extends Bicluster<V>> extends AbstractAlgorithm<V, Clustering<M>> implements ClusteringAlgorithm<Clustering<M>, V> {
+public abstract class AbstractBiclustering<V extends NumberVector<V,?>, M extends Bicluster<V>> extends AbstractAlgorithm<V, Clustering<M>> implements ClusteringAlgorithm<Clustering<M>, V> {
   /**
    * Keeps the currently set database.
    */
@@ -90,7 +91,7 @@ public abstract class AbstractBiclustering<V extends FeatureVector<V, ? extends 
 
   /**
    * Any concrete biclustering algorithm should be implemented within this
-   * method. The database of double-valued <code>RealVector</code>s is
+   * method. The database of double-valued <code>NumberVector</code>s is
    * encapsulated, methods {@link #sortRows(int,int,List,Comparator)},
    * {@link #sortCols(int,int,List,Comparator)},
    * {@link #meanOfBicluster(BitSet,BitSet)}, {@link #meanOfRow(int,BitSet)},

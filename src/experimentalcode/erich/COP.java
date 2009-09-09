@@ -6,7 +6,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator;
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -31,9 +31,9 @@ import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
  * Publication pending
  *
  * @author Erich Schubert
- * @param <V> the type of RealVector handled by this Algorithm
+ * @param <V> the type of NumberVector handled by this Algorithm
  */
-public class COP<V extends RealVector<V, ?>, D extends NumberDistance<D,?>> extends DistanceBasedAlgorithm<V, D, MultiResult> {
+public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D,?>> extends DistanceBasedAlgorithm<V, D, MultiResult> {
     /**
      * OptionID for {@link #K_PARAM}
      */

@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.parser.meta;
 import java.util.List;
 import java.util.Random;
 
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -17,9 +17,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
  *
  * @author Arthur Zimek
  *
- * @param <V> the type of RealVector contained in both the ParsingResult<V> of the base parser and the projected ParsingResult<V> of this ProjectionParser
+ * @param <V> the type of NumberVector contained in both the ParsingResult<V> of the base parser and the projected ParsingResult<V> of this ProjectionParser
  */
-public abstract class RandomProjectionParser<V extends RealVector<V,?>> extends MetaParser<V> {
+public abstract class RandomProjectionParser<V extends NumberVector<V,?>> extends MetaParser<V> {
 
   /**
    * Holds the desired cardinality of the subset of attributes selected for projection.

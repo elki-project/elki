@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 import java.util.Collection;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  *
  * @param <V>
  */
-public class PCARunner<V extends FeatureVector<V, ? extends Number>, D extends NumberDistance<D,?>> extends AbstractParameterizable {
+public class PCARunner<V extends NumberVector<V,?>, D extends NumberDistance<D,?>> extends AbstractParameterizable {
   /**
    * OptionID for {@link #COVARIANCE_PARAM}
    */

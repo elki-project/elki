@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
  * @param <V> the type of FeatureVector handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  */
-public class DependencyDerivator<V extends RealVector<V, ?>, D extends Distance<D>> extends DistanceBasedAlgorithm<V, D, CorrelationAnalysisSolution<V>> {
+public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distance<D>> extends DistanceBasedAlgorithm<V, D, CorrelationAnalysisSolution<V>> {
   /**
    * OptionID for {@link #RANDOM_SAMPLE_FLAG}
    */

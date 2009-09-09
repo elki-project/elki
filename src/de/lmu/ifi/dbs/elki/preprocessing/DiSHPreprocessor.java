@@ -13,7 +13,7 @@ import java.util.Set;
 import de.lmu.ifi.dbs.elki.algorithm.APRIORI;
 import de.lmu.ifi.dbs.elki.data.Bit;
 import de.lmu.ifi.dbs.elki.data.BitVector;
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -50,7 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
  * @param <V> Vector type
  * @param <N> Number type
  */
-public class DiSHPreprocessor<V extends FeatureVector<V, N>, N extends Number> extends AbstractParameterizable implements PreferenceVectorPreprocessor<V> {
+public class DiSHPreprocessor<V extends NumberVector<V,N>, N extends Number> extends AbstractParameterizable implements PreferenceVectorPreprocessor<V> {
   /**
    * Available strategies for determination of the preference vector.
    */

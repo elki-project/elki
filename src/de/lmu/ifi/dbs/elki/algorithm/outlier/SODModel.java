@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 import java.util.BitSet;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObjects handled by this Result
  */
-public class SODModel<O extends RealVector<O, ?>> implements TextWriteable, Comparable<SODModel<?>> {
+public class SODModel<O extends NumberVector<O, ?>> implements TextWriteable, Comparable<SODModel<?>> {
   private final DimensionsSelectingEuclideanDistanceFunction<O> DISTANCE_FUNCTION = new DimensionsSelectingEuclideanDistanceFunction<O>();
 
   private double[] centerValues;

@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.parser.meta;
 import java.util.BitSet;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.parser.ParsingResult;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntListParameter;
@@ -16,9 +16,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListGreaterEqual
  * onto a subspace specified by a BitSet.</p>
  * 
  * @author Arthur Zimek
- * @param <V> the type of RealVector contained in both the ParsingResult<V> of the base parser and the projected ParsingResult<V> of this ProjectionParser
+ * @param <V> the type of NumberVector contained in both the ParsingResult<V> of the base parser and the projected ParsingResult<V> of this ProjectionParser
  */
-public abstract class ProjectionParser<V extends RealVector<V,?>> extends MetaParser<V> {
+public abstract class ProjectionParser<V extends NumberVector<V,?>> extends MetaParser<V> {
 
   /**
    * Keeps the selection of the subspace to project onto.

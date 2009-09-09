@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
- * Provides an experimental KernelDistanceFunction for RealVectors.
+ * Provides an experimental KernelDistanceFunction for NumberVectors.
  * Currently only supports 2D data and x1^2 ~ x2 correlations.
  *
  * @author Simon Paradies

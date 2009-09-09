@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
  * @author Erich Schubert
  * @param <V> vector type
  */
-public class PCAFilteredAutotuningRunner<V extends RealVector<V, ?>, D extends NumberDistance<D,?>> extends PCAFilteredRunner<V,D> {
+public class PCAFilteredAutotuningRunner<V extends NumberVector<V, ?>, D extends NumberDistance<D,?>> extends PCAFilteredRunner<V,D> {
   /**
    * Default constructor
    */

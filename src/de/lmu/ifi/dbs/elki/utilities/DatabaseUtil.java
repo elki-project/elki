@@ -11,8 +11,7 @@ import java.util.TreeSet;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
-import de.lmu.ifi.dbs.elki.data.RealVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -26,9 +25,9 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  */
 public final class DatabaseUtil {
   /**
-   * Returns the centroid as a RealVector object of the specified objects stored
+   * Returns the centroid as a NumberVector object of the specified objects stored
    * in the given database. The objects belonging to the specified ids must be
-   * instance of <code>RealVector</code>.
+   * instance of <code>NumberVector</code>.
    * 
    * @param <V> Vector type
    * @param database the database storing the objects
@@ -36,7 +35,7 @@ public final class DatabaseUtil {
    * @return the centroid of the specified objects stored in the given database
    * @throws IllegalArgumentException if the id list is empty
    */
-  public static <V extends RealVector<V, ?>> V centroid(Database<V> database, Collection<Integer> ids) {
+  public static <V extends NumberVector<V, ?>> V centroid(Database<V> database, Collection<Integer> ids) {
     if(ids.isEmpty()) {
       throw new IllegalArgumentException("Cannot compute a centroid, because of empty list of ids!");
     }
@@ -61,18 +60,18 @@ public final class DatabaseUtil {
 
   /**
    * Returns the centroid w.r.t. the dimensions specified by the given BitSet as
-   * a RealVector object of the specified objects stored in the given database.
+   * a NumberVector object of the specified objects stored in the given database.
    * The objects belonging to the specified ids must be instance of
-   * <code>RealVector</code>.
+   * <code>NumberVector</code>.
    * 
    * @param <V> Vector type
    * @param database the database storing the objects
    * @param ids the identifiable objects
-   * @param bitSet the bitSet specifiying the dimensions to be considered
+   * @param bitSet the bitSet specifying the dimensions to be considered
    * @return the centroid of the specified objects stored in the given database
    * @throws IllegalArgumentException if the id list is empty
    */
-  public static <V extends RealVector<V, ?>> V centroid(Database<V> database, Collection<Integer> ids, BitSet bitSet) {
+  public static <V extends NumberVector<V, ?>> V centroid(Database<V> database, Collection<Integer> ids, BitSet bitSet) {
     if(ids.isEmpty()) {
       throw new IllegalArgumentException("Cannot compute a centroid, because of empty list of ids!");
     }
@@ -100,18 +99,18 @@ public final class DatabaseUtil {
 
   /**
    * Returns the centroid w.r.t. the dimensions specified by the given BitSet as
-   * a RealVector object of the specified objects stored in the given database.
+   * a NumberVector object of the specified objects stored in the given database.
    * The objects belonging to the specified ids must be instance of
-   * <code>RealVector</code>.
+   * <code>NumberVector</code>.
    * 
    * @param <V> Vector type
    * @param database the database storing the objects
    * @param iter iterator over the identifiable objects
-   * @param bitSet the bitSet specifiying the dimensions to be considered
+   * @param bitSet the bitSet specifying the dimensions to be considered
    * @return the centroid of the specified objects stored in the given database
    * @throws IllegalArgumentException if the id list is empty
    */
-  public static <V extends RealVector<V, ?>> V centroid(Database<V> database, Iterator<Integer> iter, BitSet bitSet) {
+  public static <V extends NumberVector<V, ?>> V centroid(Database<V> database, Iterator<Integer> iter, BitSet bitSet) {
     if(!iter.hasNext()) {
       throw new IllegalArgumentException("Cannot compute a centroid, because of empty list of ids!");
     }
@@ -142,15 +141,15 @@ public final class DatabaseUtil {
   }
 
   /**
-   * Returns the centroid as a RealVector object of the specified database. The
-   * objects must be instance of <code>RealVector</code>.
+   * Returns the centroid as a NumberVector object of the specified database. The
+   * objects must be instance of <code>NumberVector</code>.
    * 
    * @param <O> Vector type
    * @param database the database storing the objects
    * @return the centroid of the specified objects stored in the given database
    * @throws IllegalArgumentException if the database is empty
    */
-  public static <O extends RealVector<O, ?>> O centroid(Database<O> database) {
+  public static <O extends NumberVector<O, ?>> O centroid(Database<O> database) {
     if(database == null || database.size() == 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
@@ -159,7 +158,7 @@ public final class DatabaseUtil {
 
     Iterator<Integer> it = database.iterator();
     while(it.hasNext()) {
-      RealVector<O, ?> o = database.get(it.next());
+      NumberVector<O, ?> o = database.get(it.next());
       for(int j = 1; j <= dim; j++) {
         centroid[j - 1] += o.getValue(j).doubleValue();
       }
@@ -207,7 +206,7 @@ public final class DatabaseUtil {
    * @param ids the ids of the objects
    * @return the covariance matrix of the specified objects
    */
-  public static <V extends RealVector<V, ?>> Matrix covarianceMatrix(Database<V> database, Collection<Integer> ids) {
+  public static <V extends NumberVector<V, ?>> Matrix covarianceMatrix(Database<V> database, Collection<Integer> ids) {
     // centroid
     V centroid = centroid(database, ids);
 
@@ -219,7 +218,7 @@ public final class DatabaseUtil {
 
     int i = 0;
     for(Iterator<Integer> it = ids.iterator(); it.hasNext(); i++) {
-      RealVector<?, ?> obj = database.get(it.next());
+      NumberVector<?, ?> obj = database.get(it.next());
       for(int d = 0; d < columns; d++) {
         matrixArray[i][d] = obj.getValue(d + 1).doubleValue() - centroid.getValue(d + 1).doubleValue();
       }
@@ -236,7 +235,7 @@ public final class DatabaseUtil {
    * @param database the database storing the objects
    * @return the covariance matrix of the specified objects
    */
-  public static <O extends RealVector<O, ?>> Matrix covarianceMatrix(Database<O> database) {
+  public static <O extends NumberVector<O, ?>> Matrix covarianceMatrix(Database<O> database) {
     // centroid
     O centroid = centroid(database);
 
@@ -254,7 +253,7 @@ public final class DatabaseUtil {
    * @param centroid the centroid of the database
    * @return the covariance matrix of the specified objects
    */
-  public static <O extends FeatureVector<O, ? extends Number>> Matrix covarianceMatrix(Database<O> database, O centroid) {
+  public static <O extends NumberVector<O,?>> Matrix covarianceMatrix(Database<O> database, O centroid) {
 
     // centered matrix
     int columns = centroid.getDimensionality();
@@ -264,7 +263,7 @@ public final class DatabaseUtil {
     Iterator<Integer> it = database.iterator();
     int i = 0;
     while(it.hasNext()) {
-      FeatureVector<?, ? extends Number> obj = database.get(it.next());
+      NumberVector<?,?> obj = database.get(it.next());
       for(int d = 0; d < columns; d++) {
         matrixArray[i][d] = obj.getValue(d + 1).doubleValue() - centroid.getValue(d + 1).doubleValue();
       }
@@ -313,7 +312,7 @@ public final class DatabaseUtil {
    * @return the variances in each dimension of all objects stored in the given
    *         database
    */
-  public static <O extends RealVector<O, ?>> double[] variances(Database<O> database) {
+  public static <O extends NumberVector<O, ?>> double[] variances(Database<O> database) {
     O centroid = centroid(database);
     double[] variances = new double[centroid.getDimensionality()];
 
@@ -321,7 +320,7 @@ public final class DatabaseUtil {
       double mu = centroid.getValue(d).doubleValue();
 
       for(Iterator<Integer> it = database.iterator(); it.hasNext();) {
-        RealVector<?, ?> o = database.get(it.next());
+        NumberVector<?, ?> o = database.get(it.next());
         double diff = o.getValue(d).doubleValue() - mu;
         variances[d - 1] += diff * diff;
       }
@@ -341,7 +340,7 @@ public final class DatabaseUtil {
    * @param ids the ids of the objects
    * @return the variances in each dimension of the specified objects
    */
-  public static <V extends RealVector<V, ?>> double[] variances(Database<V> database, Collection<Integer> ids) {
+  public static <V extends NumberVector<V, ?>> double[] variances(Database<V> database, Collection<Integer> ids) {
     return variances(database, centroid(database, ids), ids);
   }
 
@@ -355,7 +354,7 @@ public final class DatabaseUtil {
    * @param centroid the centroid or reference vector of the ids
    * @return the variances in each dimension of the specified objects
    */
-  public static <V extends FeatureVector<V, ? extends Number>> double[] variances(Database<V> database, V centroid, Collection<Integer> ids) {
+  public static <V extends NumberVector<V,?>> double[] variances(Database<V> database, V centroid, Collection<Integer> ids) {
     double[] variances = new double[centroid.getDimensionality()];
 
     for(int d = 1; d <= centroid.getDimensionality(); d++) {
@@ -382,7 +381,7 @@ public final class DatabaseUtil {
    * @param centroid the centroid or reference vector of the ids
    * @return the variances in each dimension of the specified objects
    */
-  public static double[] variances(Database<RealVector<?, ?>> database, RealVector<?, ?> centroid, Collection<Integer>[] ids) {
+  public static double[] variances(Database<NumberVector<?, ?>> database, NumberVector<?, ?> centroid, Collection<Integer>[] ids) {
     double[] variances = new double[centroid.getDimensionality()];
 
     for(int d = 1; d <= centroid.getDimensionality(); d++) {
@@ -390,7 +389,7 @@ public final class DatabaseUtil {
 
       Collection<Integer> ids_d = ids[d - 1];
       for(Integer neighborID : ids_d) {
-        RealVector<?, ?> neighbor = database.get(neighborID);
+        NumberVector<?, ?> neighbor = database.get(neighborID);
         double diff = neighbor.getValue(d).doubleValue() - mu;
         variances[d - 1] += diff * diff;
       }
@@ -410,7 +409,7 @@ public final class DatabaseUtil {
    *         maximum values in each dimension of all objects stored in the given
    *         database
    */
-  public static double[][] min_max(Database<FeatureVector<?, ? extends Number>> database) {
+  public static double[][] min_max(Database<NumberVector<?,?>> database) {
     int dim = database.dimensionality();
     double[] min = new double[dim];
     double[] max = new double[dim];
@@ -418,7 +417,7 @@ public final class DatabaseUtil {
     Arrays.fill(max, -Double.MAX_VALUE);
 
     for(Iterator<Integer> it = database.iterator(); it.hasNext();) {
-      FeatureVector<?, ? extends Number> o = database.get(it.next());
+      NumberVector<?,?> o = database.get(it.next());
       for(int d = 1; d <= dim; d++) {
         double v = o.getValue(d).doubleValue();
         min[d] = Math.min(min[d], v);

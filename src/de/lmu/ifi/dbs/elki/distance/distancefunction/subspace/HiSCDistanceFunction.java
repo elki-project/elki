@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 
 import java.util.BitSet;
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.AbstractPreferenceVectorBasedCorrelationDistanceFunction;
@@ -14,16 +14,16 @@ import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
  * Distance function used in the HiSC algorithm.
  * 
  * @author Elke Achtert
- * @param <V> the type of RealVector to compute the distances in between
+ * @param <V> the type of NumberVector to compute the distances in between
  * @param <P> the type of Preprocessor used
  */
-public class HiSCDistanceFunction<V extends FeatureVector<V, ? extends Number>, P extends PreferenceVectorPreprocessor<V>> extends AbstractPreferenceVectorBasedCorrelationDistanceFunction<V, P> {
+public class HiSCDistanceFunction<V extends NumberVector<V,?>, P extends PreferenceVectorPreprocessor<V>> extends AbstractPreferenceVectorBasedCorrelationDistanceFunction<V, P> {
   /**
    * Computes the correlation distance between the two specified vectors
    * according to the specified preference vectors.
    * 
-   * @param v1 first RealVector
-   * @param v2 second RealVector
+   * @param v1 first vector
+   * @param v2 second vector
    * @param pv1 the first preference vector
    * @param pv2 the second preference vector
    * @return the correlation distance between the two specified vectors
