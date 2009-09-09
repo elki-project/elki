@@ -65,8 +65,8 @@ public class RankingQualityHistogram<V extends DatabaseObject, D extends NumberD
       logger.verbose("Preprocessing clusters...");
     }
     // Cluster by labels
-    ByLabelClustering<V> split = new ByLabelClustering<V>();
-    Set<Cluster<Model>> splitted = split.run(database).getAllClusters();
+    ByLabelClustering<V> splitter = new ByLabelClustering<V>();
+    Set<Cluster<Model>> split = splitter.run(database).getAllClusters();
 
     AggregatingHistogram<Double, Double> hist = AggregatingHistogram.DoubleSumHistogram(100, 0.0, 1.0);
 
@@ -77,7 +77,7 @@ public class RankingQualityHistogram<V extends DatabaseObject, D extends NumberD
     int rocproc = 0;
 
     // sort neighbors
-    for(Cluster<?> clus : splitted) {
+    for(Cluster<?> clus : split) {
       for(Integer i1 : clus.getIDs()) {
         List<DistanceResultPair<D>> knn = database.kNNQueryForID(i1, size, distFunc);
         double result = ROC.computeROCAUCDistanceResult(size, clus, knn);

@@ -129,8 +129,8 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
     DoubleMinMax gminmax = new DoubleMinMax();
 
     // Cluster by labels
-    ByLabelClustering<V> split = new ByLabelClustering<V>();
-    Set<Cluster<Model>> splitted = split.run(database).getAllClusters();
+    ByLabelClustering<V> splitter = new ByLabelClustering<V>();
+    Set<Cluster<Model>> split = splitter.run(database).getAllClusters();
 
     // global in-cluster min/max
     DoubleMinMax giminmax = new DoubleMinMax();
@@ -159,7 +159,7 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
     // iterate per cluster
     final Pair<Long,Long> incFirst = new Pair<Long,Long>(1L, 0L);
     final Pair<Long,Long> incSecond = new Pair<Long,Long>(0L, 1L);
-    for(Cluster<?> c1 : splitted) {
+    for(Cluster<?> c1 : split) {
       for(Integer id1 : c1) {
         // in-cluster distances
         DoubleMinMax iminmax = new DoubleMinMax();
@@ -184,7 +184,7 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
 
         // other-cluster distances
         DoubleMinMax ominmax = new DoubleMinMax();
-        for(Cluster<?> c2 : splitted) {
+        for(Cluster<?> c2 : split) {
           if(c2 == c1) {
             continue;
           }

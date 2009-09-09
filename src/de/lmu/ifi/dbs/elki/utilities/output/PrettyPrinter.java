@@ -132,9 +132,9 @@ public class PrettyPrinter {
   /**
    * Splits the specified string at the last blank before columnWidth[column].
    * 
-   * @param s the string to be splitted
+   * @param s the string to be split
    * @param column the index of column in columnWidth
-   * @return the splitted string
+   * @return the split string
    */
   private String splitAtLastBlank(String s, int column) {
     if(s.length() <= columnWidth[column]) {

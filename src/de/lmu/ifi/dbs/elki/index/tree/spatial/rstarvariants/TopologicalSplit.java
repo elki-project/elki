@@ -70,7 +70,7 @@ class TopologicalSplit<E extends SpatialEntry> {
   }
 
   /**
-   * Returns the entries to be splitted sorted according to their max values of their MBRs.
+   * Returns the entries to be split sorted according to their max values of their MBRs.
    *
    * @return the entries sorted according to their max values of their MBRs
    */
@@ -79,7 +79,7 @@ class TopologicalSplit<E extends SpatialEntry> {
   }
 
   /**
-   * Returns the entries to be splitted sorted according to their min values of their MBRs.
+   * Returns the entries to be split sorted according to their min values of their MBRs.
    *
    * @return the entries sorted according to their min values of their MBRs
    */
