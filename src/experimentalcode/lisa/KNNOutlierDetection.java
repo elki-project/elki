@@ -22,6 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
  * Outlier Detection based on the distance of a point from its kth nearest neighbor. 
  * 
  * 
+ * 
  * Based on:
  * S. Ramaswamy, R. Rastogi, K. Shim:
  * Efficient Algorithms for Mining Outliers from Large Data Sets.
