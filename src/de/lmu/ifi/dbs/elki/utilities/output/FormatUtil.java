@@ -517,9 +517,9 @@ public final class FormatUtil {
    * Splits the specified string at the last blank before width. If there is no
    * blank before the given width, it is split at the next.
    * 
-   * @param s the string to be splitted
+   * @param s the string to be split
    * @param width int
-   * @return the splitted string
+   * @return string fragments
    */
   public static List<String> splitAtLastBlank(String s, int width) {
     List<String> chunks = new ArrayList<String>();

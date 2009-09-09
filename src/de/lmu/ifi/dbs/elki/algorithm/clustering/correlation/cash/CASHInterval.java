@@ -49,7 +49,7 @@ public class CASHInterval extends HyperBoundingBox implements Identifiable {
     private Set<Integer> ids;
 
     /**
-     * Holds the maximum dimension which has already been splitted.
+     * Holds the maximum dimension which has already been split.
      */
     private int maxSplitDimension;
 
@@ -84,7 +84,7 @@ public class CASHInterval extends HyperBoundingBox implements Identifiable {
      * @param max               the coordinates of the maximum hyper point
      * @param split             the object to perform interval splitting
      * @param ids               the ids of the objects associated with this interval
-     * @param maxSplitDimension the maximum dimension which has already been splitted
+     * @param maxSplitDimension the maximum dimension which has already been split
      * @param level             the level of this interval, 0 indicates the root level
      * @param d_min             the minimum distance value
      * @param d_max             the maximum distance value
@@ -135,12 +135,12 @@ public class CASHInterval extends HyperBoundingBox implements Identifiable {
     }
 
     /**
-     * Returns true if this interval has already been splitted in the specified dimension.
+     * Returns true if this interval has already been split in the specified dimension.
      *
      * @param d the dimension to be tested
-     * @return true if this interval has already been splitted in the specified dimension
+     * @return true if this interval has already been split in the specified dimension
      */
-    public boolean isSplitted(int d) {
+    public boolean isSplit(int d) {
         return maxSplitDimension >= d;
     }
 
@@ -288,9 +288,9 @@ public class CASHInterval extends HyperBoundingBox implements Identifiable {
         if (hasChildren()) return;
 
         int dim = getDimensionality();
-        int childLevel = isSplitted(dim) ? level + 1 : level;
+        int childLevel = isSplit(dim) ? level + 1 : level;
 
-        int splitDim = isSplitted(dim) ? 1 : maxSplitDimension + 1;
+        int splitDim = isSplit(dim) ? 1 : maxSplitDimension + 1;
         double splitPoint = getMin(splitDim) + (getMax(splitDim) - getMin(splitDim)) / 2;
 
         // left and right child

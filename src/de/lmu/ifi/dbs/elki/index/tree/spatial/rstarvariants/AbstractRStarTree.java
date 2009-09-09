@@ -998,9 +998,11 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
       return null;
     }
     if(mbr1 == null) {
+      // getMin() and getMax() clone - intentionally
       return new HyperBoundingBox(mbr2.getMin(), mbr2.getMax());
     }
     if(mbr2 == null) {
+      // getMin() and getMax() clone - intentionally
       return new HyperBoundingBox(mbr1.getMin(), mbr1.getMax());
     }
     return mbr1.union(mbr2);
@@ -1010,7 +1012,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * Treatment of overflow in the specified node: if the node is not the root
    * node and this is the first call of overflowTreatment in the given level
    * during insertion the specified node will be reinserted, otherwise the node
-   * will be splitted.
+   * will be split.
    * 
    * @param node the node where an overflow occurred
    * @param path the path to the specified node
@@ -1040,7 +1042,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
   /**
    * Splits the specified node and returns the newly created split node.
    * 
-   * @param node the node to be splitted
+   * @param node the node to be split
    * @return the newly created split node
    */
   private N split(N node) {
@@ -1154,7 +1156,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
       // treatment of overflow: reinsertion or split
       N split = overflowTreatment(node, subtree);
 
-      // node was splitted
+      // node was split
       if(split != null) {
         // if root was split: create a new root that points the two
         // split nodes

@@ -196,7 +196,7 @@ public class BulkSplit<N extends SpatialObject> {
    * Computes and returns the best split axis. The best split axis is the split
    * axes with the maximal extension.
    * 
-   * @param objects the spatial objects to be splitted
+   * @param objects the spatial objects to be split
    * @return the best split axis
    */
   private int chooseMaximalExtendedSplitAxis(List<N> objects) {

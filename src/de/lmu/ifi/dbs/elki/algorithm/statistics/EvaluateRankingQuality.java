@@ -93,13 +93,13 @@ public class EvaluateRankingQuality<V extends RealVector<V, ?>, D extends Number
       logger.verbose("Preprocessing clusters...");
     }
     // Cluster by labels
-    ByLabelClustering<V> split = new ByLabelClustering<V>();
-    Set<Cluster<Model>> splitted = split.run(database).getAllClusters();
+    ByLabelClustering<V> splitter = new ByLabelClustering<V>();
+    Set<Cluster<Model>> split = splitter.run(database).getAllClusters();
 
     // Compute cluster averages and covariance matrix
-    HashMap<Cluster<?>, V> averages = new HashMap<Cluster<?>, V>(splitted.size());
-    HashMap<Cluster<?>, Matrix> covmats = new HashMap<Cluster<?>, Matrix>(splitted.size());
-    for(Cluster<?> clus : splitted) {
+    HashMap<Cluster<?>, V> averages = new HashMap<Cluster<?>, V>(split.size());
+    HashMap<Cluster<?>, Matrix> covmats = new HashMap<Cluster<?>, Matrix>(split.size());
+    for(Cluster<?> clus : split) {
       averages.put(clus, DatabaseUtil.centroid(database, clus.getIDs()));
       covmats.put(clus, DatabaseUtil.covarianceMatrix(database, clus.getIDs()));
     }
@@ -113,7 +113,7 @@ public class EvaluateRankingQuality<V extends RealVector<V, ?>, D extends Number
     int rocproc = 0;
     
     // sort neighbors
-    for(Cluster<?> clus : splitted) {
+    for(Cluster<?> clus : split) {
       ArrayList<FCPair<Double, Integer>> cmem = new ArrayList<FCPair<Double, Integer>>(clus.size());
       Vector av = averages.get(clus).getColumnVector();
       Matrix covm = covmats.get(clus);

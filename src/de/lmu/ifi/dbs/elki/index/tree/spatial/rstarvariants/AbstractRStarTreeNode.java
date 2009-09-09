@@ -59,6 +59,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
       return null;
     }
     int dim = firstEntry.getMBR().getDimensionality();
+    // Note: we deliberately get a cloned copy here, since we will modify it.
     double[] min = firstEntry.getMBR().getMin();
     double[] max = firstEntry.getMBR().getMax();
 
