@@ -130,7 +130,7 @@ public class AggregatingHistogram<T, D> extends ReplacingHistogram<T> {
   }
 
   /**
-   * Convenience constructor for Integer-based Histograms. Uses a constructor to
+   * Convenience constructor for Double-based Histograms. Uses a constructor to
    * initialize bins with Double(0.0). Aggregation is done by adding the values
    * 
    * @param bins Number of bins
@@ -189,6 +189,28 @@ public class AggregatingHistogram<T, D> extends ReplacingHistogram<T> {
 
       @Override
       public Pair<Long, Long> aggregate(Pair<Long, Long> existing, Pair<Long, Long> data) {
+        existing.setFirst(existing.getFirst() + data.getFirst());
+        existing.setSecond(existing.getSecond() + data.getSecond());
+        return existing;
+      }
+    });
+  }
+  
+  /**
+   * Histograms that work like two {@link #DoubleSumHistogram}, component wise.
+   * 
+   * @param bins Number of bins.
+   * @return Histogram object
+   */
+  public static AggregatingHistogram<Pair<Double, Double>, Pair<Double, Double>> DoubleSumDoubleSumHistogram(int bins, double min, double max) {
+    return new AggregatingHistogram<Pair<Double, Double>, Pair<Double, Double>>(bins, min, max, new Adapter<Pair<Double, Double>, Pair<Double, Double>>() {
+      @Override
+      public Pair<Double, Double> make() {
+        return new Pair<Double, Double>(0.,0.);
+      }
+
+      @Override
+      public Pair<Double, Double> aggregate(Pair<Double, Double> existing, Pair<Double, Double> data) {
         existing.setFirst(existing.getFirst() + data.getFirst());
         existing.setSecond(existing.getSecond() + data.getSecond());
         return existing;
