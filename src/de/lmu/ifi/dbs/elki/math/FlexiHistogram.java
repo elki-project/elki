@@ -392,4 +392,36 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
       }
     });
   }
+
+  /**
+   * Histograms that work like two {@link #DoubleSumHistogram}, component wise.
+   * 
+   * @param bins Number of bins.
+   * @return New Histogram object
+   */
+  public static FlexiHistogram<Pair<Double, Double>, Pair<Double, Double>> DoubleSumDoubleSumHistogram(int bins) {
+    return new FlexiHistogram<Pair<Double, Double>, Pair<Double, Double>>(bins, new Adapter<Pair<Double, Double>, Pair<Double, Double>>() {
+      @Override
+      public Pair<Double, Double> make() {
+        return new Pair<Double, Double>(0.,0.);
+      }
+
+      @Override
+      public Pair<Double, Double> cloneForCache(Pair<Double, Double> data) {
+        return new Pair<Double, Double>(data.getFirst(), data.getSecond());
+      }
+
+      @Override
+      public Pair<Double, Double> downsample(Pair<Double, Double> first, Pair<Double, Double> second) {
+        return new Pair<Double, Double>(first.getFirst() + second.getFirst(), first.getSecond() + second.getSecond());
+      }
+
+      @Override
+      public Pair<Double, Double> aggregate(Pair<Double, Double> existing, Pair<Double, Double> data) {
+        existing.setFirst(existing.getFirst() + data.getFirst());
+        existing.setSecond(existing.getSecond() + data.getSecond());
+        return existing;
+      }
+    });
+  }
 }
