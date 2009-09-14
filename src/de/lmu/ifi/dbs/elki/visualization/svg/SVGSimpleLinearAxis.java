@@ -64,6 +64,8 @@ public class SVGSimpleLinearAxis {
     if(!manager.contains(CSS_AXIS_LABEL)) {
       CSSClass label = new CSSClass(owner, CSS_AXIS_LABEL);
       label.setStatement(SVGConstants.CSS_FILL_PROPERTY, colors.getNamedColor(ColorLibrary.COLOR_AXIS_LABEL));
+      label.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, "serif");
+      // label.setStatement(SVGConstants.SVG_TEXT_RENDERING_ATTRIBUTE, SVGConstants.SVG_OPTIMIZE_LEGIBILITY_VALUE);
       label.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, "0.2%");
       manager.addClass(label);
     }
@@ -147,7 +149,6 @@ public class SVGSimpleLinearAxis {
         }
         Element text = plot.svgText(tex, tey, scale.formatValue(tick));
         SVGUtil.setAtt(text, SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_AXIS_LABEL);
-        SVGUtil.setAtt(text, SVGConstants.SVG_TEXT_RENDERING_ATTRIBUTE, SVGConstants.SVG_OPTIMIZE_LEGIBILITY_VALUE);
         switch(pos){
         case LL:
         case RL:

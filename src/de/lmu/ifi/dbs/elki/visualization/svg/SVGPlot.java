@@ -240,7 +240,7 @@ public class SVGPlot {
   /**
    * @return The color library
    */
-  protected ColorLibrary getColorLibrary() {
+  public ColorLibrary getColorLibrary() {
     return colors;
   }
 
