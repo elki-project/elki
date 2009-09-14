@@ -59,16 +59,15 @@ public class EMOutlierDetection<V extends NumberVector<V, ?>> extends AbstractAl
   protected MultiResult runInTime(Database<V> database) throws IllegalStateException {
      
     Clustering<EMModel<V>> emresult = emClustering.run(database);
-    double globmax = 0.0; 
+    double globmax = 0.0;
     for (Integer id : database) {
       Double maxProb = 0.0;
-      List<Double> probs = database.getAssociation(AssociationID.PROBABILITY_X_GIVEN_CLUSTER_I, id);
+      List<Double> probs = database.getAssociation(AssociationID.PROBABILITY_CLUSTER_I_GIVEN_X, id);
       for (Double prob : probs){
-        logger.debug("bl  " + prob);
          maxProb = Math.max(prob, maxProb);
       }
-      database.associate(DBOD_MAXCPROB, id, maxProb);     
-      globmax = Math.max(maxProb, globmax);
+      database.associate(DBOD_MAXCPROB, id, 1 - maxProb);     
+      globmax = Math.max(1-maxProb, globmax);
     }
     result = new MultiResult();
     result.addResult(new AnnotationFromDatabase<Double, V>(database, DBOD_MAXCPROB));
