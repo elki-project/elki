@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.data.cluster;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -459,5 +460,33 @@ public class Cluster<M extends Model> extends AbstractDatabaseObject implements 
    */
   public void setNoise(boolean noise) {
     this.noise = noise;
+  }
+  
+  /**
+   * A partial comparator for Clusters, based on their name.
+   * Useful for sorting clusters. Do NOT use in e.g. a TreeSet since
+   * it is <em>inconsistent with equals</em>.
+   * 
+   * @author Erich Schubert
+   */
+  public static class PartialComparator implements Comparator<Cluster<?>> {
+    @Override
+    public int compare(Cluster<?> o1, Cluster<?> o2) {
+      if (o1 == o2) {
+        return 0;
+      }
+      // sort by label if possible
+      if (o1 != null && o1.name != null && o2 != null && o2.name != null) {
+        int lblresult = o1.name.compareTo(o2.getName());
+        if (lblresult != 0) {
+          return lblresult;
+        }
+      }
+      int hashresult = o1.hashCode() - o2.hashCode();
+      if (hashresult != 0) {
+        return hashresult;
+      }
+      return 0;
+    }
   }
 }

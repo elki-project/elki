@@ -1,13 +1,13 @@
 package de.lmu.ifi.dbs.elki.evaluation.paircounting;
 
-import java.util.Set;
+import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairGeneratorSingleCluster;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairGeneratorMerge;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairGeneratorNoise;
+import de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairGeneratorSingleCluster;
 import de.lmu.ifi.dbs.elki.evaluation.paircounting.generator.PairSortedGeneratorInterface;
 
 /**
@@ -35,7 +35,7 @@ public class PairCountingFMeasure {
    */
   public static <R extends Clustering<M>, M extends Model> PairSortedGeneratorInterface getPairGenerator(R clusters) {
     // collect all clusters into a flat list.
-    Set<Cluster<M>> allclusters = clusters.getAllClusters();
+    Collection<Cluster<M>> allclusters = clusters.getAllClusters();
 
     // Make generators for each cluster
     PairSortedGeneratorInterface[] gens = new PairSortedGeneratorInterface[allclusters.size()];

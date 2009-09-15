@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 import java.util.TreeSet;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
@@ -130,7 +129,7 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
 
     // Cluster by labels
     ByLabelClustering<V> splitter = new ByLabelClustering<V>();
-    Set<Cluster<Model>> split = splitter.run(database).getAllClusters();
+    Collection<Cluster<Model>> split = splitter.run(database).getAllClusters();
 
     // global in-cluster min/max
     DoubleMinMax giminmax = new DoubleMinMax();
