@@ -15,11 +15,13 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
+import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -116,16 +118,24 @@ public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Numbe
 
     // Creating histograms
     int clusterID = 0;
+    MinMax<Double> minmax = new MinMax<Double>();
+    
     for(Cluster<Model> cluster : clustering.getAllClusters()) {
       clusterID += 1;
       AggregatingHistogram<Double, Double> hist = AggregatingHistogram.DoubleSumHistogram(BINS, scales[dim].getMin(), scales[dim].getMax());
       for(int id : cluster.getIDs()) {
         hist.aggregate(database.get(id).getValue(dim).doubleValue(), frac);
       }
+
+      for(int bin = 0; bin < hist.getNumBins(); bin++) {
+        double val = hist.get(bin * (scales[dim].getMax() - scales[dim].getMin()) / BINS);
+        minmax.put(val);
+      }
+     
       hists.put(clusterID, hist);
       setupCSS(svgp, clusterID);
     }
-
+    
     // Visualizing
     // TODO: Drawing centered instead of left-end values of bins.
     for(int key = 1; key <= hists.size(); key++) {
@@ -134,7 +144,7 @@ public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Numbe
         for(int bin = 0; bin < hist.getNumBins(); bin++) {
           // TODO: calculating the value *must* be simpler. Something is wrong
           // here.
-          double val = hist.get(bin * (scales[dim].getMax() - scales[dim].getMin()) / BINS);
+          double val = hist.get(bin * (scales[dim].getMax() - scales[dim].getMin()) / BINS)/minmax.getMax();
           layer.appendChild(ShapeLibrary.createRow(svgp.getDocument(), getPositioned(bin * hist.getBinsize(), dim), 1 - val, hist.getBinsize(), val, dim, key, bin));
         }
       }
@@ -144,7 +154,7 @@ public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Numbe
         // Just a hack to ensure the path ends at its beginning.
         ShapeLibrary.addLine(path, 0, 1);
         for(int bin = 0; bin < hist.getNumBins(); bin++) {
-          double val = hist.get((bin * (scales[dim].getMax() - scales[dim].getMin()) / BINS));
+          double val = hist.get((bin * (scales[dim].getMax() - scales[dim].getMin()) / BINS))/minmax.getMax();
           ShapeLibrary.addLine(path, getPositioned(bin * hist.getBinsize(), dim), 1 - val);
         }
         layer.appendChild(path);
