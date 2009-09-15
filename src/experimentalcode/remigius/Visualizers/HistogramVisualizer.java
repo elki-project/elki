@@ -24,7 +24,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
+import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import experimentalcode.remigius.ShapeLibrary;
 
 /**
@@ -135,6 +137,20 @@ public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Numbe
       hists.put(clusterID, hist);
       setupCSS(svgp, clusterID);
     }
+    
+    LinearScale scale = new LinearScale(minmax.getMin(), minmax.getMax());
+    
+    // Axis
+    try {
+      SVGSimpleLinearAxis.drawAxis(svgp, layer, scale, 0, 1, 0, 0, true, false);
+      svgp.updateStyleElement();
+    }
+    catch(CSSNamingConflict e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    
+    
     
     // Visualizing
     // TODO: Drawing centered instead of left-end values of bins.
