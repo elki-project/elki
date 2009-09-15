@@ -138,6 +138,8 @@ public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Numbe
       setupCSS(svgp, clusterID);
     }
     
+    System.out.println(minmax.getMax());
+    
     LinearScale scale = new LinearScale(minmax.getMin(), minmax.getMax());
     
     // Axis
@@ -150,8 +152,6 @@ public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Numbe
       e.printStackTrace();
     }
     
-    
-    
     // Visualizing
     // TODO: Drawing centered instead of left-end values of bins.
     for(int key = 1; key <= hists.size(); key++) {
@@ -161,7 +161,7 @@ public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Numbe
           // TODO: calculating the value *must* be simpler. Something is wrong
           // here.
           double val = hist.get(bin * (scales[dim].getMax() - scales[dim].getMin()) / BINS)/minmax.getMax();
-          layer.appendChild(ShapeLibrary.createRow(svgp.getDocument(), getPositioned(bin * hist.getBinsize(), dim), 1 - val, hist.getBinsize(), val, dim, key, bin));
+          layer.appendChild(ShapeLibrary.createRow(svgp.getDocument(), getPositioned(bin * hist.getBinsize(), dim), 1 - val, 1./BINS, val, dim, key, bin));
         }
       }
       else {
