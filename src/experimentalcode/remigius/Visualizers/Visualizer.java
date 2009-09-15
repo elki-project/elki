@@ -6,7 +6,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 
 /**
- * Defines the requirements for a visualizer.
+ * Defines the requirements for a visualizer. <br>
+ * Note: Any implementation is supposed to provide a constructor without
+ * parameters (default constructor).
  * 
  * @author Remigius Wojdanowski
  */
