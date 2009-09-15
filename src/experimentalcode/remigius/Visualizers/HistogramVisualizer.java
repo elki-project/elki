@@ -123,7 +123,6 @@ public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Numbe
     MinMax<Double> minmax = new MinMax<Double>();
     
     for(Cluster<Model> cluster : clustering.getAllClusters()) {
-      clusterID += 1;
       AggregatingHistogram<Double, Double> hist = AggregatingHistogram.DoubleSumHistogram(BINS, scales[dim].getMin(), scales[dim].getMax());
       for(int id : cluster.getIDs()) {
         hist.aggregate(database.get(id).getValue(dim).doubleValue(), frac);
@@ -136,9 +135,8 @@ public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Numbe
      
       hists.put(clusterID, hist);
       setupCSS(svgp, clusterID);
+      clusterID += 1;
     }
-    
-    System.out.println(minmax.getMax());
     
     LinearScale scale = new LinearScale(minmax.getMin(), minmax.getMax());
     
@@ -154,7 +152,7 @@ public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Numbe
     
     // Visualizing
     // TODO: Drawing centered instead of left-end values of bins.
-    for(int key = 1; key <= hists.size(); key++) {
+    for(int key = 0; key < hists.size(); key++) {
       AggregatingHistogram<Double, Double> hist = hists.get(key);
       if(row) {
         for(int bin = 0; bin < hist.getNumBins(); bin++) {

@@ -213,16 +213,11 @@ public class BubbleVisualizer<NV extends NumberVector<NV, N>, N extends Number> 
    * @param svgp the SVGPlot to register the ToolTip-CSS-Class.
    */
   private void setupCSS(SVGPlot svgp) {
-
-    Iterator<Cluster<Model>> iter = clustering.getAllClusters().iterator();
+    
+    // creating IDs manually because cluster often return a null-ID.
     int clusterID = 0;
-
-    while(iter.hasNext()) {
-
-      // just need to consume a cluster; creating IDs manually because cluster
-      // often return a null-ID.
-      iter.next();
-      clusterID += 1;
+    
+    for (Cluster<Model> cluster : clustering.getAllClusters()){
 
       CSSClass bubble = new CSSClass(svgp, ShapeLibrary.BUBBLE + clusterID);
       bubble.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, "0.001");
@@ -238,7 +233,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, N>, N extends Number> 
         bubble.setStatement(SVGConstants.CSS_STROKE_VALUE, COLORS.getColor(clusterID));
         bubble.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0");
       }
-
+      
       // TODO: try/catch-structure is equal for almost all Visualizers, maybe
       // put that into a superclass.
       try {
@@ -248,6 +243,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, N>, N extends Number> 
       catch(CSSNamingConflict e) {
         LoggingUtil.exception("Equally-named CSSClass with different owner already exists", e);
       }
+      clusterID += 1;
     }
   }
 
@@ -280,15 +276,13 @@ public class BubbleVisualizer<NV extends NumberVector<NV, N>, N extends Number> 
   public Element visualize(SVGPlot svgp) {
     setupCSS(svgp);
     Element layer = ShapeLibrary.createSVG(svgp.getDocument());
-    Iterator<Cluster<Model>> iter = clustering.getAllClusters().iterator();
     int clusterID = 0;
 
-    while(iter.hasNext()) {
-      Cluster<Model> cluster = iter.next();
-      clusterID += 1;
+    for (Cluster<Model> cluster : clustering.getAllClusters()){
       for(int id : cluster.getIDs()) {
         layer.appendChild(ShapeLibrary.createBubble(svgp.getDocument(), getPositioned(database.get(id), dimx), 1 - getPositioned(database.get(id), dimy), getScaled(getValue(id)), clusterID, id, dimx, dimy, toString()));
       }
+      clusterID += 1;
     }
     return layer;
   }
