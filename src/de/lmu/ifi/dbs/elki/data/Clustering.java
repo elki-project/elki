@@ -74,6 +74,7 @@ public class Clustering<M extends Model> implements Result {
         clu = rc.getDescendants(clu);
       }
     }
+    // Note: we canNOT use TreeSet above, because this comparator is only partial!
     ArrayList<Cluster<M>> res = new ArrayList<Cluster<M>>(clu);
     Collections.sort(res, new Cluster.PartialComparator());
     return res;
