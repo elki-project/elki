@@ -7,7 +7,6 @@ import java.util.Map;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
@@ -17,11 +16,9 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
@@ -74,35 +71,50 @@ public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Numbe
     this.clustering = clustering;
   }
 
-  // private void setupCSS() {
-  //
-  // int clusterID = 0;
-  // for (Cluster<Model> cluster : clustering.getAllClusters()){
-  // clusterID+=1;
-  // CSSClass bin = visManager.createCSSClass(ShapeLibrary.BIN + clusterID);
-  // bin.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0.5");
-  // bin.setStatement(SVGConstants.CSS_FILL_PROPERTY,
-  // COLORS.getColor(clusterID));
-  // visManager.registerCSSClass(bin);
-  // }
-  // }
-
-  private void setupCSS(SVGPlot svgp, int clusterID) {
-    CSSClass bin = new CSSClass(svgp, ShapeLibrary.BIN + clusterID);
-    bin.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0.5");
-    bin.setStatement(SVGConstants.CSS_FILL_PROPERTY, COLORS.getColor(clusterID));
-
-    try {
-      svgp.getCSSClassManager().addClass(bin);
-      svgp.updateStyleElement();
-    }
-    catch(CSSNamingConflict e) {
-      LoggingUtil.exception("Equally-named CSSClass with different owner already exists", e);
+private void setupCSS(SVGPlot svgp) {
+    
+    // creating IDs manually because cluster often return a null-ID.
+    int clusterID = 0;
+    
+    for (Cluster<Model> cluster : clustering.getAllClusters()){
+      
+      CSSClass bin = new CSSClass(svgp, ShapeLibrary.BIN + clusterID);
+      
+      if (clustering.getAllClusters().size() == 1){
+        bin.setStatement(SVGConstants.CSS_FILL_PROPERTY, "black");
+      } else {
+        bin.setStatement(SVGConstants.CSS_FILL_PROPERTY, COLORS.getColor(clusterID));
+        bin.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0.5");
+      }
+      
+      try {
+        svgp.getCSSClassManager().addClass(bin);
+        svgp.updateStyleElement();
+      }
+      catch(CSSNamingConflict e) {
+        LoggingUtil.exception("Equally-named CSSClass with different owner already exists", e);
+      }
+      clusterID += 1;
     }
   }
 
+//  private void setupCSS(SVGPlot svgp, int clusterID) {
+//    CSSClass bin = new CSSClass(svgp, ShapeLibrary.BIN + clusterID);
+//    bin.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0.5");
+//    bin.setStatement(SVGConstants.CSS_FILL_PROPERTY, COLORS.getColor(clusterID));
+//
+//    try {
+//      svgp.getCSSClassManager().addClass(bin);
+//      svgp.updateStyleElement();
+//    }
+//    catch(CSSNamingConflict e) {
+//      LoggingUtil.exception("Equally-named CSSClass with different owner already exists", e);
+//    }
+//  }
+
   @Override
   public Element visualize(SVGPlot svgp) {
+    setupCSS(svgp);
     Element layer = ShapeLibrary.createSVG(svgp.getDocument());
 
     Map<Integer, AggregatingHistogram<Double, Double>> hists = new HashMap<Integer, AggregatingHistogram<Double, Double>>();
@@ -123,7 +135,6 @@ public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Numbe
       }
      
       hists.put(clusterID, hist);
-      setupCSS(svgp, clusterID);
       clusterID += 1;
     }
     

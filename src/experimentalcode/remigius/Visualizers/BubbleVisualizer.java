@@ -200,17 +200,23 @@ public class BubbleVisualizer<NV extends NumberVector<NV, N>, N extends Number> 
       
       CSSClass bubble = new CSSClass(svgp, ShapeLibrary.BUBBLE + clusterID);
       bubble.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, "0.001");
-
+      
+      String color;
+      
+      if (clustering.getAllClusters().size() == 1){
+        color = "black";
+      } else {
+        color = COLORS.getColor(clusterID);
+      }
+      
       if(fill) {
-        // fill bubbles
-        bubble.setStatement(SVGConstants.CSS_FILL_PROPERTY, COLORS.getColor(clusterID));
-        bubble.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0.5");
+        bubble.setStatement(SVGConstants.CSS_FILL_PROPERTY, color);
+        bubble.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.5);
       }
       else {
-        // or don't fill them.
         // for diamond-shaped strokes, see bugs.sun.com, bug ID 6294396
-        bubble.setStatement(SVGConstants.CSS_STROKE_VALUE, COLORS.getColor(clusterID));
-        bubble.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0");
+        bubble.setStatement(SVGConstants.CSS_STROKE_VALUE, color);
+        bubble.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.0);
       }
       
       // TODO: try/catch-structure is equal for almost all Visualizers, maybe
@@ -256,7 +262,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, N>, N extends Number> 
     setupCSS(svgp);
     Element layer = ShapeLibrary.createSVG(svgp.getDocument());
     int clusterID = 0;
-
+    
     for (Cluster<Model> cluster : clustering.getAllClusters()){
       for(int id : cluster.getIDs()) {
         layer.appendChild(ShapeLibrary.createBubble(svgp.getDocument(), getPositioned(database.get(id), dimx), 1 - getPositioned(database.get(id), dimy), getScaled(getValue(id)), clusterID, id, dimx, dimy, toString()));
