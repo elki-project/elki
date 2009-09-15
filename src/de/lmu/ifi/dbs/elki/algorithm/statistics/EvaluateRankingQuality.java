@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
@@ -94,7 +93,7 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
     }
     // Cluster by labels
     ByLabelClustering<V> splitter = new ByLabelClustering<V>();
-    Set<Cluster<Model>> split = splitter.run(database).getAllClusters();
+    Collection<Cluster<Model>> split = splitter.run(database).getAllClusters();
 
     // Compute cluster averages and covariance matrix
     HashMap<Cluster<?>, V> averages = new HashMap<Cluster<?>, V>(split.size());

@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.data;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -61,18 +62,21 @@ public class Clustering<M extends Model> implements Result {
   }
 
   /**
-   * Collect all clusters (recursively) into a Set.
+   * Collect all clusters (recursively) into a List.
    * 
-   * @return Set of all clusters.
+   * @return List of all clusters.
    */
-  public Set<Cluster<M>> getAllClusters() {
+  public List<Cluster<M>> getAllClusters() {
     Set<Cluster<M>> clu = new HashSet<Cluster<M>>();
-    for(Cluster<M> rc : toplevelclusters)
+    for(Cluster<M> rc : toplevelclusters) {
       if(!clu.contains(rc)) {
         clu.add(rc);
         clu = rc.getDescendants(clu);
       }
-    return clu;
+    }
+    ArrayList<Cluster<M>> res = new ArrayList<Cluster<M>>(clu);
+    Collections.sort(res, new Cluster.PartialComparator());
+    return res;
   }
 
   @Override

@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.algorithm.statistics;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering;
@@ -66,7 +65,7 @@ public class RankingQualityHistogram<V extends DatabaseObject, D extends NumberD
     }
     // Cluster by labels
     ByLabelClustering<V> splitter = new ByLabelClustering<V>();
-    Set<Cluster<Model>> split = splitter.run(database).getAllClusters();
+    Collection<Cluster<Model>> split = splitter.run(database).getAllClusters();
 
     AggregatingHistogram<Double, Double> hist = AggregatingHistogram.DoubleSumHistogram(100, 0.0, 1.0);
 
