@@ -1,6 +1,8 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
@@ -84,7 +86,10 @@ public class ByLabelClustering<O extends DatabaseObject> extends AbstractAlgorit
     }
 
     result = new Clustering<Model>();
-    for (Collection<Integer> ids : labelmap.values()) {
+    ArrayList<String> labels = new ArrayList<String>(labelmap.keySet());
+    Collections.sort(labels);
+    for (String key : labels) {
+      Collection<Integer> ids = labelmap.get(key);
       DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Collection<Integer>>(ids);
       Cluster<Model> c = new Cluster<Model>(group, ClusterModel.CLUSTER);
       result.addCluster(c);
