@@ -32,7 +32,7 @@ public class DefaultAdapter<NV extends NumberVector<NV, N>, N extends Number> ex
 	protected void initVisualizer(Database<NV> database, Result result) {
 		axisVisualizer.init(database);
 		dotVisualizer.init(database);
-		histoVisualizer.init(database, result);
+		histoVisualizer.init(database, result, clustering);
 		usableVisualizers.addAll(providedVisualizers);
 	}
 }
