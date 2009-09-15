@@ -49,11 +49,11 @@ public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Numbe
 
   private static final int BINS = 20;
 
+  private Clustering<Model> clustering;
+  
   private double frac;
 
   private Result result;
-
-  private Clustering<Model> clustering;
 
   public HistogramVisualizer() {
     addOption(STYLE_ROW_PARAM);
@@ -67,22 +67,11 @@ public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Numbe
     return remainingParameters;
   }
 
-  public void init(Database<NV> database, Result result) {
+  public void init(Database<NV> database, Result result, Clustering<Model> clustering) {
     init(database, NAME);
     this.frac = 1. / database.size();
     this.result = result;
-    setupClustering();
-  }
-
-  private void setupClustering() {
-    List<Clustering<?>> clusterings = ResultUtil.getClusteringResults(result);
-
-    if(clusterings != null && clusterings.size() > 0) {
-      clustering = (Clustering<Model>) clusterings.get(0);
-    }
-    else {
-      clustering = new ByLabelClustering<NV>().run(database);
-    }
+    this.clustering = clustering;
   }
 
   // private void setupCSS() {
@@ -158,7 +147,7 @@ public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Numbe
         for(int bin = 0; bin < hist.getNumBins(); bin++) {
           // TODO: calculating the value *must* be simpler. Something is wrong
           // here.
-          double val = hist.get(bin * (scales[dim].getMax() - scales[dim].getMin()) / BINS)/minmax.getMax();
+          double val = hist.get((bin * (scales[dim].getMax() - scales[dim].getMin()) / BINS))/minmax.getMax();
           layer.appendChild(ShapeLibrary.createRow(svgp.getDocument(), getPositioned(bin * hist.getBinsize(), dim), 1 - val, 1./BINS, val, dim, key, bin));
         }
       }

@@ -1,6 +1,5 @@
 package experimentalcode.remigius.Visualizers;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
@@ -150,10 +149,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, N>, N extends Number> 
    * {@link #init(Database, AnnotationResult, Result, DoubleScale)}
    */
   private Result result;
-
-  /**
-   * A clustering of the database's objects.
-   */
+  
   private Clustering<Model> clustering;
 
   /**
@@ -179,31 +175,16 @@ public class BubbleVisualizer<NV extends NumberVector<NV, N>, N extends Number> 
    * @param result complete result for further information.
    * @param normalizationScale
    */
-  public void init(Database<NV> database, AnnotationResult<Double> anResult, Result result, DoubleScale normalizationScale) {
+  public void init(Database<NV> database, AnnotationResult<Double> anResult, Result result, DoubleScale normalizationScale, Clustering<Model> clustering) {
     init(database, 1000, NAME);
     this.anResult = anResult;
     this.result = result;
-
+    this.clustering = clustering;
+    
     this.normalizationScale = normalizationScale;
     this.plotScale = new LinearScale();
     this.gammaFunction = new GammaFunction(gamma);
     this.cutOffScale = new CutOffScale(cutOff);
-
-    setupClustering();
-  }
-
-  /**
-   * Finds or creates a clustering of the database's objects.
-   */
-  private void setupClustering() {
-    List<Clustering<?>> clusterings = ResultUtil.getClusteringResults(result);
-
-    if(clusterings != null && clusterings.size() > 0) {
-      clustering = (Clustering<Model>) clusterings.get(0);
-    }
-    else {
-      clustering = new ByLabelClustering<NV>().run(database);
-    }
   }
 
   /**
@@ -218,7 +199,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, N>, N extends Number> 
     int clusterID = 0;
     
     for (Cluster<Model> cluster : clustering.getAllClusters()){
-
+      
       CSSClass bubble = new CSSClass(svgp, ShapeLibrary.BUBBLE + clusterID);
       bubble.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, "0.001");
 
