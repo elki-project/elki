@@ -5,13 +5,12 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
-import experimentalcode.remigius.VisualizationManager;
 import experimentalcode.remigius.Visualizers.Visualizer;
 
 /**
- * Defines the requirements for an algorithm-adapter.
- * Note: Any implementation is supposed to provide a constructor 
- * without parameters (default constructor).
+ * Defines the requirements for an algorithm-adapter. <br>
+ * Note: Any implementation is supposed to provide a constructor without
+ * parameters (default constructor).
  * 
  * @author Remigius Wojdanowski
  * 
@@ -35,7 +34,7 @@ public interface AlgorithmAdapter<O extends DatabaseObject> {
    * @return a collection of {@link Visualizer}s this adapter provides.
    */
   public Collection<Visualizer> getProvidedVisualizers();
-  
+
   public Collection<Visualizer> getUsableVisualizers();
 
   /**
