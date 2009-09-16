@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
+import org.w3c.dom.svg.SVGDocument;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -76,7 +77,7 @@ public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Numbe
     // creating IDs manually because cluster often return a null-ID.
     int clusterID = 0;
 
-    CSSClass allInOne = new CSSClass(svgp, ShapeLibrary.BIN);
+    CSSClass allInOne = new CSSClass(svgp, ShapeLibrary.BIN+-1);
     for (Cluster<Model> cluster : clustering.getAllClusters()){
 
       CSSClass bin = new CSSClass(svgp, ShapeLibrary.BIN + clusterID);
@@ -86,9 +87,9 @@ public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Numbe
         bin.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 1.0);
         coloredElement = SVGConstants.CSS_FILL_PROPERTY;
       } else {
-        bin.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.001);
+        bin.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.002);
         bin.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.0);
-        allInOne.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.001);
+        allInOne.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.002);
         allInOne.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.0);
         coloredElement = SVGConstants.CSS_STROKE_PROPERTY;
       }
@@ -102,6 +103,7 @@ public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Numbe
 
       try {
         svgp.getCSSClassManager().addClass(bin);
+        svgp.getCSSClassManager().addClass(allInOne);
         svgp.updateStyleElement();
       }
       catch(CSSNamingConflict e) {
@@ -110,20 +112,6 @@ public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Numbe
       clusterID += 1;
     }
   }
-
-  //  private void setupCSS(SVGPlot svgp, int clusterID) {
-  //    CSSClass bin = new CSSClass(svgp, ShapeLibrary.BIN + clusterID);
-  //    bin.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0.5");
-  //    bin.setStatement(SVGConstants.CSS_FILL_PROPERTY, COLORS.getColor(clusterID));
-  //
-  //    try {
-  //      svgp.getCSSClassManager().addClass(bin);
-  //      svgp.updateStyleElement();
-  //    }
-  //    catch(CSSNamingConflict e) {
-  //      LoggingUtil.exception("Equally-named CSSClass with different owner already exists", e);
-  //    }
-  //  }
 
   @Override
   public Element visualize(SVGPlot svgp) {
@@ -154,7 +142,7 @@ public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Numbe
 
     LinearScale scale = new LinearScale(minmax.getMin(), minmax.getMax());
 
-    // Axis
+    // Axis. TODO: Use AxisVisualizer for this.
     try {
       SVGSimpleLinearAxis.drawAxis(svgp, layer, scale, 0, 1, 0, 0, true, false);
       svgp.updateStyleElement();
@@ -165,34 +153,36 @@ public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Numbe
     }
 
     // Visualizing
-
     if (row){
       for(int bin = 0; bin < BINS; bin++) {
         double lastVal = 0;
         for(int key = 0; key < hists.size(); key++) {
           AggregatingHistogram<Double, Double> hist = hists.get(key);
-
           double val = hist.get((bin * (scales[dim].getMax() - scales[dim].getMin()) / BINS))/minmax.getMax();
           layer.appendChild(ShapeLibrary.createRow(svgp.getDocument(), getPositioned(bin * hist.getBinsize(), dim), 1-(val + lastVal), 1./BINS, val, dim, key, bin));
           lastVal += val;
         }
       }
     } else {
+      layer.appendChild(drawLine(svgp, -1, allInOne, minmax.getMax()));
       for(int key = 0; key < hists.size(); key++) {
-        AggregatingHistogram<Double, Double> hist = hists.get(key);
-        Element path = ShapeLibrary.createPath(svgp.getDocument(), 0, 1, key, Integer.toString(key));
-        double right = 0;
-        for(int bin = 0; bin < hist.getNumBins(); bin++) {
-          double val = hist.get((bin * (scales[dim].getMax() - scales[dim].getMin()) / BINS))/minmax.getMax();
-          double left = getPositioned(bin * hist.getBinsize(), dim);
-          right = getPositioned(bin * hist.getBinsize(), dim) + (1./BINS);
-          ShapeLibrary.addLine(path, left, 1 - val);
-          ShapeLibrary.addLine(path, right, 1 - val);
-        }
-        ShapeLibrary.addLine(path, right, 1);
-        layer.appendChild(path);
+        layer.appendChild(drawLine(svgp, key, hists.get(key), minmax.getMax()));
       }
     }
     return layer;
+  }
+  
+  private Element drawLine(SVGPlot svgp, int color, AggregatingHistogram<Double, Double> hist, double max){
+    Element path = ShapeLibrary.createPath(svgp.getDocument(), 0, 1, color, Integer.toString(color));
+    double right = 0;
+    for(int bin = 0; bin < hist.getNumBins(); bin++) {
+      double val = hist.get((bin * (scales[dim].getMax() - scales[dim].getMin()) / BINS))/max;
+      double left = getPositioned(bin * hist.getBinsize(), dim);
+      right = getPositioned(bin * hist.getBinsize(), dim) + (1./BINS);
+      ShapeLibrary.addLine(path, left, 1 - val);
+      ShapeLibrary.addLine(path, right, 1 - val);
+    }
+    ShapeLibrary.addLine(path, right, 1);
+    return path;
   }
 }
