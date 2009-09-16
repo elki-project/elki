@@ -1,6 +1,5 @@
 package experimentalcode.remigius.Visualizers;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,7 +8,6 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
@@ -183,13 +181,15 @@ public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Numbe
       for(int key = 0; key < hists.size(); key++) {
         AggregatingHistogram<Double, Double> hist = hists.get(key);
         Element path = ShapeLibrary.createPath(svgp.getDocument(), 0, 1, key, Integer.toString(key));
+        double right = 0;
         for(int bin = 0; bin < hist.getNumBins(); bin++) {
           double val = hist.get((bin * (scales[dim].getMax() - scales[dim].getMin()) / BINS))/minmax.getMax();
           double left = getPositioned(bin * hist.getBinsize(), dim);
-          double right = getPositioned(bin * hist.getBinsize(), dim) + (1./BINS);
+          right = getPositioned(bin * hist.getBinsize(), dim) + (1./BINS);
           ShapeLibrary.addLine(path, left, 1 - val);
           ShapeLibrary.addLine(path, right, 1 - val);
         }
+        ShapeLibrary.addLine(path, right, 1);
         layer.appendChild(path);
       }
     }
