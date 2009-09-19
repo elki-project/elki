@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
-import org.w3c.dom.svg.SVGDocument;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -93,7 +92,7 @@ public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Numbe
         allInOne.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.0);
         coloredElement = SVGConstants.CSS_STROKE_PROPERTY;
       }
-      
+
       allInOne.setStatement(coloredElement, "black");
       if (clustering.getAllClusters().size() == 1){
         bin.setStatement(coloredElement, "black");
@@ -159,7 +158,7 @@ public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Numbe
         for(int key = 0; key < hists.size(); key++) {
           AggregatingHistogram<Double, Double> hist = hists.get(key);
           double val = hist.get((bin * (scales[dim].getMax() - scales[dim].getMin()) / BINS))/minmax.getMax();
-          layer.appendChild(ShapeLibrary.createRow(svgp.getDocument(), getPositioned(bin * hist.getBinsize(), dim), 1-(val + lastVal), 1./BINS, val, dim, key, bin));
+          layer.appendChild(ShapeLibrary.createRow(svgp.getDocument(), getPositioned(bin * hist.getBinsize(), dim), 1-(val + lastVal), 1./BINS, val, key));
           lastVal += val;
         }
       }
@@ -171,9 +170,9 @@ public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Numbe
     }
     return layer;
   }
-  
+
   private Element drawLine(SVGPlot svgp, int color, AggregatingHistogram<Double, Double> hist, double max){
-    Element path = ShapeLibrary.createPath(svgp.getDocument(), 0, 1, color, Integer.toString(color));
+    Element path = ShapeLibrary.createPath(svgp.getDocument(), 0, 1, color);
     double right = 0;
     for(int bin = 0; bin < hist.getNumBins(); bin++) {
       double val = hist.get((bin * (scales[dim].getMax() - scales[dim].getMin()) / BINS))/max;
