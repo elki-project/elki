@@ -39,8 +39,10 @@ public class DotVisualizer<NV extends NumberVector<NV, N>, N extends Number> ext
     Element layer = ShapeLibrary.createSVG(svgp.getDocument());
     for(int id : database.getIDs()) {
       Element dot = ShapeLibrary.createMarkerDot(svgp.getDocument(), getPositioned(database.get(id), dimx), (1 - getPositioned(database.get(id), dimy)));
+      // setting ID for efficient use of ToolTips.
+      dot.setAttribute("id", ShapeLibrary.createID(ShapeLibrary.MARKER, id));
       layer.appendChild(dot);
-      svgp.putIdElement(ShapeLibrary.createID(ShapeLibrary.MARKER, id, dimx, dimy), dot);
+      svgp.putIdElement(ShapeLibrary.createID(ShapeLibrary.MARKER, id), dot);
     }
     return layer;
   }
