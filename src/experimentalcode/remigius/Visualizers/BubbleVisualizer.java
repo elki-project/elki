@@ -265,7 +265,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, N>, N extends Number> 
     
     for (Cluster<Model> cluster : clustering.getAllClusters()){
       for(int id : cluster.getIDs()) {
-        layer.appendChild(ShapeLibrary.createBubble(svgp.getDocument(), getPositioned(database.get(id), dimx), 1 - getPositioned(database.get(id), dimy), getScaled(getValue(id)), clusterID, id, dimx, dimy, toString()));
+        layer.appendChild(ShapeLibrary.createBubble(svgp.getDocument(), getPositioned(database.get(id), dimx), 1 - getPositioned(database.get(id), dimy), getScaled(getValue(id)), clusterID));
       }
       clusterID += 1;
     }
