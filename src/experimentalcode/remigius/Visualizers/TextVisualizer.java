@@ -98,12 +98,12 @@ public class TextVisualizer<NV extends NumberVector<NV, N>, N extends Number> ex
       for(int id : database.getIDs()) {
         Element tooltip = ShapeLibrary.createToolTip(svgp.getDocument(), getPositioned(database.get(id), dimx), (1 - getPositioned(database.get(id), dimy)), getValue(id));
         
-        String dotID = ShapeLibrary.createID(ShapeLibrary.MARKER, id, dimx, dimy);
+        String dotID = ShapeLibrary.createID(ShapeLibrary.MARKER, id);
         Element dot = svgp.getIdElement(dotID);
         if(dot != null) {
 
           EventTarget targ = (EventTarget) dot;
-          ToolTipListener hoverer = new ToolTipListener((UpdatableSVGPlot)svgp, ShapeLibrary.createID(ShapeLibrary.TOOLTIP, id, dimx, dimy));
+          ToolTipListener hoverer = new ToolTipListener((UpdatableSVGPlot)svgp, ShapeLibrary.createID(ShapeLibrary.TOOLTIP, id));
           targ.addEventListener(SVGConstants.SVG_MOUSEOVER_EVENT_TYPE, hoverer, false);
           targ.addEventListener(SVGConstants.SVG_MOUSEOUT_EVENT_TYPE, hoverer, false);
           targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, hoverer, false);
@@ -112,7 +112,7 @@ public class TextVisualizer<NV extends NumberVector<NV, N>, N extends Number> ex
           LoggingUtil.message("Attaching ToolTip to non-existing Object: " + dotID);
         }
         layer.appendChild(tooltip);
-        svgp.putIdElement(ShapeLibrary.createID(ShapeLibrary.TOOLTIP, id, dimx, dimy), tooltip);
+        svgp.putIdElement(ShapeLibrary.createID(ShapeLibrary.TOOLTIP, id), tooltip);
       }
     } else {
       LoggingUtil.message("This SVGPlot doesn't contain an UpdateRunner.");
