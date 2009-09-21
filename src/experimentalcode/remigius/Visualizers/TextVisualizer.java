@@ -93,8 +93,9 @@ public class TextVisualizer<NV extends NumberVector<NV, N>, N extends Number> ex
   public Element visualize(SVGPlot svgp) {
     setupCSS(svgp);
     Element layer = ShapeLibrary.createSVG(svgp.getDocument());
-
+    
     if (svgp instanceof UpdatableSVGPlot){
+      ToolTipListener hoverer = new ToolTipListener((UpdatableSVGPlot)svgp);
       for(int id : database.getIDs()) {
         Element tooltip = ShapeLibrary.createToolTip(svgp.getDocument(), getPositioned(database.get(id), dimx), (1 - getPositioned(database.get(id), dimy)), getValue(id));
         
@@ -103,7 +104,6 @@ public class TextVisualizer<NV extends NumberVector<NV, N>, N extends Number> ex
         if(dot != null) {
 
           EventTarget targ = (EventTarget) dot;
-          ToolTipListener hoverer = new ToolTipListener((UpdatableSVGPlot)svgp, ShapeLibrary.createID(ShapeLibrary.TOOLTIP, id));
           targ.addEventListener(SVGConstants.SVG_MOUSEOVER_EVENT_TYPE, hoverer, false);
           targ.addEventListener(SVGConstants.SVG_MOUSEOUT_EVENT_TYPE, hoverer, false);
           targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, hoverer, false);
