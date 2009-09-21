@@ -41,7 +41,7 @@ public class AxisVisualizer<NV extends NumberVector<NV, N>, N extends Number> ex
 
   @Override
   public Element visualize(SVGPlot svgp) {
-    Element layer = ShapeLibrary.createSVG(svgp.getDocument());
+    Element layer = ShapeLibrary.createG(svgp.getDocument());
     try {
       SVGSimpleLinearAxis.drawAxis(svgp, layer, scales[dimx], 0, 1, 1, 1, true, true);
       SVGSimpleLinearAxis.drawAxis(svgp, layer, scales[dimy], 0, 1, 0, 0, true, false);

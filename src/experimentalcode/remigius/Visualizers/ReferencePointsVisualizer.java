@@ -71,7 +71,7 @@ public class ReferencePointsVisualizer<NV extends NumberVector<NV, N>, N extends
 	@Override
 	public Element visualize(SVGPlot svgp) {
 	  setupCSS(svgp);
-	  Element layer = ShapeLibrary.createSVG(svgp.getDocument());
+	  Element layer = ShapeLibrary.createG(svgp.getDocument());
 		Iterator<NV> iter = colResult.iterator();
 		
 		while (iter.hasNext()){
