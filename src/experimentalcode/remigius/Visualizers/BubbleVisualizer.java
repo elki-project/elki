@@ -260,7 +260,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, N>, N extends Number> 
   @Override
   public Element visualize(SVGPlot svgp) {
     setupCSS(svgp);
-    Element layer = ShapeLibrary.createSVG(svgp.getDocument());
+    Element layer = ShapeLibrary.createG(svgp.getDocument());
     int clusterID = 0;
     
     for (Cluster<Model> cluster : clustering.getAllClusters()){

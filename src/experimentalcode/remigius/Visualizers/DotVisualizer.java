@@ -36,7 +36,7 @@ public class DotVisualizer<NV extends NumberVector<NV, N>, N extends Number> ext
   @Override
   public Element visualize(SVGPlot svgp) {
 
-    Element layer = ShapeLibrary.createSVG(svgp.getDocument());
+    Element layer = ShapeLibrary.createG(svgp.getDocument());
     for(int id : database.getIDs()) {
       Element dot = ShapeLibrary.createMarkerDot(svgp.getDocument(), getPositioned(database.get(id), dimx), (1 - getPositioned(database.get(id), dimy)));
       // setting ID for efficient use of ToolTips.

@@ -92,7 +92,7 @@ public class TextVisualizer<NV extends NumberVector<NV, N>, N extends Number> ex
   @Override
   public Element visualize(SVGPlot svgp) {
     setupCSS(svgp);
-    Element layer = ShapeLibrary.createSVG(svgp.getDocument());
+    Element layer = ShapeLibrary.createG(svgp.getDocument());
     
     if (svgp instanceof UpdatableSVGPlot){
       ToolTipListener hoverer = new ToolTipListener((UpdatableSVGPlot)svgp);

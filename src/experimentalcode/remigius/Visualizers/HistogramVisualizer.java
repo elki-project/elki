@@ -115,7 +115,7 @@ public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Numbe
   @Override
   public Element visualize(SVGPlot svgp) {
     setupCSS(svgp);
-    Element layer = ShapeLibrary.createSVG(svgp.getDocument());
+    Element layer = ShapeLibrary.createG(svgp.getDocument());
 
     Map<Integer, AggregatingHistogram<Double, Double>> hists = new HashMap<Integer, AggregatingHistogram<Double, Double>>();
 
