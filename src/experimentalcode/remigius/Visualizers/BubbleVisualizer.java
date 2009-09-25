@@ -142,12 +142,13 @@ public class BubbleVisualizer<NV extends NumberVector<NV, N>, N extends Number> 
   /**
    * The complete Result, as returned by an algorithm.
    * 
-   * TODO: We don't need the whole result. In fact, it only serves a clustering,
-   * which should be searched outside of the Visualizer and set by
-   * {@link #init(Database, AnnotationResult, Result, DoubleScale)}
+   * TODO: We don't need this anymore.
    */
   private Result result;
   
+  /**
+   * A clustering of the database.
+   */
   private Clustering<Model> clustering;
 
   /**
