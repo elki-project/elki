@@ -17,7 +17,7 @@ import experimentalcode.remigius.Visualizers.Visualizer;
  * 
  * @param <NV> the type of {@link DatabaseObject}s the adapter will handle.
  */
-public interface AlgorithmAdapter<O extends DatabaseObject> extends Parameterizable{
+public interface AlgorithmAdapter<O extends DatabaseObject> extends Parameterizable {
 
   /**
    * Returns <code>true</code> if the adapter can provide one or more
@@ -30,12 +30,21 @@ public interface AlgorithmAdapter<O extends DatabaseObject> extends Parameteriza
   public boolean canVisualize(Result result);
 
   /**
-   * Returns a collection of {@link Visualizer}s this adapter provides.
+   * Returns a collection of {@link Visualizer}s this adapter generally
+   * provides.
    * 
-   * @return a collection of {@link Visualizer}s this adapter provides.
+   * @return a collection of {@link Visualizer}s this adapter generally
+   *         provides.
    */
   public Collection<Visualizer> getProvidedVisualizers();
 
+  /**
+   * Returns a collection of {@link Visualizer}s this adapter provides,
+   * depending on the given database and result.
+   * 
+   * @return a collection of {@link Visualizer}s this adapter provides,
+   *         depending on the given database and result.
+   */
   public Collection<Visualizer> getUsableVisualizers();
 
   /**
