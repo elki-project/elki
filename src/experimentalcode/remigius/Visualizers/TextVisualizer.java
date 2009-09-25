@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import experimentalcode.remigius.ShapeLibrary;
 import experimentalcode.remigius.UpdatableSVGPlot;
-import experimentalcode.remigius.gui.ToolTipListener;
+import experimentalcode.remigius.gui.listener.ToolTipListener;
 
 /**
  * Generates a SVG-Element containing ToolTips. ToolTips remain invisible
