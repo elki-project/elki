@@ -171,7 +171,9 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisu
    * @param anResult contains "outlierness-scores", corresponding to the
    *        database.
    * @param result complete result for further information.
-   * @param normalizationScale
+   * @param normalizationScale normalizes coordinates.
+   * 
+   * TODO: Refactor from AnnotationResult<Double> to AnnotationResult<Number>
    */
   public void init(Database<NV> database, AnnotationResult<Double> anResult, Result result, DoubleScale normalizationScale, Clustering<Model> clustering) {
     init(database, 1000, NAME);
