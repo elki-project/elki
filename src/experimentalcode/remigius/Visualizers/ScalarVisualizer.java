@@ -8,7 +8,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
  * @author Remigius Wojdanowski
  *
  * @param <NV>
- * @param <N>
  */
 public abstract class ScalarVisualizer<NV extends NumberVector<NV, ?>> extends NumberVectorVisualizer<NV> {
   

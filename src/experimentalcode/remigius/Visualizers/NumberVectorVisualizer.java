@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
  *         includes (all) sub-classes.
  * 
  * @param <NV>
- * @param <N>
  */
 public abstract class NumberVectorVisualizer<NV extends NumberVector<NV, ?>> extends AbstractVisualizer<NV> {
 

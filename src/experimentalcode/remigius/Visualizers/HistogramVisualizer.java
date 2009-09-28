@@ -32,7 +32,6 @@ import experimentalcode.remigius.ShapeLibrary;
  * @author Remigius Wojdanowski
  * 
  * @param <NV>
- * @param <N>
  */
 public class HistogramVisualizer<NV extends NumberVector<NV, ?>> extends ScalarVisualizer<NV> {
 
