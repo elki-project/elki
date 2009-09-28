@@ -70,7 +70,7 @@ public class SimpleEnumeratingScheme implements NamingScheme {
    */
   @Override
   public String getNameFor(Object o) {
-    if(o instanceof Cluster) {
+    if(o instanceof Cluster<?>) {
       try {
         Cluster<?> cluster = (Cluster<?>) o;
         String nam = names.get(cluster);

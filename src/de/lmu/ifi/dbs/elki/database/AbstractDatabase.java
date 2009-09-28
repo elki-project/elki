@@ -389,7 +389,7 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
     Iterator<Integer> iter = this.iterator();
     if(iter.hasNext()) {
       O entry = this.get(iter.next());
-      if(entry instanceof NumberVector) {
+      if(entry instanceof NumberVector<?,?>) {
         return ((NumberVector<?, ?>) entry).getDimensionality();
       }
       else {

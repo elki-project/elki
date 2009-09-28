@@ -236,7 +236,6 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
         }
 
         // test if covering radius is correctly set
-        //noinspection unchecked
         if (entry.getCoveringRadius().compareTo(parentDistance) < 0) {
             String msg = "cr < pd \n"
                 + entry.getCoveringRadius() + " < " + parentDistance
@@ -246,7 +245,7 @@ public abstract class AbstractMTreeNode<O extends DatabaseObject, D extends Dist
                 + " >  cr(" + entry + ")";
 
             // throw new RuntimeException(msg);
-            if (parentDistance instanceof NumberDistance) {
+            if (parentDistance instanceof NumberDistance<?,?>) {
                 double d1 = Double.parseDouble(parentDistance.toString());
                 double d2 = Double.parseDouble(entry.getCoveringRadius().toString());
                 if (Math.abs(d1 - d2) > 0.000000001) {

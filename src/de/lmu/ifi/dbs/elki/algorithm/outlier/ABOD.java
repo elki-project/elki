@@ -129,6 +129,11 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
   public static final AssociationID<Double> ABOD_NORM = AssociationID.getOrCreateAssociationID("ABOD normalization", Double.class);
 
   /**
+   * use alternate code below
+   */
+  private static final boolean useRNDSample = false;
+
+  /**
    * Store the configured Kernel version
    */
   KernelFunction<V, DoubleDistance> kernelFunction;
@@ -222,10 +227,13 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
     for(Integer aKey : database) {
       HashMap<Integer, Double> dists = new HashMap<Integer, Double>(database.size());
       // determine kNearestNeighbors and pairwise distances
-      PriorityQueue<FCPair<Double, Integer>> nn = calcDistsandNN(database, kernelMatrix, sampleSize, aKey, dists);
-      if(false) {
+      PriorityQueue<FCPair<Double, Integer>> nn;
+      if (!useRNDSample) {
+        nn = calcDistsandNN(database, kernelMatrix, sampleSize, aKey, dists);
+      }
+      else {
         // alternative:
-        PriorityQueue<FCPair<Double, Integer>> nn2 = calcDistsandRNDSample(database, kernelMatrix, sampleSize, aKey, dists);
+        nn = calcDistsandRNDSample(database, kernelMatrix, sampleSize, aKey, dists);
       }
 
       // get normalization

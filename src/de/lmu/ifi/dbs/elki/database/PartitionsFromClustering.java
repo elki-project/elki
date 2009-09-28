@@ -49,7 +49,7 @@ public class PartitionsFromClustering {
     int clusterID = 1;
     for(Cluster<M> c : clustering.getAllClusters()) {
       Collection<Integer> col = c.getIDs();
-      if (col instanceof List) {
+      if (col instanceof List<?>) {
         partitions.put(clusterID, (List<Integer>) col);
       } else {
         partitions.put(clusterID, new ArrayList<Integer>(col));
@@ -93,7 +93,7 @@ public class PartitionsFromClustering {
     int clusterID = 1;
     for(Cluster<M> c : clustering.getAllClusters()) {
       Collection<Integer> col = c.getIDs();
-      if (col instanceof List) {
+      if (col instanceof List<?>) {
         partitions.put(clusterID, (List<Integer>) col);
       } else {
         partitions.put(clusterID, new ArrayList<Integer>(col));

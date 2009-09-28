@@ -30,8 +30,8 @@ public class OptionHandler extends AbstractLoggable {
   /**
    * Prefix of option markers on the command line.
    * <p/>
-   * The option markers are supposed to be given on the command line with leading
-   * -.
+   * The option markers are supposed to be given on the command line with
+   * leading -.
    */
   public static final String OPTION_PREFIX = "-";
 
@@ -67,9 +67,8 @@ public class OptionHandler extends AbstractLoggable {
    * @return String[] an array containing the unexpected parameters in the given
    *         order. Parameters are treated as unexpected if they are not known
    *         to the OptionHandler or if they were already read.
-   * @throws ParameterException if a parameter, for which a value is
-   *         required, has none (e.g. because the next value is itself some
-   *         option)
+   * @throws ParameterException if a parameter, for which a value is required,
+   *         has none (e.g. because the next value is itself some option)
    */
   public List<String> grabOptions(List<String> currentOptions) throws ParameterException {
     ArrayList<String> unexpectedParameters = new ArrayList<String>();
@@ -88,7 +87,7 @@ public class OptionHandler extends AbstractLoggable {
 
         Option<?> current = parameters.get(noPrefixOption);
         // check if the option is a parameter or a flag
-        if(current instanceof Parameter) {
+        if(current instanceof Parameter<?, ?>) {
 
           // check if there is a next element in the option array and
           // if it's indeed an option value
@@ -224,7 +223,7 @@ public class OptionHandler extends AbstractLoggable {
 
     for(Option<?> opt : parameters.values()) {
 
-      if(opt instanceof Parameter && !opt.isSet() && ((Parameter<?, ?>) opt).hasDefaultValue()) {
+      if(opt instanceof Parameter<?, ?> && !opt.isSet() && ((Parameter<?, ?>) opt).hasDefaultValue()) {
 
         ((Parameter<?, ?>) opt).setDefaultValueToValue();
       }
@@ -236,7 +235,7 @@ public class OptionHandler extends AbstractLoggable {
     Vector<Option<?>> notOptional = new Vector<Option<?>>();
 
     for(Option<?> opt : parameters.values()) {
-      if(opt instanceof Parameter && !opt.isSet() && !((Parameter<?, ?>) opt).isOptional()) {
+      if(opt instanceof Parameter<?, ?> && !opt.isSet() && !((Parameter<?, ?>) opt).isOptional()) {
         notOptional.add(opt);
       }
     }
