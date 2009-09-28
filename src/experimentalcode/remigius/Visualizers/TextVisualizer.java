@@ -63,6 +63,8 @@ public class TextVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisual
    * 
    * @param database contains all objects to be processed.
    * @param anResult contains "outlierness-scores", corresponding to the database.
+   * 
+   * TODO: Refactor from AnnotationResult<Double> to AnnotationResult<Number>
    */
   public void init(Database<NV> database, AnnotationResult<Double> anResult) {
     init(database, NAME);
