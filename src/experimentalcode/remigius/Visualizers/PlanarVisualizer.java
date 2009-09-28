@@ -11,7 +11,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
  * @author Remigius Wojdanowski
  * 
  * @param <NV>
- * @param <N>
  */
 public abstract class PlanarVisualizer<NV extends NumberVector<NV, ?>> extends NumberVectorVisualizer<NV> {
 

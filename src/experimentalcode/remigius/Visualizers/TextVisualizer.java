@@ -26,7 +26,6 @@ import experimentalcode.remigius.gui.listener.ToolTipListener;
  * @author Remigius Wojdanowski
  * 
  * @param <NV>
- * @param <N>
  */
 public class TextVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisualizer<NV> {
 

@@ -22,8 +22,6 @@ import experimentalcode.remigius.ShapeLibrary;
  * @author Remigius Wojdanowski
  *
  * @param <NV>
- * @param <V>
- * @param <N>
  */
 public class ReferencePointsVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisualizer<NV> {
   
