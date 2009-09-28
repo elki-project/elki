@@ -189,7 +189,9 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
    * @param name the name of the desired AssociationID
    * @return the AssociationID for the given name if it exists, null otherwise
    */
-  @SuppressWarnings({ "unchecked", "cast" })
+  // We extensively suppress warnings because of compiler differences in what
+  // warning they generate here - including "unneeded suppressWarnings". Argh.
+  @SuppressWarnings( { "unchecked", "cast", "all" })
   public static AssociationID<?> getAssociationID(final String name) {
     return (AssociationID<?>) AssociationID.lookup(AssociationID.class, name);
   }
