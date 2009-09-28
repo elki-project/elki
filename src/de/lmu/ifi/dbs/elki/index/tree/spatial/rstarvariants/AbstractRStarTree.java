@@ -143,7 +143,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * 
    * @param entry the leaf entry to be inserted
    */
-  private void insertLeafEntry(E entry) {
+  protected void insertLeafEntry(E entry) {
     // choose subtree for insertion
     HyperBoundingBox mbr = entry.getMBR();
     TreeIndexPath<E> subtree = choosePath(getRootPath(), mbr, 1);
@@ -167,7 +167,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    * @param entry the directory entry to be inserted
    * @param level the level at which the directory entry is to be inserted
    */
-  private void insertDirectoryEntry(E entry, int level) {
+  protected void insertDirectoryEntry(E entry, int level) {
     // choose node for insertion of o
     HyperBoundingBox mbr = entry.getMBR();
     TreeIndexPath<E> subtree = choosePath(getRootPath(), mbr, level);
@@ -844,22 +844,30 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
    */
   protected TreeIndexPathComponent<E> containedTest(N node, HyperBoundingBox mbr) {
     E containingEntry = null;
-    int index = -1, tempIndex = 0;
-    double cEVol = Double.MAX_VALUE;
+    int index = -1;
+    double cEVol = Double.NaN;
     E ei;
     for(int i = 0; i < node.getNumEntries(); i++) {
       ei = node.getEntry(i);
       // skip test on pairwise overlaps
       if(ei.getMBR().contains(mbr)) {
-        double tempVol = ei.getMBR().volume();
-        // take containing node with lowest volume
-        if(tempVol < cEVol) {
-          cEVol = tempVol;
+        if(containingEntry == null) {
           containingEntry = ei;
-          index = tempIndex;
+          index = i;
+        }
+        else {
+          double tempVol = ei.getMBR().volume();
+          if(Double.isNaN(cEVol)) { // calculate volume of currently best
+            cEVol = containingEntry.getMBR().volume();
+          }
+          // take containing node with lowest volume
+          if(tempVol < cEVol) {
+            cEVol = tempVol;
+            containingEntry = ei;
+            index = i;
+          }
         }
       }
-      tempIndex++;
     }
     return (containingEntry == null ? null : new TreeIndexPathComponent<E>(containingEntry, index));
   }
