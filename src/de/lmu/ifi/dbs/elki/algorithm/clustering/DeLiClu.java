@@ -104,20 +104,20 @@ public class DeLiClu<O extends NumberVector<O, ?>, D extends Distance<D>> extend
      */
     @Override
     protected ClusterOrderResult<D> runInTime(Database<O> database) throws IllegalStateException {
-        if (!(database instanceof SpatialIndexDatabase)) {
+        if (!(database instanceof SpatialIndexDatabase<?,?,?>)) {
             throw new IllegalArgumentException(
                 "Database must be an instance of "
                     + SpatialIndexDatabase.class.getName());
         }
         SpatialIndexDatabase<O, DeLiCluNode, DeLiCluEntry> db = ClassGenericsUtil.castWithGenericsOrNull(SpatialIndexDatabase.class, database);
 
-        if (!(db.getIndex() instanceof DeLiCluTree)) {
+        if (!(db.getIndex() instanceof DeLiCluTree<?>)) {
             throw new IllegalArgumentException("Index must be an instance of "
                 + DeLiCluTree.class.getName());
         }
         DeLiCluTree<O> index = (DeLiCluTree<O>) db.getIndex();
 
-        if (!(getDistanceFunction() instanceof SpatialDistanceFunction)) {
+        if (!(getDistanceFunction() instanceof SpatialDistanceFunction<?,?>)) {
             throw new IllegalArgumentException(
                 "Distance Function must be an instance of "
                     + SpatialDistanceFunction.class.getName());

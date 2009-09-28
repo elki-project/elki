@@ -110,7 +110,7 @@ public class ResultUtil {
    * @return List of all annotation results
    */
   public static List<AnnotationResult<?>> getAnnotationResults(Result r) {
-    if(r instanceof AnnotationResult) {
+    if(r instanceof AnnotationResult<?>) {
       List<AnnotationResult<?>> anns = new ArrayList<AnnotationResult<?>>(1);
       anns.add((AnnotationResult<?>) r);
       return anns;
@@ -146,7 +146,7 @@ public class ResultUtil {
    * @return List of clustering results
    */
   public static List<Clustering<?>> getClusteringResults(Result r) {
-    if(r instanceof Clustering) {
+    if(r instanceof Clustering<?>) {
       List<Clustering<?>> crs = new ArrayList<Clustering<?>>(1);
       crs.add((Clustering<?>) r);
       return crs;
@@ -164,7 +164,7 @@ public class ResultUtil {
    * @return List of collection results
    */
   public static List<CollectionResult<?>> getCollectionResults(Result r) {
-    if(r instanceof CollectionResult) {
+    if(r instanceof CollectionResult<?>) {
       List<CollectionResult<?>> crs = new ArrayList<CollectionResult<?>>(1);
       crs.add((CollectionResult<?>) r);
       return crs;
@@ -182,7 +182,7 @@ public class ResultUtil {
    * @return List of iterable results
    */
   public static List<IterableResult<?>> getIterableResults(Result r) {
-    if(r instanceof IterableResult) {
+    if(r instanceof IterableResult<?>) {
       List<IterableResult<?>> irs = new ArrayList<IterableResult<?>>(1);
       irs.add((IterableResult<?>) r);
       return irs;

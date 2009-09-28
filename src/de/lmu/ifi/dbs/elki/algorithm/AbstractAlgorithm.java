@@ -127,7 +127,7 @@ public abstract class AbstractAlgorithm<O extends DatabaseObject, R extends Resu
             logger.verbose(this.getClass().getName() + " runtime  : " + elapsedTime + " milliseconds.");
 
         }
-        if (database instanceof IndexDatabase && isVerbose()) {
+        if (database instanceof IndexDatabase<?> && isVerbose()) {
             IndexDatabase<?> db = (IndexDatabase<?>) database;
             StringBuffer msg = new StringBuffer();
             msg.append(getClass().getName()).append(" physical read access : ").append(db.getPhysicalReadAccess()).append("\n");

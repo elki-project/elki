@@ -92,7 +92,7 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
       return result;
     }
 
-    if(!(distanceFunction instanceof SpatialDistanceFunction)) {
+    if(!(distanceFunction instanceof SpatialDistanceFunction<?,?>)) {
       // TODO: why is this emulated here, but not for other queries.
       List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
       D distance = distanceFunction.valueOf(epsilon);
@@ -112,21 +112,21 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
   }
 
   public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForObject(O queryObject, int k, DistanceFunction<O, D> distanceFunction) {
-    if(!(distanceFunction instanceof SpatialDistanceFunction)) {
+    if(!(distanceFunction instanceof SpatialDistanceFunction<?,?>)) {
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
     }
     return index.kNNQuery(queryObject, k, (SpatialDistanceFunction<O, D>) distanceFunction);
   }
 
   public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQueryForID(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
-    if(!(distanceFunction instanceof SpatialDistanceFunction)) {
+    if(!(distanceFunction instanceof SpatialDistanceFunction<?,?>)) {
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
     }
     return index.kNNQuery(get(id), k, (SpatialDistanceFunction<O, D>) distanceFunction);
   }
 
   public <D extends Distance<D>> List<List<DistanceResultPair<D>>> bulkKNNQueryForID(List<Integer> ids, int k, DistanceFunction<O, D> distanceFunction) {
-    if(!(distanceFunction instanceof SpatialDistanceFunction)) {
+    if(!(distanceFunction instanceof SpatialDistanceFunction<?,?>)) {
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
     }
     return index.bulkKNNQueryForIDs(ids, k, (SpatialDistanceFunction<O, D>) distanceFunction);
@@ -143,7 +143,7 @@ public class SpatialIndexDatabase<O extends NumberVector<O, ?>, N extends Spatia
    * @return a List of the query results
    */
   public <D extends Distance<D>> List<DistanceResultPair<D>> reverseKNNQuery(Integer id, int k, DistanceFunction<O, D> distanceFunction) {
-    if(!(distanceFunction instanceof SpatialDistanceFunction)) {
+    if(!(distanceFunction instanceof SpatialDistanceFunction<?,?>)) {
       throw new IllegalArgumentException("Distance function must be an instance of SpatialDistanceFunction!");
     }
     try {

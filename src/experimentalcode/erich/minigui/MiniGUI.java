@@ -640,7 +640,7 @@ public class MiniGUI extends JPanel {
           activeEditor = dropdownEditor;
           return dropdownEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
         }
-        if(p.getFirst() instanceof ClassParameter) {
+        if(p.getFirst() instanceof ClassParameter<?>) {
           activeEditor = dropdownEditor;
           return dropdownEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
         }
