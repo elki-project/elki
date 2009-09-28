@@ -28,7 +28,7 @@ import experimentalcode.remigius.gui.listener.ToolTipListener;
  * @param <NV>
  * @param <N>
  */
-public class TextVisualizer<NV extends NumberVector<NV, N>, N extends Number> extends PlanarVisualizer<NV, N> {
+public class TextVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisualizer<NV> {
 
   /**
    * A short name characterizing this Visualizer.

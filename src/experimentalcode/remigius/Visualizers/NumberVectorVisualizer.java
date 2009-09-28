@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
  * @param <NV>
  * @param <N>
  */
-public abstract class NumberVectorVisualizer<NV extends NumberVector<NV, N>, N extends Number> extends AbstractVisualizer<NV> {
+public abstract class NumberVectorVisualizer<NV extends NumberVector<NV, ?>> extends AbstractVisualizer<NV> {
 
   /**
    * Array of {@link LinearScale}-objects to calculate normalized positions of
