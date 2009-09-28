@@ -25,7 +25,7 @@ import experimentalcode.remigius.ShapeLibrary;
  * @param <V>
  * @param <N>
  */
-public class ReferencePointsVisualizer<NV extends NumberVector<NV, N>, N extends Number> extends PlanarVisualizer<NV, N> {
+public class ReferencePointsVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisualizer<NV> {
   
   /**
    * Serves reference points.

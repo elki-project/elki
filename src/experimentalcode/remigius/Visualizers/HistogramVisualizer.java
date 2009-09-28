@@ -34,7 +34,7 @@ import experimentalcode.remigius.ShapeLibrary;
  * @param <NV>
  * @param <N>
  */
-public class HistogramVisualizer<NV extends NumberVector<NV, N>, N extends Number> extends ScalarVisualizer<NV, N> {
+public class HistogramVisualizer<NV extends NumberVector<NV, ?>> extends ScalarVisualizer<NV> {
 
   public static final OptionID STYLE_ROW_ID = OptionID.getOrCreateOptionID("histogram.row", "Alternative style: Rows.");
 

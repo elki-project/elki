@@ -21,7 +21,7 @@ import experimentalcode.remigius.ShapeLibrary;
  * @param <NV>
  * @param <N>
  */
-public class AxisVisualizer<NV extends NumberVector<NV, N>, N extends Number> extends PlanarVisualizer<NV, N> {
+public class AxisVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisualizer<NV> {
 
   /**
    * A short name characterizing this Visualizer.

@@ -36,7 +36,7 @@ import experimentalcode.remigius.ShapeLibrary;
  * @param <NV>
  * @param <N>
  */
-public class BubbleVisualizer<NV extends NumberVector<NV, N>, N extends Number> extends PlanarVisualizer<NV, N> {
+public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisualizer<NV> {
 
   /**
    * OptionID for {@link #GAMMA_PARAM}.

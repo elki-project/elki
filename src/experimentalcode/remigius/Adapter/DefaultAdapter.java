@@ -7,17 +7,17 @@ import experimentalcode.remigius.Visualizers.AxisVisualizer;
 import experimentalcode.remigius.Visualizers.DotVisualizer;
 import experimentalcode.remigius.Visualizers.HistogramVisualizer;
 
-public class DefaultAdapter<NV extends NumberVector<NV, N>, N extends Number> extends AbstractAlgorithmAdapter<NV>{
+public class DefaultAdapter<NV extends NumberVector<NV, ?>> extends AbstractAlgorithmAdapter<NV>{
 
-	private DotVisualizer<NV, N> dotVisualizer;
-	private AxisVisualizer<NV, N> axisVisualizer;
-	private HistogramVisualizer<NV, N> histoVisualizer;
+	private DotVisualizer<NV> dotVisualizer;
+	private AxisVisualizer<NV> axisVisualizer;
+	private HistogramVisualizer<NV> histoVisualizer;
 
 	public DefaultAdapter(){
 		super();
-		dotVisualizer = new DotVisualizer<NV, N>();
-		axisVisualizer = new AxisVisualizer<NV, N>();
-		histoVisualizer = new HistogramVisualizer<NV, N>();
+		dotVisualizer = new DotVisualizer<NV>();
+		axisVisualizer = new AxisVisualizer<NV>();
+		histoVisualizer = new HistogramVisualizer<NV>();
 		providedVisualizers.add(dotVisualizer);
 		providedVisualizers.add(axisVisualizer);
 		providedVisualizers.add(histoVisualizer);
