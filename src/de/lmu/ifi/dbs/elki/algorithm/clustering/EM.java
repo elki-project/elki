@@ -134,7 +134,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
     List<Matrix> covarianceMatrices = new ArrayList<Matrix>(k);
     List<Double> normDistrFactor = new ArrayList<Double>(k);
     List<Matrix> invCovMatr = new ArrayList<Matrix>(k);
-    List<Double> clusterWeights = new ArrayList<Double>(k);    
+    List<Double> clusterWeights = new ArrayList<Double>(k);
     probClusterIGivenX = new HashMap<Integer, double[]>(database.size());
     
     int dimensionality = means.get(0).getDimensionality();
