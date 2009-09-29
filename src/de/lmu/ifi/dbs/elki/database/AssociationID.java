@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.SortedSet;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
-import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
@@ -75,28 +74,6 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
   public static final AssociationID<ArrayList<Integer>> RANKING_LIST = new AssociationID<ArrayList<Integer>>("rankingList", ArrayList.class);
 
   /**
-   * The association id to associate a DoubleDistance to an object.
-   */
-  public static final AssociationID<DoubleDistance> DOUBLE_DISTANCE = new AssociationID<DoubleDistance>("doubleDistance", DoubleDistance.class);
-
-  /**
-   * AssociationID to associate the probabilities for an instance given a (set
-   * of) distribution(s).
-   */
-  public static final AssociationID<List<Double>> PROBABILITY_X_GIVEN_CLUSTER_I = new AssociationID<List<Double>>("P(x|C_i)", List.class);
-
-  /**
-   * AssociationID to associate the prior probability for an instance.
-   */
-  public static final AssociationID<Double> PROBABILITY_X = new AssociationID<Double>("P(x)", Double.class);
-
-  /**
-   * AssociationID to associate the probabilities for the clusters for a single
-   * instance.
-   */
-  public static final AssociationID<List<Double>> PROBABILITY_CLUSTER_I_GIVEN_X = new AssociationID<List<Double>>("P(C_i|x)", List.class);
-
-  /**
    * The association id to associate the locally weighted matrix of an object
    * for the locally weighted distance function.
    */
@@ -107,13 +84,6 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
    */
   public static final AssociationID<BitSet> PREFERENCE_VECTOR = new AssociationID<BitSet>("preferenceVector", BitSet.class);
 
-  /**
-   * The association id to associate precomputed distances.
-   */
-  /*
-   * @SuppressWarnings("unchecked") public static final AssociationID<Map>
-   * CACHED_DISTANCES = new AssociationID<Map>("cachedDistances", Map.class);
-   */
   /**
    * The association id to associate the strong eigenvector weighted matrix of
    * an object.
