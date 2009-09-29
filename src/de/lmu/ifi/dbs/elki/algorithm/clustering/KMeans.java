@@ -13,8 +13,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroup;
 import de.lmu.ifi.dbs.elki.data.DatabaseObjectGroupCollection;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
-import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
-import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.normalization.AttributeWiseMinMaxNormalization;
@@ -39,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * @param <V> a type of {@link NumberVector} as a suitable datatype for this
  *        algorithm
  */
-public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V, D, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, V> {
+public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V, D, Clustering<MeanModel<V>>> implements ClusteringAlgorithm<Clustering<MeanModel<V>>, V> {
 
   /**
    * OptionID for {@link #K_PARAM}
@@ -63,7 +62,7 @@ public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends
   /**
    * Keeps the result.
    */
-  private Clustering<Model> result;
+  private Clustering<MeanModel<V>> result;
 
   /**
    * Provides the k-means algorithm, adding parameter {@link #K_PARAM} to the
@@ -78,7 +77,7 @@ public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends
     return new Description("K-Means", "K-Means", "Finds a partitioning into k clusters.", "J. McQueen: Some Methods for Classification and Analysis of Multivariate Observations. " + "In 5th Berkeley Symp. Math. Statist. Prob., Vol. 1, 1967, pp 281-297");
   }
 
-  public Clustering<Model> getResult() {
+  public Clustering<MeanModel<V>> getResult() {
     return result;
   }
 
@@ -86,7 +85,7 @@ public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends
    * Performs the k-means algorithm on the given database.
    */
   @Override
-  protected Clustering<Model> runInTime(Database<V> database) throws IllegalStateException {
+  protected Clustering<MeanModel<V>> runInTime(Database<V> database) throws IllegalStateException {
     Random random = new Random();
     if(database.size() > 0) {
       // needs normalization to ensure the randomly generated means
@@ -134,14 +133,15 @@ public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends
         changed = !means.equals(oldMeans);
         iteration++;
       }
-      result = new Clustering<Model>();
+      result = new Clustering<MeanModel<V>>();
       for(int i = 0; i < clusters.size(); i++) {
         DatabaseObjectGroup group = new DatabaseObjectGroupCollection<List<Integer>>(clusters.get(i));
-        result.addCluster(new Cluster<Model>(group, ClusterModel.CLUSTER));
+        MeanModel<V> model = new MeanModel<V>(means.get(i));
+        result.addCluster(new Cluster<MeanModel<V>>(group, model ));
       }
     }
     else {
-      result = new Clustering<Model>();
+      result = new Clustering<MeanModel<V>>();
     }
     return result;
   }

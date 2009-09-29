@@ -12,11 +12,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  *
  * @param <V>
  */
-public class EMModel<V extends FeatureVector<V, ?>> extends BaseModel {
-  /**
-   * Cluster mean
-   */
-  private V mean;
+public class EMModel<V extends FeatureVector<V, ?>> extends MeanModel<V> {
   /**
    * Cluster covariance matrix
    */
@@ -29,8 +25,7 @@ public class EMModel<V extends FeatureVector<V, ?>> extends BaseModel {
    * @param covarianceMatrix
    */
   public EMModel(V mean, Matrix covarianceMatrix) {
-    super();
-    this.mean = mean;
+    super(mean);
     this.covarianceMatrix = covarianceMatrix;
   }
 
@@ -38,27 +33,13 @@ public class EMModel<V extends FeatureVector<V, ?>> extends BaseModel {
   public void writeToText(TextWriterStream out, String label) {
     try {
       super.writeToText(out, label);
-      out.commentPrintLn("Mean: "+out.normalizationRestore(this.mean).toString());
+      out.commentPrintLn("Mean: "+out.normalizationRestore(this.getMean()).toString());
       out.commentPrintLn("Covariance Matrix: "+this.covarianceMatrix.toString());
     }
     catch(NonNumericFeaturesException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-  }
-
-  /**
-   * @return mean
-   */
-  public V getMean() {
-    return mean;
-  }
-
-  /**
-   * @param mean
-   */
-  public void setMean(V mean) {
-    this.mean = mean;
   }
 
   /**
