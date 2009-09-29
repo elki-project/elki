@@ -23,6 +23,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 
 /**
  * Provides the k-means algorithm.
@@ -39,7 +40,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  *        algorithm
  */
 public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V, D, Clustering<MeanModel<V>>> implements ClusteringAlgorithm<Clustering<MeanModel<V>>, V> {
-
   /**
    * OptionID for {@link #K_PARAM}
    */
@@ -55,9 +55,28 @@ public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends
   private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(0));
 
   /**
+   * OptionID for {@link #MAXITER_PARAM}
+   */
+  public static final OptionID MAXITER_ID = OptionID.getOrCreateOptionID("kmeans.maxiter", "The maximum number of iterations to do. 0 means no limit.");
+
+  /**
+   * Parameter to specify the number of clusters to find, must be an integer
+   * greater or equal to 0, where 0 means no limit.
+   * <p>
+   * Key: {@code -kmeans.maxiter}
+   * </p>
+   */
+  private final IntParameter MAXITER_PARAM = new IntParameter(MAXITER_ID, new GreaterEqualConstraint(0), 0);
+
+  /**
    * Holds the value of {@link #K_PARAM}.
    */
   private int k;
+
+  /**
+   * Holds the value of {@link #MAXITER_PARAM}.
+   */
+  private int maxiter;
 
   /**
    * Keeps the result.
@@ -71,6 +90,7 @@ public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends
   public KMeans() {
     super();
     addOption(K_PARAM);
+    addOption(MAXITER_PARAM);
   }
 
   public Description getDescription() {
@@ -126,12 +146,15 @@ public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends
         if(logger.isVerbose()) {
           logger.verbose("iteration " + iteration);
         }
-        oldMeans = new ArrayList<V>(k);
-        oldMeans.addAll(means);
+        oldMeans = new ArrayList<V>(means);
         means = means(clusters, means, database);
         clusters = sort(means, database);
         changed = !means.equals(oldMeans);
         iteration++;
+        
+        if (maxiter > 0 && iteration > maxiter) {
+          break;
+        }
       }
       result = new Clustering<MeanModel<V>>();
       for(int i = 0; i < clusters.size(); i++) {
@@ -223,6 +246,9 @@ public class KMeans<D extends Distance<D>, V extends NumberVector<V, ?>> extends
 
     // k
     k = K_PARAM.getValue();
+    
+    // maximum number of iterations
+    maxiter = MAXITER_PARAM.getValue();
 
     return remainingParameters;
   }
