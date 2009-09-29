@@ -23,18 +23,18 @@ public class ComputeRGBColorHistogram extends AbstractComputeColorHistogram {
    * Key: {@code -rgbhist.bpp}
    * </p>
    */
-  private final IntParameter BINSPERPLANEPARAM = new IntParameter(BINSPERPLANE_ID, new IntervalConstraint(2, IntervalBoundary.CLOSE, 256, IntervalBoundary.CLOSE));  
+  private final IntParameter BINSPERPLANE_PARAM = new IntParameter(BINSPERPLANE_ID, new IntervalConstraint(2, IntervalBoundary.CLOSE, 256, IntervalBoundary.CLOSE));  
   
   public ComputeRGBColorHistogram() {
     super();
-    addOption(BINSPERPLANEPARAM);
+    addOption(BINSPERPLANE_PARAM);
   }
 
   @Override
   public List<String> setParameters(List<String> args) throws ParameterException {
     List<String> remainingParameters = super.setParameters(args);
     
-    quant = BINSPERPLANEPARAM.getValue();
+    quant = BINSPERPLANE_PARAM.getValue();
     
     return remainingParameters;
   }
