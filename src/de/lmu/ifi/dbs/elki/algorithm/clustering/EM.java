@@ -96,6 +96,11 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
    * Keeps the result.
    */
   private Clustering<EMModel<V>> result;
+  
+  /**
+   * Store the individual probabilities, for use by EMOutlierDetection etc.
+   */
+  private HashMap<Integer, double[]> probClusterIGivenX;
 
   /**
    * Provides the EM algorithm (clustering by expectation maximization), adding
@@ -130,8 +135,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
     List<Double> normDistrFactor = new ArrayList<Double>(k);
     List<Matrix> invCovMatr = new ArrayList<Matrix>(k);
     List<Double> clusterWeights = new ArrayList<Double>(k);    
-    HashMap<Integer, Double> priorProbX = new HashMap<Integer, Double>(database.size());
-    HashMap<Integer, List<Double>> probClusterIGivenX = new HashMap<Integer, List<Double>>(database.size());
+    probClusterIGivenX = new HashMap<Integer, double[]>(database.size());
     
     int dimensionality = means.get(0).getDimensionality();
     for(int i = 0; i < k; i++) {
@@ -151,8 +155,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
         logger.debugFine(msg.toString());
       }
     }
-    assignProbabilitiesToInstances(database, normDistrFactor, means, invCovMatr, clusterWeights, priorProbX, probClusterIGivenX);
-    double emNew = expectationOfMixture(database, priorProbX);
+    double emNew = assignProbabilitiesToInstances(database, normDistrFactor, means, invCovMatr, clusterWeights, probClusterIGivenX);
 
     // iteration unless no change
     if(logger.isVerbose()) {
@@ -180,11 +183,11 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
 
       // weights and means
       for(Integer id : database) {
-        List<Double> clusterProbabilities = probClusterIGivenX.get(id);
+        double[] clusterProbabilities = probClusterIGivenX.get(id);
 
         for(int i = 0; i < k; i++) {
-          sumOfClusterProbabilities[i] += clusterProbabilities.get(i);
-          V summand = database.get(id).multiplicate(clusterProbabilities.get(i));
+          sumOfClusterProbabilities[i] += clusterProbabilities[i];
+          V summand = database.get(id).multiplicate(clusterProbabilities[i]);
           V currentMeanSum = meanSums.get(i).plus(summand);
           meanSums.set(i, currentMeanSum);
         }
@@ -197,11 +200,11 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
       }
       // covariance matrices
       for(Integer id : database) {
-        List<Double> clusterProbabilities = probClusterIGivenX.get(id);
+        double[] clusterProbabilities = probClusterIGivenX.get(id);
         V instance = database.get(id);
         for(int i = 0; i < k; i++) {
           V difference = instance.plus(means.get(i).negativeVector());
-          Matrix newCovMatr = covarianceMatrices.get(i).plus(difference.getColumnVector().times(difference.getRowVector()).times(clusterProbabilities.get(i)));
+          Matrix newCovMatr = covarianceMatrices.get(i).plus(difference.getColumnVector().times(difference.getRowVector()).times(clusterProbabilities[i]));
           covarianceMatrices.set(i, newCovMatr);
         }
       }
@@ -213,11 +216,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
         invCovMatr.set(i, covarianceMatrices.get(i).inverse());
       }
       // reassign probabilities
-      assignProbabilitiesToInstances(database, normDistrFactor, means, invCovMatr, clusterWeights, priorProbX, probClusterIGivenX);
-
-      // new expectation
-      emNew = expectationOfMixture(database, priorProbX);
-
+      emNew = assignProbabilitiesToInstances(database, normDistrFactor, means, invCovMatr, clusterWeights, probClusterIGivenX);
     }
     while(Math.abs(em - emNew) > delta);
 
@@ -233,13 +232,13 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
     
     // provide a hard clustering
     for(Integer id : database) {
-      List<Double> clusterProbabilities = probClusterIGivenX.get(id);
+      double[] clusterProbabilities = probClusterIGivenX.get(id);
       int maxIndex = 0;
       double currentMax = 0.0;
       for(int i = 0; i < k; i++) {
-        if(clusterProbabilities.get(i) > currentMax) {
+        if(clusterProbabilities[i] > currentMax) {
           maxIndex = i;
-          currentMax = clusterProbabilities.get(i);
+          currentMax = clusterProbabilities[i];
         }
       }
       hardClusters.get(maxIndex).add(id);
@@ -262,7 +261,11 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
   }
 
   /**
-   * Assigns the current probability values to the instances in the database.
+   * Assigns the current probability values to the instances in the database and
+   * compute the expectation value of the current mixture of distributions.
+   *
+   * Computed as the sum of the logarithms of the prior probability of each
+   * instance.
    * 
    * @param database the database used for assignment to instances
    * @param normDistrFactor normalization factor for density function, based on
@@ -270,8 +273,11 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
    * @param means the current means
    * @param invCovMatr the inverse covariance matrices
    * @param clusterWeights the weights of the current clusters
+   * @return the expectation value of the current mixture of distributions
    */
-  protected void assignProbabilitiesToInstances(Database<V> database, List<Double> normDistrFactor, List<V> means, List<Matrix> invCovMatr, List<Double> clusterWeights, HashMap<Integer, Double> priorProbX, HashMap<Integer, List<Double>> probClusterIGivenX) {
+  protected double assignProbabilitiesToInstances(Database<V> database, List<Double> normDistrFactor, List<V> means, List<Matrix> invCovMatr, List<Double> clusterWeights, HashMap<Integer, double[]> probClusterIGivenX) {
+    double emSum = 0.0;
+    
     for(Integer id : database) {
       V x = database.get(id);
       List<Double> probabilities = new ArrayList<Double>(k);
@@ -293,46 +299,27 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
       for(int i = 0; i < k; i++) {
         priorProbability += probabilities.get(i) * clusterWeights.get(i);
       }
-      priorProbX.put(id, priorProbability);
-      List<Double> clusterProbabilities = new ArrayList<Double>(k);
+      double logP = Math.max(Math.log(priorProbability), MIN_LOGLIKELIHOOD);
+      if(!Double.isNaN(logP)) {
+        emSum += logP;
+      }
+
+      double[] clusterProbabilities = new double[k];
       for(int i = 0; i < k; i++) {
         assert (priorProbability >= 0.0);
         assert (clusterWeights.get(i) >= 0.0);
         // do not divide by zero!
         if(priorProbability == 0.0) {
-          clusterProbabilities.add(0.0);
+          clusterProbabilities[i]=0.0;
         }
         else {
-          clusterProbabilities.add(probabilities.get(i) / priorProbability * clusterWeights.get(i));
+          clusterProbabilities[i] = probabilities.get(i) / priorProbability * clusterWeights.get(i);
         }
       }
       probClusterIGivenX.put(id, clusterProbabilities);
     }
-  }
-
-  /**
-   * The expectation value of the current mixture of distributions.
-   * <p/>
-   * Computed as the sum of the logarithms of the prior probability of each
-   * instance.
-   * 
-   * @param database the database where the prior probability of each instance
-   *        is associated
-   * @return the expectation value of the current mixture of distributions
-   */
-  protected double expectationOfMixture(Database<V> database, HashMap<Integer, Double> priorProbX) {
-    double sum = 0.0;
-    for(Integer id : database) {
-      double pProbX = priorProbX.get(id);
-      double logP = Math.max(Math.log(pProbX), MIN_LOGLIKELIHOOD);
-      if(!Double.isNaN(logP)) {
-        sum += logP;
-      }
-      if(logger.isDebuggingFinest()) {
-        logger.debugFinest("id=" + id + "\nP(x)=" + pProbX + "\nlogP=" + logP + "\nsum=" + sum);
-      }
-    }
-    return sum;
+    
+    return emSum;
   }
 
   /**
@@ -390,6 +377,16 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
 
   public Clustering<EMModel<V>> getResult() {
     return this.result;
+  }
+  
+  /**
+   * Get the probabilities for a given point.
+   * 
+   * @param index
+   * @return
+   */
+  public double[] getProbClusterIGivenX(Integer index) {
+    return probClusterIGivenX.get(index);
   }
 
   /**
