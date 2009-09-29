@@ -17,7 +17,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
  * vectors as the absolute difference of their values in a specified dimension.
  * 
  * @author Elke Achtert
- * @param <N> number type
  * @param <V> the type of FeatureVector to compute the distances in between
  */
 public class DimensionSelectingDistanceFunction<V extends NumberVector<V,?>> extends AbstractDoubleDistanceFunction<V> implements SpatialDistanceFunction<V, DoubleDistance> {

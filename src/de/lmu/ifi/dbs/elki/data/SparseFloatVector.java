@@ -114,7 +114,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
 
   /**
    * 
-   * @see de.lmu.ifi.dbs.elki.data.NumberVector#newInstance(Number[])
+   * @see de.lmu.ifi.dbs.elki.data.FeatureVector#newInstance
    */
   public SparseFloatVector newInstance(Float[] values) {
     return new SparseFloatVector(Util.unboxToFloat(values));
