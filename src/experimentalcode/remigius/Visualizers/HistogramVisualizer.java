@@ -85,9 +85,9 @@ public class HistogramVisualizer<NV extends NumberVector<NV, ?>> extends ScalarV
         bin.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 1.0);
         coloredElement = SVGConstants.CSS_FILL_PROPERTY;
       } else {
-        bin.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.002);
+        bin.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.005);
         bin.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.0);
-        allInOne.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.002);
+        allInOne.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.005);
         allInOne.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.0);
         coloredElement = SVGConstants.CSS_STROKE_PROPERTY;
       }
