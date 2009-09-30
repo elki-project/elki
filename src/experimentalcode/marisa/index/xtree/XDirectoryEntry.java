@@ -13,7 +13,10 @@ public class XDirectoryEntry extends SpatialDirectoryEntry implements SplitHisto
   /**
    * The split history of this entry. Should be set via {@link #splitHistory}
    * and only afterwards queried by {@link #getSplitHistory()} or extended by
-   * {@link #addSplitDimension(int)}.
+   * {@link #addSplitDimension(int)}. Only used if this {@link XDirectoryEntry}
+   * does <em>not</em> approximate a leaf node. If it does, all dimensions of
+   * the parent node of <code>this</code> will be examined as potential split
+   * axes, regardless of any former splits.
    */
   private SplitHistory splitHistory = null;
 

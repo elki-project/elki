@@ -15,12 +15,17 @@ import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.KNNList;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
@@ -28,6 +33,8 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
 import de.lmu.ifi.dbs.elki.persistent.LRUCache;
 import de.lmu.ifi.dbs.elki.persistent.PersistentPageFile;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.utilities.ModifiableHyperBoundingBox;
+import de.lmu.ifi.dbs.elki.utilities.heap.DefaultIdentifiable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -39,6 +46,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstrai
 import experimentalcode.marisa.index.xtree.util.SplitHistory;
 import experimentalcode.marisa.index.xtree.util.SquareEuclideanDistanceFunction;
 import experimentalcode.marisa.index.xtree.util.XSplitter;
+import experimentalcode.marisa.utils.MyKNNList;
+import experimentalcode.marisa.utils.PQ;
+import experimentalcode.marisa.utils.PriorityQueue;
 
 /**
  * Base class for XTree implementations and other extensions; derived from
@@ -51,6 +61,15 @@ import experimentalcode.marisa.index.xtree.util.XSplitter;
  * @param <E> Entry type
  */
 public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E, N>, E extends SpatialEntry> extends AbstractRStarTree<O, N, E> {
+
+  /**
+   * If <code>true</code>, the expensive call of
+   * {@link #calculateOverlapIncrease(List, SpatialEntry, HyperBoundingBox)} is
+   * omitted for supernodes. This may lead to longer query times, however, is
+   * necessary for enabling the construction of the tree for some
+   * parameterizations.
+   * */
+  public boolean OMIT_OVERLAP_INCREASE_4_SUPERNODES = true;
 
   /**
    * Mapping id to supernode. Supernodes are appended to the end of the index
@@ -70,7 +89,11 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
   /** Maximum overlap for a split partition. */
   protected float max_overlap = .2f;
 
+  /** Dimensionality of the {@link NumberVector}s stored in this tree. */
   protected int dimensionality;
+
+  /** Number of elements (of type <O>) currently contained in this tree. */
+  protected long num_elements = 0;
 
   /**
    * The maximum overlap is calculated as the ratio of total data objects in the
@@ -149,13 +172,17 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
    * region.</dd>
    * <dt><code>VolumeOverlap</code></dt>
    * <dd>The overlap is the fraction of the overlapping region of the two
-   * original mbrs:
+   * original mbrs:<br>
    * <code>(overlap volume of mbr 1 and mbr 2) / (volume of mbr 1 + volume of mbr 2)</code>
-   * </dd>
+   * <br>
+   * This option is faster than <code>DataOverlap</code>, however, it may result
+   * in a tree structure which is not optimally adapted to the indexed data.</dd>
    * </dl>
    * Defaults to <code>VolumeOverlap</code>.
    */
   private final PatternParameter OVERLAP_TYPE_PARAMETER = new PatternParameter(OVERLAP_TYPE_ID, new EqualStringConstraint(new String[] { "DataOverlap", "VolumeOverlap" }), "VolumeOverlap");
+
+  public static final int QUEUE_INIT = 50;
 
   /*
    * Creates a new RTree.
@@ -315,46 +342,44 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     return overlap_type;
   }
 
-  /**
-   * @return the maximally allowed overlap for this XTree.
-   */
+  /** @return the maximally allowed overlap for this XTree. */
   public float get_max_overlap() {
     return max_overlap;
   }
 
-  /**
-   * @return the minimum directory capacity after a minimum overlap split
-   */
+  /** @return the minimum directory capacity after a minimum overlap split */
   public int get_min_fanout() {
     return min_fanout;
   }
 
-  /**
-   * @return the minimum directory capacity
-   */
+  /** @return the minimum directory capacity */
   public int getDirMinimum() {
     return super.dirMinimum;
   }
 
-  /**
-   * @return the minimum leaf capacity
-   */
+  /** @return the minimum leaf capacity */
   public int getLeafMinimum() {
     return super.leafMinimum;
   }
 
-  /**
-   * @return the maximum directory capacity
-   */
+  /** @return the maximum directory capacity */
   public int getDirCapacity() {
     return super.dirCapacity;
   }
 
-  /**
-   * @return the maximum leaf capacity
-   */
+  /** @return the maximum leaf capacity */
   public int getLeafCapacity() {
     return super.leafCapacity;
+  }
+
+  /** @return the tree's objects' dimension */
+  public int getDimensionality() {
+    return dimensionality;
+  }
+
+  /** @return the number of elements in this tree */
+  public long getSize() {
+    return num_elements;
   }
 
   /**
@@ -376,6 +401,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     XTreeHeader ph = (XTreeHeader) ((PersistentPageFile<N>) super.file).getHeader();
     long offset = (ph.getReservedPages() + npid) * ph.getPageSize();
     ph.setSupernode_offset(npid * ph.getPageSize());
+    ph.setNumberOfElements(num_elements);
     RandomAccessFile ra_file = ((PersistentPageFile<N>) super.file).getFile();
     ph.writeHeader(ra_file);
     ra_file.seek(offset);
@@ -402,7 +428,15 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
 
   @Override
   protected TreeIndexHeader createHeader() {
-    return new XTreeHeader(pageSize, dirCapacity, leafCapacity, dirMinimum, leafMinimum, min_fanout, dimensionality, reinsert_fraction, max_overlap);
+    return new XTreeHeader(pageSize, dirCapacity, leafCapacity, dirMinimum, leafMinimum, min_fanout, num_elements, dimensionality, reinsert_fraction, max_overlap);
+  }
+
+  /**
+   * Raises the "number of elements" counter.
+   */
+  @Override
+  protected void preInsert(@SuppressWarnings("unused") E entry) {
+    num_elements++;
   }
 
   public boolean initializeTree(O dataObject) {
@@ -430,6 +464,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     super.dirMinimum = header.getDirMinimum();
     super.leafMinimum = header.getLeafMinimum();
     this.min_fanout = header.getMin_fanout();
+    this.num_elements = header.getNumberOfElements();
     this.dimensionality = header.getDimensionality();
     this.reinsert_fraction = header.getReinsert_fraction();
     this.max_overlap = header.getMaxOverlap();
@@ -656,9 +691,10 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
    * children)</li>
    * <li>If there are multiple containing children, the child with the minimum
    * volume is chosen.</li>
-   * <li>Else, chooses the child with the minimum multi-overlap increase.</li>
-   * <li>If this increase is 0 or there are ties, the child with the minimum
-   * volume increase is selected.</li>
+   * <li>Else, if the children point to leaf nodes, chooses the child with the
+   * minimum multi-overlap increase.</li>
+   * <li>Else, or the multi-overlap increase leads to ties, the child with the
+   * minimum volume increase is selected.</li>
    * <li>If there are still ties, the child with the minimum volume is chosen.</li>
    * </ol>
    * 
@@ -693,12 +729,13 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
 
     TreeIndexPathComponent<E> optEntry = null;
     HyperBoundingBox optTestMBR = null;
-    double optMultiOverlapInc = 0;
-    boolean isLeafContainer = false;
-    // children are leafs
-    if(getNode(node.getEntry(0)).isLeaf()) {
+    double optOverlapInc = 0;
+    boolean isLeafContainer = false; // test overlap increase?
+    if((!OMIT_OVERLAP_INCREASE_4_SUPERNODES // also test supernodes
+    || (OMIT_OVERLAP_INCREASE_4_SUPERNODES && !node.isSuperNode())) // don't
+        && getNode(node.getEntry(0)).isLeaf()) { // children are leafs
       // overlap increase is to be tested
-      optMultiOverlapInc = Double.POSITIVE_INFINITY;
+      optOverlapInc = Double.POSITIVE_INFINITY;
       isLeafContainer = true;
     }
     double optVolume = Double.POSITIVE_INFINITY;
@@ -711,21 +748,21 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
       E child = iterator.next();
       HyperBoundingBox childMBR = child.getMBR();
       HyperBoundingBox testMBR = childMBR.union(mbr);
-      double multiOverlapInc;
+      double pairwiseOverlapInc;
       if(isLeafContainer) {
-        multiOverlapInc = calculateOverlapIncrease(entries, child, testMBR);
-        if(Double.isInfinite(multiOverlapInc) || Double.isNaN(multiOverlapInc)) {
-          throw new IllegalStateException("an entry's MBR is too large to calculate its overlap increase: " + multiOverlapInc + "; \nplease re-scale your data s.t. it can be dealt with");
+        pairwiseOverlapInc = calculateOverlapIncrease(entries, child, testMBR);
+        if(Double.isInfinite(pairwiseOverlapInc) || Double.isNaN(pairwiseOverlapInc)) {
+          throw new IllegalStateException("an entry's MBR is too large to calculate its overlap increase: " + pairwiseOverlapInc + "; \nplease re-scale your data s.t. it can be dealt with");
         }
       }
       else {
         // no need to examine overlap increase?
-        multiOverlapInc = 0;
+        pairwiseOverlapInc = 0;
       }
 
-      if(multiOverlapInc <= optMultiOverlapInc) {
-        if(multiOverlapInc == optMultiOverlapInc) {
-          // If there are multiple entries with the same multi-overlap increase
+      if(pairwiseOverlapInc <= optOverlapInc) {
+        if(pairwiseOverlapInc == optOverlapInc) {
+          // If there are multiple entries with the same overlap increase,
           // choose the one with the minimum volume increase.
           // If there are also multiple entries with the same volume increase
           // choose the one with the minimum volume.
@@ -749,13 +786,15 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
             optEntry = new TreeIndexPathComponent<E>(child, index);
           }
           else if(volumeInc == optVolumeInc && volume < optVolume) {
+            // TODO: decide whether to remove this option
+            System.out.println("####\nEQUAL VOLUME INCREASE: HAPPENS!\n####");
             optVolumeInc = volumeInc;
             optVolume = volume;
             optEntry = new TreeIndexPathComponent<E>(child, index);
           }
         }
         else { // already better
-          optMultiOverlapInc = multiOverlapInc;
+          optOverlapInc = pairwiseOverlapInc;
           optVolume = Double.NaN;
           optVolumeInc = Double.NaN;
           optTestMBR = testMBR; // for later calculations
@@ -795,12 +834,13 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
    */
   private double calculateOverlapIncrease(List<E> entries, E ei, HyperBoundingBox testMBR) {
 
-    HyperBoundingBox eiMBR = ei.getMBR();
+    ModifiableHyperBoundingBox eiMBR = new ModifiableHyperBoundingBox(ei.getMBR());
+    ModifiableHyperBoundingBox testMBRModifiable = new ModifiableHyperBoundingBox(testMBR);
 
-    double[] lb = eiMBR.getMin();
-    double[] ub = eiMBR.getMax();
-    double[] lbT = testMBR.getMin();
-    double[] ubT = testMBR.getMax();
+    double[] lb = eiMBR.getMinRef();
+    double[] ub = eiMBR.getMaxRef();
+    double[] lbT = testMBRModifiable.getMinRef();
+    double[] ubT = testMBRModifiable.getMaxRef();
     double[] lbNext = null; // next tested lower bounds
     double[] ubNext = null; // and upper bounds
     boolean[] dimensionChanged = new boolean[lb.length];
@@ -814,13 +854,13 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     double multiOverlapInc = 0, multiOverlapMult = 1, mOOld = 1, mONew = 1;
     double ol, olT; // dimensional overlap
     for(E ej : entries) {
-      if(!ej.equals(ei)) {
+      if(!ej.getID().equals(ei.getID())) {
         multiOverlapMult = 1; // is constant for a unchanged dimension
         mOOld = 1; // overlap for old MBR on changed dimensions
         mONew = 1; // overlap on new MBR on changed dimension
-        HyperBoundingBox ejMBR = ej.getMBR();
-        lbNext = ejMBR.getMin();
-        ubNext = ejMBR.getMax();
+        ModifiableHyperBoundingBox ejMBR = new ModifiableHyperBoundingBox(ej.getMBR());
+        lbNext = ejMBR.getMinRef();
+        ubNext = ejMBR.getMaxRef();
         for(int i = 0; i < dimensionChanged.length; i++) {
           if(dimensionChanged[i]) {
             if(lbT[i] > ubNext[i] || ubT[i] < lbNext[i]) {
@@ -867,8 +907,9 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
    *         <code>node</code> has been converted into a supernode.
    */
   private N split(N node, int[] splitAxis) {
-    if(splitAxis.length != 1)
+    if(splitAxis.length != 1) {
       throw new IllegalArgumentException("Expecting integer container for returning the split axis");
+    }
     // choose the split dimension and the split point
 
     XSplitter splitter = new XSplitter(this, node.getChildren());
@@ -880,7 +921,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
       }
       split = splitter.minimumOverlapSplit();
       if(splitter.getPastOverlap() < minOv) {
-        minOv = splitter.getPastOverlap();
+        minOv = splitter.getPastOverlap(); // only used for logging
       }
     }
     if(split != null) {// do the split
@@ -965,6 +1006,45 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
   }
 
   /**
+   * Compute the centroid of the MBRs or data objects contained by
+   * <code>node</code>. Was intended to lead to more central re-insert
+   * distributions, however, this variant rarely avoids a supernode, and
+   * definitely costs more time.
+   * 
+   * @param node
+   * @return
+   */
+  protected O compute_centroid(N node) {
+    double[] d = new double[node.getDimensionality()];
+    for(int i = 0; i < node.getNumEntries(); i++) {
+      if(node.isLeaf()) {
+        double[] values = ((SpatialLeafEntry) node.getEntry(i)).getValues();
+        for(int j = 0; j < values.length; j++) {
+          d[j] += values[j];
+        }
+      }
+      else {
+        ModifiableHyperBoundingBox mbr = new ModifiableHyperBoundingBox(node.getEntry(i).getMBR());
+        double[] min = mbr.getMinRef();
+        double[] max = mbr.getMaxRef();
+        for(int j = 0; j < min.length; j++) {
+          d[j] += min[j] + max[j];
+        }
+      }
+    }
+    for(int j = 0; j < d.length; j++) {
+      if(node.isLeaf()) {
+        d[j] /= node.getNumEntries();
+      }
+      else {
+        d[j] /= (node.getNumEntries() * 2);
+      }
+    }
+    // FIXME: make generic (or just hope DoubleVector is fine)
+    return (O) new DoubleVector(d);
+  }
+
+  /**
    * Reinserts the specified node at the specified level.
    * 
    * @param node the node to be reinserted
@@ -979,11 +1059,16 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     SquareEuclideanDistanceFunction<O> distFunction = new SquareEuclideanDistanceFunction<O>();
     DistanceEntry<DoubleDistance, E>[] reInsertEntries = new DistanceEntry[node.getNumEntries()];
 
+    // O centroid = compute_centroid(node);
+
     // compute the center distances of entries to the node and sort it
     // in decreasing order to their distances
     for(int i = 0; i < node.getNumEntries(); i++) {
       E entry = node.getEntry(i);
       DoubleDistance dist = distFunction.centerDistance(mbr, entry.getMBR());
+      // DoubleDistance dist = distFunction.maxDist(entry.getMBR(), centroid);
+      // DoubleDistance dist = distFunction.centerDistance(entry.getMBR(),
+      // centroid);
       reInsertEntries[i] = new DistanceEntry<DoubleDistance, E>(entry, dist, i);
     }
     Arrays.sort(reInsertEntries, Collections.reverseOrder());
@@ -1026,34 +1111,76 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
    * Inserts the specified entry at the specified level into this R*-Tree.
    * 
    * @param entry the entry to be inserted
-   * @param level the level at which the entry is to be inserted; should be
-   *        <code>1</code> for leaf entries
+   * @param level the level at which the entry is to be inserted; automatically
+   *        set to <code>1</code> for leaf entries
    */
   private void insertEntry(E entry, int level) {
+    if(entry.isLeafEntry()) {
+      insertLeafEntry(entry);
+    }
+    else {
+      insertDirectoryEntry(entry, level);
+    }
+  }
+
+  /**
+   * Inserts the specified leaf entry into this R*-Tree.
+   * 
+   * @param entry the leaf entry to be inserted
+   */
+  @Override
+  protected void insertLeafEntry(E entry) {
+    // choose subtree for insertion
+    HyperBoundingBox mbr = entry.getMBR();
+    TreeIndexPath<E> subtree = choosePath(getRootPath(), mbr, 1);
+
+    if(logger.isDebugging()) {
+      logger.debugFine("insertion-subtree " + subtree + "\n");
+    }
+
+    N parent = getNode(subtree.getLastPathComponent().getEntry());
+    parent.addLeafEntry(entry);
+    file.writePage(parent);
+
+    // since adjustEntry is expensive, try to avoid unnecessary subtree updates
+    if(!hasOverflow(parent) && // no overflow treatment
+    (parent.getID() == getRootEntry().getID() || // is root
+    // below: no changes in the MBR
+    subtree.getLastPathComponent().getEntry().getMBR().contains(((SpatialLeafEntry) entry).getValues()))) {
+      return; // no need to adapt subtree
+    }
+
+    // adjust the tree from subtree to root
+    adjustTree(subtree);
+  }
+
+  /**
+   * Inserts the specified directory entry at the specified level into this
+   * R*-Tree.
+   * 
+   * @param entry the directory entry to be inserted
+   * @param level the level at which the directory entry is to be inserted
+   */
+  @Override
+  protected void insertDirectoryEntry(E entry, int level) {
     // choose node for insertion of o
     HyperBoundingBox mbr = entry.getMBR();
-    if(entry.isLeafEntry() && level != 1) {
-      // logger.warning("level = " + level + " for leaf entry -- setting to 1");
-      level = 1;
-    }
     TreeIndexPath<E> subtree = choosePath(getRootPath(), mbr, level);
     if(logger.isDebugging()) {
       logger.debugFine("subtree " + subtree);
     }
+
     N parent = getNode(subtree.getLastPathComponent().getEntry());
-    if(entry.isLeafEntry()) {
-      if(!parent.isLeaf()) {
-        throw new IllegalStateException("Require the end of the selected path to be a leaf node for leave entries!");
-      }
-      parent.addLeafEntry(entry);
-    }
-    else {
-      if(parent.isLeaf()) {
-        throw new IllegalStateException("Require the end of the selected path to be a directory node for directory entries!");
-      }
-      parent.addDirectoryEntry(entry);
-    }
+    parent.addDirectoryEntry(entry);
     file.writePage(parent);
+
+    // since adjustEntry is expensive, try to avoid unnecessary subtree updates
+    if(!hasOverflow(parent) && // no overflow treatment
+    (parent.getID() == getRootEntry().getID() || // is root
+    // below: no changes in the MBR
+    subtree.getLastPathComponent().getEntry().getMBR().contains(entry.getMBR()))) {
+      return; // no need to adapt subtree
+    }
 
     // adjust the tree from subtree to root
     adjustTree(subtree);
@@ -1083,11 +1210,15 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
         }
         else {
           N parent = getNode(subtree.getParentPath().getLastPathComponent().getEntry());
-          node.adjustEntry(parent.getEntry(subtree.getLastPathComponent().getIndex()));
+          E e = parent.getEntry(subtree.getLastPathComponent().getIndex());
+          HyperBoundingBox mbr = e.getMBR();
+          node.adjustEntry(e);
 
-          // write changes in parent to file
-          file.writePage(parent);
-          adjustTree(subtree.getParentPath());
+          if(!mbr.equals(e.getMBR())) { // MBR has changed
+            // write changes in parent to file
+            file.writePage(parent);
+            adjustTree(subtree.getParentPath());
+          }
         }
       }
       else {
@@ -1113,33 +1244,33 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
             }
             E newEntry = createNewDirectoryEntry(split);
             parent.addDirectoryEntry(newEntry);
-            if(!node.isLeaf()) {
-              // adjust split history
-              E oldEntry = subtree.getParentPath().getLastPathComponent().getEntry();
-              SplitHistory sh = ((SplitHistorySpatialEntry) oldEntry).getSplitHistory();
-              if(sh == null) { // not yet initialized (dimension not known of
-                // this tree)
-                sh = new SplitHistory(oldEntry.getDimensionality());
-                sh.setDim(splitAxis[0]);
-                ((SplitHistorySpatialEntry) oldEntry).setSplitHistory(sh);
-              }
-              else {
-                ((SplitHistorySpatialEntry) oldEntry).addSplitDimension(splitAxis[0]);
-              }
-              try {
-                ((SplitHistorySpatialEntry) newEntry).setSplitHistory((SplitHistory) sh.clone());
-              }
-              catch(CloneNotSupportedException e) {
-                throw new RuntimeException("Clone of a split history should not throw an Exception", e);
-              }
+
+            // The below variant does not work in the persistent version
+            // E oldEntry = subtree.getLastPathComponent().getEntry();
+            // [reason: if oldEntry is modified, this must be permanent]
+            E oldEntry = parent.getEntry(subtree.getLastPathComponent().getIndex());
+
+            // adjust split history
+            SplitHistory sh = ((SplitHistorySpatialEntry) oldEntry).getSplitHistory();
+            if(sh == null) {
+              // not yet initialized (dimension not known of this tree)
+              sh = new SplitHistory(oldEntry.getDimensionality());
+              sh.setDim(splitAxis[0]);
+              ((SplitHistorySpatialEntry) oldEntry).setSplitHistory(sh);
+            }
+            else {
+              ((SplitHistorySpatialEntry) oldEntry).addSplitDimension(splitAxis[0]);
+            }
+            try {
+              ((SplitHistorySpatialEntry) newEntry).setSplitHistory((SplitHistory) sh.clone());
+            }
+            catch(CloneNotSupportedException e) {
+              throw new RuntimeException("Clone of a split history should not throw an Exception", e);
             }
 
             // adjust the entry representing the (old) node, that has
             // been split
-
-            // This does not work in the persistent version
-            // node.adjustEntry(subtree.getLastPathComponent().getEntry());
-            node.adjustEntry(parent.getEntry(subtree.getLastPathComponent().getIndex()));
+            node.adjustEntry(oldEntry);
 
             // write changes in parent to file
             file.writePage(parent);
@@ -1153,11 +1284,16 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     else {
       if(node.getID() != getRootEntry().getID()) {
         N parent = getNode(subtree.getParentPath().getLastPathComponent().getEntry());
-        int index = subtree.getLastPathComponent().getIndex();
-        node.adjustEntry(parent.getEntry(index));
-        // write changes in parent to file
-        file.writePage(parent);
-        adjustTree(subtree.getParentPath());
+        E e = parent.getEntry(subtree.getLastPathComponent().getIndex());
+        HyperBoundingBox mbr = e.getMBR();
+        node.adjustEntry(e);
+
+        if(node.isLeaf() || // we already know that mbr is extended
+        !mbr.equals(e.getMBR())) { // MBR has changed
+          // write changes in parent to file
+          file.writePage(parent);
+          adjustTree(subtree.getParentPath());
+        }
       }
       // root level is reached
       else {
@@ -1181,13 +1317,12 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     file.writePage(root);
     // get split history
     SplitHistory sh = null;
-    if(!oldRoot.isLeaf()) {
-      sh = ((XDirectoryEntry) getRootEntry()).getSplitHistory();
-      if(sh == null) {
-        sh = new SplitHistory(oldRoot.getDimensionality());
-      }
-      sh.setDim(splitAxis);
+    // TODO: see whether root entry is ALWAYS a directory entry .. it SHOULD!
+    sh = ((XDirectoryEntry) getRootEntry()).getSplitHistory();
+    if(sh == null) {
+      sh = new SplitHistory(oldRoot.getDimensionality());
     }
+    sh.setDim(splitAxis);
 
     // switch the ids
     oldRoot.setID(root.getID());
@@ -1207,15 +1342,13 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     root.setID(getRootEntry().getID());
     E oldRootEntry = createNewDirectoryEntry(oldRoot);
     E newNodeEntry = createNewDirectoryEntry(newNode);
-    if(sh != null) { // adjust split history
-      ((SplitHistorySpatialEntry) oldRootEntry).setSplitHistory(sh);
-      try {
-        ((SplitHistorySpatialEntry) newNodeEntry).setSplitHistory((SplitHistory) sh.clone());
-      }
-      catch(CloneNotSupportedException e) {
-        throw new RuntimeException("Clone of a split history should not throw an Exception", e);
-      }
-    } // else: data entries do not need a split history
+    ((SplitHistorySpatialEntry) oldRootEntry).setSplitHistory(sh);
+    try {
+      ((SplitHistorySpatialEntry) newNodeEntry).setSplitHistory((SplitHistory) sh.clone());
+    }
+    catch(CloneNotSupportedException e) {
+      throw new RuntimeException("Clone of a split history should not throw an Exception", e);
+    }
     root.addDirectoryEntry(oldRootEntry);
     root.addDirectoryEntry(newNodeEntry);
 
@@ -1229,40 +1362,86 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
       msg += "\n";
       logger.debugFine(msg);
     }
-    // TODO: Test whether or not NOW this new root is available via getRootEntry
-    // -- probably not!
-
+    // the root entry still needs to be set to the new root node's MBR
     return new TreeIndexPath<E>(new TreeIndexPathComponent<E>(getRootEntry(), null));
   }
 
-  // /**
-  // * Performs a k-nearest neighbor query for the given NumberVector with the
-  // * given parameter k and the according distance function. The query result
-  // is
-  // * in ascending order to the distance to the query object.
-  // *
-  // * @param object the query object
-  // * @param k the number of nearest neighbors to be returned
-  // * @param distanceFunction the distance function that computes the distances
-  // * between the objects
-  // * @return a List of the query results
-  // */
-  // @Override
-  // public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQuery(O
-  // object, int k, SpatialDistanceFunction<O, D> distanceFunction) {
-  // if(k < 1) {
-  // throw new
-  // IllegalArgumentException("At least one enumeration has to be requested!");
-  // }
-  //
-  // // TODO: this is not better, so just leave it
-  // // final KNNList<D> knnList = new MyKNNList<D>(k,
-  // distanceFunction.infiniteDistance());
-  // final KNNList<D> knnList = new KNNList<D>(k,
-  // distanceFunction.infiniteDistance());
-  // doKNNQuery(object, distanceFunction, knnList);
-  // return knnList.toList();
-  // }
+  /**
+   * Performs a k-nearest neighbor query for the given NumberVector with the
+   * given parameter k and the according distance function. The query result is
+   * in ascending order to the distance to the query object.
+   * 
+   * @param object the query object
+   * @param k the number of nearest neighbors to be returned
+   * @param distanceFunction the distance function that computes the distances
+   *        between the objects
+   * @return a List of the query results
+   */
+  @Override
+  public <D extends Distance<D>> List<DistanceResultPair<D>> kNNQuery(O object, int k, SpatialDistanceFunction<O, D> distanceFunction) {
+    if(k < 1) {
+      throw new IllegalArgumentException("At least one enumeration has to be requested!");
+    }
+    final KNNList<D> knnList = new MyKNNList<D>(k, distanceFunction.infiniteDistance());
+    doKNNQuery(object, distanceFunction, knnList);
+    return knnList.toList();
+  }
+
+  /**
+   * Performs a k-nearest neighbor query for the given NumberVector with the
+   * given parameter k (in <code>knnList</code>) and the according distance
+   * function. The query result is in ascending order to the distance to the
+   * query object.
+   * 
+   * @param object the query object
+   * @param distanceFunction the distance function that computes the distances
+   *        between the objects
+   * @param knnList the knn list containing the result
+   */
+  @SuppressWarnings("unchecked")
+  @Override
+  protected <D extends Distance<D>> void doKNNQuery(Object object, SpatialDistanceFunction<O, D> distanceFunction, KNNList<D> knnList) {
+    // candidate queue
+    PQ<D, DefaultIdentifiable> pq = new PQ<D, DefaultIdentifiable>(PriorityQueue.Ascending, QUEUE_INIT);
+
+    // push root
+    pq.add(distanceFunction.nullDistance(), new DefaultIdentifiable(getRootEntry().getID()));
+    D maxDist = distanceFunction.infiniteDistance();
+
+    // search in tree
+    while(!pq.isEmpty()) {
+      D dist = pq.firstPriority();
+      Integer firstID = pq.removeFirst().getID();
+      if(dist.compareTo(maxDist) > 0) {
+        return;
+      }
+
+      N node = getNode(firstID);
+      // data node
+      if(node.isLeaf()) {
+        for(int i = 0; i < node.getNumEntries(); i++) {
+          E entry = node.getEntry(i);
+          D distance = object instanceof Integer ? distanceFunction.minDist(entry.getMBR(), (Integer) object) : distanceFunction.minDist(entry.getMBR(), (O) object);
+          distanceCalcs++;
+          if(distance.compareTo(maxDist) <= 0) {
+            knnList.add(new DistanceResultPair<D>(distance, entry.getID()));
+            maxDist = knnList.getKNNDistance();
+          }
+        }
+      }
+      // directory node
+      else {
+        for(int i = 0; i < node.getNumEntries(); i++) {
+          E entry = node.getEntry(i);
+          D distance = object instanceof Integer ? distanceFunction.minDist(entry.getMBR(), (Integer) object) : distanceFunction.minDist(entry.getMBR(), (O) object);
+          distanceCalcs++;
+          if(distance.compareTo(maxDist) <= 0) {
+            pq.add(distance, new DefaultIdentifiable(entry.getID()));
+          }
+        }
+      }
+    }
+  }
 
   /**
    * Returns a string representation of this XTree.
@@ -1321,6 +1500,7 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
           totalCapacity = totalCapacity.add(BigInteger.valueOf(node.getCapacity()));
         }
       }
+      assert objects == num_elements : "objects=" + objects + ", size=" + num_elements;
       result.append(getClass().getName()).append(" has ").append((levels + 1)).append(" levels.\n");
       result.append(dirNodes).append(" Directory Nodes (max = ").append(dirCapacity - 1).append(", min = ").append(dirMinimum).append(")\n");
       result.append(superNodes).append(" Supernodes (max = ").append(maxSuperCapacity - 1).append(", min = ").append(minSuperCapacity - 1).append(")\n");

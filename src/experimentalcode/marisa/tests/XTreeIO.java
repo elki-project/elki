@@ -45,8 +45,8 @@ public class XTreeIO {
     List<String> parameters = Arrays.asList(split);
     xTree.setParameters(parameters);
 
-    xTree.initializeTree(new DoubleVector(new double[15]));
-    System.out.println(xTree.toString());
+//    xTree.initializeTree(new DoubleVector(new double[15]));
+//    System.out.println(xTree.toString());
 
     FileInputStream fis = new FileInputStream(csvInputFile);
     DataInputStream in = new DataInputStream(fis);
@@ -131,9 +131,7 @@ public class XTreeIO {
     // String inputCSV = "/theseus/data/synthetic/15DUniform.csv";
     String inputCSV = "/tmp/marisa/15DUniform.csv";
     String outputPrefix = "/theseus/data/Experimente/index/xTree/elki/15DUniformXT/";
-    // buildTrees(inputCSV, outputPrefix, new int[] { 4096, 8192 }, new double[]
-    // { 1, .9, .5, .2, .1 }, new double[] { 0, .15, .3 }, new double[]{.2, .3,
-    // .4}, new long[] { 1000000 });
+     buildTrees(inputCSV, outputPrefix, new int[] { 4096, 8192 }, new double[] { /*1, .9, .5,*/ .2, .1 }, new double[] { 0, .15, .3 }, new double[] { .2, .3, .4 }, new long[] { 1000000 });
     outputPrefix += "DO";
     DATA_OVERLAP = true;
     buildTrees(inputCSV, outputPrefix, new int[] { 4096, 8192 }, new double[] { 1, .9, .5, .2, .1 }, new double[] { 0, .15, .3 }, new double[] { .2, .3, .4 }, new long[] { 1000000 });

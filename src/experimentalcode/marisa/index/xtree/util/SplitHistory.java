@@ -11,7 +11,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 
 /**
  * History of all splits ever occurred in a Node.
@@ -123,5 +122,9 @@ public final class SplitHistory implements Serializable {
    */
   public static SplitHistory readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     return new SplitHistory(LargeProperties.readExternal(in), false);
+  }
+  
+  public boolean isEmpty() {
+    return dimBits.isEmpty();
   }
 }

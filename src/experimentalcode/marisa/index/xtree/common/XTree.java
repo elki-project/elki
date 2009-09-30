@@ -77,16 +77,6 @@ public class XTree<O extends NumberVector<O, ?>> extends XTreeBase<O, XTreeNode,
   }
 
   /**
-   * Performs necessary operations before inserting the specified entry.
-   * 
-   * @param entry the entry to be inserted
-   */
-  @Override
-  protected void preInsert(SpatialEntry entry) {
-    // do nothing
-  }
-
-  /**
    * Performs necessary operations after deleting the specified object.
    * 
    * @param o the object to be deleted

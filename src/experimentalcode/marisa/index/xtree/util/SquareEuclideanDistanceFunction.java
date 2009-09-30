@@ -66,6 +66,41 @@ public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> exten
   }
 
   /**
+   * @return The square maximum distance between <code>v</code> and
+   *         <code>mbr</code>.
+   */
+  protected double square_MaxDist(HyperBoundingBox mbr, V v) {
+    if(mbr.getDimensionality() != v.getDimensionality()) {
+      throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + v.toString());
+    }
+
+    double sqrDist = 0;
+    for(int d = 1; d <= v.getDimensionality(); d++) {
+      double value = v.getValue(d).doubleValue();
+      double manhattanI, min = mbr.getMin(d), max = mbr.getMax(d);
+      if(value < min)
+        manhattanI = max - value;
+      else if(value > max)
+        manhattanI = value - min;
+      else if(value - min > max - value)
+        manhattanI = value - min;
+      else
+        manhattanI = max - value;
+
+      sqrDist += manhattanI * manhattanI;
+    }
+    return sqrDist;
+  }
+
+  /**
+   * @return The square maximum distance between <code>v</code> and
+   *         <code>mbr</code>.
+   */
+  public DoubleDistance maxDist(HyperBoundingBox mbr, V v) {
+    return new DoubleDistance(square_MaxDist(mbr, v));
+  }
+
+  /**
    * @return The square minimum distance between <code>v</code> and
    *         <code>mbr</code>.
    */
@@ -82,7 +117,8 @@ public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> exten
         r = mbr.getMin(d);
       else if(value > mbr.getMax(d))
         r = mbr.getMax(d);
-      else // zero distance in dimension d
+      else
+        // zero distance in dimension d
         continue;
 
       double manhattanI = value - r;
@@ -183,5 +219,26 @@ public class SquareEuclideanDistanceFunction<V extends NumberVector<V, ?>> exten
   /** @return the distance of the two MBRs' center points */
   public DoubleDistance sqrtCenterDistance(HyperBoundingBox mbr1, HyperBoundingBox mbr2) {
     return new DoubleDistance(Math.sqrt(square_CenterDistance(mbr1, mbr2)));
+  }
+
+  protected double square_CenterDistance(HyperBoundingBox mbr, V v) {
+    if(mbr.getDimensionality() != v.getDimensionality()) {
+      throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + v.toString());
+    }
+
+    double sqrDist = 0;
+    for(int d = 1; d <= mbr.getDimensionality(); d++) {
+      double c1 = mbr.getMin(d) + mbr.getMax(d);
+      double c2 = v.getMin(d);
+
+      double manhattanI = c1 / 2 - c2;
+      sqrDist += manhattanI * manhattanI;
+    }
+    return sqrDist;
+  }
+
+  /** @return the square distance of mbr's center point to v*/
+  public DoubleDistance centerDistance(HyperBoundingBox mbr, V v) {
+    return new DoubleDistance(square_CenterDistance(mbr, v));
   }
 }

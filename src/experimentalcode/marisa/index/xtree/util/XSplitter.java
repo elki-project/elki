@@ -10,11 +10,13 @@ import java.util.Locale;
 import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.utilities.ModifiableHyperBoundingBox;
+import experimentalcode.marisa.index.xtree.SplitHistorySpatialEntry;
 import experimentalcode.marisa.index.xtree.XDirectoryEntry;
 import experimentalcode.marisa.index.xtree.XNode;
 import experimentalcode.marisa.index.xtree.XTreeBase;
+import experimentalcode.marisa.utils.PriorityQueue;
 
 /**
  * Provides methods for splitting X-tree nodes.
@@ -78,16 +80,206 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    *         input orderings
    */
   private double generateDistributionsAndSurfaceSums(int minEntries, int maxEntries, Integer[] entriesByLB, Integer[] entriesByUB) {
-    double surfaceSum = 0;
-    for(int limit = minEntries; limit <= maxEntries; limit++) {
-      HyperBoundingBox mbr1 = mbr(entriesByLB, 0, limit);
-      HyperBoundingBox mbr2 = mbr(entriesByLB, limit, entriesByLB.length);
-      surfaceSum += mbr1.perimeter() + mbr2.perimeter();
-      mbr1 = mbr(entriesByUB, 0, limit);
-      mbr2 = mbr(entriesByUB, limit, entriesByUB.length);
+    // the old variant is minimally slower
+    // double surfaceSum = 0;
+    // for(int limit = minEntries; limit <= maxEntries; limit++) {
+    // HyperBoundingBox mbr1 = mbr(entriesByLB, 0, limit);
+    // HyperBoundingBox mbr2 = mbr(entriesByLB, limit, entriesByLB.length);
+    // surfaceSum += mbr1.perimeter() + mbr2.perimeter();
+    // mbr1 = mbr(entriesByUB, 0, limit);
+    // mbr2 = mbr(entriesByUB, limit, entriesByUB.length);
+    // surfaceSum += mbr1.perimeter() + mbr2.perimeter();
+    // }
+    // return surfaceSum;
+    int dim = tree.getDimensionality();
+    // get surface sum for lower-bound sorting
+    double surfaceSum = getSurfaceSums4Sorting(minEntries, maxEntries, entriesByLB, dim);
+    // get surface sum for upper-bound sorting
+    surfaceSum += getSurfaceSums4Sorting(minEntries, maxEntries, entriesByUB, dim);
+    return surfaceSum;
+  }
+
+  /**
+   * Compute the surfaces of the <code>2 * (maxEntries - minEntries + 1)</code>
+   * split MBRs resulting for the sorting <code>entrySorting</code>.
+   * 
+   * @param minEntries minimally allowed subgroup size
+   * @param maxEntries maximally allowed subgroup size for the first entry set
+   * @param entrySorting a permutation of the indices of {@link #entries}
+   * @param dim the dimension of the tree
+   * @return the sum of all first and second MBRs' surfaces for the tested entry
+   *         distributions
+   */
+  @SuppressWarnings("unchecked")
+  private double getSurfaceSums4Sorting(int minEntries, int maxEntries, Integer[] entrySorting, int dim) {
+    // avoid multiple MBR calculations by updating min/max-logs for the two
+    // collections' bounds:
+
+    // the first entries' maximum upper bounds
+    double[] pqUBFirst = new double[dim];
+    Arrays.fill(pqUBFirst, Double.NEGATIVE_INFINITY);
+    // maintain the second entries' upper bounds
+    PriorityQueue<Integer>[] pqUBSecond = new PriorityQueue[dim];
+    for(int i = 0; i < pqUBSecond.length; i++) {
+      pqUBSecond[i] = new PriorityQueue<Integer>(false, maxEntries);
+    }
+    // the first entries' minimum lower bounds
+    double[] pqLBFirst = new double[dim];
+    Arrays.fill(pqLBFirst, Double.POSITIVE_INFINITY);
+    // maintain the second entries' minimum lower bounds
+    PriorityQueue<Integer>[] pqLBSecond = new PriorityQueue[dim];
+    for(int i = 0; i < pqLBSecond.length; i++) {
+      pqLBSecond[i] = new PriorityQueue<Integer>(true, maxEntries);
+    }
+    // initialize bounds for first entry collection
+    for(int index = 0; index < minEntries; index++) {
+      add2MBR(entrySorting, pqUBFirst, pqLBFirst, index);
+    }
+    HyperBoundingBox mbr1 = new HyperBoundingBox(pqLBFirst, pqUBFirst);
+
+    // fill bounding queues for the second entry collection
+    double[] minSecond = new double[dim];
+    double[] maxSecond = new double[dim];
+    Arrays.fill(maxSecond, Double.NEGATIVE_INFINITY);
+    Arrays.fill(minSecond, Double.POSITIVE_INFINITY);
+
+    assert entrySorting.length - maxEntries == minEntries;
+    // initialize min/max entries of the second collections' tail
+    for(int index = maxEntries; index < entrySorting.length; index++) {
+      add2MBR(entrySorting, maxSecond, minSecond, index);
+    }
+    for(int i = 0; i < pqLBSecond.length; i++) {
+      // with index entrySorting.length => never to be removed
+      pqLBSecond[i].add(minSecond[i], entrySorting.length);
+      pqUBSecond[i].add(maxSecond[i], entrySorting.length);
+    }
+    // add the entries to be removed later on
+    for(int index = minEntries; index < maxEntries; index++) {
+      add2MBR(entrySorting, pqUBSecond, pqLBSecond, index);
+    }
+    for(int i = 0; i < minSecond.length; i++) {
+      minSecond[i] = pqLBSecond[i].firstPriority();
+      maxSecond[i] = pqUBSecond[i].firstPriority();
+    }
+    ModifiableHyperBoundingBox mbr2 = new ModifiableHyperBoundingBox(minSecond, maxSecond);
+    double surfaceSum = mbr1.perimeter() + mbr2.perimeter();
+
+    // generate the other distributions and file the surface sums
+    for(int limit = minEntries; limit < maxEntries; limit++) {
+      // extend first MBR by entry at position entrySorting[limit]:
+      add2MBR(entrySorting, pqUBFirst, pqLBFirst, limit);
+      // shrink entry at position entrySorting[limit] from second MBR:
+      removeFromMBR(pqUBSecond, pqLBSecond, limit, mbr2);
       surfaceSum += mbr1.perimeter() + mbr2.perimeter();
     }
+
     return surfaceSum;
+  }
+
+  /**
+   * Update operation for maintaining the second entry distribution. Removes the
+   * entries associated with indices <code>&le; index</code> from the
+   * dimensions' lower and upper bound priority queues (<code>pqLB</code> and
+   * <code>pqUB</code>). Whenever this causes a change in a dimension's lower or
+   * upper bound, <code>mbr</code> is updated accordingly.
+   * 
+   * @param pqUB One priority queue for each dimension. They are sorted by upper
+   *        bound in descending order and consist of entry indices for the
+   *        entries belonging to <code>mbr</code> (and possibly others, which
+   *        may first have to be removed).
+   * @param pqLB One priority queue for each dimension. They are sorted by lower
+   *        bound in ascending order and consist of entry indices for the
+   *        entries belonging to <code>mbr</code> (and possibly others, which
+   *        may first have to be removed).
+   * @param index All indices <code>&le; index</code> must no longer be part of
+   *        <code>mbr</code>.
+   * @param mbr The MBR to be adapted to a smaller entry list.
+   */
+  private void removeFromMBR(PriorityQueue<Integer>[] pqUB, PriorityQueue<Integer>[] pqLB, Integer index, ModifiableHyperBoundingBox mbr) {
+    boolean change = false;
+    PriorityQueue<Integer>.Pair<Integer> pqPair;
+    for(int d = 1; d <= mbr.getDimensionality(); d++) {
+      // remove all relevant upper bound entries belonging to the first set
+      pqPair = pqUB[d - 1].getFirstEntry();
+      while(pqPair.getValue().compareTo(index) <= 0) {
+        change = true;
+        pqUB[d - 1].removeFirst();
+        pqPair = pqUB[d - 1].getFirstEntry();
+      }
+      if(change) { // there probably was a change, as an entry has been removed
+        mbr.setMax(d, pqPair.getPriority());
+      }
+      change = false;
+      // remove all relevant lower bound entries belonging to the first set
+      pqPair = pqLB[d - 1].getFirstEntry();
+      while(pqPair.getValue().compareTo(index) <= 0) {
+        change = true;
+        pqLB[d - 1].removeFirst();
+        pqPair = pqLB[d - 1].getFirstEntry();
+      }
+      if(change) { // there probably was a change, as an entry has been removed
+        mbr.setMin(d, pqPair.getPriority());
+      }
+      change = false;
+    }
+  }
+
+  /**
+   * Adds the minimum and maximum bounds of the MBR of entry
+   * <code>entrySorting[index]</code> in {@link #entries} to the dimension-wise
+   * upper and lower bounds, <code>ub</code> and <code>lb</code>. Note that if
+   * this method is called for <code>ub</code> and <code>lb</code> which are
+   * already owned by an MBR, this update operation also updates the MBR defined
+   * by those bounds.
+   * 
+   * @param entrySorting a sorting providing the mapping of <code>index</code>
+   *        to the entry in {@link #entries} to be added
+   * @param ub the upper bound of the MBR to be extended
+   * @param lb the lower bound of the MBR to be extended
+   * @param index the index in the sorting referencing the entry to be added
+   */
+  private void add2MBR(Integer[] entrySorting, double[] ub, double[] lb, int index) {
+    HyperBoundingBox currMBR = this.entries.get(entrySorting[index]).getMBR();
+    double min, max;
+    for(int d = 1; d <= currMBR.getDimensionality(); d++) {
+      max = currMBR.getMax(d);
+      if(max > ub[d - 1]) {
+        ub[d - 1] = max;
+      }
+      min = currMBR.getMin(d);
+      if(min < lb[d - 1]) {
+        lb[d - 1] = min;
+      }
+    }
+  }
+
+  /**
+   * Adds the minimum and maximum bounds of the MBR of entry
+   * <code>entrySorting[index]</code> in {@link #entries} to the dimension-wise
+   * upper and lower bound priority queues <code>pqUBFirst</code> and
+   * <code>pqLBFirst</code>.
+   * 
+   * @param entrySorting a sorting providing the mapping of <code>index</code>
+   *        to the entry in {@link #entries} to be added
+   * @param pqUB One priority queue for each dimension. They are sorted by upper
+   *        bound in descending order and consist of entry indices in
+   *        <code>entrySorting</code> for the entries belonging to
+   *        <code>mbr</code>.
+   * @param pqLB One priority queue for each dimension. They are sorted by lower
+   *        bound in ascending order and consist of entry indices in
+   *        <code>entrySorting</code> for the entries belonging to
+   *        <code>mbr</code>.
+   * @param index the index in the sorting referencing the entry to be added
+   */
+  private void add2MBR(Integer[] entrySorting, PriorityQueue<Integer>[] pqUB, PriorityQueue<Integer>[] pqLB, int index) {
+    HyperBoundingBox currMBR = this.entries.get(entrySorting[index]).getMBR();
+    double min, max;
+    for(int d = 1; d <= currMBR.getDimensionality(); d++) {
+      max = currMBR.getMax(d);
+      pqUB[d - 1].add(max, index);
+      min = currMBR.getMin(d);
+      pqLB[d - 1].add(min, index);
+    }
   }
 
   /**
@@ -194,7 +386,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    *        this is either the minimum directory capacity or, if a topological
    *        split has already failed, the tree's minimum fan-out parameter.
    * @param maxEntries Maximum number of entries in each sub group
-   * @return The dimension with the minimum surface sum, or null if
+   * @return The dimension with the minimum surface sum, or <code>null</code> if
    *         dimensionIterable yielded nothing
    */
   private int chooseSplitAxis(Iterable<Integer> dimensionIterable, int minEntries, int maxEntries) {
@@ -218,15 +410,17 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
 
     Integer[] entriesByLBRev = null, entriesByUBRev = null;
     if(maxEntries <= entries.size() / 2) {
+      System.out.println("THIS HAPPENS!!");
       // initialize backwards direction
-      entriesByLBRev = Arrays.copyOf(entriesByLB, entries.size());
-      entriesByUBRev = Arrays.copyOf(entriesByLB, entries.size());
+      entriesByLBRev = new Integer[entries.size()];
+      entriesByUBRev = new Integer[entries.size()];
     }
 
     for(Integer d : dimensionIterable) {
       sortEntriesForDimension(d, entriesByLB, entriesByUB);
       double surfaceSum = generateDistributionsAndSurfaceSums(minEntries, maxEntries, entriesByLB, entriesByUB);
       if(maxEntries <= entries.size() / 2) { // add opposite ranges
+        System.out.println("THIS HAPPENS intern");
         for(int j = 0; j < entriesByUB.length; j++) {
           // reverse sorting
           entriesByUBRev[entries.size() - 1 - j] = entriesByUB[j];
@@ -325,12 +519,12 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
           }
         }
       }
-      if(!entries.get(0).isLeafEntry() && tree.get_max_overlap() < 1) { // test
-        // overlap
+      if(!entries.get(0).isLeafEntry() && tree.get_max_overlap() < 1) {
+        // test overlap
         if(maxOverlapStrategy == XTreeBase.DATA_OVERLAP) {
-          double overlap = getRatioOfDataInIntersectionVolume(this.generateDistribution(optDistribution), optMBRs);
-          if(tree.get_max_overlap() < overlap) {
-            logger.finest(String.format(Locale.ENGLISH, "No %s split found%s; best data overlap was %.3f", (minEntries == tree.get_min_fanout() ? "minimum overlap" : "topological"), (maxEntries < entries.size() / 2 ? " in " + (revert ? "second" : "first") + " range" : ""), overlap));
+          pastOverlap = getRatioOfDataInIntersectionVolume(generateDistribution(optDistribution), optMBRs);
+          if(tree.get_max_overlap() < pastOverlap) {
+            logger.finest(String.format(Locale.ENGLISH, "No %s split found%s; best data overlap was %.3f", (minEntries == tree.get_min_fanout() ? "minimum overlap" : "topological"), (maxEntries < entries.size() / 2 ? " in " + (revert ? "second" : "first") + " range" : ""), pastOverlap));
             return null;
           }
         }
@@ -339,16 +533,21 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
             optVolume = optMBRs[0].volume();
             optVolume += optMBRs[1].volume();
           }
-          if(tree.get_max_overlap() < optXVolume / optVolume) {
-            logger.finest(String.format(Locale.ENGLISH, "No %s split found%s; best volume overlap was %.3f", (minEntries == tree.get_min_fanout() ? "minimum overlap" : "topological"), (maxEntries < entries.size() / 2 ? " in " + (revert ? "second" : "first") + " range" : ""), optXVolume / optVolume));
+          pastOverlap = optXVolume / optVolume;
+          if(tree.get_max_overlap() < pastOverlap) {
+            logger.finest(String.format(Locale.ENGLISH, "No %s split found%s; best volume overlap was %.3f", (minEntries == tree.get_min_fanout() ? "minimum overlap" : "topological"), (maxEntries < entries.size() / 2 ? " in " + (revert ? "second" : "first") + " range" : ""), pastOverlap));
             return null;
           }
         }
+      }
+      else {
+        pastOverlap = Double.NaN; // overlap is not computed
       }
 
       return optDistribution;
     }
     else {
+      pastOverlap = Double.MAX_VALUE;
       return null;
     }
   }
@@ -363,6 +562,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    * @param entrySorting this splitDistribution
    * @return the split distribution for the given sorting and split point
    */
+  @SuppressWarnings("unchecked")
   private List<ET>[] generateDistribution(SplitSorting sorting) {
     List<ET>[] distibution;
     distibution = new List[2];
@@ -420,7 +620,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
     if(entries.size() < 2) {
       throw new IllegalArgumentException("Splitting less than two entries is pointless.");
     }
-    int maxEntries = tree.getDirCapacity();
+    int maxEntries = tree.getDirCapacity() - 1;
     int minFanout = tree.get_min_fanout();
     if(entries.size() < maxEntries) {
       throw new IllegalArgumentException("This entry list has not yet reached the maximum limit: " + entries.size() + "<=" + maxEntries);
@@ -432,6 +632,9 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
       if(entries.get(0) instanceof XDirectoryEntry) {
         // filter common split dimensions
         dimensionListing = getCommonSplitDimensions(entries);
+        if(!dimensionListing.iterator().hasNext()) { // no common dimensions
+          return null;
+        }
       }
       else {
         // test all dimensions
@@ -439,19 +642,19 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
       }
       int formerSplitAxis = this.splitAxis;
       maxEntries = maxEntries + 1 - minFanout; // = maximum left-hand size
-      int splitAxis = chooseSplitAxis(dimensionListing, minFanout, maxEntries);
+      chooseSplitAxis(dimensionListing, minFanout, maxEntries);
       // find the best split point
-      if(formerSplitAxis == splitAxis && tree.getDirMinimum() > minFanout) {
+      if(formerSplitAxis == this.splitAxis && tree.getDirMinimum() > minFanout) {
         // remember: this follows an unsuccessful topological split
         // avoid duplicate computations of {minEntries, ..., maxEntries}
-        double minOverlap = Double.MAX_VALUE;
+        double minOverlap = pastOverlap;
         // test {minFanout, ..., minEntries - 1}
-        SplitSorting ret1 = chooseMinimumOverlapSplit(splitAxis, minFanout, tree.getDirMinimum() - 1, false);
+        SplitSorting ret1 = chooseMinimumOverlapSplit(this.splitAxis, minFanout, tree.getDirMinimum() - 1, false);
         if(ret1 != null && pastOverlap < minOverlap) {
           minOverlap = pastOverlap; // this is a valid choice
         }
         // test {maxEntries - minEntries + 2, ..., maxEntries - minFanout + 1}
-        SplitSorting ret2 = chooseMinimumOverlapSplit(splitAxis, minFanout, tree.getDirMinimum(), true);
+        SplitSorting ret2 = chooseMinimumOverlapSplit(this.splitAxis, minFanout, tree.getDirMinimum() - 1, true);
         if(ret2 == null) {
           // accept first range regardless of whether or not there is one
           pastOverlap = minOverlap;
@@ -464,7 +667,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
         return ret1;
       }
       else {
-        return chooseMinimumOverlapSplit(splitAxis, minFanout, maxEntries, false);
+        return chooseMinimumOverlapSplit(this.splitAxis, minFanout, maxEntries, false);
       }
     }
     else { // minFanout not set for allowing underflowing nodes
@@ -485,7 +688,6 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    *      Robust Access Method for Points and Rectangles, ACM SIGMOD Int. Conf.
    *      on Management of Data (SIGMOD'90), Atlantic City, NJ, 1990, pp.
    *      322-331"
-   * @param entries list of at least 2 entries to be split
    * @return chosen split distribution; note that this method returns null, if
    *         the minimum overlap split has a volume which is larger than the
    *         allowed <code>maxOverlap</code> ratio of #tree
@@ -495,14 +697,14 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
       throw new IllegalArgumentException("Splitting less than two entries is pointless.");
     }
     int minEntries = (entries.get(0).isLeafEntry() ? tree.getLeafMinimum() : tree.getDirMinimum());
-    int maxEntries = (entries.get(0).isLeafEntry() ? tree.getLeafCapacity() : tree.getDirCapacity());
+    int maxEntries = (entries.get(0).isLeafEntry() ? tree.getLeafCapacity() - 1 : tree.getDirCapacity() - 1);
     if(entries.size() < maxEntries) {
       throw new IllegalArgumentException("This entry list has not yet reached the maximum limit: " + entries.size() + "<=" + maxEntries);
     }
 
     maxEntries = maxEntries + 1 - minEntries;
 
-    int splitAxis = chooseSplitAxis(new Range(0, entries.get(0).getDimensionality()), minEntries, maxEntries);
+    chooseSplitAxis(new Range(0, entries.get(0).getDimensionality()), minEntries, maxEntries);
     return chooseMinimumOverlapSplit(splitAxis, minEntries, maxEntries, false);
   }
 

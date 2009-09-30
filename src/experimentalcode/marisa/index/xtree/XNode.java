@@ -17,6 +17,9 @@ import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
  * XTree node extension for testing on supernodes
  * 
  * @author Marisa Thoma
+ * 
+ * @param <E> Type of the entries stored in this node
+ * @param <N> Type of this node (for extendability)
  */
 public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> extends AbstractRStarTreeNode<N, E> {
 

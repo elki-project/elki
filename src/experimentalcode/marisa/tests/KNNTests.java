@@ -12,12 +12,11 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.index.tree.TreeIndex;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import experimentalcode.marisa.index.xtree.common.XTree;
+import experimentalcode.marisa.index.xtree.util.SquareEuclideanDistanceFunction;
 import experimentalcode.marisa.utils.PriorityQueue;
 import experimentalcode.marisa.utils.Zeit;
 
@@ -25,8 +24,8 @@ public class KNNTests {
 
   public static <O extends NumberVector<O, ?>> List<DistanceResultPair<DoubleDistance>> sequKNN(int k, List<O> objects, O query, SpatialDistanceFunction<O, DoubleDistance> df) {
     PriorityQueue<O> pq = new PriorityQueue<O>(false, k);
-    for(Iterator iterator = objects.iterator(); iterator.hasNext();) {
-      O o = (O) iterator.next();
+    for(Iterator<O> iterator = objects.iterator(); iterator.hasNext();) {
+      O o = iterator.next();
       double dist = df.distance(o, query).getValue();
       pq.addSecure(dist, o, k);
     }
@@ -38,11 +37,10 @@ public class KNNTests {
   }
 
   public static <O extends NumberVector<O, ?>> void knnCorrectTest(int k, List<O> objects, AbstractRStarTree<O, ?, ?> index, List<O> queries) {
-    EuclideanDistanceFunction<O> ed = new EuclideanDistanceFunction<O>();
+    SquareEuclideanDistanceFunction<O> ed = new SquareEuclideanDistanceFunction<O>();
     int queryNumber = 0;
     for(; queryNumber < queries.size(); queryNumber++) {
       O nv = queries.get(queryNumber);
-      System.out.println(queryNumber);
       List<DistanceResultPair<DoubleDistance>> result = index.kNNQuery(nv, k, ed);
       List<DistanceResultPair<DoubleDistance>> resultS = sequKNN(k, objects, nv, ed);
       assert result.size() == resultS.size() : "index: " + result.size() + "; sequ: " + resultS.size() + "; k: " + k;
@@ -53,12 +51,12 @@ public class KNNTests {
   }
 
   public static <O extends NumberVector<O, ?>> void knnRun(int k, AbstractRStarTree<O, ?, ?> index, List<O> queries) {
-    EuclideanDistanceFunction<O> ed = new EuclideanDistanceFunction<O>();
+    SquareEuclideanDistanceFunction<O> sed = new SquareEuclideanDistanceFunction<O>();
     int queryNumber = 0;
     for(; queryNumber < queries.size(); queryNumber++) {
       O nv = queries.get(queryNumber);
       // System.out.println(queryNumber);
-      List<DistanceResultPair<DoubleDistance>> result = index.kNNQuery(nv, k, ed);
+      List<DistanceResultPair<DoubleDistance>> result = index.kNNQuery(nv, k, sed);
       assert result.size() == k;
     }
   }
@@ -67,15 +65,17 @@ public class KNNTests {
     XTree<DoubleVector> xt;
     xt = XTreeTests.loadXTree(xtFileName);
     System.out.println("XT: " + xt.toString());
+    speedTest(xt, queryFileName);
+  }
+
+  public static void speedTest(XTree<DoubleVector> xt, String queryFileName) throws NumberFormatException, IOException {
     List<DoubleVector> queries = new ArrayList<DoubleVector>();
 
     FileInputStream fis = new FileInputStream(queryFileName);
     DataInputStream in = new DataInputStream(fis);
     int stop = 10000;
-    for(int i = 0; (in.available() != 0); i++) {
-      if(i == stop)
-        break;
-      queries.add(XTreeTests.readNext(in, i));
+    for(int i = 0; (in.available() != 0) && i < stop; i++) {
+      queries.add(XTreeTests.readNext(in, i, xt.getDimensionality()));
     }
     in.close();
     fis.close();
@@ -92,9 +92,10 @@ public class KNNTests {
       System.out.println("Took " + Zeit.wieLange(now));
     }
     System.out.println("Done with the warming up");
+    xt.resetPageAccess();
     now = new Date();
     knnRun(k, xt, queries);
-    System.out.println("Took " + Zeit.wieLange(now));
+    System.out.println("Took " + Zeit.wieLange(now)+ ", logical: "+xt.getLogicalPageAccess()+", physical read: "+xt.getPhysicalReadAccess());
   }
 
   public static void amICorrect() throws ParameterException, NumberFormatException, IOException {
@@ -129,8 +130,36 @@ public class KNNTests {
     knnCorrectTest(10, db, xt, queries);
   }
 
+  public static void amICorrect(XTree<DoubleVector> xt, String queryFileName) throws NumberFormatException, IOException {
+    List<DoubleVector> db = new ArrayList<DoubleVector>(), queries = new ArrayList<DoubleVector>();
+    FileInputStream fis = new FileInputStream("C:/WORK/Theseus/data/synthetic/15DUniform.csv");
+    DataInputStream in = new DataInputStream(fis);
+    long stop = xt.getSize();
+    for(long i = 0; (in.available() != 0); i++) {
+      if(i == stop)
+        break;
+      db.add(XTreeTests.readNext(in, (int) i, xt.getDimensionality()));
+    }
+    in.close();
+    fis.close();
+    System.out.println("loaded DB of size " + db.size());
+    fis = new FileInputStream(queryFileName);
+    in = new DataInputStream(fis);
+    stop = 100;
+    for(int i = 0; (in.available() != 0); i++) {
+      if(i == stop)
+        break;
+      queries.add(XTreeTests.readNext(in, i, xt.getDimensionality()));
+    }
+    in.close();
+    fis.close();
+    System.out.println("loaded QUERY DB of size " + queries.size());
+
+    knnCorrectTest(10, db, xt, queries);
+  }
+
   public static void main(String[] args) throws ParameterException, NumberFormatException, IOException {
     // amICorrect();
-    speedTest("", "C:/WORK/Theseus/data/synthetic/15Dqueries.csv");
+    speedTest("C:/WORK/Theseus/Experimente/xtrees/15DUniformXTree_default_mO1", "C:/WORK/Theseus/data/synthetic/15Dqueries.csv");
   }
 }

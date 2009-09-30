@@ -14,12 +14,13 @@ import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 public class XTreeHeader extends TreeIndexHeader {
 
   /**
-   * The size of this header in bytes, which is 24 Bytes. We have the integers
+   * The size of this header in bytes, which is 32 Bytes. We have the integers
    * {@link #min_fanout} and {@link #dimensionality} (each 4 bytes), the floats
    * {@link #reinsert_fraction} and {@link #max_overlap} (each 4 bytes) and the
-   * 8 Bytes for the long {@link #supernode_offset}.
+   * 8 bytes each for the longs {@link #num_elements} and
+   * {@link #supernode_offset}.
    */
-  private static int SIZE = 24;
+  private static int SIZE = 32;
 
   /**
    * Minimum size to be allowed for page sizes after a split in case of a
@@ -32,6 +33,9 @@ public class XTreeHeader extends TreeIndexHeader {
 
   /** Maximally allowed overlap. */
   private float max_overlap = (float) .2;
+
+  /** Number of elements stored in this tree. */
+  private long num_elements;
 
   /** Dimensionality of the objects in this header's tree. */
   private int dimensionality;
@@ -47,9 +51,10 @@ public class XTreeHeader extends TreeIndexHeader {
     super();
   }
 
-  public XTreeHeader(int pageSize, int dirCapacity, int leafCapacity, int dirMinimum, int leafMinimum, int min_fanout, int dimensionality, float reinsert_fraction, float max_overlap) {
+  public XTreeHeader(int pageSize, int dirCapacity, int leafCapacity, int dirMinimum, int leafMinimum, int min_fanout, long num_elements, int dimensionality, float reinsert_fraction, float max_overlap) {
     super(pageSize, dirCapacity, leafCapacity, dirMinimum, leafMinimum);
     this.min_fanout = min_fanout;
+    this.num_elements = num_elements;
     this.dimensionality = dimensionality;
     this.reinsert_fraction = reinsert_fraction;
     this.max_overlap = max_overlap;
@@ -59,7 +64,7 @@ public class XTreeHeader extends TreeIndexHeader {
    * Initializes this header from the specified file. Reads the integer values
    * <code>version</code>, <code>pageSize</code>, {@link #dirCapacity},
    * {@link #leafCapacity}, {@link #dirMinimum}, and {@link #leafMinimum}, as
-   * well as the minimum fanout {@link #min_fanout}, the tree's dimensnion
+   * well as the minimum fanout {@link #min_fanout}, the tree's dimension
    * {@link #dimensionality}, the fraction of pages to be re-inserted before
    * splitting {@link #reinsert_fraction}, the maximum overlap
    * {@link #max_overlap} and the supernode offset {@link #supernode_offset}
@@ -69,6 +74,7 @@ public class XTreeHeader extends TreeIndexHeader {
   public void readHeader(RandomAccessFile file) throws IOException {
     super.readHeader(file);
     this.min_fanout = file.readInt();
+    this.num_elements = file.readLong();
     this.dimensionality = file.readInt();
     this.reinsert_fraction = file.readFloat();
     this.max_overlap = file.readFloat();
@@ -87,6 +93,7 @@ public class XTreeHeader extends TreeIndexHeader {
   public void writeHeader(RandomAccessFile file) throws IOException {
     super.writeHeader(file);
     file.writeInt(min_fanout);
+    file.writeLong(num_elements);
     file.writeInt(dimensionality);
     file.writeFloat(reinsert_fraction);
     file.writeFloat(max_overlap);
@@ -152,6 +159,20 @@ public class XTreeHeader extends TreeIndexHeader {
    */
   public int getDimensionality() {
     return dimensionality;
+  }
+
+  /**
+   * @return The number of elements stored in the tree
+   */
+  public void setNumberOfElements(long num_elements) {
+    this.num_elements = num_elements;
+  }
+
+  /**
+   * @return The number of elements stored in the tree
+   */
+  public long getNumberOfElements() {
+    return num_elements;
   }
 
 }

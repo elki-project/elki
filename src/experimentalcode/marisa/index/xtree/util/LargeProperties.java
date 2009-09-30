@@ -33,7 +33,8 @@ public class LargeProperties implements Serializable, Cloneable, Iterable<Boolea
   protected long[] propArray = null;
 
   /**
-   * Number of attributes stored in this
+   * Number of attributes that can be stored in this == the capacity, not the
+   * number of set elements.
    */
   protected int size = 0;
 
@@ -308,8 +309,36 @@ public class LargeProperties implements Serializable, Cloneable, Iterable<Boolea
     return lp;
   }
 
+  /**
+   * @return Number of attributes that can be stored in this == the capacity,
+   *         <i>not</i> the number of set elements.
+   */
   public int getSize() {
     return size;
+  }
+
+  /**
+   * @return Number of attributes which are set to <code>true</code>.
+   */
+  public int getNumberOfElements() {
+    int numSet = 0;
+    for(Iterator<Boolean> iterator = newPropertyIterator(); iterator.hasNext();) {
+      if(iterator.next())
+        numSet++;
+    }
+    return numSet;
+  }
+
+  /**
+   * @return <code>true</code> if no attributes of <code>this</code> are set,
+   *         else <code>false</code>.
+   */
+  public boolean isEmpty() {
+    for(int i = 0; i < propArray.length; i++) {
+      if (propArray[i] != 0)
+        return false;
+    }
+    return true;
   }
 
   @Override
