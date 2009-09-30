@@ -23,7 +23,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.table.AbstractTableModel;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
 
@@ -34,14 +35,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
 
 public class MiniGUI extends JPanel {
   /**
@@ -49,41 +48,31 @@ public class MiniGUI extends JPanel {
    */
   private static final long serialVersionUID = 1L;
 
-  public static final int BIT_INCOMPLETE = 0;
-
-  public static final int BIT_INVALID = 1;
-
-  public static final int BIT_SYNTAX_ERROR = 2;
-
-  public static final int BIT_NO_NAME_BUT_VALUE = 3;
-
-  public static final int BIT_OPTIONAL = 4;
-
-  public static final int BIT_DEFAULT_VALUE = 5;
-
-  private static final String STRING_USE_DEFAULT = "(use default)";
-
-  private static final String STRING_OPTIONAL = "(optional)";
-
-  static final String[] columns = { "Parameter", "Value" };
-
   private static final String NEWLINE = System.getProperty("line.separator");
 
   protected Logging logger = Logging.getLogger(MiniGUI.class);
 
   protected LogPane outputArea;
 
-  protected ArrayList<Triple<Option<?>, String, BitSet>> parameters;
-
   protected JTable parameterTable;
+
+  protected DynamicParameters parameters;
 
   public MiniGUI() {
     super();
     this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-    parameters = new ArrayList<Triple<Option<?>, String, BitSet>>();
+    this.parameters = new DynamicParameters();
 
-    parameterTable = new JTable(new ParametersModel(parameters));
+    ParametersModel parameterModel = new ParametersModel(parameters);
+    parameterModel.addTableModelListener(new TableModelListener() {
+      @Override
+      public void tableChanged(@SuppressWarnings("unused") TableModelEvent e) {
+        logger.debug("Change event.");
+        runSetParameters();
+      }
+    });
+    parameterTable = new JTable(parameterModel);
     parameterTable.setPreferredScrollableViewportSize(new Dimension(800, 400));
     parameterTable.setFillsViewportHeight(true);
     parameterTable.setDefaultRenderer(Option.class, new HighlightingRenderer(parameters));
@@ -133,7 +122,9 @@ public class MiniGUI extends JPanel {
   }
 
   protected void runSetParameters() {
-    ArrayList<String> params = serializeParameters();
+    parameterTable.setEnabled(false);
+    ArrayList<String> params = parameters.serializeParameters();
+    parameterTable.setEnabled(true);
     outputArea.clear();
     outputArea.publish("Parameters: " + FormatUtil.format(params, " ") + NEWLINE, Level.INFO);
     doSetParameters(params);
@@ -158,88 +149,16 @@ public class MiniGUI extends JPanel {
 
     // update table:
     parameterTable.setEnabled(false);
-    parameters.clear();
-    for(Pair<Parameterizable, Option<?>> p : options) {
-      Option<?> option = p.getSecond();
-      String value = option.getGivenValue();
-      if(value == null) {
-        if(option instanceof Flag) {
-          value = Flag.NOT_SET;
-        }
-        else {
-          value = "";
-        }
-      }
-      BitSet bits = new BitSet();
-      if(option instanceof Parameter<?, ?>) {
-        Parameter<?, ?> par = (Parameter<?, ?>) option;
-        if(par.isOptional()) {
-          bits.set(BIT_OPTIONAL);
-        }
-        if(par.hasDefaultValue() && par.tookDefaultValue()) {
-          bits.set(BIT_DEFAULT_VALUE);
-        }
-      }
-      else if(option instanceof Flag) {
-        bits.set(BIT_OPTIONAL);
-      }
-      else {
-        logger.warning("Option is neither Parameter nor Flag!");
-      }
-      if(value == "") {
-        if(!bits.get(BIT_DEFAULT_VALUE) && !bits.get(BIT_OPTIONAL)) {
-          bits.set(BIT_INCOMPLETE);
-        }
-      }
-      if(value != "") {
-        try {
-          if(!option.isValid(value)) {
-            bits.set(BIT_INVALID);
-          }
-        }
-        catch(ParameterException e) {
-          bits.set(BIT_INVALID);
-        }
-      }
-      // SKIP these options, they should be moved out of KDDTask:
-      if (option.getOptionID() == OptionID.HELP || option.getOptionID() == OptionID.HELP_LONG) {
-        continue;
-      }
-      if (option.getOptionID() == OptionID.DESCRIPTION) {
-        continue;
-      }
-      Triple<Option<?>, String, BitSet> t = new Triple<Option<?>, String, BitSet>(option, value, bits);
-      parameters.add(t);
-    }
+    parameters.updateFromOptions(options);
     parameterTable.revalidate();
     parameterTable.setEnabled(true);
     return options;
   }
 
-  private ArrayList<String> serializeParameters() {
-    parameterTable.setEnabled(false);
-    ArrayList<String> p = new ArrayList<String>(2 * parameters.size());
-    for(Triple<Option<?>, String, BitSet> t : parameters) {
-      if(t.getFirst() != null) {
-        if(t.getFirst() instanceof Parameter<?, ?> && t.getSecond() != null && t.getSecond().length() > 0) {
-          if(t.getSecond() != STRING_USE_DEFAULT && t.getSecond() != STRING_OPTIONAL) {
-            p.add("-" + t.getFirst().getOptionID().getName());
-            p.add(t.getSecond());
-          }
-        }
-        else if(t.getFirst() instanceof Flag) {
-          if(t.getSecond() == Flag.SET) {
-            p.add("-" + t.getFirst().getOptionID().getName());
-          }
-        }
-      }
-    }
-    parameterTable.setEnabled(true);
-    return p;
-  }
-
   protected void runTask() {
-    ArrayList<String> params = serializeParameters();
+    parameterTable.setEnabled(false);
+    ArrayList<String> params = parameters.serializeParameters();
+    parameterTable.setEnabled(true);
     outputArea.clear();
     outputArea.publish("Running: " + FormatUtil.format(params, " ") + NEWLINE, Level.INFO);
     KDDTask<DatabaseObject> task = new KDDTask<DatabaseObject>();
@@ -282,124 +201,13 @@ public class MiniGUI extends JPanel {
     });
   }
 
-  class ParametersModel extends AbstractTableModel {
-    /**
-     * Serial version
-     */
-    private static final long serialVersionUID = 1L;
-
-    private ArrayList<Triple<Option<?>, String, BitSet>> parameters;
-
-    public ParametersModel(ArrayList<Triple<Option<?>, String, BitSet>> parameters) {
-      super();
-      this.parameters = parameters;
-    }
-
-    @Override
-    public int getColumnCount() {
-      return 2;
-    }
-
-    @Override
-    public int getRowCount() {
-      return parameters.size();
-    }
-
-    @Override
-    public Object getValueAt(int rowIndex, int columnIndex) {
-      if(rowIndex < parameters.size()) {
-        Triple<Option<?>, String, BitSet> p = parameters.get(rowIndex);
-        if(columnIndex == 0) {
-          Option<?> ret = p.getFirst();
-          return ret;
-        }
-        else if(columnIndex == 1) {
-          String ret = p.getSecond();
-          if(ret == null) {
-            ret = "";
-          }
-          return ret;
-        }
-        return "";
-      }
-      else {
-        return "";
-      }
-    }
-
-    @Override
-    public String getColumnName(int column) {
-      return columns[column];
-    }
-
-    @Override
-    public Class<?> getColumnClass(int columnIndex) {
-      if(columnIndex == 0) {
-        return Option.class;
-      }
-      return String.class;
-    }
-
-    @Override
-    public boolean isCellEditable(int rowIndex, int columnIndex) {
-      return (columnIndex == 1) || (rowIndex > parameters.size());
-    }
-
-    @Override
-    public void setValueAt(Object value, int rowIndex, int columnIndex) {
-      if(value instanceof String) {
-        String s = (String) value;
-        Triple<Option<?>, String, BitSet> p;
-        if(rowIndex < parameters.size()) {
-          p = parameters.get(rowIndex);
-        }
-        else {
-          BitSet flags = new BitSet();
-          // flags.set(BIT_INCOMPLETE);
-          p = new Triple<Option<?>, String, BitSet>(null, "", flags);
-          parameters.add(p);
-        }
-        BitSet flags = p.getThird();
-        if(columnIndex == 0) {
-          p.setFirst(null); // TODO: allow editing!
-        }
-        else if(columnIndex == 1) {
-          p.setSecond(s);
-
-          if(p.getFirst() instanceof Flag) {
-            if((!Flag.SET.equals(s)) && (!Flag.NOT_SET.equals(s))) {
-              flags.set(BIT_SYNTAX_ERROR);
-            }
-            else {
-              flags.clear(BIT_SYNTAX_ERROR);
-            }
-          }
-        }
-        // set flag when we have a key but no value
-        // flags.set(BIT_NO_NAME_BUT_VALUE, (p.getFirst().length() == 0 &&
-        // p.getSecond().length() > 0));
-        // no data at all?
-        // if(p.getFirst() == null || p.getFirst() == "") {
-        // if(p.getSecond() == null || p.getSecond() == "") {
-        // flags.clear();
-        // }
-        // }
-        p.setThird(flags);
-        runSetParameters();
-      }
-      else {
-        logger.warning("Edited value is not a String!");
-      }
-    }
-  }
-
   protected static class HighlightingRenderer extends DefaultTableCellRenderer {
     /**
      * Serial Version
      */
     private static final long serialVersionUID = 1L;
 
-    private ArrayList<Triple<Option<?>, String, BitSet>> parameters;
+    private DynamicParameters parameters;
 
     private static final Color COLOR_INCOMPLETE = new Color(0xFFFFAF);
 
@@ -409,7 +217,7 @@ public class MiniGUI extends JPanel {
 
     private static final Color COLOR_DEFAULT_VALUE = new Color(0xBFBFBF);
 
-    public HighlightingRenderer(ArrayList<Triple<Option<?>, String, BitSet>> parameters) {
+    public HighlightingRenderer(DynamicParameters parameters) {
       super();
       this.parameters = parameters;
     }
@@ -435,23 +243,23 @@ public class MiniGUI extends JPanel {
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
       Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
       if(row < parameters.size()) {
-        Triple<Option<?>, String, BitSet> p = parameters.get(row);
-        if((p.getThird().get(BIT_INVALID))) {
+        BitSet flags = parameters.getFlags(row);
+        if((flags.get(DynamicParameters.BIT_INVALID))) {
           c.setBackground(COLOR_SYNTAX_ERROR);
         }
-        else if((p.getThird().get(BIT_SYNTAX_ERROR))) {
+        else if((flags.get(DynamicParameters.BIT_SYNTAX_ERROR))) {
           c.setBackground(COLOR_SYNTAX_ERROR);
         }
-        else if((p.getThird().get(BIT_NO_NAME_BUT_VALUE))) {
+        else if((flags.get(DynamicParameters.BIT_NO_NAME_BUT_VALUE))) {
           c.setBackground(COLOR_SYNTAX_ERROR);
         }
-        else if((p.getThird().get(BIT_INCOMPLETE))) {
+        else if((flags.get(DynamicParameters.BIT_INCOMPLETE))) {
           c.setBackground(COLOR_INCOMPLETE);
         }
-        else if((p.getThird().get(BIT_OPTIONAL))) {
+        else if((flags.get(DynamicParameters.BIT_OPTIONAL))) {
           c.setBackground(COLOR_OPTIONAL);
         }
-        else if((p.getThird().get(BIT_DEFAULT_VALUE))) {
+        else if((flags.get(DynamicParameters.BIT_DEFAULT_VALUE))) {
           c.setBackground(COLOR_DEFAULT_VALUE);
         }
         else {
@@ -468,11 +276,11 @@ public class MiniGUI extends JPanel {
      */
     private static final long serialVersionUID = 1L;
 
-    private ArrayList<Triple<Option<?>, String, BitSet>> parameters;
+    private DynamicParameters parameters;
 
     private final JComboBox comboBox;
 
-    public DropdownEditor(ArrayList<Triple<Option<?>, String, BitSet>> parameters, JComboBox comboBox) {
+    public DropdownEditor(DynamicParameters parameters, JComboBox comboBox) {
       super(comboBox);
       this.comboBox = comboBox;
       this.parameters = parameters;
@@ -495,14 +303,14 @@ public class MiniGUI extends JPanel {
         comboBox.setSelectedIndex(0);
       }
       if(row < parameters.size()) {
-        Triple<Option<?>, String, BitSet> p = parameters.get(row);
-        if(p.getFirst() instanceof ClassParameter<?>) {
-          ClassParameter<?> cp = (ClassParameter<?>) p.getFirst();
+        Option<?> option = parameters.getOption(row);
+        if(option instanceof ClassParameter<?>) {
+          ClassParameter<?> cp = (ClassParameter<?>) option;
           if(cp.hasDefaultValue()) {
-            comboBox.addItem(STRING_USE_DEFAULT);
+            comboBox.addItem(DynamicParameters.STRING_USE_DEFAULT);
           }
           else if(cp.isOptional()) {
-            comboBox.addItem(STRING_OPTIONAL);
+            comboBox.addItem(DynamicParameters.STRING_OPTIONAL);
           }
           String prefix = cp.getRestrictionClass().getPackage().getName() + ".";
           for(Class<?> impl : cp.getKnownImplementations()) {
@@ -515,7 +323,7 @@ public class MiniGUI extends JPanel {
             }
           }
         }
-        else if(p.getFirst() instanceof Flag) {
+        else if(option instanceof Flag) {
           if(!Flag.SET.equals(val)) {
             comboBox.addItem(Flag.SET);
           }
@@ -523,7 +331,7 @@ public class MiniGUI extends JPanel {
             comboBox.addItem(Flag.NOT_SET);
           }
         }
-        else if(p.getFirst() instanceof Parameter<?, ?>) {
+        else if(option instanceof Parameter<?, ?>) {
           // no completion.
         }
       }
@@ -545,9 +353,9 @@ public class MiniGUI extends JPanel {
 
     final JFileChooser fc = new JFileChooser();
 
-    private ArrayList<Triple<Option<?>, String, BitSet>> parameters;
+    private DynamicParameters parameters;
 
-    public FileNameEditor(ArrayList<Triple<Option<?>, String, BitSet>> parameters) {
+    public FileNameEditor(DynamicParameters parameters) {
       this.parameters = parameters;
       button.addActionListener(this);
       panel.setLayout(new BorderLayout());
@@ -573,9 +381,9 @@ public class MiniGUI extends JPanel {
 
     public Component getTableCellEditorComponent(@SuppressWarnings("unused") JTable table, @SuppressWarnings("unused") Object value, @SuppressWarnings("unused") boolean isSelected, int row, @SuppressWarnings("unused") int column) {
       if(row < parameters.size()) {
-        Triple<Option<?>, String, BitSet> p = parameters.get(row);
-        if(p.getFirst() instanceof FileParameter) {
-          FileParameter fp = (FileParameter) p.getFirst();
+        Option<?> option = parameters.getOption(row);
+        if(option instanceof FileParameter) {
+          FileParameter fp = (FileParameter) option;
           File f;
           try {
             f = fp.getValue();
@@ -596,7 +404,6 @@ public class MiniGUI extends JPanel {
       }
       return panel;
     }
-
   }
 
   protected static class AdjustingEditor extends AbstractCellEditor implements TableCellEditor {
@@ -613,9 +420,9 @@ public class MiniGUI extends JPanel {
 
     private TableCellEditor activeEditor;
 
-    private final ArrayList<Triple<Option<?>, String, BitSet>> parameters;
+    private final DynamicParameters parameters;
 
-    public AdjustingEditor(ArrayList<Triple<Option<?>, String, BitSet>> parameters) {
+    public AdjustingEditor(DynamicParameters parameters) {
       final JComboBox combobox = new JComboBox();
       combobox.setEditable(true);
       this.parameters = parameters;
@@ -635,16 +442,16 @@ public class MiniGUI extends JPanel {
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
       if(row < parameters.size()) {
-        Triple<Option<?>, String, BitSet> p = parameters.get(row);
-        if(p.getFirst() instanceof Flag) {
+        Option<?> option = parameters.getOption(row);
+        if(option instanceof Flag) {
           activeEditor = dropdownEditor;
           return dropdownEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
         }
-        if(p.getFirst() instanceof ClassParameter<?>) {
+        if(option instanceof ClassParameter<?>) {
           activeEditor = dropdownEditor;
           return dropdownEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
         }
-        if(p.getFirst() instanceof FileParameter) {
+        if(option instanceof FileParameter) {
           activeEditor = fileNameEditor;
           return fileNameEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
         }
