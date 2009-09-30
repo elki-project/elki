@@ -201,7 +201,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisu
     for (Cluster<Model> cluster : clustering.getAllClusters()){
       
       CSSClass bubble = new CSSClass(svgp, ShapeLibrary.BUBBLE + clusterID);
-      bubble.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, "0.001");
+      bubble.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, "0.005");
       
       String color;
       
