@@ -52,7 +52,7 @@ public class DynamicParameters {
     return this.parameters.get(rowIndex).third;
   }
 
-  public void setValue(int rowIndex, String s) {
+  public synchronized void setValue(int rowIndex, String s) {
     Triple<Option<?>, String, BitSet> p;
     if(rowIndex < parameters.size()) {
       p = parameters.get(rowIndex);
@@ -76,7 +76,7 @@ public class DynamicParameters {
     }
   }
 
-  public void updateFromOptions(ArrayList<Pair<Parameterizable, Option<?>>> options) {
+  public synchronized void updateFromOptions(ArrayList<Pair<Parameterizable, Option<?>>> options) {
     parameters.clear();
     for(Pair<Parameterizable, Option<?>> p : options) {
       Option<?> option = p.getSecond();
@@ -132,7 +132,7 @@ public class DynamicParameters {
     }
   }
   
-  public ArrayList<String> serializeParameters() {
+  public synchronized ArrayList<String> serializeParameters() {
     ArrayList<String> p = new ArrayList<String>(2 * parameters.size());
     for(Triple<Option<?>, String, BitSet> t : parameters) {
       if(t.getFirst() != null) {
