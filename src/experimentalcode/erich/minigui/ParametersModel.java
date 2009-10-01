@@ -5,6 +5,11 @@ import javax.swing.table.AbstractTableModel;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
 
+/**
+ * A Swing TableModel that uses a {@link DynamicParameters} object as storage.
+ * @author Erich Schubert
+ *
+ */
 class ParametersModel extends AbstractTableModel {
   /**
    * Serial version
@@ -26,6 +31,11 @@ class ParametersModel extends AbstractTableModel {
    */
   public static final String[] columns = { "Parameter", "Value" };
 
+  /**
+   * Constructor
+   * 
+   * @param parameters Parameter store
+   */
   public ParametersModel(DynamicParameters parameters) {
     super();
     this.parameters = parameters;
