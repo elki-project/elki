@@ -6,6 +6,7 @@ import java.util.BitSet;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -13,6 +14,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
 
+/**
+ * Wrapper around a set of parameters for ELKI, that may not yet be complete or correct.
+ * 
+ * @author Erich Schubert
+ */
 public class DynamicParameters {
   /**
    * Logger
@@ -22,40 +28,74 @@ public class DynamicParameters {
   public static final int BIT_INCOMPLETE = 0;
   public static final int BIT_INVALID = 1;
   public static final int BIT_SYNTAX_ERROR = 2;
-  public static final int BIT_NO_NAME_BUT_VALUE = 3;
-  public static final int BIT_OPTIONAL = 4;
-  public static final int BIT_DEFAULT_VALUE = 5;
+  public static final int BIT_OPTIONAL = 3;
+  public static final int BIT_DEFAULT_VALUE = 4;
   
   public static final String STRING_USE_DEFAULT = "(use default)";
   public static final String STRING_OPTIONAL = "(optional)";
 
+  /**
+   * Parameter storage
+   */
   protected ArrayList<Triple<Option<?>, String, BitSet>> parameters;
 
+  /**
+   * Constructor
+   */
   public DynamicParameters() {
     super();
     this.parameters = new ArrayList<Triple<Option<?>, String, BitSet>>();
   }
 
+  /**
+   * Get the size
+   * 
+   * @return number of parameters
+   */
   public int size() {
     return this.parameters.size();
   }
 
-  public Option<?> getOption(int rowIndex) {
-    return this.parameters.get(rowIndex).first;
+  /**
+   * Get the Option for the given index
+   * 
+   * @param index
+   * @return Option
+   */
+  public Option<?> getOption(int index) {
+    return this.parameters.get(index).first;
   }
   
-  public String getValue(int rowIndex) {
-    return this.parameters.get(rowIndex).second;
+  /**
+   * Get the value for the given index
+   * 
+   * @param index
+   * @return Value as String
+   */
+  public String getValue(int index) {
+    return this.parameters.get(index).second;
   }
   
-  public BitSet getFlags(int rowIndex) {
-    return this.parameters.get(rowIndex).third;
+  /**
+   * Get the flags bit set for the given index
+   * 
+   * @param index
+   * @return Flags bit set
+   */
+  public BitSet getFlags(int index) {
+    return this.parameters.get(index).third;
   }
 
-  public synchronized void setValue(int rowIndex, String s) {
+  /**
+   * Set the value of the ith parameter
+   * 
+   * @param index Parameter index
+   * @param value New value
+   */
+  public synchronized void setValue(int index, String value) {
     Triple<Option<?>, String, BitSet> p;
-    if(rowIndex < parameters.size()) {
-      p = parameters.get(rowIndex);
+    if(index < parameters.size()) {
+      p = parameters.get(index);
     }
     else {
       BitSet flags = new BitSet();
@@ -64,10 +104,11 @@ public class DynamicParameters {
     }
     BitSet flags = p.getThird();
     
-    p.setSecond(s);
+    p.setSecond(value);
 
+    // Detect wrong values for flags.
     if(p.getFirst() instanceof Flag) {
-      if((!Flag.SET.equals(s)) && (!Flag.NOT_SET.equals(s))) {
+      if((!Flag.SET.equals(value)) && (!Flag.NOT_SET.equals(value))) {
         flags.set(DynamicParameters.BIT_SYNTAX_ERROR);
       }
       else {
@@ -76,6 +117,11 @@ public class DynamicParameters {
     }
   }
 
+  /**
+   * Update the Parameter list from the collected options of an ELKI context
+   * 
+   * @param options Collected options
+   */
   public synchronized void updateFromOptions(ArrayList<Pair<Parameterizable, Option<?>>> options) {
     parameters.clear();
     for(Pair<Parameterizable, Option<?>> p : options) {
@@ -132,19 +178,24 @@ public class DynamicParameters {
     }
   }
   
+  /**
+   * Serialize parameters into an array list to pass to setParameters()
+   * 
+   * @return Array list of String parameters.
+   */
   public synchronized ArrayList<String> serializeParameters() {
     ArrayList<String> p = new ArrayList<String>(2 * parameters.size());
     for(Triple<Option<?>, String, BitSet> t : parameters) {
       if(t.getFirst() != null) {
         if(t.getFirst() instanceof Parameter<?, ?> && t.getSecond() != null && t.getSecond().length() > 0) {
           if(t.getSecond() != STRING_USE_DEFAULT && t.getSecond() != STRING_OPTIONAL) {
-            p.add("-" + t.getFirst().getOptionID().getName());
+            p.add(OptionHandler.OPTION_PREFIX + t.getFirst().getOptionID().getName());
             p.add(t.getSecond());
           }
         }
         else if(t.getFirst() instanceof Flag) {
           if(t.getSecond() == Flag.SET) {
-            p.add("-" + t.getFirst().getOptionID().getName());
+            p.add(OptionHandler.OPTION_PREFIX + t.getFirst().getOptionID().getName());
           }
         }
       }

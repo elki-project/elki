@@ -15,6 +15,12 @@ import javax.swing.text.StyleConstants;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.logging.MessageFormatter;
 
+/**
+ * A Swing object to receive ELKI logging output.
+ * Call {@link #becomeDefaultLogger()} to register as default logger in ELKI.
+ * 
+ * @author Erich Schubert
+ */
 public class LogPane extends JTextPane {
   /**
    * Serialization version number

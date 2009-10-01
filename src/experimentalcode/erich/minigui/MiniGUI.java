@@ -12,7 +12,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
@@ -25,22 +24,45 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
+/**
+ * Minimal GUI built around a table-based parameter editor.
+ * 
+ * @author Erich Schubert
+ */
 public class MiniGUI extends JPanel {
   /**
    * Serial version
    */
   private static final long serialVersionUID = 1L;
 
+  /**
+   * Newline used in output.
+   */
   private static final String NEWLINE = System.getProperty("line.separator");
 
+  /**
+   * ELKI logger for the GUI
+   */
   protected Logging logger = Logging.getLogger(MiniGUI.class);
 
+  /**
+   * Logging output area.
+   */
   protected LogPane outputArea;
 
-  protected JTable parameterTable;
+  /**
+   * The parameter table
+   */
+  protected ParameterTable parameterTable;
 
+  /**
+   * Parameter storage
+   */
   protected DynamicParameters parameters;
 
+  /**
+   * Constructor
+   */
   public MiniGUI() {
     super();
     this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -52,7 +74,7 @@ public class MiniGUI extends JPanel {
       @Override
       public void tableChanged(@SuppressWarnings("unused") TableModelEvent e) {
         logger.debug("Change event.");
-        runSetParameters();
+        updateParameterTable();
       }
     });
 
@@ -99,15 +121,24 @@ public class MiniGUI extends JPanel {
     doSetParameters(ps);
   }
 
-  protected void runSetParameters() {
+  /**
+   * Serialize the parameter table and run setParameters()
+   */
+  protected void updateParameterTable() {
     parameterTable.setEnabled(false);
     ArrayList<String> params = parameters.serializeParameters();
-    parameterTable.setEnabled(true);
     outputArea.clear();
     outputArea.publish("Parameters: " + FormatUtil.format(params, " ") + NEWLINE, Level.INFO);
     doSetParameters(params);
+    parameterTable.setEnabled(true);
   }
 
+  /**
+   * Do the actual setParameters invocation.
+   * 
+   * @param params Parameters
+   * @return Collected options from KDDTask 
+   */
   private List<Pair<Parameterizable, Option<?>>> doSetParameters(ArrayList<String> params) {
     KDDTask<DatabaseObject> task = new KDDTask<DatabaseObject>();
     try {
@@ -133,6 +164,9 @@ public class MiniGUI extends JPanel {
     return options;
   }
 
+  /**
+   * Do a full run of the KDDTask with the specified parameters.
+   */
   protected void runTask() {
     parameterTable.setEnabled(false);
     ArrayList<String> params = parameters.serializeParameters();
@@ -171,6 +205,10 @@ public class MiniGUI extends JPanel {
     frame.setVisible(true);
   }
 
+  /**
+   * Main method that just spawns the UI.
+   * @param args
+   */
   public static void main(String[] args) {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {

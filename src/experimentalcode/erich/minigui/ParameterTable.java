@@ -19,6 +19,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableColumn;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
@@ -27,43 +28,83 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 
+/**
+ * Class showing a table of ELKI parameters.
+ * 
+ * @author Erich Schubert
+ */
 public class ParameterTable extends JTable {
   /**
    * Serial version
    */
   private static final long serialVersionUID = 1L;
 
+  /**
+   * Color for parameters that are not optional and not yet specified.
+   */
+  static final Color COLOR_INCOMPLETE = new Color(0xFFFFAF);
+
+  /**
+   * Color for parameters with an invalid value.
+   */
+  static final Color COLOR_SYNTAX_ERROR = new Color(0xFFAFAF);
+
+  /**
+   * Color for optional parameters
+   */
+  static final Color COLOR_OPTIONAL = new Color(0xAFFFAF);
+
+  /**
+   * Color for parameters using default value.
+   */
+  static final Color COLOR_DEFAULT_VALUE = new Color(0xBFBFBF);
+
+  /**
+   * The parameters we edit.
+   */
+  protected DynamicParameters parameters;
+
+  /**
+   * Constructor
+   * 
+   * @param pm Parameter Model
+   * @param parameters Parameter storage
+   */
   public ParameterTable(ParametersModel pm, DynamicParameters parameters) {
     super(pm);
+    this.parameters = parameters;
     this.setPreferredScrollableViewportSize(new Dimension(800, 400));
     this.setFillsViewportHeight(true);
-    this.setDefaultRenderer(Option.class, new HighlightingRenderer(parameters));
-    this.setDefaultRenderer(String.class, new HighlightingRenderer(parameters));
-    final AdjustingEditor editor = new AdjustingEditor(parameters);
+    final ColorfolRenderer colorfulRenderer = new ColorfolRenderer();
+    this.setDefaultRenderer(Option.class, colorfulRenderer);
+    this.setDefaultRenderer(String.class, colorfulRenderer);
+    final AdjustingEditor editor = new AdjustingEditor();
     this.setDefaultEditor(String.class, editor);
+    this.setAutoResizeMode(AUTO_RESIZE_ALL_COLUMNS);
+    TableColumn col1 = this.getColumnModel().getColumn(0);
+    col1.setPreferredWidth(150);
+    TableColumn col2 = this.getColumnModel().getColumn(1);
+    col2.setPreferredWidth(650);
   }
-  
-  protected static class HighlightingRenderer extends DefaultTableCellRenderer {
+
+  /**
+   * Renderer for the table that colors the entries according to their bitmask.
+   * 
+   * @author Erich Schubert
+   */
+  private class ColorfolRenderer extends DefaultTableCellRenderer {
     /**
      * Serial Version
      */
     private static final long serialVersionUID = 1L;
-  
-    private DynamicParameters parameters;
-  
-    private static final Color COLOR_INCOMPLETE = new Color(0xFFFFAF);
-  
-    private static final Color COLOR_SYNTAX_ERROR = new Color(0xFFAFAF);
-  
-    private static final Color COLOR_OPTIONAL = new Color(0xAFFFAF);
-  
-    private static final Color COLOR_DEFAULT_VALUE = new Color(0xBFBFBF);
-  
-    public HighlightingRenderer(DynamicParameters parameters) {
+
+    /**
+     * Constructor.
+     */
+    public ColorfolRenderer() {
       super();
-      this.parameters = parameters;
     }
-  
+
     @Override
     public void setValue(Object value) {
       if(value instanceof String) {
@@ -80,7 +121,7 @@ public class ParameterTable extends JTable {
       setText("");
       setToolTipText("");
     }
-  
+
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
       Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
@@ -90,9 +131,6 @@ public class ParameterTable extends JTable {
           c.setBackground(COLOR_SYNTAX_ERROR);
         }
         else if((flags.get(DynamicParameters.BIT_SYNTAX_ERROR))) {
-          c.setBackground(COLOR_SYNTAX_ERROR);
-        }
-        else if((flags.get(DynamicParameters.BIT_NO_NAME_BUT_VALUE))) {
           c.setBackground(COLOR_SYNTAX_ERROR);
         }
         else if((flags.get(DynamicParameters.BIT_INCOMPLETE))) {
@@ -112,33 +150,38 @@ public class ParameterTable extends JTable {
     }
   }
 
-  protected static class DropdownEditor extends DefaultCellEditor {
+  /**
+   * Editor using a Dropdown box to offer known values to choose from.
+   * 
+   * @author Erich Schubert
+   */
+  private class DropdownEditor extends DefaultCellEditor {
     /**
      * Serial Version
      */
     private static final long serialVersionUID = 1L;
-  
-    private DynamicParameters parameters;
-  
+
+    /**
+     * Combo box to use
+     */
     private final JComboBox comboBox;
-  
-    public DropdownEditor(DynamicParameters parameters, JComboBox comboBox) {
+
+    /**
+     * Constructor.
+     * 
+     * @param comboBox Combo box we're going to use
+     */
+    public DropdownEditor(JComboBox comboBox) {
       super(comboBox);
       this.comboBox = comboBox;
-      this.parameters = parameters;
     }
-  
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * javax.swing.DefaultCellEditor#getTableCellEditorComponent(javax.swing
-     * .JTable, java.lang.Object, boolean, int, int)
-     */
+
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
       Component c = super.getTableCellEditorComponent(table, value, isSelected, row, column);
+      // remove old contents
       comboBox.removeAllItems();
+      // Put the current value in first.
       Object val = table.getValueAt(row, column);
       if(val != null) {
         comboBox.addItem(val);
@@ -146,14 +189,18 @@ public class ParameterTable extends JTable {
       }
       if(row < parameters.size()) {
         Option<?> option = parameters.getOption(row);
+        // We can do dropdown choices for class parameters
         if(option instanceof ClassParameter<?>) {
           ClassParameter<?> cp = (ClassParameter<?>) option;
+          // For parameters with a default value, offer using the default
+          // For optional parameters, offer not specifying them.
           if(cp.hasDefaultValue()) {
             comboBox.addItem(DynamicParameters.STRING_USE_DEFAULT);
           }
           else if(cp.isOptional()) {
             comboBox.addItem(DynamicParameters.STRING_OPTIONAL);
           }
+          // Offer the shorthand version of class names.
           String prefix = cp.getRestrictionClass().getPackage().getName() + ".";
           for(Class<?> impl : cp.getKnownImplementations()) {
             String name = impl.getName();
@@ -165,6 +212,7 @@ public class ParameterTable extends JTable {
             }
           }
         }
+        // and for Flag parameters.
         else if(option instanceof Flag) {
           if(!Flag.SET.equals(val)) {
             comboBox.addItem(Flag.SET);
@@ -181,33 +229,53 @@ public class ParameterTable extends JTable {
     }
   }
 
-  protected static class FileNameEditor extends AbstractCellEditor implements TableCellEditor, ActionListener {
+  /**
+   * Editor for selecting input and output file and folders names
+   * 
+   * @author Erich Schubert
+   */
+  private class FileNameEditor extends AbstractCellEditor implements TableCellEditor, ActionListener {
     /**
      * Serial version number
      */
     private static final long serialVersionUID = 1L;
-  
+
+    /**
+     * We need a panel to put our components on.
+     */
     final JPanel panel = new JPanel();
-  
+
+    /**
+     * Text field to store the name
+     */
     final JTextField textfield = new JTextField();
-  
+
+    /**
+     * The button to open the file selector
+     */
     final JButton button = new JButton("...");
-  
+
+    /**
+     * The actual file chooser
+     */
     final JFileChooser fc = new JFileChooser();
-  
-    private DynamicParameters parameters;
-  
-    public FileNameEditor(DynamicParameters parameters) {
-      this.parameters = parameters;
+
+    /**
+     * Constructor.
+     */
+    public FileNameEditor() {
       button.addActionListener(this);
       panel.setLayout(new BorderLayout());
       panel.add(textfield, BorderLayout.CENTER);
       panel.add(button, BorderLayout.EAST);
     }
-  
+
+    /**
+     * Callback from the file selector.
+     */
     public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
       int returnVal = fc.showOpenDialog(button);
-  
+
       if(returnVal == JFileChooser.APPROVE_OPTION) {
         textfield.setText(fc.getSelectedFile().getPath());
       }
@@ -216,11 +284,17 @@ public class ParameterTable extends JTable {
       }
       fireEditingStopped();
     }
-  
+
+    /**
+     * Delegate getCellEditorValue to the text field.
+     */
     public Object getCellEditorValue() {
       return textfield.getText();
     }
-  
+
+    /**
+     * Apply the Editor for a selected option.
+     */
     public Component getTableCellEditorComponent(@SuppressWarnings("unused") JTable table, @SuppressWarnings("unused") Object value, @SuppressWarnings("unused") boolean isSelected, int row, @SuppressWarnings("unused") int column) {
       if(row < parameters.size()) {
         Option<?> option = parameters.getOption(row);
@@ -248,31 +322,54 @@ public class ParameterTable extends JTable {
     }
   }
 
-  protected static class AdjustingEditor extends AbstractCellEditor implements TableCellEditor {
+  /**
+   * This Editor will adjust to the type of the Option:
+   * Sometimes just a plain text editor, sometimes a ComboBox to offer known choices,
+   * and sometime a file selector dialog.
+   * 
+   * TODO: class list parameters etc.
+   * 
+   * @author Erich Schubert
+   *
+   */
+  private class AdjustingEditor extends AbstractCellEditor implements TableCellEditor {
     /**
      * Serial version
      */
     private static final long serialVersionUID = 1L;
-  
+
+    /**
+     * The dropdown editor
+     */
     private final DropdownEditor dropdownEditor;
-  
-    private final DefaultCellEditor defaultEditor;
-  
+
+    /**
+     * The plain text cell editor
+     */
+    private final DefaultCellEditor plaintextEditor;
+
+    /**
+     * The file selector editor
+     */
     private final FileNameEditor fileNameEditor;
-  
+
+    /**
+     * We need to remember which editor we delegated to, so we know
+     * whom to ask for the value entered.
+     */
     private TableCellEditor activeEditor;
-  
-    private final DynamicParameters parameters;
-  
-    public AdjustingEditor(DynamicParameters parameters) {
+
+    /**
+     * Constructor.
+     */
+    public AdjustingEditor() {
       final JComboBox combobox = new JComboBox();
       combobox.setEditable(true);
-      this.parameters = parameters;
-      this.dropdownEditor = new DropdownEditor(parameters, combobox);
-      this.defaultEditor = new DefaultCellEditor(new JTextField());
-      this.fileNameEditor = new FileNameEditor(parameters);
+      this.dropdownEditor = new DropdownEditor(combobox);
+      this.plaintextEditor = new DefaultCellEditor(new JTextField());
+      this.fileNameEditor = new FileNameEditor();
     }
-  
+
     @Override
     public Object getCellEditorValue() {
       if(activeEditor == null) {
@@ -280,7 +377,7 @@ public class ParameterTable extends JTable {
       }
       return activeEditor.getCellEditorValue();
     }
-  
+
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
       if(row < parameters.size()) {
@@ -298,8 +395,8 @@ public class ParameterTable extends JTable {
           return fileNameEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
         }
       }
-      activeEditor = defaultEditor;
-      return defaultEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
+      activeEditor = plaintextEditor;
+      return plaintextEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
     }
   }
 }
