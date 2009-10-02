@@ -3,6 +3,7 @@ package experimentalcode.erich.minigui;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
@@ -11,22 +12,47 @@ import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
+/**
+ * Class to manage saved settings in a text file.
+ * 
+ * @author Erich Schubert
+ *
+ */
 public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String>>> {
+  /**
+   * Comment prefix
+   */
   public static final String COMMENT_PREFIX = "#";
 
+  /**
+   * File to read and write
+   */
   private File file;
   
+  /**
+   * Data store
+   */
   private ArrayList<Pair<String, ArrayList<String>>> store;
 
+  /**
+   * Constructor.
+   * 
+   * @param filename Filename
+   */
   public SavedSettingsFile(String filename) {
     super();
     this.file = new File(filename);
     this.store = new ArrayList<Pair<String, ArrayList<String>>>();
   }
   
+  /**
+   * Save the current data to the given file.
+   * 
+   * @throws IOException
+   */
   public void save() throws IOException {
     PrintStream p = new PrintStream(file);
-    p.println("# Save ELKI settings. First line is title, remaining lines are parameters.");
+    p.println(COMMENT_PREFIX + "Saved ELKI settings. First line is title, remaining lines are parameters.");
     for (Pair<String, ArrayList<String>> settings : store) {
       p.println(settings.first);
       for (String str : settings.second) {
@@ -37,7 +63,13 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
     p.close();
   }
   
-  public void load() throws IOException {
+  /**
+   * Read the current file
+   * 
+   * @throws FileNotFoundException
+   * @throws IOException
+   */
+  public void load() throws FileNotFoundException, IOException {
     BufferedReader is = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
     ArrayList<String> buf = new ArrayList<String>();
     while (is.ready()) {
@@ -65,7 +97,12 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
   public Iterator<Pair<String, ArrayList<String>>> iterator() {
     return store.iterator();
   }
-  
+
+  /**
+   * Remove a given key from the file.
+   * 
+   * @param key
+   */
   public void remove(String key) {
     Iterator<Pair<String, ArrayList<String>>> it = store.iterator();
     while (it.hasNext()) {
@@ -77,6 +114,12 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
     }
   }
   
+  /**
+   * Find a saved setting by key.
+   * 
+   * @param key
+   * @return
+   */
   public ArrayList<String> get(String key) {
     Iterator<Pair<String, ArrayList<String>>> it = store.iterator();
     while (it.hasNext()) {
@@ -88,10 +131,19 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
     return null;
   }
 
+  /**
+   * Remove all saved settings.
+   */
   public void clear() {
     store.clear();
   }
 
+  /**
+   * Add/Replace a saved setting
+   * 
+   * @param key Key
+   * @param value (New) value.
+   */
   public void put(String key, ArrayList<String> value) {
     Iterator<Pair<String, ArrayList<String>>> it = store.iterator();
     while (it.hasNext()) {
@@ -104,10 +156,21 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
     store.add(new Pair<String, ArrayList<String>>(key, value));
   }
 
+  /**
+   * Return number of saved settings.
+   * 
+   * @return
+   */
   public int size() {
     return store.size();
   }
 
+  /**
+   * Array access.
+   * 
+   * @param index
+   * @return
+   */
   public Pair<String, ArrayList<String>> getElementAt(int index) {
     return store.get(index);
   }

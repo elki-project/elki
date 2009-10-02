@@ -48,7 +48,7 @@ public class MiniGUI extends JPanel {
   /**
    * Newline used in output.
    */
-  private static final String NEWLINE = System.getProperty("line.separator");
+  public static final String NEWLINE = System.getProperty("line.separator");
 
   /**
    * ELKI logger for the GUI
@@ -74,11 +74,16 @@ public class MiniGUI extends JPanel {
    * Settings storage
    */
   protected SavedSettingsFile store = new SavedSettingsFile(SAVED_SETTINGS_FILENAME);
+
+  /**
+   * Combo box for saved settings
+   */
+  protected JComboBox savedCombo;
   
   /**
    * Model to link the combobox with
    */
-  private SettingsComboboxModel savedSettingsModel;
+  protected SettingsComboboxModel savedSettingsModel;
 
   /**
    * Constructor
@@ -111,21 +116,63 @@ public class MiniGUI extends JPanel {
     JPanel buttonPanel = new JPanel();
     buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
 
-    // combo box for saved settings
+    // Combo box for saved settings
     savedSettingsModel = new SettingsComboboxModel(store);
-    JComboBox savedCombo = new JComboBox(savedSettingsModel);
+    savedCombo = new JComboBox(savedSettingsModel);
     savedCombo.setEditable(true);
+    savedCombo.setSelectedItem("[Saved Settings]");
     buttonPanel.add(savedCombo);
 
-    // button to launch the task
+    // button to load settings
+    JButton loadButton = new JButton("Load");
+    loadButton.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
+        String key = savedSettingsModel.getSelectedItem();
+        ArrayList<String> settings = store.get(key);
+        if (settings != null) {
+          outputArea.clear();
+          outputArea.publish("Parameters: " + FormatUtil.format(settings, " ") + NEWLINE, Level.INFO);
+          doSetParameters(settings);
+        }
+      }
+    });
+    buttonPanel.add(loadButton);
+    // button to save settings
     JButton saveButton = new JButton("Save");
     saveButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
-        // TODO:
+        String key = savedSettingsModel.getSelectedItem();
+        store.put(key, parameters.serializeParameters());
+        try {
+          store.save();
+        }
+        catch(IOException e1) {
+          logger.exception(e1);
+        }
+        savedSettingsModel.update();
       }
     });
     buttonPanel.add(saveButton);
+    // button to remove saved settings
+    JButton removeButton = new JButton("Remove");
+    removeButton.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
+        String key = savedSettingsModel.getSelectedItem();
+        store.remove(key);
+        try {
+          store.save();
+        }
+        catch(IOException e1) {
+          logger.exception(e1);
+        }
+        savedCombo.setSelectedItem("[Saved Settings]");
+        savedSettingsModel.update();
+      }
+    });
+    buttonPanel.add(removeButton);
 
     // button to launch the task
     JButton runButton = new JButton("Run Task");
@@ -189,7 +236,7 @@ public class MiniGUI extends JPanel {
    * @param params Parameters
    * @return Collected options from KDDTask
    */
-  private List<Pair<Parameterizable, Option<?>>> doSetParameters(ArrayList<String> params) {
+  protected List<Pair<Parameterizable, Option<?>>> doSetParameters(ArrayList<String> params) {
     KDDTask<DatabaseObject> task = new KDDTask<DatabaseObject>();
     try {
       if(params.size() > 0) {
@@ -267,7 +314,12 @@ public class MiniGUI extends JPanel {
       }
     });
   }
-  
+
+  /**
+   * Class to interface between the saved settings list and a JComboBox
+   * 
+   * @author Erich Schubert
+   */
   class SettingsComboboxModel extends AbstractListModel implements ComboBoxModel {
     /**
      * Serial version
@@ -278,9 +330,17 @@ public class MiniGUI extends JPanel {
      * Settings storage
      */
     protected SavedSettingsFile store;
-    
+
+    /**
+     * Selected entry
+     */
     protected String selected = null;
-    
+
+    /**
+     * Constructor
+     * 
+     * @param store Store to access
+     */
     public SettingsComboboxModel(SavedSettingsFile store) {
       super();
       this.store = store;
@@ -293,7 +353,7 @@ public class MiniGUI extends JPanel {
 
     @Override
     public void setSelectedItem(Object anItem) {
-      if (anItem instanceof String) {
+      if(anItem instanceof String) {
         selected = (String) anItem;
       }
     }
@@ -307,9 +367,12 @@ public class MiniGUI extends JPanel {
     public int getSize() {
       return store.size();
     }
-    
+
+    /**
+     * Force an update
+     */
     public void update() {
-      fireContentsChanged(this, 0, getSize());
+      fireContentsChanged(this, 0, getSize() + 1);
     }
   }
 }
