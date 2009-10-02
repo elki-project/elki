@@ -3,12 +3,17 @@ package experimentalcode.erich.minigui;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
+import javax.swing.AbstractListModel;
 import javax.swing.BoxLayout;
+import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -36,6 +41,11 @@ public class MiniGUI extends JPanel {
   private static final long serialVersionUID = 1L;
 
   /**
+   * Filename for saved settings
+   */
+  public static final String SAVED_SETTINGS_FILENAME = "MiniGUI-saved-settings.txt";
+
+  /**
    * Newline used in output.
    */
   private static final String NEWLINE = System.getProperty("line.separator");
@@ -61,10 +71,21 @@ public class MiniGUI extends JPanel {
   protected DynamicParameters parameters;
 
   /**
+   * Settings storage
+   */
+  protected SavedSettingsFile store = new SavedSettingsFile(SAVED_SETTINGS_FILENAME);
+  
+  /**
+   * Model to link the combobox with
+   */
+  private SettingsComboboxModel savedSettingsModel;
+
+  /**
    * Constructor
    */
   public MiniGUI() {
     super();
+
     this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
     // Setup parameter storage and table model
@@ -89,6 +110,22 @@ public class MiniGUI extends JPanel {
     // Button panel
     JPanel buttonPanel = new JPanel();
     buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+
+    // combo box for saved settings
+    savedSettingsModel = new SettingsComboboxModel(store);
+    JComboBox savedCombo = new JComboBox(savedSettingsModel);
+    savedCombo.setEditable(true);
+    buttonPanel.add(savedCombo);
+
+    // button to launch the task
+    JButton saveButton = new JButton("Save");
+    saveButton.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
+        // TODO:
+      }
+    });
+    buttonPanel.add(saveButton);
 
     // button to launch the task
     JButton runButton = new JButton("Run Task");
@@ -119,6 +156,19 @@ public class MiniGUI extends JPanel {
     ArrayList<String> ps = new ArrayList<String>();
     ps.add("-algorithm XXX");
     doSetParameters(ps);
+
+    // load saved settings (we wanted to have the logger first!)
+    try {
+      store.load();
+      savedSettingsModel.update();
+    }
+    catch(FileNotFoundException e) {
+      // Ignore - probably didn't save any settings yet.
+    }
+    catch(IOException e) {
+      logger.exception(e);
+    }
+
   }
 
   /**
@@ -137,7 +187,7 @@ public class MiniGUI extends JPanel {
    * Do the actual setParameters invocation.
    * 
    * @param params Parameters
-   * @return Collected options from KDDTask 
+   * @return Collected options from KDDTask
    */
   private List<Pair<Parameterizable, Option<?>>> doSetParameters(ArrayList<String> params) {
     KDDTask<DatabaseObject> task = new KDDTask<DatabaseObject>();
@@ -207,6 +257,7 @@ public class MiniGUI extends JPanel {
 
   /**
    * Main method that just spawns the UI.
+   * 
    * @param args
    */
   public static void main(String[] args) {
@@ -215,5 +266,50 @@ public class MiniGUI extends JPanel {
         createAndShowGUI();
       }
     });
+  }
+  
+  class SettingsComboboxModel extends AbstractListModel implements ComboBoxModel {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Settings storage
+     */
+    protected SavedSettingsFile store;
+    
+    protected String selected = null;
+    
+    public SettingsComboboxModel(SavedSettingsFile store) {
+      super();
+      this.store = store;
+    }
+
+    @Override
+    public String getSelectedItem() {
+      return selected;
+    }
+
+    @Override
+    public void setSelectedItem(Object anItem) {
+      if (anItem instanceof String) {
+        selected = (String) anItem;
+      }
+    }
+
+    @Override
+    public Object getElementAt(int index) {
+      return store.getElementAt(index).first;
+    }
+
+    @Override
+    public int getSize() {
+      return store.size();
+    }
+    
+    public void update() {
+      fireContentsChanged(this, 0, getSize());
+    }
   }
 }
