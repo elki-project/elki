@@ -1,4 +1,4 @@
-package experimentalcode.erich.minigui;
+package de.lmu.ifi.dbs.elki.gui.minigui;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -22,6 +22,11 @@ import javax.swing.event.TableModelListener;
 
 import de.lmu.ifi.dbs.elki.KDDTask;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.gui.util.DynamicParameters;
+import de.lmu.ifi.dbs.elki.gui.util.LogPane;
+import de.lmu.ifi.dbs.elki.gui.util.ParameterTable;
+import de.lmu.ifi.dbs.elki.gui.util.ParametersModel;
+import de.lmu.ifi.dbs.elki.gui.util.SavedSettingsFile;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;

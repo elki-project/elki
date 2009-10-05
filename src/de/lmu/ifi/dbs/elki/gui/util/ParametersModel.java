@@ -1,4 +1,4 @@
-package experimentalcode.erich.minigui;
+package de.lmu.ifi.dbs.elki.gui.util;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
  * @author Erich Schubert
  *
  */
-class ParametersModel extends AbstractTableModel {
+public class ParametersModel extends AbstractTableModel {
   /**
    * Serial version
    */
