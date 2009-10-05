@@ -1,4 +1,4 @@
-package experimentalcode.erich.minigui;
+package de.lmu.ifi.dbs.elki.gui.util;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

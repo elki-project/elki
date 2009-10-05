@@ -1,4 +1,4 @@
-package experimentalcode.erich.minigui;
+package de.lmu.ifi.dbs.elki.gui.util;
 
 import java.io.BufferedReader;
 import java.io.File;

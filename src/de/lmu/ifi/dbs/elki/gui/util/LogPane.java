@@ -1,4 +1,4 @@
-package experimentalcode.erich.minigui;
+package de.lmu.ifi.dbs.elki.gui.util;
 
 import java.awt.Color;
 import java.util.logging.ErrorManager;
