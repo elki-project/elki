@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 
 /**
  * Histogram with flexible size, guaranteed to be in [bin, 2*bin[
@@ -90,7 +91,10 @@ public class FlexiHistogram<T,D> extends AggregatingHistogram<T,D> {
       min = Math.min(min, pair.first);
       max = Math.max(max, pair.first);
     }
-    // TODO: auto-adjust min/max by some magic margin/rounding?
+    // use the LinearScale magic to round to "likely suiteable" step sizes.
+    LinearScale scale = new LinearScale(min, max);
+    min = scale.getMin();
+    max = scale.getMax();
     this.base = min;
     this.max = max;
     this.binsize = (max - min) / this.destsize;
