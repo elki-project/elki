@@ -1,7 +1,6 @@
 package experimentalcode.erich.histogram;
 
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 
@@ -32,7 +31,6 @@ public class MultiplicativeInverseScaling implements OutlierScalingFunction {
         max = Math.max(max, inv);
       }
     }
-    LoggingUtil.warning(""+max);
     return max;
   }
 }
