@@ -1,0 +1,12 @@
+<!DOCTYPE dataset PUBLIC "GeneratorByModel.dtd" "GeneratorByModel.dtd">
+<dataset random-seed="3">
+
+  	<cluster name="Cluster" size="400">
+		<normal stddev="0.07"/>
+		<normal stddev="0.02"/>
+		<translate vector="0.1 0.0" />
+		<rotate axis2="2" axis1="1" angle="-60" />
+		<translate vector="0.5 0.5" />
+		<clip min="0.0 0.0" max="1.0 1.0" />
+	</cluster>
+</dataset>
