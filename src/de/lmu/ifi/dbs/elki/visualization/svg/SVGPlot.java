@@ -42,6 +42,7 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.svg.SVGDocument;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.utilities.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.xml.XMLNodeListIterator;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.colors.PropertiesBasedColorLibrary;
@@ -55,6 +56,11 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager;
  * 
  */
 public class SVGPlot {
+  /**
+   * Default JPEG quality setting
+   */
+  public static final double DEFAULT_QUALITY = 0.85;
+
   /**
    * SVG document we plot to.
    */
@@ -79,7 +85,7 @@ public class SVGPlot {
    * CSS class manager
    */
   private CSSClassManager cssman;
-  
+
   /**
    * Default color library
    */
@@ -122,7 +128,7 @@ public class SVGPlot {
 
     // create a CSS class manager.
     cssman = new CSSClassManager();
-    
+
     // create a default color library
     colors = new PropertiesBasedColorLibrary();
   }
@@ -149,7 +155,7 @@ public class SVGPlot {
   public Element svgRect(double x, double y, double w, double h) {
     return SVGUtil.svgRect(document, x, y, w, h);
   }
-  
+
   /**
    * Create a SVG circle
    * 
@@ -161,7 +167,7 @@ public class SVGPlot {
   public Element svgCircle(double cx, double cy, double r) {
     return SVGUtil.svgCircle(document, cx, cy, r);
   }
-  
+
   /**
    * Create a SVG line element
    * 
@@ -186,7 +192,7 @@ public class SVGPlot {
   public Element svgText(double x, double y, String text) {
     return SVGUtil.svgText(document, x, y, text);
   }
-  
+
   /**
    * Retrieve the SVG document.
    * 
@@ -257,9 +263,10 @@ public class SVGPlot {
    * CSS styles.
    */
   public void updateStyleElement() {
-    // TODO: this should be sufficient - why does Batik occasionally not pick up the 
+    // TODO: this should be sufficient - why does Batik occasionally not pick up
+    // the
     // changes unless we actually replace the style element itself?
-    //cssman.updateStyleElement(document, style);
+    // cssman.updateStyleElement(document, style);
     Element newstyle = cssman.makeStyleElement(document);
     style.getParentNode().replaceChild(newstyle, style);
     style = newstyle;
@@ -268,7 +275,8 @@ public class SVGPlot {
   /**
    * Save document into a SVG file.
    * 
-   * References PNG images from the temporary files will be inlined automatically.
+   * References PNG images from the temporary files will be inlined
+   * automatically.
    * 
    * @param file Output filename
    * @throws IOException On write errors
@@ -297,7 +305,9 @@ public class SVGPlot {
             byte[] buf = new byte[4096];
             while(true) {
               int read = instream.read(buf, 0, buf.length);
-              if (read <= 0) { break; }
+              if(read <= 0) {
+                break;
+              }
               encoder.write(buf, 0, read);
             }
             instream.close();
@@ -418,7 +428,44 @@ public class SVGPlot {
    * @throws TranscoderException On input/parsing errors.
    */
   public void saveAsJPEG(File file, int width, int height) throws IOException, TranscoderException {
-    saveAsJPEG(file, width, height, 0.85);
+    saveAsJPEG(file, width, height, DEFAULT_QUALITY);
+  }
+
+  /**
+   * Save a file trying to auto-guess the file type.
+   * 
+   * @param file File name
+   * @param width Width (for pixel formats)
+   * @param height Height (for pixel formats)
+   * @param quality Quality (for lossy compression)
+   * @throws IOException on file write errors or unrecognized file extensions
+   * @throws TranscoderException on transcoding errors
+   * @throws TransformerFactoryConfigurationError on transcoding errors
+   * @throws TransformerException on transcoding errors
+   */
+  public void saveAsANY(File file, int width, int height, double quality) throws IOException, TranscoderException, TransformerFactoryConfigurationError, TransformerException {
+    String extension = FileUtil.getFilenameExtension(file);
+    if(extension.equals("svg")) {
+      saveAsSVG(file);
+    }
+    else if(extension.equals("pdf")) {
+      saveAsPDF(file);
+    }
+    else if(extension.equals("ps")) {
+      saveAsPS(file);
+    }
+    else if(extension.equals("eps")) {
+      saveAsEPS(file);
+    }
+    else if(extension.equals("png")) {
+      saveAsPNG(file, width, height);
+    }
+    else if(extension.equals("jpg") || extension.equals("jpeg")) {
+      saveAsJPEG(file, width, height, quality);
+    }
+    else {
+      throw new IOException("Unknown file extension: " + extension);
+    }
   }
 
   /**
@@ -441,7 +488,7 @@ public class SVGPlot {
     WeakReference<Element> ref = objWithId.get(id);
     return (ref != null) ? ref.get() : null;
   }
-  
+
   /**
    * Get all used DOM Ids in this plot.
    * 
