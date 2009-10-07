@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.visualization.scales;
 
-import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 /**
  * Class to handle a linear scale for an axis.
@@ -131,7 +132,7 @@ public class LinearScale {
    * @return formatted number
    */
   public String formatValue(double val) {
-    DecimalFormat fmt = new DecimalFormat();
+    NumberFormat fmt = NumberFormat.getInstance(Locale.US);
     fmt.setMaximumFractionDigits(-log10res);
     return fmt.format(val);
   }
