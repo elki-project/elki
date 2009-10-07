@@ -5,14 +5,14 @@ import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 
 /**
- * Scaling function to invert values by computing 1/(1+x)
+ * Scaling function to invert values by computing -1 * Math.log(x)
  * 
  * @author Erich Schubert
  */
-public class ABODSimpleScaling implements OutlierScalingFunction {
+public class MinusLogScaling implements OutlierScalingFunction {
   @Override
   public double getScaled(double value) {
-    return 1.0 / (1.0 + value);
+    return - Math.log(value);
   }
 
   @Override
