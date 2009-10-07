@@ -4,6 +4,11 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 
+/**
+ * The trivial "identity" scaling function.
+ * 
+ * @author Erich Schubert
+ */
 public class IdentityScaling implements OutlierScalingFunction {
   @Override
   public double getScaled(double value) {
