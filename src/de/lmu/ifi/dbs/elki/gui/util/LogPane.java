@@ -14,6 +14,7 @@ import javax.swing.text.StyleConstants;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.logging.MessageFormatter;
+import de.lmu.ifi.dbs.elki.logging.OutputStreamLogger;
 
 /**
  * A Swing object to receive ELKI logging output.
@@ -61,6 +62,11 @@ public class LogPane extends JTextPane {
    * Formatter for error messages
    */
   private Formatter errformat = new SimpleFormatter();
+  
+  /**
+   * Last newline position
+   */
+  private int lastNewlinePos = 0;
   
   /**
    * Constructor
@@ -120,14 +126,54 @@ public class LogPane extends JTextPane {
     // format
     final String m;
     m = fmt.format(record);
-    getStyledDocument().insertString(getStyledDocument().getLength(), m, style);
+    int pos = 0; 
+    if (m.charAt(pos) == OutputStreamLogger.CARRIAGE_RETURN) {
+      if (lastNewlinePos < getStyledDocument().getLength()) {
+        getStyledDocument().remove(lastNewlinePos, getStyledDocument().getLength() - lastNewlinePos);
+      }
+      pos++;
+    }
+    int tail = tailingNonNewline(m, pos, m.length() - pos);
+    int headlen = m.length() - tail - pos;
+    if (headlen > 0) {
+      String pre = m.substring(pos, headlen);
+      getStyledDocument().insertString(getStyledDocument().getLength(), pre, style);
+    }
+    lastNewlinePos = getStyledDocument().getLength();
+    if (tail > 0) {
+      String post = m.substring(m.length() - tail);
+      getStyledDocument().insertString(lastNewlinePos, post, style);
+    }
   }  
   
+  /**
+   * Count the tailing non-newline characters.
+   * 
+   * @param str String
+   * @param off Offset
+   * @param len Range
+   * @return number of tailing non-newline character
+   */
+  private int tailingNonNewline(String str, int off, int len) {
+    for(int cnt = 0; cnt < len; cnt++) {
+      final int pos = off + (len - 1) - cnt;
+      if(str.charAt(pos) == OutputStreamLogger.UNIX_NEWLINE) {
+        return cnt;
+      }
+      if(str.charAt(pos) == OutputStreamLogger.CARRIAGE_RETURN) {
+        return cnt;
+      }
+      // TODO: need to compare to NEWLINE, too?
+    }
+    return len;
+  }
+
   /**
    * Clear the current contents.
    */
   public void clear() {
     setText("");
+    lastNewlinePos = 0;
   }
   
   /**
