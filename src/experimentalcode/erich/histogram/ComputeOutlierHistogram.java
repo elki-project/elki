@@ -36,8 +36,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * The parameter {@code -hist.positive} specifies the class label of "positive"
  * hits.
  * 
- * 
  * @author Lisa
+ * @author Erich Schubert
  * 
  * @param <O> Database object type
  */
@@ -219,13 +219,6 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractA
     return result;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#setParameters(java.lang
-   * .String[])
-   */
   @Override
   public List<String> setParameters(List<String> args) throws ParameterException {
     List<String> remainingParameters = super.setParameters(args);

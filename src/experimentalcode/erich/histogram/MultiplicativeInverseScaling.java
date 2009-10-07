@@ -4,7 +4,16 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 
+/**
+ * Scaling function to invert values basically by computing 1/x, but in a variation
+ * that maps the values to the [0:1] interval and avoiding division by 0.
+ * 
+ * @author Erich Schubert
+ */
 public class MultiplicativeInverseScaling implements OutlierScalingFunction {
+  /**
+   * Scaling value, set by {@link #prepare}.
+   */
   double scaleval;
 
   @Override
@@ -13,7 +22,7 @@ public class MultiplicativeInverseScaling implements OutlierScalingFunction {
       return 1.0 / (value * scaleval);
     }
     catch(ArithmeticException e) {
-      return 0;
+      return 1.0;
     }
   }
 
@@ -22,6 +31,13 @@ public class MultiplicativeInverseScaling implements OutlierScalingFunction {
     scaleval = getScaleValue(db, ann);
   }
 
+  /**
+   * Compute the scaling value in a linear scan over the annotation.
+   * 
+   * @param db Database
+   * @param ann Annotation to use.
+   * @return Scaling value.
+   */
   private static double getScaleValue(Database<?> db, AnnotationResult<Double> ann) {
     double max = Double.MIN_VALUE;
     for(Integer id : db) {

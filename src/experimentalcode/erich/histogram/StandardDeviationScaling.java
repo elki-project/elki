@@ -12,6 +12,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
+/**
+ * Scaling that can map arbitrary values to a probability in the range of [0:1].
+ * 
+ * Transformation is done using the formula max(0, erf(lambda * (x - mean) / (stddev * sqrt(2))))
+ * 
+ * Where mean can be fixed to a given value, and stddev is then computed against this mean.
+ * 
+ * @author Erich Schubert
+ *
+ */
 public class StandardDeviationScaling extends AbstractParameterizable implements OutlierScalingFunction {
   /**
    * OptionID for {@link #MEAN_PARAM}
