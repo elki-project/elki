@@ -23,6 +23,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -57,6 +58,11 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractA
    * OptionID for {@link #SCALING_PARAM}
    */
   public static final OptionID SCALING_ID = OptionID.getOrCreateOptionID("comphist.scaling", "Class to use as scaling function.");
+
+  /**
+   * OptionID for {@link #SPLITFREQ_PARAM}
+   */
+  public static final OptionID SPLITFREQ_ID = OptionID.getOrCreateOptionID("histogram.splitfreq", "Use separate frequencies for outliers and non-outliers.");
 
   /**
    * The distance function to determine the reachability distance between
@@ -99,6 +105,14 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractA
   private final ClassParameter<OutlierScalingFunction> SCALING_PARAM = new ClassParameter<OutlierScalingFunction>(SCALING_ID, OutlierScalingFunction.class, IdentityScaling.class.getName());
 
   /**
+   * Flag to count frequencies of outliers and non-outliers separately
+   * <p>
+   * Key: {@code -histogram.splitfreq}
+   * </p>
+   */
+  private final Flag SPLITFREQ_PARAM = new Flag(SPLITFREQ_ID);
+
+  /**
    * Stores the "positive" class.
    */
   private String positive_class_name;
@@ -118,7 +132,15 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractA
    */
   private MultiResult result;
 
+  /**
+   * Scaling function to use
+   */
   private OutlierScalingFunction scaling;
+
+  /**
+   * Flag to make split frequencies
+   */
+  private boolean splitfreq = false;
 
   public ComputeOutlierHistogram() {
     super();
@@ -126,6 +148,7 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractA
     addOption(ALGORITHM_PARAM);
     addOption(BINS_PARAM);
     addOption(SCALING_PARAM);
+    addOption(SPLITFREQ_PARAM);
   }
 
   @Override
@@ -141,8 +164,14 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractA
     // first value for outliers, second for each object
     AggregatingHistogram<Pair<Double, Double>, Pair<Double, Double>> hist = FlexiHistogram.DoubleSumDoubleSumHistogram(bins);
     // first fill histogram only with values of outliers
-    Pair<Double, Double> positive = new Pair<Double, Double>(0., 1. / ids.size());
-    Pair<Double, Double> negative = new Pair<Double, Double>(1. / ids.size(), 0.);
+    Pair<Double, Double> positive, negative;
+    if (!splitfreq) {
+      positive = new Pair<Double, Double>(0., 1. / ids.size());
+      negative = new Pair<Double, Double>(1. / ids.size(), 0.);
+    } else {
+      positive = new Pair<Double, Double>(0., 1. / outlierIds.size());
+      negative = new Pair<Double, Double>(1. / (ids.size() - outlierIds.size()), 0.);      
+    }
     for(Integer id : outlierIds) {
       double result = ann.getValueFor(id);
       result = scaling.getScaled(result);
@@ -235,6 +264,9 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractA
       Parameterizable param = (Parameterizable) scaling;
       addParameterizable(param);
       remainingParameters = param.setParameters(remainingParameters);
+    }
+    if (SPLITFREQ_PARAM.isSet()) {
+      splitfreq = true;
     }
 
     rememberParametersExcept(args, remainingParameters);
