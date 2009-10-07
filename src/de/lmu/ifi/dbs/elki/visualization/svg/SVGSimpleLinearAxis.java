@@ -121,7 +121,7 @@ public class SVGSimpleLinearAxis {
     }
     // vertical text offset; align approximately with middle instead of
     // baseline.
-    double textvoff = 0.007;
+    double textvoff = 0.01;
 
     // draw ticks on x axis
     for(double tick = scale.getMin(); tick <= scale.getMax(); tick += scale.getRes()) {
