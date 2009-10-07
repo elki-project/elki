@@ -8,6 +8,12 @@ import de.lmu.ifi.dbs.elki.result.Result;
  * Scaling function to invert values basically by computing 1/x, but in a variation
  * that maps the values to the [0:1] interval and avoiding division by 0.
  * 
+ * The exact formula can be written as
+ * 
+ * 1 / (value * max_{x!=0}(1 / abs(x))) = min_{x != 0}(abs(x)) / x
+ * 
+ * with 1 / 0 := 1
+ * 
  * @author Erich Schubert
  */
 public class MultiplicativeInverseScaling implements OutlierScalingFunction {
