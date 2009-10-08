@@ -66,7 +66,7 @@ public class SVGSimpleLinearAxis {
       label.setStatement(SVGConstants.CSS_FILL_PROPERTY, colors.getNamedColor(ColorLibrary.COLOR_AXIS_LABEL));
       label.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, "serif");
       // label.setStatement(SVGConstants.SVG_TEXT_RENDERING_ATTRIBUTE, SVGConstants.SVG_OPTIMIZE_LEGIBILITY_VALUE);
-      label.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, "0.2%");
+      label.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, "0.3%");
       manager.addClass(label);
     }
   }
@@ -121,7 +121,7 @@ public class SVGSimpleLinearAxis {
     }
     // vertical text offset; align approximately with middle instead of
     // baseline.
-    double textvoff = 0.01;
+    double textvoff = 0.015;
 
     // draw ticks on x axis
     for(double tick = scale.getMin(); tick <= scale.getMax(); tick += scale.getRes()) {
@@ -138,14 +138,14 @@ public class SVGSimpleLinearAxis {
         case LL:
         case LC:
         case LR:
-          tex = x + tw * 1.5;
-          tey = y + th * 1.5 + textvoff;
+          tex = x + tw * 2.5;
+          tey = y + th * 2.5 + textvoff;
           break;
         case RL:
         case RC:
         case RR:
-          tex = x - tw * 1.5;
-          tey = y - th * 1.5 + textvoff;
+          tex = x - tw * 2.5;
+          tey = y - th * 2.5 + textvoff;
         }
         Element text = plot.svgText(tex, tey, scale.formatValue(tick));
         SVGUtil.setAtt(text, SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_AXIS_LABEL);
