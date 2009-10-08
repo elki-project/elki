@@ -172,17 +172,17 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractA
       positive = new Pair<Double, Double>(0., 1. / outlierIds.size());
       negative = new Pair<Double, Double>(1. / (ids.size() - outlierIds.size()), 0.);      
     }
-    for(Integer id : outlierIds) {
-      double result = ann.getValueFor(id);
-      result = scaling.getScaled(result);
-      hist.aggregate(result, positive);
-    }
     ids.removeAll(outlierIds);
     // fill histogram with values of each object
     for(Integer id : ids) {
       double result = ann.getValueFor(id);
       result = scaling.getScaled(result);
       hist.aggregate(result, negative);
+    }
+    for(Integer id : outlierIds) {
+      double result = ann.getValueFor(id);
+      result = scaling.getScaled(result);
+      hist.aggregate(result, positive);
     }
 
     // turn into Collection
