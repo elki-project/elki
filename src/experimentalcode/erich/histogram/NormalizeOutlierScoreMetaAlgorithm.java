@@ -23,7 +23,7 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
   /**
    * Association ID for scaled values
    */
-  private static final AssociationID<Double> SCALED_SCORE = AssociationID.getOrCreateAssociationID("SCALED_SCORE", Double.class);
+  public static final AssociationID<Double> SCALED_SCORE = AssociationID.getOrCreateAssociationID("SCALED_SCORE", Double.class);
 
   /**
    * OptionID for {@link #SCALING_PARAM}
