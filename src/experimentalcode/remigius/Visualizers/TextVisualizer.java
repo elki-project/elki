@@ -28,11 +28,10 @@ import experimentalcode.remigius.gui.listener.ToolTipListener;
  * @param <NV>
  */
 public class TextVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisualizer<NV> {
-
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "ToolTips";
+  public static final String NAME = "Tooltips";
 
   /**
    * Contains the "outlierness-scores" to be displayed as ToolTips. If this
@@ -66,8 +65,8 @@ public class TextVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisual
    * 
    * TODO: Refactor from AnnotationResult<Double> to AnnotationResult<Number>
    */
-  public void init(Database<NV> database, AnnotationResult<Double> anResult) {
-    init(database, NAME);
+  public void init(String name, Database<NV> database, AnnotationResult<Double> anResult) {
+    init(database, name);
     this.anResult = anResult;
   }
 

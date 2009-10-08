@@ -153,7 +153,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisu
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "Bubbles";
+  public static final String NAME = "Bubbles";
 
   /**
    * The default constructor only registers parameters.
@@ -175,8 +175,8 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisu
    * 
    * TODO: Refactor from AnnotationResult<Double> to AnnotationResult<Number>
    */
-  public void init(Database<NV> database, AnnotationResult<Double> anResult, Result result, DoubleScale normalizationScale, Clustering<Model> clustering) {
-    init(database, 1000, NAME);
+  public void init(String name, Database<NV> database, AnnotationResult<Double> anResult, Result result, DoubleScale normalizationScale, Clustering<Model> clustering) {
+    init(database, 1000, name);
     this.anResult = anResult;
     this.result = result;
     this.clustering = clustering;
