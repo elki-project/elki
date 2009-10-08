@@ -52,12 +52,12 @@ public class StandardDeviationScaling extends AbstractParameterizable implements
   /**
    * Field storing the fixed mean to use
    */
-  private Double fixedmean = null;
+  protected Double fixedmean = null;
 
   /**
    * Field storing the lambda value
    */
-  private Double lambda = null;
+  protected Double lambda = null;
 
   /**
    * Mean to use
@@ -80,6 +80,9 @@ public class StandardDeviationScaling extends AbstractParameterizable implements
 
   @Override
   public double getScaled(double value) {
+    if (value <= mean) {
+      return 0;
+    }
     return Math.max(0, ErrorFunctions.erf((value - mean) / factor));
   }
 
@@ -110,13 +113,14 @@ public class StandardDeviationScaling extends AbstractParameterizable implements
   @Override
   public List<String> setParameters(List<String> args) throws ParameterException {
     List<String> remainingParameters = super.setParameters(args);
-
+    
     if(MEAN_PARAM.isSet()) {
       fixedmean = MEAN_PARAM.getValue();
     }
-    
+
     lambda = LAMBDA_PARAM.getValue();
 
+    rememberParametersExcept(args, remainingParameters);
     return remainingParameters;
   }
 }
