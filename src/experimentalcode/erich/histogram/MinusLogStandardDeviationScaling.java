@@ -31,14 +31,11 @@ public class MinusLogStandardDeviationScaling extends StandardDeviationScaling i
 
   @Override
   public double getScaled(double value) {
-    double val = ErrorFunctions.erf((-Math.log(value) - mean) / factor);
-    if (Double.isNaN(val)) {
+    final double mlogv = -Math.log(value);
+    if (mlogv < mean || Double.isNaN(mlogv)) {
       return 0.0;
     }
-    if (Double.isInfinite(val)) {
-      return 1.0;
-    }
-    return val;
+    return Math.max(0.0, ErrorFunctions.erf((mlogv - mean) / factor));
   }
 
   @Override
