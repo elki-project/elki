@@ -10,7 +10,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import org.apache.batik.swing.JSVGCanvas;
 import org.apache.batik.swing.svg.AbstractJSVGComponent;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -26,9 +25,9 @@ import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import de.lmu.ifi.dbs.elki.visualization.batikutil.JSVGSynchronizedCanvas;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.LazyCanvasResizer;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.NodeReplacer;
-import de.lmu.ifi.dbs.elki.visualization.batikutil.UpdateRunner;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.savedialog.SVGSaveDialog;
@@ -107,14 +106,11 @@ public class ResultROCCurveVisualizer<O extends DatabaseObject> extends Abstract
     protected JButton saveButton = new JButton("Export");
 
     // The SVG canvas.
-    protected JSVGCanvas svgCanvas = new JSVGCanvas();
+    protected JSVGSynchronizedCanvas svgCanvas = new JSVGSynchronizedCanvas();
 
     // The plot
     SVGPlot plot;
 
-    // The update handler
-    UpdateRunner updateRunner = new UpdateRunner();
-    
     // Viewport
     Element viewport;
 
@@ -218,8 +214,7 @@ public class ResultROCCurveVisualizer<O extends DatabaseObject> extends Abstract
       updateCurve();
 
       svgCanvas.setDocumentState(AbstractJSVGComponent.ALWAYS_DYNAMIC);
-      updateRunner.attachComponent(svgCanvas);
-      svgCanvas.setDocument(plot.getDocument());
+      svgCanvas.setPlot(plot);
 
       this.frame.setVisible(true);
     }
@@ -248,7 +243,7 @@ public class ResultROCCurveVisualizer<O extends DatabaseObject> extends Abstract
       line.setAttribute(SVGConstants.SVG_D_ATTRIBUTE, path.toString());
       line.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, SERIESID);
       newe.appendChild(line);
-      updateRunner.invokeLater(new NodeReplacer(newe, plot, SERIESID));
+      plot.scheduleUpdate(new NodeReplacer(newe, plot, SERIESID));
     }
     
     public void updateFrame() {
@@ -257,7 +252,7 @@ public class ResultROCCurveVisualizer<O extends DatabaseObject> extends Abstract
       SVGUtil.setAtt(newe, SVGConstants.SVG_ID_ATTRIBUTE, FRAMEID);
       SVGUtil.setAtt(newe, SVGConstants.SVG_CLASS_ATTRIBUTE, FRAMEID);
       newe.setAttribute(SVGConstants.SVG_D_ATTRIBUTE, SVGConstants.PATH_MOVE + "0 0 " + SVGConstants.PATH_LINE_TO + ratio + " 0 " + ratio + " 1 0 1 0 0");
-      updateRunner.invokeLater(new NodeReplacer(newe, plot, FRAMEID));
+      plot.scheduleUpdate(new NodeReplacer(newe, plot, FRAMEID));
     }
   }  
 }

@@ -97,6 +97,11 @@ public class SVGPlot {
   private HashMap<String, WeakReference<Element>> objWithId = new HashMap<String, WeakReference<Element>>();
 
   /**
+   * Registers changes of this SVGPlot.
+   */
+  private UpdateRunner runner = null;  
+  
+  /**
    * Create a new plotting document.
    */
   public SVGPlot() {
@@ -496,5 +501,35 @@ public class SVGPlot {
    */
   protected Collection<String> getAllIds() {
     return objWithId.keySet();
+  }
+
+  /**
+   * Get the plots update runner.
+   * 
+   * @return update runner
+   */
+  private UpdateRunner getUpdateRunner() {
+    if (runner == null) {
+      runner = new UpdateRunner();
+    }
+    return runner;
+  }
+
+  /**
+   * Schedule an update.
+   * 
+   * @param runnable
+   */
+  public void scheduleUpdate(Runnable runnable) {
+    getUpdateRunner().invokeLater(runnable);
+  }
+
+  /**
+   * Assign an update synchronizer. May be null, to detach.
+   * 
+   * @param sync Update synchronizer
+   */
+  public void setUpdateSynchronizer(UpdateSynchronizer sync) {
+    getUpdateRunner().setUpdateSynchronizer(sync);
   }
 }
