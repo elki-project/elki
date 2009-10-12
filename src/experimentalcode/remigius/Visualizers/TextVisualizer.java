@@ -12,13 +12,12 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import experimentalcode.remigius.ShapeLibrary;
-import experimentalcode.remigius.UpdatableSVGPlot;
 import experimentalcode.remigius.gui.listener.ToolTipListener;
 
 /**
- * Generates a SVG-Element containing ToolTips. ToolTips remain invisible
- * until their corresponding Marker is touched by the cursor and stay visible as
- * long as the cursor lingers on the marker. This implementation uses
+ * Generates a SVG-Element containing ToolTips. ToolTips remain invisible until
+ * their corresponding Marker is touched by the cursor and stay visible as long
+ * as the cursor lingers on the marker. This implementation uses
  * {@link ToolTipListener} to achieve this behavior.
  * 
  * @see ToolTipListener
@@ -35,8 +34,8 @@ public class TextVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisual
 
   /**
    * Contains the "outlierness-scores" to be displayed as ToolTips. If this
-   * result does not contain <b>all</b> IDs the database contains,
-   * behavior is undefined.
+   * result does not contain <b>all</b> IDs the database contains, behavior is
+   * undefined.
    */
   private AnnotationResult<Double> anResult;
 
@@ -55,9 +54,11 @@ public class TextVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisual
    * Initializes this Visualizer.
    * 
    * @param database contains all objects to be processed.
-   * @param anResult contains "outlierness-scores", corresponding to the database.
+   * @param anResult contains "outlierness-scores", corresponding to the
+   *        database.
    * 
-   * TODO: Refactor from AnnotationResult<Double> to AnnotationResult<Number>
+   *        TODO: Refactor from AnnotationResult<Double> to
+   *        AnnotationResult<Number>
    */
   public void init(String name, Database<NV> database, AnnotationResult<Double> anResult) {
     init(database, Integer.MAX_VALUE, name);
@@ -86,29 +87,25 @@ public class TextVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisual
   public Element visualize(SVGPlot svgp) {
     setupCSS(svgp);
     Element layer = ShapeLibrary.createG(svgp.getDocument());
-    
-    if (svgp instanceof UpdatableSVGPlot){
-      ToolTipListener hoverer = new ToolTipListener((UpdatableSVGPlot)svgp);
-      for(int id : database.getIDs()) {
-        Element tooltip = ShapeLibrary.createToolTip(svgp.getDocument(), getPositioned(database.get(id), dimx), (1 - getPositioned(database.get(id), dimy)), getValue(id));
-        
-        String dotID = ShapeLibrary.createID(ShapeLibrary.MARKER, id);
-        Element dot = svgp.getIdElement(dotID);
-        if(dot != null) {
 
-          EventTarget targ = (EventTarget) dot;
-          targ.addEventListener(SVGConstants.SVG_MOUSEOVER_EVENT_TYPE, hoverer, false);
-          targ.addEventListener(SVGConstants.SVG_MOUSEOUT_EVENT_TYPE, hoverer, false);
-          targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, hoverer, false);
-        }
-        else {
-          LoggingUtil.message("Attaching ToolTip to non-existing Object: " + dotID);
-        }
-        layer.appendChild(tooltip);
-        svgp.putIdElement(ShapeLibrary.createID(ShapeLibrary.TOOLTIP, id), tooltip);
+    ToolTipListener hoverer = new ToolTipListener(svgp);
+    for(int id : database.getIDs()) {
+      Element tooltip = ShapeLibrary.createToolTip(svgp.getDocument(), getPositioned(database.get(id), dimx), (1 - getPositioned(database.get(id), dimy)), getValue(id));
+
+      String dotID = ShapeLibrary.createID(ShapeLibrary.MARKER, id);
+      Element dot = svgp.getIdElement(dotID);
+      if(dot != null) {
+
+        EventTarget targ = (EventTarget) dot;
+        targ.addEventListener(SVGConstants.SVG_MOUSEOVER_EVENT_TYPE, hoverer, false);
+        targ.addEventListener(SVGConstants.SVG_MOUSEOUT_EVENT_TYPE, hoverer, false);
+        targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, hoverer, false);
       }
-    } else {
-      LoggingUtil.message("This SVGPlot doesn't contain an UpdateRunner.");
+      else {
+        LoggingUtil.message("Attaching ToolTip to non-existing Object: " + dotID);
+      }
+      layer.appendChild(tooltip);
+      svgp.putIdElement(ShapeLibrary.createID(ShapeLibrary.TOOLTIP, id), tooltip);
     }
     return layer;
   }

@@ -25,7 +25,6 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.apache.batik.swing.JSVGCanvas;
 import org.apache.batik.swing.svg.AbstractJSVGComponent;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -50,9 +49,9 @@ import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.visualization.batikutil.JSVGSynchronizedCanvas;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.LazyCanvasResizer;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.NodeReplacer;
-import de.lmu.ifi.dbs.elki.visualization.batikutil.UpdateRunner;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.savedialog.SVGSaveDialog;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
@@ -242,13 +241,10 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
     protected JButton saveButton = new JButton("Export");
 
     // The SVG canvas.
-    protected JSVGCanvas svgCanvas = new JSVGCanvas();
+    protected JSVGSynchronizedCanvas svgCanvas = new JSVGSynchronizedCanvas();
 
     // The plot
     SVGPlot plot;
-
-    // The update handler
-    UpdateRunner updateRunner = new UpdateRunner();
 
     // Viewport
     Element viewport;
@@ -360,7 +356,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
       SVGUtil.setAtt(plot.getRoot(), SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 " + ratio + " 1");
       SVGUtil.setAtt(viewport, SVGConstants.SVG_WIDTH_ATTRIBUTE, ratio);
       SVGUtil.setAtt(viewport, SVGConstants.SVG_HEIGHT_ATTRIBUTE, "1");
-      SVGUtil.setAtt(viewport, SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "-0.05 -0.05 " + (ratio + 0.1) + " 1.1");
+      SVGUtil.setAtt(viewport, SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "-0.1 -0.1 " + (ratio + 0.2) + " 1.2");
     }
 
     public void run(Database<O> db, DistanceFunction<O, N> distanceFunction) {
@@ -400,8 +396,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
       plot.putIdElement(SERIESID, egroup);
 
       svgCanvas.setDocumentState(AbstractJSVGComponent.ALWAYS_DYNAMIC);
-      updateRunner.attachComponent(svgCanvas);
-      svgCanvas.setDocument(plot.getDocument());
+      svgCanvas.setPlot(plot);
 
       DefaultListModel m = new DefaultListModel();
       for(Integer dbid : db) {
@@ -447,7 +442,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
           }
         }
       }
-      updateRunner.invokeLater(new NodeReplacer(newe, plot, SERIESID));
+      plot.scheduleUpdate(new NodeReplacer(newe, plot, SERIESID));
       seriesList.repaint();
     }
 
@@ -484,6 +479,11 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
       return p;
     }
 
+    /**
+     * FIXME: add JavaDoc
+     * 
+     * @author Erich Schubert
+     */
     private class SeriesLabelRenderer extends DefaultListCellRenderer {
       /**
        * Serial version
