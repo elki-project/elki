@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.UpdateSynchronizer;
  * 
  * @author Erich Schubert
  */
-public class JSVGUpdateSynchronizer implements UpdateSynchronizer {
+class JSVGUpdateSynchronizer implements UpdateSynchronizer {
   /**
    * A weak reference to the component the plot is in.
    */
@@ -41,7 +41,7 @@ public class JSVGUpdateSynchronizer implements UpdateSynchronizer {
    * 
    * @param component Component to manage updates on.
    */
-  public JSVGUpdateSynchronizer(JSVGComponent component) {
+  protected JSVGUpdateSynchronizer(JSVGComponent component) {
     assert(component != null);
     
     this.cref = new WeakReference<JSVGComponent>(component);
