@@ -5,12 +5,12 @@ import java.io.IOException;
 
 import org.apache.batik.transcoder.TranscoderException;
 
-
 /**
- * Class that will render a {@link SVGPlot} into a {@link File} as thumbnail. 
+ * Class that will render a {@link SVGPlot} into a {@link File} as thumbnail.
+ * 
+ * Note: this does not happen in the background - call it from your own Thread if you need that!
  * 
  * @author Erich Schubert
- *
  */
 public class Thumbnailer {
   /**

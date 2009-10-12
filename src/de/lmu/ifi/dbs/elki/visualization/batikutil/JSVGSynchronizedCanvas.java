@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.visualization.batikutil;
 
 import org.apache.batik.swing.JSVGCanvas;
 import org.w3c.dom.Document;
+import org.w3c.dom.svg.SVGDocument;
 
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 
@@ -35,9 +36,31 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
     this.synchronizer = new JSVGUpdateSynchronizer(this);
   }
 
+  /**
+   * Use {@link #setPlot} instead if you need synchronization!
+   * 
+   * @deprecated Document cannot be synchronized - use {@link #setPlot} and a {@link SVGPlot} object!
+   */
   @Override
   @Deprecated
   public synchronized void setDocument(Document doc) {
+    SVGPlot oldplot = this.plot;
+    this.plot = null;
+    super.setDocument(doc);
+    
+    if (oldplot != null) {
+      oldplot.setUpdateSynchronizer(null);
+    }
+  }
+  
+  /**
+   * Use {@link #setPlot} instead if you need synchronization!
+   * 
+   * @deprecated Document cannot be synchronized - use {@link #setPlot} and a {@link SVGPlot} object!
+   */
+  @Override
+  @Deprecated
+  public synchronized void setSVGDocument(SVGDocument doc) {
     SVGPlot oldplot = this.plot;
     this.plot = null;
     super.setDocument(doc);
