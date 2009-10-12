@@ -8,18 +8,15 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 /**
  * Defines the requirements for a visualizer. <br>
  * Note: Any implementation is supposed to provide a constructor without
- * parameters (default constructor).
+ * parameters (default constructor) to be used for parameterization.
  * 
  * @author Remigius Wojdanowski
  */
 public interface Visualizer extends Parameterizable {
-
   /**
    * Returns an Element representing a visualization.
    * 
    * @param svgp the SVGPlot which will act as owner for the returned Element.
-   * @param dimx the dimension to appear as horizontal (x-) dimension
-   * @param dimy the dimension to appear as vertical (y-) dimension.
    * @return an Element representing a 2-dimensional visualization.
    */
   public Element visualize(SVGPlot svgp);
