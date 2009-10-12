@@ -2,6 +2,7 @@ package experimentalcode.remigius.Visualizers;
 
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.utilities.AnyMap;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 
@@ -14,22 +15,15 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
  */
 public interface Visualizer extends Parameterizable {
   /**
-   * Returns an Element representing a visualization.
+   * Meta data key: Visualizer name for UI
    * 
-   * @param svgp the SVGPlot which will act as owner for the returned Element.
-   * @return an Element representing a 2-dimensional visualization.
+   * Type: String
    */
-  public Element visualize(SVGPlot svgp);
-
+  public final static String META_NAME = "name";
+  
   /**
-   * Returns a <b>short</b> name for the visualizer. Intended to be used for
-   * displaying a representation of this Visualizer in the UI.
-   * 
-   * @return a short string characterizing the visualizer.
-   */
-  public String getName();
-
-  /**
+   * Meta data key: Level for visualizer ordering
+   *
    * Returns an integer indicating the "temporal position" of this Visualizer.
    * It is intended to impose an ordering on the execution of Visualizers as a
    * Visualizer may depend on another Visualizer running earlier. <br>
@@ -39,7 +33,22 @@ public interface Visualizer extends Parameterizable {
    * Note that this value is only a recommendation, as it is totally up to the
    * framework to ignore it.
    * 
-   * @return an integer indicating the "temporal position" of this Visualizer.
+   * Type: Integer
    */
-  public int getLevel();
+  public final static String META_LEVEL = "level";
+
+  /**
+   * Get visualization meta data, such as dimensions visualized.
+   * 
+   * @return AnyMap reference with meta data.
+   */
+  public AnyMap<String> getMetadata();
+  
+  /**
+   * Returns an Element representing a visualization.
+   * 
+   * @param svgp the SVGPlot which will act as owner for the returned Element.
+   * @return an Element representing a 2-dimensional visualization.
+   */
+  public Element visualize(SVGPlot svgp);
 }

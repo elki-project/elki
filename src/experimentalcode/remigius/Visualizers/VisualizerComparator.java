@@ -11,6 +11,11 @@ import java.util.Comparator;
 public class VisualizerComparator implements Comparator<Visualizer> {
   @Override
   public int compare(Visualizer o1, Visualizer o2) {
-    return o2.getLevel() - o1.getLevel();
+    Integer level1 = o1.getMetadata().get(Visualizer.META_LEVEL, Integer.class);
+    Integer level2 = o2.getMetadata().get(Visualizer.META_LEVEL, Integer.class);
+    if (level1 != null && level2 != null) {
+      return level2 - level1;
+    }
+    return 0;
   }
 }

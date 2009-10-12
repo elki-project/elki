@@ -40,11 +40,6 @@ public class TextVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisual
    */
   private AnnotationResult<Double> anResult;
 
-  @Override
-  public int getLevel() {
-    return Integer.MAX_VALUE;
-  }
-
   /**
    * Returns the outlierness-score for a given ID. If there is no corresponding
    * score, behavior is undefined.
@@ -53,7 +48,6 @@ public class TextVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisual
    * @return the outlierness-score for a given ID.
    */
   private Double getValue(int id) {
-
     return anResult.getValueFor(id);
   }
 
@@ -66,7 +60,7 @@ public class TextVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisual
    * TODO: Refactor from AnnotationResult<Double> to AnnotationResult<Number>
    */
   public void init(String name, Database<NV> database, AnnotationResult<Double> anResult) {
-    init(database, name);
+    init(database, Integer.MAX_VALUE, name);
     this.anResult = anResult;
   }
 
@@ -76,7 +70,6 @@ public class TextVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisual
    * @param svgp the SVGPlot to register the ToolTip-CSS-Class.
    */
   private void setupCSS(SVGPlot svgp) {
-
     CSSClass tooltip = new CSSClass(svgp, ShapeLibrary.TOOLTIP);
     tooltip.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, "0.1%");
 
