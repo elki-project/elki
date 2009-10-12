@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.visualization.batikutil;
 
 import java.lang.ref.WeakReference;
 import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.batik.bridge.UpdateManager;
 import org.apache.batik.bridge.UpdateManagerAdapter;
@@ -11,11 +11,17 @@ import org.apache.batik.swing.svg.JSVGComponent;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 
+/**
+ * Class to handle updates to an SVG plot, in particular when used in an Apache Batik UI.
+ * 
+ * @author Erich Schubert
+ *
+ */
 public class UpdateRunner {
   /**
    * The queue of pending updates
    */
-  final private Queue<Runnable> queue = new LinkedBlockingQueue<Runnable>();
+  final private Queue<Runnable> queue = new ConcurrentLinkedQueue<Runnable>();
 
   /**
    * A reference to the component the plot is in.
