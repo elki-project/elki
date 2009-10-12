@@ -100,6 +100,15 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    * @see NumberVector#newInstance(double[])
    */
   @Override
+  public SparseFloatVector newInstance(Vector values) {
+    // FIXME: inefficient
+    return new SparseFloatVector(Util.convertToFloat(values.getColumnPackedCopy()));
+  }
+
+  /**
+   * @see NumberVector#newInstance(double[])
+   */
+  @Override
   public SparseFloatVector newInstance(double[] values) {
     return new SparseFloatVector(Util.convertToFloat(values));
   }

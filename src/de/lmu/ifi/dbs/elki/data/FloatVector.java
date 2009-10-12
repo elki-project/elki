@@ -57,6 +57,26 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
     }
 
     /**
+     * Expects a matrix of one column.
+     *
+     * @param columnMatrix a matrix of one column
+     */
+    public FloatVector(Matrix columnMatrix) {
+      values = new float[columnMatrix.getRowDimensionality()];
+      for (int i = 0; i < values.length; i++) {
+        values[i] = (float) columnMatrix.get(i, 0);
+      }
+    }
+
+    /**
+     * @return a new FloatVector with the specified values
+     */
+    @Override
+    public FloatVector newInstance(Vector values) {
+        return new FloatVector(values);
+    }
+    
+    /**
      * @return a new FloatVector with the specified values
      */
     @Override

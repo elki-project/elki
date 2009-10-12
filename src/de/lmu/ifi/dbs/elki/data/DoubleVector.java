@@ -72,6 +72,14 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector,Double> {
    * @return a new DoubleVector with the specified values
    */
   @Override
+  public DoubleVector newInstance(Vector values) {
+    return new DoubleVector(values);
+  }
+  
+  /**
+   * @return a new DoubleVector with the specified values
+   */
+  @Override
   public DoubleVector newInstance(Double[] values) {
     return new DoubleVector(values);
   }

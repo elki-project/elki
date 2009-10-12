@@ -68,6 +68,30 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
     this.dimensionality = bits.size();
   }
 
+  @Override
+  public BitVector newInstance(double[] values) {
+    int dim = values.length;
+    bits = new BitSet(dim);
+    for (int i = 0; i < dim; i++) {
+      if (values[i] >= 0.5) {
+        bits.set(i);
+      }
+    }
+    return new BitVector(bits, dim);
+  }
+
+  @Override
+  public BitVector newInstance(Vector values) {
+    int dim = values.getDimensionality();
+    bits = new BitSet(dim);
+    for (int i = 0; i < dim; i++) {
+      if (values.get(i) >= 0.5) {
+        bits.set(i);
+      }
+    }
+    return new BitVector(bits, dim);
+  }
+
   /**
    * Creates and returns a new BitVector based on the passed values.
    * 
@@ -365,18 +389,6 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
     else {
       return false;
     }
-  }
-
-  @Override
-  public BitVector newInstance(double[] values) {
-    int dim = values.length;
-    bits = new BitSet(dim);
-    for (int i = 0; i < dim; i++) {
-      if (values[i] >= 0.5) {
-        bits.set(i);
-      }
-    }
-    return new BitVector(bits, dim);
   }
 
 }
