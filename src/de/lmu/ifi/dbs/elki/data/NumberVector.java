@@ -109,4 +109,12 @@ public interface NumberVector<V extends NumberVector<V, N>, N extends Number> ex
    * @return a new NumberVector of N for the given values
    */
   V newInstance(double[] values);
+  
+  /**
+   * Returns a new NumberVector of N for the given values.
+   *
+   * @param values the values of the NumberVector
+   * @return a new NumberVector of N for the given values
+   */
+  V newInstance(Vector values);
 }
