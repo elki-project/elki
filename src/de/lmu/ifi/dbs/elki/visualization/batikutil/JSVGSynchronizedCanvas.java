@@ -63,7 +63,7 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
   public synchronized void setSVGDocument(SVGDocument doc) {
     SVGPlot oldplot = this.plot;
     this.plot = null;
-    super.setDocument(doc);
+    super.setSVGDocument(doc);
     
     if (oldplot != null) {
       oldplot.setUpdateSynchronizer(null);
