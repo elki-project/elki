@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
  * @param <NV>
  */
 public abstract class PlanarVisualizer<NV extends NumberVector<NV, ?>> extends NumberVectorVisualizer<NV> {
-
   /**
    * the dimension to appear as horizontal dimension.
    */

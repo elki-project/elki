@@ -16,7 +16,6 @@ import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
  * @param <NV>
  */
 public abstract class NumberVectorVisualizer<NV extends NumberVector<NV, ?>> extends AbstractVisualizer<NV> {
-
   /**
    * Array of {@link LinearScale}-objects to calculate normalized positions of
    * objects.
@@ -45,6 +44,7 @@ public abstract class NumberVectorVisualizer<NV extends NumberVector<NV, ?>> ext
    * 
    * @param db contains all objects to be processed.
    */
+  @Override
   public void init(Database<NV> db, int level, String name) {
     super.init(db, level, name);
     this.scales = Scales.calcScales(database);

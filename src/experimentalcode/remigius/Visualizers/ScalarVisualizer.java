@@ -10,7 +10,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
  * @param <NV>
  */
 public abstract class ScalarVisualizer<NV extends NumberVector<NV, ?>> extends NumberVectorVisualizer<NV> {
-  
   /**
    * the dimension to appear as horizontal dimension.
    */
@@ -19,8 +18,7 @@ public abstract class ScalarVisualizer<NV extends NumberVector<NV, ?>> extends N
   /**
    * Setting up parameters individual to each run of the visualization.
    * 
-   * @param dimx
-   * @param dimy
+   * @param dim
    */
   public void setup(int dim){
     this.dim = dim;
