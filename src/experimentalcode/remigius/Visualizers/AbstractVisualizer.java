@@ -37,7 +37,7 @@ public abstract class AbstractVisualizer<O extends DatabaseObject> extends Abstr
    * @param level indicates when to execute this Visualizer.
    * @param name a short name characterizing this Visualizer
    */
-  public void init(Database<O> db, int level, String name) {
+  protected void init(Database<O> db, int level, String name) {
     this.database = db;
     this.metadata = new AnyMap<String>();
     this.metadata.put(Visualizer.META_LEVEL, level);

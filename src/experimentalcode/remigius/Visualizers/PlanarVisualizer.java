@@ -1,6 +1,7 @@
 package experimentalcode.remigius.Visualizers;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import experimentalcode.erich.visualization.VisualizationProjection;
 
 /**
  * Produces visualizations of 2-dimensional projections. <br>
@@ -29,8 +30,9 @@ public abstract class PlanarVisualizer<NV extends NumberVector<NV, ?>> extends N
    * @param dimx
    * @param dimy
    */
-  public void setup(int dimx, int dimy) {
+  public void setup(int dimx, int dimy, VisualizationProjection<NV> proj) {
     this.dimx = dimx;
     this.dimy = dimy;
+    super.setup(proj);
   }
 }

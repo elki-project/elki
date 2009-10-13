@@ -1,6 +1,7 @@
 package experimentalcode.remigius.Visualizers;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import experimentalcode.erich.visualization.VisualizationProjection;
 
 /**
  * Produces visualizations of 1-dimensional projections.
@@ -20,7 +21,8 @@ public abstract class ScalarVisualizer<NV extends NumberVector<NV, ?>> extends N
    * 
    * @param dim
    */
-  public void setup(int dim){
+  public void setup(int dim, VisualizationProjection<NV> proj){
     this.dim = dim;
+    this.proj = proj;
   }
 }
