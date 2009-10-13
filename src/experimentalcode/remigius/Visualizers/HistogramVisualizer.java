@@ -24,6 +24,7 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
+import experimentalcode.erich.visualization.VisualizationProjection;
 import experimentalcode.remigius.ShapeLibrary;
 
 /**
@@ -64,7 +65,7 @@ public class HistogramVisualizer<NV extends NumberVector<NV, ?>> extends ScalarV
   }
 
   public void init(Database<NV> database, Result result, Clustering<Model> clustering) {
-    init(database, NAME);
+    init(database, 0, NAME);
     this.frac = 1. / database.size();
     this.result = result;
     this.clustering = clustering;
@@ -122,16 +123,16 @@ public class HistogramVisualizer<NV extends NumberVector<NV, ?>> extends ScalarV
     int clusterID = 0;
     MinMax<Double> minmax = new MinMax<Double>();
 
-    AggregatingHistogram<Double, Double> allInOne = AggregatingHistogram.DoubleSumHistogram(BINS, scales[dim].getMin(), scales[dim].getMax());
+    AggregatingHistogram<Double, Double> allInOne = AggregatingHistogram.DoubleSumHistogram(BINS, proj.getScale(dim).getMin(), proj.getScale(dim).getMax());
     for(Cluster<Model> cluster : clustering.getAllClusters()) {
-      AggregatingHistogram<Double, Double> hist = AggregatingHistogram.DoubleSumHistogram(BINS, scales[dim].getMin(), scales[dim].getMax());
+      AggregatingHistogram<Double, Double> hist = AggregatingHistogram.DoubleSumHistogram(BINS, proj.getScale(dim).getMin(), proj.getScale(dim).getMax());
       for(int id : cluster.getIDs()) {
         hist.aggregate(database.get(id).getValue(dim).doubleValue(), frac);
         allInOne.aggregate(database.get(id).getValue(dim).doubleValue(), frac);
       }
 
       for(int bin = 0; bin < hist.getNumBins(); bin++) {
-        double valAllInOne = allInOne.get(bin * (scales[dim].getMax() - scales[dim].getMin()) / BINS);
+        double valAllInOne = allInOne.get(bin * (proj.getScale(dim).getMax() - proj.getScale(dim).getMin()) / BINS);
         minmax.put(valAllInOne);
       }
       hists.put(clusterID, hist);
@@ -142,7 +143,7 @@ public class HistogramVisualizer<NV extends NumberVector<NV, ?>> extends ScalarV
 
     // Axis. TODO: Use AxisVisualizer for this.
     try {
-      SVGSimpleLinearAxis.drawAxis(svgp, layer, scale, 0, 1, 0, 0, true, false);
+      SVGSimpleLinearAxis.drawAxis(svgp, layer, scale, -1, 1, -1, -1, true, false);
       svgp.updateStyleElement();
     }
     catch(CSSNamingConflict e) {
@@ -154,9 +155,10 @@ public class HistogramVisualizer<NV extends NumberVector<NV, ?>> extends ScalarV
     if (row){
       for(int bin = 0; bin < BINS; bin++) {
         double lastVal = 0;
+        double binsize = (proj.getScale(dim).getMax() - proj.getScale(dim).getMin()) / BINS;
         for(int key = 0; key < hists.size(); key++) {
           AggregatingHistogram<Double, Double> hist = hists.get(key);
-          double val = hist.get((bin * (scales[dim].getMax() - scales[dim].getMin()) / BINS))/minmax.getMax();
+          double val = hist.get((bin * binsize))/minmax.getMax();
           layer.appendChild(ShapeLibrary.createRow(svgp.getDocument(), getPositioned(bin * hist.getBinsize(), dim), 1-(val + lastVal), 1./BINS, val, key));
           lastVal += val;
         }
@@ -171,16 +173,17 @@ public class HistogramVisualizer<NV extends NumberVector<NV, ?>> extends ScalarV
   }
 
   private Element drawLine(SVGPlot svgp, int color, AggregatingHistogram<Double, Double> hist, double max){
-    Element path = ShapeLibrary.createPath(svgp.getDocument(), 0, 1, color);
+    Element path = ShapeLibrary.createPath(svgp.getDocument(), -1, 1, color);
     double right = 0;
+    double binwidth = (proj.getScale(dim).getMax() - proj.getScale(dim).getMin()) / BINS;
     for(int bin = 0; bin < hist.getNumBins(); bin++) {
-      double val = hist.get((bin * (scales[dim].getMax() - scales[dim].getMin()) / BINS))/max;
+      double val = hist.get((bin * binwidth))/max;
       double left = getPositioned(bin * hist.getBinsize(), dim);
       right = getPositioned(bin * hist.getBinsize(), dim) + (1./BINS);
-      ShapeLibrary.addLine(path, left, 1 - val);
-      ShapeLibrary.addLine(path, right, 1 - val);
+      ShapeLibrary.addLine(path, -1 + left * 2, 1 - val * 2);
+      ShapeLibrary.addLine(path, -1 + right * 2, 1 - val * 2);
     }
-    ShapeLibrary.addLine(path, right, 1);
+    ShapeLibrary.addLine(path, -1 + right * 2, 1);
     return path;
   }
 }

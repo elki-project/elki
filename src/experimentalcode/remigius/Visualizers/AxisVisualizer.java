@@ -34,15 +34,15 @@ public class AxisVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisual
   public void init(Database<NV> database) {
     // We don't need the Database. Maybe another superclass / inheritance
     // hierarchy would serve us better.
-    init(database, NAME);
+    super.init(database, 0, NAME);
   }
 
   @Override
   public Element visualize(SVGPlot svgp) {
     Element layer = ShapeLibrary.createG(svgp.getDocument());
     try {
-      SVGSimpleLinearAxis.drawAxis(svgp, layer, scales[dimx], 0, 1, 1, 1, true, true);
-      SVGSimpleLinearAxis.drawAxis(svgp, layer, scales[dimy], 0, 1, 0, 0, true, false);
+      SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(dimx), -1, 1, 1, 1, true, true);
+      SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(dimy), -1, 1, -1, -1, true, false);
       svgp.updateStyleElement();
     }
     catch(CSSNamingConflict e) {

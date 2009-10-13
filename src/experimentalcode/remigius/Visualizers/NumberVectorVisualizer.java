@@ -1,9 +1,8 @@
 package experimentalcode.remigius.Visualizers;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import experimentalcode.erich.visualization.VisualizationProjection;
 
 /**
  * Abstract superclass for Visualizers which process NumberVectors.
@@ -17,37 +16,12 @@ import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
  */
 public abstract class NumberVectorVisualizer<NV extends NumberVector<NV, ?>> extends AbstractVisualizer<NV> {
   /**
-   * Array of {@link LinearScale}-objects to calculate normalized positions of
-   * objects.
+   * Projection used
    */
-  protected LinearScale[] scales;
-
-  /**
-   * Convenience method, initializing this Visualizer with a default level of 0.
-   * 
-   * @see #init(Database, int, String)
-   * 
-   * @param db contains all objects to be processed.
-   * @param v used to receive and publish different information.
-   * @param name a short name characterizing this Visualizer.
-   */
-  public void init(Database<NV> db, String name) {
-    init(db, 0, name);
-  }
-
-  /**
-   * Initializes this Visualizer, especially its scales. <br>
-   * This method acts as a replacement for the constructor, which can't take any
-   * arguments due to restrictions imposed by the way parameters are collected.
-   * 
-   * @see AbstractVisualizer#init(Database, int, String)
-   * 
-   * @param db contains all objects to be processed.
-   */
-  @Override
-  public void init(Database<NV> db, int level, String name) {
-    super.init(db, level, name);
-    this.scales = Scales.calcScales(database);
+  protected VisualizationProjection<NV> proj = null;
+  
+  public void setup(VisualizationProjection<NV> proj) {
+    this.proj = proj;
   }
 
   /**
@@ -61,7 +35,8 @@ public abstract class NumberVectorVisualizer<NV extends NumberVector<NV, ?>> ext
    *         given dimension.
    */
   public Double getPositioned(NV nv, int dim) {
-    return getPositioned(nv.getValue(dim).doubleValue(), dim);
+    Vector v = proj.projectDataToRenderSpace(nv);
+    return v.get(dim - 1);
   }
 
   /**
@@ -73,6 +48,6 @@ public abstract class NumberVectorVisualizer<NV extends NumberVector<NV, ?>> ext
    *         to our actual coordinate system.
    */
   public Double getPositioned(Number n, int dim) {
-    return scales[dim].getScaled(n.doubleValue());
+    return proj.getScale(dim).getScaled(n.doubleValue());
   }
 }
