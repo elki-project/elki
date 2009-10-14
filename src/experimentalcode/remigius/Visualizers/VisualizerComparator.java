@@ -14,7 +14,7 @@ public class VisualizerComparator implements Comparator<Visualizer> {
     Integer level1 = o1.getMetadata().get(Visualizer.META_LEVEL, Integer.class);
     Integer level2 = o2.getMetadata().get(Visualizer.META_LEVEL, Integer.class);
     if (level1 != null && level2 != null) {
-      return level2 - level1;
+      return level1 - level2;
     }
     return 0;
   }
