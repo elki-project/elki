@@ -73,16 +73,22 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
   /**
    * Choose a new plot to display.
    * 
-   * @param plot New plot to display.
+   * @param plot New plot to display. May be null!
    */
   public synchronized void setPlot(SVGPlot plot) {
     SVGPlot oldplot = this.plot;
     this.plot = plot;
-    super.setDocument(this.plot.getDocument());
+    if (this.plot != null) {
+      super.setDocument(this.plot.getDocument());
+    } else {
+      super.setDocument(null);
+    }
     
     if (oldplot != null) {
       oldplot.setUpdateSynchronizer(null);
     }
-    plot.setUpdateSynchronizer(this.synchronizer);
+    if (plot != null) {
+      plot.setUpdateSynchronizer(this.synchronizer);
+    }
   }
 }
