@@ -91,4 +91,13 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
       plot.setUpdateSynchronizer(this.synchronizer);
     }
   }
+ 
+  /**
+   * Get the currently displayed SVG plot.
+   * 
+   * @return current SVG plot. May be {@code null}!
+   */
+  public SVGPlot getPlot() {
+    return plot;
+  }
 }
