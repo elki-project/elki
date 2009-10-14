@@ -1,4 +1,4 @@
-package experimentalcode.erich.histogram;
+package experimentalcode.shared.outlier.scaling;
 
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;

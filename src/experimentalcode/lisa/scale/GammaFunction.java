@@ -1,8 +1,8 @@
 package experimentalcode.lisa.scale;
 
+import experimentalcode.shared.outlier.scaling.StaticScalingFunction;
 
-
-public class GammaFunction implements DoubleScale {
+public class GammaFunction implements StaticScalingFunction {
 
 	private double gamma;
 	
@@ -23,7 +23,7 @@ public class GammaFunction implements DoubleScale {
 	}
 	
 	@Override
-	public Double getScaled(Double d) {
+	public double getScaled(double d) {
 		return Math.pow(d, gamma);
 	}
 }

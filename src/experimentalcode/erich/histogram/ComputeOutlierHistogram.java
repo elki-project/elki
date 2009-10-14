@@ -30,6 +30,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import experimentalcode.shared.outlier.scaling.IdentityScaling;
+import experimentalcode.shared.outlier.scaling.OutlierScalingFunction;
+import experimentalcode.shared.outlier.scaling.ScalingFunction;
 
 /**
  * Compute a Histogram to evaluate a ranking algorithm.
@@ -102,7 +105,7 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractA
    * Key: {@code -comphist.scaling}
    * </p>
    */
-  private final ClassParameter<OutlierScalingFunction> SCALING_PARAM = new ClassParameter<OutlierScalingFunction>(SCALING_ID, OutlierScalingFunction.class, IdentityScaling.class.getName());
+  private final ClassParameter<ScalingFunction> SCALING_PARAM = new ClassParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, IdentityScaling.class.getName());
 
   /**
    * Flag to count frequencies of outliers and non-outliers separately
@@ -135,7 +138,7 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractA
   /**
    * Scaling function to use
    */
-  private OutlierScalingFunction scaling;
+  private ScalingFunction scaling;
 
   /**
    * Flag to make split frequencies
@@ -156,7 +159,10 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractA
     Result innerresult = algorithm.run(database);
 
     AnnotationResult<Double> ann = getAnnotationResult(database, innerresult);
-    scaling.prepare(database, innerresult, ann);
+    if (scaling instanceof OutlierScalingFunction) {
+      OutlierScalingFunction oscaling = (OutlierScalingFunction) scaling;
+      oscaling.prepare(database, innerresult, ann);
+    }
 
     Collection<Integer> ids = database.getIDs();
     Cluster<Model> positivecluster = getReferenceCluster(database, positive_class_name);

@@ -72,7 +72,7 @@ public class TextVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisual
    */
   private void setupCSS(SVGPlot svgp) {
     CSSClass tooltip = new CSSClass(svgp, ShapeLibrary.TOOLTIP);
-    tooltip.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, "0.1%");
+    tooltip.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, "0.2%");
 
     try {
       svgp.getCSSClassManager().addClass(tooltip);

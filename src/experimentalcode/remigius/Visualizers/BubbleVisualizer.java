@@ -21,10 +21,10 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import experimentalcode.lisa.scale.CutOffScale;
-import experimentalcode.lisa.scale.DoubleScale;
 import experimentalcode.lisa.scale.GammaFunction;
 import experimentalcode.lisa.scale.LinearScale;
 import experimentalcode.remigius.ShapeLibrary;
+import experimentalcode.shared.outlier.scaling.StaticScalingFunction;
 
 /**
  * Generates a SVG-Element containing bubbles. A Bubble is a circle visualizing
@@ -107,13 +107,13 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisu
   /**
    * Used for normalizing coordinates.
    */
-  private DoubleScale normalizationScale;
+  private StaticScalingFunction normalizationScale;
 
   /**
    * TODO: Find out & document what this scale was for. I can't remember, but it
    * seems essential.
    */
-  private DoubleScale plotScale;
+  private StaticScalingFunction plotScale;
 
   /**
    * Used for Gamma-Correction.
@@ -175,14 +175,14 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisu
    * 
    * TODO: Refactor from AnnotationResult<Double> to AnnotationResult<Number>
    */
-  public void init(String name, Database<NV> database, AnnotationResult<Double> anResult, Result result, DoubleScale normalizationScale, Clustering<Model> clustering) {
+  public void init(String name, Database<NV> database, AnnotationResult<Double> anResult, Result result, StaticScalingFunction normalizationScale, Clustering<Model> clustering) {
     init(database, 1000, name);
     this.anResult = anResult;
     this.result = result;
     this.clustering = clustering;
     
     this.normalizationScale = normalizationScale;
-    this.plotScale = new LinearScale();
+    this.plotScale = new LinearScale(0.1);
     this.gammaFunction = new GammaFunction(gamma);
     this.cutOffScale = new CutOffScale(cutOff);
   }
