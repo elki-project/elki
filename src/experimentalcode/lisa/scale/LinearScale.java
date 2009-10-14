@@ -1,12 +1,12 @@
 package experimentalcode.lisa.scale;
 
+import experimentalcode.shared.outlier.scaling.StaticScalingFunction;
 
-public class LinearScale implements DoubleScale {
-	
+public class LinearScale implements StaticScalingFunction {
 	private double factor;
 	
 	public LinearScale(){
-		this(0.1);
+		this(1.0);
 	}
 	
 	public LinearScale(double factor){
@@ -14,8 +14,7 @@ public class LinearScale implements DoubleScale {
 	}
 
 	@Override
-	public Double getScaled(Double d) {
+	public double getScaled(double d) {
 		return factor*d;
 	}
-
 }

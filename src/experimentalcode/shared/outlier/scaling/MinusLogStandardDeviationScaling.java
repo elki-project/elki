@@ -1,4 +1,4 @@
-package experimentalcode.erich.histogram;
+package experimentalcode.shared.outlier.scaling;
 
 import java.util.List;
 

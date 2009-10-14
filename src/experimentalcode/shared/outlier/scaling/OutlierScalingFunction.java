@@ -1,4 +1,4 @@
-package experimentalcode.erich.histogram;
+package experimentalcode.shared.outlier.scaling;
 
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @author Erich Schubert
  * 
  */
-public interface OutlierScalingFunction {
+public interface OutlierScalingFunction extends ScalingFunction {
   /**
    * Prepare is called once for each data set, before getScaled() will be called.
    * This function can be used to extract global parameters such as means, minimums
@@ -25,12 +25,4 @@ public interface OutlierScalingFunction {
    * @param ann Annotation that is being used
    */
   public void prepare(Database<?> db, Result result, AnnotationResult<Double> ann);
-
-  /**
-   * Transform a given value using the scaling function.
-   * 
-   * @param value Original value
-   * @return Scaled value
-   */
-  public double getScaled(double value);
 }

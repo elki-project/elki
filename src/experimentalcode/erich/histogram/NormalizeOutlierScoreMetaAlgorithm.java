@@ -18,6 +18,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import experimentalcode.shared.outlier.scaling.IdentityScaling;
+import experimentalcode.shared.outlier.scaling.OutlierScalingFunction;
 
 public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extends AbstractAlgorithm<O, Result> {
   /**
