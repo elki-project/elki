@@ -20,6 +20,11 @@ public abstract class NumberVectorVisualizer<NV extends NumberVector<NV, ?>> ext
    */
   protected VisualizationProjection<NV> proj = null;
   
+  /**
+   * Setup the projection used by this visualizer.
+   * 
+   * @param proj Projection
+   */
   public void setup(VisualizationProjection<NV> proj) {
     this.proj = proj;
   }
@@ -27,14 +32,14 @@ public abstract class NumberVectorVisualizer<NV extends NumberVector<NV, ?>> ext
   /**
    * Returns a Double representing the position where the object will be placed.
    * 
-   * @see #getPositioned(NumberVector, int)
+   * @see #getProjected(NumberVector, int)
    * 
    * @param o the object to be positioned.
    * @param dim the dimension in which the position will be calculated.
    * @return a Double representing the scaled position of the object in the
    *         given dimension.
    */
-  public Double getPositioned(NV nv, int dim) {
+  public Double getProjected(NV nv, int dim) {
     Vector v = proj.projectDataToRenderSpace(nv);
     return v.get(dim - 1);
   }
@@ -47,7 +52,7 @@ public abstract class NumberVectorVisualizer<NV extends NumberVector<NV, ?>> ext
    * @return a Double representing a given coordinate being scaled appropriately
    *         to our actual coordinate system.
    */
-  public Double getPositioned(Number n, int dim) {
+  public Double getScaled(Number n, int dim) {
     return proj.getScale(dim).getScaled(n.doubleValue());
   }
 }
