@@ -90,7 +90,7 @@ public class TextVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisual
 
     ToolTipListener hoverer = new ToolTipListener(svgp);
     for(int id : database.getIDs()) {
-      Element tooltip = ShapeLibrary.createToolTip(svgp.getDocument(), getPositioned(database.get(id), dimx), getPositioned(database.get(id), dimy), getValue(id));
+      Element tooltip = ShapeLibrary.createToolTip(svgp.getDocument(), getProjected(database.get(id), dimx), getProjected(database.get(id), dimy), getValue(id));
 
       String dotID = ShapeLibrary.createID(ShapeLibrary.MARKER, id);
       Element dot = svgp.getIdElement(dotID);

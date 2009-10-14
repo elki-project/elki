@@ -75,7 +75,7 @@ public class ReferencePointsVisualizer<NV extends NumberVector<NV, ?>> extends P
 		while (iter.hasNext()){
 			NV v = iter.next();
 			layer.appendChild(
-					ShapeLibrary.createRef(svgp.getDocument(), getPositioned(v, dimx), getPositioned(v, dimy))
+					ShapeLibrary.createRef(svgp.getDocument(), getProjected(v, dimx), getProjected(v, dimy))
 			);
 		}
 		return layer;

@@ -24,7 +24,6 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
-import experimentalcode.erich.visualization.VisualizationProjection;
 import experimentalcode.remigius.ShapeLibrary;
 
 /**
@@ -159,7 +158,7 @@ public class HistogramVisualizer<NV extends NumberVector<NV, ?>> extends ScalarV
         for(int key = 0; key < hists.size(); key++) {
           AggregatingHistogram<Double, Double> hist = hists.get(key);
           double val = hist.get((bin * binsize))/minmax.getMax();
-          layer.appendChild(ShapeLibrary.createRow(svgp.getDocument(), getPositioned(bin * hist.getBinsize(), dim), 1-(val + lastVal), 1./BINS, val, key));
+          layer.appendChild(ShapeLibrary.createRow(svgp.getDocument(), getScaled(bin * hist.getBinsize(), dim), 1-(val + lastVal), 1./BINS, val, key));
           lastVal += val;
         }
       }
@@ -178,8 +177,8 @@ public class HistogramVisualizer<NV extends NumberVector<NV, ?>> extends ScalarV
     double binwidth = (proj.getScale(dim).getMax() - proj.getScale(dim).getMin()) / BINS;
     for(int bin = 0; bin < hist.getNumBins(); bin++) {
       double val = hist.get((bin * binwidth))/max;
-      double left = getPositioned(bin * hist.getBinsize(), dim);
-      right = getPositioned(bin * hist.getBinsize(), dim) + (1./BINS);
+      double left = getScaled(bin * hist.getBinsize(), dim);
+      right = getScaled(bin * hist.getBinsize(), dim) + (1./BINS);
       ShapeLibrary.addLine(path, -1 + left * 2, 1 - val * 2);
       ShapeLibrary.addLine(path, -1 + right * 2, 1 - val * 2);
     }
