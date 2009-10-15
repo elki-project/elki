@@ -61,11 +61,13 @@ public class EMOutlierDetection<V extends NumberVector<V, ?>> extends AbstractAl
     Clustering<EMModel<V>> emresult = emClustering.run(database);
     double globmax = 0.0;
     for (Integer id : database) {
+
       double maxProb = 0.0;
       double[] probs = emClustering.getProbClusterIGivenX(id);
       for (double prob : probs){
          maxProb = Math.max(prob, maxProb);
       }
+      logger.debug("maxprob"+ maxProb);
       database.associate(DBOD_MAXCPROB, id, 1 - maxProb);     
       globmax = Math.max(1-maxProb, globmax);
     }

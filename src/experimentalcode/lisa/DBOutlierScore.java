@@ -16,8 +16,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 
 /**
- 
- * @author Lisa
+  
+ * @author Lisa Reichert
  *
  * @param <O>
  * @param <D>

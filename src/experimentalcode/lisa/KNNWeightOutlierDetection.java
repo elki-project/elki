@@ -20,57 +20,47 @@ import java.util.List;
 
 
 /**
- * Outlier Detection based on the accumulated distance of a point to its kth nearest neighbors. 
+ * Outlier Detection based on the accumulated distances of a point to its k nearest neighbors. 
  * 
  * 
  * Based on:
  * F. Angiulli, C. Pizzuti: Fast Outlier Detection in High Dimensional Spaces. 
  * In: Proc. European Conference on Principles of Knowledge Discovery and Data Mining (PKDD'02), Helsinki, Finland, 2002.
  * 
- * @author lisa
+ * @author Lisa Reichert
  *
- * @param <O>
+ * @param <O> the type of DatabaseObjects handled by this Algorithm
+ * @param <D> the type of Distance used by this Algorithm
  */
 
 public class KNNWeightOutlierDetection <O extends DatabaseObject, D extends DoubleDistance> extends DistanceBasedAlgorithm<O , DoubleDistance , MultiResult> {
   
   public static final OptionID K_ID = OptionID.getOrCreateOptionID(
           "knnwod.k",
-          "kth nearest neighbor"
+          "k nearest neighbor"
       );
-
- /* public static final OptionID N_ID = OptionID.getOrCreateOptionID(
-              "knnio.n",
-              "number of outliers that are searched"
-          );
-   */
-  
+  /**
+   * Association ID for .
+   */  
     public static final AssociationID<Double> KNNWOD_WEIGHT= AssociationID.getOrCreateAssociationID("knnwod_weight", Double.class);
-   
-    public static final AssociationID<Double> KNNWOD_MAXWEIGHT = AssociationID.getOrCreateAssociationID("knnwod_maxweight", Double.class);
+    
     /**
-       * Parameter to specify the kth nearest neighbor,
+     * The association id to associate the KNNO_MAXODEGREE. Needed for the visualization. 
+     */
+    public static final AssociationID<Double> KNNWOD_MAXWEIGHT = AssociationID.getOrCreateAssociationID("knnwod_maxweight", Double.class);
+    
+    /**
+       * Parameter to specify the k nearest neighbor,
        * 
        * <p>Key: {@code -knnio.k} </p>
        */
       private final IntParameter K_PARAM = new IntParameter(K_ID);
   
-      
-      /*
-       * Parameter to specify the number of outliers
-       * 
-       * <p>Key: {@code -knnio.n} </p>
-       /
-      private final IntParameter N_PARAM = new IntParameter(N_ID);
-      */
-      /**
+        /**
        * Holds the value of {@link #K_PARAM}.
        */
       private int k;
-      /**
-       * Holds the value of {@link #N_PARAM}.
-       */
-      //private int n;
+  
       /**
        * Provides the result of the algorithm.
        */
@@ -81,10 +71,8 @@ public class KNNWeightOutlierDetection <O extends DatabaseObject, D extends Doub
        */
       public KNNWeightOutlierDetection() {
         super();
-        // kth nearest neighbor
+        // k nearest neighbor
         addOption(K_PARAM);
-        // number of outliers
-        //addOption(N_PARAM);
         }
       
       /**
@@ -95,8 +83,7 @@ public class KNNWeightOutlierDetection <O extends DatabaseObject, D extends Doub
       @Override
       public List<String> setParameters(List<String> args) throws ParameterException {
           List<String> remainingParameters = super.setParameters(args);
-          k = K_PARAM.getValue();
-        //n = N_PARAM.getValue(); 
+          k = K_PARAM.getValue(); 
           return remainingParameters;
       }
 
@@ -125,8 +112,6 @@ public class KNNWeightOutlierDetection <O extends DatabaseObject, D extends Doub
          for (int i = 1; i< k; i++) {
            skn = skn.plus(knn.get(i).getFirst());
          }
-         
-            debugFine(skn + "  dkn");
             
           double doubleSkn = skn.getValue();
           if(doubleSkn > maxweight) {
@@ -157,8 +142,14 @@ public class KNNWeightOutlierDetection <O extends DatabaseObject, D extends Doub
 
     @Override
     public Description getDescription() {
-      // TODO Auto-generated method stub
-      return null;
+      return new Description(
+          "KNNWeight outlier detection",
+          "Fast Outlier Detection in High Dimensional Spaces",
+          "Outlier Detection based on the distances of an object to its k nearest neighbors.",
+          "F. Angiulli, C. Pizzuti: " +
+          "Fast Outlier Detection in High Dimensional Spaces: " +
+          "In: Proc. European Conference on Principles of Knowledge Discovery and Data Mining (PKDD'02), Helsinki, Finland, 2002.");
+    
     }
 
     @Override
