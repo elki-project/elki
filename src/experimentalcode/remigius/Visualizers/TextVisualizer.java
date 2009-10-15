@@ -26,7 +26,7 @@ import experimentalcode.remigius.gui.listener.ToolTipListener;
  * 
  * @param <NV>
  */
-public class TextVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisualizer<NV> {
+public class TextVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -90,7 +90,7 @@ public class TextVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisual
 
     ToolTipListener hoverer = new ToolTipListener(svgp);
     for(int id : database.getIDs()) {
-      Element tooltip = ShapeLibrary.createToolTip(svgp.getDocument(), getProjected(database.get(id), dimx), getProjected(database.get(id), dimy), getValue(id));
+      Element tooltip = ShapeLibrary.createToolTip(svgp.getDocument(), getProjected(database.get(id), 0), getProjected(database.get(id), 1), getValue(id));
 
       String dotID = ShapeLibrary.createID(ShapeLibrary.MARKER, id);
       Element dot = svgp.getIdElement(dotID);

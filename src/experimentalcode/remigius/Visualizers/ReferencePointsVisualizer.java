@@ -23,7 +23,7 @@ import experimentalcode.remigius.ShapeLibrary;
  *
  * @param <NV>
  */
-public class ReferencePointsVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisualizer<NV> {
+public class ReferencePointsVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
   
   /**
    * Serves reference points.
@@ -75,7 +75,7 @@ public class ReferencePointsVisualizer<NV extends NumberVector<NV, ?>> extends P
 		while (iter.hasNext()){
 			NV v = iter.next();
 			layer.appendChild(
-					ShapeLibrary.createRef(svgp.getDocument(), getProjected(v, dimx), getProjected(v, dimy))
+					ShapeLibrary.createRef(svgp.getDocument(), getProjected(v, 0), getProjected(v, 1))
 			);
 		}
 		return layer;

@@ -4,11 +4,10 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
-import experimentalcode.remigius.ShapeLibrary;
 
 /**
  * Generates a SVG-Element containing axes, including labeling.
@@ -20,7 +19,7 @@ import experimentalcode.remigius.ShapeLibrary;
  * 
  * @param <NV>
  */
-public class AxisVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisualizer<NV> {
+public class AxisVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -38,16 +37,44 @@ public class AxisVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisual
   }
 
   @Override
-  public Element visualize(SVGPlot svgp) {
-    Element layer = super.visualize(svgp);
-    try {
-      SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(dimx), -1, 1, 1, 1, true, true);
-      SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(dimy), -1, 1, -1, -1, true, false);
-      svgp.updateStyleElement();
+  public Element visualize(SVGPlot plot) {
+    Element layer = super.visualize(plot);
+    int dim = database.dimensionality();
+    
+    // origin
+    Vector orig = proj.projectScaledToRender(new Vector(dim));
+    // diagonal point opposite to origin
+    Vector diag = new Vector(dim);
+    for(int d2 = 0; d2 < dim; d2++) {
+      diag.set(d2, 1);
     }
-    catch(CSSNamingConflict e) {
-      LoggingUtil.exception(e);
+    diag = proj.projectScaledToRender(diag);
+    // compute angle to diagonal line, used for axis labeling.
+    double diaga = Math.atan2(diag.get(1) - orig.get(1), diag.get(0) - orig.get(0));
+    
+    // draw axes
+    for(int d = 1; d <= dim; d++) {
+      Vector v = new Vector(dim);
+      v.set(d-1,1);
+      // projected endpoint of axis
+      Vector ax = proj.projectScaledToRender(v);
+      boolean righthand = false;
+      double axa = Math.atan2(ax.get(1) - orig.get(1), ax.get(0) - orig.get(0));
+      if (axa > diaga || (diaga > 0 && axa > diaga + Math.PI)) {
+        righthand = true;
+      }
+      //System.err.println(ax.get(0) + " "+ ax.get(1)+ " "+(axa*180/Math.PI)+" "+(diaga*180/Math.PI));
+      if(ax.get(0) != orig.get(0) || ax.get(1) != orig.get(1)) {
+        try {
+          SVGSimpleLinearAxis.drawAxis(plot, layer, proj.getScale(d), orig.get(0), orig.get(1), ax.get(0), ax.get(1), true, righthand);
+        }
+        catch(CSSNamingConflict e) {
+          throw new RuntimeException("Conflict in CSS naming for axes.", e);
+        }
+      }
     }
+    // FIXME: caller should also call updateStyleElement at the end.
+    plot.updateStyleElement();
     return layer;
   }
 }
