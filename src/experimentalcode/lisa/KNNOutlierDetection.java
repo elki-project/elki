@@ -19,32 +19,39 @@ import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
 
 
 /**
- * Outlier Detection based on the distance of a point from its kth nearest neighbor. 
+ * <p> Outlier Detection based on the distance of an object to its k nearest neighbor.</p>  
  * 
+ * <p>Reference:<br>
+ * S. Ramaswamy, R. Rastogi, K. Shim: Efficient Algorithms for Mining Outliers from Large Data Sets.</br>
+ * In: Proc. of the Int. Conf. on Management of Data, Dallas, Texas, 2000.</p>
  * 
- * 
- * Based on:
- * S. Ramaswamy, R. Rastogi, K. Shim:
- * Efficient Algorithms for Mining Outliers from Large Data Sets.
- * In: Proc. of the Int. Conf. on Management of Data, Dallas, Texas, 2000.
- * 
- * 
- * @author lisa
+ * @author Lisa Reichert
  *
- * @param <O>
+ * @param <O> the type of DatabaseObjects handled by this Algorithm
+ * @param <D> the type of Distance used by this Algorithm
  */
 
 public class KNNOutlierDetection <O extends DatabaseObject, D extends DoubleDistance> extends DistanceBasedAlgorithm<O , DoubleDistance , MultiResult> {
-	
-	public static final OptionID K_ID = OptionID.getOrCreateOptionID(
-		      "knno.k",
-		      "kth nearest neighbor"
-		  );
+  /**
+   * The association id to associate the KNNO_KNNDISTANCE of an object for the
+   *KNN outlier detection algorithm.
+   */
+  public static final AssociationID<Double> KNNO_KNNDISTANCE= AssociationID.getOrCreateAssociationID("knno_knndistance", Double.class);
+  /**
+   * The association id to associate the KNNO_MAXODEGREE. Needed for the visualization. 
+   */
+  public static final AssociationID<Double> KNNO_MAXODEGREE = AssociationID.getOrCreateAssociationID("knno_maxodegree", Double.class);
 
-		public static final AssociationID<Double> KNNO_KNNDISTANCE= AssociationID.getOrCreateAssociationID("knno_knndistance", Double.class);
-		 public static final AssociationID<Double> KNNO_MAXODEGREE = AssociationID.getOrCreateAssociationID("knno_maxodegree", Double.class);
-		/**
-		   * Parameter to specify the kth nearest neighbor,
+  /**
+   * OptionID for {@link #K_PARAM}
+   */
+  public static final OptionID K_ID = OptionID.getOrCreateOptionID(
+          "knno.k",
+          "k nearest neighbor"
+      );
+  
+  /**
+		   * Parameter to specify the k nearest neighbor,
 		   * 
 		   * <p>Key: {@code -knno.k} </p>
 		   */
@@ -66,7 +73,6 @@ public class KNNOutlierDetection <O extends DatabaseObject, D extends DoubleDist
 		   */
 		  public KNNOutlierDetection() {
 		    super();
-		    //debug = true;
 		    // kth nearest neighbor
 		    addOption(K_PARAM);
 		    }
@@ -74,14 +80,13 @@ public class KNNOutlierDetection <O extends DatabaseObject, D extends DoubleDist
 		  /**
 		   * Calls the super method
 		   * and sets additionally the values of the parameter
-		   * {@link #K_PARAM}, {@link #N_PARAM} 
+		   * {@link #K_PARAM} 
 		   */
 		  @Override
 		  public List<String> setParameters(List<String> args) throws ParameterException {
 		      List<String> remainingParameters = super.setParameters(args);
 		      k = K_PARAM.getValue();
-			 
-		      return remainingParameters;
+			    return remainingParameters;
 		  }
 
 		  /**
@@ -132,11 +137,12 @@ public class KNNOutlierDetection <O extends DatabaseObject, D extends DoubleDist
 		@Override
 		public Description getDescription() {
 		  return new Description(
-		      "KNNOutlierDetection",
+		      "KNN outlier detection",
 		      "Efficient Algorithms for Mining Outliers from Large Data Sets",
-		      "Outlier Detection based on the distance of a point from its kth nearest neighbor.",
+		      "Outlier Detection based on the distance of an object to its k nearest neighbor.",
 		      "S. Ramaswamy, R. Rastogi, K. Shim: " +
-		      "Efficient Algorithms for Mining Outliers from Large Data Sets");
+		      "Efficient Algorithms for Mining Outliers from Large Data Sets. " +
+		      "In: Proc. of the Int. Conf. on Management of Data, Dallas, Texas, 2000.");
 		}
 
 		@Override
