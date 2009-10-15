@@ -42,8 +42,8 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
    * @param component Component to manage updates on.
    */
   protected JSVGUpdateSynchronizer(JSVGComponent component) {
-    assert(component != null);
-    
+    assert (component != null);
+
     this.cref = new WeakReference<JSVGComponent>(component);
     // Hook into UpdateManager creation.
     component.addUpdateManagerListener(umadapter);
@@ -54,7 +54,7 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
   public void activate() {
     makeRunnerIfNeeded();
   }
-  
+
   /**
    * Join the runnable queue of a component.
    */
@@ -119,7 +119,12 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
    * @return update runner
    */
   protected UpdateRunner getUpdateRunner() {
-    return updaterunner.get();
+    if(updaterunner == null) {
+      return null;
+    }
+    else {
+      return updaterunner.get();
+    }
   }
 
   /**
@@ -142,7 +147,7 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
     }
     return syncrunner.get();
   }
-  
+
   /**
    * Update Runner that will be placed in the Components UpdateManagers queue.
    * 

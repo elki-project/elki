@@ -44,13 +44,8 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
   @Override
   @Deprecated
   public synchronized void setDocument(Document doc) {
-    SVGPlot oldplot = this.plot;
-    this.plot = null;
-    super.setDocument(doc);
-    
-    if (oldplot != null) {
-      oldplot.setUpdateSynchronizer(null);
-    }
+    // Note: this will call this.setSVGDocument!
+    super.setDocument(doc);    
   }
   
   /**
@@ -61,13 +56,13 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
   @Override
   @Deprecated
   public synchronized void setSVGDocument(SVGDocument doc) {
-    SVGPlot oldplot = this.plot;
-    this.plot = null;
-    super.setSVGDocument(doc);
-    
-    if (oldplot != null) {
-      oldplot.setUpdateSynchronizer(null);
+    // Don't reset if this is our current document.
+    if (this.plot.getDocument() != doc) {
+      super.setDocument(null);
+      this.plot.setUpdateSynchronizer(null);
+      this.plot = null;
     }
+    super.setSVGDocument(doc);
   }
 
   /**
@@ -76,19 +71,15 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
    * @param plot New plot to display. May be null!
    */
   public synchronized void setPlot(SVGPlot plot) {
-    SVGPlot oldplot = this.plot;
-    this.plot = plot;
     if (this.plot != null) {
-      super.setDocument(this.plot.getDocument());
-    } else {
-      super.setDocument(null);
+      this.plot.setUpdateSynchronizer(null);
     }
     
-    if (oldplot != null) {
-      oldplot.setUpdateSynchronizer(null);
-    }
-    if (plot != null) {
-      plot.setUpdateSynchronizer(this.synchronizer);
+    this.plot = plot;
+    super.setSVGDocument((plot != null) ? plot.getDocument() : null);
+    
+    if (this.plot != null) {
+      this.plot.setUpdateSynchronizer(this.synchronizer);
     }
   }
  
@@ -98,6 +89,6 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
    * @return current SVG plot. May be {@code null}!
    */
   public SVGPlot getPlot() {
-    return plot;
+    return this.plot;
   }
 }
