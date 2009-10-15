@@ -85,8 +85,8 @@ public class TextVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisual
 
   @Override
   public Element visualize(SVGPlot svgp) {
+    Element layer = super.visualize(svgp);
     setupCSS(svgp);
-    Element layer = ShapeLibrary.createG(svgp.getDocument());
 
     ToolTipListener hoverer = new ToolTipListener(svgp);
     for(int id : database.getIDs()) {

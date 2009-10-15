@@ -24,6 +24,7 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import experimentalcode.remigius.ShapeLibrary;
 
 /**
@@ -113,8 +114,9 @@ public class HistogramVisualizer<NV extends NumberVector<NV, ?>> extends ScalarV
 
   @Override
   public Element visualize(SVGPlot svgp) {
+    Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_SVG_TAG);
+    SVGUtil.setAtt(layer, SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "-1.2 -1.2 2.4 2.4");
     setupCSS(svgp);
-    Element layer = ShapeLibrary.createG(svgp.getDocument());
 
     Map<Integer, AggregatingHistogram<Double, Double>> hists = new HashMap<Integer, AggregatingHistogram<Double, Double>>();
 
