@@ -261,8 +261,8 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisu
 
   @Override
   public Element visualize(SVGPlot svgp) {
+    Element layer = super.visualize(svgp);
     setupCSS(svgp);
-    Element layer = ShapeLibrary.createG(svgp.getDocument());
     int clusterID = 0;
     
     for (Cluster<Model> cluster : clustering.getAllClusters()){

@@ -39,7 +39,7 @@ public class AxisVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisual
 
   @Override
   public Element visualize(SVGPlot svgp) {
-    Element layer = ShapeLibrary.createG(svgp.getDocument());
+    Element layer = super.visualize(svgp);
     try {
       SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(dimx), -1, 1, 1, 1, true, true);
       SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(dimy), -1, 1, -1, -1, true, false);
