@@ -124,7 +124,7 @@ public class SVGSimpleLinearAxis {
     double textvoff = 0.015;
 
     // draw ticks on x axis
-    for(double tick = scale.getMin(); tick <= scale.getMax(); tick += scale.getRes()) {
+    for(double tick = scale.getMin(); tick <= scale.getMax() + scale.getRes()/10; tick += scale.getRes()) {
       double x = x1 + tx * scale.getScaled(tick);
       double y = y1 + ty * scale.getScaled(tick);
       Element tickline = plot.svgLine(x - tw, y - th, x + tw, y + th);
