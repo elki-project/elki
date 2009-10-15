@@ -16,7 +16,7 @@ import experimentalcode.remigius.ShapeLibrary;
  * 
  * @param <NV>
  */
-public class DotVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisualizer<NV> {
+public class DotVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
 
   /**
    * A short name characterizing this Visualizer.
@@ -36,7 +36,7 @@ public class DotVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisuali
   public Element visualize(SVGPlot svgp) {
     Element layer = super.visualize(svgp);
     for(int id : database.getIDs()) {
-      Element dot = ShapeLibrary.createMarkerDot(svgp.getDocument(), getProjected(database.get(id), dimx), getProjected(database.get(id), dimy));
+      Element dot = ShapeLibrary.createMarkerDot(svgp.getDocument(), getProjected(database.get(id), 0), getProjected(database.get(id), 1));
       // setting ID for efficient use of ToolTips.
       dot.setAttribute("id", ShapeLibrary.createID(ShapeLibrary.MARKER, id));
       layer.appendChild(dot);

@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
@@ -28,13 +29,14 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import experimentalcode.remigius.ShapeLibrary;
 
 /**
- * Generates a SVG-Element containing a histogram representing the distribution of the database's objects.
+ * Generates a SVG-Element containing a histogram representing the distribution
+ * of the database's objects.
  * 
  * @author Remigius Wojdanowski
  * 
  * @param <NV>
  */
-public class HistogramVisualizer<NV extends NumberVector<NV, ?>> extends ScalarVisualizer<NV> {
+public class HistogramVisualizer<NV extends NumberVector<NV, ?>> extends Projection1DVisualizer<NV> {
 
   public static final OptionID STYLE_ROW_ID = OptionID.getOrCreateOptionID("histogram.row", "Alternative style: Rows.");
 
@@ -76,16 +78,17 @@ public class HistogramVisualizer<NV extends NumberVector<NV, ?>> extends ScalarV
     // creating IDs manually because cluster often return a null-ID.
     int clusterID = 0;
 
-    CSSClass allInOne = new CSSClass(svgp, ShapeLibrary.BIN+-1);
-    for (Cluster<Model> cluster : clustering.getAllClusters()){
+    CSSClass allInOne = new CSSClass(svgp, ShapeLibrary.BIN + -1);
+    for(Cluster<Model> cluster : clustering.getAllClusters()) {
 
       CSSClass bin = new CSSClass(svgp, ShapeLibrary.BIN + clusterID);
       String coloredElement;
 
-      if (row){
+      if(row) {
         bin.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 1.0);
         coloredElement = SVGConstants.CSS_FILL_PROPERTY;
-      } else {
+      }
+      else {
         bin.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.005);
         bin.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.0);
         allInOne.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.005);
@@ -94,9 +97,10 @@ public class HistogramVisualizer<NV extends NumberVector<NV, ?>> extends ScalarV
       }
 
       allInOne.setStatement(coloredElement, "black");
-      if (clustering.getAllClusters().size() == 1){
+      if(clustering.getAllClusters().size() == 1) {
         bin.setStatement(coloredElement, "black");
-      } else {
+      }
+      else {
         bin.setStatement(coloredElement, COLORS.getColor(clusterID));
       }
 
@@ -124,23 +128,24 @@ public class HistogramVisualizer<NV extends NumberVector<NV, ?>> extends ScalarV
     int clusterID = 0;
     MinMax<Double> minmax = new MinMax<Double>();
 
-    AggregatingHistogram<Double, Double> allInOne = AggregatingHistogram.DoubleSumHistogram(BINS, proj.getScale(dim).getMin(), proj.getScale(dim).getMax());
+    AggregatingHistogram<Double, Double> allInOne = AggregatingHistogram.DoubleSumHistogram(BINS, 0, 1);
     for(Cluster<Model> cluster : clustering.getAllClusters()) {
-      AggregatingHistogram<Double, Double> hist = AggregatingHistogram.DoubleSumHistogram(BINS, proj.getScale(dim).getMin(), proj.getScale(dim).getMax());
+      AggregatingHistogram<Double, Double> hist = AggregatingHistogram.DoubleSumHistogram(BINS, 0, 1);
       for(int id : cluster.getIDs()) {
-        hist.aggregate(database.get(id).getValue(dim).doubleValue(), frac);
-        allInOne.aggregate(database.get(id).getValue(dim).doubleValue(), frac);
-      }
-
-      for(int bin = 0; bin < hist.getNumBins(); bin++) {
-        double valAllInOne = allInOne.get(bin * (proj.getScale(dim).getMax() - proj.getScale(dim).getMin()) / BINS);
-        minmax.put(valAllInOne);
+        double pos = getProjected(database.get(id), 0);
+        hist.aggregate(pos, frac);
+        allInOne.aggregate(pos, frac);
       }
       hists.put(clusterID, hist);
       clusterID += 1;
+
+      // for scaling, get the maximum occurring value in the bins:
+      for(Pair<Double, Double> bin : hist) {
+        minmax.put(bin.getSecond());
+      }
     }
 
-    LinearScale scale = new LinearScale(minmax.getMin(), minmax.getMax());
+    LinearScale scale = new LinearScale(0, minmax.getMax());
 
     // Axis. TODO: Use AxisVisualizer for this.
     try {
@@ -153,38 +158,42 @@ public class HistogramVisualizer<NV extends NumberVector<NV, ?>> extends ScalarV
     }
 
     // Visualizing
-    if (row){
-      for(int bin = 0; bin < BINS; bin++) {
-        double lastVal = 0;
-        double binsize = (proj.getScale(dim).getMax() - proj.getScale(dim).getMin()) / BINS;
-        for(int key = 0; key < hists.size(); key++) {
-          AggregatingHistogram<Double, Double> hist = hists.get(key);
-          double val = hist.get((bin * binsize))/minmax.getMax();
-          layer.appendChild(ShapeLibrary.createRow(svgp.getDocument(), getScaled(bin * hist.getBinsize(), dim), 1-(val + lastVal), 1./BINS, val, key));
-          lastVal += val;
+    if(row) {
+      // FIXME: stacking is nontrivial with this kind of ordering (and because
+      // of using one histogram each! - so the "row" mode is currently broken.
+      for(int key = 0; key < hists.size(); key++) {
+        AggregatingHistogram<Double, Double> hist = hists.get(key);
+        double binsize = hist.getBinsize();
+        for(Pair<Double, Double> bin : hist) {
+          double lpos = bin.getFirst() - binsize / 2;
+          double rpos = bin.getFirst() + binsize / 2;
+          double val = bin.getSecond() / scale.getMax();
+          layer.appendChild(ShapeLibrary.createRow(svgp.getDocument(), lpos, 1 - val, rpos - lpos, val, key));
         }
       }
-    } else {
-      layer.appendChild(drawLine(svgp, -1, allInOne, minmax.getMax()));
+    }
+    else {
+      layer.appendChild(drawLine(svgp, -1, allInOne, scale.getMax()));
       for(int key = 0; key < hists.size(); key++) {
-        layer.appendChild(drawLine(svgp, key, hists.get(key), minmax.getMax()));
+        layer.appendChild(drawLine(svgp, key, hists.get(key), scale.getMax()));
       }
     }
     return layer;
   }
 
-  private Element drawLine(SVGPlot svgp, int color, AggregatingHistogram<Double, Double> hist, double max){
-    Element path = ShapeLibrary.createPath(svgp.getDocument(), -1, 1, color);
+  private Element drawLine(SVGPlot svgp, int color, AggregatingHistogram<Double, Double> hist, double max) {
+    Element path = ShapeLibrary.createPath(svgp.getDocument(), hist.getCoverMinimum(), 1, color);
+    double left = 0;
     double right = 0;
-    double binwidth = (proj.getScale(dim).getMax() - proj.getScale(dim).getMin()) / BINS;
-    for(int bin = 0; bin < hist.getNumBins(); bin++) {
-      double val = hist.get((bin * binwidth))/max;
-      double left = getScaled(bin * hist.getBinsize(), dim);
-      right = getScaled(bin * hist.getBinsize(), dim) + (1./BINS);
-      ShapeLibrary.addLine(path, -1 + left * 2, 1 - val * 2);
-      ShapeLibrary.addLine(path, -1 + right * 2, 1 - val * 2);
+    double binwidth = hist.getBinsize();
+    for(Pair<Double, Double> bin : hist) {
+      double val = bin.getSecond() / max;
+      left = bin.getFirst() - binwidth / 2;
+      right = bin.getFirst() + binwidth / 2;
+      ShapeLibrary.addLine(path, left, 1 - val * 2);
+      ShapeLibrary.addLine(path, right, 1 - val * 2);
     }
-    ShapeLibrary.addLine(path, -1 + right * 2, 1);
+    ShapeLibrary.addLine(path, right, hist.getCoverMaximum());
     return path;
   }
 }

@@ -35,7 +35,7 @@ import experimentalcode.shared.outlier.scaling.StaticScalingFunction;
  * 
  * @param <NV>
  */
-public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisualizer<NV> {
+public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
 
   /**
    * OptionID for {@link #GAMMA_PARAM}.
@@ -267,7 +267,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends PlanarVisu
     
     for (Cluster<Model> cluster : clustering.getAllClusters()){
       for(int id : cluster.getIDs()) {
-        layer.appendChild(ShapeLibrary.createBubble(svgp.getDocument(), getProjected(database.get(id), dimx), getProjected(database.get(id), dimy), getScaled(getValue(id)), clusterID));
+        layer.appendChild(ShapeLibrary.createBubble(svgp.getDocument(), getProjected(database.get(id), 0), getProjected(database.get(id), 1), getScaled(getValue(id)), clusterID));
       }
       clusterID += 1;
     }
