@@ -25,14 +25,14 @@ public class VisualizerContext extends AnyMap<String> {
   private static final long serialVersionUID = 1L;
 
   /**
-   * Identifier for the full database
+   * The database
    */
-  public static final String DATABASE = "database";
+  private Database<?> database;
 
   /**
-   * Identifier for the full result object
+   * The full result object
    */
-  public static final String RESULT = "result";
+  private Result result;
 
   /**
    * Identifier for the main color library to use.
@@ -52,13 +52,13 @@ public class VisualizerContext extends AnyMap<String> {
   /**
    * Constructor. We currently require a Database and a Result.
    * 
-   * @param db Database
-   * @param r Result
+   * @param database Database
+   * @param result Result
    */
-  public VisualizerContext(Database<?> db, Result r) {
+  public VisualizerContext(Database<?> database, Result result) {
     super();
-    this.put(DATABASE, db);
-    this.put(RESULT, r);
+    this.database = database;
+    this.result = result;
   }
 
   /**
@@ -70,14 +70,14 @@ public class VisualizerContext extends AnyMap<String> {
   @SuppressWarnings("unchecked")
   public <O extends DatabaseObject> Database<O> getDatabase() {
     // TODO: can we get some increase type safety here maybe?
-    return get(DATABASE, Database.class);
+    return (Database<O>) database;
   }
   
   /**
    * Get the full result object
    */
   public Result getResult() {
-    return get(RESULT, Result.class);
+    return result;
   }
 
   /**
