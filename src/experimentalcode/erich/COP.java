@@ -1,6 +1,7 @@
 package experimentalcode.erich;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -15,9 +16,9 @@ import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromDatabase;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
-import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
+import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -29,176 +30,180 @@ import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
  * Algorithm to compute local correlation outlier probability.
  * <p/>
  * Publication pending
- *
+ * 
  * @author Erich Schubert
  * @param <V> the type of NumberVector handled by this Algorithm
  */
-public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D,?>> extends DistanceBasedAlgorithm<V, D, MultiResult> {
-    /**
-     * OptionID for {@link #K_PARAM}
-     */
-    public static final OptionID K_ID = OptionID.getOrCreateOptionID(
-        "cop.k",
-        "The number of nearest neighbors of an object to be considered for computing its COP_SCORE.");
+public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends DistanceBasedAlgorithm<V, D, MultiResult> {
+  /**
+   * OptionID for {@link #K_PARAM}
+   */
+  public static final OptionID K_ID = OptionID.getOrCreateOptionID("cop.k", "The number of nearest neighbors of an object to be considered for computing its COP_SCORE.");
 
-    /**
-     * Parameter to specify the number of nearest neighbors of an object to be
-     * considered for computing its COP_SCORE, must be an integer greater than 0.
-     * <p/>
-     * Key: {@code -cop.k}
-     * </p>
-     */
-    private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(0));
+  /**
+   * Parameter to specify the number of nearest neighbors of an object to be
+   * considered for computing its COP_SCORE, must be an integer greater than 0.
+   * <p/>
+   * Key: {@code -cop.k}
+   * </p>
+   */
+  private final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(0));
 
-    /**
-     * Number of neighbors to be considered.
-     */
-    int k;
+  /**
+   * Number of neighbors to be considered.
+   */
+  int k;
 
-    /**
-     * Holds the object performing the dependency derivation
-     */
-    private DependencyDerivator<V, D> dependencyDerivator;
+  /**
+   * Holds the object performing the dependency derivation
+   */
+  private DependencyDerivator<V, D> dependencyDerivator;
 
-    /**
-     * Provides the result of the algorithm.
-     */
-    MultiResult result;
+  /**
+   * Provides the result of the algorithm.
+   */
+  MultiResult result;
 
-    /**
-     * The association id to associate the Correlation Outlier Probability of an object
-     */
-    public static final AssociationID<Double> COP_SCORE = AssociationID.getOrCreateAssociationID("cop", Double.class);
+  /**
+   * The association id to associate the Correlation Outlier Probability of an
+   * object
+   */
+  public static final AssociationID<Double> COP_SCORE = AssociationID.getOrCreateAssociationID("cop", Double.class);
 
-    /**
-     * The association id to associate the COP_SCORE error vector of an object for the COP_SCORE
-     * algorithm.
-     */
-    public static final AssociationID<Vector> COP_ERROR_VECTOR = AssociationID.getOrCreateAssociationID("cop error vector", Vector.class);
+  /**
+   * The association id to associate the COP_SCORE error vector of an object for
+   * the COP_SCORE algorithm.
+   */
+  public static final AssociationID<Vector> COP_ERROR_VECTOR = AssociationID.getOrCreateAssociationID("cop error vector", Vector.class);
 
-    /**
-     * The association id to associate the COP_SCORE data vector of an object for the COP_SCORE
-     * algorithm.
-     */
-    // TODO: use or remove.
-    public static final AssociationID<Matrix> COP_DATA_VECTORS = AssociationID.getOrCreateAssociationID("cop data vectors", Matrix.class);
+  /**
+   * The association id to associate the COP_SCORE data vector of an object for
+   * the COP_SCORE algorithm.
+   */
+  // TODO: use or remove.
+  public static final AssociationID<Matrix> COP_DATA_VECTORS = AssociationID.getOrCreateAssociationID("cop data vectors", Matrix.class);
 
-    /**
-     * The association id to associate the COP_SCORE correlation dimensionality of an object for the COP_SCORE
-     * algorithm.
-     */
-    public static final AssociationID<Integer> COP_DIM = AssociationID.getOrCreateAssociationID("cop dim", Integer.class);
+  /**
+   * The association id to associate the COP_SCORE correlation dimensionality of
+   * an object for the COP_SCORE algorithm.
+   */
+  public static final AssociationID<Integer> COP_DIM = AssociationID.getOrCreateAssociationID("cop dim", Integer.class);
 
-    /**
-     * The association id to associate the COP_SCORE correlation solution
-     */
-    public static final AssociationID<CorrelationAnalysisSolution<?>> COP_SOL = AssociationID.getOrCreateAssociationIDGenerics("cop sol", CorrelationAnalysisSolution.class);
+  /**
+   * The association id to associate the COP_SCORE correlation solution
+   */
+  public static final AssociationID<CorrelationAnalysisSolution<?>> COP_SOL = AssociationID.getOrCreateAssociationIDGenerics("cop sol", CorrelationAnalysisSolution.class);
 
-    /**
-     * Sets minimum points to the optionhandler additionally to the parameters
-     * provided by super-classes.
-     */
-    public COP() {
-        super();
-        addOption(K_PARAM);
+  /**
+   * Sets minimum points to the optionhandler additionally to the parameters
+   * provided by super-classes.
+   */
+  public COP() {
+    super();
+    addOption(K_PARAM);
+  }
+
+  @Override
+  protected MultiResult runInTime(Database<V> database) throws IllegalStateException {
+    getDistanceFunction().setDatabase(database, isVerbose(), isTime());
+    if(logger.isVerbose()) {
+      logger.verbose("CorrelationOutlierProbability ");
     }
 
-    @Override
-    protected MultiResult runInTime(Database<V> database) throws IllegalStateException {
-        getDistanceFunction().setDatabase(database, isVerbose(), isTime());
-        if (logger.isVerbose()) {
-          logger.verbose("CorrelationOutlierProbability ");
+    HashMap<Integer, Double> cop_score = new HashMap<Integer, Double>(database.size());
+    HashMap<Integer, Vector> cop_err_v = new HashMap<Integer, Vector>(database.size());
+    HashMap<Integer, Matrix> cop_datav = new HashMap<Integer, Matrix>(database.size());
+    HashMap<Integer, Integer> cop_dim = new HashMap<Integer, Integer>(database.size());
+    HashMap<Integer, CorrelationAnalysisSolution<?>> cop_sol = new HashMap<Integer, CorrelationAnalysisSolution<?>>(database.size());
+    {// compute neighbors of each db object
+      if(logger.isVerbose()) {
+        logger.verbose("Running dependency derivation");
+      }
+      FiniteProgress progressLocalPCA = new FiniteProgress("COP_SCORE", database.size());
+      int counter = 1;
+      double sqrt2 = Math.sqrt(2.0);
+      for(Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
+        Integer id = iter.next();
+        List<DistanceResultPair<D>> neighbors = database.kNNQueryForID(id, k + 1, getDistanceFunction());
+        neighbors.remove(0);
+
+        List<Integer> ids = new ArrayList<Integer>(neighbors.size());
+        for(DistanceResultPair<D> n : neighbors) {
+          ids.add(n.getID());
         }
 
-        {// compute neighbors of each db object
-            if (logger.isVerbose()) {
-              logger.verbose("Running dependency derivation");
-            }
-            FiniteProgress progressLocalPCA = new FiniteProgress("COP_SCORE", database.size());
-            int counter = 1;
-            double sqrt2 = Math.sqrt(2.0);
-            for (Iterator<Integer> iter = database.iterator(); iter.hasNext(); counter++) {
-                Integer id = iter.next();
-                List<DistanceResultPair<D>> neighbors = database.kNNQueryForID(id, k + 1, getDistanceFunction());
-                neighbors.remove(0);
+        // TODO: do we want to use the query point as centroid?
+        CorrelationAnalysisSolution<V> depsol = dependencyDerivator.generateModel(database, ids);
 
-                List<Integer> ids = new ArrayList<Integer>(neighbors.size());
-                for (DistanceResultPair<D> n : neighbors) {
-                    ids.add(n.getID());
-                }
+        // temp code, experimental.
+        /*if(false) {
+          double traddistance = depsol.getCentroid().minus(database.get(id).getColumnVector()).euclideanNorm(0);
+          if(traddistance > 0.0) {
+            double distance = depsol.distance(database.get(id));
+            cop_score.put(id, distance / traddistance);
+          }
+          else {
+            cop_score.put(id, 0.0);
+          }
+        }*/
+        double stddev = depsol.getStandardDeviation();
+        double distance = depsol.distance(database.get(id));
+        double prob = ErrorFunctions.erf(distance / (stddev * sqrt2));
 
-                // TODO: do we want to use the query point as centroid?
-                CorrelationAnalysisSolution<V> depsol = dependencyDerivator.generateModel(database, ids);
+        cop_score.put(id, prob);
 
-                // temp code, experimental.
-                if (false) {
-                    double traddistance = depsol.getCentroid().minus(database.get(id).getColumnVector()).euclideanNorm(0);
-                    if (traddistance > 0.0) {
-                        double distance = depsol.distance(database.get(id));
-                        database.associate(COP_SCORE, id, distance / traddistance);
-                    }
-                    else {
-                        database.associate(COP_SCORE, id, 0.0);
-                    }
-                }
-                double stddev = depsol.getStandardDeviation();
-                double distance = depsol.distance(database.get(id));
-                double prob = ErrorFunctions.erf(distance / (stddev * sqrt2));
+        Vector errv = depsol.errorVector(database.get(id));
+        cop_err_v.put(id, errv);
 
-                database.associate(COP_SCORE, id, prob);
+        Matrix datav = depsol.dataProjections(database.get(id));
+        cop_datav.put(id, datav);
 
-                Vector errv = depsol.errorVector(database.get(id));
-                database.associate(COP_ERROR_VECTOR, id, errv);
+        cop_dim.put(id, depsol.getCorrelationDimensionality());
 
-                Matrix datav = depsol.dataProjections(database.get(id));
-                database.associate(COP_DATA_VECTORS, id, datav);
+        cop_sol.put(id, depsol);
 
-                database.associate(COP_DIM, id, depsol.getCorrelationDimensionality());
-
-                database.associate(COP_SOL, id, depsol);
-
-                if (logger.isVerbose()) {
-                    progressLocalPCA.setProcessed(counter);
-                    logger.progress(progressLocalPCA);
-                }
-            }
+        if(logger.isVerbose()) {
+          progressLocalPCA.setProcessed(counter);
+          logger.progress(progressLocalPCA);
         }
-        // combine results.
-        result = new MultiResult();
-        result.addResult(new AnnotationFromDatabase<Double, V>(database,COP_SCORE));
-        result.addResult(new AnnotationFromDatabase<Integer, V>(database,COP_DIM));
-        result.addResult(new AnnotationFromDatabase<Vector, V>(database,COP_ERROR_VECTOR));
-        result.addResult(new AnnotationFromDatabase<CorrelationAnalysisSolution<?>, V>(database,COP_SOL));
-        result.addResult(new OrderingFromAssociation<Double, V>(database,COP_SCORE, true)); 
-        return result;
+      }
     }
+    // combine results.
+    result = new MultiResult();
+    result.addResult(new AnnotationFromHashMap<Double>(COP_SCORE, cop_score));
+    result.addResult(new AnnotationFromHashMap<Integer>(COP_DIM, cop_dim));
+    result.addResult(new AnnotationFromHashMap<Vector>(COP_ERROR_VECTOR, cop_err_v));
+    result.addResult(new AnnotationFromHashMap<Matrix>(COP_DATA_VECTORS, cop_datav));
+    result.addResult(new AnnotationFromHashMap<CorrelationAnalysisSolution<?>>(COP_SOL, cop_sol));
+    result.addResult(new OrderingFromHashMap<Double>(cop_score, true));
+    return result;
+  }
 
-    public Description getDescription() {
-        return new Description("COP_SCORE", "Correlation Outlier Probability", "Algorithm to compute correlation-based local outlier probabilitys in a database based on the parameter " + K_PARAM + " and different distance functions", "unpublished");
-    }
+  public Description getDescription() {
+    return new Description("COP_SCORE", "Correlation Outlier Probability", "Algorithm to compute correlation-based local outlier probabilitys in a database based on the parameter " + K_PARAM + " and different distance functions", "unpublished");
+  }
 
-    /**
-     * Calls the super method
-     * and sets additionally the value of the parameter
-     * {@link #K_PARAM}.
-     * The remaining parameters are passed to {@link #dependencyDerivator}.
-     */
-    @Override
-    public List<String> setParameters(List<String> args) throws ParameterException {
-        List<String> remainingParameters = super.setParameters(args);
+  /**
+   * Calls the super method and sets additionally the value of the parameter
+   * {@link #K_PARAM}. The remaining parameters are passed to
+   * {@link #dependencyDerivator}.
+   */
+  @Override
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
 
-        k = K_PARAM.getValue();
+    k = K_PARAM.getValue();
 
-        // dependency derivator (currently hardcoded)
-        dependencyDerivator = new DependencyDerivator<V, D>();
-        addParameterizable(dependencyDerivator);
-        remainingParameters = dependencyDerivator.setParameters(remainingParameters);
+    // dependency derivator (currently hardcoded)
+    dependencyDerivator = new DependencyDerivator<V, D>();
+    addParameterizable(dependencyDerivator);
+    remainingParameters = dependencyDerivator.setParameters(remainingParameters);
 
-        rememberParametersExcept(args, remainingParameters);
-        return remainingParameters;
-    }
+    rememberParametersExcept(args, remainingParameters);
+    return remainingParameters;
+  }
 
-    public MultiResult getResult() {
-        return result;
-    }
+  public MultiResult getResult() {
+    return result;
+  }
 }
