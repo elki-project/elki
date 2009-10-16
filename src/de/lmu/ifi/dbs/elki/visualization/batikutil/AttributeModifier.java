@@ -8,6 +8,7 @@ import org.w3c.dom.Element;
  * @author Remigius Wojdanowski
  * 
  */
+// FIXME: Unused? Remove?
 public class AttributeModifier implements Runnable {
 
   /**
