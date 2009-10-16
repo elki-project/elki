@@ -1,4 +1,4 @@
-package experimentalcode.remigius.gui.runnables;
+package de.lmu.ifi.dbs.elki.visualization.batikutil;
 
 import org.w3c.dom.Element;
 
