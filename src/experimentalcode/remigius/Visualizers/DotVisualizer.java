@@ -34,7 +34,9 @@ public class DotVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DV
   @Override
   public Element visualize(SVGPlot svgp) {
     Element layer = super.visualize(svgp);
+    //MarkerLibrary ml = context.getMarkerLibrary();
     for(int id : database) {
+      //Element dot = ml.useMarker(svgp, layer, getProjected(id, 0), getProjected(id, 1), 0, 0.01);
       Element dot = ShapeLibrary.createMarkerDot(svgp.getDocument(), getProjected(id, 0), getProjected(id, 1));
       // setting ID for efficient use of ToolTips.
       dot.setAttribute("id", ShapeLibrary.createID(ShapeLibrary.MARKER, id));
