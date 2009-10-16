@@ -79,6 +79,7 @@ public class OrderingFromAssociation<T extends Comparable<T>, O extends Database
    * @param comparator Comparator for data type used by association
    * @param descending boolean to mark descending ordering (true)
    */
+  @Deprecated
   public OrderingFromAssociation(Database<O> db, AssociationID<T> association, Comparator<T> comparator, boolean descending) {
     this.db = db;
     this.association = association;
@@ -93,6 +94,7 @@ public class OrderingFromAssociation<T extends Comparable<T>, O extends Database
    * @param association AssociationID to use
    * @param descending boolean to mark descending ordering (true)
    */
+  @Deprecated
   public OrderingFromAssociation(Database<O> db, AssociationID<T> association, boolean descending) {
     this.db = db;
     this.association = association;
@@ -106,6 +108,7 @@ public class OrderingFromAssociation<T extends Comparable<T>, O extends Database
    * @param db Database
    * @param association AssociationID to use
    */
+  @Deprecated
   public OrderingFromAssociation(Database<O> db, AssociationID<T> association) {
     this.db = db;
     this.association = association;
