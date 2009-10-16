@@ -7,36 +7,53 @@ import org.w3c.dom.events.EventTarget;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
+import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import experimentalcode.remigius.ShapeLibrary;
-import experimentalcode.remigius.gui.listener.ToolTipListener;
+import experimentalcode.remigius.gui.listener.TooltipListener;
 
 /**
  * Generates a SVG-Element containing ToolTips. ToolTips remain invisible until
  * their corresponding Marker is touched by the cursor and stay visible as long
  * as the cursor lingers on the marker. This implementation uses
- * {@link ToolTipListener} to achieve this behavior.
+ * {@link TooltipListener} to achieve this behavior.
  * 
- * @see ToolTipListener
+ * @see TooltipListener
  * 
  * @author Remigius Wojdanowski
  * 
  * @param <NV>
  */
-public class TextVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
+public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
   /**
    * A short name characterizing this Visualizer.
    */
   public static final String NAME = "Tooltips";
 
   /**
+   * Tooltip ID prefix
+   */
+  public static final String TOOLTIP_ID = "tooltip";
+
+  /**
+   * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
+   */
+  public static final String TOOLTIP_HIDDEN = "tooltip_hidden";
+
+  /**
+   * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
+   */
+  public static final String TOOLTIP_VISIBLE = "tooltip_visible";
+
+  /**
    * Contains the "outlierness-scores" to be displayed as ToolTips. If this
    * result does not contain <b>all</b> IDs the database contains, behavior is
    * undefined.
    */
-  private AnnotationResult<Double> anResult;
+  private AnnotationResult<? extends Number> anResult;
 
   /**
    * Returns the outlierness-score for a given ID. If there is no corresponding
@@ -45,7 +62,7 @@ public class TextVisualizer<NV extends NumberVector<NV, ?>> extends Projection2D
    * @param id an ID which has to exist in both the database and the result.
    * @return the outlierness-score for a given ID.
    */
-  private Double getValue(int id) {
+  private Number getValue(int id) {
     return anResult.getValueFor(id);
   }
 
@@ -55,11 +72,8 @@ public class TextVisualizer<NV extends NumberVector<NV, ?>> extends Projection2D
    * @param database contains all objects to be processed.
    * @param anResult contains "outlierness-scores", corresponding to the
    *        database.
-   * 
-   *        TODO: Refactor from AnnotationResult<Double> to
-   *        AnnotationResult<Number>
    */
-  public void init(String name, VisualizerContext context, AnnotationResult<Double> anResult) {
+  public void init(String name, VisualizerContext context, AnnotationResult<? extends Number> anResult) {
     init(Integer.MAX_VALUE, name, context);
     this.anResult = anResult;
   }
@@ -70,11 +84,19 @@ public class TextVisualizer<NV extends NumberVector<NV, ?>> extends Projection2D
    * @param svgp the SVGPlot to register the ToolTip-CSS-Class.
    */
   private void setupCSS(SVGPlot svgp) {
-    CSSClass tooltip = new CSSClass(svgp, ShapeLibrary.TOOLTIP);
-    tooltip.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, "0.2%");
+    CSSClass tooltiphidden = new CSSClass(svgp, TOOLTIP_HIDDEN);
+    tooltiphidden.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, "0.3%");
+    tooltiphidden.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, "\"Times New Roman\", serif");
+    tooltiphidden.setStatement(SVGConstants.CSS_DISPLAY_PROPERTY, SVGConstants.CSS_NONE_VALUE);
+
+    CSSClass tooltipvisible = new CSSClass(svgp, TOOLTIP_VISIBLE);
+    tooltipvisible.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, "0.3%");
+    tooltipvisible.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, "\"Times New Roman\", serif");
 
     try {
-      svgp.getCSSClassManager().addClass(tooltip);
+      svgp.getCSSClassManager().addClass(tooltiphidden);
+      svgp.getCSSClassManager().addClass(tooltipvisible);
+      // TODO: have the parent call updateStyleElement!
       svgp.updateStyleElement();
     }
     catch(CSSNamingConflict e) {
@@ -87,9 +109,10 @@ public class TextVisualizer<NV extends NumberVector<NV, ?>> extends Projection2D
     Element layer = super.visualize(svgp);
     setupCSS(svgp);
 
-    ToolTipListener hoverer = new ToolTipListener(svgp);
+    TooltipListener hoverer = new TooltipListener(svgp);
     for(int id : database) {
-      Element tooltip = ShapeLibrary.createToolTip(svgp.getDocument(), getProjected(id, 0), getProjected(id, 1), getValue(id));
+      Element tooltip = SVGUtil.svgText(svgp.getDocument(), getProjected(id, 0) + 0.005, getProjected(id, 1) + 0.003, FormatUtil.NF2.format(getValue(id).doubleValue()));
+      SVGUtil.addCSSClass(tooltip, TOOLTIP_HIDDEN);
 
       String dotID = ShapeLibrary.createID(ShapeLibrary.MARKER, id);
       Element dot = svgp.getIdElement(dotID);
@@ -104,7 +127,7 @@ public class TextVisualizer<NV extends NumberVector<NV, ?>> extends Projection2D
         LoggingUtil.message("Attaching ToolTip to non-existing Object: " + dotID);
       }
       layer.appendChild(tooltip);
-      svgp.putIdElement(ShapeLibrary.createID(ShapeLibrary.TOOLTIP, id), tooltip);
+      svgp.putIdElement(ShapeLibrary.createID(TOOLTIP_ID, id), tooltip);
     }
     return layer;
   }
