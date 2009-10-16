@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -175,10 +174,9 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
    * 
    * TODO: Refactor from AnnotationResult<Double> to AnnotationResult<Number>
    */
-  public void init(String name, Database<NV> database, AnnotationResult<Double> anResult, Result result, StaticScalingFunction normalizationScale, Clustering<Model> clustering) {
-    init(database, 1000, name);
+  public void init(String name, VisualizerContext context, AnnotationResult<Double> anResult, StaticScalingFunction normalizationScale, Clustering<Model> clustering) {
+    super.init(1000, name, context);
     this.anResult = anResult;
-    this.result = result;
     this.clustering = clustering;
     
     this.normalizationScale = normalizationScale;
@@ -208,7 +206,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
       if (clustering.getAllClusters().size() == 1){
         color = "black";
       } else {
-        color = COLORS.getColor(clusterID);
+        color = context.getColorLibrary().getColor(clusterID);
       }
       
       if(fill) {
@@ -267,7 +265,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
     
     for (Cluster<Model> cluster : clustering.getAllClusters()){
       for(int id : cluster.getIDs()) {
-        layer.appendChild(ShapeLibrary.createBubble(svgp.getDocument(), getProjected(database.get(id), 0), getProjected(database.get(id), 1), getScaled(getValue(id)), clusterID));
+        layer.appendChild(ShapeLibrary.createBubble(svgp.getDocument(), getProjected(id, 0), getProjected(id, 1), getScaled(getValue(id)), clusterID));
       }
       clusterID += 1;
     }

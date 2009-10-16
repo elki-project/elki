@@ -3,7 +3,6 @@ package experimentalcode.remigius.Visualizers;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -30,16 +29,16 @@ public class AxisVisualizer<NV extends NumberVector<NV, ?>> extends Projection2D
    * 
    * @param database contains all objects to be processed.
    */
-  public void init(Database<NV> database) {
+  public void init(VisualizerContext context) {
     // We don't need the Database. Maybe another superclass / inheritance
     // hierarchy would serve us better.
-    super.init(database, 0, NAME);
+    super.init(0, NAME, context);
   }
 
   @Override
   public Element visualize(SVGPlot plot) {
     Element layer = super.visualize(plot);
-    int dim = database.dimensionality();
+    int dim = context.getDatabase().dimensionality();
     
     // origin
     Vector orig = proj.projectScaledToRender(new Vector(dim));

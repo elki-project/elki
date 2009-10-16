@@ -3,10 +3,10 @@ package experimentalcode.remigius.Adapter;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import experimentalcode.remigius.Visualizers.Visualizer;
+import experimentalcode.remigius.Visualizers.VisualizerContext;
 
 /**
  * Defines the requirements for an algorithm-adapter. <br>
@@ -50,9 +50,7 @@ public interface AlgorithmAdapter<O extends DatabaseObject> extends Parameteriza
   /**
    * Initializes all provided {@link Visualizer}s.
    * 
-   * @param database the {@link Database} which was processed to obtain the
-   *        result.
-   * @param result the {@link Result} to be visualized.
+   * @param context Context to store shared visualization properties.
    */
-  public void init(Database<O> database, Result result);
+  public void init(VisualizerContext context);
 }

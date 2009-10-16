@@ -3,7 +3,6 @@ package experimentalcode.remigius.Visualizers;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import experimentalcode.remigius.ShapeLibrary;
 
@@ -28,15 +27,15 @@ public class DotVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DV
    * 
    * @param database contains all objects to be processed.
    */
-  public void init(Database<NV> database) {
-    init(database, Integer.MAX_VALUE - 1000, NAME);
+  public void init(VisualizerContext context) {
+    init(Integer.MAX_VALUE - 1000, NAME, context);
   }
 
   @Override
   public Element visualize(SVGPlot svgp) {
     Element layer = super.visualize(svgp);
-    for(int id : database.getIDs()) {
-      Element dot = ShapeLibrary.createMarkerDot(svgp.getDocument(), getProjected(database.get(id), 0), getProjected(database.get(id), 1));
+    for(int id : database) {
+      Element dot = ShapeLibrary.createMarkerDot(svgp.getDocument(), getProjected(id, 0), getProjected(id, 1));
       // setting ID for efficient use of ToolTips.
       dot.setAttribute("id", ShapeLibrary.createID(ShapeLibrary.MARKER, id));
       layer.appendChild(dot);

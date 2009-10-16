@@ -1,11 +1,7 @@
 package experimentalcode.remigius.Visualizers;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.AnyMap;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
-import de.lmu.ifi.dbs.elki.visualization.colors.PropertiesBasedColorLibrary;
 
 /**
  * Abstract superclass for Visualizers.
@@ -14,17 +10,12 @@ import de.lmu.ifi.dbs.elki.visualization.colors.PropertiesBasedColorLibrary;
  * 
  * @param <O> the type of object this Visualizer will process.
  */
-public abstract class AbstractVisualizer<O extends DatabaseObject> extends AbstractParameterizable implements Visualizer {
+public abstract class AbstractVisualizer extends AbstractParameterizable implements Visualizer {
   /**
-   * Contains all objects to be processed.
+   * Visualizer context to use
    */
-  protected Database<O> database;
+  protected VisualizerContext context;
 
-  /**
-   * Provides colors which can be used by elements of the visualization.
-   */
-  protected static final ColorLibrary COLORS = new PropertiesBasedColorLibrary();
-  
   /**
    * Meta data storage
    */
@@ -37,11 +28,11 @@ public abstract class AbstractVisualizer<O extends DatabaseObject> extends Abstr
    * @param level indicates when to execute this Visualizer.
    * @param name a short name characterizing this Visualizer
    */
-  protected void init(Database<O> db, int level, String name) {
-    this.database = db;
+  protected void init(int level, String name, VisualizerContext context) {
     this.metadata = new AnyMap<String>();
     this.metadata.put(Visualizer.META_LEVEL, level);
     this.metadata.put(Visualizer.META_NAME, name);
+    this.context = context;
   }
 
   @Override

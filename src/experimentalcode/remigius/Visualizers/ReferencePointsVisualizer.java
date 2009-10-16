@@ -6,7 +6,6 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -41,8 +40,8 @@ public class ReferencePointsVisualizer<NV extends NumberVector<NV, ?>> extends P
    * @param database contains all objects to be processed.
 	 * @param colResult contains all reference points.
 	 */
-	public void init(Database<NV> database, CollectionResult<NV> colResult){
-		init(database, Integer.MAX_VALUE-2000, NAME);
+	public void init(VisualizerContext context, CollectionResult<NV> colResult){
+		init(Integer.MAX_VALUE-2000, NAME, context);
 		this.colResult = colResult;
 	}
 	

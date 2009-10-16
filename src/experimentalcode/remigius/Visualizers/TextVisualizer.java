@@ -5,7 +5,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.events.EventTarget;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -60,8 +59,8 @@ public class TextVisualizer<NV extends NumberVector<NV, ?>> extends Projection2D
    *        TODO: Refactor from AnnotationResult<Double> to
    *        AnnotationResult<Number>
    */
-  public void init(String name, Database<NV> database, AnnotationResult<Double> anResult) {
-    init(database, Integer.MAX_VALUE, name);
+  public void init(String name, VisualizerContext context, AnnotationResult<Double> anResult) {
+    init(Integer.MAX_VALUE, name, context);
     this.anResult = anResult;
   }
 
@@ -89,8 +88,8 @@ public class TextVisualizer<NV extends NumberVector<NV, ?>> extends Projection2D
     setupCSS(svgp);
 
     ToolTipListener hoverer = new ToolTipListener(svgp);
-    for(int id : database.getIDs()) {
-      Element tooltip = ShapeLibrary.createToolTip(svgp.getDocument(), getProjected(database.get(id), 0), getProjected(database.get(id), 1), getValue(id));
+    for(int id : database) {
+      Element tooltip = ShapeLibrary.createToolTip(svgp.getDocument(), getProjected(id, 0), getProjected(id, 1), getValue(id));
 
       String dotID = ShapeLibrary.createID(ShapeLibrary.MARKER, id);
       Element dot = svgp.getIdElement(dotID);
