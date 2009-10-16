@@ -1,38 +1,40 @@
 package experimentalcode.remigius.Adapter;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
 import experimentalcode.remigius.Visualizers.AxisVisualizer;
 import experimentalcode.remigius.Visualizers.DotVisualizer;
 import experimentalcode.remigius.Visualizers.HistogramVisualizer;
+import experimentalcode.remigius.Visualizers.VisualizerContext;
 
-public class DefaultAdapter<NV extends NumberVector<NV, ?>> extends AbstractAlgorithmAdapter<NV>{
+public class DefaultAdapter<NV extends NumberVector<NV, ?>> extends AbstractAlgorithmAdapter<NV> {
 
-	private DotVisualizer<NV> dotVisualizer;
-	private AxisVisualizer<NV> axisVisualizer;
-	private HistogramVisualizer<NV> histoVisualizer;
+  private DotVisualizer<NV> dotVisualizer;
 
-	public DefaultAdapter(){
-		super();
-		dotVisualizer = new DotVisualizer<NV>();
-		axisVisualizer = new AxisVisualizer<NV>();
-		histoVisualizer = new HistogramVisualizer<NV>();
-		providedVisualizers.add(dotVisualizer);
-		providedVisualizers.add(axisVisualizer);
-		providedVisualizers.add(histoVisualizer);
-	}
+  private AxisVisualizer<NV> axisVisualizer;
 
-	@Override
-	public boolean canVisualize(Result r){
-		return true;
-	}
+  private HistogramVisualizer<NV> histoVisualizer;
 
-	@Override
-	protected void initVisualizer(Database<NV> database, Result result) {
-		axisVisualizer.init(database);
-		dotVisualizer.init(database);
-		histoVisualizer.init(database, result, clustering);
-		usableVisualizers.addAll(providedVisualizers);
-	}
+  public DefaultAdapter() {
+    super();
+    dotVisualizer = new DotVisualizer<NV>();
+    axisVisualizer = new AxisVisualizer<NV>();
+    histoVisualizer = new HistogramVisualizer<NV>();
+    providedVisualizers.add(dotVisualizer);
+    providedVisualizers.add(axisVisualizer);
+    providedVisualizers.add(histoVisualizer);
+  }
+
+  @Override
+  public boolean canVisualize(@SuppressWarnings("unused") Result r) {
+    return true;
+  }
+
+  @Override
+  protected void initVisualizer(VisualizerContext context) {
+    axisVisualizer.init(context);
+    dotVisualizer.init(context);
+    histoVisualizer.init(context, clustering);
+    usableVisualizers.addAll(providedVisualizers);
+  }
 }

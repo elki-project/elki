@@ -11,11 +11,9 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.math.MinMax;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -50,10 +48,6 @@ public class HistogramVisualizer<NV extends NumberVector<NV, ?>> extends Project
 
   private Clustering<Model> clustering;
 
-  private double frac;
-
-  private Result result;
-
   public HistogramVisualizer() {
     addOption(STYLE_ROW_PARAM);
   }
@@ -66,10 +60,8 @@ public class HistogramVisualizer<NV extends NumberVector<NV, ?>> extends Project
     return remainingParameters;
   }
 
-  public void init(Database<NV> database, Result result, Clustering<Model> clustering) {
-    init(database, 0, NAME);
-    this.frac = 1. / database.size();
-    this.result = result;
+  public void init(VisualizerContext context, Clustering<Model> clustering) {
+    init(0, NAME, context);
     this.clustering = clustering;
   }
 
@@ -101,7 +93,7 @@ public class HistogramVisualizer<NV extends NumberVector<NV, ?>> extends Project
         bin.setStatement(coloredElement, "black");
       }
       else {
-        bin.setStatement(coloredElement, COLORS.getColor(clusterID));
+        bin.setStatement(coloredElement, context.getColorLibrary().getColor(clusterID));
       }
 
       try {
@@ -127,6 +119,7 @@ public class HistogramVisualizer<NV extends NumberVector<NV, ?>> extends Project
     // Creating histograms
     int clusterID = 0;
     MinMax<Double> minmax = new MinMax<Double>();
+    final double frac = 1. / database.size();
 
     AggregatingHistogram<Double, Double> allInOne = AggregatingHistogram.DoubleSumHistogram(BINS, 0, 1);
     for(Cluster<Model> cluster : clustering.getAllClusters()) {
