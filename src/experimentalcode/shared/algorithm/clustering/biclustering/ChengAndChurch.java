@@ -1,16 +1,16 @@
 package experimentalcode.shared.algorithm.clustering.biclustering;
 
+import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbortException;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering.AbstractBiclustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.BiclusterWithInverted;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
@@ -18,894 +18,928 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.LongParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.pairs.IntDoublePair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 
 /**
- * Provides a biclustering algorithm which deletes or inserts rows/columns
- * dependent on their score and finds biclusters with correlated values.
- *
+ * Provides a biclustering algorithm which deletes or inserts
+ * currentRows/columns dependent on their score and finds biclusters with
+ * correlated values.</p>
+ * <p>
+ * Parameters:
+ * <ul>
+ * <li>{@link #DELTA_PARAM}</li>
+ * <li>{@link #ALPHA_PARAM}</li>
+ * <li>{@link #N_PARAM}</li>
+ * <li>{@link #BEGIN_PARAM}</li>
+ * <li>{@link #END_PARAM}</li>
+ * <li>{@link #MISSING_PARAM}</li>
+ * <li>{@link #MULTIPLE_ADDITION_PARAM} ???</li>
+ * <li>{@link #SEED_PARAM}</li>
+ * </ul>
+ * </p>
+ * <p>
+ * Implementation details: In each iteration a single bicluster is found. The
+ * properties of the current bicluster are saved in the fields:
+ * {@link #currentRows}, {@link #currentCols}, {@link #currentResidue},
+ * {@link #currentMean}, {@link #rowMeans} and {@link #columnMeans}.
+ * </p>
+ * 
  * <p>
  * Reference: <br>
- * Y. Cheng and G. M. Church. Biclustering of expression data. In Proceedings of the 8th International
- * Conference on Intelligent Systems for Molecular Biology (ISMB), San Diego, CA, 2000.
+ * Y. Cheng and G. M. Church. Biclustering of expression data. In Proceedings of
+ * the 8th International Conference on Intelligent Systems for Molecular Biology
+ * (ISMB), San Diego, CA, 2000.
  * </p>
- *
+ * 
  * @author Noemi Andor
  * @param <V> a certain subtype of NumberVector - the data matrix is supposed to
- * consist of rows where each row relates to an object of type V and
- * the columns relate to the attribute values of these objects
+ *        consist of currentRows where each row relates to an object of type V
+ *        and the columns relate to the attribute values of these objects
  */
-
 public class ChengAndChurch<V extends NumberVector<V, Double>> extends AbstractBiclustering<V, BiclusterWithInverted<V>> {
 
-    /**
-     * OptionID for the parameter {@link #SEED_PARAM}.
-     */
-    public static final OptionID SEED_ID = OptionID.getOrCreateOptionID(
-        "chengandchurch.random",
-        "seed for initializing random list for the masking values");
+  /**
+   * The minimum number of columns that the database must have so that a removal
+   * of columns is performed in {@link #multipleNodeDeletion()}.</p>
+   * <p>
+   * Just start deleting multiple columns when more than 100 columns are in the
+   * datamatrix.
+   * </p>
+   */
+  private static final int MIN_COLUMN_REMOE_THRESHOLD = 100;
 
-    /**
-     * Parameter to specifiy the seed for initializing a random list for the masking values.
-     * <p>Default value: 1</p>
-     * <p>Key: {@code -chengandchurch.random}</p>
-     */
-    private final LongParameter SEED_PARAM = new LongParameter(SEED_ID, true, 1L);
+  /**
+   * The minimum number of rows that the database must have so that a removal of
+   * rowss is performed in {@link #multipleNodeDeletion()}.
+   * <p>
+   * Just start deleting multiple rows when more than 100 rows are in the
+   * datamatrix.
+   * </p>
+   * <!--
+   * <p>
+   * The value is set to 100 as this is not really described in the paper.
+   * </p>
+   * -->
+   */
+  private static final int MIN_ROW_REMOE_THRESHOLD = 100;
 
-    /**
-     * OptionID for the parameter {@link #MULTIPLE_ADDITION_PARAM}.
-     */
-    public static final OptionID MULTIPLE_ADDITION_ID = OptionID
-        .getOrCreateOptionID("chengandchurch.multipleAddition",
-            "indicates how many times the algorithm to add Nodes should be performed");
+  /**
+   * Default value for {@link #MULTIPLE_ADDITION_PARAM}
+   */
+  private static final int DEFAULT_MULTIPLE_ADDITION = 1;
 
-    /**
-     * Parameter to indicate how many times the algorithm to add Nodes should be
-     * performed for each iteration. A greater value will result in a more
-     * accurate result but will require more time.
-     * <p/>
-     * Default value: 1
-     * </p>
-     * <p/>
-     * Key: {@code -chengandchurch.multipleAddition}
-     * </p>
-     */
-    public final IntParameter MULTIPLE_ADDITION_PARAM = new IntParameter(
-        MULTIPLE_ADDITION_ID, new GreaterEqualConstraint(1));
+  /**
+   * OptionID for the parameter {@link #SEED_PARAM}.
+   */
+  public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("chengandchurch.random", "Seed for the random that creates the missing values.");
 
-    /**
-     * OptionID for the parameter {@link #SIGMA_PARAM}.
-     */
-    public static final OptionID SIGMA_ID = OptionID
-        .getOrCreateOptionID("chengandchurch.sigma",
-            "treshhold value to determine the maximal acceptable score of a bicluster");
+  /**
+   * Parameter to specify the seed for the random that creates the missing
+   * values.
+   * <p>
+   * Default value: 0
+   * </p>
+   * <p>
+   * Key: {@code -chengandchurch.random}
+   * </p>
+   */
+  private final LongParameter SEED_PARAM = new LongParameter(SEED_ID, true, 0L);
 
-    /**
-     * Treshhold value to determine the maximal acceptable score of a bicluster.
-     * <p/>
-     * Key: {@code -chengandchurch.sigma}
-     * </p>
-     */
-    public final DoubleParameter SIGMA_PARAM = new DoubleParameter(SIGMA_ID,
-        new GreaterEqualConstraint(0.0));
+  /**
+   * OptionID for the parameter {@link #DELTA_PARAM}.
+   */
+  public static final OptionID DELTA_ID = OptionID.getOrCreateOptionID("chengandchurch.delta", "Threshold value to determine the maximal acceptable score (mean squared residue) of a bicluster.");
 
-    /**
-     * OptionID for the parameter {@link #ALPHA_PARAM}.
-     */
-    public static final OptionID ALPHA_ID = OptionID
-        .getOrCreateOptionID("chengandchurch.alpha",
-            "parameter for multiple node deletion to accelerate the algorithm ");
+  /**
+   * Threshold value to determine the maximal acceptable score (mean squared
+   * residue) of a bicluster.
+   * <p/>
+   * Key: {@code -chengandchurch.delta}
+   * </p>
+   */
+  public final DoubleParameter DELTA_PARAM = new DoubleParameter(DELTA_ID, new GreaterEqualConstraint(0.0));
 
-    /**
-     * Parameter for multiple node deletion to accelerate the algorithm.
-     * <p/>
-     * Key: {@code -chengandchurch.alpha}
-     * </p>
-     */
-    public final DoubleParameter ALPHA_PARAM = new DoubleParameter(ALPHA_ID,
-        new GreaterEqualConstraint(1.0));
+  /**
+   * OptionID for the parameter {@link #ALPHA_PARAM}.
+   */
+  public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("chengandchurch.alpha", "Parameter for multiple node deletion to accelerate the algorithm.");
 
-    /**
-     * OptionID for the parameter {@link #N_PARAM}.
-     */
-    public static final OptionID N_ID = OptionID.getOrCreateOptionID(
-        "chengandchurch.n", "number of biclusters to be found ");
+  /**
+   * Parameter for multiple node deletion to accelerate the algorithm. (&gt;= 1)
+   * <p/>
+   * Key: {@code -chengandchurch.alpha}
+   * </p>
+   */
+  public final DoubleParameter ALPHA_PARAM = new DoubleParameter(ALPHA_ID, new GreaterEqualConstraint(1.0));
 
-    /**
-     * Number of biclusters to be found.
-     * <p/>
-     * Default value: 1
-     * </p>
-     * <p/>
-     * Key: {@code -chengandchurch.n}
-     * </p>
-     */
-    public final IntParameter N_PARAM = new IntParameter(N_ID,
-        new GreaterEqualConstraint(1));
+  /**
+   * OptionID for the parameter {@link #N_PARAM}.
+   */
+  public static final OptionID N_ID = OptionID.getOrCreateOptionID("chengandchurch.n", "The number of biclusters to be found.");
 
-    /**
-     * OptionID for the parameter {@link #BEGIN_PARAM}.
-     */
-    public static final OptionID BEGIN_ID = OptionID.getOrCreateOptionID(
-        "chengandchurch.begin", "lower limit for maskingValues");
+  /**
+   * Number of biclusters to be found.
+   * <p/>
+   * Default value: 1
+   * </p>
+   * <p/>
+   * Key: {@code -chengandchurch.n}
+   * </p>
+   */
+  public final IntParameter N_PARAM = new IntParameter(N_ID, new GreaterEqualConstraint(1));
 
-    /**
-     * Lower limit for maskingValues.
-     * <p/>
-     * Key: {@code -chengandchurch.begin}
-     * </p>
-     */
-    public final IntParameter BEGIN_PARAM = new IntParameter(BEGIN_ID);
+  /**
+   * OptionID for the parameter {@link #BEGIN_PARAM}.
+   */
+  public static final OptionID BEGIN_ID = OptionID.getOrCreateOptionID("chengandchurch.begin", "The lower limit for the masking and missing values. Must be smaller than the upper limit.");
 
-    /**
-     * OptionID for the parameter {@link #END_PARAM}.
-     */
-    public static final OptionID END_ID = OptionID.getOrCreateOptionID(
-        "chengandchurch.end", "upper limit for maskingValues");
+  /**
+   * Lower limit for the masking and missing values.
+   * <p/>
+   * Key: {@code -chengandchurch.begin}
+   * </p>
+   */
+  public final DoubleParameter BEGIN_PARAM = new DoubleParameter(BEGIN_ID);
 
-    /**
-     * Upper limit for maskingValues.
-     * <p/>
-     * Key: {@code -chengandchurch.end}
-     * </p>
-     */
-    public final IntParameter END_PARAM = new IntParameter(END_ID);
+  /**
+   * OptionID for the parameter {@link #END_PARAM}.
+   */
+  public static final OptionID END_ID = OptionID.getOrCreateOptionID("chengandchurch.end", "The upper limit for the masking and missing values.");
 
-    /**
-     * OptionID for the parameter {@link #MISSING_PARAM}.
-     */
-    public static final OptionID MISSING_ID = OptionID.getOrCreateOptionID(
-        "chengandchurch.missing",
-        "missing Value in database to be raplaced with maskingValues");
+  /**
+   * Upper limit for the masking and missing values.
+   * <p/>
+   * Key: {@code -chengandchurch.end}
+   * </p>
+   */
+  public final DoubleParameter END_PARAM = new DoubleParameter(END_ID);
 
-    /**
-     * Missing Value in database to be replaced with maskingValues.
-     * <p/>
-     * Key: {@code -chengandchurch.missing}
-     * </p>
-     */
-    public final IntParameter MISSING_PARAM = new IntParameter(MISSING_ID);
+  /**
+   * OptionID for the parameter {@link #MISSING_PARAM}.
+   */
+  public static final OptionID MISSING_ID = OptionID.getOrCreateOptionID("chengandchurch.missing", "This value in database will be replaced with random values in the range from begin to end.");
 
-    /**
-     * Keeps the number of rows in the dataset.
-     */
-    private int rowDim;
+  /**
+   * A parameter to indicate what value the missing values in the database
+   * have.</p>
+   * <p>
+   * If a value is missing in the database, you have to give them a value (e.g.
+   * -10000) and specify -10000 as this parameter.
+   * </p>
+   * <p>
+   * The missing values in database will be replaced by a random generated value
+   * in the range between {@link #BEGIN_PARAM} and {@link #END_PARAM}. The
+   * missing values will be uniform distributed. Note that the random values are
+   * <code>double</code> and not <code>int</code>.
+   * </p>
+   * <p>
+   * Default: No replacement of missing parameters occurs.
+   * <p/>
+   * Key: {@code -chengandchurch.missing}
+   * </p>
+   */
+  public final IntParameter MISSING_PARAM = new IntParameter(MISSING_ID);
 
-    /**
-     * Keeps the number of columns in the dataset.
-     */
-    private int colDim;
+  /**
+   * OptionID for the parameter {@link #MULTIPLE_ADDITION_PARAM}.
+   */
+  public static final OptionID MULTIPLE_ADDITION_ID = OptionID.getOrCreateOptionID("chengandchurch.multipleAddition", "Indicates how many times the algorithm to add Nodes should be performed.");
 
-    /**
-     * Keeps the position of inverted rows belonging to the current bicluster.
-     */
-    private BitSet invertedRows = new BitSet();
+  /**
+   * Parameter to indicate how many times an addition should be performed in
+   * each of the <code>n</code> iterations.</p>
+   * <p>
+   * A greater value will result in a more accurate result but will require more
+   * time.
+   * </p>
+   * <p/>
+   * Default value: 1 ({@value #DEFAULT_MULTIPLE_ADDITION})
+   * </p>
+   * <p/>
+   * Key: {@code -chengandchurch.multipleAddition}
+   * </p>
+   */
+  public final IntParameter MULTIPLE_ADDITION_PARAM = new IntParameter(MULTIPLE_ADDITION_ID, new GreaterEqualConstraint(1));
 
-    /**
-     * Keeps the position of the columns belonging to the current bicluster.
-     */
-    private BitSet cols;
+  /**
+   * Threshold for the score ({@link #DELTA_PARAM}).
+   */
+  private double delta;
 
-    /**
-     * Keeps the position of the rows belonging to the current bicluster.
-     */
-    private BitSet rows;
+  /**
+   * The parameter for multiple node deletion.</p>
+   * <p>
+   * It is used to magnify the {@link #delta} value in the
+   * {@link #multipleNodeDeletion()} method.
+   * </p>
+   */
+  private double alpha;
 
-    /**
-     * Rows with missing values for masking.
-     */
-    private BitSet missingRowsToMask;
+  /**
+   * Number of biclusters to be found.
+   */
+  private int n;
 
-    /**
-     * Columns with missing values for masking.
-     */
-    private BitSet missingColsToMask;
+  /**
+   * Mean of the current bicluster.
+   */
+  private double currentMean;
 
-    /**
-     * Lower threshold for random maskedValues.
-     */
-    private int begin;
+  /**
+   * The current bicluster score (mean squared residue).
+   */
+  private double currentResidue;
 
-    /**
-     * Upper threshold for random maskedValues.
-     */
-    private int end;
+  /**
+   * Indicates the columns that belong to the current bicluster.
+   */
+  private BitSet currentCols;
 
-    /**
-     * Keeps the rowMeans of all rows.
-     */
-    private Map<Integer, Double> rowMeans;
+  /**
+   * Indicates the current rows that belong to the current bicluster.
+   */
+  private BitSet currentRows;
 
-    /**
-     * Keeps the columnMeans of all columns.
-     */
-    private Map<Integer, Double> columnMeans;
+  /**
+   * All row means of the current bicluster.</p>
+   * <p>
+   * A row mean is the (arithmetic) mean of the values defined on the current
+   * columns in a specific row (the key of the map). The value of the map is the
+   * row mean.
+   * </p>
+   */
+  private Map<Integer, Double> rowMeans;
 
-    /**
-     * A list of all masked values mapped to their row and column.
-     */
-    private Map<IntIntPair, Double> maskedVals;
+  /**
+   * All column means of the current bicluster.</p>
+   * <p>
+   * A column mean is the (arithmetic) mean of the values defined on the current
+   * rows in a specific column (the key of the map). The value of the map is the
+   * column mean.
+   * </p>
+   */
+  private Map<Integer, Double> columnMeans;
 
-    /**
-     * Mean of the current bicluster.
-     */
-    private double biclusterMean;
+  /**
+   * Keeps the position of the inverted rows belonging to the current bicluster.
+   */
+  // TODO: Check if implementation is valid...
+  private BitSet invertedRows = new BitSet();
 
-    /**
-     * Threshold for bicluster score.
-     */
-    private double sigma;
+  /**
+   * Lower threshold for random maskedValues.
+   */
+  private double minMissingValue;
 
-    /**
-     * The current bicluster score.
-     */
-    private double valueH;
+  /**
+   * Upper threshold for random maskedValues.
+   */
+  private double maxMissingValue;
 
-    /**
-     * A generator for masking found or missing rows/columns with random
-     * numbers.
-     */
-    private Random random;
+  /**
+   * <p>
+   * Keeps track of all masked values. A masked value is occupied by a
+   * previously found bicluster and thus populated with random noise so that a
+   * new iteration will not detect the same cluster again.
+   * </p>
+   * <p>
+   * The key of the map is an {@link IntIntPair} that contains the row and
+   * column. The value of the map represents the new value that is randomly
+   * distributed. The original value is still in the database but we bypass the
+   * {@link AbstractBiclustering#valueAt(int, int)} by overriding it so the new
+   * {@link #valueAt(int, int)} will return the masked value instead of the
+   * original. The masked values will be between {@link #minMissingValue} and
+   * {@link #maxMissingValue}.
+   * </p>
+   */
+  private Map<IntIntPair, Double> maskedVals;
 
-    /**
-     * Parameter for multiple node deletion.
-     */
-    private double alpha;
+  /**
+   * <p>
+   * Keeps track of all values that are missing in the database (that are
+   * <code>null</code>).
+   * </p>
+   * <p>
+   * Depends on the {@link Database} implementation used. For every key that
+   * represents a row and a column the value is returned when calling
+   * {@link #valueAt(int, int)}.
+   * </p>
+   * 
+   */
+  private Map<IntIntPair, Double> missingValues;
 
-    /**
-     * Number of biclusters to be found.
-     */
-    private int n;
+  /**
+   * A random for generating values for the missing or masking
+   * currentRows/columns.
+   */
+  private Random random;
 
-    /**
-     * A value marking missing elements in the data matrix.
-     */
-    private int missing;
+  /**
+   * Sets the options for the parameter values {@link #random}, {@link #delta},
+   * {@link #alpha}, {@link #n}, {@link #MISSING_PARAM},
+   * {@link #minMissingValue} and {@link #maxMissingValue}.
+   */
+  public ChengAndChurch() {
+    // SEED_PARAM.setOptional(true);
+    DELTA_PARAM.setOptional(false);
+    ALPHA_PARAM.setOptional(false);
+    N_PARAM.setDefaultValue(1);
+    MULTIPLE_ADDITION_PARAM.setOptional(true);
+    MULTIPLE_ADDITION_PARAM.setDefaultValue(DEFAULT_MULTIPLE_ADDITION);
+    MISSING_PARAM.setOptional(true);
+    BEGIN_PARAM.setOptional(false);
+    END_PARAM.setOptional(false);
 
-    /**
-     * Information if some row/column has been removed from the current
-     * bicluster.
-     */
-    private boolean removed;
+    this.addOption(SEED_PARAM);
+    this.addOption(DELTA_PARAM);
+    this.addOption(N_PARAM);
+    this.addOption(ALPHA_PARAM);
+    this.addOption(MULTIPLE_ADDITION_PARAM);
+    this.addOption(MISSING_PARAM);
+    this.addOption(BEGIN_PARAM);
+    this.addOption(END_PARAM);
 
-    /**
-     * Information if some row/column has been added to the current bicluster.
-     */
-    private boolean added;
+    this.maskedVals = new HashMap<IntIntPair, Double>();
+    this.missingValues = new HashMap<IntIntPair, Double>();
+    this.rowMeans = new HashMap<Integer, Double>();
+    this.columnMeans = new HashMap<Integer, Double>();
 
-    /**
-     * Specifies that the current state of the iteration is in nodeAddition.
-     */
-    private boolean inNodeAddition;
+  }
 
-    /**
-     * Parameter to indicate how many times the algorithm to add Nodes should be
-     * performed for each iteration.
-     */
-    private int multipleAddition;
+  /**
+   * Calls the super method and sets additionally the parameters for random,
+   * delta, alpha, n, minMissingValue, maxMissingValue.
+   */
+  @Override
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
+    long seed = SEED_PARAM.getDefaultValue();
+    if(SEED_PARAM.isSet()) {
+      seed = SEED_PARAM.getValue();
+    }
+    random = new Random(seed);
+    delta = DELTA_PARAM.getValue();
+    alpha = ALPHA_PARAM.getValue();
+    n = N_PARAM.getValue();
+    minMissingValue = BEGIN_PARAM.getValue();
+    maxMissingValue = END_PARAM.getValue();
+    if(minMissingValue > maxMissingValue) {
+      throw new WrongParameterValueException(BEGIN_PARAM, "The minimum value for missing values is larger than the maximum value", "Minimum value: " + minMissingValue + "  maximum value: " + maxMissingValue);
+    }
+    return remainingParameters;
+  }
 
-    /**
-     * Sets the options for the ParameterValues random, sigma, alpha, n,
-     * missing, begin and end. Adds the parameterValues.
-     */
-    public ChengAndChurch() {
-        MULTIPLE_ADDITION_PARAM.setOptional(true);
-        MULTIPLE_ADDITION_PARAM.setDefaultValue(1);
-        SIGMA_PARAM.setOptional(false);
-        ALPHA_PARAM.setOptional(false);
-        N_PARAM.setDefaultValue(1);
-        MISSING_PARAM.setOptional(true);
-        BEGIN_PARAM.setOptional(false);
-        END_PARAM.setOptional(false);
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering.AbstractBiclustering
+   * #biclustering()
+   */
+  @Override
+  public void biclustering() {
+    long t = System.currentTimeMillis();
 
-        this.addOption(SEED_PARAM);
-        this.addOption(ALPHA_PARAM);
-        this.addOption(MULTIPLE_ADDITION_PARAM);
-        this.addOption(SIGMA_PARAM);
-        this.addOption(N_PARAM);
-        this.addOption(MISSING_PARAM);
-        this.addOption(BEGIN_PARAM);
-        this.addOption(END_PARAM);
+    chengAndChurch();
+    if(logger.isVerbose()) {
+      logger.verbose("Runtime: " + (System.currentTimeMillis() - t));
+    }
+  }
+
+  /**
+   * Initiates this algorithm and runs {@link #n} iterations to find the
+   * {@link #n} biclusters.</p>
+   * <p>
+   * It first checks if some missing (<code>NULL</code>) values are in the
+   * database and masks them ({@link #fillMissingValues()}).<br />
+   * For each iteration it starts with the complete database as subspace cluster
+   * and performs multiple row and column deletions (
+   * {@link #multipleNodeDeletion()}) if more than 100 rows or columns are in
+   * the datamatrix, otherwise {@link #singleNodeDeletion()} is performed until
+   * the {@link #delta} value is reached. Then it calls the
+   * {@link #nodeAddition()} and finally masks the found bicluster (
+   * {@link #maskMatrix()}). A reset operation is called after each iteration to
+   * start with the complete database as starting subspace cluster again (
+   * {@link #reset()}).
+   * </p>
+   */
+  private void chengAndChurch() {
+    this.reset();
+//    long t = System.currentTimeMillis();
+    this.fillMissingValues();
+//    logger.verbose("fillMissingValues() finished. (" + (System.currentTimeMillis() - t) + ")");
+    for(int i = 0; i < n; i++) {
+//      t = System.currentTimeMillis();
+      this.multipleNodeDeletion();
+//      logger.verbose("\tmultipleNodeDeletion() finished. (" + (System.currentTimeMillis() - t) + ")");
+//      t = System.currentTimeMillis();
+      this.nodeAddition();
+//      logger.verbose("\tnodeAddition() finished. (" + (System.currentTimeMillis() - t) + ")");
+//      t = System.currentTimeMillis();
+      this.maskMatrix();
+//      logger.verbose("\tmaskMatrix() finished. (" + (System.currentTimeMillis() - t) + ")");
+//      t = System.currentTimeMillis();
+      BiclusterWithInverted<V> bicluster = new BiclusterWithInverted<V>(rowsBitsetToIDs(currentRows), colsBitsetToIDs(currentCols), getDatabase());
+      bicluster.setInvertedRows(rowsBitsetToIDs(invertedRows));
+      addBiclusterToResult(bicluster);
+
+      if(logger.isVerbose()) {
+        logger.verbose("Score of bicluster" + (i + 1) + ": " + this.currentResidue);
+        logger.verbose("Number of rows: " + currentRows.cardinality());
+        logger.verbose("Number of columns: " + currentCols.cardinality());
+        logger.verbose("Total number of masked values: " + maskedVals.size() + "\n");
+      }
+      this.reset();
+    }
+  }
+
+  //
+  /**
+   * <p>
+   * Removes alternating rows and columns until the residue of the current
+   * bicluster is smaller than {@link #delta}.
+   * </p>
+   * <p>
+   * If the dimension of the database is small ({@link #getColDim()} >
+   * {@link #MIN_COLUMN_REMOE_THRESHOLD}), no column deletion is performed.<br />
+   * If a single iteration does not remove anything a single node deletion
+   * algorithm ({@link #singleNodeDeletion()}) is performed.
+   * </p>
+   */
+  private void multipleNodeDeletion() {
+
+    // If something has been removed:
+    boolean removed = false;
+
+    int c = 0;
+    while(this.currentResidue > this.delta) {
+      removed = false;
+      // TODO: Proposal in paper: use an adaptive alpha based on the new scores
+      // of the current bicluster.
+      double alphaResidue = alpha * currentResidue;
+      c++;
+      // TODO: Maybe use the row dim of the current cluster instead of the dim
+      // of the database?
+      // TODO: Also use a threshold on the rows? In Algorithm4, it is describe
+      // same as with columns -
+      // so just start removing multiple rows when datamatrix contains more than
+      // 100 rows
+      // Paper is not clear about that.
+
+      // This value is 100,
+      if(getRowDim() > MIN_ROW_REMOE_THRESHOLD) {
+        // Compute row mean for each row i
+        List<Integer> rowToRemove = new ArrayList<Integer>();
+        for(int i = currentRows.nextSetBit(0); i >= 0; i = currentRows.nextSetBit(i + 1)) {
+          if(computeRowResidue(i, false) > alphaResidue) {
+            rowToRemove.add(i);
+          }
+        }
+        // remove the found ones
+        for(Integer row : rowToRemove) {
+          currentRows.clear(row);
+          removed = true;
+        }
+        if(removed) {
+          updateValues();
+        }
+      }
+
+      // Just start deleting multiple columns when more than 100 columns are in
+      // the datamatrix.
+      if(getColDim() > MIN_COLUMN_REMOE_THRESHOLD) {
+        // Compute row mean for each row i
+        List<Integer> colsToRemove = new ArrayList<Integer>();
+        for(int j = currentCols.nextSetBit(0); j >= 0; j = currentCols.nextSetBit(j + 1)) {
+          if(computeColResidue(j) > alphaResidue) {
+            colsToRemove.add(j);
+          }
+        }
+        boolean colRemoved = false;
+        // remove them
+        for(Integer col : colsToRemove) {
+          currentCols.clear(col);
+          removed = true;
+          colRemoved = true;
+        }
+        if(colRemoved) {
+          updateValues();
+        }
+      }
+
+      if(!removed) {
+        singleNodeDeletion();
+      }
+    }
+  }
+
+  /**
+   * <p>
+   * Performs a single node deletion per iteration until the score of the
+   * resulting bicluster is lower or equal to delta.
+   * </p>
+   */
+  private void singleNodeDeletion() {
+
+    while(this.currentResidue > delta) {
+      IntDoublePair maxRowResidue = getLargestRowResidue();
+      IntDoublePair maxColResidue = getLargestColResidue();
+      if(maxRowResidue.getSecond() > maxColResidue.getSecond()) {
+        currentRows.clear(maxRowResidue.getFirst());
+      }
+      else {
+        currentCols.clear(maxColResidue.getFirst());
+      }
+      updateValues();
+    }
+  }
+
+  /**
+   * <p>
+   * Adds alternating rows and columns so that the {@link #currentResidue} will
+   * decrease. This is done {@link #MULTIPLE_ADDITION_PARAM} times if the
+   * parameter is set of {@link #DEFAULT_MULTIPLE_ADDITION} times otherwise.
+   * </p>
+   * <p>
+   * Also addes the <b>inverse</b> of a row.
+   * </p>
+   */
+  private void nodeAddition() {
+    boolean added = true;
+    int numberOfAddition = DEFAULT_MULTIPLE_ADDITION;
+    if(MULTIPLE_ADDITION_PARAM.isSet()) {
+      try {
+        numberOfAddition = MULTIPLE_ADDITION_PARAM.getValue();
+      }
+      catch(UnusedParameterException e) {
+        e.printStackTrace();
+      }
     }
 
-    /**
-     * Calls the super method
-     * and sets additionally the parameters for random, sigma, alpha, n, begin,
-     * end.
-     */
-    @Override
-    public List<String> setParameters(List<String> args) throws ParameterException {
-        List<String> remainingParameters = super.setParameters(args);
-        long seed = SEED_PARAM.getValue();
-        random = new Random(seed);
-        sigma = SIGMA_PARAM.getValue();
-        alpha = ALPHA_PARAM.getValue();
-        n = N_PARAM.getValue();
-        begin = BEGIN_PARAM.getValue();
-        end = END_PARAM.getValue() - begin;
-        if (MISSING_PARAM.isSet()) {
-            missing = MISSING_PARAM.getValue();
+    while(added && numberOfAddition > 0) {
+      added = false;
+      numberOfAddition--;
+      // Compute row mean for each col j
+      List<Integer> colToAdd = new ArrayList<Integer>();
+      for(int j = currentCols.nextClearBit(0); j < getColDim(); j = currentCols.nextClearBit(j + 1)) {
+        if(computeColResidue(j) <= currentResidue) {
+          colToAdd.add(j);
         }
-        if (MULTIPLE_ADDITION_PARAM.isSet()) {
-            multipleAddition = MULTIPLE_ADDITION_PARAM.getValue();
-        }
-        return remainingParameters;
-    }
-
-    /**
-     * Calculates the score of the current bicluster, according to the rows and
-     * columns set to true.
-     *
-     * @return score of the bicluster
-     */
-    public double getValueH() {
-        double hValue = 0;
-        for (int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
-            for (int j = cols.nextSetBit(0); j >= 0; j = cols.nextSetBit(j + 1)) {
-                double value;
-                if (inNodeAddition && invertedRows.get(i)) {
-                    value = -valueAt(i, j);
-                }
-                else if (inNodeAddition && !invertedRows.get(i)) {
-                    value = valueAt(i, j);
-                }
-                else {
-                    value = maskedValueAt(i, j);
-                }
-                hValue = hValue + meanSQR(value, i, j);
-            }
-        }
-        hValue = hValue / (rows.cardinality() * cols.cardinality());
-        return hValue;
-
-    }
-
-    /**
-     * Calculates the score of a single value within the data matrix.
-     *
-     * @param val the value who`s score will be calculated
-     * @param i   the row-key to the corresponding rowMean
-     * @param j   the column-key to the corresponding columnMean
-     * @return the score of the value in row i and column j
-     */
-    public double meanSQR(double val, int i, int j) {
-        double rowMean = rowMeans.get(i);
-        double columnMean = columnMeans.get(j);
-        double biclusterM = biclusterMean;
-
-        double residue = (val - rowMean - columnMean + biclusterM)
-            * (val - rowMean - columnMean + biclusterM);
-        return residue;
-    }
-
-    /**
-     * Recalculates the rowMeans.
-     */
-    protected void initiateRowMeans() {
-        for (int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
-            rowMeans.put(i, meanOfRow(i, cols));
-        }
-        if (inNodeAddition) {
-            for (int i = rows.nextClearBit(0); i >= 0; i = rows
-                .nextClearBit(i + 1)) {
-                if (i >= rowDim) {
-                    break;
-                }
-                rowMeans.put(i, meanOfRow(i, cols));
-            }
-        }
-    }
-
-    /**
-     * Recalculates the columnMeans.
-     */
-    protected void initiateColMeans() {
-        for (int j = cols.nextSetBit(0); j >= 0; j = cols.nextSetBit(j + 1)) {
-            columnMeans.put(j, meanOfCol(rows, j));
-        }
-        if (inNodeAddition) {
-            for (int j = cols.nextClearBit(0); j >= 0; j = cols
-                .nextClearBit(j + 1)) {
-                if (j >= colDim) {
-                    break;
-                }
-                columnMeans.put(j, meanOfRow(j, cols));
-            }
-        }
-    }
-
-    /**
-     * Overrides valueAt in AbstractBiclustering to replace missing values with
-     * random numbers.
-     */
-    @Override
-    protected double valueAt(int row, int col) {
-        if (missingRowsToMask.get(row) && missingColsToMask.get(col)) {
-            return maskedValueAt(row, col);
-        }
-        return super.valueAt(row, col);
-    }
-
-    /**
-     * Adjusts the rowMean to the different requests of Algorithm3.
-     */
-    @Override
-    protected double meanOfRow(int row, BitSet cols) {
-        double sum = 0;
-        if (inNodeAddition && invertedRows.get(row)) {
-            for (int j = cols.nextSetBit(0); j >= 0; j = cols.nextSetBit(j + 1)) {
-                sum += -valueAt(row, j);
-            }
-        }
-        else if (inNodeAddition && !invertedRows.get(row)) {
-            for (int j = cols.nextSetBit(0); j >= 0; j = cols.nextSetBit(j + 1)) {
-                sum += valueAt(row, j);
-            }
-        }
-        else {
-            for (int j = cols.nextSetBit(0); j >= 0; j = cols.nextSetBit(j + 1)) {
-                sum += maskedValueAt(row, j);
-            }
-        }
-        return sum / cols.cardinality();
-    }
-
-    /**
-     * Adjusts the columnMean to the different requests of the
-     * Node-Addition-Algorithm.
-     */
-    @Override
-    protected double meanOfCol(BitSet rows, int col) {
-        double sum = 0;
-        for (int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
-            if (inNodeAddition && invertedRows.get(i)) {
-                sum += -valueAt(i, col);
-            }
-            else if (inNodeAddition && !invertedRows.get(i)) {
-                sum += valueAt(i, col);
-            }
-            else {
-                sum += maskedValueAt(i, col);
-            }
-        }
-        return sum / rows.cardinality();
-
-    }
-
-    /**
-     * Calculates the score of each row still belonging to the bicluster as a
-     * potential candidate to be removed.
-     *
-     * @return a list of scores mapped to their row
-     */
-    protected Map<Integer, Double> reductionValuesRows() {
-        Map<Integer, Double> resultRows = new LinkedHashMap<Integer, Double>();
-        double temp = 0;
-        for (int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
-            temp = 0;
-            for (int j = cols.nextSetBit(0); j >= 0; j = cols.nextSetBit(j + 1)) {
-                double value = maskedValueAt(i, j);
-                temp = temp + meanSQR(value, i, j);
-            }
-            resultRows.put(i, temp / cols.cardinality());
-        }
-        return resultRows;
-    }
-
-    /**
-     * Calculates the score of each column still belonging to the bicluster as a
-     * potential candidate to be removed.
-     *
-     * @return a list of scores mapped to their column
-     */
-    protected Map<Integer, Double> reductionValuesCols() {
-        Map<Integer, Double> resultCols = new LinkedHashMap<Integer, Double>();
-        double temp = 0;
-        for (int j = cols.nextSetBit(0); j >= 0; j = cols.nextSetBit(j + 1)) {
-            temp = 0;
-            for (int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
-                double value = maskedValueAt(i, j);
-                temp = temp + meanSQR(value, i, j);
-            }
-            resultCols.put(j, temp / rows.cardinality());
-        }
-        return resultCols;
-    }
-
-    /**
-     * Recalculates the rowMean, the columnMean, the biclusterMean and the score
-     * of the current bicluster.
-     */
-    protected void recomputeValues() {
-        initiateRowMeans();
-        initiateColMeans();
-        biclusterMean = meanOfBicluster(rows, cols);
-        valueH = getValueH();
-    }
-
-    /**
-     * @param row the row of the requested value
-     * @param col the column of the requested value
-     * @return a random value if the row and the column already belong to a
-     *         found bicluster, the value of the row and column in the dataset
-     *         otherwise.
-     */
-    protected double maskedValueAt(int row, int col) {
-        IntIntPair key = new IntIntPair(row, col);
-        if (maskedVals.containsKey(key)) {
-            return maskedVals.get(key);
-        }
-        return super.valueAt(row, col);
-    }
-
-    /**
-     * Initiates the necessary structures for the following algorithm.
-     */
-    public void initiateChengAndChurch() {
-        maskedVals = new LinkedHashMap<IntIntPair, Double>();
-        this.rowDim = super.getRowDim();
-        this.colDim = super.getColDim();
-        missingRowsToMask = new BitSet();
-        missingColsToMask = new BitSet();
-        findMissingValues();
-        applyAlgorithms();
-    }
-
-    /**
-     * Finds the missing values in the dataset if the missingParameter is set.
-     */
-    private void findMissingValues() {
-        if (!MISSING_PARAM.isSet()) {
-            return;
-        }
-        for (int i = 0; i < rowDim; i++) {
-            for (int j = 0; j < colDim; j++) {
-                if (super.valueAt(i, j) == missing) {
-                    missingRowsToMask.set(i);
-                    missingColsToMask.set(j);
-                    IntIntPair key = new IntIntPair(i, j);
-                    maskedVals.put(key, (double) random.nextInt(end) + begin);
-                }
-            }
-        }
-    }
-
-    /**
-     * Masks all rows and columns previously belonging to some bicluster.
-     */
-    private void maskMatrix() {
-        for (int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
-            for (int j = cols.nextSetBit(0); j >= 0; j = cols.nextSetBit(j + 1)) {
-                IntIntPair key = new IntIntPair(i, j);
-                maskedVals.put(key, (double) random.nextInt(end) + begin);
-            }
-        }
-    }
-
-    /**
-     * Initiates the multipleNodeDeletion, the singleNodeDeletion and the
-     * nodeAddition, masks the remaining rows and columns within the resulting
-     * bicluster adds the found bicluster to the result.
-     */
-    public void applyAlgorithms() {
-        for (int i = 0; i < n; i++) {
-            multipleNodeDeletion();
-            singleNodeDeletion();
-            nodeAddition();
-            if (isVerbose()) {
-                verbose("Score of bicluster" + (i + 1) + ": " + valueH);
-                verbose("number of rows: " + rows.cardinality());
-                verbose("number of columns: " + cols.cardinality());
-                verbose("total number of masked values: " + maskedVals.size()
-                    + "\n");
-            }
-            maskMatrix();
-            //BiclusterWithInverted<V> bicluster = defineBicluster(rows, cols);
-            BiclusterWithInverted<V> bicluster = new BiclusterWithInverted<V>(rowsBitsetToIDs(rows), colsBitsetToIDs(cols), getDatabase());
-            //addInvertedRows(bicluster, invertedRows);
-            bicluster.setInvertedRows(rowsBitsetToIDs(invertedRows));
-            addBiclusterToResult(bicluster);
-            reset();
-        }
-    }
-
-    /**
-     * Resets the values for the next iteration.
-     */
-    private void reset() {
-        rowMeans.clear();
-        columnMeans.clear();
-        biclusterMean = 0;
-        valueH = 0;
-        invertedRows.clear();
+      }
+      // Add the found ones
+      for(Integer col : colToAdd) {
+        currentCols.set(col);
         added = true;
-        removed = true;
-        inNodeAddition = false;
+      }
+      if(added) {
+        updateValues();
+      }
+
+      // Compute row mean for each row i
+      List<Integer> rowsToAdd = new ArrayList<Integer>();
+      for(int i = currentRows.nextClearBit(0); i < getRowDim(); i = currentRows.nextClearBit(i + 1)) {
+        if(computeRowResidue(i, false) <= currentResidue) {
+          rowsToAdd.add(i);
+        }
+        else if(computeRowResidue(i, true) <= currentResidue) {
+          // TODO: add this row to the normal rows or just to the inverted?
+          // When just to the inverted, consider these rows in computation of
+          // mean squared residue?
+          rowsToAdd.add(i);
+          invertedRows.set(i);
+        }
+      }
+      // Add the found ones
+      for(Integer row : rowsToAdd) {
+        currentRows.set(row);
+        added = true;
+      }
+      if(added) {
+        updateValues();
+      }
     }
+  }
 
-    /**
-     * Recalculates the necessary structures for multipleNodeDeletion. Performs
-     * multiple node deletion until the score of the resulting bicluster is
-     * lower or equal to alpha &lowast; sigma.
-     */
-    public void multipleNodeDeletion() {
-        rows = new BitSet(rowDim - 1);
-        cols = new BitSet(colDim - 1);
-        rows.set(0, rowDim);
-        cols.set(0, colDim);
-        rowMeans = new LinkedHashMap<Integer, Double>();
-        columnMeans = new LinkedHashMap<Integer, Double>();
-        recomputeValues();
-        removed = true;
-        while (removed) {
-            removed = false;
-            if (valueH > sigma) {
-                if (rowDim >= 100) {
-                    Map<Integer, Double> delRows = reductionValuesRows();
-                    for (int i = rows.nextSetBit(0); i >= 0; i = rows
-                        .nextSetBit(i + 1)) {
-                        if (delRows.get(i) > alpha * valueH) {
-                            rows.clear(i);
-                            removed = true;
-                        }
-                    }
-                    initiateColMeans();
-                    biclusterMean = meanOfBicluster(rows, cols);
-                    valueH = getValueH();
-                }
+  /**
+   * <p>
+   * Resets the values for the next iteration to start.
+   * </p>
+   * <p>
+   * These are {@link #rowMeans}, {@link #columnMeans}, {@link #currentMean},
+   * {@link #currentResidue}, {@link #invertedRows}. It sets the
+   * {@link #currentRows} and {@link #currentCols} from 0 to
+   * {@link #getRowDim()} ({@link #getColDim()} resp.).<br/>
+   * It calls {@link #updateValues()} at the end.
+   * </p>
+   */
+  private void reset() {
 
-                if (colDim >= 100) {
-                    Map<Integer, Double> delCols = reductionValuesCols();
-                    for (int j = cols.nextSetBit(0); j >= 0; j = cols
-                        .nextSetBit(j + 1)) {
-                        if (delCols.get(j) > alpha * valueH) {
-                            cols.clear(j);
-                            removed = true;
-                        }
-                    }
-                }
-                recomputeValues();
+    currentResidue = 0.0;
+    currentMean = 0.0;
 
-                // if (removed) {
-                // chooseMaxRAlgorithm2();
-                // }
-            }
-        }
+    rowMeans = new HashMap<Integer, Double>();
+    columnMeans = new HashMap<Integer, Double>();
+
+    invertedRows.clear();
+
+    currentCols = new BitSet(getColDim());
+    currentCols.set(0, getColDim());
+
+    currentRows = new BitSet(getRowDim());
+    currentRows.set(0, getRowDim());
+    updateValues();
+
+  }
+
+  /**
+   * Fills the missing values with random values ranging from
+   * {@link #minMissingValue} to {@link #maxMissingValue}.
+   */
+  private void fillMissingValues() {
+    if(this.missingValues == null) {
+      this.missingValues = new HashMap<IntIntPair, Double>();
     }
-
-    /**
-     * Performs single node deletion until the score of the resulting bicluster
-     * is lower or equal to sigma.
-     */
-    private void singleNodeDeletion() {
-        recomputeValues();
-        if (valueH > sigma) {
-            int maxDelRow = -1;
-            int maxDelColumn = -1;
-            Map<Integer, Double> delRows = reductionValuesRows();
-            Map<Integer, Double> delCols = reductionValuesCols();
-
-            if (delRows.size() != 0) {
-                maxDelRow = chooseMax(delRows);
-            }
-            if (delCols.size() != 0) {
-                maxDelColumn = chooseMax(delCols);
-            }
-
-            if (delRows.get(maxDelRow) >= delCols.get(maxDelColumn)) {
-                rows.clear(maxDelRow);
-            }
-            else {
-                cols.clear(maxDelColumn);
-            }
-            singleNodeDeletion();
-        }
+    if(!MISSING_PARAM.isSet()) {
+      return;
     }
-
-    /**
-     * Determines the key associated with the doubleValue within the map.
-     *
-     * @param a a map with scores associated to their row
-     * @return the key for the row with maximal score
-     */
-    public static int chooseMax(Map<Integer, Double> a) {
-        if (a != null && a.size() != 0) {
-            Iterator<Integer> iter = a.keySet().iterator();
-            Integer max = iter.next();
-            for (int i = 1; i < a.size(); i++) {
-                Integer potentialMax = iter.next();
-                if (a.get(potentialMax) > a.get(max)) {
-                    max = potentialMax;
-                }
-            }
-            return max;
+    try {
+      for(int i = 0; i < getRowDim(); i++) {
+        for(int j = 0; j < getColDim(); j++) {
+          if(super.valueAt(i, j) == MISSING_PARAM.getValue()) {
+            missingValues.put(new IntIntPair(i, j), minMissingValue + random.nextDouble() * (maxMissingValue - minMissingValue));
+          }
         }
-        throw new IllegalArgumentException(
-            "the HashMap must contain at least one Element");
+      }
     }
-
-    /**
-     * Initiates node Addition.
-     */
-    public void nodeAddition() {
-        invertedRows.clear();
-        chooseMinAdditions();
+    catch(UnusedParameterException e) {
+      e.printStackTrace();
     }
+  }
 
-    /**
-     * Determines which row can be added to the bicluster without increasing the
-     * score and adds them to the bicluster.
-     */
-    private void chooseMinAdditions() {
-        inNodeAddition = true;
-        recomputeValues();
-        added = false;
-
-        Map<Integer, Double> colAdds = additionValuesCols();
-        if (colAdds.size() != 0) {
-            for (int j = cols.nextClearBit(0); j >= 0; j = cols
-                .nextClearBit(j + 1)) {
-                if (j >= colDim) {
-                    break;
-                }
-                if (colAdds.get(j) <= valueH) {
-                    added = true;
-                    cols.set(j);
-                }
-            }
-            initiateRowMeans();
-            biclusterMean = meanOfBicluster(rows, cols);
-            valueH = getValueH();
-        }
-
-        Map<Integer, Double> rowAdds = additionValuesRows();
-        if (rowAdds.size() != 0) {
-            for (int i = rows.nextClearBit(0); i >= 0; i = rows
-                .nextClearBit(i + 1)) {
-                if (i >= rowDim) {
-                    break;
-                }
-                if (rowAdds.get(i) <= valueH) {
-                    added = true;
-                    rows.set(i);
-                }
-            }
-        }
-
-        Map<Integer, Double> rowAddsInv = reductionValuesRowsInv();
-        if (rowAddsInv.size() != 0) {
-            for (int i = rows.nextClearBit(0); i >= 0; i = rows
-                .nextClearBit(i + 1)) {
-                if (i >= rowDim) {
-                    break;
-                }
-                if (rowAddsInv.get(i) <= valueH) {
-                    added = true;
-                    rows.set(i);
-                    invertedRows.set(i);
-                }
-            }
-        }
-        recomputeValues();
-        inNodeAddition = false;
-        if (multipleAddition > 1 && added) {
-            multipleAddition--;
-            chooseMinAdditions();
-        }
-        else {
-            if (MULTIPLE_ADDITION_PARAM.isSet()) {
-                // restores the value of multipleAddition for the next iteration
-                // if the parameter is not set, the previous if-clause will
-                // never be entered and
-                // therefore the parameter will remain unchanged.
-                try {
-                    multipleAddition = MULTIPLE_ADDITION_PARAM.getValue();
-                }
-                catch (UnusedParameterException e) {
-                    // We tested for isSet(), thus this should not be reachable.
-                    throw new AbortException("Should not be possible." + e.toString());
-                }
-
-            }
-
-        }
+  /**
+   * Masks all {@link #currentRows} and {@link #currentCols} belonging to the
+   * current bicluster.</p>
+   * <p>
+   * The masking values range from {@link #minMissingValue} to
+   * {@link #maxMissingValue} in a uniform manner.
+   * </p>
+   */
+  private void maskMatrix() {
+    for(int i = currentRows.nextSetBit(0); i >= 0; i = currentRows.nextSetBit(i + 1)) {
+      for(int j = currentCols.nextSetBit(0); j >= 0; j = currentCols.nextSetBit(j + 1)) {
+        IntIntPair key = new IntIntPair(i, j);
+        maskedVals.put(key, minMissingValue + random.nextDouble() * (maxMissingValue - minMissingValue));
+      }
     }
+  }
 
-    /**
-     * Calculates the scores for the rows not belonging to the current bicluster
-     * as potential candidates to be added.
-     *
-     * @return list of scores mapped to their rows
-     */
-    protected Map<Integer, Double> additionValuesRows() {
-        Map<Integer, Double> resultRows = new LinkedHashMap<Integer, Double>();
-        double temp = 0;
-        for (int i = rows.nextClearBit(0); i >= 0; i = rows.nextClearBit(i + 1)) {
-            if (i >= rowDim) {
-                break;
-            }
-            temp = 0;
-            for (int j = cols.nextSetBit(0); j >= 0; j = cols.nextSetBit(j + 1)) {
-                double value = valueAt(i, j);
-                temp = temp + meanSQR(value, i, j);
-            }
-            resultRows.put(i, temp / cols.cardinality());
-        }
-        return resultRows;
+  /**
+   * Updates the {@link #currentResidue}, {@link #currentMean} and calls
+   * {@link #updateAllColMeans()} and {@link #updateAllRowMeans()}. </p>
+   * <p>
+   * It uses the {@link #currentRows} and {@link #currentCols} for that purpose.
+   * </p>
+   */
+  private void updateValues() {
+    this.currentMean = meanOfSubmatrix(currentRows, currentCols);
+    updateAllRowMeans();
+    updateAllColMeans();
+    this.currentResidue = computeMeanSquaredResidue(currentRows, currentCols);
+  }
+
+  /**
+   * Computes all row means of the current bicluster ({@link #currentRowMeans}
+   * and {@link #currentColMeans}).
+   * 
+   * <!-- @param currentRows The currentRows of the sub matrix.
+   * 
+   * @param currentCols The columns of the sub matrix.
+   * @return Returns a map that contains a row mean for every specified row in
+   *         <code>currentRows</code>. -->
+   */
+  private void updateAllRowMeans() {
+    // if (this.rowMeans == null) {
+    this.rowMeans = new HashMap<Integer, Double>();
+    // }
+    // TODO: inverted?
+    for(int i = currentRows.nextSetBit(0); i >= 0; i = currentRows.nextSetBit(i + 1)) {
+      rowMeans.put(i, meanOfRow(i, currentCols));
     }
+    // return rowMeans;
+  }
 
-    /**
-     * Calculates the scores for the columns not belonging to the current
-     * bicluster as potential candidates to be added.
-     *
-     * @return list of scores mapped to their columns
-     */
-    protected Map<Integer, Double> additionValuesCols() {
-        Map<Integer, Double> resultCols = new LinkedHashMap<Integer, Double>();
-        double temp = 0;
-        for (int j = cols.nextClearBit(0); j >= 0; j = cols.nextClearBit(j + 1)) {
-            if (j >= colDim) {
-                break;
-            }
-            temp = 0;
-            for (int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
-                double value = valueAt(i, j);
-                temp = temp + meanSQR(value, i, j);
-            }
-            resultCols.put(j, temp / rows.cardinality());
-        }
-        return resultCols;
+  /**
+   * Computes all column means of the current bicluster (
+   * {@link #currentRowMeans} and {@link #currentColMeans}). <!--
+   * 
+   * @param currentRows The currentRows of the sub matrix.
+   * @param currentCols The columns of the sub matrix.
+   * @return Returns a map that contains a column mean for every specified
+   *         column in <code>currentCols</code>. -->
+   */
+  private void updateAllColMeans() {
+    // if (this.columnMeans == null) {
+    this.columnMeans = new HashMap<Integer, Double>();
+    // }
+    // TODO: inverted?
+    for(int j = currentCols.nextSetBit(0); j >= 0; j = currentCols.nextSetBit(j + 1)) {
+      columnMeans.put(j, meanOfCol(currentRows, j));
     }
+  }
 
-    /**
-     * Calculates the scores for the inverted rows not belonging to the current
-     * bicluster as potential candidates to be added.
-     *
-     * @return list of scores mapped to their rows
-     */
-    protected Map<Integer, Double> reductionValuesRowsInv() {
-        Map<Integer, Double> resultRows = new LinkedHashMap<Integer, Double>();
-        double temp = 0;
-        for (int i = rows.nextClearBit(0); i >= 0; i = rows.nextClearBit(i + 1)) {
-            if (i >= rowDim) {
-                break;
-            }
-            temp = 0;
-            for (int j = cols.nextSetBit(0); j >= 0; j = cols.nextSetBit(j + 1)) {
-                double value = -valueAt(i, j);
-                double rowMean = -rowMeans.get(i);
-                double columnMean = columnMeans.get(j);
-                double biclusterM = biclusterMean;
-                double term = (value - rowMean - columnMean + biclusterM);
-                temp = temp + term * term;
-            }
-            resultRows.put(i, temp / cols.cardinality());
-        }
-        return resultRows;
+  /**
+   * Calculates the score (= mean squared residue) of the bicluster given by the
+   * currentRows and columns.
+   * 
+   * @param currentRows A {@link BitSet} that specifies the currentRows of the
+   *        bicluster.
+   * @param currentCols A {@link BitSet} that specifies the columns of the
+   *        bicluster.
+   * 
+   * @return Returns the score (mean squared residue) of the given bicluster.
+   */
+  private double computeMeanSquaredResidue(BitSet rows, BitSet cols) {
+    double msr = 0.0;
+    // double meanOfSubmatrix = meanOfSubmatrix(rows, cols, addition);
+    // TODO: invertedRows?
+
+    for(int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
+      for(int j = cols.nextSetBit(0); j >= 0; j = cols.nextSetBit(j + 1)) {
+        // double val = valueAt(i, j) - meanOfRow(i, cols, addition) +
+        // meanOfCols(j, rows, addition) - currentMean;
+        double val = valueAt(i, j) - rowMeans.get(i) + columnMeans.get(j) - currentMean;
+        msr += (val * val);
+      }
     }
+    msr /= (rows.cardinality() * cols.cardinality());
+    return msr;
+  }
 
-    /**
-     * The description of this Algorithm.
-     */
-    public Description getDescription() {
-        Description abs = new Description(
-            "ChengAndChurch",
-            "a biclustering method on row- and columnScoreBases",
-            "finding correlated values in a subset of rows and a subset of columns",
-            "Y. Cheng and G. M. Church. Biclustering of expression data. In Proceedings of the 8th International Conference on Intelligent Systems for Molecular Biology (ISMB), San Diego, CA, 2000.");
-		return abs;
-	}
+  /**
+   * Computes the mean of the bicluster that spans over the given currentRows
+   * and columns.</p>
+   * 
+   * @param currentCols A {@link BitSet} that indicates which columns should be
+   *        used to compute the mean.
+   * @param currentRows A {@link BitSet} that indicates which rows should be
+   *        used to compute the mean. <!-- @param addition A flag that indicates
+   *        if the mean should be computed in the addition mode (
+   *        <code>true</code>) or not (<code>false</code>). -->
+   * @return Returns the mean of the bicluster at the given currentRows and
+   *         columns.
+   */
+  private double meanOfSubmatrix(BitSet rows, BitSet cols) {
+    double sum = 0.0;
+    // TODO: Consider invertedRows???
+    for(int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
+      for(int j = cols.nextSetBit(0); j >= 0; j = cols.nextSetBit(j + 1)) {
+        sum += valueAt(i, j);
+      }
+    }
+    return sum / (rows.cardinality() * cols.cardinality());
+  }
 
-	/**
-	 * Initiates this Algorithm.
-	 */
-	@Override
-	public void biclustering() {
-		long t = System.currentTimeMillis();
-		initiateChengAndChurch();
-		if(isVerbose()){
-		verbose("Runtime: "+(System.currentTimeMillis() - t));}
-	}
+  /**
+   * Finds the <b>largest row residue</b> in the current biclsuter by examine
+   * the its current row means. The row means and current rows of the current
+   * cluster are used. </p>
+   * 
+   * @return An {@link IntDoublePair} that holds the row as FIRST and the value
+   *         of that row residue as SECOND.
+   */
+  private IntDoublePair getLargestRowResidue() {
+    Double max = 0.0;
+    int row = currentRows.nextSetBit(0);
+    for(int i = currentRows.nextSetBit(0); i >= 0; i = currentRows.nextSetBit(i + 1)) {
+      double rowResidue = computeRowResidue(i, false);
+      if(max < rowResidue) {
+        max = rowResidue;
+        row = i;
+      }
+    }
+    return new IntDoublePair(row, max);
+  }
+
+  /**
+   * Computes the <b>mean row residue</b> of the given <code>row</code>.
+   * 
+   * @param row The row who's residue should be computed.
+   * @param inverted Indicates if the residue should be computed as the inverted
+   *        (<code>true</code>).
+   * @return The row residue of the given <code>row</code>.
+   */
+  private double computeRowResidue(int row, boolean inverted) {
+    double rowResidue = 0.0;
+    for(int j = currentCols.nextSetBit(0); j >= 0; j = currentCols.nextSetBit(j + 1)) {
+      // if rowMeans does not contains the row: recompute it...
+      Double rowMean = rowMeans.get(row);
+      if(rowMean == null) {
+        rowMean = this.meanOfRow(row, currentCols);
+        rowMeans.put(row, rowMean);
+      }
+      Double colMean = columnMeans.get(j);
+      if(colMean == null) {
+        colMean = this.meanOfCol(currentRows, j);
+        columnMeans.put(j, colMean);
+      }
+      double val = 0.0;
+      if(inverted) {
+        // TODO: check for invertedRows... Check formula
+        val = currentMean + rowMean - colMean - valueAt(row, j);
+      }
+      else {
+        val = valueAt(row, j) - colMean - rowMean + currentMean;
+      }
+      rowResidue += (val * val);
+    }
+    return (rowResidue / currentCols.cardinality());
+  }
+
+  /**
+   * Finds the <b>largest column residue</b> in the current biclsuter by examine
+   * the its current column means. The column means and current columns of the
+   * current cluster are used. </p>
+   * 
+   * @return An {@link IntDoublePair} that holds the column as FIRST and the
+   *         value of that column residue as SECOND.
+   */
+  private IntDoublePair getLargestColResidue() {
+    Double max = 0.0;
+    int col = currentCols.nextSetBit(0);
+    for(int j = currentCols.nextSetBit(0); j >= 0; j = currentCols.nextSetBit(j + 1)) {
+      double colResidue = computeColResidue(j);
+      if(max < colResidue) {
+        max = colResidue;
+        col = j;
+      }
+    }
+    return new IntDoublePair(col, max);
+  }
+
+  /**
+   * 
+   * Computes the <b>mean column residue</b> of the given <code>col</code>.
+   * 
+   * @param col The column who's residue should be computed.
+   * @return The row residue of the given <code>col</code>um.
+   */
+  private double computeColResidue(int col) {
+    double colResidue = 0.0;
+    for(int i = currentRows.nextSetBit(0); i >= 0; i = currentRows.nextSetBit(i + 1)) {
+      Double colMean = columnMeans.get(col);
+      // if columnMeans does not contains the column: recompute it...
+      if(colMean == null) {
+        colMean = this.meanOfCol(currentRows, col);
+        columnMeans.put(col, colMean);
+      }
+      Double rowMean = rowMeans.get(i);
+      if(rowMean == null) {
+        rowMean = this.meanOfRow(i, currentCols);
+        rowMeans.put(i, rowMean);
+      }
+      double val = valueAt(i, col) - rowMean - colMean + currentMean;
+      colResidue += (val * val);
+    }
+    return (colResidue / currentRows.cardinality());
+  }
+
+  //
+  /**
+   * Returns the newly generated value at the specified position if this
+   * position has been masked (see {@link #maskedVals}) or that this position is
+   * missing ({@link #missingValues}). Otherwise the value in the database is
+   * returned. </p>
+   * <p>
+   * Overrides {@link AbstractBiclustering#valueAt(int, int)}
+   * </p>
+   * 
+   * @param row The row.
+   * @param col The column.
+   * @return Returns the fake value if the position (given by row and col) has
+   *         been masked or is missing. Otherwise the original value in the
+   *         database is returned.
+   */
+  @Override
+  protected double valueAt(int row, int col) {
+    IntIntPair key = new IntIntPair(row, col);
+    if(maskedVals.containsKey(key)) {
+      return maskedVals.get(key);
+    }
+    if(missingValues.containsKey(key)) {
+      return missingValues.get(key);
+    }
+    return super.valueAt(row, col);
+  }
+
+  /**
+   * The description of this Algorithm.
+   */
+  public Description getDescription() {
+    Description abs = new Description("ChengAndChurch", "A biclustering method on row- and column score base", "Finding correlated values in a subset of currentRows and a subset of columns", "Y. Cheng and G. M. Church. Biclustering of expression data. In Proceedings of the 8th International Conference on Intelligent Systems for Molecular Biology (ISMB), San Diego, CA, 2000.");
+    return abs;
+  }
 
 }
