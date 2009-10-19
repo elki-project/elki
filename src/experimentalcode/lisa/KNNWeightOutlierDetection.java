@@ -143,8 +143,8 @@ public class KNNWeightOutlierDetection <O extends DatabaseObject, D extends Doub
     @Override
     public Description getDescription() {
       return new Description(
+          "KNN Weight",
           "KNNWeight outlier detection",
-          "Fast Outlier Detection in High Dimensional Spaces",
           "Outlier Detection based on the distances of an object to its k nearest neighbors.",
           "F. Angiulli, C. Pizzuti: " +
           "Fast Outlier Detection in High Dimensional Spaces: " +

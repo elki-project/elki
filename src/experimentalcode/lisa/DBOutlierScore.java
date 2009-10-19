@@ -80,8 +80,6 @@ public  class DBOutlierScore<O extends DatabaseObject, D extends Distance<D>> ex
     for(Integer id : database) {
       // compute percentage of neighbors in the given neighborhood with size d
       n = (database.rangeQuery(id, d, getDistanceFunction()).size()) / (double) database.size();
-
-      
       database.associate(DBOS_ODEGREE, id, 1- n);
     }
     AnnotationFromDatabase<Double, O> res1 = new AnnotationFromDatabase<Double, O>(database, DBOS_ODEGREE);
