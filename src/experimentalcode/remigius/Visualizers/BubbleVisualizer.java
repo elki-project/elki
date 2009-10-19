@@ -185,7 +185,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
     this.clustering = clustering;
     
     this.normalizationScale = normalizationScale;
-    this.plotScale = new LinearScale(0.1);
+    this.plotScale = new LinearScale(0.2);
     this.gammaFunction = new GammaFunction(gamma);
     this.cutOffScale = new CutOffScale(cutOff);
   }
