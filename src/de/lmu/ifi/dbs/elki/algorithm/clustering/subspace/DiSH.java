@@ -230,7 +230,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
     private void computeClusters(Database<V> database, ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> clusterOrder) {
         int dimensionality = database.dimensionality();
 
-        DiSHDistanceFunction<V, DiSHPreprocessor<V, ?>> distanceFunction = (DiSHDistanceFunction) optics.getDistanceFunction();
+        DiSHDistanceFunction<V, DiSHPreprocessor<V>> distanceFunction = (DiSHDistanceFunction) optics.getDistanceFunction();
 
         // extract clusters
         Map<BitSet, List<Pair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>>> clustersMap = extractClusters(database, distanceFunction, clusterOrder);
@@ -302,7 +302,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
      * @return the extracted clusters
      */
     private Map<BitSet, List<Pair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>>> extractClusters(Database<V> database,
-                                                                                          DiSHDistanceFunction<V, DiSHPreprocessor<V, ?>> distanceFunction,
+                                                                                          DiSHDistanceFunction<V, DiSHPreprocessor<V>> distanceFunction,
                                                                                           ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> clusterOrder) {
 
         FiniteProgress progress = new FiniteProgress("Extract Clusters", database.size());
@@ -426,7 +426,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
      * @param clustersMap      the map containing the clusters
      */
     private void checkClusters(Database<V> database,
-                               DiSHDistanceFunction<V, DiSHPreprocessor<V, ?>> distanceFunction,
+                               DiSHDistanceFunction<V, DiSHPreprocessor<V>> distanceFunction,
                                Map<BitSet, List<Pair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>>> clustersMap) {
 
         // check if there are clusters < minpts
@@ -491,7 +491,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
      * @return the parent of the specified cluster
      */
     private Pair<BitSet, DatabaseObjectGroupCollection<List<Integer>>> findParent(Database<V> database,
-                                                                  DiSHDistanceFunction<V, DiSHPreprocessor<V, ?>> distanceFunction,
+                                                                  DiSHDistanceFunction<V, DiSHPreprocessor<V>> distanceFunction,
                                                                   Pair<BitSet, DatabaseObjectGroupCollection<List<Integer>>> child,
                                                                   Map<BitSet, List<Pair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>>> clustersMap) {
         V child_centroid = DatabaseUtil.centroid(database, child.second.getIDs(), child.first);
@@ -538,7 +538,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
      * @param database         the database containing the data objects
      */
     private void buildHierarchy(Database<V> database,
-                                DiSHDistanceFunction<V, DiSHPreprocessor<V, ?>> distanceFunction,
+                                DiSHDistanceFunction<V, DiSHPreprocessor<V>> distanceFunction,
                                 List<Cluster<AxesModel>> clusters, int dimensionality) {
 
         StringBuffer msg = new StringBuffer();
@@ -611,7 +611,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
      *         false otherwise
      */
     private boolean isParent(Database<V> database,
-                             DiSHDistanceFunction<V, DiSHPreprocessor<V, ?>> distanceFunction,
+                             DiSHDistanceFunction<V, DiSHPreprocessor<V>> distanceFunction,
                              Cluster<AxesModel> parent,
                              List<Cluster<AxesModel>> children) {
 
