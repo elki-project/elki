@@ -19,10 +19,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import experimentalcode.lisa.scale.CutOffScale;
 import experimentalcode.lisa.scale.GammaFunction;
 import experimentalcode.lisa.scale.LinearScale;
-import experimentalcode.remigius.ShapeLibrary;
 import experimentalcode.shared.outlier.scaling.StaticScalingFunction;
 
 /**
@@ -150,6 +150,11 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
   private Clustering<Model> clustering;
 
   /**
+   * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
+   */
+  public static final String BUBBLE = "bubble";
+
+  /**
    * A short name characterizing this Visualizer.
    */
   public static final String NAME = "Bubbles";
@@ -198,7 +203,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
     
     for (Cluster<Model> cluster : clustering.getAllClusters()){
       
-      CSSClass bubble = new CSSClass(svgp, ShapeLibrary.BUBBLE + clusterID);
+      CSSClass bubble = new CSSClass(svgp, BUBBLE + clusterID);
       bubble.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, "0.005");
       
       String color;
@@ -265,7 +270,9 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
     
     for (Cluster<Model> cluster : clustering.getAllClusters()){
       for(int id : cluster.getIDs()) {
-        layer.appendChild(ShapeLibrary.createBubble(svgp.getDocument(), getProjected(id, 0), getProjected(id, 1), getScaled(getValue(id)), clusterID));
+        Element circle = SVGUtil.svgCircle(svgp.getDocument(), getProjected(id, 0), getProjected(id, 1), getScaled(getValue(id)));
+        SVGUtil.addCSSClass(circle, BUBBLE + clusterID);
+        layer.appendChild(circle);
       }
       clusterID += 1;
     }

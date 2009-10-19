@@ -11,72 +11,74 @@ import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
-import experimentalcode.remigius.ShapeLibrary;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 
 /**
- * Generates a SVG-Element containing reference points.
- * TODO: Extend that documentation.
- * TODO: This class needs testing.
+ * Generates a SVG-Element containing reference points. TODO: Extend that
+ * documentation. TODO: This class needs testing.
  * 
  * @author Remigius Wojdanowski
- *
+ * 
  * @param <NV>
  */
 public class ReferencePointsVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
-  
+
   /**
    * Serves reference points.
    */
-	private CollectionResult<NV> colResult;
-	
-	/**
+  private CollectionResult<NV> colResult;
+
+  /**
+   * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
+   */
+  public static final String REFPOINT = "refpoint";
+
+  /**
    * A short name characterizing this Visualizer.
    */
-	private static final String NAME = "ReferencePoints";
-	
-	/**
+  private static final String NAME = "ReferencePoints";
+
+  /**
    * Initializes this Visualizer.
    * 
    * @param database contains all objects to be processed.
-	 * @param colResult contains all reference points.
-	 */
-	public void init(VisualizerContext context, CollectionResult<NV> colResult){
-		init(Integer.MAX_VALUE-2000, NAME, context);
-		this.colResult = colResult;
-	}
-	
-	/**
+   * @param colResult contains all reference points.
+   */
+  public void init(VisualizerContext context, CollectionResult<NV> colResult) {
+    init(Integer.MAX_VALUE - 2000, NAME, context);
+    this.colResult = colResult;
+  }
+
+  /**
    * Registers the Reference-Point-CSS-Class at a SVGPlot.
    * 
    * @param svgp the SVGPlot to register the ToolTip-CSS-Class.
    */
-	private void setupCSS(SVGPlot svgp){
+  private void setupCSS(SVGPlot svgp) {
+    CSSClass refpoint = new CSSClass(svgp, REFPOINT);
+    refpoint.setStatement(SVGConstants.CSS_FILL_PROPERTY, "red");
 
-			CSSClass refpoint = new CSSClass(svgp, ShapeLibrary.REFPOINT);
-			refpoint.setStatement(SVGConstants.CSS_FILL_PROPERTY, "red");
+    try {
+      svgp.getCSSClassManager().addClass(refpoint);
+      svgp.updateStyleElement();
+    }
+    catch(CSSNamingConflict e) {
+      LoggingUtil.exception("Equally-named CSSClass with different owner already exists", e);
+    }
+  }
 
-			try {
-        svgp.getCSSClassManager().addClass(refpoint);
-        svgp.updateStyleElement();
-      }
-      catch(CSSNamingConflict e) {
-        LoggingUtil.exception("Equally-named CSSClass with different owner already exists", e);
-      }
-	}
-	
-
-	@Override
-	public Element visualize(SVGPlot svgp) {
+  @Override
+  public Element visualize(SVGPlot svgp) {
     Element layer = super.visualize(svgp);
-	  setupCSS(svgp);
-		Iterator<NV> iter = colResult.iterator();
-		
-		while (iter.hasNext()){
-			NV v = iter.next();
-			layer.appendChild(
-					ShapeLibrary.createRef(svgp.getDocument(), getProjected(v, 0), getProjected(v, 1))
-			);
-		}
-		return layer;
-	}
+    setupCSS(svgp);
+    Iterator<NV> iter = colResult.iterator();
+
+    while(iter.hasNext()) {
+      NV v = iter.next();
+      Element dot = SVGUtil.svgCircle(svgp.getDocument(), getProjected(v, 0), getProjected(v, 1), 0.005);
+      SVGUtil.addCSSClass(dot, REFPOINT);
+      layer.appendChild(dot);
+    }
+    return layer;
+  }
 }

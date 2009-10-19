@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import experimentalcode.remigius.ShapeLibrary;
 import experimentalcode.remigius.gui.listener.TooltipListener;
 
 /**
@@ -114,7 +113,7 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
       Element tooltip = SVGUtil.svgText(svgp.getDocument(), getProjected(id, 0) + 0.005, getProjected(id, 1) + 0.003, FormatUtil.NF2.format(getValue(id).doubleValue()));
       SVGUtil.addCSSClass(tooltip, TOOLTIP_HIDDEN);
 
-      String dotID = ShapeLibrary.createID(ShapeLibrary.MARKER, id);
+      String dotID = DotVisualizer.MARKER + id;
       Element dot = svgp.getIdElement(dotID);
       if(dot != null) {
 
@@ -127,7 +126,7 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
         LoggingUtil.message("Attaching ToolTip to non-existing Object: " + dotID);
       }
       layer.appendChild(tooltip);
-      svgp.putIdElement(ShapeLibrary.createID(TOOLTIP_ID, id), tooltip);
+      svgp.putIdElement(TOOLTIP_ID + id, tooltip);
     }
     return layer;
   }
