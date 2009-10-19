@@ -21,10 +21,10 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import experimentalcode.remigius.ShapeLibrary;
 
 /**
  * Generates a SVG-Element containing a histogram representing the distribution
@@ -182,8 +182,7 @@ public class HistogramVisualizer<NV extends NumberVector<NV, ?>> extends Project
   }
 
   private Element drawLine(SVGPlot svgp, int color, AggregatingHistogram<Double, Double> hist, double max) {
-    Element path = ShapeLibrary.createPath(svgp.getDocument(), hist.getCoverMinimum(), 1, color);
-    SVGUtil.addCSSClass(path, BIN + color);
+    SVGPath path = new SVGPath(hist.getCoverMinimum(), 1);
     double left = 0;
     double right = 0;
     double binwidth = hist.getBinsize();
@@ -191,10 +190,12 @@ public class HistogramVisualizer<NV extends NumberVector<NV, ?>> extends Project
       double val = bin.getSecond() / max;
       left = bin.getFirst() - binwidth / 2;
       right = bin.getFirst() + binwidth / 2;
-      ShapeLibrary.addLine(path, left, 1 - val * 2);
-      ShapeLibrary.addLine(path, right, 1 - val * 2);
+      path.lineTo(left, 1 - val * 2);
+      path.lineTo(right, 1 - val * 2);
     }
-    ShapeLibrary.addLine(path, right, hist.getCoverMaximum());
-    return path;
+    path.lineTo(right, hist.getCoverMaximum());
+    Element elem = path.makeElement(svgp);
+    SVGUtil.addCSSClass(elem, BIN + color);
+    return elem;
   }
 }
