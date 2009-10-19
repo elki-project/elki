@@ -48,6 +48,11 @@ public class HistogramVisualizer<NV extends NumberVector<NV, ?>> extends Project
 
   private Clustering<Model> clustering;
 
+  /**
+   * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
+   */
+  public static final String BIN = "bin";
+
   public HistogramVisualizer() {
     addOption(STYLE_ROW_PARAM);
   }
@@ -70,10 +75,10 @@ public class HistogramVisualizer<NV extends NumberVector<NV, ?>> extends Project
     // creating IDs manually because cluster often return a null-ID.
     int clusterID = 0;
 
-    CSSClass allInOne = new CSSClass(svgp, ShapeLibrary.BIN + -1);
+    CSSClass allInOne = new CSSClass(svgp, BIN + -1);
     for(Cluster<Model> cluster : clustering.getAllClusters()) {
 
-      CSSClass bin = new CSSClass(svgp, ShapeLibrary.BIN + clusterID);
+      CSSClass bin = new CSSClass(svgp, BIN + clusterID);
       String coloredElement;
 
       if(row) {
@@ -161,7 +166,9 @@ public class HistogramVisualizer<NV extends NumberVector<NV, ?>> extends Project
           double lpos = bin.getFirst() - binsize / 2;
           double rpos = bin.getFirst() + binsize / 2;
           double val = bin.getSecond() / scale.getMax();
-          layer.appendChild(ShapeLibrary.createRow(svgp.getDocument(), lpos, 1 - val, rpos - lpos, val, key));
+          Element row = SVGUtil.svgRect(svgp.getDocument(), lpos, 1 - val, rpos - lpos, val);
+          SVGUtil.addCSSClass(row, BIN + key);
+          layer.appendChild(row);
         }
       }
     }
@@ -176,6 +183,7 @@ public class HistogramVisualizer<NV extends NumberVector<NV, ?>> extends Project
 
   private Element drawLine(SVGPlot svgp, int color, AggregatingHistogram<Double, Double> hist, double max) {
     Element path = ShapeLibrary.createPath(svgp.getDocument(), hist.getCoverMinimum(), 1, color);
+    SVGUtil.addCSSClass(path, BIN + color);
     double left = 0;
     double right = 0;
     double binwidth = hist.getBinsize();
