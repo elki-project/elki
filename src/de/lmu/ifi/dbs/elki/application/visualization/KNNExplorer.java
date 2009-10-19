@@ -55,6 +55,7 @@ import de.lmu.ifi.dbs.elki.visualization.batikutil.NodeReplacer;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.savedialog.SVGSaveDialog;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -459,23 +460,12 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
         step = (double) dim / (double) resolution;
       }
 
-      StringBuffer path = new StringBuffer();
+      SVGPath path = new SVGPath();
       for(double id = 0; id < dim; id += step) {
         int i = (int) Math.floor(id);
-        if(i == 0) {
-          path.append(SVGConstants.PATH_MOVE);
-        }
-        path.append(ratio * (((double) i) / (dim - 1)));
-        path.append(" ");
-        path.append(1.0 - s.getScaled(series.getValue(i + 1).doubleValue()));
-        path.append(" ");
-        if(i == 0) {
-          path.append(SVGConstants.PATH_LINE_TO);
-        }
+        path.drawTo(ratio * (((double) i) / (dim - 1)), 1.0 - s.getScaled(series.getValue(i + 1).doubleValue()));
       }
-      // path.append(SVGConstants.PATH_CLOSE);
-      Element p = plot.svgElement(SVGConstants.SVG_PATH_TAG);
-      p.setAttribute(SVGConstants.SVG_D_ATTRIBUTE, path.toString());
+      Element p = path.makeElement(plot);
       return p;
     }
 

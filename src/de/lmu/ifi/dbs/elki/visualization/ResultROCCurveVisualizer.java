@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.visualization.batikutil.NodeReplacer;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.savedialog.SVGSaveDialog;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 
@@ -224,23 +225,11 @@ public class ResultROCCurveVisualizer<O extends DatabaseObject> extends Abstract
       Element newe = plot.svgElement(SVGConstants.SVG_G_TAG);
       SVGUtil.setAtt(newe, SVGConstants.SVG_ID_ATTRIBUTE, SERIESID);
 
-      StringBuffer path = new StringBuffer();
-      boolean first = true;
+      SVGPath path = new SVGPath();
       for(Pair<Double, Double> pair : curve) {
-        if(first) {
-          path.append(SVGConstants.PATH_MOVE);
-        }
-        path.append(ratio * pair.getFirst());
-        path.append(" ");
-        path.append(1.0 - pair.getSecond());
-        path.append(" ");
-        if(first) {
-          path.append(SVGConstants.PATH_LINE_TO);
-        }
-        first = false;
+        path.drawTo(ratio * pair.getFirst(), 1.0 - pair.getSecond());
       }
-      Element line = plot.svgElement(SVGConstants.SVG_PATH_TAG);
-      line.setAttribute(SVGConstants.SVG_D_ATTRIBUTE, path.toString());
+      Element line = path.makeElement(plot);
       line.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, SERIESID);
       newe.appendChild(line);
       plot.scheduleUpdate(new NodeReplacer(newe, plot, SERIESID));
@@ -248,10 +237,9 @@ public class ResultROCCurveVisualizer<O extends DatabaseObject> extends Abstract
     
     public void updateFrame() {
       // prepare replacement tag.
-      Element newe = plot.svgElement(SVGConstants.SVG_PATH_TAG);
+      Element newe = plot.svgRect(0, 0, ratio, 1);
       SVGUtil.setAtt(newe, SVGConstants.SVG_ID_ATTRIBUTE, FRAMEID);
       SVGUtil.setAtt(newe, SVGConstants.SVG_CLASS_ATTRIBUTE, FRAMEID);
-      newe.setAttribute(SVGConstants.SVG_D_ATTRIBUTE, SVGConstants.PATH_MOVE + "0 0 " + SVGConstants.PATH_LINE_TO + ratio + " 0 " + ratio + " 1 0 1 0 0");
       plot.scheduleUpdate(new NodeReplacer(newe, plot, FRAMEID));
     }
   }  

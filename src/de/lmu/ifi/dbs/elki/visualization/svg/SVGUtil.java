@@ -16,7 +16,6 @@ import org.w3c.dom.Element;
  * @author Erich Schubert
  */
 public final class SVGUtil {
-
   /**
    * Formatter to output numbers in a valid SVG number format.
    */
