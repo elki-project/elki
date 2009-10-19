@@ -22,7 +22,7 @@ public class Scales {
    * @param db Database
    * @return Scales, indexed starting with 1 (just like the database)
    */
-  public static <O extends FeatureVector<O,N>, N extends Number> LinearScale[] calcScales(Database<O> db) {
+  public static <O extends FeatureVector<?,? extends Number>> LinearScale[] calcScales(Database<O> db) {
     if (db == null) {
       throw new AbortException("No database was given to Scales.calcScales.");
     }
