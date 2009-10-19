@@ -48,7 +48,7 @@ public class MinimalMarkers implements MarkerLibrary {
   }
 
   @Override
-  public ColorLibrary setColorLibrary() {
+  public ColorLibrary getColorLibrary() {
     return this.colors;
   }
 }

@@ -42,5 +42,5 @@ public interface MarkerLibrary {
    * 
    * @return Color library in use.
    */
-  public ColorLibrary setColorLibrary();
+  public ColorLibrary getColorLibrary();
 }

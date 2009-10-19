@@ -182,7 +182,7 @@ public class PrettyMarkers implements MarkerLibrary {
   }
 
   @Override
-  public ColorLibrary setColorLibrary() {
+  public ColorLibrary getColorLibrary() {
     return this.colors;
   }
 }
