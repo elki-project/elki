@@ -33,9 +33,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * @param <V> Vector Type
  */
 public class MixtureModelOutlierDetection<V extends NumberVector<V,Double>> extends AbstractAlgorithm<V,MultiResult> {
+  /**
+   * The association id to associate the MMOD_OFLAF of an object for the
+   * MixtureModelOutlierDetection algorithm.
+   */
   public static final AssociationID<Double> MMOD_OFLAG = AssociationID.getOrCreateAssociationID("mmod.oflag", Double.class);
-public static final OptionID L_ID = OptionID.getOrCreateOptionID("mmo.l", "expected fraction of outliers");
-public static final OptionID C_ID = OptionID.getOrCreateOptionID("mmo.c", "cutoff");
+  /**
+   * OptionID for {@link #L_PARAM}
+   */
+  public static final OptionID L_ID = OptionID.getOrCreateOptionID("mmo.l", "expected fraction of outliers");
+  /**
+   * OptionID for {@link #C_PARAM}
+   */
+  public static final OptionID C_ID = OptionID.getOrCreateOptionID("mmo.c", "cutoff");
 /**
  * Small value to increment diagonally of a matrix
  * in order to avoid singularity before building the inverse.
@@ -194,8 +204,12 @@ private static final double SINGULARITY_CHEAT = 1E-9;
   
   @Override
   public Description getDescription() {
-    // TODO Auto-generated method stub
-    return null;
+    return new Description(
+        "Mixture Model",
+        "Mixture Model Outlier Detection",
+        "sd",
+        "Eskin, Eleazar: Anomaly detection over noisy data using learned probability distributions. +" +
+        "In: Proc. of the Seventeenth International Conference on Machine Learning (ICML-2000).");
   }
   @Override
   public MultiResult getResult() {

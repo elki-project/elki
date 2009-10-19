@@ -20,7 +20,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
 
 /**
- * Simple distanced based outlier detection algorithm. Based on: E.M. Knorr, R.
+ * Simple distanced based outlier detection algorithm.
+ * 
+ * <p>Reference: 
+ *  E.M. Knorr, R.
  * T. Ng: Algorithms for Mining Distance-Based Outliers in Large Datasets, In:
  * Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998.
  * 

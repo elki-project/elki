@@ -16,15 +16,19 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 /**
- * outlier detection algorithm using EM Clustering. If an object does not belong to any cluster it is supposed to be an outlier.
- * if the probability for an object to belong to the most probable cluster is still relatively low this object is an outlier 
- * @author lisa
+ * outlier detection algorithm using EM Clustering. 
+ * If an object does not belong to any cluster it is supposed to be an outlier. 
+ * If the probability for an object to belong to the most probable cluster is still relatively low this object is an outlier. 
  *
- * @param <V>
+ * @author Lisa Reichert
+ *
+ * @param <V> Vector type
  */
 public class EMOutlierDetection<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, MultiResult>{
   EM<V> emClustering = new EM<V>();
-  
+  /**
+   * association id to associate the 
+   */
   public static final AssociationID<Double> DBOD_MAXCPROB= AssociationID.getOrCreateAssociationID("dbod_maxcprob", Double.class);
   /**
    * Provides the result of the algorithm.
