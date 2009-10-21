@@ -11,7 +11,6 @@ import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -57,7 +56,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
   /**
    * Gamma parameter.
    */
-  private Double gamma;
+  private double gamma;
 
   /**
    * OptionID for {@link #FILL_FLAG}.
@@ -76,7 +75,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
   /**
    * Fill parameter.
    */
-  private Boolean fill;
+  private boolean fill;
 
   /**
    * OptionID for {@link #CUTOFF_PARAM}.
@@ -135,15 +134,8 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
    * result does not contain <b>all</b> IDs the database contains, behavior is
    * undefined.
    */
-  private AnnotationResult<Double> anResult;
+  private AnnotationResult<? extends Number> anResult;
 
-  /**
-   * The complete Result, as returned by an algorithm.
-   * 
-   * TODO: We don't need this anymore.
-   */
-  private Result result;
-  
   /**
    * A clustering of the database.
    */
@@ -176,10 +168,8 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
    *        database.
    * @param result complete result for further information.
    * @param normalizationScale normalizes coordinates.
-   * 
-   * TODO: Refactor from AnnotationResult<Double> to AnnotationResult<Number>
    */
-  public void init(String name, VisualizerContext context, AnnotationResult<Double> anResult, StaticScalingFunction normalizationScale, Clustering<Model> clustering) {
+  public void init(String name, VisualizerContext context, AnnotationResult<? extends Number> anResult, StaticScalingFunction normalizationScale, Clustering<Model> clustering) {
     super.init(1000, name, context);
     this.anResult = anResult;
     this.clustering = clustering;
@@ -201,7 +191,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
     // creating IDs manually because cluster often return a null-ID.
     int clusterID = 0;
     
-    for (Cluster<Model> cluster : clustering.getAllClusters()){
+    for (@SuppressWarnings("unused") Cluster<Model> cluster : clustering.getAllClusters()){
       
       CSSClass bubble = new CSSClass(svgp, BUBBLE + clusterID);
       bubble.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, "0.005");
@@ -247,8 +237,8 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
     return remainingParameters;
   }
 
-  private Double getValue(int id) {
-    return anResult.getValueFor(id);
+  private double getValue(int id) {
+    return anResult.getValueFor(id).doubleValue();
   }
 
   /**
