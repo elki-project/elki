@@ -184,7 +184,6 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
    */
   protected void toggleTooltip(Element elem, String type) {
     String csscls = elem.getAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE);
-    logger.debug("Event on " + elem + " type: " + type + " cls: " + csscls);
     if(SVGConstants.SVG_MOUSEOVER_EVENT_TYPE.equals(type)) {
       if(TOOLTIP_HIDDEN.equals(csscls)) {
         elem.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, TOOLTIP_VISIBLE);
