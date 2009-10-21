@@ -14,8 +14,11 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 
 /**
- * Generates a SVG-Element containing reference points. TODO: Extend that
- * documentation. TODO: This class needs testing.
+ * Generates a SVG-Element containing reference points.
+ * 
+ * TODO: Extend that documentation.
+ * 
+ * TODO: This class needs testing.
  * 
  * @author Remigius Wojdanowski
  * 
@@ -52,7 +55,7 @@ public class ReferencePointsVisualizer<NV extends NumberVector<NV, ?>> extends P
   /**
    * Registers the Reference-Point-CSS-Class at a SVGPlot.
    * 
-   * @param svgp the SVGPlot to register the ToolTip-CSS-Class.
+   * @param svgp the SVGPlot to register the -CSS-Class.
    */
   private void setupCSS(SVGPlot svgp) {
     CSSClass refpoint = new CSSClass(svgp, REFPOINT);

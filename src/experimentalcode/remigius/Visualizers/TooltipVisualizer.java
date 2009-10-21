@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import experimentalcode.remigius.gui.listener.TooltipListener;
 
 /**
- * Generates a SVG-Element containing ToolTips. ToolTips remain invisible until
+ * Generates a SVG-Element containing Tooltips. Tooltips remain invisible until
  * their corresponding Marker is touched by the cursor and stay visible as long
  * as the cursor lingers on the marker. This implementation uses
  * {@link TooltipListener} to achieve this behavior.
@@ -48,7 +48,7 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
   public static final String TOOLTIP_VISIBLE = "tooltip_visible";
 
   /**
-   * Contains the "outlierness-scores" to be displayed as ToolTips. If this
+   * Contains the "outlierness-scores" to be displayed as Tooltips. If this
    * result does not contain <b>all</b> IDs the database contains, behavior is
    * undefined.
    */
@@ -78,9 +78,9 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
   }
 
   /**
-   * Registers the ToolTip-CSS-Class at a SVGPlot.
+   * Registers the Tooltip-CSS-Class at a SVGPlot.
    * 
-   * @param svgp the SVGPlot to register the ToolTip-CSS-Class.
+   * @param svgp the SVGPlot to register the Tooltip-CSS-Class.
    */
   private void setupCSS(SVGPlot svgp) {
     CSSClass tooltiphidden = new CSSClass(svgp, TOOLTIP_HIDDEN);
@@ -123,7 +123,7 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
         targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, hoverer, false);
       }
       else {
-        LoggingUtil.message("Attaching ToolTip to non-existing Object: " + dotID);
+        LoggingUtil.message("Attaching Tooltip to non-existing Object: " + dotID);
       }
       layer.appendChild(tooltip);
       svgp.putIdElement(TOOLTIP_ID + id, tooltip);

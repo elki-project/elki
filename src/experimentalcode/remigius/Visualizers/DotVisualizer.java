@@ -43,7 +43,7 @@ public class DotVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DV
       //Element dot = ml.useMarker(svgp, layer, getProjected(id, 0), getProjected(id, 1), 0, 0.01);
       Element dot = SVGUtil.svgCircle(svgp.getDocument(), getProjected(id, 0), getProjected(id, 1), 0.005);
       SVGUtil.addCSSClass(dot, MARKER);
-      // setting ID for efficient use of ToolTips.
+      // setting ID for efficient use of Tooltips.
       dot.setAttribute("id", MARKER + id);
       layer.appendChild(dot);
       svgp.putIdElement(MARKER + id, dot);
