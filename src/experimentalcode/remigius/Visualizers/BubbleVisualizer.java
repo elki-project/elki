@@ -130,7 +130,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
   private CutOffScale cutOffScale;
 
   /**
-   * Contains the "outlierness-scores" to be displayed as ToolTips. If this
+   * Contains the "outlierness-scores" to be displayed as Tooltips. If this
    * result does not contain <b>all</b> IDs the database contains, behavior is
    * undefined.
    */
@@ -184,7 +184,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
    * Registers the Bubble-CSS-Class at a SVGPlot. This class depends on the
    * {@link #FILL_FLAG}.
    * 
-   * @param svgp the SVGPlot to register the ToolTip-CSS-Class.
+   * @param svgp the SVGPlot to register the Tooltip-CSS-Class.
    */
   private void setupCSS(SVGPlot svgp) {
     
