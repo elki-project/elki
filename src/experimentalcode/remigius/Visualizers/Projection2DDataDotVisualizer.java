@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * 
  * @param <NV>
  */
-public class DotVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
+public class Projection2DDataDotVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
 
   /**
    * A short name characterizing this Visualizer.
