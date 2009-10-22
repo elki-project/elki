@@ -33,7 +33,8 @@ public class DotVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DV
    * @param database contains all objects to be processed.
    */
   public void init(VisualizerContext context) {
-    init(Integer.MAX_VALUE - 1000, NAME, context);
+    super.init(NAME, context);
+    super.setLevel(Visualizer.LEVEL_BACKGROUND + 1);
   }
 
   @Override

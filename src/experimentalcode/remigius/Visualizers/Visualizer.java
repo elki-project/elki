@@ -38,6 +38,26 @@ public interface Visualizer extends Parameterizable {
   public final static String META_LEVEL = "level";
 
   /**
+   * Background layer
+   */
+  public final static int LEVEL_BACKGROUND = 0;
+
+  /**
+   * Static plot layer
+   */
+  public final static int LEVEL_STATIC = 100;
+
+  /**
+   * Passive foreground layer
+   */
+  public final static int LEVEL_FOREGROUND = 200;
+
+  /**
+   * Active foreground layer (interactive elements)
+   */
+  public final static int LEVEL_INTERACTIVE = 1000;
+
+  /**
    * Get visualization meta data, such as dimensions visualized.
    * 
    * @return AnyMap reference with meta data.

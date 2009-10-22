@@ -30,9 +30,8 @@ public class AxisVisualizer<NV extends NumberVector<NV, ?>> extends Projection2D
    * @param database contains all objects to be processed.
    */
   public void init(VisualizerContext context) {
-    // We don't need the Database. Maybe another superclass / inheritance
-    // hierarchy would serve us better.
-    super.init(0, NAME, context);
+    super.init(NAME, context);
+    super.setLevel(Visualizer.LEVEL_BACKGROUND);
   }
 
   @Override

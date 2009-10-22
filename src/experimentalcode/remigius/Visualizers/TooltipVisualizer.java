@@ -80,7 +80,8 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
    *        database.
    */
   public void init(String name, VisualizerContext context, AnnotationResult<? extends Number> anResult) {
-    init(Integer.MAX_VALUE, name, context);
+    super.init(name, context);
+    super.setLevel(Visualizer.LEVEL_INTERACTIVE);
     this.anResult = anResult;
   }
 
