@@ -155,6 +155,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
    * The default constructor only registers parameters.
    */
   public BubbleVisualizer() {
+    super();
     addOption(GAMMA_PARAM);
     addOption(FILL_FLAG);
     addOption(CUTOFF_PARAM);
@@ -170,7 +171,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
    * @param normalizationScale normalizes coordinates.
    */
   public void init(String name, VisualizerContext context, AnnotationResult<? extends Number> anResult, StaticScalingFunction normalizationScale, Clustering<Model> clustering) {
-    super.init(1000, name, context);
+    super.init(name, context);
     this.anResult = anResult;
     this.clustering = clustering;
     

@@ -66,7 +66,7 @@ public class HistogramVisualizer<NV extends NumberVector<NV, ?>> extends Project
   }
 
   public void init(VisualizerContext context, Clustering<Model> clustering) {
-    init(0, NAME, context);
+    super.init(NAME, context);
     this.clustering = clustering;
   }
 
@@ -76,7 +76,7 @@ public class HistogramVisualizer<NV extends NumberVector<NV, ?>> extends Project
     int clusterID = 0;
 
     CSSClass allInOne = new CSSClass(svgp, BIN + -1);
-    for(Cluster<Model> cluster : clustering.getAllClusters()) {
+    for(@SuppressWarnings("unused") Cluster<Model> cluster : clustering.getAllClusters()) {
 
       CSSClass bin = new CSSClass(svgp, BIN + clusterID);
       String coloredElement;
