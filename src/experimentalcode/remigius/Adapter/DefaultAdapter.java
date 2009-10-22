@@ -2,26 +2,26 @@ package experimentalcode.remigius.Adapter;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.result.Result;
-import experimentalcode.remigius.Visualizers.AxisVisualizer;
-import experimentalcode.remigius.Visualizers.DotVisualizer;
-import experimentalcode.remigius.Visualizers.HistogramVisualizer;
+import experimentalcode.remigius.Visualizers.Projection2DAxisVisualizer;
+import experimentalcode.remigius.Visualizers.Projection2DDataDotVisualizer;
+import experimentalcode.remigius.Visualizers.Projection1DHistogramVisualizer;
 import experimentalcode.remigius.Visualizers.VisualizerContext;
 
 public class DefaultAdapter<NV extends NumberVector<NV, ?>> extends AbstractAlgorithmAdapter<NV> {
 
-  private DotVisualizer<NV> dotVisualizer;
+  private Projection2DDataDotVisualizer<NV> projection2DDataDotVisualizer;
 
-  private AxisVisualizer<NV> axisVisualizer;
+  private Projection2DAxisVisualizer<NV> projection2DAxisVisualizer;
 
-  private HistogramVisualizer<NV> histoVisualizer;
+  private Projection1DHistogramVisualizer<NV> histoVisualizer;
 
   public DefaultAdapter() {
     super();
-    dotVisualizer = new DotVisualizer<NV>();
-    axisVisualizer = new AxisVisualizer<NV>();
-    histoVisualizer = new HistogramVisualizer<NV>();
-    providedVisualizers.add(dotVisualizer);
-    providedVisualizers.add(axisVisualizer);
+    projection2DDataDotVisualizer = new Projection2DDataDotVisualizer<NV>();
+    projection2DAxisVisualizer = new Projection2DAxisVisualizer<NV>();
+    histoVisualizer = new Projection1DHistogramVisualizer<NV>();
+    providedVisualizers.add(projection2DDataDotVisualizer);
+    providedVisualizers.add(projection2DAxisVisualizer);
     providedVisualizers.add(histoVisualizer);
   }
 
@@ -32,8 +32,8 @@ public class DefaultAdapter<NV extends NumberVector<NV, ?>> extends AbstractAlgo
 
   @Override
   protected void initVisualizer(VisualizerContext context) {
-    axisVisualizer.init(context);
-    dotVisualizer.init(context);
+    projection2DAxisVisualizer.init(context);
+    projection2DDataDotVisualizer.init(context);
     histoVisualizer.init(context, clustering);
     usableVisualizers.addAll(providedVisualizers);
   }

@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * 
  * @param <NV>
  */
-public class HistogramVisualizer<NV extends NumberVector<NV, ?>> extends Projection1DVisualizer<NV> {
+public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends Projection1DVisualizer<NV> {
 
   public static final OptionID STYLE_ROW_ID = OptionID.getOrCreateOptionID("histogram.row", "Alternative style: Rows.");
 
@@ -53,7 +53,7 @@ public class HistogramVisualizer<NV extends NumberVector<NV, ?>> extends Project
    */
   public static final String BIN = "bin";
 
-  public HistogramVisualizer() {
+  public Projection1DHistogramVisualizer() {
     addOption(STYLE_ROW_PARAM);
   }
 
@@ -145,7 +145,7 @@ public class HistogramVisualizer<NV extends NumberVector<NV, ?>> extends Project
 
     LinearScale scale = new LinearScale(0, minmax.getMax());
 
-    // Axis. TODO: Use AxisVisualizer for this.
+    // Axis. TODO: Use Projection2DAxisVisualizer for this.
     try {
       SVGSimpleLinearAxis.drawAxis(svgp, layer, scale, -1, 1, -1, -1, true, false);
       svgp.updateStyleElement();

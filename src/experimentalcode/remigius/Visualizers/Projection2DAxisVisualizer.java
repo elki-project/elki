@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
  * 
  * @param <NV>
  */
-public class AxisVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
+public class Projection2DAxisVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
   /**
    * A short name characterizing this Visualizer.
    */
