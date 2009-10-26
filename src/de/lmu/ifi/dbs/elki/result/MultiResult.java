@@ -39,6 +39,7 @@ public class MultiResult implements Result {
   public MultiResult() {
     super();
     this.results = new ArrayList<Result>();
+    this.meta = new AnyMap<AssociationID<?>>();
   }
 
   /**
