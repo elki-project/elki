@@ -15,36 +15,16 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
  */
 public class ResultUtil {
   /**
-   * Set global meta association. It tries to replace an existing Association
-   * first, then tries to insert in the first {@link MetadataResult} otherwise
-   * creating a new {@link MetadataResult} if none was found.
+   * Set global meta association.
    * 
    * @param <M> restriction class
    * @param result Result collection
    * @param meta Association
    * @param value Value
    */
+  @Deprecated
   public static final <M> void setGlobalAssociation(MultiResult result, AssociationID<M> meta, M value) {
-    ArrayList<MetadataResult> mrs = result.filterResults(MetadataResult.class);
-    // first try to overwrite an existing result.
-    if(mrs != null) {
-      for(MetadataResult mri : mrs) {
-        M res = mri.getAssociation(meta);
-        if(res != null) {
-          mri.setAssociation(meta, value);
-          return;
-        }
-      }
-      // otherwise, set in first
-      if(mrs.size() > 0) {
-        mrs.get(0).setAssociation(meta, value);
-        return;
-      }
-    }
-    // or create a new MetadataResult.
-    MetadataResult mr = new MetadataResult();
-    mr.setAssociation(meta, value);
-    result.addResult(mr);
+    result.setAssociation(meta, value);
   }
 
   /**
@@ -56,14 +36,9 @@ public class ResultUtil {
    * @return first match or null
    */
   public static final <M> M getGlobalAssociation(Result result, AssociationID<M> meta) {
-    List<MetadataResult> mrs = getMetadataResults(result);
-    if(mrs != null) {
-      for(MetadataResult mr : mrs) {
-        M res = mr.getAssociation(meta);
-        if(res != null) {
-          return res;
-        }
-      }
+    if (result instanceof MultiResult) {
+      MultiResult r = (MultiResult) result;
+      return r.getAssociation(meta);
     }
     return null;
   }
@@ -193,24 +168,6 @@ public class ResultUtil {
     return null;
   }
 
-  /**
-   * Return all Metadata results
-   * 
-   * @param r Result
-   * @return List of metadata results
-   */
-  public static List<MetadataResult> getMetadataResults(Result r) {
-    if(r instanceof MetadataResult) {
-      List<MetadataResult> irs = new ArrayList<MetadataResult>(1);
-      irs.add((MetadataResult) r);
-      return irs;
-    }
-    if(r instanceof MultiResult) {
-      return ClassGenericsUtil.castWithGenericsOrNull(List.class, ((MultiResult) r).filterResults(MetadataResult.class));
-    }
-    return null;
-  }
-  
   /**
    * Filter results
    * 

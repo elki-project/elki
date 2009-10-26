@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
-import de.lmu.ifi.dbs.elki.result.MetadataResult;
+import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -145,7 +145,7 @@ public class TextWriter<O extends DatabaseObject> {
     List<OrderingResult> ro = null;
     List<Clustering<? extends Model>> rc = null;
     List<IterableResult<?>> ri = null;
-    List<MetadataResult> rm = null;
+    MultiResult rm = null;
 
     Collection<DatabaseObjectGroup> groups = null;
 
@@ -153,7 +153,10 @@ public class TextWriter<O extends DatabaseObject> {
     ro = ResultUtil.getOrderingResults(r);
     rc = ResultUtil.getClusteringResults(r);
     ri = ResultUtil.getIterableResults(r);
-    rm = ResultUtil.getMetadataResults(r);
+    
+    if (r instanceof MultiResult) {
+      rm = (MultiResult) r;
+    }
 
     if(ra == null && ro == null && rc == null && ri == null) {
       throw new UnableToComplyException("No printable result found.");
@@ -222,7 +225,7 @@ public class TextWriter<O extends DatabaseObject> {
         filename = filenameFromLabel(naming.getNameFor(group));
       }
     }
-    if (filename == null) {
+    if(filename == null) {
       if(ro != null && ro.size() > 0) {
         filename = ro.get(0).getName();
       }
@@ -280,32 +283,30 @@ public class TextWriter<O extends DatabaseObject> {
     out.flush();
   }
 
-  private void writeIterableResult(Database<O> db, StreamFactory streamOpener, IterableResult<?> ri, List<MetadataResult> rm) throws UnableToComplyException, IOException {
+  private void writeIterableResult(Database<O> db, StreamFactory streamOpener, IterableResult<?> ri, MultiResult mr) throws UnableToComplyException, IOException {
     String filename = ri.getName();
-    logger.verbose("Filename is "+filename);
-    if (filename == null) {
+    logger.verbose("Filename is " + filename);
+    if(filename == null) {
       filename = "list";
     }
     PrintStream outStream = streamOpener.openStream(filename);
     TextWriterStream out = new TextWriterStreamNormalizing<O>(outStream, writers, getNormalization());
 
-    if(rm != null) {
+    if(mr != null) {
       // TODO: this is an ugly hack!
       out.setForceincomments(true);
-      for(MetadataResult meta : rm) {
-        for(AssociationID<?> assoc : meta.getAssociations()) {
-          // TODO: make generic!
-          if(assoc == AssociationID.META_SETTINGS) {
-            printSettings(db, out, meta.getAssociation(AssociationID.META_SETTINGS));
-            continue;
-          }
-          Object o = meta.getAssociation(assoc);
-          TextWriterWriterInterface<?> writer = out.getWriterFor(o);
-          if(writer != null) {
-            writer.writeObject(out, assoc.getLabel(), o);
-          }
-          out.flush();
+      for(AssociationID<?> assoc : mr.getAssociations()) {
+        // TODO: make generic!
+        if(assoc == AssociationID.META_SETTINGS) {
+          printSettings(db, out, mr.getAssociation(AssociationID.META_SETTINGS));
+          continue;
         }
+        Object o = mr.getAssociation(assoc);
+        TextWriterWriterInterface<?> writer = out.getWriterFor(o);
+        if(writer != null) {
+          writer.writeObject(out, assoc.getLabel(), o);
+        }
+        out.flush();
       }
       // TODO: this is an ugly hack!
       out.setForceincomments(false);
