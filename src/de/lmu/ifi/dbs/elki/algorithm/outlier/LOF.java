@@ -12,11 +12,16 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.preprocessing.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.OrderingResult;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
@@ -77,16 +82,6 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D,?>> extend
    * LOF_SCORE algorithm.
    */
   public static final AssociationID<Double> LOF_SCORE = AssociationID.getOrCreateAssociationID("lof", Double.class);
-
-  /**
-   * The association id to associate the minimum LOF_SCORE of an algorithm run.
-   */
-  public static final AssociationID<Double> LOF_MIN = AssociationID.getOrCreateAssociationID("lof min", Double.class);
-
-  /**
-   * The association id to associate the maximum LOF_SCORE of an algorithm run.
-   */
-  public static final AssociationID<Double> LOF_MAX = AssociationID.getOrCreateAssociationID("lof max", Double.class);
 
   /**
    * Holds the instance of the reachability distance function specified by
@@ -210,8 +205,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D,?>> extend
     // Compute final LOF values.
     HashMap<Integer, Double> lofs = new HashMap<Integer, Double>();
     // track the maximum value for normalization.
-    double lofmin = 0;
-    double lofmax = 0;
+    MinMax<Double> lofminmax = new MinMax<Double>();
     {// compute LOF_SCORE of each db object
       if(logger.isVerbose()) {
         logger.verbose("computing LOFs");
@@ -235,10 +229,8 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D,?>> extend
         }
         Double lof = sum / nsize;
         lofs.put(id, lof);
-        // update minimum.
-        lofmin = Math.min(lofmin, lof);
-        // update maximum.
-        lofmax = Math.max(lofmax, lof);
+        // update minimum and maximum
+        lofminmax.put(lof);
         
         if(logger.isVerbose()) {
           progressLOFs.setProcessed(counter);
@@ -252,12 +244,10 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D,?>> extend
     }
 
     // Build result representation.
-    result = new MultiResult();
-    result.addResult(new AnnotationFromHashMap<Double>(LOF_SCORE, lofs));
-    result.addResult(new OrderingFromHashMap<Double>(lofs, true));
-
-    ResultUtil.setGlobalAssociation(result, LOF_MAX, lofmax);
-    ResultUtil.setGlobalAssociation(result, LOF_MIN, lofmin);
+    AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(LOF_SCORE, lofs);
+    OrderingResult orderingResult = new OrderingFromHashMap<Double>(lofs, true);
+    OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
+    this.result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
 
     return result;
   }

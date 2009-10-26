@@ -18,10 +18,15 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.PolynomialKernelFunction;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.OrderingResult;
+import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
@@ -124,11 +129,6 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
   public static final AssociationID<Double> ABOD_SCORE = AssociationID.getOrCreateAssociationID("ABOD", Double.class);
 
   /**
-   * Association ID for ABOD Normalization value.
-   */
-  public static final AssociationID<Double> ABOD_NORM = AssociationID.getOrCreateAssociationID("ABOD normalization", Double.class);
-
-  /**
    * use alternate code below
    */
   private static final boolean useRNDSample = false;
@@ -196,19 +196,18 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
       pq.add(new FCPair<Double, Integer>(s.getVariance(), objKey));
     }
     
-    Double maxabod = Double.MIN_VALUE;
+    MinMax<Double> minmaxabod = new MinMax<Double>();
     HashMap<Integer, Double> abodvalues = new HashMap<Integer, Double>();
     for(FCPair<Double, Integer> pair : pq) {
       abodvalues.put(pair.getSecond(), pair.getFirst());
-      maxabod = Math.max(maxabod, pair.getFirst());
+      minmaxabod.put(pair.getFirst());
     }
-    // combine results.
-    result = new MultiResult();
-    result.addResult(new AnnotationFromHashMap<Double>(ABOD_SCORE, abodvalues));
-    result.addResult(new OrderingFromHashMap<Double>(abodvalues, false));
-    // store normalization information.
-    ResultUtil.setGlobalAssociation(result, ABOD_NORM, maxabod);
-    return result;
+    // Build result representation.
+    AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(ABOD_SCORE, abodvalues);
+    OrderingResult orderingResult = new OrderingFromHashMap<Double>(abodvalues, false);
+    OutlierScoreMeta scoreMeta = new InvertedOutlierScoreMeta(minmaxabod.getMin(), minmaxabod.getMax(), 0.0, Double.POSITIVE_INFINITY);
+    this.result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
+    return this.result;
   }
 
   /**
@@ -302,19 +301,18 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
 
     }
     // System.out.println(v + " Punkte von " + data.size() + " verfeinert !!");
-    Double maxabod = Double.MIN_VALUE;
+    MinMax<Double> minmaxabod = new MinMax<Double>();
     HashMap<Integer, Double> abodvalues = new HashMap<Integer, Double>();
     for(FCPair<Double, Integer> pair : pq) {
       abodvalues.put(pair.getSecond(), pair.getFirst());
-      maxabod = Math.max(maxabod, pair.getFirst());
+      minmaxabod.put(pair.getFirst());
     }
-    // ABOD values as result
-    result = new MultiResult();
-    result.addResult(new AnnotationFromHashMap<Double>(ABOD_SCORE, abodvalues));
-    result.addResult(new OrderingFromHashMap<Double>(abodvalues, false));
-    // store normalization information.
-    ResultUtil.setGlobalAssociation(result, ABOD_NORM, maxabod);
-    return result;
+    // Build result representation.
+    AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(ABOD_SCORE, abodvalues);
+    OrderingResult orderingResult = new OrderingFromHashMap<Double>(abodvalues, false);
+    OutlierScoreMeta scoreMeta = new InvertedOutlierScoreMeta(minmaxabod.getMin(), minmaxabod.getMax(), 0.0, Double.POSITIVE_INFINITY);
+    this.result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
+    return this.result;
   }
 
   // TODO: remove?

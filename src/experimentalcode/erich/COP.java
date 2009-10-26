@@ -17,8 +17,13 @@ import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
+import de.lmu.ifi.dbs.elki.result.OrderingResult;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -169,13 +174,15 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
       }
     }
     // combine results.
-    result = new MultiResult();
-    result.addResult(new AnnotationFromHashMap<Double>(COP_SCORE, cop_score));
+    AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(COP_SCORE, cop_score);
+    OrderingResult orderingResult = new OrderingFromHashMap<Double>(cop_score, true);
+    OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
+    result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
+    // extra results
     result.addResult(new AnnotationFromHashMap<Integer>(COP_DIM, cop_dim));
     result.addResult(new AnnotationFromHashMap<Vector>(COP_ERROR_VECTOR, cop_err_v));
     result.addResult(new AnnotationFromHashMap<Matrix>(COP_DATA_VECTORS, cop_datav));
     result.addResult(new AnnotationFromHashMap<CorrelationAnalysisSolution<?>>(COP_SOL, cop_sol));
-    result.addResult(new OrderingFromHashMap<Double>(cop_score, true));
     return result;
   }
 

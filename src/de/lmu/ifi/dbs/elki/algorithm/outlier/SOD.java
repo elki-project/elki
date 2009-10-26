@@ -132,6 +132,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
     }
     // combine results.
     sodResult = new MultiResult();
+    // TODO: return an outlier result.
     sodResult.addResult(new AnnotationFromHashMap<SODModel<?>>(SOD_MODEL, sod_models));
     sodResult.addResult(new OrderingFromHashMap<SODModel<?>>(sod_models, true));
     return sodResult;
