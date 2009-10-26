@@ -1,6 +1,10 @@
 package de.lmu.ifi.dbs.elki.result;
 
 import java.util.ArrayList;
+import java.util.Collection;
+
+import de.lmu.ifi.dbs.elki.database.AssociationID;
+import de.lmu.ifi.dbs.elki.utilities.AnyMap;
 
 /**
  * MultiResult is a result collection class.
@@ -14,6 +18,11 @@ public class MultiResult implements Result {
   private ArrayList<Result> results;
 
   /**
+   * Meta data.
+   */
+  private AnyMap<AssociationID<?>> meta;  
+  
+  /**
    * Constructor
    * 
    * @param results Array to use for results.
@@ -21,6 +30,7 @@ public class MultiResult implements Result {
   public MultiResult(ArrayList<Result> results) {
     super();
     this.results = results;
+    this.meta = new AnyMap<AssociationID<?>>();
   }
 
   /**
@@ -102,6 +112,52 @@ public class MultiResult implements Result {
     return null;
   }
 
+  /**
+   * Put meta data.
+   * 
+   * @param <M> data class
+   * @param meta key
+   * @param value data
+   */
+  public <M> void setAssociation(AssociationID<M> metaid, M value) {
+    meta.put(metaid, value);
+  }
+  
+  /**
+   * Get a meta data object.
+   * 
+   * @param <M> data class
+   * @param meta Key
+   * @return stored meta data or null
+   */
+  public <M> M getAssociation(AssociationID<M> metaid) {
+    return meta.get(metaid, metaid.getType());
+  }
+  
+  /**
+   * Get a meta data object, with weaker compile time type checking.
+   * 
+   * Note that in this version, it is not verified that the restriction class
+   * actually satisfies the return type M.
+   * 
+   * @param <M> data class
+   * @param meta Key
+   * @return stored meta data or null
+   */
+  @SuppressWarnings("unchecked")
+  public <M> M getAssociationGenerics(AssociationID<?> metaid) {
+    return (M) meta.getGenerics(metaid, metaid.getType());
+  }
+  
+  /**
+   * Get stored meta data associations.
+   * 
+   * @return Stored keys
+   */
+  public Collection<AssociationID<?>> getAssociations() {
+    return meta.keySet();
+  }
+  
   @Override
   public String getName() {
     return "multi";
