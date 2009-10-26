@@ -10,11 +10,16 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.preprocessing.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.OrderingResult;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -25,30 +30,35 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
 import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
 
 /**
- * <p>Computes the LDOF (Local Distance-Based Outlier Factor) for all objects of a Database.</p>
- *
- * <p>Reference:<br>
- * K. Zhang, M. Hutter, H. Jin: A New Local Distance-Based Outlier Detection Approach for Scattered Real-World Data.<br>
- * In: Proc. 13th Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining (PAKDD 2009), Bangkok, Thailand, 2009.
+ * <p>
+ * Computes the LDOF (Local Distance-Based Outlier Factor) for all objects of a
+ * Database.
  * </p>
- *
+ * 
+ * <p>
+ * Reference:<br>
+ * K. Zhang, M. Hutter, H. Jin: A New Local Distance-Based Outlier Detection
+ * Approach for Scattered Real-World Data.<br>
+ * In: Proc. 13th Pacific-Asia Conference on Advances in Knowledge Discovery and
+ * Data Mining (PAKDD 2009), Bangkok, Thailand, 2009.
+ * </p>
+ * 
  * @author Arthur Zimek
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  */
 public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, DoubleDistance, MultiResult> {
+  /**
+   * The baseline for LDOF values. The paper gives 0.5 for uniform
+   * distributions, although one might also discuss using 1.0 as baseline.
+   */
+  private static final double LDOF_BASELINE = 0.5;
 
   /**
-   * The association id to associate the LDOF_SCORE of an object for the
-   * LDOF algorithm.
+   * The association id to associate the LDOF_SCORE of an object for the LDOF
+   * algorithm.
    */
   public static final AssociationID<Double> LDOF_SCORE = AssociationID.getOrCreateAssociationID("ldof", Double.class);
 
-  /**
-   * The association id to associate the maximum LDOF_SCORE of an algorithm run.
-   */
-  public static final AssociationID<Double> LDOF_MAX = AssociationID.getOrCreateAssociationID("ldofmax", Double.class);
-
-  
   /**
    * OptionID for {@link #K_PARAM}
    */
@@ -67,7 +77,7 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
    * Holds the value of {@link #K_PARAM}.
    */
   int k;
-  
+
   /**
    * Preprocessor for materialization of kNN queries.
    */
@@ -77,17 +87,18 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
    * Provides the result of the algorithm.
    */
   MultiResult result;
-  
+
   /**
    * Provides the LDOF algorithm.
    * 
-   * Sets parameter {@link #K_PARAM} and initializes the {@link #knnPreprocessor}.
+   * Sets parameter {@link #K_PARAM} and initializes the
+   * {@link #knnPreprocessor}.
    */
-  public LDOF(){
+  public LDOF() {
     addOption(K_PARAM);
     knnPreprocessor = new MaterializeKNNPreprocessor<O, DoubleDistance>();
   }
-  
+
   /**
    * @see de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm#runInTime(de.lmu.ifi.dbs.elki.database.Database)
    */
@@ -100,9 +111,9 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
     }
     knnPreprocessor.run(database, isVerbose(), isTime());
     HashMap<Integer, List<DistanceResultPair<DoubleDistance>>> kNearestNeighboorhoods = knnPreprocessor.getMaterialized();
-    
+
     // track the maximum value for normalization
-    double ldofmax = 0;
+    MinMax<Double> ldofminmax = new MinMax<Double>();
     // compute the ldof values
     HashMap<Integer, Double> ldofs = new HashMap<Integer, Double>();
     // compute LOF_SCORE of each db object
@@ -113,29 +124,29 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
     FiniteProgress progressLDOFs = new FiniteProgress("LDOF_SCORE for objects", database.size());
     int counter = 0;
     for(Integer id : database) {
-      counter ++;
+      counter++;
       List<DistanceResultPair<DoubleDistance>> neighbors = kNearestNeighboorhoods.get(id);
       int nsize = neighbors.size() - 1;
       // skip the point itself
       double dxp = 0;
       double Dxp = 0;
       for(DistanceResultPair<DoubleDistance> neighbor1 : neighbors) {
-        if (neighbor1.getID() != id) {
+        if(neighbor1.getID() != id) {
           dxp += neighbor1.getDistance().getValue();
-          for(DistanceResultPair<DoubleDistance> neighbor2 : neighbors){
-            if (neighbor1.getID() != neighbor2.getID() && neighbor2.getID() != id){
+          for(DistanceResultPair<DoubleDistance> neighbor2 : neighbors) {
+            if(neighbor1.getID() != neighbor2.getID() && neighbor2.getID() != id) {
               Dxp += getDistanceFunction().distance(neighbor1.getID(), neighbor2.getID()).getValue();
             }
           }
         }
       }
       dxp /= nsize;
-      Dxp /= (nsize * (nsize-1));
+      Dxp /= (nsize * (nsize - 1));
       Double ldof = dxp / Dxp;
       ldofs.put(id, ldof);
       // update maximum
-      ldofmax = Math.max(ldofmax, ldof);
-      
+      ldofminmax.put(ldof);
+
       if(this.isVerbose()) {
         progressLDOFs.setProcessed(counter);
         this.progress(progressLDOFs);
@@ -144,17 +155,15 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
     if(this.isVerbose()) {
       this.verbose("LDOF finished");
     }
-    
-    // Build result representation.
-    result = new MultiResult();
-    result.addResult(new AnnotationFromHashMap<Double>(LDOF_SCORE, ldofs));
-    result.addResult(new OrderingFromHashMap<Double>(ldofs, true));
 
-    ResultUtil.setGlobalAssociation(result, LDOF_MAX, ldofmax);
-    
+    // Build result representation.
+    AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(LDOF_SCORE, ldofs);
+    OrderingResult orderingResult = new OrderingFromHashMap<Double>(ldofs, true);
+    OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(ldofminmax.getMin(), ldofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, LDOF_BASELINE);
+    this.result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
     return this.result;
   }
-  
+
   /**
    * Calls the super method and sets additionally the value of the parameter
    * {@link #K_PARAM} and accordingly parameterizes the preprocessor.
@@ -167,14 +176,13 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
     // k
     k = K_PARAM.getValue();
 
-    
     // configure preprocessor
     ArrayList<String> preprocParams1 = new ArrayList<String>();
-    OptionUtil.addParameter(preprocParams1, MaterializeKNNPreprocessor.K_ID, Integer.toString(k+1));
+    OptionUtil.addParameter(preprocParams1, MaterializeKNNPreprocessor.K_ID, Integer.toString(k + 1));
     OptionUtil.addParameter(preprocParams1, MaterializeKNNPreprocessor.DISTANCE_FUNCTION_ID, getDistanceFunction().getClass().getCanonicalName());
     OptionUtil.addParameters(preprocParams1, getDistanceFunction().getParameters());
     List<String> remaining1 = knnPreprocessor.setParameters(preprocParams1);
-    if (remaining1.size() > 0) {
+    if(remaining1.size() > 0) {
       throw new UnusedParameterException("First preprocessor did not use all parameters.");
     }
     rememberParametersExcept(args, remainingParameters);

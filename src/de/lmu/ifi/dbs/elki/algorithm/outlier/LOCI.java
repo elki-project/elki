@@ -12,8 +12,13 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
+import de.lmu.ifi.dbs.elki.result.OrderingResult;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
@@ -239,10 +244,13 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
       mdef_norm.put(id, maxmdefnorm);
       mdef_radius.put(id, maxnormr);
     }
-    result = new MultiResult();
-    result.addResult(new AnnotationFromHashMap<Double>(LOCI_MDEF_NORM, mdef_norm));
+    AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(LOCI_MDEF_NORM, mdef_norm);
+    OrderingResult orderingResult = new OrderingFromHashMap<Double>(mdef_norm, true);
+    // TODO: actually provide min and max?
+    OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(Double.NaN, Double.NaN, 0.0, Double.POSITIVE_INFINITY, 0.0);
+    this.result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
+    
     result.addResult(new AnnotationFromHashMap<Double>(LOCI_MDEF_CRITICAL_RADIUS, mdef_radius));
-    result.addResult(new OrderingFromHashMap<Double>(mdef_norm, true));
     return result;
   }
 

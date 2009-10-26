@@ -17,8 +17,13 @@ import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.preprocessing.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
+import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
+import de.lmu.ifi.dbs.elki.result.OrderingResult;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
@@ -325,10 +330,12 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
 
     // Build result representation.
     result = new MultiResult();
-    result.addResult(new AnnotationFromHashMap<Double>(LOOP_SCORE, loops));
-    result.addResult(new OrderingFromHashMap<Double>(loops, true));
+    AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(LOOP_SCORE, loops);
+    OrderingResult orderingResult = new OrderingFromHashMap<Double>(loops, true);
+    OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
+    this.result = new OutlierResult(scoreMeta, scoreResult, orderingResult);    
 
-    return result;
+    return this.result;
   }
 
   public Description getDescription() {
