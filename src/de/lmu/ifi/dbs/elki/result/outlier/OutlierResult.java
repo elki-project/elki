@@ -6,7 +6,7 @@ import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 
 /**
- * Wrap a typical Outlier result.
+ * Wrap a typical Outlier result, keeping direct references to the main result parts.
  * 
  * @author Erich Schubert
  */
