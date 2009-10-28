@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.data;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -11,16 +12,19 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.result.Result;
 
 /**
- * Result class for clusterings. Can be used for both hierarchical and non-hierarchical clusterings.
+ * Result class for clusterings. Can be used for both hierarchical and
+ * non-hierarchical clusterings.
  * 
- * The class does not enforce or rely on clusterings to be a tree or DAG, instead they can be an arbitrary
- * forest of directed graphs that COULD contain cycles.
+ * The class does not enforce or rely on clusterings to be a tree or DAG,
+ * instead they can be an arbitrary forest of directed graphs that COULD contain
+ * cycles.
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <M> Model type
  */
-public class Clustering<M extends Model> implements Result {
+public class Clustering<M extends Model> implements Result, Iterable<Cluster<M>> {
+
   /**
    * Keep a list of top level clusters.
    */
@@ -74,7 +78,8 @@ public class Clustering<M extends Model> implements Result {
         clu = rc.getDescendants(clu);
       }
     }
-    // Note: we canNOT use TreeSet above, because this comparator is only partial!
+    // Note: we canNOT use TreeSet above, because this comparator is only
+    // partial!
     ArrayList<Cluster<M>> res = new ArrayList<Cluster<M>>(clu);
     Collections.sort(res, new Cluster.PartialComparator());
     return res;
@@ -83,5 +88,10 @@ public class Clustering<M extends Model> implements Result {
   @Override
   public String getName() {
     return "clustering";
+  }
+
+  @Override
+  public Iterator<Cluster<M>> iterator() {
+    return getAllClusters().iterator();
   }
 }
