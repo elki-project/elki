@@ -1005,44 +1005,44 @@ public abstract class XTreeBase<O extends NumberVector<O, ?>, N extends XNode<E,
     }
   }
 
-  /**
-   * Compute the centroid of the MBRs or data objects contained by
-   * <code>node</code>. Was intended to lead to more central re-insert
-   * distributions, however, this variant rarely avoids a supernode, and
-   * definitely costs more time.
-   * 
-   * @param node
-   * @return
-   */
-  protected O compute_centroid(N node) {
-    double[] d = new double[node.getDimensionality()];
-    for(int i = 0; i < node.getNumEntries(); i++) {
-      if(node.isLeaf()) {
-        double[] values = ((SpatialLeafEntry) node.getEntry(i)).getValues();
-        for(int j = 0; j < values.length; j++) {
-          d[j] += values[j];
-        }
-      }
-      else {
-        ModifiableHyperBoundingBox mbr = new ModifiableHyperBoundingBox(node.getEntry(i).getMBR());
-        double[] min = mbr.getMinRef();
-        double[] max = mbr.getMaxRef();
-        for(int j = 0; j < min.length; j++) {
-          d[j] += min[j] + max[j];
-        }
-      }
-    }
-    for(int j = 0; j < d.length; j++) {
-      if(node.isLeaf()) {
-        d[j] /= node.getNumEntries();
-      }
-      else {
-        d[j] /= (node.getNumEntries() * 2);
-      }
-    }
-    // FIXME: make generic (or just hope DoubleVector is fine)
-    return (O) new DoubleVector(d);
-  }
+//  /**
+//   * Compute the centroid of the MBRs or data objects contained by
+//   * <code>node</code>. Was intended to lead to more central re-insert
+//   * distributions, however, this variant rarely avoids a supernode, and
+//   * definitely costs more time.
+//   *
+//   * @param node
+//   * @return
+//   */
+//  protected O compute_centroid(N node) {
+//    double[] d = new double[node.getDimensionality()];
+//    for(int i = 0; i < node.getNumEntries(); i++) {
+//      if(node.isLeaf()) {
+//        double[] values = ((SpatialLeafEntry) node.getEntry(i)).getValues();
+//        for(int j = 0; j < values.length; j++) {
+//          d[j] += values[j];
+//        }
+//      }
+//      else {
+//        ModifiableHyperBoundingBox mbr = new ModifiableHyperBoundingBox(node.getEntry(i).getMBR());
+//        double[] min = mbr.getMinRef();
+//        double[] max = mbr.getMaxRef();
+//        for(int j = 0; j < min.length; j++) {
+//          d[j] += min[j] + max[j];
+//        }
+//      }
+//    }
+//    for(int j = 0; j < d.length; j++) {
+//      if(node.isLeaf()) {
+//        d[j] /= node.getNumEntries();
+//      }
+//      else {
+//        d[j] /= (node.getNumEntries() * 2);
+//      }
+//    }
+//    // FIXME: make generic (or just hope DoubleVector is fine)
+//    return (O) new DoubleVector(d);
+//  }
 
   /**
    * Reinserts the specified node at the specified level.
