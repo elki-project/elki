@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.data;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -19,11 +18,14 @@ import de.lmu.ifi.dbs.elki.result.Result;
  * instead they can be an arbitrary forest of directed graphs that COULD contain
  * cycles.
  * 
+ * This class is NOT iterable for a simple reason: there is more than one method to do so.
+ * You need to specify whether you want to use getToplevelClusters() or getAllClusters().
+ * 
  * @author Erich Schubert
  * 
  * @param <M> Model type
  */
-public class Clustering<M extends Model> implements Result, Iterable<Cluster<M>> {
+public class Clustering<M extends Model> implements Result {
 
   /**
    * Keep a list of top level clusters.
@@ -88,10 +90,5 @@ public class Clustering<M extends Model> implements Result, Iterable<Cluster<M>>
   @Override
   public String getName() {
     return "clustering";
-  }
-
-  @Override
-  public Iterator<Cluster<M>> iterator() {
-    return getAllClusters().iterator();
   }
 }
