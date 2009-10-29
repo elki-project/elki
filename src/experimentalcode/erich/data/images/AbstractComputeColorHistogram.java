@@ -3,32 +3,19 @@ package experimentalcode.erich.data.images;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
 
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 
+/**
+ * Abstract class for color histogram computation.
+ *  
+ * @author Erich Schubert
+ */
 public abstract class AbstractComputeColorHistogram extends AbstractParameterizable implements ComputeColorHistogram {
-  public BufferedImage loadImage(File file) throws IOException {
-    ImageInputStream is = ImageIO.createImageInputStream(file);
-    Iterator<ImageReader> iter = ImageIO.getImageReaders(is);
-
-    if(!iter.hasNext()) {
-      throw new IOException("Unsupported file format.");
-    }
-    ImageReader imageReader = iter.next();
-    imageReader.setInput(is);
-    return imageReader.read(0);
-  }
-
-  /* (non-Javadoc)
-   * @see experimentalcode.erich.data.images.ComputeColorHistogram#computeColorHistogram(java.lang.String)
-   */
+  @Override
   public double[] computeColorHistogram(File file) throws IOException {
-    BufferedImage image = loadImage(file);
+    BufferedImage image = ImageUtil.loadImage(file);
     int height = image.getHeight();
     int width = image.getWidth();
     double[] bins = new double[getNumBins()];
@@ -45,8 +32,19 @@ public abstract class AbstractComputeColorHistogram extends AbstractParameteriza
     }
     return bins;
   }
-  
+
+  /**
+   * Get the number of bins.
+   * 
+   * @return Number of bins
+   */
   protected abstract int getNumBins();
 
+  /**
+   * Compute the bin number from a pixel color value.
+   * 
+   * @param rgb Pixel color value
+   * @return Bin number
+   */
   protected abstract int getBinForColor(int rgb);
 }
