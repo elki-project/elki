@@ -1,10 +1,11 @@
-package experimentalcode.erich.data.images;
+package de.lmu.ifi.dbs.elki.application;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.application.AbstractApplication;
+import de.lmu.ifi.dbs.elki.data.images.ComputeColorHistogram;
+import de.lmu.ifi.dbs.elki.data.images.ComputeNaiveRGBColorHistogram;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.FileParameter;
