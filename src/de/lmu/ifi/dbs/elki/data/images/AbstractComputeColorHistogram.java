@@ -1,4 +1,4 @@
-package experimentalcode.erich.data.images;
+package de.lmu.ifi.dbs.elki.data.images;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
