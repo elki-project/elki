@@ -9,9 +9,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
 
-public class ComputeHSBColorHistogram extends AbstractComputeColorHistogram {
-  int quant;
-
+/**
+ * Compute color histograms in a Hue-Saturation-Brightness model.
+ * 
+ * @author Erich Schubert
+ */
+public class ComputeNaiveHSBColorHistogram extends AbstractComputeColorHistogram {
   /**
    * OptionID for {@link #BINSPERPLANE_PARAM}
    */
@@ -26,7 +29,15 @@ public class ComputeHSBColorHistogram extends AbstractComputeColorHistogram {
    */
   private final IntParameter BINSPERPLANE_PARAM = new IntParameter(BINSPERPLANE_ID, new IntervalConstraint(2, IntervalBoundary.CLOSE, 256, IntervalBoundary.CLOSE));
 
-  public ComputeHSBColorHistogram() {
+  /**
+   * Number of bins in each dimension to use.
+   */
+  int quant;
+
+  /**
+   * Constructor. No parameters, since this class is Parameterizable.
+   */
+  public ComputeNaiveHSBColorHistogram() {
     super();
     addOption(BINSPERPLANE_PARAM);
   }
@@ -40,32 +51,28 @@ public class ComputeHSBColorHistogram extends AbstractComputeColorHistogram {
     return remainingParameters;
   }
 
-  private final static float[] hsbbuf = new float[3];
-
   @Override
   protected int getBinForColor(int rgb) {
     int r = (rgb & 0xFF0000) >> 16;
     int g = (rgb & 0x00FF00) >> 8;
     int b = (rgb & 0x0000FF);
 
-    synchronized(hsbbuf) {
-      float[] hsbvals = Color.RGBtoHSB(r, g, b, hsbbuf);
-      // The values returned by RGBtoHSB are all in [0:1]
-      int h = (int) Math.floor(quant * hsbvals[0]);
-      int s = (int) Math.floor(quant * hsbvals[1]);
-      int v = (int) Math.floor(quant * hsbvals[2]);
-      // Guard against the value of 1.0
-      if(h >= quant) {
-        h = quant - 1;
-      }
-      if(s >= quant) {
-        s = quant - 1;
-      }
-      if(v >= quant) {
-        v = quant - 1;
-      }
-      return h * quant * quant + s * quant + v;
+    float[] hsbvals = Color.RGBtoHSB(r, g, b, null);
+    // The values returned by RGBtoHSB are all in [0:1]
+    int h = (int) Math.floor(quant * hsbvals[0]);
+    int s = (int) Math.floor(quant * hsbvals[1]);
+    int v = (int) Math.floor(quant * hsbvals[2]);
+    // Guard against the value of 1.0
+    if(h >= quant) {
+      h = quant - 1;
     }
+    if(s >= quant) {
+      s = quant - 1;
+    }
+    if(v >= quant) {
+      v = quant - 1;
+    }
+    return h * quant * quant + s * quant + v;
   }
 
   @Override

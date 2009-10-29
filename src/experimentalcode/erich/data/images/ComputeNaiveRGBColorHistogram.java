@@ -8,9 +8,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
 
-public class ComputeRGBColorHistogram extends AbstractComputeColorHistogram {
-  int quant;
-
+/**
+ * Compute a (rather naive) RGB color histogram.
+ * 
+ * @author Erich Schubert
+ */
+public class ComputeNaiveRGBColorHistogram extends AbstractComputeColorHistogram {
   /**
    * OptionID for {@link #BINSPERPLANE_PARAM}
    */
@@ -25,7 +28,15 @@ public class ComputeRGBColorHistogram extends AbstractComputeColorHistogram {
    */
   private final IntParameter BINSPERPLANE_PARAM = new IntParameter(BINSPERPLANE_ID, new IntervalConstraint(2, IntervalBoundary.CLOSE, 256, IntervalBoundary.CLOSE));  
   
-  public ComputeRGBColorHistogram() {
+  /**
+   * Number of bins in each dimension to use.
+   */
+  int quant;
+
+  /**
+   * Constructor. No parameters - uses Parametrizable interface.
+   */
+  public ComputeNaiveRGBColorHistogram() {
     super();
     addOption(BINSPERPLANE_PARAM);
   }
@@ -38,8 +49,6 @@ public class ComputeRGBColorHistogram extends AbstractComputeColorHistogram {
     
     return remainingParameters;
   }
-
-
 
   @Override
   protected int getBinForColor(int rgb) {
