@@ -152,6 +152,22 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
         }
         return new FloatVector(values);
     }
+    
+    /**
+     * Provides the scalar product (inner product) of this and the given FloatVector.
+     * @param f the FloatVector to compute the scalar product for
+     * @return the scalar product (inner product) of this and the given FloatVector
+     */
+    public double scalarProcuct(FloatVector f){
+      if(this.getDimensionality()!=f.getDimensionality()){
+        throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + f.getDimensionality() + ".");
+      }
+      float result = 0.0f;
+      for(int i = 0; i < this.getDimensionality(); i++){
+        result += this.values[i]*f.values[i];
+      }
+      return result;
+    }
 
     public FloatVector nullVector() {
         return new FloatVector(new float[this.values.length]);
