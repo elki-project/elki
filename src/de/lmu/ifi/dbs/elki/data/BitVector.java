@@ -271,12 +271,11 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
    *         specified bit vector
    */
   public BitVector plus(BitVector fv) {
-    Bit[] fv_bits = new Bit[fv.getDimensionality()];
-    for(int i = 0; i < fv.getDimensionality(); i++) {
-      fv_bits[i] = fv.getValue(i);
+    if(this.getDimensionality()!=fv.getDimensionality()){
+      throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
     }
 
-    BitVector bv = new BitVector(fv_bits);
+    BitVector bv = new BitVector(fv.getBits(), this.dimensionality);
     bv.bits.xor(this.bits);
     return bv;
   }
@@ -389,6 +388,26 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
     else {
       return false;
     }
+  }
+
+  /**
+   * Provides the scalar product (inner product) of this BitVector and the given BitVector.
+   * 
+   * As multiplication of Bits, the logical AND operation is used.
+   * The result is 0 if the number of bits after the AND operation is a multiple of 2, otherwise the result is 1.
+   * 
+   * @param d the BitVector to compute the scalar product for
+   * @return the scalar product (inner product) of this and the given BitVector
+   */
+  @Override
+  public Bit scalarProduct(BitVector fv) {
+    if(this.getDimensionality()!=fv.getDimensionality()){
+      throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
+    }
+    BitSet bs = this.getBits();
+    bs.and(fv.bits);
+
+    return new Bit(bs.cardinality()%2==1);
   }
 
 }
