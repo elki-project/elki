@@ -350,4 +350,32 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
     return keys;
   }
 
+  /**
+   * Provides the scalar product (inner product) of this and the given SparseFloatVector.
+   * @param f the SparseFloatVector to compute the scalar product for
+   * @return the scalar product (inner product) of this and the given SparseFloatVector
+   */
+  @Override
+  public Float scalarProduct(SparseFloatVector fv) {
+    if(this.getDimensionality()!=fv.getDimensionality()){
+      throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
+    }
+    float result = 0.0f;
+    if(fv.values.keySet().size()<=this.values.keySet().size()){
+      for(Integer fvkey : fv.values.keySet()){
+        if(this.values.containsKey(fvkey)){
+          result += this.values.get(fvkey)*fv.values.get(fvkey);
+        }
+      }
+    }
+    else{
+      for(Integer key : this.values.keySet()){
+        if(fv.values.containsKey(key)){
+          result += this.values.get(key)*fv.values.get(key);
+        }
+      }
+    }
+    return result;
+  }
+
 }
