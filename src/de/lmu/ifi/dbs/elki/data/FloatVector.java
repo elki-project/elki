@@ -158,7 +158,7 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
      * @param f the FloatVector to compute the scalar product for
      * @return the scalar product (inner product) of this and the given FloatVector
      */
-    public double scalarProcuct(FloatVector f){
+    public Float scalarProduct(FloatVector f){
       if(this.getDimensionality()!=f.getDimensionality()){
         throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + f.getDimensionality() + ".");
       }

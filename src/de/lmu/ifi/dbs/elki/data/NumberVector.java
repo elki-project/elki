@@ -75,6 +75,13 @@ public interface NumberVector<V extends NumberVector<V, N>, N extends Number> ex
    *         given NumberVector of V
    */
   V plus(V fv);
+  
+  /**
+   * Provides the scalar product (inner product) of this NumberVector of V and the given NumberVector of V.
+   * @param d the NumberVector of V to compute the scalar product for
+   * @return the scalar product (inner product) of this and the given NumberVector of V
+   */
+  N scalarProduct(V fv);
 
   /**
    * Provides a null vector of the same Vector Space as this
