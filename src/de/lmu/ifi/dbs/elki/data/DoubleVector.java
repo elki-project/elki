@@ -201,7 +201,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector,Double> {
    * @param d the DoubleVector to compute the scalar product for
    * @return the scalar product (inner product) of this and the given DoubleVector
    */
-  public double scalarProcuct(DoubleVector d){
+  public Double scalarProduct(DoubleVector d){
     if(this.getDimensionality()!=d.getDimensionality()){
       throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + d.getDimensionality() + ".");
     }
