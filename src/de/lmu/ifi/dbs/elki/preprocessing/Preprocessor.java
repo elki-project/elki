@@ -8,7 +8,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * Defines the requirements for classes that do some preprocessing steps for
  * objects of a certain database.
  *
- * @author Elke Achtert (
+ * @author Elke Achtert
  * @param <O> Object type
  */
 public interface Preprocessor<O extends DatabaseObject> extends Parameterizable {
