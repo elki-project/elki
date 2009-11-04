@@ -251,7 +251,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
     }
     // refine Candidates
     PriorityQueue<FCPair<Double, Integer>> resqueue = new PriorityQueue<FCPair<Double, Integer>>(k);
-    System.out.println(pq.size() + " objects ordered into candidate list.");
+    //System.out.println(pq.size() + " objects ordered into candidate list.");
     int v = 0;
     while(!pq.isEmpty()) {
       if(resqueue.size() == k && pq.peek().getFirst() > resqueue.peek().getFirst()) {
