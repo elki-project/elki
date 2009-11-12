@@ -364,6 +364,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
       this.db = db;
       this.dim = db.dimensionality();
       this.distanceFunction = distanceFunction;
+      this.distanceFunction.setDatabase(this.db, false, false);
 
       double min = Double.MAX_VALUE;
       double max = Double.MIN_VALUE;
