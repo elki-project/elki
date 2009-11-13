@@ -50,7 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
  * @param <V> Vector type
  * @param <N> Number type
  */
-public class DiSHPreprocessor<V extends NumberVector<V,? extends Number>> extends AbstractParameterizable implements PreferenceVectorPreprocessor<V> {
+public class DiSHPreprocessor<V extends NumberVector<V,?>> extends AbstractParameterizable implements PreferenceVectorPreprocessor<V> {
   /**
    * Available strategies for determination of the preference vector.
    */
