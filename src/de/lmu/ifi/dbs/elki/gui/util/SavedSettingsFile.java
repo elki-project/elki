@@ -118,7 +118,7 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
    * Find a saved setting by key.
    * 
    * @param key
-   * @return
+   * @return saved settings for this key
    */
   public ArrayList<String> get(String key) {
     Iterator<Pair<String, ArrayList<String>>> it = store.iterator();
@@ -157,9 +157,9 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
   }
 
   /**
-   * Return number of saved settings.
+   * Return number of saved settings profiles.
    * 
-   * @return
+   * @return Number of saved settings profiles
    */
   public int size() {
     return store.size();
@@ -169,7 +169,7 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
    * Array access.
    * 
    * @param index
-   * @return
+   * @return pair at this index
    */
   public Pair<String, ArrayList<String>> getElementAt(int index) {
     return store.get(index);

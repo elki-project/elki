@@ -396,7 +396,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
    * As multiplication of Bits, the logical AND operation is used.
    * The result is 0 if the number of bits after the AND operation is a multiple of 2, otherwise the result is 1.
    * 
-   * @param d the BitVector to compute the scalar product for
+   * @param fv the BitVector to compute the scalar product for
    * @return the scalar product (inner product) of this and the given BitVector
    */
   @Override
