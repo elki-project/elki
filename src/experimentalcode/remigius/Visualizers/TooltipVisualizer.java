@@ -187,20 +187,20 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
     String csscls = elem.getAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE);
     if(SVGConstants.SVG_MOUSEOVER_EVENT_TYPE.equals(type)) {
       if(TOOLTIP_HIDDEN.equals(csscls)) {
-        elem.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, TOOLTIP_VISIBLE);
+        SVGUtil.setAtt(elem, SVGConstants.SVG_CLASS_ATTRIBUTE, TOOLTIP_VISIBLE);
       }
     }
     else if(SVGConstants.SVG_MOUSEOUT_EVENT_TYPE.equals(type)) {
       if(TOOLTIP_VISIBLE.equals(csscls)) {
-        elem.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, TOOLTIP_HIDDEN);
+        SVGUtil.setAtt(elem, SVGConstants.SVG_CLASS_ATTRIBUTE, TOOLTIP_HIDDEN);
       }
     }
     else if(SVGConstants.SVG_CLICK_EVENT_TYPE.equals(type)) {
       if(TOOLTIP_STICKY.equals(csscls)) {
-        elem.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, TOOLTIP_HIDDEN);
+        SVGUtil.setAtt(elem, SVGConstants.SVG_CLASS_ATTRIBUTE, TOOLTIP_HIDDEN);
       }
       if(TOOLTIP_HIDDEN.equals(csscls) || TOOLTIP_VISIBLE.equals(csscls)) {
-        elem.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, TOOLTIP_STICKY);
+        SVGUtil.setAtt(elem, SVGConstants.SVG_CLASS_ATTRIBUTE, TOOLTIP_STICKY);
       }
     }
   }
