@@ -31,7 +31,7 @@ import experimentalcode.shared.outlier.scaling.StaticScalingFunction;
  * 
  * @author Remigius Wojdanowski
  * 
- * @param <NV>
+ * @param <NV> Type of the DatabaseObject being visualized.
  */
 public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
 
