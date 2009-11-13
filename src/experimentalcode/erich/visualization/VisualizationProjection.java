@@ -105,7 +105,7 @@ public class VisualizationProjection<O extends NumberVector<O, ?>> {
    * 
    * @param v vector in scaled space
    * @param sampleobject Sample object needed for instantiation via
-   *        {@link NumberVector#newInstance()}
+   *        {@link de.lmu.ifi.dbs.elki.data.NumberVector#newInstance()}
    * @return vector in data space
    */
   public O projectScaledToDataSpace(Vector v, O sampleobject) {
@@ -132,7 +132,7 @@ public class VisualizationProjection<O extends NumberVector<O, ?>> {
    * 
    * @param v vector in rendering space
    * @param sampleobject Sample object needed for instantiation via
-   *        {@link NumberVector#newInstance()}
+   *        {@link de.lmu.ifi.dbs.elki.data.NumberVector#newInstance()}
    * @return vector in data space
    */
   public O projectRenderToDataSpace(Vector v, O sampleobject) {
@@ -195,7 +195,7 @@ public class VisualizationProjection<O extends NumberVector<O, ?>> {
   /**
    * Return a string version of the viewport size for use as SVG viewport.
    * 
-   * @param extrasize Extra margin for labels etc.
+   * @param margin Extra margin for labels etc.
    * @return String rendition of the viewport.
    */
   public String estimateViewportString(double margin) {

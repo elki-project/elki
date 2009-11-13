@@ -26,7 +26,6 @@ import java.util.Random;
  * @author Arthur Zimek
  */
 public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, Float> {
-
   /**
    * Mapping of indices and corresponding values. Only non-zero values will to
    * be stored.
@@ -352,7 +351,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
 
   /**
    * Provides the scalar product (inner product) of this and the given SparseFloatVector.
-   * @param f the SparseFloatVector to compute the scalar product for
+   * @param fv the SparseFloatVector to compute the scalar product for
    * @return the scalar product (inner product) of this and the given SparseFloatVector
    */
   @Override
@@ -377,5 +376,4 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
     }
     return result;
   }
-
 }

@@ -117,7 +117,7 @@ public class MultiResult implements Result {
    * Put meta data.
    * 
    * @param <M> data class
-   * @param meta key
+   * @param metaid key
    * @param value data
    */
   public <M> void setAssociation(AssociationID<M> metaid, M value) {
@@ -128,7 +128,7 @@ public class MultiResult implements Result {
    * Get a meta data object.
    * 
    * @param <M> data class
-   * @param meta Key
+   * @param metaid Key
    * @return stored meta data or null
    */
   public <M> M getAssociation(AssociationID<M> metaid) {
@@ -142,7 +142,7 @@ public class MultiResult implements Result {
    * actually satisfies the return type M.
    * 
    * @param <M> data class
-   * @param meta Key
+   * @param metaid Key
    * @return stored meta data or null
    */
   @SuppressWarnings("unchecked")
