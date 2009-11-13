@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
  * 
  * @param <O> Vector type
  */
-public class VisualizationProjection<O extends NumberVector<O, ? extends Number>> {
+public class VisualizationProjection<O extends NumberVector<O, ?>> {
   /**
    * Database dimensionality
    */

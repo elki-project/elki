@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * @param <V> the type of FeatureVector to compute the distances in between
  * @param <N> the type of Number of the attributes of vectors of type V
  */
-public class PearsonCorrelationDistanceFunction<V extends NumberVector<V,? extends Number>> extends AbstractDoubleDistanceFunction<V> {
+public class PearsonCorrelationDistanceFunction<V extends NumberVector<V,N>, N extends Number> extends AbstractDoubleDistanceFunction<V> {
 
   /**
    * Provides a PearsonCorrelationDistanceFunction.

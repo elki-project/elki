@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * 
  * TODO: implement SpatialDistanceFunction
  */
-public class LPNormDistanceFunction<V extends NumberVector<V, ? extends Number>> extends AbstractDoubleDistanceFunction<V> {
+public class LPNormDistanceFunction<V extends NumberVector<V, N>, N extends Number> extends AbstractDoubleDistanceFunction<V> {
 
   /**
    * OptionID for {@link #P_PARAM}
