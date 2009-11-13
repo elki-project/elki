@@ -89,8 +89,11 @@
 	<!-- ******************* FILE (IGNORE) PATTERNS ******************* -->
 	<!-- Experimentalcode is sometimes excluded - if it prevents an internal build -->
 	<patternset id="exclude.internal">
-		<exclude name="experimentalcode/tobias/**" />
+		<exclude name="experimentalcode/hettab/**" />
+		<exclude name="experimentalcode/marisa/**" />
 		<exclude name="experimentalcode/simon/**" />
+		<exclude name="experimentalcode/thomas/**" />
+		<exclude name="experimentalcode/tobias/**" />
 	</patternset>
 	<!-- Code not to be release -->
 	<patternset id="exclude.release">
