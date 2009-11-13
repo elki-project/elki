@@ -14,15 +14,13 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 
 /**
- * Generates a SVG-Element containing reference points.
- * 
- * TODO: Extend that documentation.
+ * Generates a SVG-Element visualizing reference points.
  * 
  * TODO: This class needs testing.
  * 
  * @author Remigius Wojdanowski
  * 
- * @param <NV>
+  * @param <NV> Type of the DatabaseObject being visualized.
  */
 public class ReferencePointsVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
 

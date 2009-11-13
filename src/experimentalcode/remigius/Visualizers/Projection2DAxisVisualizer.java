@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
  * 
  * @author Remigius Wojdanowski
  * 
- * @param <NV>
+ * @param <NV> Type of the DatabaseObject being visualized.
  */
 public class Projection2DAxisVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
   /**

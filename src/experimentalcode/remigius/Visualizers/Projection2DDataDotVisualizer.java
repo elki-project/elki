@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * 
  * @author Remigius Wojdanowski
  * 
- * @param <NV>
+  * @param <NV> Type of the DatabaseObject being visualized.
  */
 public class Projection2DDataDotVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
 

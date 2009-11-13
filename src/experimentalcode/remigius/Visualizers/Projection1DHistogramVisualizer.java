@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * 
  * @author Remigius Wojdanowski
  * 
- * @param <NV>
+ * @param <NV> Type of the DatabaseObject being visualized.
  */
 public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends Projection1DVisualizer<NV> {
 
