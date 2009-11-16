@@ -1,16 +1,13 @@
-package experimentalcode.erich.newdblayer.storage.memory;
+package experimentalcode.erich.newdblayer;
 
 import java.util.Collection;
 import java.util.Iterator;
 
-import experimentalcode.erich.newdblayer.DBID;
-import experimentalcode.erich.newdblayer.DBIDs;
 
 /**
  * Static (no modifications allowed) set of Database Object IDs.
  * 
  * @author Erich Schubert
- * 
  */
 public abstract class StaticDBIDs implements DBIDs, Collection<DBID> {
   @Override

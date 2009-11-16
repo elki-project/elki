@@ -11,6 +11,7 @@ import experimentalcode.erich.newdblayer.storage.Storage;
  *
  * @param <T> Representation object type
  */
+// TODO: currently unused, so far we can use ArrayRecordStorage which is more efficient.
 public class MapRecordStorage<T> implements Storage<T> {
   /**
    * Representation index.
