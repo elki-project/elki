@@ -65,9 +65,9 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
     return remainingParameters;
   }
 
-  public void init(VisualizerContext context, Clustering<Model> clustering) {
+  public void init(VisualizerContext context) {
     super.init(NAME, context);
-    this.clustering = clustering;
+    this.clustering = context.getOrCreateDefaultClustering();
   }
 
   private void setupCSS(SVGPlot svgp) {

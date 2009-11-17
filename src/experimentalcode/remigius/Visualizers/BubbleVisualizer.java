@@ -170,10 +170,10 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
    * @param result complete result for further information.
    * @param normalizationScale normalizes coordinates.
    */
-  public void init(String name, VisualizerContext context, AnnotationResult<? extends Number> anResult, StaticScalingFunction normalizationScale, Clustering<Model> clustering) {
+  public void init(String name, VisualizerContext context, AnnotationResult<? extends Number> anResult, StaticScalingFunction normalizationScale) {
     super.init(name, context);
     this.anResult = anResult;
-    this.clustering = clustering;
+    this.clustering = context.getOrCreateDefaultClustering();
     
     this.normalizationScale = normalizationScale;
     this.plotScale = new LinearScale(0.2);

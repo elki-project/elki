@@ -1,6 +1,9 @@
 package experimentalcode.remigius.Visualizers;
 
+import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelHierarchicalClustering;
+import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.AnyMap;
@@ -50,6 +53,16 @@ public class VisualizerContext extends AnyMap<String> {
   public static final String LINESTYLE_LIBRARY = "linelibrary";
 
   /**
+   * Identifier for the primary clustering to use.
+   */
+  public static final String CLUSTERING = "clustering";
+
+  /**
+   * Identifier for a fallback (default) clustering.
+   */
+  public static final String CLUSTERING_FALLBACK = "clustering-fallback";
+
+  /**
    * Constructor. We currently require a Database and a Result.
    * 
    * @param database Database
@@ -72,7 +85,7 @@ public class VisualizerContext extends AnyMap<String> {
     // TODO: can we get some increase type safety here maybe?
     return (Database<O>) database;
   }
-  
+
   /**
    * Get the full result object
    */
@@ -120,5 +133,36 @@ public class VisualizerContext extends AnyMap<String> {
       put(LINESTYLE_LIBRARY, lib);
     }
     return lib;
+  }
+
+  /**
+   * Convenience method to get the clustering to use, and fall back to a default
+   * "clustering".
+   * 
+   * @return Clustering to use
+   */
+  public Clustering<Model> getOrCreateDefaultClustering() {
+    Clustering<Model> c = getGenerics(CLUSTERING, Clustering.class);
+    if(c == null) {
+      c = getGenerics(CLUSTERING_FALLBACK, Clustering.class);
+    }
+    if(c == null) {
+      c = generateDefaultClustering();
+    }
+    return c;
+  }
+
+  /**
+   * Generate a default (fallback) clustering.
+   * 
+   * @return generated clustering
+   */
+  private Clustering<Model> generateDefaultClustering() {
+    // Cluster by labels
+    ByLabelHierarchicalClustering<DatabaseObject> split = new ByLabelHierarchicalClustering<DatabaseObject>();
+    Clustering<Model> c = split.run(getDatabase());
+    // store.
+    put(CLUSTERING_FALLBACK, c);
+    return c;
   }
 }
