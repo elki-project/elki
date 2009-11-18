@@ -187,4 +187,19 @@ public class ResultUtil {
     }
     return null;
   }
+
+  /**
+   * Ensure the result is a MultiResult, otherwise wrap it in one.
+   * 
+   * @param result
+   * @return MultiResult, either result itself or a MultiResult containing result.
+   */
+  public static MultiResult ensureMultiResult(Result result) {
+    if (result instanceof MultiResult) {
+      return (MultiResult) result;
+    }
+    MultiResult mr = new MultiResult();
+    mr.addResult(result);
+    return mr;
+  }
 }
