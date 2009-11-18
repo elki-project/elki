@@ -2,6 +2,7 @@ package experimentalcode.remigius.Adapter;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import experimentalcode.remigius.Visualizers.Projection2DAxisVisualizer;
 import experimentalcode.remigius.Visualizers.Projection2DClusteringVisualizer;
 import experimentalcode.remigius.Visualizers.Projection2DDataDotVisualizer;
@@ -41,6 +42,13 @@ public class DefaultAdapter<NV extends NumberVector<NV, ?>> extends AbstractAlgo
     projection2DDataDotVisualizer.init(context);
     projection2DClusteringVisualizer.init(context);
     histoVisualizer.init(context);
-    usableVisualizers.addAll(providedVisualizers);
+    
+    usableVisualizers.add(projection2DAxisVisualizer);
+    if (ResultUtil.getClusteringResults(context.getResult()).size() > 0) {
+      usableVisualizers.add(projection2DClusteringVisualizer);
+    } else {
+      usableVisualizers.add(projection2DDataDotVisualizer);
+    }
+    usableVisualizers.add(histoVisualizer);    
   }
 }
