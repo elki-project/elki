@@ -158,5 +158,6 @@ public class ResultWindow extends JFrame {
   public void addVisualizations(Collection<Visualizer> vs) {
     overview.addVisualizations(vs);
     overview.refresh();
+    showPlot(overview);
   }
 }

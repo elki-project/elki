@@ -42,6 +42,7 @@ public class VisualizersForResult extends AbstractParameterizable {
   public VisualizersForResult() {
     super();
     this.adapters = collectAlgorithmAdapters();
+    this.visualizers = new ArrayList<Visualizer>();
   }
   
   /**
