@@ -184,7 +184,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractApplication {
   public void run() throws IllegalStateException {
     Database<O> db = databaseConnection.getDatabase(normalization);
     algorithm.run(db);
-    Result res = algorithm.getResult();
+    MultiResult res = ResultUtil.ensureMultiResult(algorithm.getResult());
 
     // standard annotations from the source file
     // TODO: get them via databaseConnection!
@@ -193,19 +193,8 @@ public class KDDTask<O extends DatabaseObject> extends AbstractApplication {
     AnnotationFromDatabase<String, O> ar1 = new AnnotationFromDatabase<String, O>(db, AssociationID.LABEL);
     AnnotationFromDatabase<ClassLabel, O> ar2 = new AnnotationFromDatabase<ClassLabel, O>(db, AssociationID.CLASS);
 
-    // insert standard annotations when we have a MultiResult
-    if(res instanceof MultiResult) {
-      result = (MultiResult) res;
-      result.prependResult(ar1);
-      result.prependResult(ar2);
-    }
-    else {
-      // TODO: can we always wrap them in a MultiResult safely?
-      result = new MultiResult();
-      result.addResult(ar1);
-      result.addResult(ar2);
-      result.addResult(res);
-    }
+    result.prependResult(ar1);
+    result.prependResult(ar2);
 
     List<AttributeSettings> settings = getAttributeSettings();
     ResultUtil.setGlobalAssociation(result, AssociationID.META_SETTINGS, settings);
