@@ -66,15 +66,15 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
 
   public void refresh() {
     // split the visualizers into three sets.
-    Collection<Projection1DVisualizer<NV>> vis1d = new ArrayList<Projection1DVisualizer<NV>>(vis.size());
-    Collection<Projection2DVisualizer<NV>> vis2d = new ArrayList<Projection2DVisualizer<NV>>(vis.size());
+    Collection<Projection1DVisualizer<?>> vis1d = new ArrayList<Projection1DVisualizer<?>>(vis.size());
+    Collection<Projection2DVisualizer<?>> vis2d = new ArrayList<Projection2DVisualizer<?>>(vis.size());
     Collection<Visualizer> visot = new ArrayList<Visualizer>(vis.size());
     for(Visualizer v : vis) {
       if(Projection2DVisualizer.class.isAssignableFrom(v.getClass())) {
-        vis2d.add((Projection2DVisualizer<NV>) v);
+        vis2d.add((Projection2DVisualizer<?>) v);
       }
       else if(Projection1DVisualizer.class.isAssignableFrom(v.getClass())) {
-        vis1d.add((Projection1DVisualizer<NV>) v);
+        vis1d.add((Projection1DVisualizer<?>) v);
       }
       else {
         visot.add(v);
@@ -97,7 +97,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
         for(int d2 = d1 + 1; d2 <= dim; d2++) {
           VisualizationProjection proj = new VisualizationProjection(dvdb, scales, d1, d2);
 
-          for(Projection2DVisualizer<NV> v : vis2d) {
+          for(Projection2DVisualizer<?> v : vis2d) {
             VisualizationInfo vi = new Visualization2DInfo(v, proj);
             plotmap.addVis(d1 - 1, d2 - 2, 1.0, 1.0, vi);
           }
@@ -109,7 +109,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
       for(int d1 = 1; d1 <= dim; d1++) {
         VisualizationProjection proj = new VisualizationProjection(dvdb, scales, d1, (d1 == 1 ? 2 : 1));
         double ypos = 0;
-        for(Projection1DVisualizer<NV> v : vis1d) {
+        for(Projection1DVisualizer<?> v : vis1d) {
           VisualizationInfo vi = new Visualization1DInfo(v, proj);
           // TODO: 1d vis might have a different native scaling.
           double height = 1.0;
@@ -209,7 +209,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
   class Visualization2DInfo extends VisualizationInfo {
     VisualizationProjection proj;
 
-    public Visualization2DInfo(Projection2DVisualizer<NV> vis, VisualizationProjection proj) {
+    public Visualization2DInfo(Projection2DVisualizer<?> vis, VisualizationProjection proj) {
       super(vis);
       this.proj = proj;
     }
@@ -218,7 +218,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
   class Visualization1DInfo extends VisualizationInfo {
     VisualizationProjection proj;
 
-    public Visualization1DInfo(Projection1DVisualizer<NV> vis, VisualizationProjection proj) {
+    public Visualization1DInfo(Projection1DVisualizer<?> vis, VisualizationProjection proj) {
       super(vis);
       this.proj = proj;
     }
