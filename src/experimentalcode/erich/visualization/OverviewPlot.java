@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -12,8 +13,9 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
-import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -97,7 +99,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
 
           for(Projection2DVisualizer<NV> v : vis2d) {
             VisualizationInfo vi = new Visualization2DInfo(v, proj);
-            plotmap.addVis(d1 - 1, d2 - 2, vi);
+            plotmap.addVis(d1 - 1, d2 - 2, 1.0, 1.0, vi);
           }
         }
       }
@@ -106,42 +108,41 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
       int dim = db.dimensionality();
       for(int d1 = 1; d1 <= dim; d1++) {
         VisualizationProjection<NV> proj = new VisualizationProjection<NV>(dvdb, scales, d1, (d1 == 1 ? 2 : 1));
-        int ypos = 1;
+        double ypos = 0;
         for(Projection1DVisualizer<NV> v : vis1d) {
           VisualizationInfo vi = new Visualization1DInfo(v, proj);
-          plotmap.addVis(d1 - 1, -ypos, vi);
-          ypos = ypos + 1;
+          // TODO: 1d vis might have a different native scaling.
+          double height = 1.0;
+          plotmap.addVis(d1 - 1, ypos - height, 1.0, height, vi);
+          ypos = ypos - height;
         }
       }
     }
     if(visot.size() > 0) {
       // find starting position.
-      int pos = plotmap.miny;
-      if(pos == Integer.MAX_VALUE) {
-        pos = 0;
+      Double pos = plotmap.minmaxy.getMin();
+      if(pos == null) {
+        pos = 0.0;
       }
-      for (Visualizer v : visot) {
+      for(Visualizer v : visot) {
         VisualizationInfo vi = new VisualizationInfo(v);
-        plotmap.addVis(-1, pos, vi);
-        pos++;
+        // TODO: might have different scaling.
+        plotmap.addVis(-1, pos, 1., 1., vi);
+        pos += 1.0;
       }
     }
 
-    final int plotw = plotmap.maxx - plotmap.minx + 1;
-    final int ploth = plotmap.maxy - plotmap.miny + 1;
-    String vb = plotmap.minx + " " + plotmap.miny + " " + plotw + " " + ploth;
+    final double plotw = plotmap.minmaxx.getMax() - plotmap.minmaxx.getMin();
+    final double ploth = plotmap.minmaxy.getMax() - plotmap.minmaxy.getMin();
+    String vb = plotmap.minmaxx.getMin() + " " + plotmap.minmaxy.getMin() + " " + plotw + " " + ploth;
     SVGUtil.setAtt(getRoot(), SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, vb);
-    for (int x = plotmap.minx; x <= plotmap.maxx; x++) {
-      for (int y = plotmap.miny; y <= plotmap.maxy; y++) {
-        int num = 0;
-        List<VisualizationInfo> visl = plotmap.get(x, y);
-        if (visl != null) {
-          num = visl.size();
-        }
-        Element t = SVGUtil.svgText(getDocument(), x + .5, y + .5, ""+num);
-        t.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: .2; fill: black");
-        getRoot().appendChild(t);
-      }
+    for(Entry<DoubleDoublePair, ArrayList<VisualizationInfo>> e : plotmap.entrySet()) {
+      int num = e.getValue().size();
+      double x = e.getKey().getFirst() + .4;
+      double y = e.getKey().getSecond() + .6;
+      Element t = SVGUtil.svgText(getDocument(), x, y, "" + num);
+      t.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: .2; fill: black");
+      getRoot().appendChild(t);
     }
   }
 
@@ -155,37 +156,33 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
     return (Database<NV>) db;
   }
 
-  class PlotMap extends HashMap<IntIntPair, ArrayList<VisualizationInfo>> {
+  class PlotMap extends HashMap<DoubleDoublePair, ArrayList<VisualizationInfo>> {
     private static final long serialVersionUID = 1L;
 
-    int minx = Integer.MAX_VALUE;
+    MinMax<Double> minmaxx = new MinMax<Double>();
 
-    int miny = Integer.MAX_VALUE;
-
-    int maxx = Integer.MIN_VALUE;
-
-    int maxy = Integer.MIN_VALUE;
+    MinMax<Double> minmaxy = new MinMax<Double>();
 
     PlotMap() {
       super();
     }
 
-    void addVis(int x, int y, VisualizationInfo v) {
-      ArrayList<VisualizationInfo> l = this.get(new IntIntPair(x, y));
+    void addVis(double x, double y, double w, double h, VisualizationInfo v) {
+      ArrayList<VisualizationInfo> l = this.get(new DoubleDoublePair(x, y));
       if(l == null) {
         l = new ArrayList<VisualizationInfo>();
-        this.put(new IntIntPair(x, y), l);
+        this.put(new DoubleDoublePair(x, y), l);
       }
       l.add(v);
       // Update min/max
-      minx = Math.min(minx, x);
-      miny = Math.min(miny, y);
-      maxx = Math.max(maxx, x);
-      maxy = Math.max(maxy, y);
+      minmaxx.put(x);
+      minmaxx.put(x + w);
+      minmaxy.put(y);
+      minmaxy.put(y + h);
     }
 
-    List<VisualizationInfo> get(int x, int y) {
-      return this.get(new IntIntPair(x, y));
+    List<VisualizationInfo> get(double x, double y) {
+      return this.get(new DoubleDoublePair(x, y));
     }
   }
 
@@ -193,6 +190,10 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
     Double x = null;
 
     Double y = null;
+
+    Double w = null;
+
+    Double h = null;
 
     int depth = 0;
 
