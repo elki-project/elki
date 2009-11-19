@@ -15,10 +15,8 @@ import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
  * often be just 2D, but should ideally support any projection onto a 2D plane.
  * 
  * @author Erich Schubert
- * 
- * @param <O> Vector type
  */
-public class VisualizationProjection<O extends NumberVector<O, ?>> {
+public class VisualizationProjection {
   /**
    * Database dimensionality
    */
@@ -42,7 +40,7 @@ public class VisualizationProjection<O extends NumberVector<O, ?>> {
    * @param ax1 First axis
    * @param ax2 Second axis
    */
-  public VisualizationProjection(Database<O> db, LinearScale[] scales, int ax1, int ax2) {
+  public VisualizationProjection(Database<? extends NumberVector<?,?>> db, LinearScale[] scales, int ax1, int ax2) {
     this(db, scales, axisProjection(db.dimensionality(), ax1, ax2));
   }
 
@@ -53,7 +51,7 @@ public class VisualizationProjection<O extends NumberVector<O, ?>> {
    * @param scales Scales to use
    * @param proj Projection to use
    */
-  public VisualizationProjection(Database<O> db, LinearScale[] scales, AffineTransformation proj) {
+  public VisualizationProjection(Database<? extends NumberVector<?,?>> db, LinearScale[] scales, AffineTransformation proj) {
     if(scales == null) {
       scales = Scales.calcScales(db);
     }
@@ -92,7 +90,7 @@ public class VisualizationProjection<O extends NumberVector<O, ?>> {
    * @param data vector in data space
    * @return vector in scaled space
    */
-  public Vector projectDataToScaledSpace(O data) {
+  public Vector projectDataToScaledSpace(NumberVector<?,?> data) {
     Vector vec = new Vector(dim);
     for(int d = 1; d <= dim; d++) {
       vec.set(d - 1, scales[d].getScaled(data.getValue(d).doubleValue()));
@@ -108,7 +106,7 @@ public class VisualizationProjection<O extends NumberVector<O, ?>> {
    *        {@link de.lmu.ifi.dbs.elki.data.NumberVector#newInstance()}
    * @return vector in data space
    */
-  public O projectScaledToDataSpace(Vector v, O sampleobject) {
+  public <NV extends NumberVector<NV,?>> NV projectScaledToDataSpace(Vector v, NV sampleobject) {
     Vector vec = v.copy();
     for(int d = 1; d <= dim; d++) {
       vec.set(d - 1, scales[d].getUnscaled(vec.get(d - 1)));
@@ -122,7 +120,7 @@ public class VisualizationProjection<O extends NumberVector<O, ?>> {
    * @param data vector in data space
    * @return vector in rendering space
    */
-  public Vector projectDataToRenderSpace(O data) {
+  public Vector projectDataToRenderSpace(NumberVector<?,?> data) {
     Vector vec = projectDataToScaledSpace(data);
     return projectScaledToRender(vec);
   }
@@ -135,7 +133,7 @@ public class VisualizationProjection<O extends NumberVector<O, ?>> {
    *        {@link de.lmu.ifi.dbs.elki.data.NumberVector#newInstance()}
    * @return vector in data space
    */
-  public O projectRenderToDataSpace(Vector v, O sampleobject) {
+  public <NV extends NumberVector<NV,?>> NV projectRenderToDataSpace(Vector v, NV sampleobject) {
     Vector vec = projectRenderToScaled(v);
     // Not calling {@link #projectScaledToDataSpace} to avoid extra copy of
     // vector.

@@ -95,7 +95,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
       int dim = db.dimensionality();
       for(int d1 = 1; d1 <= dim; d1++) {
         for(int d2 = d1 + 1; d2 <= dim; d2++) {
-          VisualizationProjection<NV> proj = new VisualizationProjection<NV>(dvdb, scales, d1, d2);
+          VisualizationProjection proj = new VisualizationProjection(dvdb, scales, d1, d2);
 
           for(Projection2DVisualizer<NV> v : vis2d) {
             VisualizationInfo vi = new Visualization2DInfo(v, proj);
@@ -107,7 +107,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
     if(vis1d.size() > 0) {
       int dim = db.dimensionality();
       for(int d1 = 1; d1 <= dim; d1++) {
-        VisualizationProjection<NV> proj = new VisualizationProjection<NV>(dvdb, scales, d1, (d1 == 1 ? 2 : 1));
+        VisualizationProjection proj = new VisualizationProjection(dvdb, scales, d1, (d1 == 1 ? 2 : 1));
         double ypos = 0;
         for(Projection1DVisualizer<NV> v : vis1d) {
           VisualizationInfo vi = new Visualization1DInfo(v, proj);
@@ -207,18 +207,18 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
   }
 
   class Visualization2DInfo extends VisualizationInfo {
-    VisualizationProjection<NV> proj;
+    VisualizationProjection proj;
 
-    public Visualization2DInfo(Projection2DVisualizer<NV> vis, VisualizationProjection<NV> proj) {
+    public Visualization2DInfo(Projection2DVisualizer<NV> vis, VisualizationProjection proj) {
       super(vis);
       this.proj = proj;
     }
   }
 
   class Visualization1DInfo extends VisualizationInfo {
-    VisualizationProjection<NV> proj;
+    VisualizationProjection proj;
 
-    public Visualization1DInfo(Projection1DVisualizer<NV> vis, VisualizationProjection<NV> proj) {
+    public Visualization1DInfo(Projection1DVisualizer<NV> vis, VisualizationProjection proj) {
       super(vis);
       this.proj = proj;
     }
