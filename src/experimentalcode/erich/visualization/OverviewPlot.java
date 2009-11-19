@@ -187,16 +187,6 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
   }
 
   class VisualizationInfo {
-    Double x = null;
-
-    Double y = null;
-
-    Double w = null;
-
-    Double h = null;
-
-    int depth = 0;
-
     File thumbnail = null;
 
     Visualizer vis = null;
