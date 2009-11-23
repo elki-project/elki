@@ -105,7 +105,8 @@ public class ResultWindow extends JFrame {
     p.add(quitButton);
 
     panel.add("North", p);
-    
+
+    // Create a *dynamic* Canvas. We need updates for thumbnail insertion!
     svgCanvas = new JSVGSynchronizedCanvas();
     svgCanvas.setDocumentState(JSVGComponent.ALWAYS_DYNAMIC);
     panel.add("Center", svgCanvas);
