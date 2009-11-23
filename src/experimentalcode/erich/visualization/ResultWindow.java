@@ -10,8 +10,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import org.apache.batik.swing.svg.JSVGComponent;
-
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -106,9 +104,7 @@ public class ResultWindow extends JFrame {
 
     panel.add("North", p);
 
-    // Create a *dynamic* Canvas. We need updates for thumbnail insertion!
     svgCanvas = new JSVGSynchronizedCanvas();
-    svgCanvas.setDocumentState(JSVGComponent.ALWAYS_DYNAMIC);
     panel.add("Center", svgCanvas);
 
     this.getContentPane().add(panel);

@@ -25,7 +25,6 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.apache.batik.swing.svg.AbstractJSVGComponent;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
@@ -397,7 +396,6 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
       viewport.appendChild(egroup);
       plot.putIdElement(SERIESID, egroup);
 
-      svgCanvas.setDocumentState(AbstractJSVGComponent.ALWAYS_DYNAMIC);
       svgCanvas.setPlot(plot);
 
       DefaultListModel m = new DefaultListModel();

@@ -34,6 +34,7 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
   public JSVGSynchronizedCanvas() {
     super();
     this.synchronizer = new JSVGUpdateSynchronizer(this);
+    super.setDocumentState(JSVGCanvas.ALWAYS_DYNAMIC);
   }
 
   /**
