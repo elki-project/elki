@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import de.lmu.ifi.dbs.elki.visualization.svg.Thumbnailer;
 import experimentalcode.remigius.Visualizers.Projection1DVisualizer;
 import experimentalcode.remigius.Visualizers.Projection2DVisualizer;
 import experimentalcode.remigius.Visualizers.Visualizer;
@@ -125,7 +126,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
         pos = 0.0;
       }
       for(Visualizer v : visot) {
-        VisualizationInfo vi = new VisualizationInfo(v);
+        VisualizationInfo vi = new VisualizationUnprojectedInfo(v);
         // TODO: might have different scaling.
         plotmap.addVis(-1, pos, 1., 1., vi);
         pos += 1.0;
@@ -137,12 +138,22 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
     String vb = plotmap.minmaxx.getMin() + " " + plotmap.minmaxy.getMin() + " " + plotw + " " + ploth;
     SVGUtil.setAtt(getRoot(), SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, vb);
     for(Entry<DoubleDoublePair, ArrayList<VisualizationInfo>> e : plotmap.entrySet()) {
-      int num = e.getValue().size();
-      double x = e.getKey().getFirst() + .4;
-      double y = e.getKey().getSecond() + .6;
-      Element t = SVGUtil.svgText(getDocument(), x, y, "" + num);
-      t.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: .2; fill: black");
-      getRoot().appendChild(t);
+      double x = e.getKey().getFirst();
+      double y = e.getKey().getSecond();
+      //int num = e.getValue().size();
+      //Element t = SVGUtil.svgText(getDocument(), x + .4, y + .6, "" + num);
+      //t.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: .2; fill: black");
+      //getRoot().appendChild(t);
+      for (VisualizationInfo vi : e.getValue()) {
+        File thumb = vi.makeThumbnail();
+        Element i = this.svgElement(SVGConstants.SVG_IMAGE_TAG);
+        SVGUtil.setAtt(i, SVGConstants.SVG_X_ATTRIBUTE, x);
+        SVGUtil.setAtt(i, SVGConstants.SVG_Y_ATTRIBUTE, y);
+        SVGUtil.setAtt(i, SVGConstants.SVG_WIDTH_ATTRIBUTE, 1);
+        SVGUtil.setAtt(i, SVGConstants.SVG_HEIGHT_ATTRIBUTE, 1);
+        i.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, thumb.toURI().toString());
+        getRoot().appendChild(i);
+      }
     }
   }
 
@@ -186,31 +197,82 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
     }
   }
 
-  class VisualizationInfo {
+  static Thumbnailer t = new Thumbnailer();
+  
+  abstract class VisualizationInfo {
+    
     File thumbnail = null;
+    
+    abstract Element build(SVGPlot plot);
+    
+    File getThumbnailIfGenerated() {
+      return thumbnail;
+    }
+    
+    File makeThumbnail() {
+      SVGPlot plot = new SVGPlot();
+      plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 1 1");
+      Element e = build(plot);
+      plot.getRoot().appendChild(e);
+      synchronized(t) {
+        thumbnail = t.thumbnail(plot, 512);
+      }
+      return thumbnail;
+    }
+  }
+  
+  class VisualizationUnprojectedInfo extends VisualizationInfo {
+    private Visualizer vis;
 
-    Visualizer vis = null;
-
-    VisualizationInfo(final Visualizer vis) {
+    public VisualizationUnprojectedInfo(Visualizer vis) {
       this.vis = vis;
+    }
+    
+    @Override
+    public Element build(SVGPlot plot) {
+      synchronized(vis) {
+        return vis.visualize(plot);
+      }
     }
   }
 
   class Visualization2DInfo extends VisualizationInfo {
     VisualizationProjection proj;
+    
+    Projection2DVisualizer<?> vis;
 
     public Visualization2DInfo(Projection2DVisualizer<?> vis, VisualizationProjection proj) {
-      super(vis);
+      super();
+      this.vis = vis;
       this.proj = proj;
+    }
+    
+    @Override
+    public Element build(SVGPlot plot) {
+      synchronized(vis) {
+        vis.setup(proj);
+        return vis.visualize(plot);
+      }
     }
   }
 
   class Visualization1DInfo extends VisualizationInfo {
     VisualizationProjection proj;
 
+    Projection1DVisualizer<?> vis;
+
     public Visualization1DInfo(Projection1DVisualizer<?> vis, VisualizationProjection proj) {
-      super(vis);
+      super();
+      this.vis = vis;
       this.proj = proj;
+    }
+
+    @Override
+    public Element build(SVGPlot plot) {
+      synchronized(vis) {
+        vis.setup(proj);
+        return vis.visualize(plot);
+      }
     }
   }
 }
