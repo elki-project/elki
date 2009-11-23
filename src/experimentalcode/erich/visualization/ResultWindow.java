@@ -10,6 +10,8 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import org.apache.batik.swing.svg.JSVGComponent;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -54,7 +56,7 @@ public class ResultWindow extends JFrame {
   /** 
    * The SVG canvas. 
    */
-  private JSVGSynchronizedCanvas svgCanvas = new JSVGSynchronizedCanvas();
+  private JSVGSynchronizedCanvas svgCanvas;
 
   /**
    * The overview plot.
@@ -103,6 +105,9 @@ public class ResultWindow extends JFrame {
     p.add(quitButton);
 
     panel.add("North", p);
+    
+    svgCanvas = new JSVGSynchronizedCanvas();
+    svgCanvas.setDocumentState(JSVGComponent.ALWAYS_DYNAMIC);
     panel.add("Center", svgCanvas);
 
     this.getContentPane().add(panel);
