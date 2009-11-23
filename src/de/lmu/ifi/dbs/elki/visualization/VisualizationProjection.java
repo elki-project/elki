@@ -1,4 +1,4 @@
-package experimentalcode.erich.visualization;
+package de.lmu.ifi.dbs.elki.visualization;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;

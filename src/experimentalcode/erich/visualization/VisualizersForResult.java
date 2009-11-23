@@ -24,7 +24,7 @@ public class VisualizersForResult extends AbstractParameterizable {
   /**
    * Get a logger for this class.
    */
-  protected final static Logging logger = Logging.getLogger(ResultHistogramVisualizer.class);
+  protected final static Logging logger = Logging.getLogger(VisualizersForResult.class);
 
   /**
    * (Result-to-visualization) Adapters
