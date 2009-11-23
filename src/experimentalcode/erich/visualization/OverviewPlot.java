@@ -15,10 +15,10 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -174,7 +174,9 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
       SVGUtil.setAtt(g, SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 1 1");
       */
       for(VisualizationInfo vi : e.getValue()) {
-        thumbnails.queue(new ThumbnailTask(g, vi));
+        Element gg = this.svgElement(SVGConstants.SVG_G_TAG);
+        g.appendChild(gg);
+        thumbnails.queue(new Pair<Element, VisualizationInfo>(gg, vi));
       }
       getRoot().appendChild(g);
     }
@@ -195,42 +197,32 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
     SVGUtil.setAtt(i, SVGConstants.SVG_WIDTH_ATTRIBUTE, 1);
     SVGUtil.setAtt(i, SVGConstants.SVG_HEIGHT_ATTRIBUTE, 1);
     i.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, thumb.toURI().toString());
-    LoggingUtil.message("Queueing thumbnail.");
     this.scheduleUpdate(new Runnable() {
       @Override
       public void run() {
-        LoggingUtil.message("Inserting thumbnail.");
+        // Replace children.
+        while (g.getFirstChild() != null) {
+          g.removeChild(g.getFirstChild());
+        }
         g.appendChild(i);
       }
     });
   }
 
-  class ThumbnailTask {
-    Element parent;
-
-    VisualizationInfo vi;
-
-    public ThumbnailTask(Element parent, VisualizationInfo vi) {
-      super();
-      this.parent = parent;
-      this.vi = vi;
-    }
-  }
-
   class ThumbnailThread extends Thread {
     boolean shutdown = false;
 
-    Queue<ThumbnailTask> queue = new ConcurrentLinkedQueue<ThumbnailTask>();
+    Queue<Pair<Element, VisualizationInfo>> queue = new ConcurrentLinkedQueue<Pair<Element, VisualizationInfo>>();
 
     @Override
     public void run() {
       while(!queue.isEmpty()) {
-        ThumbnailTask ti = queue.poll();
-        generateThumbnail(ti.parent, ti.vi);
+        Pair<Element, VisualizationInfo> ti = queue.poll();
+        generateThumbnail(ti.first, ti.second);
       }
     }
 
-    public void queue(ThumbnailTask thumbnailTask) {
+    public void queue(Pair<Element, VisualizationInfo> thumbnailTask) {
       queue.add(thumbnailTask);
     }
   }
