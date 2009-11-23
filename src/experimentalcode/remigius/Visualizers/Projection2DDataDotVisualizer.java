@@ -3,6 +3,9 @@ package experimentalcode.remigius.Visualizers;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 
@@ -38,12 +41,12 @@ public class Projection2DDataDotVisualizer<NV extends NumberVector<NV, ?>> exten
   }
 
   @Override
-  public Element visualize(SVGPlot svgp) {
-    Element layer = super.visualize(svgp);
-    //MarkerLibrary ml = context.getMarkerLibrary();
+  public Element visualize(SVGPlot svgp, VisualizationProjection proj) {
+    Element layer = super.setupCanvas(svgp, proj);
+    Database<NV> database = context.getDatabase();
     for(int id : database) {
-      //Element dot = ml.useMarker(svgp, layer, getProjected(id, 0), getProjected(id, 1), 0, 0.01);
-      Element dot = SVGUtil.svgCircle(svgp.getDocument(), getProjected(id, 0), getProjected(id, 1), 0.005);
+      Vector v = proj.projectDataToRenderSpace(database.get(id));
+      Element dot = SVGUtil.svgCircle(svgp.getDocument(), v.get(0), v.get(1), 0.005);
       SVGUtil.addCSSClass(dot, MARKER);
       layer.appendChild(dot);
     }

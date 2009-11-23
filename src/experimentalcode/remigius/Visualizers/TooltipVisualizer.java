@@ -8,9 +8,12 @@ import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -125,8 +128,8 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
   }
 
   @Override
-  public Element visualize(SVGPlot svgp) {
-    Element layer = super.visualize(svgp);
+  public Element visualize(SVGPlot svgp, VisualizationProjection proj) {
+    Element layer = super.setupCanvas(svgp, proj);
     setupCSS(svgp);
 
     EventListener hoverer = new EventListener() {
@@ -136,12 +139,14 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
       }
     };
 
+    Database<NV> database = context.getDatabase();
     for(int id : database) {
-      Element tooltip = svgp.svgText(getProjected(id, 0) + 0.005, getProjected(id, 1) + 0.003, FormatUtil.NF2.format(getValue(id).doubleValue()));
+      Vector v = proj.projectDataToRenderSpace(database.get(id));
+      Element tooltip = svgp.svgText(v.get(0) + 0.005, v.get(1) + 0.003, FormatUtil.NF2.format(getValue(id).doubleValue()));
       SVGUtil.addCSSClass(tooltip, TOOLTIP_HIDDEN);
 
       // sensitive area.
-      Element area = svgp.svgCircle(getProjected(id, 0), getProjected(id, 1), 0.01);
+      Element area = svgp.svgCircle(v.get(0), v.get(1), 0.01);
       SVGUtil.addCSSClass(area, TOOLTIP_AREA);
 
       EventTarget targ = (EventTarget) area;

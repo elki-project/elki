@@ -4,6 +4,7 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
@@ -35,8 +36,8 @@ public class Projection2DAxisVisualizer<NV extends NumberVector<NV, ?>> extends 
   }
 
   @Override
-  public Element visualize(SVGPlot plot) {
-    Element layer = super.visualize(plot);
+  public Element visualize(SVGPlot plot, VisualizationProjection proj) {
+    Element layer = super.setupCanvas(plot, proj);
     int dim = context.getDatabase().dimensionality();
     
     // origin

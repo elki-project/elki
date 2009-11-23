@@ -15,6 +15,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
@@ -27,6 +28,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.svg.Thumbnailer;
 import experimentalcode.remigius.Visualizers.Projection1DVisualizer;
 import experimentalcode.remigius.Visualizers.Projection2DVisualizer;
+import experimentalcode.remigius.Visualizers.UnprojectedVisualizer;
 import experimentalcode.remigius.Visualizers.Visualizer;
 
 /**
@@ -83,7 +85,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
     // split the visualizers into three sets.
     Collection<Projection1DVisualizer<?>> vis1d = new ArrayList<Projection1DVisualizer<?>>(vis.size());
     Collection<Projection2DVisualizer<?>> vis2d = new ArrayList<Projection2DVisualizer<?>>(vis.size());
-    Collection<Visualizer> visot = new ArrayList<Visualizer>(vis.size());
+    Collection<UnprojectedVisualizer> visup = new ArrayList<UnprojectedVisualizer>(vis.size());
     for(Visualizer v : vis) {
       if(Projection2DVisualizer.class.isAssignableFrom(v.getClass())) {
         vis2d.add((Projection2DVisualizer<?>) v);
@@ -91,8 +93,11 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
       else if(Projection1DVisualizer.class.isAssignableFrom(v.getClass())) {
         vis1d.add((Projection1DVisualizer<?>) v);
       }
+      else if(UnprojectedVisualizer.class.isAssignableFrom(v.getClass())) {
+        visup.add((UnprojectedVisualizer) v);
+      }
       else {
-        visot.add(v);
+        LoggingUtil.exception("Encountered visualization that is neither projected nor unprojected!", new Throwable());
       }
     }
     // We'll use three regions for now:
@@ -133,13 +138,13 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
         }
       }
     }
-    if(visot.size() > 0) {
+    if(visup.size() > 0) {
       // find starting position.
       Double pos = plotmap.minmaxy.getMin();
       if(pos == null) {
         pos = 0.0;
       }
-      for(Visualizer v : visot) {
+      for(UnprojectedVisualizer v : visup) {
         VisualizationInfo vi = new VisualizationUnprojectedInfo(v);
         // TODO: might have different scaling.
         plotmap.addVis(-1, pos, 1., 1., vi);
@@ -157,26 +162,26 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
     String vb = plotmap.minmaxx.getMin() + " " + plotmap.minmaxy.getMin() + " " + plotw + " " + ploth;
     // Reset root bounding box.
     SVGUtil.setAtt(getRoot(), SVGConstants.SVG_WIDTH_ATTRIBUTE, "20cm");
-    SVGUtil.setAtt(getRoot(), SVGConstants.SVG_HEIGHT_ATTRIBUTE, (20/plotw*ploth)+"cm");
+    SVGUtil.setAtt(getRoot(), SVGConstants.SVG_HEIGHT_ATTRIBUTE, (20 / plotw * ploth) + "cm");
     SVGUtil.setAtt(getRoot(), SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, vb);
     // TODO: kill all children in document root except style, defs etc?
     for(Entry<DoubleDoublePair, ArrayList<VisualizationInfo>> e : plotmap.entrySet()) {
       double x = e.getKey().getFirst();
       double y = e.getKey().getSecond();
       Element g = this.svgElement(SVGConstants.SVG_G_TAG);
-      SVGUtil.setAtt(g, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "translate("+x+" "+y+")");
+      SVGUtil.setAtt(g, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "translate(" + x + " " + y + ")");
       /*
-      //SVG element instead of G, works much worse in Inkscape
-      Element g = this.svgElement(SVGConstants.SVG_SVG_TAG);
-      SVGUtil.setAtt(g, SVGConstants.SVG_X_ATTRIBUTE, x);
-      SVGUtil.setAtt(g, SVGConstants.SVG_Y_ATTRIBUTE, y);
-      SVGUtil.setAtt(g, SVGConstants.SVG_WIDTH_ATTRIBUTE, 1);
-      SVGUtil.setAtt(g, SVGConstants.SVG_HEIGHT_ATTRIBUTE, 1);
-      SVGUtil.setAtt(g, SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 1 1");
-      */
+       * //SVG element instead of G, works much worse in Inkscape Element g =
+       * this.svgElement(SVGConstants.SVG_SVG_TAG); SVGUtil.setAtt(g,
+       * SVGConstants.SVG_X_ATTRIBUTE, x); SVGUtil.setAtt(g,
+       * SVGConstants.SVG_Y_ATTRIBUTE, y); SVGUtil.setAtt(g,
+       * SVGConstants.SVG_WIDTH_ATTRIBUTE, 1); SVGUtil.setAtt(g,
+       * SVGConstants.SVG_HEIGHT_ATTRIBUTE, 1); SVGUtil.setAtt(g,
+       * SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 1 1");
+       */
       for(VisualizationInfo vi : e.getValue()) {
         Element gg = this.svgElement(SVGConstants.SVG_G_TAG);
-        gg.appendChild(SVGUtil.svgWaitIcon(this.getDocument(),0,0,1,1));
+        gg.appendChild(SVGUtil.svgWaitIcon(this.getDocument(), 0, 0, 1, 1));
         g.appendChild(gg);
         thumbnails.queue(new Pair<Element, VisualizationInfo>(gg, vi));
       }
@@ -203,7 +208,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
       @Override
       public void run() {
         // Replace children.
-        while (g.getFirstChild() != null) {
+        while(g.getFirstChild() != null) {
           g.removeChild(g.getFirstChild());
         }
         g.appendChild(i);
@@ -294,9 +299,9 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
   }
 
   class VisualizationUnprojectedInfo extends VisualizationInfo {
-    private Visualizer vis;
+    private UnprojectedVisualizer vis;
 
-    public VisualizationUnprojectedInfo(Visualizer vis) {
+    public VisualizationUnprojectedInfo(UnprojectedVisualizer vis) {
       this.vis = vis;
     }
 
@@ -322,8 +327,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
     @Override
     public Element build(SVGPlot plot) {
       synchronized(vis) {
-        vis.setup(proj);
-        return vis.visualize(plot);
+        return vis.visualize(plot, proj);
       }
     }
   }
@@ -342,8 +346,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
     @Override
     public Element build(SVGPlot plot) {
       synchronized(vis) {
-        vis.setup(proj);
-        return vis.visualize(plot);
+        return vis.visualize(plot, proj);
       }
     }
   }
