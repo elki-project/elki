@@ -10,7 +10,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import org.apache.batik.swing.svg.AbstractJSVGComponent;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
@@ -214,7 +213,6 @@ public class ResultROCCurveVisualizer<O extends DatabaseObject> extends Abstract
       updateFrame();
       updateCurve();
 
-      svgCanvas.setDocumentState(AbstractJSVGComponent.ALWAYS_DYNAMIC);
       svgCanvas.setPlot(plot);
 
       this.frame.setVisible(true);
