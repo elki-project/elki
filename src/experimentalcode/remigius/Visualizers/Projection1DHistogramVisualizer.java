@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.math.MinMax;
@@ -18,6 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
@@ -114,12 +116,15 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
   }
 
   @Override
-  public Element visualize(SVGPlot svgp) {
+  public Element visualize(SVGPlot svgp, VisualizationProjection proj) {
     Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_SVG_TAG);
     SVGUtil.setAtt(layer, SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "-1.2 -1.2 2.4 2.4");
     setupCSS(svgp);
 
     Map<Integer, AggregatingHistogram<Double, Double>> hists = new HashMap<Integer, AggregatingHistogram<Double, Double>>();
+
+    // Get the database.
+    Database<NV> database = context.getDatabase();
 
     // Creating histograms
     int clusterID = 0;
@@ -130,7 +135,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
     for(Cluster<Model> cluster : clustering.getAllClusters()) {
       AggregatingHistogram<Double, Double> hist = AggregatingHistogram.DoubleSumHistogram(BINS, 0, 1);
       for(int id : cluster.getIDs()) {
-        double pos = getProjected(database.get(id), 0);
+        double pos = proj.projectDataToRenderSpace(database.get(id)).get(0);
         hist.aggregate(pos, frac);
         allInOne.aggregate(pos, frac);
       }
@@ -141,6 +146,10 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
       for(Pair<Double, Double> bin : hist) {
         minmax.put(bin.getSecond());
       }
+    }
+    // for scaling, get the maximum occurring value in the bins:
+    for(Pair<Double, Double> bin : allInOne) {
+      minmax.put(bin.getSecond());
     }
 
     LinearScale scale = new LinearScale(0, minmax.getMax());

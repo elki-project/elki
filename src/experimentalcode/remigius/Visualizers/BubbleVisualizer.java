@@ -9,12 +9,15 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -254,14 +257,16 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
   }
 
   @Override
-  public Element visualize(SVGPlot svgp) {
-    Element layer = super.visualize(svgp);
+  public Element visualize(SVGPlot svgp, VisualizationProjection proj) {
+    Element layer = super.setupCanvas(svgp, proj);
     setupCSS(svgp);
     int clusterID = 0;
     
+    Database<NV> database = context.getDatabase();
     for (Cluster<Model> cluster : clustering.getAllClusters()){
       for(int id : cluster.getIDs()) {
-        Element circle = SVGUtil.svgCircle(svgp.getDocument(), getProjected(id, 0), getProjected(id, 1), getScaled(getValue(id)));
+        Vector v = proj.projectDataToRenderSpace(database.get(id));
+        Element circle = SVGUtil.svgCircle(svgp.getDocument(), v.get(0), v.get(1), getScaled(getValue(id)));
         SVGUtil.addCSSClass(circle, BUBBLE + clusterID);
         layer.appendChild(circle);
       }

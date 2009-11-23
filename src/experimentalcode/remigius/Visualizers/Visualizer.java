@@ -1,10 +1,7 @@
 package experimentalcode.remigius.Visualizers;
 
-import org.w3c.dom.Element;
-
 import de.lmu.ifi.dbs.elki.utilities.AnyMap;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 
 /**
  * Defines the requirements for a visualizer. <br>
@@ -63,12 +60,4 @@ public interface Visualizer extends Parameterizable {
    * @return AnyMap reference with meta data.
    */
   public AnyMap<String> getMetadata();
-  
-  /**
-   * Returns an Element representing a visualization.
-   * 
-   * @param svgp the SVGPlot which will act as owner for the returned Element.
-   * @return an Element representing a 2-dimensional visualization.
-   */
-  public Element visualize(SVGPlot svgp);
 }

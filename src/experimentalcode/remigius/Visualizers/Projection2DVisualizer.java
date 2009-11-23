@@ -4,6 +4,7 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 
@@ -15,11 +16,10 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * 
  * @author Remigius Wojdanowski
  * 
-  * @param <NV> Type of the DatabaseObject being visualized.
+ * @param <NV> Type of the DatabaseObject being visualized.
  */
-public abstract class Projection2DVisualizer<NV extends NumberVector<NV, ?>> extends ProjectionVisualizer<NV> {
-  @Override
-  public Element visualize(SVGPlot svgp) {
+public abstract class Projection2DVisualizer<NV extends NumberVector<NV, ?>> extends AbstractVisualizer implements ProjectedVisualizer {
+  public Element setupCanvas(SVGPlot svgp, VisualizationProjection proj) {
     Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_SVG_TAG);
     // Use the projections viewport by default.
     SVGUtil.setAtt(layer, SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, proj.estimateViewportString(0.2));
