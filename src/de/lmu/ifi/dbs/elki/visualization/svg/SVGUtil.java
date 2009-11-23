@@ -26,6 +26,16 @@ public final class SVGUtil {
   }
 
   /**
+   * Hourglass object.
+   */
+  final public static String HOURGLASS_PATH = "M.35 .2 L.65 .2 L.65 .3 L.35 .7 L.35 .8 L.65 .8 L.65 .7 L.35 .3 Z";
+  
+  /**
+   * Hourglass style.
+   */
+  final public static String HOURGLASS_STYLE = "stroke: black; stroke-width: .01; fill: grey; opacity: .2";
+
+  /**
    * Format a double according to the SVG specs.
    * 
    * @param x number to format
@@ -227,6 +237,24 @@ public final class SVGUtil {
     SVGUtil.setAtt(elem, SVGConstants.SVG_X_ATTRIBUTE, x);
     SVGUtil.setAtt(elem, SVGConstants.SVG_Y_ATTRIBUTE, y);
     elem.setTextContent(text);
+    return elem;
+  }
+  
+  /**
+   * Draw a simple "please wait" icon (in-progress) as placeholder for running renderings.
+   * 
+   * @param document Document.
+   * @param x Left
+   * @param y Top
+   * @param w Width
+   * @param h Height
+   * @return New element (currently a {@link SVGConstats.SVG_PATH_TAG})
+   */
+  public static Element svgWaitIcon(Document document, double x, double y, double w, double h) {
+    Element elem = SVGUtil.svgElement(document, SVGConstants.SVG_PATH_TAG);
+    setAtt(elem, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "translate("+x+" "+y+") scale("+w+" "+h+")");
+    setAtt(elem, SVGConstants.SVG_D_ATTRIBUTE, HOURGLASS_PATH);
+    setStyle(elem, HOURGLASS_STYLE);
     return elem;
   }
 }

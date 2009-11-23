@@ -175,6 +175,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
       */
       for(VisualizationInfo vi : e.getValue()) {
         Element gg = this.svgElement(SVGConstants.SVG_G_TAG);
+        gg.appendChild(SVGUtil.svgWaitIcon(this.getDocument(),0,0,1,1));
         g.appendChild(gg);
         thumbnails.queue(new Pair<Element, VisualizationInfo>(gg, vi));
       }
