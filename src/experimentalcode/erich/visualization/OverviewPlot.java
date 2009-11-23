@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Queue;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -13,6 +15,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
@@ -48,6 +51,11 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
   private MultiResult result;
 
   /**
+   * Map of coordinates to plots.
+   */
+  protected PlotMap plotmap;
+
+  /**
    * Constructor.
    */
   public OverviewPlot(Database<? extends DatabaseObject> db, MultiResult result) {
@@ -64,6 +72,11 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
   public void addVisualizations(Collection<Visualizer> vs) {
     vis.addAll(vs);
   }
+
+  /**
+   * Current thumbnail thread.
+   */
+  private ThumbnailThread thumbnails = null;
 
   public void refresh() {
     // split the visualizers into three sets.
@@ -85,7 +98,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
     // 2D projections starting at 0,0 and going right and down.
     // 1D projections starting at 0, -1 and going right
     // Other projections starting at -1, min() and going down.
-    PlotMap plotmap = new PlotMap();
+    plotmap = new PlotMap();
     // FIXME: ugly cast used here.
     Database<NV> dvdb = uglyCastDatabase();
     LinearScale[] scales = null;
@@ -132,28 +145,93 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
         pos += 1.0;
       }
     }
-
+    // Reset thumbnailer.
+    if(thumbnails != null) {
+      thumbnails.shutdown = true;
+    }
+    thumbnails = new ThumbnailThread();
+    // Recalculate bounding box.
     final double plotw = plotmap.minmaxx.getMax() - plotmap.minmaxx.getMin();
     final double ploth = plotmap.minmaxy.getMax() - plotmap.minmaxy.getMin();
     String vb = plotmap.minmaxx.getMin() + " " + plotmap.minmaxy.getMin() + " " + plotw + " " + ploth;
+    // Reset root bounding box.
+    SVGUtil.setAtt(getRoot(), SVGConstants.SVG_WIDTH_ATTRIBUTE, "20cm");
+    SVGUtil.setAtt(getRoot(), SVGConstants.SVG_HEIGHT_ATTRIBUTE, (20/plotw*ploth)+"cm");
     SVGUtil.setAtt(getRoot(), SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, vb);
+    // TODO: kill all children in document root except style, defs etc?
     for(Entry<DoubleDoublePair, ArrayList<VisualizationInfo>> e : plotmap.entrySet()) {
       double x = e.getKey().getFirst();
       double y = e.getKey().getSecond();
-      //int num = e.getValue().size();
-      //Element t = SVGUtil.svgText(getDocument(), x + .4, y + .6, "" + num);
-      //t.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: .2; fill: black");
-      //getRoot().appendChild(t);
-      for (VisualizationInfo vi : e.getValue()) {
-        File thumb = vi.makeThumbnail();
-        Element i = this.svgElement(SVGConstants.SVG_IMAGE_TAG);
-        SVGUtil.setAtt(i, SVGConstants.SVG_X_ATTRIBUTE, x);
-        SVGUtil.setAtt(i, SVGConstants.SVG_Y_ATTRIBUTE, y);
-        SVGUtil.setAtt(i, SVGConstants.SVG_WIDTH_ATTRIBUTE, 1);
-        SVGUtil.setAtt(i, SVGConstants.SVG_HEIGHT_ATTRIBUTE, 1);
-        i.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, thumb.toURI().toString());
-        getRoot().appendChild(i);
+      Element g = this.svgElement(SVGConstants.SVG_G_TAG);
+      SVGUtil.setAtt(g, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "translate("+x+" "+y+")");
+      /*
+      //SVG element instead of G, works much worse in Inkscape
+      Element g = this.svgElement(SVGConstants.SVG_SVG_TAG);
+      SVGUtil.setAtt(g, SVGConstants.SVG_X_ATTRIBUTE, x);
+      SVGUtil.setAtt(g, SVGConstants.SVG_Y_ATTRIBUTE, y);
+      SVGUtil.setAtt(g, SVGConstants.SVG_WIDTH_ATTRIBUTE, 1);
+      SVGUtil.setAtt(g, SVGConstants.SVG_HEIGHT_ATTRIBUTE, 1);
+      SVGUtil.setAtt(g, SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 1 1");
+      */
+      for(VisualizationInfo vi : e.getValue()) {
+        thumbnails.queue(new ThumbnailTask(g, vi));
       }
+      getRoot().appendChild(g);
+    }
+    thumbnails.start();
+  }
+
+  /**
+   * Generate a single Thumbnail.
+   * 
+   * @param g Parent element to insert the thumbnail into.
+   * @param vi Visualization.
+   */
+  protected void generateThumbnail(final Element g, VisualizationInfo vi) {
+    File thumb = vi.makeThumbnail();
+    final Element i = this.svgElement(SVGConstants.SVG_IMAGE_TAG);
+    SVGUtil.setAtt(i, SVGConstants.SVG_X_ATTRIBUTE, 0);
+    SVGUtil.setAtt(i, SVGConstants.SVG_Y_ATTRIBUTE, 0);
+    SVGUtil.setAtt(i, SVGConstants.SVG_WIDTH_ATTRIBUTE, 1);
+    SVGUtil.setAtt(i, SVGConstants.SVG_HEIGHT_ATTRIBUTE, 1);
+    i.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, thumb.toURI().toString());
+    LoggingUtil.message("Queueing thumbnail.");
+    this.scheduleUpdate(new Runnable() {
+      @Override
+      public void run() {
+        LoggingUtil.message("Inserting thumbnail.");
+        g.appendChild(i);
+      }
+    });
+  }
+
+  class ThumbnailTask {
+    Element parent;
+
+    VisualizationInfo vi;
+
+    public ThumbnailTask(Element parent, VisualizationInfo vi) {
+      super();
+      this.parent = parent;
+      this.vi = vi;
+    }
+  }
+
+  class ThumbnailThread extends Thread {
+    boolean shutdown = false;
+
+    Queue<ThumbnailTask> queue = new ConcurrentLinkedQueue<ThumbnailTask>();
+
+    @Override
+    public void run() {
+      while(!queue.isEmpty()) {
+        ThumbnailTask ti = queue.poll();
+        generateThumbnail(ti.parent, ti.vi);
+      }
+    }
+
+    public void queue(ThumbnailTask thumbnailTask) {
+      queue.add(thumbnailTask);
     }
   }
 
@@ -198,17 +276,17 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
   }
 
   static Thumbnailer t = new Thumbnailer();
-  
+
   abstract class VisualizationInfo {
-    
+
     File thumbnail = null;
-    
+
     abstract Element build(SVGPlot plot);
-    
+
     File getThumbnailIfGenerated() {
       return thumbnail;
     }
-    
+
     File makeThumbnail() {
       SVGPlot plot = new SVGPlot();
       plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 1 1");
@@ -220,14 +298,14 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
       return thumbnail;
     }
   }
-  
+
   class VisualizationUnprojectedInfo extends VisualizationInfo {
     private Visualizer vis;
 
     public VisualizationUnprojectedInfo(Visualizer vis) {
       this.vis = vis;
     }
-    
+
     @Override
     public Element build(SVGPlot plot) {
       synchronized(vis) {
@@ -238,7 +316,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
 
   class Visualization2DInfo extends VisualizationInfo {
     VisualizationProjection proj;
-    
+
     Projection2DVisualizer<?> vis;
 
     public Visualization2DInfo(Projection2DVisualizer<?> vis, VisualizationProjection proj) {
@@ -246,7 +324,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
       this.vis = vis;
       this.proj = proj;
     }
-    
+
     @Override
     public Element build(SVGPlot plot) {
       synchronized(vis) {
