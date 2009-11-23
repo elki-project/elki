@@ -1,4 +1,4 @@
-package experimentalcode.erich.visualization;
+package experimentalcode.erich.visualization.gui;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.JSVGSynchronizedCanvas;
 import de.lmu.ifi.dbs.elki.visualization.savedialog.SVGSaveDialog;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
+import experimentalcode.erich.visualization.old.ResultHistogramVisualizer;
 import experimentalcode.remigius.Visualizers.Visualizer;
 
 /**

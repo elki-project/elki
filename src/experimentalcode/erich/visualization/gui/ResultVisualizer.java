@@ -1,4 +1,4 @@
-package experimentalcode.erich.visualization;
+package experimentalcode.erich.visualization.gui;
 
 import java.util.Collection;
 import java.util.List;
@@ -13,6 +13,8 @@ import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import experimentalcode.erich.visualization.VisualizersForResult;
+import experimentalcode.erich.visualization.old.ResultHistogramVisualizer;
 import experimentalcode.remigius.Visualizers.Visualizer;
 
 /**
