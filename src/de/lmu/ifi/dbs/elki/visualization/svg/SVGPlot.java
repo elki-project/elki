@@ -208,7 +208,7 @@ public class SVGPlot {
   }
 
   /**
-   * Getter for definitions section
+   * Getter for root element.
    * 
    * @return DOM element
    */
@@ -508,7 +508,7 @@ public class SVGPlot {
    * 
    * @return update runner
    */
-  private UpdateRunner getUpdateRunner() {
+  private synchronized UpdateRunner getUpdateRunner() {
     if (runner == null) {
       runner = new UpdateRunner();
     }
