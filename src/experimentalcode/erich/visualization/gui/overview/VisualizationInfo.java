@@ -50,6 +50,7 @@ abstract class VisualizationInfo {
     plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 1 1");
     Element e = build(plot);
     plot.getRoot().appendChild(e);
+    plot.updateStyleElement();
     synchronized(t) {
       thumbnail = t.thumbnail(plot, 512);
     }

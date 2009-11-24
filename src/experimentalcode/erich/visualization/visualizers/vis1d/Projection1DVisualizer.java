@@ -14,13 +14,19 @@ import experimentalcode.erich.visualization.visualizers.ProjectedVisualizer;
  * 
  * @author Remigius Wojdanowski
  *
- * @param <NV> Type of the DatabaseObject being visualized.
+ * @param <NV> Type of the NumberVector being visualized.
  */
 public abstract class Projection1DVisualizer<NV extends NumberVector<NV, ?>> extends AbstractVisualizer implements ProjectedVisualizer {
+  /**
+   * Setup a canvas (wrapper) element for the visualization.
+   * 
+   * @param svgp Plot context
+   * @return Wrapper element with appropriate view box.
+   */
   public Element setupCanvas(SVGPlot svgp) {
     Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_SVG_TAG);
     // Some default for the view box.
-    SVGUtil.setAtt(layer, SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "-.2 -.2 2.4 2.4");    
+    SVGUtil.setAtt(layer, SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "-1.2 -1.2 2.4 2.4");    
     return layer;
   }
 }

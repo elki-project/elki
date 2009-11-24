@@ -31,7 +31,7 @@ import experimentalcode.erich.visualization.visualizers.VisualizerContext;
  * 
  * @author Remigius Wojdanowski
  * 
-  * @param <NV> Type of the DatabaseObject being visualized.
+ * @param <NV> Type of the DatabaseObject being visualized.
  */
 public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
   /**
@@ -121,8 +121,6 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
       svgp.getCSSClassManager().addClass(tooltipvisible);
       svgp.getCSSClassManager().addClass(tooltipsticky);
       svgp.getCSSClassManager().addClass(tooltiparea);
-      // TODO: have the parent call updateStyleElement!
-      svgp.updateStyleElement();
     }
     catch(CSSNamingConflict e) {
       LoggingUtil.exception("Equally-named CSSClass with different owner already exists", e);

@@ -13,12 +13,11 @@ import experimentalcode.erich.visualization.visualizers.VisualizerContext;
 
 /**
  * Generates a SVG-Element containing "dots" as markers representing the Database's
- * objects. <br>
- * Future versions may contain a parameter for switching the used markers.
+ * objects.
  * 
  * @author Remigius Wojdanowski
  * 
-  * @param <NV> Type of the DatabaseObject being visualized.
+ * @param <NV> Type of the NumberVector being visualized.
  */
 public class DataDotVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
 

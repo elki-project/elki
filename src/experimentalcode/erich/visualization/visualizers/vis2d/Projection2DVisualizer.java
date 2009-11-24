@@ -21,6 +21,13 @@ import experimentalcode.erich.visualization.visualizers.ProjectedVisualizer;
  * @param <NV> Type of the DatabaseObject being visualized.
  */
 public abstract class Projection2DVisualizer<NV extends NumberVector<NV, ?>> extends AbstractVisualizer implements ProjectedVisualizer {
+  /**
+   * Utility function to setup a canvas element for the visualization.
+   * 
+   * @param svgp Plot element
+   * @param proj Projection to use
+   * @return wrapper element with appropriate view box.
+   */
   public Element setupCanvas(SVGPlot svgp, VisualizationProjection proj) {
     Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_SVG_TAG);
     // Use the projections viewport by default.
