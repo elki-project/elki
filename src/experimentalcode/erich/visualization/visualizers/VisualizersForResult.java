@@ -1,4 +1,4 @@
-package experimentalcode.erich.visualization;
+package experimentalcode.erich.visualization.visualizers;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,8 +12,6 @@ import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import experimentalcode.remigius.Adapter.AlgorithmAdapter;
-import experimentalcode.remigius.Visualizers.Visualizer;
-import experimentalcode.remigius.Visualizers.VisualizerContext;
 
 /**
  * Utility class to determine the visualizers for a result class.
@@ -58,8 +56,7 @@ public class VisualizersForResult extends AbstractParameterizable {
     for (AlgorithmAdapter<?> a: adapters){
       if (a.canVisualize(result)){
         // Note: this can throw an exception when setParameters() was not called!
-        a.init(context);        
-        Collection<Visualizer> avis = a.getUsableVisualizers();
+        Collection<Visualizer> avis = a.getUsableVisualizers(context);
         logger.debug("Got "+avis.size()+" visualizers from "+a.getClass().getName());
         this.visualizers.addAll(avis);
       }

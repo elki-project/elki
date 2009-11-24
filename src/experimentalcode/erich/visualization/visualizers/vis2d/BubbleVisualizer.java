@@ -1,4 +1,4 @@
-package experimentalcode.remigius.Visualizers;
+package experimentalcode.erich.visualization.visualizers.vis2d;
 
 import java.util.List;
 
@@ -22,6 +22,7 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import experimentalcode.erich.visualization.visualizers.VisualizerContext;
 import experimentalcode.lisa.scale.CutOffScale;
 import experimentalcode.lisa.scale.GammaFunction;
 import experimentalcode.lisa.scale.LinearScale;

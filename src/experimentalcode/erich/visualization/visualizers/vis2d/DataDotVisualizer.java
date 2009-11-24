@@ -1,4 +1,4 @@
-package experimentalcode.remigius.Visualizers;
+package experimentalcode.erich.visualization.visualizers.vis2d;
 
 import org.w3c.dom.Element;
 
@@ -8,6 +8,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import experimentalcode.erich.visualization.visualizers.Visualizer;
+import experimentalcode.erich.visualization.visualizers.VisualizerContext;
 
 /**
  * Generates a SVG-Element containing "dots" as markers representing the Database's
@@ -18,7 +20,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * 
   * @param <NV> Type of the DatabaseObject being visualized.
  */
-public class Projection2DDataDotVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
+public class DataDotVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
 
   /**
    * A short name characterizing this Visualizer.

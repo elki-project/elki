@@ -1,4 +1,4 @@
-package experimentalcode.remigius.Visualizers;
+package experimentalcode.erich.visualization.visualizers;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelHierarchicalClustering;
 import de.lmu.ifi.dbs.elki.data.Clustering;

@@ -1,4 +1,4 @@
-package experimentalcode.remigius.Visualizers;
+package experimentalcode.erich.visualization.visualizers.vis2d;
 
 import java.util.Iterator;
 
@@ -13,6 +13,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.svg.MarkerLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
+import experimentalcode.erich.visualization.visualizers.Visualizer;
+import experimentalcode.erich.visualization.visualizers.VisualizerContext;
 
 /**
  * 
@@ -20,7 +22,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
  * 
  * @param <NV> Type of the DatabaseObject being visualized.
  */
-public class Projection2DClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
+public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
   /**
    * A short name characterizing this Visualizer.
    */

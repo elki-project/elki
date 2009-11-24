@@ -18,8 +18,7 @@ import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.JSVGSynchronizedCanvas;
 import de.lmu.ifi.dbs.elki.visualization.savedialog.SVGSaveDialog;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
-import experimentalcode.erich.visualization.old.ResultHistogramVisualizer;
-import experimentalcode.remigius.Visualizers.Visualizer;
+import experimentalcode.erich.visualization.visualizers.Visualizer;
 
 /**
  * Swing window to manage a particular result visualization.
@@ -35,7 +34,7 @@ public class ResultWindow extends JFrame {
   /**
    * Get a logger for this class.
    */
-  protected final static Logging logger = Logging.getLogger(ResultHistogramVisualizer.class);
+  protected final static Logging logger = Logging.getLogger(ResultWindow.class);
   
   /** 
    * The "Overview" button, which goes to the overview view. 

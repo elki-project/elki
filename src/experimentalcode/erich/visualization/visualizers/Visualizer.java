@@ -1,4 +1,4 @@
-package experimentalcode.remigius.Visualizers;
+package experimentalcode.erich.visualization.visualizers;
 
 import de.lmu.ifi.dbs.elki.utilities.AnyMap;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;

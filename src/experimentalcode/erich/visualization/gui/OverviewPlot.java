@@ -26,10 +26,10 @@ import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.svg.Thumbnailer;
-import experimentalcode.remigius.Visualizers.Projection1DVisualizer;
-import experimentalcode.remigius.Visualizers.Projection2DVisualizer;
-import experimentalcode.remigius.Visualizers.UnprojectedVisualizer;
-import experimentalcode.remigius.Visualizers.Visualizer;
+import experimentalcode.erich.visualization.visualizers.UnprojectedVisualizer;
+import experimentalcode.erich.visualization.visualizers.Visualizer;
+import experimentalcode.erich.visualization.visualizers.vis1d.Projection1DVisualizer;
+import experimentalcode.erich.visualization.visualizers.vis2d.Projection2DVisualizer;
 
 /**
  * Generate an overview plot for a set of vis
