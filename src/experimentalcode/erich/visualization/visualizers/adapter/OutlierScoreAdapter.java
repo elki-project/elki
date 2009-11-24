@@ -1,4 +1,4 @@
-package experimentalcode.remigius.Adapter;
+package experimentalcode.erich.visualization.visualizers.adapter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import experimentalcode.erich.visualization.visualizers.Visualizer;
 import experimentalcode.erich.visualization.visualizers.VisualizerContext;
 import experimentalcode.erich.visualization.visualizers.vis2d.BubbleVisualizer;
@@ -17,7 +16,7 @@ import experimentalcode.erich.visualization.visualizers.vis2d.TooltipVisualizer;
 import experimentalcode.shared.outlier.scaling.OutlierScoreScale;
 import experimentalcode.shared.outlier.scaling.ScalingFunction;
 
-public class OutlierScoreAdapter<NV extends NumberVector<NV, ?>> extends AbstractParameterizable implements AlgorithmAdapter<NV> {
+public class OutlierScoreAdapter<NV extends NumberVector<NV, ?>> implements AlgorithmAdapter<NV> {
   /**
    * Visualizes outlier-scores with bubbles.
    */

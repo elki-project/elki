@@ -1,10 +1,9 @@
-package experimentalcode.remigius.Adapter;
+package experimentalcode.erich.visualization.visualizers.adapter;
 
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import experimentalcode.erich.visualization.visualizers.Visualizer;
 import experimentalcode.erich.visualization.visualizers.VisualizerContext;
 
@@ -17,8 +16,7 @@ import experimentalcode.erich.visualization.visualizers.VisualizerContext;
  * 
  * @param <NV> the type of {@link DatabaseObject}s the adapter will handle.
  */
-public interface AlgorithmAdapter<O extends DatabaseObject> extends Parameterizable {
-
+public interface AlgorithmAdapter<O extends DatabaseObject> {
   /**
    * Returns <code>true</code> if the adapter can provide one or more
    * {@link Visualizer}s for the given Result, else false.

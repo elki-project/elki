@@ -11,7 +11,8 @@ import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import experimentalcode.remigius.Adapter.AlgorithmAdapter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import experimentalcode.erich.visualization.visualizers.adapter.AlgorithmAdapter;
 
 /**
  * Utility class to determine the visualizers for a result class.
@@ -57,7 +58,7 @@ public class VisualizersForResult extends AbstractParameterizable {
       if (a.canVisualize(result)){
         // Note: this can throw an exception when setParameters() was not called!
         Collection<Visualizer> avis = a.getUsableVisualizers(context);
-        logger.debug("Got "+avis.size()+" visualizers from "+a.getClass().getName());
+        //logger.debug("Got "+avis.size()+" visualizers from "+a.getClass().getName());
         this.visualizers.addAll(avis);
       }
     }
@@ -96,7 +97,10 @@ public class VisualizersForResult extends AbstractParameterizable {
     List<String> remainingParameters = super.setParameters(args);
     
     for (AlgorithmAdapter<?> a : adapters){
-      a.setParameters(remainingParameters);
+      // parameterize if possible.
+      if (a instanceof Parameterizable) {
+        ((Parameterizable)a).setParameters(remainingParameters);
+      }
       for (Visualizer v : a.getProvidedVisualizers()){
         List<String> leftoverParameters = v.setParameters(remainingParameters);
         remainingParameters.removeAll(leftoverParameters);
