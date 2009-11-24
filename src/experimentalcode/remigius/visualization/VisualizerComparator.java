@@ -1,6 +1,8 @@
-package experimentalcode.erich.visualization.visualizers;
+package experimentalcode.remigius.visualization;
 
 import java.util.Comparator;
+
+import experimentalcode.erich.visualization.visualizers.Visualizer;
 
 /**
  * Compares Visualizers by level. <br>
