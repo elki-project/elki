@@ -23,10 +23,9 @@ import experimentalcode.erich.visualization.visualizers.VisualizerContext;
  * 
  * @author Remigius Wojdanowski
  * 
-  * @param <NV> Type of the DatabaseObject being visualized.
+ * @param <NV> Type of the DatabaseObject being visualized.
  */
 public class ReferencePointsVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
-
   /**
    * Serves reference points.
    */
@@ -64,7 +63,6 @@ public class ReferencePointsVisualizer<NV extends NumberVector<NV, ?>> extends P
 
     try {
       svgp.getCSSClassManager().addClass(refpoint);
-      svgp.updateStyleElement();
     }
     catch(CSSNamingConflict e) {
       LoggingUtil.exception("Equally-named CSSClass with different owner already exists", e);

@@ -234,7 +234,6 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
       // put that into a superclass.
       try {
         svgp.getCSSClassManager().addClass(bubble);
-        svgp.updateStyleElement();
       }
       catch(CSSNamingConflict e) {
         LoggingUtil.exception("Equally-named CSSClass with different owner already exists", e);

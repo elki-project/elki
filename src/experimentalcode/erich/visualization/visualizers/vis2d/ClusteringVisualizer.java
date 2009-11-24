@@ -17,6 +17,7 @@ import experimentalcode.erich.visualization.visualizers.Visualizer;
 import experimentalcode.erich.visualization.visualizers.VisualizerContext;
 
 /**
+ * Visualize a clustering using different markers for different clusters.
  * 
  * @author Erich Schubert
  * 

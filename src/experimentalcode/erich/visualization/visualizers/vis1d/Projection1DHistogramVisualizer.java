@@ -1,8 +1,7 @@
 package experimentalcode.erich.visualization.visualizers.vis1d;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -18,6 +17,7 @@ import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -38,24 +38,44 @@ import experimentalcode.erich.visualization.visualizers.VisualizerContext;
  * @param <NV> Type of the DatabaseObject being visualized.
  */
 public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> extends Projection1DVisualizer<NV> {
-
+  /**
+   * OptionID for {@link #STYLE_ROW_PARAM}.
+   */
   public static final OptionID STYLE_ROW_ID = OptionID.getOrCreateOptionID("histogram.row", "Alternative style: Rows.");
 
+  /**
+   * Flag to specify the "row" rendering style.
+   * 
+   * <p>
+   * Key: {@code -histogram.row}
+   * </p>
+   */
   private final Flag STYLE_ROW_PARAM = new Flag(STYLE_ROW_ID);
 
+  /**
+   * Internal storage of the row flag.
+   */
   private boolean row;
 
+  /**
+   * Name for this visualizer.
+   */
   private static final String NAME = "Histograms";
 
+  /**
+   * Number of bins to use in histogram.
+   */
+  // TODO: make configurable!
   private static final int BINS = 20;
-
-  private Clustering<Model> clustering;
 
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
   public static final String BIN = "bin";
 
+  /**
+   * Constructor, as per {@link Parameterizable} API.
+   */
   public Projection1DHistogramVisualizer() {
     addOption(STYLE_ROW_PARAM);
   }
@@ -68,85 +88,96 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
     return remainingParameters;
   }
 
+  /**
+   * Initialization.
+   * 
+   * @param context context.
+   */
   public void init(VisualizerContext context) {
     super.init(NAME, context);
-    this.clustering = context.getOrCreateDefaultClustering();
   }
 
-  private void setupCSS(SVGPlot svgp) {
-
-    // creating IDs manually because cluster often return a null-ID.
-    int clusterID = 0;
-
+  /**
+   * Generate the needed CSS classes.
+   * 
+   * @param svgp Plot context
+   * @param numc Number of classes we need.
+   */
+  private void setupCSS(SVGPlot svgp, int numc) {
     CSSClass allInOne = new CSSClass(svgp, BIN + -1);
-    for(@SuppressWarnings("unused") Cluster<Model> cluster : clustering.getAllClusters()) {
+    if(row) {
+      allInOne.setStatement(SVGConstants.CSS_FILL_PROPERTY, "black");
+      allInOne.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 1.0);
+    }
+    else {
+      allInOne.setStatement(SVGConstants.CSS_STROKE_PROPERTY, "black");
+      allInOne.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.005);
+      allInOne.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.0);
+    }
+    try {
+      svgp.getCSSClassManager().addClass(allInOne);
+    }
+    catch(CSSNamingConflict e) {
+      LoggingUtil.exception("Could not add allInOne histogram CSS class.", e);
+    }
 
+    for(int clusterID = 0; clusterID < numc; clusterID++) {
       CSSClass bin = new CSSClass(svgp, BIN + clusterID);
-      String coloredElement;
 
       if(row) {
+        bin.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getColorLibrary().getColor(clusterID));
         bin.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 1.0);
-        coloredElement = SVGConstants.CSS_FILL_PROPERTY;
       }
       else {
+        bin.setStatement(SVGConstants.CSS_STROKE_PROPERTY, context.getColorLibrary().getColor(clusterID));
         bin.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.005);
         bin.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.0);
-        allInOne.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.005);
-        allInOne.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.0);
-        coloredElement = SVGConstants.CSS_STROKE_PROPERTY;
-      }
-
-      allInOne.setStatement(coloredElement, "black");
-      if(clustering.getAllClusters().size() == 1) {
-        bin.setStatement(coloredElement, "black");
-      }
-      else {
-        bin.setStatement(coloredElement, context.getColorLibrary().getColor(clusterID));
       }
 
       try {
         svgp.getCSSClassManager().addClass(bin);
-        svgp.getCSSClassManager().addClass(allInOne);
-        svgp.updateStyleElement();
       }
       catch(CSSNamingConflict e) {
-        LoggingUtil.exception("Equally-named CSSClass with different owner already exists", e);
+        LoggingUtil.exception("Could not create histogram CSS classes.", e);
       }
-      clusterID += 1;
     }
   }
 
   @Override
   public Element visualize(SVGPlot svgp, VisualizationProjection proj) {
-    Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_SVG_TAG);
-    SVGUtil.setAtt(layer, SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "-1.2 -1.2 2.4 2.4");
-    setupCSS(svgp);
+    Element layer = super.setupCanvas(svgp);
 
-    Map<Integer, AggregatingHistogram<Double, Double>> hists = new HashMap<Integer, AggregatingHistogram<Double, Double>>();
+    Clustering<Model> clustering = context.getOrCreateDefaultClustering();
+    final List<Cluster<Model>> allClusters = clustering.getAllClusters();
+
+    setupCSS(svgp, allClusters.size());
+
+    ArrayList<AggregatingHistogram<Double, Double>> hists = new ArrayList<AggregatingHistogram<Double, Double>>(allClusters.size());
 
     // Get the database.
     Database<NV> database = context.getDatabase();
 
     // Creating histograms
-    int clusterID = 0;
     MinMax<Double> minmax = new MinMax<Double>();
     final double frac = 1. / database.size();
-
     AggregatingHistogram<Double, Double> allInOne = AggregatingHistogram.DoubleSumHistogram(BINS, 0, 1);
-    for(Cluster<Model> cluster : clustering.getAllClusters()) {
+
+    int clusterID = 0;
+    for(Cluster<Model> cluster : allClusters) {
       AggregatingHistogram<Double, Double> hist = AggregatingHistogram.DoubleSumHistogram(BINS, 0, 1);
       for(int id : cluster.getIDs()) {
         double pos = proj.projectDataToRenderSpace(database.get(id)).get(0);
         hist.aggregate(pos, frac);
         allInOne.aggregate(pos, frac);
       }
-      hists.put(clusterID, hist);
-      clusterID += 1;
-
+      assert(hists.size() == clusterID);
+      hists.add(hist);
       // for scaling, get the maximum occurring value in the bins:
       for(Pair<Double, Double> bin : hist) {
         minmax.put(bin.getSecond());
       }
+      
+      clusterID += 1;
     }
     // for scaling, get the maximum occurring value in the bins:
     for(Pair<Double, Double> bin : allInOne) {
@@ -158,11 +189,9 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
     // Axis. TODO: Use AxisVisualizer for this.
     try {
       SVGSimpleLinearAxis.drawAxis(svgp, layer, scale, -1, 1, -1, -1, true, false);
-      svgp.updateStyleElement();
     }
     catch(CSSNamingConflict e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      LoggingUtil.exception("CSS class exception in axis class.", e);
     }
 
     // Visualizing
@@ -191,6 +220,15 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
     return layer;
   }
 
+  /**
+   * Helper to draw a single histogram line.
+   * 
+   * @param svgp Plot context.
+   * @param color Color number
+   * @param hist Histogram to plot
+   * @param max Maximum value for scaling.
+   * @return New SVG path
+   */
   private Element drawLine(SVGPlot svgp, int color, AggregatingHistogram<Double, Double> hist, double max) {
     SVGPath path = new SVGPath(hist.getCoverMinimum(), 1);
     double left = 0;

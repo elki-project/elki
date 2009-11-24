@@ -14,9 +14,6 @@ import experimentalcode.erich.visualization.visualizers.VisualizerContext;
 /**
  * Generates a SVG-Element containing axes, including labeling.
  * 
- * TODO: This visualizer could be more useful if it only would draw 1 axis with
- * its position depending on a parameter.
- * 
  * @author Remigius Wojdanowski
  * 
  * @param <NV> Type of the DatabaseObject being visualized.
@@ -74,8 +71,6 @@ public class AxisVisualizer<NV extends NumberVector<NV, ?>> extends Projection2D
         }
       }
     }
-    // FIXME: caller should also call updateStyleElement at the end.
-    plot.updateStyleElement();
     return layer;
   }
 }
