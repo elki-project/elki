@@ -51,7 +51,7 @@ public class OutlierResult extends MultiResult {
    * Get the outlier score meta data
    * @return the outlier meta information
    */
-  protected OutlierScoreMeta getOutlierMeta() {
+  public OutlierScoreMeta getOutlierMeta() {
     return meta;
   }
 
@@ -59,7 +59,7 @@ public class OutlierResult extends MultiResult {
    * Get the outlier scores association.
    * @return the scores
    */
-  protected AnnotationResult<Double> getScores() {
+  public AnnotationResult<Double> getScores() {
     return scores;
   }
 
@@ -67,7 +67,7 @@ public class OutlierResult extends MultiResult {
    * Get the outlier ordering
    * @return the ordering
    */
-  protected OrderingResult getOrdering() {
+  public OrderingResult getOrdering() {
     return ordering;
   }
 }
