@@ -17,7 +17,7 @@ public class ProbabilisticOutlierScore implements OutlierScoreMeta {
    */
   private double actualMaximum = Double.NaN;
   /**
-   * Theretical baseline specified by the algorithm. Defaults to 0.0 in short constructor.
+   * Theoretical baseline specified by the algorithm. Defaults to 0.0 in short constructor.
    */
   private double theoreticalBaseline = Double.NaN;
 
@@ -84,5 +84,10 @@ public class ProbabilisticOutlierScore implements OutlierScoreMeta {
   @Override
   public double getTheoreticalMinimum() {
     return 0.0;
+  }
+
+  @Override
+  public double normalizeScore(double value) {
+    return value;
   }
 }

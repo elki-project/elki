@@ -91,4 +91,30 @@ public class BasicOutlierScoreMeta implements OutlierScoreMeta {
   public double getTheoreticalMinimum() {
     return theoreticalMinimum;
   }
+
+  @Override
+  public double normalizeScore(double value) {
+    double center = 0.0;
+    if (!Double.isNaN(theoreticalBaseline) && !Double.isInfinite(theoreticalBaseline)) {
+      center = theoreticalBaseline;
+    } else if (!Double.isNaN(theoreticalMinimum) && !Double.isInfinite(theoreticalMinimum)) {
+      center = theoreticalMinimum;
+    } else if (!Double.isNaN(actualMinimum) && !Double.isInfinite(actualMinimum)) {
+      center = actualMinimum;
+    }
+    if (value < center) {
+      return 0.0;
+    }
+    double max = Double.NaN;
+    if (!Double.isNaN(theoreticalMaximum) && !Double.isInfinite(theoreticalMaximum)) {
+      max = theoreticalMaximum;
+    }
+    else if (!Double.isNaN(actualMaximum) && !Double.isInfinite(actualMaximum)) {
+      max = actualMaximum;
+    }
+    if (!Double.isNaN(max) && !Double.isInfinite(max) && max >= center) {
+      return (value - center) / (max - center);
+    }
+    return value - center;
+  }
 }
