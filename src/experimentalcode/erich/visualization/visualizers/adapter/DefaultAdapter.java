@@ -1,15 +1,19 @@
-package experimentalcode.remigius.Adapter;
+package experimentalcode.erich.visualization.visualizers.adapter;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import experimentalcode.erich.visualization.visualizers.Visualizer;
 import experimentalcode.erich.visualization.visualizers.VisualizerContext;
 import experimentalcode.erich.visualization.visualizers.vis1d.Projection1DHistogramVisualizer;
 import experimentalcode.erich.visualization.visualizers.vis2d.AxisVisualizer;
 import experimentalcode.erich.visualization.visualizers.vis2d.ClusteringVisualizer;
 import experimentalcode.erich.visualization.visualizers.vis2d.DataDotVisualizer;
 
-public class DefaultAdapter<NV extends NumberVector<NV, ?>> extends AbstractAlgorithmAdapter<NV, Object> {
+public class DefaultAdapter<NV extends NumberVector<NV, ?>> implements AlgorithmAdapter<NV> {
 
   private DataDotVisualizer<NV> dataDotVisualizer;
 
@@ -25,10 +29,6 @@ public class DefaultAdapter<NV extends NumberVector<NV, ?>> extends AbstractAlgo
     clusteringVisualizer = new ClusteringVisualizer<NV>();
     axisVisualizer = new AxisVisualizer<NV>();
     histoVisualizer = new Projection1DHistogramVisualizer<NV>();
-    providedVisualizers.add(dataDotVisualizer);
-    providedVisualizers.add(clusteringVisualizer);
-    providedVisualizers.add(axisVisualizer);
-    providedVisualizers.add(histoVisualizer);
   }
 
   @Override
@@ -37,7 +37,18 @@ public class DefaultAdapter<NV extends NumberVector<NV, ?>> extends AbstractAlgo
   }
 
   @Override
-  protected void initVisualizer(VisualizerContext context) {
+  public Collection<Visualizer> getProvidedVisualizers() {
+    ArrayList<Visualizer> providedVisualizers = new ArrayList<Visualizer>(4);
+    providedVisualizers.add(dataDotVisualizer);
+    providedVisualizers.add(clusteringVisualizer);
+    providedVisualizers.add(axisVisualizer);
+    providedVisualizers.add(histoVisualizer);
+    return providedVisualizers;
+  }
+
+  @Override
+  public Collection<Visualizer> getUsableVisualizers(VisualizerContext context) {
+    ArrayList<Visualizer> usableVisualizers = new ArrayList<Visualizer>(3);
     axisVisualizer.init(context);
     dataDotVisualizer.init(context);
     clusteringVisualizer.init(context);
@@ -49,6 +60,7 @@ public class DefaultAdapter<NV extends NumberVector<NV, ?>> extends AbstractAlgo
     } else {
       usableVisualizers.add(dataDotVisualizer);
     }
-    usableVisualizers.add(histoVisualizer);    
+    usableVisualizers.add(histoVisualizer);
+    return usableVisualizers;
   }
 }
