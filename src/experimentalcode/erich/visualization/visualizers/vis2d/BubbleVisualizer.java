@@ -26,6 +26,7 @@ import experimentalcode.erich.visualization.visualizers.VisualizerContext;
 import experimentalcode.lisa.scale.CutOffScale;
 import experimentalcode.lisa.scale.GammaFunction;
 import experimentalcode.lisa.scale.LinearScale;
+import experimentalcode.shared.outlier.scaling.ScalingFunction;
 import experimentalcode.shared.outlier.scaling.StaticScalingFunction;
 
 /**
@@ -109,7 +110,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
   /**
    * Used for normalizing coordinates.
    */
-  private StaticScalingFunction normalizationScale;
+  private ScalingFunction normalizationScale;
 
   /**
    * TODO: Find out & document what this scale was for. I can't remember, but it
@@ -174,7 +175,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
    * @param result complete result for further information.
    * @param normalizationScale normalizes coordinates.
    */
-  public void init(String name, VisualizerContext context, AnnotationResult<? extends Number> anResult, StaticScalingFunction normalizationScale) {
+  public void init(String name, VisualizerContext context, AnnotationResult<? extends Number> anResult, ScalingFunction normalizationScale) {
     super.init(name, context);
     this.anResult = anResult;
     this.clustering = context.getOrCreateDefaultClustering();

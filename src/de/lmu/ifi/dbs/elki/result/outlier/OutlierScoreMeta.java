@@ -43,4 +43,11 @@ public interface OutlierScoreMeta {
    * @return theoretical baseline or {@link Double#NaN}
    */
   public double getTheoreticalBaseline();
+  /**
+   * Return a normalized value of the outlier score.
+   * 
+   * @param value outlier score
+   * @return Normalized value (in 0.0-1.0)
+   */
+  public double normalizeScore(double value);
 }
