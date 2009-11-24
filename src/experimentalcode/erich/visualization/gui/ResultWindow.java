@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.JSVGSynchronizedCanvas;
 import de.lmu.ifi.dbs.elki.visualization.savedialog.SVGSaveDialog;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
+import experimentalcode.erich.visualization.gui.overview.OverviewPlot;
 import experimentalcode.erich.visualization.visualizers.Visualizer;
 
 /**
