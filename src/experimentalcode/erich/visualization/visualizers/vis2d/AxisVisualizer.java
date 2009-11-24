@@ -1,4 +1,4 @@
-package experimentalcode.remigius.Visualizers;
+package experimentalcode.erich.visualization.visualizers.vis2d;
 
 import org.w3c.dom.Element;
 
@@ -8,6 +8,8 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
+import experimentalcode.erich.visualization.visualizers.Visualizer;
+import experimentalcode.erich.visualization.visualizers.VisualizerContext;
 
 /**
  * Generates a SVG-Element containing axes, including labeling.
@@ -19,7 +21,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
  * 
  * @param <NV> Type of the DatabaseObject being visualized.
  */
-public class Projection2DAxisVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
+public class AxisVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
   /**
    * A short name characterizing this Visualizer.
    */

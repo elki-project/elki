@@ -1,4 +1,4 @@
-package experimentalcode.remigius.Visualizers;
+package experimentalcode.erich.visualization.visualizers.vis1d;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import experimentalcode.erich.visualization.visualizers.VisualizerContext;
 
 /**
  * Generates a SVG-Element containing a histogram representing the distribution
@@ -154,7 +155,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
 
     LinearScale scale = new LinearScale(0, minmax.getMax());
 
-    // Axis. TODO: Use Projection2DAxisVisualizer for this.
+    // Axis. TODO: Use AxisVisualizer for this.
     try {
       SVGSimpleLinearAxis.drawAxis(svgp, layer, scale, -1, 1, -1, -1, true, false);
       svgp.updateStyleElement();

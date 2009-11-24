@@ -13,9 +13,8 @@ import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import experimentalcode.erich.visualization.VisualizersForResult;
-import experimentalcode.erich.visualization.old.ResultHistogramVisualizer;
-import experimentalcode.remigius.Visualizers.Visualizer;
+import experimentalcode.erich.visualization.visualizers.Visualizer;
+import experimentalcode.erich.visualization.visualizers.VisualizersForResult;
 
 /**
  * Handler to process and visualize a Result.
@@ -26,7 +25,7 @@ public class ResultVisualizer extends AbstractParameterizable implements ResultH
   /**
    * Get a logger for this class.
    */
-  protected final static Logging logger = Logging.getLogger(ResultHistogramVisualizer.class);
+  protected final static Logging logger = Logging.getLogger(ResultVisualizer.class);
 
   /**
    * Visualization manager.

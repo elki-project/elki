@@ -3,31 +3,31 @@ package experimentalcode.remigius.Adapter;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import experimentalcode.remigius.Visualizers.Projection2DAxisVisualizer;
-import experimentalcode.remigius.Visualizers.Projection2DClusteringVisualizer;
-import experimentalcode.remigius.Visualizers.Projection2DDataDotVisualizer;
-import experimentalcode.remigius.Visualizers.Projection1DHistogramVisualizer;
-import experimentalcode.remigius.Visualizers.VisualizerContext;
+import experimentalcode.erich.visualization.visualizers.VisualizerContext;
+import experimentalcode.erich.visualization.visualizers.vis1d.Projection1DHistogramVisualizer;
+import experimentalcode.erich.visualization.visualizers.vis2d.AxisVisualizer;
+import experimentalcode.erich.visualization.visualizers.vis2d.ClusteringVisualizer;
+import experimentalcode.erich.visualization.visualizers.vis2d.DataDotVisualizer;
 
-public class DefaultAdapter<NV extends NumberVector<NV, ?>> extends AbstractAlgorithmAdapter<NV> {
+public class DefaultAdapter<NV extends NumberVector<NV, ?>> extends AbstractAlgorithmAdapter<NV, Object> {
 
-  private Projection2DDataDotVisualizer<NV> projection2DDataDotVisualizer;
+  private DataDotVisualizer<NV> dataDotVisualizer;
 
-  private Projection2DClusteringVisualizer<NV> projection2DClusteringVisualizer;
+  private ClusteringVisualizer<NV> clusteringVisualizer;
 
-  private Projection2DAxisVisualizer<NV> projection2DAxisVisualizer;
+  private AxisVisualizer<NV> axisVisualizer;
 
   private Projection1DHistogramVisualizer<NV> histoVisualizer;
 
   public DefaultAdapter() {
     super();
-    projection2DDataDotVisualizer = new Projection2DDataDotVisualizer<NV>();
-    projection2DClusteringVisualizer = new Projection2DClusteringVisualizer<NV>();
-    projection2DAxisVisualizer = new Projection2DAxisVisualizer<NV>();
+    dataDotVisualizer = new DataDotVisualizer<NV>();
+    clusteringVisualizer = new ClusteringVisualizer<NV>();
+    axisVisualizer = new AxisVisualizer<NV>();
     histoVisualizer = new Projection1DHistogramVisualizer<NV>();
-    providedVisualizers.add(projection2DDataDotVisualizer);
-    providedVisualizers.add(projection2DClusteringVisualizer);
-    providedVisualizers.add(projection2DAxisVisualizer);
+    providedVisualizers.add(dataDotVisualizer);
+    providedVisualizers.add(clusteringVisualizer);
+    providedVisualizers.add(axisVisualizer);
     providedVisualizers.add(histoVisualizer);
   }
 
@@ -38,16 +38,16 @@ public class DefaultAdapter<NV extends NumberVector<NV, ?>> extends AbstractAlgo
 
   @Override
   protected void initVisualizer(VisualizerContext context) {
-    projection2DAxisVisualizer.init(context);
-    projection2DDataDotVisualizer.init(context);
-    projection2DClusteringVisualizer.init(context);
+    axisVisualizer.init(context);
+    dataDotVisualizer.init(context);
+    clusteringVisualizer.init(context);
     histoVisualizer.init(context);
     
-    usableVisualizers.add(projection2DAxisVisualizer);
+    usableVisualizers.add(axisVisualizer);
     if (ResultUtil.getClusteringResults(context.getResult()).size() > 0) {
-      usableVisualizers.add(projection2DClusteringVisualizer);
+      usableVisualizers.add(clusteringVisualizer);
     } else {
-      usableVisualizers.add(projection2DDataDotVisualizer);
+      usableVisualizers.add(dataDotVisualizer);
     }
     usableVisualizers.add(histoVisualizer);    
   }

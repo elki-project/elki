@@ -1,4 +1,4 @@
-package experimentalcode.remigius.Visualizers;
+package experimentalcode.erich.visualization.visualizers.vis2d;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -7,6 +7,8 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import experimentalcode.erich.visualization.visualizers.AbstractVisualizer;
+import experimentalcode.erich.visualization.visualizers.ProjectedVisualizer;
 
 /**
  * Produces visualizations of 2-dimensional projections. <br>
