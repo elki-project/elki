@@ -1,5 +1,6 @@
 package experimentalcode.erich.visualization.visualizers.vis2d;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
@@ -13,9 +14,11 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -23,10 +26,9 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import experimentalcode.erich.visualization.visualizers.VisualizerContext;
-import experimentalcode.lisa.scale.CutOffScale;
-import experimentalcode.lisa.scale.GammaFunction;
-import experimentalcode.lisa.scale.LinearScale;
-import experimentalcode.shared.outlier.scaling.ScalingFunction;
+import experimentalcode.shared.outlier.scaling.ClipScaling;
+import experimentalcode.shared.outlier.scaling.GammaScaling;
+import experimentalcode.shared.outlier.scaling.LinearScaling;
 import experimentalcode.shared.outlier.scaling.StaticScalingFunction;
 
 /**
@@ -110,7 +112,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
   /**
    * Used for normalizing coordinates.
    */
-  private ScalingFunction normalizationScale;
+  private OutlierScoreMeta outlierMeta;
 
   /**
    * TODO: Find out & document what this scale was for. I can't remember, but it
@@ -123,7 +125,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
    * 
    * TODO: Make the gamma-function exchangeable (inc. Parameter etc.).
    */
-  private GammaFunction gammaFunction;
+  private GammaScaling gammaScaling;
 
   /**
    * Used for cut-off on normalized data.
@@ -132,7 +134,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
    * @see #CUTOFF_PARAM
    * @see #cutOff
    */
-  private CutOffScale cutOffScale;
+  private ClipScaling cutOffScale;
 
   /**
    * Contains the "outlierness-scores" to be displayed as Tooltips. If this
@@ -173,17 +175,25 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
    * @param anResult contains "outlierness-scores", corresponding to the
    *        database.
    * @param result complete result for further information.
-   * @param normalizationScale normalizes coordinates.
+   * @param outlierMeta normalizes coordinates.
    */
-  public void init(String name, VisualizerContext context, AnnotationResult<? extends Number> anResult, ScalingFunction normalizationScale) {
+  public void init(String name, VisualizerContext context, AnnotationResult<? extends Number> anResult, OutlierScoreMeta normalizationScale) {
     super.init(name, context);
     this.anResult = anResult;
     this.clustering = context.getOrCreateDefaultClustering();
     
-    this.normalizationScale = normalizationScale;
-    this.plotScale = new LinearScale(0.2);
-    this.gammaFunction = new GammaFunction(gamma);
-    this.cutOffScale = new CutOffScale(cutOff);
+    this.outlierMeta = normalizationScale;
+    this.plotScale = new LinearScaling(0.2);
+    this.gammaScaling = new GammaScaling(gamma);
+    this.cutOffScale = new ClipScaling();
+    ArrayList<String> options = new ArrayList<String>(2);
+    OptionUtil.addParameter(options, ClipScaling.MIN_ID, Double.toString(cutOff));
+    try {
+      this.cutOffScale.setParameters(options);
+    }
+    catch(ParameterException e) {
+      logger.exception("Exception in configuring cut-off scale.", e);
+    }
   }
 
   /**
@@ -255,7 +265,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
    *         the given scales.
    */
   private Double getScaled(Double d) {
-    return plotScale.getScaled(gammaFunction.getScaled(cutOffScale.getScaled(normalizationScale.getScaled(d))));
+    return plotScale.getScaled(gammaScaling.getScaled(cutOffScale.getScaled(outlierMeta.normalizeScore(d))));
   }
 
   @Override

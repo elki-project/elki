@@ -13,8 +13,6 @@ import experimentalcode.erich.visualization.visualizers.Visualizer;
 import experimentalcode.erich.visualization.visualizers.VisualizerContext;
 import experimentalcode.erich.visualization.visualizers.vis2d.BubbleVisualizer;
 import experimentalcode.erich.visualization.visualizers.vis2d.TooltipVisualizer;
-import experimentalcode.shared.outlier.scaling.OutlierScoreScale;
-import experimentalcode.shared.outlier.scaling.ScalingFunction;
 
 public class OutlierScoreAdapter<NV extends NumberVector<NV, ?>> implements AlgorithmAdapter<NV> {
   /**
@@ -52,9 +50,8 @@ public class OutlierScoreAdapter<NV extends NumberVector<NV, ?>> implements Algo
     Collection<Visualizer> c = new ArrayList<Visualizer>(2 * ors.size());
     for(OutlierResult o : ors) {
       OutlierScoreMeta meta = o.getOutlierMeta();
-      ScalingFunction outlierscale = new OutlierScoreScale(meta);
       // TODO: generate names.
-      bubbleVisualizer.init(BubbleVisualizer.NAME, context, o.getScores(), outlierscale);
+      bubbleVisualizer.init(BubbleVisualizer.NAME, context, o.getScores(), meta);
       tooltipVisualizer.init(TooltipVisualizer.NAME, context, o.getScores());
       c.add(bubbleVisualizer);
       c.add(tooltipVisualizer);
