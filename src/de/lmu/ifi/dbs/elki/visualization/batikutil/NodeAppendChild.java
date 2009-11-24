@@ -8,37 +8,36 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
  * Runnable wrapper for appending XML-Elements to existing Elements.
  * 
  * @author Remigius Wojdanowski.
- *
+ * 
  */
 public class NodeAppendChild implements Runnable {
-  
   /**
-   * Will become the parent of the appended Element. 
+   * Parent node to append to.
    */
-  private Element parent;
-  
+  protected Element parent;
+
   /**
-   * The Element to be appended.
+   * The child to be appended.
    */
-  private Element child;
-  
+  protected Element child;
+
   /**
-   * The plot (for ID updates)
+   * The plot (for ID updates). May be {code null}.
    */
-  private SVGPlot plot;
-  
+  protected SVGPlot plot;
+
   /**
-   * The ID
+   * The ID. May be {code null}.
    */
-  private String id;
-  
+  protected String id;
+
   /**
    * Trivial constructor.
-   *  
-   * @param parent will become the parent of the appended Element. 
+   * 
+   * @param parent will become the parent of the appended Element.
    * @param child the Element to be appended.
    */
-  public NodeAppendChild(Element parent, Element child){
+  public NodeAppendChild(Element parent, Element child) {
     this(parent, child, null, null);
   }
 
@@ -61,7 +60,7 @@ public class NodeAppendChild implements Runnable {
   @Override
   public void run() {
     parent.appendChild(child);
-    if (plot != null && id != null) {
+    if(plot != null && id != null) {
       plot.putIdElement(id, child);
     }
   }
