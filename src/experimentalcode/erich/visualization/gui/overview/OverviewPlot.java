@@ -1,14 +1,20 @@
 package experimentalcode.erich.visualization.gui.overview;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Queue;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
+import org.w3c.dom.events.Event;
+import org.w3c.dom.events.EventListener;
+import org.w3c.dom.events.EventTarget;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -18,7 +24,10 @@ import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
+import de.lmu.ifi.dbs.elki.visualization.batikutil.CSSHoverClass;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.NodeReplaceChild;
+import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.scales.Scales;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -62,6 +71,11 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
   static Thumbnailer t = new Thumbnailer();
 
   /**
+   * Action listeners for this plot.
+   */
+  private java.util.Vector<ActionListener> actionListeners = new java.util.Vector<ActionListener>();
+
+  /**
    * Constructor.
    */
   public OverviewPlot(Database<? extends DatabaseObject> db, MultiResult result) {
@@ -88,6 +102,24 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
    * Refresh the overview plot.
    */
   public void refresh() {
+    // setup the hover CSS classes.
+    CSSClass selcss = new CSSClass(this, "s");
+    selcss.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_RED_VALUE);
+    selcss.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_NONE_VALUE);
+    selcss.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0");
+    selcss.setStatement(SVGConstants.CSS_CURSOR_PROPERTY, SVGConstants.CSS_POINTER_VALUE);
+    CSSClass hovcss = new CSSClass(this, "h");
+    hovcss.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0.25");
+    try {
+      getCSSClassManager().addClass(selcss);
+      getCSSClassManager().addClass(hovcss);
+    }
+    catch(CSSNamingConflict e) {
+      throw new RuntimeException("Unresolved conflict in CSS.", e);
+    }
+    // Hover listener.
+    EventListener hoverer = new CSSHoverClass(hovcss.getName(), null, true);
+
     // split the visualizers into three sets.
     Collection<Projection1DVisualizer<?>> vis1d = new ArrayList<Projection1DVisualizer<?>>(vis.size());
     Collection<Projection2DVisualizer<?>> vis2d = new ArrayList<Projection2DVisualizer<?>>(vis.size());
@@ -170,6 +202,11 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
     SVGUtil.setAtt(getRoot(), SVGConstants.SVG_WIDTH_ATTRIBUTE, "20cm");
     SVGUtil.setAtt(getRoot(), SVGConstants.SVG_HEIGHT_ATTRIBUTE, (20 / plotw * ploth) + "cm");
     SVGUtil.setAtt(getRoot(), SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, vb);
+
+    // Layers.
+    Element plotlayer = this.svgElement(SVGConstants.SVG_G_TAG);
+    Element hoverlayer = this.svgElement(SVGConstants.SVG_G_TAG);
+
     // TODO: kill all children in document root except style, defs etc?
     for(Entry<DoubleDoublePair, ArrayList<VisualizationInfo>> e : plotmap.entrySet()) {
       double x = e.getKey().getFirst();
@@ -191,8 +228,21 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
         g.appendChild(gg);
         thumbnails.queue(gg, vi);
       }
-      getRoot().appendChild(g);
+      plotlayer.appendChild(g);
+      Element h = this.svgRect(x, y, 1, 1);
+      SVGUtil.addCSSClass(h, selcss.getName());
+      // link hoverer.
+      EventTarget targ = (EventTarget) h;
+      targ.addEventListener(SVGConstants.SVG_MOUSEOVER_EVENT_TYPE, hoverer, false);
+      targ.addEventListener(SVGConstants.SVG_MOUSEOUT_EVENT_TYPE, hoverer, false);
+      targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, hoverer, false);
+      targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, new SelectPlotEvent(x, y), false);
+
+      hoverlayer.appendChild(h);
     }
+    getRoot().appendChild(plotlayer);
+    getRoot().appendChild(hoverlayer);
+    updateStyleElement();
     thumbnails.start();
   }
 
@@ -255,5 +305,82 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
   @SuppressWarnings("unchecked")
   private Database<NV> uglyCastDatabase() {
     return (Database<NV>) db;
+  }
+
+  /**
+   * Event triggered when a plot was selected.
+   * 
+   * @param x X coordinate
+   * @param y Y coordinate
+   * @return sub plot
+   */
+  public SVGPlot makeDetailPlot(double x, double y) {
+    SVGPlot plot = new SVGPlot();
+    plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 1 1");
+
+    List<VisualizationInfo> layers = plotmap.get(x, y);
+
+    for(VisualizationInfo vi : layers) {
+      Element e = vi.build(plot);
+      plot.getRoot().appendChild(e);
+    }
+    plot.updateStyleElement();
+    return plot;
+  }
+
+  /**
+   * Adds an {@link ActionListener} to the plot.
+   * 
+   * @param l the {@link ActionListener} to be added
+   */
+  public void addActionListener(ActionListener actionListener) {
+    actionListeners.add(actionListener);
+  }
+
+  /**
+   * When a subplot was selected, forward the event to listeners.
+   * 
+   * @param x X coordinate
+   * @param y Y coordinate
+   */
+  protected void triggerSubplotSelectEvent(double x, double y) {
+    // forward event to all listeners.
+    for(ActionListener actionListener : actionListeners) {
+      actionListener.actionPerformed(new SubplotSelectedEvent(this, ActionEvent.ACTION_PERFORMED, null, 0, x, y));
+    }
+  }
+  
+  /**
+   * Event when a plot was selected.
+   * 
+   * @author Erich Schubert
+   */
+  public class SelectPlotEvent implements EventListener {
+    /**
+     * X coordinate of box.
+     */
+    double x;
+
+    /**
+     * Y coordinate of box.
+     */
+    double y;
+
+    /**
+     * Constructor.
+     * 
+     * @param x coordinate
+     * @param y coordinate
+     */
+    public SelectPlotEvent(double x, double y) {
+      super();
+      this.x = x;
+      this.y = y;
+    }
+
+    @Override
+    public void handleEvent(@SuppressWarnings("unused") Event evt) {
+      triggerSubplotSelectEvent(x, y);
+    }
   }
 }
