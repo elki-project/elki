@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.visualization.batikutil.JSVGSynchronizedCanvas;
 import de.lmu.ifi.dbs.elki.visualization.savedialog.SVGSaveDialog;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import experimentalcode.erich.visualization.gui.overview.OverviewPlot;
+import experimentalcode.erich.visualization.gui.overview.SubplotSelectedEvent;
 import experimentalcode.erich.visualization.visualizers.Visualizer;
 
 /**
@@ -36,24 +37,24 @@ public class ResultWindow extends JFrame {
    * Get a logger for this class.
    */
   protected final static Logging logger = Logging.getLogger(ResultWindow.class);
-  
-  /** 
-   * The "Overview" button, which goes to the overview view. 
+
+  /**
+   * The "Overview" button, which goes to the overview view.
    */
   private JButton overviewButton;
 
-  /** 
-   * The "Quit" button, to close the application. 
+  /**
+   * The "Quit" button, to close the application.
    */
   private JButton quitButton;
 
-  /** 
+  /**
    * The "Export" button, to save the image
    */
   private JButton saveButton;
 
-  /** 
-   * The SVG canvas. 
+  /**
+   * The SVG canvas.
    */
   private JSVGSynchronizedCanvas svgCanvas;
 
@@ -111,7 +112,7 @@ public class ResultWindow extends JFrame {
     this.getContentPane().add(panel);
 
     this.setSize(600, 600);
-    
+
     this.overview = new OverviewPlot<DoubleVector>(db, result);
   }
 
@@ -146,9 +147,10 @@ public class ResultWindow extends JFrame {
    */
   public void saveCurrentPlot() {
     final SVGPlot currentPlot = svgCanvas.getPlot();
-    if (currentPlot != null) {
-      SVGSaveDialog.showSaveDialog(currentPlot,512,512);
-    } else {
+    if(currentPlot != null) {
+      SVGSaveDialog.showSaveDialog(currentPlot, 512, 512);
+    }
+    else {
       logger.warning("saveCurrentPlot() called without a visible plot!");
     }
   }
@@ -161,6 +163,16 @@ public class ResultWindow extends JFrame {
   public void addVisualizations(Collection<Visualizer> vs) {
     overview.addVisualizations(vs);
     overview.refresh();
+    // when a subplot is clicked, show the selected subplot.
+    overview.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        if(e instanceof SubplotSelectedEvent) {
+          SubplotSelectedEvent se = (SubplotSelectedEvent) e;
+          showPlot(se.makeSubplot());
+        }
+      }
+    });
     showPlot(overview);
   }
 }
