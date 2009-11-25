@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.adapter;
 
 import java.util.Collection;
 
-import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -13,10 +12,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * parameters (default constructor).
  * 
  * @author Remigius Wojdanowski
- * 
- * @param <O> the type of {@link DatabaseObject}s the adapter will handle.
  */
-public interface AlgorithmAdapter<O extends DatabaseObject> {
+public interface AlgorithmAdapter {
   /**
    * Returns <code>true</code> if the adapter can provide one or more
    * {@link Visualizer}s for the given Result, else false.

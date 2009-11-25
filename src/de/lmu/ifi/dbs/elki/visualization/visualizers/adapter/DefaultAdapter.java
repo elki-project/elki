@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.AxisVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.ClusteringVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.DataDotVisualizer;
 
-public class DefaultAdapter<NV extends NumberVector<NV, ?>> implements AlgorithmAdapter<NV> {
+public class DefaultAdapter<NV extends NumberVector<NV, ?>> implements AlgorithmAdapter {
 
   private DataDotVisualizer<NV> dataDotVisualizer;
 
