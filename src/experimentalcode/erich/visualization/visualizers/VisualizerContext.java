@@ -1,11 +1,14 @@
 package experimentalcode.erich.visualization.visualizers;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelHierarchicalClustering;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.AnyMap;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.colors.PropertiesBasedColorLibrary;
@@ -72,6 +75,11 @@ public class VisualizerContext extends AnyMap<String> {
     super();
     this.database = database;
     this.result = result;
+    
+    List<Clustering<?>> clusterings = ResultUtil.getClusteringResults(result);
+    if (clusterings.size() > 0) {
+      this.put(CLUSTERING, clusterings.get(0));
+    }
   }
 
   /**
