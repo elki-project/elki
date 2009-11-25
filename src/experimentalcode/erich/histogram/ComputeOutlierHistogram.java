@@ -30,9 +30,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import experimentalcode.shared.outlier.scaling.IdentityScaling;
-import experimentalcode.shared.outlier.scaling.OutlierScalingFunction;
-import experimentalcode.shared.outlier.scaling.ScalingFunction;
+import de.lmu.ifi.dbs.elki.utilities.scaling.IdentityScaling;
+import de.lmu.ifi.dbs.elki.utilities.scaling.OutlierScalingFunction;
+import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
 
 /**
  * Compute a Histogram to evaluate a ranking algorithm.
