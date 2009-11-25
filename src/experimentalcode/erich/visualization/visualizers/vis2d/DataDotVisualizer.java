@@ -34,7 +34,7 @@ public class DataDotVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
   /**
    * Initializes this Visualizer.
    * 
-   * @param database contains all objects to be processed.
+   * @param context Visualization context
    */
   public void init(VisualizerContext context) {
     super.init(NAME, context);

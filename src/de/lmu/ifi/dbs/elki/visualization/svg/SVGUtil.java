@@ -248,7 +248,7 @@ public final class SVGUtil {
    * @param y Top
    * @param w Width
    * @param h Height
-   * @return New element (currently a {@link SVGConstats.SVG_PATH_TAG})
+   * @return New element (currently a {@link SVGConstants#SVG_PATH_TAG})
    */
   public static Element svgWaitIcon(Document document, double x, double y, double w, double h) {
     Element elem = SVGUtil.svgElement(document, SVGConstants.SVG_PATH_TAG);

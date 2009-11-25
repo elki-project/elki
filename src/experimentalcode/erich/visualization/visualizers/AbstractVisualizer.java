@@ -7,8 +7,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
  * Abstract superclass for Visualizers.
  * 
  * @author Remigius Wojdanowski
- * 
- * @param <O> the type of object this Visualizer will process.
  */
 public abstract class AbstractVisualizer extends AbstractParameterizable implements Visualizer {
   /**

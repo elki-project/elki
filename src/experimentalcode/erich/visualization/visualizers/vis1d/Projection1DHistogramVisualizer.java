@@ -160,6 +160,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
     // Creating histograms
     MinMax<Double> minmax = new MinMax<Double>();
     final double frac = 1. / database.size();
+    // TODO: change this into a double[] histogram to have the same bins everywhere!
     AggregatingHistogram<Double, Double> allInOne = AggregatingHistogram.DoubleSumHistogram(BINS, 0, 1);
 
     int clusterID = 0;

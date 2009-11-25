@@ -27,7 +27,7 @@ public class AxisVisualizer<NV extends NumberVector<NV, ?>> extends Projection2D
   /**
    * Initializes this Visualizer.
    * 
-   * @param database contains all objects to be processed.
+   * @param context visualization context
    */
   public void init(VisualizerContext context) {
     super.init(NAME, context);

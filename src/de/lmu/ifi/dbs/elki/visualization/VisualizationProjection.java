@@ -103,7 +103,7 @@ public class VisualizationProjection {
    * 
    * @param v vector in scaled space
    * @param sampleobject Sample object needed for instantiation via
-   *        {@link de.lmu.ifi.dbs.elki.data.NumberVector#newInstance()}
+   *        {@link de.lmu.ifi.dbs.elki.data.NumberVector#newInstance}
    * @return vector in data space
    */
   public <NV extends NumberVector<NV,?>> NV projectScaledToDataSpace(Vector v, NV sampleobject) {
@@ -130,7 +130,7 @@ public class VisualizationProjection {
    * 
    * @param v vector in rendering space
    * @param sampleobject Sample object needed for instantiation via
-   *        {@link de.lmu.ifi.dbs.elki.data.NumberVector#newInstance()}
+   *        {@link de.lmu.ifi.dbs.elki.data.NumberVector#newInstance}
    * @return vector in data space
    */
   public <NV extends NumberVector<NV,?>> NV projectRenderToDataSpace(Vector v, NV sampleobject) {

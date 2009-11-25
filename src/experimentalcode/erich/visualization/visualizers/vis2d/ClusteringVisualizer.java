@@ -32,7 +32,7 @@ public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projec
   /**
    * Initializes this Visualizer.
    * 
-   * @param database contains all objects to be processed.
+   * @param context Visualization context
    */
   public void init(VisualizerContext context) {
     super.init(NAME, context);
