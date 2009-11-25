@@ -290,7 +290,8 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
     /**
      * Enqueue a new Thumbnail task.
      * 
-     * @param thumbnailTask
+     * @param parent Parent element
+     * @param vi Visualiation info
      */
     public void queue(Element parent, VisualizationInfo vi) {
       queue.add(new Pair<Element, VisualizationInfo>(parent, vi));
@@ -300,7 +301,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
   /**
    * Ugly cast of the database to a default number vector.
    * 
-   * @return
+   * @return Database
    */
   @SuppressWarnings("unchecked")
   private Database<NV> uglyCastDatabase() {
@@ -331,7 +332,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
   /**
    * Adds an {@link ActionListener} to the plot.
    * 
-   * @param l the {@link ActionListener} to be added
+   * @param actionListener the {@link ActionListener} to be added
    */
   public void addActionListener(ActionListener actionListener) {
     actionListeners.add(actionListener);

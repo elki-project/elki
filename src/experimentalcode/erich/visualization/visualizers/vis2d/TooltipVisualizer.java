@@ -24,14 +24,11 @@ import experimentalcode.erich.visualization.visualizers.VisualizerContext;
 /**
  * Generates a SVG-Element containing Tooltips. Tooltips remain invisible until
  * their corresponding Marker is touched by the cursor and stay visible as long
- * as the cursor lingers on the marker. This implementation uses
- * {@link TooltipListener} to achieve this behavior.
- * 
- * @see TooltipListener
+ * as the cursor lingers on the marker.
  * 
  * @author Remigius Wojdanowski
  * 
- * @param <NV> Type of the DatabaseObject being visualized.
+ * @param <NV> Data type visualized.
  */
 public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projection2DVisualizer<NV> {
   /**
@@ -80,9 +77,9 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
   /**
    * Initializes this Visualizer.
    * 
-   * @param database contains all objects to be processed.
-   * @param anResult contains "outlierness-scores", corresponding to the
-   *        database.
+   * @param name Visualizer name
+   * @param context Visualization context
+   * @param anResult the outlier score visualized
    */
   public void init(String name, VisualizerContext context, AnnotationResult<? extends Number> anResult) {
     super.init(name, context);

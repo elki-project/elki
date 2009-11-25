@@ -44,7 +44,7 @@ public class ReferencePointsVisualizer<NV extends NumberVector<NV, ?>> extends P
   /**
    * Initializes this Visualizer.
    * 
-   * @param database contains all objects to be processed.
+   * @param context Visualization context
    * @param colResult contains all reference points.
    */
   public void init(VisualizerContext context, CollectionResult<NV> colResult) {
