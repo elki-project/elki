@@ -2,7 +2,8 @@ package experimentalcode.remigius.visualization;
 
 import java.util.Comparator;
 
-import experimentalcode.erich.visualization.visualizers.Visualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
+
 
 /**
  * Compares Visualizers by level. <br>
