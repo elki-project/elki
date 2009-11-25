@@ -28,7 +28,7 @@ public class VisualizersForResult extends AbstractParameterizable {
   /**
    * (Result-to-visualization) Adapters
    */
-  private Collection<AlgorithmAdapter<?>> adapters;
+  private Collection<AlgorithmAdapter> adapters;
   
   /**
    * Visualizer instances.
@@ -54,7 +54,7 @@ public class VisualizersForResult extends AbstractParameterizable {
     VisualizerContext context = new VisualizerContext(db, result);
     
     // Collect all visualizers.
-    for (AlgorithmAdapter<?> a: adapters){
+    for (AlgorithmAdapter a: adapters){
       if (a.canVisualize(result)){
         // Note: this can throw an exception when setParameters() was not called!
         Collection<Visualizer> avis = a.getUsableVisualizers(context);
@@ -79,11 +79,11 @@ public class VisualizersForResult extends AbstractParameterizable {
    * 
    * @return List of all adapters found.
    */
-  private static Collection<AlgorithmAdapter<?>> collectAlgorithmAdapters() {
-    ArrayList<AlgorithmAdapter<?>> algorithmAdapters = new ArrayList<AlgorithmAdapter<?>>();
+  private static Collection<AlgorithmAdapter> collectAlgorithmAdapters() {
+    ArrayList<AlgorithmAdapter> algorithmAdapters = new ArrayList<AlgorithmAdapter>();
     for (Class<?> c : InspectionUtil.findAllImplementations(AlgorithmAdapter.class, false)){
       try {
-        AlgorithmAdapter<?> a = (AlgorithmAdapter<?>) c.newInstance();
+        AlgorithmAdapter a = (AlgorithmAdapter) c.newInstance();
         algorithmAdapters.add(a);
       } catch (Exception e) {
         logger.exception("Error instantiating AlgorithmAdapter "+c.getName(),e);
@@ -96,7 +96,7 @@ public class VisualizersForResult extends AbstractParameterizable {
   public List<String> setParameters(List<String> args) throws ParameterException {
     List<String> remainingParameters = super.setParameters(args);
     
-    for (AlgorithmAdapter<?> a : adapters){
+    for (AlgorithmAdapter a : adapters){
       // parameterize if possible.
       if (a instanceof Parameterizable) {
         ((Parameterizable)a).setParameters(remainingParameters);

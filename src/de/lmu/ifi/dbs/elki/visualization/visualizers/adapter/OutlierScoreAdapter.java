@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.BubbleVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.TooltipVisualizer;
 
-public class OutlierScoreAdapter<NV extends NumberVector<NV, ?>> implements AlgorithmAdapter<NV> {
+public class OutlierScoreAdapter<NV extends NumberVector<NV, ?>> implements AlgorithmAdapter {
   /**
    * Visualizes outlier-scores with bubbles.
    */
