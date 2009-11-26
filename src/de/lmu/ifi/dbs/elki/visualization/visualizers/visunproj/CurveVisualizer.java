@@ -40,11 +40,6 @@ public class CurveVisualizer extends AbstractVisualizer implements UnprojectedVi
   private static final String SERIESID = "series";
 
   /**
-   * SVG class name for frame
-   */
-  private static final String FRAMEID = "frame";
-
-  /**
    * Curve to visualize
    */
   IterableResult<Pair<Double, Double>> curve = null;
@@ -97,9 +92,6 @@ public class CurveVisualizer extends AbstractVisualizer implements UnprojectedVi
 
     final double ratio = 1.0;
 
-    Element rect = svgp.svgRect(0, 0, ratio, 1);
-    SVGUtil.setAtt(rect, SVGConstants.SVG_CLASS_ATTRIBUTE, FRAMEID);
-
     // determine scaling
     MinMax<Double> minmaxx = new MinMax<Double>();
     MinMax<Double> minmaxy = new MinMax<Double>();
@@ -129,7 +121,6 @@ public class CurveVisualizer extends AbstractVisualizer implements UnprojectedVi
       logger.exception(e);
     }
 
-    layer.appendChild(rect);
     layer.appendChild(line);
 
     // add a slight border
@@ -141,7 +132,7 @@ public class CurveVisualizer extends AbstractVisualizer implements UnprojectedVi
   /**
    * Setup the CSS classes for the plot.
    * 
-   * @param svgp
+   * @param svgp Plot
    */
   private void setupCSS(SVGPlot svgp) {
     // setup CSS
@@ -151,11 +142,6 @@ public class CurveVisualizer extends AbstractVisualizer implements UnprojectedVi
       csscls.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, SVGConstants.SVG_NONE_VALUE);
       context.getLineStyleLibrary().formatCSSClass(csscls, 0, 0.005);
       svgp.getCSSClassManager().addClass(csscls);
-      CSSClass frmcls = new CSSClass(this, FRAMEID);
-      frmcls.setStatement(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, "0.5%");
-      frmcls.setStatement(SVGConstants.SVG_STROKE_ATTRIBUTE, SVGConstants.CSS_SILVER_VALUE);
-      frmcls.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, SVGConstants.SVG_NONE_VALUE);
-      svgp.getCSSClassManager().addClass(frmcls);
     }
     catch(CSSNamingConflict e) {
       logger.exception(e);
