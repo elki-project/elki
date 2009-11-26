@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.evaluation;
+package de.lmu.ifi.dbs.elki.evaluation.roc;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
