@@ -1,4 +1,4 @@
-package experimentalcode.erich.visualization.visualizers.adapter;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.adapter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,8 +10,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.adapter.AlgorithmAdapter;
-import experimentalcode.erich.visualization.visualizers.CurveVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.CurveVisualizer;
 
 /**
  * Adapter that will look for visualizable 2D curves and create visualizations for them.

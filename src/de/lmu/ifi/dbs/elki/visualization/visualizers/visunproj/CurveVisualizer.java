@@ -1,4 +1,4 @@
-package experimentalcode.erich.visualization.visualizers;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
 
 import java.util.Collection;
 import java.util.Iterator;
