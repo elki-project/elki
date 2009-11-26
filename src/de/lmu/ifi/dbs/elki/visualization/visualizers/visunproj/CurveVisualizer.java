@@ -70,7 +70,7 @@ public class CurveVisualizer extends AbstractVisualizer implements UnprojectedVi
    * Find a 2D Double curve in the result object.
    * 
    * @param result Result object to inspect
-   * @return
+   * @return Collection of curves
    */
   @SuppressWarnings("unchecked")
   public static Collection<IterableResult<Pair<Double, Double>>> findCurveResult(Result result) {

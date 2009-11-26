@@ -24,7 +24,7 @@ public class CurveAdapter implements AlgorithmAdapter {
   private CurveVisualizer curveVisualizer;
   
   /**
-   * Constructor, following the {@link Parameterizable} style.
+   * Constructor, following the {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable} style.
    */
   public CurveAdapter() {
     super();
