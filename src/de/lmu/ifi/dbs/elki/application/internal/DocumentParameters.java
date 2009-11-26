@@ -21,9 +21,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.properties.IterateKnownImplementations;
 import de.lmu.ifi.dbs.elki.utilities.HashMapList;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
+import de.lmu.ifi.dbs.elki.utilities.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
@@ -468,7 +468,7 @@ public class DocumentParameters {
   }
 
   private static void appendKnownImplementationsIfNonempty(Document htmldoc, ClassParameter<?> opt, Element elemdd) {
-    IterateKnownImplementations iter = opt.getKnownImplementations();
+    IterableIterator<Class<?>> iter = opt.getKnownImplementations();
     if(iter.hasNext()) {
       String prefix = opt.getRestrictionClass().getPackage().getName() + ".";
       Element p = htmldoc.createElement(HTMLUtil.HTML_P_TAG);
