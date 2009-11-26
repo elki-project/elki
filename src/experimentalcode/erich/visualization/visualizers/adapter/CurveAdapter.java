@@ -3,17 +3,30 @@ package experimentalcode.erich.visualization.visualizers.adapter;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.adapter.AlgorithmAdapter;
 import experimentalcode.erich.visualization.visualizers.CurveVisualizer;
 
+/**
+ * Adapter that will look for visualizable 2D curves and create visualizations for them.
+ * 
+ * @author Erich Schubert
+ */
 public class CurveAdapter implements AlgorithmAdapter {
+  /**
+   * The primary visualizer
+   */
   private CurveVisualizer curveVisualizer;
   
+  /**
+   * Constructor, following the {@link Parameterizable} style.
+   */
   public CurveAdapter() {
     super();
     curveVisualizer = new CurveVisualizer();
@@ -21,12 +34,13 @@ public class CurveAdapter implements AlgorithmAdapter {
 
   @Override
   public boolean canVisualize(Result result) {
-    IterableResult<Pair<Double, Double>> curve = CurveVisualizer.findCurveResult(result);
-    return (curve != null);
+    Collection<IterableResult<Pair<Double, Double>>> curves = CurveVisualizer.findCurveResult(result);
+    return (curves.size() > 0);
   }
 
   @Override
   public Collection<Visualizer> getProvidedVisualizers() {
+    // FIXME: parameter handling is not very nice here.
     ArrayList<Visualizer> providedVisualizers = new ArrayList<Visualizer>(1);
     providedVisualizers.add(curveVisualizer);
     return providedVisualizers;
@@ -34,11 +48,20 @@ public class CurveAdapter implements AlgorithmAdapter {
 
   @Override
   public Collection<Visualizer> getUsableVisualizers(VisualizerContext context) {
-    ArrayList<Visualizer> usableVisualizers = new ArrayList<Visualizer>(1);
-    IterableResult<Pair<Double, Double>> curve = CurveVisualizer.findCurveResult(context.getResult());
-    curveVisualizer.init(context);
-    if(curve != null) {
-      usableVisualizers.add(curveVisualizer);
+    Collection<IterableResult<Pair<Double, Double>>> curves = CurveVisualizer.findCurveResult(context.getResult());
+    ArrayList<Visualizer> usableVisualizers = new ArrayList<Visualizer>(curves.size());
+    ArrayList<String> params = curveVisualizer.getParameters();
+    for (IterableResult<Pair<Double, Double>> curve : curves) {
+      CurveVisualizer curveVis = new CurveVisualizer();
+      // setup parameters.
+      try {
+        curveVis.setParameters(params);
+      }
+      catch(ParameterException e) {
+        LoggingUtil.exception("Error setting parameters for curve visualizers.", e);
+      }
+      curveVis.init(context, curve);
+      usableVisualizers.add(curveVis);
     }
     return usableVisualizers;
   }
