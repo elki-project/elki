@@ -38,6 +38,23 @@ public class InspectionUtil {
   };
 
   /**
+   * If we have a non-static classpath, we do more extensive scanning for user extensions.
+   */
+  public static final boolean NONSTATIC_CLASSPATH;
+  
+  // Check for non-jar entries in classpath.
+  static {
+    String[] classpath = System.getProperty("java.class.path").split(System.getProperty("path.separator"));
+    boolean hasnonstatic = false;
+    for (String path : classpath) {
+      if(!path.endsWith(".jar")) {
+        hasnonstatic = true;
+      }
+    }
+    NONSTATIC_CLASSPATH = hasnonstatic;
+  }
+
+  /**
    * Find all implementations of a given class in the classpath.
    * 
    * Note: returned classes may be abstract.
@@ -210,6 +227,7 @@ public class InspectionUtil {
         File f = set.pop();
         // recurse into directories
         if(f.isDirectory()) {
+          // TODO: do not recurse into ignored packages!.
           for(File newf : f.listFiles()) {
             set.push(newf);
           }

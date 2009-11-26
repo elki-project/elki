@@ -1,10 +1,12 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 
-
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.properties.IterateKnownImplementations;
 import de.lmu.ifi.dbs.elki.properties.Properties;
 import de.lmu.ifi.dbs.elki.properties.PropertyName;
+import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
+import de.lmu.ifi.dbs.elki.utilities.IterableIterator;
+import de.lmu.ifi.dbs.elki.utilities.IterableIteratorAdapter;
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 
 /**
@@ -23,6 +25,7 @@ public class ClassParameter<C> extends Parameter<String, String> {
    * The restriction class for this class parameter.
    */
   private Class<C> restrictionClass;
+
   /**
    * Non-breaking unicode space character.
    */
@@ -236,16 +239,20 @@ public class ClassParameter<C> extends Parameter<String, String> {
   public String getValuesDescription() {
     return restrictionString(getRestrictionClass());
   }
-  
+
   /**
    * Get an iterator over all known implementations of the class restriction.
    * 
-   * @return {@link java.lang.Iterable Iterable} and {@link java.util.Iterator Iterator} object
+   * @return {@link java.lang.Iterable Iterable} and {@link java.util.Iterator
+   *         Iterator} object
    */
-  public IterateKnownImplementations getKnownImplementations() {
+  public IterableIterator<Class<?>> getKnownImplementations() {
+    if(InspectionUtil.NONSTATIC_CLASSPATH) {
+      return new IterableIteratorAdapter<Class<?>>(InspectionUtil.findAllImplementations(getRestrictionClass(), false));
+    }
     return new IterateKnownImplementations(getRestrictionClass());
   }
-  
+
   /**
    * Provides a description string listing all classes for the given superclass
    * or interface as specified in the properties.
@@ -265,12 +272,12 @@ public class ClassParameter<C> extends Parameter<String, String> {
     }
     info.append(superclass.getName());
     info.append(FormatUtil.NEWLINE);
-    
-    IterateKnownImplementations known = getKnownImplementations();
-    if (known.hasNext()) {
+
+    IterableIterator<Class<?>> known = getKnownImplementations();
+    if(known.hasNext()) {
       info.append("Known classes (default package " + prefix + "):");
       info.append(FormatUtil.NEWLINE);
-      for (Class<?> c : known) {
+      for(Class<?> c : known) {
         info.append("->" + NONBREAKING_SPACE);
         String name = c.getName();
         if(name.startsWith(prefix)) {
