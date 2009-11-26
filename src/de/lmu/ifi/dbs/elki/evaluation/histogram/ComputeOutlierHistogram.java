@@ -1,4 +1,4 @@
-package experimentalcode.erich.histogram;
+package de.lmu.ifi.dbs.elki.evaluation.histogram;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
  * The parameter {@code -hist.positive} specifies the class label of "positive"
  * hits.
  * 
- * @author Lisa
+ * @author Lisa Reichert
  * @author Erich Schubert
  * 
  * @param <O> Database object type
