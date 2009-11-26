@@ -19,16 +19,15 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.CurveVisualizer;
  */
 public class CurveAdapter implements AlgorithmAdapter {
   /**
-   * The primary visualizer
+   * Prototype for parameterization
    */
-  private CurveVisualizer curveVisualizer;
+  private CurveVisualizer curveVisualizer = new CurveVisualizer();
   
   /**
    * Constructor, following the {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable} style.
    */
   public CurveAdapter() {
     super();
-    curveVisualizer = new CurveVisualizer();
   }
 
   @Override
