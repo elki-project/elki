@@ -1,0 +1,146 @@
+package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
+
+import org.apache.batik.util.SVGConstants;
+import org.w3c.dom.Element;
+
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.math.MinMax;
+import de.lmu.ifi.dbs.elki.result.HistogramResult;
+import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
+import de.lmu.ifi.dbs.elki.visualization.css.linestyles.LineStyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.UnprojectedVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
+
+/**
+ * Visualizer to draw histograms.
+ * 
+ * TODO: dashed lines aren't sensible on screen.
+ * 
+ * @author Erich Schubert
+ */
+public class HistogramVisualizer extends AbstractVisualizer implements UnprojectedVisualizer {
+  /**
+   * Histogram visualizer name
+   */
+  private static final String NAME = "Histogram";
+  
+  /**
+   * CSS class name for the series.
+   */
+  private static final String SERIESID = "series";
+
+  /**
+   * The histogram result to visualize
+   */
+  private HistogramResult<? extends NumberVector<?,?>> curve;
+  
+  // TODO: re-add "-histogram.ymax" option.
+
+  /**
+   * Constructor, Parameterizable style - does nothing.
+   */
+  public HistogramVisualizer() {
+    super();
+  }
+
+  /**
+   * Initialization.
+   * 
+   * @param context context.
+   */
+  public void init(VisualizerContext context, HistogramResult<? extends NumberVector<?,?>> curve) {
+    super.init(NAME, context);
+    this.curve = curve;
+  }
+
+  @Override
+  public Element visualize(SVGPlot svgp) {
+    final double ratio = 1.0;
+    
+    // find maximum, determine step size
+    Integer dim = null;
+    MinMax<Double> xminmax = new MinMax<Double>();
+    MinMax<Double> yminmax = new MinMax<Double>();
+    for(NumberVector<?,?> vec : curve) {
+      xminmax.put(vec.getValue(1).doubleValue());
+      if(dim == null) {
+        dim = vec.getDimensionality();
+      }
+      else {
+        // TODO: test and throw always
+        assert (dim == vec.getDimensionality());
+      }
+      for(int i = 1; i < dim; i++) {
+        yminmax.put(vec.getValue(i + 1).doubleValue());
+      }
+    }
+    // Minimum should always start at 0 for histograms
+    yminmax.put(0.0);
+    // remove one dimension which are the x values.
+    dim = dim - 1;
+
+    int size = curve.size();
+    double range = xminmax.getMax() - xminmax.getMin();
+    double binwidth = range / (size - 1);
+
+    LinearScale xscale = new LinearScale(xminmax.getMin() - binwidth / 2, xminmax.getMax() + binwidth / 2);
+    LinearScale yscale = new LinearScale(yminmax.getMin(), yminmax.getMax());
+
+    SVGPath[] path = new SVGPath[dim];
+    for(int i = 0; i < dim; i++) {
+      path[i] = new SVGPath(ratio * xscale.getScaled(xminmax.getMin() - binwidth / 2), 1);
+    }
+
+    // draw curves.
+    for(NumberVector<?,?> vec : curve) {
+      for(int d = 0; d < dim; d++) {
+        path[d].lineTo(ratio * (xscale.getScaled(vec.getValue(1).doubleValue() - binwidth / 2)), 1 - yscale.getScaled(vec.getValue(d + 2).doubleValue()));
+        path[d].lineTo(ratio * (xscale.getScaled(vec.getValue(1).doubleValue() + binwidth / 2)), 1 - yscale.getScaled(vec.getValue(d + 2).doubleValue()));
+      }
+    }
+
+    // close all histograms
+    for(int i = 0; i < dim; i++) {
+      path[i].lineTo(ratio * xscale.getScaled(xminmax.getMax() + binwidth / 2), 1);
+    }
+
+    Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
+    // add axes
+    try {
+      SVGSimpleLinearAxis.drawAxis(svgp, layer, xscale, 0, 1, 1, 1, true, true);
+      SVGSimpleLinearAxis.drawAxis(svgp, layer, yscale, 0, 1, 0, 0, true, false);
+    }
+    catch(CSSNamingConflict e) {
+      logger.exception(e);
+    }
+    // Setup line styles and insert lines.
+    LineStyleLibrary ls = context.getLineStyleLibrary();
+    for(int d = 0; d < dim; d++) {
+      CSSClass csscls = new CSSClass(this, SERIESID + "_" + d);
+      csscls.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, SVGConstants.SVG_NONE_VALUE);
+      ls.formatCSSClass(csscls, d, 0.002);
+      try {
+        svgp.getCSSClassManager().addClass(csscls);
+      }
+      catch(CSSNamingConflict e) {
+        logger.exception(e);
+      }
+
+      Element line = path[d].makeElement(svgp);
+      line.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, csscls.getName());
+      layer.appendChild(line);
+    }
+
+    // add a small margin for the axis labels
+    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "scale(0.9) translate(0.08 0.02)");
+
+    return layer;
+  }
+}
