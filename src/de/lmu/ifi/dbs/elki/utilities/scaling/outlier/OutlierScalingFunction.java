@@ -1,9 +1,10 @@
-package de.lmu.ifi.dbs.elki.utilities.scaling;
+package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
 
 /**
  * Interface for scaling functions used by Outlier evaluation such as Histograms

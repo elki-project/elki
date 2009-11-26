@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.utilities.scaling;
+package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
