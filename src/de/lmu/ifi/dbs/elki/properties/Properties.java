@@ -16,8 +16,11 @@ import de.lmu.ifi.dbs.elki.utilities.FileUtil;
  * @author Arthur Zimek
  */
 public final class Properties {
+  /**
+   * Out logger
+   */
   private static Logging logger = Logging.getLogger(Properties.class);
-
+  
   /**
    * The pattern to split for separate entries in a property string, which is a
    * &quot;,&quot;.
