@@ -6,6 +6,7 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d.Projection1DHistogramVisualizer;
@@ -13,6 +14,13 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.AxisVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.ClusteringVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.DataDotVisualizer;
 
+/**
+ * 
+ * @author Erich Schubert
+ *
+ * @param <NV>
+ */
+// FIXME: Comment
 public class DefaultAdapter<NV extends NumberVector<NV, ?>> implements AlgorithmAdapter {
 
   private DataDotVisualizer<NV> dataDotVisualizer;
@@ -55,7 +63,7 @@ public class DefaultAdapter<NV extends NumberVector<NV, ?>> implements Algorithm
     histoVisualizer.init(context);
     
     usableVisualizers.add(axisVisualizer);
-    if (ResultUtil.getClusteringResults(context.getResult()).size() > 0) {
+    if (ResultUtil.filterResults(context.getResult(), OutlierResult.class).size() <= 0) {
       usableVisualizers.add(clusteringVisualizer);
     } else {
       usableVisualizers.add(dataDotVisualizer);
