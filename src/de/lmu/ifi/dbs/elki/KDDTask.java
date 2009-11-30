@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromDatabase;
+import de.lmu.ifi.dbs.elki.result.IDResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
@@ -190,11 +191,9 @@ public class KDDTask<O extends DatabaseObject> extends AbstractApplication {
     // TODO: get them via databaseConnection!
     // adding them here will make the output writer think
     // that they were an part of the actual result.
-    AnnotationFromDatabase<String, O> ar1 = new AnnotationFromDatabase<String, O>(db, AssociationID.LABEL);
-    AnnotationFromDatabase<ClassLabel, O> ar2 = new AnnotationFromDatabase<ClassLabel, O>(db, AssociationID.CLASS);
-
-    result.prependResult(ar1);
-    result.prependResult(ar2);
+    result.prependResult(new AnnotationFromDatabase<String, O>(db, AssociationID.LABEL));
+    result.prependResult(new AnnotationFromDatabase<ClassLabel, O>(db, AssociationID.CLASS));
+    result.prependResult(new IDResult());
 
     List<AttributeSettings> settings = getAttributeSettings();
     ResultUtil.setGlobalAssociation(result, AssociationID.META_SETTINGS, settings);
