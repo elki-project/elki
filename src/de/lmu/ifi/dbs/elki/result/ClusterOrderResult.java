@@ -20,7 +20,7 @@ public class ClusterOrderResult<D extends Distance<D>> extends MultiResult imple
   /**
    * Association ID for reachability distance.
    */
-  public static final AssociationID<Distance<?>> REACHABILITY_ID = AssociationID.getOrCreateAssociationIDGenerics("reachability", Distance.class);
+  public static final AssociationID<? extends Distance<?>> REACHABILITY_ID = AssociationID.getOrCreateAssociationIDGenerics("reachability", Distance.class);
 
   /**
    * Predecessor ID for reachability distance.
