@@ -225,7 +225,11 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
 
     Collection<DoubleVector> binstat = new ArrayList<DoubleVector>(numbin);
     for(Pair<Double, Pair<Long, Long>> ppair : histogram) {
-      DoubleVector row = new DoubleVector(new double[] { ppair.getFirst(), ((double) ppair.getSecond().getFirst()) / inum / histogram.getBinsize(), ((double) ppair.getSecond().getFirst()) / bnum / histogram.getBinsize(), ((double) ppair.getSecond().getSecond()) / onum / histogram.getBinsize(), ((double) ppair.getSecond().getSecond()) / bnum / histogram.getBinsize() });
+      final double icof = (inum == 0) ? 0 : ((double) ppair.getSecond().getFirst()) / inum / histogram.getBinsize();
+      final double icaf = ((double) ppair.getSecond().getFirst()) / bnum / histogram.getBinsize();
+      final double ocof = (onum == 0) ? 0 : ((double) ppair.getSecond().getSecond()) / onum / histogram.getBinsize();
+      final double ocaf = ((double) ppair.getSecond().getSecond()) / bnum / histogram.getBinsize();
+      DoubleVector row = new DoubleVector(new double[] { ppair.getFirst(), icof, icaf, ocof, ocaf });
       binstat.add(row);
     }
     result = new HistogramResult<DoubleVector>(binstat);
