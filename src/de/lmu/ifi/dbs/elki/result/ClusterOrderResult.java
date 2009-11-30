@@ -6,22 +6,32 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.Distance;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Class to store the result of an ordering clustering algorithm such as OPTICS.
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <D> distance type.
  */
-// TODO: Annotations!
-public class ClusterOrderResult<D extends Distance<D>> implements OrderingResult, Iterable<ClusterOrderEntry<D>> {
+public class ClusterOrderResult<D extends Distance<D>> extends MultiResult implements Iterable<ClusterOrderEntry<D>> {
+  /**
+   * Association ID for reachability distance.
+   */
+  public static final AssociationID<Distance<?>> REACHABILITY_ID = AssociationID.getOrCreateAssociationIDGenerics("reachability", Distance.class);
+
+  /**
+   * Predecessor ID for reachability distance.
+   */
+  public static final AssociationID<Integer> PREDECESSOR_ID = AssociationID.getOrCreateAssociationID("predecessor", Integer.class);
+
   /**
    * Cluster order storage
    */
   private ArrayList<ClusterOrderEntry<D>> clusterOrder;
+
   /**
    * Map of object IDs to their cluster order entry
    */
@@ -34,8 +44,12 @@ public class ClusterOrderResult<D extends Distance<D>> implements OrderingResult
     super();
     clusterOrder = new ArrayList<ClusterOrderEntry<D>>();
     map = new HashMap<Integer, ClusterOrderEntry<D>>();
+    
+    addResult(new ClusterOrderAdapter(clusterOrder));
+    addResult(new ReachabilityDistanceAdapter(map));
+    addResult(new PredecessorAdapter(map));
   }
-  
+
   /**
    * Retrieve the complete cluster order.
    * 
@@ -75,37 +89,123 @@ public class ClusterOrderResult<D extends Distance<D>> implements OrderingResult
   }
 
   /**
-   * Use the cluster order to sort the given collection ids.
+   * Ordering part of the result.
    * 
-   * Implementation of the {@link OrderingResult} interface.
+   * @author Erich Schubert
    */
-  @Override
-  public Iterator<Integer> iter(Collection<Integer> ids) {
-    ArrayList<Integer> res = new ArrayList<Integer>(ids.size());
-    for (ClusterOrderEntry<D> e : clusterOrder)
-      if (ids.contains(e.getID()))
-        res.add(e.getID());
+  class ClusterOrderAdapter implements OrderingResult {
+    /**
+     * Access reference.
+     */
+    private ArrayList<ClusterOrderEntry<D>> clusterOrder;
+
+    /**
+     * Constructor.
+     * 
+     * @param clusterOrder order to return
+     */
+    public ClusterOrderAdapter(final ArrayList<ClusterOrderEntry<D>> clusterOrder) {
+      super();
+      this.clusterOrder = clusterOrder;
+    }
+
+    /**
+     * Use the cluster order to sort the given collection ids.
+     * 
+     * Implementation of the {@link OrderingResult} interface.
+     */
+    @Override
+    public Iterator<Integer> iter(Collection<Integer> ids) {
+      ArrayList<Integer> res = new ArrayList<Integer>(ids.size());
+      for(ClusterOrderEntry<D> e : clusterOrder) {
+        if(ids.contains(e.getID())) {
+          res.add(e.getID());
+        }
+      }
+
+      // TODO: elements in ids that are not in clusterOrder are lost!
+      return res.iterator();
+    }
+
+    @Override
+    public String getName() {
+      return "clusterorder";
+    }
+  }
+  
+  /**
+   * Result containing the reachability distances.
+   * 
+   * @author Erich Schubert
+   */
+  class ReachabilityDistanceAdapter implements AnnotationResult<D> {
+    /**
+     * Access reference.
+     */
+    private HashMap<Integer, ClusterOrderEntry<D>> map;
     
-    // TODO: elements in ids that are not in clusterOrder are lost!
-    return res.iterator();
+    /**
+     * Constructor.
+     * 
+     * @param map Map that stores the results.
+     */
+    public ReachabilityDistanceAdapter(HashMap<Integer, ClusterOrderEntry<D>> map) {
+      super();
+      this.map = map;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public AssociationID<D> getAssociationID() {
+      return (AssociationID<D>) REACHABILITY_ID;
+    }
+
+    @Override
+    public D getValueFor(Integer objID) {
+      return map.get(objID).getReachability();
+    }
+
+    @Override
+    public String getName() {
+      return "Reachability";
+    }
   }
 
   /**
-   * Retrieve annotations for the cluster order.
+   * Result containing the predecessor ID.
    * 
-   * Implementation of the {@link AnnotationResult} interface.
-   * @param objID Object ID
-   * @return Annotations for this object
+   * @author Erich Schubert
    */
-  //@Override
-  // TODO: re-add functionality!
-  public Pair<String, Object>[] getAnnotations(Integer objID) {
-    Pair<String, Object>[] anns = Pair.newArray(3);
-    // TODO: do we really need to include the ID here?
-    anns[0] = new Pair<String, Object>("ID", objID);
-    anns[1] = new Pair<String, Object>("REACHABILITY", map.get(objID).getReachability());
-    anns[2] = new Pair<String, Object>("PREDECESSOR", map.get(objID).getPredecessorID());
-    return anns;
+  class PredecessorAdapter implements AnnotationResult<Integer> {
+    /**
+     * Access reference.
+     */
+    private HashMap<Integer, ClusterOrderEntry<D>> map;
+    
+    /**
+     * Constructor.
+     * 
+     * @param map Map that stores the results.
+     */
+    public PredecessorAdapter(HashMap<Integer, ClusterOrderEntry<D>> map) {
+      super();
+      this.map = map;
+    }
+
+    @Override
+    public AssociationID<Integer> getAssociationID() {
+      return PREDECESSOR_ID;
+    }
+
+    @Override
+    public Integer getValueFor(Integer objID) {
+      return map.get(objID).getPredecessorID();
+    }
+
+    @Override
+    public String getName() {
+      return "Predecessor";
+    }
   }
 
   @Override
