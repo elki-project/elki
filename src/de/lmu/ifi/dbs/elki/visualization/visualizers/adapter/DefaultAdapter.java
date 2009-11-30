@@ -13,30 +13,51 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d.Projection1DHistogram
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.AxisVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.ClusteringVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.DataDotVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.KeyVisualizer;
 
 /**
+ * Class to add various default visualizations.
  * 
  * @author Erich Schubert
  *
  * @param <NV>
  */
-// FIXME: Comment
 public class DefaultAdapter<NV extends NumberVector<NV, ?>> implements AlgorithmAdapter {
-
+  /**
+   * Visualizer to do data dots (e.g. for outlier visualization)
+   */
   private DataDotVisualizer<NV> dataDotVisualizer;
 
+  /**
+   * Visualizer for clusterings (unless doing outliers ...)
+   */
   private ClusteringVisualizer<NV> clusteringVisualizer;
 
+  /**
+   * Visualizer to show the clustering key.
+   */
+  private KeyVisualizer keyVisualizer;
+
+  /**
+   * Visualizer to draw the axes on 2D projections
+   */
   private AxisVisualizer<NV> axisVisualizer;
 
+  /**
+   * Visualizer to draw 1D distribution histograms
+   */
   private Projection1DHistogramVisualizer<NV> histoVisualizer;
 
+  /**
+   * Constructor, Parameterizable style.
+   */
   public DefaultAdapter() {
     super();
     dataDotVisualizer = new DataDotVisualizer<NV>();
     clusteringVisualizer = new ClusteringVisualizer<NV>();
     axisVisualizer = new AxisVisualizer<NV>();
     histoVisualizer = new Projection1DHistogramVisualizer<NV>();
+    keyVisualizer = new KeyVisualizer();
   }
 
   @Override
@@ -51,20 +72,23 @@ public class DefaultAdapter<NV extends NumberVector<NV, ?>> implements Algorithm
     providedVisualizers.add(clusteringVisualizer);
     providedVisualizers.add(axisVisualizer);
     providedVisualizers.add(histoVisualizer);
+    providedVisualizers.add(keyVisualizer);
     return providedVisualizers;
   }
 
   @Override
   public Collection<Visualizer> getUsableVisualizers(VisualizerContext context) {
-    ArrayList<Visualizer> usableVisualizers = new ArrayList<Visualizer>(3);
+    ArrayList<Visualizer> usableVisualizers = new ArrayList<Visualizer>(4);
     axisVisualizer.init(context);
     dataDotVisualizer.init(context);
     clusteringVisualizer.init(context);
     histoVisualizer.init(context);
+    keyVisualizer.init(context);
     
     usableVisualizers.add(axisVisualizer);
     if (ResultUtil.filterResults(context.getResult(), OutlierResult.class).size() <= 0) {
       usableVisualizers.add(clusteringVisualizer);
+      usableVisualizers.add(keyVisualizer);
     } else {
       usableVisualizers.add(dataDotVisualizer);
     }
