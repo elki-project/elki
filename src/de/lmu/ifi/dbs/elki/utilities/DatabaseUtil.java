@@ -412,13 +412,13 @@ public final class DatabaseUtil {
     double[] mins = new double[dim];
     double[] maxs = new double[dim];
     for (int i = 0; i < dim; i++) {
-      mins[i] = -Double.MAX_VALUE;
-      maxs[i] = Double.MAX_VALUE;
+      mins[i] = Double.MAX_VALUE;
+      maxs[i] = -Double.MAX_VALUE;
     }
     for(Integer it : database) {
       NV o = database.get(it);
-      for(int d = 1; d <= dim; d++) {
-        double v = o.getValue(d).doubleValue();
+      for(int d = 0; d < dim; d++) {
+        double v = o.getValue(d + 1).doubleValue();
         mins[d] = Math.min(mins[d],v);
         maxs[d] = Math.max(maxs[d],v);
       }
