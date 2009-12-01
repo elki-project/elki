@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.utilities;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Iterator;
@@ -16,6 +15,7 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Class with Database-related utility functions such as centroid computation,
@@ -405,26 +405,28 @@ public final class DatabaseUtil {
    * stored in the given database.
    * 
    * @param database the database storing the objects
-   * @return an array consisting of an array of the minimum and an array of the
-   *         maximum values in each dimension of all objects stored in the given
-   *         database
+   * @return Minimum and Maximum vector for the hyperrectangle
    */
-  public static double[][] min_max(Database<NumberVector<?,?>> database) {
+  public static <NV extends NumberVector<NV,?>> Pair<NV, NV> computeMinMax(Database<NV> database) {
     int dim = database.dimensionality();
-    double[] min = new double[dim];
-    double[] max = new double[dim];
-    Arrays.fill(min, Double.MAX_VALUE);
-    Arrays.fill(max, -Double.MAX_VALUE);
-
-    for(Iterator<Integer> it = database.iterator(); it.hasNext();) {
-      NumberVector<?,?> o = database.get(it.next());
+    double[] mins = new double[dim];
+    double[] maxs = new double[dim];
+    for (int i = 0; i < dim; i++) {
+      mins[i] = -Double.MAX_VALUE;
+      maxs[i] = Double.MAX_VALUE;
+    }
+    for(Integer it : database) {
+      NV o = database.get(it);
       for(int d = 1; d <= dim; d++) {
         double v = o.getValue(d).doubleValue();
-        min[d] = Math.min(min[d], v);
-        max[d] = Math.min(max[d], v);
+        mins[d] = Math.min(mins[d],v);
+        maxs[d] = Math.max(maxs[d],v);
       }
     }
-    return new double[][] { min, max };
+    NV prototype = database.get(database.iterator().next());
+    NV min = prototype.newInstance(mins);
+    NV max = prototype.newInstance(maxs);
+    return new Pair<NV,NV>(min, max);
   }
 
   /**
