@@ -88,7 +88,7 @@ public class Pair<FIRST, SECOND> {
    * @param size array size
    * @return empty array of the new type.
    */
-  public static final <F, S> Pair<F, S>[] newArray(int size) {
+  public static final <F, S> Pair<F, S>[] newPairArray(int size) {
     Class<Pair<F,S>> paircls = ClassGenericsUtil.uglyCastIntoSubclass(Pair.class);
     return ClassGenericsUtil.newArrayOfNull(size, paircls);
   }
