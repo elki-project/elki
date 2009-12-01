@@ -43,16 +43,20 @@ abstract class VisualizationInfo {
    * accessed again via {@link #getThumbnailIfGenerated()}.
    * 
    * @param t Thumbnailer to use
+   * @param width Thumbnail width
    * @return File reference of new thumbnail
    */
-  File makeThumbnail(Thumbnailer t) {
+  File makeThumbnail(Thumbnailer t, int width) {
+    double ratio = 1.0;
     SVGPlot plot = new SVGPlot();
-    plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 1 1");
+    plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 "+ratio+" 1");
     Element e = build(plot);
     plot.getRoot().appendChild(e);
     plot.updateStyleElement();
+    int wi = width;
+    int he = (int)(width / ratio);
     synchronized(t) {
-      thumbnail = t.thumbnail(plot, 512);
+      thumbnail = t.thumbnail(plot, wi, he);
     }
     return thumbnail;
   }
