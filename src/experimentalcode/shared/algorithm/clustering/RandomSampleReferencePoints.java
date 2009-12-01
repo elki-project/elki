@@ -13,6 +13,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 
+/**
+ * Random-Sampling strategy for picking reference points.
+ * 
+ * @author Erich Schubert
+ *
+ * @param <O>
+ */
 public class RandomSampleReferencePoints<O extends NumberVector<O, ?>> extends AbstractParameterizable implements ReferencePointsHeuristic<O> {
   /**
    * OptionID for {@link #N_PARAM}
@@ -85,12 +92,10 @@ public class RandomSampleReferencePoints<O extends NumberVector<O, ?>> extends A
           j = (int)(Math.random() * dbsize);
         }
         selected.add(j);
-        logger.debug("Adding element: "+j);
         result.add(db.get(j));
       }
     }
     assert(result.size() == samplesize);
-    logger.debug("Sample size: "+samplesize);
     return result;
   }
 

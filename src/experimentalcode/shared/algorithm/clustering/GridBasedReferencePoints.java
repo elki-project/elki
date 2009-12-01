@@ -15,6 +15,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
+/**
+ * Grid-based strategy to pick reference points.
+ * 
+ * @author Erich Schubert
+ *
+ * @param <O> Object type
+ */
+// TODO: allow picking cell centers as refpoints, not only cell corners.
+// TODO: allow deliberately moving reference points outside of the data space.
 public class GridBasedReferencePoints<O extends NumberVector<O,?>> extends AbstractParameterizable implements ReferencePointsHeuristic<O> {
   /**
    * OptionID for {@link #GRID_PARAM}
@@ -27,13 +36,16 @@ public class GridBasedReferencePoints<O extends NumberVector<O,?>> extends Abstr
    * Key: {@code -grid.steps}
    * </p>
    */
-  private final IntParameter GRID_PARAM = new IntParameter(GRID_ID, new GreaterConstraint(1), 2);
+  private final IntParameter GRID_PARAM = new IntParameter(GRID_ID, new GreaterConstraint(0), 2);
 
   /**
    * Holds the value of {@link #GRID_PARAM}.
    */
   private int gridres;
   
+  /**
+   * Constructor, Parameterizable style.
+   */
   public GridBasedReferencePoints() {
     super();
     addOption(GRID_PARAM);
@@ -50,8 +62,9 @@ public class GridBasedReferencePoints<O extends NumberVector<O,?>> extends Abstr
     
     ArrayList<O> result = new ArrayList<O>(gridpoints);
     double[] delta = new double[dim];
+    int div = (gridres > 1) ? (gridres - 1) : 1;
     for (int d = 0; d < dim; d++) {
-      delta[d] = (minmax.second.getValue(d+1).doubleValue() - minmax.first.getValue(d+1).doubleValue()) / (gridres - 1);
+      delta[d] = (minmax.second.getValue(d+1).doubleValue() - minmax.first.getValue(d+1).doubleValue()) / div;
     }
     
     double[] vec = new double[dim];
