@@ -14,7 +14,11 @@ import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
  * 
  * @author Elke Achtert
  */
+// TODO: shouldn't this be generalized to Number?
 public class HyperBoundingBox implements Externalizable {
+  /**
+   * Serial version
+   */
   private static final long serialVersionUID = 1;
 
   /**
