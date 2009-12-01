@@ -1,7 +1,9 @@
 package de.lmu.ifi.dbs.elki.visualization.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collection;
@@ -112,8 +114,15 @@ public class ResultWindow extends JFrame {
     this.getContentPane().add(panel);
 
     this.setSize(600, 600);
+    // Maximize.
+    this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 
     this.overview = new OverviewPlot<DoubleVector>(db, result);
+    
+    Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+
+    this.overview.screenwidth = dim.width;
+    this.overview.screenheight = dim.height;
   }
 
   /**

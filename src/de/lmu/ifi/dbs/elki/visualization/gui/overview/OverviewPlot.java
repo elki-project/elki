@@ -97,6 +97,16 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
    * Current thumbnail thread.
    */
   private ThumbnailThread thumbnails = null;
+  
+  /**
+   * Screen size (used for thumbnail sizing)
+   */
+  public int screenwidth = 1000;
+
+  /**
+   * Screen size (used for thumbnail sizing)
+   */
+  public int screenheight = 1000;
 
   /**
    * Refresh the overview plot.
@@ -195,12 +205,10 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
     }
     thumbnails = new ThumbnailThread();
     // Recalculate bounding box.
-    final double plotw = plotmap.minmaxx.getMax() - plotmap.minmaxx.getMin();
-    final double ploth = plotmap.minmaxy.getMax() - plotmap.minmaxy.getMin();
-    String vb = plotmap.minmaxx.getMin() + " " + plotmap.minmaxy.getMin() + " " + plotw + " " + ploth;
+    String vb = plotmap.minmaxx.getMin() + " " + plotmap.minmaxy.getMin() + " " + plotmap.getWidth() + " " + plotmap.getHeight();
     // Reset root bounding box.
     SVGUtil.setAtt(getRoot(), SVGConstants.SVG_WIDTH_ATTRIBUTE, "20cm");
-    SVGUtil.setAtt(getRoot(), SVGConstants.SVG_HEIGHT_ATTRIBUTE, (20 / plotw * ploth) + "cm");
+    SVGUtil.setAtt(getRoot(), SVGConstants.SVG_HEIGHT_ATTRIBUTE, (20 / plotmap.getWidth() * plotmap.getHeight()) + "cm");
     SVGUtil.setAtt(getRoot(), SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, vb);
 
     // Layers.
@@ -253,7 +261,8 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
    * @param vi Visualization.
    */
   protected void generateThumbnail(final Element g, VisualizationInfo vi) {
-    File thumb = vi.makeThumbnail(t);
+    int thumbwidth = (int) Math.max(screenwidth / plotmap.getWidth(), screenheight / plotmap.getHeight());
+    File thumb = vi.makeThumbnail(t, thumbwidth);
     final Element i = this.svgElement(SVGConstants.SVG_IMAGE_TAG);
     SVGUtil.setAtt(i, SVGConstants.SVG_X_ATTRIBUTE, 0);
     SVGUtil.setAtt(i, SVGConstants.SVG_Y_ATTRIBUTE, 0);

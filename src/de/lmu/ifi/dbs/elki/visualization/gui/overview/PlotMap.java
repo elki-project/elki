@@ -68,4 +68,22 @@ class PlotMap<NV> extends HashMap<DoubleDoublePair, ArrayList<VisualizationInfo>
   List<VisualizationInfo> get(double x, double y) {
     return this.get(new DoubleDoublePair(x, y));
   }
+
+  /**
+   * Get width in plot units
+   * 
+   * @return width
+   */
+  public double getWidth() {
+    return minmaxx.getMax() - minmaxx.getMin();
+  }
+  
+  /**
+   * Get height in plot units.
+   * 
+   * @return height
+   */
+  public double getHeight() {
+    return minmaxy.getMax() - minmaxy.getMin();
+  }
 }

@@ -44,13 +44,28 @@ public class Thumbnailer {
    * @param plot Plot to use
    * @param thumbnailsize Size of the thumbnail
    * @return File object of the thumbnail, which has deleteOnExit set.
+   * 
+   * @deprecated Use {@link #thumbnail(SVGPlot, int, int)} instead!
    */
+  @Deprecated
   public synchronized File thumbnail(SVGPlot plot, int thumbnailsize) {
+    return thumbnail(plot, thumbnailsize, thumbnailsize);
+  }
+  
+  /**
+   * Generate a thumbnail for a given plot.
+   * 
+   * @param plot Plot to use
+   * @param thumbnailwidth Width of the thumbnail
+   * @param thumbnailheight height of the thumbnail
+   * @return File object of the thumbnail, which has deleteOnExit set.
+   */
+  public synchronized File thumbnail(SVGPlot plot, int thumbwidth, int thumbheight) {
     File temp = null;
     try {
       temp = File.createTempFile(prefix, ".png");
       temp.deleteOnExit();
-      plot.saveAsPNG(temp, thumbnailsize, thumbnailsize);
+      plot.saveAsPNG(temp, thumbwidth, thumbheight);
     }
     catch(TranscoderException e) {
       e.printStackTrace();
