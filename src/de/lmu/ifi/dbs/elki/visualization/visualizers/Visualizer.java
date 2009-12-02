@@ -33,6 +33,16 @@ public interface Visualizer extends Parameterizable {
    * Type: Integer
    */
   public final static String META_LEVEL = "level";
+  
+  /**
+   * Flag to control visibility.
+   */
+  public final static String META_VISIBLE = "visible";
+
+  /**
+   * Flag to signal there is no thumbnail needed.
+   */
+  public final static String META_NOTHUMB = "no-thumbnail";
 
   /**
    * Background layer

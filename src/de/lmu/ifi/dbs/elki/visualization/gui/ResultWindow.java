@@ -1,11 +1,18 @@
 package de.lmu.ifi.dbs.elki.visualization.gui;
 
 import java.awt.BorderLayout;
+import java.awt.CheckboxMenuItem;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.PopupMenu;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.swing.JButton;
@@ -57,6 +64,16 @@ public class ResultWindow extends JFrame {
   private JButton saveButton;
 
   /**
+   * The "Visualizers" button, to enable/disable visualizers
+   */
+  private JButton visualizersButton;
+
+  /**
+   * The Popup menu for Visualizers
+   */
+  private PopupMenu popup;
+
+  /**
    * The SVG canvas.
    */
   private JSVGSynchronizedCanvas svgCanvas;
@@ -65,6 +82,11 @@ public class ResultWindow extends JFrame {
    * The overview plot.
    */
   private OverviewPlot<DoubleVector> overview;
+
+  /**
+   * Visualizers
+   */
+  private ArrayList<Visualizer> visualizers;
 
   /**
    * Constructor.
@@ -99,12 +121,21 @@ public class ResultWindow extends JFrame {
       }
     });
 
+    visualizersButton = new JButton("Visualizers");
+    visualizersButton.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        selectVisualizers(e);
+      }
+    });
+
     // Create a panel and add the button, status label and the SVG canvas.
     final JPanel panel = new JPanel(new BorderLayout());
 
     JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
-    p.add(saveButton);
     p.add(overviewButton);
+    p.add(visualizersButton);
+    p.add(saveButton);
     p.add(quitButton);
 
     panel.add("North", p);
@@ -119,11 +150,37 @@ public class ResultWindow extends JFrame {
     this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 
     this.overview = new OverviewPlot<DoubleVector>(db, result);
-    
-    Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+    // when a subplot is clicked, show the selected subplot.
+    overview.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        if(e instanceof SubplotSelectedEvent) {
+          SubplotSelectedEvent se = (SubplotSelectedEvent) e;
+          showPlot(se.makeSubplot());
+        }
+      }
+    });
 
+    // Prepare popup menu
+    this.popup = new PopupMenu("Visualizers");
+    this.add(popup);
+
+    // handle screen size
+    Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
     this.overview.screenwidth = dim.width;
     this.overview.screenheight = dim.height;
+
+    // Visualizers
+    this.visualizers = new ArrayList<Visualizer>();
+  }
+
+  /**
+   * Visualization popup button triggered.
+   * 
+   * @param event
+   */
+  protected void selectVisualizers(MouseEvent event) {
+    popup.show(event.getComponent(), event.getX(), event.getY());
   }
 
   /**
@@ -171,18 +228,43 @@ public class ResultWindow extends JFrame {
    * @param vs Visualizations
    */
   public void addVisualizations(Collection<Visualizer> vs) {
+    visualizers.addAll(vs);
     overview.addVisualizations(vs);
-    overview.refresh();
-    // when a subplot is clicked, show the selected subplot.
-    overview.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        if(e instanceof SubplotSelectedEvent) {
-          SubplotSelectedEvent se = (SubplotSelectedEvent) e;
-          showPlot(se.makeSubplot());
-        }
+    for(Visualizer v : vs) {
+      if(v.getMetadata().getGenerics(Visualizer.META_VISIBLE, Boolean.class) == null) {
+        v.getMetadata().put(Visualizer.META_VISIBLE, true);
       }
-    });
+    }
+    update();
     showPlot(overview);
+  }
+
+  /**
+   * Refresh the overview
+   */
+  protected void update() {
+    overview.refresh();
+    updatePopupMenu();
+  }
+
+  /**
+   * Update the popup menu.
+   */
+  private void updatePopupMenu() {
+    popup.removeAll();
+    for(final Visualizer v : visualizers) {
+      Boolean enabled = v.getMetadata().getGenerics(Visualizer.META_VISIBLE, Boolean.class);
+      assert(enabled != null);
+      final String name = v.getMetadata().getGenerics(Visualizer.META_NAME, String.class);
+      final CheckboxMenuItem visItem = new CheckboxMenuItem(name, enabled);
+      visItem.addItemListener(new ItemListener() {
+        @Override
+        public void itemStateChanged(@SuppressWarnings("unused") ItemEvent e) {
+          v.getMetadata().put(Visualizer.META_VISIBLE, visItem.getState());
+          update();
+        }
+      });
+      popup.add(visItem);
+    }
   }
 }
