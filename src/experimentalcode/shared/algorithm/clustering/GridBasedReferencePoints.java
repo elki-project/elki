@@ -23,8 +23,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @param <O> Object type
  */
-// TODO: allow picking cell centers as refpoints, not only cell corners.
-// TODO: allow deliberately moving reference points outside of the data space.
 public class GridBasedReferencePoints<O extends NumberVector<O, ?>> extends AbstractParameterizable implements ReferencePointsHeuristic<O> {
   /**
    * OptionID for {@link #GRID_PARAM}
