@@ -261,7 +261,9 @@ public class DBSCAN<O extends DatabaseObject, D extends Distance<D>> extends Dis
       processedIDs.add(startObjectID);
     }
     // Signal that the progress has completed.
-    clusprog.setCompleted();
+    if (clusprog != null) {
+      clusprog.setCompleted();
+    }
   }
 
   public Description getDescription() {
