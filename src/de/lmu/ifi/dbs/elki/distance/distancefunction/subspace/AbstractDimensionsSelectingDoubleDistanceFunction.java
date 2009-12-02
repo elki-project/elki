@@ -22,7 +22,7 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
   /**
    * OptionID for {@link #DIMS_PARAM}
    */
-  public static final OptionID DIMS_ID = OptionID.getOrCreateOptionID("distance.dims", "a comma separated array of integer " + "values, where 1 <= d_i <= the " + "dimensionality of the feature space " + "specifying the dimensions to be considered " + "for distance computation. If this parameter is not set, " + "no dimensions will be considered, i.e. the distance between " + "two objects is always 0.");
+  public static final OptionID DIMS_ID = OptionID.getOrCreateOptionID("distance.dims", "a comma separated array of integer values, where 1 <= d_i <= the dimensionality of the feature space specifying the dimensions to be considered for distance computation. If this parameter is not set, no dimensions will be considered, i.e. the distance between two objects is always 0.");
 
   /**
    * Dimensions parameter.
