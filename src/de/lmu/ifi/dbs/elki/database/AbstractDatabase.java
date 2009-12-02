@@ -121,7 +121,15 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
   }
 
   public final O get(Integer id) {
-    return content.get(id);
+    try {
+      return content.get(id);
+    } catch (RuntimeException e) {
+      if (id == null) {
+        throw new UnsupportedOperationException("AbstractDatabase.get(null) called!");
+      }
+      // throw e upwards.
+      throw e;
+    }
   }
 
   /**
