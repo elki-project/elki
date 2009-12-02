@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -285,6 +286,13 @@ public abstract class AbstractDatabase<O extends DatabaseObject> extends Abstrac
       associate(aID, id, idAssociations.get(aID));
     }
   }
+  
+  public Database<O> partition(List<Integer> ids) throws UnableToComplyException {
+    Map<Integer, List<Integer>> partitions = new HashMap<Integer, List<Integer>>();
+    partitions.put(0, ids);
+    return partition(partitions, null, null).get(0);
+  }
+  
 
   public Map<Integer, Database<O>> partition(Map<Integer, List<Integer>> partitions) throws UnableToComplyException {
     return partition(partitions, null, null);
