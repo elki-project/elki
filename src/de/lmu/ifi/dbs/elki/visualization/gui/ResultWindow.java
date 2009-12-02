@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
  * Swing window to manage a particular result visualization.
  * 
  * @author Erich Schubert
+ * @author Remigius Wojdanowski
  */
 public class ResultWindow extends JFrame {
   /**

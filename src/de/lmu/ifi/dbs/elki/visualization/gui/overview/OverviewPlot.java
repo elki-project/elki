@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualize
  * Generate an overview plot for a set of visualizations.
  * 
  * @author Erich Schubert
+ * @author Remigius Wojdanowski
  */
 public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
   /**

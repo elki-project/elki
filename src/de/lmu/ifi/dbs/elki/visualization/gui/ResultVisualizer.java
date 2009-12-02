@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizersForResult;
  * Handler to process and visualize a Result.
  * 
  * @author Erich Schubert
+ * @author Remigius Wojdanowski
  */
 public class ResultVisualizer extends AbstractParameterizable implements ResultHandler<DatabaseObject, Result> {
   /**
