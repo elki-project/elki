@@ -74,7 +74,7 @@ public class RandomSampleReferencePoints<O extends NumberVector<O, ?>> extends A
     if (samplesize > 5) {
         setsize += 2 << (int)Math.ceil(Math.log(samplesize * 3) / log4);
     }
-    logger.debug("Setsize: "+setsize);
+    //logger.debug("Setsize: "+setsize);
     if (samplesize <= setsize) {
       // use pool approach
       ArrayList<Integer> pool = new ArrayList<Integer>(db.getIDs());
