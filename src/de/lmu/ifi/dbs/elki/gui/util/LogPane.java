@@ -132,6 +132,12 @@ public class LogPane extends JTextPane {
         getStyledDocument().remove(lastNewlinePos, getStyledDocument().getLength() - lastNewlinePos);
       }
       pos++;
+    } else {
+      // insert a newline, if we didn't see one yet.
+      if (lastNewlinePos < getStyledDocument().getLength()) {
+        getStyledDocument().insertString(getStyledDocument().getLength(),"\n",style);
+        lastNewlinePos = getStyledDocument().getLength();
+      }
     }
     int tail = tailingNonNewline(m, pos, m.length() - pos);
     int headlen = m.length() - tail - pos;
