@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.clique;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -16,7 +15,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
  * Represents a unit in the CLIQUE algorithm.
  * 
  * @author Elke Achtert
- * @param <V> the type of NumberVector handled by this Algorithm
+ * @param <V> the type of NumberVector this unit contains
  */
 public class CLIQUEUnit<V extends NumberVector<V,?>> {
   /**
@@ -131,11 +130,11 @@ public class CLIQUEUnit<V extends NumberVector<V,?>> {
   }
 
   /**
-   * Returns a collection of the intervals of which this unit is build.
+   * Returns a sorted set of the intervals of which this unit is build.
    * 
-   * @return a collection of the intervals of which this unit is build
+   * @return a sorted set of the intervals of which this unit is build
    */
-  public Collection<Interval> getIntervals() {
+  public SortedSet<Interval> getIntervals() {
     return intervals;
   }
 
@@ -209,10 +208,10 @@ public class CLIQUEUnit<V extends NumberVector<V,?>> {
    * Joins this unit with the specified unit.
    * 
    * @param other the unit to be joined
-   * @param all the overall number of featuer vectors
+   * @param all the overall number of feature vectors
    * @param tau the density threshold for the selectivity of a unit
    * @return the joined unit if the selectivity of the join result is equal or
-   *         greater than tau, null otwerwise
+   *         greater than tau, null otherwise
    */
   public CLIQUEUnit<V> join(CLIQUEUnit<V> other, double all, double tau) {
     Interval i1 = this.intervals.last();
