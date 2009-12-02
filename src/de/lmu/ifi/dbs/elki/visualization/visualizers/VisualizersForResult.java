@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.adapter.AlgorithmAdapter;
  * Utility class to determine the visualizers for a result class.
  * 
  * @author Erich Schubert
+ * @author Remigius Wojdanowski
  */
 public class VisualizersForResult extends AbstractParameterizable {
   /**

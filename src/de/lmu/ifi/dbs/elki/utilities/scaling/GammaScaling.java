@@ -4,6 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling;
  * Non-linear scaling function using a Gamma curve.
  * 
  * @author Erich Schubert
+ * @author Remigius Wojdanowski
  */
 public class GammaScaling implements StaticScalingFunction {
   /**
