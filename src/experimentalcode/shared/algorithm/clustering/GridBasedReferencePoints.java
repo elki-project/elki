@@ -30,7 +30,7 @@ public class GridBasedReferencePoints<O extends NumberVector<O, ?>> extends Abst
   public static final OptionID GRID_ID = OptionID.getOrCreateOptionID("grid.size", "The number of partitions in each dimension. Points will be placed on the edges of the grid, except for a grid size of 0, where only the mean is generated as reference point.");
 
   /**
-   * Parameter to specify the sample size.
+   * Parameter to specify the grid resolution.
    * <p>
    * Key: {@code -grid.size}
    * </p>
@@ -43,7 +43,7 @@ public class GridBasedReferencePoints<O extends NumberVector<O, ?>> extends Abst
   public static final OptionID GRID_SCALE_ID = OptionID.getOrCreateOptionID("grid.scale", "Scale the grid by the given factor. This can be used to obtain reference points outside the used data space.");
 
   /**
-   * Parameter to specify the sample size.
+   * Parameter to specify the extra scaling of the space, to allow out-of-data-space reference points.
    * <p>
    * Key: {@code -grid.oversize}
    * </p>
