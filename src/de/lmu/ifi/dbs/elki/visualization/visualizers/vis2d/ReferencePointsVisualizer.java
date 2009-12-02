@@ -19,8 +19,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 /**
  * Generates a SVG-Element visualizing reference points.
  * 
- * TODO: This class needs testing.
- * 
  * @author Remigius Wojdanowski
  * 
  * @param <NV> Type of the DatabaseObject being visualized.
