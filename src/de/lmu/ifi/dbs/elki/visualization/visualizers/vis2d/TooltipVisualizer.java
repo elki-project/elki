@@ -62,6 +62,14 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
    * undefined.
    */
   private AnnotationResult<? extends Number> anResult;
+  
+  /**
+   * Constructor.
+   */
+  public TooltipVisualizer() {
+    super();
+    super.metadata.put(Visualizer.META_NOTHUMB, true);
+  }
 
   /**
    * Returns the outlierness-score for a given ID. If there is no corresponding
