@@ -292,13 +292,14 @@ public final class Util {
   public static String parseSelectedBits(BitSet b, String sep) {
     StringBuffer result = new StringBuffer();
     for(int i = b.nextSetBit(0); i >= 0; i = b.nextSetBit(i + 1)) {
-      if(i > 0) {
+      if(result.length() != 0) {
         result.append(sep).append(i + 1);
       }
       else {
         result.append((i + 1));
       }
     }
+    
     return result.toString();
   }
   
