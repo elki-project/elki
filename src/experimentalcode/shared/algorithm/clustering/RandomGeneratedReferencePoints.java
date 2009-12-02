@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -92,7 +91,7 @@ public class RandomGeneratedReferencePoints<O extends NumberVector<O, ?>> extend
         vec[d] = mean[d] + (Math.random() - 0.5) * scale * delta[d];
       }
       O newp = prototype.newInstance(vec);
-      logger.debug("New reference point: " + FormatUtil.format(vec));
+      //logger.debug("New reference point: " + FormatUtil.format(vec));
       result.add(newp);
     }
 

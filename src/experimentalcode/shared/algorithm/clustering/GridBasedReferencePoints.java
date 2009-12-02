@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -100,12 +99,12 @@ public class GridBasedReferencePoints<O extends NumberVector<O, ?>> extends Abst
           vec[d] = mean[d] + (coord - halfgrid) * delta[d] * gridscale;
         }
         O newp = prototype.newInstance(vec);
-        logger.debug("New reference point: " + FormatUtil.format(vec));
+        //logger.debug("New reference point: " + FormatUtil.format(vec));
         result.add(newp);
       }
     } else {
       result.add(prototype.newInstance(mean));
-      logger.debug("New reference point: " + FormatUtil.format(mean));
+      //logger.debug("New reference point: " + FormatUtil.format(mean));
     }
 
     return result;
