@@ -179,10 +179,10 @@ public class CLIQUESubspace<V extends NumberVector<V, ?>> extends Subspace<V> {
    * @param tau the density threshold for the selectivity of a unit
    * @return the join of this subspace with the specified subspace if the join
    *         condition is fulfilled, null otherwise.
-   * @see Subspace#joinDimensions(Subspace)
+   * @see Subspace#joinLastDimensions(Subspace)
    */
   public CLIQUESubspace<V> join(CLIQUESubspace<V> other, double all, double tau) {
-    SortedSet<Integer> dimensions = joinDimensions(other);
+    SortedSet<Integer> dimensions = joinLastDimensions(other);
     if(dimensions == null)
       return null;
 

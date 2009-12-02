@@ -68,10 +68,10 @@ public class Subspace<V extends FeatureVector<V, ?>> implements TextWriteable, M
    * @param other the subspace to join
    * @return the join of this subspace with the specified subspace if the join
    *         condition is fulfilled, null otherwise.
-   * @see Subspace#joinDimensions(Subspace)
+   * @see Subspace#joinLastDimensions(Subspace)
    */
   public Subspace<V> join(Subspace<V> other) {
-    SortedSet<Integer> newDimensions = joinDimensions(other);
+    SortedSet<Integer> newDimensions = joinLastDimensions(other);
     if(newDimensions == null) {
       return null;
     }
@@ -149,7 +149,15 @@ public class Subspace<V extends FeatureVector<V, ?>> implements TextWriteable, M
    * @throws IllegalArgumentException if the dimensionality of the subspaces to
    *         join differs
    */
-  protected SortedSet<Integer> joinDimensions(Subspace<V> other) {
+  protected SortedSet<Integer> joinLastDimensions(Subspace<V> other) {
+//    BitSet dims = new BitSet();
+//    
+//    for (int i = dims.nextSetBit(0); i >= 0; i = dims.nextSetBit(i + 1)) {
+//    }
+//    
+//    dims.
+    
+    
     SortedSet<Integer> otherDimensions = other.dimensions;
 
     if(this.dimensionality() != other.dimensionality()) {
@@ -243,9 +251,9 @@ public class Subspace<V extends FeatureVector<V, ?>> implements TextWriteable, M
       if(s1.getDimensions() != null && s2.getDimensions() == null) {
         return 1;
       }
-
-      int compare = s1.dimensionality() - s2.dimensionality();
-      if(compare != 0) {
+      
+      int compare = s1.dimensionality()-s2.dimensionality();
+      if (compare != 0) {
         return compare;
       }
 
