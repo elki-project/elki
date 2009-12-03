@@ -5,11 +5,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.connection.AbstractDatabaseConnection;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -47,12 +48,12 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
    * <p/>
    * The parameter is optional and the default value is set to -1.
    */
-  private final IntParameter CLASS_LABEL_INDEX_PARAM = new IntParameter(CLASS_LABEL_INDEX_ID, null, -1);
+  private final IntListParameter CLASS_LABEL_INDEX_PARAM = new IntListParameter(CLASS_LABEL_INDEX_ID, null, true, null);
 
   /**
    * Keeps the index of an attribute to be treated as a string label.
    */
-  protected int classLabelIndex;
+  protected BitSet classLabelIndex;
 
   /**
    * Provides a parser for parsing one point per line, attributes separated by
@@ -101,7 +102,7 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
     List<Double> attributes = new ArrayList<Double>();
     List<String> labels = new ArrayList<String>();
     for(int i = 0; i < entries.length; i++) {
-      if(i != classLabelIndex) {
+      if(!classLabelIndex.get(i)) {
         try {
           Double attribute = Double.valueOf(entries[i]);
           attributes.add(attribute);
@@ -158,11 +159,12 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
   public List<String> setParameters(List<String> args) throws ParameterException {
     List<String> remainingParams = super.setParameters(args);
     //parseFloat = FLOAT_FLAG.isSet();
+    classLabelIndex = new BitSet();
     if(CLASS_LABEL_INDEX_PARAM.isSet()) {
-      classLabelIndex = CLASS_LABEL_INDEX_PARAM.getValue();
-    }
-    else {
-      classLabelIndex = CLASS_LABEL_INDEX_PARAM.getDefaultValue();
+      List<Integer> labelcols = CLASS_LABEL_INDEX_PARAM.getValue();
+      for (Integer idx : labelcols) {
+        classLabelIndex.set(idx);
+      }
     }
 
     return remainingParams;
