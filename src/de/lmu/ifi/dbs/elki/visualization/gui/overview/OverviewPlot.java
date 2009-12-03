@@ -434,7 +434,10 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
    * @return sub plot
    */
   public SVGPlot makeDetailPlot(double x, double y) {
+    double ratio = 1.0;
     SVGPlot plot = new SVGPlot();
+    plot.getRoot().setAttribute(SVGConstants.SVG_WIDTH_ATTRIBUTE, "20cm");
+    plot.getRoot().setAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE, (20 / ratio) + "cm");
     plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 1 1");
 
     List<VisualizationInfo> layers = plotmap.get(x, y);

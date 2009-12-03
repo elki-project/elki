@@ -212,6 +212,26 @@ public class VisualizationProjection {
   }
 
   /**
+   * Get a SVG transformation string to bring the contents into the unit cube.
+   * 
+   * @param margin extra margin to add.
+   * @return
+   */
+  public String estimateTransformString(double margin) {
+    MinMax<Double>[] minmax = estimateViewport();
+    // auto sizing magic, especially for rotated plots.
+    double sizex = minmax[0].getMax() - minmax[0].getMin();
+    double sizey = minmax[1].getMax() - minmax[1].getMin();
+    double sizem = Math.max(sizex, sizey);
+    double offx = (sizex - sizem) / 2 - margin;
+    double offy = (sizey - sizem) / 2 - margin;
+    double scale = 1./(sizem + 2 * margin);
+    String left = FormatUtil.NF4.format(-(minmax[0].getMin() + offx));
+    String top = FormatUtil.NF4.format(-(minmax[0].getMin() + offy));
+    return "scale("+FormatUtil.NF4.format(scale)+") translate("+left+" "+top+")";
+  }
+  
+  /**
    * Compute an transformation matrix to show only axis ax1 and ax2.
    * 
    * @param dim Dimensionality
