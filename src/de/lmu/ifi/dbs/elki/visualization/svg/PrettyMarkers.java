@@ -40,7 +40,8 @@ public class PrettyMarkers implements MarkerLibrary {
   }
 
   /**
-   * Constructor without prefix argument, will use {@link #DEFAULT_PREFIX} as prefix.
+   * Constructor without prefix argument, will use {@link #DEFAULT_PREFIX} as
+   * prefix.
    * 
    * @param colors color library to use
    */
@@ -82,7 +83,7 @@ public class PrettyMarkers implements MarkerLibrary {
     assert (parent != null);
     // TODO: add more styles.
     String colorstr = colors.getColor(style);
-    String strokestyle = "stroke:" + colorstr + ";stroke-width:" + SVGUtil.fmt(size / 6);
+    String strokestyle = SVGConstants.CSS_STROKE_PROPERTY + ":" + colorstr + ";" + SVGConstants.CSS_STROKE_WIDTH_PROPERTY + ":" + SVGUtil.fmt(size / 6);
 
     switch(style % 8){
     case 0: {
@@ -107,8 +108,8 @@ public class PrettyMarkers implements MarkerLibrary {
     }
     case 2: {
       // O filled circle
-      Element circ = plot.svgCircle( x, y, size / 2);
-      SVGUtil.setStyle(circ, "fill:" + colorstr);
+      Element circ = plot.svgCircle(x, y, size / 2);
+      SVGUtil.setStyle(circ, SVGConstants.CSS_FILL_PROPERTY + ":" + colorstr);
       parent.appendChild(circ);
       break;
     }
@@ -154,22 +155,19 @@ public class PrettyMarkers implements MarkerLibrary {
 
   @Override
   public Element useMarker(SVGPlot plot, Element parent, double x, double y, int style, double size) {
-    String id = prefix + style;
+    String id = prefix + style + "_" + size;
     Element existing = plot.getIdElement(id);
     if(existing == null) {
       Element symbol = plot.svgElement(SVGConstants.SVG_SYMBOL_TAG);
       SVGUtil.setAtt(symbol, SVGConstants.SVG_ID_ATTRIBUTE, id);
-      SVGUtil.setAtt(symbol, SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "-1 -1 2 2");
-      plotMarker(plot, symbol, 0, 0, style, 2);
+      plotMarker(plot, symbol, 2*size, 2*size, style, 2*size);
       plot.getDefs().appendChild(symbol);
       plot.putIdElement(id, symbol);
     }
     Element use = plot.svgElement(SVGConstants.SVG_USE_TAG);
     use.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, "#" + id);
-    SVGUtil.setAtt(use, SVGConstants.SVG_X_ATTRIBUTE, x - size);
-    SVGUtil.setAtt(use, SVGConstants.SVG_Y_ATTRIBUTE, y - size);
-    SVGUtil.setAtt(use, SVGConstants.SVG_WIDTH_ATTRIBUTE, size * 2);
-    SVGUtil.setAtt(use, SVGConstants.SVG_HEIGHT_ATTRIBUTE, size * 2);
+    SVGUtil.setAtt(use, SVGConstants.SVG_X_ATTRIBUTE, x - 2*size);
+    SVGUtil.setAtt(use, SVGConstants.SVG_Y_ATTRIBUTE, y - 2*size);
     if(parent != null) {
       parent.appendChild(use);
     }

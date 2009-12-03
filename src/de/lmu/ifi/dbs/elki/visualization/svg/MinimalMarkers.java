@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.visualization.svg;
 
+import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
@@ -37,7 +38,7 @@ public class MinimalMarkers implements MarkerLibrary {
    */
   public Element useMarker(SVGPlot plot, Element parent, double x, double y, int style, double size) {
     Element marker = plot.svgRect(x - size / 2, y - size / 2, size, size);
-    SVGUtil.setStyle(marker, "fill:" + colors.getColor(style));
+    SVGUtil.setStyle(marker, SVGConstants.CSS_FILL_PROPERTY+":" + colors.getColor(style));
     parent.appendChild(marker);
     return marker;
   }
