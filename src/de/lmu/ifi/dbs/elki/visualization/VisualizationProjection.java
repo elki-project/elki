@@ -191,27 +191,6 @@ public class VisualizationProjection {
   }
 
   /**
-   * Return a string version of the viewport size for use as SVG viewport.
-   * 
-   * @param margin Extra margin for labels etc.
-   * @return String rendition of the viewport.
-   */
-  public String estimateViewportString(double margin) {
-    MinMax<Double>[] minmax = estimateViewport();
-    // auto sizing magic, especially for rotated plots.
-    double sizex = minmax[0].getMax() - minmax[0].getMin();
-    double sizey = minmax[1].getMax() - minmax[1].getMin();
-    double sizem = Math.max(sizex, sizey);
-    double offx = (sizex - sizem) / 2 - margin;
-    double offy = (sizey - sizem) / 2 - margin;
-    String left = FormatUtil.NF4.format(minmax[0].getMin() + offx);
-    String top = FormatUtil.NF4.format(minmax[0].getMin() + offy);
-    String width = FormatUtil.NF4.format(sizem + margin * 2);
-    String height = FormatUtil.NF4.format(sizem + margin * 2);
-    return left + " " + top + " " + width + " " + height;
-  }
-
-  /**
    * Get a SVG transformation string to bring the contents into the unit cube.
    * 
    * @param margin extra margin to add.
