@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.UnprojectedVisualizer;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
 /**
@@ -32,7 +31,6 @@ public class KeyVisualizer extends AbstractVisualizer implements UnprojectedVisu
    */
   public KeyVisualizer() {
     super();
-    metadata.put(Visualizer.META_NOTHUMB, true);
   }
 
   /**
