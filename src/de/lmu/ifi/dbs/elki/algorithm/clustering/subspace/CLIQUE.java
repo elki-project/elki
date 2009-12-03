@@ -23,6 +23,7 @@ import de.lmu.ifi.dbs.elki.data.Interval;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.Subspace;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
+import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.Description;
@@ -59,7 +60,7 @@ import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
  * @author Elke Achtert
  * @param <V> the type of NumberVector handled by this Algorithm
  */
-public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<CLIQUESubspace<V>>> implements ClusteringAlgorithm<Clustering<CLIQUESubspace<V>>, V> {
+public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clustering<SubspaceModel<V>>> implements ClusteringAlgorithm<Clustering<SubspaceModel<V>>, V> {
   /**
    * OptionID for {@link #XSI_PARAM}
    */
@@ -122,7 +123,7 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
   /**
    * The result of the algorithm;
    */
-  private Clustering<CLIQUESubspace<V>> result;
+  private Clustering<SubspaceModel<V>> result;
 
   /**
    * Provides the CLIQUE algorithm, adding parameters {@link #XSI_PARAM},
@@ -148,7 +149,7 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
    * 
    * @return the result of the algorithm
    */
-  public Clustering<CLIQUESubspace<V>> getResult() {
+  public Clustering<SubspaceModel<V>> getResult() {
     return result;
   }
 
@@ -166,7 +167,7 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
    * 
    */
   @Override
-  protected Clustering<CLIQUESubspace<V>> runInTime(Database<V> database) throws IllegalStateException {
+  protected Clustering<SubspaceModel<V>> runInTime(Database<V> database) throws IllegalStateException {
     Map<CLIQUESubspace<V>, Set<Integer>> modelsAndClusters = new HashMap<CLIQUESubspace<V>, Set<Integer>>();
 
     // 1. Identification of subspaces that contain clusters
@@ -203,11 +204,11 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
       }
     }
 
-    result = new Clustering<CLIQUESubspace<V>>();
-
+    // build result
+    result = new Clustering<SubspaceModel<V>>();
     for(Entry<CLIQUESubspace<V>, Set<Integer>> e : modelsAndClusters.entrySet()) {
       DatabaseObjectGroup group = new DatabaseObjectGroupCollection<Set<Integer>>(e.getValue());
-      result.addCluster(new Cluster<CLIQUESubspace<V>>(group, e.getKey()));
+      result.addCluster(new Cluster<SubspaceModel<V>>(group, new SubspaceModel<V>(e.getKey())));
     }
 
     return result;
