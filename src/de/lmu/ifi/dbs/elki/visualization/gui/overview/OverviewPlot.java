@@ -98,7 +98,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
    * Current thumbnail thread.
    */
   private ThumbnailThread thumbnails = null;
-  
+
   /**
    * Screen size (used for thumbnail sizing)
    */
@@ -233,9 +233,11 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
        */
       for(VisualizationInfo vi : e.getValue()) {
         Element gg = this.svgElement(SVGConstants.SVG_G_TAG);
-        gg.appendChild(SVGUtil.svgWaitIcon(this.getDocument(), 0, 0, 1, 1));
-        g.appendChild(gg);
-        thumbnails.queue(gg, vi);
+        if(vi.thumbnailEnabled() && vi.isVisible()) {
+          gg.appendChild(SVGUtil.svgWaitIcon(this.getDocument(), 0, 0, 1, 1));
+          g.appendChild(gg);
+          thumbnails.queue(gg, vi);
+        }
       }
       plotlayer.appendChild(g);
       Element h = this.svgRect(x, y, 1, 1);
@@ -360,7 +362,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
       actionListener.actionPerformed(new SubplotSelectedEvent(this, ActionEvent.ACTION_PERFORMED, null, 0, x, y));
     }
   }
-  
+
   /**
    * Event when a plot was selected.
    * 

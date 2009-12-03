@@ -7,6 +7,7 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.Thumbnailer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 
 /**
  * Class representing a single visualization on the screen.
@@ -59,5 +60,37 @@ abstract class VisualizationInfo {
       thumbnail = t.thumbnail(plot, wi, he);
     }
     return thumbnail;
+  }
+  
+  protected abstract Visualizer getVisualization();
+
+  /**
+   * Test whether a thumbnail is needed for this visualization.
+   * 
+   * @return Whether or not to generate a thumbnail.
+   */
+  public boolean thumbnailEnabled() {
+    Boolean nothumb = getVisualization().getMetadata().get(Visualizer.META_NOTHUMB, Boolean.class);
+    if (nothumb != null && nothumb) {
+      return false;
+    }
+    return true;
+  }
+  
+  /**
+   * Test whether the visualization is set to be visible.
+   * 
+   * @return Whether or not to show this visualization.
+   */
+  public boolean isVisible() {
+    Boolean visible = getVisualization().getMetadata().get(Visualizer.META_VISIBLE, Boolean.class);
+    if (visible != null) {
+      return visible;
+    }
+    visible = getVisualization().getMetadata().get(Visualizer.META_VISIBLE_DEFAULT, Boolean.class);
+    if (visible != null) {
+      return visible;
+    }
+    return true;
   }
 }

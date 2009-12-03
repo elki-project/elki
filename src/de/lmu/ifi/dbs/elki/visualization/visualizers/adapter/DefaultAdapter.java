@@ -86,11 +86,14 @@ public class DefaultAdapter<NV extends NumberVector<NV, ?>> implements Algorithm
     keyVisualizer.init(context);
     
     usableVisualizers.add(axisVisualizer);
-    if (ResultUtil.filterResults(context.getResult(), OutlierResult.class).size() <= 0) {
-      usableVisualizers.add(clusteringVisualizer);
-      usableVisualizers.add(keyVisualizer);
+    usableVisualizers.add(clusteringVisualizer);
+    usableVisualizers.add(keyVisualizer);
+    usableVisualizers.add(dataDotVisualizer);
+    if (ResultUtil.filterResults(context.getResult(), OutlierResult.class).size() > 0) {
+      clusteringVisualizer.getMetadata().put(Visualizer.META_VISIBLE_DEFAULT, false);
+      keyVisualizer.getMetadata().put(Visualizer.META_VISIBLE_DEFAULT, false);
     } else {
-      usableVisualizers.add(dataDotVisualizer);
+      dataDotVisualizer.getMetadata().put(Visualizer.META_VISIBLE_DEFAULT, false);
     }
     usableVisualizers.add(histoVisualizer);
     return usableVisualizers;
