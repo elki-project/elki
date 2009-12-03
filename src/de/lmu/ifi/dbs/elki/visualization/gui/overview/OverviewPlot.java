@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Queue;
 import java.util.Map.Entry;
@@ -100,6 +101,11 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
   private ThumbnailThread thumbnails = null;
 
   /**
+   * Queue of thumbnails to generate.
+   */
+  Queue<Pair<Element, VisualizationInfo>> queue = new ConcurrentLinkedQueue<Pair<Element, VisualizationInfo>>();
+
+  /**
    * Screen size (used for thumbnail sizing)
    */
   public int screenwidth = 1000;
@@ -110,27 +116,167 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
   public int screenheight = 1000;
 
   /**
+   * React to mouse hover events
+   */
+  private EventListener hoverer;
+
+  /**
+   * Lookup
+   */
+  private HashMap<VisualizationInfo, Element> vistoelem;
+
+  /**
+   * Layer for plot thumbnail
+   */
+  private Element plotlayer;
+
+  /**
+   * Layer for hover elements
+   */
+  private Element hoverlayer;
+
+  /**
+   * The CSS class used on "selectable" rectangles.
+   */
+  private CSSClass selcss;
+
+  /**
    * Refresh the overview plot.
    */
-  public void refresh() {
-    // setup the hover CSS classes.
-    CSSClass selcss = new CSSClass(this, "s");
-    selcss.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_RED_VALUE);
-    selcss.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_NONE_VALUE);
-    selcss.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0");
-    selcss.setStatement(SVGConstants.CSS_CURSOR_PROPERTY, SVGConstants.CSS_POINTER_VALUE);
-    CSSClass hovcss = new CSSClass(this, "h");
-    hovcss.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0.25");
-    try {
-      getCSSClassManager().addClass(selcss);
-      getCSSClassManager().addClass(hovcss);
-    }
-    catch(CSSNamingConflict e) {
-      throw new RuntimeException("Unresolved conflict in CSS.", e);
-    }
-    // Hover listener.
-    EventListener hoverer = new CSSHoverClass(hovcss.getName(), null, true);
+  public void reinitialize() {
+    setupHoverer();
+    arrangeVisualizations();
+    recalcViewbox();
+    stopThumbnailer();
 
+    // Layers.
+    if(plotlayer != null) {
+      if(plotlayer.getParentNode() != null) {
+        plotlayer.getParentNode().removeChild(plotlayer);
+      }
+      plotlayer = null;
+    }
+    if(hoverlayer != null) {
+      if(hoverlayer.getParentNode() != null) {
+        hoverlayer.getParentNode().removeChild(hoverlayer);
+      }
+      hoverlayer = null;
+    }
+    plotlayer = this.svgElement(SVGConstants.SVG_G_TAG);
+    hoverlayer = this.svgElement(SVGConstants.SVG_G_TAG);
+    vistoelem = new HashMap<VisualizationInfo, Element>();
+
+    // TODO: kill all children in document root except style, defs etc?
+    for(Entry<DoubleDoublePair, ArrayList<VisualizationInfo>> e : plotmap.entrySet()) {
+      double x = e.getKey().getFirst();
+      double y = e.getKey().getSecond();
+      Element g = this.svgElement(SVGConstants.SVG_G_TAG);
+      SVGUtil.setAtt(g, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "translate(" + x + " " + y + ")");
+      for(VisualizationInfo vi : e.getValue()) {
+        Element gg = this.svgElement(SVGConstants.SVG_G_TAG);
+        if(vi.thumbnailEnabled() && vi.isVisible()) {
+          queueThumbnail(vi, gg);
+        }
+        g.appendChild(gg);
+        vistoelem.put(vi, gg);
+      }
+      plotlayer.appendChild(g);
+      Element h = this.svgRect(x, y, 1, 1);
+      SVGUtil.addCSSClass(h, selcss.getName());
+      // link hoverer.
+      EventTarget targ = (EventTarget) h;
+      targ.addEventListener(SVGConstants.SVG_MOUSEOVER_EVENT_TYPE, hoverer, false);
+      targ.addEventListener(SVGConstants.SVG_MOUSEOUT_EVENT_TYPE, hoverer, false);
+      targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, hoverer, false);
+      targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, new SelectPlotEvent(x, y), false);
+
+      hoverlayer.appendChild(h);
+    }
+    getRoot().appendChild(plotlayer);
+    getRoot().appendChild(hoverlayer);
+    updateStyleElement();
+  }
+
+  /**
+   * Do a refresh (when visibilities have changed).
+   */
+  public void refresh() {
+    if(vistoelem == null || plotlayer == null || hoverlayer == null) {
+      reinitialize();
+    }
+    else {
+      for(Entry<DoubleDoublePair, ArrayList<VisualizationInfo>> e : plotmap.entrySet()) {
+        for(VisualizationInfo vi : e.getValue()) {
+          Element gg = vistoelem.get(vi);
+          if(vi.thumbnailEnabled() && vi.isVisible()) {
+            // unhide when hidden.
+            if(gg.hasAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY)) {
+              gg.removeAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY);
+            }
+            // if not yet rendered, add a thumbnail
+            if(!gg.hasChildNodes()) {
+              queueThumbnail(vi, gg);
+            }
+          }
+          else {
+            // hide if there is anything to hide.
+            if(gg.hasChildNodes()) {
+              gg.setAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY, SVGConstants.CSS_HIDDEN_VALUE);
+            }
+            // TODO: unqueue pending thumbnails
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Queue a thumbnail for generation.
+   * 
+   * @param vi VisualizationInfo
+   * @param gg Thumbnail element
+   */
+  private synchronized void queueThumbnail(VisualizationInfo vi, Element gg) {
+    if(vi.getThumbnailIfGenerated() != null) {
+      gg.appendChild(makeThumbnailElement(vi.getThumbnailIfGenerated()));
+    }
+    else {
+      gg.appendChild(SVGUtil.svgWaitIcon(this.getDocument(), 0, 0, 1, 1));
+      queue.add(new Pair<Element, VisualizationInfo>(gg, vi));
+      if(thumbnails == null || !thumbnails.isAlive()) {
+        thumbnails = new ThumbnailThread();
+        thumbnails.start();
+      }
+    }
+  }
+
+  /**
+   * Recompute the view box of the plot.
+   */
+  private void recalcViewbox() {
+    // Recalculate bounding box.
+    String vb = plotmap.minmaxx.getMin() + " " + plotmap.minmaxy.getMin() + " " + plotmap.getWidth() + " " + plotmap.getHeight();
+    // Reset root bounding box.
+    SVGUtil.setAtt(getRoot(), SVGConstants.SVG_WIDTH_ATTRIBUTE, "20cm");
+    SVGUtil.setAtt(getRoot(), SVGConstants.SVG_HEIGHT_ATTRIBUTE, (20 / plotmap.getWidth() * plotmap.getHeight()) + "cm");
+    SVGUtil.setAtt(getRoot(), SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, vb);
+  }
+
+  /**
+   * Stop a running thumbnailer.
+   */
+  private void stopThumbnailer() {
+    // Stop thumbnail
+    if(thumbnails != null) {
+      thumbnails.shutdown = true;
+      thumbnails = null;
+    }
+  }
+
+  /**
+   * Recompute the layout of visualizations.
+   */
+  private void arrangeVisualizations() {
     // split the visualizers into three sets.
     Collection<Projection1DVisualizer<?>> vis1d = new ArrayList<Projection1DVisualizer<?>>(vis.size());
     Collection<Projection2DVisualizer<?>> vis2d = new ArrayList<Projection2DVisualizer<?>>(vis.size());
@@ -200,61 +346,31 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
         pos += 1.0;
       }
     }
-    // Reset thumbnailer.
-    if(thumbnails != null) {
-      thumbnails.shutdown = true;
+  }
+
+  /**
+   * Setup the CSS hover effect.
+   * 
+   * @return CSS class used for the effect.
+   */
+  private void setupHoverer() {
+    // setup the hover CSS classes.
+    selcss = new CSSClass(this, "s");
+    selcss.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_RED_VALUE);
+    selcss.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_NONE_VALUE);
+    selcss.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0");
+    selcss.setStatement(SVGConstants.CSS_CURSOR_PROPERTY, SVGConstants.CSS_POINTER_VALUE);
+    CSSClass hovcss = new CSSClass(this, "h");
+    hovcss.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0.25");
+    try {
+      getCSSClassManager().addClass(selcss);
+      getCSSClassManager().addClass(hovcss);
     }
-    thumbnails = new ThumbnailThread();
-    // Recalculate bounding box.
-    String vb = plotmap.minmaxx.getMin() + " " + plotmap.minmaxy.getMin() + " " + plotmap.getWidth() + " " + plotmap.getHeight();
-    // Reset root bounding box.
-    SVGUtil.setAtt(getRoot(), SVGConstants.SVG_WIDTH_ATTRIBUTE, "20cm");
-    SVGUtil.setAtt(getRoot(), SVGConstants.SVG_HEIGHT_ATTRIBUTE, (20 / plotmap.getWidth() * plotmap.getHeight()) + "cm");
-    SVGUtil.setAtt(getRoot(), SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, vb);
-
-    // Layers.
-    Element plotlayer = this.svgElement(SVGConstants.SVG_G_TAG);
-    Element hoverlayer = this.svgElement(SVGConstants.SVG_G_TAG);
-
-    // TODO: kill all children in document root except style, defs etc?
-    for(Entry<DoubleDoublePair, ArrayList<VisualizationInfo>> e : plotmap.entrySet()) {
-      double x = e.getKey().getFirst();
-      double y = e.getKey().getSecond();
-      Element g = this.svgElement(SVGConstants.SVG_G_TAG);
-      SVGUtil.setAtt(g, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "translate(" + x + " " + y + ")");
-      /*
-       * //SVG element instead of G, works much worse in Inkscape Element g =
-       * this.svgElement(SVGConstants.SVG_SVG_TAG); SVGUtil.setAtt(g,
-       * SVGConstants.SVG_X_ATTRIBUTE, x); SVGUtil.setAtt(g,
-       * SVGConstants.SVG_Y_ATTRIBUTE, y); SVGUtil.setAtt(g,
-       * SVGConstants.SVG_WIDTH_ATTRIBUTE, 1); SVGUtil.setAtt(g,
-       * SVGConstants.SVG_HEIGHT_ATTRIBUTE, 1); SVGUtil.setAtt(g,
-       * SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 1 1");
-       */
-      for(VisualizationInfo vi : e.getValue()) {
-        Element gg = this.svgElement(SVGConstants.SVG_G_TAG);
-        if(vi.thumbnailEnabled() && vi.isVisible()) {
-          gg.appendChild(SVGUtil.svgWaitIcon(this.getDocument(), 0, 0, 1, 1));
-          g.appendChild(gg);
-          thumbnails.queue(gg, vi);
-        }
-      }
-      plotlayer.appendChild(g);
-      Element h = this.svgRect(x, y, 1, 1);
-      SVGUtil.addCSSClass(h, selcss.getName());
-      // link hoverer.
-      EventTarget targ = (EventTarget) h;
-      targ.addEventListener(SVGConstants.SVG_MOUSEOVER_EVENT_TYPE, hoverer, false);
-      targ.addEventListener(SVGConstants.SVG_MOUSEOUT_EVENT_TYPE, hoverer, false);
-      targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, hoverer, false);
-      targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, new SelectPlotEvent(x, y), false);
-
-      hoverlayer.appendChild(h);
+    catch(CSSNamingConflict e) {
+      throw new RuntimeException("Unresolved conflict in CSS.", e);
     }
-    getRoot().appendChild(plotlayer);
-    getRoot().appendChild(hoverlayer);
-    updateStyleElement();
-    thumbnails.start();
+    // Hover listener.
+    hoverer = new CSSHoverClass(hovcss.getName(), null, true);
   }
 
   /**
@@ -266,13 +382,18 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
   protected void generateThumbnail(final Element g, VisualizationInfo vi) {
     int thumbwidth = (int) Math.max(screenwidth / plotmap.getWidth(), screenheight / plotmap.getHeight());
     File thumb = vi.makeThumbnail(t, thumbwidth);
+    final Element i = makeThumbnailElement(thumb);
+    this.scheduleUpdate(new NodeReplaceChild(g, i));
+  }
+
+  private Element makeThumbnailElement(File thumb) {
     final Element i = this.svgElement(SVGConstants.SVG_IMAGE_TAG);
     SVGUtil.setAtt(i, SVGConstants.SVG_X_ATTRIBUTE, 0);
     SVGUtil.setAtt(i, SVGConstants.SVG_Y_ATTRIBUTE, 0);
     SVGUtil.setAtt(i, SVGConstants.SVG_WIDTH_ATTRIBUTE, 1);
     SVGUtil.setAtt(i, SVGConstants.SVG_HEIGHT_ATTRIBUTE, 1);
     i.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, thumb.toURI().toString());
-    this.scheduleUpdate(new NodeReplaceChild(g, i));
+    return i;
   }
 
   /**
@@ -286,27 +407,12 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
      */
     boolean shutdown = false;
 
-    /**
-     * Queue of thumbnails to generate.
-     */
-    Queue<Pair<Element, VisualizationInfo>> queue = new ConcurrentLinkedQueue<Pair<Element, VisualizationInfo>>();
-
     @Override
     public void run() {
       while(!queue.isEmpty()) {
         Pair<Element, VisualizationInfo> ti = queue.poll();
         generateThumbnail(ti.first, ti.second);
       }
-    }
-
-    /**
-     * Enqueue a new Thumbnail task.
-     * 
-     * @param parent Parent element
-     * @param vi Visualiation info
-     */
-    public void queue(Element parent, VisualizationInfo vi) {
-      queue.add(new Pair<Element, VisualizationInfo>(parent, vi));
     }
   }
 
@@ -334,8 +440,10 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
     List<VisualizationInfo> layers = plotmap.get(x, y);
 
     for(VisualizationInfo vi : layers) {
-      Element e = vi.build(plot);
-      plot.getRoot().appendChild(e);
+      if(vi.isVisible()) {
+        Element e = vi.build(plot);
+        plot.getRoot().appendChild(e);
+      }
     }
     plot.updateStyleElement();
     return plot;
