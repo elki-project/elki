@@ -216,9 +216,11 @@ public class SaveOptionsPanel extends JPanel {
       public void propertyChange(PropertyChangeEvent e) {
         if(e.getPropertyName().equals(JFileChooser.SELECTED_FILE_CHANGED_PROPERTY)) {
           File file = (File) e.getNewValue();
-          String format = SVGSaveDialog.guessFormat(file.getName());
-          if(format != null) {
-            setFormat(format);
+          if(file != null && file.getName() != null) {
+            String format = SVGSaveDialog.guessFormat(file.getName());
+            if(format != null) {
+              setFormat(format);
+            }
           }
         }
       }
@@ -227,7 +229,7 @@ public class SaveOptionsPanel extends JPanel {
 
   protected void setFormat(String format) {
     int index = Util.arrayFind(SVGSaveDialog.getVisibleFormats(), format);
-    if (index != formatSelector.getSelectedIndex() && index >= 0) {
+    if(index != formatSelector.getSelectedIndex() && index >= 0) {
       formatSelector.setSelectedIndex(index);
     }
     if(format.equals("jpeg") || format.equals("jpg")) {
@@ -260,7 +262,7 @@ public class SaveOptionsPanel extends JPanel {
     }
     else {
       // TODO: what to do on unknown formats?
-      //LoggingUtil.warning("Unrecognized file extension seen: " + format);
+      // LoggingUtil.warning("Unrecognized file extension seen: " + format);
     }
   }
 
