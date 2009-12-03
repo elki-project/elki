@@ -4,6 +4,12 @@ import java.awt.event.ActionEvent;
 
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 
+/**
+ * Event when a particular subplot was selected.
+ * Plots are currently identified by their coordinates on the screen.
+ * 
+ * @author Erich Schubert
+ */
 public class SubplotSelectedEvent extends ActionEvent {
   /**
    * Serial version
@@ -22,6 +28,16 @@ public class SubplotSelectedEvent extends ActionEvent {
    */
   double y;
   
+  /**
+   * Constructor. To be called by OverviewPlot only!
+   * 
+   * @param source
+   * @param id
+   * @param command
+   * @param modifiers
+   * @param x
+   * @param y
+   */
   public SubplotSelectedEvent(OverviewPlot<?> source, int id, String command, int modifiers, double x, double y) {
     super(source, id, command, modifiers);
     this.overview = source;
@@ -29,6 +45,11 @@ public class SubplotSelectedEvent extends ActionEvent {
     this.y = y;
   }
   
+  /**
+   * Retrieve a materialized detail plot.
+   * 
+   * @return
+   */
   public SVGPlot makeSubplot() {
     return overview.makeDetailPlot(x, y);
   }
