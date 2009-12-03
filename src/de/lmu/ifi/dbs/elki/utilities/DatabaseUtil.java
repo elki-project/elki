@@ -11,6 +11,7 @@ import java.util.TreeSet;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.Subspace;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -25,9 +26,9 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 public final class DatabaseUtil {
   /**
-   * Returns the centroid as a NumberVector object of the specified objects stored
-   * in the given database. The objects belonging to the specified ids must be
-   * instance of <code>NumberVector</code>.
+   * Returns the centroid as a NumberVector object of the specified objects
+   * stored in the given database. The objects belonging to the specified ids
+   * must be instance of <code>NumberVector</code>.
    * 
    * @param <V> Vector type
    * @param database the database storing the objects
@@ -59,19 +60,20 @@ public final class DatabaseUtil {
   }
 
   /**
-   * Returns the centroid w.r.t. the dimensions specified by the given BitSet as
-   * a NumberVector object of the specified objects stored in the given database.
-   * The objects belonging to the specified ids must be instance of
+   * Returns the centroid w.r.t. the dimensions specified by the given BitSet
+   * as a NumberVector object of the specified objects stored in the given
+   * database. The objects belonging to the specified IDs must be instance of
    * <code>NumberVector</code>.
    * 
    * @param <V> Vector type
    * @param database the database storing the objects
    * @param ids the identifiable objects
-   * @param bitSet the bitSet specifying the dimensions to be considered
+   * @param dimensions the BitSet representing the dimensions to be considered
    * @return the centroid of the specified objects stored in the given database
+   *         w.r.t. the specified subspace
    * @throws IllegalArgumentException if the id list is empty
    */
-  public static <V extends NumberVector<V, ?>> V centroid(Database<V> database, Collection<Integer> ids, BitSet bitSet) {
+  public static <V extends NumberVector<V, ?>> V centroid(Database<V> database, Collection<Integer> ids, BitSet dimensions) {
     if(ids.isEmpty()) {
       throw new IllegalArgumentException("Cannot compute a centroid, because of empty list of ids!");
     }
@@ -81,10 +83,8 @@ public final class DatabaseUtil {
 
     for(Integer id : ids) {
       V o = database.get(id);
-      for(int j = 1; j <= dim; j++) {
-        if(bitSet.get(j - 1)) {
-          centroid[j - 1] += o.getValue(j).doubleValue();
-        }
+      for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d)) {
+        centroid[d] += o.getValue(d + 1).doubleValue();
       }
     }
 
@@ -99,8 +99,8 @@ public final class DatabaseUtil {
 
   /**
    * Returns the centroid w.r.t. the dimensions specified by the given BitSet as
-   * a NumberVector object of the specified objects stored in the given database.
-   * The objects belonging to the specified ids must be instance of
+   * a NumberVector object of the specified objects stored in the given
+   * database. The objects belonging to the specified ids must be instance of
    * <code>NumberVector</code>.
    * 
    * @param <V> Vector type
@@ -141,8 +141,8 @@ public final class DatabaseUtil {
   }
 
   /**
-   * Returns the centroid as a NumberVector object of the specified database. The
-   * objects must be instance of <code>NumberVector</code>.
+   * Returns the centroid as a NumberVector object of the specified database.
+   * The objects must be instance of <code>NumberVector</code>.
    * 
    * @param <O> Vector type
    * @param database the database storing the objects
@@ -253,7 +253,7 @@ public final class DatabaseUtil {
    * @param centroid the centroid of the database
    * @return the covariance matrix of the specified objects
    */
-  public static <O extends NumberVector<O,?>> Matrix covarianceMatrix(Database<O> database, O centroid) {
+  public static <O extends NumberVector<O, ?>> Matrix covarianceMatrix(Database<O> database, O centroid) {
 
     // centered matrix
     int columns = centroid.getDimensionality();
@@ -263,7 +263,7 @@ public final class DatabaseUtil {
     Iterator<Integer> it = database.iterator();
     int i = 0;
     while(it.hasNext()) {
-      NumberVector<?,?> obj = database.get(it.next());
+      NumberVector<?, ?> obj = database.get(it.next());
       for(int d = 0; d < columns; d++) {
         matrixArray[i][d] = obj.getValue(d + 1).doubleValue() - centroid.getValue(d + 1).doubleValue();
       }
@@ -354,7 +354,7 @@ public final class DatabaseUtil {
    * @param centroid the centroid or reference vector of the ids
    * @return the variances in each dimension of the specified objects
    */
-  public static <V extends NumberVector<V,?>> double[] variances(Database<V> database, V centroid, Collection<Integer> ids) {
+  public static <V extends NumberVector<V, ?>> double[] variances(Database<V> database, V centroid, Collection<Integer> ids) {
     double[] variances = new double[centroid.getDimensionality()];
 
     for(int d = 1; d <= centroid.getDimensionality(); d++) {
@@ -407,11 +407,11 @@ public final class DatabaseUtil {
    * @param database the database storing the objects
    * @return Minimum and Maximum vector for the hyperrectangle
    */
-  public static <NV extends NumberVector<NV,?>> Pair<NV, NV> computeMinMax(Database<NV> database) {
+  public static <NV extends NumberVector<NV, ?>> Pair<NV, NV> computeMinMax(Database<NV> database) {
     int dim = database.dimensionality();
     double[] mins = new double[dim];
     double[] maxs = new double[dim];
-    for (int i = 0; i < dim; i++) {
+    for(int i = 0; i < dim; i++) {
       mins[i] = Double.MAX_VALUE;
       maxs[i] = -Double.MAX_VALUE;
     }
@@ -419,14 +419,14 @@ public final class DatabaseUtil {
       NV o = database.get(it);
       for(int d = 0; d < dim; d++) {
         double v = o.getValue(d + 1).doubleValue();
-        mins[d] = Math.min(mins[d],v);
-        maxs[d] = Math.max(maxs[d],v);
+        mins[d] = Math.min(mins[d], v);
+        maxs[d] = Math.max(maxs[d], v);
       }
     }
     NV prototype = database.get(database.iterator().next());
     NV min = prototype.newInstance(mins);
     NV max = prototype.newInstance(maxs);
-    return new Pair<NV,NV>(min, max);
+    return new Pair<NV, NV>(min, max);
   }
 
   /**
@@ -468,8 +468,8 @@ public final class DatabaseUtil {
    * 
    * Note: this can be an abstract class or interface!
    * 
-   * TODO: Implement a full search for shared superclasses.
-   * But since currently the databases will always use only once class, this is not yet implemented.
+   * TODO: Implement a full search for shared superclasses. But since currently
+   * the databases will always use only once class, this is not yet implemented.
    * 
    * @param <O> Restriction type
    * @param database Database
@@ -481,29 +481,29 @@ public final class DatabaseUtil {
     List<Class<? extends DatabaseObject>> candidates = new ArrayList<Class<? extends DatabaseObject>>();
     Iterator<Integer> iditer = database.iterator();
     // empty database?!
-    if (!iditer.hasNext()) {
+    if(!iditer.hasNext()) {
       return null;
     }
     // put first class into result set.
     candidates.add(database.get(iditer.next()).getClass());
     // other objects
-    while (iditer.hasNext()) {
+    while(iditer.hasNext()) {
       Class<? extends DatabaseObject> newcls = database.get(iditer.next()).getClass();
       // validate all candidates
       Iterator<Class<? extends DatabaseObject>> ci = candidates.iterator();
-      while (ci.hasNext()) {
+      while(ci.hasNext()) {
         Class<? extends DatabaseObject> cand = ci.next();
-        if (cand.isAssignableFrom(newcls)) {
+        if(cand.isAssignableFrom(newcls)) {
           continue;
         }
         // TODO: resolve conflicts by finding all superclasses!
         // Does this code here work?
-        for (Class<?> interf : cand.getInterfaces()) {
-          if (interf.isAssignableFrom(databaseObjectClass)) {
+        for(Class<?> interf : cand.getInterfaces()) {
+          if(interf.isAssignableFrom(databaseObjectClass)) {
             candidates.add((Class<? extends DatabaseObject>) interf);
           }
         }
-        if (cand.getSuperclass().isAssignableFrom(databaseObjectClass)) {
+        if(cand.getSuperclass().isAssignableFrom(databaseObjectClass)) {
           candidates.add((Class<? extends DatabaseObject>) cand.getSuperclass());
         }
         ci.remove();
@@ -513,16 +513,16 @@ public final class DatabaseUtil {
     if(candidates != null && candidates.size() > 0) {
       // remove subclasses
       Iterator<Class<? extends DatabaseObject>> ci = candidates.iterator();
-      while (ci.hasNext()) {
+      while(ci.hasNext()) {
         Class<? extends DatabaseObject> cand = ci.next();
-        for (Class<? extends DatabaseObject> oc : candidates) {
-          if (oc != cand && cand.isAssignableFrom(oc)) {
+        for(Class<? extends DatabaseObject> oc : candidates) {
+          if(oc != cand && cand.isAssignableFrom(oc)) {
             ci.remove();
             break;
           }
         }
       }
-      assert(candidates.size() > 0);
+      assert (candidates.size() > 0);
       try {
         return candidates.get(0);
       }

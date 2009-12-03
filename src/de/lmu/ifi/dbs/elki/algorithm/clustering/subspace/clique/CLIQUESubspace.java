@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.clique;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -49,7 +50,7 @@ public class CLIQUESubspace<V extends NumberVector<V, ?>> extends Subspace<V> {
    * 
    * @param dimensions the dimensions building this subspace
    */
-  public CLIQUESubspace(SortedSet<Integer> dimensions) {
+  public CLIQUESubspace(BitSet dimensions) {
     super(dimensions);
     denseUnits = new ArrayList<CLIQUEUnit<V>>();
     coverage = 0;
@@ -63,8 +64,8 @@ public class CLIQUESubspace<V extends NumberVector<V, ?>> extends Subspace<V> {
   public void addDenseUnit(CLIQUEUnit<V> unit) {
     Collection<Interval> intervals = unit.getIntervals();
     for(Interval interval : intervals) {
-      if(!getDimensions().contains(interval.getDimension())) {
-        throw new IllegalArgumentException("Unit " + unit + "cannot be added to this subspace, " + "because of wrong dimensions!");
+      if(!getDimensions().get(interval.getDimension())) {
+        throw new IllegalArgumentException("Unit " + unit + "cannot be added to this subspace, because of wrong dimensions!");
       }
     }
 
@@ -99,13 +100,13 @@ public class CLIQUESubspace<V extends NumberVector<V, ?>> extends Subspace<V> {
    * finds all units it is connected to.
    * 
    * @param unit the unit
-   * @param cluster the ids of the feature vectors of the current cluster
+   * @param cluster the IDs of the feature vectors of the current cluster
    */
   public void dfs(CLIQUEUnit<V> unit, Set<Integer> cluster) {
     cluster.addAll(unit.getIds());
     unit.markAsAssigned();
 
-    for(Integer dim : getDimensions()) {
+    for(int dim = getDimensions().nextSetBit(0); dim >= 0; dim = getDimensions().nextSetBit(dim + 1)) {
       CLIQUEUnit<V> left = leftNeighbor(unit, dim);
       if(left != null && !left.isAssigned())
         dfs(left, cluster);
@@ -182,7 +183,7 @@ public class CLIQUESubspace<V extends NumberVector<V, ?>> extends Subspace<V> {
    * @see Subspace#joinLastDimensions(Subspace)
    */
   public CLIQUESubspace<V> join(CLIQUESubspace<V> other, double all, double tau) {
-    SortedSet<Integer> dimensions = joinLastDimensions(other);
+    BitSet dimensions = joinLastDimensions(other);
     if(dimensions == null)
       return null;
 
@@ -208,8 +209,8 @@ public class CLIQUESubspace<V extends NumberVector<V, ?>> extends Subspace<V> {
   public String toString(String pre) {
     StringBuffer result = new StringBuffer();
     result.append(super.toString(pre));
-    result.append(pre).append("Coverage: ").append(coverage).append("\n");
-    result.append(pre).append("Units: " + "\n");
+    result.append(pre).append("\nCoverage: ").append(coverage);
+    result.append(pre).append("\nUnits: " + "\n");
     for(CLIQUEUnit<V> denseUnit : getDenseUnits()) {
       result.append(pre).append("   ").append(denseUnit.toString()).append("   ").append(denseUnit.getIds().size()).append(" objects\n");
     }

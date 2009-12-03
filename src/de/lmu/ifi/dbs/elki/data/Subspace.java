@@ -1,13 +1,7 @@
 package de.lmu.ifi.dbs.elki.data;
 
+import java.util.BitSet;
 import java.util.Comparator;
-import java.util.Iterator;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
 /**
  * Represents a subspace of the original data space.
@@ -15,11 +9,16 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * @author Elke Achtert
  * @param <V> the type of FeatureVector this subspace contains
  */
-public class Subspace<V extends FeatureVector<V, ?>> implements TextWriteable, Model {
+public class Subspace<V extends FeatureVector<V, ?>> {
   /**
    * The dimensions building this subspace.
    */
-  private TreeSet<Integer> dimensions;
+  private final BitSet dimensions = new BitSet();
+
+  /**
+   * The dimensionality of this subspace.
+   */
+  private final int dimensionality;
 
   /**
    * Creates a new one-dimensional subspace of the original data space.
@@ -27,8 +26,8 @@ public class Subspace<V extends FeatureVector<V, ?>> implements TextWriteable, M
    * @param dimension the dimension building this subspace
    */
   public Subspace(int dimension) {
-    dimensions = new TreeSet<Integer>();
-    dimensions.add(dimension);
+    dimensions.set(dimension);
+    dimensionality = 1;
   }
 
   /**
@@ -36,17 +35,19 @@ public class Subspace<V extends FeatureVector<V, ?>> implements TextWriteable, M
    * 
    * @param dimensions the dimensions building this subspace
    */
-  public Subspace(SortedSet<Integer> dimensions) {
-    this.dimensions = new TreeSet<Integer>();
-    this.dimensions.addAll(dimensions);
+  public Subspace(BitSet dimensions) {
+    for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
+      this.dimensions.set(d);
+    }
+    dimensionality = dimensions.cardinality();
   }
 
   /**
-   * Returns the set of dimensions of this subspace.
+   * Returns the BitSet representing the dimensions of this subspace.
    * 
    * @return the dimensions of this subspace
    */
-  public final SortedSet<Integer> getDimensions() {
+  public final BitSet getDimensions() {
     return dimensions;
   }
 
@@ -56,7 +57,7 @@ public class Subspace<V extends FeatureVector<V, ?>> implements TextWriteable, M
    * @return the number of dimensions this subspace contains
    */
   public final int dimensionality() {
-    return dimensions.size();
+    return dimensionality;
   }
 
   /**
@@ -71,7 +72,7 @@ public class Subspace<V extends FeatureVector<V, ?>> implements TextWriteable, M
    * @see Subspace#joinLastDimensions(Subspace)
    */
   public Subspace<V> join(Subspace<V> other) {
-    SortedSet<Integer> newDimensions = joinLastDimensions(other);
+    BitSet newDimensions = joinLastDimensions(other);
     if(newDimensions == null) {
       return null;
     }
@@ -100,26 +101,15 @@ public class Subspace<V extends FeatureVector<V, ?>> implements TextWriteable, M
   public String toString(String pre) {
     StringBuffer result = new StringBuffer();
     result.append(pre).append("Dimensions: [");
-    for(Iterator<Integer> it = dimensions.iterator(); it.hasNext();) {
-      int d = it.next();
-      result.append(d + 1);
-      if(it.hasNext()) {
+    int start = dimensions.nextSetBit(0);
+    for(int d = start; d >= 0; d = dimensions.nextSetBit(d + 1)) {
+      if(d != start) {
         result.append(", ");
       }
+      result.append(d + 1);
     }
     result.append("]");
     return result.toString();
-  }
-
-  /**
-   * Serialize using {@link #toString()} method.
-   */
-  @Override
-  public void writeToText(TextWriterStream out, String label) {
-    if(label != null) {
-      out.commentPrintLn(label);
-    }
-    out.commentPrintLn(this.toString());
   }
 
   /**
@@ -132,7 +122,15 @@ public class Subspace<V extends FeatureVector<V, ?>> implements TextWriteable, M
    *         false otherwise
    */
   public boolean isSubspace(Subspace<V> subspace) {
-    return subspace.dimensions.containsAll(this.dimensions);
+    if(this.dimensionality > subspace.dimensionality) {
+      return false;
+    }
+    for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
+      if(!subspace.dimensions.get(d)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**
@@ -146,57 +144,46 @@ public class Subspace<V extends FeatureVector<V, ?>> implements TextWriteable, M
    * @return the joined dimensions of this subspace with the dimensions of the
    *         specified subspace if the join condition is fulfilled, null
    *         otherwise.
-   * @throws IllegalArgumentException if the dimensionality of the subspaces to
-   *         join differs
    */
-  protected SortedSet<Integer> joinLastDimensions(Subspace<V> other) {
-//    BitSet dims = new BitSet();
-//    
-//    for (int i = dims.nextSetBit(0); i >= 0; i = dims.nextSetBit(i + 1)) {
-//    }
-//    
-//    dims.
-    
-    
-    SortedSet<Integer> otherDimensions = other.dimensions;
-
-    if(this.dimensionality() != other.dimensionality()) {
-      throw new IllegalArgumentException("different number of dimensions: " + this.dimensionality() + " != " + other.dimensionality());
-    }
-
-    if(this.dimensions.last().compareTo(otherDimensions.last()) >= 0) {
+  protected BitSet joinLastDimensions(Subspace<V> other) {
+    if(this.dimensionality != other.dimensionality) {
       return null;
     }
 
-    SortedSet<Integer> result = new TreeSet<Integer>();
-    Iterator<Integer> it1 = this.dimensions.iterator();
-    Iterator<Integer> it2 = otherDimensions.iterator();
-    for(int i = 0; i < this.dimensions.size() - 1; i++) {
-      Integer dim1 = it1.next();
-      Integer dim2 = it2.next();
-      if(!dim1.equals(dim2)) {
-        return null;
+    BitSet resultDimensions = new BitSet();
+    int last1 = -1, last2 = -1;
+
+    for(int d1 = this.dimensions.nextSetBit(0), d2 = other.dimensions.nextSetBit(0); d1 >= 0 && d2 >= 0; d1 = this.dimensions.nextSetBit(d1 + 1), d2 = other.dimensions.nextSetBit(d2 + 1)) {
+
+      if(d1 == d2) {
+        resultDimensions.set(d1);
       }
-      result.add(dim1);
+      last1 = d1;
+      last2 = d2;
     }
 
-    result.add(this.dimensions.last());
-    result.add(otherDimensions.last());
-    return result;
+    if(last1 < last2) {
+      resultDimensions.set(last1);
+      resultDimensions.set(last2);
+      return resultDimensions;
+    }
+    else {
+      return null;
+    }
   }
 
-  /*
+  /**
+   * Returns the hash code value of the {@link dimensions} of this subspace.
+   * 
+   * @return a hash code value for this subspace
    * @see java.lang.Object#hashCode()
    */
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((dimensions == null) ? 0 : dimensions.hashCode());
-    return result;
+    return dimensions.hashCode();
   }
 
-  /*
+  /**
    * Indicates if the specified object is equal to this subspace, i.e. if the
    * specified object is a Subspace and is built of the same dimensions than
    * this subspace.
@@ -251,25 +238,17 @@ public class Subspace<V extends FeatureVector<V, ?>> implements TextWriteable, M
       if(s1.getDimensions() != null && s2.getDimensions() == null) {
         return 1;
       }
-      
-      int compare = s1.dimensionality()-s2.dimensionality();
-      if (compare != 0) {
+
+      int compare = s1.dimensionality() - s2.dimensionality();
+      if(compare != 0) {
         return compare;
       }
 
-      Iterator<Integer> it1 = s1.getDimensions().iterator();
-      Iterator<Integer> it2 = s2.getDimensions().iterator();
-      while(it1.hasNext()) {
-        Integer d1 = it1.next();
-        Integer d2 = it2.next();
-        if(d1 == d2) {
-          continue;
-        }
-        else {
+      for(int d1 = s1.getDimensions().nextSetBit(0), d2 = s2.getDimensions().nextSetBit(0); d1 >= 0 && d2 >= 0; d1 = s1.getDimensions().nextSetBit(d1 + 1), d2 = s2.getDimensions().nextSetBit(d2 + 1)) {
+        if(d1 != d2) {
           return d1 - d2;
         }
       }
-
       return 0;
     }
   }

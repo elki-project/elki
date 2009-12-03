@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
-import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
@@ -16,8 +14,7 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.Subspace;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
-import de.lmu.ifi.dbs.elki.data.model.AxesModel;
-import de.lmu.ifi.dbs.elki.data.model.DimensionModel;
+import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.Distance;
@@ -55,14 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * @param <V> the type of FeatureVector handled by this Algorithm
  * @param <D> the type of Distance used
  */
-// todo elke implementation
-/**
- * @author Elke Achtert
- * 
- * @param <V>
- * @param <D>
- */
-public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<V, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>, V> {
+public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<V, Clustering<SubspaceModel<V>>> implements ClusteringAlgorithm<Clustering<SubspaceModel<V>>, V> {
 
   /**
    * OptionID for {@link #DISTANCE_FUNCTION_PARAM}
@@ -128,7 +118,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
   /**
    * Holds the result;
    */
-  private Clustering<Model> result;
+  private Clustering<SubspaceModel<V>> result;
 
   /**
    * Provides the SUBCLU algorithm, adding parameters {@link #EPSILON_PARAM},
@@ -157,7 +147,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
    * 
    */
   @Override
-  protected Clustering<Model> runInTime(Database<V> database) throws IllegalStateException {
+  protected Clustering<SubspaceModel<V>> runInTime(Database<V> database) throws IllegalStateException {
     try {
       int dimensionality = database.dimensionality();
 
@@ -247,12 +237,12 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
         }
       }
 
-      result = new Clustering<Model>();
+      result = new Clustering<SubspaceModel<V>>();
       for(Subspace<V> subspace : clusterMap.keySet()) {
         List<Cluster<Model>> clusters = clusterMap.get(subspace);
         for(Cluster<Model> cluster : clusters) {
-          Cluster<Model> newCluster = new Cluster<Model>(cluster.getGroup());
-          newCluster.setModel(new AxesModel(dimensions(subspace)));
+          Cluster<SubspaceModel<V>> newCluster = new Cluster<SubspaceModel<V>>(cluster.getGroup());
+          newCluster.setModel(new SubspaceModel<V>(subspace));
           newCluster.setName(cluster.getName());
           result.addCluster(newCluster);
         }
@@ -272,7 +262,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
    * 
    * @return the result of the algorithm
    */
-  public Clustering<Model> getResult() {
+  public Clustering<SubspaceModel<V>> getResult() {
     return result;
   }
 
@@ -335,7 +325,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
 
     // selected dimensions for distance function
     parameters.add(OptionHandler.OPTION_PREFIX + AbstractDimensionsSelectingDoubleDistanceFunction.DIMS_ID.getName());
-    parameters.add(Util.parseSelectedBits(dimensions(subspace), ","));
+    parameters.add(Util.parseSelectedBits(subspace.getDimensions(), ","));
 
     // additional distance function parameters
     ArrayList<String> distanceFunctionParams = distanceFunction.getParameters();
@@ -454,10 +444,10 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
 
     // order result according to the dimensions
     List<Subspace<V>> result = new ArrayList<Subspace<V>>();
-    SortedSet<Integer> dimensions = subspace.getDimensions();
-    for(int dim : dimensions) {
-      SortedSet<Integer> newDimensions = new TreeSet<Integer>(dimensions);
-      newDimensions.remove(dim);
+    BitSet dimensions = subspace.getDimensions();
+    for(int dim = dimensions.nextSetBit(0); dim >= 0; dim = dimensions.nextSetBit(dim + 1)) {
+      BitSet newDimensions = (BitSet) dimensions.clone();
+      newDimensions.set(dim, false);
       result.add(new Subspace<V>(newDimensions));
     }
 
@@ -507,12 +497,12 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
   private String subspaceToString(Subspace<V> subspace) {
     StringBuffer result = new StringBuffer();
     result.append("[");
-    for(Integer dimension : subspace.getDimensions()) {
+    for(int dim = subspace.getDimensions().nextSetBit(0); dim >= 0; dim = subspace.getDimensions().nextSetBit(dim + 1)) {
       if(result.length() == 1) {
-        result.append(dimension + 1);
+        result.append(dim + 1);
       }
       else {
-        result.append(", ").append(dimension + 1);
+        result.append(", ").append(dim + 1);
       }
     }
     result.append("]");
@@ -520,17 +510,4 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
     return result.toString();
   }
   
-  /**
-   * Returns a BitSet representing the dimensions which build the specified subspace.
-   * @param subspace the subspace
-   * @return a BitSet representing the dimensions which build the specified subspace
-   */
-  private BitSet dimensions(Subspace<V> subspace) {
-    SortedSet<Integer> dimensions = subspace.getDimensions();
-    BitSet dimensionBits = new BitSet();
-    for(Integer d : dimensions) {
-      dimensionBits.set(d);
-    }
-    return dimensionBits;
-  }
 }
