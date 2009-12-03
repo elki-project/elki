@@ -52,8 +52,6 @@ public class ClusterOrderAdapter implements AlgorithmAdapter {
     ArrayList<String> params = clusterorderVisualizer.getParameters();
     for (ClusterOrderResult<?> co : cos) {
       ClusterOrderVisualizer<?> coVis = new ClusterOrderVisualizer<DoubleVector>();
-      // don't show by default.
-      coVis.getMetadata().put(Visualizer.META_VISIBLE_DEFAULT, false);
       // setup parameters.
       try {
         coVis.setParameters(params);
