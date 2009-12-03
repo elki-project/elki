@@ -4,6 +4,7 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.UnprojectedVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 
 /**
  * Visualization that does not require extra information for rendering.
@@ -30,5 +31,10 @@ class VisualizationUnprojectedInfo extends VisualizationInfo {
     synchronized(vis) {
       return vis.visualize(plot);
     }
+  }
+
+  @Override
+  protected Visualizer getVisualization() {
+    return vis;
   }
 }

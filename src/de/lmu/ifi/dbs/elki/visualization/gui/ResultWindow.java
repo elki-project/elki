@@ -230,11 +230,6 @@ public class ResultWindow extends JFrame {
   public void addVisualizations(Collection<Visualizer> vs) {
     visualizers.addAll(vs);
     overview.addVisualizations(vs);
-    for(Visualizer v : vs) {
-      if(v.getMetadata().getGenerics(Visualizer.META_VISIBLE, Boolean.class) == null) {
-        v.getMetadata().put(Visualizer.META_VISIBLE, true);
-      }
-    }
     update();
     showPlot(overview);
   }
@@ -254,7 +249,12 @@ public class ResultWindow extends JFrame {
     popup.removeAll();
     for(final Visualizer v : visualizers) {
       Boolean enabled = v.getMetadata().getGenerics(Visualizer.META_VISIBLE, Boolean.class);
-      assert(enabled != null);
+      if (enabled == null) {
+        enabled = v.getMetadata().getGenerics(Visualizer.META_VISIBLE_DEFAULT, Boolean.class);
+      }
+      if (enabled == null) {
+        enabled = true;
+      }
       final String name = v.getMetadata().getGenerics(Visualizer.META_NAME, String.class);
       final CheckboxMenuItem visItem = new CheckboxMenuItem(name, enabled);
       visItem.addItemListener(new ItemListener() {

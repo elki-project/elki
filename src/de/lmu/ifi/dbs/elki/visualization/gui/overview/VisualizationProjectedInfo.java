@@ -5,6 +5,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.ProjectedVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 
 /**
  * Visualization info that needs projection information.
@@ -39,5 +40,10 @@ class VisualizationProjectedInfo extends VisualizationInfo {
     synchronized(vis) {
       return vis.visualize(plot, proj);
     }
+  }
+
+  @Override
+  protected Visualizer getVisualization() {
+    return vis;
   }
 }
