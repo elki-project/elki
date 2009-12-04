@@ -21,6 +21,7 @@ import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -139,6 +140,91 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
    * The CSS class used on "selectable" rectangles.
    */
   private CSSClass selcss;
+
+  /**
+   * Recompute the layout of visualizations.
+   */
+  private void arrangeVisualizations() {
+    // split the visualizers into three sets.
+    Collection<Projection1DVisualizer<?>> vis1d = new ArrayList<Projection1DVisualizer<?>>(vis.size());
+    Collection<Projection2DVisualizer<?>> vis2d = new ArrayList<Projection2DVisualizer<?>>(vis.size());
+    Collection<UnprojectedVisualizer> visup = new ArrayList<UnprojectedVisualizer>(vis.size());
+    for(Visualizer v : vis) {
+      if(Projection2DVisualizer.class.isAssignableFrom(v.getClass())) {
+        vis2d.add((Projection2DVisualizer<?>) v);
+      }
+      else if(Projection1DVisualizer.class.isAssignableFrom(v.getClass())) {
+        vis1d.add((Projection1DVisualizer<?>) v);
+      }
+      else if(UnprojectedVisualizer.class.isAssignableFrom(v.getClass())) {
+        visup.add((UnprojectedVisualizer) v);
+      }
+      else {
+        LoggingUtil.exception("Encountered visualization that is neither projected nor unprojected!", new Throwable());
+      }
+    }
+    // We'll use three regions for now:
+    // 2D projections starting at 0,0 and going right and down.
+    // 1D projections starting at 0, -1 and going right
+    // Other projections starting at -1, min() and going down.
+    plotmap = new PlotMap<NV>();
+    // FIXME: ugly cast used here.
+    Database<NV> dvdb = uglyCastDatabase();
+    LinearScale[] scales = null;
+    if(vis2d.size() > 0 || vis1d.size() > 0) {
+      scales = Scales.calcScales(dvdb);
+    }
+    if(vis2d.size() > 0) {
+      int dim = db.dimensionality();
+      for(int d1 = 1; d1 <= dim; d1++) {
+        for(int d2 = d1 + 1; d2 <= dim; d2++) {
+          VisualizationProjection proj = new VisualizationProjection(dvdb, scales, d1, d2);
+
+          for(Projection2DVisualizer<?> v : vis2d) {
+            VisualizationInfo vi = new VisualizationProjectedInfo(v, proj);
+            plotmap.addVis(d1 - 1, d2 - 2, 1.0, 1.0, vi);
+          }
+        }
+      }
+      if(dim >= 3) {
+        AffineTransformation p = VisualizationProjection.axisProjection(dim, 1, 2);
+        p.addRotation(0, 2, Math.PI / 180 * -30. / dim);
+        p.addRotation(1, 2, Math.PI / 180 * 50. / dim);
+        VisualizationProjection proj = new VisualizationProjection(dvdb, scales, p);
+        for(Projection2DVisualizer<?> v : vis2d) {
+          VisualizationInfo vi = new VisualizationProjectedInfo(v, proj);
+          plotmap.addVis(Math.ceil((dim - 1) / 2.0), 0.0, Math.floor((dim - 1) / 2.0), Math.floor((dim - 1) / 2.0), vi);
+        }
+      }
+    }
+    if(vis1d.size() > 0) {
+      int dim = db.dimensionality();
+      for(int d1 = 1; d1 <= dim; d1++) {
+        VisualizationProjection proj = new VisualizationProjection(dvdb, scales, d1, (d1 == 1 ? 2 : 1));
+        double ypos = 0;
+        for(Projection1DVisualizer<?> v : vis1d) {
+          VisualizationInfo vi = new VisualizationProjectedInfo(v, proj);
+          // TODO: 1d vis might have a different native scaling.
+          double height = 1.0;
+          plotmap.addVis(d1 - 1, ypos - height, 1.0, height, vi);
+          ypos = ypos - height;
+        }
+      }
+    }
+    if(visup.size() > 0) {
+      // find starting position.
+      Double pos = plotmap.minmaxy.getMin();
+      if(pos == null) {
+        pos = 0.0;
+      }
+      for(UnprojectedVisualizer v : visup) {
+        VisualizationInfo vi = new VisualizationUnprojectedInfo(v);
+        // TODO: might have different scaling.
+        plotmap.addVis(-1, pos, 1., 1., vi);
+        pos += 1.0;
+      }
+    }
+  }
 
   /**
    * Refresh the overview plot.
@@ -270,81 +356,6 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
     if(thumbnails != null) {
       thumbnails.shutdown = true;
       thumbnails = null;
-    }
-  }
-
-  /**
-   * Recompute the layout of visualizations.
-   */
-  private void arrangeVisualizations() {
-    // split the visualizers into three sets.
-    Collection<Projection1DVisualizer<?>> vis1d = new ArrayList<Projection1DVisualizer<?>>(vis.size());
-    Collection<Projection2DVisualizer<?>> vis2d = new ArrayList<Projection2DVisualizer<?>>(vis.size());
-    Collection<UnprojectedVisualizer> visup = new ArrayList<UnprojectedVisualizer>(vis.size());
-    for(Visualizer v : vis) {
-      if(Projection2DVisualizer.class.isAssignableFrom(v.getClass())) {
-        vis2d.add((Projection2DVisualizer<?>) v);
-      }
-      else if(Projection1DVisualizer.class.isAssignableFrom(v.getClass())) {
-        vis1d.add((Projection1DVisualizer<?>) v);
-      }
-      else if(UnprojectedVisualizer.class.isAssignableFrom(v.getClass())) {
-        visup.add((UnprojectedVisualizer) v);
-      }
-      else {
-        LoggingUtil.exception("Encountered visualization that is neither projected nor unprojected!", new Throwable());
-      }
-    }
-    // We'll use three regions for now:
-    // 2D projections starting at 0,0 and going right and down.
-    // 1D projections starting at 0, -1 and going right
-    // Other projections starting at -1, min() and going down.
-    plotmap = new PlotMap<NV>();
-    // FIXME: ugly cast used here.
-    Database<NV> dvdb = uglyCastDatabase();
-    LinearScale[] scales = null;
-    if(vis2d.size() > 0 || vis1d.size() > 0) {
-      scales = Scales.calcScales(dvdb);
-    }
-    if(vis2d.size() > 0) {
-      int dim = db.dimensionality();
-      for(int d1 = 1; d1 <= dim; d1++) {
-        for(int d2 = d1 + 1; d2 <= dim; d2++) {
-          VisualizationProjection proj = new VisualizationProjection(dvdb, scales, d1, d2);
-
-          for(Projection2DVisualizer<?> v : vis2d) {
-            VisualizationInfo vi = new VisualizationProjectedInfo(v, proj);
-            plotmap.addVis(d1 - 1, d2 - 2, 1.0, 1.0, vi);
-          }
-        }
-      }
-    }
-    if(vis1d.size() > 0) {
-      int dim = db.dimensionality();
-      for(int d1 = 1; d1 <= dim; d1++) {
-        VisualizationProjection proj = new VisualizationProjection(dvdb, scales, d1, (d1 == 1 ? 2 : 1));
-        double ypos = 0;
-        for(Projection1DVisualizer<?> v : vis1d) {
-          VisualizationInfo vi = new VisualizationProjectedInfo(v, proj);
-          // TODO: 1d vis might have a different native scaling.
-          double height = 1.0;
-          plotmap.addVis(d1 - 1, ypos - height, 1.0, height, vi);
-          ypos = ypos - height;
-        }
-      }
-    }
-    if(visup.size() > 0) {
-      // find starting position.
-      Double pos = plotmap.minmaxy.getMin();
-      if(pos == null) {
-        pos = 0.0;
-      }
-      for(UnprojectedVisualizer v : visup) {
-        VisualizationInfo vi = new VisualizationUnprojectedInfo(v);
-        // TODO: might have different scaling.
-        plotmap.addVis(-1, pos, 1., 1., vi);
-        pos += 1.0;
-      }
     }
   }
 
