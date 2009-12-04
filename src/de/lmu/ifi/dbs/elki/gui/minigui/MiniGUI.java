@@ -84,11 +84,16 @@ public class MiniGUI extends JPanel {
    * Combo box for saved settings
    */
   protected JComboBox savedCombo;
-  
+
   /**
    * Model to link the combobox with
    */
   protected SettingsComboboxModel savedSettingsModel;
+
+  /**
+   * The "run" button.
+   */
+  private JButton runButton;
 
   /**
    * Constructor
@@ -135,7 +140,7 @@ public class MiniGUI extends JPanel {
       public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
         String key = savedSettingsModel.getSelectedItem();
         ArrayList<String> settings = store.get(key);
-        if (settings != null) {
+        if(settings != null) {
           outputArea.clear();
           outputArea.publish("Parameters: " + FormatUtil.format(settings, " ") + NEWLINE, Level.INFO);
           doSetParameters(settings);
@@ -180,11 +185,17 @@ public class MiniGUI extends JPanel {
     buttonPanel.add(removeButton);
 
     // button to launch the task
-    JButton runButton = new JButton("Run Task");
+    runButton = new JButton("Run Task");
     runButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
-        runTask();
+        Thread r = new Thread() {
+          @Override
+          public void run() {
+            runTask();
+          }
+        };
+        r.start();
       }
     });
     buttonPanel.add(runButton);
@@ -273,6 +284,9 @@ public class MiniGUI extends JPanel {
     parameterTable.setEnabled(false);
     ArrayList<String> params = parameters.serializeParameters();
     parameterTable.setEnabled(true);
+
+    runButton.setEnabled(false);
+
     outputArea.clear();
     outputArea.publish("Running: " + FormatUtil.format(params, " ") + NEWLINE, Level.INFO);
     KDDTask<DatabaseObject> task = new KDDTask<DatabaseObject>();
@@ -286,6 +300,8 @@ public class MiniGUI extends JPanel {
     catch(Exception e) {
       logger.exception(e);
     }
+
+    runButton.setEnabled(true);
   }
 
   /**
