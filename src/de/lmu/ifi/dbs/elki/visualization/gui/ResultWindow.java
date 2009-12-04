@@ -145,10 +145,6 @@ public class ResultWindow extends JFrame {
 
     this.getContentPane().add(panel);
 
-    this.setSize(600, 600);
-    // Maximize.
-    this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
-
     this.overview = new OverviewPlot<DoubleVector>(db, result);
     // when a subplot is clicked, show the selected subplot.
     overview.addActionListener(new ActionListener() {
@@ -172,6 +168,10 @@ public class ResultWindow extends JFrame {
 
     // Visualizers
     this.visualizers = new ArrayList<Visualizer>();
+    
+    // Maximize.
+    this.setSize(600, 600);
+    this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
   }
 
   /**
