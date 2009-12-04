@@ -89,4 +89,64 @@ public class MathUtil {
     double correlation = covXY / (popSdX * popSdY);
     return correlation;
   }
+
+  /**
+   * Compute the Factorial of n, often written as <code>c!</code> in mathematics. 
+   * 
+   * @param n Note: n &gt;= 0
+   * @return n * (n-1) * (n-2) * ... * 1
+   */
+  public static double factorial(int n) {
+    double nFac = 1.0;
+    for(int i = n; i > 0; i--) {
+      nFac *= i;
+    }
+    return nFac;
+  }
+
+  /**
+   * <p>
+   * Binomial coefficent, also known as "n choose k")
+   * </p>
+   * 
+   * @param n Total number of samples. n &gt; 0
+   * @param k Number of elements to choose. <code>n &gt;= k</code>, <code>k &gt;= 0</code>
+   * @return n! / (k! * (n-k)!)
+   */
+  public static double binomialCoefficient(int n, int k) {
+    long temp = 1;
+    int m = Math.max(k, n - k);
+    for(int i = n, j = 1; i > m; i--, j++) {
+      temp = temp * i / j;
+    }
+    return temp;
+  }
+
+  /**
+   * Probability density function of the normal distribution.
+   * 
+   * <pre>
+   * 1/(SQRT(2*pi*sigma^2)) * e^(-(x-mu)^2/2sigma^2)
+   * </pre>
+   * 
+   * @param x The value.
+   * @param mu The mean.
+   * @param sigma The standard deviation.
+   * @return PDF of the given normal distribution at x.
+   */
+  public static double normalPDF(double x, double mu, double sigma) {
+    return 1 / (Math.sqrt(2 * Math.PI * sigma * sigma)) * Math.exp(-1 * (x - mu) * (x - mu) / 2 / sigma / sigma);
+  }
+
+  /**
+   * Cumulative probability density function (CDF) of a normal distribution.
+   * 
+   * @param x
+   * @param mu Mean value
+   * @param sigma Standard deviation.
+   * @return The CDF of the normal given distribution at x.
+   */
+  public static double normalCDF(double x, double mu, double sigma) {
+    return (1 + ErrorFunctions.erf(x / Math.sqrt(2))) / 2;
+  }
 }
