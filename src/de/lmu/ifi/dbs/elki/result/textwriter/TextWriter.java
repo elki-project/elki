@@ -285,7 +285,7 @@ public class TextWriter<O extends DatabaseObject> {
 
   private void writeIterableResult(Database<O> db, StreamFactory streamOpener, IterableResult<?> ri, MultiResult mr) throws UnableToComplyException, IOException {
     String filename = ri.getName();
-    logger.verbose("Filename is " + filename);
+    logger.debugFine("Filename is " + filename);
     if(filename == null) {
       filename = "list";
     }
