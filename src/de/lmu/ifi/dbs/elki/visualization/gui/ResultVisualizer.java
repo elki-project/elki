@@ -3,6 +3,8 @@ package de.lmu.ifi.dbs.elki.visualization.gui;
 import java.util.Collection;
 import java.util.List;
 
+import javax.swing.JFrame;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -54,6 +56,7 @@ public class ResultVisualizer extends AbstractParameterizable implements ResultH
     ResultWindow window = new ResultWindow(db, mr);
     window.addVisualizations(vs);
     window.setVisible(true);
+    window.setExtendedState(window.getExtendedState() | JFrame.MAXIMIZED_BOTH);    
   }
 
   @Override
