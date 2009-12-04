@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  *
  * @param <O>
  */
+// TODO: use reproducible Random
 public class RandomSampleReferencePoints<O extends NumberVector<O, ?>> extends AbstractParameterizable implements ReferencePointsHeuristic<O> {
   /**
    * OptionID for {@link #N_PARAM}
@@ -54,7 +55,7 @@ public class RandomSampleReferencePoints<O extends NumberVector<O, ?>> extends A
 
   @Override
   public Collection<O> getReferencePoints(Database<O> db) {
-    if (samplesize > db.size()) {
+    if (samplesize >= db.size()) {
       logger.warning("Sample size is larger than database size!");
       
       ArrayList<O> selection = new ArrayList<O>(db.size());
@@ -75,24 +76,31 @@ public class RandomSampleReferencePoints<O extends NumberVector<O, ?>> extends A
         setsize += 2 << (int)Math.ceil(Math.log(samplesize * 3) / log4);
     }
     //logger.debug("Setsize: "+setsize);
-    if (samplesize <= setsize) {
+    List<Integer> ids = db.getIDs();
+    boolean fastrandomaccess = false;
+    if (ArrayList.class.isAssignableFrom(ids.getClass())) {
+      fastrandomaccess = true;
+    }
+    if (samplesize <= setsize || !fastrandomaccess) {
       // use pool approach
-      ArrayList<Integer> pool = new ArrayList<Integer>(db.getIDs());
+      // if getIDs() is an array list, we don't need to copy it again.
+      ArrayList<Integer> pool = ((ArrayList.class.isAssignableFrom(ids.getClass())) ? (ArrayList<Integer>) ids : new ArrayList<Integer>(ids));
       for (int i = 0; i < samplesize; i++) {
-        int j = (int)(Math.random() * (dbsize-i));
+        int j = (int)Math.floor(Math.random() * (dbsize-i));
         result.add(db.get(pool.get(j)));
         pool.set(j, pool.get(dbsize-i-1));
       }
+      ids = null; // dirty!
     } else {
       HashSet<Integer> selected = new HashSet<Integer>();
       for (int i = 0; i < samplesize; i++) {
-        int j = (int)(Math.random() * dbsize);
+        int j = (int)Math.floor(Math.random() * dbsize);
         // Redraw from pool.
         while (selected.contains(j)) {
-          j = (int)(Math.random() * dbsize);
+          j = (int)Math.floor(Math.random() * dbsize);
         }
         selected.add(j);
-        result.add(db.get(j));
+        result.add(db.get(ids.get(j)));
       }
     }
     assert(result.size() == samplesize);
