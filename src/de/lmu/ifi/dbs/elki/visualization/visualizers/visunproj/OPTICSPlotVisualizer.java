@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.imageio.ImageIO;
-import javax.swing.text.html.StyleSheet;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
