@@ -203,7 +203,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
         double[] clusterProbabilities = probClusterIGivenX.get(id);
         V instance = database.get(id);
         for(int i = 0; i < k; i++) {
-          V difference = instance.plus(means.get(i).negativeVector());
+          V difference = instance.minus(means.get(i));
           Matrix newCovMatr = covarianceMatrices.get(i).plus(difference.getColumnVector().times(difference.getRowVector()).times(clusterProbabilities[i]));
           covarianceMatrices.set(i, newCovMatr);
         }
@@ -282,7 +282,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clust
       V x = database.get(id);
       List<Double> probabilities = new ArrayList<Double>(k);
       for(int i = 0; i < k; i++) {
-        V difference = x.plus(means.get(i).negativeVector());
+        V difference = x.minus(means.get(i));
         Matrix differenceRow = difference.getRowVector();
         Matrix differenceCol = difference.getColumnVector();
         Matrix rowTimesCov = differenceRow.times(invCovMatr.get(i));

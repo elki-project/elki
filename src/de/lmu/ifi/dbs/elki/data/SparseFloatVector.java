@@ -234,6 +234,27 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
 
   /**
    * 
+   * @see de.lmu.ifi.dbs.elki.data.NumberVector#plus(de.lmu.ifi.dbs.elki.data.NumberVector)
+   */
+  public SparseFloatVector minus(SparseFloatVector fv) {
+    if(fv.getDimensionality() != this.getDimensionality()) {
+      throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
+    }
+    Map<Integer, Float> newValues = new HashMap<Integer, Float>(this.values);
+    
+    for(Integer fvkey : fv.values.keySet()){
+      if(newValues.containsKey(fvkey)){
+        newValues.put(fvkey, newValues.get(fvkey)-fv.values.get(fvkey));
+      }
+      else{
+        newValues.put(fvkey, fv.values.get(fvkey));
+      }
+    }
+    return new SparseFloatVector(newValues,this.dimensionality);
+  }
+
+  /**
+   * 
    * @see de.lmu.ifi.dbs.elki.data.NumberVector#nullVector()
    */
   public SparseFloatVector nullVector() {

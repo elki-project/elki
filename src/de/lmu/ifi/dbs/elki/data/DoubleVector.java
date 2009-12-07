@@ -180,6 +180,17 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector,Double> {
     return new DoubleVector(values);
   }
 
+  public DoubleVector minus(DoubleVector fv) {
+    if (fv.getDimensionality() != this.getDimensionality()) {
+      throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
+    }
+    double[] values = new double[this.values.length];
+    for (int i = 0; i < values.length; i++) {
+      values[i] = this.values[i] - fv.getValue(i + 1);
+    }
+    return new DoubleVector(values);
+  }
+
   public DoubleVector nullVector() {
     return new DoubleVector(new double[this.values.length]);
   }

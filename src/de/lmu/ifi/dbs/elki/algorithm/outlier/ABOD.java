@@ -545,7 +545,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends DistanceBasedAlgorithm<V
       V exp = data.get(iter.next());
       System.out.println("Most common neighbor: " + exp);
       // determine difference Vector
-      V vals = exp.plus(vect1.negativeVector());
+      V vals = exp.minus(vect1);
       System.out.println(vals);
       // System.out.println(new FeatureVector(
       // "Diff-"+vect1.getPrimaryKey(),vals ));

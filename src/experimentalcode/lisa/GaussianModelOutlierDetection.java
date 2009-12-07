@@ -28,7 +28,6 @@ public class GaussianModelOutlierDetection<V extends NumberVector<V,Double>> ext
 	protected MultiResult runInTime(Database<V> database) throws IllegalStateException {
 		double maxProb = 0;
 	  V mean = DatabaseUtil.centroid(database);
-		V meanNeg = mean.negativeVector();
 		debugFine(mean.toString());
 		Matrix covarianceMatrix = DatabaseUtil.covarianceMatrix(database, mean);
 		debugFine(covarianceMatrix.toString());
@@ -38,7 +37,7 @@ public class GaussianModelOutlierDetection<V extends NumberVector<V,Double>> ext
 		//for each object compute mahalanobis distance
 		 for (Integer id : database) {
              V x = database.get(id);
-             Vector x_minus_mean = x.plus(meanNeg).getColumnVector();
+             Vector x_minus_mean = x.minus(mean).getColumnVector();
              double mDist = x_minus_mean.transposeTimes(covarianceTransposed).times(x_minus_mean).get(0,0);
              double prob = fakt * Math.exp(- mDist/2.0);
              if(prob > maxProb) {
