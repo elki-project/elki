@@ -77,6 +77,16 @@ public interface NumberVector<V extends NumberVector<V, N>, N extends Number> ex
   V plus(V fv);
   
   /**
+   * Returns a new NumberVector of V that is the sum of this NumberVector of V and the
+   * negativeVector() of given NumberVector of V.
+   * 
+   * @param fv a NumberVector of V to be subtracted to this NumberVector of V
+   * @return a new NumberVector of V that is the sum of this NumberVector of V and the
+   *         negative of given NumberVector of V
+   */
+  V minus(V fv);
+  
+  /**
    * Provides the scalar product (inner product) of this NumberVector of V and the given NumberVector of V.
    * @param fv the NumberVector of V to compute the scalar product for
    * @return the scalar product (inner product) of this and the given NumberVector of V

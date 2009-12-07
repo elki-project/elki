@@ -46,10 +46,8 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<V, ?>, P ext
       return new DoubleDistance(Double.POSITIVE_INFINITY);
     }
 
-    // noinspection unchecked
-    Matrix v1Mv2 = v1.plus(v2.negativeVector()).getColumnVector();
-    // noinspection unchecked
-    Matrix v2Mv1 = v2.plus(v1.negativeVector()).getColumnVector();
+    Matrix v1Mv2 = v1.minus(v2).getColumnVector();
+    Matrix v2Mv1 = v2.minus(v1).getColumnVector();
 
     double dist1 = v1Mv2.transposeTimes(m1).times(v1Mv2).get(0, 0);
     double dist2 = v2Mv1.transposeTimes(m2).times(v2Mv1).get(0, 0);
@@ -96,7 +94,7 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<V, ?>, P ext
     V mbrVector = v.newInstance(r);
     Matrix m = getDatabase().getAssociation(AssociationID.LOCALLY_WEIGHTED_MATRIX, v.getID());
     // noinspection unchecked
-    Matrix rv1Mrv2 = v.plus(mbrVector.negativeVector()).getColumnVector();
+    Matrix rv1Mrv2 = v.minus(mbrVector).getColumnVector();
     double dist = rv1Mrv2.transposeTimes(m).times(rv1Mrv2).get(0, 0);
 
     return new DoubleDistance(Math.sqrt(dist));

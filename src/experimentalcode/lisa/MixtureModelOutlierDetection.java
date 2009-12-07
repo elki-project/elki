@@ -179,7 +179,6 @@ private static final double SINGULARITY_CHEAT = 1E-9;
     }
     else {
       V mean = DatabaseUtil.centroid(database, normalObjs);
-      V meanNeg = mean.negativeVector();
       
       Matrix covarianceMatrix = DatabaseUtil.covarianceMatrix(database, normalObjs);
       Matrix covInv;
@@ -193,7 +192,7 @@ private static final double SINGULARITY_CHEAT = 1E-9;
       //for each object compute probability and sum
        for (Integer id: normalObjs) {
                V x = database.get(id);
-               Vector x_minus_mean = x.plus(meanNeg).getColumnVector();
+               Vector x_minus_mean = x.minus(mean).getColumnVector();
                double mDist = x_minus_mean.transposeTimes(covInv).times(x_minus_mean).get(0,0);
                prob += Math.log(fakt * Math.exp(- mDist/2.0));
                

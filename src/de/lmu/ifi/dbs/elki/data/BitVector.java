@@ -281,6 +281,25 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
   }
 
   /**
+   * Returns a bit vector corresponding to an NXOR operation on this and the
+   * specified bit vector.
+   * 
+   * @param fv the bit vector to add
+   * @return a new bit vector corresponding to an NXOR operation on this and the
+   *         specified bit vector
+   */
+  public BitVector minus(BitVector fv) {
+    if(this.getDimensionality()!=fv.getDimensionality()){
+      throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
+    }
+
+    BitVector bv = new BitVector(fv.getBits(), this.dimensionality);
+    bv.bits.flip(0, dimensionality);
+    bv.bits.xor(this.bits);
+    return bv;
+  }
+
+  /**
    * Returns whether the bit at specified index is set.
    * 
    * @param index the index of the bit to inspect

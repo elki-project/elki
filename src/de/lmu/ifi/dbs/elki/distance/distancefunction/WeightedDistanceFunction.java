@@ -43,7 +43,7 @@ public class WeightedDistanceFunction<V extends NumberVector<V, ?>> extends Abst
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + o1.toString() + "\n  second argument: " + o2.toString());
     }
 
-    Vector o1_minus_o2 = o1.plus(o2.negativeVector()).getColumnVector();
+    Vector o1_minus_o2 = o1.minus(o2).getColumnVector();
     double dist = MathUtil.mahalanobisDistance(weightMatrix, o1_minus_o2);
 
     return new DoubleDistance(dist);
