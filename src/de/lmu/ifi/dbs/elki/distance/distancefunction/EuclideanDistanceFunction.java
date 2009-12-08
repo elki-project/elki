@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
  * @author Arthur Zimek
  * @param <V> the type of FeatureVector to compute the distances in between
  */
-public class EuclideanDistanceFunction<V extends NumberVector<V,?>> extends AbstractDoubleDistanceFunction<V> implements SpatialDistanceFunction<V, DoubleDistance> {
+public class EuclideanDistanceFunction<V extends NumberVector<V, ?>> extends AbstractDoubleDistanceFunction<V> implements SpatialDistanceFunction<V, DoubleDistance> {
   /**
    * Provides a Euclidean distance function that can compute the Euclidean
    * distance (that is a DoubleDistance) for FeatureVectors.
@@ -29,7 +29,7 @@ public class EuclideanDistanceFunction<V extends NumberVector<V,?>> extends Abst
   @Override
   public DoubleDistance distance(V v1, V v2) {
     if(v1.getDimensionality() != v2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString()+"\n"+v1.getDimensionality() +"!="+ v2.getDimensionality());
+      throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString() + "\n" + v1.getDimensionality() + "!=" + v2.getDimensionality());
     }
     double sqrDist = 0;
     for(int i = 1; i <= v1.getDimensionality(); i++) {
@@ -47,19 +47,22 @@ public class EuclideanDistanceFunction<V extends NumberVector<V,?>> extends Abst
   @Override
   public DoubleDistance minDist(HyperBoundingBox mbr, V v) {
     if(mbr.getDimensionality() != v.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + v.toString()+"\n"+mbr.getDimensionality() +"!="+ v.getDimensionality());
+      throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + v.toString() + "\n" + mbr.getDimensionality() + "!=" + v.getDimensionality());
     }
 
     double sqrDist = 0;
     for(int d = 1; d <= v.getDimensionality(); d++) {
       double value = v.getValue(d).doubleValue();
       double r;
-      if(value < mbr.getMin(d))
+      if(value < mbr.getMin(d)) {
         r = mbr.getMin(d);
-      else if(value > mbr.getMax(d))
+      }
+      else if(value > mbr.getMax(d)) {
         r = mbr.getMax(d);
-      else
+      }
+      else {
         r = value;
+      }
 
       double manhattanI = value - r;
       sqrDist += manhattanI * manhattanI;
