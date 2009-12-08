@@ -142,10 +142,12 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
   }
 
   public Float getValue(int dimension) {
-    if(dimension < 1 || dimension > values.length) {
+    try {
+      return values[dimension - 1];
+    }
+    catch(ArrayIndexOutOfBoundsException e) {
       throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
     }
-    return values[dimension - 1];
   }
 
   public Vector getColumnVector() {
