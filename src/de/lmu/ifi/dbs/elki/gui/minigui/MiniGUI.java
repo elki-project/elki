@@ -29,8 +29,10 @@ import de.lmu.ifi.dbs.elki.gui.util.ParametersModel;
 import de.lmu.ifi.dbs.elki.gui.util.SavedSettingsFile;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -254,10 +256,9 @@ public class MiniGUI extends JPanel {
    */
   protected List<Pair<Parameterizable, Option<?>>> doSetParameters(ArrayList<String> params) {
     KDDTask<DatabaseObject> task = new KDDTask<DatabaseObject>();
+    List<String> remainingParameters = null;
     try {
-      if(params.size() > 0) {
-        task.setParameters(params);
-      }
+      remainingParameters = task.setParameters(params);
     }
     catch(ParameterException e) {
       logger.error("Parameter Error: " + e.getMessage());
@@ -268,6 +269,17 @@ public class MiniGUI extends JPanel {
 
     // Collect options
     ArrayList<Pair<Parameterizable, Option<?>>> options = task.collectOptions();
+    if (remainingParameters != null && !remainingParameters.isEmpty()) {
+      RemainingOptions remo = new RemainingOptions();
+      try {
+        remo.setValue(FormatUtil.format(remainingParameters, " "));
+      }
+      catch(ParameterException e) {
+        logger.exception(e);
+      }
+      logger.warning("Unused parameters:" + FormatUtil.format(remainingParameters, " "));
+      options.add(new Pair<Parameterizable, Option<?>>(task, remo));
+    }
 
     // update table:
     parameterTable.setEnabled(false);
@@ -394,6 +406,14 @@ public class MiniGUI extends JPanel {
      */
     public void update() {
       fireContentsChanged(this, 0, getSize() + 1);
+    }
+  }
+  
+  static OptionID REMAINING_OPTIONS_ID = OptionID.getOrCreateOptionID("", "Unrecognized options."); 
+  class RemainingOptions extends PatternParameter {    
+    public RemainingOptions() {
+      super(REMAINING_OPTIONS_ID);
+      super.setOptional(true);
     }
   }
 }
