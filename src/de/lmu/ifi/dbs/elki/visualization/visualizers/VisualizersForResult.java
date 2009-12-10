@@ -96,19 +96,21 @@ public class VisualizersForResult extends AbstractParameterizable {
   @Override
   public List<String> setParameters(List<String> args) throws ParameterException {
     List<String> remainingParameters = super.setParameters(args);
-    
+    List<String> usedParameters = new ArrayList<String>();
     for (AlgorithmAdapter a : adapters){
       // parameterize if possible.
       if (a instanceof Parameterizable) {
         ((Parameterizable)a).setParameters(remainingParameters);
       }
       for (Visualizer v : a.getProvidedVisualizers()){
-        List<String> leftoverParameters = v.setParameters(remainingParameters);
-        remainingParameters.removeAll(leftoverParameters);
+        v.setParameters(remainingParameters);
+        usedParameters.addAll(v.getParameters());
         // TODO: collect the usable parameters somehow!
         //addParameterizable(v);
       }
     }
+    // hack, this should be done with parameter understanding...
+    remainingParameters.removeAll(usedParameters);
     
     rememberParametersExcept(args, remainingParameters);
     return remainingParameters;
