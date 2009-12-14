@@ -129,9 +129,9 @@ public class CacheDoubleDistanceInOnDiskMatrix<O extends DatabaseObject, N exten
       for(Integer id2 : database) {
         if(id2 >= id1) {
           byte[] data = new byte[8];
-          double d = distance.distance(id1, id2).getValue().doubleValue();
+          double d = distance.distance(id1, id2).doubleValue();
           if(debugExtraCheckSymmetry) {
-            double d2 = distance.distance(id2, id1).getValue().doubleValue();
+            double d2 = distance.distance(id2, id1).doubleValue();
             if(Math.abs(d-d2) > 0.0000001) {
               logger.warning("Distance function doesn't appear to be symmetric!");
             }            

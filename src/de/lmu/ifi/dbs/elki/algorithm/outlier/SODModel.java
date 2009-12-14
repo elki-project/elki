@@ -89,7 +89,7 @@ public class SODModel<O extends NumberVector<O, ?>> implements TextWriteable, Co
    */
   private double subspaceOutlierDegree(O queryObject, O center, BitSet weightVector) {
     DISTANCE_FUNCTION.setSelectedDimensions(weightVector);
-    double distance = DISTANCE_FUNCTION.distance(queryObject, center).getValue();
+    double distance = DISTANCE_FUNCTION.distance(queryObject, center).doubleValue();
     distance /= weightVector.cardinality();
     return distance;
   }

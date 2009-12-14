@@ -134,10 +134,10 @@ public class CacheFloatDistanceInOnDiskMatrix<O extends DatabaseObject, N extend
       for(Integer id2 : database) {
         if(id2 >= id1) {
           byte[] data = new byte[8];
-          float d = distance.distance(id1, id2).getValue().floatValue();
+          float d = distance.distance(id1, id2).floatValue();
           ByteArrayUtil.writeFloat(data, 0, d);
           if(debugExtraCheckSymmetry) {
-            double d2 = distance.distance(id2, id1).getValue().floatValue();
+            float d2 = distance.distance(id2, id1).floatValue();
             if(Math.abs(d-d2) > 0.0000001) {
               logger.warning("Distance function doesn't appear to be symmetric!");
             }            

@@ -420,7 +420,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
 
         List<DistanceResultPair<N>> knn = db.kNNQueryForID(idx, k, distanceFunction);
 
-        double maxdist = knn.get(knn.size() - 1).getDistance().getValue().doubleValue();
+        double maxdist = knn.get(knn.size() - 1).getDistance().doubleValue();
         // avoid division by zero.
         if(maxdist == 0) {
           maxdist = 1;
@@ -429,7 +429,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
         for(ListIterator<DistanceResultPair<N>> iter = knn.listIterator(knn.size()); iter.hasPrevious();) {
           DistanceResultPair<N> pair = iter.previous();
           Element line = plotSeries(pair.getID(), MAXRESOLUTION);
-          double dist = pair.getDistance().getValue().doubleValue() / maxdist;
+          double dist = pair.getDistance().doubleValue() / maxdist;
           Color color = getColor(dist);
           String colstr = "#" + Integer.toHexString(color.getRGB()).substring(2);
           String width = (pair.getID() == idx) ? "0.5%" : "0.2%";

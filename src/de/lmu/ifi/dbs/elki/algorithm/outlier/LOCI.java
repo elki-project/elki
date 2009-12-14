@@ -167,8 +167,8 @@ public class LOCI<O extends DatabaseObject, D extends NumberDistance<D, ?>> exte
       {
         int i = 0;
         for(DistanceResultPair<D> r : neighbors) {
-          cdist.add(new CPair<Double, Integer>(r.getDistance().getValue().doubleValue(), i));
-          cdist.add(new CPair<Double, Integer>(r.getDistance().getValue().doubleValue() / alpha, null));
+          cdist.add(new CPair<Double, Integer>(r.getDistance().doubleValue(), i));
+          cdist.add(new CPair<Double, Integer>(r.getDistance().doubleValue() / alpha, null));
           i++;
         }
       }

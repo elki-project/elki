@@ -233,7 +233,7 @@ public class LoOP<O extends DatabaseObject> extends AbstractAlgorithm<O, MultiRe
         int ks = 0;
         for(DistanceResultPair<DoubleDistance> neighbor : neighbors) {
           if(objectIsInKNN || neighbor.getID() != id) {
-            double d = neighbor.getDistance().getValue();
+            double d = neighbor.getDistance().doubleValue();
             sqsum += d*d;
             ks++;
             if(ks >= kref) {

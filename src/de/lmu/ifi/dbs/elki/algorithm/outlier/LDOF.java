@@ -132,10 +132,10 @@ public class LDOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, Do
       double Dxp = 0;
       for(DistanceResultPair<DoubleDistance> neighbor1 : neighbors) {
         if(neighbor1.getID() != id) {
-          dxp += neighbor1.getDistance().getValue();
+          dxp += neighbor1.getDistance().doubleValue();
           for(DistanceResultPair<DoubleDistance> neighbor2 : neighbors) {
             if(neighbor1.getID() != neighbor2.getID() && neighbor2.getID() != id) {
-              Dxp += getDistanceFunction().distance(neighbor1.getID(), neighbor2.getID()).getValue();
+              Dxp += getDistanceFunction().distance(neighbor1.getID(), neighbor2.getID()).doubleValue();
             }
           }
         }

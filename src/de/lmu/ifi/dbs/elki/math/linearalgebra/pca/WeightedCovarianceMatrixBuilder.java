@@ -107,7 +107,7 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<V, ?>, D ext
     {
       for(Iterator<Integer> it = ids.iterator(); it.hasNext();) {
         V obj = database.get(it.next());
-        double distance = weightDistance.distance(centroid, obj).getValue();
+        double distance = weightDistance.distance(centroid, obj).doubleValue();
         stddev += distance * distance;
         if(distance > maxdist) {
           maxdist = distance;
@@ -175,7 +175,7 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<V, ?>, D ext
       int i = 0;
       for(Iterator<DistanceResultPair<D>> it = results.iterator(); it.hasNext() && i < k; i++) {
         DistanceResultPair<D> res = it.next();
-        double dist = res.getDistance().getValue().doubleValue();
+        double dist = res.getDistance().doubleValue();
         stddev += dist * dist;
         if(dist > maxdist) {
           maxdist = dist;
@@ -192,7 +192,7 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<V, ?>, D ext
     for(Iterator<DistanceResultPair<D>> it = results.iterator(); it.hasNext() && i < k; i++) {
       DistanceResultPair<D> res = it.next();
       V obj = database.get(res.getID());
-      double weight = weightfunction.getWeight(res.getDistance().getValue().doubleValue(), maxdist, stddev);
+      double weight = weightfunction.getWeight(res.getDistance().doubleValue(), maxdist, stddev);
       for(int d1 = 0; d1 < dim; d1++) {
         /* We're exploiting symmetry here, start with d2 == d1 */
         for(int d2 = d1; d2 < dim; d2++) {

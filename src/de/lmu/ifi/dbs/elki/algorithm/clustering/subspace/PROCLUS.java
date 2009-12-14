@@ -75,8 +75,6 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
     super();
     // parameter m_i
     addOption(M_I_PARAM);
-
-    // this.debug = true;
   }
 
   /**
@@ -92,8 +90,9 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
       final int k = getK();
       final int k_i = getK_i();
 
-      if(database.dimensionality() < dim)
+      if(database.dimensionality() < dim) {
         throw new IllegalStateException("Dimensionality of data < parameter l! " + "(" + database.dimensionality() + " < " + dim + ")");
+      }
 
       // initialization phase
       int sampleSize = Math.min(database.size(), k_i * k);
@@ -195,7 +194,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
     Map<Integer, IntDoublePair> distances = new HashMap<Integer, IntDoublePair>();
     for(Integer id : s) {
       DoubleDistance dist = getDistanceFunction().distance(id, m_i);
-      distances.put(id, new IntDoublePair(id, dist.getValue()));
+      distances.put(id, new IntDoublePair(id, dist.doubleValue()));
     }
 
     for(int i = 1; i < m; i++) {
@@ -212,7 +211,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
       for(Integer id : s) {
         DoubleDistance dist_new = getDistanceFunction().distance(id, m_i);
         double dist_old = distances.get(id).getSecond();
-        double dist = Math.min(dist_new.getValue(), dist_old);
+        double dist = Math.min(dist_new.doubleValue(), dist_old);
         distances.put(id, new IntDoublePair(id, dist));
       }
     }
@@ -283,12 +282,14 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
       // determine minimum distance between each point in m_c and m
       IntDoublePair minDist = null;
       for(Integer m_i : m_c) {
-        if(m_i == m)
+        if(m_i == m) {
           continue;
+        }
         DoubleDistance dist = getDistanceFunction().distance(m, m_i);
-        IntDoublePair currentDist = new IntDoublePair(m_i, dist.getValue());
-        if(minDist == null || currentDist.compareTo(minDist) < 0)
+        IntDoublePair currentDist = new IntDoublePair(m_i, dist.doubleValue());
+        if(minDist == null || currentDist.compareTo(minDist) < 0) {
           minDist = currentDist;
+        }
       }
 
       // determine points in sphere centered at m with radius minDist

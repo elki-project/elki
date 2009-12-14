@@ -55,7 +55,7 @@ public class MaterializeDistances<V extends DatabaseObject, D extends NumberDist
         if(id2 < id1) {
           continue;
         }
-        double d = distFunc.distance(id1, id2).getValue().doubleValue();
+        double d = distFunc.distance(id1, id2).doubleValue();
         r.add(new CTriple<Integer, Integer, Double>(id1, id2, d));
       }
     }

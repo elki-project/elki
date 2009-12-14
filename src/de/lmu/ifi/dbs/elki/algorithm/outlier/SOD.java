@@ -155,7 +155,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends Distance<D>> extends Ab
     for(Iterator<Integer> iter = database.iterator(); iter.hasNext();) {
       Integer id = iter.next();
       if(!id.equals(queryObject)) {
-        DoubleDistance distance = new DoubleDistance(1.0 / similarityFunction.similarity(queryObject, id).getValue());
+        DoubleDistance distance = new DoubleDistance(1.0 / similarityFunction.similarity(queryObject, id).doubleValue());
         kNearestNeighbors.add(new DistanceResultPair<DoubleDistance>(distance, id));
       }
     }

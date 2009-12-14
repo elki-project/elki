@@ -59,7 +59,7 @@ public class KernelMatrix<O extends FeatureVector<O, ?>> extends AbstractParamet
     Collections.sort(ids);
     for(int idx = 0; idx < ids.size(); idx++) {
       for(int idy = idx; idy < ids.size(); idy++) {
-        value = kernelFunction.similarity(database.get(ids.get(idx)), database.get(ids.get(idy))).getValue();
+        value = kernelFunction.similarity(database.get(ids.get(idx)), database.get(ids.get(idy))).doubleValue();
         kernel.set(idx, idy, value);
         kernel.set(idy, idx, value);
       }
