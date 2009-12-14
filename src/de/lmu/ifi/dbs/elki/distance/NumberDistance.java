@@ -8,20 +8,13 @@ package de.lmu.ifi.dbs.elki.distance;
  * @param <N> the type of Number used (e.g. Double, Integer, Float, etc.)
  */
 public abstract class NumberDistance<D extends NumberDistance<D, N>, N extends Number> extends AbstractDistance<D> {
-
-  /**
-   * The value of this distance.
-   */
-  private N value;
-
   /**
    * Constructs a new NumberDistance object that represents the value argument.
    * 
    * @param value the value to be represented by the NumberDistance.
    */
-  public NumberDistance(N value) {
+  public NumberDistance() {
     super();
-    this.value = value;
   }
 
   /**
@@ -32,7 +25,7 @@ public abstract class NumberDistance<D extends NumberDistance<D, N>, N extends N
    */
   @Override
   public final int hashCode() {
-    return value.hashCode();
+    return getValue().hashCode();
   }
 
   /**
@@ -49,7 +42,7 @@ public abstract class NumberDistance<D extends NumberDistance<D, N>, N extends N
    *         value of the specified NumberDistance.
    */
   public int compareTo(D other) {
-    return Double.compare(this.value.doubleValue(), other.getValue().doubleValue());
+    return Double.compare(this.doubleValue(), other.doubleValue());
   }
 
   /**
@@ -59,7 +52,7 @@ public abstract class NumberDistance<D extends NumberDistance<D, N>, N extends N
    */
   @Override
   public final String toString() {
-    return value.toString();
+    return getValue().toString();
   }
 
   /**
@@ -67,16 +60,62 @@ public abstract class NumberDistance<D extends NumberDistance<D, N>, N extends N
    * 
    * @return the value of this NumberDistance
    */
-  public final N getValue() {
-    return value;
-  }
+  public abstract N getValue();
 
   /**
    * Sets the value of this NumberDistance.
    * 
    * @param value the value to be set
    */
-  void setValue(N value) {
-    this.value = value;
+  abstract void setValue(N value);
+  
+  /**
+   * Get the value as double.
+   * 
+   * @return same result as getValue().doubleValue() but may be more efficient.
+   */
+  public abstract double doubleValue();
+  
+  /**
+   * Get the value as float.
+   * 
+   * @return same result as getValue().floatValue() but may be more efficient.
+   */
+  public float floatValue() {
+    return (float) doubleValue();
+  }
+  
+  /**
+   * Get the value as int.
+   * 
+   * @return same result as getValue().intValue() but may be more efficient.
+   */
+  public abstract int intValue();
+  
+  /**
+   * Get the value as long.
+   * 
+   * @return same result as getValue().longValue() but may be more efficient.
+   */
+  public long longValue() {
+    return intValue();
+  }
+  
+  /**
+   * Get the value as short.
+   * 
+   * @return same result as getValue().shortValue() but may be more efficient.
+   */
+  public short shortValue() {
+    return (short) intValue();
+  }
+  
+  /**
+   * Get the value as byte.
+   * 
+   * @return same result as getValue().byteValue() but may be more efficient.
+   */
+  public byte byteValue() {
+    return (byte) intValue();
   }
 }

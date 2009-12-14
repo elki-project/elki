@@ -246,13 +246,13 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
         insertObjectIntoTables(o, neighbors);
 
         // 1. Consequences of changing neighbors(p)
-        double kNNDist_o = neighbors.get(minpts - 1).getDistance().getValue();
+        double kNNDist_o = neighbors.get(minpts - 1).getDistance().doubleValue();
         Map<Integer, Double> knnDistances = new HashMap<Integer, Double>();
         for (DistanceResultPair<DoubleDistance> qr : reverseNeighbors) {
             // o has been added to the neighbors(p),
             // therefor another object is no longer in neighbors(p)
             Integer p = qr.getID();
-            double dist_po = getDistanceFunction().distance(p, o).getValue();
+            double dist_po = getDistanceFunction().distance(p, o).doubleValue();
             double reachDist_po = Math.max(kNNDist_o, dist_po);
             NeighborList neighbors_p_old = nnTable.getNeighbors(p);
 
@@ -367,7 +367,7 @@ public class OnlineLOF<O extends DatabaseObject> extends LOF<O> {
             // insert into NNTable
             NeighborList neighbors_p = nnTable.getNeighbors(p);
             double knnDist_p = neighbors_p.get(minpts - 1).getDistance();
-            double dist = getDistanceFunction().distance(id, p).getValue();
+            double dist = getDistanceFunction().distance(id, p).doubleValue();
             double reachDist = Math.max(knnDist_p, dist);
             Neighbor neighbor = new Neighbor(id, i, p, reachDist, dist);
             nnTable.insert(neighbor);

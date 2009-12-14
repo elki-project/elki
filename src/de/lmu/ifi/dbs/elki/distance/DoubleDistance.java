@@ -6,90 +6,119 @@ import java.io.ObjectOutput;
 
 /**
  * Provides a Distance for a double-valued distance.
- *
+ * 
  * @author Elke Achtert
  */
 public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
+  /**
+   * The actual value.
+   */
+  double value;
+  
+  /**
+   * Generated serialVersionUID.
+   */
+  private static final long serialVersionUID = 3711413449321214862L;
 
-    /**
-     * Generated serialVersionUID.
-     */
-    private static final long serialVersionUID = 3711413449321214862L;
+  /**
+   * Empty constructor for serialization purposes.
+   */
+  public DoubleDistance() {
+    super();
+  }
 
-    /**
-     * Empty constructor for serialization purposes.
-     */
-    public DoubleDistance() {
-        super(null);
-    }
+  /**
+   * Constructs a new DoubleDistance object that represents the double argument.
+   * 
+   * @param value the value to be represented by the DoubleDistance.
+   */
+  public DoubleDistance(double value) {
+    super();
+    this.value = value;
+  }
 
-    /**
-     * Constructs a new DoubleDistance object that represents the double
-     * argument.
-     *
-     * @param value the value to be represented by the DoubleDistance.
-     */
-    public DoubleDistance(double value) {
-        super(value);
-    }
+  public String description() {
+    return "DoubleDistance.doubleValue";
+  }
 
-    public String description() {
-        return "DoubleDistance.doubleValue";
-    }
+  public DoubleDistance plus(DoubleDistance distance) {
+    return new DoubleDistance(this.getValue() + distance.getValue());
+  }
 
-    public DoubleDistance plus(DoubleDistance distance) {
-        return new DoubleDistance(this.getValue() + distance.getValue());
-    }
+  public DoubleDistance minus(DoubleDistance distance) {
+    return new DoubleDistance(this.getValue() - distance.getValue());
+  }
 
-    public DoubleDistance minus(DoubleDistance distance) {
-        return new DoubleDistance(this.getValue() - distance.getValue());
-    }
+  /**
+   * Returns a new distance as the product of this distance and the given
+   * distance.
+   * 
+   * @param distance the distance to be multiplied with this distance
+   * @return a new distance as the product of this distance and the given
+   *         distance
+   */
+  public DoubleDistance times(DoubleDistance distance) {
+    return new DoubleDistance(this.getValue() * distance.getValue());
+  }
 
-    /**
-     * Returns a new distance as the product of this distance and the given
-     * distance.
-     *
-     * @param distance the distance to be multiplied with this distance
-     * @return a new distance as the product of this distance and the given
-     *         distance
-     */
-    public DoubleDistance times(DoubleDistance distance) {
-        return new DoubleDistance(this.getValue() * distance.getValue());
-    }
+  /**
+   * Returns a new distance as the product of this distance and the given double
+   * value.
+   * 
+   * @param lambda the double value this distance should be multiplied with
+   * @return a new distance as the product of this distance and the given double
+   *         value
+   */
+  public DoubleDistance times(double lambda) {
+    return new DoubleDistance(this.getValue() * lambda);
+  }
 
-    /**
-     * Returns a new distance as the product of this distance and the given
-     * double value.
-     *
-     * @param lambda the double value this distance should be multiplied with
-     * @return a new distance as the product of this distance and the given
-     *         double value
-     */
-    public DoubleDistance times(double lambda) {
-        return new DoubleDistance(this.getValue() * lambda);
-    }
+  /**
+   * Writes the double value of this DoubleDistance to the specified stream.
+   */
+  public void writeExternal(ObjectOutput out) throws IOException {
+    out.writeDouble(this.getValue());
+  }
 
-    /**
-     * Writes the double value of this DoubleDistance to the specified stream.
-     */
-    public void writeExternal(ObjectOutput out) throws IOException {
-        out.writeDouble(this.getValue());
-    }
+  /**
+   * Reads the double value of this DoubleDistance from the specified stream.
+   */
+  public void readExternal(ObjectInput in) throws IOException {
+    setValue(in.readDouble());
+  }
 
-    /**
-     * Reads the double value of this DoubleDistance from the specified stream.
-     */
-    public void readExternal(ObjectInput in) throws IOException {
-        setValue(in.readDouble());
-    }
+  /**
+   * Returns the number of Bytes this distance uses if it is written to an
+   * external file.
+   * 
+   * @return 8 (8 Byte for a double value)
+   */
+  public int externalizableSize() {
+    return 8;
+  }
 
-    /**
-     * Returns the number of Bytes this distance uses if it is written to an
-     * external file.
-     *
-     * @return 8 (8 Byte for a double value)
-     */
-    public int externalizableSize() {
-        return 8;
-    }
+  @Override
+  public Double getValue() {
+    return this.value;
+  }
+
+  @Override
+  void setValue(Double value) {
+    this.value = value;
+  }
+
+  @Override
+  public double doubleValue() {
+    return value;
+  }
+
+  @Override
+  public int intValue() {
+    return (int) value;
+  }
+
+  @Override
+  public int compareTo(DoubleDistance other) {
+    return Double.compare(this.value, other.value);
+  }
 }

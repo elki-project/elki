@@ -102,10 +102,10 @@ public class TestIndexStructures implements JUnit4Test {
       DoubleVector c = db.get(id);
       // verify vector
       DoubleVector c2 = new DoubleVector(shouldc[i]);
-      assertTrue(dist.distance(c, c2).getValue() < 0.00001);
+      assertTrue(dist.distance(c, c2).doubleValue() < 0.00001);
 
       // Verify distance
-      assertTrue(res.getDistance().getValue() == shouldd[i]);
+      assertTrue(res.getDistance().doubleValue() == shouldd[i]);
       i++;
     }
   }

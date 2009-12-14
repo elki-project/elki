@@ -167,7 +167,7 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
           if(id1 == id2) {
             continue;
           }
-          double d = distFunc.distance(id1, id2).getValue().doubleValue();
+          double d = distFunc.distance(id1, id2).doubleValue();
 
           histogram.aggregate(d, incFirst);
 
@@ -192,7 +192,7 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
             if(id1 == id2) {
               continue;
             }
-            double d = distFunc.distance(id1, id2).getValue().doubleValue();
+            double d = distFunc.distance(id1, id2).doubleValue();
 
             histogram.aggregate(d, incSecond);
 
@@ -274,12 +274,12 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
         if(id1 == id2) {
           continue;
         }
-        double d = distFunc.distance(id1, id2).getValue().doubleValue();
+        double d = distFunc.distance(id1, id2).doubleValue();
         np.add(new FCPair<Double, Integer>(d, id1));
         np.add(new FCPair<Double, Integer>(d, id2));
       }
       for(Integer id2 : randomset) {
-        double d = distFunc.distance(id1, id2).getValue().doubleValue();
+        double d = distFunc.distance(id1, id2).doubleValue();
         np.add(new FCPair<Double, Integer>(d, id1));
         np.add(new FCPair<Double, Integer>(d, id2));
       }
@@ -294,12 +294,12 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
         if(id1 == id2) {
           continue;
         }
-        double d = distFunc.distance(id1, id2).getValue().doubleValue();
+        double d = distFunc.distance(id1, id2).doubleValue();
         np2.add(new FCPair<Double, Integer>(d, id1));
         np2.add(new FCPair<Double, Integer>(d, id2));
       }
       for(Integer id2 : randomset) {
-        double d = distFunc.distance(id1, id2).getValue().doubleValue();
+        double d = distFunc.distance(id1, id2).doubleValue();
         np.add(new FCPair<Double, Integer>(d, id1));
         np.add(new FCPair<Double, Integer>(d, id2));
       }
@@ -325,7 +325,7 @@ public class DistanceStatisticsWithClasses<V extends DatabaseObject, D extends N
         if(id1 == id2) {
           continue;
         }
-        double d = distFunc.distance(id1, id2).getValue().doubleValue();
+        double d = distFunc.distance(id1, id2).doubleValue();
         minmax.put(d);
       }
     }    

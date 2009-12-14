@@ -17,6 +17,6 @@ public class SimilarityAdapterLinear<V extends NumberVector<V,?>> extends Simila
   @Override
   public DoubleDistance distance(V v1, V v2) {
     DoubleDistance sim = similarityFunction.similarity(v1, v2);
-    return new DoubleDistance(1.0 - sim.getValue());
+    return new DoubleDistance(1.0 - sim.doubleValue());
   }
 }

@@ -93,7 +93,7 @@ public class OPTICSPlotVisualizer<D extends NumberDistance<D,?>> extends Abstrac
     MinMax<Double> range = new MinMax<Double>();
     // calculate range
     for (ClusterOrderEntry<D> coe : order) {
-      double reach = coe.getReachability().getValue().doubleValue();
+      double reach = coe.getReachability().doubleValue();
       if (!Double.isInfinite(reach) && !Double.isNaN(reach)) {
         range.put(reach);
       }
@@ -106,7 +106,7 @@ public class OPTICSPlotVisualizer<D extends NumberDistance<D,?>> extends Abstrac
 
     int x = 0;
     for (ClusterOrderEntry<D> coe : order) {
-      double reach = coe.getReachability().getValue().doubleValue();
+      double reach = coe.getReachability().doubleValue();
       final int y;
       if (!Double.isInfinite(reach) && !Double.isNaN(reach)) {
         y = (height - 1) - (int)Math.floor(scale.getScaled(reach) * (height - 1));

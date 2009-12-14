@@ -171,10 +171,10 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<V, ?>, D extends
     double dist = -1.0;
     for(Iterator<DistanceResultPair<D>> it = results.iterator(); it.hasNext();) {
       DistanceResultPair<D> qr = it.next();
-      if(qr.getDistance().getValue().doubleValue() < dist) {
+      if(qr.getDistance().doubleValue() < dist) {
         System.err.println("WARNING: results not sorted by distance!");
       }
-      dist = qr.getDistance().getValue().doubleValue();
+      dist = qr.getDistance().doubleValue();
     }
   }
 }

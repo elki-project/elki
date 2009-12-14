@@ -293,7 +293,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
       List<D> knnDists = knns.distancesToList();
       for(int k = 0; k < k_max; k++) {
         D knnDist = knnDists.get(k);
-        means[k] += knnDist.getValue().doubleValue();
+        means[k] += knnDist.doubleValue();
       }
     }
 
@@ -376,7 +376,7 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     int k_0 = 0;
     if(log) {
       for(int i = 0; i < k_max; i++) {
-        double dist = knnDistances.get(i).getValue().doubleValue();
+        double dist = knnDistances.get(i).doubleValue();
         if(dist == 0) {
           k_0++;
         }
@@ -392,11 +392,11 @@ public class MkAppTree<O extends DatabaseObject, D extends NumberDistance<D, N>,
     for(int k = 0; k < k_max - k_0; k++) {
       if(log) {
         x.set(k, Math.log(k + k_0));
-        y.set(k, Math.log(knnDistances.get(k + k_0).getValue().doubleValue()));
+        y.set(k, Math.log(knnDistances.get(k + k_0).doubleValue()));
       }
       else {
         x.set(k, k + k_0);
-        y.set(k, knnDistances.get(k + k_0).getValue().doubleValue());
+        y.set(k, knnDistances.get(k + k_0).doubleValue());
       }
     }
 

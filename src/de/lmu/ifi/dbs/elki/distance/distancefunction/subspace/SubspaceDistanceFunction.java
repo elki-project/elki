@@ -124,7 +124,7 @@ public class SubspaceDistanceFunction<V extends NumberVector<V, ?>, P extends Pr
     WeightedDistanceFunction<V> df1 = new WeightedDistanceFunction<V>(pca1.similarityMatrix());
     WeightedDistanceFunction<V> df2 = new WeightedDistanceFunction<V>(pca2.similarityMatrix());
 
-    double affineDistance = Math.max(df1.distance(o1, o2).getValue(), df2.distance(o1, o2).getValue());
+    double affineDistance = Math.max(df1.distance(o1, o2).doubleValue(), df2.distance(o1, o2).doubleValue());
 
     return new SubspaceDistance(d1, affineDistance);
   }

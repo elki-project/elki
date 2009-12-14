@@ -17,6 +17,6 @@ public class SimilarityAdapterArccos<V extends NumberVector<V,?>> extends Simila
   @Override
   public DoubleDistance distance(V v1, V v2) {
     DoubleDistance sim = similarityFunction.similarity(v1, v2);
-    return new DoubleDistance(Math.acos(sim.getValue()));
+    return new DoubleDistance(Math.acos(sim.doubleValue()));
   }
 }

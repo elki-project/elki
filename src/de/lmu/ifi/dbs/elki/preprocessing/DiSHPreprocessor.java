@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
  * @author Elke Achtert
  * @param <V> Vector type
  */
-public class DiSHPreprocessor<V extends NumberVector<V,?>> extends AbstractParameterizable implements PreferenceVectorPreprocessor<V> {
+public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractParameterizable implements PreferenceVectorPreprocessor<V> {
   /**
    * Available strategies for determination of the preference vector.
    */
@@ -141,7 +141,7 @@ public class DiSHPreprocessor<V extends NumberVector<V,?>> extends AbstractParam
     // parameter epsilon
     // todo: constraint auf positive werte
     List<Double> defaultEps = new ArrayList<Double>();
-    defaultEps.add(DEFAULT_EPSILON.getValue());
+    defaultEps.add(DEFAULT_EPSILON.doubleValue());
     EPSILON_PARAM.setDefaultValue(defaultEps);
     addOption(EPSILON_PARAM);
 
@@ -248,7 +248,7 @@ public class DiSHPreprocessor<V extends NumberVector<V,?>> extends AbstractParam
 
       for(int d = 0; d < eps_list.size(); d++) {
         epsilon[d] = new DoubleDistance(eps_list.get(d));
-        if(epsilon[d].getValue() < 0) {
+        if(epsilon[d].doubleValue() < 0) {
           throw new WrongParameterValueException(EPSILON_PARAM, eps_list.toString());
         }
       }
@@ -262,8 +262,9 @@ public class DiSHPreprocessor<V extends NumberVector<V,?>> extends AbstractParam
     else if(strategyString.equals(Strategy.MAX_INTERSECTION.toString())) {
       strategy = Strategy.MAX_INTERSECTION;
     }
-    else
+    else {
       throw new WrongParameterValueException(STRATEGY_PARAM, strategyString);
+    }
 
     return remainingParameters;
   }

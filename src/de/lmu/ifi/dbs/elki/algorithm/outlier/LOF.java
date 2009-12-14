@@ -191,7 +191,7 @@ public class LOF<O extends DatabaseObject, D extends NumberDistance<D,?>> extend
         for(DistanceResultPair<D> neighbor : neighbors) {
           if (objectIsInKNN || neighbor.getID() != id) {
             List<DistanceResultPair<D>> neighborsNeighbors = neigh2.get(neighbor.getID());
-            sum += Math.max(neighbor.getDistance().getValue().doubleValue(), neighborsNeighbors.get(neighborsNeighbors.size() - 1).getDistance().getValue().doubleValue());
+            sum += Math.max(neighbor.getDistance().doubleValue(), neighborsNeighbors.get(neighborsNeighbors.size() - 1).getDistance().doubleValue());
           }
         }
         Double lrd = nsize / sum;
