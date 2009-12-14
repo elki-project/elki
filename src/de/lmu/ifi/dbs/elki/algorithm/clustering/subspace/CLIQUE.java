@@ -375,11 +375,11 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, C
       throw new IllegalArgumentException("FeatureVectors differ in length.");
     }
     for(int d = 1; d <= featureVector.getDimensionality(); d++) {
-      if((featureVector.getValue(d).doubleValue()) > maxima[d - 1]) {
-        maxima[d - 1] = (featureVector.getValue(d).doubleValue());
+      if((featureVector.doubleValue(d)) > maxima[d - 1]) {
+        maxima[d - 1] = (featureVector.doubleValue(d));
       }
-      if((featureVector.getValue(d).doubleValue()) < minima[d - 1]) {
-        minima[d - 1] = (featureVector.getValue(d).doubleValue());
+      if((featureVector.doubleValue(d)) < minima[d - 1]) {
+        minima[d - 1] = (featureVector.doubleValue(d));
       }
     }
   }

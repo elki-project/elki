@@ -59,7 +59,7 @@ public class LPNormDistanceFunction<V extends NumberVector<V, N>, N extends Numb
 
     double sqrDist = 0;
     for(int i = 1; i <= v1.getDimensionality(); i++) {
-      double manhattanI = Math.abs(v1.getValue(i).doubleValue() - v2.getValue(i).doubleValue());
+      double manhattanI = Math.abs(v1.doubleValue(i) - v2.doubleValue(i));
       sqrDist += Math.pow(manhattanI, p);
     }
     return new DoubleDistance(Math.pow(sqrDist, 1.0 / p));

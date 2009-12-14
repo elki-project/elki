@@ -93,7 +93,7 @@ public class VisualizationProjection {
   public Vector projectDataToScaledSpace(NumberVector<?,?> data) {
     Vector vec = new Vector(dim);
     for(int d = 1; d <= dim; d++) {
-      vec.set(d - 1, scales[d].getScaled(data.getValue(d).doubleValue()));
+      vec.set(d - 1, scales[d].getScaled(data.doubleValue(d)));
     }
     return vec;
   }

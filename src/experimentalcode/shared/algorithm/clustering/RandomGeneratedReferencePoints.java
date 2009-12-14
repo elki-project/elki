@@ -80,8 +80,8 @@ public class RandomGeneratedReferencePoints<O extends NumberVector<O, ?>> extend
     double[] mean = new double[dim];
     double[] delta = new double[dim];
     for(int d = 0; d < dim; d++) {
-      mean[d] = (minmax.first.getValue(d + 1).doubleValue() + minmax.second.getValue(d + 1).doubleValue()) / 2;
-      delta[d] = (minmax.second.getValue(d + 1).doubleValue() - minmax.first.getValue(d + 1).doubleValue());
+      mean[d] = (minmax.first.doubleValue(d + 1) + minmax.second.doubleValue(d + 1)) / 2;
+      delta[d] = (minmax.second.doubleValue(d + 1) - minmax.first.doubleValue(d + 1));
     }
 
     ArrayList<O> result = new ArrayList<O>(samplesize);

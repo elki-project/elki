@@ -25,7 +25,7 @@ public class MaximumDistanceFunction<V extends NumberVector<V, ?>> extends Abstr
     }
     double max = 0;
     for(int i = 1; i <= v1.getDimensionality(); i++) {
-      double d = Math.abs(v1.getValue(i).doubleValue() - v2.getValue(i).doubleValue());
+      double d = Math.abs(v1.doubleValue(i) - v2.doubleValue(i));
       max = Math.max(d, max);
     }
     return new DoubleDistance(max);

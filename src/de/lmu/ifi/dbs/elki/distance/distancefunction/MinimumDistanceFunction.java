@@ -25,7 +25,7 @@ public class MinimumDistanceFunction<V extends NumberVector<V, ?>> extends Abstr
     }
     double min = Double.MAX_VALUE;
     for(int i = 1; i <= v1.getDimensionality(); i++) {
-      double d = Math.abs(v1.getValue(i).doubleValue() - v2.getValue(i).doubleValue());
+      double d = Math.abs(v1.doubleValue(i) - v2.doubleValue(i));
       min = Math.min(d, min);
     }
     return new DoubleDistance(min);

@@ -76,7 +76,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
     global.add(STDDEV_PARAM);
     optionHandler.setGlobalParameterConstraint(new EqualSizeGlobalConstraint(global));
   }
-  
+
   private double normalize(int d, double val) {
     return (val - mean[d]) / stddev[d];
   }
@@ -104,7 +104,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
       for(Pair<V, Associations> objectAndAssociations : objectAndAssociationsList) {
         double[] values = new double[objectAndAssociations.getFirst().getDimensionality()];
         for(int d = 1; d <= objectAndAssociations.getFirst().getDimensionality(); d++) {
-          values[d - 1] = normalize(d - 1, objectAndAssociations.getFirst().getValue(d).doubleValue());
+          values[d - 1] = normalize(d - 1, objectAndAssociations.getFirst().doubleValue(d));
         }
 
         V normalizedFeatureVector = objectAndAssociationsList.get(0).getFirst().newInstance(values);
@@ -138,7 +138,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
       for(V featureVector : featureVectors) {
         double[] values = new double[featureVector.getDimensionality()];
         for(int d = 1; d <= featureVector.getDimensionality(); d++) {
-          values[d - 1] = normalize(d-1, featureVector.getValue(d).doubleValue());
+          values[d - 1] = normalize(d - 1, featureVector.doubleValue(d));
         }
         V normalizedFeatureVector = featureVectors.get(0).newInstance(values);
         normalizedFeatureVector.setID(featureVector.getID());
@@ -155,7 +155,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
     if(featureVector.getDimensionality() == mean.length) {
       double[] values = new double[featureVector.getDimensionality()];
       for(int d = 1; d <= featureVector.getDimensionality(); d++) {
-        values[d - 1] = restore(d-1, featureVector.getValue(d).doubleValue());
+        values[d - 1] = restore(d - 1, featureVector.doubleValue(d));
       }
       V restoredFeatureVector = featureVector.newInstance(values);
       restoredFeatureVector.setID(featureVector.getID());
@@ -235,12 +235,12 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
     if(MEAN_PARAM.isSet() || STDDEV_PARAM.isSet()) {
       List<Double> mean_list = MEAN_PARAM.getValue();
       List<Double> stddev_list = STDDEV_PARAM.getValue();
-      
+
       mean = Util.unbox(mean_list.toArray(new Double[mean_list.size()]));
       stddev = Util.unbox(stddev_list.toArray(new Double[stddev_list.size()]));
-      
-      for (double d : stddev) {
-        if (d == 0) {
+
+      for(double d : stddev) {
+        if(d == 0) {
           throw new WrongParameterValueException("Standard deviations must not be 0.");
         }
       }
@@ -263,16 +263,16 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
 
     for(V featureVector : featureVectors) {
       for(int d = 1; d <= featureVector.getDimensionality(); d++) {
-        mvs[d-1].put( featureVector.getValue(d).doubleValue() );
+        mvs[d - 1].put(featureVector.doubleValue(d));
       }
     }
-    
+
     mean = new double[dimensionality];
     stddev = new double[dimensionality];
-    for (int d = 0; d < dimensionality; d++) {
+    for(int d = 0; d < dimensionality; d++) {
       mean[d] = mvs[d].getMean();
       stddev[d] = mvs[d].getStddev();
-      if (stddev[d] == 0) {
+      if(stddev[d] == 0) {
         stddev[d] = 1.0;
       }
     }
@@ -295,16 +295,16 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
     for(Pair<V, Associations> objectAndAssociations : objectAndAssociationsList) {
       V featureVector = objectAndAssociations.getFirst();
       for(int d = 1; d <= featureVector.getDimensionality(); d++) {
-        mvs[d-1].put( featureVector.getValue(d).doubleValue() );
-      }      
+        mvs[d - 1].put(featureVector.doubleValue(d));
+      }
     }
-    
+
     mean = new double[dimensionality];
     stddev = new double[dimensionality];
-    for (int d = 0; d < dimensionality; d++) {
+    for(int d = 0; d < dimensionality; d++) {
       mean[d] = mvs[d].getMean();
       stddev[d] = mvs[d].getStddev();
-      if (stddev[d] == 0) {
+      if(stddev[d] == 0) {
         stddev[d] = 1.0;
       }
     }

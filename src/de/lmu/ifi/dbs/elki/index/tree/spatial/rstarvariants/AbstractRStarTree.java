@@ -760,7 +760,7 @@ public abstract class AbstractRStarTree<O extends NumberVector<O, ?>, N extends 
     int dim = object.getDimensionality();
     double[] values = new double[dim];
     for(int i = 0; i < dim; i++) {
-      values[i] = object.getValue(i + 1).doubleValue();
+      values[i] = object.doubleValue(i + 1);
     }
     return values;
   }

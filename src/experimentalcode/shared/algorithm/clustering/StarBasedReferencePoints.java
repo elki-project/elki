@@ -84,7 +84,7 @@ public class StarBasedReferencePoints<O extends NumberVector<O, ?>> extends Abst
     for (Integer objID : db) {
       O obj = db.get(objID);
       for (int d = 0; d < dim; d++) {
-        double val = obj.getValue(d+1).doubleValue();
+        double val = obj.doubleValue(d+1);
         centroid[d] += val;
         min[d] = Math.min(min[d], val);
         max[d] = Math.max(max[d], val);

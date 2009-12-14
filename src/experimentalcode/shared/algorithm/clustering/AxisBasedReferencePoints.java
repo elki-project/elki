@@ -63,8 +63,8 @@ public class AxisBasedReferencePoints<O extends NumberVector<O, ?>> extends Abst
     double[] mean = new double[dim];
     double[] delta = new double[dim];
     for(int d = 0; d < dim; d++) {
-      mean[d] = (minmax.first.getValue(d + 1).doubleValue() + minmax.second.getValue(d + 1).doubleValue()) / 2;
-      delta[d] = spacescale * (minmax.second.getValue(d + 1).doubleValue() - mean[d]);
+      mean[d] = (minmax.first.doubleValue(d + 1) + minmax.second.doubleValue(d + 1)) / 2;
+      delta[d] = spacescale * (minmax.second.doubleValue(d + 1) - mean[d]);
     }
 
     ArrayList<O> result = new ArrayList<O>(2 + dim);

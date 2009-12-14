@@ -71,12 +71,12 @@ public class MathUtil {
     double sumSqX = 0;
     double sumSqY = 0;
     double sumCoproduct = 0;
-    double meanX = x.getValue(1).doubleValue();
-    double meanY = y.getValue(1).doubleValue();
+    double meanX = x.doubleValue(1);
+    double meanY = y.doubleValue(1);
     for(int i = 2; i < x.getDimensionality(); i++) {
       double sweep = (i - 1.0) / i;
-      double deltaX = x.getValue(i).doubleValue() - meanX;
-      double deltaY = y.getValue(i).doubleValue() - meanY;
+      double deltaX = x.doubleValue(i) - meanX;
+      double deltaY = y.doubleValue(i) - meanY;
       sumSqX += deltaX * deltaX * sweep;
       sumSqY += deltaY * deltaY * sweep;
       sumCoproduct += deltaX * deltaY * sweep;
@@ -91,7 +91,8 @@ public class MathUtil {
   }
 
   /**
-   * Compute the Factorial of n, often written as <code>c!</code> in mathematics. 
+   * Compute the Factorial of n, often written as <code>c!</code> in
+   * mathematics.
    * 
    * @param n Note: n &gt;= 0
    * @return n * (n-1) * (n-2) * ... * 1
@@ -110,7 +111,8 @@ public class MathUtil {
    * </p>
    * 
    * @param n Total number of samples. n &gt; 0
-   * @param k Number of elements to choose. <code>n &gt;= k</code>, <code>k &gt;= 0</code>
+   * @param k Number of elements to choose. <code>n &gt;= k</code>,
+   *        <code>k &gt;= 0</code>
    * @return n! / (k! * (n-k)!)
    */
   public static double binomialCoefficient(int n, int k) {

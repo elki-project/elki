@@ -33,7 +33,7 @@ public class EuclideanDistanceFunction<V extends NumberVector<V, ?>> extends Abs
     }
     double sqrDist = 0;
     for(int i = 1; i <= v1.getDimensionality(); i++) {
-      double manhattanI = v1.getValue(i).doubleValue() - v2.getValue(i).doubleValue();
+      double manhattanI = v1.doubleValue(i) - v2.doubleValue(i);
       sqrDist += manhattanI * manhattanI;
     }
     return new DoubleDistance(Math.sqrt(sqrDist));
@@ -52,7 +52,7 @@ public class EuclideanDistanceFunction<V extends NumberVector<V, ?>> extends Abs
 
     double sqrDist = 0;
     for(int d = 1; d <= v.getDimensionality(); d++) {
-      double value = v.getValue(d).doubleValue();
+      double value = v.doubleValue(d);
       double r;
       if(value < mbr.getMin(d)) {
         r = mbr.getMin(d);

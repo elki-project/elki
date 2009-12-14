@@ -68,7 +68,7 @@ public class TestKernelDensityFitting implements JUnit4Test {
     {
       int i = 0;
       for(Integer id : db.getIDs()) {
-        fulldata[i] = db.get(id).getValue(1);
+        fulldata[i] = db.get(id).doubleValue(1);
         i++;
       }
     }

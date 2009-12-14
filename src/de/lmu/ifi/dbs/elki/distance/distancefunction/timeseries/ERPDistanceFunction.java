@@ -55,40 +55,37 @@ public class ERPDistanceFunction<V extends NumberVector<V, ?>> extends AbstractE
     Step[][] steps = new Step[v1.getDimensionality()][v2.getDimensionality()];
 
     // size of edit distance band
-    int band = (int) Math.ceil(v2.getDimensionality() * bandSize); // bandsize
-                                                                   // is the
-                                                                   // maximum
-                                                                   // allowed
-                                                                   // distance
-                                                                   // to the
-                                                                   // diagonal
+    // bandsize is the maximum allowed distance to the diagonal
+    int band = (int) Math.ceil(v2.getDimensionality() * bandSize);
 
     // g parameter for local usage
     double gValue = g;
 
     for(int i = 0; i < v1.getDimensionality(); i++) {
       int l = i - (band + 1);
-      if(l < 0)
+      if(l < 0) {
         l = 0;
+      }
       int r = i + (band + 1);
-      if(r > (v2.getDimensionality() - 1))
+      if(r > (v2.getDimensionality() - 1)) {
         r = (v2.getDimensionality() - 1);
+      }
 
       for(int j = l; j <= r; j++) {
         if(Math.abs(i - j) <= band) {
           // compute squared distance of feature vectors
-          double val1 = v1.getValue(i + 1).doubleValue();
+          double val1 = v1.doubleValue(i + 1);
           double val2 = gValue;
           double diff = (val1 - val2);
           final double d1 = Math.sqrt(diff * diff);
 
           val1 = gValue;
-          val2 = v2.getValue(j + 1).doubleValue();
+          val2 = v2.doubleValue(j + 1);
           diff = (val1 - val2);
           final double d2 = Math.sqrt(diff * diff);
 
-          val1 = v1.getValue(i + 1).doubleValue();
-          val2 = v2.getValue(j + 1).doubleValue();
+          val1 = v1.doubleValue(i + 1);
+          val2 = v2.doubleValue(j + 1);
           diff = (val1 - val2);
           final double d12 = Math.sqrt(diff * diff);
 

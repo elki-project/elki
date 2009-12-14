@@ -94,7 +94,7 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
         double result = 0;
         for (int i = 0; i < d; i++) {
             double alpha_i = i == d - 1 ? 0 : alpha[i];
-            result += getValue(i + 1) * sinusProduct(0, i, alpha) * Math.cos(alpha_i);
+            result += doubleValue(i + 1) * sinusProduct(0, i, alpha) * Math.cos(alpha_i);
         }
         return result;
     }
@@ -402,7 +402,7 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
             if (d != 0) {
                 result.append(" + \n").append(FormatUtil.whitespace(offset));
             }
-            result.append(FormatUtil.format(getValue(d + 1)));
+            result.append(FormatUtil.format(doubleValue(d + 1)));
             for (int j = 0; j < d; j++) {
                 result.append(" * sin(a_").append(j + 1).append(")");
             }
@@ -497,16 +497,16 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
      */
     private double extremum_alpha_n(int n, double[] alpha) {
         // arctan(infinity) = PI/2
-        if (getValue(n + 1) == 0) {
+        if (doubleValue(n + 1) == 0) {
             return 0.5 * Math.PI;
         }
 
         double tan = 0;
         for (int j = n + 1; j < getDimensionality(); j++) {
             double alpha_j = j == getDimensionality() - 1 ? 0 : alpha[j];
-            tan += getValue(j + 1) * sinusProduct(n + 1, j, alpha) * Math.cos(alpha_j);
+            tan += doubleValue(j + 1) * sinusProduct(n + 1, j, alpha) * Math.cos(alpha_j);
         }
-        tan /= getValue(n + 1);
+        tan /= doubleValue(n + 1);
 
 //        if (debug) {
 //            debugFiner("tan alpha_" + (n + 1) + " = " + tan);

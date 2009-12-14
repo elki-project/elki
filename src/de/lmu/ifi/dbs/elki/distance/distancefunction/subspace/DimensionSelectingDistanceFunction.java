@@ -58,7 +58,7 @@ public class DimensionSelectingDistanceFunction<V extends NumberVector<V,?>> ext
       throw new IllegalArgumentException("Specified dimension to be considered " + "is larger that dimensionality of FeatureVectors:" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString() + "\n  dimension: " + dim);
     }
 
-    double manhattan = v1.getValue(dim).doubleValue() - v2.getValue(dim).doubleValue();
+    double manhattan = v1.doubleValue(dim) - v2.doubleValue(dim);
     return new DoubleDistance(Math.abs(manhattan));
   }
 
@@ -79,7 +79,7 @@ public class DimensionSelectingDistanceFunction<V extends NumberVector<V,?>> ext
       throw new IllegalArgumentException("Specified dimension to be considered " + "is larger that dimensionality of FeatureVectors:" + "\n  first argument: " + mbr.toString() + "\n  second argument: " + v.toString() + "\n  dimension: " + dim);
     }
 
-    double value = v.getValue(dim).doubleValue();
+    double value = v.doubleValue(dim);
     double r;
     if(value < mbr.getMin(dim)) {
       r = mbr.getMin(dim);

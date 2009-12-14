@@ -11,7 +11,6 @@ import java.util.TreeSet;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.Subspace;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -47,7 +46,7 @@ public final class DatabaseUtil {
     for(int id : ids) {
       V o = database.get(id);
       for(int j = 1; j <= dim; j++) {
-        centroid[j - 1] += o.getValue(j).doubleValue();
+        centroid[j - 1] += o.doubleValue(j);
       }
     }
     double size = ids.size();
@@ -84,7 +83,7 @@ public final class DatabaseUtil {
     for(Integer id : ids) {
       V o = database.get(id);
       for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d)) {
-        centroid[d] += o.getValue(d + 1).doubleValue();
+        centroid[d] += o.doubleValue(d + 1);
       }
     }
 
@@ -128,7 +127,7 @@ public final class DatabaseUtil {
       o = database.get(id);
       for(int j = 1; j <= dim; j++) {
         if(bitSet.get(j - 1)) {
-          centroid[j - 1] += o.getValue(j).doubleValue();
+          centroid[j - 1] += o.doubleValue(j);
         }
       }
     }
@@ -160,7 +159,7 @@ public final class DatabaseUtil {
     while(it.hasNext()) {
       NumberVector<O, ?> o = database.get(it.next());
       for(int j = 1; j <= dim; j++) {
-        centroid[j - 1] += o.getValue(j).doubleValue();
+        centroid[j - 1] += o.doubleValue(j);
       }
     }
 
@@ -220,7 +219,7 @@ public final class DatabaseUtil {
     for(Iterator<Integer> it = ids.iterator(); it.hasNext(); i++) {
       NumberVector<?, ?> obj = database.get(it.next());
       for(int d = 0; d < columns; d++) {
-        matrixArray[i][d] = obj.getValue(d + 1).doubleValue() - centroid.getValue(d + 1).doubleValue();
+        matrixArray[i][d] = obj.doubleValue(d + 1) - centroid.doubleValue(d + 1);
       }
     }
     Matrix centeredMatrix = new Matrix(matrixArray);
@@ -265,7 +264,7 @@ public final class DatabaseUtil {
     while(it.hasNext()) {
       NumberVector<?, ?> obj = database.get(it.next());
       for(int d = 0; d < columns; d++) {
-        matrixArray[i][d] = obj.getValue(d + 1).doubleValue() - centroid.getValue(d + 1).doubleValue();
+        matrixArray[i][d] = obj.doubleValue(d + 1) - centroid.doubleValue(d + 1);
       }
       i++;
     }
@@ -317,11 +316,11 @@ public final class DatabaseUtil {
     double[] variances = new double[centroid.getDimensionality()];
 
     for(int d = 1; d <= centroid.getDimensionality(); d++) {
-      double mu = centroid.getValue(d).doubleValue();
+      double mu = centroid.doubleValue(d);
 
       for(Iterator<Integer> it = database.iterator(); it.hasNext();) {
         NumberVector<?, ?> o = database.get(it.next());
-        double diff = o.getValue(d).doubleValue() - mu;
+        double diff = o.doubleValue(d) - mu;
         variances[d - 1] += diff * diff;
       }
 
@@ -358,11 +357,11 @@ public final class DatabaseUtil {
     double[] variances = new double[centroid.getDimensionality()];
 
     for(int d = 1; d <= centroid.getDimensionality(); d++) {
-      double mu = centroid.getValue(d).doubleValue();
+      double mu = centroid.doubleValue(d);
 
       for(Integer id : ids) {
         V o = database.get(id);
-        double diff = o.getValue(d).doubleValue() - mu;
+        double diff = o.doubleValue(d) - mu;
         variances[d - 1] += diff * diff;
       }
 
@@ -385,12 +384,12 @@ public final class DatabaseUtil {
     double[] variances = new double[centroid.getDimensionality()];
 
     for(int d = 1; d <= centroid.getDimensionality(); d++) {
-      double mu = centroid.getValue(d).doubleValue();
+      double mu = centroid.doubleValue(d);
 
       Collection<Integer> ids_d = ids[d - 1];
       for(Integer neighborID : ids_d) {
         NumberVector<?, ?> neighbor = database.get(neighborID);
-        double diff = neighbor.getValue(d).doubleValue() - mu;
+        double diff = neighbor.doubleValue(d) - mu;
         variances[d - 1] += diff * diff;
       }
 
@@ -418,7 +417,7 @@ public final class DatabaseUtil {
     for(Integer it : database) {
       NV o = database.get(it);
       for(int d = 0; d < dim; d++) {
-        double v = o.getValue(d + 1).doubleValue();
+        double v = o.doubleValue(d + 1);
         mins[d] = Math.min(mins[d], v);
         maxs[d] = Math.max(maxs[d], v);
       }
