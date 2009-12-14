@@ -118,8 +118,8 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
   }
 
   @Override
-  public int intValue() {
-    return (int) value;
+  public long longValue() {
+    return (long) value;
   }
 
   @Override

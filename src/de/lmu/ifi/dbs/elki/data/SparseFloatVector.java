@@ -7,7 +7,6 @@ import de.lmu.ifi.dbs.elki.parser.SparseFloatVectorLabelParser;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,7 +35,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    * The maximal occurring index of any dimension.
    */
   private Integer maximumIndex = -1;
-  
+
   /**
    * The dimensionality of this feature vector.
    */
@@ -48,7 +47,9 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    * 
    * @param values the values to be set as values of the real vector
    * @param dimensionality the dimensionality of this feature vector
-   * @throws IllegalArgumentException if the given dimensionality is too small to cover the given values (i.e., the maximum index of any value not zero is bigger than the given dimensionality)
+   * @throws IllegalArgumentException if the given dimensionality is too small
+   *         to cover the given values (i.e., the maximum index of any value not
+   *         zero is bigger than the given dimensionality)
    */
   public SparseFloatVector(Map<Integer, Float> values, int dimensionality) throws IllegalArgumentException {
     if(values.size() > dimensionality) {
@@ -57,7 +58,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
 
     this.values = new HashMap<Integer, Float>(values.size(), 1);
     for(Integer index : values.keySet()) {
-      if(index > maximumIndex){
+      if(index > maximumIndex) {
         maximumIndex = index;
       }
       Float value = values.get(index);
@@ -66,8 +67,8 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
       }
     }
     this.dimensionality = dimensionality;
-    if(maximumIndex > dimensionality){
-      throw new IllegalArgumentException("Given dimensionality "+dimensionality+" is too small w.r.t. the given values (occurring maximum: "+maximumIndex+").");
+    if(maximumIndex > dimensionality) {
+      throw new IllegalArgumentException("Given dimensionality " + dimensionality + " is too small w.r.t. the given values (occurring maximum: " + maximumIndex + ").");
     }
   }
 
@@ -76,7 +77,9 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    * specified mapping of indices and values.
    * 
    * @param values the values to be set as values of the real vector
-   * @throws IllegalArgumentException if the given dimensionality is too small to cover the given values (i.e., the maximum index of any value not zero is bigger than the given dimensionality)
+   * @throws IllegalArgumentException if the given dimensionality is too small
+   *         to cover the given values (i.e., the maximum index of any value not
+   *         zero is bigger than the given dimensionality)
    */
   public SparseFloatVector(float[] values) throws IllegalArgumentException {
     this.dimensionality = values.length;
@@ -84,14 +87,14 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
     for(int i = 0; i < values.length; i++) {
       float value = values[i];
       if(value != 0.0f) {
-        if(i+1 > maximumIndex){
-          maximumIndex = i+1;
+        if(i + 1 > maximumIndex) {
+          maximumIndex = i + 1;
         }
         this.values.put(i + 1, value);
       }
     }
-    if(maximumIndex > dimensionality){
-      throw new IllegalArgumentException("Given dimensionality "+dimensionality+" is too small w.r.t. the given values (occurring maximum: "+maximumIndex+").");
+    if(maximumIndex > dimensionality) {
+      throw new IllegalArgumentException("Given dimensionality " + dimensionality + " is too small w.r.t. the given values (occurring maximum: " + maximumIndex + ").");
     }
   }
 
@@ -138,7 +141,8 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
 
   /**
    * 
-   * @see de.lmu.ifi.dbs.elki.data.NumberVector#randomInstance(java.lang.Number, java.lang.Number, java.util.Random)
+   * @see de.lmu.ifi.dbs.elki.data.NumberVector#randomInstance(java.lang.Number,
+   *      java.lang.Number, java.util.Random)
    */
   public SparseFloatVector randomInstance(Float min, Float max, Random random) {
     float[] randomValues = new float[dimensionality];
@@ -170,11 +174,13 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    * 
    * 
    * @param dimensionality the new dimensionality
-   * @throws IllegalArgumentException if the given dimensionality is too small to cover the given values (i.e., the maximum index of any value not zero is bigger than the given dimensionality)
+   * @throws IllegalArgumentException if the given dimensionality is too small
+   *         to cover the given values (i.e., the maximum index of any value not
+   *         zero is bigger than the given dimensionality)
    */
   public void setDimensionality(int dimensionality) throws IllegalArgumentException {
-    if(maximumIndex > dimensionality){
-      throw new IllegalArgumentException("Given dimensionality "+dimensionality+" is too small w.r.t. the given values (occurring maximum: "+maximumIndex+").");
+    if(maximumIndex > dimensionality) {
+      throw new IllegalArgumentException("Given dimensionality " + dimensionality + " is too small w.r.t. the given values (occurring maximum: " + maximumIndex + ").");
     }
     this.dimensionality = dimensionality;
   }
@@ -209,6 +215,20 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
 
   /**
    * 
+   * @see de.lmu.ifi.dbs.elki.data.NumberVector#longValue(int)
+   */
+  public long longValue(int dimension) {
+    Float d = values.get(dimension);
+    if(d != null) {
+      return d.longValue();
+    }
+    else {
+      return 0;
+    }
+  }
+
+  /**
+   * 
    * @see de.lmu.ifi.dbs.elki.data.NumberVector#getColumnVector()
    */
   public Vector getColumnVector() {
@@ -234,16 +254,16 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
       throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
     }
     Map<Integer, Float> newValues = new HashMap<Integer, Float>(this.values);
-    
-    for(Integer fvkey : fv.values.keySet()){
-      if(newValues.containsKey(fvkey)){
-        newValues.put(fvkey, newValues.get(fvkey)+fv.values.get(fvkey));
+
+    for(Integer fvkey : fv.values.keySet()) {
+      if(newValues.containsKey(fvkey)) {
+        newValues.put(fvkey, newValues.get(fvkey) + fv.values.get(fvkey));
       }
-      else{
+      else {
         newValues.put(fvkey, fv.values.get(fvkey));
       }
     }
-    return new SparseFloatVector(newValues,this.dimensionality);
+    return new SparseFloatVector(newValues, this.dimensionality);
   }
 
   /**
@@ -255,16 +275,16 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
       throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
     }
     Map<Integer, Float> newValues = new HashMap<Integer, Float>(this.values);
-    
-    for(Integer fvkey : fv.values.keySet()){
-      if(newValues.containsKey(fvkey)){
-        newValues.put(fvkey, newValues.get(fvkey)-fv.values.get(fvkey));
+
+    for(Integer fvkey : fv.values.keySet()) {
+      if(newValues.containsKey(fvkey)) {
+        newValues.put(fvkey, newValues.get(fvkey) - fv.values.get(fvkey));
       }
-      else{
+      else {
         newValues.put(fvkey, fv.values.get(fvkey));
       }
     }
-    return new SparseFloatVector(newValues,this.dimensionality);
+    return new SparseFloatVector(newValues, this.dimensionality);
   }
 
   /**
@@ -304,7 +324,8 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    * 
    * This includes zero valued attributes but no indices.
    * 
-   * <p>Example: a vector (0,1.2,1.3,0)<sup>T</sup> would result in the String<br>
+   * <p>
+   * Example: a vector (0,1.2,1.3,0)<sup>T</sup> would result in the String<br>
    * <code>0 1.2 1.3 0</code><br>
    * </p>
    * 
@@ -323,16 +344,21 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
   }
 
   /**
-   * <p>Provides a String representation of this SparseFloatVector as suitable for
-   * {@link SparseFloatVectorLabelParser}.</p>
+   * <p>
+   * Provides a String representation of this SparseFloatVector as suitable for
+   * {@link SparseFloatVectorLabelParser}.
+   * </p>
    * 
-   * <p>The returned String is a single line with entries separated by
-   * {@link AbstractNumberVector#ATTRIBUTE_SEPARATOR}. The first entry gives the number
-   * of values actually not zero. Following entries are pairs of Integer and
-   * Float where the Integer gives the index of the dimensionality and the Float
-   * gives the corresponding value.</p>
+   * <p>
+   * The returned String is a single line with entries separated by
+   * {@link AbstractNumberVector#ATTRIBUTE_SEPARATOR}. The first entry gives the
+   * number of values actually not zero. Following entries are pairs of Integer
+   * and Float where the Integer gives the index of the dimensionality and the
+   * Float gives the corresponding value.
+   * </p>
    * 
-   * <p>Example: a vector (0,1.2,1.3,0)<sup>T</sup> would result in the String<br>
+   * <p>
+   * Example: a vector (0,1.2,1.3,0)<sup>T</sup> would result in the String<br>
    * <code>2 2 1.2 3 1.3</code><br>
    * </p>
    * 
@@ -385,27 +411,30 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
   }
 
   /**
-   * Provides the scalar product (inner product) of this and the given SparseFloatVector.
+   * Provides the scalar product (inner product) of this and the given
+   * SparseFloatVector.
+   * 
    * @param fv the SparseFloatVector to compute the scalar product for
-   * @return the scalar product (inner product) of this and the given SparseFloatVector
+   * @return the scalar product (inner product) of this and the given
+   *         SparseFloatVector
    */
   @Override
   public Float scalarProduct(SparseFloatVector fv) {
-    if(this.getDimensionality()!=fv.getDimensionality()){
+    if(this.getDimensionality() != fv.getDimensionality()) {
       throw new IllegalArgumentException("Incompatible dimensionality: " + this.getDimensionality() + " - " + fv.getDimensionality() + ".");
     }
     float result = 0.0f;
-    if(fv.values.keySet().size()<=this.values.keySet().size()){
-      for(Integer fvkey : fv.values.keySet()){
-        if(this.values.containsKey(fvkey)){
-          result += this.values.get(fvkey)*fv.values.get(fvkey);
+    if(fv.values.keySet().size() <= this.values.keySet().size()) {
+      for(Integer fvkey : fv.values.keySet()) {
+        if(this.values.containsKey(fvkey)) {
+          result += this.values.get(fvkey) * fv.values.get(fvkey);
         }
       }
     }
-    else{
-      for(Integer key : this.values.keySet()){
-        if(fv.values.containsKey(key)){
-          result += this.values.get(key)*fv.values.get(key);
+    else {
+      for(Integer key : this.values.keySet()) {
+        if(fv.values.containsKey(key)) {
+          result += this.values.get(key) * fv.values.get(key);
         }
       }
     }

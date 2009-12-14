@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.data;
 
+
 /**
  * AbstractNumberVector is an abstract implementation of FeatureVector. Provided is an
  * attribute separator (space), and the ID-methods as required for a
@@ -94,5 +95,25 @@ public abstract class AbstractNumberVector<V extends AbstractNumberVector<V, N>,
    */
   public double getMax(int dimension) {
     return doubleValue(dimension);
+  }
+
+  @Override
+  public byte byteValue(int dimension) {
+    return (byte) longValue(dimension);
+  }
+
+  @Override
+  public float floatValue(int dimension) {
+    return (float) doubleValue(dimension);
+  }
+
+  @Override
+  public int intValue(int dimension) {
+    return (int) longValue(dimension);
+  }
+
+  @Override
+  public short shortValue(int dimension) {
+    return (short) longValue(dimension);
   }
 }

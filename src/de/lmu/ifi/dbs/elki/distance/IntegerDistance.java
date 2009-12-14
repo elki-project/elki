@@ -89,6 +89,11 @@ public class IntegerDistance extends NumberDistance<IntegerDistance, Integer> {
   }
   
   @Override
+  public long longValue() {
+    return value;
+  }
+
+  @Override
   public int intValue() {
     return value;
   }

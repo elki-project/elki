@@ -183,15 +183,31 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
   }
 
   /**
-   * Returns the value in the specified dimension.
+   * Returns the value in the specified dimension as double.
    * 
    * @param dimension the desired dimension, where 1 &le; dimension &le;
    *        <code>this.getDimensionality()</code>
    * @return the value in the specified dimension
    * 
-   * @see de.lmu.ifi.dbs.elki.data.NumberVector#getValue(int)
+   * @see de.lmu.ifi.dbs.elki.data.NumberVector#doubleValue(int)
    */
   public double doubleValue(int dimension) {
+    if(dimension < 1 || dimension > dimensionality) {
+      throw new IllegalArgumentException("illegal dimension: " + dimension);
+    }
+    return bits.get(dimension) ? 1.0 : 0.0;
+  }
+
+  /**
+   * Returns the value in the specified dimension as long.
+   * 
+   * @param dimension the desired dimension, where 1 &le; dimension &le;
+   *        <code>this.getDimensionality()</code>
+   * @return the value in the specified dimension
+   * 
+   * @see de.lmu.ifi.dbs.elki.data.NumberVector#longValue(int)
+   */
+  public long longValue(int dimension) {
     if(dimension < 1 || dimension > dimensionality) {
       throw new IllegalArgumentException("illegal dimension: " + dimension);
     }
