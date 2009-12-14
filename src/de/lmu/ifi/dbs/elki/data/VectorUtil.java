@@ -13,7 +13,7 @@ public final class VectorUtil {
     DoubleMinMax minmax = new DoubleMinMax();
 
     for(int i = 0; i < vec.getDimensionality(); i++) {
-      minmax.put(vec.getValue(i+1).doubleValue());
+      minmax.put(vec.doubleValue(i+1));
     }
 
     return minmax;

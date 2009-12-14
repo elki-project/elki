@@ -119,10 +119,12 @@ public class LCSSDistanceFunction<V extends NumberVector<V, ?>> extends Abstract
       a = new double[m];
       b = new double[n];
 
-      for(int i = 0; i < v1.getDimensionality(); i++)
-        a[i] = v1.getValue(i + 1).doubleValue();
-      for(int j = 0; j < v2.getDimensionality(); j++)
-        b[j] = v2.getValue(j + 1).doubleValue();
+      for(int i = 0; i < v1.getDimensionality(); i++) {
+        a[i] = v1.doubleValue(i + 1);
+      }
+      for(int j = 0; j < v2.getDimensionality(); j++) {
+        b[j] = v2.doubleValue(j + 1);
+      }
     }
     else {
       m = v2.getDimensionality();
@@ -130,10 +132,12 @@ public class LCSSDistanceFunction<V extends NumberVector<V, ?>> extends Abstract
       a = new double[m];
       b = new double[n];
 
-      for(int i = 0; i < v2.getDimensionality(); i++)
-        a[i] = v2.getValue(i + 1).doubleValue();
-      for(int j = 0; j < v1.getDimensionality(); j++)
-        b[j] = v1.getValue(j + 1).doubleValue();
+      for(int i = 0; i < v2.getDimensionality(); i++) {
+        a[i] = v2.doubleValue(i + 1);
+      }
+      for(int j = 0; j < v1.getDimensionality(); j++) {
+        b[j] = v1.doubleValue(j + 1);
+      }
     }
 
     double[][] matrix = new double[m + 1][n + 1];

@@ -261,7 +261,7 @@ public abstract class AbstractBiclustering<V extends NumberVector<V,?>, M extend
    *         <code>database.get(rowIDs[row]).getValue(colIDs[col])</code>
    */
   protected double valueAt(int row, int col) {
-    return getDatabase().get(rowIDs[row]).getValue(colIDs[col]).doubleValue();
+    return getDatabase().get(rowIDs[row]).doubleValue(colIDs[col]);
   }
 
   /**

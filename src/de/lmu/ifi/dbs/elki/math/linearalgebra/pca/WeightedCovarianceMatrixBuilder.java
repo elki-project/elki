@@ -126,7 +126,7 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<V, ?>, D ext
       // TODO: hard coded distance... make parametrizable?
       double distance = 0.0;
       for(int d = 0; d < dim; d++) {
-        double delta = centroid.getValue(d + 1).doubleValue() - obj.getValue(d + 1).doubleValue();
+        double delta = centroid.doubleValue(d + 1) - obj.doubleValue(d + 1);
         distance += delta * delta;
       }
       distance = java.lang.Math.sqrt(distance);
@@ -134,9 +134,9 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<V, ?>, D ext
       for(int d1 = 0; d1 < dim; d1++) {
         /* We're exploiting symmetry here, start with d2 == d1 */
         for(int d2 = d1; d2 < dim; d2++) {
-          squares[d1][d2] += obj.getValue(d1 + 1).doubleValue() * obj.getValue(d2 + 1).doubleValue() * weight;
+          squares[d1][d2] += obj.doubleValue(d1 + 1) * obj.doubleValue(d2 + 1) * weight;
         }
-        sums[d1] += obj.getValue(d1 + 1).doubleValue() * weight;
+        sums[d1] += obj.doubleValue(d1 + 1) * weight;
       }
       weightsum += weight;
     }
@@ -196,9 +196,9 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<V, ?>, D ext
       for(int d1 = 0; d1 < dim; d1++) {
         /* We're exploiting symmetry here, start with d2 == d1 */
         for(int d2 = d1; d2 < dim; d2++) {
-          squares[d1][d2] += obj.getValue(d1 + 1).doubleValue() * obj.getValue(d2 + 1).doubleValue() * weight;
+          squares[d1][d2] += obj.doubleValue(d1 + 1) * obj.doubleValue(d2 + 1) * weight;
         }
-        sums[d1] += obj.getValue(d1 + 1).doubleValue() * weight;
+        sums[d1] += obj.doubleValue(d1 + 1) * weight;
       }
       weightsum += weight;
     }

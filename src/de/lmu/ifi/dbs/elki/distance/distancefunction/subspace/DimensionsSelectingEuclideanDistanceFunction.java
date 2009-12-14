@@ -42,7 +42,7 @@ public class DimensionsSelectingEuclideanDistanceFunction<V extends NumberVector
 
     double sqrDist = 0;
     for(int d = getSelectedDimensions().nextSetBit(0); d >= 0; d = getSelectedDimensions().nextSetBit(d + 1)) {
-      double manhattanI = v1.getValue(d + 1).doubleValue() - v2.getValue(d + 1).doubleValue();
+      double manhattanI = v1.doubleValue(d + 1) - v2.doubleValue(d + 1);
       sqrDist += manhattanI * manhattanI;
     }
     return new DoubleDistance(Math.sqrt(sqrDist));
@@ -63,7 +63,7 @@ public class DimensionsSelectingEuclideanDistanceFunction<V extends NumberVector
 
     double sqrDist = 0;
     for(int d = getSelectedDimensions().nextSetBit(0); d >= 0; d = getSelectedDimensions().nextSetBit(d + 1)) {
-      double value = v.getValue(d).doubleValue();
+      double value = v.doubleValue(d);
       double r;
       if(value < mbr.getMin(d)) {
         r = mbr.getMin(d);

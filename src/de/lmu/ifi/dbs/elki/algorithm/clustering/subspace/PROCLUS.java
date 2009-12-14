@@ -323,7 +323,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
       for(DistanceResultPair<DoubleDistance> qr : l_i) {
         V o = database.get(qr.getID());
         for(int d = 0; d < dim; d++) {
-          x_i[d] += Math.abs(medoid_i.getValue(d + 1).doubleValue() - o.getValue(d + 1).doubleValue());
+          x_i[d] += Math.abs(medoid_i.doubleValue(d + 1) - o.doubleValue(d + 1));
         }
       }
       for(int j = 0; j < dim; j++) {
@@ -432,7 +432,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
   private double manhattanSegmentalDistance(V o1, V o2, Set<Integer> dimensions) {
     double result = 0;
     for(Integer d : dimensions) {
-      result += Math.abs(o1.getValue(d).doubleValue() - o2.getValue(d).doubleValue());
+      result += Math.abs(o1.doubleValue(d) - o2.doubleValue(d));
     }
     result /= dimensions.size();
     return result;
@@ -480,7 +480,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
     double avg = 0;
     for(Integer objectID : objectIDs) {
       V o = database.get(objectID);
-      avg += Math.abs(centroid.getValue(dimension).doubleValue() - o.getValue(dimension).doubleValue());
+      avg += Math.abs(centroid.doubleValue(dimension) - o.doubleValue(dimension));
     }
     return avg / objectIDs.size();
   }

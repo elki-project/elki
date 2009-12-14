@@ -134,4 +134,13 @@ public interface NumberVector<V extends NumberVector<V, N>, N extends Number> ex
    * @return a new NumberVector of N for the given values
    */
   V newInstance(Vector values);
+  
+  /**
+   * Returns the value in the specified dimension as double
+   * 
+   * @param dimension the desired dimension, where 1 &le; dimension &le;
+   *        <code>this.getDimensionality()</code>
+   * @return the value in the specified dimension
+   */
+  double doubleValue(int dimension);
 }

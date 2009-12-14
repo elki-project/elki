@@ -79,7 +79,7 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<V, ?>, P ext
 
     double[] r = new double[v.getDimensionality()];
     for(int d = 1; d <= v.getDimensionality(); d++) {
-      double value = v.getValue(d).doubleValue();
+      double value = v.doubleValue(d);
       if(value < mbr.getMin(d)) {
         r[d - 1] = mbr.getMin(d);
       }

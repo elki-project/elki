@@ -195,6 +195,20 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
 
   /**
    * 
+   * @see de.lmu.ifi.dbs.elki.data.NumberVector#doubleValue(int)
+   */
+  public double doubleValue(int dimension) {
+    Float d = values.get(dimension);
+    if(d != null) {
+      return d;
+    }
+    else {
+      return 0.0f;
+    }
+  }
+
+  /**
+   * 
    * @see de.lmu.ifi.dbs.elki.data.NumberVector#getColumnVector()
    */
   public Vector getColumnVector() {

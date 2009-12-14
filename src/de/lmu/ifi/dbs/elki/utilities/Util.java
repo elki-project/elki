@@ -329,13 +329,13 @@ public final class Util {
    * @param selectedAttributes the attributes selected for projection
    * @return a new DoubleVector as a projection on the specified attributes
    * @throws IllegalArgumentException if the given selected attributes specify an attribute as selected which is out of range for the given DoubleVector.
-   * @see DoubleVector#getValue(int)
+   * @see DoubleVector#doubleValue(int)
    */
   public static DoubleVector project(DoubleVector v, BitSet selectedAttributes){
     double[] newAttributes = new double[selectedAttributes.cardinality()];
     int i = 0;
     for (int d = selectedAttributes.nextSetBit(0); d >= 0; d = selectedAttributes.nextSetBit(d + 1)) {
-      newAttributes[i] = v.getValue(d+1);
+      newAttributes[i] = v.doubleValue(d+1);
       i++;
     }
     DoubleVector projectedVector = new DoubleVector(newAttributes);

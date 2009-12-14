@@ -48,7 +48,7 @@ public class SODModel<O extends NumberVector<O, ?>> implements TextWriteable, Co
     for(Integer id : neighborhood) {
       O databaseObject = database.get(id);
       for(int d = 0; d < centerValues.length; d++) {
-        centerValues[d] += databaseObject.getValue(d + 1).doubleValue();
+        centerValues[d] += databaseObject.doubleValue(d + 1);
       }
     }
     for(int d = 0; d < centerValues.length; d++) {
@@ -58,7 +58,7 @@ public class SODModel<O extends NumberVector<O, ?>> implements TextWriteable, Co
       O databaseObject = database.get(id);
       for(int d = 0; d < centerValues.length; d++) {
         // distance
-        double distance = centerValues[d] - databaseObject.getValue(d + 1).doubleValue();
+        double distance = centerValues[d] - databaseObject.doubleValue(d + 1);
         // variance
         variances[d] += distance * distance;
       }

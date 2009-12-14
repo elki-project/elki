@@ -80,19 +80,19 @@ public abstract class AbstractNumberVector<V extends AbstractNumberVector<V, N>,
    * Get Minimum - implementation of the SpatialComparable interface
    * 
    * @return the value at the specified dimension
-   * @see #getValue(int)
+   * @see #doubleValue(int)
    */
   public double getMin(int dimension) {
-    return getValue(dimension).doubleValue();
+    return doubleValue(dimension);
   }
 
   /**
    * Get Maximum - implementation of the SpatialComparable interface
    * 
    * @return the value at the specified dimension
-   * @see #getValue(int)
+   * @see #doubleValue(int)
    */
   public double getMax(int dimension) {
-    return getValue(dimension).doubleValue();
+    return doubleValue(dimension);
   }
 }

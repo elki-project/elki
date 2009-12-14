@@ -33,9 +33,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstrai
  * ORCLUS provides the ORCLUS algorithm, an algorithm to find clusters in high
  * dimensional spaces.
  * <p>
- * Reference: C. C. Aggrawal, P. S. Yu:
- * Finding Generalized Projected Clusters in High Dimensional Spaces.
- * <br/>In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00).
+ * Reference: C. C. Aggrawal, P. S. Yu: Finding Generalized Projected Clusters
+ * in High Dimensional Spaces. <br/>
+ * In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00).
  * </p>
  * 
  * @author Elke Achtert
@@ -149,8 +149,8 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V>
   }
 
   /**
-   * Calls the super method
-   * and sets additionally the value of the parameter {@link #ALPHA_PARAM}.
+   * Calls the super method and sets additionally the value of the parameter
+   * {@link #ALPHA_PARAM}.
    */
   @Override
   public List<String> setParameters(List<String> args) throws ParameterException {
@@ -236,8 +236,8 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V>
   }
 
   /**
-   * Finds the basis of the subspace of dimensionality <code>dim</code> for
-   * the specified cluster.
+   * Finds the basis of the subspace of dimensionality <code>dim</code> for the
+   * specified cluster.
    * 
    * @param database the database to run the algorithm on
    * @param cluster the cluster
@@ -260,7 +260,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V>
     return eigenPairs.reverseEigenVectors(dim);
 
     // Used to be just this:
-    
+
     // Matrix pcaMatrix = pca.pcaMatrixResults(database, results);
     // pca.determineEigenPairs(pcaMatrix);
 
@@ -469,8 +469,9 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V>
 
       // initially the centroid is the value array of o
       double[] values = new double[o.getDimensionality()];
-      for(int d = 1; d <= o.getDimensionality(); d++)
-        values[d - 1] = o.getValue(d).doubleValue();
+      for(int d = 1; d <= o.getDimensionality(); d++) {
+        values[d - 1] = o.doubleValue(d);
+      }
       this.centroid = o.newInstance(values);
     }
   }

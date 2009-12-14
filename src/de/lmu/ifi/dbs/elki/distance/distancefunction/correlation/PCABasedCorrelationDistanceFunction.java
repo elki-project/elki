@@ -253,7 +253,7 @@ public class PCABasedCorrelationDistanceFunction<V extends NumberVector<V,?>, P 
 
     double sqrDist = 0;
     for(int i = 1; i <= dv1.getDimensionality(); i++) {
-      double manhattanI = dv1.getValue(i).doubleValue() - dv2.getValue(i).doubleValue();
+      double manhattanI = dv1.doubleValue(i) - dv2.doubleValue(i);
       sqrDist += manhattanI * manhattanI;
     }
     return Math.sqrt(sqrDist);

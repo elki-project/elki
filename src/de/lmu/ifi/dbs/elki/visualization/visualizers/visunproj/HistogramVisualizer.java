@@ -69,7 +69,7 @@ public class HistogramVisualizer extends AbstractVisualizer implements Unproject
     MinMax<Double> xminmax = new MinMax<Double>();
     MinMax<Double> yminmax = new MinMax<Double>();
     for(NumberVector<?,?> vec : curve) {
-      xminmax.put(vec.getValue(1).doubleValue());
+      xminmax.put(vec.doubleValue(1));
       if(dim == null) {
         dim = vec.getDimensionality();
       }
@@ -78,7 +78,7 @@ public class HistogramVisualizer extends AbstractVisualizer implements Unproject
         assert (dim == vec.getDimensionality());
       }
       for(int i = 1; i < dim; i++) {
-        yminmax.put(vec.getValue(i + 1).doubleValue());
+        yminmax.put(vec.doubleValue(i + 1));
       }
     }
     // Minimum should always start at 0 for histograms
@@ -101,8 +101,8 @@ public class HistogramVisualizer extends AbstractVisualizer implements Unproject
     // draw curves.
     for(NumberVector<?,?> vec : curve) {
       for(int d = 0; d < dim; d++) {
-        path[d].lineTo(ratio * (xscale.getScaled(vec.getValue(1).doubleValue() - binwidth / 2)), 1 - yscale.getScaled(vec.getValue(d + 2).doubleValue()));
-        path[d].lineTo(ratio * (xscale.getScaled(vec.getValue(1).doubleValue() + binwidth / 2)), 1 - yscale.getScaled(vec.getValue(d + 2).doubleValue()));
+        path[d].lineTo(ratio * (xscale.getScaled(vec.doubleValue(1) - binwidth / 2)), 1 - yscale.getScaled(vec.doubleValue(d + 2)));
+        path[d].lineTo(ratio * (xscale.getScaled(vec.doubleValue(1) + binwidth / 2)), 1 - yscale.getScaled(vec.doubleValue(d + 2)));
       }
     }
 

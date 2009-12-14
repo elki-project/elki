@@ -94,7 +94,7 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> exte
       for(Pair<V, Associations> objectAndAssociations : objectAndAssociationsList) {
         double[] values = new double[objectAndAssociations.getFirst().getDimensionality()];
         for(int d = 1; d <= objectAndAssociations.getFirst().getDimensionality(); d++) {
-          values[d - 1] = (objectAndAssociations.getFirst().getValue(d).doubleValue() - minima[d - 1]) / factor(d);
+          values[d - 1] = (objectAndAssociations.getFirst().doubleValue(d) - minima[d - 1]) / factor(d);
         }
 
         V normalizedFeatureVector = objectAndAssociationsList.get(0).getFirst().newInstance(values);
@@ -128,7 +128,7 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> exte
       for(V featureVector : featureVectors) {
         double[] values = new double[featureVector.getDimensionality()];
         for(int d = 1; d <= featureVector.getDimensionality(); d++) {
-          values[d - 1] = (featureVector.getValue(d).doubleValue() - minima[d - 1]) / factor(d);
+          values[d - 1] = (featureVector.doubleValue(d) - minima[d - 1]) / factor(d);
         }
         V normalizedFeatureVector = featureVectors.get(0).newInstance(values);
         normalizedFeatureVector.setID(featureVector.getID());
@@ -145,7 +145,7 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> exte
     if(featureVector.getDimensionality() == maxima.length && featureVector.getDimensionality() == minima.length) {
       double[] values = new double[featureVector.getDimensionality()];
       for(int d = 1; d <= featureVector.getDimensionality(); d++) {
-        values[d - 1] = (featureVector.getValue(d).doubleValue() * (factor(d)) + minima[d - 1]);
+        values[d - 1] = (featureVector.doubleValue(d) * (factor(d)) + minima[d - 1]);
       }
       V restoredFeatureVector = featureVector.newInstance(values);
       restoredFeatureVector.setID(featureVector.getID());
@@ -310,11 +310,11 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> exte
       throw new IllegalArgumentException("FeatureVectors differ in length.");
     }
     for(int d = 1; d <= featureVector.getDimensionality(); d++) {
-      if((featureVector.getValue(d).doubleValue()) > maxima[d - 1]) {
-        maxima[d - 1] = (featureVector.getValue(d).doubleValue());
+      if((featureVector.doubleValue(d)) > maxima[d - 1]) {
+        maxima[d - 1] = featureVector.doubleValue(d);
       }
-      if((featureVector.getValue(d).doubleValue()) < minima[d - 1]) {
-        minima[d - 1] = (featureVector.getValue(d).doubleValue());
+      if((featureVector.doubleValue(d)) < minima[d - 1]) {
+        minima[d - 1] = featureVector.doubleValue(d);
       }
     }
   }

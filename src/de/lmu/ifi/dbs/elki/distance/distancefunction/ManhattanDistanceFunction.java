@@ -25,7 +25,7 @@ public class ManhattanDistanceFunction<V extends NumberVector<V, ?>> extends Abs
     }
     double sum = 0;
     for(int i = 1; i <= v1.getDimensionality(); i++) {
-      sum += Math.abs(v1.getValue(i).doubleValue() - v2.getValue(i).doubleValue());
+      sum += Math.abs(v1.doubleValue(i) - v2.doubleValue(i));
     }
     return new DoubleDistance(sum);
   }
