@@ -136,11 +136,74 @@ public interface NumberVector<V extends NumberVector<V, N>, N extends Number> ex
   V newInstance(Vector values);
   
   /**
-   * Returns the value in the specified dimension as double
+   * Returns the value in the specified dimension as double.
+   * 
+   * Note: this might seem redundant with respect to {@code getValue(dim).doubleValue()}, but
+   * usually this is much more efficient due to boxing/unboxing cost.
    * 
    * @param dimension the desired dimension, where 1 &le; dimension &le;
    *        <code>this.getDimensionality()</code>
    * @return the value in the specified dimension
    */
   double doubleValue(int dimension);
+  
+  /**
+   * Returns the value in the specified dimension as float.
+   * 
+   * Note: this might seem redundant with respect to {@code getValue(dim).floatValue()}, but
+   * usually this is much more efficient due to boxing/unboxing cost.
+   * 
+   * @param dimension the desired dimension, where 1 &le; dimension &le;
+   *        <code>this.getDimensionality()</code>
+   * @return the value in the specified dimension
+   */
+  float floatValue(int dimension);
+  
+  /**
+   * Returns the value in the specified dimension as int.
+   * 
+   * Note: this might seem redundant with respect to {@code getValue(dim).intValue()}, but
+   * usually this is much more efficient due to boxing/unboxing cost.
+   * 
+   * @param dimension the desired dimension, where 1 &le; dimension &le;
+   *        <code>this.getDimensionality()</code>
+   * @return the value in the specified dimension
+   */
+  int intValue(int dimension);
+  
+  /**
+   * Returns the value in the specified dimension as long.
+   * 
+   * Note: this might seem redundant with respect to {@code getValue(dim).longValue()}, but
+   * usually this is much more efficient due to boxing/unboxing cost.
+   * 
+   * @param dimension the desired dimension, where 1 &le; dimension &le;
+   *        <code>this.getDimensionality()</code>
+   * @return the value in the specified dimension
+   */
+  long longValue(int dimension);
+
+  /**
+   * Returns the value in the specified dimension as short.
+   * 
+   * Note: this might seem redundant with respect to {@code getValue(dim).shortValue()}, but
+   * usually this is much more efficient due to boxing/unboxing cost.
+   * 
+   * @param dimension the desired dimension, where 1 &le; dimension &le;
+   *        <code>this.getDimensionality()</code>
+   * @return the value in the specified dimension
+   */
+  short shortValue(int dimension);
+  
+  /**
+   * Returns the value in the specified dimension as byte.
+   * 
+   * Note: this might seem redundant with respect to {@code getValue(dim).byteValue()}, but
+   * usually this is much more efficient due to boxing/unboxing cost.
+   * 
+   * @param dimension the desired dimension, where 1 &le; dimension &le;
+   *        <code>this.getDimensionality()</code>
+   * @return the value in the specified dimension
+   */
+  byte byteValue(int dimension);
 }

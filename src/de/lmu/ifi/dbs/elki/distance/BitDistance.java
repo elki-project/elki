@@ -100,6 +100,11 @@ public class BitDistance extends NumberDistance<BitDistance, Bit> {
   }
   
   @Override
+  public long longValue() {
+    return value ? 1 : 0;
+  }
+
+  @Override
   public int intValue() {
     return value ? 1 : 0;
   }

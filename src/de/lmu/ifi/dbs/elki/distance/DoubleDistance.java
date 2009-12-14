@@ -113,8 +113,8 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
   }
 
   @Override
-  public int intValue() {
-    return (int) value;
+  public long longValue() {
+    return (long) value;
   }
 
   @Override

@@ -182,6 +182,24 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
   }
 
   /**
+   * Returns the value of the specified attribute as long.
+   * 
+   * @param dimension the selected attribute. Attributes are counted starting
+   *        with 1.
+   * 
+   * @throws IllegalArgumentException if the specified dimension is out of range
+   *         of the possible attributes
+   */
+  public long longValue(int dimension) {
+    try {
+      return (long) values[dimension - 1];
+    }
+    catch(IndexOutOfBoundsException e) {
+      throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
+    }
+  }
+
+  /**
    * Get a copy of the raw double[] array.
    * 
    * @return copy of values array.

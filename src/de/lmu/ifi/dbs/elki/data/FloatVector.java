@@ -159,6 +159,15 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
     }
   }
 
+  public long longValue(int dimension) {
+    try {
+      return (long) values[dimension - 1];
+    }
+    catch(ArrayIndexOutOfBoundsException e) {
+      throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
+    }
+  }
+
   public Vector getColumnVector() {
     return new Vector(Util.convertToDoubles(values));
   }

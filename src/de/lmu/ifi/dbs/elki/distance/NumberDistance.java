@@ -90,16 +90,16 @@ public abstract class NumberDistance<D extends NumberDistance<D, N>, N extends N
    * 
    * @return same result as getValue().intValue() but may be more efficient.
    */
-  public abstract int intValue();
+  public int intValue() {
+    return (int) longValue();
+  }
   
   /**
    * Get the value as long.
    * 
    * @return same result as getValue().longValue() but may be more efficient.
    */
-  public long longValue() {
-    return intValue();
-  }
+  public abstract long longValue();
   
   /**
    * Get the value as short.
@@ -107,7 +107,7 @@ public abstract class NumberDistance<D extends NumberDistance<D, N>, N extends N
    * @return same result as getValue().shortValue() but may be more efficient.
    */
   public short shortValue() {
-    return (short) intValue();
+    return (short) longValue();
   }
   
   /**
@@ -116,6 +116,6 @@ public abstract class NumberDistance<D extends NumberDistance<D, N>, N extends N
    * @return same result as getValue().byteValue() but may be more efficient.
    */
   public byte byteValue() {
-    return (byte) intValue();
+    return (byte) longValue();
   }
 }
