@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.vis1d;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
@@ -126,12 +125,12 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
 
       if(row) {
         bin.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getColorLibrary().getColor(clusterID));
-        bin.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 1.0);
+        bin.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.5);
       }
       else {
         bin.setStatement(SVGConstants.CSS_STROKE_PROPERTY, context.getColorLibrary().getColor(clusterID));
         bin.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.005);
-        bin.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.0);
+        bin.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
       }
 
       try {
@@ -152,99 +151,101 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
 
     setupCSS(svgp, allClusters.size());
 
-    ArrayList<AggregatingHistogram<Double, Double>> hists = new ArrayList<AggregatingHistogram<Double, Double>>(allClusters.size());
-
     // Get the database.
     Database<NV> database = context.getDatabase();
 
     // Creating histograms
     MinMax<Double> minmax = new MinMax<Double>();
     final double frac = 1. / database.size();
-    // TODO: change this into a double[] histogram to have the same bins everywhere!
-    AggregatingHistogram<Double, Double> allInOne = AggregatingHistogram.DoubleSumHistogram(BINS, 0, 1);
+    final int cols = allClusters.size() + 1;
+    AggregatingHistogram<double[], double[]> histogram = new AggregatingHistogram<double[], double[]>(BINS, 0, 1, new AggregatingHistogram.Adapter<double[], double[]>() {
+      @Override
+      public double[] aggregate(double[] existing, double[] data) {
+        for(int i = 0; i < existing.length; i++) {
+          existing[i] += data[i];
+        }
+        return existing;
+      }
+
+      @Override
+      public double[] make() {
+        return new double[cols];
+      }
+    });
 
     int clusterID = 0;
     for(Cluster<Model> cluster : allClusters) {
-      AggregatingHistogram<Double, Double> hist = AggregatingHistogram.DoubleSumHistogram(BINS, 0, 1);
+      double[] inc = new double[cols];
+      inc[0] = frac;
+      inc[clusterID + 1] = frac;
       for(int id : cluster.getIDs()) {
         double pos = proj.projectDataToRenderSpace(database.get(id)).get(0);
-        hist.aggregate(pos, frac);
-        allInOne.aggregate(pos, frac);
+        histogram.aggregate(pos, inc);
       }
-      assert(hists.size() == clusterID);
-      hists.add(hist);
-      // for scaling, get the maximum occurring value in the bins:
-      for(Pair<Double, Double> bin : hist) {
-        minmax.put(bin.getSecond());
-      }
-      
       clusterID += 1;
     }
     // for scaling, get the maximum occurring value in the bins:
-    for(Pair<Double, Double> bin : allInOne) {
-      minmax.put(bin.getSecond());
+    for(Pair<Double, double[]> bin : histogram) {
+      for (double val : bin.second) {
+        minmax.put(val);
+      }
     }
 
-    LinearScale scale = new LinearScale(0, minmax.getMax());
+    LinearScale yscale = new LinearScale(0, minmax.getMax());
+    LinearScale xscale = new LinearScale(histogram.getCoverMinimum(), histogram.getCoverMaximum());
 
-    // Axis. TODO: Use AxisVisualizer for this.
+    // Axis. TODO: Use AxisVisualizer for this?
     try {
-      SVGSimpleLinearAxis.drawAxis(svgp, layer, scale, -1, 1, -1, -1, true, false);
+      SVGSimpleLinearAxis.drawAxis(svgp, layer, yscale, -1, 1, -1, -1, true, false);
+      //SVGSimpleLinearAxis.drawAxis(svgp, layer, xscale, -1, 1, 1, 1, true, true);
     }
     catch(CSSNamingConflict e) {
       LoggingUtil.exception("CSS class exception in axis class.", e);
     }
 
+    double binwidth = histogram.getBinsize();
     // Visualizing
     if(row) {
-      // FIXME: stacking is nontrivial with this kind of ordering (and because
-      // of using one histogram each! - so the "row" mode is currently broken.
-      for(int key = 0; key < hists.size(); key++) {
-        AggregatingHistogram<Double, Double> hist = hists.get(key);
-        double binsize = hist.getBinsize();
-        for(Pair<Double, Double> bin : hist) {
-          double lpos = bin.getFirst() - binsize / 2;
-          double rpos = bin.getFirst() + binsize / 2;
-          double val = bin.getSecond() / scale.getMax();
-          Element row = SVGUtil.svgRect(svgp.getDocument(), lpos, 1 - val, rpos - lpos, val);
-          SVGUtil.addCSSClass(row, BIN + key);
+      for(Pair<Double, double[]> bin : histogram) {
+        double lpos = xscale.getScaled(bin.getFirst() - binwidth / 2);
+        double rpos = xscale.getScaled(bin.getFirst() + binwidth / 2);
+        double stack = 0.0;
+        for(int key = 1; key < cols; key++) {
+          double val = yscale.getScaled(bin.getSecond()[key]);
+          Element row = SVGUtil.svgRect(svgp.getDocument(), lpos * 2 - 1, 1 - (val + stack) * 2, (rpos - lpos) * 2, val * 2);
+          stack = stack + val;
+          SVGUtil.addCSSClass(row, BIN + (key - 1));
           layer.appendChild(row);
         }
       }
     }
     else {
-      layer.appendChild(drawLine(svgp, -1, allInOne, scale.getMax()));
-      for(int key = 0; key < hists.size(); key++) {
-        layer.appendChild(drawLine(svgp, key, hists.get(key), scale.getMax()));
+      double left = xscale.getScaled(histogram.getCoverMinimum());
+      double right = left;
+      
+      SVGPath[] paths = new SVGPath[cols];
+      for (int i = 0; i < cols; i++) {
+        paths[i] = new SVGPath(left * 2 - 1, 1);
+      }
+
+      // draw histogram lines
+      for(Pair<Double, double[]> bin : histogram) {
+        left = xscale.getScaled(bin.getFirst() - binwidth / 2);
+        right = xscale.getScaled(bin.getFirst() + binwidth / 2);
+        for (int i = 0; i < cols; i++) {
+          double val = yscale.getScaled(bin.getSecond()[i]);
+          paths[i].lineTo(left * 2 - 1, 1 - val * 2);
+          paths[i].lineTo(right * 2 - 1, 1 - val * 2);
+        }        
+      }
+      // close and insert all lines.
+      for (int i = 0; i < cols; i++) {
+        paths[i].lineTo(right * 2 - 1, 1);
+        Element elem = paths[i].makeElement(svgp);
+        SVGUtil.addCSSClass(elem, BIN + (i - 1));
+        layer.appendChild(elem);
       }
     }
     return layer;
-  }
-
-  /**
-   * Helper to draw a single histogram line.
-   * 
-   * @param svgp Plot context.
-   * @param color Color number
-   * @param hist Histogram to plot
-   * @param max Maximum value for scaling.
-   * @return New SVG path
-   */
-  private Element drawLine(SVGPlot svgp, int color, AggregatingHistogram<Double, Double> hist, double max) {
-    SVGPath path = new SVGPath(hist.getCoverMinimum(), 1);
-    double left = 0;
-    double right = 0;
-    double binwidth = hist.getBinsize();
-    for(Pair<Double, Double> bin : hist) {
-      double val = bin.getSecond() / max;
-      left = bin.getFirst() - binwidth / 2;
-      right = bin.getFirst() + binwidth / 2;
-      path.lineTo(left, 1 - val * 2);
-      path.lineTo(right, 1 - val * 2);
-    }
-    path.lineTo(right, hist.getCoverMaximum());
-    Element elem = path.makeElement(svgp);
-    SVGUtil.addCSSClass(elem, BIN + color);
-    return elem;
   }
 }
