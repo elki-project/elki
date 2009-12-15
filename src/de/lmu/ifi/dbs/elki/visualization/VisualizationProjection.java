@@ -99,6 +99,20 @@ public class VisualizationProjection {
   }
 
   /**
+   * Project a data vector from data space to scaled space.
+   * 
+   * @param data vector in data space
+   * @return vector in scaled space
+   */
+  public Vector projectDataToScaledSpace(double[] data) {
+    Vector vec = new Vector(dim);
+    for(int d = 1; d <= dim; d++) {
+      vec.set(d - 1, scales[d].getScaled(data[d - 1]));
+    }
+    return vec;
+  }
+
+  /**
    * Project a vector from scaled space to data space.
    * 
    * @param v vector in scaled space
@@ -121,6 +135,17 @@ public class VisualizationProjection {
    * @return vector in rendering space
    */
   public Vector projectDataToRenderSpace(NumberVector<?,?> data) {
+    Vector vec = projectDataToScaledSpace(data);
+    return projectScaledToRender(vec);
+  }
+
+  /**
+   * Project a data vector from data space to rendering space.
+   * 
+   * @param data vector in data space
+   * @return vector in rendering space
+   */
+  public Vector projectDataToRenderSpace(double[] data) {
     Vector vec = projectDataToScaledSpace(data);
     return projectScaledToRender(vec);
   }
