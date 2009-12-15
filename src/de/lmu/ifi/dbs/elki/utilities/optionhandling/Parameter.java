@@ -32,7 +32,7 @@ public abstract class Parameter<T, C> extends Option<T> {
    * Specifies if this parameter is an optional parameter.
    */
   protected boolean optionalParameter = false;
-  
+
   /**
    * Holds parameter constraints for this parameter.
    */
@@ -111,6 +111,15 @@ public abstract class Parameter<T, C> extends Option<T> {
    */
   public Parameter(OptionID optionID) {
     super(optionID);
+  }
+
+  /**
+   * Constructs a parameter with the given optionID.
+   * 
+   * @param optionID the unique id of the option
+   */
+  public Parameter(OptionID optionID, boolean optional) {
+    this(optionID, (ParameterConstraint<C>) null, optional, null);
   }
 
   /**
