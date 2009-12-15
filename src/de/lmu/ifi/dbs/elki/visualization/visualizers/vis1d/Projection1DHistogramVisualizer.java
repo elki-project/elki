@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.math.MinMax;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -197,6 +198,18 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
     // Axis. TODO: Use AxisVisualizer for this?
     try {
       SVGSimpleLinearAxis.drawAxis(svgp, layer, yscale, -1, 1, -1, -1, true, false);
+      
+      // draw axes that are non-trivial
+      Vector orig = proj.projectScaledToRender(new Vector(database.dimensionality()));
+      for(int d = 1; d <= database.dimensionality(); d++) {
+        Vector v = new Vector(database.dimensionality());
+        v.set(d-1,1);
+        // projected endpoint of axis
+        Vector ax = proj.projectScaledToRender(v);
+        if(ax.get(0) != orig.get(0)) {
+          SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(d), orig.get(0), 1, ax.get(0), 1, true, true);
+        }
+      }
       //SVGSimpleLinearAxis.drawAxis(svgp, layer, xscale, -1, 1, 1, 1, true, true);
     }
     catch(CSSNamingConflict e) {
