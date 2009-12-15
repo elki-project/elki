@@ -126,6 +126,26 @@ public class LinearScale {
   }
 
   /**
+   * Covert a relative value to it's scale position
+   * 
+   * @param val relative data value
+   * @return relative scale position in the interval [0:1]
+   */
+  public double getRelativeScaled(double val) {
+    return val / delta;
+  }
+
+  /**
+   * Covert a relative scale position to the actual value
+   * 
+   * @param val relative scale position in the interval [0:1]
+   * @return relative value on the original scale
+   */
+  public double getRelativeUnscaled(double val) {
+    return val * delta ;
+  }
+
+  /**
    * Format value according to the scales resolution (i.e. appropriate number of digits)
    * 
    * @param val
