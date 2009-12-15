@@ -5,7 +5,6 @@ import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
@@ -34,8 +33,8 @@ public class ReferencePointsAdapter<NV extends NumberVector<NV,?>> implements Al
   }
 
   @Override
-  public boolean canVisualize(Result result) {
-    Collection<ReferencePointsResult<NV>> cos = ResultUtil.filterResults(result, ReferencePointsResult.class);
+  public boolean canVisualize(VisualizerContext context) {
+    Collection<ReferencePointsResult<NV>> cos = ResultUtil.filterResults(context.getResult(), ReferencePointsResult.class);
     return (cos.size() > 0);
   }
 

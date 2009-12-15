@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
@@ -61,7 +60,8 @@ public class DefaultAdapter<NV extends NumberVector<NV, ?>> implements Algorithm
   }
 
   @Override
-  public boolean canVisualize(@SuppressWarnings("unused") Result r) {
+  public boolean canVisualize(@SuppressWarnings("unused") VisualizerContext context) {
+    // TODO: check the database has number vectors?
     return true;
   }
 

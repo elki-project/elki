@@ -56,7 +56,7 @@ public class VisualizersForResult extends AbstractParameterizable {
     
     // Collect all visualizers.
     for (AlgorithmAdapter a: adapters){
-      if (a.canVisualize(result)){
+      if (a.canVisualize(context)){
         // Note: this can throw an exception when setParameters() was not called!
         Collection<Visualizer> avis = a.getUsableVisualizers(context);
         //logger.debug("Got "+avis.size()+" visualizers from "+a.getClass().getName());

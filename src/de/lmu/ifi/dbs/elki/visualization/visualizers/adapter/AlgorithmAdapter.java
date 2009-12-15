@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.adapter;
 
 import java.util.Collection;
 
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
@@ -18,11 +17,11 @@ public interface AlgorithmAdapter {
    * Returns <code>true</code> if the adapter can provide one or more
    * {@link Visualizer}s for the given Result, else false.
    * 
-   * @param result the {@link Result} the adapter checks.
+   * @param context Context to store shared visualization properties.
    * @return <code>true</code> if the adapter can provide one or more
    *         {@link Visualizer}s for the given Result, else false.
    */
-  public boolean canVisualize(Result result);
+  public boolean canVisualize(VisualizerContext context);
 
   /**
    * Returns a collection of {@link Visualizer}s this adapter generally

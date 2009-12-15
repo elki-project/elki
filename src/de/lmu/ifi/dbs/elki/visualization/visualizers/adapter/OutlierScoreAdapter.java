@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -32,8 +31,8 @@ public class OutlierScoreAdapter<NV extends NumberVector<NV, ?>> implements Algo
 
   // TODO: This should be done by the adapter itself (in a more specific way).
   // Eliminates the AssociationID here, too.
-  public boolean canVisualize(Result result) {
-    return ResultUtil.filterResults(result, OutlierResult.class).size() > 0;
+  public boolean canVisualize(VisualizerContext context) {
+    return ResultUtil.filterResults(context.getResult(), OutlierResult.class).size() > 0;
   }
 
   @Override

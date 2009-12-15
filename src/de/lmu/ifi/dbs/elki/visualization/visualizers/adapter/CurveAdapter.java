@@ -5,7 +5,6 @@ import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
@@ -31,8 +30,8 @@ public class CurveAdapter implements AlgorithmAdapter {
   }
 
   @Override
-  public boolean canVisualize(Result result) {
-    Collection<IterableResult<Pair<Double, Double>>> curves = CurveVisualizer.findCurveResult(result);
+  public boolean canVisualize(VisualizerContext context) {
+    Collection<IterableResult<Pair<Double, Double>>> curves = CurveVisualizer.findCurveResult(context.getResult());
     return (curves.size() > 0);
   }
 
