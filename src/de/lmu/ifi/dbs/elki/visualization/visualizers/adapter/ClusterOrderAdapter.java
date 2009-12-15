@@ -7,7 +7,6 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
@@ -39,8 +38,8 @@ public class ClusterOrderAdapter implements AlgorithmAdapter {
   }
 
   @Override
-  public boolean canVisualize(Result result) {
-    Collection<ClusterOrderResult<?>> cos = ResultUtil.filterResults(result, ClusterOrderResult.class);
+  public boolean canVisualize(VisualizerContext context) {
+    Collection<ClusterOrderResult<?>> cos = ResultUtil.filterResults(context.getResult(), ClusterOrderResult.class);
     return (cos.size() > 0);
   }
 

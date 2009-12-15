@@ -7,7 +7,6 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
@@ -34,8 +33,8 @@ public class HistogramAdapter implements AlgorithmAdapter {
   }
 
   @Override
-  public boolean canVisualize(Result result) {
-    List<HistogramResult<?>> histograms = ResultUtil.filterResults(result, HistogramResult.class);
+  public boolean canVisualize(VisualizerContext context) {
+    List<HistogramResult<?>> histograms = ResultUtil.filterResults(context.getResult(), HistogramResult.class);
     return histograms.size() > 0;
   }
 
