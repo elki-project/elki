@@ -85,6 +85,26 @@ public class VisualizationProjection {
   }
 
   /**
+   * Project a relative vector from scaled space to rendering space.
+   * 
+   * @param v relative vector in scaled space
+   * @return relative vector in rendering space
+   */
+  public Vector projectRelativeScaledToRender(Vector v) {
+    return proj.applyRelative(v);
+  }
+
+  /**
+   * Project a relative vector from rendering space to scaled space.
+   * 
+   * @param v relative vector in rendering space
+   * @return relative vector in scaled space
+   */
+  public Vector projectRelativeRenderToScaled(Vector v) {
+    return proj.applyRelativeInverse(v);
+  }
+
+  /**
    * Project a data vector from data space to scaled space.
    * 
    * @param data vector in data space
@@ -129,6 +149,50 @@ public class VisualizationProjection {
   }
 
   /**
+   * Project a relative data vector from data space to scaled space.
+   * 
+   * @param relative data vector in data space
+   * @return relative vector in scaled space
+   */
+  public Vector projectRelativeDataToScaledSpace(NumberVector<?,?> data) {
+    Vector vec = new Vector(dim);
+    for(int d = 1; d <= dim; d++) {
+      vec.set(d - 1, scales[d].getRelativeScaled(data.doubleValue(d)));
+    }
+    return vec;
+  }
+
+  /**
+   * Project a relative data vector from data space to scaled space.
+   * 
+   * @param relative data vector in data space
+   * @return relative vector in scaled space
+   */
+  public Vector projectRelativeDataToScaledSpace(double[] data) {
+    Vector vec = new Vector(dim);
+    for(int d = 1; d <= dim; d++) {
+      vec.set(d - 1, scales[d].getRelativeScaled(data[d - 1]));
+    }
+    return vec;
+  }
+
+  /**
+   * Project a relative vector from scaled space to data space.
+   * 
+   * @param v relative vector in scaled space
+   * @param sampleobject Sample object needed for instantiation via
+   *        {@link de.lmu.ifi.dbs.elki.data.NumberVector#newInstance}
+   * @return relative vector in data space
+   */
+  public <NV extends NumberVector<NV,?>> NV projectRelativeScaledToDataSpace(Vector v, NV sampleobject) {
+    Vector vec = v.copy();
+    for(int d = 1; d <= dim; d++) {
+      vec.set(d - 1, scales[d].getRelativeUnscaled(vec.get(d - 1)));
+    }
+    return sampleobject.newInstance(vec);
+  }
+
+  /**
    * Project a data vector from data space to rendering space.
    * 
    * @param data vector in data space
@@ -164,6 +228,46 @@ public class VisualizationProjection {
     // vector.
     for(int d = 1; d <= dim; d++) {
       vec.set(d - 1, scales[d].getUnscaled(vec.get(d - 1)));
+    }
+    return sampleobject.newInstance(vec);
+  }
+
+  /**
+   * Project a relative data vector from data space to rendering space.
+   * 
+   * @param relative data vector in data space
+   * @return relative vector in rendering space
+   */
+  public Vector projectRelativeDataToRenderSpace(NumberVector<?,?> data) {
+    Vector vec = projectRelativeDataToScaledSpace(data);
+    return projectRelativeScaledToRender(vec);
+  }
+
+  /**
+   * Project a relative data vector from data space to rendering space.
+   * 
+   * @param relative data vector in data space
+   * @return relative vector in rendering space
+   */
+  public Vector projectRelativeDataToRenderSpace(double[] data) {
+    Vector vec = projectRelativeDataToScaledSpace(data);
+    return projectRelativeScaledToRender(vec);
+  }
+
+  /**
+   * Project a relative vector from rendering space to data space.
+   * 
+   * @param v relative vector in rendering space
+   * @param sampleobject Sample object needed for instantiation via
+   *        {@link de.lmu.ifi.dbs.elki.data.NumberVector#newInstance}
+   * @return relative vector in data space
+   */
+  public <NV extends NumberVector<NV,?>> NV projectRelativeRenderToDataSpace(Vector v, NV sampleobject) {
+    Vector vec = projectRelativeRenderToScaled(v);
+    // Not calling {@link #projectScaledToDataSpace} to avoid extra copy of
+    // vector.
+    for(int d = 1; d <= dim; d++) {
+      vec.set(d - 1, scales[d].getRelativeUnscaled(vec.get(d - 1)));
     }
     return sampleobject.newInstance(vec);
   }
