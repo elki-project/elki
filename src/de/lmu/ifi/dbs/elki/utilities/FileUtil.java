@@ -102,4 +102,66 @@ public final class FileUtil {
     }
     return in;
   }
+
+  /**
+   * Try to locate an file in the filesystem, given a partial name and a prefix.
+   * 
+   * @param name file name
+   * @param basedir extra base directory to try
+   * @return file, if the file could be found. {@code null} otherwise
+   */
+  public static File locateFile(String name, String basedir) {
+    // Try exact match first.
+    File f = new File(name);
+    if(f.exists()) {
+      return f;
+    }
+    // Try with base directory
+    if(basedir != null) {
+      f = new File(basedir, name);
+      // logger.warning("Trying: "+f.getAbsolutePath());
+      if(f.exists()) {
+        return f;
+      }
+    }
+    // try stripping whitespace
+    {
+      String name2 = name.trim();
+      if(!name.equals(name2)) {
+        // logger.warning("Trying without whitespace.");
+        f = locateFile(name2, basedir);
+        if(f != null) {
+          return f;
+        }
+      }
+    }
+    // try substituting path separators
+    {
+      String name2 = name.replace('/',File.separatorChar);
+      if (!name.equals(name2)) {
+        // logger.warning("Trying with replaced separators.");
+        f = locateFile(name2, basedir);
+        if(f != null) {
+          return f;
+        }
+      }
+      name2 = name.replace('\\',File.separatorChar);
+      if (!name.equals(name2)) {
+        // logger.warning("Trying with replaced separators.");
+        f = locateFile(name2, basedir);
+        if(f != null) {
+          return f;
+        }
+      }
+    }
+    // try stripping extra characters, such as quotes.
+    if(name.length() > 2 && name.charAt(0) == '"' && name.charAt(name.length() - 1) == '"') {
+      // logger.warning("Trying without quotes.");
+      f = locateFile(name.substring(1, name.length() - 1), basedir);
+      if(f != null) {
+        return f;
+      }
+    }
+    return null;
+  }
 }
