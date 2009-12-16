@@ -17,7 +17,7 @@ public class BlendComposite implements Composite {
   /**
    * Source blending, using the source image only.
    */
-  public static final int SRC = 0;
+  public static final int NORMAL = 0;
 
   /**
    * Lighten-only blending.
@@ -85,7 +85,7 @@ public class BlendComposite implements Composite {
   @Override
   public CompositeContext createContext(ColorModel srcColorModel, ColorModel dstColorModel, @SuppressWarnings("unused") RenderingHints hints) {
     switch(mode){
-    case SRC:
+    case NORMAL:
       return new BlendingContext(srcColorModel, dstColorModel, alpha);
     case LIGHTEN:
       return new LightenBlendingContext(srcColorModel, dstColorModel, alpha);
@@ -162,8 +162,8 @@ public class BlendComposite implements Composite {
       Object srcPixel = null;
       Object dstPixel = null;
 
-      for(int y = 0; y < height; y++) {
-        for(int x = 0; x < width; x++) {
+      for(int y = dstOut.getMinY(); y < height; y++) {
+        for(int x = dstOut.getMinX(); x < width; x++) {
           srcPixel = src.getDataElements(x, y, srcPixel);
           dstPixel = dstIn.getDataElements(x, y, dstPixel);
 
