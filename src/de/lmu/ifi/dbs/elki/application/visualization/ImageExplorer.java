@@ -3,9 +3,16 @@ package de.lmu.ifi.dbs.elki.application.visualization;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
@@ -26,13 +33,12 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.apache.batik.util.SVGConstants;
-import org.w3c.dom.Element;
-
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.images.BlendComposite;
+import de.lmu.ifi.dbs.elki.data.images.ImageUtil;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
@@ -42,18 +48,14 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
+import de.lmu.ifi.dbs.elki.utilities.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
-import de.lmu.ifi.dbs.elki.visualization.batikutil.JSVGSynchronizedCanvas;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.LazyCanvasResizer;
-import de.lmu.ifi.dbs.elki.visualization.batikutil.NodeReplacer;
-import de.lmu.ifi.dbs.elki.visualization.savedialog.SVGSaveDialog;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 
 /**
  * User application to explore the k Nearest Neighbors for a given image data
@@ -151,7 +153,7 @@ public class ImageExplorer<O extends NumberVector<?, ?>, N extends NumberDistanc
   /**
    * Store the base directory.
    */
-  private String basedir = "";
+  String basedir = "";
 
   public ImageExplorer() {
     super();
@@ -216,71 +218,27 @@ public class ImageExplorer<O extends NumberVector<?, ?>, N extends NumberDistanc
     new ImageExplorer<DoubleVector, DoubleDistance, Double>().runCLIApplication(args);
   }
 
-  /**
-   * Try to locate an image.
-   * 
-   * @param name ID string
-   * @return file, if the image could be found.
-   */
-  public File locateImage(String name) {
-    // Try exact match first.
-    File f = new File(name);
-    if(f.exists()) {
-      return f;
-    }
-    // Try with base directory
-    if(basedir != null) {
-      f = new File(basedir, name);
-      //logger.warning("Trying: "+f.getAbsolutePath());
-      if(f.exists()) {
-        return f;
-      }
-    }
-    // try stripping whitespace
-    {
-      String name2 = name.trim();
-      if(!name.equals(name2)) {
-        //logger.warning("Trying without whitespace.");
-        f = locateImage(name2);
-        if(f != null) {
-          return f;
-        }
-      }
-    }
-    // try stripping extra characters, such as quotes.
-    if(name.length() > 2 && name.charAt(0) == '"' && name.charAt(name.length() - 1) == '"') {
-      //logger.warning("Trying without quotes.");
-      f = locateImage(name.substring(1, name.length() - 1));
-      if(f != null) {
-        return f;
-      }
-    }
-    return null;
+  protected static GraphicsConfiguration getSystemGraphicsConfiguration() {
+    // setup JFrame with optimal graphics settings.
+    GraphicsEnvironment graphEnv = GraphicsEnvironment.getLocalGraphicsEnvironment();
+    GraphicsDevice graphDevice = graphEnv.getDefaultScreenDevice();
+    GraphicsConfiguration graphicConf = graphDevice.getDefaultConfiguration();
+    return graphicConf;
   }
 
-  class ExplorerWindow extends AbstractLoggable {
+  class ExplorerWindow extends JFrame {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 1L;
+
     /**
      * Default Window Title
      */
     private static final String WINDOW_TITLE_BASE = "ELKI Image Explorer";
 
-    /**
-     * Object ID used for replacing plot parts
-     */
-    private static final String IMAGESID = "images";
-
-    /**
-     * Object ID used for background element.
-     */
-    private static final String BACKGROUNDID = "background";
-
-    /**
-     * Filter ID for blending
-     */
-    private static final String FILTERID = "blend";
-
-    // The frame.
-    protected JFrame frame = new JFrame(WINDOW_TITLE_BASE);
+    // The canvas
+    protected ExplorerCanvas canvas;
 
     // The spinner
     protected JSpinner spinner;
@@ -293,15 +251,6 @@ public class ImageExplorer<O extends NumberVector<?, ?>, N extends NumberDistanc
 
     // The "Export" button, to save the image
     protected JButton saveButton = new JButton("Export");
-
-    // The SVG canvas.
-    protected JSVGSynchronizedCanvas svgCanvas = new JSVGSynchronizedCanvas();
-
-    // The plot
-    SVGPlot plot;
-
-    // Viewport
-    Element viewport;
 
     // Dimensionality
     protected int dim;
@@ -318,16 +267,16 @@ public class ImageExplorer<O extends NumberVector<?, ?>, N extends NumberDistanc
     // Canvas scaling ratio
     protected double ratio;
 
-    /**
-     * Holds the instance of the distance function specified by
-     * {@link #DISTANCE_FUNCTION_PARAM}.
-     */
+    // Distance function
     private DistanceFunction<O, N> distanceFunction;
 
     public ExplorerWindow() {
-      super(false);
+      super(WINDOW_TITLE_BASE, getSystemGraphicsConfiguration());
+      this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+      this.setIgnoreRepaint(true);
 
-      frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+      // setup Canvas accordingly
+      canvas = new ExplorerCanvas(getGraphicsConfiguration());
 
       // Create a panel and add the button, status label and the SVG canvas.
       final JPanel bigpanel = new JPanel(new BorderLayout());
@@ -353,15 +302,17 @@ public class ImageExplorer<O extends NumberVector<?, ?>, N extends NumberDistanc
       sidepanel.add(BorderLayout.SOUTH, buttonPanel);
 
       bigpanel.add(BorderLayout.WEST, sidepanel);
-      bigpanel.add(BorderLayout.CENTER, svgCanvas);
 
-      frame.getContentPane().add(bigpanel);
+      bigpanel.add(BorderLayout.CENTER, canvas);
+
+      this.getContentPane().add(bigpanel);
 
       spinner.addChangeListener(new ChangeListener() {
         @Override
         public void stateChanged(@SuppressWarnings("unused") ChangeEvent e) {
           k = (Integer) (spinner.getValue());
-          updateSelection();
+          canvas.setK(k);
+          refresh();
         }
       });
 
@@ -374,40 +325,34 @@ public class ImageExplorer<O extends NumberVector<?, ?>, N extends NumberDistanc
         }
       });
 
-      saveButton.addActionListener(new ActionListener() {
-        public void actionPerformed(@SuppressWarnings("unused") ActionEvent ae) {
-          SVGSaveDialog.showSaveDialog(plot, 512, 512);
-        }
-      });
+      saveButton.setEnabled(false);
+      // saveButton.addActionListener(new ActionListener() {
+      // public void actionPerformed(@SuppressWarnings("unused") ActionEvent ae)
+      // {
+      // logger.warning("Not yet implemented: save dialog");
+      // // FIXME: implement.
+      // }
+      // });
 
       quitButton.addActionListener(new ActionListener() {
         public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
-          frame.setVisible(false);
-          frame.dispose();
+          ExplorerWindow.this.setVisible(false);
+          ExplorerWindow.this.dispose();
         }
       });
 
       // display
-      frame.setSize(600, 600);
+      this.setSize(600, 600);
 
       // resize listener
-      LazyCanvasResizer listener = new LazyCanvasResizer(frame) {
+      LazyCanvasResizer listener = new LazyCanvasResizer(this) {
         @Override
         public void executeResize(double newratio) {
           ratio = newratio;
-          updateSize();
-          updateSelection();
         }
       };
       ratio = listener.getActiveRatio();
-      frame.addComponentListener(listener);
-    }
-
-    public void updateSize() {
-      SVGUtil.setAtt(plot.getRoot(), SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 " + ratio + " 1");
-      SVGUtil.setAtt(viewport, SVGConstants.SVG_WIDTH_ATTRIBUTE, ratio);
-      SVGUtil.setAtt(viewport, SVGConstants.SVG_HEIGHT_ATTRIBUTE, "1");
-      SVGUtil.setAtt(viewport, SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "-0.1 -0.1 " + (ratio + 0.2) + " 1.2");
+      this.addComponentListener(listener);
     }
 
     public void run(Database<O> db, DistanceFunction<O, N> distanceFunction) {
@@ -416,39 +361,12 @@ public class ImageExplorer<O extends NumberVector<?, ?>, N extends NumberDistanc
       this.distanceFunction = distanceFunction;
       this.distanceFunction.setDatabase(this.db, false, false);
 
-      this.frame.setTitle(distanceFunction.getClass().getSimpleName() + " - " + WINDOW_TITLE_BASE);
+      this.canvas.setDatabase(db);
+      this.canvas.setDistanceFunction(distanceFunction);
+      this.canvas.setDistanceCache(distancecache);
+      this.canvas.setK(k);
 
-      plot = new SVGPlot();
-      viewport = plot.svgElement(SVGConstants.SVG_SVG_TAG);
-      SVGUtil.setAtt(viewport, SVGConstants.SVG_STYLE_ATTRIBUTE, "fill: black");
-      plot.getRoot().appendChild(viewport);
-      updateSize();
-      
-      // setup blending
-      Element filter = plot.svgElement(SVGConstants.SVG_FILTER_TAG);
-      SVGUtil.setAtt(filter, SVGConstants.SVG_ID_ATTRIBUTE, FILTERID);
-      Element blend = plot.svgElement(SVGConstants.SVG_FE_BLEND_TAG);
-      SVGUtil.setAtt(blend, SVGConstants.SVG_MODE_ATTRIBUTE, SVGConstants.SVG_LIGHTEN_VALUE);
-      SVGUtil.setAtt(blend, SVGConstants.SVG_IN_ATTRIBUTE, SVGConstants.SVG_SOURCE_GRAPHIC_VALUE);
-      SVGUtil.setAtt(blend, SVGConstants.SVG_IN2_ATTRIBUTE, SVGConstants.SVG_BACKGROUND_IMAGE_VALUE);
-      filter.appendChild(blend);
-      plot.getDefs().appendChild(filter);
-      
-      // background
-      Element background = plot.svgElement(SVGConstants.SVG_RECT_TAG);
-      SVGUtil.setAtt(background,SVGConstants.SVG_X_ATTRIBUTE, 0);
-      SVGUtil.setAtt(background,SVGConstants.SVG_Y_ATTRIBUTE, 0);
-      SVGUtil.setAtt(background,SVGConstants.SVG_WIDTH_ATTRIBUTE, "100%");
-      SVGUtil.setAtt(background,SVGConstants.SVG_HEIGHT_ATTRIBUTE, "100%");
-      viewport.appendChild(background);
-
-      // insert the actual data series.
-      Element egroup = plot.svgElement(SVGConstants.SVG_G_TAG);
-      SVGUtil.setAtt(egroup, SVGConstants.SVG_ID_ATTRIBUTE, IMAGESID);
-      viewport.appendChild(egroup);
-      plot.putIdElement(IMAGESID, egroup);
-
-      svgCanvas.setPlot(plot);
+      this.setTitle(distanceFunction.getClass().getSimpleName() + " - " + WINDOW_TITLE_BASE);
 
       DefaultListModel m = new DefaultListModel();
       for(Integer dbid : db) {
@@ -456,66 +374,9 @@ public class ImageExplorer<O extends NumberVector<?, ?>, N extends NumberDistanc
       }
       seriesList.setModel(m);
 
-      frame.setVisible(true);
-    }
+      updateSelection();
 
-    protected void updateSelection() {
-      Object[] sel = seriesList.getSelectedValues();
-      // prepare replacement tag.
-      Element newe = plot.svgElement(SVGConstants.SVG_G_TAG);
-      // need background buffer for Filter effects to work.
-      //SVGUtil.setAtt(newe, SVGConstants.SVG_STYLE_ATTRIBUTE, "enable-background: new;");
-      SVGUtil.setAtt(newe, SVGConstants.SVG_ID_ATTRIBUTE, IMAGESID);
-
-      distancecache.clear();
-
-      for(Object o : sel) {
-        int idx = (Integer) o;
-
-        List<DistanceResultPair<N>> knn = db.kNNQueryForID(idx, k, distanceFunction);
-
-        double maxdist = knn.get(knn.size() - 1).getDistance().doubleValue();
-        // avoid division by zero.
-        if(maxdist == 0) {
-          maxdist = 1;
-        }
-
-        for(ListIterator<DistanceResultPair<N>> iter = knn.listIterator(knn.size()); iter.hasPrevious();) {
-          DistanceResultPair<N> pair = iter.previous();
-          //Element line = plotSeries(pair.getID(), MAXRESOLUTION);
-          double dist = pair.getDistance().doubleValue() / maxdist;
-          
-          String name = db.getAssociation(AssociationID.LABEL, pair.getID());
-          File f = (name != null) ? locateImage(name) : null;
-          if (f != null) {
-            Element img = plot.svgElement(SVGConstants.SVG_IMAGE_TAG);
-            double size = 0.3;
-            SVGUtil.setAtt(img, SVGConstants.SVG_X_ATTRIBUTE, dist * (1 / (ratio + size)));
-            SVGUtil.setAtt(img, SVGConstants.SVG_Y_ATTRIBUTE, 0.5 + 0.25 * ((double)name.hashCode() / Integer.MAX_VALUE));
-            SVGUtil.setAtt(img, SVGConstants.SVG_WIDTH_ATTRIBUTE, size);
-            SVGUtil.setAtt(img, SVGConstants.SVG_HEIGHT_ATTRIBUTE, size * 0.75);
-            img.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, f.toURI().toString());
-            SVGUtil.setAtt(img, SVGConstants.SVG_IMAGE_RENDERING_ATTRIBUTE, SVGConstants.SVG_OPTIMIZE_SPEED_VALUE);
-            //SVGUtil.setAtt(img, SVGConstants.SVG_STYLE_ATTRIBUTE, "filter:url(#"+FILTERID+");");
-            newe.appendChild(img);
-          } else {
-            logger.warning("Image not found: "+name);
-          }
-          
-          //Color color = getColor(dist);
-          //String colstr = "#" + Integer.toHexString(color.getRGB()).substring(2);
-          //String width = (pair.getID() == idx) ? "0.5%" : "0.2%";
-          //SVGUtil.setStyle(line, "stroke: " + colstr + "; stroke-width: " + width + "; fill: none");
-          //newe.appendChild(line);
-          // put into cache
-          Double known = distancecache.get(pair.getID());
-          if(known == null || dist < known) {
-            distancecache.put(pair.getID(), dist);
-          }
-        }
-      }
-      plot.scheduleUpdate(new NodeReplacer(newe, plot, IMAGESID));
-      seriesList.repaint();
+      this.setVisible(true);
     }
 
     Color getColor(double dist) {
@@ -563,6 +424,157 @@ public class ImageExplorer<O extends NumberVector<?, ?>, N extends NumberDistanc
           setBackground(getColor(known));
         }
         return renderer;
+      }
+    }
+
+    public void updateSelection() {
+      Object[] sel = seriesList.getSelectedValues();
+      canvas.setSelection(sel);
+      refresh();
+    }
+
+    public void refresh() {
+      canvas.repaint();
+      seriesList.repaint();
+    }
+  }
+
+  private class ExplorerCanvas extends JPanel {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 1L;
+    
+    /**
+     * Logger
+     */
+    private Logging logger = Logging.getLogger(ExplorerCanvas.class);
+
+    // Distance function
+    private DistanceFunction<O, N> distanceFunction;
+
+    // Object Selection
+    private Object[] selection;
+
+    // Database
+    private Database<O> db;
+
+    // Distance cache
+    private HashMap<Integer, Double> distancecache;
+
+    // k
+    private int k = 20;
+
+    /**
+     * @param k the k to set
+     */
+    protected void setK(int k) {
+      this.k = k;
+      if(distancecache != null) {
+        distancecache.clear();
+      }
+    }
+
+    /**
+     * Constructor.
+     * 
+     * @param graphicConf Graphics configuration.
+     */
+    public ExplorerCanvas(GraphicsConfiguration graphicConf) {
+      super();
+      this.setIgnoreRepaint(true);
+    }
+
+    /**
+     * @param distancecache the distance cache to use
+     */
+    protected void setDistanceCache(HashMap<Integer, Double> distancecache) {
+      this.distancecache = distancecache;
+    }
+
+    /**
+     * @param db the Database to set
+     */
+    protected void setDatabase(Database<O> db) {
+      this.db = db;
+      if(distancecache != null) {
+        distancecache.clear();
+      }
+    }
+
+    /**
+     * @param distanceFunction the distanceFunction to set
+     */
+    protected void setDistanceFunction(DistanceFunction<O, N> distanceFunction) {
+      this.distanceFunction = distanceFunction;
+      if(distancecache != null) {
+        distancecache.clear();
+      }
+    }
+
+    /**
+     * @param selection the selection to set
+     */
+    protected void setSelection(Object[] selection) {
+      this.selection = selection;
+      if(distancecache != null) {
+        distancecache.clear();
+      }
+    }
+
+    @Override
+    public void paintComponent(Graphics g) {
+      int width = this.getWidth();
+      int height = this.getHeight();
+      int size = 256;
+      // fill background
+      g.setColor(Color.BLACK);
+      g.fillRect(0, 0, width, height);
+      Graphics2D destG = (Graphics2D) g;
+      destG.setComposite(new BlendComposite(BlendComposite.SCREEN, 1.0));
+
+      for(Object o : this.selection) {
+        int idx = (Integer) o;
+
+        List<DistanceResultPair<N>> knn = db.kNNQueryForID(idx, k, distanceFunction);
+
+        double maxdist = knn.get(knn.size() - 1).getDistance().doubleValue();
+        // avoid division by zero.
+        if(maxdist == 0) {
+          maxdist = 1;
+        }
+
+        for(ListIterator<DistanceResultPair<N>> iter = knn.listIterator(knn.size()); iter.hasPrevious();) {
+          DistanceResultPair<N> pair = iter.previous();
+          double dist = pair.getDistance().doubleValue() / maxdist;
+          // put distance into cache, use minimum of all selected objects
+          Double known = distancecache.get(pair.getID());
+          if(known == null || dist < known) {
+            distancecache.put(pair.getID(), dist);
+          }
+
+          String name = db.getAssociation(AssociationID.LABEL, pair.getID());
+          int x = (int) ((width - size) * dist);
+          int y = (int) ((height - size) * (.5 + .25 * ((double) name.hashCode() / Integer.MAX_VALUE)));
+
+          drawThumbnail(g, name, x, y);
+        }
+      }
+    }
+
+    private void drawThumbnail(Graphics g, String name, int x, int y) {
+      File f = (name != null) ? FileUtil.locateFile(name, basedir) : null;
+      if(f != null) {
+        try {
+          BufferedImage img = ImageUtil.loadImage(f);
+          g.drawImage(img, x, y, null);
+        }
+        catch(IOException e) {
+          logger.exception("Exception drawing image.", e);
+        }
+      }
+      else {
+        logger.warning("Image not found: " + name);
       }
     }
   }
