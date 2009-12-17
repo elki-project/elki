@@ -42,8 +42,8 @@ public class DataDotVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
   }
 
   @Override
-  public Element visualize(SVGPlot svgp, VisualizationProjection proj) {
-    Element layer = super.setupCanvas(svgp, proj);
+  public Element visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+    Element layer = super.setupCanvas(svgp, proj, width, height);
     Database<NV> database = context.getDatabase();
     for(int id : database) {
       Vector v = proj.projectDataToRenderSpace(database.get(id));

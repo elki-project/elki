@@ -87,10 +87,10 @@ public class CurveVisualizer extends AbstractVisualizer implements UnprojectedVi
   }
 
   @Override
-  public Element visualize(SVGPlot svgp) {
+  public Element visualize(SVGPlot svgp, double width, double height) {
     setupCSS(svgp);
 
-    final double ratio = 1.0;
+    final double ratio = width/height;
 
     // determine scaling
     MinMax<Double> minmaxx = new MinMax<Double>();
@@ -124,6 +124,7 @@ public class CurveVisualizer extends AbstractVisualizer implements UnprojectedVi
     layer.appendChild(line);
 
     // add a slight border
+    // FIXME: use width, height!
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "scale(0.9) translate(0.08 0.02)");
 
     return layer;

@@ -23,9 +23,11 @@ public abstract class Projection1DVisualizer<NV extends NumberVector<NV, ?>> ext
    * @param svgp Plot context
    * @return Wrapper element with appropriate view box.
    */
-  public Element setupCanvas(SVGPlot svgp) {
+  public Element setupCanvas(SVGPlot svgp, double width, double height) {
     Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_SVG_TAG);
     // Some default for the view box.
+    double xmargin = 0.2 * width;
+    double ymargin = 0.2 * height;
     SVGUtil.setAtt(layer, SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "-1.2 -1.2 2.4 2.4");    
     return layer;
   }

@@ -29,8 +29,8 @@ class VisualizationProjectedInfo extends VisualizationInfo {
    * @param vis Visualizer to use
    * @param proj Projection to use
    */
-  public VisualizationProjectedInfo(ProjectedVisualizer vis, VisualizationProjection proj) {
-    super();
+  public VisualizationProjectedInfo(ProjectedVisualizer vis, VisualizationProjection proj, double width, double height) {
+    super(width, height);
     this.vis = vis;
     this.proj = proj;
   }
@@ -38,7 +38,7 @@ class VisualizationProjectedInfo extends VisualizationInfo {
   @Override
   public Element build(SVGPlot plot) {
     synchronized(vis) {
-      return vis.visualize(plot, proj);
+      return vis.visualize(plot, proj, width, height);
     }
   }
 

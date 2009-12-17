@@ -6,9 +6,9 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
+import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
-import de.lmu.ifi.dbs.elki.visualization.css.linestyles.LineStyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -61,8 +61,8 @@ public class HistogramVisualizer extends AbstractVisualizer implements Unproject
   }
 
   @Override
-  public Element visualize(SVGPlot svgp) {
-    final double ratio = 1.0;
+  public Element visualize(SVGPlot svgp, double width, double height) {
+    final double ratio = width/height;
     
     // find maximum, determine step size
     Integer dim = null;
@@ -121,11 +121,12 @@ public class HistogramVisualizer extends AbstractVisualizer implements Unproject
       logger.exception(e);
     }
     // Setup line styles and insert lines.
-    LineStyleLibrary ls = context.getLineStyleLibrary();
+    ColorLibrary cl = context.getColorLibrary();
     for(int d = 0; d < dim; d++) {
       CSSClass csscls = new CSSClass(this, SERIESID + "_" + d);
       csscls.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, SVGConstants.SVG_NONE_VALUE);
-      ls.formatCSSClass(csscls, d, 0.002);
+      csscls.setStatement(SVGConstants.SVG_STROKE_ATTRIBUTE, cl.getColor(d));
+      csscls.setStatement(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, "0.002");
       try {
         svgp.getCSSClassManager().addClass(csscls);
       }
@@ -139,6 +140,7 @@ public class HistogramVisualizer extends AbstractVisualizer implements Unproject
     }
 
     // add a small margin for the axis labels
+    // FIXME: use width, height
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "scale(0.9) translate(0.08 0.02)");
 
     return layer;

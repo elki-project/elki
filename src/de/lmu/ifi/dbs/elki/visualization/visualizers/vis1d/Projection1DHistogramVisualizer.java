@@ -126,7 +126,6 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
 
       if(row) {
         bin.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getColorLibrary().getColor(clusterID));
-        bin.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.5);
       }
       else {
         bin.setStatement(SVGConstants.CSS_STROKE_PROPERTY, context.getColorLibrary().getColor(clusterID));
@@ -144,8 +143,8 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
   }
 
   @Override
-  public Element visualize(SVGPlot svgp, VisualizationProjection proj) {
-    Element layer = super.setupCanvas(svgp);
+  public Element visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+    Element layer = super.setupCanvas(svgp, width, height);
 
     Clustering<Model> clustering = context.getOrCreateDefaultClustering();
     final List<Cluster<Model>> allClusters = clustering.getAllClusters();

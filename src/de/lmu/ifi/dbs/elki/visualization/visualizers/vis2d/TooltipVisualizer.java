@@ -133,8 +133,8 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
   }
 
   @Override
-  public Element visualize(SVGPlot svgp, VisualizationProjection proj) {
-    Element layer = super.setupCanvas(svgp, proj);
+  public Element visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+    Element layer = super.setupCanvas(svgp, proj, width, height);
     setupCSS(svgp);
 
     EventListener hoverer = new EventListener() {

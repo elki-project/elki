@@ -35,8 +35,8 @@ public class AxisVisualizer<NV extends NumberVector<NV, ?>> extends Projection2D
   }
 
   @Override
-  public Element visualize(SVGPlot plot, VisualizationProjection proj) {
-    Element layer = super.setupCanvas(plot, proj);
+  public Element visualize(SVGPlot plot, VisualizationProjection proj, double width, double height) {
+    Element layer = super.setupCanvas(plot, proj, width, height);
     int dim = context.getDatabase().dimensionality();
     
     // origin

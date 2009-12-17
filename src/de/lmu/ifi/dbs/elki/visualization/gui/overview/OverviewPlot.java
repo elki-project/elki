@@ -180,19 +180,19 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
           VisualizationProjection proj = new VisualizationProjection(dvdb, scales, d1, d2);
 
           for(Projection2DVisualizer<?> v : vis2d) {
-            VisualizationInfo vi = new VisualizationProjectedInfo(v, proj);
+            VisualizationInfo vi = new VisualizationProjectedInfo(v, proj, 1., 1.);
             plotmap.addVis(d1 - 1, d2 - 2, 1.0, 1.0, vi);
           }
         }
       }
       if(dim >= 3) {
         AffineTransformation p = VisualizationProjection.axisProjection(dim, 1, 2);
-        p.addRotation(0, 2, Math.PI / 180 * -30. / dim);
+        p.addRotation(0, 2, Math.PI / 180 * -40. / dim);
         p.addRotation(1, 2, Math.PI / 180 * 50. / dim);
         VisualizationProjection proj = new VisualizationProjection(dvdb, scales, p);
         for(Projection2DVisualizer<?> v : vis2d) {
-          VisualizationInfo vi = new VisualizationProjectedInfo(v, proj);
-          plotmap.addVis(Math.ceil((dim - 1) / 2.0), 0.0, Math.floor((dim - 1) / 2.0), Math.floor((dim - 1) / 2.0), vi);
+          VisualizationInfo vi = new VisualizationProjectedInfo(v, proj, 2., 2.);
+          plotmap.addVis(Math.ceil((dim - 1) / 2.0), 0.0, Math.floor((dim ) / 2.0), Math.floor((dim) / 2.0), vi);
         }
       }
     }
@@ -216,7 +216,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
         VisualizationProjection proj = new VisualizationProjection(dvdb, scales, d1, (d1 == 1 ? 2 : 1));
         double ypos = -.1;
         for(Projection1DVisualizer<?> v : vis1d) {
-          VisualizationInfo vi = new VisualizationProjectedInfo(v, proj);
+          VisualizationInfo vi = new VisualizationProjectedInfo(v, proj, 1., 1.);
           // TODO: 1d vis might have a different native scaling.
           double height = 1.0;
           plotmap.addVis(d1 - 1, ypos - height, 1.0, height, vi);
@@ -231,7 +231,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
         pos = 0.0;
       }
       for(UnprojectedVisualizer v : visup) {
-        VisualizationInfo vi = new VisualizationUnprojectedInfo(v);
+        VisualizationInfo vi = new VisualizationUnprojectedInfo(v, 1., 1.);
         // TODO: might have different scaling.
         plotmap.addVis(-1.1, pos, 1., 1., vi);
         pos += 1.0;
@@ -270,23 +270,30 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
       boolean hasDetails = false;
       double x = e.getKey().getFirst();
       double y = e.getKey().getSecond();
+      double w = 0.0;
+      double h = 0.0;
       Element g = this.svgElement(SVGConstants.SVG_G_TAG);
       SVGUtil.setAtt(g, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "translate(" + x + " " + y + ")");
       for(VisualizationInfo vi : e.getValue()) {
-        Element gg = this.svgElement(SVGConstants.SVG_G_TAG);
+        Element parent = g;
+        if (e.getValue().size() > 1) {
+          parent = this.svgElement(SVGConstants.SVG_G_TAG);
+          g.appendChild(parent);
+        }
+        w = Math.max(w, vi.getWidth());
+        h = Math.max(h, vi.getHeight());
         if(vi.isVisible()) {
           Element child = vi.makeElement(this);
           if(child != null) {
-            gg.appendChild(child);
+            parent.appendChild(child);
           }
           else {
             if(vi.thumbnailEnabled()) {
-              queueThumbnail(vi, gg);
+              queueThumbnail(vi, parent);
             }
           }
         }
-        g.appendChild(gg);
-        vistoelem.put(vi, gg);
+        vistoelem.put(vi, parent);
 
         if(vi.hasDetails()) {
           hasDetails = true;
@@ -294,16 +301,16 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
       }
       plotlayer.appendChild(g);
       if(hasDetails) {
-        Element h = this.svgRect(x, y, 1, 1);
-        SVGUtil.addCSSClass(h, selcss.getName());
+        Element hover = this.svgRect(x, y, w, h);
+        SVGUtil.addCSSClass(hover, selcss.getName());
         // link hoverer.
-        EventTarget targ = (EventTarget) h;
+        EventTarget targ = (EventTarget) hover;
         targ.addEventListener(SVGConstants.SVG_MOUSEOVER_EVENT_TYPE, hoverer, false);
         targ.addEventListener(SVGConstants.SVG_MOUSEOUT_EVENT_TYPE, hoverer, false);
         targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, hoverer, false);
         targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, new SelectPlotEvent(x, y), false);
 
-        hoverlayer.appendChild(h);
+        hoverlayer.appendChild(hover);
       }
     }
     getRoot().appendChild(plotlayer);
@@ -356,7 +363,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
       gg.appendChild(elem);
     }
     else {
-      gg.appendChild(SVGUtil.svgWaitIcon(this.getDocument(), 0, 0, 1, 1));
+      gg.appendChild(SVGUtil.svgWaitIcon(this.getDocument(), 0, 0, vi.getWidth(), vi.getHeight()));
       queue.add(new Pair<Element, VisualizationInfo>(gg, vi));
       if(thumbnails == null || !thumbnails.isAlive()) {
         thumbnails = new ThumbnailThread();
@@ -464,20 +471,26 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
    * @return sub plot
    */
   public SVGPlot makeDetailPlot(double x, double y) {
-    double ratio = 1.0;
     SVGPlot plot = new SVGPlot();
-    plot.getRoot().setAttribute(SVGConstants.SVG_WIDTH_ATTRIBUTE, "20cm");
-    plot.getRoot().setAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE, (20 / ratio) + "cm");
-    plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 1 1");
 
     List<VisualizationInfo> layers = plotmap.get(x, y);
+    double width = Double.MIN_VALUE;
+    double height = Double.MIN_VALUE;
 
     for(VisualizationInfo vi : layers) {
       if(vi.isVisible()) {
         Element e = vi.build(plot);
         plot.getRoot().appendChild(e);
+        width = Math.max(width,vi.getWidth());
+        height = Math.max(height,vi.getHeight());
       }
     }
+
+    double ratio = width/height;
+    plot.getRoot().setAttribute(SVGConstants.SVG_WIDTH_ATTRIBUTE, "20cm");
+    plot.getRoot().setAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE, (20 / ratio) + "cm");
+    plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 "+width+" "+height);
+    
     plot.updateStyleElement();
     return plot;
   }

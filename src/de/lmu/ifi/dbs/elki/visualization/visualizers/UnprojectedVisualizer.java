@@ -17,5 +17,5 @@ public interface UnprojectedVisualizer extends Visualizer {
    * @param svgp the SVGPlot which will act as owner for the returned Element.
    * @return an Element representing a 2-dimensional visualization.
    */
-  public Element visualize(SVGPlot svgp);
+  public Element visualize(SVGPlot svgp, double width, double height);
 }

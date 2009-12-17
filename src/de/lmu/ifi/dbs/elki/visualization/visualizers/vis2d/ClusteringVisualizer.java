@@ -40,10 +40,10 @@ public class ClusteringVisualizer<NV extends NumberVector<NV, ?>> extends Projec
   }
 
   @Override
-  public Element visualize(SVGPlot svgp, VisualizationProjection proj) {
+  public Element visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
     MarkerLibrary ml = context.getMarkerLibrary();
     Clustering<Model> c = context.getOrCreateDefaultClustering();
-    Element layer = super.setupCanvas(svgp, proj);
+    Element layer = super.setupCanvas(svgp, proj, width, height);
     // get the Database
     Database<NV> database = context.getDatabase();
     // draw data

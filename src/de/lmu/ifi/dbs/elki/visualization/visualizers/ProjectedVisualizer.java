@@ -18,5 +18,5 @@ public interface ProjectedVisualizer extends Visualizer {
    * @param proj projection to use
    * @return an Element representing a 2-dimensional visualization.
    */
-  public Element visualize(SVGPlot svgp, VisualizationProjection proj);
+  public Element visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height);
 }

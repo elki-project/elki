@@ -21,15 +21,18 @@ class VisualizationUnprojectedInfo extends VisualizationInfo {
    * Constructor
    * 
    * @param vis Visualization
+   * @param width Width
+   * @param height Height
    */
-  public VisualizationUnprojectedInfo(UnprojectedVisualizer vis) {
+  public VisualizationUnprojectedInfo(UnprojectedVisualizer vis, double width, double height) {
+    super(width, height);
     this.vis = vis;
   }
 
   @Override
   public Element build(SVGPlot plot) {
     synchronized(vis) {
-      return vis.visualize(plot);
+      return vis.visualize(plot, width, height);
     }
   }
 

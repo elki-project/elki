@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.scaling.IdentityScaling;
+import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
 import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
 
 public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extends AbstractAlgorithm<O, Result> {
@@ -47,7 +48,7 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
    * Key: {@code -comphist.scaling}
    * </p>
    */
-  private final ClassParameter<OutlierScalingFunction> SCALING_PARAM = new ClassParameter<OutlierScalingFunction>(SCALING_ID, OutlierScalingFunction.class, IdentityScaling.class.getName());
+  private final ClassParameter<ScalingFunction> SCALING_PARAM = new ClassParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, IdentityScaling.class.getName());
 
   /**
    * Holds the algorithm to run.
@@ -62,7 +63,7 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
   /**
    * Scaling function to use
    */
-  private OutlierScalingFunction scaling;
+  private ScalingFunction scaling;
 
   public NormalizeOutlierScoreMetaAlgorithm() {
     addOption(ALGORITHM_PARAM);
@@ -74,7 +75,9 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
     Result innerresult = algorithm.run(database);
 
     AnnotationResult<Double> ann = getAnnotationResult(database, innerresult);
-    scaling.prepare(database, innerresult, ann);
+    if (scaling instanceof OutlierScalingFunction) {
+      ((OutlierScalingFunction)scaling).prepare(database, innerresult, ann);
+    }
     
     HashMap<Integer, Double> scaledscores = new HashMap<Integer, Double>(database.size());
 

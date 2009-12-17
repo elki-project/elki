@@ -19,7 +19,29 @@ abstract class VisualizationInfo {
   /**
    * Thumbnail reference.
    */
-  File thumbnail = null;
+  protected File thumbnail = null;
+  
+  /**
+   * Width
+   */
+  protected double width;
+  
+  /**
+   * Height
+   */
+  protected double height;
+  
+  /**
+   * Constructor.
+   * 
+   * @param width Width
+   * @param height Height
+   */
+  public VisualizationInfo(double width, double height) {
+    super();
+    this.width = width;
+    this.height = height;
+  }
 
   /**
    * Build (render) the visualization into an SVG tree.
@@ -48,15 +70,14 @@ abstract class VisualizationInfo {
    * @param width Thumbnail width
    * @return File reference of new thumbnail
    */
-  File generateThumbnail(Thumbnailer t, int width) {
-    double ratio = 1.0;
+  File generateThumbnail(Thumbnailer t, int uwidth) {
     SVGPlot plot = new SVGPlot();
-    plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 "+ratio+" 1");
+    plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 "+width+" "+height);
     Element e = build(plot);
     plot.getRoot().appendChild(e);
     plot.updateStyleElement();
-    int wi = width;
-    int he = (int)(width / ratio);
+    int wi = (int)(uwidth * width);
+    int he = (int)(uwidth * height);
     synchronized(t) {
       thumbnail = t.thumbnail(plot, wi, he);
     }
@@ -117,10 +138,27 @@ abstract class VisualizationInfo {
     final Element i = plot.svgElement(SVGConstants.SVG_IMAGE_TAG);
     SVGUtil.setAtt(i, SVGConstants.SVG_X_ATTRIBUTE, 0);
     SVGUtil.setAtt(i, SVGConstants.SVG_Y_ATTRIBUTE, 0);
-    SVGUtil.setAtt(i, SVGConstants.SVG_WIDTH_ATTRIBUTE, 1);
-    SVGUtil.setAtt(i, SVGConstants.SVG_HEIGHT_ATTRIBUTE, 1);
+    SVGUtil.setAtt(i, SVGConstants.SVG_WIDTH_ATTRIBUTE, width);
+    SVGUtil.setAtt(i, SVGConstants.SVG_HEIGHT_ATTRIBUTE, height);
     i.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, getThumbnailIfGenerated().toURI().toString());
     return i;
   }
 
+  /**
+   * Get the width
+   * 
+   * @return the width
+   */
+  protected double getWidth() {
+    return width;
+  }
+
+  /**
+   * Get the height
+   * 
+   * @return the height
+   */
+  protected double getHeight() {
+    return height;
+  }
 }
