@@ -28,10 +28,10 @@ public abstract class Projection2DVisualizer<NV extends NumberVector<NV, ?>> ext
    * @param proj Projection to use
    * @return wrapper element with appropriate view box.
    */
-  public Element setupCanvas(SVGPlot svgp, VisualizationProjection proj) {
+  public Element setupCanvas(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
     Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
     // Use the projections viewport by default.
-    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, proj.estimateTransformString(0.2));
+    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, proj.estimateTransformString(0.2, width, height));
     
     return layer;
   }

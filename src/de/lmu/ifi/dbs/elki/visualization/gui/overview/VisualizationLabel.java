@@ -9,14 +9,10 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 
 public class VisualizationLabel extends VisualizationInfo {
   String label;
-  double width;
-  double height;
   
   public VisualizationLabel(String label, double width, double height) {
-    super();
+    super(width, height);
     this.label = label;
-    this.width = width;
-    this.height = height;
   }
 
   @Override
@@ -36,14 +32,15 @@ public class VisualizationLabel extends VisualizationInfo {
 
   @Override
   protected Visualizer getVisualization() {
-    // Should not be called, since we've overriden isVisible and thumbnailEnabled above.
+    // Should not be called, since we've overridden isVisible and thumbnailEnabled above.
     throw new UnsupportedOperationException("Labels don't have a detail view.");
   }
 
   @Override
   public Element makeElement(SVGPlot plot) {
-    Element text = plot.svgText(width/2, height/2 + .05, this.label);
-    SVGUtil.setAtt(text, SVGConstants.SVG_STYLE_ATTRIBUTE, "fill:black; font-size: .1");
+    double fontsize = .1;
+    Element text = plot.svgText(width/2, height/2 + .35*fontsize, this.label);
+    SVGUtil.setAtt(text, SVGConstants.SVG_STYLE_ATTRIBUTE, "fill:black; font-size:"+fontsize+"; font-family: 'Times New Roman', sans-serif");
     SVGUtil.setAtt(text, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_MIDDLE_VALUE);
     return text;
   }

@@ -43,7 +43,7 @@ public class KeyVisualizer extends AbstractVisualizer implements UnprojectedVisu
   }
 
   @Override
-  public Element visualize(SVGPlot svgp) {
+  public Element visualize(SVGPlot svgp, double width, double height) {
     Clustering<Model> clustering = context.getOrCreateDefaultClustering();
     final List<Cluster<Model>> allcs = clustering.getAllClusters();
     int numc = allcs.size();
@@ -65,6 +65,7 @@ public class KeyVisualizer extends AbstractVisualizer implements UnprojectedVisu
     int size = Math.max(numc, 6);
     double scale = (1. / size);
     // scale
+    // FIXME: use width, height
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "scale("+(0.9*scale)+") translate(0.08 0.02)");
 
     return layer;

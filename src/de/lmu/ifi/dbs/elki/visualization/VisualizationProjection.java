@@ -325,11 +325,11 @@ public class VisualizationProjection {
    * @param margin extra margin to add.
    * @return
    */
-  public String estimateTransformString(double margin) {
+  public String estimateTransformString(double margin, double width, double height) {
     MinMax<Double>[] minmax = estimateViewport();
     // auto sizing magic, especially for rotated plots.
-    double sizex = minmax[0].getMax() - minmax[0].getMin();
-    double sizey = minmax[1].getMax() - minmax[1].getMin();
+    double sizex = (minmax[0].getMax() - minmax[0].getMin()) / width;
+    double sizey = (minmax[1].getMax() - minmax[1].getMin()) / height;
     double sizem = Math.max(sizex, sizey);
     double offx = (sizex - sizem) / 2 - margin;
     double offy = (sizey - sizem) / 2 - margin;

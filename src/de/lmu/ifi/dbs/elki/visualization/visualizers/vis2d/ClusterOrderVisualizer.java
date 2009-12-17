@@ -49,9 +49,9 @@ public class ClusterOrderVisualizer<NV extends NumberVector<NV,?>> extends Proje
   }
 
   @Override
-  public Element visualize(SVGPlot svgp, VisualizationProjection proj) {
+  public Element visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
     Database<NV> database = context.getDatabase();
-    Element layer = super.setupCanvas(svgp, proj);
+    Element layer = super.setupCanvas(svgp, proj, width, height);
     
     CSSClass cls = new CSSClass(this, CSSNAME);
     context.getLineStyleLibrary().formatCSSClass(cls, 0, 0.001);

@@ -80,8 +80,8 @@ public class AbstractRTreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extend
   }
 
   @Override
-  public Element visualize(SVGPlot svgp, VisualizationProjection proj) {
-    Element layer = super.setupCanvas(svgp, proj);
+  public Element visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+    Element layer = super.setupCanvas(svgp, proj, width, height);
     AbstractRStarTree<NV, ? extends N, E> rtree = findRStarTree(context);
     if(rtree != null) {
       E root = rtree.getRootEntry();

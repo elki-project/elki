@@ -132,9 +132,10 @@ public class OPTICSPlotVisualizer<D extends NumberDistance<D,?>> extends Abstrac
   }
 
   @Override
-  public Element visualize(SVGPlot svgp) {
+  public Element visualize(SVGPlot svgp, double width, double height) {
     Element layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
     double ratio = 4.0;
+    // FIXME: use width, height
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "scale("+(0.9/ratio)+") translate("+(0.05*ratio)+" "+(0.05*ratio)+")");
     
     if (imgfile == null) {
