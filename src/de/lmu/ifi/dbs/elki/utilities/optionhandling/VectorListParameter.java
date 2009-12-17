@@ -24,6 +24,16 @@ public class VectorListParameter extends ListParameter<List<Double>> {
    * Constructs a vector list parameter with the given name and description.
    * 
    * @param optionID
+   * @param optional
+   */
+  public VectorListParameter(OptionID optionID, boolean optional) {
+    super(optionID, optional);
+  }
+
+  /**
+   * Constructs a vector list parameter with the given name and description.
+   * 
+   * @param optionID
    * @param constraint
    */
   public VectorListParameter(OptionID optionID, ParameterConstraint<List<List<Double>>> constraint) {
@@ -36,10 +46,20 @@ public class VectorListParameter extends ListParameter<List<Double>> {
    * @param optionID
    * @param constraint
    * @param optional
+   */
+  public VectorListParameter(OptionID optionID, ParameterConstraint<List<List<Double>>> constraint, boolean optional) {
+    super(optionID, constraint, optional);
+  }
+
+  /**
+   * Constructs a vector list parameter with the given name and description.
+   * 
+   * @param optionID
+   * @param constraint
    * @param defaultValue
    */
-  public VectorListParameter(OptionID optionID, ParameterConstraint<List<List<Double>>> constraint, boolean optional, List<List<Double>> defaultValue) {
-    super(optionID, constraint, optional, defaultValue);
+  public VectorListParameter(OptionID optionID, ParameterConstraint<List<List<Double>>> constraint, List<List<Double>> defaultValue) {
+    super(optionID, constraint, defaultValue);
   }
 
   @Override

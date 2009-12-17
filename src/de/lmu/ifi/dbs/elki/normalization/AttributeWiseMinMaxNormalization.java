@@ -40,12 +40,12 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> exte
   /**
    * Parameter for minimum.
    */
-  private final DoubleListParameter MINIMA_PARAM = new DoubleListParameter(MINIMA_ID, null, true, null);
+  private final DoubleListParameter MINIMA_PARAM = new DoubleListParameter(MINIMA_ID, true);
 
   /**
    * Parameter for maximum.
    */
-  private final DoubleListParameter MAXIMA_PARAM = new DoubleListParameter(MAXIMA_ID, null, true, null);
+  private final DoubleListParameter MAXIMA_PARAM = new DoubleListParameter(MAXIMA_ID, true);
 
   /**
    * Stores the maximum in each dimension.

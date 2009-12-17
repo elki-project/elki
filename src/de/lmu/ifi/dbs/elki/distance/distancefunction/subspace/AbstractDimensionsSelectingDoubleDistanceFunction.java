@@ -27,7 +27,7 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
   /**
    * Dimensions parameter.
    */
-  private final IntListParameter DIMS_PARAM = new IntListParameter(DIMS_ID, new ListGreaterEqualConstraint<Integer>(1), true, null);
+  private final IntListParameter DIMS_PARAM = new IntListParameter(DIMS_ID, new ListGreaterEqualConstraint<Integer>(1), true);
 
   /**
    * The dimensions to be considered for distance computation.

@@ -42,12 +42,12 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
   /**
    * Parameter for means.
    */
-  private final DoubleListParameter MEAN_PARAM = new DoubleListParameter(MEAN_ID, null, true, null);
+  private final DoubleListParameter MEAN_PARAM = new DoubleListParameter(MEAN_ID, true);
 
   /**
    * Parameter for stddevs.
    */
-  private final DoubleListParameter STDDEV_PARAM = new DoubleListParameter(STDDEV_ID, null, true, null);
+  private final DoubleListParameter STDDEV_PARAM = new DoubleListParameter(STDDEV_ID, true);
 
   /**
    * Stores the mean in each dimension.

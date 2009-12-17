@@ -37,7 +37,7 @@ public class DoubleParameter extends NumberParameter<Double> {
    * @param optional specifies whether this parameter is an optional parameter
    */
   public DoubleParameter(OptionID optionID, boolean optional) {
-    super(optionID, null, optional, null);
+    super(optionID, optional);
   }
 
   /**
@@ -49,7 +49,7 @@ public class DoubleParameter extends NumberParameter<Double> {
    * @param optional specifies whether this parameter is an optional parameter
    */
   public DoubleParameter(OptionID optionID, ParameterConstraint<Number> constraint, boolean optional) {
-    super(optionID, constraint, optional, null);
+    super(optionID, constraint, optional);
   }
 
   /**
@@ -61,7 +61,7 @@ public class DoubleParameter extends NumberParameter<Double> {
    * @param defaultValue the default value for this parameter
    */
   public DoubleParameter(OptionID optionID, ParameterConstraint<Number> constraint, Double defaultValue) {
-    super(optionID, constraint, false, defaultValue);
+    super(optionID, constraint, defaultValue);
   }
 
   /**
@@ -98,8 +98,7 @@ public class DoubleParameter extends NumberParameter<Double> {
    * @param defaultValue the default value for this double parameter
    */
   public DoubleParameter(OptionID optionID, List<ParameterConstraint<Number>> cons, Double defaultValue) {
-    this(optionID, cons);
-    setDefaultValue(defaultValue);
+    super(optionID, cons, defaultValue);
   }
 
   /**
@@ -109,8 +108,7 @@ public class DoubleParameter extends NumberParameter<Double> {
    * @param defaultValue the default value for this double parameter
    */
   public DoubleParameter(OptionID optionID, Double defaultValue) {
-    this(optionID);
-    setDefaultValue(defaultValue);
+    super(optionID, defaultValue);
   }
 
   @Override

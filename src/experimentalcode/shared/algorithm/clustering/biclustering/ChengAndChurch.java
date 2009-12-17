@@ -106,7 +106,7 @@ public class ChengAndChurch<V extends NumberVector<V, Double>> extends AbstractB
    * Key: {@code -chengandchurch.random}
    * </p>
    */
-  private final LongParameter SEED_PARAM = new LongParameter(SEED_ID, true, 0L);
+  private final LongParameter SEED_PARAM = new LongParameter(SEED_ID, 0L);
 
   /**
    * OptionID for the parameter {@link #DELTA_PARAM}.
@@ -376,11 +376,7 @@ public class ChengAndChurch<V extends NumberVector<V, Double>> extends AbstractB
   @Override
   public List<String> setParameters(List<String> args) throws ParameterException {
     List<String> remainingParameters = super.setParameters(args);
-    long seed = SEED_PARAM.getDefaultValue();
-    if(SEED_PARAM.isSet()) {
-      seed = SEED_PARAM.getValue();
-    }
-    random = new Random(seed);
+    random = new Random(SEED_PARAM.getValue());
     delta = DELTA_PARAM.getValue();
     alpha = ALPHA_PARAM.getValue();
     n = N_PARAM.getValue();
