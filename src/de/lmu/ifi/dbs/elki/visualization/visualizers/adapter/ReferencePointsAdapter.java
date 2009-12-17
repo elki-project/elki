@@ -51,7 +51,6 @@ public class ReferencePointsAdapter<NV extends NumberVector<NV,?>> implements Al
     Collection<ReferencePointsResult<NV>> cos = ResultUtil.filterResults(context.getResult(), ReferencePointsResult.class);
     ArrayList<Visualizer> usableVisualizers = new ArrayList<Visualizer>(cos.size());
     ArrayList<String> params = referencePointsVisualizer.getParameters();
-    LoggingUtil.warning("Have "+cos.size()+ " reference points results!");
     for (ReferencePointsResult<NV> co : cos) {
       ReferencePointsVisualizer<NV> rpVis = new ReferencePointsVisualizer<NV>();
       // setup parameters.
