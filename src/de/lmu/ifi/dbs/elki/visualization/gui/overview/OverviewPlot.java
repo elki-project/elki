@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.elki.visualization.gui.overview;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -197,11 +196,25 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
         }
       }
     }
+    // insert column numbers
+    if(vis1d.size() > 0 || vis2d.size() > 0) {
+      for(int d1 = 1; d1 <= db.dimensionality(); d1++) {
+        VisualizationInfo colvi = new VisualizationLabel(Integer.toString(d1), 1, .1);
+        plotmap.addVis(d1 - 1, -.1, 1., .1, colvi);
+      }
+    }
+    // insert row numbers
+    if(vis2d.size() > 0) {
+      for(int d1 = 2; d1 <= db.dimensionality(); d1++) {
+        VisualizationInfo colvi = new VisualizationLabel(Integer.toString(d1), .1, 1);
+        plotmap.addVis(-.1, d1 - 2, .1, 1., colvi);
+      }
+    }
     if(vis1d.size() > 0) {
       int dim = db.dimensionality();
       for(int d1 = 1; d1 <= dim; d1++) {
         VisualizationProjection proj = new VisualizationProjection(dvdb, scales, d1, (d1 == 1 ? 2 : 1));
-        double ypos = 0;
+        double ypos = -.1;
         for(Projection1DVisualizer<?> v : vis1d) {
           VisualizationInfo vi = new VisualizationProjectedInfo(v, proj);
           // TODO: 1d vis might have a different native scaling.
@@ -220,7 +233,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
       for(UnprojectedVisualizer v : visup) {
         VisualizationInfo vi = new VisualizationUnprojectedInfo(v);
         // TODO: might have different scaling.
-        plotmap.addVis(-1, pos, 1., 1., vi);
+        plotmap.addVis(-1.1, pos, 1., 1., vi);
         pos += 1.0;
       }
     }
@@ -254,29 +267,44 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
 
     // TODO: kill all children in document root except style, defs etc?
     for(Entry<DoubleDoublePair, ArrayList<VisualizationInfo>> e : plotmap.entrySet()) {
+      boolean hasDetails = false;
       double x = e.getKey().getFirst();
       double y = e.getKey().getSecond();
       Element g = this.svgElement(SVGConstants.SVG_G_TAG);
       SVGUtil.setAtt(g, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "translate(" + x + " " + y + ")");
       for(VisualizationInfo vi : e.getValue()) {
         Element gg = this.svgElement(SVGConstants.SVG_G_TAG);
-        if(vi.thumbnailEnabled() && vi.isVisible()) {
-          queueThumbnail(vi, gg);
+        if(vi.isVisible()) {
+          Element child = vi.makeElement(this);
+          if(child != null) {
+            gg.appendChild(child);
+          }
+          else {
+            if(vi.thumbnailEnabled()) {
+              queueThumbnail(vi, gg);
+            }
+          }
         }
         g.appendChild(gg);
         vistoelem.put(vi, gg);
+
+        if(vi.hasDetails()) {
+          hasDetails = true;
+        }
       }
       plotlayer.appendChild(g);
-      Element h = this.svgRect(x, y, 1, 1);
-      SVGUtil.addCSSClass(h, selcss.getName());
-      // link hoverer.
-      EventTarget targ = (EventTarget) h;
-      targ.addEventListener(SVGConstants.SVG_MOUSEOVER_EVENT_TYPE, hoverer, false);
-      targ.addEventListener(SVGConstants.SVG_MOUSEOUT_EVENT_TYPE, hoverer, false);
-      targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, hoverer, false);
-      targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, new SelectPlotEvent(x, y), false);
+      if(hasDetails) {
+        Element h = this.svgRect(x, y, 1, 1);
+        SVGUtil.addCSSClass(h, selcss.getName());
+        // link hoverer.
+        EventTarget targ = (EventTarget) h;
+        targ.addEventListener(SVGConstants.SVG_MOUSEOVER_EVENT_TYPE, hoverer, false);
+        targ.addEventListener(SVGConstants.SVG_MOUSEOUT_EVENT_TYPE, hoverer, false);
+        targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, hoverer, false);
+        targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, new SelectPlotEvent(x, y), false);
 
-      hoverlayer.appendChild(h);
+        hoverlayer.appendChild(h);
+      }
     }
     getRoot().appendChild(plotlayer);
     getRoot().appendChild(hoverlayer);
@@ -323,8 +351,9 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
    * @param gg Thumbnail element
    */
   private synchronized void queueThumbnail(VisualizationInfo vi, Element gg) {
-    if(vi.getThumbnailIfGenerated() != null) {
-      gg.appendChild(makeThumbnailElement(vi.getThumbnailIfGenerated()));
+    Element elem = vi.makeElement(this);
+    if(elem != null) {
+      gg.appendChild(elem);
     }
     else {
       gg.appendChild(SVGUtil.svgWaitIcon(this.getDocument(), 0, 0, 1, 1));
@@ -392,19 +421,9 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
    */
   protected void generateThumbnail(final Element g, VisualizationInfo vi) {
     int thumbwidth = (int) Math.max(screenwidth / plotmap.getWidth(), screenheight / plotmap.getHeight());
-    File thumb = vi.makeThumbnail(t, thumbwidth);
-    final Element i = makeThumbnailElement(thumb);
+    vi.generateThumbnail(t, thumbwidth);
+    final Element i = vi.makeElement(this);
     this.scheduleUpdate(new NodeReplaceChild(g, i));
-  }
-
-  private Element makeThumbnailElement(File thumb) {
-    final Element i = this.svgElement(SVGConstants.SVG_IMAGE_TAG);
-    SVGUtil.setAtt(i, SVGConstants.SVG_X_ATTRIBUTE, 0);
-    SVGUtil.setAtt(i, SVGConstants.SVG_Y_ATTRIBUTE, 0);
-    SVGUtil.setAtt(i, SVGConstants.SVG_WIDTH_ATTRIBUTE, 1);
-    SVGUtil.setAtt(i, SVGConstants.SVG_HEIGHT_ATTRIBUTE, 1);
-    i.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, thumb.toURI().toString());
-    return i;
   }
 
   /**
