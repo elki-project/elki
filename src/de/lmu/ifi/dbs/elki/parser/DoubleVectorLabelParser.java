@@ -22,7 +22,6 @@ import java.util.List;
  * @author Arthur Zimek
  */
 public class DoubleVectorLabelParser extends NumberVectorLabelParser<DoubleVector> {
-
   /**
    * Creates a DoubleVector out of the given attribute values.
    * 
@@ -37,7 +36,4 @@ public class DoubleVectorLabelParser extends NumberVectorLabelParser<DoubleVecto
   protected String descriptionLineType() {
     return "The values will be parsed as doubles (resulting in a set of DoubleVectors).";
   }
-
-  
-  
 }

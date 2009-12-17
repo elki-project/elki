@@ -38,7 +38,7 @@ public class PatternParameter extends Parameter<String, String> {
    * @param defaultValue the default value of the parameter
    */
   public PatternParameter(OptionID optionID, String defaultValue) {
-    super(optionID, new ArrayList<ParameterConstraint<String>>(), false, defaultValue);
+    super(optionID, new ArrayList<ParameterConstraint<String>>(), defaultValue);
   }
 
   /**
@@ -50,8 +50,7 @@ public class PatternParameter extends Parameter<String, String> {
    * @param defaultValue the default value of the parameter
    */
   public PatternParameter(OptionID optionID, ParameterConstraint<String> constraint, String defaultValue) {
-    this(optionID, defaultValue);
-    addConstraint(constraint);
+    super(optionID, constraint, defaultValue);
   }
 
   @Override

@@ -22,15 +22,35 @@ public class DoubleListParameter extends ListParameter<Double> {
   }
 
   /**
+   * Constructs a list parameter with the given optionID and optional flag.
+   * 
+   * @param optionID
+   * @param optional
+   */
+  public DoubleListParameter(OptionID optionID, boolean optional) {
+    super(optionID, optional);
+  }
+
+  /**
    * Constructs a list parameter with the given optionID.
    * 
    * @param optionID
    * @param constraint
    * @param optional
+   */
+  public DoubleListParameter(OptionID optionID, ParameterConstraint<List<Double>> constraint, boolean optional) {
+    super(optionID, constraint, optional);
+  }
+
+  /**
+   * Constructs a list parameter with the given optionID.
+   * 
+   * @param optionID
+   * @param constraint
    * @param defaultValue
    */
-  public DoubleListParameter(OptionID optionID, ParameterConstraint<List<Double>> constraint, boolean optional, List<Double> defaultValue) {
-    super(optionID, constraint, optional, defaultValue);
+  public DoubleListParameter(OptionID optionID, ParameterConstraint<List<Double>> constraint, List<Double> defaultValue) {
+    super(optionID, constraint, defaultValue);
   }
 
   /**

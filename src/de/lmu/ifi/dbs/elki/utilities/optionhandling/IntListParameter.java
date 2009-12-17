@@ -16,12 +16,32 @@ public class IntListParameter extends ListParameter<Integer> {
    * Constructs an integer list parameter
    * 
    * @param optionID
+   * @param optional
+   */
+  public IntListParameter(OptionID optionID, boolean optional) {
+    super(optionID, optional);
+  }
+
+  /**
+   * Constructs an integer list parameter
+   * 
+   * @param optionID
    * @param constraint
    * @param optional
+   */
+  public IntListParameter(OptionID optionID, ParameterConstraint<List<Integer>> constraint, boolean optional) {
+    super(optionID, constraint, optional);
+  }
+
+  /**
+   * Constructs an integer list parameter
+   * 
+   * @param optionID
+   * @param constraint
    * @param defaultValue
    */
-  public IntListParameter(OptionID optionID, ParameterConstraint<List<Integer>> constraint, boolean optional, List<Integer> defaultValue) {
-    super(optionID, constraint, optional, defaultValue);
+  public IntListParameter(OptionID optionID, ParameterConstraint<List<Integer>> constraint, List<Integer> defaultValue) {
+    super(optionID, constraint, defaultValue);
   }
 
   /**
@@ -32,6 +52,38 @@ public class IntListParameter extends ListParameter<Integer> {
    */
   public IntListParameter(OptionID optionID, ParameterConstraint<List<Integer>> constraint) {
     super(optionID, constraint);
+  }
+
+  /**
+   * Constructs an integer list parameter
+   * 
+   * @param optionID
+   * @param constraint
+   * @param defaultValue
+   */
+  public IntListParameter(OptionID optionID, List<ParameterConstraint<List<Integer>>> constraints, List<Integer> defaultValue) {
+    super(optionID, constraints, defaultValue);
+  }
+
+  /**
+   * Constructs an integer list parameter
+   * 
+   * @param optionID
+   * @param constraint
+   * @param optional
+   */
+  public IntListParameter(OptionID optionID, List<ParameterConstraint<List<Integer>>> constraints, boolean optional) {
+    super(optionID, constraints, optional);
+  }
+
+  /**
+   * Constructs an integer list parameter
+   * 
+   * @param optionID
+   * @param constraint
+   */
+  public IntListParameter(OptionID optionID, List<ParameterConstraint<List<Integer>>> constraints) {
+    super(optionID, constraints);
   }
 
   /**

@@ -102,7 +102,7 @@ public class DiSHPreprocessor<V extends NumberVector<V, ?>> extends AbstractPara
   /**
    * Parameter Epsilon.
    */
-  protected final DoubleListParameter EPSILON_PARAM = new DoubleListParameter(EPSILON_ID, null, true, null);
+  protected final DoubleListParameter EPSILON_PARAM = new DoubleListParameter(EPSILON_ID, true);
 
   /**
    * The epsilon value for each dimension;

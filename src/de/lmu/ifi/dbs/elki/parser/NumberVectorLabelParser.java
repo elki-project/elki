@@ -48,7 +48,7 @@ public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> exte
    * <p/>
    * The parameter is optional and the default value is set to -1.
    */
-  private final IntListParameter CLASS_LABEL_INDEX_PARAM = new IntListParameter(CLASS_LABEL_INDEX_ID, null, true, null);
+  private final IntListParameter CLASS_LABEL_INDEX_PARAM = new IntListParameter(CLASS_LABEL_INDEX_ID, true);
 
   /**
    * Keeps the index of an attribute to be treated as a string label.

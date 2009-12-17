@@ -14,7 +14,6 @@ import java.util.List;
  * @param <C> Class type
  */
 public class ClassListParameter<C> extends ListParameter<String> {
-
   /**
    * The restriction class for the list of class names.
    */
@@ -43,7 +42,7 @@ public class ClassListParameter<C> extends ListParameter<String> {
    */
   @SuppressWarnings("unchecked")
   public ClassListParameter(OptionID optionID, Class<?> restrictionClass, boolean optional) {
-    super(optionID, null, optional, null);
+    super(optionID, optional);
     this.restrictionClass = (Class<C>) restrictionClass;
   }
 

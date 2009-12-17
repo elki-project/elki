@@ -77,12 +77,27 @@ public abstract class Parameter<T, C> extends Option<T> {
    * @param constraints the constraints of this parameter, may be empty if there
    *        are no constraints
    * @param optional specifies if this parameter is an optional parameter
-   * @param defaultValue the default value of this parameter (may be null)
    */
-  public Parameter(OptionID optionID, List<ParameterConstraint<C>> constraints, boolean optional, T defaultValue) {
+  public Parameter(OptionID optionID, List<ParameterConstraint<C>> constraints, boolean optional) {
     this(optionID, constraints);
     // optional
     this.optionalParameter = optional;
+    // defaultValue
+    this.defaultValue = null;
+  }
+
+  /**
+   * Constructs a parameter with the given optionID, constraints, and default value.
+   * 
+   * @param optionID the unique id of this parameter
+   * @param constraints the constraints of this parameter, may be empty if there
+   *        are no constraints
+   * @param defaultValue the default value of this parameter (may be null)
+   */
+  public Parameter(OptionID optionID, List<ParameterConstraint<C>> constraints, T defaultValue) {
+    this(optionID, constraints);
+    // optional
+    this.optionalParameter = true;
     // defaultValue
     this.defaultValue = defaultValue;
   }
@@ -94,12 +109,26 @@ public abstract class Parameter<T, C> extends Option<T> {
    * @param optionID the unique id of this parameter
    * @param constraint the constraint of this parameter
    * @param optional specifies if this parameter is an optional parameter
-   * @param defaultValue the default value of this parameter (may be null)
    */
-  public Parameter(OptionID optionID, ParameterConstraint<C> constraint, boolean optional, T defaultValue) {
+  public Parameter(OptionID optionID, ParameterConstraint<C> constraint, boolean optional) {
     this(optionID, constraint);
     // optional
     this.optionalParameter = optional;
+    // defaultValue
+    this.defaultValue = null;
+  }
+
+  /**
+   * Constructs a parameter with the given optionID, constraint, and default value.
+   * 
+   * @param optionID the unique id of this parameter
+   * @param constraint the constraint of this parameter
+   * @param defaultValue the default value of this parameter (may be null)
+   */
+  public Parameter(OptionID optionID, ParameterConstraint<C> constraint, T defaultValue) {
+    this(optionID, constraint);
+    // optional
+    this.optionalParameter = true;
     // defaultValue
     this.defaultValue = defaultValue;
   }
@@ -114,33 +143,23 @@ public abstract class Parameter<T, C> extends Option<T> {
   }
 
   /**
-   * Constructs a parameter with the given optionID.
+   * Constructs a parameter with the given optionID and optional flag.
    * 
    * @param optionID the unique id of the option
+   * @param optional optional flag
    */
   public Parameter(OptionID optionID, boolean optional) {
-    this(optionID, (ParameterConstraint<C>) null, optional, null);
+    this(optionID, (ParameterConstraint<C>) null, optional);
   }
 
   /**
-   * Adds a parameter constraint to the list of parameter constraints.
+   * Constructs a parameter with the given optionID and default value.
    * 
-   * @param constraint the parameter constraint to be added
+   * @param optionID the unique id of the option
+   * @param defaultValue default value.
    */
-  // todo private setzen
-  protected void addConstraint(ParameterConstraint<C> constraint) {
-    constraints.add(constraint);
-  }
-
-  /**
-   * Adds a list of parameter constraints to the current list of parameter
-   * constraints.
-   * 
-   * @param constraints list of parameter constraints to be added
-   */
-  // todo remove
-  protected void addConstraintList(List<ParameterConstraint<C>> constraints) {
-    this.constraints.addAll(constraints);
+  public Parameter(OptionID optionID, T defaultValue) {
+    this(optionID, (ParameterConstraint<C>) null, defaultValue);
   }
 
   /**
