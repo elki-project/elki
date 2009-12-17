@@ -13,9 +13,9 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ListIterator;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
@@ -49,12 +49,17 @@ import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAResult;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.LazyCanvasResizer;
 
 /**
@@ -80,7 +85,7 @@ import de.lmu.ifi.dbs.elki.visualization.batikutil.LazyCanvasResizer;
  * 
  * @param <O> Object type
  */
-public class ImageExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<N, D>, D extends Number> extends AbstractApplication {
+public class ImageExplorer<O extends NumberVector<O, ?>, N extends NumberDistance<N, D>, D extends Number> extends AbstractApplication {
   /**
    * Parameter to specify the database connection to be used, must extend
    * {@link de.lmu.ifi.dbs.elki.database.connection.DatabaseConnection}.
@@ -444,7 +449,7 @@ public class ImageExplorer<O extends NumberVector<?, ?>, N extends NumberDistanc
      * Serial version
      */
     private static final long serialVersionUID = 1L;
-    
+
     /**
      * Logger
      */
@@ -464,6 +469,12 @@ public class ImageExplorer<O extends NumberVector<?, ?>, N extends NumberDistanc
 
     // k
     private int k = 20;
+
+    // objects to display
+    private ArrayList<Integer> objids;
+
+    // coordinates
+    private ArrayList<DoubleDoublePair> objcoords;
 
     /**
      * @param k the k to set
@@ -520,6 +531,54 @@ public class ImageExplorer<O extends NumberVector<?, ?>, N extends NumberDistanc
       if(distancecache != null) {
         distancecache.clear();
       }
+      updateObjects();
+    }
+
+    public void updateObjects() {
+      objids = new ArrayList<Integer>(this.selection.length * k);
+      objcoords = new ArrayList<DoubleDoublePair>(this.selection.length * k);
+      for(Object o : this.selection) {
+        int idx = (Integer) o;
+        List<DistanceResultPair<N>> knn = db.kNNQueryForID(idx, k, distanceFunction);
+        for(DistanceResultPair<N> pair : knn) {
+          objids.add(pair.getID());
+          Double known = distancecache.get(pair.getID());
+          double dist = pair.getDistance().doubleValue();
+          if(known == null || dist < known) {
+            distancecache.put(pair.getID(), dist);
+          }
+        }
+      }
+      if(objids.size() > 0) {
+        // TODO: center when there is more than one obj selected?
+        Vector center = db.get(objids.get(0)).getColumnVector();
+        PCARunner<O, N> pcar = new PCARunner<O, N>();
+        try {
+          pcar.setParameters(new ArrayList<String>(0));
+        }
+        catch(ParameterException e) {
+          logger.exception(e);
+        }
+        PCAResult pcares = pcar.processIds(objids, db);
+        Matrix projm = pcares.getEigenvectors().transpose();
+
+        double[] stddevs = pcares.getEigenvalues();
+        for(int i = 0; i < stddevs.length; i++) {
+          stddevs[i] = Math.sqrt(stddevs[i]);
+        }
+        for(int i = 0; i < db.dimensionality(); i++) {
+          for(int j = 0; j < db.dimensionality(); j++) {
+            // Note: rows on backward transformation!
+            projm.set(j, i, projm.get(j, i) / stddevs[j]);
+          }
+        }
+
+        for(Integer objid : objids) {
+          Vector centered = db.get(objid).getColumnVector().minus(center);
+          Vector p = projm.times(centered).getColumnVector(0);
+          objcoords.add(new DoubleDoublePair(p.get(0), p.get(1)));
+        }
+      }
     }
 
     @Override
@@ -531,34 +590,19 @@ public class ImageExplorer<O extends NumberVector<?, ?>, N extends NumberDistanc
       g.setColor(Color.BLACK);
       g.fillRect(0, 0, width, height);
       Graphics2D destG = (Graphics2D) g;
-      destG.setComposite(new BlendComposite(BlendComposite.SCREEN, 1.0));
+      destG.setComposite(new BlendComposite(BlendComposite.LIGHTEN, 1.0));
 
-      for(Object o : this.selection) {
-        int idx = (Integer) o;
+      int xrange = (width - size) / 2;
+      int yrange = (height - size) / 2;
 
-        List<DistanceResultPair<N>> knn = db.kNNQueryForID(idx, k, distanceFunction);
+      for(int i = 0; i < objids.size(); i++) {
+        int objid = objids.get(i);
+        String name = db.getAssociation(AssociationID.LABEL, objid);
+        DoubleDoublePair pos = objcoords.get(i);
+        int x = (int) (pos.getFirst() * xrange + xrange);
+        int y = (int) (pos.getSecond() * yrange + yrange);
 
-        double maxdist = knn.get(knn.size() - 1).getDistance().doubleValue();
-        // avoid division by zero.
-        if(maxdist == 0) {
-          maxdist = 1;
-        }
-
-        for(ListIterator<DistanceResultPair<N>> iter = knn.listIterator(knn.size()); iter.hasPrevious();) {
-          DistanceResultPair<N> pair = iter.previous();
-          double dist = pair.getDistance().doubleValue() / maxdist;
-          // put distance into cache, use minimum of all selected objects
-          Double known = distancecache.get(pair.getID());
-          if(known == null || dist < known) {
-            distancecache.put(pair.getID(), dist);
-          }
-
-          String name = db.getAssociation(AssociationID.LABEL, pair.getID());
-          int x = (int) ((width - size) * dist);
-          int y = (int) ((height - size) * (.5 + .25 * ((double) name.hashCode() / Integer.MAX_VALUE)));
-
-          drawThumbnail(g, name, x, y);
-        }
+        drawThumbnail(g, name, x, y);
       }
     }
 
