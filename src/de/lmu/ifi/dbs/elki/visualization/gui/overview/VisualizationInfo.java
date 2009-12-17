@@ -6,6 +6,7 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.svg.Thumbnailer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 
@@ -47,7 +48,7 @@ abstract class VisualizationInfo {
    * @param width Thumbnail width
    * @return File reference of new thumbnail
    */
-  File makeThumbnail(Thumbnailer t, int width) {
+  File generateThumbnail(Thumbnailer t, int width) {
     double ratio = 1.0;
     SVGPlot plot = new SVGPlot();
     plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 "+ratio+" 1");
@@ -78,6 +79,15 @@ abstract class VisualizationInfo {
   }
   
   /**
+   * Test whether a detail view is available.
+   * 
+   * @return Whether or not a detail view is available.
+   */
+  public boolean hasDetails() {
+    return true;
+  }
+  
+  /**
    * Test whether the visualization is set to be visible.
    * 
    * @return Whether or not to show this visualization.
@@ -93,4 +103,24 @@ abstract class VisualizationInfo {
     }
     return true;
   }
+  
+  /**
+   * Make an element for this visualization.
+   * 
+   * @param plot Plot to insert into
+   * @return SVG Element
+   */
+  public Element makeElement(SVGPlot plot) {
+    if (getThumbnailIfGenerated() == null) {
+      return null;
+    }
+    final Element i = plot.svgElement(SVGConstants.SVG_IMAGE_TAG);
+    SVGUtil.setAtt(i, SVGConstants.SVG_X_ATTRIBUTE, 0);
+    SVGUtil.setAtt(i, SVGConstants.SVG_Y_ATTRIBUTE, 0);
+    SVGUtil.setAtt(i, SVGConstants.SVG_WIDTH_ATTRIBUTE, 1);
+    SVGUtil.setAtt(i, SVGConstants.SVG_HEIGHT_ATTRIBUTE, 1);
+    i.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, getThumbnailIfGenerated().toURI().toString());
+    return i;
+  }
+
 }
