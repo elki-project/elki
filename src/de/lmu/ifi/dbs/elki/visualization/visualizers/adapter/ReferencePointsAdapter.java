@@ -5,12 +5,12 @@ import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.result.ReferencePointsResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.ReferencePointsVisualizer;
-import experimentalcode.lisa.ReferencePointsResult;
 
 /**
  * Adapter to generate a reference points visualizer when reference points were found in the data.
@@ -51,6 +51,7 @@ public class ReferencePointsAdapter<NV extends NumberVector<NV,?>> implements Al
     Collection<ReferencePointsResult<NV>> cos = ResultUtil.filterResults(context.getResult(), ReferencePointsResult.class);
     ArrayList<Visualizer> usableVisualizers = new ArrayList<Visualizer>(cos.size());
     ArrayList<String> params = referencePointsVisualizer.getParameters();
+    LoggingUtil.warning("Have "+cos.size()+ " reference points results!");
     for (ReferencePointsResult<NV> co : cos) {
       ReferencePointsVisualizer<NV> rpVis = new ReferencePointsVisualizer<NV>();
       // setup parameters.

@@ -1,8 +1,7 @@
-package experimentalcode.lisa;
+package de.lmu.ifi.dbs.elki.result;
 
 import java.util.Collection;
 
-import de.lmu.ifi.dbs.elki.result.CollectionResult;
 
 /**
  * Result used in passing the reference points to the visualizers.
