@@ -59,7 +59,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.LazyCanvasResizer;
 
 /**
@@ -443,6 +442,18 @@ public class ImageExplorer<O extends NumberVector<O, ?>, N extends NumberDistanc
       seriesList.repaint();
     }
   }
+  
+  class ImgObj {
+    double x;
+    double y;
+    Integer id;
+    BufferedImage image;
+    
+    public ImgObj(Integer id) {
+      super();
+      this.id = id;
+    }
+  }
 
   private class ExplorerCanvas extends JPanel {
     /**
@@ -471,14 +482,8 @@ public class ImageExplorer<O extends NumberVector<O, ?>, N extends NumberDistanc
     private int k = 20;
 
     // objects to display
-    private ArrayList<Integer> objids;
-
-    // coordinates
-    private ArrayList<DoubleDoublePair> objcoords;
-
-    // images
-    private ArrayList<BufferedImage> objimgs;
-
+    private ArrayList<ImgObj> objects;
+    
     /**
      * @param k the k to set
      */
@@ -538,14 +543,15 @@ public class ImageExplorer<O extends NumberVector<O, ?>, N extends NumberDistanc
     }
 
     public void updateObjects() {
-      objids = new ArrayList<Integer>(this.selection.length * k);
-      objcoords = new ArrayList<DoubleDoublePair>(this.selection.length * k);
-      objimgs = new ArrayList<BufferedImage>(this.selection.length * k);
+      objects = new ArrayList<ImgObj>(this.selection.length * k);
+      ArrayList<Integer> objids = new ArrayList<Integer>();
       for(Object o : this.selection) {
         int idx = (Integer) o;
         List<DistanceResultPair<N>> knn = db.kNNQueryForID(idx, k, distanceFunction);
         for(DistanceResultPair<N> pair : knn) {
-          objids.add(pair.getID());
+          Integer id = pair.getID();
+          objids.add(id);
+          objects.add(new ImgObj(id));
           Double known = distancecache.get(pair.getID());
           double dist = pair.getDistance().doubleValue();
           if(known == null || dist < known) {
@@ -553,9 +559,9 @@ public class ImageExplorer<O extends NumberVector<O, ?>, N extends NumberDistanc
           }
         }
       }
-      if(objids.size() > 0) {
-        // TODO: center when there is more than one obj selected?
-        Vector center = db.get(objids.get(0)).getColumnVector();
+      if(objects.size() > 0) {
+        // TODO: use center when there is more than one obj selected?
+        Vector center = db.get(objects.get(0).id).getColumnVector();
         PCARunner<O, N> pcar = new PCARunner<O, N>();
         try {
           pcar.setParameters(new ArrayList<String>(0));
@@ -577,15 +583,12 @@ public class ImageExplorer<O extends NumberVector<O, ?>, N extends NumberDistanc
           }
         }
 
-        for(Integer objid : objids) {
-          Vector centered = db.get(objid).getColumnVector().minus(center);
+        for(ImgObj object : objects) {
+          Vector centered = db.get(object.id).getColumnVector().minus(center);
           Vector p = projm.times(centered).getColumnVector(0);
-          objcoords.add(new DoubleDoublePair(p.get(0), p.get(1)));
+          object.x = p.get(0);
+          object.y = p.get(1);
         }
-      }
-      // fill image array with blanks
-      for(int i = 0; i < objids.size(); i++) {
-        objimgs.add(null);
       }
     }
 
@@ -603,26 +606,24 @@ public class ImageExplorer<O extends NumberVector<O, ?>, N extends NumberDistanc
       int xrange = (width - size) / 2;
       int yrange = (height - size) / 2;
 
-      for(int i = 0; i < objids.size(); i++) {
-        DoubleDoublePair pos = objcoords.get(i);
-        int x = (int) (pos.getFirst() * xrange + xrange);
-        int y = (int) (pos.getSecond() * yrange + yrange);
+      for(ImgObj object : objects) {
+        int x = (int) (object.x * xrange + xrange);
+        int y = (int) (object.y * yrange + yrange);
 
-        drawThumbnail(g, i, x, y);
+        drawThumbnail(g, object, x, y);
       }
     }
 
-    private void drawThumbnail(Graphics g, int i, int x, int y) {
-      BufferedImage img = objimgs.get(i);
+    private void drawThumbnail(Graphics g, ImgObj object, int x, int y) {
+      BufferedImage img = object.image;
       if (img == null) {
-        int objid = objids.get(i);
-        String name = db.getAssociation(AssociationID.LABEL, objid);
+        String name = db.getAssociation(AssociationID.LABEL, object.id);
         File f = (name != null) ? FileUtil.locateFile(name, basedir) : null;
         if(f != null) {
           try {
             img = ImageUtil.loadImage(f);
             if (img != null) {
-              objimgs.set(i, img);
+              object.image = img;
             }
           }
           catch(IOException e) {
