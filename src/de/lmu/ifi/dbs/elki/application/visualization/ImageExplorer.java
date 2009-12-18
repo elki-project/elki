@@ -476,6 +476,9 @@ public class ImageExplorer<O extends NumberVector<O, ?>, N extends NumberDistanc
     // coordinates
     private ArrayList<DoubleDoublePair> objcoords;
 
+    // images
+    private ArrayList<BufferedImage> objimgs;
+
     /**
      * @param k the k to set
      */
@@ -537,6 +540,7 @@ public class ImageExplorer<O extends NumberVector<O, ?>, N extends NumberDistanc
     public void updateObjects() {
       objids = new ArrayList<Integer>(this.selection.length * k);
       objcoords = new ArrayList<DoubleDoublePair>(this.selection.length * k);
+      objimgs = new ArrayList<BufferedImage>(this.selection.length * k);
       for(Object o : this.selection) {
         int idx = (Integer) o;
         List<DistanceResultPair<N>> knn = db.kNNQueryForID(idx, k, distanceFunction);
@@ -579,6 +583,10 @@ public class ImageExplorer<O extends NumberVector<O, ?>, N extends NumberDistanc
           objcoords.add(new DoubleDoublePair(p.get(0), p.get(1)));
         }
       }
+      // fill image array with blanks
+      for(int i = 0; i < objids.size(); i++) {
+        objimgs.add(null);
+      }
     }
 
     @Override
@@ -596,29 +604,37 @@ public class ImageExplorer<O extends NumberVector<O, ?>, N extends NumberDistanc
       int yrange = (height - size) / 2;
 
       for(int i = 0; i < objids.size(); i++) {
-        int objid = objids.get(i);
-        String name = db.getAssociation(AssociationID.LABEL, objid);
         DoubleDoublePair pos = objcoords.get(i);
         int x = (int) (pos.getFirst() * xrange + xrange);
         int y = (int) (pos.getSecond() * yrange + yrange);
 
-        drawThumbnail(g, name, x, y);
+        drawThumbnail(g, i, x, y);
       }
     }
 
-    private void drawThumbnail(Graphics g, String name, int x, int y) {
-      File f = (name != null) ? FileUtil.locateFile(name, basedir) : null;
-      if(f != null) {
-        try {
-          BufferedImage img = ImageUtil.loadImage(f);
-          g.drawImage(img, x, y, null);
+    private void drawThumbnail(Graphics g, int i, int x, int y) {
+      BufferedImage img = objimgs.get(i);
+      if (img == null) {
+        int objid = objids.get(i);
+        String name = db.getAssociation(AssociationID.LABEL, objid);
+        File f = (name != null) ? FileUtil.locateFile(name, basedir) : null;
+        if(f != null) {
+          try {
+            img = ImageUtil.loadImage(f);
+            if (img != null) {
+              objimgs.set(i, img);
+            }
+          }
+          catch(IOException e) {
+            logger.exception("Exception drawing image.", e);
+          }
         }
-        catch(IOException e) {
-          logger.exception("Exception drawing image.", e);
+        else {
+          logger.warning("Image not found: " + name);
         }
       }
-      else {
-        logger.warning("Image not found: " + name);
+      if (img != null) {
+        g.drawImage(img, x, y, null);
       }
     }
   }
