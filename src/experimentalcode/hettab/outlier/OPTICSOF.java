@@ -1,7 +1,11 @@
 package experimentalcode.hettab.outlier;
 
 
+
+
+
 import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.List;
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
@@ -13,6 +17,7 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
+
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
@@ -82,13 +87,18 @@ public class OPTICSOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O
 	}
 
 	
+	
+
 	/**
 	 *
 	 */
 	@Override
 	protected MultiResult runInTime(Database<O> database)
 			throws IllegalStateException {
+
 		
+		
+		//
 		 getDistanceFunction().setDatabase(database, isVerbose(), isTime());
 		 
 		HashMap<Integer,List<DistanceResultPair<DoubleDistance>>> nMinPts = new HashMap<Integer, List<DistanceResultPair<DoubleDistance>>>();
@@ -148,9 +158,16 @@ public class OPTICSOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O
 	    OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(ofminmax.getMin(), ofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
 	    this.result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
 
+
+		for(Integer id : database){
+			List<DistanceResultPair<DoubleDistance>> neighbors = database.kNNQueryForID(id, minpts, getDistanceFunction());
+			nMinPts.put(id,neighbors);
+			coreDistance.put(id, neighbors.get(neighbors.size()-1).getDistance().getValue());
+		}
 	    return result;
 	}
-
+	
+	
 
 	@Override
 	public MultiResult getResult() {
