@@ -19,7 +19,7 @@ public class WeightedDistanceFunction<V extends NumberVector<V, ?>> extends Abst
   /**
    * The weight matrix.
    */
-  private Matrix weightMatrix;
+  protected Matrix weightMatrix;
 
   /**
    * Provides the Weighted distance for feature vectors.
