@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * in a database.
  * <p>
  * Reference<br>
- * Markus M. Breunig, Hans-Peter Kriegel, Raymond T. N, Jörg Sander
+ * Markus M. Breunig, Hans-Peter Kriegel, Raymond T. N, J&ouml;rg Sander
  * 
  * @author hettab
  *
@@ -81,7 +81,7 @@ public class OPTICSOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O
      *
      */
 	public Description getDescription() {
-		return new Description("OPTICS-OF", ": Identifying Local Outliers", "Markus M. Breunig, Hans-Peter Kriegel, Raymond T. N, Jörg Sander", null);
+		return new Description("OPTICS-OF", "OPTICS-OF: Identifying Local Outliers", "", "Markus M. Breunig, Hans-Peter Kriegel, Raymond T. N, J\u00F6rg Sander: OPTICS-OF: ...");
 	}
 
 	
