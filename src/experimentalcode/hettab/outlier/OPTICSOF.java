@@ -96,16 +96,18 @@ public class OPTICSOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O
 		 
 		HashMap<Integer,List<DistanceResultPair<DoubleDistance>>> nMinPts = new HashMap<Integer, List<DistanceResultPair<DoubleDistance>>>();
 		HashMap<Integer,Double> coreDistance = new HashMap<Integer,Double>();
+		HashMap<Integer,Integer> minPtsNeighborhoodSize = new HashMap<Integer, Integer>();
 		
 		
 		// Pass 1 
 		//N_minpts(id) and core-distance(id)
-		//|N_minpts(id)| = nminpts
+		
 		for(Integer id : database){
 			 List<DistanceResultPair<DoubleDistance>> minptsNegibours =  database.kNNQueryForID(id, minpts, getDistanceFunction());
-			 double d  = minptsNegibours.get(minptsNegibours.size()-1).getDistance().doubleValue();
-		     nMinPts.put(id,minptsNegibours);
+			 Double d  = minptsNegibours.get(minptsNegibours.size()-1).getDistance().doubleValue();
+			 nMinPts.put(id,minptsNegibours);
 		     coreDistance.put(id,d);
+		     minPtsNeighborhoodSize.put(id,database.rangeQuery(id,d.toString(), getDistanceFunction()).size()) ;
 		 }
 		
 		// Pass 2 
@@ -122,7 +124,7 @@ public class OPTICSOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O
 				lrd = rd + lrd ;
 				core.add(rd);
 			}
-			lrd = (minpts/lrd);
+			lrd = (minPtsNeighborhoodSize.get(id)/lrd);
 			reachDistance.put(id,core);
 			lrds.put(id, lrd);
 			
@@ -139,7 +141,7 @@ public class OPTICSOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O
 				double lrdN = lrds.get(idN);
 				of = of + lrdN/lrd ;
 			}
-			of = of/minpts ;
+			of = of/minPtsNeighborhoodSize.get(id) ;
 			ofs.put(id,of);
 			 // update minimum and maximum
 	        ofminmax.put(of);
