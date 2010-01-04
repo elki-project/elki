@@ -177,7 +177,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
     addParameterizable(databaseConnection);
     remainingParameters = databaseConnection.setParameters(remainingParameters);
 
-    // instanciate distance function.
+    // instantiate distance function.
     distanceFunction = DISTANCE_FUNCTION_PARAM.instantiateClass();
     addParameterizable(distanceFunction);
     remainingParameters = distanceFunction.setParameters(remainingParameters);
