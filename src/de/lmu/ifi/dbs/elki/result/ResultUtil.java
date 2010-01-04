@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 
@@ -120,7 +121,7 @@ public class ResultUtil {
    * @param r Result
    * @return List of clustering results
    */
-  public static List<Clustering<?>> getClusteringResults(Result r) {
+  public static List<Clustering<? extends Model>> getClusteringResults(Result r) {
     if(r instanceof Clustering<?>) {
       List<Clustering<?>> crs = new ArrayList<Clustering<?>>(1);
       crs.add((Clustering<?>) r);

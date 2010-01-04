@@ -12,8 +12,8 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.SpatialIndexDatabase;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndex;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
  * 
  * @param <NV> Type of the DatabaseObject being visualized.
  */
-public class AbstractRTreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends Projection2DVisualizer<NV> {
+public class AbstractRStarTreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends Projection2DVisualizer<NV> {
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
@@ -47,7 +47,7 @@ public class AbstractRTreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extend
   /**
    * The default constructor only registers parameters.
    */
-  public AbstractRTreeMBRVisualizer() {
+  public AbstractRStarTreeMBRVisualizer() {
     super();
   }
 
@@ -68,12 +68,12 @@ public class AbstractRTreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extend
   }
 
   @SuppressWarnings("unchecked")
-  public static <NV extends NumberVector<NV, ?>, N extends SpatialNode<N, E>, E extends SpatialEntry> AbstractRStarTree<NV, ? extends N, E> findRStarTree(VisualizerContext context) {
+  public static <NV extends NumberVector<NV, ?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> AbstractRStarTree<NV, N, E> findRStarTree(VisualizerContext context) {
     Database<NV> database = context.getDatabase();
     if(SpatialIndexDatabase.class.isAssignableFrom(database.getClass())) {
       SpatialIndex<?, ?, ?> index = ((SpatialIndexDatabase<?, ?, ?>) database).getIndex();
       if(AbstractRStarTree.class.isAssignableFrom(index.getClass())) {
-        return (AbstractRStarTree<NV, ? extends N, E>) index;
+        return (AbstractRStarTree<NV, N, E>) index;
       }
     }
     return null;
@@ -82,7 +82,7 @@ public class AbstractRTreeMBRVisualizer<NV extends NumberVector<NV, ?>, N extend
   @Override
   public Element visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
     Element layer = super.setupCanvas(svgp, proj, width, height);
-    AbstractRStarTree<NV, ? extends N, E> rtree = findRStarTree(context);
+    AbstractRStarTree<NV, N, E> rtree = findRStarTree(context);
     if(rtree != null) {
       E root = rtree.getRootEntry();
       try {
