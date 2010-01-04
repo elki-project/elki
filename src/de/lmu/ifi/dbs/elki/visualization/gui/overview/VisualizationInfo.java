@@ -67,7 +67,7 @@ abstract class VisualizationInfo {
    * accessed again via {@link #getThumbnailIfGenerated()}.
    * 
    * @param t Thumbnailer to use
-   * @param width Thumbnail width
+   * @param uwidth Thumbnail width
    * @return File reference of new thumbnail
    */
   File generateThumbnail(Thumbnailer t, int uwidth) {

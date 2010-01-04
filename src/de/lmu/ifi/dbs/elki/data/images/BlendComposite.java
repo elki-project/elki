@@ -65,7 +65,7 @@ public class BlendComposite implements Composite {
   /**
    * Simplified constructor with full opacity.
    * 
-   * @mode Blending mode.
+   * @param mode Blending mode.
    */
   public BlendComposite(int mode) {
     this(mode, 1.0);

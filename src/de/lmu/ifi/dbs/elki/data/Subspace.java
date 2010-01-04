@@ -81,8 +81,7 @@ public class Subspace<V extends FeatureVector<V, ?>> {
   }
 
   /**
-   * Returns a string representation of this subspace by calling {@link
-   * #toString("")}.
+   * Returns a string representation of this subspace by calling {@link #toString} with an empty prefix.
    * 
    * @return a string representation of this subspace
    */
@@ -173,10 +172,9 @@ public class Subspace<V extends FeatureVector<V, ?>> {
   }
 
   /**
-   * Returns the hash code value of the {@link dimensions} of this subspace.
+   * Returns the hash code value of the {@link #dimensions} of this subspace.
    * 
    * @return a hash code value for this subspace
-   * @see java.lang.Object#hashCode()
    */
   @Override
   public int hashCode() {

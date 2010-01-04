@@ -77,7 +77,7 @@ public abstract class ListParameter<T> extends Parameter<List<T>, List<T>> {
    * Constructs a list parameter with the given optionID.
    * 
    * @param optionID the unique id of this parameter
-   * @param constraint the constraint of this parameter
+   * @param constraints the constraint of this parameter
    */
   public ListParameter(OptionID optionID, List<ParameterConstraint<List<T>>> constraints) {
     super(optionID, constraints);
@@ -87,7 +87,7 @@ public abstract class ListParameter<T> extends Parameter<List<T>, List<T>> {
    * Constructs a list parameter with the given optionID.
    * 
    * @param optionID the unique id of this parameter
-   * @param constraint the constraint of this parameter, may be null
+   * @param constraints the constraints of this parameter, may be null
    * @param defaultValue the default value of this parameter (may be null)
    */
   public ListParameter(OptionID optionID, List<ParameterConstraint<List<T>>> constraints, List<T> defaultValue) {
@@ -98,7 +98,7 @@ public abstract class ListParameter<T> extends Parameter<List<T>, List<T>> {
    * Constructs a list parameter with the given optionID.
    * 
    * @param optionID the unique id of this parameter
-   * @param constraint the constraint of this parameter, may be null
+   * @param constraints the constraints of this parameter, may be null
    * @param optional specifies if this parameter is an optional parameter
    */
   public ListParameter(OptionID optionID, List<ParameterConstraint<List<T>>> constraints, boolean optional) {

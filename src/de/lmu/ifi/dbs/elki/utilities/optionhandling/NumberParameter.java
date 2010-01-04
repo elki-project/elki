@@ -102,7 +102,7 @@ public abstract class NumberParameter<T extends Number> extends Parameter<T, Num
    * optional flag.
    * 
    * @param optionID the unique id of this parameter
-   * @param constraint the constraint of this parameter
+   * @param constraints the constraints of this parameter
    * @param defaultValue the default value for this parameter
    */
   public NumberParameter(OptionID optionID, List<ParameterConstraint<Number>> constraints, T defaultValue) {
