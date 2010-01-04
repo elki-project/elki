@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
  */
 public class StarBasedReferencePoints<O extends NumberVector<O, ?>> extends AbstractParameterizable implements ReferencePointsHeuristic<O> {
   /**
-   * OptionID for {@link #NOCENTER_PARAM}
+   * OptionID for {@link #NOCENTER_FLAG}
    */
   public static final OptionID NOCENTER_ID = OptionID.getOrCreateOptionID("star.nocenter", "Do not use the center as extra reference point.");
 
@@ -48,7 +48,7 @@ public class StarBasedReferencePoints<O extends NumberVector<O, ?>> extends Abst
   private final DoubleParameter SCALE_PARAM = new DoubleParameter(SCALE_ID, new GreaterEqualConstraint(0.0), 1.0);
 
   /**
-   * Holds the value of {@link #NOCENTER_PARAM}.
+   * Holds the value of {@link #NOCENTER_FLAG}.
    */
   protected boolean nocenter;
 

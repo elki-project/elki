@@ -387,7 +387,6 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<V, Clu
    * the clusters.
    * 
    * @param clustersMap the mapping of bits sets to clusters
-   * @param dimensionality the dimensionality of the data
    * @return a sorted list of the clusters
    */
   private List<Cluster<SubspaceModel<V>>> sortClusters(Map<BitSet, List<Pair<BitSet, DatabaseObjectGroupCollection<List<Integer>>>>> clustersMap) {

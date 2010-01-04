@@ -397,8 +397,6 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
 
   /**
    * Setup the CSS hover effect.
-   * 
-   * @return CSS class used for the effect.
    */
   private void setupHoverer() {
     // setup the hover CSS classes.

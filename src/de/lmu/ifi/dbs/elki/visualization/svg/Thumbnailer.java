@@ -56,8 +56,8 @@ public class Thumbnailer {
    * Generate a thumbnail for a given plot.
    * 
    * @param plot Plot to use
-   * @param thumbnailwidth Width of the thumbnail
-   * @param thumbnailheight height of the thumbnail
+   * @param thumbwidth Width of the thumbnail
+   * @param thumbheight height of the thumbnail
    * @return File object of the thumbnail, which has deleteOnExit set.
    */
   public synchronized File thumbnail(SVGPlot plot, int thumbwidth, int thumbheight) {

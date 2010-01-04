@@ -10,8 +10,6 @@ package de.lmu.ifi.dbs.elki.distance;
 public abstract class NumberDistance<D extends NumberDistance<D, N>, N extends Number> extends AbstractDistance<D> {
   /**
    * Constructs a new NumberDistance object that represents the value argument.
-   * 
-   * @param value the value to be represented by the NumberDistance.
    */
   public NumberDistance() {
     super();
@@ -37,6 +35,7 @@ public abstract class NumberDistance<D extends NumberDistance<D, N>, N extends N
    * d2.value.doubleValue())}. Subclasses may need to overwrite this method if
    * necessary.
    * 
+   * @param other Other object
    * @return a negative integer, zero, or a positive integer as the value of
    *         this NumberDistance is less than, equal to, or greater than the
    *         value of the specified NumberDistance.

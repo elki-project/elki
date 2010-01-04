@@ -48,7 +48,7 @@ public class SubplotSelectedEvent extends ActionEvent {
   /**
    * Retrieve a materialized detail plot.
    * 
-   * @return
+   * @return materialized detail plot
    */
   public SVGPlot makeSubplot() {
     return overview.makeDetailPlot(x, y);

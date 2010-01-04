@@ -151,7 +151,7 @@ public class VisualizationProjection {
   /**
    * Project a relative data vector from data space to scaled space.
    * 
-   * @param relative data vector in data space
+   * @param data relative vector in data space
    * @return relative vector in scaled space
    */
   public Vector projectRelativeDataToScaledSpace(NumberVector<?,?> data) {
@@ -165,7 +165,7 @@ public class VisualizationProjection {
   /**
    * Project a relative data vector from data space to scaled space.
    * 
-   * @param relative data vector in data space
+   * @param data relative vector in data space
    * @return relative vector in scaled space
    */
   public Vector projectRelativeDataToScaledSpace(double[] data) {
@@ -235,7 +235,7 @@ public class VisualizationProjection {
   /**
    * Project a relative data vector from data space to rendering space.
    * 
-   * @param relative data vector in data space
+   * @param data relative vector in data space
    * @return relative vector in rendering space
    */
   public Vector projectRelativeDataToRenderSpace(NumberVector<?,?> data) {
@@ -246,7 +246,7 @@ public class VisualizationProjection {
   /**
    * Project a relative data vector from data space to rendering space.
    * 
-   * @param relative data vector in data space
+   * @param data relative vector in data space
    * @return relative vector in rendering space
    */
   public Vector projectRelativeDataToRenderSpace(double[] data) {
@@ -323,7 +323,7 @@ public class VisualizationProjection {
    * Get a SVG transformation string to bring the contents into the unit cube.
    * 
    * @param margin extra margin to add.
-   * @return
+   * @return transformation string.
    */
   public String estimateTransformString(double margin, double width, double height) {
     MinMax<Double>[] minmax = estimateViewport();
