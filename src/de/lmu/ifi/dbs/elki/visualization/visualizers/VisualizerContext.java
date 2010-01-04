@@ -76,7 +76,7 @@ public class VisualizerContext extends AnyMap<String> {
     this.database = database;
     this.result = result;
     
-    List<Clustering<?>> clusterings = ResultUtil.getClusteringResults(result);
+    List<Clustering<? extends Model>> clusterings = ResultUtil.getClusteringResults(result);
     if (clusterings.size() > 0) {
       this.put(CLUSTERING, clusterings.get(0));
     }

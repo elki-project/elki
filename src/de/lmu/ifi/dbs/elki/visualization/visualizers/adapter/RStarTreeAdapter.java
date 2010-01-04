@@ -8,23 +8,23 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.AbstractRTreeMBRVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.AbstractRStarTreeMBRVisualizer;
 
 /**
- * Adapter that will look for an RTree to visualize
+ * Adapter that will look for an AbstractRStarTree to visualize
  * 
  * @author Erich Schubert
  */
-public class RTreeAdapter implements AlgorithmAdapter {
+public class RStarTreeAdapter implements AlgorithmAdapter {
   /**
    * Prototype for parameterization
    */
-  private AbstractRTreeMBRVisualizer<?,?,?> mbrVisualizer = new AbstractRTreeMBRVisualizer<DoubleVector,RStarTreeNode,SpatialEntry>();
+  private AbstractRStarTreeMBRVisualizer<?,?,?> mbrVisualizer = new AbstractRStarTreeMBRVisualizer<DoubleVector,RStarTreeNode,SpatialEntry>();
   
   /**
    * Constructor, following the {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable} style.
    */
-  public RTreeAdapter() {
+  public RStarTreeAdapter() {
     super();
   }
 
