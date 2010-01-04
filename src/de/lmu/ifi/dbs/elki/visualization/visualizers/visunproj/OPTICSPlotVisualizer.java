@@ -27,6 +27,13 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.UnprojectedVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
 
+/**
+ * Visualize an OPTICS result by constructing an OPTICS plot for it.
+ * 
+ * @author Erich Schubert
+ *
+ * @param <D>
+ */
 public class OPTICSPlotVisualizer<D extends NumberDistance<D,?>> extends AbstractVisualizer implements UnprojectedVisualizer {
   /**
    * Name for this visualizer.
