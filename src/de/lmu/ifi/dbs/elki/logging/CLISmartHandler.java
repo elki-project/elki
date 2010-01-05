@@ -126,7 +126,13 @@ public class CLISmartHandler extends Handler {
     }
     // write
     try {
-      destination.write(m);
+      // use a carriage return to signal "overwriteability"
+      if(record instanceof ElkiLogRecord && ((ElkiLogRecord) record).isOverwriteable()) {
+        destination.write(OutputStreamLogger.CARRIAGE_RETURN + m);
+      }
+      else {
+        destination.write(m);
+      }
       // always flush (although the streams should auto-flush already)
       destination.flush();
     }

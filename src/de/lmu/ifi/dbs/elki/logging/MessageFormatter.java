@@ -25,14 +25,13 @@ public class MessageFormatter extends Formatter {
   public String format(LogRecord record) {
     String msg = record.getMessage();
     if(msg.length() > 0) {
-      if(msg.charAt(0) == OutputStreamLogger.CARRIAGE_RETURN) {
+      if (record instanceof ElkiLogRecord && ((ElkiLogRecord)record).isOverwriteable()) {
         return msg;
       }
       if(msg.endsWith(OutputStreamLogger.NEWLINE)) {
         return msg;
       }
     }
-    return msg + "\n";
+    return msg + OutputStreamLogger.NEWLINE;
   }
-
 }

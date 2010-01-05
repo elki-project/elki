@@ -12,6 +12,7 @@ import javax.swing.JTextPane;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 
+import de.lmu.ifi.dbs.elki.logging.ElkiLogRecord;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.logging.MessageFormatter;
 import de.lmu.ifi.dbs.elki.logging.OutputStreamLogger;
@@ -126,12 +127,10 @@ public class LogPane extends JTextPane {
     // format
     final String m;
     m = fmt.format(record);
-    int pos = 0; 
-    if (m.charAt(pos) == OutputStreamLogger.CARRIAGE_RETURN) {
+    if(record instanceof ElkiLogRecord && ((ElkiLogRecord) record).isOverwriteable()) {
       if (lastNewlinePos < getStyledDocument().getLength()) {
         getStyledDocument().remove(lastNewlinePos, getStyledDocument().getLength() - lastNewlinePos);
       }
-      pos++;
     } else {
       // insert a newline, if we didn't see one yet.
       if (lastNewlinePos < getStyledDocument().getLength()) {
@@ -139,10 +138,10 @@ public class LogPane extends JTextPane {
         lastNewlinePos = getStyledDocument().getLength();
       }
     }
-    int tail = tailingNonNewline(m, pos, m.length() - pos);
-    int headlen = m.length() - tail - pos;
+    int tail = tailingNonNewline(m, 0, m.length());
+    int headlen = m.length() - tail;
     if (headlen > 0) {
-      String pre = m.substring(pos, headlen);
+      String pre = m.substring(0, headlen);
       getStyledDocument().insertString(getStyledDocument().getLength(), pre, style);
     }
     lastNewlinePos = getStyledDocument().getLength();
@@ -164,9 +163,6 @@ public class LogPane extends JTextPane {
     for(int cnt = 0; cnt < len; cnt++) {
       final int pos = off + (len - 1) - cnt;
       if(str.charAt(pos) == OutputStreamLogger.UNIX_NEWLINE) {
-        return cnt;
-      }
-      if(str.charAt(pos) == OutputStreamLogger.CARRIAGE_RETURN) {
         return cnt;
       }
       // TODO: need to compare to NEWLINE, too?
