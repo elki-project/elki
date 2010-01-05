@@ -99,4 +99,13 @@ public class AttributeSettings {
     return toString("");
   }
 
+  /**
+   * Return the object that owns these settings.
+   * 
+   * @return owning object
+   */
+  public Object getObject() {
+    return object;
+  }
+
 }
