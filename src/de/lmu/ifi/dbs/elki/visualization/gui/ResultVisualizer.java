@@ -46,12 +46,17 @@ public class ResultVisualizer extends AbstractParameterizable implements ResultH
    * Default value: "ELKI Result Visualization"
    * </p>
    */
-  protected final PatternParameter WINDOW_TITLE_PARAM = new PatternParameter(WINDOW_TITLE_ID, "ELKI Result Visualization");
+  protected final PatternParameter WINDOW_TITLE_PARAM = new PatternParameter(WINDOW_TITLE_ID, true);
   
   /**
    * Stores the set title.
    */
   private String title;
+  
+  /**
+   * Default title
+   */
+  protected final static String DEFAULT_TITLE = "ELKI Result Visualization";
 
   /**
    * Visualization manager.
@@ -75,6 +80,14 @@ public class ResultVisualizer extends AbstractParameterizable implements ResultH
     if (vs.size() == 0) {
       logger.error("No visualizers found for result!");
       return;
+    }
+    
+    if (title == null) {
+      title = manager.getTitle(db, mr);
+    }
+    
+    if (title == null) {
+      title = DEFAULT_TITLE;
     }
     
     ResultWindow window = new ResultWindow(title, db, mr);

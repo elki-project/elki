@@ -4,12 +4,19 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
+import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSetting;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.adapter.AlgorithmAdapter;
@@ -114,5 +121,52 @@ public class VisualizersForResult extends AbstractParameterizable {
     
     rememberParametersExcept(args, remainingParameters);
     return remainingParameters;
+  }
+
+  /**
+   * Try to automatically generate a title for this.
+   * 
+   * @param db Database
+   * @param result Result object
+   * @return generated title
+   */
+  public String getTitle(Database<? extends DatabaseObject> db, MultiResult result) {
+    List<AttributeSettings> settings = ResultUtil.getGlobalAssociation(result, AssociationID.META_SETTINGS);
+    String algorithm = null;
+    String distance = null;
+    String dataset = null;
+    for (AttributeSettings s : settings) {
+      for (AttributeSetting setting : s.getSettings()) {
+        if (setting.getName().equals(OptionID.ALGORITHM.getName())) {
+          algorithm = setting.getValue();
+        }
+        if (setting.getName().equals(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID.getName())) {
+          distance = setting.getValue();
+        }
+        if (setting.getName().equals(FileBasedDatabaseConnection.INPUT_ID.getName())) {
+          dataset = setting.getValue();
+        }
+      }
+    }
+    StringBuilder buf = new StringBuilder();
+    if (algorithm != null) {
+      buf.append(algorithm);
+    }
+    if (distance != null) {
+      if (buf.length() > 0) {
+        buf.append(" using ");
+      }
+      buf.append(distance);
+    }
+    if (dataset != null) {
+      if (buf.length() > 0) {
+        buf.append(" on ");
+      }
+      buf.append(dataset);
+    }
+    if (buf.length() > 0) {
+      return buf.toString();
+    }
+    return null;
   }
 }
