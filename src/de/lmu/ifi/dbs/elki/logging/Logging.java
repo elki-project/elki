@@ -5,7 +5,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import de.lmu.ifi.dbs.elki.utilities.progress.Progress;
+import de.lmu.ifi.dbs.elki.logging.progress.Progress;
 
 /**
  * This class is a wrapper around {@link java.util.logging.Logger} and

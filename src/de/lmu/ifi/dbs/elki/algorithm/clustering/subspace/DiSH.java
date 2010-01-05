@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DiSHDistanceFunction;
+import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.preprocessing.DiSHPreprocessor;
 import de.lmu.ifi.dbs.elki.preprocessing.PreprocessorHandler;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
@@ -34,7 +35,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
 
 /**
  * <p>

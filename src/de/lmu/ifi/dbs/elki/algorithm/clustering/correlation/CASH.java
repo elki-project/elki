@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.database.SequentialDatabase;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
+import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FirstNEigenPairFilter;
@@ -47,7 +48,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import de.lmu.ifi.dbs.elki.utilities.progress.FiniteProgress;
 
 /**
  * Provides the CASH algorithm, an subspace clustering algorithm based on the hough transform.

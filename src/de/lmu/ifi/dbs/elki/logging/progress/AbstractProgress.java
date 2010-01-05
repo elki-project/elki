@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.utilities.progress;
+package de.lmu.ifi.dbs.elki.logging.progress;
 
 /**
  * Abstract base class for FiniteProgress objects.
