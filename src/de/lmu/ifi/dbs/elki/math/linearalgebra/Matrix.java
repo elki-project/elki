@@ -553,7 +553,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
   /**
    * Matrix transpose.
    * 
-   * @return A'
+   * @return A<sup>T</sup>
    */
   public Matrix transpose() {
     Matrix X = new Matrix(columndimension, rowdimension);
@@ -644,7 +644,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
    * C = A + B
    * 
    * @param B another matrix
-   * @return A + B
+   * @return A + B in a new Matrix
    */
   public Matrix plus(Matrix B) {
     checkMatrixDimensions(B);
@@ -662,7 +662,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
    * A = A + B
    * 
    * @param B another matrix
-   * @return A + B
+   * @return A + B in this Matrix
    */
   public Matrix plusEquals(Matrix B) {
     checkMatrixDimensions(B);
@@ -678,7 +678,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
    * C = A - B
    * 
    * @param B another matrix
-   * @return A - B
+   * @return A - B in a new Matrix
    */
   public Matrix minus(Matrix B) {
     checkMatrixDimensions(B);
@@ -696,7 +696,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
    * A = A - B
    * 
    * @param B another matrix
-   * @return A - B
+   * @return A - B in this Matrix
    */
   public Matrix minusEquals(Matrix B) {
     checkMatrixDimensions(B);
@@ -876,10 +876,10 @@ public class Matrix implements Cloneable, java.io.Serializable {
   }
 
   /**
-   * Linear algebraic matrix multiplication, A^T * B
+   * Linear algebraic matrix multiplication, A<sup>T</sup> * B
    * 
    * @param B another matrix
-   * @return Matrix product, A^T * B
+   * @return Matrix product, A<sup>T</sup> * B
    * @throws IllegalArgumentException Matrix inner dimensions must agree.
    */
   public Matrix transposeTimes(Matrix B) {
