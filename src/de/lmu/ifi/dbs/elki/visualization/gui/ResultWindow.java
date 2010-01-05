@@ -91,8 +91,8 @@ public class ResultWindow extends JFrame {
   /**
    * Constructor.
    */
-  public ResultWindow(Database<? extends DatabaseObject> db, MultiResult result) {
-    super("ELKI Result Visualization");
+  public ResultWindow(String title, Database<? extends DatabaseObject> db, MultiResult result) {
+    super(title);
 
     // close handler
     this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
