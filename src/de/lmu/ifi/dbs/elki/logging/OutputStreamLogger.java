@@ -27,7 +27,7 @@ public class OutputStreamLogger extends OutputStreamWriter {
   /**
    * Carriage return character.
    */
-  public static final char CARRIAGE_RETURN = '\r';
+  protected static final char CARRIAGE_RETURN = '\r';
 
   /**
    * Unix newline

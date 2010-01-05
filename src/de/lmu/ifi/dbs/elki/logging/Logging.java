@@ -405,10 +405,7 @@ public class Logging {
    * @param pgr Progress to log.
    */
   public void progress(Progress pgr) {
-    StringBuffer buf = new StringBuffer();
-    buf.append(OutputStreamLogger.CARRIAGE_RETURN);
-    pgr.appendToBuffer(buf);
-    logger.log(Level.INFO, buf.toString());
+    logger.log(new ElkiLogRecord(Level.INFO, pgr.toString(), true));
   }
 
   /**
@@ -419,11 +416,10 @@ public class Logging {
    */
   public void progress(Progress pgr1, Progress pgr2) {
     StringBuffer buf = new StringBuffer();
-    buf.append(OutputStreamLogger.CARRIAGE_RETURN);
     pgr1.appendToBuffer(buf);
     buf.append(" ");
     pgr2.appendToBuffer(buf);
-    logger.log(Level.INFO, buf.toString());
+    logger.log(new ElkiLogRecord(Level.INFO, buf.toString(), true));
   }
 
   /**
