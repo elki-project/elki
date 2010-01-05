@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -150,15 +151,27 @@ public class VisualizersForResult extends AbstractParameterizable {
     }
     StringBuilder buf = new StringBuilder();
     if (algorithm != null) {
+      // shorten the algorithm
+      if (algorithm.contains(".")) {
+        algorithm = algorithm.substring(algorithm.lastIndexOf(".")+1);
+      }
       buf.append(algorithm);
     }
     if (distance != null) {
+      // shorten the distance
+      if (distance.contains(".")) {
+        distance = distance.substring(distance.lastIndexOf(".")+1);
+      }
       if (buf.length() > 0) {
         buf.append(" using ");
       }
       buf.append(distance);
     }
     if (dataset != null) {
+      // shorten the data set filename
+      if (dataset.contains(File.separator)) {
+        dataset = dataset.substring(dataset.lastIndexOf(File.separator)+1);
+      }
       if (buf.length() > 0) {
         buf.append(" on ");
       }
