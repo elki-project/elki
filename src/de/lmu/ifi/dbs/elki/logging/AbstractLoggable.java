@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.logging;
 
-import de.lmu.ifi.dbs.elki.utilities.progress.Progress;
+import de.lmu.ifi.dbs.elki.logging.progress.Progress;
 
 /**
  * Abstract superclass for classes being loggable, i.e. classes intending to log
