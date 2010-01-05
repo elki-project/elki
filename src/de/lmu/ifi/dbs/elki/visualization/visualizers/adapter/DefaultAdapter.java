@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.AxisVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.ClusteringVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.DataDotVisualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.KeyVisualizer;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.SettingsVisualizer;
 
 /**
  * Class to add various default visualizations.
@@ -38,6 +39,11 @@ public class DefaultAdapter<NV extends NumberVector<NV, ?>> implements Algorithm
   private KeyVisualizer keyVisualizer;
 
   /**
+   * Visualizer to show the settings.
+   */
+  private SettingsVisualizer settingsVisualizer;
+
+  /**
    * Visualizer to draw the axes on 2D projections
    */
   private AxisVisualizer<NV> axisVisualizer;
@@ -57,6 +63,7 @@ public class DefaultAdapter<NV extends NumberVector<NV, ?>> implements Algorithm
     axisVisualizer = new AxisVisualizer<NV>();
     histoVisualizer = new Projection1DHistogramVisualizer<NV>();
     keyVisualizer = new KeyVisualizer();
+    settingsVisualizer = new SettingsVisualizer();
   }
 
   @Override
@@ -67,27 +74,30 @@ public class DefaultAdapter<NV extends NumberVector<NV, ?>> implements Algorithm
 
   @Override
   public Collection<Visualizer> getProvidedVisualizers() {
-    ArrayList<Visualizer> providedVisualizers = new ArrayList<Visualizer>(4);
+    ArrayList<Visualizer> providedVisualizers = new ArrayList<Visualizer>(6);
     providedVisualizers.add(dataDotVisualizer);
     providedVisualizers.add(clusteringVisualizer);
     providedVisualizers.add(axisVisualizer);
     providedVisualizers.add(histoVisualizer);
     providedVisualizers.add(keyVisualizer);
+    providedVisualizers.add(settingsVisualizer);
     return providedVisualizers;
   }
 
   @Override
   public Collection<Visualizer> getUsableVisualizers(VisualizerContext context) {
-    ArrayList<Visualizer> usableVisualizers = new ArrayList<Visualizer>(4);
+    ArrayList<Visualizer> usableVisualizers = new ArrayList<Visualizer>(6);
     axisVisualizer.init(context);
     dataDotVisualizer.init(context);
     clusteringVisualizer.init(context);
     histoVisualizer.init(context);
     keyVisualizer.init(context);
+    settingsVisualizer.init(context);
     
     usableVisualizers.add(axisVisualizer);
     usableVisualizers.add(clusteringVisualizer);
     usableVisualizers.add(keyVisualizer);
+    usableVisualizers.add(settingsVisualizer);
     usableVisualizers.add(dataDotVisualizer);
     if (ResultUtil.filterResults(context.getResult(), OutlierResult.class).size() > 0) {
       clusteringVisualizer.getMetadata().put(Visualizer.META_VISIBLE_DEFAULT, false);
