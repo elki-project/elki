@@ -14,7 +14,9 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizersForResult;
 
@@ -31,6 +33,27 @@ public class ResultVisualizer extends AbstractParameterizable implements ResultH
   protected final static Logging logger = Logging.getLogger(ResultVisualizer.class);
 
   /**
+   * OptionID for {@link #WINDOW_TITLE_PARAM}
+   */
+  public static final OptionID WINDOW_TITLE_ID = OptionID.getOrCreateOptionID("vis.window.title", "Title to use for visualization window.");
+
+  /**
+   * Parameter to specify the window title
+   * <p>
+   * Key: {@code -vis.window.title}
+   * </p>
+   * <p>
+   * Default value: "ELKI Result Visualization"
+   * </p>
+   */
+  protected final PatternParameter WINDOW_TITLE_PARAM = new PatternParameter(WINDOW_TITLE_ID, "ELKI Result Visualization");
+  
+  /**
+   * Stores the set title.
+   */
+  private String title;
+
+  /**
    * Visualization manager.
    */
   VisualizersForResult manager = new VisualizersForResult();
@@ -40,6 +63,7 @@ public class ResultVisualizer extends AbstractParameterizable implements ResultH
    */
   public ResultVisualizer() {
     super();
+    addOption(WINDOW_TITLE_PARAM);
     addParameterizable(manager);
   }
 
@@ -53,7 +77,7 @@ public class ResultVisualizer extends AbstractParameterizable implements ResultH
       return;
     }
     
-    ResultWindow window = new ResultWindow(db, mr);
+    ResultWindow window = new ResultWindow(title, db, mr);
     window.addVisualizations(vs);
     window.setVisible(true);
     window.setExtendedState(window.getExtendedState() | JFrame.MAXIMIZED_BOTH);    
@@ -73,6 +97,8 @@ public class ResultVisualizer extends AbstractParameterizable implements ResultH
   @Override
   public List<String> setParameters(List<String> args) throws ParameterException {
     List<String> remainingParameters = super.setParameters(args);
+    
+    title = WINDOW_TITLE_PARAM.getValue();
     
     remainingParameters = manager.setParameters(remainingParameters);
     
