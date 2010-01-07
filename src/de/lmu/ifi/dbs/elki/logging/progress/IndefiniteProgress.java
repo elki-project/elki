@@ -9,7 +9,7 @@ public class IndefiniteProgress extends AbstractProgress {
   /**
    * Store completion flag.
    */
-  private boolean completed;
+  private boolean completed = false;
   
   /**
    * Constructor.
@@ -18,7 +18,6 @@ public class IndefiniteProgress extends AbstractProgress {
    */
   public IndefiniteProgress(String task) {
     super(task);
-    this.completed = false;
   }
 
   /**
@@ -38,23 +37,14 @@ public class IndefiniteProgress extends AbstractProgress {
    * @return Completion status.
    */
   @Override
-  public boolean complete() {
+  public boolean isComplete() {
     return completed;
   }
 
   /**
-   * Set the completion Flag.
-   * 
-   * @param completed boolean whether the progress is complete.
-   */
-  private void setCompleted(boolean completed) {
-    this.completed = completed;
-  }
-  
-  /**
    * Set the completion flag.
    */
   public void setCompleted() {
-    this.setCompleted(true);
+    this.completed = true;
   }
 }

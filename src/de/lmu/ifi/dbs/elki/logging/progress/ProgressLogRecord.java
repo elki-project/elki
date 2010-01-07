@@ -24,19 +24,32 @@ public class ProgressLogRecord extends ELKILogRecord {
    * Constructor for progress log messages.
    * 
    * @param level Logging level
-   * @param msg Logging message
    * @param progress Progress to log
    */
-  public ProgressLogRecord(Level level, String msg, Progress progress) {
-    super(level, msg);
+  public ProgressLogRecord(Level level, Progress progress) {
+    super(level, null);
     this.progress = progress;
   }
 
   /**
+   * Get the objects progress.
+   * 
    * @return the progress
    */
-  protected Progress getProgress() {
+  public Progress getProgress() {
     return progress;
   }
 
+  /**
+   * Generate the message only when needed.
+   */
+  @Override
+  public String getMessage() {
+    String message = super.getMessage();
+    if (message == null) {
+      message = progress.toString();
+      super.setMessage(message);
+    }
+    return message;
+  }
 }

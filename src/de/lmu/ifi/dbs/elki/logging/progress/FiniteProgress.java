@@ -82,7 +82,7 @@ public class FiniteProgress extends AbstractProgress {
    * Test whether the progress was completed.
    */
   @Override
-  public boolean complete() {
+  public boolean isComplete() {
     return getProcessed() == total;
   }
 }

@@ -20,7 +20,7 @@ public interface Progress {
    * 
    * @return Whether the progress was completed.
    */
-  public boolean complete();
+  public boolean isComplete();
   
   /**
    * Returns a String representation of the progress suitable as a message for
