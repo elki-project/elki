@@ -415,12 +415,15 @@ public class Logging {
    * @param pgr1 First progress to log.
    * @param pgr2 Second progress to log.
    */
+  @Deprecated
+  // FIXME: remove. This way of displaying two progress records at the same time is highly "unstable"
   public void progress(Progress pgr1, Progress pgr2) {
     StringBuffer buf = new StringBuffer();
+    buf.append("\r");
     pgr1.appendToBuffer(buf);
     buf.append(" ");
     pgr2.appendToBuffer(buf);
-    logger.log(new ELKILogRecord(Level.INFO, buf.toString(), true));
+    logger.log(new ELKILogRecord(Level.INFO, buf.toString()));
   }
 
   /**

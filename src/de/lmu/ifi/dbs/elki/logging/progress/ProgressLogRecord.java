@@ -28,7 +28,7 @@ public class ProgressLogRecord extends ELKILogRecord {
    * @param progress Progress to log
    */
   public ProgressLogRecord(Level level, String msg, Progress progress) {
-    super(level, msg, true);
+    super(level, msg);
     this.progress = progress;
   }
 

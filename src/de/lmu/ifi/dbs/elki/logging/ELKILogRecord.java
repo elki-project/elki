@@ -34,11 +34,6 @@ public class ELKILogRecord extends LogRecord {
   private final static String START_TRACE_AT = Logger.class.getCanonicalName();
   
   /**
-   * Flag to signal "overwrite" property for progress etc. records.
-   */
-  private boolean overwriteable = false;
-  
-  /**
    * Constructor.
    * 
    * @param level Message level
@@ -47,19 +42,6 @@ public class ELKILogRecord extends LogRecord {
   public ELKILogRecord(Level level, String msg) {
     super(level, msg);
     needToInferCaller = true;
-  }
-
-  /**
-   * Constructor.
-   * 
-   * @param level Message level
-   * @param msg Message contents.
-   * @param overwriteable overwriteable
-   */
-  public ELKILogRecord(Level level, String msg, boolean overwriteable) {
-    super(level, msg);
-    this.needToInferCaller = true;
-    this.overwriteable = overwriteable;
   }
 
   /*
@@ -137,14 +119,5 @@ public class ELKILogRecord extends LogRecord {
       }
       ix++;
     }
-  }
-
-  /**
-   * Get the "overwriteable" state of this record.
-   * 
-   * @return Whether or not this message is overwriteable.
-   */
-  public boolean isOverwriteable() {
-    return overwriteable;
   }
 }
