@@ -44,7 +44,7 @@ public final class LoggingUtil {
    * @param message Message to log.
    */
   public final static void logExpensive(Level level, String message) {
-    LogRecord rec = new ElkiLogRecord(level, message);
+    LogRecord rec = new ELKILogRecord(level, message);
     String[] caller = inferCaller();
     if(caller != null) {
       rec.setSourceClassName(caller[0]);
@@ -126,7 +126,7 @@ public final class LoggingUtil {
   /**
    * Infer which class has called the logging helper.
    * 
-   * While this looks like duplicated code from ElkiLogRecord, it is needed here
+   * While this looks like duplicated code from ELKILogRecord, it is needed here
    * to find an appropriate Logger (and check the logging level) for the calling class,
    * not just to log the right class and method name.
    * 

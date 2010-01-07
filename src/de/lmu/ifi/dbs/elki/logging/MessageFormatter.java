@@ -25,7 +25,7 @@ public class MessageFormatter extends Formatter {
   public String format(LogRecord record) {
     String msg = record.getMessage();
     if(msg.length() > 0) {
-      if (record instanceof ElkiLogRecord && ((ElkiLogRecord)record).isOverwriteable()) {
+      if (record instanceof ELKILogRecord && ((ELKILogRecord)record).isOverwriteable()) {
         return msg;
       }
       if(msg.endsWith(OutputStreamLogger.NEWLINE)) {

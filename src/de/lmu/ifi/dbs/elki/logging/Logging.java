@@ -6,6 +6,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.logging.progress.Progress;
+import de.lmu.ifi.dbs.elki.logging.progress.ProgressLogRecord;
 
 /**
  * This class is a wrapper around {@link java.util.logging.Logger} and
@@ -15,8 +16,8 @@ import de.lmu.ifi.dbs.elki.logging.progress.Progress;
  * performance penalty compared to standard logging should be minimal.
  * 
  * However when using {@link java.util.logging.LogRecord} directly instead of 
- * {@link ElkiLogRecord}, the use of the {@link #log(LogRecord)} method will result in
- * incorrectly logged cause location. Therefore, use {@link ElkiLogRecord}!
+ * {@link ELKILogRecord}, the use of the {@link #log(LogRecord)} method will result in
+ * incorrectly logged cause location. Therefore, use {@link ELKILogRecord}!
  * 
  * @author Erich Schubert
  *
@@ -132,7 +133,7 @@ public class Logging {
    * @param message Message to log.
    */
   public void log(Level level, String message) {
-    LogRecord rec = new ElkiLogRecord(level, message);
+    LogRecord rec = new ELKILogRecord(level, message);
     logger.log(rec);
   }
 
@@ -144,13 +145,13 @@ public class Logging {
    * @param e Exception
    */
   public void log(Level level, String message, Throwable e) {
-    LogRecord rec = new ElkiLogRecord(level, message);
+    LogRecord rec = new ELKILogRecord(level, message);
     rec.setThrown(e);
     logger.log(rec);
   }
 
   /**
-   * Log a given log record (should be a {@link ElkiLogRecord})
+   * Log a given log record (should be a {@link ELKILogRecord})
    * 
    * @param rec Log record to log.
    */
@@ -405,7 +406,7 @@ public class Logging {
    * @param pgr Progress to log.
    */
   public void progress(Progress pgr) {
-    logger.log(new ElkiLogRecord(Level.INFO, pgr.toString(), true));
+    logger.log(new ProgressLogRecord(Level.INFO, pgr.toString(), pgr));
   }
 
   /**
@@ -419,7 +420,7 @@ public class Logging {
     pgr1.appendToBuffer(buf);
     buf.append(" ");
     pgr2.appendToBuffer(buf);
-    logger.log(new ElkiLogRecord(Level.INFO, buf.toString(), true));
+    logger.log(new ELKILogRecord(Level.INFO, buf.toString(), true));
   }
 
   /**
