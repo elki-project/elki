@@ -191,8 +191,8 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
         p.addRotation(1, 2, Math.PI / 180 * 50. / dim);
         VisualizationProjection proj = new VisualizationProjection(dvdb, scales, p);
         for(Projection2DVisualizer<?> v : vis2d) {
-          VisualizationInfo vi = new VisualizationProjectedInfo(v, proj, 2., 2.);
-          plotmap.addVis(Math.ceil((dim - 1) / 2.0), 0.0, Math.floor((dim ) / 2.0), Math.floor((dim) / 2.0), vi);
+          VisualizationInfo vi = new VisualizationProjectedInfo(v, proj, dim / 2, dim / 2);
+          plotmap.addVis(Math.ceil((dim - 1) / 2.0), 0.0, Math.floor((dim - 1) / 2.0), Math.floor((dim - 1) / 2.0), vi);
         }
       }
     }
