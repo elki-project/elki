@@ -391,6 +391,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
     // Stop thumbnail
     if(thumbnails != null) {
       thumbnails.shutdown = true;
+      thumbnails.interrupt();
       thumbnails = null;
     }
   }
@@ -431,6 +432,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
     this.scheduleUpdate(new NodeReplaceChild(g, i));
   }
 
+  // TODO: don't restart the thumbnailer, but clear the queue.
   /**
    * Thread to update thumbnails in the background.
    * 
@@ -444,7 +446,7 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
 
     @Override
     public void run() {
-      while(!queue.isEmpty()) {
+      while(!queue.isEmpty() && !shutdown) {
         Pair<Element, VisualizationInfo> ti = queue.poll();
         generateThumbnail(ti.first, ti.second);
       }
@@ -547,5 +549,12 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
     public void handleEvent(@SuppressWarnings("unused") Event evt) {
       triggerSubplotSelectEvent(x, y);
     }
+  }
+
+  /**
+   * Cancel the overview, i.e. stop the thumbnailer
+   */
+  public void dispose() {
+    stopThumbnailer();
   }
 }

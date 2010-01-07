@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.logging;
 
 import java.io.OutputStream;
 import java.io.Writer;
+import java.util.Collection;
 import java.util.logging.ErrorManager;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
@@ -9,7 +10,9 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
 
+import de.lmu.ifi.dbs.elki.logging.progress.Progress;
 import de.lmu.ifi.dbs.elki.logging.progress.ProgressLogRecord;
+import de.lmu.ifi.dbs.elki.logging.progress.ProgressTracker;
 
 /**
  * Handler that handles output to the console with clever formatting.
@@ -41,6 +44,11 @@ public class CLISmartHandler extends Handler {
    * Formatter for error messages
    */
   private Formatter errformat = new SimpleFormatter();
+
+  /**
+   * Tracker for progress messages
+   */
+  private ProgressTracker ptrack = new ProgressTracker();
 
   /**
    * Constructor
@@ -102,39 +110,71 @@ public class CLISmartHandler extends Handler {
     else {
       destination = this.out;
     }
-    // choose an appropriate formatter
-    final Formatter fmt;
-    // always format progress messages using the progress formatter.
-    if(record.getLevel().intValue() >= Level.WARNING.intValue()) {
-      // format errors using the error formatter
-      fmt = errformat;
-    }
-    else if(record.getLevel().intValue() <= Level.FINE.intValue()) {
-      // format debug statements using the debug formatter.
-      fmt = debugformat;
-    }
-    else {
-      // default to the message formatter.
-      fmt = msgformat;
-    }
+
     // format
     final String m;
-    try {
-      m = fmt.format(record);
+
+    // Progress records are handled specially.
+    if(record instanceof ProgressLogRecord) {
+      ProgressLogRecord prec = (ProgressLogRecord) record;
+      ptrack.addProgress(prec.getProgress());
+      // TODO: rate control?
+
+      Collection<Progress> completed = ptrack.removeCompleted();
+      Collection<Progress> progresses = ptrack.getProgresses();
+
+      StringBuffer buf = new StringBuffer();
+      if(completed.size() > 0) {
+        buf.append(OutputStreamLogger.CARRIAGE_RETURN);
+        for(Progress prog : completed) {
+          // TODO: use formatter, somehow?
+          prog.appendToBuffer(buf);
+          buf.append(OutputStreamLogger.NEWLINE);
+        }
+      }
+      if(progresses.size() > 0) {
+        boolean first = true;
+        buf.append(OutputStreamLogger.CARRIAGE_RETURN);
+        for(Progress prog : progresses) {
+          if(first) {
+            first = false;
+          }
+          else {
+            buf.append(" ");
+          }
+          // TODO: use formatter, somehow?
+          prog.appendToBuffer(buf);
+        }
+      }
+      m = buf.toString();
     }
-    catch(Exception ex) {
-      reportError(null, ex, ErrorManager.FORMAT_FAILURE);
-      return;
+    else {
+      // choose an appropriate formatter
+      final Formatter fmt;
+      // always format progress messages using the progress formatter.
+      if(record.getLevel().intValue() >= Level.WARNING.intValue()) {
+        // format errors using the error formatter
+        fmt = errformat;
+      }
+      else if(record.getLevel().intValue() <= Level.FINE.intValue()) {
+        // format debug statements using the debug formatter.
+        fmt = debugformat;
+      }
+      else {
+        // default to the message formatter.
+        fmt = msgformat;
+      }
+      try {
+        m = fmt.format(record);
+      }
+      catch(Exception ex) {
+        reportError(null, ex, ErrorManager.FORMAT_FAILURE);
+        return;
+      }
     }
     // write
     try {
-      // use a carriage return to signal "overwriteability"
-      if(record instanceof ProgressLogRecord) {
-        destination.write(OutputStreamLogger.CARRIAGE_RETURN + m);
-      }
-      else {
-        destination.write(m);
-      }
+      destination.write(m);
       // always flush (although the streams should auto-flush already)
       destination.flush();
     }

@@ -191,7 +191,8 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
         if(isVerbose()) {
           objprog.setProcessed(processedIDs.size());
           clusprog.setProcessed(resultList.size());
-          logger.progress(objprog, clusprog);
+          logger.progress(objprog);
+          logger.progress(clusprog);
         }
       }
     }
@@ -201,7 +202,8 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
         if(isVerbose()) {
           objprog.setProcessed(processedIDs.size());
           clusprog.setProcessed(resultList.size());
-          logger.progress(objprog, clusprog);
+          logger.progress(objprog);
+          logger.progress(clusprog);
         }
       }
     }
@@ -209,7 +211,8 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
     if(isVerbose()) {
       objprog.setProcessed(processedIDs.size());
       clusprog.setProcessed(resultList.size());
-      logger.progress(objprog, clusprog);
+      logger.progress(objprog);
+      logger.progress(clusprog);
     }
 
     result = new Clustering<Model>();
@@ -226,7 +229,8 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
     if(isVerbose()) {
       objprog.setProcessed(processedIDs.size());
       clusprog.setProcessed(resultList.size());
-      logger.progress(objprog, clusprog);
+      logger.progress(objprog);
+      logger.progress(clusprog);
     }
     // Signal that the progress has completed.
     clusprog.setCompleted();
@@ -257,7 +261,8 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
       if(logger.isVerbose()) {
         objprog.setProcessed(processedIDs.size());
         clusprog.setProcessed(resultList.size());
-        logger.progress(objprog, clusprog);
+        logger.progress(objprog);
+        logger.progress(clusprog);
       }
       return;
     }
@@ -271,7 +276,8 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
       if(logger.isVerbose()) {
         objprog.setProcessed(processedIDs.size());
         clusprog.setProcessed(resultList.size());
-        logger.progress(objprog, clusprog);
+        logger.progress(objprog);
+        logger.progress(clusprog);
       }
       return;
     }
@@ -283,8 +289,9 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
 
       Integer nextID_corrDim = database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, nextID);
       // nextID is not reachable from start object
-      if(nextID_corrDim > lambda)
+      if(nextID_corrDim > lambda) {
         continue;
+      }
 
       if(!processedIDs.contains(nextID)) {
         currentCluster.add(nextID);
@@ -301,16 +308,18 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
       Integer q = seeds.remove(0).getID();
       Integer corrDim_q = database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, q);
       // q forms no lambda-dim hyperplane
-      if(corrDim_q > lambda)
+      if(corrDim_q > lambda) {
         continue;
+      }
 
       List<DistanceResultPair<DoubleDistance>> reachables = database.rangeQuery(q, epsilon, distanceFunction);
       if(reachables.size() > minpts) {
         for(DistanceResultPair<DoubleDistance> r : reachables) {
           Integer corrDim_r = database.getAssociation(AssociationID.LOCAL_DIMENSIONALITY, r.getSecond());
           // r is not reachable from q
-          if(corrDim_r > lambda)
+          if(corrDim_r > lambda) {
             continue;
+          }
 
           boolean inNoise = noise.contains(r.getID());
           boolean unclassified = !processedIDs.contains(r.getID());
@@ -327,7 +336,8 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
               objprog.setProcessed(processedIDs.size());
               int numClusters = currentCluster.size() > minpts ? resultList.size() + 1 : resultList.size();
               clusprog.setProcessed(numClusters);
-              logger.progress(objprog, clusprog);
+              logger.progress(objprog);
+              logger.progress(clusprog);
             }
           }
         }
@@ -352,7 +362,8 @@ public abstract class ProjectedDBSCAN<V extends NumberVector<V, ?>> extends Abst
     if(logger.isVerbose()) {
       objprog.setProcessed(processedIDs.size());
       clusprog.setProcessed(resultList.size());
-      logger.progress(objprog, clusprog);
+      logger.progress(objprog);
+      logger.progress(clusprog);
     }
   }
 

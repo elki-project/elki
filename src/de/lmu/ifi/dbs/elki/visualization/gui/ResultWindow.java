@@ -173,6 +173,13 @@ public class ResultWindow extends JFrame {
     this.setSize(600, 600);
     this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
   }
+  
+  @Override
+  public void dispose() {
+    svgCanvas.setPlot(null);
+    overview.dispose();
+    super.dispose();
+  }
 
   /**
    * Visualization popup button triggered.
