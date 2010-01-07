@@ -12,10 +12,10 @@ import javax.swing.JTextPane;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 
-import de.lmu.ifi.dbs.elki.logging.ELKILogRecord;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.logging.MessageFormatter;
 import de.lmu.ifi.dbs.elki.logging.OutputStreamLogger;
+import de.lmu.ifi.dbs.elki.logging.progress.ProgressLogRecord;
 
 /**
  * A Swing object to receive ELKI logging output.
@@ -127,7 +127,7 @@ public class LogPane extends JTextPane {
     // format
     final String m;
     m = fmt.format(record);
-    if(record instanceof ELKILogRecord && ((ELKILogRecord) record).isOverwriteable()) {
+    if(record instanceof ProgressLogRecord) {
       if (lastNewlinePos < getStyledDocument().getLength()) {
         getStyledDocument().remove(lastNewlinePos, getStyledDocument().getLength() - lastNewlinePos);
       }

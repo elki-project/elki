@@ -9,6 +9,8 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
 
+import de.lmu.ifi.dbs.elki.logging.progress.ProgressLogRecord;
+
 /**
  * Handler that handles output to the console with clever formatting.
  * 
@@ -127,7 +129,7 @@ public class CLISmartHandler extends Handler {
     // write
     try {
       // use a carriage return to signal "overwriteability"
-      if(record instanceof ELKILogRecord && ((ELKILogRecord) record).isOverwriteable()) {
+      if(record instanceof ProgressLogRecord) {
         destination.write(OutputStreamLogger.CARRIAGE_RETURN + m);
       }
       else {
