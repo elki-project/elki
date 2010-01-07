@@ -12,7 +12,7 @@ import java.util.logging.Logger;
  * 
  * @author Erich Schubert
  */
-public class ElkiLogRecord extends LogRecord {
+public class ELKILogRecord extends LogRecord {
   /**
    * Serial Version UID
    */
@@ -26,7 +26,7 @@ public class ElkiLogRecord extends LogRecord {
   /**
    * Classes to ignore when finding the relevant caller.
    */
-  public final static String[] IGNORE_CLASSES = { Logger.class.getCanonicalName(), Logging.class.getCanonicalName(), LoggingUtil.class.getCanonicalName(), ElkiLogRecord.class.getCanonicalName(), AbstractLoggable.class.getCanonicalName() };
+  public final static String[] IGNORE_CLASSES = { Logger.class.getCanonicalName(), Logging.class.getCanonicalName(), LoggingUtil.class.getCanonicalName(), ELKILogRecord.class.getCanonicalName(), AbstractLoggable.class.getCanonicalName() };
 
   /**
    * Name of this class.
@@ -44,7 +44,7 @@ public class ElkiLogRecord extends LogRecord {
    * @param level Message level
    * @param msg Message contents.
    */
-  public ElkiLogRecord(Level level, String msg) {
+  public ELKILogRecord(Level level, String msg) {
     super(level, msg);
     needToInferCaller = true;
   }
@@ -56,7 +56,7 @@ public class ElkiLogRecord extends LogRecord {
    * @param msg Message contents.
    * @param overwriteable overwriteable
    */
-  public ElkiLogRecord(Level level, String msg, boolean overwriteable) {
+  public ELKILogRecord(Level level, String msg, boolean overwriteable) {
     super(level, msg);
     this.needToInferCaller = true;
     this.overwriteable = overwriteable;

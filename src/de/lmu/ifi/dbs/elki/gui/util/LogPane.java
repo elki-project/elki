@@ -12,7 +12,7 @@ import javax.swing.JTextPane;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 
-import de.lmu.ifi.dbs.elki.logging.ElkiLogRecord;
+import de.lmu.ifi.dbs.elki.logging.ELKILogRecord;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.logging.MessageFormatter;
 import de.lmu.ifi.dbs.elki.logging.OutputStreamLogger;
@@ -127,7 +127,7 @@ public class LogPane extends JTextPane {
     // format
     final String m;
     m = fmt.format(record);
-    if(record instanceof ElkiLogRecord && ((ElkiLogRecord) record).isOverwriteable()) {
+    if(record instanceof ELKILogRecord && ((ELKILogRecord) record).isOverwriteable()) {
       if (lastNewlinePos < getStyledDocument().getLength()) {
         getStyledDocument().remove(lastNewlinePos, getStyledDocument().getLength() - lastNewlinePos);
       }

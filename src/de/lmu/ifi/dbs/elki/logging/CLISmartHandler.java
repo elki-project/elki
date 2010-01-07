@@ -127,7 +127,7 @@ public class CLISmartHandler extends Handler {
     // write
     try {
       // use a carriage return to signal "overwriteability"
-      if(record instanceof ElkiLogRecord && ((ElkiLogRecord) record).isOverwriteable()) {
+      if(record instanceof ELKILogRecord && ((ELKILogRecord) record).isOverwriteable()) {
         destination.write(OutputStreamLogger.CARRIAGE_RETURN + m);
       }
       else {
