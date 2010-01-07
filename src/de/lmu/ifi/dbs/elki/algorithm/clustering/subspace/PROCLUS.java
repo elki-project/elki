@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
@@ -115,6 +116,11 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
         logger.debugFine("m_c " + m_current);
       }
 
+      IndefiniteProgress cprogress = null;
+      if(logger.isVerbose()) {
+        cprogress = new IndefiniteProgress("Current number of clusters:");
+      }
+      
       Map<Integer, PROCLUSCluster> clusters = null;
       int loops = 0;
       while(loops < 10) {
@@ -131,13 +137,15 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V
 
         m_current = computeM_current(medoids, m_best, m_bad);
         loops++;
-        if(logger.isVerbose()) {
-          logger.verbose("\rCurrent number of clusters: " + clusters.size() + ".");
+        if(logger.isVerbose() && cprogress != null) {
+          cprogress.setProcessed(clusters.size());
+          logger.progress(cprogress);
         }
       }
 
-      if(logger.isVerbose()) {
-        logger.verbose("Number of clusters: " + clusters.size() + ".");
+      if(logger.isVerbose() && cprogress != null) {
+        cprogress.setCompleted();
+        logger.progress(cprogress);
       }
 
       // todo refinement phase ?

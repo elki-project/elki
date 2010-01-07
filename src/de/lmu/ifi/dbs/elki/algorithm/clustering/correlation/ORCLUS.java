@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
+import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAResult;
@@ -90,8 +91,9 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V>
       final int k = getK();
       final int k_i = getK_i();
 
-      if(database.dimensionality() < dim)
+      if(database.dimensionality() < dim) {
         throw new IllegalStateException("Dimensionality of data < parameter l! " + "(" + database.dimensionality() + " < " + dim + ")");
+      }
 
       // current number of seeds
       int k_c = Math.min(database.size(), k_i * k);
@@ -104,9 +106,15 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V>
 
       double beta = StrictMath.exp(-StrictMath.log((double) dim_c / (double) dim) * StrictMath.log(1 / alpha) / StrictMath.log((double) k_c / (double) k));
 
+      IndefiniteProgress cprogress = null;
+      if(logger.isVerbose()) {
+        cprogress = new IndefiniteProgress("Current number of clusters:");
+      }
+
       while(k_c > k) {
-        if(logger.isVerbose()) {
-          logger.verbose("\rCurrent number of clusters: " + clusters.size() + ".");
+        if(logger.isVerbose() && cprogress != null) {
+          cprogress.setProcessed(clusters.size());
+          logger.progress(cprogress);
         }
 
         // find partitioning induced by the seeds of the clusters
@@ -114,20 +122,23 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V>
 
         // determine current subspace associated with each cluster
         for(ORCLUSCluster cluster : clusters) {
-          if(cluster.objectIDs.size() > 0)
+          if(cluster.objectIDs.size() > 0) {
             cluster.basis = findBasis(database, cluster, dim_c);
+          }
         }
 
         // reduce number of seeds and dimensionality associated with
         // each seed
         k_c = (int) Math.max(k, k_c * alpha);
         dim_c = (int) Math.max(dim, dim_c * beta);
-        merge(database, clusters, k_c, dim_c);
+        merge(database, clusters, k_c, dim_c, cprogress);
       }
       assign(database, clusters);
 
-      if(logger.isVerbose()) {
-        logger.verbose("\nNumber of clusters: " + clusters.size() + ".                           ");
+      if(logger.isVerbose() && cprogress != null) {
+        cprogress.setProcessed(clusters.size());
+        cprogress.setCompleted();
+        logger.progress(cprogress);
       }
 
       // get the result
@@ -280,7 +291,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V>
    * @param k_new the new number of seeds
    * @param d_new the new dimensionality of the subspaces for each seed
    */
-  private void merge(Database<V> database, List<ORCLUSCluster> clusters, int k_new, int d_new) {
+  private void merge(Database<V> database, List<ORCLUSCluster> clusters, int k_new, int d_new, IndefiniteProgress cprogress) {
     ArrayList<ProjectedEnergy> projectedEnergies = new ArrayList<ProjectedEnergy>();
     for(int i = 0; i < clusters.size(); i++) {
       for(int j = 0; j < clusters.size(); j++) {
@@ -297,8 +308,9 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends ProjectedClustering<V>
     }
 
     while(clusters.size() > k_new) {
-      if(logger.isVerbose()) {
-        logger.verbose("\rCurrent number of clusters: " + clusters.size() + ".");
+      if(logger.isVerbose() && cprogress != null) {
+        cprogress.setProcessed(clusters.size());
+        logger.progress(cprogress);
       }
       // find the smallest value of r_ij
       ProjectedEnergy minPE = Collections.min(projectedEnergies);
