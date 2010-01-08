@@ -38,10 +38,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
  * <p>
  * Implementation of the SUBCLU algorithm, an algorithm to detect arbitrarily
  * shaped and positioned clusters in subspaces.
- * </p>
  * SUBCLU delivers for each subspace the same clusters DBSCAN would have found,
  * when applied to this subspace separately.
- * 
+ * </p>
  * <p>
  * Reference: <br>
  * K. Kailing, H.-P. Kriegel, P. Kroeger: Density connected Subspace Clustering
@@ -187,7 +186,6 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
       }
 
       // Generate (d+1)-dimensional clusters from d-dimensional clusters
-      // if(false) {
       for(int d = 0; d < dimensionality - 1; d++) {
         if(logger.isVerbose()) {
           logger.verbose("\n*** Generate " + (d + 2) + "-dimensional clusters from " + (d + 1) + "-dimensional clusters ***");
@@ -238,7 +236,6 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
           subspaceMap.put(d + 1, s_d);
         }
       }
-      // }
 
       result = new Clustering<SubspaceModel<V>>();
       for(Subspace<V> subspace : clusterMap.descendingKeySet()) {
@@ -248,7 +245,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
         for(Cluster<Model> cluster : clusters) {
           Cluster<SubspaceModel<V>> newCluster = new Cluster<SubspaceModel<V>>(cluster.getGroup());
           newCluster.setModel(new SubspaceModel<V>(subspace));
-          newCluster.setName("subspace_"+subspaceToString(subspace, "-")+"_cluster_"+c);
+          newCluster.setName("subspace_" + subspaceToString(subspace, "-") + "_cluster_" + c);
           result.addCluster(newCluster);
           c++;
         }
@@ -492,10 +489,10 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
 
     return bestSubspace;
   }
-  
+
   /**
-   * Returns a string representation of the dimensions of the specified
-   * subspace separated by comma.
+   * Returns a string representation of the dimensions of the specified subspace
+   * separated by comma.
    * 
    * @param subspace the subspace
    * @return a string representation of the dimensions of the specified subspace
