@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.Subspace;
 import de.lmu.ifi.dbs.elki.data.cluster.Cluster;
+import de.lmu.ifi.dbs.elki.data.cluster.SimpleHierarchy;
 import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -186,6 +187,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
       }
 
       // Generate (d+1)-dimensional clusters from d-dimensional clusters
+      // if(false) {
       for(int d = 0; d < dimensionality - 1; d++) {
         if(logger.isVerbose()) {
           logger.verbose("\n*** Generate " + (d + 2) + "-dimensional clusters from " + (d + 1) + "-dimensional clusters ***");
@@ -236,15 +238,19 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
           subspaceMap.put(d + 1, s_d);
         }
       }
+      // }
 
       result = new Clustering<SubspaceModel<V>>();
-      for(Subspace<V> subspace : clusterMap.keySet()) {
+      for(Subspace<V> subspace : clusterMap.descendingKeySet()) {
+
         List<Cluster<Model>> clusters = clusterMap.get(subspace);
+        int c = 1;
         for(Cluster<Model> cluster : clusters) {
           Cluster<SubspaceModel<V>> newCluster = new Cluster<SubspaceModel<V>>(cluster.getGroup());
           newCluster.setModel(new SubspaceModel<V>(subspace));
-          newCluster.setName(cluster.getName());
+          newCluster.setName("subspace_"+subspaceToString(subspace, "-")+"_cluster_"+c);
           result.addCluster(newCluster);
+          c++;
         }
       }
     }
@@ -486,15 +492,27 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
 
     return bestSubspace;
   }
+  
+  /**
+   * Returns a string representation of the dimensions of the specified
+   * subspace separated by comma.
+   * 
+   * @param subspace the subspace
+   * @return a string representation of the dimensions of the specified subspace
+   */
+  private String subspaceToString(Subspace<V> subspace) {
+    return subspaceToString(subspace, ", ");
+  }
 
   /**
    * Returns a string representation of the dimensions of the specified
    * subspace.
    * 
    * @param subspace the subspace
+   * @param sep the separator between the dimensions
    * @return a string representation of the dimensions of the specified subspace
    */
-  private String subspaceToString(Subspace<V> subspace) {
+  private String subspaceToString(Subspace<V> subspace, String sep) {
     StringBuffer result = new StringBuffer();
     result.append("[");
     for(int dim = subspace.getDimensions().nextSetBit(0); dim >= 0; dim = subspace.getDimensions().nextSetBit(dim + 1)) {
@@ -502,12 +520,12 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
         result.append(dim + 1);
       }
       else {
-        result.append(", ").append(dim + 1);
+        result.append(sep).append(dim + 1);
       }
     }
     result.append("]");
 
     return result.toString();
   }
-  
+
 }
