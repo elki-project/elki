@@ -16,12 +16,12 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  */
 public class SubspaceModel<V extends FeatureVector<V, ?>> extends BaseModel implements TextWriteable {
   /**
-   * The subspaces of the cluster.
+   * The subspace of the cluster.
    */
   private final Subspace<V> subspace;
 
   /**
-   * Creates a new AxesModel for the specified subspace.
+   * Creates a new SubspaceModel for the specified subspace.
    * 
    * @param subspace the subspaces of the cluster
    */
@@ -31,7 +31,7 @@ public class SubspaceModel<V extends FeatureVector<V, ?>> extends BaseModel impl
   }
 
   /**
-   * Creates a new AxesModel for a subspace of the specified dimensions.
+   * Creates a new SubspaceModel for a subspace of the specified dimensions.
    * 
    * @param dimensions the dimensions of the subspace
    */
@@ -41,7 +41,7 @@ public class SubspaceModel<V extends FeatureVector<V, ?>> extends BaseModel impl
   }
 
   /**
-   * Returns the subspace of this AxesModel.
+   * Returns the subspace of this SubspaceModel.
    * 
    * @return the subspace
    */
@@ -51,7 +51,7 @@ public class SubspaceModel<V extends FeatureVector<V, ?>> extends BaseModel impl
 
   /**
    * Returns the BitSet that represents the dimensions of the subspace of this
-   * AxesModel.
+   * SubspaceModel.
    * 
    * @return the dimensions of the subspace
    */
