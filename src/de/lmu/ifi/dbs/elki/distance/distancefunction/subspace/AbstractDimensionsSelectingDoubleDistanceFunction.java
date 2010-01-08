@@ -5,6 +5,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -55,7 +56,7 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
         dimensions.set(d - 1);
       }
     }
-
+    
     return remainingParameters;
   }
 
@@ -77,7 +78,7 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
    * @param dimensions a BitSet designating the new selected dimensions
    */
   public void setSelectedDimensions(BitSet dimensions) {
-    String s = dimensions.toString().replace("{", "").replace("}", "").replace(" ", "");
+    String s = Util.parseSelectedBits(dimensions, ",");
     try {
       this.DIMS_PARAM.setValue(s);
     }
