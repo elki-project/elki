@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -54,7 +55,7 @@ public class ClusterOrderVisualizer<NV extends NumberVector<NV,?>> extends Proje
     Element layer = super.setupCanvas(svgp, proj, width, height);
     
     CSSClass cls = new CSSClass(this, CSSNAME);
-    context.getLineStyleLibrary().formatCSSClass(cls, 0, 0.001);
+    context.getLineStyleLibrary().formatCSSClass(cls, 0, 0.005 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
     
     try {
       svgp.getCSSClassManager().addClass(cls);

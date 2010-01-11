@@ -3,11 +3,18 @@ package de.lmu.ifi.dbs.elki.visualization.gui.overview;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
 
+// FIXME: JavaDoc
 public class VisualizationLabel extends VisualizationInfo {
+  // FIXME: use shared library
+  StyleLibrary style = new PropertiesBasedStyleLibrary();
+  
   String label;
   
   public VisualizationLabel(String label, double width, double height) {
@@ -38,9 +45,14 @@ public class VisualizationLabel extends VisualizationInfo {
 
   @Override
   public Element makeElement(SVGPlot plot) {
-    double fontsize = .1;
+    CSSClass cls = new CSSClass(plot,"unmanaged");
+    double fontsize = .1 * style.getTextSize("overview.labels");
+    cls.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, fontsize);
+    cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getTextColor("overview.labels"));
+    cls.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, style.getFontFamily("overview.labels"));
+    
     Element text = plot.svgText(width/2, height/2 + .35*fontsize, this.label);
-    SVGUtil.setAtt(text, SVGConstants.SVG_STYLE_ATTRIBUTE, "fill:black; font-size:"+fontsize+"; font-family: 'Times New Roman', sans-serif");
+    SVGUtil.setAtt(text, SVGConstants.SVG_STYLE_ATTRIBUTE, cls.inlineCSS());
     SVGUtil.setAtt(text, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_MIDDLE_VALUE);
     return text;
   }

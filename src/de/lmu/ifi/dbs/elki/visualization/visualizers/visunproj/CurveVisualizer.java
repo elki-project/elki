@@ -15,6 +15,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
@@ -106,7 +107,7 @@ public class CurveVisualizer extends AbstractVisualizer implements UnprojectedVi
     for(Pair<Double, Double> pair : curve) {
       final double x = scalex.getScaled(pair.getFirst());
       final double y = scaley.getScaled(pair.getSecond());
-      path.drawTo(ratio * x, 1.0 - y);
+      path.drawTo(ratio * x * 2, 2.0 - y * 2);
     }
     Element line = path.makeElement(svgp);
     line.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, SERIESID);
@@ -114,8 +115,8 @@ public class CurveVisualizer extends AbstractVisualizer implements UnprojectedVi
     Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
     // add axes
     try {
-      SVGSimpleLinearAxis.drawAxis(svgp, layer, scalex, 0, 1, 1, 1, true, true);
-      SVGSimpleLinearAxis.drawAxis(svgp, layer, scaley, 0, 1, 0, 0, true, false);
+      SVGSimpleLinearAxis.drawAxis(svgp, layer, scalex, 0, 2, 2, 2, true, true, context.getStyleLibrary());
+      SVGSimpleLinearAxis.drawAxis(svgp, layer, scaley, 0, 2, 0, 0, true, false, context.getStyleLibrary());
     }
     catch(CSSNamingConflict e) {
       logger.exception(e);
@@ -125,7 +126,7 @@ public class CurveVisualizer extends AbstractVisualizer implements UnprojectedVi
 
     // add a slight border
     // FIXME: use width, height!
-    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "scale(0.9) translate(0.08 0.02)");
+    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "scale(0.45) translate(0.16 0.08)");
 
     return layer;
   }
@@ -141,7 +142,7 @@ public class CurveVisualizer extends AbstractVisualizer implements UnprojectedVi
       CSSClass csscls = new CSSClass(this, SERIESID);
       //csscls.setStatement(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, "0.2%");
       csscls.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, SVGConstants.SVG_NONE_VALUE);
-      context.getLineStyleLibrary().formatCSSClass(csscls, 0, 0.005);
+      context.getLineStyleLibrary().formatCSSClass(csscls, 0, 0.01 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
       svgp.getCSSClassManager().addClass(csscls);
     }
     catch(CSSNamingConflict e) {

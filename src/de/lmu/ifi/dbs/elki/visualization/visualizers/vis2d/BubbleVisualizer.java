@@ -25,8 +25,10 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.GammaScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.LinearScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.StaticScalingFunction;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
+import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -203,6 +205,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
    * @param svgp the SVGPlot to register the Tooltip-CSS-Class.
    */
   private void setupCSS(SVGPlot svgp) {
+    ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
     
     // creating IDs manually because cluster often return a null-ID.
     int clusterID = 0;
@@ -210,14 +213,14 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
     for (@SuppressWarnings("unused") Cluster<Model> cluster : clustering.getAllClusters()){
       
       CSSClass bubble = new CSSClass(svgp, BUBBLE + clusterID);
-      bubble.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, "0.005");
+      bubble.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.005 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
       
       String color;
       
       if (clustering.getAllClusters().size() == 1){
         color = "black";
       } else {
-        color = context.getColorLibrary().getColor(clusterID);
+        color = colors.getColor(clusterID);
       }
       
       if(fill) {
@@ -227,7 +230,7 @@ public class BubbleVisualizer<NV extends NumberVector<NV, ?>> extends Projection
       else {
         // for diamond-shaped strokes, see bugs.sun.com, bug ID 6294396
         bubble.setStatement(SVGConstants.CSS_STROKE_VALUE, color);
-        bubble.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.0);
+        bubble.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
       }
       
       // TODO: try/catch-structure is equal for almost all Visualizers, maybe

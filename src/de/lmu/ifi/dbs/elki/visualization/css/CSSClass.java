@@ -263,4 +263,15 @@ public class CSSClass {
      */
     private static final long serialVersionUID = 3130536799704124363L;
   }
+
+  public String inlineCSS() {
+    StringBuffer buf = new StringBuffer();
+    for (Pair<String, String> pair : statements) {
+      buf.append(pair.getFirst());
+      buf.append(":");
+      buf.append(pair.getSecond());
+      buf.append(";");
+    }
+    return buf.toString();
+  }
 }

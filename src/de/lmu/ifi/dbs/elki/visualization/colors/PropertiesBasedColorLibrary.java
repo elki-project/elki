@@ -14,6 +14,7 @@ import de.lmu.ifi.dbs.elki.utilities.FileUtil;
  * 
  * @author Erich Schubert
  */
+@Deprecated
 public class PropertiesBasedColorLibrary implements ColorLibrary {
   /**
    * Logger
@@ -111,7 +112,9 @@ public class PropertiesBasedColorLibrary implements ColorLibrary {
     return colors.length;
   }
 
+  @SuppressWarnings("deprecation")
   @Override
+  @Deprecated
   public String getNamedColor(String name) {
     return this.properties.getProperty(name);
   }

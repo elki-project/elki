@@ -47,6 +47,8 @@ public class SettingsVisualizer extends AbstractVisualizer implements Unprojecte
     List<AttributeSettings> settings = ResultUtil.getGlobalAssociation(context.getResult(), AssociationID.META_SETTINGS);
 
     Element layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
+    
+    // FIXME: use CSSClass and StyleLibrary
 
     int i = 0;
     for(AttributeSettings setting : settings) {
