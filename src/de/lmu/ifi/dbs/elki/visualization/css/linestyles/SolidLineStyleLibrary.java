@@ -5,6 +5,7 @@ import org.apache.batik.util.CSSConstants;
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 
 /**
  * Line style library featuring solid lines for default styles only
@@ -30,9 +31,9 @@ public class SolidLineStyleLibrary implements LineStyleLibrary {
    * 
    * @param colors Color library to use.
    */
-  public SolidLineStyleLibrary(ColorLibrary colors) {
+  public SolidLineStyleLibrary(StyleLibrary style) {
     super();
-    this.colors = colors;
+    this.colors = style.getColorSet(StyleLibrary.PLOT);
   }
 
   @Override

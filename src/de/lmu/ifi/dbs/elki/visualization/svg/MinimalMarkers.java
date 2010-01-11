@@ -4,7 +4,8 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
-import de.lmu.ifi.dbs.elki.visualization.colors.PropertiesBasedColorLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 
 /**
  * Simple marker library that just draws colored crosses at the given coordinates.
@@ -21,35 +22,30 @@ public class MinimalMarkers implements MarkerLibrary {
   /**
    * Constructor
    */
-  public MinimalMarkers(ColorLibrary colors) {
+  public MinimalMarkers(StyleLibrary style) {
     super();
-    this.colors = colors;
+    this.colors = style.getColorSet(StyleLibrary.PLOT);
   }
 
   /**
    * Constructor
    */
   public MinimalMarkers() {
-    this(new PropertiesBasedColorLibrary());
+    this(new PropertiesBasedStyleLibrary());
   }
 
   /**
    * Use a given marker on the document.
    */
-  public Element useMarker(SVGPlot plot, Element parent, double x, double y, int style, double size) {
+  public Element useMarker(SVGPlot plot, Element parent, double x, double y, int stylenr, double size) {
     Element marker = plot.svgRect(x - size / 2, y - size / 2, size, size);
-    SVGUtil.setStyle(marker, SVGConstants.CSS_FILL_PROPERTY+":" + colors.getColor(style));
+    SVGUtil.setStyle(marker, SVGConstants.CSS_FILL_PROPERTY+":" + colors.getColor(stylenr));
     parent.appendChild(marker);
     return marker;
   }
 
   @Override
-  public void setColorLibrary(ColorLibrary colors) {
-    this.colors = colors;
-  }
-
-  @Override
-  public ColorLibrary getColorLibrary() {
-    return this.colors;
+  public void setStyleLibrary(StyleLibrary style) {
+    this.colors = style.getColorSet(StyleLibrary.PLOT);
   }
 }

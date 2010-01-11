@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerContext;
@@ -76,7 +77,7 @@ public class ReferencePointsVisualizer<NV extends NumberVector<NV, ?>> extends P
     while(iter.hasNext()) {
       NV v = iter.next();
       Vector projected = proj.projectDataToRenderSpace(v);
-      Element dot = SVGUtil.svgCircle(svgp.getDocument(), projected.get(0), projected.get(1), 0.005);
+      Element dot = SVGUtil.svgCircle(svgp.getDocument(), projected.get(0), projected.get(1), 0.005 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
       SVGUtil.addCSSClass(dot, REFPOINT);
       layer.appendChild(dot);
     }

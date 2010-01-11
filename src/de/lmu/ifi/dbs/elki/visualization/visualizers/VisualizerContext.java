@@ -10,10 +10,10 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.AnyMap;
-import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
-import de.lmu.ifi.dbs.elki.visualization.colors.PropertiesBasedColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.linestyles.DashedLineStyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.linestyles.LineStyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.MarkerLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.PrettyMarkers;
 
@@ -54,6 +54,11 @@ public class VisualizerContext extends AnyMap<String> {
    * Identifier for the main line library to use.
    */
   public static final String LINESTYLE_LIBRARY = "linelibrary";
+
+  /**
+   * Identifier for the main style library to use.
+   */
+  public static final String STYLE_LIBRARY = "stylelibrary";
 
   /**
    * Identifier for the primary clustering to use.
@@ -102,20 +107,6 @@ public class VisualizerContext extends AnyMap<String> {
   }
 
   /**
-   * Convenience method to get the current color library, or use a default.
-   * 
-   * @return Color library
-   */
-  public ColorLibrary getColorLibrary() {
-    ColorLibrary lib = get(COLOR_LIBRARY, ColorLibrary.class);
-    if(lib == null) {
-      lib = new PropertiesBasedColorLibrary();
-      put(COLOR_LIBRARY, lib);
-    }
-    return lib;
-  }
-
-  /**
    * Convenience method to get the current marker
    * 
    * @return Marker library
@@ -123,7 +114,7 @@ public class VisualizerContext extends AnyMap<String> {
   public MarkerLibrary getMarkerLibrary() {
     MarkerLibrary lib = get(MARKER_LIBRARY, MarkerLibrary.class);
     if(lib == null) {
-      lib = new PrettyMarkers(getColorLibrary());
+      lib = new PrettyMarkers(getStyleLibrary());
       put(MARKER_LIBRARY, lib);
     }
     return lib;
@@ -137,8 +128,22 @@ public class VisualizerContext extends AnyMap<String> {
   public LineStyleLibrary getLineStyleLibrary() {
     LineStyleLibrary lib = get(LINESTYLE_LIBRARY, LineStyleLibrary.class);
     if(lib == null) {
-      lib = new DashedLineStyleLibrary(getColorLibrary());
+      lib = new DashedLineStyleLibrary(getStyleLibrary());
       put(LINESTYLE_LIBRARY, lib);
+    }
+    return lib;
+  }
+  
+  /**
+   * Get the style library
+   * 
+   * @return style library
+   */
+  public StyleLibrary getStyleLibrary() {
+    StyleLibrary lib = get(STYLE_LIBRARY, StyleLibrary.class);
+    if(lib == null) {
+      lib = new PropertiesBasedStyleLibrary();
+      put(STYLE_LIBRARY, lib);
     }
     return lib;
   }

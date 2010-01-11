@@ -20,9 +20,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
+import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
@@ -104,16 +106,18 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
    * @param numc Number of classes we need.
    */
   private void setupCSS(SVGPlot svgp, int numc) {
+    ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
+    
     CSSClass allInOne = new CSSClass(svgp, BIN + -1);
-    if(row) {
-      allInOne.setStatement(SVGConstants.CSS_FILL_PROPERTY, "black");
-      allInOne.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 1.0);
-    }
-    else {
-      allInOne.setStatement(SVGConstants.CSS_STROKE_PROPERTY, "black");
-      allInOne.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.005);
-      allInOne.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.0);
-    }
+    //if(row) {
+    //  allInOne.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_BLACK_VALUE);
+      //allInOne.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 1.0);
+    //}
+    //else {
+      allInOne.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_BLACK_VALUE);
+      allInOne.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.005 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+      allInOne.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
+    //}
     try {
       svgp.getCSSClassManager().addClass(allInOne);
     }
@@ -125,11 +129,11 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
       CSSClass bin = new CSSClass(svgp, BIN + clusterID);
 
       if(row) {
-        bin.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getColorLibrary().getColor(clusterID));
+        bin.setStatement(SVGConstants.CSS_FILL_PROPERTY, colors.getColor(clusterID));
       }
       else {
-        bin.setStatement(SVGConstants.CSS_STROKE_PROPERTY, context.getColorLibrary().getColor(clusterID));
-        bin.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.005);
+        bin.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(clusterID));
+        bin.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.005 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
         bin.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
       }
 
@@ -196,7 +200,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
 
     // Axis. TODO: Use AxisVisualizer for this?
     try {
-      SVGSimpleLinearAxis.drawAxis(svgp, layer, yscale, -1, 1, -1, -1, true, false);
+      SVGSimpleLinearAxis.drawAxis(svgp, layer, yscale, -1, 1, -1, -1, true, false, context.getStyleLibrary());
       
       // draw axes that are non-trivial
       Vector orig = proj.projectScaledToRender(new Vector(database.dimensionality()));
@@ -206,7 +210,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
         // projected endpoint of axis
         Vector ax = proj.projectScaledToRender(v);
         if(ax.get(0) != orig.get(0)) {
-          SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(d), orig.get(0), 1, ax.get(0), 1, true, true);
+          SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(d), orig.get(0), 1, ax.get(0), 1, true, true, context.getStyleLibrary());
         }
       }
       //SVGSimpleLinearAxis.drawAxis(svgp, layer, xscale, -1, 1, 1, 1, true, true);

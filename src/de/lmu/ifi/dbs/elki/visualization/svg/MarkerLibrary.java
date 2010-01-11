@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.visualization.svg;
 
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 
 
 /**
@@ -31,16 +31,9 @@ public interface MarkerLibrary {
   public Element useMarker(SVGPlot plot, Element parent, double x, double y, int style, double size);
   
   /**
-   * Set the color library for this marker library.
+   * Set the style library for this marker library.
    * 
-   * @param colors New color library to use.
+   * @param style New style library to use.
    */
-  public void setColorLibrary(ColorLibrary colors);
-  
-  /**
-   * Get the color library of this marker library.
-   * 
-   * @return Color library in use.
-   */
-  public ColorLibrary getColorLibrary();
+  public void setStyleLibrary(StyleLibrary style);
 }

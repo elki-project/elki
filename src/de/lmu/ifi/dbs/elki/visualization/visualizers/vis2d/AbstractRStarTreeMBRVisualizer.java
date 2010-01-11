@@ -19,8 +19,10 @@ import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
+import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -81,6 +83,7 @@ public class AbstractRStarTreeMBRVisualizer<NV extends NumberVector<NV, ?>, N ex
 
   @Override
   public Element visualize(SVGPlot svgp, VisualizationProjection proj, double width, double height) {
+    ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
     Element layer = super.setupCanvas(svgp, proj, width, height);
     AbstractRStarTree<NV, N, E> rtree = findRStarTree(context);
     if(rtree != null) {
@@ -88,8 +91,8 @@ public class AbstractRStarTreeMBRVisualizer<NV extends NumberVector<NV, ?>, N ex
       try {
         for(int i = 0; i < rtree.getHeight(); i++) {
           CSSClass cls = new CSSClass(this, INDEX + i);
-          cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, context.getColorLibrary().getColor(i));
-          cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.002);
+          cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(i));
+          cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.002 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
           cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
           svgp.getCSSClassManager().addClass(cls);
         }

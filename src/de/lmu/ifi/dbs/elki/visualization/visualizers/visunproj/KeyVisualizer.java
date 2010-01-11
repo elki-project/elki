@@ -48,6 +48,8 @@ public class KeyVisualizer extends AbstractVisualizer implements UnprojectedVisu
     final List<Cluster<Model>> allcs = clustering.getAllClusters();
     int numc = allcs.size();
     
+    // FIXME: Use CSS and style library.
+    
     Element layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
     
     MarkerLibrary ml = context.getMarkerLibrary();

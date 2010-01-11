@@ -18,8 +18,10 @@ import de.lmu.ifi.dbs.elki.distance.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.ClusterOrderResult;
+import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -71,6 +73,8 @@ public class OPTICSPlotVisualizer<D extends NumberDistance<D,?>> extends Abstrac
   }
   
   private void makePlot() throws IOException {
+    ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
+
     List<ClusterOrderEntry<D>> order = co.getClusterOrder();
     
     // FIXME: always use a label based clustering? 
@@ -85,11 +89,11 @@ public class OPTICSPlotVisualizer<D extends NumberDistance<D,?>> extends Abstrac
     }
     int cols[] = new int[cnum];
     for (int i = 0; i < cnum; i++) {
-      Color color = SVGUtil.stringToColor(context.getColorLibrary().getColor(i));
+      Color color = SVGUtil.stringToColor(colors.getColor(i));
       if (color != null) {
         cols[i] = color.getRGB();
       } else {
-        logger.warning("Could not parse color: "+context.getColorLibrary().getColor(i));
+        logger.warning("Could not parse color: "+colors.getColor(i));
         cols[i] = 0x7F7F7F7F;
       }
     }
@@ -165,8 +169,8 @@ public class OPTICSPlotVisualizer<D extends NumberDistance<D,?>> extends Abstrac
     layer.appendChild(itag);
     
     try {
-      SVGSimpleLinearAxis.drawAxis(svgp, layer, scale, 0, ratio*imgratio, 0, 0, true, false);
-      SVGSimpleLinearAxis.drawAxis(svgp, layer, scale, ratio, ratio*imgratio, ratio, 0, true, true);
+      SVGSimpleLinearAxis.drawAxis(svgp, layer, scale, 0, ratio*imgratio, 0, 0, true, false, context.getStyleLibrary());
+      SVGSimpleLinearAxis.drawAxis(svgp, layer, scale, ratio, ratio*imgratio, ratio, 0, true, true, context.getStyleLibrary());
     }
     catch(CSSNamingConflict e) {
       logger.exception("CSS naming conflict for axes on OPTICS plot", e);

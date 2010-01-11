@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProjection;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualizer;
@@ -62,7 +63,7 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
    * undefined.
    */
   private AnnotationResult<? extends Number> anResult;
-  
+
   /**
    * Constructor.
    */
@@ -101,18 +102,20 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
    * @param svgp the SVGPlot to register the Tooltip-CSS-Class.
    */
   private void setupCSS(SVGPlot svgp) {
+    double fontsize = 0.03 * context.getStyleLibrary().getTextSize(StyleLibrary.PLOT);
+
     CSSClass tooltiphidden = new CSSClass(svgp, TOOLTIP_HIDDEN);
-    tooltiphidden.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, "0.3%");
-    tooltiphidden.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, "\"Times New Roman\", serif");
+    tooltiphidden.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, fontsize);
+    tooltiphidden.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, context.getStyleLibrary().getFontFamily(StyleLibrary.PLOT));
     tooltiphidden.setStatement(SVGConstants.CSS_DISPLAY_PROPERTY, SVGConstants.CSS_NONE_VALUE);
 
     CSSClass tooltipvisible = new CSSClass(svgp, TOOLTIP_VISIBLE);
-    tooltipvisible.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, "0.3%");
-    tooltipvisible.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, "\"Times New Roman\", serif");
+    tooltipvisible.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, fontsize);
+    tooltipvisible.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, context.getStyleLibrary().getFontFamily(StyleLibrary.PLOT));
 
     CSSClass tooltipsticky = new CSSClass(svgp, TOOLTIP_STICKY);
-    tooltipsticky.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, "0.3%");
-    tooltipsticky.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, "\"Times New Roman\", serif");
+    tooltipsticky.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, fontsize);
+    tooltipsticky.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, context.getStyleLibrary().getFontFamily(StyleLibrary.PLOT));
 
     // invisible but sensitive area for the tooltip activator
     CSSClass tooltiparea = new CSSClass(svgp, TOOLTIP_AREA);
@@ -137,6 +140,9 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
     Element layer = super.setupCanvas(svgp, proj, width, height);
     setupCSS(svgp);
 
+    double dotsize = 0.05 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT);
+    double fontsize = 0.03 * context.getStyleLibrary().getTextSize(StyleLibrary.PLOT);
+
     EventListener hoverer = new EventListener() {
       @Override
       public void handleEvent(Event evt) {
@@ -147,7 +153,7 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
     Database<NV> database = context.getDatabase();
     for(int id : database) {
       Vector v = proj.projectDataToRenderSpace(database.get(id));
-      Element tooltip = svgp.svgText(v.get(0) + 0.005, v.get(1) + 0.003, FormatUtil.NF2.format(getValue(id).doubleValue()));
+      Element tooltip = svgp.svgText(v.get(0) + dotsize * 0.1, v.get(1) + fontsize * 0.7, FormatUtil.NF2.format(getValue(id).doubleValue()));
       SVGUtil.addCSSClass(tooltip, TOOLTIP_HIDDEN);
 
       // sensitive area.

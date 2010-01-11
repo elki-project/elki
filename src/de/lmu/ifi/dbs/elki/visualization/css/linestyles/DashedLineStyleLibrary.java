@@ -5,6 +5,7 @@ import org.apache.batik.util.CSSConstants;
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 
 /**
  * Line library using various dashed and dotted line styles.
@@ -21,6 +22,9 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
  *
  */
 public class DashedLineStyleLibrary implements LineStyleLibrary {
+  /**
+   * The style library we use for colors
+   */
   private ColorLibrary colors;
 
   /** Dash patterns to regularly use */
@@ -40,9 +44,9 @@ public class DashedLineStyleLibrary implements LineStyleLibrary {
 
   private int dashnum = dashpatterns.length;
   
-  public DashedLineStyleLibrary(ColorLibrary colors) {
+  public DashedLineStyleLibrary(StyleLibrary style) {
     super();
-    this.colors = colors;
+    this.colors = style.getColorSet(StyleLibrary.PLOT);
     // TODO: Do a divisor-check to optimize colors * styles combinations?
   }
 

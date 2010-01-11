@@ -54,6 +54,8 @@ import de.lmu.ifi.dbs.elki.visualization.batikutil.NodeReplacer;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.savedialog.SVGSaveDialog;
 import de.lmu.ifi.dbs.elki.visualization.scales.LinearScale;
+import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
@@ -383,7 +385,8 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
       updateSize();
 
       try {
-        SVGSimpleLinearAxis.drawAxis(plot, viewport, this.s, 0.0, 1.0, 0.0, 0.0, true, false);
+        StyleLibrary style = new PropertiesBasedStyleLibrary();
+        SVGSimpleLinearAxis.drawAxis(plot, viewport, this.s, 0.0, 1.0, 0.0, 0.0, true, false, style);
       }
       catch(CSSNamingConflict e) {
         logger.exception(e);

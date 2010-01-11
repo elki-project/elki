@@ -5,6 +5,8 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.colors.PropertiesBasedColorLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 
 /**
  * Marker library achieving a larger number of styles by combining different
@@ -34,9 +36,9 @@ public class PrettyMarkers implements MarkerLibrary {
    * @param prefix prefix to use.
    * @param colors color library to use
    */
-  public PrettyMarkers(String prefix, ColorLibrary colors) {
+  public PrettyMarkers(String prefix, StyleLibrary style) {
     this.prefix = prefix;
-    this.colors = colors;
+    this.colors = style.getColorSet(StyleLibrary.PLOT);
   }
 
   /**
@@ -45,7 +47,7 @@ public class PrettyMarkers implements MarkerLibrary {
    * 
    * @param colors color library to use
    */
-  public PrettyMarkers(ColorLibrary colors) {
+  public PrettyMarkers(StyleLibrary colors) {
     this(DEFAULT_PREFIX, colors);
   }
 
@@ -56,7 +58,7 @@ public class PrettyMarkers implements MarkerLibrary {
    * @param prefix prefix to use.
    */
   public PrettyMarkers(String prefix) {
-    this(prefix, new PropertiesBasedColorLibrary());
+    this(prefix, new PropertiesBasedStyleLibrary());
   }
 
   /**
@@ -64,7 +66,7 @@ public class PrettyMarkers implements MarkerLibrary {
    * and a default {@link PropertiesBasedColorLibrary} as color library.
    */
   public PrettyMarkers() {
-    this(DEFAULT_PREFIX, new PropertiesBasedColorLibrary());
+    this(DEFAULT_PREFIX, new PropertiesBasedStyleLibrary());
   }
 
   /**
@@ -160,14 +162,14 @@ public class PrettyMarkers implements MarkerLibrary {
     if(existing == null) {
       Element symbol = plot.svgElement(SVGConstants.SVG_SYMBOL_TAG);
       SVGUtil.setAtt(symbol, SVGConstants.SVG_ID_ATTRIBUTE, id);
-      plotMarker(plot, symbol, 2*size, 2*size, style, 2*size);
+      plotMarker(plot, symbol, 2 * size, 2 * size, style, 2 * size);
       plot.getDefs().appendChild(symbol);
       plot.putIdElement(id, symbol);
     }
     Element use = plot.svgElement(SVGConstants.SVG_USE_TAG);
     use.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, "#" + id);
-    SVGUtil.setAtt(use, SVGConstants.SVG_X_ATTRIBUTE, x - 2*size);
-    SVGUtil.setAtt(use, SVGConstants.SVG_Y_ATTRIBUTE, y - 2*size);
+    SVGUtil.setAtt(use, SVGConstants.SVG_X_ATTRIBUTE, x - 2 * size);
+    SVGUtil.setAtt(use, SVGConstants.SVG_Y_ATTRIBUTE, y - 2 * size);
     if(parent != null) {
       parent.appendChild(use);
     }
@@ -175,12 +177,7 @@ public class PrettyMarkers implements MarkerLibrary {
   }
 
   @Override
-  public void setColorLibrary(ColorLibrary colors) {
-    this.colors = colors;
-  }
-
-  @Override
-  public ColorLibrary getColorLibrary() {
-    return this.colors;
+  public void setStyleLibrary(StyleLibrary style) {
+    this.colors = style.getColorSet(StyleLibrary.PLOT);
   }
 }

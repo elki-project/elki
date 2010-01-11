@@ -64,7 +64,7 @@ public class AxisVisualizer<NV extends NumberVector<NV, ?>> extends Projection2D
       //System.err.println(ax.get(0) + " "+ ax.get(1)+ " "+(axa*180/Math.PI)+" "+(diaga*180/Math.PI));
       if(ax.get(0) != orig.get(0) || ax.get(1) != orig.get(1)) {
         try {
-          SVGSimpleLinearAxis.drawAxis(plot, layer, proj.getScale(d), orig.get(0), orig.get(1), ax.get(0), ax.get(1), true, righthand);
+          SVGSimpleLinearAxis.drawAxis(plot, layer, proj.getScale(d), orig.get(0), orig.get(1), ax.get(0), ax.get(1), true, righthand, context.getStyleLibrary());
         }
         catch(CSSNamingConflict e) {
           throw new RuntimeException("Conflict in CSS naming for axes.", e);
