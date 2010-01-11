@@ -43,11 +43,4 @@ public class ListBasedColorLibrary implements ColorLibrary {
   protected String getName() {
     return name;
   }
-
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public String getNamedColor(@SuppressWarnings("unused") String name) {
-    return "magenta";
-  }
 }

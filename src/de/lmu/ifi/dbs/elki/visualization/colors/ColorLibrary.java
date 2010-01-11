@@ -56,13 +56,4 @@ public interface ColorLibrary {
    * @return color in hexadecimal notation (#aabbcc) or color name ("red") as valid in CSS and SVG.
    */
   public String getColor(int index);
-  /**
-   * Retrieve named colors (e.g. "background")
-   * 
-   * @param name Reference name
-   * @return color in CSS/SVG valid format: hexadecimal (#aabbcc) or names such as "red"
-   * @deprecated Use the StyleLibrary API instead!
-   */
-  @Deprecated
-  public String getNamedColor(String name);
 }
