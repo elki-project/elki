@@ -154,6 +154,9 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
    */
   private Normalization<O> normalization = null;
 
+  /**
+   * KNN Explorer wrapper.
+   */
   public KNNExplorer() {
     super();
 
@@ -210,6 +213,11 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
     new KNNExplorer<DoubleVector, DoubleDistance, Double>().runCLIApplication(args);
   }
 
+  /**
+   * Main window of KNN Explorer. 
+   * 
+   * @author Erich Schubert
+   */
   class ExplorerWindow extends AbstractLoggable {
     /**
      * Default Window Title
@@ -275,6 +283,9 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
      */
     private DistanceFunction<O, N> distanceFunction;
 
+    /**
+     * Constructor.
+     */
     public ExplorerWindow() {
       super(false);
 
@@ -354,6 +365,9 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
       frame.addComponentListener(listener);
     }
 
+    /**
+     * Update the SVG plot size.
+     */
     public void updateSize() {
       SVGUtil.setAtt(plot.getRoot(), SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 " + ratio + " 1");
       SVGUtil.setAtt(viewport, SVGConstants.SVG_WIDTH_ATTRIBUTE, ratio);
@@ -361,6 +375,12 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
       SVGUtil.setAtt(viewport, SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "-0.1 -0.1 " + (ratio + 0.2) + " 1.2");
     }
 
+    /**
+     * Process the given Database and distance function.
+     * 
+     * @param db Database
+     * @param distanceFunction Distance function
+     */
     public void run(Database<O> db, DistanceFunction<O, N> distanceFunction) {
       this.db = db;
       this.dim = db.dimensionality();
@@ -410,6 +430,9 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
       frame.setVisible(true);
     }
 
+    /**
+     * Process the users new selection.
+     */
     protected void updateSelection() {
       Object[] sel = seriesList.getSelectedValues();
       // prepare replacement tag.
@@ -449,11 +472,24 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
       seriesList.repaint();
     }
 
+    /**
+     * Get the appropriate color for the given distance.
+     * 
+     * @param dist Distance
+     * @return Color
+     */
     Color getColor(double dist) {
       Color color = new Color((int) (255 * dist), 0, (int) (255 * (1.0 - dist)));
       return color;
     }
 
+    /**
+     * Plot a single time series.
+     * 
+     * @param idx Object index
+     * @param resolution Maximum number of steps to plot
+     * @return SVG element
+     */
     private Element plotSeries(int idx, int resolution) {
       O series = db.get(idx);
 
@@ -472,7 +508,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
     }
 
     /**
-     * FIXME: add JavaDoc
+     * Renderer for the labels, with coloring as in the plot.
      * 
      * @author Erich Schubert
      */
