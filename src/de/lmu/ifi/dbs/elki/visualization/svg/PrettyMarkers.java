@@ -4,7 +4,6 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
-import de.lmu.ifi.dbs.elki.visualization.colors.PropertiesBasedColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 
@@ -53,7 +52,7 @@ public class PrettyMarkers implements MarkerLibrary {
 
   /**
    * Constructor without a a {@link ColorLibrary}, will use a default
-   * {@link PropertiesBasedColorLibrary} as color library.
+   * {@link PropertiesBasedStyleLibrary} as style library.
    * 
    * @param prefix prefix to use.
    */
@@ -63,7 +62,7 @@ public class PrettyMarkers implements MarkerLibrary {
 
   /**
    * Constructor without arguments, will use {@link #DEFAULT_PREFIX} as prefix
-   * and a default {@link PropertiesBasedColorLibrary} as color library.
+   * and a default {@link PropertiesBasedStyleLibrary} as style library.
    */
   public PrettyMarkers() {
     this(DEFAULT_PREFIX, new PropertiesBasedStyleLibrary());
