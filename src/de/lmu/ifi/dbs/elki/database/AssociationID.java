@@ -10,7 +10,9 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.utilities.ConstantObject;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * An AssociationID is used by databases as a unique identifier for specific
@@ -103,7 +105,7 @@ public class AssociationID<C> extends ConstantObject<AssociationID<C>> {
   /**
    * Meta-data: algorithm settings
    */
-  public static final AssociationID<List<AttributeSettings>> META_SETTINGS = new AssociationID<List<AttributeSettings>>("meta setttings", List.class);
+  public static final AssociationID<List<Pair<Parameterizable, Option<?>>>> META_SETTINGS = new AssociationID<List<Pair<Parameterizable, Option<?>>>>("meta setttings", List.class);
 
   /**
    * The serial version UID.

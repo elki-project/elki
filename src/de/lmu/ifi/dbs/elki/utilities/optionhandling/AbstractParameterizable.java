@@ -150,8 +150,9 @@ public abstract class AbstractParameterizable extends AbstractLoggable implement
   /**
    * Returns the settings of all options assigned to the option handler.
    * @return the settings of all options assigned to the option handler
+   * @deprecated Use {@link #collectOptions} instead.
    */
-  // FIXME - legacy adapter. Retire and use collectOptions instead.
+  @Deprecated
   public List<AttributeSettings> getAttributeSettings() {
     List<AttributeSettings> settings = new ArrayList<AttributeSettings>();
     // collect all options

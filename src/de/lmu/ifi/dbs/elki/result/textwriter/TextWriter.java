@@ -41,7 +41,10 @@ import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterTriple;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterVector;
 import de.lmu.ifi.dbs.elki.utilities.HandlerList;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionHandler;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
 
@@ -104,7 +107,7 @@ public class TextWriter<O extends DatabaseObject> {
    * @param out the print stream where to write
    * @param settings the settings to be written into the header
    */
-  protected void printSettings(Database<O> db, TextWriterStream out, List<AttributeSettings> settings) {
+  protected void printSettings(Database<O> db, TextWriterStream out, List<Pair<Parameterizable, Option<?>>> settings) {
     out.commentPrintSeparator();
     out.commentPrintLn("Settings and meta information:");
     out.commentPrintLn("db size = " + db.size());
@@ -119,11 +122,27 @@ public class TextWriter<O extends DatabaseObject> {
     out.commentPrintLn("");
 
     if(settings != null) {
-      for(AttributeSettings setting : settings) {
-        if(!setting.getSettings().isEmpty()) {
-          out.commentPrintLn(setting.toString());
-          out.commentPrintLn("");
+      Parameterizable last = null;
+      for(Pair<Parameterizable, Option<?>> setting : settings) {
+        if(setting.first != last) {
+          if(last != null) {
+            out.commentPrintLn("");
+          }
+          out.commentPrintLn(setting.first.getClass());
+          last = setting.first;
         }
+        String name = setting.second.getOptionID().getName();
+        String value;
+        try {
+          value = setting.second.getValue().toString();
+        }
+        catch(NullPointerException e) {
+          value = "[null]";
+        }
+        catch(UnusedParameterException e) {
+          value = "[unset]";
+        }
+        out.commentPrintLn(OptionHandler.OPTION_PREFIX + name + " " + value);
       }
     }
 
@@ -153,8 +172,8 @@ public class TextWriter<O extends DatabaseObject> {
     ro = ResultUtil.getOrderingResults(r);
     rc = ResultUtil.getClusteringResults(r);
     ri = ResultUtil.getIterableResults(r);
-    
-    if (r instanceof MultiResult) {
+
+    if(r instanceof MultiResult) {
       rm = (MultiResult) r;
     }
 
@@ -177,7 +196,7 @@ public class TextWriter<O extends DatabaseObject> {
       }
     }
 
-    List<AttributeSettings> settings = ResultUtil.getGlobalAssociation(r, AssociationID.META_SETTINGS);
+    List<Pair<Parameterizable, Option<?>>> settings = ResultUtil.getGlobalAssociation(r, AssociationID.META_SETTINGS);
 
     if(ri != null && ri.size() > 0) {
       // TODO: associations are not passed to ri results.
@@ -217,7 +236,7 @@ public class TextWriter<O extends DatabaseObject> {
     out.flush();
   }
 
-  private void writeGroupResult(Database<O> db, StreamFactory streamOpener, DatabaseObjectGroup group, List<AnnotationResult<?>> ra, List<OrderingResult> ro, NamingScheme naming, List<AttributeSettings> settings) throws FileNotFoundException, UnableToComplyException, IOException {
+  private void writeGroupResult(Database<O> db, StreamFactory streamOpener, DatabaseObjectGroup group, List<AnnotationResult<?>> ra, List<OrderingResult> ro, NamingScheme naming, List<Pair<Parameterizable, Option<?>>> settings) throws FileNotFoundException, UnableToComplyException, IOException {
     String filename = null;
     // for clusters, use naming.
     if(group instanceof Cluster) {

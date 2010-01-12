@@ -15,11 +15,12 @@ import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSetting;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.adapter.AlgorithmAdapter;
 
 /**
@@ -38,12 +39,12 @@ public class VisualizersForResult extends AbstractParameterizable {
    * (Result-to-visualization) Adapters
    */
   private Collection<AlgorithmAdapter> adapters;
-  
+
   /**
    * Visualizer instances.
    */
   private Collection<Visualizer> visualizers;
-  
+
   /**
    * Constructor. No parameters: AbstractParameterizable
    */
@@ -52,7 +53,7 @@ public class VisualizersForResult extends AbstractParameterizable {
     this.adapters = collectAlgorithmAdapters();
     this.visualizers = new ArrayList<Visualizer>();
   }
-  
+
   /**
    * Process a particular result.
    * 
@@ -61,18 +62,19 @@ public class VisualizersForResult extends AbstractParameterizable {
    */
   public void processResult(Database<? extends DatabaseObject> db, MultiResult result) {
     VisualizerContext context = new VisualizerContext(db, result);
-    
+
     // Collect all visualizers.
-    for (AlgorithmAdapter a: adapters){
-      if (a.canVisualize(context)){
-        // Note: this can throw an exception when setParameters() was not called!
+    for(AlgorithmAdapter a : adapters) {
+      if(a.canVisualize(context)) {
+        // Note: this can throw an exception when setParameters() was not
+        // called!
         Collection<Visualizer> avis = a.getUsableVisualizers(context);
-        //logger.debug("Got "+avis.size()+" visualizers from "+a.getClass().getName());
+        // logger.debug("Got "+avis.size()+" visualizers from "+a.getClass().getName());
         this.visualizers.addAll(avis);
       }
     }
   }
-  
+
   /**
    * Get the visualizers found.
    * 
@@ -90,12 +92,13 @@ public class VisualizersForResult extends AbstractParameterizable {
    */
   private static Collection<AlgorithmAdapter> collectAlgorithmAdapters() {
     ArrayList<AlgorithmAdapter> algorithmAdapters = new ArrayList<AlgorithmAdapter>();
-    for (Class<?> c : InspectionUtil.findAllImplementations(AlgorithmAdapter.class, false)){
+    for(Class<?> c : InspectionUtil.findAllImplementations(AlgorithmAdapter.class, false)) {
       try {
         AlgorithmAdapter a = (AlgorithmAdapter) c.newInstance();
         algorithmAdapters.add(a);
-      } catch (Exception e) {
-        logger.exception("Error instantiating AlgorithmAdapter "+c.getName(),e);
+      }
+      catch(Exception e) {
+        logger.exception("Error instantiating AlgorithmAdapter " + c.getName(), e);
       }
     }
     return algorithmAdapters;
@@ -105,21 +108,21 @@ public class VisualizersForResult extends AbstractParameterizable {
   public List<String> setParameters(List<String> args) throws ParameterException {
     List<String> remainingParameters = super.setParameters(args);
     List<String> usedParameters = new ArrayList<String>();
-    for (AlgorithmAdapter a : adapters){
+    for(AlgorithmAdapter a : adapters) {
       // parameterize if possible.
-      if (a instanceof Parameterizable) {
-        ((Parameterizable)a).setParameters(remainingParameters);
+      if(a instanceof Parameterizable) {
+        ((Parameterizable) a).setParameters(remainingParameters);
       }
-      for (Visualizer v : a.getProvidedVisualizers()){
+      for(Visualizer v : a.getProvidedVisualizers()) {
         v.setParameters(remainingParameters);
         usedParameters.addAll(v.getParameters());
         // TODO: collect the usable parameters somehow!
-        //addParameterizable(v);
+        // addParameterizable(v);
       }
     }
     // hack, this should be done with parameter understanding...
     remainingParameters.removeAll(usedParameters);
-    
+
     rememberParametersExcept(args, remainingParameters);
     return remainingParameters;
   }
@@ -132,52 +135,56 @@ public class VisualizersForResult extends AbstractParameterizable {
    * @return generated title
    */
   public String getTitle(Database<? extends DatabaseObject> db, MultiResult result) {
-    List<AttributeSettings> settings = ResultUtil.getGlobalAssociation(result, AssociationID.META_SETTINGS);
+    List<Pair<Parameterizable, Option<?>>> settings = ResultUtil.getGlobalAssociation(result, AssociationID.META_SETTINGS);
     String algorithm = null;
     String distance = null;
     String dataset = null;
-    for (AttributeSettings s : settings) {
-      for (AttributeSetting setting : s.getSettings()) {
-        if (setting.getName().equals(OptionID.ALGORITHM.getName())) {
-          algorithm = setting.getValue();
+
+    for(Pair<Parameterizable, Option<?>> setting : settings) {
+      try {
+        if(setting.second.equals(OptionID.ALGORITHM)) {
+          algorithm = setting.second.getValue().toString();
         }
-        if (setting.getName().equals(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID.getName())) {
-          distance = setting.getValue();
+        if(setting.second.equals(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID)) {
+          distance = setting.second.getValue().toString();
         }
-        if (setting.getName().equals(FileBasedDatabaseConnection.INPUT_ID.getName())) {
-          dataset = setting.getValue();
+        if(setting.second.equals(FileBasedDatabaseConnection.INPUT_ID)) {
+          dataset = setting.second.getValue().toString();
         }
+      }
+      catch(UnusedParameterException e) {
+        // Do nothing, the parameter wasn't set.
       }
     }
     StringBuilder buf = new StringBuilder();
-    if (algorithm != null) {
+    if(algorithm != null) {
       // shorten the algorithm
-      if (algorithm.contains(".")) {
-        algorithm = algorithm.substring(algorithm.lastIndexOf(".")+1);
+      if(algorithm.contains(".")) {
+        algorithm = algorithm.substring(algorithm.lastIndexOf(".") + 1);
       }
       buf.append(algorithm);
     }
-    if (distance != null) {
+    if(distance != null) {
       // shorten the distance
-      if (distance.contains(".")) {
-        distance = distance.substring(distance.lastIndexOf(".")+1);
+      if(distance.contains(".")) {
+        distance = distance.substring(distance.lastIndexOf(".") + 1);
       }
-      if (buf.length() > 0) {
+      if(buf.length() > 0) {
         buf.append(" using ");
       }
       buf.append(distance);
     }
-    if (dataset != null) {
+    if(dataset != null) {
       // shorten the data set filename
-      if (dataset.contains(File.separator)) {
-        dataset = dataset.substring(dataset.lastIndexOf(File.separator)+1);
+      if(dataset.contains(File.separator)) {
+        dataset = dataset.substring(dataset.lastIndexOf(File.separator) + 1);
       }
-      if (buf.length() > 0) {
+      if(buf.length() > 0) {
         buf.append(" on ");
       }
       buf.append(dataset);
     }
-    if (buf.length() > 0) {
+    if(buf.length() > 0) {
       return buf.toString();
     }
     return null;

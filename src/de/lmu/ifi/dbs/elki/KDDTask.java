@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
@@ -18,13 +19,15 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.ResultWriter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterFlagGlobalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Provides a KDDTask that can be used to perform any algorithm implementing
@@ -195,7 +198,7 @@ public class KDDTask<O extends DatabaseObject> extends AbstractApplication {
     result.prependResult(new AnnotationFromDatabase<ClassLabel, O>(db, AssociationID.CLASS));
     result.prependResult(new IDResult());
 
-    List<AttributeSettings> settings = getAttributeSettings();
+    ArrayList<Pair<Parameterizable, Option<?>>> settings = collectOptions();
     ResultUtil.setGlobalAssociation(result, AssociationID.META_SETTINGS, settings);
 
     if(normalizationUndo) {

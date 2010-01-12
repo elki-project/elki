@@ -7,8 +7,10 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSetting;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualizer;
@@ -44,28 +46,43 @@ public class SettingsVisualizer extends AbstractVisualizer implements Unprojecte
 
   @Override
   public Element visualize(SVGPlot svgp, double width, double height) {
-    List<AttributeSettings> settings = ResultUtil.getGlobalAssociation(context.getResult(), AssociationID.META_SETTINGS);
+    List<Pair<Parameterizable, Option<?>>> settings = ResultUtil.getGlobalAssociation(context.getResult(), AssociationID.META_SETTINGS);
 
     Element layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
-    
+
     // FIXME: use CSSClass and StyleLibrary
 
     int i = 0;
-    for(AttributeSettings setting : settings) {
-      Element object = svgp.svgText(0, i + 0.7, setting.getObject().getClass().getName());
-      object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; font-weight: bold");
-      layer.appendChild(object);
-      i++;
-      for(AttributeSetting set : setting.getSettings()) {
-        Element label = svgp.svgText(0, i + 0.7, set.getName());
-        label.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6");
-        layer.appendChild(label);
-        Element value = svgp.svgText(7.5, i + 0.7, set.getValue());
-        value.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6");
-        layer.appendChild(value);
-        // only advance once, since we want these two to be in the same line.
+    Parameterizable last = null;
+    for(Pair<Parameterizable, Option<?>> setting : settings) {
+      if(setting.first != last) {
+        Element object = svgp.svgText(0, i + 0.7, setting.first.getClass().getName());
+        object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; font-weight: bold");
+        layer.appendChild(object);
         i++;
+        last = setting.first;
       }
+      // get name and value
+      String name = setting.second.getOptionID().getName();
+      String value;
+      try {
+        value = setting.second.getValue().toString();
+      }
+      catch(NullPointerException e) {
+        value = "[null]";
+      }
+      catch(UnusedParameterException e) {
+        value = "[unset]";
+      }
+
+      Element label = svgp.svgText(0, i + 0.7, name);
+      label.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6");
+      layer.appendChild(label);
+      Element vale = svgp.svgText(7.5, i + 0.7, value);
+      vale.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6");
+      layer.appendChild(vale);
+      // only advance once, since we want these two to be in the same line.
+      i++;
     }
 
     int size = Math.max(i, 20);

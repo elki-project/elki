@@ -8,6 +8,8 @@ import java.util.List;
  * 
  * @author Elke Achtert
  */
+@Deprecated
+// TODO: remove
 public class AttributeSettings {
   /**
    * The settings of the attributes.
