@@ -131,36 +131,6 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
   }
 
   /**
-   * Writes the clustering result to the given stream.
-   * 
-   * @param outStream the stream to write to
-   * @param normalization Normalization to restore original values according to,
-   *        if this action is supported - may remain null.
-   * @param settings the settings to be written into the header
-   * @throws de.lmu.ifi.dbs.elki.utilities.UnableToComplyException if any
-   *         feature vector is not compatible with values initialized during
-   *         normalization
-   * @throws IOException
-   */
-  //TODO: remove
-  public void output(PrintStream outStream, Normalization<V> normalization, List<AttributeSettings> settings) throws UnableToComplyException, IOException {
-    //writeHeader(outStream, settings, null);
-
-    try {
-      LinearEquationSystem printSolution = getNormalizedLinearEquationSystem(normalization);
-      outStream.println("### " + this.getClass().getSimpleName() + ":");
-      outStream.println("### standardDeviation = " + standardDeviation);
-      outStream.println("### mean = " + centroid);
-      outStream.println(printSolution.equationsToString("###  ", nf.getMaximumFractionDigits()));
-      outStream.println("################################################################################");
-      // outStream.flush();
-    }
-    catch(NonNumericFeaturesException e) {
-      throw new UnableToComplyException(e);
-    }
-  }
-
-  /**
    * Returns the linear equation system for printing purposes. If normalization
    * is null the linear equation system is returned, otherwise the linear
    * equation system will be transformed according to the normalization.
