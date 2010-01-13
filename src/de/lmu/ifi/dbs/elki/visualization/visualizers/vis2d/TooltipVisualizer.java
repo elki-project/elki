@@ -140,7 +140,7 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
     Element layer = super.setupCanvas(svgp, proj, width, height);
     setupCSS(svgp);
 
-    double dotsize = 0.05 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT);
+    double dotsize = 0.01 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT);
     double fontsize = 0.03 * context.getStyleLibrary().getTextSize(StyleLibrary.PLOT);
 
     EventListener hoverer = new EventListener() {
@@ -153,11 +153,11 @@ public class TooltipVisualizer<NV extends NumberVector<NV, ?>> extends Projectio
     Database<NV> database = context.getDatabase();
     for(int id : database) {
       Vector v = proj.projectDataToRenderSpace(database.get(id));
-      Element tooltip = svgp.svgText(v.get(0) + dotsize * 0.1, v.get(1) + fontsize * 0.7, FormatUtil.NF2.format(getValue(id).doubleValue()));
+      Element tooltip = svgp.svgText(v.get(0) + dotsize, v.get(1) + fontsize * 0.07, FormatUtil.NF2.format(getValue(id).doubleValue()));
       SVGUtil.addCSSClass(tooltip, TOOLTIP_HIDDEN);
 
       // sensitive area.
-      Element area = svgp.svgCircle(v.get(0), v.get(1), 0.01);
+      Element area = svgp.svgCircle(v.get(0), v.get(1), dotsize);
       SVGUtil.addCSSClass(area, TOOLTIP_AREA);
 
       EventTarget targ = (EventTarget) area;
