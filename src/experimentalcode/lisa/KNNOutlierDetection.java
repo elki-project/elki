@@ -1,5 +1,6 @@
 package experimentalcode.lisa;
 
+import java.util.HashMap;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
@@ -8,147 +9,143 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.result.AnnotationFromDatabase;
-import de.lmu.ifi.dbs.elki.result.MultiResult;
-import de.lmu.ifi.dbs.elki.result.OrderingFromAssociation;
+import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
+import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
-
 /**
- * <p> Outlier Detection based on the distance of an object to its k nearest neighbor.</p>  
+ * <p>
+ * Outlier Detection based on the distance of an object to its k nearest
+ * neighbor.
+ * </p>
  * 
- * <p>Reference:<br>
- * S. Ramaswamy, R. Rastogi, K. Shim: Efficient Algorithms for Mining Outliers from Large Data Sets.</br>
- * In: Proc. of the Int. Conf. on Management of Data, Dallas, Texas, 2000.</p>
+ * <p>
+ * Reference:<br>
+ * S. Ramaswamy, R. Rastogi, K. Shim: Efficient Algorithms for Mining Outliers
+ * from Large Data Sets.</br> In: Proc. of the Int. Conf. on Management of Data,
+ * Dallas, Texas, 2000.
+ * </p>
  * 
  * @author Lisa Reichert
- *
+ * 
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  */
 
-public class KNNOutlierDetection <O extends DatabaseObject, D extends DoubleDistance> extends DistanceBasedAlgorithm<O , DoubleDistance , MultiResult> {
+public class KNNOutlierDetection<O extends DatabaseObject, D extends DoubleDistance> extends DistanceBasedAlgorithm<O, DoubleDistance, OutlierResult> {
   /**
    * The association id to associate the KNNO_KNNDISTANCE of an object for the
-   *KNN outlier detection algorithm.
+   * KNN outlier detection algorithm.
    */
-  public static final AssociationID<Double> KNNO_KNNDISTANCE= AssociationID.getOrCreateAssociationID("knno_knndistance", Double.class);
+  public static final AssociationID<Double> KNNO_KNNDISTANCE = AssociationID.getOrCreateAssociationID("knno_knndistance", Double.class);
+
   /**
-   * The association id to associate the KNNO_MAXODEGREE. Needed for the visualization. 
+   * The association id to associate the KNNO_MAXODEGREE. Needed for the
+   * visualization.
    */
   public static final AssociationID<Double> KNNO_MAXODEGREE = AssociationID.getOrCreateAssociationID("knno_maxodegree", Double.class);
 
   /**
    * OptionID for {@link #K_PARAM}
    */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID(
-          "knno.k",
-          "k nearest neighbor"
-      );
-  
+  public static final OptionID K_ID = OptionID.getOrCreateOptionID("knno.k", "k nearest neighbor");
+
   /**
-		   * Parameter to specify the k nearest neighbor,
-		   * 
-		   * <p>Key: {@code -knno.k} </p>
-		   */
-		  private final IntParameter K_PARAM = new IntParameter(K_ID);
-		  
-		  
-		  /**
-		   * Holds the value of {@link #K_PARAM}.
-		   */
-		  private int k;
+   * Parameter to specify the k nearest neighbor,
+   * 
+   * <p>
+   * Key: {@code -knno.k}
+   * </p>
+   */
+  private final IntParameter K_PARAM = new IntParameter(K_ID);
 
-		  /**
-		   * Provides the result of the algorithm.
-		   */
-		  MultiResult result;
+  /**
+   * Holds the value of {@link #K_PARAM}.
+   */
+  private int k;
 
-		  /**
-		   * Constructor, adding options to option handler.
-		   */
-		  public KNNOutlierDetection() {
-		    super();
-		    // kth nearest neighbor
-		    addOption(K_PARAM);
-		    }
-		  
-		  /**
-		   * Calls the super method
-		   * and sets additionally the values of the parameter
-		   * {@link #K_PARAM} 
-		   */
-		  @Override
-		  public List<String> setParameters(List<String> args) throws ParameterException {
-		      List<String> remainingParameters = super.setParameters(args);
-		      k = K_PARAM.getValue();
-			    return remainingParameters;
-		  }
+  /**
+   * Provides the result of the algorithm.
+   */
+  OutlierResult result;
 
-		  /**
-		   * Runs the algorithm in the timed evaluation part.
-		   */
+  /**
+   * Constructor, adding options to option handler.
+   */
+  public KNNOutlierDetection() {
+    super();
+    // kth nearest neighbor
+    addOption(K_PARAM);
+  }
 
-      @Override
-		  protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
-			  double maxodegree = 0;
-        getDistanceFunction().setDatabase(database, isVerbose(), isTime());
+  /**
+   * Calls the super method and sets additionally the values of the parameter
+   * {@link #K_PARAM}
+   */
+  @Override
+  public List<String> setParameters(List<String> args) throws ParameterException {
+    List<String> remainingParameters = super.setParameters(args);
+    k = K_PARAM.getValue();
+    return remainingParameters;
+  }
 
-        if(this.isVerbose()) {
-          this.verbose("computing outlier degree(distance to the k nearest neighbor");
-        }
-        FiniteProgress progressKNNDistance = new FiniteProgress("KNNOD_KNNDISTANCE for objects", database.size());
-        int counter = 0;
-        
-				// compute distance to the k nearest neighbor. 
-        for(Integer id : database){
-          counter++;
-				  //distance to the kth nearest neighbor
-				 Double dkn = database.kNNQueryForID(id,  k, getDistanceFunction()).get(k-1).getDistance().getValue();
+  /**
+   * Runs the algorithm in the timed evaluation part.
+   */
 
-		      if(dkn > maxodegree) {
-		        maxodegree = dkn;
-		      }
-				  database.associate(KNNO_KNNDISTANCE, id, dkn);
+  @Override
+  protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
+    double maxodegree = 0;
+    getDistanceFunction().setDatabase(database, isVerbose(), isTime());
 
-          if(this.isVerbose()) {
-            progressKNNDistance.setProcessed(counter);
-            this.progress(progressKNNDistance);
-          }
-        }
-			  AnnotationFromDatabase<Double, O> res1 = new AnnotationFromDatabase<Double, O>(database, KNNO_KNNDISTANCE);
-		        // Ordering
-		        OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database,KNNO_KNNDISTANCE, true); 
-		        // combine results.
-		        result = new MultiResult();
-		        result.addResult(res1);
-		        result.addResult(res2);
-		        ResultUtil.setGlobalAssociation(result, KNNO_MAXODEGREE, maxodegree);
-		        return result;
-				
+    if(this.isVerbose()) {
+      this.verbose("computing outlier degree(distance to the k nearest neighbor");
+    }
+    FiniteProgress progressKNNDistance = new FiniteProgress("KNNOD_KNNDISTANCE for objects", database.size());
+    int counter = 0;
 
-			 
-		  }
+    HashMap<Integer, Double> knno_score = new HashMap<Integer,Double>(database.size());
+    // compute distance to the k nearest neighbor.
+    for(Integer id : database) {
+      counter++;
+      // distance to the kth nearest neighbor
+      Double dkn = database.kNNQueryForID(id, k, getDistanceFunction()).get(k - 1).getDistance().getValue();
 
-		@Override
-		public Description getDescription() {
-		  return new Description(
-		      "KNN outlier detection",
-		      "Efficient Algorithms for Mining Outliers from Large Data Sets",
-		      "Outlier Detection based on the distance of an object to its k nearest neighbor.",
-		      "S. Ramaswamy, R. Rastogi, K. Shim: " +
-		      "Efficient Algorithms for Mining Outliers from Large Data Sets. " +
-		      "In: Proc. of the Int. Conf. on Management of Data, Dallas, Texas, 2000.");
-		}
+      if(dkn > maxodegree) {
+        maxodegree = dkn;
+      }
+      knno_score.put(id, dkn);
 
-		@Override
-		public MultiResult getResult() {
-			return result;
-		}}
-			  
-			  
-			  
+      if(this.isVerbose()) {
+        progressKNNDistance.setProcessed(counter);
+        this.progress(progressKNNDistance);
+      }
+    }
+    AnnotationFromHashMap<Double> res1 = new AnnotationFromHashMap<Double>(KNNO_KNNDISTANCE, knno_score);
+    OrderingFromHashMap<Double> res2 = new OrderingFromHashMap<Double>(knno_score, true);
+    OutlierScoreMeta meta = new BasicOutlierScoreMeta(Double.NaN, maxodegree, 0.0, Double.POSITIVE_INFINITY);
+    // combine results.
+    result = new OutlierResult(meta, res1, res2);
+    // TODO: remove, but is still used by lisas histogram classes.
+    ResultUtil.setGlobalAssociation(result, KNNO_MAXODEGREE, maxodegree);
+    return result;
+
+  }
+
+  @Override
+  public Description getDescription() {
+    return new Description("KNN outlier detection", "Efficient Algorithms for Mining Outliers from Large Data Sets", "Outlier Detection based on the distance of an object to its k nearest neighbor.", "S. Ramaswamy, R. Rastogi, K. Shim: " + "Efficient Algorithms for Mining Outliers from Large Data Sets. " + "In: Proc. of the Int. Conf. on Management of Data, Dallas, Texas, 2000.");
+  }
+
+  @Override
+  public OutlierResult getResult() {
+    return result;
+  }
+}
