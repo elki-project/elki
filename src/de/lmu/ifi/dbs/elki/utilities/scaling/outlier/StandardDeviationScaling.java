@@ -123,4 +123,14 @@ public class StandardDeviationScaling extends AbstractParameterizable implements
     rememberParametersExcept(args, remainingParameters);
     return remainingParameters;
   }
+  
+  @Override
+  public double getMin() {
+    return 0.0;
+  }
+  
+  @Override
+  public double getMax() {
+    return 1.0;
+  }
 }

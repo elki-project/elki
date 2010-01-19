@@ -10,4 +10,14 @@ public class IdentityScaling implements StaticScalingFunction {
   public double getScaled(double value) {
     return value;
   }
+  
+  @Override
+  public double getMin() {
+    return Double.NEGATIVE_INFINITY;
+  }
+  
+  @Override
+  public double getMax() {
+    return Double.POSITIVE_INFINITY;
+  }
 }
