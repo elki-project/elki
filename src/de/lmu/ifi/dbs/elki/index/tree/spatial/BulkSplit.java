@@ -18,12 +18,14 @@ import de.lmu.ifi.dbs.elki.math.spacefillingcurves.ZCurve;
  * @param <N> object type
  */
 public class BulkSplit<N extends SpatialObject> {
+
   private static Logging logger = Logging.getLogger(BulkSplit.class);
 
   /**
    * Available strategies for bulk loading.
    */
   public enum Strategy {
+
     /**
      * ZCurve strategy
      */
@@ -124,6 +126,41 @@ public class BulkSplit<N extends SpatialObject> {
     List<List<N>> partitions = new ArrayList<List<N>>();
     List<N> objects = new ArrayList<N>(spatialObjects);
 
+    // one dimensional special case
+    if(spatialObjects.size() > 0 && spatialObjects.get(0).getDimensionality() == 1) {
+      // TODO: move this Comparator into shared code.
+      Collections.sort(objects, new Comparator<N>() {
+        @Override
+        public int compare(N o1, N o2) {
+          return Double.compare(o1.getMin(1), o2.getMin(1));
+        }
+      });
+
+      // build partitions
+      List<N> onePartition = new ArrayList<N>(maxEntries);
+      partitions.add(onePartition);
+      for(N o : objects) {
+        if(onePartition.size() < maxEntries) {
+          onePartition.add(o);
+        }
+        else {
+          onePartition = new ArrayList<N>(maxEntries);
+          partitions.add(onePartition);
+        }
+      }
+
+      // okay, check last partition for underfill
+      // only check if there is more than 1 partition
+      if(partitions.size() > 1) {
+        List<N> last = partitions.get(partitions.size() - 1);
+        List<N> nextToLast = partitions.get(partitions.size() - 2);
+        while(last.size() < minEntries) {
+          last.add(0, nextToLast.remove(nextToLast.size() - 1));
+        }
+      }
+      return partitions;
+    }
+
     // get z-values
     List<double[]> valuesList = new ArrayList<double[]>();
     for(SpatialObject o : spatialObjects) {
@@ -148,6 +185,7 @@ public class BulkSplit<N extends SpatialObject> {
 
     // create a comparator
     Comparator<SpatialObject> comparator = new Comparator<SpatialObject>() {
+
       public int compare(SpatialObject o1, SpatialObject o2) {
         byte[] z1 = zValues.get(o1.getID());
         byte[] z2 = zValues.get(o1.getID());
@@ -252,11 +290,9 @@ public class BulkSplit<N extends SpatialObject> {
     if(numEntries <= maxEntries) {
       return numEntries;
     }
-
     else if(numEntries < maxEntries + minEntries) {
       return (numEntries - minEntries);
     }
-
     else {
       return maxEntries;
     }
