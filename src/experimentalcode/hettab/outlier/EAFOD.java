@@ -1,14 +1,13 @@
 package experimentalcode.hettab.outlier;
 
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
+import java.util.TreeSet;
 import java.util.Vector;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -19,17 +18,20 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import experimentalcode.hettab.AxisPoint;
+import experimentalcode.hettab.MySubspace;
 
-public class EAFOD <V extends DoubleVector> extends AbstractAlgorithm<V, MultiResult>{
-	
+
+public class EAFOD<V extends DoubleVector> extends
+		AbstractAlgorithm<V, MultiResult> {
+
 	/**
 	 * OptionID for {@link #M_PARAM}
 	 */
 	public static final OptionID M_ID = OptionID.getOrCreateOptionID("eafod.m",
 			"number of projection");
 	/**
-	 * Parameter to specify the number of projection
-	 * must be an integer greater than 1.
+	 * Parameter to specify the number of projection must be an integer greater
+	 * than 1.
 	 * <p>
 	 * <p>
 	 * Key: {@code -eafod.m}
@@ -44,17 +46,17 @@ public class EAFOD <V extends DoubleVector> extends AbstractAlgorithm<V, MultiRe
 	/**
 	 * OptionID for {@link #PHI_PARAM}
 	 */
-	public static final OptionID PHI_ID = OptionID.getOrCreateOptionID("eafod.phi",
-			"the dimensoinality of projection");
+	public static final OptionID PHI_ID = OptionID.getOrCreateOptionID(
+			"eafod.phi", "the dimensoinality of projection");
 	/**
-	 * Parameter to specify the equi-depth ranges
-	 *  must be an integer greater than 1.
+	 * Parameter to specify the equi-depth ranges must be an integer greater
+	 * than 1.
 	 * <p>
 	 * Key: {@code -eafod.k}
 	 * </p>
 	 */
 	private final IntParameter PHI_PARAM = new IntParameter(PHI_ID,
-			new GreaterConstraint(2));
+			new GreaterConstraint(0));
 	/**
 	 * Holds the value of {@link #PHI_PARAM}.
 	 */
@@ -66,14 +68,14 @@ public class EAFOD <V extends DoubleVector> extends AbstractAlgorithm<V, MultiRe
 			"the dimensoinality of projection");
 
 	/**
-	 * Parameter to specify the dimensionality of projection
-	 *  must be an integer greater than 1.
+	 * Parameter to specify the dimensionality of projection must be an integer
+	 * greater than 1.
 	 * <p>
 	 * Key: {@code -eafod.k}
 	 * </p>
 	 */
 	private final IntParameter K_PARAM = new IntParameter(K_ID,
-			new GreaterConstraint(2));
+			new GreaterConstraint(0));
 
 	/**
 	 * Holds the value of {@link #K_PARAM}.
@@ -83,12 +85,12 @@ public class EAFOD <V extends DoubleVector> extends AbstractAlgorithm<V, MultiRe
 	/**
 	 * 
 	 */
-	private HashMap<Integer, HashMap<Integer, Vector<Integer>>> ranges ;
+	private HashMap<Integer, HashMap<Integer, HashSet<Integer>>> ranges;
 	
 	/**
 	 * 
 	 */
-	public EAFOD(){
+	public EAFOD() {
 		addOption(K_PARAM);
 		addOption(M_PARAM);
 		addOption(PHI_PARAM);
@@ -97,59 +99,134 @@ public class EAFOD <V extends DoubleVector> extends AbstractAlgorithm<V, MultiRe
 	@Override
 	protected MultiResult runInTime(Database<V> database)
 			throws IllegalStateException {
-		//
-		ranges = new HashMap<Integer, HashMap<Integer,Vector<Integer>>>();
-		int n = database.size() ;
-		//step 1 equi-depth
-		//
-		ArrayList<ArrayList<AxisPoint>> dbAxis = new ArrayList<ArrayList<AxisPoint>>(database.dimensionality());
-		for (int i = 0; i < database.dimensionality(); i++) {
-			ArrayList<AxisPoint> axis = new ArrayList<AxisPoint>(database
-					.size());
-			dbAxis.add(i, axis);
+		ranges = new HashMap<Integer, HashMap<Integer,HashSet<Integer>>>();
+		this.calculteDepth(database);
+		Vector<Integer> individium  = new Vector<Integer>();
+		for(int i = 0 ; i<database.dimensionality() ; i++){
+			individium.add(i);
 		}
-		for (Integer id : database) {
-			for (int index = 0; index < database.dimensionality(); index++) {
-				double value = database.get(id).getValue(index + 1);
-				AxisPoint point = new AxisPoint(id, value);
-				dbAxis.get(index).add(point);
+		System.out.println(fitness(database, individium));
+		return null ;
+	}
+	
+	
+    /**
+	 * 
+	 * @param database
+	 */
+	public void calculteDepth(Database<V> database){
+			ArrayList<ArrayList<AxisPoint>> dbAxis = new ArrayList<ArrayList<AxisPoint>>(database.dimensionality());
+			HashSet<Integer> range = new HashSet<Integer>();;
+			HashMap<Integer, HashSet<Integer>> rangesAt = new HashMap<Integer, HashSet<Integer>>(); ;
+			for (int i = 0; i < database.dimensionality(); i++) {
+				ArrayList<AxisPoint> axis = new ArrayList<AxisPoint>(database
+						.size());
+				dbAxis.add(i, axis);
 			}
-		}
-		for (int index = 0; index < database.dimensionality(); index++) {
-			Collections.sort(dbAxis.get(index));
-	    }
-		
-		//
-		ArrayList<AxisPoint> axis = dbAxis.get(0);
-		System.out.println(axis.size());
-		HashMap<Integer,Vector<Integer>> range = new HashMap<Integer, Vector<Integer>>();
-		range.put(0,new Vector<Integer>());
-		int f = n/phi ;
-		int r = n%phi ;
-		System.out.println(f);
-		System.out.println(r);
-		List<AxisPoint> rangeAt ;
-		for(int i = 0 ; i<n%phi;i++){
-			rangeAt =  axis.subList(i*f+2*i,f*(i+1)+(2*i+1));
-				for(int j = 0 ; j<rangeAt.size() ; j++){
-					range.get(0).add(rangeAt.get(0).getId());
+			for (Integer id : database) {
+				for (int index = 0; index < database.dimensionality(); index++) {
+					double value = database.get(id).getValue(index + 1);
+					AxisPoint point = new AxisPoint(id, value);
+					dbAxis.get(index).add(point);
 				}
-				System.out.println(rangeAt.size());	
+			}
+			for (int index = 0; index < database.dimensionality(); index++) {
+				Collections.sort(dbAxis.get(index));
+			}
+			
+			int rest = database.size()%phi ;
+			int f = database.size()/phi ;
+			 for(int dim = 0 ; dim<database.dimensionality() ; dim ++){
+		          for(int i = 0 ; i<rest ; i++){
+			           range = new HashSet<Integer>();
+			               for(int j = i*f + i ; j<(i+1)*f +i+1 ;j++){
+			    	           range.add(dbAxis.get(dim).get(j).getId()) ;
+			               }
+			               rangesAt.put(i+1,range);
+		                                   }
+		          for(int i = rest ; i<phi ; i++){
+			           range = new HashSet<Integer>();
+			               for(int j = i*f + rest ; j<(i+1)*f+rest;j++){
+			    	           range.add(dbAxis.get(dim).get(j).getId()) ;
+			  	               }
+			               rangesAt.put(i+1,range);
+		                                   }
+		   
+		          
+		          ranges.put(dim+1,rangesAt);
+		    }
+			
 		}
-		for(int i = n%phi ; i<phi;i++){
-			rangeAt =  axis.subList(f*i+2*i,f*(i+1)+2*i);
-				for(int j = 0 ; j<rangeAt.size() ; j++){
-					range.get(0).add(rangeAt.get(0).getId());
+	
+	/**
+	 * 
+	 */
+	public TreeSet<MySubspace> initialPopulation(Database<V> database , int popsize)
+	{	
+		int dDim = database.dimensionality();
+		TreeSet<MySubspace> population= new TreeSet<MySubspace>();
+		//fill population
+		for (int i=0; i<popsize;i++)
+		{
+			Vector<Integer> individium = new Vector<Integer>();
+			int[] tmp= new int[dDim] ;
+			int tmp2=k;
+			// fill "non don´t care" positions of the String
+			while(tmp2>0)
+			{
+				int z= (int)(Math.random()*dDim);
+				if(tmp[z]==0)
+				{
+					tmp[z]=(int)(Math.random()*phi+1);
+					tmp2--;
 				}
-				System.out.println(rangeAt.size());
-				
-		}
-		
-		
-		
-		return null;
+			}	
+			//fill rest with don´t cares	
+			for (int j=0;j<dDim;j++)
+			{
+				if (tmp[j]==0)tmp[j]=0;
+			}
+			for(int j = 0 ; j<tmp.length ; j++){
+				individium.add(tmp[j]);
+			}
+			MySubspace subspace = new MySubspace(individium,fitness(database, individium));
+			population.add(subspace);
+			}	
+			return population;	
 	}
 
+	/**
+	 * 
+	 * @param individium
+	 * @return
+	 */
+	public double fitness(Database<V> database , Vector<Integer> individium){
+		Vector<Integer> noNull = new Vector<Integer>();
+		Vector<Integer> dimNoNull = new Vector<Integer>();
+		int dim = 1 ;
+		for(Integer depth : individium){
+			if(depth!=0){
+				dimNoNull.add(dim);
+				noNull.add(depth);
+				dim++ ;
+			}
+		}
+		HashSet<Integer> ids = ranges.get(dimNoNull.get(0)).get(noNull.get(0));
+		for(int i = 0 ;i<noNull.size();i++){
+				ids.retainAll(ranges.get(noNull.get(i)).get(dimNoNull.get(i)));
+			
+		}
+		double nD = ids.size() ;
+		System.out.println(nD+" :"+"N(D)");
+		double fK = Math.pow(phi, k) ;
+		System.out.println(fK+" :"+"fK");
+		double n = database.size();
+		return (nD-n*fK/Math.sqrt(n*fK*(1-fK)));
+		
+	}		
+	/**
+	 * 
+	 */    
 	@Override
 	public Description getDescription() {
 		// TODO Auto-generated method stub
@@ -161,7 +238,7 @@ public class EAFOD <V extends DoubleVector> extends AbstractAlgorithm<V, MultiRe
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	/**
 	 * Calls the super method and additionally sets the values of the parameters
 	 * {@link #K_PARAM} and {@link #M_PARAM} and {@link #PHI_PARAM}
@@ -171,10 +248,9 @@ public class EAFOD <V extends DoubleVector> extends AbstractAlgorithm<V, MultiRe
 			throws ParameterException {
 		List<String> remainingParameters = super.setParameters(args);
 		k = K_PARAM.getValue();
-		m=  M_PARAM.getValue() ;
-		phi = PHI_PARAM.getValue() ;
+		m = M_PARAM.getValue();
+		phi = PHI_PARAM.getValue();
 		return remainingParameters;
 	}
-
 
 }
