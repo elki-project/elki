@@ -55,4 +55,14 @@ public class MultiplicativeInverseScaling implements OutlierScalingFunction {
     }
     return max;
   }
+  
+  @Override
+  public double getMin() {
+    return 0.0;
+  }
+  
+  @Override
+  public double getMax() {
+    return 1.0;
+  }
 }

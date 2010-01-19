@@ -83,4 +83,14 @@ public class ClipScaling extends AbstractParameterizable implements StaticScalin
     }
     return remainingParameters;
   }
+  
+  @Override
+  public double getMin() {
+    return (min != null) ? min : Double.NEGATIVE_INFINITY;
+  }
+  
+  @Override
+  public double getMax() {
+    return (max != null) ? max : Double.POSITIVE_INFINITY;
+  }
 }

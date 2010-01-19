@@ -32,4 +32,14 @@ public class GammaScaling implements StaticScalingFunction {
 	public double getScaled(double d) {
 		return Math.pow(d, gamma);
 	}
+  
+  @Override
+  public double getMin() {
+    return Double.NEGATIVE_INFINITY;
+  }
+  
+  @Override
+  public double getMax() {
+    return Double.POSITIVE_INFINITY;
+  }
 }

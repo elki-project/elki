@@ -10,4 +10,14 @@ public class MinusLogScaling implements StaticScalingFunction {
   public double getScaled(double value) {
     return - Math.log(value);
   }
+
+  @Override
+  public double getMin() {
+    return 0.0;
+  }
+  
+  @Override
+  public double getMax() {
+    return Double.POSITIVE_INFINITY;
+  }
 }

@@ -11,8 +11,13 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
+import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
+import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -22,7 +27,7 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.IdentityScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
 import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
 
-public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extends AbstractAlgorithm<O, Result> {
+public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extends AbstractAlgorithm<O, OutlierResult> {
   /**
    * Association ID for scaled values
    */
@@ -58,7 +63,7 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
   /**
    * Stores the result object.
    */
-  private MultiResult result;
+  private OutlierResult result;
 
   /**
    * Scaling function to use
@@ -71,7 +76,7 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
   }
 
   @Override
-  protected Result runInTime(Database<O> database) throws IllegalStateException {
+  protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     Result innerresult = algorithm.run(database);
 
     AnnotationResult<Double> ann = getAnnotationResult(database, innerresult);
@@ -87,13 +92,11 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
       scaledscores.put(id, val);
     }
     
-    if (innerresult instanceof MultiResult) {
-      result = (MultiResult) innerresult;
-    } else {
-      result = new MultiResult();
-      result.addResult(innerresult);
-    }
-    result.prependResult(new AnnotationFromHashMap<Double>(SCALED_SCORE, scaledscores));
+    OutlierScoreMeta meta = new BasicOutlierScoreMeta(0.0,1.0);
+    AnnotationResult<Double> scoresult = new AnnotationFromHashMap<Double>(SCALED_SCORE, scaledscores);
+    OrderingResult ordresult = new OrderingFromHashMap<Double>(scaledscores);
+    result = new OutlierResult(meta, scoresult, ordresult);
+    result.addResult(innerresult);
     
     return result;
   }
@@ -123,7 +126,7 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
   }
 
   @Override
-  public MultiResult getResult() {
+  public OutlierResult getResult() {
     return result;
   }
 

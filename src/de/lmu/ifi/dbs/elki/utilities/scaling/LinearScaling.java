@@ -47,4 +47,14 @@ public class LinearScaling implements StaticScalingFunction {
 	public double getScaled(double d) {
 		return factor*d + shift;
 	}
+	
+  @Override
+  public double getMin() {
+    return Double.NEGATIVE_INFINITY;
+  }
+  
+  @Override
+  public double getMax() {
+    return Double.POSITIVE_INFINITY;
+  }
 }

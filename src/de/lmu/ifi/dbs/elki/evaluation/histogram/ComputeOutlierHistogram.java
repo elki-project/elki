@@ -168,7 +168,15 @@ public class ComputeOutlierHistogram<O extends DatabaseObject> extends AbstractA
     Cluster<Model> positivecluster = getReferenceCluster(database, positive_class_name);
     Collection<Integer> outlierIds = positivecluster.getIDs();
     // first value for outliers, second for each object
-    AggregatingHistogram<Pair<Double, Double>, Pair<Double, Double>> hist = FlexiHistogram.DoubleSumDoubleSumHistogram(bins);
+    final AggregatingHistogram<Pair<Double, Double>, Pair<Double, Double>> hist;
+    // If we have useful (finite) min/max, use these for binning.
+    double min = scaling.getMin();
+    double max = scaling.getMax();
+    if (Double.isInfinite(min) || Double.isNaN(min) || Double.isInfinite(max) || Double.isNaN(max)) {
+      hist = FlexiHistogram.DoubleSumDoubleSumHistogram(bins);
+    } else {
+      hist = AggregatingHistogram.DoubleSumDoubleSumHistogram(bins, min, max);
+    }
     // first fill histogram only with values of outliers
     Pair<Double, Double> positive, negative;
     if (!splitfreq) {
