@@ -11,7 +11,6 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -45,12 +44,6 @@ public class KNNOutlierDetection<O extends DatabaseObject, D extends DoubleDista
    * KNN outlier detection algorithm.
    */
   public static final AssociationID<Double> KNNO_KNNDISTANCE = AssociationID.getOrCreateAssociationID("knno_knndistance", Double.class);
-
-  /**
-   * The association id to associate the KNNO_MAXODEGREE. Needed for the
-   * visualization.
-   */
-  public static final AssociationID<Double> KNNO_MAXODEGREE = AssociationID.getOrCreateAssociationID("knno_maxodegree", Double.class);
 
   /**
    * OptionID for {@link #K_PARAM}
@@ -133,8 +126,6 @@ public class KNNOutlierDetection<O extends DatabaseObject, D extends DoubleDista
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(Double.NaN, maxodegree, 0.0, Double.POSITIVE_INFINITY);
     // combine results.
     result = new OutlierResult(meta, res1, res2);
-    // TODO: remove, but is still used by lisas histogram classes.
-    ResultUtil.setGlobalAssociation(result, KNNO_MAXODEGREE, maxodegree);
     return result;
 
   }

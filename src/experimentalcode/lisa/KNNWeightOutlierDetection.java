@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -37,19 +36,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  */
 
 public class KNNWeightOutlierDetection<O extends DatabaseObject, D extends DoubleDistance> extends DistanceBasedAlgorithm<O, DoubleDistance, OutlierResult> {
-
+  // TODO: javadoc!
   public static final OptionID K_ID = OptionID.getOrCreateOptionID("knnwod.k", "k nearest neighbor");
 
   /**
    * Association ID for .
    */
   public static final AssociationID<Double> KNNWOD_WEIGHT = AssociationID.getOrCreateAssociationID("knnwod_weight", Double.class);
-
-  /**
-   * The association id to associate the KNNO_MAXODEGREE. Needed for the
-   * visualization.
-   */
-  public static final AssociationID<Double> KNNWOD_MAXWEIGHT = AssociationID.getOrCreateAssociationID("knnwod_maxweight", Double.class);
 
   /**
    * Parameter to specify the k nearest neighbor,
@@ -135,8 +128,6 @@ public class KNNWeightOutlierDetection<O extends DatabaseObject, D extends Doubl
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(Double.NaN, maxweight, 0.0, Double.POSITIVE_INFINITY);
     // combine results.
     result = new OutlierResult(meta, res1, res2);
-    // TODO: remove, but is still used by Lisas histogram classes.
-    ResultUtil.setGlobalAssociation(result, KNNWOD_MAXWEIGHT, maxweight);
     return result;
 
   }
