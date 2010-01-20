@@ -130,6 +130,7 @@ public class BulkSplit<N extends SpatialObject> {
     if(spatialObjects.size() > 0 && spatialObjects.get(0).getDimensionality() == 1) {
       // TODO: move this Comparator into shared code.
       Collections.sort(objects, new Comparator<N>() {
+
         @Override
         public int compare(N o1, N o2) {
           return Double.compare(o1.getMin(1), o2.getMin(1));
@@ -137,16 +138,17 @@ public class BulkSplit<N extends SpatialObject> {
       });
 
       // build partitions
-      List<N> onePartition = new ArrayList<N>(maxEntries);
-      partitions.add(onePartition);
+      // reinitialize array with correct size. Array will not use more space
+      // than neccessary.
+      int numberPartitions = (int) Math.ceil(1d * spatialObjects.size() / maxEntries);
+      partitions = new ArrayList<List<N>>(numberPartitions);
+      List<N> onePartition = null;
       for(N o : objects) {
-        if(onePartition.size() < maxEntries) {
-          onePartition.add(o);
-        }
-        else {
+        if(onePartition == null || onePartition.size() >= maxEntries) {
           onePartition = new ArrayList<N>(maxEntries);
           partitions.add(onePartition);
         }
+        onePartition.add(o);
       }
 
       // okay, check last partition for underfill
