@@ -8,6 +8,8 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.distance.Distance;
+import de.lmu.ifi.dbs.elki.utilities.IterableIterator;
+import de.lmu.ifi.dbs.elki.utilities.IterableIteratorAdapter;
 
 /**
  * Class to store the result of an ordering clustering algorithm such as OPTICS.
@@ -115,7 +117,7 @@ public class ClusterOrderResult<D extends Distance<D>> extends MultiResult imple
      * Implementation of the {@link OrderingResult} interface.
      */
     @Override
-    public Iterator<Integer> iter(Collection<Integer> ids) {
+    public IterableIterator<Integer> iter(Collection<Integer> ids) {
       ArrayList<Integer> res = new ArrayList<Integer>(ids.size());
       for(ClusterOrderEntry<D> e : clusterOrder) {
         if(ids.contains(e.getID())) {
@@ -124,7 +126,7 @@ public class ClusterOrderResult<D extends Distance<D>> extends MultiResult imple
       }
 
       // TODO: elements in ids that are not in clusterOrder are lost!
-      return res.iterator();
+      return new IterableIteratorAdapter<Integer>(res);
     }
 
     @Override
