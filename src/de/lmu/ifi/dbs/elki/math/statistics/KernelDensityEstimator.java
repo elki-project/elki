@@ -11,34 +11,6 @@ package de.lmu.ifi.dbs.elki.math.statistics;
  */
 public class KernelDensityEstimator {
   /**
-   * Supported kernel functions
-   * 
-   */
-  public static enum Kernel {
-    /**
-     * Uniform Kernel
-     */
-    KERNEL_UNIFORM,
-    /**
-     * Triangular Kernel
-     */
-    KERNEL_TRIANGLE,
-    /**
-     * Epanechnikov Kernel
-     */
-    KERNEL_EPANECHNIKOV,
-    /**
-     * Gaussian Kernel
-     */
-    KERNEL_GAUSSIAN
-  }
-
-  /**
-   * Scaling constant for Gaussian kernel
-   */
-  private static final double GSCALE = 1.0 / Math.sqrt(2.0 * Math.PI);
-
-  /**
    * Result storage: density
    */
   private double[] dens;
@@ -57,10 +29,10 @@ public class KernelDensityEstimator {
    * @param kernel Kernel function to use
    * @param windows window size
    */
-  public KernelDensityEstimator(double[] data, double min, double max, Kernel kernel, int windows) {
+  public KernelDensityEstimator(double[] data, double min, double max, KernelDensityFunction kernel, int windows) {
     process(data, min, max, kernel, windows);
   }
-
+  
   /**
    * Process a new array
    * 
@@ -70,7 +42,7 @@ public class KernelDensityEstimator {
    * @param kernel Kernel function to use
    * @param windows window size
    */
-  private void process(double[] data, double min, double max, Kernel kernel, int windows) {
+  private void process(double[] data, double min, double max, KernelDensityFunction kernel, int windows) {
     dens = new double[data.length];
     var = new double[data.length];
 
@@ -79,35 +51,16 @@ public class KernelDensityEstimator {
     // collect data points
     for(int current = 0; current < data.length; current++) {
       double value = 0.0;
+      // TODO: is there any way we can skip through some of the data (at least if its sorted?)
+      // Since we know that all kKernels return 0 outside of [-1:1]?
       for(int i = 0; i < data.length; i++) {
         double delta = Math.abs(data[i] - data[current]) / halfwidth;
-        switch(kernel){
-        case KERNEL_TRIANGLE:
-          if(delta < 1)
-            value += 1 - delta;
-          break;
-        case KERNEL_EPANECHNIKOV:
-          if(delta < 1)
-            value += 0.75 * (1 - delta * delta);
-          break;
-        case KERNEL_GAUSSIAN:
-          value += GSCALE * Math.exp(-.5 * delta * delta);
-          break;
-        case KERNEL_UNIFORM:
-        default:
-          if(delta < 1)
-            value += 0.5;
-          break;
-        }
+        value += kernel.density(delta);
       }
       double realwidth = (Math.min(data[current] + halfwidth, max) - Math.max(min, data[current] - halfwidth));
       double weight = realwidth / (2 * halfwidth);
-      dens[current] = value / (data.length * realwidth / 2); // value /
-      // (realwidth *
-      // expected);
-      var[current] = 1 / weight; // / (weight*weight);
-
-      // System.out.println(xs[current]+" "+ys[current]);
+      dens[current] = value / (data.length * realwidth / 2);
+      var[current] = 1 / weight;
     }
   }
 
@@ -117,14 +70,16 @@ public class KernelDensityEstimator {
    * @param data data to process
    * @param kernel Kernel function to use.
    */
-  public KernelDensityEstimator(double[] data, Kernel kernel) {
+  public KernelDensityEstimator(double[] data, KernelDensityFunction kernel) {
     double min = Double.MAX_VALUE;
     double max = Double.MIN_VALUE;
     for(double d : data) {
-      if(d < min)
+      if(d < min) {
         min = d;
-      if(d > max)
+      }
+      if(d > max) {
         max = d;
+      }
     }
     // Heuristics.
     int windows = 1 + (int) (Math.log(data.length));

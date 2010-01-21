@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.FittingFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.GaussianFittingFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.LevenbergMarquardtMethod;
+import de.lmu.ifi.dbs.elki.math.statistics.GaussianKernelDensityFunction;
 import de.lmu.ifi.dbs.elki.math.statistics.KernelDensityEstimator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -123,7 +124,7 @@ public class TestKernelDensityFitting implements JUnit4Test {
   private double[] run(double[] data, double[] params) {
     FittingFunction func = new GaussianFittingFunction();
     boolean[] dofit = { true, true, true };
-    KernelDensityEstimator de = new KernelDensityEstimator(data, KernelDensityEstimator.Kernel.KERNEL_GAUSSIAN);
+    KernelDensityEstimator de = new KernelDensityEstimator(data, GaussianKernelDensityFunction.KERNEL);
     LevenbergMarquardtMethod fit = new LevenbergMarquardtMethod(func, params, dofit, data, de.getDensity(), de.getVariance());
     // for(int i = 0; i < 100; i++) {
     // fit.iterate();
