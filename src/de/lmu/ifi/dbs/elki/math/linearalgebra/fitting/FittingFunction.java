@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra.fitting;
 
-
 /**
  * Interface for a function used in Levenberg-Marquard-Fitting
  * 
