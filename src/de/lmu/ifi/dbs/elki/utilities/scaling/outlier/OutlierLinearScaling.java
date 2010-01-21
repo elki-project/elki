@@ -114,11 +114,11 @@ public class OutlierLinearScaling extends AbstractParameterizable implements Out
   
   @Override
   public double getMin() {
-    return (min != null) ? min : Double.NEGATIVE_INFINITY;
+    return 0.0;
   }
   
   @Override
   public double getMax() {
-    return (max != null) ? max : Double.POSITIVE_INFINITY;
+    return 1.0;
   }
 }
