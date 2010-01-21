@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.utilities.IterableIterator;
+import de.lmu.ifi.dbs.elki.utilities.IterableIteratorAdapter;
 
 /**
  * Return an ordering result backed by a database. Note that the implementation
@@ -120,7 +121,7 @@ public class OrderingFromAssociation<T extends Comparable<T>, O extends Database
    * Sort the given collection of IDs and return an iterator for the result.
    */
   @Override
-  public Iterator<Integer> iter(Collection<Integer> ids) {
+  public IterableIterator<Integer> iter(Collection<Integer> ids) {
     ArrayList<Integer> sorted = new ArrayList<Integer>(ids);
     if(comparator != null) {
       Collections.sort(sorted, new DerivedComparator());
@@ -128,7 +129,7 @@ public class OrderingFromAssociation<T extends Comparable<T>, O extends Database
     else {
       Collections.sort(sorted, new ImpliedComparator());
     }
-    return sorted.iterator();
+    return new IterableIteratorAdapter<Integer>(sorted);
   }
 
   @Override
