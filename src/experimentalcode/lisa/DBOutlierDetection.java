@@ -1,5 +1,7 @@
 package experimentalcode.lisa;
 
+import java.util.HashMap;
+
 import java.util.Iterator;
 import java.util.List;
 
@@ -20,8 +22,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 
 /**
- * Simple distanced based outlier detection algorithm.
- * 
+ * Simple distanced based outlier detection algorithm. User has to specify two parameters 
+ * An object is flagged as an outlier if at least a fraction p of all data objects has a distance aboce d from c
  * <p>Reference: 
  *  E.M. Knorr, R.
  * T. Ng: Algorithms for Mining Distance-Based Outliers in Large Datasets, In:
@@ -36,32 +38,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <D> the type of Distance used by this Algorithm
  */
-public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>> extends DistanceBasedAlgorithm<O, D, MultiResult> {
+public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>> extends AbstractDBOutlierDetection<O,D>{
 
-  /**
-   * Association ID for DBOD.
-   */
-  public static final AssociationID<Double> DBOD_OFLAG = AssociationID.getOrCreateAssociationID("dbod.oflag", Double.class);
-
-  /**
-   * OptionID for {@link #D_PARAM}
-   */
-  public static final OptionID D_ID = OptionID.getOrCreateOptionID("dbod.d", "size of the D-neighborhood");
-
-  /**
-   * Parameter to specify the size of the D-neighborhood,
-   * 
-   * <p>
-   * Key: {@code -dbod.d}
-   * </p>
-   */
-  private final PatternParameter D_PARAM = new PatternParameter(D_ID);
-
-  /**
-   * Holds the value of {@link #D_PARAM}.
-   */
-  private String d;
-
+  
   /**
    * OptionID for {@link #P_PARAM}
    */
@@ -83,17 +62,11 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
   private double p;
 
   /**
-   * Provides the result of the algorithm.
-   */
-  MultiResult result;
-
-  /**
    * Constructor, adding options to option handler.
    */
   public DBOutlierDetection() {
     super();
-    // neighborhood size
-    addOption(D_PARAM);
+    // neighborhood s
     // maximum fraction of objects outside the neighborhood of an outlier
     addOption(P_PARAM);
   }
@@ -105,90 +78,12 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
   @Override
   public List<String> setParameters(List<String> args) throws ParameterException {
     List<String> remainingParameters = super.setParameters(args);
-    // neighborhood size
-    d = D_PARAM.getValue();
     // maximum fraction of objects outside the neighborhood of an outlier
     p = P_PARAM.getValue();
     return remainingParameters;
   }
 
-  /**
-   * Runs the algorithm in the timed evaluation part.
-   * 
-   */
-  @Override
-  protected MultiResult runInTime(Database<O> database) throws IllegalStateException {
-    getDistanceFunction().setDatabase(database, isVerbose(), isTime());
-    D neighborhoodSize = getDistanceFunction().valueOf(d);
-    // maximum number of objects in the D-neighborhood of an outlier
-    int m = (int) ((database.size()) * (1 - p));
 
-    if(this.isVerbose()) {
-      this.verbose("computing outlier flag");
-    }
-
-    FiniteProgress progressOFlags = new FiniteProgress("DBOD_OFLAG for objects", database.size());
-    int counter = 0;
-    // if index exists, kNN query. if the distance to the mth nearest neighbor
-    // is more than d -> object is outlier
-    if(database instanceof IndexDatabase<?>) {
-      for(Integer id : database) {
-        counter++;
-        debugFine("distance to mth nearest neighbour" + database.kNNQueryForID(id, m, getDistanceFunction()).toString());
-        if(database.kNNQueryForID(id, m, getDistanceFunction()).get(m - 1).getFirst().compareTo(neighborhoodSize) <= 0) {
-          // flag as outlier
-          database.associate(DBOD_OFLAG, id, 1.0);
-        }
-        else {
-          // flag as no outlier
-          database.associate(DBOD_OFLAG, id, 0.0);
-        }
-      }
-      if(this.isVerbose()) {
-        progressOFlags.setProcessed(counter);
-        this.progress(progressOFlags);
-      }
-    }
-    else {
-      // range query for each object. stop if m objects are found
-      for(Integer id : database) {
-        counter++;
-        Iterator<Integer> iterator = database.iterator();
-        int count = 0;
-        while(iterator.hasNext() && count < m) {
-          Integer currentID = iterator.next();
-          D currentDistance = getDistanceFunction().distance(id, currentID);
-
-          if(currentDistance.compareTo(neighborhoodSize) <= 0) {
-            count++;
-          }
-        }
-
-        if(count < m) {
-          // flag as outlier
-          database.associate(DBOD_OFLAG, id, 1.0);
-        }
-        else {
-          // flag as no outlier
-          database.associate(DBOD_OFLAG, id, 0.0);
-        }
-      }
-
-      if(this.isVerbose()) {
-        progressOFlags.setProcessed(counter);
-        this.progress(progressOFlags);
-      }
-    }
-    AnnotationFromDatabase<Double, O> res1 = new AnnotationFromDatabase<Double, O>(database, DBOD_OFLAG);
-    // Ordering
-    OrderingFromAssociation<Double, O> res2 = new OrderingFromAssociation<Double, O>(database, DBOD_OFLAG, true);
-    // combine results.
-    result = new MultiResult();
-    result.addResult(res1);
-    result.addResult(res2);
-    return result;
-
-  }
 
   @Override
   public Description getDescription() {
@@ -199,4 +94,70 @@ public class DBOutlierDetection<O extends DatabaseObject, D extends Distance<D>>
   public MultiResult getResult() {
     return result;
   }
+
+@Override
+protected HashMap<Integer, Double> computeOutlierScores(Database<O> database, String d) {
+//maximum number of objects in the D-neighborhood of an outlier
+  int m = (int) ((database.size()) * (1 - p));
+  D neighborhoodSize = getDistanceFunction().valueOf(d);
+
+  HashMap<Integer, Double> scores= new HashMap<Integer, Double>();
+  if(this.isVerbose()) {
+    this.verbose("computing outlier flag");
+  }
+
+  FiniteProgress progressOFlags = new FiniteProgress("DBOD_OFLAG for objects", database.size());
+  int counter = 0;
+  // if index exists, kNN query. if the distance to the mth nearest neighbor
+  // is more than d -> object is outlier
+  if(database instanceof IndexDatabase<?>) {
+    for(Integer id : database) {
+      counter++;
+      debugFine("distance to mth nearest neighbour" + database.kNNQueryForID(id, m, getDistanceFunction()).toString());
+      if(database.kNNQueryForID(id, m, getDistanceFunction()).get(m - 1).getFirst().compareTo(neighborhoodSize) <= 0) {
+        // flag as outlier
+        scores.put(id, 1.0);
+      }
+      else {
+        // flag as no outlier
+        scores.put(id, 0.0);
+      }
+    }
+    if(this.isVerbose()) {
+      progressOFlags.setProcessed(counter);
+      this.progress(progressOFlags);
+    }
+  }
+  else {
+    // range query for each object. stop if m objects are found
+    for(Integer id : database) {
+      counter++;
+      Iterator<Integer> iterator = database.iterator();
+      int count = 0;
+      while(iterator.hasNext() && count < m) {
+        Integer currentID = iterator.next();
+        D currentDistance = getDistanceFunction().distance(id, currentID);
+
+        if(currentDistance.compareTo(neighborhoodSize) <= 0) {
+          count++;
+        }
+      }
+
+      if(count < m) {
+        // flag as outlier
+        scores.put(id, 1.0);
+      }
+      else {
+        // flag as no outlier
+        scores.put(id, 0.0);
+        }
+    }
+
+    if(this.isVerbose()) {
+      progressOFlags.setProcessed(counter);
+      this.progress(progressOFlags);
+    }
+  }
+  return scores;
+}
 }
