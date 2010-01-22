@@ -23,16 +23,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.PatternParameter;
 /**
- * Simple distanced based outlier detection algorithm. User has to specify two parameters 
- * An object is flagged as an outlier if at least a fraction p of all data objects has a distance above d from c
+ * Simple distance based outlier detection algorithms.   
+ * 
  * <p>Reference: 
  *  E.M. Knorr, R.
  * T. Ng: Algorithms for Mining Distance-Based Outliers in Large Datasets, In:
  * Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998.
  * 
- * This paper presents several Distance Based Outlier Detection algorithms.
- * Implemented here is a simple index based algorithm as presented in section
- * 3.1.
  * 
  * @author Lisa Reichert
  * 
