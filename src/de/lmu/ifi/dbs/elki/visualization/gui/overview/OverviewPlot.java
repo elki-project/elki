@@ -47,6 +47,12 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.vis2d.Projection2DVisualize
  */
 public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
   /**
+   * Maximum number of dimensions to visualize.
+   * TODO: add scrolling function for higher dimensionality!
+   */
+  private static final int MAX_DIMENSIONS = 10;
+
+  /**
    * Visualizations
    */
   private Collection<Visualizer> vis = new ArrayList<Visualizer>();
@@ -173,10 +179,10 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
     if(vis2d.size() > 0 || vis1d.size() > 0) {
       scales = Scales.calcScales(dvdb);
     }
+    int dmax = Math.min(db.dimensionality(), MAX_DIMENSIONS);
     if(vis2d.size() > 0) {
-      int dim = db.dimensionality();
-      for(int d1 = 1; d1 <= dim; d1++) {
-        for(int d2 = d1 + 1; d2 <= dim; d2++) {
+      for(int d1 = 1; d1 <= dmax; d1++) {
+        for(int d2 = d1 + 1; d2 <= dmax; d2++) {
           VisualizationProjection proj = new VisualizationProjection(dvdb, scales, d1, d2);
 
           for(Projection2DVisualizer<?> v : vis2d) {
@@ -185,33 +191,33 @@ public class OverviewPlot<NV extends NumberVector<NV, ?>> extends SVGPlot {
           }
         }
       }
-      if(dim >= 3) {
-        AffineTransformation p = VisualizationProjection.axisProjection(dim, 1, 2);
-        p.addRotation(0, 2, Math.PI / 180 * -40. / dim);
-        p.addRotation(1, 2, Math.PI / 180 * 50. / dim);
+      if(dmax >= 3) {
+        AffineTransformation p = VisualizationProjection.axisProjection(dmax, 1, 2);
+        p.addRotation(0, 2, Math.PI / 180 * -40. / dmax);
+        p.addRotation(1, 2, Math.PI / 180 * 50. / dmax);
         VisualizationProjection proj = new VisualizationProjection(dvdb, scales, p);
         for(Projection2DVisualizer<?> v : vis2d) {
-          VisualizationInfo vi = new VisualizationProjectedInfo(v, proj, dim / 2, dim / 2);
-          plotmap.addVis(Math.ceil((dim - 1) / 2.0), 0.0, Math.floor((dim - 1) / 2.0), Math.floor((dim - 1) / 2.0), vi);
+          VisualizationInfo vi = new VisualizationProjectedInfo(v, proj, dmax / 2, dmax / 2);
+          plotmap.addVis(Math.ceil((dmax - 1) / 2.0), 0.0, Math.floor((dmax - 1) / 2.0), Math.floor((dmax - 1) / 2.0), vi);
         }
       }
     }
     // insert column numbers
     if(vis1d.size() > 0 || vis2d.size() > 0) {
-      for(int d1 = 1; d1 <= db.dimensionality(); d1++) {
+      for(int d1 = 1; d1 <= dmax; d1++) {
         VisualizationInfo colvi = new VisualizationLabel(Integer.toString(d1), 1, .1);
         plotmap.addVis(d1 - 1, -.1, 1., .1, colvi);
       }
     }
     // insert row numbers
     if(vis2d.size() > 0) {
-      for(int d1 = 2; d1 <= db.dimensionality(); d1++) {
+      for(int d1 = 2; d1 <= dmax; d1++) {
         VisualizationInfo colvi = new VisualizationLabel(Integer.toString(d1), .1, 1);
         plotmap.addVis(-.1, d1 - 2, .1, 1., colvi);
       }
     }
     if(vis1d.size() > 0) {
-      int dim = db.dimensionality();
+      int dim = dmax;
       for(int d1 = 1; d1 <= dim; d1++) {
         VisualizationProjection proj = new VisualizationProjection(dvdb, scales, d1, (d1 == 1 ? 2 : 1));
         double ypos = -.1;
