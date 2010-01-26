@@ -40,8 +40,8 @@ public class EMOutlierDetection<V extends NumberVector<V, ?>> extends AbstractAl
    */
   public EMOutlierDetection() {
     super();
-
-    }
+    addParameterizable(emClustering);
+  }
   
   /**
    * Calls the super method
