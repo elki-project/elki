@@ -1,6 +1,7 @@
 package experimentalcode.hettab.outlier;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,7 +22,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
 import experimentalcode.hettab.AxisPoint;
 import experimentalcode.hettab.MySubspace;
 import experimentalcode.hettab.Tupel;
-
 
 /**
  * 
@@ -89,25 +89,26 @@ public class EAFOD<V extends DoubleVector> extends
 	 * Holds the value of {@link #K_PARAM}.
 	 */
 	private int k;
-	
+
 	/**
 	 * 
 	 */
-	private int dim ;
-	
+	private int dim;
+
 	/**
 	 * 
 	 */
-	private int size ;
-	
+	private int size;
+
 	/**
 	 * 
 	 */
-	private  HashMap<Integer, HashMap<Integer,HashSet<Integer>>> ranges ;	
+	private HashMap<Integer, HashMap<Integer, HashSet<Integer>>> ranges;
 	/**
 	 * 
 	 */
-	private Random random ;
+	private Random random;
+
 	/**
 	 * 
 	 */
@@ -116,59 +117,58 @@ public class EAFOD<V extends DoubleVector> extends
 		addOption(K_PARAM);
 		addOption(M_PARAM);
 		addOption(PHI_PARAM);
-		ranges = new HashMap<Integer, HashMap<Integer,HashSet<Integer>>>();
+		ranges = new HashMap<Integer, HashMap<Integer, HashSet<Integer>>>();
+
 	}
 
 	@Override
 	protected MultiResult runInTime(Database<V> database)
 			throws IllegalStateException {
-		
-        dim = database.dimensionality();
-        size = database.size() ;
-        random = new Random();
-        
-		// equiDempth sets 		
+
+		dim = database.dimensionality();
+		size = database.size();
+		random = new Random();
+
+		// equiDempth sets
 		this.calculteDepth(database);
-		
+
+		// System.exit(0);
+
 		ArrayList<MySubspace> pop = this.initialPopulation(10);
-		//best Population
+		// best Population
 		TreeSet<MySubspace> bestSol = new TreeSet<MySubspace>(pop);
-		
+
 		System.out.println(bestSol);
-		
-		while(checkConvergence(bestSol)== false){
-							
+
+		while (checkConvergence(bestSol) == false) {
+
 			System.out.println("selection");
 			pop = selection(pop);
 			System.out.println(pop);
-			
-			
-			//Crossover
+
+			// Crossover
 			System.out.println("crossover");
-			pop=crossover(pop);
+			pop = crossover(pop);
 			System.out.println(pop);
-			//Mutation
+			// Mutation
 			System.out.println("mutation");
-			pop=mutation(pop,0.1,0.1);
+			pop = mutation(pop, 0.1, 0.1);
 			System.out.println(pop);
 			System.out.println();
-			
-			bestSol.addAll(pop) ;
-		    Iterator<MySubspace> tmp=bestSol.iterator();
-			TreeSet<MySubspace> tmp2= new TreeSet<MySubspace>();
-			int i=0;
-			while ((i<m)&&(tmp.hasNext()))
-					{
-						tmp2.add(tmp.next());
-						i++;
-					}
+
+			bestSol.addAll(pop);
+			Iterator<MySubspace> tmp = bestSol.iterator();
+			TreeSet<MySubspace> tmp2 = new TreeSet<MySubspace>();
+			int i = 0;
+			while ((i < m) && (tmp.hasNext())) {
+				tmp2.add(tmp.next());
+				i++;
+			}
 
 			System.out.println("bestSol");
 			System.out.println(bestSol);
 		}
-         
-		
-	    
+
 		return null;
 	}
 
@@ -177,15 +177,13 @@ public class EAFOD<V extends DoubleVector> extends
 	 * @param database
 	 */
 	public void calculteDepth(Database<V> database) {
-		//sort dimension
+		// sort dimension
 		ArrayList<ArrayList<AxisPoint>> dbAxis = new ArrayList<ArrayList<AxisPoint>>(
 				dim);
-		
-		
-		
+
 		HashSet<Integer> range = new HashSet<Integer>();
-		HashMap<Integer, HashSet<Integer>> rangesAt = new HashMap<Integer, HashSet<Integer>>() ;
-		
+		HashMap<Integer, HashSet<Integer>> rangesAt = new HashMap<Integer, HashSet<Integer>>();
+
 		for (int i = 0; i < dim; i++) {
 			ArrayList<AxisPoint> axis = new ArrayList<AxisPoint>(size);
 			dbAxis.add(i, axis);
@@ -194,150 +192,144 @@ public class EAFOD<V extends DoubleVector> extends
 			for (int dim = 1; dim <= database.dimensionality(); dim++) {
 				double value = database.get(id).getValue(dim);
 				AxisPoint point = new AxisPoint(id, value);
-				dbAxis.get(dim-1).add(point);
+				dbAxis.get(dim - 1).add(point);
 			}
 		}
 		//
 		for (int index = 0; index < database.dimensionality(); index++) {
 			Collections.sort(dbAxis.get(index));
 		}
-		
-		// equi-depth
-		//if range = 0 => |range| = database.size();
-		//if database.size()%phi == 0 |range|=database.size()/phi 
-		//if database.size()%phi == rest (1..rest => |range| = database.size()/phi +1 , rest..phi => |range| = database.size()/phi )
-		int rest = database.size()%phi ;
-		int f = database.size()/phi ;
-		
-		
-		 
-		 HashSet<Integer> b = new HashSet<Integer>();
-		 for(Integer id : database){
-			 b.add(id);
-		} 
-		//if range = 0 => |range| = database.size();
-		 for(int dim = 1 ; dim<=database.dimensionality() ; dim ++){
-			 rangesAt = new HashMap<Integer, HashSet<Integer>>(); 
-			 rangesAt.put(0, b);
-			 ranges.put(dim, rangesAt);
-		 }
-		 
-		 for(int dim = 1 ; dim<=database.dimensionality() ; dim ++){
-			  ArrayList<AxisPoint> axis = dbAxis.get(dim-1);
-			  
-	          for(int i = 0 ; i<rest ; i++){
-	        	  //1..rest => |range| = database.size()/phi +1
-	        	  range = new HashSet<Integer>();
-	        	  for(int j = i*f + i ; j<(i+1)*f +i+1 ;j++){
-		    	          range.add(axis.get(j).getId());
-		               }
-		               ranges.get(dim).put(i+1, range);
-	                   } 
-	          
-	            //rest..phi => |range| = database.size()/phi
-	            for(int i = rest ; i<phi ; i++){
-		           range = new HashSet<Integer>();
-		               for(int j = i*f + rest ; j<(i+1)*f+rest;j++){
-		    	           range.add(axis.get(j).getId());
-		  	               }
-		               ranges.get(dim).put(i+1, range);
-	                                   }
-	                   
-	    }	
-		 
- }
-	
 
-	
+		// equi-depth
+		// if range = 0 => |range| = database.size();
+		// if database.size()%phi == 0 |range|=database.size()/phi
+		// if database.size()%phi == rest (1..rest => |range| =
+		// database.size()/phi +1 , rest..phi => |range| = database.size()/phi )
+		int rest = database.size() % phi;
+		int f = database.size() / phi;
+
+		BitSet r = new BitSet();
+		HashSet<Integer> b = new HashSet<Integer>();
+		for (Integer id : database) {
+			r.set(id);
+			b.add(id);
+		}
+		// if range = 0 => |range| = database.size();
+		for (int dim = 1; dim <= database.dimensionality(); dim++) {
+			rangesAt = new HashMap<Integer, HashSet<Integer>>();
+			rangesAt.put(0, b);
+			ranges.put(dim, rangesAt);
+		}
+
+		for (int dim = 1; dim <= database.dimensionality(); dim++) {
+			ArrayList<AxisPoint> axis = dbAxis.get(dim - 1);
+
+			for (int i = 0; i < rest; i++) {
+				// 1..rest => |range| = database.size()/phi +1
+				range = new HashSet<Integer>();
+				for (int j = i * f + i; j < (i + 1) * f + i + 1; j++) {
+					range.add(axis.get(j).getId());
+				}
+				ranges.get(dim).put(i + 1, range);
+			}
+
+			// rest..phi => |range| = database.size()/phi
+			for (int i = rest; i < phi; i++) {
+				range = new HashSet<Integer>();
+				for (int j = i * f + rest; j < (i + 1) * f + rest; j++) {
+					range.add(axis.get(j).getId());
+				}
+				ranges.get(dim).put(i + 1, range);
+			}
+
+		}
+
+	}
 
 	/**
 	 * 
 	 */
 	public boolean checkConvergence(TreeSet<MySubspace> pop) {
-	   
-		
-	    ArrayList<ArrayList<Tupel>> convDim = new ArrayList<ArrayList<Tupel>>();	    
-	    boolean result = true ; 
-	    MySubspace[] subspaces = new MySubspace[pop.size()];
-	    subspaces = pop.toArray(subspaces);
-	    
-	    //init count
-	    for(int i = 0 ; i< pop.size() ;i++){
-	    	ArrayList<Tupel> tupels = new ArrayList<Tupel>();
-	    	for(int j = 0 ; j < dim ;j++){
-	    	    tupels.add(j,new Tupel(j,0));
-	    	}
-	    	convDim.add(i,tupels);
-	     
-	    }
-	    //calculate count 
-	    for(int i = 0 ; i< pop.size(); i++){
-	    			for(int k = 0 ; k< dim ;k++){
-	    				 int count = convDim.get(i).get(k).getSecond();
-	    				 for(int j = 0 ; j<pop.size() ; j++){
-	    				   if(subspaces[i].getIndividium()[k]==subspaces[j].getIndividium()[k]){
-	    				 	count++ ;
-	    				   }
-	    				convDim.get(i).get(k).setSecond(count);
-	    		}
-	    	}
-	    }
-	    
-	  
-		for(int i=0;i<convDim.size();i++)
-		{
-			boolean converged=false;
-			
-			//convergence of each dimension
-			for (int j=0;j<convDim.get(i).size();j++)
-			{
-				if(convDim.get(i).get(j).getSecond()>= pop.size()*0.95) converged=true;
+
+		ArrayList<ArrayList<Tupel>> convDim = new ArrayList<ArrayList<Tupel>>();
+		boolean result = true;
+		MySubspace[] subspaces = new MySubspace[pop.size()];
+		subspaces = pop.toArray(subspaces);
+
+		// init count
+		for (int i = 0; i < pop.size(); i++) {
+			ArrayList<Tupel> tupels = new ArrayList<Tupel>();
+			for (int j = 0; j < dim; j++) {
+				tupels.add(j, new Tupel(j, 0));
 			}
-			if (!converged)result=false;
+			convDim.add(i, tupels);
+
 		}
-		return result;		
+		// calculate count
+		for (int i = 0; i < pop.size(); i++) {
+			for (int k = 0; k < dim; k++) {
+				int count = convDim.get(i).get(k).getSecond();
+				for (int j = 0; j < pop.size(); j++) {
+					if (subspaces[i].getIndividium()[k] == subspaces[j]
+							.getIndividium()[k]) {
+						count++;
+					}
+					convDim.get(i).get(k).setSecond(count);
+				}
+			}
+		}
+
+		for (int i = 0; i < convDim.size(); i++) {
+			boolean converged = false;
+
+			// convergence of each dimension
+			for (int j = 0; j < convDim.get(i).size(); j++) {
+				if (convDim.get(i).get(j).getSecond() >= pop.size() * 0.95)
+					converged = true;
+			}
+			if (!converged)
+				result = false;
+		}
+		return result;
 	}
-	
 
 	/**
 	 * 
 	 */
 	public ArrayList<MySubspace> initialPopulation(int popsize) {
-		
-		//Initial Population
+
+		// Initial Population
 		ArrayList<MySubspace> population = new ArrayList<MySubspace>();
-		
+
 		// fill population
-		
-		
-        for(int i = 0 ; i<popsize ;i++){
-           
-        	 //Random Individium
-			 int[] individium = new int[dim] ;
-			 
-			 //fill don't care ( any dimension == don't care)
-			 for(int j = 0 ; j<dim ; j++){
-				 individium[j] = 0 ;
-			 }
-			 
-			 //count of don't care positions
-			 int countDim = k;
-			 
-			 // fill non don't care positions of the Individium
-			 			while (countDim > 0) {
-				                int z = random.nextInt(dim);
-			                	if (individium[z] == 0) {
-					            individium[z] = random.nextInt(phi)+1;
-					            countDim--;
+
+		for (int i = 0; i < popsize; i++) {
+
+			// Random Individium
+			int[] individium = new int[dim];
+
+			// fill don't care ( any dimension == don't care)
+			for (int j = 0; j < dim; j++) {
+				individium[j] = 0;
+			}
+
+			// count of don't care positions
+			int countDim = k;
+
+			// fill non don't care positions of the Individium
+			while (countDim > 0) {
+				int z = random.nextInt(dim);
+				if (individium[z] == 0) {
+					individium[z] = random.nextInt(phi) + 1;
+					countDim--;
 				}
 			}
-			
-			
-			population.add(new MySubspace(individium,fitness(individium)));
-        }
-        
+
+			population.add(new MySubspace(individium, fitness(individium)));
+		}
+
 		Collections.sort(population);
-		return population ;
+		return population;
 	}
 
 	/**
@@ -345,111 +337,111 @@ public class EAFOD<V extends DoubleVector> extends
 	 */
 	public ArrayList<MySubspace> selection(ArrayList<MySubspace> population) {
 
-	    // probability 
-		//Roulette weehl 
+		// probability
+		// Roulette weehl
 		Vector<Integer> probability = new Vector<Integer>();
-		
-		//set of selected individium
+
+		// set of selected individium
 		ArrayList<MySubspace> newPopulation = new ArrayList<MySubspace>();
-		
+
 		int sum = 0;
 		probability.add(sum);
-		//calculate probability
+		// calculate probability
 		for (int t = 0; t < population.size(); t++) {
 			sum = sum + (population.size() - t);
 			probability.add(sum);
 		}
-		
-		//position of selection
-		for(int i = 0 ; i<population.size();i++) {
-			int z =  random.nextInt(sum);
-				for (int j = 0; j < probability.size()-1; j++) {
-					if (z >= probability.get(j) && z <= probability.get(j + 1)) {
-						//add selected pop
-						MySubspace subspace = population.get(j) ;
-						newPopulation.add(subspace);
-					}
+
+		// position of selection
+		for (int i = 0; i < population.size(); i++) {
+			int z = random.nextInt(sum);
+			for (int j = 0; j < probability.size() - 1; j++) {
+				if (z >= probability.get(j) && z <= probability.get(j + 1)) {
+					// add selected pop
+					MySubspace subspace = population.get(j);
+					newPopulation.add(subspace);
 				}
+			}
 		}
-	
-	    Collections.sort(newPopulation);
+		if (newPopulation.size() == 0) {
+			System.exit(0);
+		}
+		Collections.sort(newPopulation);
 		return newPopulation;
 	}
 
 	/**
 	 * 
 	 */
-	public ArrayList<MySubspace> mutation(ArrayList<MySubspace> population, double perc1, double perc2) {
-		//the Mutations
-		ArrayList<MySubspace> mutations= new ArrayList<MySubspace>();
-		//Set of Positions which are don´t care in the String
+	public ArrayList<MySubspace> mutation(ArrayList<MySubspace> population,
+			double perc1, double perc2) {
+		// the Mutations
+		ArrayList<MySubspace> mutations = new ArrayList<MySubspace>();
+		// Set of Positions which are don´t care in the String
 		TreeSet<Integer> Q = new TreeSet<Integer>();
-		//Set of Positions which are not don´t care in the String
+		// Set of Positions which are not don´t care in the String
 		TreeSet<Integer> R = new TreeSet<Integer>();
-		
+
 		// for each Individuum
-		for (int j=0;j<population.size();j++)
-		{
-			//clear the Sets
+		for (int j = 0; j < population.size(); j++) {
+			// clear the Sets
 			Q.clear();
 			R.clear();
-			//Fill the Sets with the Positions
-			for (int i=0; i<dim;i++)
-			{
-				if(population.get(j).getIndividium()[i]==0)
-				{
+			// Fill the Sets with the Positions
+			for (int i = 0; i < dim; i++) {
+				if (population.get(j).getIndividium()[i] == 0) {
 					Q.add(i);
-				}	
-				else
-				{
+				} else {
 					R.add(i);
 				}
-					
+
 			}
-			if(Q.size()!=0)
-			//Mutation Variant 1
-			if (Math.random() <= perc1)
-			{
-				//calc Mutation Spot
-				Integer [] pos= new Integer[Q.size()];
-				pos=Q.toArray(pos);
-				int position = random.nextInt(pos.length);
-				int depth  = pos[position];
-				//Mutate don´t Care into 1....phi
-				population.get(j).getIndividium()[depth]= random.nextInt(phi)+1;
-				//update Sets
-				Q.remove(depth);
-				R.add(depth);
-				//calc new Mutation Spot
-				pos=new Integer[R.size()];
-				pos=R.toArray(pos);
-			    position = random.nextInt(pos.length);
-				depth  = pos[position];
-				//Mutate non don´t care into don´t care
-				population.get(j).getIndividium()[depth]= 0;
-				//update Sets
-				Q.add(depth);
-				R.remove(depth);
-			}
-			if(R.size()!=0)
-			//Mutation Variant 2
-			if (Math.random() <= perc2)
-			{
-				//calc Mutation Spot
-				Integer [] pos= new Integer[R.size()];
-				pos=R.toArray(pos);
-				int position = random.nextInt(pos.length);
-				int depth  = pos[position];
-				//Mutate 1...phi into another 1...phi
-				population.get(j).getIndividium()[depth]= random.nextInt(phi)+1;
-			}
+			if (Q.size() != 0)
+				// Mutation Variant 1
+				if (Math.random() <= perc1) {
+					// calc Mutation Spot
+					Integer[] pos = new Integer[Q.size()];
+					pos = Q.toArray(pos);
+					int position = random.nextInt(pos.length);
+					int depth = pos[position];
+					// Mutate don´t Care into 1....phi
+					population.get(j).getIndividium()[depth] = random
+							.nextInt(phi) + 1;
+					// update Sets
+					Q.remove(depth);
+					R.add(depth);
+					// calc new Mutation Spot
+					pos = new Integer[R.size()];
+					pos = R.toArray(pos);
+					position = random.nextInt(pos.length);
+					depth = pos[position];
+					// Mutate non don´t care into don´t care
+					population.get(j).getIndividium()[depth] = 0;
+					// update Sets
+					Q.add(depth);
+					R.remove(depth);
+				}
+			if (R.size() != 0)
+				// Mutation Variant 2
+				if (Math.random() <= perc2) {
+					// calc Mutation Spot
+					Integer[] pos = new Integer[R.size()];
+					pos = R.toArray(pos);
+					int position = random.nextInt(pos.length);
+					int depth = pos[position];
+					// Mutate 1...phi into another 1...phi
+					population.get(j).getIndividium()[depth] = random
+							.nextInt(phi) + 1;
+				}
 			int[] individium = population.get(j).getIndividium();
-			mutations.add(new MySubspace(individium ,fitness(individium)));
-			
-			
+			mutations.add(new MySubspace(individium, fitness(individium)));
+
+		}
+		if (mutations.size() == 0) {
+			System.exit(0);
 		}
 		Collections.sort(mutations);
-		return mutations ;
+		return mutations;
 	}
 
 	/**
@@ -458,63 +450,64 @@ public class EAFOD<V extends DoubleVector> extends
 	 * @return
 	 */
 	public double fitness(int[] individium) {
-	
-	   HashSet<Integer> m = new HashSet<Integer>(ranges.get(1).get(individium[0]));
-	   for(int i=2 ;i<=individium.length;i++){
-		   HashSet<Integer> current = new HashSet<Integer>(ranges.get(i).get(individium[i-1]));
-		   HashSet<Integer> result = retainAll(m, current);
-		   m.clear();
-		   m.addAll(result);
-	   } 
-	   
-	    double f= (double) 1/phi;
-	    double nD =  (double) m.size();
-		double fK=Math.pow(f,k);
-		double sC= (nD-(size*fK))/Math.sqrt(size*fK*(1-fK));
-		return sC; 
+
+		HashSet<Integer> m = new HashSet<Integer>(ranges.get(1).get(
+				individium[0]));
+		for (int i = 2; i <= individium.length; i++) {
+			HashSet<Integer> current = new HashSet<Integer>(ranges.get(i).get(
+					individium[i - 1]));
+			HashSet<Integer> result = retainAll(m, current);
+			m.clear();
+			m.addAll(result);
+		}
+		double f = (double) 1 / phi;
+		double nD = (double) m.size();
+		double fK = Math.pow(f, k);
+		double sC = (nD - (size * fK)) / Math.sqrt(size * fK * (1 - fK));
+		return sC;
 	}
-	
+
 	/**
 	 * 
 	 * @param set1
 	 * @param set2
 	 * @return
 	 */
-	public static HashSet<Integer> retainAll(HashSet<Integer> set1 , HashSet<Integer> set2){
+	public static HashSet<Integer> retainAll(HashSet<Integer> set1,
+			HashSet<Integer> set2) {
 		HashSet<Integer> result = new HashSet<Integer>();
-		 for(Integer id : set1){
-			 if(set2.contains(id)){
-				 result.add(id);
-			 }
-		 }
-		 for(Integer id : set2){
-			 if(set1.contains(id)){
-				 result.add(id);
-			 }
-		 }
-		 return result ;
+		for (Integer id : set1) {
+			if (set2.contains(id)) {
+				result.add(id);
+			}
+		}
+		for (Integer id : set2) {
+			if (set1.contains(id)) {
+				result.add(id);
+			}
+		}
+		return result;
 	}
 
 	/**
 	 * Crossover.
 	 * 
-	 * @param population
-	 *            
+	 * @param pop
+	 *            the pop
 	 * 
-	 * @return the tree set< Mysubspace>
+	 * @return the tree set< Myubspace>
 	 */
 	public ArrayList<MySubspace> crossover(ArrayList<MySubspace> population) {
-		
-		//Crossover Set of population Set
+
+		// Crossover Set of population Set
 		ArrayList<MySubspace> crossover = new ArrayList<MySubspace>();
-		
-		//recombine vector
+
+		// recombine vector
 		Vector<MySubspace> recombine = new Vector<MySubspace>();
 		//
-		MySubspace[] pop= new MySubspace[population.size()];
-		pop=population.toArray(pop);
-		int i=0;
-
+		MySubspace[] pop = new MySubspace[population.size()];
+		pop = population.toArray(pop);
+		int i = 0;
 
 		// Match the Solutions pairwise
 		while (i < (population.size() / 2) * 2) {
@@ -527,9 +520,12 @@ public class EAFOD<V extends DoubleVector> extends
 		// if the set contains an odd number of Subspaces
 		if (pop.length % 2 == 1)
 			crossover.add(pop[pop.length - 1]);
-		    Collections.sort(crossover);
-		    return crossover ;
-		   
+		Collections.sort(crossover);
+		if (crossover.size() == 0) {
+			System.exit(0);
+		}
+		return crossover;
+
 	}
 
 	/**
@@ -538,14 +534,13 @@ public class EAFOD<V extends DoubleVector> extends
 	 * @param s2
 	 * @return
 	 */
-	public Vector<MySubspace> recombine(MySubspace s1,
-			MySubspace s2) {
-		//TODO
+	public Vector<MySubspace> recombine(MySubspace s1, MySubspace s2) {
+		// TODO
 		Vector<MySubspace> recombineVector = new Vector<MySubspace>();
-		
-		//Set of Positions in which either s1 or s2 are don´t care
+
+		// Set of Positions in which either s1 or s2 are don´t care
 		TreeSet<Integer> Q = new TreeSet<Integer>();
-		//Set of Positions in which neither s1 or s2 is don´t care
+		// Set of Positions in which neither s1 or s2 is don´t care
 		TreeSet<Integer> R = new TreeSet<Integer>();
 
 		for (int i = 0; i < s1.getIndividium().length; i++) {
@@ -554,130 +549,162 @@ public class EAFOD<V extends DoubleVector> extends
 				Q.add(i);
 			if ((s2.getIndividium()[i] == 0) && (s1.getIndividium()[i] != 0))
 				Q.add(i);
-			if ((s2.getIndividium()[i] != 0) && (s1.getIndividium()[i] != 0)){
+			if ((s1.getIndividium()[i] != 0) && (s2.getIndividium()[i] != 0)) {
 				R.add(i);
 			}
 		}
-		
-		Iterator<Integer> r = R.iterator();
-		// Selection of the Best Combination of R Spots
-		TreeSet<MySubspace> tmp2= new TreeSet<MySubspace>(); 
-		tmp2.add(nullSubspace(dim));
-		
-		// For every Position in R
-		while(r.hasNext())
-		{
-			int index = r.next();
-			MySubspace[] tmp4= new MySubspace[tmp2.size()];
-			tmp4=tmp2.toArray(tmp4);
-			//For every String in the Enumeration
-			for (int i=0; i<tmp4.length;i++)
-			{
-				//Set the new Positions
-				int[] mod1= tmp4[i].getIndividium().clone();
-				int[] mod2= tmp4[i].getIndividium().clone();
-				
-				mod1[index]=s1.getIndividium()[index];
-				mod2[index]=s2.getIndividium()[index];
-				//Add to the Enumeration
-				
-				tmp2.add(new MySubspace(mod1,fitness(mod1)));
-				tmp2.add(new MySubspace(mod2,fitness(mod2)));
-				
-				//remove the cloned individuum
-				tmp2.remove(tmp4[i]);
-			}
-			
+		/**
+		 * Iterator<Integer> r = R.iterator(); // Selection of the Best
+		 * Combination of R Spots TreeSet<MySubspace> tmp2= new
+		 * TreeSet<MySubspace>(); tmp2.add(nullSubspace(dim));
+		 * 
+		 * // For every Position in R while (r.hasNext()) { int index =
+		 * r.next(); MySubspace[] tmp4= new MySubspace[tmp2.size()];
+		 * tmp4=tmp2.toArray(tmp4); //For every String in the Enumeration for
+		 * (int i=0; i< tmp4.length;i++) { //Set the new Positions int[] mod1=
+		 * tmp4[i].getIndividium().clone(); int[] mod2=
+		 * tmp4[i].getIndividium().clone();
+		 * 
+		 * mod1[index]=s1.getIndividium()[index];
+		 * mod2[index]=s2.getIndividium()[index]; //Add to the Enumeration
+		 * 
+		 * tmp2.add(new MySubspace(mod1,fitness(mod1))); tmp2.add(new
+		 * MySubspace(mod2,fitness(mod2)));
+		 * 
+		 * //remove the cloned individuum tmp2.remove(tmp4[i]); }
+		 * 
+		 * }
+		 **/
+		TreeSet<MySubspace> bestCombi = new TreeSet<MySubspace>();
+		ArrayList<int[]> best = comb(R, s1, s2);
+		Iterator<int[]> m = best.iterator();
+
+		while (m.hasNext()) {
+			int[] next = m.next();
+			bestCombi.add(new MySubspace(next, fitness(next)));
 		}
-		int[] best2R=s1.getIndividium();
-		//Select the fittest	
-		int k2= Q.size()/2;
-		int pos= 0;
-		int data=1;
-		
+
+		// Select the fittest
+		int[] best2R = bestCombi.first().getIndividium();
+
+		// pos of don't care in best2R
+		TreeSet<Integer> nullDepth = new TreeSet<Integer>();
+		for (int i = 0; i < dim; i++) {
+			if (best2R[i] == 0)
+				nullDepth.add(i);
+		}
+		int[] b = best2R.clone();
+		int count = k - R.size();
 		Iterator<Integer> q = Q.iterator();
-		
-		//Extend it greedily
-		while (k2>=0)
-		{
-			int[] mod1= best2R.clone();
-			int[] mod2= best2R.clone(); 
-			q = Q.iterator();
-			
-			double bestfit= fitness(best2R);
-			//for every position in Q
-			while (q.hasNext())
-			{
-				//Calculate the Fittnes if the Position
-				int index = q.next();
-				mod1[index]=s1.getIndividium()[index];
-				mod2[index]=s2.getIndividium()[index];
-				//search for the fittest
-				if (fitness(mod1)>bestfit && (mod1[index]!=0))
-				{
-					pos=index;
-					data=1;
-					bestfit=fitness(mod1);
-				}
-				if ( fitness(mod2)>bestfit &&(mod2[index]!=0))
-				{
-					pos=index;
-					data=2;
-					bestfit=fitness(mod2);
+
+		while (count > 0) {
+            int pos = 0 ;
+			int[] l1 = b.clone();
+			int[] l2 = b.clone();
+
+			while (q.hasNext()) {
+
+				int next = q.next();
+				pos = next ;
+				if (nullDepth.contains(next))
+                 
+		          {
+					boolean s1Null = (s1.getIndividium()[next] == 0);
+					boolean s2Null = (s1.getIndividium()[next] == 0);
+
+					l1[next] = s1.getIndividium()[next];
+					l2[next] = s2.getIndividium()[next];
+
+					if (fitness(l1) >= fitness(l2)) {
+						b = l1.clone();
+						if (s1Null) {
+							nullDepth.add(next);
+							count--;
+						}
+					} else {
+						b = l2.clone();
+						if (s2Null) {
+							nullDepth.add(next);
+							count--;
+						}
+					}
 				}
 				
 			}
-			k2--;
-			//remove the picked Position
 			Q.remove(pos);
-			//Extend the String
-			if (data==1) best2R[pos] = s1.getIndividium()[pos];
-			if (data==2) best2R[pos] = s2.getIndividium()[pos];
 		}
-		
-			//create the complementary String
-			int[] comp= new int[dim];
-			
-			for(int i=0;i<dim;i++)
-			{
-				if(best2R[i]==s1.getIndividium()[i])comp[i]=s2.getIndividium()[i];
-				else comp[i]=s2.getIndividium()[i];
-			}	
-               recombineVector.add(new MySubspace(best2R, fitness(best2R)));
-               recombineVector.add(new MySubspace(comp,fitness(comp)));
-               
-	
-	return recombineVector;
-	}
-	
-	/**
-	 * 
-	 * @param c
-	 * @return
-	 */
-	public static ArrayList<String> comb (ArrayList<String> c ){
-		ArrayList<String> comb = new ArrayList<String>();
-		for(int i = 0 ; i<comb.size() ; i++){
-			String s = comb.get(i);
-			String s1 = s+"1";
-			String s2 = s+"2";
-			comb.add(s1);
-			comb.add(s2);
+
+		best2R = b.clone();
+
+		// create the complementary String
+		int[] comp = new int[dim];
+
+		for (int i = 0; i < dim; i++) {
+			if (best2R[i] == s1.getIndividium()[i])
+				comp[i] = s2.getIndividium()[i];
+			else
+				comp[i] = s2.getIndividium()[i];
 		}
-		return comb ;
+		recombineVector.add(new MySubspace(best2R, fitness(best2R)));
+		recombineVector.add(new MySubspace(comp, fitness(comp)));
+
+		return recombineVector;
 	}
-	
+
 	/**
 	 * 
 	 */
-	public static MySubspace nullSubspace(int dim){
-		int[] individium = new int[dim]; 
-		for(int i = 0 ; i<dim ; i++){
-			individium[i]=0 ;
+	public static MySubspace nullSubspace(int dim) {
+		int[] individium = new int[dim];
+		for (int i = 0; i < dim; i++) {
+			individium[i] = 0;
 		}
 		return new MySubspace(individium);
 	}
-	
+
+	/**
+	 * 
+	 */
+	public static ArrayList<int[]> comb(TreeSet<Integer> R, MySubspace s1,
+			MySubspace s2) {
+
+		ArrayList<int[]> mySubspaces = new ArrayList<int[]>();
+		int size = R.size();
+		HashMap<Integer, ArrayList<String>> comb = new HashMap<Integer, ArrayList<String>>();
+		ArrayList<String> r1 = new ArrayList<String>();
+		r1.add(new String("1"));
+		r1.add(new String("2"));
+		comb.put(1, r1);
+		for (int i = 2; i <= size; i++) {
+			ArrayList<String> ri = new ArrayList<String>();
+			ArrayList<String> rOld = comb.get(i - 1);
+			for (int j = 0; j < rOld.size(); j++) {
+				String neu1 = rOld.get(j) + "1";
+				String neu2 = rOld.get(j) + "2";
+				ri.add(neu1);
+				ri.add(neu2);
+			}
+			comb.put(i, ri);
+			comb.remove(i - 1);
+		}
+		for (int i = 0; i < comb.get(size).size(); i++) {
+			Iterator<Integer> r = R.iterator();
+			MySubspace m = nullSubspace(s1.getIndividium().length);
+			String s = comb.get(size).get(i);
+			for (int pos = 0; pos < s.length(); pos++) {
+				int d = r.next();
+				if (s.charAt(pos) == '1') {
+					m.getIndividium()[d] = s1.getIndividium()[d];
+				}
+				if (s.charAt(pos) == '2') {
+					m.getIndividium()[d] = s2.getIndividium()[d];
+				}
+			}
+			int[] t = m.getIndividium().clone();
+			mySubspaces.add(t);
+		}
+		return mySubspaces;
+	}
 
 	/**
 	 * 
