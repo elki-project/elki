@@ -1,7 +1,6 @@
 package experimentalcode.hettab.outlier;
 
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -211,10 +210,9 @@ public class EAFOD<V extends DoubleVector> extends
 		int f = database.size()/phi ;
 		
 		
-		 BitSet r = new BitSet();
+		 
 		 HashSet<Integer> b = new HashSet<Integer>();
 		 for(Integer id : database){
-			 r.set(id);
 			 b.add(id);
 		} 
 		//if range = 0 => |range| = database.size();
@@ -373,7 +371,7 @@ public class EAFOD<V extends DoubleVector> extends
 					}
 				}
 		}
-		if(newPopulation.size()==0) {System.exit(0);}
+	
 	    Collections.sort(newPopulation);
 		return newPopulation;
 	}
@@ -450,7 +448,6 @@ public class EAFOD<V extends DoubleVector> extends
 			
 			
 		}
-		if(mutations.size()==0) {System.exit(0);}
 		Collections.sort(mutations);
 		return mutations ;
 	}
@@ -501,10 +498,10 @@ public class EAFOD<V extends DoubleVector> extends
 	/**
 	 * Crossover.
 	 * 
-	 * @param pop
-	 *            the pop
+	 * @param population
+	 *            
 	 * 
-	 * @return the tree set< Myubspace>
+	 * @return the tree set< Mysubspace>
 	 */
 	public ArrayList<MySubspace> crossover(ArrayList<MySubspace> population) {
 		
@@ -531,7 +528,6 @@ public class EAFOD<V extends DoubleVector> extends
 		if (pop.length % 2 == 1)
 			crossover.add(pop[pop.length - 1]);
 		    Collections.sort(crossover);
-		    if(crossover.size()==0) {System.exit(0);}
 		    return crossover ;
 		   
 	}
@@ -585,7 +581,7 @@ public class EAFOD<V extends DoubleVector> extends
 				mod2[index]=s2.getIndividium()[index];
 				//Add to the Enumeration
 				
-				tmp2.add(new MySubspace(mod2,fitness(mod1)));
+				tmp2.add(new MySubspace(mod1,fitness(mod1)));
 				tmp2.add(new MySubspace(mod2,fitness(mod2)));
 				
 				//remove the cloned individuum
@@ -594,13 +590,7 @@ public class EAFOD<V extends DoubleVector> extends
 			
 		}
 		int[] best2R=s1.getIndividium();
-		System.out.println(new MySubspace(best2R,fitness(best2R)).toString());
-		//Select the fittest
-		 int count = 0 ;
-		 for(int i = 0 ;i<dim ; i++){
-			 if( best2R[i] == 0) count ++ ;
-		 }
-	
+		//Select the fittest	
 		int k2= Q.size()/2;
 		int pos= 0;
 		int data=1;
@@ -658,6 +648,23 @@ public class EAFOD<V extends DoubleVector> extends
                
 	
 	return recombineVector;
+	}
+	
+	/**
+	 * 
+	 * @param c
+	 * @return
+	 */
+	public static ArrayList<String> comb (ArrayList<String> c ){
+		ArrayList<String> comb = new ArrayList<String>();
+		for(int i = 0 ; i<comb.size() ; i++){
+			String s = comb.get(i);
+			String s1 = s+"1";
+			String s2 = s+"2";
+			comb.add(s1);
+			comb.add(s2);
+		}
+		return comb ;
 	}
 	
 	/**
