@@ -19,9 +19,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 import experimentalcode.hettab.AxisPoint;
 import experimentalcode.hettab.MySubspace;
-import experimentalcode.hettab.Tupel;
+
 
 /**
  * 
@@ -91,17 +92,17 @@ public class EAFOD<V extends DoubleVector> extends
 	private int k;
 
 	/**
-	 * 
+	 * Holds the value of database dimensionality
 	 */
 	private int dim;
 
 	/**
-	 * 
+	 * Holds the value of database size
 	 */
 	private int size;
 
 	/**
-	 * 
+	 * Holds the value of equi-depth
 	 */
 	private HashMap<Integer, HashMap<Integer, HashSet<Integer>>> ranges;
 	/**
@@ -132,8 +133,6 @@ public class EAFOD<V extends DoubleVector> extends
 		// equiDempth sets
 		this.calculteDepth(database);
 
-		// System.exit(0);
-
 		ArrayList<MySubspace> pop = this.initialPopulation(10);
 		// best Population
 		TreeSet<MySubspace> bestSol = new TreeSet<MySubspace>(pop);
@@ -152,7 +151,7 @@ public class EAFOD<V extends DoubleVector> extends
 			System.out.println(pop);
 			// Mutation
 			System.out.println("mutation");
-			pop = mutation(pop, 0.1, 0.1);
+			pop = mutation(pop, 0.5,0.5);
 			System.out.println(pop);
 			System.out.println();
 
@@ -164,7 +163,7 @@ public class EAFOD<V extends DoubleVector> extends
 				tmp2.add(tmp.next());
 				i++;
 			}
-
+			bestSol = tmp2 ;
 			System.out.println("bestSol");
 			System.out.println(bestSol);
 		}
@@ -172,6 +171,7 @@ public class EAFOD<V extends DoubleVector> extends
 		return null;
 	}
 
+	
 	/**
 	 * 
 	 * @param database
@@ -204,7 +204,7 @@ public class EAFOD<V extends DoubleVector> extends
 		// if range = 0 => |range| = database.size();
 		// if database.size()%phi == 0 |range|=database.size()/phi
 		// if database.size()%phi == rest (1..rest => |range| =
-		// database.size()/phi +1 , rest..phi => |range| = database.size()/phi )
+		// database.size()/phi +1 , rest..phi => |range| = database.size()/phi 
 		int rest = database.size() % phi;
 		int f = database.size() / phi;
 
@@ -250,17 +250,17 @@ public class EAFOD<V extends DoubleVector> extends
 	 * 
 	 */
 	public boolean checkConvergence(TreeSet<MySubspace> pop) {
-
-		ArrayList<ArrayList<Tupel>> convDim = new ArrayList<ArrayList<Tupel>>();
+        
+		ArrayList<ArrayList<IntIntPair>> convDim = new ArrayList<ArrayList<IntIntPair>>();
 		boolean result = true;
 		MySubspace[] subspaces = new MySubspace[pop.size()];
 		subspaces = pop.toArray(subspaces);
 
 		// init count
 		for (int i = 0; i < pop.size(); i++) {
-			ArrayList<Tupel> tupels = new ArrayList<Tupel>();
+			ArrayList<IntIntPair> tupels = new ArrayList<IntIntPair>();
 			for (int j = 0; j < dim; j++) {
-				tupels.add(j, new Tupel(j, 0));
+				tupels.add(j, new IntIntPair(j, 0));
 			}
 			convDim.add(i, tupels);
 
@@ -302,20 +302,15 @@ public class EAFOD<V extends DoubleVector> extends
 		ArrayList<MySubspace> population = new ArrayList<MySubspace>();
 
 		// fill population
-
 		for (int i = 0; i < popsize; i++) {
-
 			// Random Individium
 			int[] individium = new int[dim];
-
 			// fill don't care ( any dimension == don't care)
 			for (int j = 0; j < dim; j++) {
 				individium[j] = 0;
 			}
-
 			// count of don't care positions
 			int countDim = k;
-
 			// fill non don't care positions of the Individium
 			while (countDim > 0) {
 				int z = random.nextInt(dim);
@@ -324,10 +319,8 @@ public class EAFOD<V extends DoubleVector> extends
 					countDim--;
 				}
 			}
-
 			population.add(new MySubspace(individium, fitness(individium)));
 		}
-
 		Collections.sort(population);
 		return population;
 	}
@@ -336,14 +329,11 @@ public class EAFOD<V extends DoubleVector> extends
 	 * 
 	 */
 	public ArrayList<MySubspace> selection(ArrayList<MySubspace> population) {
-
 		// probability
 		// Roulette weehl
 		Vector<Integer> probability = new Vector<Integer>();
-
 		// set of selected individium
 		ArrayList<MySubspace> newPopulation = new ArrayList<MySubspace>();
-
 		int sum = 0;
 		probability.add(sum);
 		// calculate probability
@@ -366,6 +356,7 @@ public class EAFOD<V extends DoubleVector> extends
 		if (newPopulation.size() == 0) {
 			System.exit(0);
 		}
+		//sort initialPopulation
 		Collections.sort(newPopulation);
 		return newPopulation;
 	}
@@ -396,9 +387,11 @@ public class EAFOD<V extends DoubleVector> extends
 				}
 
 			}
-			if (Q.size() != 0)
+			//
+			double r1 = random.nextDouble() ;
+			if (Q.size() != 0){
 				// Mutation Variant 1
-				if (Math.random() <= perc1) {
+				if (r1 <= perc1) {
 					// calc Mutation Spot
 					Integer[] pos = new Integer[Q.size()];
 					pos = Q.toArray(pos);
@@ -421,9 +414,10 @@ public class EAFOD<V extends DoubleVector> extends
 					Q.add(depth);
 					R.remove(depth);
 				}
-			if (R.size() != 0)
+			}
+		     r1 = random.nextDouble() ;
 				// Mutation Variant 2
-				if (Math.random() <= perc2) {
+				if (r1 <= perc2) {
 					// calc Mutation Spot
 					Integer[] pos = new Integer[R.size()];
 					pos = R.toArray(pos);
@@ -436,9 +430,6 @@ public class EAFOD<V extends DoubleVector> extends
 			int[] individium = population.get(j).getIndividium();
 			mutations.add(new MySubspace(individium, fitness(individium)));
 
-		}
-		if (mutations.size() == 0) {
-			System.exit(0);
 		}
 		Collections.sort(mutations);
 		return mutations;
@@ -453,6 +444,7 @@ public class EAFOD<V extends DoubleVector> extends
 
 		HashSet<Integer> m = new HashSet<Integer>(ranges.get(1).get(
 				individium[0]));
+		//intersect
 		for (int i = 2; i <= individium.length; i++) {
 			HashSet<Integer> current = new HashSet<Integer>(ranges.get(i).get(
 					individium[i - 1]));
@@ -460,6 +452,7 @@ public class EAFOD<V extends DoubleVector> extends
 			m.clear();
 			m.addAll(result);
 		}
+		//calculate sparsity c
 		double f = (double) 1 / phi;
 		double nD = (double) m.size();
 		double fK = Math.pow(f, k);
@@ -467,27 +460,6 @@ public class EAFOD<V extends DoubleVector> extends
 		return sC;
 	}
 
-	/**
-	 * 
-	 * @param set1
-	 * @param set2
-	 * @return
-	 */
-	public static HashSet<Integer> retainAll(HashSet<Integer> set1,
-			HashSet<Integer> set2) {
-		HashSet<Integer> result = new HashSet<Integer>();
-		for (Integer id : set1) {
-			if (set2.contains(id)) {
-				result.add(id);
-			}
-		}
-		for (Integer id : set2) {
-			if (set1.contains(id)) {
-				result.add(id);
-			}
-		}
-		return result;
-	}
 
 	/**
 	 * Crossover.
@@ -521,9 +493,6 @@ public class EAFOD<V extends DoubleVector> extends
 		if (pop.length % 2 == 1)
 			crossover.add(pop[pop.length - 1]);
 		Collections.sort(crossover);
-		if (crossover.size() == 0) {
-			System.exit(0);
-		}
 		return crossover;
 
 	}
@@ -553,46 +522,31 @@ public class EAFOD<V extends DoubleVector> extends
 				R.add(i);
 			}
 		}
-		/**
-		 * Iterator<Integer> r = R.iterator(); // Selection of the Best
-		 * Combination of R Spots TreeSet<MySubspace> tmp2= new
-		 * TreeSet<MySubspace>(); tmp2.add(nullSubspace(dim));
-		 * 
-		 * // For every Position in R while (r.hasNext()) { int index =
-		 * r.next(); MySubspace[] tmp4= new MySubspace[tmp2.size()];
-		 * tmp4=tmp2.toArray(tmp4); //For every String in the Enumeration for
-		 * (int i=0; i< tmp4.length;i++) { //Set the new Positions int[] mod1=
-		 * tmp4[i].getIndividium().clone(); int[] mod2=
-		 * tmp4[i].getIndividium().clone();
-		 * 
-		 * mod1[index]=s1.getIndividium()[index];
-		 * mod2[index]=s2.getIndividium()[index]; //Add to the Enumeration
-		 * 
-		 * tmp2.add(new MySubspace(mod1,fitness(mod1))); tmp2.add(new
-		 * MySubspace(mod2,fitness(mod2)));
-		 * 
-		 * //remove the cloned individuum tmp2.remove(tmp4[i]); }
-		 * 
-		 * }
-		 **/
-		TreeSet<MySubspace> bestCombi = new TreeSet<MySubspace>();
-		ArrayList<int[]> best = comb(R, s1, s2);
-		Iterator<int[]> m = best.iterator();
+		
 
-		while (m.hasNext()) {
-			int[] next = m.next();
-			bestCombi.add(new MySubspace(next, fitness(next)));
+		
+		int[] best2R = new int[dim];
+		//select the fittest combination of R
+		if(R.size()!=0){
+			TreeSet<MySubspace> bestCombi = new TreeSet<MySubspace>();
+			//best 2R Combination
+			ArrayList<int[]> best = comb(R, s1, s2);
+			Iterator<int[]> m = best.iterator();
+         
+			while (m.hasNext()) {
+				int[] next = m.next();
+				bestCombi.add(new MySubspace(next, fitness(next)));
+			      }
+		    best2R = bestCombi.first().getIndividium();
+		}
+		//if R.size() == 0 only extends String
+		else{
+			for(int i = 0 ;i<dim ; i++){
+				best2R[i]= 0 ;
+			}
 		}
 
-		// Select the fittest
-		int[] best2R = bestCombi.first().getIndividium();
-
-		// pos of don't care in best2R
-		TreeSet<Integer> nullDepth = new TreeSet<Integer>();
-		for (int i = 0; i < dim; i++) {
-			if (best2R[i] == 0)
-				nullDepth.add(i);
-		}
+        //Extends String greedily
 		int[] b = best2R.clone();
 		int count = k - R.size();
 		Iterator<Integer> q = Q.iterator();
@@ -606,7 +560,6 @@ public class EAFOD<V extends DoubleVector> extends
 
 				int next = q.next();
 				pos = next ;
-				if (nullDepth.contains(next))
                  
 		          {
 					boolean s1Null = (s1.getIndividium()[next] == 0);
@@ -618,13 +571,13 @@ public class EAFOD<V extends DoubleVector> extends
 					if (fitness(l1) >= fitness(l2)) {
 						b = l1.clone();
 						if (s1Null) {
-							nullDepth.add(next);
+							
 							count--;
 						}
 					} else {
 						b = l2.clone();
 						if (s2Null) {
-							nullDepth.add(next);
+							
 							count--;
 						}
 					}
@@ -661,6 +614,29 @@ public class EAFOD<V extends DoubleVector> extends
 		}
 		return new MySubspace(individium);
 	}
+	
+	/**
+	 * 
+	 * @param set1
+	 * @param set2
+	 * @return
+	 */
+	public static HashSet<Integer> retainAll(HashSet<Integer> set1,
+			HashSet<Integer> set2) {
+		HashSet<Integer> result = new HashSet<Integer>();
+		for (Integer id : set1) {
+			if (set2.contains(id)) {
+				result.add(id);
+			}
+		}
+		for (Integer id : set2) {
+			if (set1.contains(id)) {
+				result.add(id);
+			}
+		}
+		return result;
+	}
+
 
 	/**
 	 * 
