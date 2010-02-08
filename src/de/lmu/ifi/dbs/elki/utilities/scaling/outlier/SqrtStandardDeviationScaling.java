@@ -6,8 +6,8 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.MinMax;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -111,11 +111,11 @@ public class SqrtStandardDeviationScaling extends AbstractParameterizable implem
   }
 
   @Override
-  public void prepare(Database<?> db, @SuppressWarnings("unused") Result result, AnnotationResult<Double> ann) {
+  public void prepare(Database<?> db, @SuppressWarnings("unused") Result result, OutlierResult or) {
     if(min == null) {
       MinMax<Double> mm = new MinMax<Double>();
       for(Integer id : db) {
-        double val = ann.getValueFor(id);
+        double val = or.getScores().getValueFor(id);
         mm.put(val);
       }
       min = mm.getMin();
@@ -123,7 +123,7 @@ public class SqrtStandardDeviationScaling extends AbstractParameterizable implem
     if(mean == null) {
       MeanVariance mv = new MeanVariance();
       for(Integer id : db) {
-        double val = ann.getValueFor(id);
+        double val = or.getScores().getValueFor(id);
         val = (val <= min) ? 0 : Math.sqrt(val - min);
         mv.put(val);
       }
@@ -134,7 +134,7 @@ public class SqrtStandardDeviationScaling extends AbstractParameterizable implem
       double sqsum = 0;
       int cnt = 0;
       for(Integer id : db) {
-        double val = ann.getValueFor(id);
+        double val = or.getScores().getValueFor(id);
         val = (val <= min) ? 0 : Math.sqrt(val - min);
         sqsum += (val - mean) * (val - mean);
         cnt += 1;

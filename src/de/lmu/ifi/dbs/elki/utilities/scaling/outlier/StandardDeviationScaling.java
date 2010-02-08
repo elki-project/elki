@@ -5,8 +5,8 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -87,11 +87,11 @@ public class StandardDeviationScaling extends AbstractParameterizable implements
   }
 
   @Override
-  public void prepare(Database<?> db, @SuppressWarnings("unused") Result result, AnnotationResult<Double> ann) {
+  public void prepare(Database<?> db, @SuppressWarnings("unused") Result result, OutlierResult or) {
     if(fixedmean == null) {
       MeanVariance mv = new MeanVariance();
       for(Integer id : db) {
-        double val = ann.getValueFor(id);
+        double val = or.getScores().getValueFor(id);
         mv.put(val);
       }
       mean = mv.getMean();
@@ -102,7 +102,7 @@ public class StandardDeviationScaling extends AbstractParameterizable implements
       double sqsum = 0;
       int cnt = 0;
       for(Integer id : db) {
-        double val = ann.getValueFor(id);
+        double val = or.getScores().getValueFor(id);
         sqsum += (val - mean) * (val - mean);
         cnt += 1;
       }
