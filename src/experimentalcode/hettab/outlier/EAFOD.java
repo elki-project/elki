@@ -50,7 +50,6 @@ public class EAFOD<V extends DoubleVector> extends
 	 * Parameter to specify the number of solutions must be an integer greater
 	 * than 1.
 	 * <p>
-	 * <p>
 	 * Key: {@code -eafod.m}
 	 * </p>
 	 */
@@ -409,7 +408,7 @@ public class EAFOD<V extends DoubleVector> extends
 	}
 
 	/**
-	 * 
+	 * method implements the mutation algorithm
 	 */
 	public ArrayList<MySubspace> mutation(ArrayList<MySubspace> population,
 			double perc1, double perc2) {
@@ -483,9 +482,9 @@ public class EAFOD<V extends DoubleVector> extends
 	}
 
 	/**
-	 * 
+	 * method calculate the fitness of individual
 	 * @param individual
-	 * @return
+	 * @return sparsity coefficient
 	 */
 	public double fitness(int[] individual) {
 
@@ -508,7 +507,7 @@ public class EAFOD<V extends DoubleVector> extends
 	}
 	
 	/**
-	 * 
+	 * method get the ids of individual
 	 */
       public Vector<Integer> getIDs (int[] individual){
     	  
@@ -529,12 +528,8 @@ public class EAFOD<V extends DoubleVector> extends
       }
 
 	/**
-	 * Crossover.
+	 * method implements the crossover algorithm
 	 * 
-	 * @param pop
-	 *            the pop
-	 * 
-	 * @return the tree set< Myubspace>
 	 */
 	public ArrayList<MySubspace> crossover(ArrayList<MySubspace> population) {
 
@@ -566,9 +561,7 @@ public class EAFOD<V extends DoubleVector> extends
 
 	/**
 	 * 
-	 * @param s1
-	 * @param s2
-	 * @return
+	 * method implements the recombine algorithm
 	 */
 	public Pair<MySubspace,MySubspace> recombine(MySubspace s1, MySubspace s2) {
 		
@@ -666,7 +659,7 @@ public class EAFOD<V extends DoubleVector> extends
 	}
 
 	/**
-	 * 
+	 * method 
 	 */
 	public static MySubspace nullSubspace(int dim) {
 		int[] individual = new int[dim];
@@ -700,7 +693,7 @@ public class EAFOD<V extends DoubleVector> extends
 
 
 	/**
-	 * 
+	 * method 
 	 */
 	public static ArrayList<int[]> comb(TreeSet<Integer> R, MySubspace s1,
 			MySubspace s2) {
@@ -750,10 +743,12 @@ public class EAFOD<V extends DoubleVector> extends
 	 */
 	@Override
 	public Description getDescription() {
-		// TODO Auto-generated method stub
-		return null;
+		return new Description("shortTitle", "longTitle", "purposeAndDescription", "reference");
 	}
-
+    
+	/**
+	 * 
+	 */
 	@Override
 	public MultiResult getResult() {
 		// TODO Auto-generated method stub
