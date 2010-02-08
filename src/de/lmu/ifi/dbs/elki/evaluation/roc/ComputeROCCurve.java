@@ -116,9 +116,10 @@ public class ComputeROCCurve<O extends DatabaseObject> extends AbstractAlgorithm
     List<Pair<Double, Double>> roccurve = ROC.materializeROC(database.size(), positivecluster.getIDs(), new ROC.SimpleAdapter(order.iterator()));
     double rocauc = ROC.computeAUC(roccurve);    
     
-    result = new MultiResult();
-    result.addResult(new CollectionResult<Pair<Double, Double>>(roccurve));
-    ResultUtil.setGlobalAssociation(result, ROC_AUC, rocauc);
+    List<String> header = new ArrayList<String>(1);
+    header.add(ROC_AUC.getLabel()+": "+rocauc);
+    result = ResultUtil.ensureMultiResult(innerresult);
+    result.addResult(new CollectionResult<Pair<Double, Double>>(roccurve, header));
     return result;
   }
 
