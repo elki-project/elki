@@ -19,7 +19,7 @@ public abstract class AbstractDoubleDistanceFunction<O extends DatabaseObject> e
    * Strings that define a non-negative Double.
    */
   protected AbstractDoubleDistanceFunction() {
-    super(Pattern.compile("\\d+(\\.\\d+)?([eE][-]?\\d+)?"));
+    super(Pattern.compile("(\\d+|\\d*\\.\\d+)?([eE][-]?\\d+)?"));
   }
 
   /**
