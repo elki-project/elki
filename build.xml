@@ -53,7 +53,7 @@
 	<!-- ******************* FOLDER CONFIGURATION ******************* -->
 
 	<!-- Release output folders and targets -->
-	<condition property="deploy.output" value="${sharedfolder}/releases/${release.version}/${now}/output">
+	<condition property="deploy.output" value="${sharedfolder}/releases/${release.version}/output">
 		<isset property="release.official" />
 	</condition>
 	<condition property="javadoc.destdir" value="${deploy.output}/doc">
@@ -90,9 +90,11 @@
 	<!-- Experimentalcode is sometimes excluded - if it prevents an internal build -->
 	<patternset id="exclude.internal">
 		<exclude name="experimentalcode/hettab/**" />
+		<exclude name="experimentalcode/irina/**" />
+		<exclude name="experimentalcode/ivascu/**" />
+		<exclude name="experimentalcode/lisa/**" />
 		<exclude name="experimentalcode/marisa/**" />
 		<exclude name="experimentalcode/simon/**" />
-		<exclude name="experimentalcode/irina/**" />
 		<exclude name="experimentalcode/thomas/**" />
 		<exclude name="experimentalcode/tobias/**" />
 	</patternset>
@@ -334,7 +336,7 @@
 			</mapper>
 		</unjar>
 		<!-- Install JUnit -->
-		<unjar dest="${build.jardir}" src="${build.lib}/junit-4.5.jar" overwrite="false">
+		<unjar dest="${build.jardir}" src="${build.lib}/junit-4.8.1.jar" overwrite="false">
 			<patternset>
 				<include name="junit/**" />
 				<include name="org/junit/**" />
@@ -359,14 +361,30 @@
 			</mapper>
 		</unjar>
 		<!-- Install XML Commons External -->
-		<unjar dest="${build.jardir}" src="${build.lib}/xml-commons-external-1.3.04.jar" overwrite="false">
+		<unjar dest="${build.jardir}" src="${build.lib}/xml-commons-external-1.4.01.jar" overwrite="false">
 			<patternset>
 				<include name="org/apache/xmlcommons/**" />
+				<include name="org/w3c/**" />
+				<include name="org/xml.sax/**" />
+				<include name="javax/xml/**" />
+			</patternset>
+		</unjar>
+		<unjar dest="${build.jardir}" src="${build.lib}/xml-commons-external-1.4.01-ext.jar" overwrite="false">
+			<patternset>
 				<include name="org/w3c/**" />
 			</patternset>
 		</unjar>
 		<!-- add extra licence file for XML Commons External -->
-		<copy file="${build.lib}/xml-commons-external-1.3.04.jar.LICENSE.txt" tofile="${build.jardir}/legal/xml-commons-external-LICENSE.txt" />
+		<copy file="${build.lib}/xml-commons-external-1.4.01.jar.LICENSE.txt" tofile="${build.jardir}/legal/xml-commons-external-LICENSE.txt" />
+		<!-- Install Apache Commons Math -->
+		<unjar dest="${build.jardir}" src="${build.lib}/commons-math-2.0.jar" overwrite="false">
+			<patternset>
+				<include name="org/apache/commons/math/**" />
+				<include name="META-INF/maven/org/apache/commons/**" />
+			</patternset>
+		</unjar>
+		<!-- add extra licence file for Apache Commons Math -->
+		<copy file="${build.lib}/commons-math-2.0.jar.LICENSE.txt" tofile="${build.jardir}/legal/commons-math-LICENSE.txt" />
 
 		<!-- Source code -->
 		<mkdir dir="${build.jardir}/src" />
