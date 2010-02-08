@@ -111,7 +111,7 @@ public final class MeanVariance {
    */
   public double getVariance() {
     double mu = sum / count;
-    return (sqrSum / count) - (mu * mu);
+    return (sqrSum / (count-1)) - (mu * mu);
   }
   
   /**

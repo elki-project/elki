@@ -79,7 +79,7 @@ public class TestKernelDensityFitting implements JUnit4Test {
     // data.
     double[] fullparams = estimateInitialParameters(fulldata);
     assertEquals("Full Mean before fitting", 0.4446105, fullparams[0], 0.0001);
-    assertEquals("Full Stddev before fitting", 1.39417650, fullparams[1], 0.0001);
+    assertEquals("Full Stddev before fitting", 1.401912437, fullparams[1], 0.0001);
 
     // Do a fit using only part of the data and check the results are right.
     double[] fullfit = run(fulldata, fullparams);
@@ -95,7 +95,7 @@ public class TestKernelDensityFitting implements JUnit4Test {
     // data.
     double[] params = estimateInitialParameters(halfdata);
     assertEquals("Mean before fitting", -0.65723044, params[0], 0.0001);
-    assertEquals("Stddev before fitting", 1.00107564, params[1], 0.0001);
+    assertEquals("Stddev before fitting", 1.01558843, params[1], 0.0001);
 
     // Do a fit using only part of the data and check the results are right.
     double[] ps = run(halfdata, params);
