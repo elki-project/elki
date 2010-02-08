@@ -248,6 +248,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
    * @throws ClassCastException if the association cannot be cast as the class
    *         that is specified by the associationID
    */
+  @Deprecated
   <T> void associateGlobally(AssociationID<T> associationID, T association) throws ClassCastException;
 
   /**
@@ -281,6 +282,7 @@ public interface Database<O extends DatabaseObject> extends Parameterizable, Res
    * @return Object the association or null, if there is no association with the
    *         specified associationID
    */
+  @Deprecated
   <T> T getGlobalAssociation(AssociationID<T> associationID);
 
   /**
