@@ -214,7 +214,7 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
 
     // TODO: what if we don't have any weak eigenvectors?
     if(weakEigenvectors.getColumnDimensionality() == 0) {
-      sol = new CorrelationAnalysisSolution<V>(null, db, strongEigenvectors, weakEigenvectors, pcares.similarityMatrix(), centroid, NF);
+      sol = new CorrelationAnalysisSolution<V>(null, db, strongEigenvectors, weakEigenvectors, pcares.similarityMatrix(), centroid);
     }
     else {
       Matrix transposedWeakEigenvectors = weakEigenvectors.transpose();
@@ -253,7 +253,7 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
       LinearEquationSystem lq = new LinearEquationSystem(a, b);
       lq.solveByTotalPivotSearch();
 
-      sol = new CorrelationAnalysisSolution<V>(lq, db, strongEigenvectors, pcares.getWeakEigenvectors(), pcares.similarityMatrix(), centroid, NF);
+      sol = new CorrelationAnalysisSolution<V>(lq, db, strongEigenvectors, pcares.getWeakEigenvectors(), pcares.similarityMatrix(), centroid);
 
       if(logger.isDebuggingFine()) {
         StringBuilder log = new StringBuilder();
