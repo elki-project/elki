@@ -10,7 +10,6 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.AnnotationFromHashMap;
 import de.lmu.ifi.dbs.elki.result.AnnotationResult;
-import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromHashMap;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -79,15 +78,15 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
   protected OutlierResult runInTime(Database<O> database) throws IllegalStateException {
     Result innerresult = algorithm.run(database);
 
-    AnnotationResult<Double> ann = getAnnotationResult(database, innerresult);
+    OutlierResult or = getOutlierResult(database, innerresult);
     if (scaling instanceof OutlierScalingFunction) {
-      ((OutlierScalingFunction)scaling).prepare(database, innerresult, ann);
+      ((OutlierScalingFunction)scaling).prepare(database, innerresult, or);
     }
     
     HashMap<Integer, Double> scaledscores = new HashMap<Integer, Double>(database.size());
 
     for(Integer id : database) {
-      double val = ann.getValueFor(id);
+      double val = or.getScores().getValueFor(id);
       val = scaling.getScaled(val);
       scaledscores.put(id, val);
     }
@@ -102,21 +101,18 @@ public class NormalizeOutlierScoreMetaAlgorithm<O extends DatabaseObject> extend
   }
   
   /**
-   * Find an AnnotationResult that contains Doubles.
+   * Find an OutlierResult to work with.
    * 
    * @param database Database context
    * @param result Result object
    * @return Iterator to work with
    */
-  @SuppressWarnings("unchecked")
-  private AnnotationResult<Double> getAnnotationResult(Database<O> database, Result result) {
-    List<AnnotationResult<?>> annotations = ResultUtil.getAnnotationResults(result);
-    for(AnnotationResult<?> ann : annotations) {
-      if(Double.class.isAssignableFrom(ann.getAssociationID().getType())) {
-        return (AnnotationResult<Double>) ann;
-      }
+  private OutlierResult getOutlierResult(Database<O> database, Result result) {
+    List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
+    if (ors.size() > 0) {
+      return ors.get(0);
     }
-    throw new IllegalStateException("Comparison algorithm expected at least one Annotation<Double> result, got " + annotations.size() + " annotation results.");
+    throw new IllegalStateException("Comparison algorithm expected at least one outlier result.");
   }
 
   @Override

@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
 
@@ -23,7 +23,7 @@ public interface OutlierScalingFunction extends ScalingFunction {
    * 
    * @param db Database used
    * @param result Result object
-   * @param ann Annotation that is being used
+   * @param or Outlier result to use
    */
-  public void prepare(Database<?> db, Result result, AnnotationResult<Double> ann);
+  public void prepare(Database<?> db, Result result, OutlierResult or);
 }

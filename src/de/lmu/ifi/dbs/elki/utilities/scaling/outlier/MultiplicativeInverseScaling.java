@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 
 /**
  * Scaling function to invert values basically by computing 1/x, but in a variation
@@ -33,8 +33,8 @@ public class MultiplicativeInverseScaling implements OutlierScalingFunction {
   }
 
   @Override
-  public void prepare(Database<?> db, @SuppressWarnings("unused") Result result, AnnotationResult<Double> ann) {
-    scaleval = getScaleValue(db, ann);
+  public void prepare(Database<?> db, @SuppressWarnings("unused") Result result, OutlierResult or) {
+    scaleval = getScaleValue(db, or);
   }
 
   /**
@@ -44,10 +44,10 @@ public class MultiplicativeInverseScaling implements OutlierScalingFunction {
    * @param ann Annotation to use.
    * @return Scaling value.
    */
-  private static double getScaleValue(Database<?> db, AnnotationResult<Double> ann) {
+  private static double getScaleValue(Database<?> db, OutlierResult or) {
     double max = Double.MIN_VALUE;
     for(Integer id : db) {
-      double val = ann.getValueFor(id);
+      double val = or.getScores().getValueFor(id);
       double inv = Math.abs(1.0 / val);
       if(!Double.isInfinite(inv) && !Double.isNaN(inv)) {
         max = Math.max(max, inv);

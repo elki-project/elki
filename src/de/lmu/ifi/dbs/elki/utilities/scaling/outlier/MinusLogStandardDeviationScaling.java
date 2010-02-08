@@ -5,8 +5,8 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.ErrorFunctions;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 
 /**
@@ -39,11 +39,11 @@ public class MinusLogStandardDeviationScaling extends StandardDeviationScaling i
   }
 
   @Override
-  public void prepare(Database<?> db, @SuppressWarnings("unused") Result result, AnnotationResult<Double> ann) {
+  public void prepare(Database<?> db, @SuppressWarnings("unused") Result result, OutlierResult or) {
     if(fixedmean == null) {
       MeanVariance mv = new MeanVariance();
       for(Integer id : db) {
-        double val = -Math.log(ann.getValueFor(id));
+        double val = -Math.log(or.getScores().getValueFor(id));
         if(!Double.isNaN(val) && !Double.isInfinite(val)) {
           mv.put(val);
         }
@@ -56,7 +56,7 @@ public class MinusLogStandardDeviationScaling extends StandardDeviationScaling i
       double sqsum = 0;
       int cnt = 0;
       for(Integer id : db) {
-        double val = -Math.log(ann.getValueFor(id));
+        double val = -Math.log(or.getScores().getValueFor(id));
         if(!Double.isNaN(val) && !Double.isInfinite(val)) {
           sqsum += (val - mean) * (val - mean);
           cnt += 1;

@@ -4,8 +4,8 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.MinMax;
-import de.lmu.ifi.dbs.elki.result.AnnotationResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -81,11 +81,11 @@ public class OutlierSqrtScaling extends AbstractParameterizable implements Outli
   }
 
   @Override
-  public void prepare(Database<?> db, @SuppressWarnings("unused") Result result, AnnotationResult<Double> ann) {
+  public void prepare(Database<?> db, @SuppressWarnings("unused") Result result, OutlierResult or) {
     if(min == null || max == null) {
       MinMax<Double> mm = new MinMax<Double>();
       for(Integer id : db) {
-        double val = ann.getValueFor(id);
+        double val = or.getScores().getValueFor(id);
         mm.put(val);
       }
       if(min == null) {
