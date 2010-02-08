@@ -8,7 +8,6 @@ import java.util.Set;
 import de.lmu.ifi.dbs.elki.data.ParameterizationFunction;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
 
@@ -45,7 +44,7 @@ public class CASHIntervalSplit extends AbstractLoggable {
      * @param minPts   the number of minimum points
      */
     public CASHIntervalSplit(Database<ParameterizationFunction> database, int minPts) {
-        super(LoggingConfiguration.DEBUG);
+        super();
 
         this.database = database;
         this.minPts = minPts;
