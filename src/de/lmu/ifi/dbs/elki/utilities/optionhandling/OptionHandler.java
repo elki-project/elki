@@ -54,7 +54,7 @@ public class OptionHandler extends AbstractLoggable {
    * OptionHandler will provide them.
    */
   public OptionHandler() {
-    super(false);
+    super();
   }
 
   /**

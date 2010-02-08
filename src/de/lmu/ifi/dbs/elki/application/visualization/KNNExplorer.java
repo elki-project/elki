@@ -287,7 +287,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, N extends NumberDistance<
      * Constructor.
      */
     public ExplorerWindow() {
-      super(false);
+      super();
 
       frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 

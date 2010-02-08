@@ -29,6 +29,16 @@ public abstract class AbstractLoggable {
    * 
    * @param debug the debug status.
    */
+  protected AbstractLoggable() {
+    this.logger = Logging.getLogger(this.getClass());
+    this.debug = LoggingConfiguration.DEBUG;
+  }
+
+  /**
+   * Initializes the logger and sets the debug status to the given value.
+   * 
+   * @param debug the debug status.
+   */
   protected AbstractLoggable(boolean debug) {
     this.logger = Logging.getLogger(this.getClass());
     this.debug = debug;
@@ -41,6 +51,7 @@ public abstract class AbstractLoggable {
    * @param debug the debug status.
    * @param name the name of the logger.
    */
+  @Deprecated
   protected AbstractLoggable(boolean debug, String name) {
     this.logger = Logging.getLogger(name);
     this.debug = debug;
