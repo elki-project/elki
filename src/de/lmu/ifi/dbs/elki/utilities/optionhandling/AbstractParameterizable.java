@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -155,30 +154,6 @@ public abstract class AbstractParameterizable extends AbstractLoggable implement
   public final ArrayList<String> getParameters() {
     ArrayList<String> param = new ArrayList<String>(currentParameterArrayList);
     return param;
-  }
-
-  /**
-   * Returns the settings of all options assigned to the option handler.
-   * @return the settings of all options assigned to the option handler
-   * @deprecated Use {@link #collectOptions} instead.
-   */
-  @Deprecated
-  public List<AttributeSettings> getAttributeSettings() {
-    List<AttributeSettings> settings = new ArrayList<AttributeSettings>();
-    // collect all options
-    ArrayList<Pair<Parameterizable, Option<?>>> collection = this.collectOptions();
-    // group by parameterizable
-    HashMap<Parameterizable, AttributeSettings> map = new HashMap<Parameterizable, AttributeSettings>();
-    for (Pair<Parameterizable, Option<?>> pair : collection) {
-      AttributeSettings set = map.get(pair.getFirst());
-      if (set == null) {
-        set = new AttributeSettings(pair.getFirst());
-        map.put(pair.getFirst(), set);
-        settings.add(set);
-      }
-      set.addOption(pair.getSecond());
-    }
-    return settings;
   }
 
   /**
