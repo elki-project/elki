@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.ListIterator;
 
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -37,7 +36,18 @@ public abstract class AbstractParameterizable extends AbstractLoggable implement
    * the parameter array.
    */
   public AbstractParameterizable() {
-    super(LoggingConfiguration.DEBUG);
+    super();
+    optionHandler = new OptionHandler();
+  }
+
+  /**
+   * Creates a new AbstractParameterizable that provides the option handler and
+   * the parameter array.
+   * 
+   * @param debug Force debug flag.
+   */
+  public AbstractParameterizable(boolean debug) {
+    super(debug);
     optionHandler = new OptionHandler();
   }
 
