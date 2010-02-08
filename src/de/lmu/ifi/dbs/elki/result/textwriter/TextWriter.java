@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterDatabaseObjectInline;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterObjectComment;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterObjectInline;
@@ -105,9 +106,9 @@ public class TextWriter<O extends DatabaseObject> {
    * 
    * @param db to retrieve meta information from
    * @param out the print stream where to write
-   * @param settings the settings to be written into the header
+   * @param sr the settings to be written into the header
    */
-  protected void printSettings(Database<O> db, TextWriterStream out, List<Pair<Parameterizable, Option<?>>> settings) {
+  protected void printSettings(Database<O> db, TextWriterStream out, List<SettingsResult> sr) {
     out.commentPrintSeparator();
     out.commentPrintLn("Settings and meta information:");
     out.commentPrintLn("db size = " + db.size());
@@ -121,28 +122,30 @@ public class TextWriter<O extends DatabaseObject> {
     }
     out.commentPrintLn("");
 
-    if(settings != null) {
-      Parameterizable last = null;
-      for(Pair<Parameterizable, Option<?>> setting : settings) {
-        if(setting.first != last) {
-          if(last != null) {
-            out.commentPrintLn("");
+    if(sr != null) {
+      for(SettingsResult settings : sr) {
+        Parameterizable last = null;
+        for(Pair<Parameterizable, Option<?>> setting : settings.getSettings()) {
+          if(setting.first != last) {
+            if(last != null) {
+              out.commentPrintLn("");
+            }
+            out.commentPrintLn(setting.first.getClass());
+            last = setting.first;
           }
-          out.commentPrintLn(setting.first.getClass());
-          last = setting.first;
+          String name = setting.second.getOptionID().getName();
+          String value;
+          try {
+            value = setting.second.getValue().toString();
+          }
+          catch(NullPointerException e) {
+            value = "[null]";
+          }
+          catch(UnusedParameterException e) {
+            value = "[unset]";
+          }
+          out.commentPrintLn(OptionHandler.OPTION_PREFIX + name + " " + value);
         }
-        String name = setting.second.getOptionID().getName();
-        String value;
-        try {
-          value = setting.second.getValue().toString();
-        }
-        catch(NullPointerException e) {
-          value = "[null]";
-        }
-        catch(UnusedParameterException e) {
-          value = "[unset]";
-        }
-        out.commentPrintLn(OptionHandler.OPTION_PREFIX + name + " " + value);
       }
     }
 
@@ -164,6 +167,7 @@ public class TextWriter<O extends DatabaseObject> {
     List<OrderingResult> ro = null;
     List<Clustering<? extends Model>> rc = null;
     List<IterableResult<?>> ri = null;
+    List<SettingsResult> rs = null;
     MultiResult rm = null;
 
     Collection<DatabaseObjectGroup> groups = null;
@@ -172,6 +176,7 @@ public class TextWriter<O extends DatabaseObject> {
     ro = ResultUtil.getOrderingResults(r);
     rc = ResultUtil.getClusteringResults(r);
     ri = ResultUtil.getIterableResults(r);
+    rs = ResultUtil.getSettingsResults(r);
 
     if(r instanceof MultiResult) {
       rm = (MultiResult) r;
@@ -196,15 +201,13 @@ public class TextWriter<O extends DatabaseObject> {
       }
     }
 
-    List<Pair<Parameterizable, Option<?>>> settings = ResultUtil.getGlobalAssociation(r, AssociationID.META_SETTINGS);
-
     if(ri != null && ri.size() > 0) {
       // TODO: associations are not passed to ri results.
-      writeIterableResult(db, streamOpener, ri.get(0), rm);
+      writeIterableResult(db, streamOpener, ri.get(0), rm, rs);
     }
     if(groups != null && groups.size() > 0) {
       for(DatabaseObjectGroup group : groups) {
-        writeGroupResult(db, streamOpener, group, ra, ro, naming, settings);
+        writeGroupResult(db, streamOpener, group, ra, ro, naming, rs);
       }
     }
   }
@@ -236,7 +239,7 @@ public class TextWriter<O extends DatabaseObject> {
     out.flush();
   }
 
-  private void writeGroupResult(Database<O> db, StreamFactory streamOpener, DatabaseObjectGroup group, List<AnnotationResult<?>> ra, List<OrderingResult> ro, NamingScheme naming, List<Pair<Parameterizable, Option<?>>> settings) throws FileNotFoundException, UnableToComplyException, IOException {
+  private void writeGroupResult(Database<O> db, StreamFactory streamOpener, DatabaseObjectGroup group, List<AnnotationResult<?>> ra, List<OrderingResult> ro, NamingScheme naming, List<SettingsResult> sr) throws FileNotFoundException, UnableToComplyException, IOException {
     String filename = null;
     // for clusters, use naming.
     if(group instanceof Cluster) {
@@ -253,7 +256,7 @@ public class TextWriter<O extends DatabaseObject> {
     PrintStream outStream = streamOpener.openStream(filename);
     TextWriterStream out = new TextWriterStreamNormalizing<O>(outStream, writers, getNormalization());
 
-    printSettings(db, out, settings);
+    printSettings(db, out, sr);
     // print group information...
     if(group instanceof TextWriteable) {
       TextWriterWriterInterface<?> writer = out.getWriterFor(group);
@@ -302,7 +305,7 @@ public class TextWriter<O extends DatabaseObject> {
     out.flush();
   }
 
-  private void writeIterableResult(Database<O> db, StreamFactory streamOpener, IterableResult<?> ri, MultiResult mr) throws UnableToComplyException, IOException {
+  private void writeIterableResult(Database<O> db, StreamFactory streamOpener, IterableResult<?> ri, MultiResult mr, List<SettingsResult> sr) throws UnableToComplyException, IOException {
     String filename = ri.getName();
     logger.debugFine("Filename is " + filename);
     if(filename == null) {
@@ -310,16 +313,12 @@ public class TextWriter<O extends DatabaseObject> {
     }
     PrintStream outStream = streamOpener.openStream(filename);
     TextWriterStream out = new TextWriterStreamNormalizing<O>(outStream, writers, getNormalization());
+    printSettings(db, out, sr);
 
     if(mr != null) {
       // TODO: this is an ugly hack!
       out.setForceincomments(true);
       for(AssociationID<?> assoc : mr.getAssociations()) {
-        // TODO: make generic!
-        if(assoc == AssociationID.META_SETTINGS) {
-          printSettings(db, out, mr.getAssociation(AssociationID.META_SETTINGS));
-          continue;
-        }
         Object o = mr.getAssociation(assoc);
         TextWriterWriterInterface<?> writer = out.getWriterFor(o);
         if(writer != null) {

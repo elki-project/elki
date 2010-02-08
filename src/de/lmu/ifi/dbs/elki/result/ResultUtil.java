@@ -6,6 +6,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.AssociationID;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 
 /**
@@ -165,6 +166,42 @@ public class ResultUtil {
     }
     if(r instanceof MultiResult) {
       return ClassGenericsUtil.castWithGenericsOrNull(List.class, ((MultiResult) r).filterResults(IterableResult.class));
+    }
+    return null;
+  }
+
+  /**
+   * Collect all outlier results from a Result
+   * 
+   * @param r Result
+   * @return List of outlier results
+   */
+  public static List<OutlierResult> getOutlierResults(Result r) {
+    if(r instanceof OutlierResult) {
+      List<OutlierResult> ors = new ArrayList<OutlierResult>(1);
+      ors.add((OutlierResult) r);
+      return ors;
+    }
+    if(r instanceof MultiResult) {
+      return ((MultiResult) r).filterResults(OutlierResult.class);
+    }
+    return null;
+  }
+
+  /**
+   * Collect all settings results from a Result
+   * 
+   * @param r Result
+   * @return List of settings results
+   */
+  public static List<SettingsResult> getSettingsResults(Result r) {
+    if(r instanceof SettingsResult) {
+      List<SettingsResult> ors = new ArrayList<SettingsResult>(1);
+      ors.add((SettingsResult) r);
+      return ors;
+    }
+    if(r instanceof MultiResult) {
+      return ((MultiResult) r).filterResults(SettingsResult.class);
     }
     return null;
   }

@@ -7,12 +7,12 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
@@ -135,7 +135,10 @@ public class VisualizersForResult extends AbstractParameterizable {
    * @return generated title
    */
   public String getTitle(Database<? extends DatabaseObject> db, MultiResult result) {
-    List<Pair<Parameterizable, Option<?>>> settings = ResultUtil.getGlobalAssociation(result, AssociationID.META_SETTINGS);
+    List<Pair<Parameterizable, Option<?>>> settings = new ArrayList<Pair<Parameterizable, Option<?>>>();
+    for (SettingsResult sr : ResultUtil.getSettingsResults(result)) {
+      settings.addAll(sr.getSettings());
+    }
     String algorithm = null;
     String distance = null;
     String dataset = null;

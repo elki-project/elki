@@ -1,12 +1,13 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Option;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
@@ -46,7 +47,10 @@ public class SettingsVisualizer extends AbstractVisualizer implements Unprojecte
 
   @Override
   public Element visualize(SVGPlot svgp, double width, double height) {
-    List<Pair<Parameterizable, Option<?>>> settings = ResultUtil.getGlobalAssociation(context.getResult(), AssociationID.META_SETTINGS);
+    List<Pair<Parameterizable, Option<?>>> settings = new ArrayList<Pair<Parameterizable, Option<?>>>();
+    for (SettingsResult sr : ResultUtil.getSettingsResults(context.getResult())) {
+      settings.addAll(sr.getSettings());
+    }
 
     Element layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
 
