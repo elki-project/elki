@@ -1,14 +1,12 @@
 package de.lmu.ifi.dbs.elki.data.model;
 
-import java.io.IOException;
-import java.io.PrintStream;
 import java.text.NumberFormat;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -18,8 +16,6 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStreamNormalizing;
-import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AttributeSettings;
 
 /**
  * A solution of correlation analysis is a matrix of equations describing the
@@ -108,9 +104,6 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
    * @param nf the number format for output accuracy
    */
   public CorrelationAnalysisSolution(LinearEquationSystem solution, Database<V> db, Matrix strongEigenvectors, Matrix weakEigenvectors, Matrix similarityMatrix, Vector centroid, NumberFormat nf) {
-    // TODO: re-add db or remove parameter?
-    //super(db);
-
     this.linearEquationSystem = solution;
     this.correlationDimensionality = strongEigenvectors.getColumnDimensionality();
     this.strongEigenvectors = strongEigenvectors;
@@ -218,8 +211,9 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
     Matrix evs = errorVectors(p.getColumnVector());
     Vector result = evs.getColumnVector(0);
     // getColumnDimensionality == 1 anyway.
-    for(int i = 1; i < evs.getColumnDimensionality(); i++)
+    for(int i = 1; i < evs.getColumnDimensionality(); i++) {
       result = result.minus(evs.getColumnVector(i));
+    }
     return result;
   }
 
@@ -261,8 +255,9 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
     Matrix dvs = dataVectors(p.getColumnVector());
     Vector result = dvs.getColumnVector(0);
     // getColumnDimensionality == 1 anyway.
-    for(int i = 1; i < dvs.getColumnDimensionality(); i++)
+    for(int i = 1; i < dvs.getColumnDimensionality(); i++) {
       result = result.plus(dvs.getColumnVector(i));
+    }
     return result;
   }
 
@@ -318,10 +313,10 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
   @SuppressWarnings("unchecked")
   @Override
   public void writeToText(TextWriterStream out, String label) {
-    if (label != null) {
+    if(label != null) {
       out.commentPrintLn(label);
     }
-    out.commentPrintLn("Model class: "+this.getClass().getName());
+    out.commentPrintLn("Model class: " + this.getClass().getName());
     try {
       if(getNormalizedLinearEquationSystem(null) != null) {
         // TODO: more elegant way of doing normalization here?
@@ -329,16 +324,14 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
           TextWriterStreamNormalizing<V> nout = (TextWriterStreamNormalizing<V>) out;
           LinearEquationSystem lq = getNormalizedLinearEquationSystem(nout.getNormalization());
           out.commentPrint("Linear Equation System: ");
-          out.commentPrintLn(lq.equationsToString(2));
+          out.commentPrintLn(lq.equationsToString(nf));
         }
       }
     }
     catch(NonNumericFeaturesException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      LoggingUtil.exception(e);
     }
   }
-
 
   @Override
   public String getName() {
