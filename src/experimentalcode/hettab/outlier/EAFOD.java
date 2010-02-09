@@ -1,6 +1,6 @@
 package experimentalcode.hettab.outlier;
 
-import java.util.ArrayList;
+import java.util.ArrayList;                  
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,7 +28,7 @@ import experimentalcode.hettab.MySubspace;
  * EAFOD provides the evolutionary outlier detection algorithm, an algorithm to detect 
  * outliers for high dimensional data
  * <p>Reference:
- * <br>Charu C. Aggarwal, Philip S. Yu :
+ * <br>Outlier detection for high dimensional data
  * Outlier detection for high dimensional data
  * <br>International Conference on Management of Data
  * Proceedings of the 2001 ACM SIGMOD international conference on Management of data
@@ -145,11 +145,6 @@ public class EAFOD<V extends DoubleVector> extends
 	protected MultiResult runInTime(Database<V> database)
 			throws IllegalStateException {
 		
-		double s=-Math.sqrt(database.size()/(Math.pow(phi,k)-1));
-		int k=(int)(Math.log(database.size()/(Math.pow(s, 2)+1))/Math.log(phi));
-		//this.k = k ;
-		System.out.println(k);
-
 		dim = database.dimensionality();
 		size = database.size();
 		
@@ -659,7 +654,7 @@ public class EAFOD<V extends DoubleVector> extends
 	}
 
 	/**
-	 * method 
+	 * method generate the total subspace
 	 */
 	public static MySubspace nullSubspace(int dim) {
 		int[] individual = new int[dim];
@@ -693,7 +688,7 @@ public class EAFOD<V extends DoubleVector> extends
 
 
 	/**
-	 * method 
+	 * method implements the 
 	 */
 	public static ArrayList<int[]> comb(TreeSet<Integer> R, MySubspace s1,
 			MySubspace s2) {
@@ -743,7 +738,7 @@ public class EAFOD<V extends DoubleVector> extends
 	 */
 	@Override
 	public Description getDescription() {
-		return new Description("shortTitle", "longTitle", "purposeAndDescription", "reference");
+		return new Description("EAFOD", "the evolutionary outlier detection algorithm", "Outlier detection for high dimensional data", "Outlier detection for high dimensional data :");
 	}
     
 	/**
