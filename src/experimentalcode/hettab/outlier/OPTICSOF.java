@@ -45,8 +45,7 @@ public class OPTICSOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O
 	  public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID("optics.minpts", "Threshold for minimum number of points in " + "the epsilon-neighborhood of a point.");
 
 	  /**
-	   * Parameter to specify the threshold for minimum number of points in the
-	   * epsilon-neighborhood of a point, must be an integer greater than 0.
+	   * Parameter to specify the threshold MinPts
 	   * <p>
 	   * Key: {@code -optics.minpts}
 	   * </p>
@@ -92,7 +91,7 @@ public class OPTICSOF<O extends DatabaseObject> extends DistanceBasedAlgorithm<O
 	protected MultiResult runInTime(Database<O> database)
 			throws IllegalStateException {
 		
-		 getDistanceFunction().setDatabase(database, isVerbose(), isTime());
+		getDistanceFunction().setDatabase(database, isVerbose(), isTime());
 		 
 		HashMap<Integer,List<DistanceResultPair<DoubleDistance>>> nMinPts = new HashMap<Integer, List<DistanceResultPair<DoubleDistance>>>();
 		HashMap<Integer,Double> coreDistance = new HashMap<Integer,Double>();
