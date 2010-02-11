@@ -205,7 +205,7 @@ public class INFLO<O extends DatabaseObject> extends DistanceBasedAlgorithm<O, D
     // Build result representation.
     AnnotationResult<Double> scoreResult = new AnnotationFromHashMap<Double>(INFLO_SCORE, inflos);
     OrderingResult orderingResult = new OrderingFromHashMap<Double>(inflos, true);
-    OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(inflominmax.getMin(), inflominmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
+    OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(inflominmax.getMin(), inflominmax.getMax(), 0.0, Double.POSITIVE_INFINITY);
     this.result = new OutlierResult(scoreMeta, scoreResult, orderingResult);
     
     return result;
