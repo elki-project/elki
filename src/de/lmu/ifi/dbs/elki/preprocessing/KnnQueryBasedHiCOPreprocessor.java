@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.database.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
@@ -19,7 +20,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Elke Achtert
  * @param <V> Vector type
  */
-public class KnnQueryBasedHiCOPreprocessor<V extends NumberVector<V,?>> extends HiCOPreprocessor<V> {
+public class KnnQueryBasedHiCOPreprocessor<V extends NumberVector<V,?>> extends HiCOPreprocessor<V> implements Parameterizable {
   /**
    * OptionID for {@link #K_PARAM}
    */

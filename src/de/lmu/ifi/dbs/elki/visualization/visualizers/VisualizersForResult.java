@@ -9,15 +9,14 @@ import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.MultiResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
@@ -30,7 +29,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.adapter.AlgorithmAdapter;
  * @author Erich Schubert
  * @author Remigius Wojdanowski
  */
-public class VisualizersForResult extends AbstractParameterizable {
+public class VisualizersForResult extends AbstractLoggable {
   /**
    * Get a logger for this class.
    */
@@ -124,7 +123,7 @@ public class VisualizersForResult extends AbstractParameterizable {
    * @return generated title
    */
   public String getTitle(Database<? extends DatabaseObject> db, MultiResult result) {
-    List<Pair<Parameterizable, Parameter<?,?>>> settings = new ArrayList<Pair<Parameterizable, Parameter<?,?>>>();
+    List<Pair<Object, Parameter<?,?>>> settings = new ArrayList<Pair<Object, Parameter<?,?>>>();
     for(SettingsResult sr : ResultUtil.getSettingsResults(result)) {
       settings.addAll(sr.getSettings());
     }
@@ -132,7 +131,7 @@ public class VisualizersForResult extends AbstractParameterizable {
     String distance = null;
     String dataset = null;
 
-    for(Pair<Parameterizable, Parameter<?,?>> setting : settings) {
+    for(Pair<Object, Parameter<?,?>> setting : settings) {
       if(setting.second.equals(OptionID.ALGORITHM)) {
         algorithm = setting.second.getValue().toString();
       }

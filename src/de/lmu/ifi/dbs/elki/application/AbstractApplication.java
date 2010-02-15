@@ -4,14 +4,13 @@ import java.lang.reflect.Constructor;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbortException;
+import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
@@ -32,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Elke Achtert
  * @author Erich Schubert
  */
-public abstract class AbstractApplication extends AbstractParameterizable {
+public abstract class AbstractApplication extends AbstractLoggable {
   /**
    * We need a static logger in this class.
    */
@@ -65,14 +64,12 @@ public abstract class AbstractApplication extends AbstractParameterizable {
   private static final Flag HELP_LONG_FLAG = new Flag(OptionID.HELP_LONG);
 
   /**
-   * Optional Parameter to specify a class to obtain a description for, must
-   * extend {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-   * .
+   * Optional Parameter to specify a class to obtain a description for.
    * <p>
    * Key: {@code -description}
    * </p>
    */
-  private static final ClassParameter<Parameterizable> DESCRIPTION_PARAM = new ClassParameter<Parameterizable>(OptionID.DESCRIPTION, Parameterizable.class, true);
+  private static final ClassParameter<Object> DESCRIPTION_PARAM = new ClassParameter<Object>(OptionID.DESCRIPTION, Object.class, true);
 
   /**
    * Flag to allow verbose messages while running the application.
@@ -205,17 +202,9 @@ public abstract class AbstractApplication extends AbstractParameterizable {
    * Print the description for the given parameter
    */
   private void printDescription(Class<?> descriptionClass) {
-    try {
-      // FIXME: ERICH: INCOMPLETE TRANSITION
-      throw new UnableToComplyException("NOT IMPLEMENTED CURRENTLY.");
-      // Parameterizable p =
-      // ClassGenericsUtil.instantiate(Parameterizable.class, descriptionClass);
-      // LoggingConfiguration.setVerbose(true);
-      // logger.verbose(OptionUtil.describeParameterizable(new StringBuffer(),
-      // p, FormatUtil.getConsoleWidth(), "   ").toString());
-    }
-    catch(UnableToComplyException e) {
-      logger.exception(e);
+    if(descriptionClass != null) {
+      LoggingConfiguration.setVerbose(true);
+      logger.verbose(OptionUtil.describeParameterizable(new StringBuffer(), descriptionClass, FormatUtil.getConsoleWidth(), "    ").toString());
     }
   }
 

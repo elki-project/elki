@@ -22,7 +22,7 @@ public class RStarTreeAdapter implements AlgorithmAdapter {
   private AbstractRStarTreeMBRVisualizer<?,?,?> mbrVisualizer = new AbstractRStarTreeMBRVisualizer<DoubleVector,RStarTreeNode,SpatialEntry>();
   
   /**
-   * Constructor, following the {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable} style.
+   * Constructor.
    */
   public RStarTreeAdapter() {
     super();

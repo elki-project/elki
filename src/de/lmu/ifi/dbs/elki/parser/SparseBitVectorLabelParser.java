@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.parser;
 
 import de.lmu.ifi.dbs.elki.data.BitVector;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 import java.io.BufferedReader;
@@ -21,7 +22,7 @@ import java.util.List;
  *
  * @author Elke Achtert 
  */
-public class SparseBitVectorLabelParser extends AbstractParser<BitVector> {
+public class SparseBitVectorLabelParser extends AbstractParser<BitVector> implements Parameterizable  {
 
   /**
    * Provides a parser for parsing one sparse BitVector per line,

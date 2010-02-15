@@ -29,7 +29,7 @@ public class ClusterOrderAdapter implements AlgorithmAdapter {
   private OPTICSPlotVisualizer<?> opticsplotVisualizer = new OPTICSPlotVisualizer<DoubleDistance>();
   
   /**
-   * Constructor, following the {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable} style.
+   * Constructor.
    */
   public ClusterOrderAdapter() {
     super();

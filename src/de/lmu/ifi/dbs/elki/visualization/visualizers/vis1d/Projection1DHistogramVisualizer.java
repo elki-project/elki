@@ -15,7 +15,6 @@ import de.lmu.ifi.dbs.elki.math.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.math.MinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -76,7 +75,7 @@ public class Projection1DHistogramVisualizer<NV extends NumberVector<NV, ?>> ext
   public static final String BIN = "bin";
 
   /**
-   * Constructor, as per {@link Parameterizable} API.
+   * Constructor.
    */
   public Projection1DHistogramVisualizer(Parameterization config) {
     if (config.grab(this, STYLE_ROW_FLAG)) {

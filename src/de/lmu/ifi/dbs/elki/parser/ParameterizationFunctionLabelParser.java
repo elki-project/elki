@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.parser;
 
 import de.lmu.ifi.dbs.elki.data.ParameterizationFunction;
 import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 import java.io.BufferedReader;
@@ -20,7 +21,7 @@ import java.util.List;
  *
  * @author Arthur Zimek
  */
-public class ParameterizationFunctionLabelParser extends AbstractParser<ParameterizationFunction> {
+public class ParameterizationFunctionLabelParser extends AbstractParser<ParameterizationFunction> implements Parameterizable  {
     /**
      * Provides a parser for parsing one point per line, attributes separated by
      * whitespace. The parser transforms each point into a parametrization function.

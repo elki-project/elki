@@ -13,9 +13,9 @@ import de.lmu.ifi.dbs.elki.distance.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
+import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.ExceptionMessages;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalDistanceFunctionPatternConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * @param <D> Distance type
  * @param <V> Vector type
  */
-public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V extends FeatureVector<V, ?>> extends AbstractParameterizable implements Preprocessor<V> {
+public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V extends FeatureVector<V, ?>> extends AbstractLoggable implements Preprocessor<V> {
   /**
    * Parameter to specify the maximum radius of the neighborhood to be
    * considered, must be suitable to {@link LocallyWeightedDistanceFunction
@@ -106,7 +106,7 @@ public abstract class ProjectedDBSCANPreprocessor<D extends Distance<D>, V exten
 
     // global constraint epsilon <-> distancefunction
     GlobalParameterConstraint gpc = new GlobalDistanceFunctionPatternConstraint<DistanceFunction<V, D>>(EPSILON_PARAM, DISTANCE_FUNCTION_PARAM);
-    addGlobalParameterConstraint(gpc);
+    config.checkConstraint(gpc);
   }
 
   public void run(Database<V> database, boolean verbose, boolean time) {

@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
@@ -58,4 +59,12 @@ public interface Parameterization {
    * Check for unused parameters
    */
   public boolean hasUnusedParameters();
+
+  /**
+   * Check a parameter constraint.
+   * 
+   * @param constraint Parameter constraint
+   * @return test result
+   */
+  public boolean checkConstraint(GlobalParameterConstraint constraint);
 }

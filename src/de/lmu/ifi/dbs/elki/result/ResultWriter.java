@@ -5,13 +5,13 @@ import java.io.IOException;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.textwriter.MultipleFilesOutput;
 import de.lmu.ifi.dbs.elki.result.textwriter.SingleStreamOutput;
 import de.lmu.ifi.dbs.elki.result.textwriter.StreamFactory;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriter;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
@@ -24,7 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * 
  * @param <O> Object type
  */
-public class ResultWriter<O extends DatabaseObject> extends AbstractParameterizable implements ResultHandler<O, Result> {
+public class ResultWriter<O extends DatabaseObject> extends AbstractLoggable implements ResultHandler<O, Result> {
   /**
    * Optional Parameter to specify the file to write the obtained results in. If
    * this parameter is omitted, per default the output will sequentially be

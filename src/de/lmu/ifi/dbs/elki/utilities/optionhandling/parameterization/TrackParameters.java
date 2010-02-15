@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -47,5 +48,11 @@ public class TrackParameters implements Parameterization {
   
   public Collection<Pair<Object, Parameter<?,?>>> getParameters() {
     return options;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public boolean checkConstraint(GlobalParameterConstraint constraint) {
+    return inner.checkConstraint(constraint);
   }
 }

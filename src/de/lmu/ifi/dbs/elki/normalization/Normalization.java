@@ -5,7 +5,6 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -18,7 +17,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Arthur Zimek
  * @param <O> object type
  */
-public interface Normalization<O extends DatabaseObject> extends Parameterizable {
+public interface Normalization<O extends DatabaseObject> {
   /**
    * Performs a normalization on a list of database objects and their associations.
    *
@@ -86,5 +85,4 @@ public interface Normalization<O extends DatabaseObject> extends Parameterizable
    * @return a string representation of this normalization
    */
   String toString(String pre);
-
 }

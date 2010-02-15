@@ -4,11 +4,11 @@ import org.apache.commons.math.MathException;
 import org.apache.commons.math.special.Gamma;
 
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * 
  * @author Erich Schubert
  */
-public class OutlierGammaScaling extends AbstractParameterizable implements OutlierScalingFunction {
+public class OutlierGammaScaling extends AbstractLoggable implements OutlierScalingFunction {
   /**
    * Option to normalize data before fitting the gamma curve.
    */

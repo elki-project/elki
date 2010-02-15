@@ -10,9 +10,9 @@ import de.lmu.ifi.dbs.elki.database.AssociationID;
 import de.lmu.ifi.dbs.elki.database.Associations;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.SequentialDatabase;
+import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.normalization.Normalization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.NotEqualValueGlobalConstraint;
@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <O> the type of DatabaseObject to be provided by the implementing
  *        class as element of the supplied database
  */
-public abstract class AbstractDatabaseConnection<O extends DatabaseObject> extends AbstractParameterizable implements DatabaseConnection<O> {
+public abstract class AbstractDatabaseConnection<O extends DatabaseObject> extends AbstractLoggable implements DatabaseConnection<O> {
   /**
    * A sign to separate components of a label.
    */
@@ -153,7 +153,7 @@ public abstract class AbstractDatabaseConnection<O extends DatabaseObject> exten
     ArrayList<NumberParameter<Integer>> globalConstraints = new ArrayList<NumberParameter<Integer>>();
     globalConstraints.add(CLASS_LABEL_INDEX_PARAM);
     globalConstraints.add(EXTERNAL_ID_INDEX_PARAM);
-    addGlobalParameterConstraint(new NotEqualValueGlobalConstraint<Integer>(globalConstraints));
+    config.checkConstraint(new NotEqualValueGlobalConstraint<Integer>(globalConstraints));
   }
 
   /**

@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
@@ -23,7 +24,7 @@ import de.lmu.ifi.dbs.elki.utilities.output.FormatUtil;
  * @param <D> Distance type
  * @param <V> Vector type
  */
-public class PreDeConPreprocessor<D extends Distance<D>, V extends NumberVector<V,?>> extends ProjectedDBSCANPreprocessor<D, V> {
+public class PreDeConPreprocessor<D extends Distance<D>, V extends NumberVector<V,?>> extends ProjectedDBSCANPreprocessor<D, V> implements Parameterizable {
   /**
    * The default value for delta.
    */

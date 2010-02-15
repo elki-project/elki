@@ -49,8 +49,9 @@ public abstract class AbstractDoubleDistanceFunction<O extends DatabaseObject> e
    * As pattern is required a String defining a Double.
    */
   public DoubleDistance valueOf(String pattern) throws IllegalArgumentException {
-    if(pattern.equals(INFINITY_PATTERN))
+    if(pattern.equals(INFINITY_PATTERN)) {
       return infiniteDistance();
+    }
 
     if(matches(pattern)) {
       return new DoubleDistance(Double.parseDouble(pattern));

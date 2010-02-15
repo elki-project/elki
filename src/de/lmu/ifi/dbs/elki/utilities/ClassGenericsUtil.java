@@ -133,10 +133,12 @@ public final class ClassGenericsUtil {
     final Constructor<?> constructor;
     try {
       constructor = c.getConstructor(Parameterization.class);
+      final Object instance = constructor.newInstance(config);
+      return r.cast(instance);
     } catch(NoSuchMethodException e) {
-      return r.cast(c.getConstructor().newInstance());
+      final Object instance = c.getConstructor().newInstance();
+      return r.cast(instance);
     }
-    return r.cast(constructor.newInstance(config));
   }
   
   /**

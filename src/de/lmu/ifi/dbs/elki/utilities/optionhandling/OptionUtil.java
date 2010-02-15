@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.NumberParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
@@ -23,7 +26,7 @@ public final class OptionUtil {
    * @param options the list of options
    * @return the names of the options
    */
-  public static <O extends Parameter<?,?>> String optionsNamesToString(List<O> options) {
+  public static <O extends Parameter<?, ?>> String optionsNamesToString(List<O> options) {
     StringBuffer buffer = new StringBuffer();
     buffer.append("[");
     for(int i = 0; i < options.size(); i++) {
@@ -44,7 +47,7 @@ public final class OptionUtil {
    * @param options the list of options
    * @return the names of the options
    */
-  public static <O extends Parameter<?,?>> String optionsNamesToString(O[] options) {
+  public static <O extends Parameter<?, ?>> String optionsNamesToString(O[] options) {
     StringBuffer buffer = new StringBuffer();
     buffer.append("[");
     for(int i = 0; i < options.length; i++) {
@@ -89,8 +92,8 @@ public final class OptionUtil {
    * @param indent Indentation string
    * @param options List of options
    */
-  public static void formatForConsole(StringBuffer buf, int width, String indent, Collection<Pair<Object, Parameter<?,?>>> options) {
-    for(Pair<Object, Parameter<?,?>> pair : options) {
+  public static void formatForConsole(StringBuffer buf, int width, String indent, Collection<Pair<Object, Parameter<?, ?>>> options) {
+    for(Pair<Object, Parameter<?, ?>> pair : options) {
       String currentOption = pair.getSecond().getName();
       String syntax = pair.getSecond().getSyntax();
       String longDescription = pair.getSecond().getFullDescription();
@@ -117,9 +120,10 @@ public final class OptionUtil {
    * @param p Parameterizable to describe
    * @return Formatted description
    */
-  public static String describeParameterizable(Parameterizable p) {
+  // TODO: unused?
+  public static String describeParameterizable(Class<?> p) {
     StringBuffer usage = new StringBuffer();
-    describeParameterizable(usage, p, 77, "   ");
+    describeParameterizable(usage, p, FormatUtil.getConsoleWidth(), "   ");
     return usage.toString();
   }
 
@@ -132,28 +136,38 @@ public final class OptionUtil {
    * @param indent Text indent
    * @return Formatted description
    */
-  public static StringBuffer describeParameterizable(StringBuffer buf, Parameterizable p, int width, String indent) {
-    buf.append("Description for class ");
-    buf.append(p.getClass().getName());
-    buf.append(":\n");
+  public static StringBuffer describeParameterizable(StringBuffer buf, Class<?> pcls, int width, String indent) {
+    try {
+      buf.append("Description for class ");
+      buf.append(pcls.getName());
+      buf.append(":\n");
+      
+      SerializedParameterization config = new SerializedParameterization();
+      Object p = ClassGenericsUtil.tryInstanciate(Object.class, pcls, config);
 
-    if(p instanceof Algorithm<?, ?>) {
-      Algorithm<?, ?> a = (Algorithm<?, ?>) p;
-      buf.append(a.getDescription().toString());
-      buf.append("\n");
+      if(p instanceof Algorithm<?, ?>) {
+        Algorithm<?, ?> a = (Algorithm<?, ?>) p;
+        buf.append(a.getDescription().toString());
+        buf.append("\n");
+      }
+      if(p instanceof Parameterizable) {
+        String shortdesc = ((Parameterizable) p).shortDescription();
+        if(shortdesc != null) {
+          buf.append(shortdesc);
+          buf.append("\n");
+        }
+      }
+      List<Pair<Object, Parameter<?, ?>>> options = config.getOptions();
+      if (options.size() > 0) {
+        OptionUtil.formatForConsole(buf, width, indent, options);
+      }
+      // TODO: report constraints?
+      return buf;
     }
-
-    String shortdesc = p.shortDescription();
-    if(shortdesc != null) {
-      buf.append(shortdesc);
-      buf.append("\n");
+    catch(Exception e) {
+      LoggingUtil.exception("Error instantiating class to describe.", e.getCause());
+      buf.append("No description available: " + e);
+      return buf;
     }
-
-    // Collect options
-    // FIXME: ERICH: INCOMPLETE TRANSITION
-    //ArrayList<Pair<Parameterizable, Parameter<?,?>>> options = p.collectOptions();
-    //OptionUtil.formatForConsole(buf, width, indent, options);
-    return buf;
   }
-
 }

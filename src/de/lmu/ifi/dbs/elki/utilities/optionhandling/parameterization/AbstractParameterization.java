@@ -5,6 +5,7 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
@@ -53,7 +54,7 @@ public abstract class AbstractParameterization extends AbstractLoggable implemen
       return false;
     }
     else {
-      throw new UnspecifiedParameterException("Aborted. Parameter " + par.getName() + " requires parameter value.");
+      throw new UnspecifiedParameterException("Parameter " + par.getName() + " requires parameter value.");
     }
   }
   
@@ -62,7 +63,7 @@ public abstract class AbstractParameterization extends AbstractLoggable implemen
    */
   public synchronized void logAndClearReportedErrors() {
     for (ParameterException e : getErrors()) {
-      logger.warning("Error in internal parameterization: "+e.getMessage());
+      logger.warning(e.getMessage());
     }
     errors.clear();
   }
@@ -117,5 +118,18 @@ public abstract class AbstractParameterization extends AbstractLoggable implemen
   @Override
   public void finalize() {
     failOnErrors();
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public boolean checkConstraint(GlobalParameterConstraint constraint) {
+    try {
+      constraint.test();
+    }
+    catch(ParameterException e) {
+      reportError(e);
+      return false;
+    }
+    return true;
   }
 }

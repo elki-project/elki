@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.elki.distance;
 
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 
 /**
  * Interface Measurement describes the requirements of any measurement
@@ -13,7 +13,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @param <D> the type of Distance used as measurement for comparing database objects
  * @param <O> the type of DatabaseObject for which a measurement is provided for comparison
  */
-public interface MeasurementFunction<O extends DatabaseObject, D extends Distance<D>> extends Parameterizable {
+public interface MeasurementFunction<O extends DatabaseObject, D extends Distance<D>> {
   /**
    * Set the database that holds the associations for the DatabaseObject for
    * which the measurements should be computed.

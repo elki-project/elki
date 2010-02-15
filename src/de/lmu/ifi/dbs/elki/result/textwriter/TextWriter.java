@@ -42,7 +42,6 @@ import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterTriple;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterVector;
 import de.lmu.ifi.dbs.elki.utilities.HandlerList;
 import de.lmu.ifi.dbs.elki.utilities.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -123,8 +122,8 @@ public class TextWriter<O extends DatabaseObject> {
 
     if(sr != null) {
       for(SettingsResult settings : sr) {
-        Parameterizable last = null;
-        for(Pair<Parameterizable, Parameter<?,?>> setting : settings.getSettings()) {
+        Object last = null;
+        for(Pair<Object, Parameter<?,?>> setting : settings.getSettings()) {
           if(setting.first != last) {
             if(last != null) {
               out.commentPrintLn("");

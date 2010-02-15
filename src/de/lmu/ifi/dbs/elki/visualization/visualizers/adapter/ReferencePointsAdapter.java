@@ -24,7 +24,7 @@ public class ReferencePointsAdapter<NV extends NumberVector<NV,?>> implements Al
   private ReferencePointsVisualizer<NV> referencePointsVisualizer = new ReferencePointsVisualizer<NV>();
   
   /**
-   * Constructor, following the {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable} style.
+   * Constructor.
    */
   public ReferencePointsAdapter() {
     super();

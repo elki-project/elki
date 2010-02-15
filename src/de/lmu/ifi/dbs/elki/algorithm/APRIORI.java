@@ -109,8 +109,8 @@ public class APRIORI extends AbstractAlgorithm<BitVector, AprioriResult> {
     ArrayList<Parameter<?,?>> globalConstraints = new ArrayList<Parameter<?,?>>();
     globalConstraints.add(MINFREQ_PARAM);
     globalConstraints.add(MINSUPP_PARAM);
-    addGlobalParameterConstraint(new OnlyOneIsAllowedToBeSetGlobalConstraint(globalConstraints));
-    addGlobalParameterConstraint(new OneMustBeSetGlobalConstraint(globalConstraints));
+    config.checkConstraint(new OnlyOneIsAllowedToBeSetGlobalConstraint(globalConstraints));
+    config.checkConstraint(new OneMustBeSetGlobalConstraint(globalConstraints));
   }
 
   /**

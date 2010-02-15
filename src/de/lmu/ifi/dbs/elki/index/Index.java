@@ -1,10 +1,9 @@
 package de.lmu.ifi.dbs.elki.index;
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.DatabaseObject;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-
-import java.util.List;
 
 /**
  * Interface defining the minimum requirements for all index classes.
@@ -12,8 +11,7 @@ import java.util.List;
  * @author Elke Achtert
  * @param <O> the type of DatabaseObject to be stored in the index
  */
-public interface Index<O extends DatabaseObject> extends Parameterizable {
-
+public interface Index<O extends DatabaseObject> {
   /**
    * Returns the physical read access of this index.
    *

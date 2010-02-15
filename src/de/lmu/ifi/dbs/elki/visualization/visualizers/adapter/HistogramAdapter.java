@@ -23,8 +23,7 @@ public class HistogramAdapter implements AlgorithmAdapter {
   HistogramVisualizer vis = new HistogramVisualizer();
 
   /**
-   * Constructor, following the
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable} style.
+   * Constructor.
    */
   public HistogramAdapter() {
     super();

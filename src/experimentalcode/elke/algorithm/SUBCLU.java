@@ -143,7 +143,7 @@ public class SUBCLU<V extends NumberVector<V, ?>, D extends Distance<D>> extends
     }
 
     // global constraint epsilon <-> distance function
-    addGlobalParameterConstraint(new GlobalDistanceFunctionPatternConstraint<AbstractDimensionsSelectingDoubleDistanceFunction<V>>(EPSILON_PARAM, DISTANCE_FUNCTION_PARAM));
+    config.checkConstraint(new GlobalDistanceFunctionPatternConstraint<AbstractDimensionsSelectingDoubleDistanceFunction<V>>(EPSILON_PARAM, DISTANCE_FUNCTION_PARAM));
   }
 
   /**

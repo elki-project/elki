@@ -53,13 +53,16 @@ public class GlobalDistanceFunctionPatternConstraint<D extends DistanceFunction<
     if(!DistanceFunction.class.isAssignableFrom(restrictionClass.getRestrictionClass())) {
       throw new WrongParameterValueException("Global parameter constraint error.\n" + "Class parameter " + restrictionClass.getName() + "doesn't specify a distance function.");
     }
-    try {
-      // FIXME: ERICH: INCOMPLETE TRANSITION: Does this fulfill the purpose with EmptyParameterization?
-      DistanceFunction<?, ?> func = restrictionClass.instantiateClass(new EmptyParameterization());
-      func.valueOf(pattern.getValue());
-    }
-    catch(IllegalArgumentException e) {
-      throw new WrongParameterValueException("Global parameter constraint error.\n" + "Pattern parameter " + pattern.getName() + " is no valid pattern for " + "distance function " + restrictionClass.getValue() + ".", e);
+    if(pattern.isDefined()) {
+      try {
+        // FIXME: ERICH: INCOMPLETE TRANSITION:
+        // Does this fulfill the purpose with EmptyParameterization?
+        DistanceFunction<?, ?> func = restrictionClass.instantiateClass(new EmptyParameterization());
+        func.valueOf(pattern.getValue());
+      }
+      catch(IllegalArgumentException e) {
+        throw new WrongParameterValueException("Global parameter constraint error.\n" + "Pattern parameter " + pattern.getName() + " is no valid pattern for " + "distance function " + restrictionClass.getValue() + ".", e);
+      }
     }
   }
 

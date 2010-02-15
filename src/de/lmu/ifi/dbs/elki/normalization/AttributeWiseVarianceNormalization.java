@@ -83,12 +83,12 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
     ArrayList<Parameter<?, ?>> global_1 = new ArrayList<Parameter<?, ?>>();
     global_1.add(MEAN_PARAM);
     global_1.add(STDDEV_PARAM);
-    addGlobalParameterConstraint(new AllOrNoneMustBeSetGlobalConstraint(global_1));
+    config.checkConstraint(new AllOrNoneMustBeSetGlobalConstraint(global_1));
 
     ArrayList<ListParameter<?>> global = new ArrayList<ListParameter<?>>();
     global.add(MEAN_PARAM);
     global.add(STDDEV_PARAM);
-    addGlobalParameterConstraint(new EqualSizeGlobalConstraint(global));
+    config.checkConstraint(new EqualSizeGlobalConstraint(global));
   }
 
   private double normalize(int d, double val) {

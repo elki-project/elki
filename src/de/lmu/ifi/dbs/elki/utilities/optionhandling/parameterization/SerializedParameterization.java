@@ -46,13 +46,14 @@ public class SerializedParameterization extends AbstractParameterization {
    */
   public SerializedParameterization() {
     super();
+    parameters = new LinkedList<String>();
   }
 
   /**
    * Constructor
    */
   public SerializedParameterization(String[] args) {
-    super();
+    this();
     addParameters(args);
   }
 
@@ -60,7 +61,7 @@ public class SerializedParameterization extends AbstractParameterization {
    * Constructor
    */
   public SerializedParameterization(List<String> args) {
-    super();
+    this();
     addParameters(args);
   }
 

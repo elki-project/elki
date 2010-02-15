@@ -11,6 +11,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.connection.AbstractDatabaseConnection;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -32,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Arthur Zimek
  * @param <V> the type of NumberVector expected in the {@link ParsingResult}
  */
-public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> extends AbstractParser<V> implements LinebasedParser<V> {
+public abstract class NumberVectorLabelParser<V extends NumberVector<?, ?>> extends AbstractParser<V> implements LinebasedParser<V>, Parameterizable {
   /**
    * OptionID for {@link #CLASS_LABEL_INDEX_PARAM}
    */

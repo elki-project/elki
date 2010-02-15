@@ -1,14 +1,14 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
+import de.lmu.ifi.dbs.elki.logging.AbstractLoggable;
 import de.lmu.ifi.dbs.elki.utilities.AnyMap;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizable;
 
 /**
  * Abstract superclass for Visualizers.
  * 
  * @author Remigius Wojdanowski
  */
-public abstract class AbstractVisualizer extends AbstractParameterizable implements Visualizer {
+public abstract class AbstractVisualizer extends AbstractLoggable implements Visualizer {
   /**
    * Visualizer context to use
    */
